@@ -11,12 +11,9 @@ USER root
 # RUN apt-get update && \
 # 	DEBIAN_FRONTEND=noninteractive && \
 # 	apt-get install -y \
-# 	gawk \
-# 	openssh-server \
 # 	gdb \
-# 	gdbserver \
-# 	sudo \
 # 	build-essential \
+# 	build-valgrind \
 # 	git && \
 # 	apt-get clean && \
 #     rm -r /var/lib/apt/lists/* && \
