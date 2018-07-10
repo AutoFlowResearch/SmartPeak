@@ -16,7 +16,7 @@ option (USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
 
 if (USE_SUPERBUILD)
   project ("SuperBuild" NONE)
-  #include(external/boost.cmake)
+  include(external/boost.cmake)
   #include(external/openms.cmake)
   include(external/eigen.cmake)
   include(external/imgui.cmake)
