@@ -38,10 +38,7 @@ include (${PROJECT_SOURCE_DIR}/includes.cmake)
 
 #------------------------------------------------------------------------------
 # all the dependency libraries are linked into libSmartPeak.so
-set(SMARTPEAK_DEP_LIBRARIES  ${COIN_LIBRARIES}
-                          ${Boost_LIBRARIES}
-                          ${SQLITE_LIBRARY}
-                          ${GLPK_LIBRARIES})
+set(SMARTPEAK_DEP_LIBRARIES  ${Boost_LIBRARIES})
 
 # xerces requires linking against CoreFoundation&CoreServices
 if(APPLE)
@@ -66,10 +63,7 @@ smartpeak_add_library(TARGET_NAME  SmartPeak
                    INTERNAL_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include
                                      ${CMAKE_CURRENT_BINARY_DIR}/include
                    EXTERNAL_INCLUDES ${Boost_INCLUDE_DIRS}
-                                     ${SQLITE_INCLUDE_DIR}
-                                     ${GLPK_INCLUDE_DIRS}
-                                     ${EIGEN3_INCLUDE_DIR}
-                                     ${COIN_INCLUDE_DIRS}
+                                     ${OpenMS_INCLUDE_DIRECTORIES}
                    LINK_LIBRARIES ${APPLE_EXTRA_LIBS}
                                   ${SMARTPEAK_DEP_LIBRARIES}
                    DLL_EXPORT_PATH "SmartPeak/")

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
 project("SmartPeak_src")
 
 #------------------------------------------------------------------------------
-# SmartPeak core lib
+# SmartPeak
 #------------------------------------------------------------------------------
 add_subdirectory(smartpeak)
 

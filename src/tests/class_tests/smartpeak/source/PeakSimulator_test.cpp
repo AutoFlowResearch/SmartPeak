@@ -251,7 +251,7 @@ BOOST_AUTO_TEST_CASE(simulatePeak)
   BOOST_CHECK_EQUAL(x[0], 0);
   for (int i=0; i<y.size(); ++i)
   {
-    BOOST_TEST(y[i] <= 8.0, boost::test_tools::tolerance(0.001));
+    BOOST_CHECK(y[i] <= 8.0);
   }
 
   // time and intensity arrays

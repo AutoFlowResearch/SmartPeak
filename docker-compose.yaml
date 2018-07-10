@@ -2,27 +2,19 @@ version: "3"
 
 services:
   smartpeak:
-    image: dmccloskey/docker-openms-vscode
+    image: dmccloskey/docker-openms:develop
     volumes:
       # - //C/Users/domccl/Dropbox (UCSD SBRG)/Project_FastPeak/openMS_MRMworkflow/:/home/user/openMS_MRMworkflow/
-      - //C/Users/domccl/GitHub/smartPeak_cpp/:/home/user/code/
-      # - //C/Users/dmccloskey/Dropbox (UCSD SBRG)/Project_FastPeak/openMS_MRMworkflow/:/home/user/openMS_MRMworkflow/
-      # - //C/Users/dmccloskey/Documents/GitHub/smartPeak/cpp/:/home/user/code/
-      # - /home/systemsbiochemistry/Documents/openMS_MRMworkflow/:/home/user/openMS_MRMworkflow/
-      # - /home/systemsbiochemistry/Documents/GitHub/smartPeak/cpp/:/home/user/code/
-    # ports:
-    #   - "3000:3000"
-    #   - "22:22"
+      - //C/Users/domccl/GitHub/SmartPeak2/:/home/user/code/
     privileged: true
     security_opt:
       - seccomp:unconfined #https://github.com/docker/compose/issues/2813
-    #command: python /home/user/code/debug_remote.py
     restart: always
     networks:
-      - smartpeak_network
+      - smartpeak2_network
     
 networks:
   smartpeak_network:
     ipam:
       config:
-        - subnet: 172.23.0.0/16
+        - subnet: 172.24.0.0/16
