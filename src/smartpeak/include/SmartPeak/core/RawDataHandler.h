@@ -44,10 +44,10 @@ public:
     void setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter_I);      
     OpenMS::MRMFeatureQC getFeatureFilter() const;
 
-    setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc_I);      
+    void setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc_I);      
     OpenMS::MRMFeatureQC getFeatureQC() const;
       
-    std::vector<OpenMS::FeatureMap>  getFeatureMapHistory() const;
+    std::vector<OpenMS::FeatureMap> getFeatureMapHistory() const;
 
 private:    
     // input
@@ -57,7 +57,7 @@ private:
     OpenMS::MSExperiment swath_;
 
     // output
-    OpenMS::FeatureMap featureMap_
+    OpenMS::FeatureMap featureMap_;
     std::map<std::string, std::string> meta_data_;
     std::map<std::string, float> validation_metrics_;
     std::vector<OpenMS::FeatureMap> featureMapHistory_;

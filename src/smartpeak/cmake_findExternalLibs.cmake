@@ -41,6 +41,13 @@ if (OpenMS_FOUND)
   ## include directories for OpenMS headers (and contrib)
   #       OpenMS_GUI -> ${OpenMS_GUI_INCLUDE_DIRECTORIES}
   #include_directories(${OpenMS_INCLUDE_DIRECTORIES})
+
+  ## append precompiler macros and compiler flags specific to OpenMS
+  ## Warning: this could be harmful to your project. Check this if problems occur.
+  ## Also, use this to add your own compiler flags, e.g. for OpenMP support.
+  ## e.g. for Visual Studio use /openmp
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPENMS_ADDCXX_FLAGS}")
+
 else(OpenMS_FOUND)
   message(FATAL_ERROR "OpenMSConfig.cmake file not found!")
 endif(OpenMS_FOUND)
