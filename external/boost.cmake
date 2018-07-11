@@ -69,6 +69,8 @@ if (MSVC)
     endif()
   endif()
 
+  set (BOOST_BUILD_ARGS address-model=${BOOST_ADDR_MODEL} ${BOOST_ARCH_MODEL} --with-test toolset=${BOOST_TOOLSET} variant=release link=static --prefix=${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/boost/build install)
+
 else() ## linux/macos
     if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
       if(APPLE)
@@ -85,6 +87,8 @@ else() ## linux/macos
         set(BOOST_TOOLSET "gcc")
       endif()
     endif()
+
+    set (BOOST_BUILD_ARGS --with-test --prefix=${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/boost/build install)
 endif()
 
 ExternalProject_Add(boost
@@ -94,15 +98,7 @@ ExternalProject_Add(boost
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ${BOOST_BOOTSTRAP_CMD}
     BUILD_IN_SOURCE 1
-    BUILD_COMMAND ${BOOST_BUILD_CMD}
-        address-model=${BOOST_ADDR_MODEL}
-        ${BOOST_ARCH_MODEL}
-        --with-test 
-        toolset=${BOOST_TOOLSET} 
-        variant=release 
-        link=static
-        --prefix=${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/boost/build
-        install
+    BUILD_COMMAND ${BOOST_BUILD_CMD} ${BOOST_BUILD_ARGS}
     INSTALL_COMMAND ""
     GIT_PROGRESS 1
     LOG_DOWNLOAD 1
