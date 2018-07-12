@@ -4,10 +4,10 @@
 
 int main()
 {
-  // create stringstream 
+  // create stringstream
   std::stringstream ss;
   ss << "-4.9X";
-  
+
   // try to extract double followed by character
   double d;
   ss >> d;

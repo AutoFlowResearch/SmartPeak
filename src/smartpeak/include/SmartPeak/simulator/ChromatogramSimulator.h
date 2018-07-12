@@ -1,7 +1,6 @@
 /**TODO:  Add copyright*/
 
-#ifndef SMARTPEAK_CHROMATOGRAMSIMULATOR_H
-#define SMARTPEAK_CHROMATOGRAMSIMULATOR_H
+#pragma once
 
 #include <SmartPeak/simulator/EMGModel.h>
 #include <SmartPeak/simulator/PeakSimulator.h>
@@ -15,12 +14,12 @@ namespace SmartPeak
   class ChromatogramSimulator
   {
 public:
-    ChromatogramSimulator(); ///< Default constructor
-    ~ChromatogramSimulator(); ///< Default destructor
+    ChromatogramSimulator() = default; ///< Default constructor
+    ~ChromatogramSimulator() = default; ///< Default destructor
 
     /**
-      @brief Simulates a chromatogram.  
-      
+      @brief Simulates a chromatogram.
+
       The left baseline of the first peak window
         will define the left baseline of the chromatogram, while the right baseline of the
         last peak window will define the right baseline of the chromatogram.  Peaks in the middle
@@ -43,28 +42,28 @@ public:
       @param[out] y_IO A vector of y values representing the intensity at time t or m/z m
       @param[in] peaks list of PeakSimulator classes that will compose the chromatogram
       @param[in] emgs list of corresponding EMGModel classes that define each peak
-    */ 
+    */
     void simulateChromatogram(std::vector<double>& x_O, std::vector<double>& y_O,
       const std::vector<PeakSimulator>& peaks, const std::vector<EMGModel>& emgs) const;
 
     /**
-      @brief Joins peak windows.  
-      
-      Overlapping or disconnected peak windows will be joined by extending the highest 
+      @brief Joins peak windows.
+
+      Overlapping or disconnected peak windows will be joined by extending the highest
         connecting baseline.
 
       @param[in,out] peak_left Left peak
       @param[in,out] emg_left Left peak EMGModel
       @param[in,out] peak_right Right peak
       @param[in,out] emg_right Right peak EMGModel
-    */ 
+    */
     void joinPeakWindows(
       PeakSimulator& peak_left, EMGModel& emg_left,
       PeakSimulator& peak_right, EMGModel& emg_right) const;
 
     /**
-      @brief Find the overlap between two peak windows.  
-      
+      @brief Find the overlap between two peak windows.
+
       The point of overlap between two peaks will be returned.
 
       @param[in,out] peak_left Left peak
@@ -73,11 +72,9 @@ public:
       @param[in,out] emg_right Right peak EMGModel
 
       @returns overlap The point at which both peaks overlap
-    */ 
+    */
     double findPeakOverlap(
       const PeakSimulator& peak_left, const EMGModel& emg_left,
       const PeakSimulator& peak_right, const EMGModel& emg_right) const;
   };
 }
-
-#endif //SMARTPEAK_CHROMATOGRAMSIMULATOR_H

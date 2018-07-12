@@ -82,7 +82,7 @@ else() ## linux/macos
     elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU*")
       if(APPLE)
         ## For Apples old GCC (tag in lib name will be xgcc)
-        set(BOOST_TOOLSET "darwin") 
+        set(BOOST_TOOLSET "darwin")
       else()
         set(BOOST_TOOLSET "gcc")
       endif()

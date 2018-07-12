@@ -4,13 +4,13 @@ cmake_minimum_required(VERSION 3.0.2)
 
 ## list all your executables here (a corresponding .cpp file should exist, e.g. TestExternalCode.cpp)
 set(my_executables
-	TestExternalCode
+  TestExternalCode
 )
 
 ## list all classes here, which are required by your executables
 ## (all these classes will be linked into a library)
 set(my_sources
-	ExampleLibraryFile.cpp
+  ExampleLibraryFile.cpp
 )
 
 ## find OpenMS package and register target "OpenMS" (our library)
@@ -39,7 +39,7 @@ if (OpenMS_FOUND)
     # create the executable
     add_executable(${i} ${i}.cpp)
     ## link executables against OpenMS
-	target_link_libraries(${i} OpenMS my_custom_lib)
+  target_link_libraries(${i} OpenMS my_custom_lib)
   endforeach(i)
 
 else(OpenMS_FOUND)

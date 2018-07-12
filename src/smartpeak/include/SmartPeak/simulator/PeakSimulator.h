@@ -1,7 +1,6 @@
 /**TODO:  Add copyright*/
 
-#ifndef SMARTPEAK_PEAKSIMULATOR_H
-#define SMARTPEAK_PEAKSIMULATOR_H
+#pragma once
 
 #include <SmartPeak/simulator/EMGModel.h>
 
@@ -18,7 +17,7 @@ namespace SmartPeak
 
     References:
     Kalambet, Y.; Kozmin, Y.; Mikhailova, K.; Nagaev, I.; Tikhonov, P. (2011).
-      "Reconstruction of chromatographic peaks using the exponentially modified Gaussian function". 
+      "Reconstruction of chromatographic peaks using the exponentially modified Gaussian function".
       Journal of Chemometrics. 25 (7): 352. doi:10.1002/cem.1343
   */
   class PeakSimulator
@@ -31,7 +30,7 @@ namespace SmartPeak
     4. setters/getters would be unique to each derived class
     */
 public:
-    PeakSimulator(); ///< Default constructor
+    PeakSimulator() = default; ///< Default constructor
     PeakSimulator(const double& step_size_mu,
       const double& step_size_sigma,
       const double& window_start,
@@ -41,9 +40,9 @@ public:
       const double& baseline_left,
       const double& baseline_right,
       const double& saturation_limit); ///< Explicit constructor
-    
-    ~PeakSimulator(); ///< Default destructor
- 
+
+    ~PeakSimulator() = default; ///< Default destructor
+
     /**
       @brief simulates two vector of points that correspond to x and y values that
         represent a peak
@@ -51,10 +50,10 @@ public:
       @param[out] x_IO A vector of x values representing time or m/z
       @param[out] y_IO A vector of y values representing the intensity at time t or m/z m
       @param[in] emg An emg model class
-    */ 
-    void simulatePeak(std::vector<double>& x_O, std::vector<double>& y_O, 
+    */
+    void simulatePeak(std::vector<double>& x_O, std::vector<double>& y_O,
       const EMGModel& emg) const;
- 
+
     /**
       @brief Generates a range of values with noise sampled from a normal distribution
 
@@ -64,11 +63,11 @@ public:
       @param[in] end Range end
 
       @returns A vector of values from range start to end.
-    */ 
+    */
     static std::vector<double> generateRangeWithNoise(
-      const double& start, const double& step_mu, 
+      const double& start, const double& step_mu,
       const double& step_sigma, const double& end);
- 
+
     /**
       @brief Add random noise from a normal distribution to a vector of values
         to simulate detector noise.
@@ -78,11 +77,11 @@ public:
       @param[in] std_dev Standard Deviation of the normal distribution
 
       @returns A vector of values with added random noise.
-    */ 
+    */
     static void addNoise(
       std::vector<double>& array_IO,
       const double& mean, const double& std_dev);
- 
+
     /**
       @brief Add a y offset (i.e., baseline) to a vector of values
         to simulate a rise in the baseline.
@@ -94,13 +93,13 @@ public:
       @param[in] peak_apex Time to divide left and right peak sides
 
       @returns A vector of values with added baselines.
-    */ 
+    */
     static void addBaseline(
       const std::vector<double>& x_I,
       std::vector<double>& y_IO,
       const double& baseline_left, const double& baseline_right,
       const double& peak_apex);
- 
+
     /**
       @brief Flatten the top of a peak to simulate a saturated peak.
 
@@ -108,7 +107,7 @@ public:
       @param[in] saturation_limit Saturation limit of the simulated detector
 
       @returns A vector of values with a simulated saturation point.
-    */ 
+    */
     static void flattenPeak(
       std::vector<double>& array_IO,
       const double& saturation_limit);
@@ -136,7 +135,7 @@ public:
 
     void setBaselineRight(const double& baseline_right); ///< baseline_right setter
     double getBaselineRight() const; ///< baseline_right getter
-    
+
     void setSaturationLimit(const double& saturation_limit); ///< saturation_limit setter
     double getSaturationLimit() const; ///< saturation_limit getter
 
@@ -153,5 +152,3 @@ private:
 
   };
 }
-
-#endif //SMARTPEAK_PEAKSIMULATOR_H

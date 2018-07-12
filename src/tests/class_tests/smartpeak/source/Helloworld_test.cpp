@@ -1,6 +1,6 @@
 /**TODO:  Add copyright*/
 
-#define BOOST_TEST_MODULE Helloworld test suite 
+#define BOOST_TEST_MODULE Helloworld test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/Helloworld.h>
 
@@ -9,22 +9,22 @@ using namespace std;
 
 BOOST_AUTO_TEST_SUITE(helloworld)
 
-BOOST_AUTO_TEST_CASE(constructor) 
+BOOST_AUTO_TEST_CASE(constructor)
 {
   Helloworld* ptr = nullptr;
   Helloworld* nullPointer = nullptr;
-	ptr = new Helloworld();
+  ptr = new Helloworld();
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
-BOOST_AUTO_TEST_CASE(destructor) 
+BOOST_AUTO_TEST_CASE(destructor)
 {
   Helloworld* ptr = nullptr;
-	ptr = new Helloworld();
+  ptr = new Helloworld();
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(addNumbers) 
+BOOST_AUTO_TEST_CASE(addNumbers)
 {
   Helloworld hw;
   double test = hw.addNumbers(2.0, 2.0);

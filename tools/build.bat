@@ -5,7 +5,7 @@ REM
 REM  Call build.bat without arguments to print usage
 REM
 REM Author: Chris Bielow
-REM 
+REM
 
 IF "%~1"=="" (
   ECHO.
@@ -70,7 +70,7 @@ if not %ERRORLEVEL%==0 (
 
 set t_start=%time%
 REM Invoke MSBuild.exe
-REM do not use "START /WAIT /B /LOW ..." since: 
+REM do not use "START /WAIT /B /LOW ..." since:
 REM   - it does not allow to cancel the job on the console (it will keep running in the background)
 REM   - it might trick MSBuild.exe into assuming only single-core CPU, even if /maxcpucount is specified
 MSBuild.exe %SLN% /maxcpucount /target:%TARGET% /p:Configuration=%CFG%

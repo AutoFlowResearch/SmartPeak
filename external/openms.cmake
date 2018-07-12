@@ -25,7 +25,7 @@ message (STATUS "Adding OPENMS ${OPENMS_VERSION} as an external project.")
 ExternalProject_Add(openms
     GIT_REPOSITORY "https://github.com/OpenMS/OpenMS.git"
     GIT_TAG ${OPENMS_VERSION}
-    CMAKE_ARGS 
+    CMAKE_ARGS
         -DPYOPENMS=OFF
         -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/contrib/build
         -DBOOST_USE_STATIC=OFF

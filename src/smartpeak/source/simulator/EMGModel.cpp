@@ -6,10 +6,6 @@
 
 namespace SmartPeak
 {
-  EMGModel::EMGModel()
-  {        
-  }
-
   EMGModel::EMGModel(const double& h,
     const double& tau,
     const double& mu,
@@ -19,10 +15,6 @@ namespace SmartPeak
     emg_tau_ = tau;
     emg_mu_ = mu;
     emg_sigma_ = sigma;
-  }
-
-  EMGModel::~EMGModel()
-  {
   }
 
   void EMGModel::setH(const double& h)

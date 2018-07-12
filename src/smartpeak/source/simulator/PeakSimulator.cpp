@@ -9,10 +9,6 @@
 
 namespace SmartPeak
 {
-  PeakSimulator::PeakSimulator()
-  {        
-  }
-
   PeakSimulator::PeakSimulator(const double& step_size_mu,
     const double& step_size_sigma,
     const double& window_start,
@@ -32,10 +28,6 @@ namespace SmartPeak
     baseline_left_ = baseline_left;
     baseline_right_ = baseline_right;
     saturation_limit_ = saturation_limit;
-  }
-
-  PeakSimulator::~PeakSimulator()
-  {
   }
 
   void PeakSimulator::setStepSizeMu(const double& step_size_mu)
@@ -193,12 +185,12 @@ namespace SmartPeak
   {
     for (double& value: array_IO)
     {
-      value = (value > saturation_limit) ? saturation_limit: value;      
+      value = (value > saturation_limit) ? saturation_limit: value;
     }
   }
 
   void PeakSimulator::simulatePeak(
-    std::vector<double>& x_O, std::vector<double>& y_O, 
+    std::vector<double>& x_O, std::vector<double>& y_O,
     const EMGModel& emg) const
   {
     x_O.clear();

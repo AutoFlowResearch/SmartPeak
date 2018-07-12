@@ -1,5 +1,6 @@
 set(core_executables_list
   Helloworld_test
+  RawDataHandler_test
 )
 
 set(io_executables_list
@@ -14,7 +15,7 @@ set(simulator_executables_list
 
 ### collect test executables
 set(TEST_executables
-    ${core_executables_list}
-    ${io_executables_list}
-    ${simulator_executables_list}
+  ${core_executables_list}
+  ${io_executables_list}
+  ${simulator_executables_list}
 )

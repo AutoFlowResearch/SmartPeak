@@ -32,7 +32,7 @@ file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" ${INITIAL_CACHE})
 # ignore failing GzipIfstream_test which seems to be related to the used
 # zlib version
 set(CTEST_CUSTOM_TESTS_IGNORE
-	GzipIfstream_test
+  GzipIfstream_test
 )
 
 # customize reporting of errors in CDash
@@ -49,7 +49,7 @@ set(CTEST_BUILD_FLAGS -j5)
 
 ## speed up compile time on GCC
 if (CMAKE_COMPILER_IS_GNUCXX)
-	add_definitions(-O0)
+  add_definitions(-O0)
 endif()
 
 # we want makefiles
@@ -68,7 +68,7 @@ if("$ENV{ENABLE_STYLE_TESTING}" STREQUAL "OFF")
     ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" NUMBER_ERRORS _build_errors)
   endif()
 else()
-	set(_build_errors 0)
+  set(_build_errors 0)
 endif()
 
 ## build lib&executables, run tests

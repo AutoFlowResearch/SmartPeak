@@ -34,7 +34,7 @@
 
 #------------------------------------------------------------------------------
 # This cmake file enables the AddressSanitizer
-# see http://clang.llvm.org/docs/AddressSanitizer.html 
+# see http://clang.llvm.org/docs/AddressSanitizer.html
 #     http://en.wikipedia.org/wiki/AddressSanitizer
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")

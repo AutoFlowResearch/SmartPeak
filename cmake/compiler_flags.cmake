@@ -37,11 +37,11 @@
 
 if (CMAKE_COMPILER_IS_GNUCXX)
 
-  add_definitions(-Wall -Wextra 
+  add_definitions(-Wall -Wextra
     -fvisibility=hidden
-    -Wno-non-virtual-dtor 
+    -Wno-non-virtual-dtor
     -Wno-unknown-pragmas
-    -Wno-long-long 
+    -Wno-long-long
     -Wno-unknown-pragmas
     -Wno-unused-function
     -Wno-variadic-macros)
@@ -65,7 +65,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 	if (NOT SMARTPEAK_64BIT_ARCHITECTURE AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.3.0" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.4.0")
 		add_definitions(-march=i486)
 	endif()
-  
+
 elseif (MSVC)
 	# do not use add_definitions
 	# add definitions also lands in stuff like RC_DEFINITION which tend to fail if you use
@@ -86,7 +86,7 @@ elseif (MSVC)
 
   ## disable warning: "unknown pragma" (occurs thousands of times for, e.g. '#pragma clang diagnostic ignored "-Wfloat-equal"')
 	set(CF_SMARTPEAK_ADDCXX_FLAGS "${CF_SMARTPEAK_ADDCXX_FLAGS} /wd4068")
-  
+
 	## don't warn about unchecked std::copy()
 	add_definitions(/D_SCL_SECURE_NO_WARNINGS /D_CRT_SECURE_NO_WARNINGS /D_CRT_SECURE_NO_DEPRECATE)
 
@@ -106,7 +106,7 @@ elseif (MSVC)
     ## enable SSE1 on 32bit, on 64bit the compiler flag does not exist
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE")
   endif()
-  
+
 elseif ("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
   set(CMAKE_COMPILER_IS_CLANG true CACHE INTERNAL "Is CLang compiler (clang++)")
   # add clang specific warning levels

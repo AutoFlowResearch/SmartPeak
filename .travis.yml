@@ -46,7 +46,7 @@ addons:
          - libglpk36
          - libglpk-dev
          - subversion
-         - doxygen 
+         - doxygen
          - graphviz
          - coinor-cbc
          - coinor-libcgl1
@@ -58,7 +58,7 @@ addons:
          - coinor-libosi-dev
          - coinor-libvol-dev
          - libpcre3-dev
-         
+
 before_script:
   ./tools/travis/cibuild.before.sh
 script:

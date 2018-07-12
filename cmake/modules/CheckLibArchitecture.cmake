@@ -6,7 +6,7 @@ function(check_lib_architecture link_libs)
 
     if (MSVC)
       message(STATUS "  Checking architecture of link libraries ...")
-      
+
       ## check for 'dumpbin.exe' which comes with every VS to extract architecture
       find_program(PROG_DUMPBIN "dumpbin" DOC "dumpbin allows to extract information from (link) libraries")
       if (NOT PROG_DUMPBIN)
@@ -22,7 +22,7 @@ function(check_lib_architecture link_libs)
             ## Architecture of ${LIB_VAR_N} was checked already. Force re-check by setting '${LIB_VAR}' to zero.
           else()
             set(${LIB_VAR} "0" CACHE STRING "Checking of link library ${LIB_VAR_N} architecture (32/64bit): 1 if done (will not be repeated), 0 otherwise.")
-            
+
             ## call 'dumpbin.exe' on each lib
             execute_process(COMMAND "${PROG_DUMPBIN}" "/HEADERS" "${lib_file}"
                             RESULT_VARIABLE DUMP_RESULT
@@ -63,5 +63,5 @@ function(check_lib_architecture link_libs)
     else()
       ## not implemented yet for Linux/MacOSX
     endif()
-    
+
  endfunction()

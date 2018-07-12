@@ -38,7 +38,7 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 ## CMake sanity check: sometimes CMAKE_SIZEOF_VOID_P just vanishes when
 ## updating CMake.
 if (NOT CMAKE_SIZEOF_VOID_P)
-	message(FATAL_ERROR "'CMAKE_SIZEOF_VOID_P' is undefined. Thus you should"
+  message(FATAL_ERROR "'CMAKE_SIZEOF_VOID_P' is undefined. Thus you should"
                       " delete CMakeFiles (the directory) and the"
                       " CMakeCache.txt and rerun CMake again! This is some"
                       " weird CMake bug that seems to appear when updating the"
@@ -64,7 +64,7 @@ option(BOOST_USE_STATIC "Use Boost static libraries." ON)
 # Extend module path with our modules
 # (create an empty list if CMAKE_MODULE_PATH does not exist)
 if(NOT CMAKE_MODULE_PATH)
-	set(CMAKE_MODULE_PATH)
+  set(CMAKE_MODULE_PATH)
 endif()
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/modules")
 ## CMake looks for the NSIS script in the module path.
@@ -130,11 +130,11 @@ endif()
 #------------------------------------------------------------------------------
 
 if (CMAKE_SIZEOF_VOID_P MATCHES "8")
-	set(SMARTPEAK_64BIT_ARCHITECTURE 1 CACHE INTERNAL "Architecture-bits")
-	message(STATUS "Architecture: 64 bit")
+  set(SMARTPEAK_64BIT_ARCHITECTURE 1 CACHE INTERNAL "Architecture-bits")
+  message(STATUS "Architecture: 64 bit")
 else()
-	set(SMARTPEAK_64BIT_ARCHITECTURE 0 CACHE INTERNAL "Architecture-bits")
-	message(STATUS "Architecture: 32 bit")
+  set(SMARTPEAK_64BIT_ARCHITECTURE 0 CACHE INTERNAL "Architecture-bits")
+  message(STATUS "Architecture: 32 bit")
 endif()
 
 #------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ endif()
 #------------------------------------------------------------------------------
 # Set default build type (if not set by user on command line)
 if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release)
+  set(CMAKE_BUILD_TYPE Release)
 endif()
 
 # Force build type into the cache (needs to be set beforehand)
@@ -155,6 +155,9 @@ if (CMAKE_BUILD_TYPE EQUAL Debug)
 elseif (CMAKE_BUILD_TYPE EQUAL Release)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
 endif()
+
+# prevent error "You must build your code with position independent code if Qt was built with..
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 #------------------------------------------------------------------------------
 # Enable STL debug mode (GCC only)
@@ -226,12 +229,12 @@ SET(CMAKE_INSTALL_NAME_DIR "@executable_path/../${INSTALL_LIB_DIR}")
 #------------------------------------------------------------------------------
 # lib naming when building with msvc & convenience location of build.bat
 if (MSVC)
-	## use SmartPeakd.dll in debug mode
-	SET(CMAKE_DEBUG_POSTFIX d)
-	## copy build.bat to root of binary dir to enable convenient invokation (instead of typing path to source dir all the time)
-	if(NOT ("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}"))
-		file(COPY "${PROJECT_SOURCE_DIR}/tools/build.bat" DESTINATION "${PROJECT_BINARY_DIR}")
-	endif()
+  ## use SmartPeakd.dll in debug mode
+  SET(CMAKE_DEBUG_POSTFIX d)
+  ## copy build.bat to root of binary dir to enable convenient invokation (instead of typing path to source dir all the time)
+  if(NOT ("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}"))
+    file(COPY "${PROJECT_SOURCE_DIR}/tools/build.bat" DESTINATION "${PROJECT_BINARY_DIR}")
+  endif()
 endif()
 
 #------------------------------------------------------------------------------

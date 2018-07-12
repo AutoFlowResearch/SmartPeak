@@ -1,6 +1,6 @@
 /**TODO:  Add copyright*/
 
-#define BOOST_TEST_MODULE ChromatogramSimulator test suite 
+#define BOOST_TEST_MODULE ChromatogramSimulator test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/simulator/ChromatogramSimulator.h>
 #include <SmartPeak/simulator/PeakSimulator.h>
@@ -18,18 +18,18 @@ BOOST_AUTO_TEST_SUITE(chromatogramsimulator)
 // public:
 // };
 
-BOOST_AUTO_TEST_CASE(constructor) 
+BOOST_AUTO_TEST_CASE(constructor)
 {
   ChromatogramSimulator* ptr = nullptr;
   ChromatogramSimulator* nullPointer = nullptr;
-	ptr = new ChromatogramSimulator();
+  ptr = new ChromatogramSimulator();
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
-BOOST_AUTO_TEST_CASE(destructor) 
+BOOST_AUTO_TEST_CASE(destructor)
 {
   ChromatogramSimulator* ptr = nullptr;
-	ptr = new ChromatogramSimulator();
+  ptr = new ChromatogramSimulator();
   delete ptr;
 }
 
@@ -37,16 +37,16 @@ BOOST_AUTO_TEST_CASE(findPeakOverlap)
 {
   ChromatogramSimulator chromsimulator;
   PeakSimulator peak_left, peak_right;
-  EMGModel emg_left, emg_right;  
+  EMGModel emg_left, emg_right;
 
  // Overlapping windows; left and right baseline are equal;
-  peak_left = PeakSimulator(1.0, 0.0, 
-    0.0, 12.0, 
+  peak_left = PeakSimulator(1.0, 0.0,
+    0.0, 12.0,
     0.0, 0.0,
     1.0, 5.0, //bl, br
     15);
-  peak_right = PeakSimulator(1.0, 0.0, 
-    8.0, 20.0, 
+  peak_right = PeakSimulator(1.0, 0.0,
+    8.0, 20.0,
     0.0, 0.0,
     5.0, 1.0, //bl, br
     15);
@@ -56,13 +56,13 @@ BOOST_AUTO_TEST_CASE(findPeakOverlap)
   BOOST_CHECK_EQUAL(chromsimulator.findPeakOverlap(peak_left, emg_left, peak_right, emg_right), 12.0);
 
  // Merged peaks: both baselines overlap
-  peak_left = PeakSimulator(1.0, 0.0, 
-    0.0, 15.0, 
+  peak_left = PeakSimulator(1.0, 0.0,
+    0.0, 15.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
-  peak_right = PeakSimulator(1.0, 0.0, 
-    5.0, 20.0, 
+  peak_right = PeakSimulator(1.0, 0.0,
+    5.0, 20.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
@@ -72,13 +72,13 @@ BOOST_AUTO_TEST_CASE(findPeakOverlap)
   BOOST_CHECK_EQUAL(chromsimulator.findPeakOverlap(peak_left, emg_left, peak_right, emg_right), 10.0);
 
  // Merged peaks: both baselines do not overlap
-  peak_left = PeakSimulator(1.0, 0.0, 
-    0.0, 13.0, 
+  peak_left = PeakSimulator(1.0, 0.0,
+    0.0, 13.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
-  peak_right = PeakSimulator(1.0, 0.0, 
-    5.0, 20.0, 
+  peak_right = PeakSimulator(1.0, 0.0,
+    5.0, 20.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
@@ -88,20 +88,20 @@ BOOST_AUTO_TEST_CASE(findPeakOverlap)
   BOOST_CHECK_EQUAL(chromsimulator.findPeakOverlap(peak_left, emg_left, peak_right, emg_right), 10.0);
 }
 
-BOOST_AUTO_TEST_CASE(joinPeakWindows) 
+BOOST_AUTO_TEST_CASE(joinPeakWindows)
 {
   ChromatogramSimulator chromsimulator;
   PeakSimulator peak_left, peak_right;
   EMGModel emg_left, emg_right;
 
   // Perfect overlap; no differences in baseline
-  peak_left = PeakSimulator(1.0, 0.0, 
-    0.0, 10.0, 
+  peak_left = PeakSimulator(1.0, 0.0,
+    0.0, 10.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
-  peak_right = PeakSimulator(1.0, 0.0, 
-    10.0, 20.0, 
+  peak_right = PeakSimulator(1.0, 0.0,
+    10.0, 20.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
@@ -117,13 +117,13 @@ BOOST_AUTO_TEST_CASE(joinPeakWindows)
 
   // Perfect overlap; no differences in baseline
   // swapped peaks
-  peak_right = PeakSimulator(1.0, 0.0, 
-    0.0, 10.0, 
+  peak_right = PeakSimulator(1.0, 0.0,
+    0.0, 10.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
-  peak_left = PeakSimulator(1.0, 0.0, 
-    10.0, 20.0, 
+  peak_left = PeakSimulator(1.0, 0.0,
+    10.0, 20.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
@@ -140,13 +140,13 @@ BOOST_AUTO_TEST_CASE(joinPeakWindows)
   BOOST_CHECK_EQUAL(emg_right.getMu(), 15.0);
 
  // Non overlapping windows; Left baseline is higher
-  peak_left = PeakSimulator(1.0, 0.0, 
-    0.0, 8.0, 
+  peak_left = PeakSimulator(1.0, 0.0,
+    0.0, 8.0,
     0.0, 0.0,
     1.0, 5.0, //bl, br
     15);
-  peak_right = PeakSimulator(1.0, 0.0, 
-    12.0, 20.0, 
+  peak_right = PeakSimulator(1.0, 0.0,
+    12.0, 20.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
@@ -161,13 +161,13 @@ BOOST_AUTO_TEST_CASE(joinPeakWindows)
   BOOST_CHECK_EQUAL(emg_right.getMu(), 15.0);
 
  // Non overlapping windows; Right baseline is higher
-  peak_left = PeakSimulator(1.0, 0.0, 
-    0.0, 8.0, 
+  peak_left = PeakSimulator(1.0, 0.0,
+    0.0, 8.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
-  peak_right = PeakSimulator(1.0, 0.0, 
-    12.0, 20.0, 
+  peak_right = PeakSimulator(1.0, 0.0,
+    12.0, 20.0,
     0.0, 0.0,
     5.0, 1.0, //bl, br
     15);
@@ -182,13 +182,13 @@ BOOST_AUTO_TEST_CASE(joinPeakWindows)
   BOOST_CHECK_EQUAL(emg_right.getMu(), 15.0);
 
  // Overlapping windows; Left baseline is higher
-  peak_left = PeakSimulator(1.0, 0.0, 
-    0.0, 12.0, 
+  peak_left = PeakSimulator(1.0, 0.0,
+    0.0, 12.0,
     0.0, 0.0,
     1.0, 5.0, //bl, br
     15);
-  peak_right = PeakSimulator(1.0, 0.0, 
-    8.0, 20.0, 
+  peak_right = PeakSimulator(1.0, 0.0,
+    8.0, 20.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
@@ -203,13 +203,13 @@ BOOST_AUTO_TEST_CASE(joinPeakWindows)
   BOOST_CHECK_EQUAL(emg_right.getMu(), 15.0);
 
  // Overlapping windows; Right baseline is higher
-  peak_left = PeakSimulator(1.0, 0.0, 
-    0.0, 12.0, 
+  peak_left = PeakSimulator(1.0, 0.0,
+    0.0, 12.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     15);
-  peak_right = PeakSimulator(1.0, 0.0, 
-    8.0, 20.0, 
+  peak_right = PeakSimulator(1.0, 0.0,
+    8.0, 20.0,
     0.0, 0.0,
     5.0, 1.0, //bl, br
     15);
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_CASE(joinPeakWindows)
   BOOST_CHECK_EQUAL(emg_right.getMu(), 15.0);
 }
 
-BOOST_AUTO_TEST_CASE(simulateChromatogram) 
+BOOST_AUTO_TEST_CASE(simulateChromatogram)
 {
   ChromatogramSimulator chromsimulator;
   PeakSimulator peak1, peak2, peak3;
@@ -235,8 +235,8 @@ BOOST_AUTO_TEST_CASE(simulateChromatogram)
   std::vector<EMGModel> emgs;
 
   // Perfect gaussian peak
-  peak1 = PeakSimulator(1.0, 0.0, 
-    0.0, 10.0, 
+  peak1 = PeakSimulator(1.0, 0.0,
+    0.0, 10.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     100);
@@ -255,20 +255,20 @@ BOOST_AUTO_TEST_CASE(simulateChromatogram)
   }
 
   // Perfect gaussian peaks
-  peak1 = PeakSimulator(1.0, 0.0, 
-    0.0, 10.0, 
+  peak1 = PeakSimulator(1.0, 0.0,
+    0.0, 10.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     100);
   emg1 = EMGModel(10.0, 0.0, 5.0, 1.0);
-  peak2 = PeakSimulator(1.0, 0.0, 
-    10.0, 20.0, 
+  peak2 = PeakSimulator(1.0, 0.0,
+    10.0, 20.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     100);
   emg2 = EMGModel(10.0, 0.0, 15.0, 1.0);
-  peak3 = PeakSimulator(1.0, 0.0, 
-    20.0, 30.0, 
+  peak3 = PeakSimulator(1.0, 0.0,
+    20.0, 30.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     100);
@@ -287,20 +287,20 @@ BOOST_AUTO_TEST_CASE(simulateChromatogram)
   }
 
   // Increase tailing
-  peak1 = PeakSimulator(1.0, 0.0, 
-    0.0, 10.0, 
+  peak1 = PeakSimulator(1.0, 0.0,
+    0.0, 10.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     100);
   emg1 = EMGModel(10.0, 0.0, 5.0, 1.0);
-  peak2 = PeakSimulator(1.0, 0.0, 
-    10.0, 20.0, 
+  peak2 = PeakSimulator(1.0, 0.0,
+    10.0, 20.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     100);
   emg2 = EMGModel(10.0, 0.2, 15.0, 1.0);
-  peak3 = PeakSimulator(1.0, 0.0, 
-    20.0, 30.0, 
+  peak3 = PeakSimulator(1.0, 0.0,
+    20.0, 30.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     100);
@@ -319,20 +319,20 @@ BOOST_AUTO_TEST_CASE(simulateChromatogram)
   }
 
   // Overlap and cutoff peak
-  peak1 = PeakSimulator(1.0, 0.0, 
-    0.0, 10.0, 
+  peak1 = PeakSimulator(1.0, 0.0,
+    0.0, 10.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     100);
   emg1 = EMGModel(10.0, 0.0, 5.0, 1.0);
-  peak2 = PeakSimulator(1.0, 0.0, 
-    10.0, 20.0, 
+  peak2 = PeakSimulator(1.0, 0.0,
+    10.0, 20.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     100);
   emg2 = EMGModel(10.0, 0.0, 7.0, 1.0);
-  peak3 = PeakSimulator(1.0, 0.0, 
-    20.0, 30.0, 
+  peak3 = PeakSimulator(1.0, 0.0,
+    20.0, 30.0,
     0.0, 0.0,
     1.0, 1.0, //bl, br
     100);
