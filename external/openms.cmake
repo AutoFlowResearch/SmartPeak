@@ -11,6 +11,7 @@ ExternalProject_Add(contrib
     GIT_REPOSITORY "https://github.com/OpenMS/contrib.git"
     GIT_TAG ${CONTRIB_VERSION}
     CMAKE_ARGS -DBUILD_TYPE=ALL -DNUMBER_OF_JOBS=4
+    INSTALL_COMMAND ""
     GIT_PROGRESS 1
     LOG_DOWNLOAD 1
     LOG_UPDATE 1
@@ -30,6 +31,7 @@ ExternalProject_Add(openms
         -DBOOST_USE_STATIC=OFF
         -DHAS_XSERVER=OFF
         -DWITH_GUI=OFF
+    INSTALL_COMMAND ""
     GIT_PROGRESS 1
     LOG_DOWNLOAD 1
     LOG_UPDATE 1
