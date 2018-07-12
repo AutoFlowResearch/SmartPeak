@@ -1,5 +1,4 @@
-#ifndef SMARTPEAK_HELLOWORLD_H
-#define SMARTPEAK_HELLOWORLD_H
+#pragma once
 
 namespace SmartPeak
 {
@@ -8,13 +7,11 @@ namespace SmartPeak
   {
 public:
     /// Default constructor
-    Helloworld();    
+    Helloworld() = default;    
     /// Destructor
-    ~Helloworld();
+    ~Helloworld() = default;
 
     double addNumbers(const double& x, const double& y) const;
 
   };
 }
-
-#endif //SMARTPEAK_HELLOWORLD_H

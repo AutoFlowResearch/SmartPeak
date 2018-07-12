@@ -10,14 +10,6 @@
 
 namespace SmartPeak
 {
-  ChromatogramSimulator::ChromatogramSimulator()
-  {        
-  }
-
-  ChromatogramSimulator::~ChromatogramSimulator()
-  {
-  }
-
   double ChromatogramSimulator::findPeakOverlap(
     const PeakSimulator& peak_left, const EMGModel& emg_left,
     const PeakSimulator& peak_right, const EMGModel& emg_right) const

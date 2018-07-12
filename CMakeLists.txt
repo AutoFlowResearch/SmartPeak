@@ -156,6 +156,9 @@ elseif (CMAKE_BUILD_TYPE EQUAL Release)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
 endif()
 
+# prevent error "You must build your code with position independent code if Qt was built with..
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+
 #------------------------------------------------------------------------------
 # Enable STL debug mode (GCC only)
 #------------------------------------------------------------------------------

@@ -1,7 +1,6 @@
 /**TODO:  Add copyright*/
 
-#ifndef SMARTPEAK_PEAKSIMULATOR_H
-#define SMARTPEAK_PEAKSIMULATOR_H
+#pragma once
 
 #include <SmartPeak/simulator/EMGModel.h>
 
@@ -31,7 +30,7 @@ namespace SmartPeak
     4. setters/getters would be unique to each derived class
     */
 public:
-    PeakSimulator(); ///< Default constructor
+    PeakSimulator() = default; ///< Default constructor
     PeakSimulator(const double& step_size_mu,
       const double& step_size_sigma,
       const double& window_start,
@@ -42,7 +41,7 @@ public:
       const double& baseline_right,
       const double& saturation_limit); ///< Explicit constructor
     
-    ~PeakSimulator(); ///< Default destructor
+    ~PeakSimulator() = default; ///< Default destructor
  
     /**
       @brief simulates two vector of points that correspond to x and y values that
@@ -153,5 +152,3 @@ private:
 
   };
 }
-
-#endif //SMARTPEAK_PEAKSIMULATOR_H

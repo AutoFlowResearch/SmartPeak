@@ -1,5 +1,6 @@
 set(core_executables_list
   Helloworld_test
+  RawDataHandler_test
 )
 
 set(io_executables_list

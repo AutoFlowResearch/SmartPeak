@@ -1,7 +1,6 @@
 /**TODO:  Add copyright*/
 
-#ifndef SMARTPEAK_CSVWRITER_H
-#define SMARTPEAK_CSVWRITER_H
+#pragma once
 
 #include <unsupported/Eigen/CXX11/Tensor>
 
@@ -21,8 +20,8 @@ namespace SmartPeak
   class CSVWriter
   {
 public:
-    CSVWriter(); ///< Default constructor
-    ~CSVWriter(); ///< Default destructor
+    CSVWriter() = default; ///< Default constructor
+    ~CSVWriter() = default; ///< Default destructor
     CSVWriter(const std::string& filename, std::string delm = ",");
 
     void setFilename(const std::string& filename); ///< filename setter
@@ -67,5 +66,3 @@ private:
     int line_count_;
   };
 }
-
-#endif //SMARTPEAK_CSVWRITER_H

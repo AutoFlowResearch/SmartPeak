@@ -1,7 +1,6 @@
 /**TODO:  Add copyright*/
 
-#ifndef SMARTPEAK_CHROMATOGRAMSIMULATOR_H
-#define SMARTPEAK_CHROMATOGRAMSIMULATOR_H
+#pragma once
 
 #include <SmartPeak/simulator/EMGModel.h>
 #include <SmartPeak/simulator/PeakSimulator.h>
@@ -15,8 +14,8 @@ namespace SmartPeak
   class ChromatogramSimulator
   {
 public:
-    ChromatogramSimulator(); ///< Default constructor
-    ~ChromatogramSimulator(); ///< Default destructor
+    ChromatogramSimulator() = default; ///< Default constructor
+    ~ChromatogramSimulator() = default; ///< Default destructor
 
     /**
       @brief Simulates a chromatogram.  
@@ -79,5 +78,3 @@ public:
       const PeakSimulator& peak_right, const EMGModel& emg_right) const;
   };
 }
-
-#endif //SMARTPEAK_CHROMATOGRAMSIMULATOR_H

@@ -1,7 +1,6 @@
 /**TODO:  Add copyright*/
 
-#ifndef SMARTPEAK_EMGMODEL_H
-#define SMARTPEAK_EMGMODEL_H
+#pragma once
 
 namespace SmartPeak
 {
@@ -29,12 +28,12 @@ namespace SmartPeak
     4. setters/getters would be unique to each derived class
     */
 public:
-    EMGModel(); ///< Default constructor
+    EMGModel() = default; ///< Default constructor
     EMGModel(const double& h,
       const double& tau,
       const double& mu,
       const double& sigma); ///< Explicit constructor
-    ~EMGModel(); ///< Default destructor
+    ~EMGModel() = default; ///< Default destructor
 
     void setH(const double& h); ///< EMG h setter
     double getH() const; ///< EMG h getter
@@ -103,5 +102,3 @@ private:
 
   };
 }
-
-#endif //SMARTPEAK_EMGMODEL_H
