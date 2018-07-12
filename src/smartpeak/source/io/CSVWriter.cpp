@@ -5,10 +5,7 @@
 #include <fstream>
 
 namespace SmartPeak
-{
-  CSVWriter::CSVWriter(){}
-  CSVWriter::~CSVWriter(){}
-  
+{  
   CSVWriter::CSVWriter(const std::string& filename, std::string delm) :
       filename_(filename), delimeter_(delm), line_count_(0)
   {} 

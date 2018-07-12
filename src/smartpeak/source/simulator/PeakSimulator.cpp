@@ -9,10 +9,6 @@
 
 namespace SmartPeak
 {
-  PeakSimulator::PeakSimulator()
-  {        
-  }
-
   PeakSimulator::PeakSimulator(const double& step_size_mu,
     const double& step_size_sigma,
     const double& window_start,
@@ -32,10 +28,6 @@ namespace SmartPeak
     baseline_left_ = baseline_left;
     baseline_right_ = baseline_right;
     saturation_limit_ = saturation_limit;
-  }
-
-  PeakSimulator::~PeakSimulator()
-  {
   }
 
   void PeakSimulator::setStepSizeMu(const double& step_size_mu)

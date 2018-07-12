@@ -3,8 +3,8 @@ set(directory source/core)
 
 ### list all filenames of the directory here
 set(sources_list
-Helloworld.cpp
-RawDataHandler.cpp
+	Helloworld.cpp
+	RawDataHandler.cpp
 )
 
 ### add path to the filenames

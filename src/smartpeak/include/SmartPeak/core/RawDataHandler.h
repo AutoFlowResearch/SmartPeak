@@ -1,7 +1,6 @@
 /**TODO:  Add copyright*/
 
-#ifndef SMARTPEAK_RAWDATAHANDLER_H
-#define SMARTPEAK_RAWDATAHANDLER_H
+#pragma once
 
 #include <OpenMS/KERNEL/FeatureMap.h>
 #include <OpenMS/ANALYSIS/TARGETED/TargetedExperiment.h>
@@ -19,8 +18,8 @@ namespace SmartPeak
   class RawDataHandler
   {
 public:    
-    RawDataHandler();  ///< Default constructor
-    ~RawDataHandler();  ///< Default destructor    
+    RawDataHandler() = default;  ///< Default constructor
+    ~RawDataHandler() = default;  ///< Default destructor    
     
     void setFeatureMap(const OpenMS::FeatureMap& featureMap_I);
     OpenMS::FeatureMap getFeatureMap() const;
@@ -32,9 +31,11 @@ public:
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_I);
     std::map<std::string, std::vector<std::map<std::string, std::string>>> getParameters() const;
 
+    // [REFACTOR: change to set/getTargetedExperiment]
     void setTargeted(const OpenMS::TargetedExperiment& targeted_I);      
     OpenMS::TargetedExperiment getTargeted() const;
 
+    // [TODO: need to update this at some point...]
     // setReferenceData(, reference_data_I);      
     // getReferenceData();
 
@@ -47,6 +48,7 @@ public:
     void setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc_I);      
     OpenMS::MRMFeatureQC getFeatureQC() const;
       
+    void setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps_I);
     std::vector<OpenMS::FeatureMap> getFeatureMapHistory() const;
 
 private:    
@@ -64,12 +66,10 @@ private:
 
     // input (reused between RawDataHandlers)
     std::map<std::string, std::vector<std::map<std::string, std::string>>> parameters_;
-    OpenMS::TargetedExperiment targeted_;
+    OpenMS::TargetedExperiment targeted_;  // [REFACTOR: change to targeted_experiment]
     // self.reference_data = None
     std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods_;
     OpenMS::MRMFeatureQC feature_filter_;
     OpenMS::MRMFeatureQC feature_qc_;
   };
 }
-
-#endif //SMARTPEAK_RAWDATAHANDLER_H

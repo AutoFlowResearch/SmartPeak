@@ -3,15 +3,7 @@
 #include <SmartPeak/core/RawDataHandler.h>
 
 namespace SmartPeak
-{
-  RawDataHandler::RawDataHandler()
-  {        
-  }
-
-  RawDataHandler::~RawDataHandler()
-  {
-  }
-    
+{    
   void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& featureMap_I)
   {
     featureMap_ = featureMap_I;
@@ -95,7 +87,12 @@ namespace SmartPeak
     return feature_qc_;
   }
     
-  std::vector<OpenMS::FeatureMap>  RawDataHandler::getFeatureMapHistory() const
+  void RawDataHandler::setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps_I)
+  {
+    featureMapHistory_ = feature_maps_I;
+  }
+
+  std::vector<OpenMS::FeatureMap> RawDataHandler::getFeatureMapHistory() const
   {
     return featureMapHistory_;
   }
