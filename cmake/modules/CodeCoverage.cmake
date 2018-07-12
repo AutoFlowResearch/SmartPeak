@@ -146,7 +146,7 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _outputname _addignorelibpaths)
 
     ADD_CUSTOM_COMMAND(
         OUTPUT ${_outputname}/index.html
-        
+
         # Capturing lcov counters and generating report
         COMMAND ${LCOV_PATH} --directory . --capture --output-file ${coverage_info}
         # Removing external sources
@@ -170,7 +170,7 @@ FUNCTION(SETUP_TARGET_FOR_COVERAGE _targetname _outputname _addignorelibpaths)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Coverage report up-to-date. Re-run tests if you need a new report."
     )
-    
+
     # This target is basically there for a better error message.
     # Otherwise you get "No target for Testing/Temporary/LastTest.log"
     # Workaround because you can not depend on internal targets like "test" (https://gitlab.kitware.com/cmake/cmake/issues/8438)

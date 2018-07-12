@@ -3,9 +3,9 @@ set(directory source/simulator)
 
 ### list all filenames of the directory here
 set(sources_list
-	ChromatogramSimulator.cpp
-	EMGModel.cpp
-	PeakSimulator.cpp
+  ChromatogramSimulator.cpp
+  EMGModel.cpp
+  PeakSimulator.cpp
 )
 
 ### add path to the filenames

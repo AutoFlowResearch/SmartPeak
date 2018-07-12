@@ -1,5 +1,5 @@
 
-This package contains 
+This package contains
 
 SmartPeak - Fast and intelligent processing of LC-MS, GC-MS, and HPLC data.
 

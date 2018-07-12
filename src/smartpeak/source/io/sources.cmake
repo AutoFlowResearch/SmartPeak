@@ -3,13 +3,13 @@ set(directory source/io)
 
 ### list all filenames of the directory here
 set(sources_list
-	CSVWriter.cpp
+  CSVWriter.cpp
 )
 
 ### add path to the filenames
 set(sources)
 foreach(i ${sources_list})
-	list(APPEND sources ${directory}/${i})
+  list(APPEND sources ${directory}/${i})
 endforeach(i)
 
 ### pass source file list to the upper instance

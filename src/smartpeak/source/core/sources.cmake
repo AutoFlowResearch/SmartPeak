@@ -3,14 +3,14 @@ set(directory source/core)
 
 ### list all filenames of the directory here
 set(sources_list
-	Helloworld.cpp
-	RawDataHandler.cpp
+  Helloworld.cpp
+  RawDataHandler.cpp
 )
 
 ### add path to the filenames
 set(sources)
 foreach(i ${sources_list})
-	list(APPEND sources ${directory}/${i})
+  list(APPEND sources ${directory}/${i})
 endforeach(i)
 
 ### pass source file list to the upper instance

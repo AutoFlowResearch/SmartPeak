@@ -5,10 +5,10 @@
 #------------------------------------------------------------------------------
 # set which library extensions are preferred (we prefer shared libraries)
 if(NOT MSVC)
-	set(CMAKE_FIND_LIBRARY_SUFFIXES ".so;.a")
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".so;.a")
 endif()
 if (APPLE)
-	set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib;.a")
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib;.a")
 endif()
 
 #------------------------------------------------------------------------------
@@ -57,5 +57,5 @@ endif(OpenMS_FOUND)
 #------------------------------------------------------------------------------
 #except for the contrib libs, prefer shared libraries
 if(NOT MSVC AND NOT APPLE)
-	set(CMAKE_FIND_LIBRARY_SUFFIXES ".so;.a")
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".so;.a")
 endif()

@@ -12,7 +12,7 @@ services:
     restart: always
     networks:
       - smartpeak2_network
-    
+
 networks:
   smartpeak_network:
     ipam:

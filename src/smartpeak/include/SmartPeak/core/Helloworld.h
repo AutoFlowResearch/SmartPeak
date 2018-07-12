@@ -7,7 +7,7 @@ namespace SmartPeak
   {
 public:
     /// Default constructor
-    Helloworld() = default;    
+    Helloworld() = default;
     /// Destructor
     ~Helloworld() = default;
 

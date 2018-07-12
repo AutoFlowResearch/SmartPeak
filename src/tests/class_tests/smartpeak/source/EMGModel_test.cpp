@@ -1,6 +1,6 @@
 /**TODO:  Add copyright*/
 
-#define BOOST_TEST_MODULE EMGModel test suite 
+#define BOOST_TEST_MODULE EMGModel test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/simulator/EMGModel.h>
 
@@ -30,22 +30,22 @@ public:
   }
 };
 
-BOOST_AUTO_TEST_CASE(constructor) 
+BOOST_AUTO_TEST_CASE(constructor)
 {
   EMGModel* ptr = nullptr;
   EMGModel* nullPointer = nullptr;
-	ptr = new EMGModel();
+  ptr = new EMGModel();
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
-BOOST_AUTO_TEST_CASE(destructor) 
+BOOST_AUTO_TEST_CASE(destructor)
 {
   EMGModel* ptr = nullptr;
-	ptr = new EMGModel();
+  ptr = new EMGModel();
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(constructor2) 
+BOOST_AUTO_TEST_CASE(constructor2)
 {
   EMGModel emg(1.0, 2.0, 3.0, 4.0);
 
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(constructor2)
   BOOST_CHECK_EQUAL(emg.getSigma(), 4.0);
 }
 
-BOOST_AUTO_TEST_CASE(gettersAndSetters) 
+BOOST_AUTO_TEST_CASE(gettersAndSetters)
 {
   EMGModel emg;
   emg.setH(1.0);
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(gettersAndSetters)
   BOOST_CHECK_EQUAL(emg.getSigma(), 4.0);
 }
 
-BOOST_AUTO_TEST_CASE(z_) 
+BOOST_AUTO_TEST_CASE(z_)
 {
   EMGModel_test emg;
   emg.setH(1.0);
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(z_)
   BOOST_CHECK_CLOSE(emg.z_(0), 707106781186.54749, 1e-6);
 }
 
-BOOST_AUTO_TEST_CASE(emgpdf1_) 
+BOOST_AUTO_TEST_CASE(emgpdf1_)
 {
   EMGModel_test emg;
   emg.setH(1.0);
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(emgpdf1_)
   BOOST_CHECK_CLOSE(emg.EMGPDF1_(100), 0.0, 1e-6);
 }
 
-BOOST_AUTO_TEST_CASE(emgpdf2_) 
+BOOST_AUTO_TEST_CASE(emgpdf2_)
 {
   EMGModel_test emg;
   emg.setH(1.0);
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(emgpdf2_)
   BOOST_CHECK_CLOSE(emg.EMGPDF2_(0), 0.99028596471732067, 1e-6);
 }
 
-BOOST_AUTO_TEST_CASE(emgpdf3_) 
+BOOST_AUTO_TEST_CASE(emgpdf3_)
 {
   EMGModel_test emg;
   emg.setH(1.0);
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(emgpdf3_)
   BOOST_CHECK_CLOSE(emg.EMGPDF3_(0), 1.0, 1e-6);
 }
 
-BOOST_AUTO_TEST_CASE(emgpdf) 
+BOOST_AUTO_TEST_CASE(emgpdf)
 {
   EMGModel emg;
   emg.setH(1.0);

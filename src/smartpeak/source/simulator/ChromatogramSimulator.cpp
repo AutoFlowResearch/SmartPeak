@@ -45,7 +45,7 @@ namespace SmartPeak
     }
     return x_overlap;
   }
-  
+
   void ChromatogramSimulator::joinPeakWindows(
     PeakSimulator& peak_left, EMGModel& emg_left,
     PeakSimulator& peak_right, EMGModel& emg_right) const
@@ -58,14 +58,14 @@ namespace SmartPeak
       std::swap(peak_left, peak_right);
       std::swap(emg_left, emg_right);
     }
-    
+
     const double x_delta = peak_right.getWindowStart() - peak_left.getWindowEnd();
     const double y_delta = peak_right.getBaselineLeft() - peak_left.getBaselineRight();
     if (x_delta >= 0.0 && y_delta <= 0.0)
-    {  
+    {
       // Non overlapping windows; Left baseline is higher
       // increase the right peak baseline to match the left peak baseline
-      peak_right.setBaselineLeft(peak_left.getBaselineRight()); 
+      peak_right.setBaselineLeft(peak_left.getBaselineRight());
       // extend left baseline to right baseline using the left peak sample rate
       peak_left.setWindowEnd(peak_right.getWindowStart());
     }
@@ -81,7 +81,7 @@ namespace SmartPeak
     {
       // Overlapping windows; Left baseline is higher
       // increase the right peak baseline to match the left peak baseline
-      peak_right.setBaselineLeft(peak_left.getBaselineRight()); 
+      peak_right.setBaselineLeft(peak_left.getBaselineRight());
       // find the overlap
       const double overlap = findPeakOverlap(
         peak_left, emg_left,
@@ -102,7 +102,7 @@ namespace SmartPeak
       );
       peak_right.setWindowStart(overlap);
       peak_left.setWindowEnd(overlap);
-    }    
+    }
   }
 
   void ChromatogramSimulator::simulateChromatogram(std::vector<double>& x_O, std::vector<double>& y_O,
@@ -138,7 +138,7 @@ namespace SmartPeak
     if (peak_emg_pairs.size() > 1)
     {
       for (int i=1; i<peak_emg_pairs.size(); ++i)
-      {      
+      {
         joinPeakWindows(peak_emg_pairs[i-1].first, peak_emg_pairs[i-1].second,
           peak_emg_pairs[i].first, peak_emg_pairs[i].second);
       }
@@ -146,7 +146,7 @@ namespace SmartPeak
 
     // Add the peaks in order
     for (int i=0; i<peak_emg_pairs.size(); ++i)
-    {  
+    {
       // make the first peak
       std::vector<double> x, y;
       peak_emg_pairs[i].first.simulatePeak(x, y, peak_emg_pairs[i].second);
@@ -156,6 +156,6 @@ namespace SmartPeak
       x_O.insert(x_O.end(), x.begin(), x.end());
       y_O.reserve(y_O.size() + distance(y.begin(), y.end()));
       y_O.insert(y_O.end(), y.begin(), y.end());
-    }    
+    }
   }
 }

@@ -1,6 +1,6 @@
 /**TODO:  Add copyright*/
 
-#define BOOST_TEST_MODULE CSVWriter test suite 
+#define BOOST_TEST_MODULE CSVWriter test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/CSVWriter.h>
 
@@ -11,7 +11,7 @@ using namespace std;
 
 BOOST_AUTO_TEST_SUITE(CSVWriter1)
 
-BOOST_AUTO_TEST_CASE(constructor) 
+BOOST_AUTO_TEST_CASE(constructor)
 {
   CSVWriter* ptr = nullptr;
   CSVWriter* nullPointer = nullptr;
@@ -19,14 +19,14 @@ BOOST_AUTO_TEST_CASE(constructor)
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
-BOOST_AUTO_TEST_CASE(destructor) 
+BOOST_AUTO_TEST_CASE(destructor)
 {
   CSVWriter* ptr = nullptr;
-	ptr = new CSVWriter();
+  ptr = new CSVWriter();
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(constructor2) 
+BOOST_AUTO_TEST_CASE(constructor2)
 {
   CSVWriter csvwriter("filename1", ";");
 
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(constructor2)
   BOOST_CHECK_EQUAL(csvwriter.getLineCount(), 0);
 }
 
-BOOST_AUTO_TEST_CASE(gettersAndSetters) 
+BOOST_AUTO_TEST_CASE(gettersAndSetters)
 {
   CSVWriter csvwriter;
   csvwriter.setFilename("filename1");
@@ -47,23 +47,23 @@ BOOST_AUTO_TEST_CASE(gettersAndSetters)
   BOOST_CHECK_EQUAL(csvwriter.getLineCount(), 1);
 }
 
-BOOST_AUTO_TEST_CASE(writeDataInRow) 
+BOOST_AUTO_TEST_CASE(writeDataInRow)
 {
   std::string filename = "CSVWriterTest.csv";
-  std::vector<std::string> headers, line;  
+  std::vector<std::string> headers, line;
   CSVWriter csvwriter(filename);
 
   // Write the data to file
   headers = {"Column1", "Column2", "Column3"};
-	csvwriter.writeDataInRow(headers.begin(), headers.end());
+  csvwriter.writeDataInRow(headers.begin(), headers.end());
   line = {"a", "b", "c" };
-	csvwriter.writeDataInRow(line.begin(), line.end());
+  csvwriter.writeDataInRow(line.begin(), line.end());
   line = {"1", "2", "3" };
-	csvwriter.writeDataInRow(line.begin(), line.end());
+  csvwriter.writeDataInRow(line.begin(), line.end());
 
   // Read the data back in
   io::CSVReader<3> test_in(filename);
-  test_in.read_header(io::ignore_extra_column, 
+  test_in.read_header(io::ignore_extra_column,
     "Column1", "Column2", "Column3");
   std::string col1, col2, col3;
 

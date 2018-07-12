@@ -1,6 +1,6 @@
 /**TODO:  Add copyright*/
 
-#define BOOST_TEST_MODULE PeakSimulator test suite 
+#define BOOST_TEST_MODULE PeakSimulator test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/simulator/PeakSimulator.h>
 
@@ -16,16 +16,16 @@ BOOST_AUTO_TEST_SUITE(peaksimulator)
 // public:
 // };
 
-BOOST_AUTO_TEST_CASE(constructor) 
+BOOST_AUTO_TEST_CASE(constructor)
 {
   PeakSimulator* ptr = nullptr;
   PeakSimulator* nullPointer = nullptr;
-	ptr = new PeakSimulator();
+  ptr = new PeakSimulator();
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
-BOOST_AUTO_TEST_CASE(constructor2) 
-{  
+BOOST_AUTO_TEST_CASE(constructor2)
+{
   PeakSimulator psim(500.0, 1.0, 0.0, 10.0, 2.0, 1.0, 5.0, 10.0, 1e6);
 
   BOOST_CHECK_EQUAL(psim.getStepSizeMu(), 500.0);
@@ -39,14 +39,14 @@ BOOST_AUTO_TEST_CASE(constructor2)
   BOOST_CHECK_EQUAL(psim.getSaturationLimit(), 1e6);
 }
 
-BOOST_AUTO_TEST_CASE(destructor) 
+BOOST_AUTO_TEST_CASE(destructor)
 {
   PeakSimulator* ptr = nullptr;
-	ptr = new PeakSimulator();
+  ptr = new PeakSimulator();
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(gettersAndSetters) 
+BOOST_AUTO_TEST_CASE(gettersAndSetters)
 {
   PeakSimulator psim;
   psim.setStepSizeMu(500.0);
@@ -70,8 +70,8 @@ BOOST_AUTO_TEST_CASE(gettersAndSetters)
   BOOST_CHECK_EQUAL(psim.getSaturationLimit(), 1e6);
 }
 
-BOOST_AUTO_TEST_CASE(generateRangeWithNoise) 
-{ 
+BOOST_AUTO_TEST_CASE(generateRangeWithNoise)
+{
   PeakSimulator psim;
 
   // no noise
@@ -98,8 +98,8 @@ BOOST_AUTO_TEST_CASE(generateRangeWithNoise)
   BOOST_CHECK_EQUAL(range[10], 10.0);
 }
 
-BOOST_AUTO_TEST_CASE(addNoise) 
-{ 
+BOOST_AUTO_TEST_CASE(addNoise)
+{
   PeakSimulator psim;
 
   // no noise
@@ -128,14 +128,14 @@ BOOST_AUTO_TEST_CASE(addNoise)
   }
 }
 
-BOOST_AUTO_TEST_CASE(addBaseline) 
-{ 
+BOOST_AUTO_TEST_CASE(addBaseline)
+{
   PeakSimulator psim;
 
   // toy peak
   const std::vector<double> x = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   const std::vector<double> y = {0, 0, 1, 3, 7, 10, 7, 3, 1, 0, 0};
-  
+
   // no baseline
   std::vector<double> y_baseline = y;
   psim.addBaseline(x, y_baseline, 0.0, 0.0, 5);
@@ -155,13 +155,13 @@ BOOST_AUTO_TEST_CASE(addBaseline)
   }
 }
 
-BOOST_AUTO_TEST_CASE(flattenPeak) 
-{ 
+BOOST_AUTO_TEST_CASE(flattenPeak)
+{
   PeakSimulator psim;
 
   // toy peak
   const std::vector<double> y = {0, 0, 1, 3, 7, 10, 7, 3, 1, 0, 0};
-  
+
   // no saturation
   std::vector<double> y_saturation = y;
   psim.flattenPeak(y_saturation, 10);
@@ -180,24 +180,24 @@ BOOST_AUTO_TEST_CASE(flattenPeak)
   }
 }
 
-BOOST_AUTO_TEST_CASE(simulatePeak) 
-{ 
+BOOST_AUTO_TEST_CASE(simulatePeak)
+{
 
   // time and intensity arrays
   std::vector<double> x, y;
 
   // Gaussian peak, evenly spaced points, no detector noise or saturation
-  PeakSimulator psim(1.0, 0.0, 
-    0.0, 10.0, 
+  PeakSimulator psim(1.0, 0.0,
+    0.0, 10.0,
     0.0, 0.0,
-    0.0, 0.0, 
+    0.0, 0.0,
     15);
   EMGModel emg(10.0, 0.0, 5.0, 1.0);
 
   psim.simulatePeak(x, y, emg);
   std::vector<double> x_test = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   std::vector<double> y_test = {3.7266531720786709e-05,
-    0.0033546262790251184, 0.11108996538242306, 
+    0.0033546262790251184, 0.11108996538242306,
     1.353352832366127, 6.0653065971263338, 10,
     6.0653065971263338, 1.353352832366127, 0.11108996538242306,
     0.0033546262790251184, 3.7266531720786709e-05};
@@ -212,10 +212,10 @@ BOOST_AUTO_TEST_CASE(simulatePeak)
   y.clear();
 
   // Tailing peak, evenly spaced points, no detector noise or saturation
-  psim = PeakSimulator(1.0, 0.0, 
-    0.0, 10.0, 
+  psim = PeakSimulator(1.0, 0.0,
+    0.0, 10.0,
     0.0, 0.0,
-    0.0, 0.0, 
+    0.0, 0.0,
     15);
   emg = EMGModel(10.0, 0.5, 5.0, 1.0);
 
@@ -235,10 +235,10 @@ BOOST_AUTO_TEST_CASE(simulatePeak)
   y.clear();
 
   // Tailing peak, non-evenly spaced points, detector noise and saturation
-  psim = PeakSimulator(1.0, 0.1, 
-    0.0, 10.0, 
+  psim = PeakSimulator(1.0, 0.1,
+    0.0, 10.0,
     0.0, 0.5,
-    1.0, 3.0, 
+    1.0, 3.0,
     8);
   emg = EMGModel(10.0, 0.5, 5.0, 1.0);
 
@@ -259,17 +259,17 @@ BOOST_AUTO_TEST_CASE(simulatePeak)
   y.clear();
 
   // Negative step size
-  psim = PeakSimulator(-0.2, 0.0, 
-    0.0, 10.0, 
+  psim = PeakSimulator(-0.2, 0.0,
+    0.0, 10.0,
     0.0, 0.0,
-    0.0, 0.0, 
+    0.0, 0.0,
     15);
   emg = EMGModel(10.0, 0.0, 5.0, 1.0);
 
   psim.simulatePeak(x, y, emg);
   x_test = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
   y_test = {3.7266531720786709e-05,
-    0.0033546262790251184, 0.11108996538242306, 
+    0.0033546262790251184, 0.11108996538242306,
     1.353352832366127, 6.0653065971263338, 10,
     6.0653065971263338, 1.353352832366127, 0.11108996538242306,
     0.0033546262790251184, 3.7266531720786709e-05};

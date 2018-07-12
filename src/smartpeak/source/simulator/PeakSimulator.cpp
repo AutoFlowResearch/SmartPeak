@@ -185,12 +185,12 @@ namespace SmartPeak
   {
     for (double& value: array_IO)
     {
-      value = (value > saturation_limit) ? saturation_limit: value;      
+      value = (value > saturation_limit) ? saturation_limit: value;
     }
   }
 
   void PeakSimulator::simulatePeak(
-    std::vector<double>& x_O, std::vector<double>& y_O, 
+    std::vector<double>& x_O, std::vector<double>& y_O,
     const EMGModel& emg) const
   {
     x_O.clear();

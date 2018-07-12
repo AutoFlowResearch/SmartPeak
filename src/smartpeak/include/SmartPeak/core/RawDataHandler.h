@@ -17,10 +17,10 @@ namespace SmartPeak
 
   class RawDataHandler
   {
-public:    
+public:
     RawDataHandler() = default;  ///< Default constructor
-    ~RawDataHandler() = default;  ///< Default destructor    
-    
+    ~RawDataHandler() = default;  ///< Default destructor
+
     void setFeatureMap(const OpenMS::FeatureMap& featureMap_I);
     OpenMS::FeatureMap getFeatureMap() const;
 
@@ -32,26 +32,26 @@ public:
     std::map<std::string, std::vector<std::map<std::string, std::string>>> getParameters() const;
 
     // [REFACTOR: change to set/getTargetedExperiment]
-    void setTargeted(const OpenMS::TargetedExperiment& targeted_I);      
+    void setTargeted(const OpenMS::TargetedExperiment& targeted_I);
     OpenMS::TargetedExperiment getTargeted() const;
 
     // [TODO: need to update this at some point...]
-    // setReferenceData(, reference_data_I);      
+    // setReferenceData(, reference_data_I);
     // getReferenceData();
 
-    void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods_I);      
+    void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods_I);
     std::vector<OpenMS::AbsoluteQuantitationMethod> getQuantitationMethods() const;
 
-    void setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter_I);      
+    void setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter_I);
     OpenMS::MRMFeatureQC getFeatureFilter() const;
 
-    void setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc_I);      
+    void setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc_I);
     OpenMS::MRMFeatureQC getFeatureQC() const;
-      
+
     void setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps_I);
     std::vector<OpenMS::FeatureMap> getFeatureMapHistory() const;
 
-private:    
+private:
     // input
     OpenMS::MSExperiment msExperiment_;
     OpenMS::MSExperiment chromatogram_map_;

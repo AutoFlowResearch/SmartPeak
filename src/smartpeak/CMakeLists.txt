@@ -11,9 +11,9 @@ set(CF_SMARTPEAK_PACKAGE_VERSION "${SMARTPEAK_PACKAGE_VERSION_MAJOR}.${SMARTPEAK
 #------------------------------------------------------------------------------
 # En/disable assertions
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-	set(CF_SMARTPEAK_ASSERTIONS 1)
+  set(CF_SMARTPEAK_ASSERTIONS 1)
 else()
-	set(CF_SMARTPEAK_ASSERTIONS 0)
+  set(CF_SMARTPEAK_ASSERTIONS 0)
 endif()
 set(CF_SMARTPEAK_ASSERTIONS ${CF_SMARTPEAK_ASSERTIONS} CACHE INTERNAL "Enables debug messages (precondition and postconditions are enabled, a bit slower) - this is NOT changing any compiler flags!" FORCE)
 
@@ -53,7 +53,7 @@ if (TBB_FOUND)
  list(APPEND SMARTPEAK_DEP_LIBRARIES ${TBB_LIBRARIES})
 endif()
 if (MSVC)
-	list(APPEND SMARTPEAK_DEP_LIBRARIES opengl32.lib)
+  list(APPEND SMARTPEAK_DEP_LIBRARIES opengl32.lib)
 endif()
 
 smartpeak_add_library(TARGET_NAME  SmartPeak

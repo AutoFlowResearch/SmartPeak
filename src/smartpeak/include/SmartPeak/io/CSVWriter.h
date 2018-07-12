@@ -32,21 +32,21 @@ public:
 
     void setLineCount(const int& line_count); ///< line_count setter
     int getLineCount() const; ///< line_count getter
- 
+
     /**
       @brief This Function accepts a range and appends all the elements in the range
         to the last row, seperated by delimeter (Default is comma)
 
       @param first Iterator to the first element
       @param last Iterator to the last element
-    */ 
+    */
     template<typename T>
     void writeDataInRow(T first, T last)
     {
       std::fstream file;
       // Open the file in truncate mode if first line else in Append Mode
       file.open(filename_, std::ios::out | (line_count_ ? std::ios::app : std::ios::trunc));
-    
+
       // Iterate over the range and add each lement to file seperated by delimeter.
       for (; first != last; )
       {
@@ -56,7 +56,7 @@ public:
       }
       file << "\n";
       line_count_++;
-    
+
       // Close the file
       file.close();
     }
