@@ -5,6 +5,7 @@ set(directory source/core)
 set(sources_list
 	Helloworld.cpp
 	RawDataHandler.cpp
+	SampleGroupHandler.cpp
 )
 
 ### add path to the filenames
