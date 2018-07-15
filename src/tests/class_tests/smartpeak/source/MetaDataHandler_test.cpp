@@ -7,7 +7,7 @@
 using namespace SmartPeak;
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(rawdatahandler)
+BOOST_AUTO_TEST_SUITE(metadatahandler)
 
 BOOST_AUTO_TEST_CASE(constructor) 
 {
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(checkSampleType)
   MetaDataHandler metaDataHandler;
 
   std::vector<std::string> sample_types_valid = {
-    "Unknown", "Standard", "QC", "Blank", "Double Blank", "Solvent", "BLANK", ""};  
+    "Unknown", "Standard", "QC", "Blank", "Double Blank", "Solvent"};  
   for (const std::string& sample_type: sample_types_valid)
     BOOST_CHECK(metaDataHandler.checkSampleType(sample_type));
 

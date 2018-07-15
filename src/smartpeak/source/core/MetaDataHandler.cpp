@@ -57,7 +57,7 @@ namespace SmartPeak
     return sample_type_;
   }
 
-  static bool checkSampleType(const std::string& sample_type_I)
+  bool MetaDataHandler::checkSampleType(const std::string& sample_type_I)
   {
     std::vector<std::string> sample_types = {
       "Unknown", "Standard", "QC", "Blank", "Double Blank", "Solvent"};
