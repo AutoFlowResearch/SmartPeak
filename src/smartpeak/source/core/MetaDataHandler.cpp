@@ -70,10 +70,10 @@ namespace SmartPeak
 
   void MetaDataHandler::clear()
   {    
-    sample_name_ = "";
-    sample_group_name_ = "";
-    sequence_segment_name_ = "";
-    filename_ = "";
-    sample_type_ = "";
+    sample_name_.clear();
+    sample_group_name_.clear();
+    sequence_segment_name_.clear();
+    filename_.clear();
+    sample_type_.clear();
   }
 }
