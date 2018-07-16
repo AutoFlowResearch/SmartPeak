@@ -13,14 +13,14 @@ BOOST_AUTO_TEST_CASE(constructor)
 {
   SampleGroupHandler* ptr = nullptr;
   SampleGroupHandler* nullPointer = nullptr;
-	ptr = new SampleGroupHandler();
+  ptr = new SampleGroupHandler();
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
 BOOST_AUTO_TEST_CASE(destructor)
 {
   SampleGroupHandler* ptr = nullptr;
-	ptr = new SampleGroupHandler();
+  ptr = new SampleGroupHandler();
   delete ptr;
 }
 
