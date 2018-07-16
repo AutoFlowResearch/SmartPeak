@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <SmartPeak/core/MetaDataHandler.h>
+#include <SmartPeak/core/RawDataHandler.h>
+
 namespace SmartPeak
 {
   class SampleHandler
@@ -12,16 +15,16 @@ public:
 
     void clear();
 
-    void setMetaData(const META_DATA_TYPE& meta_data);
+    void setMetaData(const MetaDataHandler& meta_data);
 
-    META_DATA_TYPE& getMetaData() const;
+    MetaDataHandler& getMetaData() const;
 
-    void setRawData(const RAW_DATA_TYPE& raw_data);
+    void setRawData(const RawDataHandler& raw_data);
 
-    RAW_DATA_TYPE& getRawData() const;
+    RawDataHandler& getRawData() const;
 
 private:
-    META_DATA_TYPE meta_data_;
-    RAW_DATA_TYPE raw_data_;
+    MetaDataHandler meta_data_;
+    RawDataHandler raw_data_;
   };
 }

@@ -10,22 +10,22 @@ namespace SmartPeak
       raw_data_.clear();
     }
 
-    void setMetaData(const META_DATA_TYPE& meta_data)
+    void setMetaData(const MetaDataHandler& meta_data)
     {
       meta_data_ = meta_data;
     }
 
-    META_DATA_TYPE& getMetaData() const
+    MetaDataHandler& getMetaData() const
     {
       return meta_data_;
     }
 
-    void setRawData(const RAW_DATA_TYPE& raw_data)
+    void setRawData(const RawDataHandler& raw_data)
     {
       raw_data_ = raw_data;
     }
 
-    RAW_DATA_TYPE& getRawData() const
+    RawDataHandler& getRawData() const
     {
       return raw_data_;
     }
