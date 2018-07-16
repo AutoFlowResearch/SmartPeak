@@ -14,12 +14,12 @@ namespace SmartPeak
     return featureMap_;
   }
 
-  void RawDataHandler::setMetaData(const std::map<std::string, std::string>& meta_data_I)
+  void RawDataHandler::setMetaData(const MetaDataHandler& meta_data_I)
   {
     meta_data_ = meta_data_I;
   }
 
-  std::map<std::string, std::string> RawDataHandler::getMetaData() const
+  MetaDataHandler RawDataHandler::getMetaData() const
   {
     return meta_data_;
   }

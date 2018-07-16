@@ -9,6 +9,8 @@
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
 #include <OpenMS/ANALYSIS/MAPMATCHING/TransformationDescription.h>
 
+#include <SmartPeak/core/MetaDataHandler.h>
+
 #include <map>
 #include <vector>
 
@@ -24,8 +26,8 @@ public:
     void setFeatureMap(const OpenMS::FeatureMap& featureMap_I);
     OpenMS::FeatureMap getFeatureMap() const;
 
-    void setMetaData(const std::map<std::string, std::string>& meta_data_I);
-    std::map<std::string, std::string> getMetaData() const;
+    void setMetaData(const MetaDataHandler& meta_data_I);
+    MetaDataHandler getMetaData() const;
 
     void setParameters(
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_I);
@@ -60,7 +62,7 @@ private:
 
     // output
     OpenMS::FeatureMap featureMap_;
-    std::map<std::string, std::string> meta_data_;
+    MetaDataHandler meta_data_;
     std::map<std::string, float> validation_metrics_;
     std::vector<OpenMS::FeatureMap> featureMapHistory_;
 
