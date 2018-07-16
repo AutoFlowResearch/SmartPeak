@@ -13,7 +13,14 @@ public:
     SampleGroupHandler() = default;
     ~SampleGroupHandler() = default;
 
-    std::string sample_group_name;
-    std::vector<size_t> sample_indices;
+    void setSampleGroupName(std::string& sample_group_name);
+    const std::string& getSampleGroupName() const;
+
+    void setSampleIndices(std::vector<size_t>& sample_indices);
+    const std::vector<size_t>& getSampleIndices() const;
+
+private:
+    std::string sample_group_name_;
+    std::vector<size_t> sample_indices_;
   };
 }
