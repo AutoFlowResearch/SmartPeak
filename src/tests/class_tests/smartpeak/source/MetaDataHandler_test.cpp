@@ -24,10 +24,37 @@ BOOST_AUTO_TEST_CASE(destructor)
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(gettersAndSetters) 
+BOOST_AUTO_TEST_CASE(gettersAndSettersAndClear) 
 {
   MetaDataHandler metaDataHandler;
-  // None
+  
+  // test defaults
+  BOOST_CHECK_EQUAL(metaDataHandler.getSampleName(), "");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSampleGroupName(), "");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSampleType(), "");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSequenceSegmentName(), "");
+  BOOST_CHECK_EQUAL(metaDataHandler.getFilename(), "");
+  
+  // test setters
+  metaDataHandler.setSampleName("1");
+  metaDataHandler.setSampleGroupName("2");
+  metaDataHandler.setSampleType("3");
+  metaDataHandler.setSequenceSegmentName("4");
+  metaDataHandler.setFilename("5");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSampleName(), "1");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSampleGroupName(), "2");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSampleType(), "3");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSequenceSegmentName(), "4");
+  BOOST_CHECK_EQUAL(metaDataHandler.getFilename(), "5");
+
+  // test clear
+  metaDataHandler.clear();
+  BOOST_CHECK_EQUAL(metaDataHandler.getSampleName(), "");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSampleGroupName(), "");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSampleType(), "");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSequenceSegmentName(), "");
+  BOOST_CHECK_EQUAL(metaDataHandler.getFilename(), "");
+
 }
 
 BOOST_AUTO_TEST_CASE(checkSampleType) 

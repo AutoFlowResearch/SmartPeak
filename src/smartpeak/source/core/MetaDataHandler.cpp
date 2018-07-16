@@ -67,4 +67,13 @@ namespace SmartPeak
     else
       return true;
   }
+
+  void MetaDataHandler::clear()
+  {    
+    sample_name_ = "";
+    sample_group_name_ = "";
+    sequence_segment_name_ = "";
+    filename_ = "";
+    sample_type_ = "";
+  }
 }

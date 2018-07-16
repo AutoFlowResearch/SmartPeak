@@ -30,11 +30,13 @@ public:
 
     static bool checkSampleType(const std::string& sample_type_I);
 
+    void clear();
+
 private:
-    std::string sample_name_;
-    std::string sample_group_name_;
-    std::string sequence_segment_name_;
-    std::string filename_;
-    std::string sample_type_; // [TODO: Refactor to use ENUM class]
+    std::string sample_name_ = "";
+    std::string sample_group_name_ = "";
+    std::string sequence_segment_name_ = "";
+    std::string filename_ = "";
+    std::string sample_type_ = ""; // [TODO: Refactor to use ENUM class]
   };
 }
