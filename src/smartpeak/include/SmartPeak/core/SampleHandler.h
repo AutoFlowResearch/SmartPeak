@@ -17,11 +17,13 @@ public:
 
     void setMetaData(const MetaDataHandler& meta_data);
 
-    MetaDataHandler& getMetaData() const;
+    MetaDataHandler& getMetaData();
+    MetaDataHandler getMetaData() const;
 
     void setRawData(const RawDataHandler& raw_data);
 
-    RawDataHandler& getRawData() const;
+    RawDataHandler& getRawData();
+    RawDataHandler getRawData() const;
 
 private:
     MetaDataHandler meta_data_;

@@ -15,7 +15,12 @@ namespace SmartPeak
       meta_data_ = meta_data;
     }
 
-    MetaDataHandler& getMetaData() const
+    MetaDataHandler& getMetaData()
+    {
+      return meta_data_;
+    }
+
+    MetaDataHandler getMetaData() const
     {
       return meta_data_;
     }
@@ -25,7 +30,12 @@ namespace SmartPeak
       raw_data_ = raw_data;
     }
 
-    RawDataHandler& getRawData() const
+    RawDataHandler& getRawData()
+    {
+      return raw_data_;
+    }
+
+    RawDataHandler getRawData() const
     {
       return raw_data_;
     }
