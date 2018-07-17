@@ -6,6 +6,7 @@ set(sources_list_h
 	Helloworld.h
 	MetaDataHandler.h
 	RawDataHandler.h
+	SampleGroupHandler.h
 	SampleHandler.h
 )
 
