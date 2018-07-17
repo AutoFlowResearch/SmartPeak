@@ -4,38 +4,38 @@
 
 namespace SmartPeak
 {
-    void clear()
+    void SampleHandler::clear()
     {
       meta_data_.clear();
-      raw_data_.clear();
+      // raw_data_.clear(); // TODO: implement .clear() in RawDataHandler
     }
 
-    void setMetaData(const MetaDataHandler& meta_data)
+    void SampleHandler::setMetaData(const MetaDataHandler& meta_data)
     {
       meta_data_ = meta_data;
     }
 
-    MetaDataHandler& getMetaData()
+    MetaDataHandler& SampleHandler::getMetaData()
     {
       return meta_data_;
     }
 
-    MetaDataHandler getMetaData() const
+    MetaDataHandler SampleHandler::getMetaData() const
     {
       return meta_data_;
     }
 
-    void setRawData(const RawDataHandler& raw_data)
+    void SampleHandler::setRawData(const RawDataHandler& raw_data)
     {
       raw_data_ = raw_data;
     }
 
-    RawDataHandler& getRawData()
+    RawDataHandler& SampleHandler::getRawData()
     {
       return raw_data_;
     }
 
-    RawDataHandler getRawData() const
+    RawDataHandler SampleHandler::getRawData() const
     {
       return raw_data_;
     }
