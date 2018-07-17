@@ -5,6 +5,7 @@ set(directory include/SmartPeak/core)
 set(sources_list_h
 	Helloworld.h
 	RawDataHandler.h
+	SequenceSegmentHandler.h
 )
 
 ### add path to the filenames
