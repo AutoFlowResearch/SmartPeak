@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
+#include <OpenMS/METADATA/AbsoluteQuantitationStandards.h>
+
 namespace SmartPeak
 {
   class SequenceSegmentHandler
@@ -10,93 +13,66 @@ public:
     SequenceSegmentHandler() = default;
     ~SequenceSegmentHandler() = default;
 
-    def __init__(self):
-        """Sequence Group
-        """
-        self.sequence_segment_name = None
-        self.sample_indices = None
-        self.standards_concentrations = None
-        self.quantitation_methods = None
-        self.components_to_concentrations = None
+    void clear_data();
 
-    def clear_data(self):
-        self.sequence_segment_name = None
-        self.sample_indices = None
-        self.standards_concentrations = None
-        self.quantitation_methods = None
-        self.components_to_concentrations = None
+    void setSequenceSegmentName(std::string& sequence_segment_name);
+    std::string& getSequenceSegmentName();
+    std::string getSequenceSegmentName() const;
 
-    def setSequenceSegmentName(self, sequence_segment_name_I):
-        """Set the sequence_segment_name"""
-        self.sequence_segment_name = sequence_segment_name_I
-        
-    def getSequenceSegmentName(self):
-        """Return the sequence_segment_name"""
-        return self.sequence_segment_name
-    
-    def setSampleIndices(self, sample_indices_I):
-        """Set the sample_indices"""
-        self.sample_indices = sample_indices_I
-        
-    def getSampleIndices(self):
-        """Return the sample_indices"""
-        return self.sample_indices
+    void setSampleIndices(std::vector<size_t>& sample_indices);
+    std::vector<size_t>& getSampleIndices();
+    std::vector<size_t> getSampleIndices() const;
 
-    def setStandardsConcentrations(self, standards_concentrations_I):
-        """Set the standards_concentrations"""
-        self.standards_concentrations = standards_concentrations_I
-        
-    def getStandardsConcentrations(self):
-        """Return the standards_concentrations"""
-        return self.standards_concentrations
+    // void setStandardsConcentrations(STD_CONC_TYPE& standards_concentrations);
+    // STD_CONC_TYPE& getStandardsConcentrations();
+    // STD_CONC_TYPE getStandardsConcentrations() const;
 
-    def setQuantitationMethods(self, quantitation_methods_I):
-        """Set the quantitation_methods"""
-        self.quantitation_methods = quantitation_methods_I
-        
-    def getQuantitationMethods(self):
-        """Return the quantitation_methods"""
-        return self.quantitation_methods
+    void setQuantitationMethods(OpenMS::AbsoluteQuantitationMethod& quantitation_methods);
+    OpenMS::AbsoluteQuantitationMethod& getQuantitationMethods();
+    OpenMS::AbsoluteQuantitationMethod getQuantitationMethods() const;
 
-    def setComponentsToConcentrations(
-        self,
-        components_to_concentrations_I
-    ):
-        """Set the components_to_concentrations"""
-        self.components_to_concentrations = \
-            components_to_concentrations_I
-        
-    def getComponentsToConcentrations(self):
-        """Return the components_to_concentrations"""
-        return self.components_to_concentrations
+    void setComponentsToConcentrations(
+      std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations
+    );
 
-    # def getDefaultSampleOrder(self, sample_type):
-    #     """Return the default order for each sample in a group
-        
-    #     Args:
-    #         sample_type (str): type of sample
+    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
+    getComponentsToConcentrations();
 
-    #     Returns:
-    #         int: order
-            
-    #     """
+    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>
+    getComponentsToConcentrations() const;
 
-    #     order = -1
-    #     if sample_type == "Standard":
-    #         order = 0
-    #     elif sample_type == "Unknown":
-    #         order = 1 
-    #     elif sample_type == "QC":
-    #         order = 2 
-    #     elif sample_type == "Blank":
-    #         order = 3
-    #     elif sample_type == "Double Blank":
-    #         order = 3
-    #     elif sample_type == "Solvent":
-    #         pass
+    // void getDefaultSampleOrder(sample_type):
+    //     """Return the default order for each sample in a group
 
-    #     return order
+    //     Args:
+    //         sample_type (str): type of sample
+
+    //     Returns:
+    //         int: order
+
+    //     """
+
+    //     order = -1
+    //     if sample_type == "Standard":
+    //         order = 0
+    //     elif sample_type == "Unknown":
+    //         order = 1
+    //     elif sample_type == "QC":
+    //         order = 2
+    //     elif sample_type == "Blank":
+    //         order = 3
+    //     elif sample_type == "Double Blank":
+    //         order = 3
+    //     elif sample_type == "Solvent":
+    //         pass
+
+    //     return order
 
 private:
+    std::string sequence_segment_name_;
+    std::vector<size_t> sample_indices_;
+    // STD_CONC_TYPE standards_concentrations_;
+    OpenMS::AbsoluteQuantitationMethod quantitation_methods_;
+    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations_;
   };
 }
