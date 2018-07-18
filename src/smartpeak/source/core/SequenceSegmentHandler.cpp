@@ -4,13 +4,12 @@
 
 namespace SmartPeak
 {
-  void SequenceSegmentHandler::clear_data()
+  void SequenceSegmentHandler::clear_data() // TODO: rename to clear() ?
   {
     sequence_segment_name_.clear();
     sample_indices_.clear();
-    // TODO: implement the following two clears
-    // STD_CONC_TYPE standards_concentrations_.clear();
-    // OpenMS::AbsoluteQuantitationMethod quantitation_methods_;
+    standards_concentrations_.clear();
+    quantitation_methods_.clear();
     components_to_concentrations_.clear();
   }
 
@@ -44,32 +43,32 @@ namespace SmartPeak
     return sample_indices_;
   }
 
-  // void SequenceSegmentHandler::setStandardsConcentrations(STD_CONC_TYPE& standards_concentrations)
-  // {
-  //   standards_concentrations_ = standards_concentrations;
-  // }
+  void SequenceSegmentHandler::setStandardsConcentrations(std::vector<OpenMS::AbsoluteQuantitationStandards>& standards_concentrations)
+  {
+    standards_concentrations_ = standards_concentrations;
+  }
 
-  // STD_CONC_TYPE& SequenceSegmentHandler::getStandardsConcentrations()
-  // {
-  //   return standards_concentrations_;
-  // }
+  std::vector<OpenMS::AbsoluteQuantitationStandards>& SequenceSegmentHandler::getStandardsConcentrations()
+  {
+    return standards_concentrations_;
+  }
 
-  // STD_CONC_TYPE SequenceSegmentHandler::getStandardsConcentrations() const
-  // {
-  //   return standards_concentrations_;
-  // }
+  std::vector<OpenMS::AbsoluteQuantitationStandards> SequenceSegmentHandler::getStandardsConcentrations() const
+  {
+    return standards_concentrations_;
+  }
 
-  void SequenceSegmentHandler::setQuantitationMethods(OpenMS::AbsoluteQuantitationMethod& quantitation_methods)
+  void SequenceSegmentHandler::setQuantitationMethods(std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods)
   {
     quantitation_methods_ = quantitation_methods;
   }
 
-  OpenMS::AbsoluteQuantitationMethod& SequenceSegmentHandler::getQuantitationMethods()
+  std::vector<OpenMS::AbsoluteQuantitationMethod>& SequenceSegmentHandler::getQuantitationMethods()
   {
     return quantitation_methods_;
   }
 
-  OpenMS::AbsoluteQuantitationMethod SequenceSegmentHandler::getQuantitationMethods() const
+  std::vector<OpenMS::AbsoluteQuantitationMethod> SequenceSegmentHandler::getQuantitationMethods() const
   {
     return quantitation_methods_;
   }
