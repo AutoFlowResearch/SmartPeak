@@ -1,5 +1,6 @@
 // TODO: Add copyright
 
+#include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SequenceHandler.h>
 
 namespace SmartPeak
@@ -20,299 +21,222 @@ namespace SmartPeak
     filenames_.clear();
   }
 
-  void SequenceHandler::setFilenames(std::vector<std::string>& filenames)
+  void SequenceHandler::setFilenames(const std::map<std::string, std::string>& filenames)
   {
     filenames_ = filenames;
   }
 
-  std::vector<std::string>& SequenceHandler::getFilenames()
+  std::map<std::string, std::string>& SequenceHandler::getFilenames()
   {
     return filenames_;
   }
 
-  std::vector<std::string> SequenceHandler::getFilenames() const
+  std::map<std::string, std::string> SequenceHandler::getFilenames() const
   {
     return filenames_;
   }
 
-  void setDirStatic(std::string& dir_static)
+  void SequenceHandler::setDirStatic(const std::string& dir_static)
   {
     dir_static_ = dir_static;
     setFilenames(getDefaultStaticFilenames(dir_static));
   }
 
-  std::string& getDirStatic()
+  std::string& SequenceHandler::getDirStatic()
   {
     return dir_static_;
   }
 
-  std::string getDirStatic() const
+  std::string SequenceHandler::getDirStatic() const
   {
     return dir_static_;
   }
 
-  void setDirDynamic(std::string& dir_dynamic)
+  void SequenceHandler::setDirDynamic(const std::string& dir_dynamic)
   {
     dir_dynamic_ = dir_dynamic;
   }
 
-  std::string& getDirDynamic()
+  std::string& SequenceHandler::getDirDynamic()
   {
     return dir_dynamic_;
   }
 
-  std::string getDirDynamic() const
+  std::string SequenceHandler::getDirDynamic() const
   {
     return dir_dynamic_;
   }
 
-  void setSequence(std::vector<SampleHandler>& sequence)
+  void SequenceHandler::setSequence(const std::vector<SampleHandler>& sequence)
   {
     sequence_ = sequence;
   }
 
-  std::vector<SampleHandler>& getSequence()
+  std::vector<SampleHandler>& SequenceHandler::getSequence()
   {
     return sequence_;
   }
 
-  std::vector<SampleHandler> getSequence() const
+  std::vector<SampleHandler> SequenceHandler::getSequence() const
   {
     return sequence_;
   }
 
-  void setSequenceSegments(std::vector<SequenceSegmentHandler>& sequence_segments)
+  void SequenceHandler::setSequenceSegments(const std::vector<SequenceSegmentHandler>& sequence_segments)
   {
     sequence_segments_ = sequence_segments;
   }
 
-  std::vector<SequenceSegmentHandler>& getSequenceSegments()
+  std::vector<SequenceSegmentHandler>& SequenceHandler::getSequenceSegments()
   {
     return sequence_segments_;
   }
 
-  std::vector<SequenceSegmentHandler> getSequenceSegments() const
+  std::vector<SequenceSegmentHandler> SequenceHandler::getSequenceSegments() const
   {
     return sequence_segments_;
   }
 
-  void setSampleGroups(std::vector<SampleGroupHandler>& sample_groups)
+  void SequenceHandler::setSampleGroups(const std::vector<SampleGroupHandler>& sample_groups)
   {
     sample_groups_ = sample_groups;
   }
 
-  std::vector<SampleGroupHandler>& getSampleGroups()
+  std::vector<SampleGroupHandler>& SequenceHandler::getSampleGroups()
   {
     return sample_groups_;
   }
 
-  std::vector<SampleGroupHandler> getSampleGroups() const
+  std::vector<SampleGroupHandler> SequenceHandler::getSampleGroups() const
   {
     return sample_groups_;
   }
 
-  def getDefaultStaticFilenames(dir_I):
-      """Return the default map of filetype to filename for static files
+  std::map<std::string, std::string> SequenceHandler::getDefaultStaticFilenames(std::string& dir)
+  {
+    return {
+      {"sequence_csv_i", dir + "/sequence.csv"},
+      {"parameters_csv_i", dir + "/parameters.csv"},
+      {"traML_csv_i", dir + "/traML.csv"},
+      {"featureFilterComponents_csv_i", dir + "/featureFilterComponents.csv"},
+      {"featureFilterComponentGroups_csv_i", dir + "/featureFilterComponentGroups.csv"},
+      {"featureQCComponents_csv_i", dir + "/featureQCComponents.csv"},
+      {"featureQCComponentGroups_csv_i", dir + "/featureQCComponentGroups.csv"},
+      {"quantitationMethods_csv_i", dir + "/quantitationMethods.csv"},
+      {"standardsConcentrations_csv_i", dir + "/standardsConcentrations.csv"},
+      {"db_json_i", dir + "/db.json"}
+    };
+  }
 
-      Static files are small and consist of application settings that
-      are loaded in at the start of the application.
-      
-      Args:
-          dir_I (str): the directory that all files can be found
-          
-      Returns:
-          dict: filenames
-      """
-      
-      filenames = {
-          # static
-          'sequence_csv_i': '''%s/%s''' % (dir_I, "sequence.csv"),
-          'parameters_csv_i': '''%s/%s''' % (dir_I, "parameters.csv"),
-          'traML_csv_i': '''%s/%s''' % (dir_I, "traML.csv"),
-          'featureFilterComponents_csv_i': '''%s/%s''' % (
-              dir_I, "featureFilterComponents.csv"),
-          'featureFilterComponentGroups_csv_i': '''%s/%s''' % (
-              dir_I, "featureFilterComponentGroups.csv"),
-          'featureQCComponents_csv_i': '''%s/%s''' % (
-              dir_I, "featureQCComponents.csv"),
-          'featureQCComponentGroups_csv_i': '''%s/%s''' % (
-              dir_I, "featureQCComponentGroups.csv"),
-          'quantitationMethods_csv_i': '''%s/%s''' % (
-              dir_I, "quantitationMethods.csv"),
-          'standardsConcentrations_csv_i': '''%s/%s''' % (
-              dir_I, "standardsConcentrations.csv"),
-          'db_json_i': '''%s/%s''' % (dir_I, "db.json")
-          }
-      return filenames
+  std::map<std::string, std::string> SequenceHandler::getDefaultDynamicFilenames(
+    const std::string& dir,
+    std::string& sample_name
+  ) const
+  {
+    std::string features = dir + "/features/" + sample_name;
+    return {
+      {"mzML_i", dir + "/mzML/" + sample_name + ".mzML"},
+      {"featureXML_o", features + ".featureXML"},
+      {"feature_csv_o", features + ".csv"},
+      {"featureXML_i", features + ".featureXML"},
+      {"features_pdf_o", features},
+      {"calibrators_pdf_o", features},
+      {"quantitationMethods_csv_o", features + "_quantitationMethods.csv"},
+      {"componentsToConcentrations_csv_o", features + "_componentsToConcentrations.csv"}
+    };
+  }
 
-  def getDefaultDynamicFilenames(dir_I, sample_name_I):
-      """Return the default map of filetype to filename for dynamic files
+  void SequenceHandler::addSampleToSequence(const SampleHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I)
+  {
+    """add meta_data and featureMap to a sequence list
 
-      Dynamic files are often much larger and are read/written to
-      disk as needed by the application
-      
-      Args:
-          dir_I (str): the directory that all files can be found
-          sample_name_I (str): the name of the file
-              (also the sample_name, sample_group_name, or sequence_segment_name)
-          
-      Returns:
-          dict: filenames
-      """
-      
-      filenames = {
-          # dynamic
-          'mzML_i': '''%s/mzML/%s.mzML''' % (dir_I, sample_name_I),
-          'featureXML_o': '''%s/features/%s.FeatureXML''' % (dir_I, sample_name_I),
-          'feature_csv_o': '''%s/features/%s.csv''' % (dir_I, sample_name_I),
-          'featureXML_i': '''%s/features/%s.FeatureXML''' % (dir_I, sample_name_I),
-          'features_pdf_o': '''%s/features/%s''' % (dir_I, sample_name_I),
-          # .pdf added dynamically
-          'calibrators_pdf_o': '''%s/features/%s''' % (dir_I, sample_name_I),
-          # .pdf added dynamically
-          'quantitationMethods_csv_o': '''%s/features/%s_quantitationMethods.csv''' % (
-              dir_I, sample_name_I),
-          'componentsToConcentrations_csv_o': '''%s/features/
-              %s_componentsToConcentrations.csv''' % (dir_I, sample_name_I),
-          }
-      return filenames
+    Args:
+        meta_data_I (dict): dictionary of meta data (e.g., sample_name)
+        featureMap_I (FeatureMap): processed data in a FeatureMap
 
-  def addSampleToSequence(
-      meta_data_I, featureMap_I, 
-  ):
-      """add meta_data and featureMap to a sequence list
+    Returns:
+        dict: injection: dictionary of meta_data and FeatureMap
+    """
 
-      Args:
-          meta_data_I (dict): dictionary of meta data (e.g., sample_name)
-          featureMap_I (FeatureMap): processed data in a FeatureMap
+    meta_data = parse_metaData(meta_data_I)
 
-      Returns:
-          dict: injection: dictionary of meta_data and FeatureMap
-      """
+    RawDataHandler rdh;
+    rdh.setFeatureMap(featureMap_I);
 
-      meta_data = self.parse_metaData(meta_data_I)
+    SampleHandler sh;
+    sh.setMetaData(meta_data_I);
+    sh.setRawData(rdh);
 
-      sample = SampleHandler()
-      sample.meta_data = meta_data
-      sample.featureMap = featureMap_I
+    sequence_.push_back(sh);
+    index_to_sample_.erase(sequence_.size() - 1);
+    index_to_sample_.emplace(sequence_.size() - 1, meta_data_I.getSampleName());
+    sample_to_index_.erase(meta_data_I.getSampleName());
+    sample_to_index_.emplace(meta_data_I.getSampleName(), sequence_.size() - 1);
+  }
 
-      self.sequence.append(sample)
-      self.index_to_sample[len(self.sequence)-1] = meta_data["sample_name"]
-      self.sample_to_index[meta_data["sample_name"]] = len(self.sequence)-1
+  void SequenceHandler::getSamplesInSequence(std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const
+  {
+    samples.clear();
 
-  def getSamplesInSequence(sample_names):
-      """Return samples in a sequence
-      
-      Args:
-          sample_names (list): list of str sample names
-      """
+    for (const std::string& name : sample_names) {
+      if (sample_to_index_.count(name)) {
+        samples.push_back(sequence_[sample_to_index_.at(name)]);
+      }
+    }
+  }
 
-      samples = [
-          self.sequence[self.sample_to_index[sample]] for sample in sample_names
-          if sample in self.sample_to_index.keys()]
-      return samples
+  float SequenceHandler::getMetaValue(
+    const OpenMS::Feature& feature,
+    const OpenMS::Feature& subordinate,
+    const std::string& meta_value
+  ) const
+  {
+    float datum = 0.0;
 
-  def getMetaValue(feature, subordinate, meta_value):
-      """Returns the metaValue
-      
-      Args:
-          feature (Feature): OpenMS::Feature corresponding to transition_group
-          subordinate (Feature): OPENMS::Feature corresponding to transition
+    if (meta_value == "RT") {
+      datum = feature.getRT();
+    } else {
+      datum = feature.metaValueExists(meta_value) ?
+        feature.getMetaValue(meta_value) : subordinate.getMetaValue(meta_value);
+    }
 
-      Returns:
-          float: datum: metaValue extraction from feature or subordinate
-          
-      """
-      datum = None
-      if meta_value == "RT":
-          datum = feature.getRT()
-      else:
-          datum = feature.getMetaValue(meta_value)
-          if datum is None:
-              datum = subordinate.getMetaValue(meta_value)
-      return datum
+    return datum;
+  }
 
-  def getRequiredHeaders(self):
-      """Return required headers in a sequence file"""
+  void SequenceHandler::parse_metaData(const MetaDataHandler& meta_data)
+  {
+    std::vector<std::string> sample_types =
+      {"Unknown", "Standard", "QC", "Blank", "Double Blank", "Solvent"};
 
-      # # MultiQuant Example
-      # required_headers = [
-      #     "SampleName","SampleID",
-      #     "Comments","AcqMethod",
-      #     "ProcMethod","RackCode","PlateCode","VialPos","SmplInjVol",
-      #     "DilutFact","WghtToVol","Type","RackPos","PlatePos",
-      #     "SetName","OutputFile"
-      #     ]
+    if (meta_data.getSampleName().empty()) {
+      std::cout << "SequenceFile Error: sample_name must be specified." << std::endl;
+      throw std::runtime_error("sample name");
+    }
 
-      # optional_headers = [
-      #     "comments", "acquisition_method", "processing_method",
-      #     "rack_code", "plate_code", "vial_position", "rack_position", 
-      #     "plate_position",
-      #     "injection_volume", "dilution_factor", "weight_to_volume",
-      #     "set_name"]
+    if (meta_data.getSampleGroupName().empty()) {
+      std::cout << "SequenceFile Error: sample_group_name must be specified." << std::endl;
+      throw std::runtime_error("sample group name");
+    }
 
-      required_headers = [
-          "sample_name", "sample_group_name", "sample_type", "filename",
-          "sequence_segment_name"
-          ]
+    if (meta_data.getSequenceSegmentName().empty()) {
+      std::cout << "SequenceFile Error: sequence_segment_name must be specified." << std::endl;
+      throw std::runtime_error("sequence segment name");
+    }
 
-      return required_headers
+    if (meta_data.getFilename().empty()) {
+      std::cout << "SequenceFile Error: filename must be specified." << std::endl;
+      throw std::runtime_error("filename");
+    }
 
-  def parse_metaData(meta_data):
-      """Parse a sequence file to ensure all headers are present
-      
-      Args:
-          meta_data (dict): a dictionary of sample information
+    std::vector<std::string>::const_container it =
+      std::find(sample_types.cbegin(), sample_types.cend(), meta_data.getSampleType());
 
-      Returns:
-          dict: meta_data
-      """
-
-      sample_types = ["Unknown", "Standard", "QC", "Blank", "Double Blank", "Solvent"]
-      sample_types_str = ",".join(sample_types)
-
-      # check for required headers
-      for header in self.getRequiredHeaders():
-          if header not in meta_data:
-              print(
-                  'SequenceFile Error: required header in sequence list "' +
-                  header + '" not found.')
-              raise NameError("sequenceFile header")
-              # meta_data[header] = None  # not needed
-          
-      # check for correctness of data
-      if meta_data["sample_name"] is None:
-          print(
-              "SequenceFile Error: sample_name must be specified.")
-          raise NameError("sample name")
-      if meta_data["sample_group_name"] is None:
-          print(
-              "SequenceFile Error: sample_group_name must be specified.")
-          raise NameError("sample group name")
-      if meta_data["sequence_segment_name"] is None:
-          print(
-              "SequenceFile Error: sequence_segment_name must be specified.")
-          raise NameError("sequence group name")
-      if meta_data["filename"] is None:
-          print(
-              "SequenceFile Error: filename must be specified.")
-          raise NameError("filename name")
-      if meta_data["filename"] is None:
-          print(
-              "SequenceFile Error: filename must be specified.")
-          raise NameError("filename name")
-
-      if meta_data["sample_type"] is None or\
-          meta_data["sample_type"] not in sample_types:
-          print(
-              "SequenceFile Error: sample_type for sample_name " +
-              meta_data["sample_name"] + " is not correct.")
-          print(
-              "Supported samples types are the following: " +
-              sample_types_str)
-          raise NameError("sample type")
-
-      # other checks...
-
-      return meta_data
+    if (meta_data.getSampleType().empty() || it == sample_types.cend()) {
+      std::cout << "SequenceFile Error: sample_type for sample_name "
+        << meta_data.getSampleName() << " is not correct." << std::endl;
+      std::cout << "Supported samples types are the following: "
+        << sample_types_str << std::endl;
+      throw std::runtime_error("sample type");
+    }
+  }
 }

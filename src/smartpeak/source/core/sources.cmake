@@ -7,6 +7,7 @@ set(sources_list
 	MetaDataHandler.cpp
 	RawDataHandler.cpp
 	SampleGroupHandler.cpp
+	SequenceHandler.cpp
 )
 
 ### add path to the filenames
