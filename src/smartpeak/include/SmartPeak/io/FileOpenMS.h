@@ -4,11 +4,11 @@
 
 namespace SmartPeak
 {
-  class FileOpenMS
+  class OpenMSFile
   {
 public:
-    FileOpenMS() = default;
-    ~FileOpenMS() = default;
+    OpenMSFile() = default;
+    ~OpenMSFile() = default;
 
 private:
   };

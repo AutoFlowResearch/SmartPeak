@@ -2,7 +2,7 @@
 
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
 #include <SmartPeak/core/RawDataHandler.h>
-#include <SmartPeak/io/FileOpenMS.h>
+#include <SmartPeak/io/OpenMSFile.h>
 #include <vector>
 
 namespace SmartPeak

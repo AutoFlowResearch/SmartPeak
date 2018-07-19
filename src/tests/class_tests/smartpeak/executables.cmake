@@ -7,7 +7,7 @@ set(core_executables_list
 
 set(io_executables_list
 	CSVWriter_test
-	FileOpenMS_test
+	OpenMSFile_test
 )
 
 set(simulator_executables_list

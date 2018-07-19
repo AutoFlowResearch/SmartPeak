@@ -1,8 +1,8 @@
 // TODO: Add copyright
 
-#define BOOST_TEST_MODULE FileOpenMS test suite
+#define BOOST_TEST_MODULE OpenMSFile test suite
 #include <boost/test/included/unit_test.hpp>
-#include <SmartPeak/core/FileOpenMS.h>
+#include <SmartPeak/core/OpenMSFile.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -11,16 +11,16 @@ BOOST_AUTO_TEST_SUITE(fileopenms)
 
 BOOST_AUTO_TEST_CASE(constructor)
 {
-  FileOpenMS* ptr = nullptr;
-  FileOpenMS* nullPointer = nullptr;
-  ptr = new FileOpenMS();
+  OpenMSFile* ptr = nullptr;
+  OpenMSFile* nullPointer = nullptr;
+  ptr = new OpenMSFile();
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
 BOOST_AUTO_TEST_CASE(destructor)
 {
-  FileOpenMS* ptr = nullptr;
-  ptr = new FileOpenMS();
+  OpenMSFile* ptr = nullptr;
+  ptr = new OpenMSFile();
   delete ptr;
 }
 
