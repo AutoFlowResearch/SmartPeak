@@ -4,6 +4,8 @@ set(core_executables_list
 	RawDataHandler_test
 	SampleGroupHandler_test
 	SampleHandler_test
+	SequenceHandler_test
+	SequenceSegmentHandler_test
 )
 
 set(io_executables_list

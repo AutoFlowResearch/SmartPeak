@@ -8,6 +8,8 @@ set(sources_list_h
 	RawDataHandler.h
 	SampleGroupHandler.h
 	SampleHandler.h
+	SequenceHandler.h
+	SequenceSegmentHandler.h
 )
 
 ### add path to the filenames
