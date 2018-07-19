@@ -13,26 +13,26 @@ public:
     SequenceSegmentHandler() = default;
     ~SequenceSegmentHandler() = default;
 
-    void clear_data();
+    void clear();
 
-    void setSequenceSegmentName(std::string& sequence_segment_name);
+    void setSequenceSegmentName(const std::string& sequence_segment_name);
     std::string& getSequenceSegmentName();
     std::string getSequenceSegmentName() const;
 
-    void setSampleIndices(std::vector<size_t>& sample_indices);
+    void setSampleIndices(const std::vector<size_t>& sample_indices);
     std::vector<size_t>& getSampleIndices();
     std::vector<size_t> getSampleIndices() const;
 
-    void setStandardsConcentrations(std::vector<OpenMS::AbsoluteQuantitationStandards>& standards_concentrations);
-    std::vector<OpenMS::AbsoluteQuantitationStandards>& getStandardsConcentrations();
-    std::vector<OpenMS::AbsoluteQuantitationStandards> getStandardsConcentrations() const;
+    void setStandardsConcentrations(const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards_concentrations);
+    std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& getStandardsConcentrations();
+    std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> getStandardsConcentrations() const;
 
-    void setQuantitationMethods(std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods);
+    void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods);
     std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods();
     std::vector<OpenMS::AbsoluteQuantitationMethod> getQuantitationMethods() const;
 
     void setComponentsToConcentrations(
-      std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations
+      const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations
     );
 
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
@@ -44,7 +44,7 @@ public:
 private:
     std::string sequence_segment_name_;
     std::vector<size_t> sample_indices_;
-    std::vector<OpenMS::AbsoluteQuantitationStandards> standards_concentrations_;
+    std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards_concentrations_;
     std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods_;
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations_;
   };

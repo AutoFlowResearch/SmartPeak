@@ -4,7 +4,7 @@
 
 namespace SmartPeak
 {
-  void SequenceSegmentHandler::clear_data() // TODO: rename to clear() ?
+  void SequenceSegmentHandler::clear()
   {
     sequence_segment_name_.clear();
     sample_indices_.clear();
@@ -13,7 +13,7 @@ namespace SmartPeak
     components_to_concentrations_.clear();
   }
 
-  void SequenceSegmentHandler::setSequenceSegmentName(std::string& sequence_segment_name)
+  void SequenceSegmentHandler::setSequenceSegmentName(const std::string& sequence_segment_name)
   {
     sequence_segment_name_ = sequence_segment_name;
   }
@@ -28,7 +28,7 @@ namespace SmartPeak
     return sequence_segment_name_;
   }
 
-  void SequenceSegmentHandler::setSampleIndices(std::vector<size_t>& sample_indices)
+  void SequenceSegmentHandler::setSampleIndices(const std::vector<size_t>& sample_indices)
   {
     sample_indices_ = sample_indices;
   }
@@ -43,22 +43,22 @@ namespace SmartPeak
     return sample_indices_;
   }
 
-  void SequenceSegmentHandler::setStandardsConcentrations(std::vector<OpenMS::AbsoluteQuantitationStandards>& standards_concentrations)
+  void SequenceSegmentHandler::setStandardsConcentrations(const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards_concentrations)
   {
     standards_concentrations_ = standards_concentrations;
   }
 
-  std::vector<OpenMS::AbsoluteQuantitationStandards>& SequenceSegmentHandler::getStandardsConcentrations()
+  std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& SequenceSegmentHandler::getStandardsConcentrations()
   {
     return standards_concentrations_;
   }
 
-  std::vector<OpenMS::AbsoluteQuantitationStandards> SequenceSegmentHandler::getStandardsConcentrations() const
+  std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> SequenceSegmentHandler::getStandardsConcentrations() const
   {
     return standards_concentrations_;
   }
 
-  void SequenceSegmentHandler::setQuantitationMethods(std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods)
+  void SequenceSegmentHandler::setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods)
   {
     quantitation_methods_ = quantitation_methods;
   }
@@ -74,7 +74,7 @@ namespace SmartPeak
   }
 
   void SequenceSegmentHandler::setComponentsToConcentrations(
-    std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations
+    const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations
   )
   {
     components_to_concentrations_ = components_to_concentrations;
