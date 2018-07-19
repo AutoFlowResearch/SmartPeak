@@ -60,7 +60,7 @@ public:
     std::string& sample_name
   ) const;
 
-  void SequenceHandler::addSampleToSequence(const SampleHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I);
+  void SequenceHandler::addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I);
 
   void SequenceHandler::getSamplesInSequence(std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const;
 
@@ -69,8 +69,6 @@ public:
     const OpenMS::Feature& subordinate,
     const std::string& meta_value
   ) const;
-
-  void SequenceHandler::parse_metaData(const MetaDataHandler& meta_data);
 
 private:
     std::vector<SampleHandler> sequence_;

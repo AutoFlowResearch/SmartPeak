@@ -146,7 +146,7 @@ namespace SmartPeak
     };
   }
 
-  void SequenceHandler::addSampleToSequence(const SampleHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I)
+  void SequenceHandler::addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I)
   {
     """add meta_data and featureMap to a sequence list
 
@@ -158,7 +158,7 @@ namespace SmartPeak
         dict: injection: dictionary of meta_data and FeatureMap
     """
 
-    meta_data = parse_metaData(meta_data_I)
+    MetaDataHandler::validateMetaData(meta_data_I);
 
     RawDataHandler rdh;
     rdh.setFeatureMap(featureMap_I);
@@ -201,42 +201,5 @@ namespace SmartPeak
     }
 
     return datum;
-  }
-
-  void SequenceHandler::parse_metaData(const MetaDataHandler& meta_data)
-  {
-    std::vector<std::string> sample_types =
-      {"Unknown", "Standard", "QC", "Blank", "Double Blank", "Solvent"};
-
-    if (meta_data.getSampleName().empty()) {
-      std::cout << "SequenceFile Error: sample_name must be specified." << std::endl;
-      throw std::runtime_error("sample name");
-    }
-
-    if (meta_data.getSampleGroupName().empty()) {
-      std::cout << "SequenceFile Error: sample_group_name must be specified." << std::endl;
-      throw std::runtime_error("sample group name");
-    }
-
-    if (meta_data.getSequenceSegmentName().empty()) {
-      std::cout << "SequenceFile Error: sequence_segment_name must be specified." << std::endl;
-      throw std::runtime_error("sequence segment name");
-    }
-
-    if (meta_data.getFilename().empty()) {
-      std::cout << "SequenceFile Error: filename must be specified." << std::endl;
-      throw std::runtime_error("filename");
-    }
-
-    std::vector<std::string>::const_container it =
-      std::find(sample_types.cbegin(), sample_types.cend(), meta_data.getSampleType());
-
-    if (meta_data.getSampleType().empty() || it == sample_types.cend()) {
-      std::cout << "SequenceFile Error: sample_type for sample_name "
-        << meta_data.getSampleName() << " is not correct." << std::endl;
-      std::cout << "Supported samples types are the following: "
-        << sample_types_str << std::endl;
-      throw std::runtime_error("sample type");
-    }
   }
 }
