@@ -3,6 +3,7 @@ set(core_executables_list
 	MetaDataHandler_test
 	RawDataHandler_test
 	SampleGroupHandler_test
+	SampleHandler_test
 	SequenceSegmentHandler_test
 )
 
