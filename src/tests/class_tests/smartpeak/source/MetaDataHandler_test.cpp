@@ -1,6 +1,6 @@
 /**TODO:  Add copyright*/
 
-#define BOOST_TEST_MODULE MetaDataHandler test suite 
+#define BOOST_TEST_MODULE MetaDataHandler test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/MetaDataHandler.h>
 
@@ -9,7 +9,7 @@ using namespace std;
 
 BOOST_AUTO_TEST_SUITE(metadatahandler)
 
-BOOST_AUTO_TEST_CASE(constructor) 
+BOOST_AUTO_TEST_CASE(constructor)
 {
   MetaDataHandler* ptr = nullptr;
   MetaDataHandler* nullPointer = nullptr;
@@ -17,24 +17,24 @@ BOOST_AUTO_TEST_CASE(constructor)
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
-BOOST_AUTO_TEST_CASE(destructor) 
+BOOST_AUTO_TEST_CASE(destructor)
 {
   MetaDataHandler* ptr = nullptr;
 	ptr = new MetaDataHandler();
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(gettersAndSettersAndClear) 
+BOOST_AUTO_TEST_CASE(gettersAndSettersAndClear)
 {
   MetaDataHandler metaDataHandler;
-  
+
   // test defaults
   BOOST_CHECK_EQUAL(metaDataHandler.getSampleName(), "");
   BOOST_CHECK_EQUAL(metaDataHandler.getSampleGroupName(), "");
   BOOST_CHECK_EQUAL(metaDataHandler.getSampleType(), "");
   BOOST_CHECK_EQUAL(metaDataHandler.getSequenceSegmentName(), "");
   BOOST_CHECK_EQUAL(metaDataHandler.getFilename(), "");
-  
+
   // test setters
   metaDataHandler.setSampleName("1");
   metaDataHandler.setSampleGroupName("2");
@@ -57,19 +57,23 @@ BOOST_AUTO_TEST_CASE(gettersAndSettersAndClear)
 
 }
 
-BOOST_AUTO_TEST_CASE(checkSampleType) 
+BOOST_AUTO_TEST_CASE(validateMetaData)
 {
-  MetaDataHandler metaDataHandler;
+  MetaDataHandler m;
 
-  std::vector<std::string> sample_types_valid = {
-    "Unknown", "Standard", "QC", "Blank", "Double Blank", "Solvent"};  
-  for (const std::string& sample_type: sample_types_valid)
-    BOOST_CHECK(metaDataHandler.checkSampleType(sample_type));
+  BOOST_CHECK_EQUAL(MetaDataHandler::validateMetaData(m), false);
 
-  std::vector<std::string> sample_types_invalid = {
-    "BLANK", ""};  
-  for (const std::string& sample_type: sample_types_invalid)
-    BOOST_CHECK(!metaDataHandler.checkSampleType(sample_type));
+  m.setSampleName("1");
+  m.setSampleGroupName("2");
+  m.setSampleType("QC");
+  m.setSequenceSegmentName("4");
+  m.setFilename("5");
+
+  BOOST_CHECK_EQUAL(MetaDataHandler::validateMetaData(m), true);
+
+  m.setSampleType("not a valid one");
+
+  BOOST_CHECK_EQUAL(MetaDataHandler::validateMetaData(m), false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

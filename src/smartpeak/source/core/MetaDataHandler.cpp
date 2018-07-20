@@ -62,41 +62,51 @@ namespace SmartPeak
     std::vector<std::string> sample_types =
       {"Unknown", "Standard", "QC", "Blank", "Double Blank", "Solvent"};
 
+    bool is_valid { true };
+
     if (meta_data.getSampleName().empty()) {
       std::cout << "SequenceFile Error: sample_name must be specified." << std::endl;
-      throw std::runtime_error("sample name");
+      // throw std::runtime_error("sample name");
+      is_valid = false;
     }
 
     if (meta_data.getSampleGroupName().empty()) {
       std::cout << "SequenceFile Error: sample_group_name must be specified." << std::endl;
-      throw std::runtime_error("sample group name");
+      // throw std::runtime_error("sample group name");
+      is_valid = false;
     }
 
     if (meta_data.getSequenceSegmentName().empty()) {
       std::cout << "SequenceFile Error: sequence_segment_name must be specified." << std::endl;
-      throw std::runtime_error("sequence segment name");
+      // throw std::runtime_error("sequence segment name");
+      is_valid = false;
     }
 
     if (meta_data.getFilename().empty()) {
       std::cout << "SequenceFile Error: filename must be specified." << std::endl;
-      throw std::runtime_error("filename");
+      // throw std::runtime_error("filename");
+      is_valid = false;
     }
 
-    std::vector<std::string>::const_container it =
+    std::vector<std::string>::const_iterator it =
       std::find(sample_types.cbegin(), sample_types.cend(), meta_data.getSampleType());
 
     if (meta_data.getSampleType().empty() || it == sample_types.cend()) {
       std::cout << "SequenceFile Error: sample_type for sample_name "
         << meta_data.getSampleName() << " is not correct." << std::endl;
+
       std::cout << "Supported samples types are the following: ";
+
       for (const std::string& sample_type : sample_types) {
         std::cout << sample_type << "; ";
       }
+
       std::cout << std::endl;
-      throw std::runtime_error("sample type");
+      // throw std::runtime_error("sample type");
+      is_valid = false;
     }
 
-    return true;
+    return is_valid;
   }
 
   void MetaDataHandler::clear()
