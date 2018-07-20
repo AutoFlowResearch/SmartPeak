@@ -7,9 +7,32 @@
 
 namespace SmartPeak
 {
+  const char* MetaDataHandler::SampleTypeToString(SampleType sample_type)
+  {
+    switch (sample_type) {
+      case SampleType::Unknown:
+        return "Unknown";
+      case SampleType::Standard:
+        return "Standard";
+      case SampleType::QC:
+        return "QC";
+      case SampleType::Blank:
+        return "Blank";
+      case SampleType::DoubleBlank:
+        return "Double Blank";
+      case SampleType::Solvent:
+        return "Solvent";
+    }
+  }
+
   void MetaDataHandler::setSampleName(const std::string& sample_name_I)
   {
     sample_name_ = sample_name_I;
+  }
+
+  std::string& MetaDataHandler::getSampleName()
+  {
+    return sample_name_;
   }
 
   std::string MetaDataHandler::getSampleName() const
@@ -22,6 +45,11 @@ namespace SmartPeak
     sample_group_name_ = sample_group_name_I;
   }
 
+  std::string& MetaDataHandler::getSampleGroupName()
+  {
+    return sample_group_name_;
+  }
+
   std::string MetaDataHandler::getSampleGroupName() const
   {
     return sample_group_name_;
@@ -30,6 +58,11 @@ namespace SmartPeak
   void MetaDataHandler::setSequenceSegmentName(const std::string& sequence_segment_name_I)
   {
     sequence_segment_name_ = sequence_segment_name_I;
+  }
+
+  std::string& MetaDataHandler::getSequenceSegmentName()
+  {
+    return sequence_segment_name_;
   }
 
   std::string MetaDataHandler::getSequenceSegmentName() const
@@ -42,17 +75,27 @@ namespace SmartPeak
     filename_ = filename_I;
   }
 
+  std::string& MetaDataHandler::getFilename()
+  {
+    return filename_;
+  }
+
   std::string MetaDataHandler::getFilename() const
   {
     return filename_;
   }
 
-  void MetaDataHandler::setSampleType(const std::string& sample_type_I)
+  void MetaDataHandler::setSampleType(SampleType sample_type)
   {
-    sample_type_ = sample_type_I;
+    sample_type_ = sample_type;
   }
 
-  std::string MetaDataHandler::getSampleType() const
+  MetaDataHandler::SampleType& MetaDataHandler::getSampleType()
+  {
+    return sample_type_;
+  }
+
+  MetaDataHandler::SampleType MetaDataHandler::getSampleType() const
   {
     return sample_type_;
   }
@@ -88,24 +131,6 @@ namespace SmartPeak
       is_valid = false;
     }
 
-    std::vector<std::string>::const_iterator it =
-      std::find(sample_types.cbegin(), sample_types.cend(), meta_data.getSampleType());
-
-    if (meta_data.getSampleType().empty() || it == sample_types.cend()) {
-      std::cout << "SequenceFile Error: sample_type for sample_name "
-        << meta_data.getSampleName() << " is not correct." << std::endl;
-
-      std::cout << "Supported samples types are the following: ";
-
-      for (const std::string& sample_type : sample_types) {
-        std::cout << sample_type << "; ";
-      }
-
-      std::cout << std::endl;
-      // throw std::runtime_error("sample type");
-      is_valid = false;
-    }
-
     return is_valid;
   }
 
@@ -115,6 +140,6 @@ namespace SmartPeak
     sample_group_name_.clear();
     sequence_segment_name_.clear();
     filename_.clear();
-    sample_type_.clear();
+    sample_type_ = SampleType::Unknown;
   }
 }
