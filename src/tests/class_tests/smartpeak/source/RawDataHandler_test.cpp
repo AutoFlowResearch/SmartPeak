@@ -1,4 +1,4 @@
-/**TODO:  Add copyright*/
+// TODO: Add copyright
 
 #define BOOST_TEST_MODULE RawDataHandler test suite
 #include <boost/test/included/unit_test.hpp>
@@ -13,21 +13,37 @@ BOOST_AUTO_TEST_CASE(constructor)
 {
   RawDataHandler* ptr = nullptr;
   RawDataHandler* nullPointer = nullptr;
-	ptr = new RawDataHandler();
+  ptr = new RawDataHandler();
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
 BOOST_AUTO_TEST_CASE(destructor)
 {
   RawDataHandler* ptr = nullptr;
-	ptr = new RawDataHandler();
+  ptr = new RawDataHandler();
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(gettersAndSetters)
+BOOST_AUTO_TEST_CASE(set_or_get_FeatureMap)
 {
-  RawDataHandler rawDataHandler;
-  // None
+  RawDataHandler raw;
+
+  OpenMS::FeatureMap f1;
+  f1.setMetaValue("name", "foo");
+
+  raw.setFeatureMap(f1);
+
+  OpenMS::FeatureMap f2 = raw.getFeatureMap(); // testing copy getter
+  BOOST_CHECK_EQUAL(f2.metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(f2.getMetaValue("name"), "foo");
+
+  raw.getFeatureMap().setMetaValue("name2", "bar"); // testing reference getter
+
+  OpenMS::FeatureMap& f3 = raw.getFeatureMap();
+  BOOST_CHECK_EQUAL(f3.metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(f3.getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(f3.metaValueExists("name2"), true);
+  BOOST_CHECK_EQUAL(f3.getMetaValue("name2"), "bar");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
