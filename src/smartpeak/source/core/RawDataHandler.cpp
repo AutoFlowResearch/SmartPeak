@@ -3,7 +3,7 @@
 #include <SmartPeak/core/RawDataHandler.h>
 
 namespace SmartPeak
-{    
+{
   void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& featureMap_I)
   {
     featureMap_ = featureMap_I;
@@ -39,7 +39,7 @@ namespace SmartPeak
   {
     targeted_ = targeted_I;
   }
-    
+
   OpenMS::TargetedExperiment RawDataHandler::getTargeted() const
   {
     return targeted_;
@@ -50,7 +50,7 @@ namespace SmartPeak
   //   """Set the reference_data"""
   //   .reference_data = reference_data_I
   // }
-    
+
   // RawDataHandler::getReferenceData()
   // {
   //   """Return the reference_data"""
@@ -61,7 +61,7 @@ namespace SmartPeak
   {
     quantitation_methods_ = quantitation_methods_I;
   }
-    
+
   std::vector<OpenMS::AbsoluteQuantitationMethod> RawDataHandler::getQuantitationMethods() const
   {
     return quantitation_methods_;
@@ -71,7 +71,7 @@ namespace SmartPeak
   {
     feature_filter_ = feature_filter_I;
   }
-    
+
   OpenMS::MRMFeatureQC RawDataHandler::getFeatureFilter() const
   {
     return feature_filter_;
@@ -81,12 +81,12 @@ namespace SmartPeak
   {
     feature_qc_ = feature_qc_I;
   }
-    
+
   OpenMS::MRMFeatureQC RawDataHandler::getFeatureQC() const
   {
     return feature_qc_;
   }
-    
+
   void RawDataHandler::setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps_I)
   {
     featureMapHistory_ = feature_maps_I;
