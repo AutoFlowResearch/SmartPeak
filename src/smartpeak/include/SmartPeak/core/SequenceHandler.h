@@ -15,56 +15,56 @@ public:
     SequenceHandler() = default;
     ~SequenceHandler() = default;
 
-  void SequenceHandler::clear();
+  void clear();
 
-  void SequenceHandler::setFilenames(const std::map<std::string, std::string>& filenames);
+  void setFilenames(const std::map<std::string, std::string>& filenames);
 
-  std::map<std::string, std::string>& SequenceHandler::getFilenames();
+  std::map<std::string, std::string>& getFilenames();
 
-  std::map<std::string, std::string> SequenceHandler::getFilenames() const;
+  std::map<std::string, std::string> getFilenames() const;
 
-  void SequenceHandler::setDirStatic(const std::string& dir_static);
+  void setDirStatic(const std::string& dir_static);
 
-  std::string& SequenceHandler::getDirStatic();
+  std::string& getDirStatic();
 
-  std::string SequenceHandler::getDirStatic() const;
+  std::string getDirStatic() const;
 
-  void SequenceHandler::setDirDynamic(const std::string& dir_dynamic);
+  void setDirDynamic(const std::string& dir_dynamic);
 
-  std::string& SequenceHandler::getDirDynamic();
+  std::string& getDirDynamic();
 
-  std::string SequenceHandler::getDirDynamic() const;
+  std::string getDirDynamic() const;
 
-  void SequenceHandler::setSequence(const std::vector<SampleHandler>& sequence);
+  void setSequence(const std::vector<SampleHandler>& sequence);
 
-  std::vector<SampleHandler>& SequenceHandler::getSequence();
+  std::vector<SampleHandler>& getSequence();
 
-  std::vector<SampleHandler> SequenceHandler::getSequence() const;
+  std::vector<SampleHandler> getSequence() const;
 
-  void SequenceHandler::setSequenceSegments(const std::vector<SequenceSegmentHandler>& sequence_segments);
+  void setSequenceSegments(const std::vector<SequenceSegmentHandler>& sequence_segments);
 
-  std::vector<SequenceSegmentHandler>& SequenceHandler::getSequenceSegments();
+  std::vector<SequenceSegmentHandler>& getSequenceSegments();
 
-  std::vector<SequenceSegmentHandler> SequenceHandler::getSequenceSegments() const;
+  std::vector<SequenceSegmentHandler> getSequenceSegments() const;
 
-  void SequenceHandler::setSampleGroups(const std::vector<SampleGroupHandler>& sample_groups);
+  void setSampleGroups(const std::vector<SampleGroupHandler>& sample_groups);
 
-  std::vector<SampleGroupHandler>& SequenceHandler::getSampleGroups();
+  std::vector<SampleGroupHandler>& getSampleGroups();
 
-  std::vector<SampleGroupHandler> SequenceHandler::getSampleGroups() const;
+  std::vector<SampleGroupHandler> getSampleGroups() const;
 
-  std::map<std::string, std::string> SequenceHandler::getDefaultStaticFilenames(std::string& dir);
+  std::map<std::string, std::string> getDefaultStaticFilenames(const std::string& dir);
 
-  std::map<std::string, std::string> SequenceHandler::getDefaultDynamicFilenames(
+  std::map<std::string, std::string> getDefaultDynamicFilenames(
     const std::string& dir,
     std::string& sample_name
   ) const;
 
-  void SequenceHandler::addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I);
+  void addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I);
 
-  void SequenceHandler::getSamplesInSequence(std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const;
+  void getSamplesInSequence(std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const;
 
-  float SequenceHandler::getMetaValue(
+  float getMetaValue(
     const OpenMS::Feature& feature,
     const OpenMS::Feature& subordinate,
     const std::string& meta_value
