@@ -152,4 +152,30 @@ BOOST_AUTO_TEST_CASE(set_or_get_FeatureQC)
   BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
 }
 
+BOOST_AUTO_TEST_CASE(set_or_get_FeatureMapHistory)
+{
+  RawDataHandler raw;
+
+  OpenMS::FeatureMap f;
+  f.setMetaValue("name", "foo");
+  vector<OpenMS::FeatureMap> f1;
+  f1.push_back(f);
+
+  raw.setFeatureMapHistory(f1);
+
+  vector<OpenMS::FeatureMap> f2 = raw.getFeatureMapHistory(); // testing copy getter
+  BOOST_CHECK_EQUAL(f2.size(), 1);
+  BOOST_CHECK_EQUAL(f2[0].metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(f2[0].getMetaValue("name"), "foo");
+
+  raw.getFeatureMapHistory()[0].setMetaValue("name2", "bar"); // testing reference getter
+
+  vector<OpenMS::FeatureMap>& f3 = raw.getFeatureMapHistory();
+  BOOST_CHECK_EQUAL(f3.size(), 1);
+  BOOST_CHECK_EQUAL(f3[0].metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(f3[0].getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(f3[0].metaValueExists("name2"), true);
+  BOOST_CHECK_EQUAL(f3[0].getMetaValue("name2"), "bar");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
