@@ -50,19 +50,19 @@ namespace SmartPeak
     return parameters_;
   }
 
-  void RawDataHandler::setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_I)
+  void RawDataHandler::setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_exp)
   {
-    targeted_ = targeted_I;
+    targeted_exp_ = targeted_exp;
   }
 
   OpenMS::TargetedExperiment& RawDataHandler::getTargetedExperiment()
   {
-    return targeted_;
+    return targeted_exp_;
   }
 
   OpenMS::TargetedExperiment RawDataHandler::getTargetedExperiment() const
   {
-    return targeted_;
+    return targeted_exp_;
   }
 
   // RawDataHandler::setReferenceData(, reference_data_I)

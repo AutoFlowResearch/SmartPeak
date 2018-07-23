@@ -75,7 +75,7 @@ private:
 
     // input (reused between RawDataHandlers)
     std::map<std::string, std::vector<std::map<std::string, std::string>>> parameters_;
-    OpenMS::TargetedExperiment targeted_;  // [REFACTOR: change to targeted_experiment]
+    OpenMS::TargetedExperiment targeted_exp_;
     // self.reference_data = None
     std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods_;
     OpenMS::MRMFeatureQC feature_filter_;
