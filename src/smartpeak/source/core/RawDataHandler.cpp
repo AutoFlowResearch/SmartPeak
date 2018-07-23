@@ -4,9 +4,9 @@
 
 namespace SmartPeak
 {
-  void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& featureMap_I)
+  void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& featureMap)
   {
-    featureMap_ = featureMap_I;
+    featureMap_ = featureMap;
   }
 
   OpenMS::FeatureMap& RawDataHandler::getFeatureMap()
@@ -19,9 +19,9 @@ namespace SmartPeak
     return featureMap_;
   }
 
-  void RawDataHandler::setMetaData(const MetaDataHandler& meta_data_I)
+  void RawDataHandler::setMetaData(const MetaDataHandler& meta_data)
   {
-    meta_data_ = meta_data_I;
+    meta_data_ = meta_data;
   }
 
   MetaDataHandler& RawDataHandler::getMetaData()
@@ -35,9 +35,9 @@ namespace SmartPeak
   }
 
   void RawDataHandler::setParameters(
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_I)
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters)
   {
-    parameters_ = parameters_I;
+    parameters_ = parameters;
   }
 
   std::map<std::string, std::vector<std::map<std::string, std::string>>>& RawDataHandler::getParameters()
@@ -65,10 +65,10 @@ namespace SmartPeak
     return targeted_exp_;
   }
 
-  // RawDataHandler::setReferenceData(, reference_data_I)
+  // RawDataHandler::setReferenceData(, reference_data)
   // {
   //   """Set the reference_data"""
-  //   .reference_data = reference_data_I
+  //   .reference_data = reference_data
   // }
 
   // RawDataHandler::getReferenceData()
@@ -77,9 +77,9 @@ namespace SmartPeak
   //   return .reference_data
   // }
 
-  void RawDataHandler::setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods_I)
+  void RawDataHandler::setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods)
   {
-    quantitation_methods_ = quantitation_methods_I;
+    quantitation_methods_ = quantitation_methods;
   }
 
   std::vector<OpenMS::AbsoluteQuantitationMethod>& RawDataHandler::getQuantitationMethods()
@@ -92,9 +92,9 @@ namespace SmartPeak
     return quantitation_methods_;
   }
 
-  void RawDataHandler::setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter_I)
+  void RawDataHandler::setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter)
   {
-    feature_filter_ = feature_filter_I;
+    feature_filter_ = feature_filter;
   }
 
   OpenMS::MRMFeatureQC& RawDataHandler::getFeatureFilter()
@@ -107,9 +107,9 @@ namespace SmartPeak
     return feature_filter_;
   }
 
-  void RawDataHandler::setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc_I)
+  void RawDataHandler::setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc)
   {
-    feature_qc_ = feature_qc_I;
+    feature_qc_ = feature_qc;
   }
 
   OpenMS::MRMFeatureQC& RawDataHandler::getFeatureQC()
@@ -122,9 +122,9 @@ namespace SmartPeak
     return feature_qc_;
   }
 
-  void RawDataHandler::setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps_I)
+  void RawDataHandler::setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps)
   {
-    featureMapHistory_ = feature_maps_I;
+    featureMapHistory_ = feature_maps;
   }
 
   std::vector<OpenMS::FeatureMap>& RawDataHandler::getFeatureMapHistory()
