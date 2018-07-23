@@ -36,10 +36,9 @@ public:
     std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters();
     std::map<std::string, std::vector<std::map<std::string, std::string>>> getParameters() const;
 
-    // [REFACTOR: change to set/getTargetedExperiment]
-    void setTargeted(const OpenMS::TargetedExperiment& targeted_I);
-    OpenMS::TargetedExperiment& getTargeted();
-    OpenMS::TargetedExperiment getTargeted() const;
+    void setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_I);
+    OpenMS::TargetedExperiment& getTargetedExperiment();
+    OpenMS::TargetedExperiment getTargetedExperiment() const;
 
     // [TODO: need to update this at some point...]
     // setReferenceData(, reference_data_I);

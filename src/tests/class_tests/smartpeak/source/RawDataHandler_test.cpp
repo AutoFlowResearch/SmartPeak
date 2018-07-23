@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(set_or_get_MetaData)
 
 BOOST_AUTO_TEST_CASE(set_or_get_Parameters)
 {
-  map<string, vector<map<string, string>>> parameters
+  map<string, vector<map<string, string>>> parameters;
   RawDataHandler raw;
   // TODO: missing tests
   // https://github.com/dmccloskey/SmartPeak2/issues/51#issuecomment-406987883
