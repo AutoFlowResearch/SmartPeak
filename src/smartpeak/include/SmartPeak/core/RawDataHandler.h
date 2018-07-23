@@ -23,40 +23,40 @@ public:
     RawDataHandler() = default;
     ~RawDataHandler() = default;
 
-    void setFeatureMap(const OpenMS::FeatureMap& featureMap_I);
+    void setFeatureMap(const OpenMS::FeatureMap& featureMap);
     OpenMS::FeatureMap& getFeatureMap();
     OpenMS::FeatureMap getFeatureMap() const;
 
-    void setMetaData(const MetaDataHandler& meta_data_I);
+    void setMetaData(const MetaDataHandler& meta_data);
     MetaDataHandler& getMetaData();
     MetaDataHandler getMetaData() const;
 
     void setParameters(
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_I);
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters);
     std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters();
     std::map<std::string, std::vector<std::map<std::string, std::string>>> getParameters() const;
 
-    void setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_I);
+    void setTargetedExperiment(const OpenMS::TargetedExperiment& targeted);
     OpenMS::TargetedExperiment& getTargetedExperiment();
     OpenMS::TargetedExperiment getTargetedExperiment() const;
 
     // [TODO: need to update this at some point...]
-    // setReferenceData(, reference_data_I);
+    // setReferenceData(, reference_data);
     // getReferenceData();
 
-    void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods_I);
+    void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods);
     std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods();
     std::vector<OpenMS::AbsoluteQuantitationMethod> getQuantitationMethods() const;
 
-    void setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter_I);
+    void setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter);
     OpenMS::MRMFeatureQC& getFeatureFilter();
     OpenMS::MRMFeatureQC getFeatureFilter() const;
 
-    void setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc_I);
+    void setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc);
     OpenMS::MRMFeatureQC& getFeatureQC();
     OpenMS::MRMFeatureQC getFeatureQC() const;
 
-    void setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps_I);
+    void setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps);
     std::vector<OpenMS::FeatureMap>& getFeatureMapHistory();
     std::vector<OpenMS::FeatureMap> getFeatureMapHistory() const;
 
