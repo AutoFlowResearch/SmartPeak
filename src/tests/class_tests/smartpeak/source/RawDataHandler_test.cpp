@@ -75,4 +75,29 @@ BOOST_AUTO_TEST_CASE(set_or_get_Parameters)
   // https://github.com/dmccloskey/SmartPeak2/issues/51#issuecomment-406987883
 }
 
+BOOST_AUTO_TEST_CASE(set_or_get_QuantitationMethods)
+{
+  RawDataHandler raw;
+
+  OpenMS::AbsoluteQuantitationMethod aqm;
+  string name {"foo"};
+  aqm.setComponentName(name);
+
+  vector<OpenMS::AbsoluteQuantitationMethod> AQMs1;
+  AQMs1.push_back(aqm);
+
+  raw.setQuantitationMethods(AQMs1);
+
+  vector<OpenMS::AbsoluteQuantitationMethod> AQMs2 = raw.getQuantitationMethods(); // testing copy getter
+  BOOST_CHECK_EQUAL(AQMs2.size(), 1);
+  BOOST_CHECK_EQUAL(AQMs2[0].getComponentName(), name);
+
+  string feature_name {"bar"};
+  raw.getQuantitationMethods()[0].setFeatureName(feature_name); // testing reference getter
+
+  vector<OpenMS::AbsoluteQuantitationMethod>& AQMs3 = raw.getQuantitationMethods();
+  BOOST_CHECK_EQUAL(AQMs3[0].getComponentName(), name);
+  BOOST_CHECK_EQUAL(AQMs3[0].getFeatureName(), feature_name);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
