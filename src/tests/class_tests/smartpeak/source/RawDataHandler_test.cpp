@@ -100,4 +100,30 @@ BOOST_AUTO_TEST_CASE(set_or_get_QuantitationMethods)
   BOOST_CHECK_EQUAL(AQMs3[0].getFeatureName(), feature_name);
 }
 
+BOOST_AUTO_TEST_CASE(set_or_get_FeatureFilter)
+{
+  RawDataHandler raw;
+
+  OpenMS::MRMFeatureQC::ComponentQCs qc;
+  string name {"foo"};
+  qc.component_name = name;
+
+  OpenMS::MRMFeatureQC fqc1;
+  fqc1.component_qcs.push_back(qc);
+
+  raw.setFeatureFilter(fqc1);
+
+  OpenMS::MRMFeatureQC fqc2 = raw.getFeatureFilter(); // testing copy getter
+  BOOST_CHECK_EQUAL(fqc2.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2.component_qcs[0].component_name, name);
+
+  const double rt_low {4.0};
+  raw.getFeatureFilter().component_qcs[0].retention_time_l = rt_low; // testing reference getter
+
+  OpenMS::MRMFeatureQC& fqc3 = raw.getFeatureFilter();
+  BOOST_CHECK_EQUAL(fqc3.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
