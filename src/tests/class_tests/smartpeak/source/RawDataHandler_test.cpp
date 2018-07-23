@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(set_or_get_MetaData)
   RawDataHandler raw;
 
   MetaDataHandler m1;
-  std::string name {"foo"};
+  string name {"foo"};
   m1.setSampleName(name);
 
   raw.setMetaData(m1);
@@ -59,12 +59,20 @@ BOOST_AUTO_TEST_CASE(set_or_get_MetaData)
   MetaDataHandler m2 = raw.getMetaData(); // testing copy getter
   BOOST_CHECK_EQUAL(m2.getSampleName(), name);
 
-  std::string group_name {"bar"};
+  string group_name {"bar"};
   raw.getMetaData().setSampleGroupName(group_name); // testing reference getter
 
   MetaDataHandler& m3 = raw.getMetaData();
   BOOST_CHECK_EQUAL(m3.getSampleName(), name);
   BOOST_CHECK_EQUAL(m3.getSampleGroupName(), group_name);
+}
+
+BOOST_AUTO_TEST_CASE(set_or_get_Parameters)
+{
+  map<string, vector<map<string, string>>> parameters
+  RawDataHandler raw;
+  // TODO: missing tests
+  // https://github.com/dmccloskey/SmartPeak2/issues/51#issuecomment-406987883
 }
 
 BOOST_AUTO_TEST_SUITE_END()
