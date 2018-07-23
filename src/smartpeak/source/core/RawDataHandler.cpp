@@ -14,7 +14,6 @@ namespace SmartPeak
     return featureMap_;
   }
 
-
   OpenMS::FeatureMap RawDataHandler::getFeatureMap() const
   {
     return featureMap_;

@@ -20,8 +20,8 @@ namespace SmartPeak
   class RawDataHandler
   {
 public:
-    RawDataHandler() = default;  ///< Default constructor
-    ~RawDataHandler() = default;  ///< Default destructor
+    RawDataHandler() = default;
+    ~RawDataHandler() = default;
 
     void setFeatureMap(const OpenMS::FeatureMap& featureMap_I);
     OpenMS::FeatureMap& getFeatureMap();

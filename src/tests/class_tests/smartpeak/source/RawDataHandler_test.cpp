@@ -46,4 +46,25 @@ BOOST_AUTO_TEST_CASE(set_or_get_FeatureMap)
   BOOST_CHECK_EQUAL(f3.getMetaValue("name2"), "bar");
 }
 
+BOOST_AUTO_TEST_CASE(set_or_get_MetaData)
+{
+  RawDataHandler raw;
+
+  MetaDataHandler m1;
+  std::string name {"foo"};
+  m1.setSampleName(name);
+
+  raw.setMetaData(m1);
+
+  MetaDataHandler m2 = raw.getMetaData(); // testing copy getter
+  BOOST_CHECK_EQUAL(m2.getSampleName(), name);
+
+  std::string group_name {"bar"};
+  raw.getMetaData().setSampleGroupName(group_name); // testing reference getter
+
+  MetaDataHandler& m3 = raw.getMetaData();
+  BOOST_CHECK_EQUAL(m3.getSampleName(), name);
+  BOOST_CHECK_EQUAL(m3.getSampleGroupName(), group_name);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
