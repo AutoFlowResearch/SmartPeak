@@ -102,6 +102,7 @@ BOOST_AUTO_TEST_CASE(SampleTypeToString)
   BOOST_CHECK_EQUAL(MetaDataHandler::SampleTypeToString(MetaDataHandler::SampleType::Blank), "Blank");
   BOOST_CHECK_EQUAL(MetaDataHandler::SampleTypeToString(MetaDataHandler::SampleType::DoubleBlank), "Double Blank");
   BOOST_CHECK_EQUAL(MetaDataHandler::SampleTypeToString(MetaDataHandler::SampleType::Solvent), "Solvent");
+  BOOST_CHECK_EQUAL(MetaDataHandler::SampleTypeToString(MetaDataHandler::SampleType::Unrecognized), "Unrecognized");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
