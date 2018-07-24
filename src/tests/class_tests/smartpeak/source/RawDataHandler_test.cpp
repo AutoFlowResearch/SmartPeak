@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(destructor)
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(set_or_get_FeatureMap)
+BOOST_AUTO_TEST_CASE(set_get_FeatureMap)
 {
   RawDataHandler rawDataHandler;
 
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(set_or_get_FeatureMap)
   BOOST_CHECK_EQUAL(f3.getMetaValue("name2"), "bar");
 }
 
-BOOST_AUTO_TEST_CASE(set_or_get_MetaData)
+BOOST_AUTO_TEST_CASE(set_get_MetaData)
 {
   RawDataHandler rawDataHandler;
 
@@ -67,15 +67,44 @@ BOOST_AUTO_TEST_CASE(set_or_get_MetaData)
   BOOST_CHECK_EQUAL(m3.getSampleGroupName(), group_name);
 }
 
-BOOST_AUTO_TEST_CASE(set_or_get_Parameters)
+BOOST_AUTO_TEST_CASE(set_get_Parameters)
 {
-  map<string, vector<map<string, string>>> parameters;
   RawDataHandler rawDataHandler;
-  // TODO: missing tests
-  // https://github.com/dmccloskey/SmartPeak2/issues/51#issuecomment-406987883
+
+  map<string, string> m1 = {
+    {"name", "stop_report_after_feature"},
+    {"value", "-1"}
+  };
+  vector<map<string, string>> v1;
+  v1.push_back(m1);
+  map<string, vector<map<string, string>>> parameters1;
+  const string name1 {"MRMFeatureFinderScoring"};
+  parameters1.insert({name1, v1});
+
+  rawDataHandler.setParameters(parameters1);
+
+  const map<string, vector<map<string, string>>> parameters2 = rawDataHandler.getParameters();
+  BOOST_CHECK_EQUAL(parameters2.count(name1), 1);
+  BOOST_CHECK_EQUAL(parameters2.at(name1).size(), 1);
+  BOOST_CHECK_EQUAL(parameters2.at(name1)[0].count("name"), 1);
+  BOOST_CHECK_EQUAL(parameters2.at(name1)[0].at("name"), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(parameters2.at(name1)[0].count("value"), 1);
+  BOOST_CHECK_EQUAL(parameters2.at(name1)[0].at("value"), "-1");
+
+  rawDataHandler.getParameters().at(name1)[0].insert({"type", "int"});
+
+  const map<string, vector<map<string, string>>>& parameters3 = rawDataHandler.getParameters();
+  BOOST_CHECK_EQUAL(parameters3.count(name1), 1);
+  BOOST_CHECK_EQUAL(parameters3.at(name1).size(), 1);
+  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].count("name"), 1);
+  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].at("name"), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].count("value"), 1);
+  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].at("value"), "-1");
+  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].count("type"), 1);
+  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].at("type"), "int");
 }
 
-BOOST_AUTO_TEST_CASE(set_or_get_QuantitationMethods)
+BOOST_AUTO_TEST_CASE(set_get_QuantitationMethods)
 {
   RawDataHandler rawDataHandler;
 
@@ -100,7 +129,7 @@ BOOST_AUTO_TEST_CASE(set_or_get_QuantitationMethods)
   BOOST_CHECK_EQUAL(AQMs3[0].getFeatureName(), feature_name);
 }
 
-BOOST_AUTO_TEST_CASE(set_or_get_FeatureFilter)
+BOOST_AUTO_TEST_CASE(set_get_FeatureFilter)
 {
   RawDataHandler rawDataHandler;
 
@@ -126,7 +155,7 @@ BOOST_AUTO_TEST_CASE(set_or_get_FeatureFilter)
   BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
 }
 
-BOOST_AUTO_TEST_CASE(set_or_get_FeatureQC)
+BOOST_AUTO_TEST_CASE(set_get_FeatureQC)
 {
   RawDataHandler rawDataHandler;
 
@@ -152,7 +181,7 @@ BOOST_AUTO_TEST_CASE(set_or_get_FeatureQC)
   BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
 }
 
-BOOST_AUTO_TEST_CASE(set_or_get_FeatureMapHistory)
+BOOST_AUTO_TEST_CASE(set_get_FeatureMapHistory)
 {
   RawDataHandler rawDataHandler;
 
