@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(destructor)
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(gettersAndSettersAndClear)
+BOOST_AUTO_TEST_CASE(getters_setters)
 {
   MetaDataHandler metaDataHandler;
 
