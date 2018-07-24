@@ -112,7 +112,7 @@ namespace SmartPeak
     return sample_groups_;
   }
 
-  std::map<std::string, std::string> SequenceHandler::getDefaultStaticFilenames(std::string& dir)
+  std::map<std::string, std::string> SequenceHandler::getDefaultStaticFilenames(const std::string& dir)
   {
     return {
       {"sequence_csv_i", dir + "/sequence.csv"},
@@ -148,16 +148,6 @@ namespace SmartPeak
 
   void SequenceHandler::addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I)
   {
-    """add meta_data and featureMap to a sequence list
-
-    Args:
-        meta_data_I (dict): dictionary of meta data (e.g., sample_name)
-        featureMap_I (FeatureMap): processed data in a FeatureMap
-
-    Returns:
-        dict: injection: dictionary of meta_data and FeatureMap
-    """
-
     MetaDataHandler::validateMetaData(meta_data_I);
 
     RawDataHandler rdh;
