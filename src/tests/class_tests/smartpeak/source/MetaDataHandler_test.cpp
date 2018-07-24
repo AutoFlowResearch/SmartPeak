@@ -70,6 +70,9 @@ BOOST_AUTO_TEST_CASE(validateMetaData)
   BOOST_CHECK_EQUAL(MetaDataHandler::validateMetaData(m), true);
   m.setSampleType(MetaDataHandler::SampleType::Solvent);
   BOOST_CHECK_EQUAL(MetaDataHandler::validateMetaData(m), true);
+
+  m.setSampleType(MetaDataHandler::SampleType::Unrecognized);
+  BOOST_CHECK_EQUAL(MetaDataHandler::validateMetaData(m), false);
 }
 
 BOOST_AUTO_TEST_CASE(clear)

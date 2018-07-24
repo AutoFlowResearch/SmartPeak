@@ -22,6 +22,8 @@ namespace SmartPeak
         return "Double Blank";
       case SampleType::Solvent:
         return "Solvent";
+      case SampleType::Unrecognized:
+        return "Unrecognized";
     }
   }
 
@@ -127,6 +129,12 @@ namespace SmartPeak
 
     if (meta_data.getFilename().empty()) {
       std::cout << "SequenceFile Error: filename must be specified." << std::endl;
+      // throw std::runtime_error("filename");
+      is_valid = false;
+    }
+
+    if (meta_data.getSampleType() == SampleType::Unrecognized) {
+      std::cout << "SequenceFile Error: sample type could not be recognized." << std::endl;
       // throw std::runtime_error("filename");
       is_valid = false;
     }

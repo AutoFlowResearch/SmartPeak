@@ -21,7 +21,8 @@ public:
       QC,
       Blank,
       DoubleBlank,
-      Solvent
+      Solvent,
+      Unrecognized
     };
 
     static const char* SampleTypeToString(const SampleType sample_type);
@@ -55,6 +56,6 @@ private:
     std::string sample_group_name_;
     std::string sequence_segment_name_;
     std::string filename_;
-    SampleType sample_type_ = SampleType::Unknown; // TODO: is this ok as default value?
+    SampleType sample_type_ = SampleType::Unknown;
   };
 }
