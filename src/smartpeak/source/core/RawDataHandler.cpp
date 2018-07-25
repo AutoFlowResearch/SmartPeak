@@ -4,9 +4,14 @@
 
 namespace SmartPeak
 {
-  void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& featureMap_I)
+  void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& featureMap)
   {
-    featureMap_ = featureMap_I;
+    featureMap_ = featureMap;
+  }
+
+  OpenMS::FeatureMap& RawDataHandler::getFeatureMap()
+  {
+    return featureMap_;
   }
 
   OpenMS::FeatureMap RawDataHandler::getFeatureMap() const
@@ -14,9 +19,14 @@ namespace SmartPeak
     return featureMap_;
   }
 
-  void RawDataHandler::setMetaData(const MetaDataHandler& meta_data_I)
+  void RawDataHandler::setMetaData(const MetaDataHandler& meta_data)
   {
-    meta_data_ = meta_data_I;
+    meta_data_ = meta_data;
+  }
+
+  MetaDataHandler& RawDataHandler::getMetaData()
+  {
+    return meta_data_;
   }
 
   MetaDataHandler RawDataHandler::getMetaData() const
@@ -25,9 +35,14 @@ namespace SmartPeak
   }
 
   void RawDataHandler::setParameters(
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_I)
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters)
   {
-    parameters_ = parameters_I;
+    parameters_ = parameters;
+  }
+
+  std::map<std::string, std::vector<std::map<std::string, std::string>>>& RawDataHandler::getParameters()
+  {
+    return parameters_;
   }
 
   std::map<std::string, std::vector<std::map<std::string, std::string>>> RawDataHandler::getParameters() const
@@ -35,20 +50,25 @@ namespace SmartPeak
     return parameters_;
   }
 
-  void RawDataHandler::setTargeted(const OpenMS::TargetedExperiment& targeted_I)
+  void RawDataHandler::setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_exp)
   {
-    targeted_ = targeted_I;
+    targeted_exp_ = targeted_exp;
   }
 
-  OpenMS::TargetedExperiment RawDataHandler::getTargeted() const
+  OpenMS::TargetedExperiment& RawDataHandler::getTargetedExperiment()
   {
-    return targeted_;
+    return targeted_exp_;
   }
 
-  // RawDataHandler::setReferenceData(, reference_data_I)
+  OpenMS::TargetedExperiment RawDataHandler::getTargetedExperiment() const
+  {
+    return targeted_exp_;
+  }
+
+  // RawDataHandler::setReferenceData(, reference_data)
   // {
   //   """Set the reference_data"""
-  //   .reference_data = reference_data_I
+  //   .reference_data = reference_data
   // }
 
   // RawDataHandler::getReferenceData()
@@ -57,9 +77,14 @@ namespace SmartPeak
   //   return .reference_data
   // }
 
-  void RawDataHandler::setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods_I)
+  void RawDataHandler::setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods)
   {
-    quantitation_methods_ = quantitation_methods_I;
+    quantitation_methods_ = quantitation_methods;
+  }
+
+  std::vector<OpenMS::AbsoluteQuantitationMethod>& RawDataHandler::getQuantitationMethods()
+  {
+    return quantitation_methods_;
   }
 
   std::vector<OpenMS::AbsoluteQuantitationMethod> RawDataHandler::getQuantitationMethods() const
@@ -67,9 +92,14 @@ namespace SmartPeak
     return quantitation_methods_;
   }
 
-  void RawDataHandler::setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter_I)
+  void RawDataHandler::setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter)
   {
-    feature_filter_ = feature_filter_I;
+    feature_filter_ = feature_filter;
+  }
+
+  OpenMS::MRMFeatureQC& RawDataHandler::getFeatureFilter()
+  {
+    return feature_filter_;
   }
 
   OpenMS::MRMFeatureQC RawDataHandler::getFeatureFilter() const
@@ -77,9 +107,14 @@ namespace SmartPeak
     return feature_filter_;
   }
 
-  void RawDataHandler::setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc_I)
+  void RawDataHandler::setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc)
   {
-    feature_qc_ = feature_qc_I;
+    feature_qc_ = feature_qc;
+  }
+
+  OpenMS::MRMFeatureQC& RawDataHandler::getFeatureQC()
+  {
+    return feature_qc_;
   }
 
   OpenMS::MRMFeatureQC RawDataHandler::getFeatureQC() const
@@ -87,9 +122,14 @@ namespace SmartPeak
     return feature_qc_;
   }
 
-  void RawDataHandler::setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps_I)
+  void RawDataHandler::setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps)
   {
-    featureMapHistory_ = feature_maps_I;
+    featureMapHistory_ = feature_maps;
+  }
+
+  std::vector<OpenMS::FeatureMap>& RawDataHandler::getFeatureMapHistory()
+  {
+    return featureMapHistory_;
   }
 
   std::vector<OpenMS::FeatureMap> RawDataHandler::getFeatureMapHistory() const
