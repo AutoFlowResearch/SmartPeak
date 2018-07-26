@@ -1,4 +1,4 @@
-/**TODO:  Add copyright*/
+// TODO: Add copyright
 
 #pragma once
 
@@ -11,23 +11,41 @@ namespace SmartPeak
   class MetaDataHandler
   {
 public:
-    MetaDataHandler() = default;  ///< Default constructor
-    ~MetaDataHandler() = default;  ///< Default destructor
+    MetaDataHandler() = default;
+    ~MetaDataHandler() = default;
 
-    void setSampleName(const std::string& sample_name_I);
+    enum struct SampleType
+    {
+      Unknown = 1,
+      Standard,
+      QC,
+      Blank,
+      DoubleBlank,
+      Solvent,
+      Unrecognized
+    };
+
+    static const char* SampleTypeToString(const SampleType sample_type);
+
+    void setSampleName(const std::string& sample_name);
+    std::string& getSampleName();
     std::string getSampleName() const;
 
-    void setSampleGroupName(const std::string& sample_group_name_I);
+    void setSampleGroupName(const std::string& sample_group_name);
+    std::string& getSampleGroupName();
     std::string getSampleGroupName() const;
 
-    void setSequenceSegmentName(const std::string& sequence_segment_name_I);
+    void setSequenceSegmentName(const std::string& sequence_segment_name);
+    std::string& getSequenceSegmentName();
     std::string getSequenceSegmentName() const;
 
-    void setFilename(const std::string& filename_I);
+    void setFilename(const std::string& filename);
+    std::string& getFilename();
     std::string getFilename() const;
 
-    void setSampleType(const std::string& sample_type_I);
-    std::string getSampleType() const;
+    void setSampleType(SampleType sample_type);
+    SampleType& getSampleType();
+    SampleType getSampleType() const;
 
     static bool validateMetaData(const MetaDataHandler& meta_data);
 
@@ -38,6 +56,6 @@ private:
     std::string sample_group_name_;
     std::string sequence_segment_name_;
     std::string filename_;
-    std::string sample_type_; // [TODO: Refactor to use ENUM class]
+    SampleType sample_type_ = SampleType::Unknown;
   };
 }

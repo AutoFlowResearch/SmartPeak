@@ -25,40 +25,69 @@ BOOST_AUTO_TEST_CASE(destructor)
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(getters_and_setters)
+BOOST_AUTO_TEST_CASE(set_get_MetaData)
 {
-  SampleHandler sh;
-  MetaDataHandler& mdh = sh.getMetaData();
-  BOOST_CHECK_EQUAL(mdh.getSampleName(), "");
-  BOOST_CHECK_EQUAL(mdh.getSampleGroupName(), "");
-  BOOST_CHECK_EQUAL(mdh.getSampleType(), "");
-  BOOST_CHECK_EQUAL(mdh.getSequenceSegmentName(), "");
-  BOOST_CHECK_EQUAL(mdh.getFilename(), "");
-  mdh.setSampleName("1");
-  mdh.setSampleGroupName("2");
-  mdh.setSampleType("3");
-  mdh.setSequenceSegmentName("4");
-  mdh.setFilename("5");
-  sh.getMetaData() = mdh;
-  MetaDataHandler& mdh2 = sh.getMetaData();
+  SampleHandler sampleHandler;
+
+  MetaDataHandler mdh1;
+  mdh1.setSampleName("1");
+
+  sampleHandler.setMetaData(mdh1);
+
+  const MetaDataHandler mdh2 = sampleHandler.getMetaData();
   BOOST_CHECK_EQUAL(mdh2.getSampleName(), "1");
-  BOOST_CHECK_EQUAL(mdh2.getSampleGroupName(), "2");
-  BOOST_CHECK_EQUAL(mdh2.getSampleType(), "3");
-  BOOST_CHECK_EQUAL(mdh2.getSequenceSegmentName(), "4");
-  BOOST_CHECK_EQUAL(mdh2.getFilename(), "5");
-  mdh2.setSampleName("10");
-  mdh2.setSampleGroupName("20");
-  mdh2.setSampleType("30");
-  mdh2.setSequenceSegmentName("40");
-  mdh2.setFilename("50");
-  sh.setMetaData(mdh2);
-  MetaDataHandler& mdh3 = sh.getMetaData();
-  BOOST_CHECK_EQUAL(mdh3.getSampleName(), "10");
-  BOOST_CHECK_EQUAL(mdh3.getSampleGroupName(), "20");
-  BOOST_CHECK_EQUAL(mdh3.getSampleType(), "30");
-  BOOST_CHECK_EQUAL(mdh3.getSequenceSegmentName(), "40");
-  BOOST_CHECK_EQUAL(mdh3.getFilename(), "50");
-  // TODO: implement getRawData() and setRawData() tests
+
+  mdh1.setSampleGroupName("2");
+  sampleHandler.getMetaData() = mdh1;
+
+  const MetaDataHandler& mdh3 = sampleHandler.getMetaData();
+  BOOST_CHECK_EQUAL(mdh3.getSampleName(), "1");
+  BOOST_CHECK_EQUAL(mdh3.getSampleGroupName(), "2");
+}
+
+BOOST_AUTO_TEST_CASE(set_get_RawData)
+{
+  SampleHandler sampleHandler;
+
+  OpenMS::FeatureMap f1;
+  f1.setIdentifier("1");
+  RawDataHandler rdh1;
+  rdh1.setFeatureMap(f1);
+
+  sampleHandler.setRawData(rdh1);
+
+  const RawDataHandler rdh2 = sampleHandler.getRawData();
+  BOOST_CHECK_EQUAL(rdh2.getFeatureMap().getIdentifier(), "1");
+
+  f1.setIdentifier("2");
+  rdh1.setFeatureMap(f1);
+  sampleHandler.getRawData() = rdh1;
+
+  const RawDataHandler& rdh3 = sampleHandler.getRawData();
+  BOOST_CHECK_EQUAL(rdh3.getFeatureMap().getIdentifier(), "2");
+}
+
+BOOST_AUTO_TEST_CASE(clear)
+{
+  SampleHandler sampleHandler;
+
+  MetaDataHandler mdh1;
+  OpenMS::FeatureMap f1;
+  RawDataHandler rdh1;
+  mdh1.setSampleName("1");
+  f1.setIdentifier("1");
+  rdh1.setFeatureMap(f1);
+  sampleHandler.setMetaData(mdh1);
+  sampleHandler.setRawData(rdh1);
+
+  BOOST_CHECK_EQUAL(sampleHandler.getMetaData().getSampleName(), "1");
+  BOOST_CHECK_EQUAL(sampleHandler.getRawData().getFeatureMap().getIdentifier(), "1");
+
+  sampleHandler.clear();
+
+  BOOST_CHECK_EQUAL(sampleHandler.getMetaData().getSampleName(), "");
+  // TODO: remove following line when clear() is fully implemented
+  // BOOST_CHECK_EQUAL(sampleHandler.getRawData().getFeatureMap().getIdentifier(), "");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
