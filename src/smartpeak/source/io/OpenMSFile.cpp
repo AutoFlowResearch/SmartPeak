@@ -541,4 +541,79 @@ namespace SmartPeak
     rawDataHandler.setParameters(parameters_file);
   }
 
+  void storeQuantitationMethods(
+      const SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const String& quantitationMethods_csv_o,
+      const bool verbose = false
+  )
+  {
+      // """Store AbsoluteQuantitationMethods
+
+      // Args:
+      //     sequenceSegmentHandler_IO (SampleHandler)
+      //     quantitationMethods_csv_o (str): filename
+
+      // Internals:
+      //     quantitationMethods (list): list of AbsoluteQuantitationMethod objects
+
+      // """
+      if (verbose)
+        std::cout << "storing quantitation methods" << std::endl;
+
+      if (quantitationMethods_csv_o.size()) {
+        AbsoluteQuantitationMethodFile aqmf;
+        aqmf.store(
+          quantitationMethods_csv_o,
+          sequenceSegmentHandler_IO.getQuantitationMethods()
+        );
+      }
+  }
+
+  void storeFeatureMap(
+    RawDataHandler& rawDataHandler_IO,
+    const std::string& featureXML_o,
+    const std::string& feature_csv_o,
+    const bool verbose = false
+  )
+  {
+    // """Store FeatureMap as .xml and .csv
+
+    // Args:
+    //     rawDataHandler_IO (SampleHandler): sample object; updated in place
+    //     featureXML_o (str): .FeatureXML filename
+    //     feature_csv_o (str): .csv filename
+    // """
+    if (verbose)
+      std::cout << "Storing FeatureMap" << std::endl;
+
+    // # Store outfile as featureXML
+    FeatureXMLFile featurexml;
+    if (featureXML_o.size())
+      featurexml.store(featureXML_o, rawDataHandler_IO.featureMap); // TODO: implement getter?
+
+    // # Store the outfile as csv
+    featurescsv = OpenSwathFeatureXMLToTSV() // implement something?
+    if (feature_csv_o.size()) {
+      featurescsv.store(
+        feature_csv_o,
+        rawDataHandler_IO.featureMap, // TODO: implement getter?
+        rawDataHandler_IO.getTargetedExperiment(),
+        run_id = rawDataHandler_IO.meta_data['sample_name'], // incomplete from here
+        filename = rawDataHandler_IO.meta_data['filename']
+      );
+    }
+  }
+
+  void storeMzML(self, const std::string& out, const MSExperiment& output)
+  {
+    // """
+    // Store as mzML File
+
+    // Args:
+    //     out (str): out filename
+    //     output (): chromatogram object
+    // """
+    MzMLFile mzmlf;
+    mzmlf.store(out, output);
+  }
 }
