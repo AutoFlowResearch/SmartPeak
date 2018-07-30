@@ -2,7 +2,7 @@
 
 #define BOOST_TEST_MODULE OpenMSFile test suite
 #include <boost/test/included/unit_test.hpp>
-#include <SmartPeak/core/OpenMSFile.h>
+#include <SmartPeak/io/OpenMSFile.h>
 
 using namespace SmartPeak;
 using namespace std;

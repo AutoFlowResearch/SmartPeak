@@ -1,361 +1,354 @@
 // TODO: Add copyright
 
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
+#include <OpenMS/FORMAT/FileTypes.h>
 #include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/io/OpenMSFile.h>
 #include <vector>
 
 namespace SmartPeak
 {
-  void load_standardsConcentrations(
-    const RawDataHandler& sequenceSegmentHandler_IO,
-    std::vector<OpenMS::AbsoluteQuantitationMethod>& standardsConcentrations_csv_i,
-    verbose_I = false
+  void loadStandardsConcentrations(
+    const std::string& filename,
+    sequenceSegmentHandler& sequenceSegmentHandler_IO,
+    std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards_concentrations,
+    const bool verbose = false
   ) const
   {
-      """Load AbsoluteQuantitationStandards
+    if (verbose)
+      std::cout << "loading standards concentrations" << std::endl;
 
-      Args:
-          sequenceSegmentHandler_IO (RawDataHandler)
-          standardsConcentrations_csv_i (str): filename
+    if (filename.empty())
+      return;
 
-      Internals:
-          standardsConcentrations (list): list of AbsoluteQuantitationMethod objects
+    standards_concentrations.clear();
+    AbsoluteQuantitationStandardsFile AQSf;
 
-      """
-      if (verbose_I)
-        std::cout << "loading standards concentrations" << std::endl;
-
-      try {
-        std::vector<OpenMS::AbsoluteQuantitationMethod> standards_concentrations;
-        if (standardsConcentrations_csv_i.empty())
-          return;
-        
-        standards_concentrations = []
-        if standardsConcentrations_csv_i is not None:
-            aqsf = pyopenms.AbsoluteQuantitationStandardsFile()
-            aqsf.load(standardsConcentrations_csv_i, standards_concentrations)
-        sequenceSegmentHandler_IO.standards_concentrations = standards_concentrations
-      } catch (except Exception as e) {
-        print(e)
-      }
+    try {
+      AQSf.load(filename, standards_concentrations);
+      sequenceSegmentHandler_IO.setStandardsConcentrations(standards_concentrations);
+    } catch (const std::exception& e) {
+      std::cout << e.what();
+    }
   }
 
-  def load_quantitationMethods(
-      self,
-      sequenceSegmentHandler_IO,
-      quantitationMethods_csv_i,
-      verbose_I=False
-  ):
-      """Load AbsoluteQuantitationMethods
+  void loadQuantitationMethods(
+    const std::string& filename,
+    sequenceSegmentHandler& sequenceSegmentHandler_IO,
+    std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods,
+    const bool verbose = false
+  ) const
+  {
+    if (verbose)
+      std::cout << "loading quantitation methods" << std::endl;
 
-      Args:
-          sequenceSegmentHandler_IO (RawDataHandler)
-          quantitationMethods_csv_i (str): None
+    if (filename.empty())
+      return;
 
-      Internals:
-          quantitationMethods (list): list of AbsoluteQuantitationMethod objects
+    quantitation_methods_.clear();
+    AbsoluteQuantitationMethodFile AQMf;
 
-      """
-      if verbose_I:
-          print("loading quantitation methods")
+    try {
+      AQMf.load(filename, quantitation_methods);
+      sequenceSegmentHandler_IO.setQuantitationMethods(quantitation_methods);
+    } catch (const std::exception& e) {
+      std::cout << e.what();
+    }
+  }
 
-      try:
-          quantitation_methods = []
-          if quantitationMethods_csv_i is not None:
-              aqmf = pyopenms.AbsoluteQuantitationMethodFile()
-              aqmf.load(quantitationMethods_csv_i, quantitation_methods)
-          sequenceSegmentHandler_IO.quantitation_methods = quantitation_methods
-      except Exception as e:
-          print(e)
+  void loadTraML(
+    RawDataHandler& rawDataHandler,
+    const std::string& filename = "",
+    const bool verbose = false
+  ) const
+  {
+    if (verbose)
+      std::cout << "Loading TraML" << std::endl;
 
-  def load_TraML(
-      self, rawDataHandler_IO,
-      traML_csv_i=None,
-      traML_i=None,
-      verbose_I=False
-  ):
-      """Load TraML file
+    if (filename.empty())
+      return;
 
-      Args:
-          rawDataHandler_IO (RawDataHandler): sample object; updated in place
-          traML_csv_i (str): .csv traML filename
-          traML (str): .traML traML filename
+    size_t which_ext {0}; // 1 for csv, 2 for traML
 
-      Internals:
-          targeted (TargetedExperiment)
+    const std::string csv_ext {".csv"};
+    const std::string traml_ext {".traML"};
 
-      """
-      if verbose_I:
-          print("Loading TraML")
+    if (filename.size() >= csv_ext.size()) {
+      const std::string ext = filename.substr(filename.size() - csv_ext.size());
+      if (ext.compare(csv_ext) == 0)
+        which_ext = 1;
+    }
+    if (filename.size() >= traml_ext.size() && which_ext != 1) {
+      const std::string ext = filename.substr(filename.size() - traml_ext.size());
+      if (ext.compare(traml_ext) == 0)
+        which_ext = 2;
+    }
 
-      # load and make the transition file
-      targeted = pyopenms.TargetedExperiment()  # must use "PeptideSequence"
-      if traML_csv_i is not None:
-          tramlfile = pyopenms.TransitionTSVFile()
-          tramlfile.convertTSVToTargetedExperiment(
-              traML_csv_i.encode('utf-8'), 21, targeted)
-      elif traML_i is not None:
-          targeted = pyopenms.TargetedExperiment()
-          tramlfile = pyopenms.TraMLFile()
-          tramlfile.load(traML_i.encode('utf-8'), targeted)
-      rawDataHandler_IO.targeted = targeted
+    TargetedExperiment targeted_exp; // # must use "PeptideSequence"
+    if (which_ext == 1) {
+      TransitionTSVFile tsvfile;
+      tsvfile.convertTSVToTargetedExperiment(filename, FileTypes::Type::TRAML, targeted_exp);
+    } else if (which_ext == 2) {
+      TraMLFile tramlfile;
+      tramlfile.load(filename, targeted_exp);
+    } else {
+      // TODO: error out? let it continue and have an empty targeted experiment?
+    }
 
-  def load_Trafo(
-      self,
-      rawDataHandler_IO,
-      trafo_csv_i,
-      MRMFeatureFinderScoring_params_I={},
-      verbose_I=False
-  ):
-      """Load Trafo file
+    rawDataHandler.setTargetedExperiment(targeted_exp);
+  }
 
-      Args:
-          rawDataHandler_IO (RawDataHandler): sample object; updated in place
-          trafo_csv_i (str): filename
-          MRMFeatureFinderScoring_params_I (dict): dictionary of parameter
-              names, values, descriptions, and tags
+// DO NOT IMPLEMENT LOAD_TRAFO
+  void load_Trafo(
+    RawDataHandler& rawDataHandler,
+    const bool trafo_csv_i,
+    MRMFeatureFinderScoring_params_I = {},
+    const bool verbose = false
+  ) const
+  {
+    if (verbose)
+      std::cout << "Loading Trafo" << std::endl;
 
-      Internals:
-          targeted (TargetedExperiment)
+    MRMFeatureFinderScoring_params = MRMFeatureFinderScoring_params_I
 
-      """
-      if verbose_I:
-          print("Loading Trafo")
+    MRMFeatureFinderScoring featurefinder;
 
-      MRMFeatureFinderScoring_params = MRMFeatureFinderScoring_params_I
+    const Param& parameters = featurefinder.getParameters();
+    utilities = Utilities()
+    parameters = utilities.updateParameters(parameters, MRMFeatureFinderScoring_params); // TODO: implement Utilities?
+    featurefinder.setParameters(parameters);
 
-      # set up MRMFeatureFinderScoring (featurefinder) and
-      # parse the MRMFeatureFinderScoring params
-      featurefinder = pyopenms.MRMFeatureFinderScoring()
-      parameters = featurefinder.getParameters()
-      utilities = Utilities()
-      parameters = utilities.updateParameters(
-          parameters,
-          MRMFeatureFinderScoring_params,
-          )
-      featurefinder.setParameters(parameters)
+    TransformationDescription trafo;
+    if (trafo_csv_i.empty()) {
+      throw std::invalid_argument("invalid input filename");
+    }
+    // # load and make the transition file for RTNormalization
+    TargetedExperiment targeted_rt_norm;
+    TransitionTSVReader tramlfile;
+    tramlfile.convertTSVToTargetedExperiment(
+      trafo_csv_i.encode('utf-8'), 21, targeted_rt_norm
+      )
+    // # Normalize the RTs
+    // # NOTE: same MRMFeatureFinderScoring params will be used to pickPeaks
+    OpenSwathRTNormalizer RTNormalizer; // TODO: implement class
+    trafo = RTNormalizer.main(
+      rawDataHandler.chromatogram_map,
+      targeted_rt_norm,
+      model_params=None,
+      // # model_params=model_params,
+      model_type="linear",
+      // # model_type="interpolated",
+      min_rsq=0.95,
+      min_coverage=0.6,
+      estimateBestPeptides=True,
+      MRMFeatureFinderScoring_params=parameters
+      )
+    rawDataHandler.setTransformationDescription(trafo); // TODO: implement the setter
+  }
 
-      # # prepare the model parameters for RTNormalization (interpolation)
-      # model_params_list = [
-      #   {'name':'interpolation_type','value': 'linear','type': 'string'},
-      #     {'name':' extrapolation_type','value': 'two-point-linear','type': 'string'},
-      # ]
-      # model_params = pyopenms.Param()
-      # model_params = utilities.setParameters(model_params_list,model_params)
 
-      trafo = pyopenms.TransformationDescription()
-      if trafo_csv_i is not None:
-          # load and make the transition file for RTNormalization
-          targeted_rt_norm = pyopenms.TargetedExperiment()
-          tramlfile = pyopenms.TransitionTSVReader()
-          tramlfile.convertTSVToTargetedExperiment(
-              trafo_csv_i.encode('utf-8'), 21, targeted_rt_norm
-              )
-          # Normalize the RTs
-          # NOTE: same MRMFeatureFinderScoring params will be used to pickPeaks
-          RTNormalizer = OpenSwathRTNormalizer()
-          trafo = RTNormalizer.main(
-              rawDataHandler_IO.chromatogram_map,
-              targeted_rt_norm,
-              model_params=None,
-              # model_params=model_params,
-              model_type="linear",
-              # model_type="interpolated",
-              min_rsq=0.95,
-              min_coverage=0.6,
-              estimateBestPeptides=True,
-              MRMFeatureFinderScoring_params=parameters
-              )
-      rawDataHandler_IO.trafo = trafo
+    //   """Load MzML into an MSExperiment
 
-  def load_MSExperiment(
-      self,
-      rawDataHandler_IO,
-      mzML_i,
+    //   Args:
+    //       rawDataHandler (RawDataHandler): sample object; updated in place
+    //       mzML_i (str): filename
+    //       MRMMapping_params_I (list):
+    //           list of key:value parameters for OpenMS::MRMMapping
+    //       chromatogramExtractor_params_I (list):
+    //           list of key:value parameters for OpenMS::ChromatogramExtractor
+    //       mzML_params_I (list):
+    //           list of key:value parameters to trigger the use of different
+    //           file importers (e.g., ChromeleonFile)
+
+    //   Internals:
+    //       msExperiment (TargetedExperiment)
+
+    //   """
+  void load_MSExperiment(
+      RawDataHandler& rawDataHandler,
+      const std::string& mzML_i,
       MRMMapping_params_I={},
       chromatogramExtractor_params_I={},
       mzML_params_I={},
-      verbose_I=False
-  ):
-      """Load MzML into an MSExperiment
+      const bool verbose = false
+  ) const
+  {
+    if (verbose)
+        std::cout << "Loading mzML" << std::endl;
 
-      Args:
-          rawDataHandler_IO (RawDataHandler): sample object; updated in place
-          mzML_i (str): filename
-          MRMMapping_params_I (list):
-              list of key:value parameters for OpenMS::MRMMapping
-          chromatogramExtractor_params_I (list):
-              list of key:value parameters for OpenMS::ChromatogramExtractor
-          mzML_params_I (list):
-              list of key:value parameters to trigger the use of different
-              file importers (e.g., ChromeleonFile)
+    // # load chromatograms
+    OpenMS::MSExperiment chromatograms;
+    if (!mzML_i.empty()) {
+      if (mzML_params_I.size()) {
+        // # convert parameters
+        std::map<std::string, Utilities::CastValue> mzML_params;
+        for (const std::map<std::string,std::string>& param : mzML_params_I) {
+          Utilities::CastValue c;
+          Utilities::castString(param.at("value"), param.at("type"), c);
+          mzML_params.insert(param.at("name"), c);
+        }
+        // if mzML_params["format"] == b"ChromeleonFile": NECESSARY? the parser does not care about the extension
+        // mzML_i = mzML_i.replace(".mzML", ".txt")
+        OpenMS::ChromeleonFile chfh;
+        chfh.load(mzML_i, chromatograms);
+      } else {
+        OpenMS::FileHandler fh;
+        fh.loadExperiment(mzML_i, chromatograms);
+      }
+    }
 
-      Internals:
-          msExperiment (TargetedExperiment)
+    OpenMS::TargetedExperiment& targeted_exp = rawDataHandler.getTargetedExperiment();
+    if (chromatogramExtractor_params_I.size() && targeted_exp.getTransitions().size()) {
+      // # convert parameters
+      std::map<std::string, Utilities::CastValue> chromatogramExtractor_params;
+      for (const std::map<std::string,std::string>& param : chromatogramExtractor_params_I) {
+        Utilities::CastValue c;
+        Utilities::castString(param.at("value"), param.at("type"), c);
+        mzML_params.insert(param.at("name"), c);
+      }
+      // # exctract chromatograms
+      OpenMS::MSExperiment chromatograms_copy = chromatograms;
+      chromatograms.clear(true);
+      if (chromatogramExtractor_params.count("extract_precursors")) {
+        const std::vector<OpenMS::ReactionMonitoringTransition>& tr_const = targeted_exp.getTransitions();
+        std::vector<OpenMS::ReactionMonitoringTransition>& tr = tr_const;
+        for (OpenMS::ReactionMonitoringTransition& t : tr) {
+          t.setProductMZ(t.getPrecursorMZ());
+        }
+        targeted_exp.setTransitions(tr);
+        rawDataHandler.setTargetedExperiment(targeted_exp);
+      }
+      TransformationDescription transfDescr;
+      ChromatogramExtractor chromatogramExtractor;
+      chromatogramExtractor.extractChromatograms(
+        chromatograms_copy,
+        chromatograms,
+        rawDataHandler.getTargetedExperiment(),
+        chromatogramExtractor_params.at("extract_window").f,
+        chromatogramExtractor_params['ppm'].b,
+        transfDescr,
+        chromatogramExtractor_params['rt_extraction_window'].f,
+        chromatogramExtractor_params['filter'].s,
+      );
+    }
+    rawDataHandler.setExperiment(chromatograms); // TODO: implement setter
 
-      """
-      if verbose_I:
-          print("Loading mzML")
+    // # map transitions to the chromatograms
+    OpenMS::TargetedExperiment& targeted_exp = rawDataHandler.getTargetedExperiment();
+    if (MRMMapping_params_I.size() && targeted_exp.getTransitions().size()) {
+      // # set up MRMMapping and
+      // # parse the MRMMapping params
+      OpenMS::MRMMapping mrmmapper;
+      OpenMS::Param& parameters = mrmmapper.getParameters();
+      parameters = utilities.updateParameters(
+        parameters,
+        MRMMapping_params_I,
+      );
+      mrmmapper.setParameters(parameters);
+      OpenMS::MSExperiment chromatogram_map;
 
-      # load chromatograms
-      chromatograms = pyopenms.MSExperiment()
-      if mzML_i is not None:
-          if mzML_params_I and mzML_params_I is not None:
-              # convert parameters
-              utilities = Utilities()
-              mzML_params = {d['name']: utilities.castString(
-                  d['value'],
-                  d['type']) for d in mzML_params_I}
-              if mzML_params["format"] == b"ChromeleonFile":
-                  mzML_i = mzML_i.replace(".mzML", ".txt")
-                  chfh = pyopenms.ChromeleonFile()
-                  chfh.load(mzML_i.encode('utf-8'), chromatograms)
-          else:
-              fh = pyopenms.FileHandler()
-              fh.loadExperiment(mzML_i.encode('utf-8'), chromatograms)
+      // # mrmmapper = MRMMapper()
+      // # chromatogram_map = mrmmapper.algorithm(
+      // #     chromatogram_map=chromatograms,
+      // #     targeted=rawDataHandler.targeted,
+      // #     precursor_tolerance=0.0009, #hard-coded for now
+      // #     product_tolerance=0.0009, #hard-coded for now
+      // #     allow_unmapped=True,
+      // #     allow_double_mappings=True
+      // # )
 
-      if chromatogramExtractor_params_I and \
-          chromatogramExtractor_params_I is not None and \
-          rawDataHandler_IO.targeted is not None:
-          # convert parameters
-          utilities = Utilities()
-          chromatogramExtractor_params = {d['name']: utilities.castString(
-              d['value'],
-              d['type']) for d in chromatogramExtractor_params_I}
-          # chromatogramExtractor_params = {d['name']:utilities.parseString(d['value'])
-          #   for d in chromatogramExtractor_params_I}
-          # exctract chromatograms
-          chromatograms_copy = copy.copy(chromatograms)
-          chromatograms.clear(True)
-          if chromatogramExtractor_params['extract_precursors']:
-              tr = rawDataHandler_IO.targeted.getTransitions()
-              for t in tr:
-                  t.setProductMZ(t.getPrecursorMZ())
-              rawDataHandler_IO.targeted.setTransitions(tr)
-          chromatogramExtractor = pyopenms.ChromatogramExtractor()
-          chromatogramExtractor.extractChromatograms(
-              chromatograms_copy,
-              chromatograms,
-              rawDataHandler_IO.targeted,
-              chromatogramExtractor_params['extract_window'],
-              chromatogramExtractor_params['ppm'],
-              pyopenms.TransformationDescription(),
-              chromatogramExtractor_params['rt_extraction_window'],
-              chromatogramExtractor_params['filter'],
-              )
+      mrmmapper.mapExperiment(
+          chromatograms,
+          rawDataHandler.getTargetedExperiment(),
+          chromatogram_map
+      );
+    }
+    rawDataHandler.chromatogram_map = chromatogram_map; // TODO: update this line, missing setter in RawDataHandler
+  }
 
-      rawDataHandler_IO.msExperiment = chromatograms
-
-      # map transitions to the chromatograms
-      if MRMMapping_params_I and \
-          MRMMapping_params_I is not None and \
-          rawDataHandler_IO.targeted is not None:
-          # set up MRMMapping and
-          # parse the MRMMapping params
-          mrmmapper = pyopenms.MRMMapping()
-          utilities = Utilities()
-          parameters = mrmmapper.getParameters()
-          parameters = utilities.updateParameters(
-              parameters,
-              MRMMapping_params_I,
-              )
-          mrmmapper.setParameters(parameters)
-          chromatogram_map = pyopenms.MSExperiment()
-
-          # mrmmapper = MRMMapper()
-          # chromatogram_map = mrmmapper.algorithm(
-          #     chromatogram_map=chromatograms,
-          #     targeted=rawDataHandler_IO.targeted,
-          #     precursor_tolerance=0.0009, #hard-coded for now
-          #     product_tolerance=0.0009, #hard-coded for now
-          #     allow_unmapped=True,
-          #     allow_double_mappings=True
-          # )
-
-          mrmmapper.mapExperiment(
-              chromatograms, rawDataHandler_IO.targeted, chromatogram_map)
-      rawDataHandler_IO.chromatogram_map = chromatogram_map
-
-  def load_SWATHorDIA(
-      self,
-      rawDataHandler_IO,
-      dia_csv_i,
-      verbose_I=False
-  ):
+  void loadSWATHorDIA(
+      RawDataHandler& rawDataHandler,
+      const String& dia_csv_i,
+      const bool verbose = false
+  )
+  {
       """Load SWATH or DIA into an MSExperiment
 
       Args:
-          rawDataHandler_IO (RawDataHandler): sample object; updated in place
+          rawDataHandler (RawDataHandler): sample object; updated in place
           dia_csv_i (str): filename
 
       Internals:
           msExperiment (TargetedExperiment)
 
       """
-      if verbose_I:
-          print("Loading SWATH/DIA files")
+      if (verbose)
+        std::cout << "Loading SWATH/DIA files" << std::endl;
 
-      # load in the DIA data
-      swath = pyopenms.MSExperiment()
-      if dia_csv_i is not None:
-          chromatogramExtractor = OpenSwathChromatogramExtractor()
-          # read in the DIA data files:
-          # dia_files_i = ...(dia_csv_i)
-          swath = chromatogramExtractor.main(
-              infiles=[],
-              targeted=rawDataHandler_IO.targeted,
-              extraction_window=0.05,
-              min_upper_edge_dist=0.0,
-              ppm=False,
-              is_swath=False,
-              rt_extraction_window=-1,
-              extraction_function="tophat"
-          )
-      rawDataHandler_IO.swath = swath
+      // # load in the DIA data
+      MSExperiment swath;
+      if (!dia_csv_i.empty()) {
+        chromatogramExtractor = OpenSwathChromatogramExtractor() // TODO: implement class
+        // # read in the DIA data files:
+        // # dia_files_i = ...(dia_csv_i)
+        swath = chromatogramExtractor.main( // TODO: and also its methods
+          infiles=[],
+          targeted=rawDataHandler.targeted,
+          extraction_window=0.05,
+          min_upper_edge_dist=0.0,
+          ppm=False,
+          is_swath=False,
+          rt_extraction_window=-1,
+          extraction_function="tophat"
+        )
+      }
+      rawDataHandler.swath = swath; // TODO: implement setter?
+  }
 
-  def load_featureMap(
-      self,
-      rawDataHandler_IO,
-      featureXML_i,
-      verbose_I=False
-  ):
-      """Load a FeatureMap
+  void loadFeatureMap(
+      RawDataHandler& rawDataHandler,
+      const String& featureXML_i,
+      const bool verbose = false
+  )
+  {
+    """Load a FeatureMap
 
-      Args:
-          rawDataHandler_IO (RawDataHandler): sample object; updated in place
-          featureXML_i (str): filename
+    Args:
+        rawDataHandler (RawDataHandler): sample object; updated in place
+        featureXML_i (str): filename
 
-      """
-      if verbose_I:
-          print("Loading FeatureMap")
+    """
+    if (verbose)
+      std::cout << "Loading FeatureMap" << std::endl;
 
-      # Store outfile as featureXML
-      featurexml = pyopenms.FeatureXMLFile()
-      output = pyopenms.FeatureMap()
-      if featureXML_i is not None:
-          featurexml.load(featureXML_i.encode('utf-8'), output)
+    // # Store outfile as featureXML
+    FeatureXMLFile featurexml;
+    FeatureMap output;
+    if (!featureXML_i.empty())
+      featurexml.load(featureXML_i, output);
 
-      rawDataHandler_IO.featureMap = output
+    rawDataHandler.setFeatureMap(output);
+  }
 
+// SKIP THIS FOR NOW
   def load_validationData(
       self,
-      rawDataHandler_IO,
+      rawDataHandler,
       referenceData_csv_i=None,
       db_json_i=None,
       ReferenceDataMethods_params_I={},
-      verbose_I=False
+      const bool verbose = false
   ):
       """Load the validation data from file or from a database
 
       Args:
-          rawDataHandler_IO (RawDataHandler): sample object; updated in place
+          rawDataHandler (RawDataHandler): sample object; updated in place
           referenceData_csv_i (str): filename of the reference data
           db_json_i (str): filename of the DB json settings file
           ReferenceDataMethods_params_I (dict): dictionary of DB query parameters
 
       """
-      if verbose_I:
+      if verbose:
           print("Loading validation data")
 
       utilities = Utilities()
@@ -406,7 +399,7 @@ namespace SmartPeak
 
       # read in the reference data
       reference_data = []
-      if referenceData_csv_i is not None:
+      if (!referenceData_csv_i.empty()) {
           smartpeak_i = FileReader()
           smartpeak_i.read_csv(referenceData_csv_i)
           reference_data = smartpeak_i.getData()
@@ -428,114 +421,124 @@ namespace SmartPeak
               settings_filename_I=db_json_i,
               data_filename_O=''
           )
-      rawDataHandler_IO.reference_data = reference_data
+      rawDataHandler.reference_data = reference_data
 
-  def load_featureFilter(
-      self,
-      rawDataHandler_IO,
-      featureFilterComponents_csv_i,
-      featureFilterComponentGroups_csv_i,
-      verbose_I=False
-  ):
-      """Load the feature filters
+  void loadFeatureFilter(
+      RawDataHandler& rawDataHandler,
+      const String& featureFilterComponents_csv_i = "",
+      const String& featureFilterComponentGroups_csv_i = "",
+      const bool verbose = false
+  )
+  {
+    """Load the feature filters
 
-      Args:
-          rawDataHandler_IO (RawDataHandler): sample object; updated in place
-          featureFilterComponents_csv_i (str): filename
-          featureFilterComponentGroups_csv_i (str): filename
+    Args:
+        rawDataHandler (RawDataHandler): sample object; updated in place
+        featureFilterComponents_csv_i (str): filename
+        featureFilterComponentGroups_csv_i (str): filename
 
-      """
-      if verbose_I:
-          print("Loading feature_filter")
+    """
+    if (verbose)
+      std::cout << "Loading feature_filter" << std::endl;
 
-      # read in the parameters for the MRMFeatureQC
-      featureQC = pyopenms.MRMFeatureQC()
-      featureQCFile = pyopenms.MRMFeatureQCFile()
-      if featureFilterComponents_csv_i is not None:
-          featureQCFile.load(
-              featureFilterComponents_csv_i.encode('utf-8'), featureQC, False)
-      if featureFilterComponentGroups_csv_i is not None:
-          featureQCFile.load(
-              featureFilterComponentGroups_csv_i.encode('utf-8'), featureQC, True)
-      rawDataHandler_IO.feature_filter = featureQC
+    // # read in the parameters for the MRMFeatureQC
+    MRMFeatureQC featureQC;
+    MRMFeatureQCFile featureQCFile;
+    if (!featureFilterComponents_csv_i.empty())
+      featureQCFile.load(featureFilterComponents_csv_i, featureQC, false);
+    if (!featureFilterComponentGroups_csv_i.empty())
+      featureQCFile.load(featureFilterComponentGroups_csv_i, featureQC, true);
+    rawDataHandler.setFeatureFilter(featureQC);
+  }
 
-  def load_featureQC(
-      self,
-      rawDataHandler_IO,
-      featureQCComponents_csv_i,
-      featureQCComponentGroups_csv_i,
-      verbose_I=False
-  ):
-      """Load the feature QCs
+  void loadFeatureQC(
+    RawDataHandler& rawDataHandler,
+    const String& featureQCComponents_csv_i,
+    const String& featureQCComponentGroups_csv_i,
+    const bool verbose = false
+  )
+  {
+    """Load the feature QCs
 
-      Args:
-          rawDataHandler_IO (RawDataHandler): sample object; updated in place
-          featureQCComponents_csv_i (str): filename
-          featureQCComponentGroups_csv_i (str): filename
+    Args:
+        rawDataHandler (RawDataHandler): sample object; updated in place
+        featureQCComponents_csv_i (str): filename
+        featureQCComponentGroups_csv_i (str): filename
 
-      """
-      if verbose_I:
-          print("Loading feature_qc")
+    """
+    if (verbose)
+      std::cout << "Loading feature_qc" << std::endl;
 
-      # read in the parameters for the MRMFeatureQC
-      featureQC = pyopenms.MRMFeatureQC()
-      featureQCFile = pyopenms.MRMFeatureQCFile()
-      if featureQCComponents_csv_i is not None:
-          featureQCFile.load(
-              featureQCComponents_csv_i.encode('utf-8'), featureQC, False)
-      if featureQCComponentGroups_csv_i is not None:
-          featureQCFile.load(
-              featureQCComponentGroups_csv_i.encode('utf-8'), featureQC, True)
-      rawDataHandler_IO.feature_qc = featureQC
+    // # read in the parameters for the MRMFeatureQC
+    MRMFeatureQC featureQC;
+    MRMFeatureQCFile featureQCFile;
+    if (!featureQCComponents_csv_i.empty())
+      featureQCFile.load(featureQCComponents_csv_i, featureQC, false);
+    if (!featureQCComponentGroups_csv_i.empty())
+      featureQCFile.load(featureQCComponentGroups_csv_i, featureQC, true)
+    rawDataHandler.setFeatureQC(featureQC);
+  }
 
-  def read_rawDataProcessingParameters(
-      self, rawDataHandler_IO, filename, delimiter=','
-  ):
-      """Import a rawDataProcessing parameters file
+  void readRawDataProcessingParameters(
+    RawDataHandler& rawDataHandler, const String& filename, const String& delimiter = ","
+  )
+  {
+    """Import a rawDataProcessing parameters file
 
-      the rawDataProcessing parameters are read in from a .csv file.
+    the rawDataProcessing parameters are read in from a .csv file.
 
-      Args:
-          rawDataHandler_IO (RawDataHandler)
+    Args:
+        rawDataHandler (RawDataHandler)
 
-      """
+    """
 
-      # read in the data
-      if filename is not None:
-          fileReader = FileReader()
-          fileReader.read_openMSParams(filename, delimiter)
-          self.parse_rawDataProcessingParameters(
-              rawDataHandler_IO, fileReader.getData())
-          fileReader.clear_data()
+    // # read in the data
+    if (filename.size()) {
+      fileReader = FileReader() // TODO: port class
+      fileReader.read_openMSParams(filename, delimiter) // TODO: and its methods
+      parse_rawDataProcessingParameters(rawDataHandler, fileReader.getData()); // TODO: check this after FileReader is ported
+      fileReader.clear_data(); // TODO: implement method
+    }
+  }
 
-  def parse_rawDataProcessingParameters(self, rawDataHandler_IO, parameters_file):
-      """Parse a rawDataProcessing file to ensure all headers are present
+  void parse_rawDataProcessingParameters(
+    RawDataHandler& rawDataHandler,
+    std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_file
+  )
+  {
+    // """Parse a rawDataProcessing file to ensure all headers are present
 
-      Args:
-          rawDataHandler_IO (RawDataHandler)
-          parameters_file (dict): dictionary of parameter
-      """
+    // Args:
+    //     rawDataHandler (RawDataHandler)
+    //     parameters_file (dict): dictionary of parameter
+    // """
 
-      # check for workflow parameters integrity
-      required_parameters = [
-          "SequenceSegmentPlotter",
-          "FeaturePlotter",
-          "AbsoluteQuantitation",
-          "mzML",
-          "MRMMapping",
-          "ChromatogramExtractor",
-          "MRMFeatureFinderScoring",
-          "MRMFeatureFilter.filter_MRMFeatures",
-          "MRMFeatureSelector.select_MRMFeatures_qmip",
-          "MRMFeatureSelector.schedule_MRMFeatures_qmip",
-          "MRMFeatureSelector.select_MRMFeatures_score",
-          "ReferenceDataMethods.getAndProcess_referenceData_samples",
-          "MRMFeatureValidator.validate_MRMFeatures",
-          "MRMFeatureFilter.filter_MRMFeatures.qc",
-      ]
-      for parameter in required_parameters:
-          if parameter not in parameters_file:
-              parameters_file[parameter] = []
-      rawDataHandler_IO.setParameters(parameters_file)
+    // # check for workflow parameters integrity
+    std::vector<std::string> required_parameters = {
+      "SequenceSegmentPlotter",
+      "FeaturePlotter",
+      "AbsoluteQuantitation",
+      "mzML",
+      "MRMMapping",
+      "ChromatogramExtractor",
+      "MRMFeatureFinderScoring",
+      "MRMFeatureFilter.filter_MRMFeatures",
+      "MRMFeatureSelector.select_MRMFeatures_qmip",
+      "MRMFeatureSelector.schedule_MRMFeatures_qmip",
+      "MRMFeatureSelector.select_MRMFeatures_score",
+      "ReferenceDataMethods.getAndProcess_referenceData_samples",
+      "MRMFeatureValidator.validate_MRMFeatures",
+      "MRMFeatureFilter.filter_MRMFeatures.qc",
+    };
+    for (const std::string& parameter : required_parameters) {
+      if (!required_parameters.count(parameter)) {
+        required_parameters.emplace(
+          parameter,
+          std::vector<std::map<std::string, std::string>>() // empty vector
+        );
+      }
+    }
+    rawDataHandler.setParameters(parameters_file);
+  }
 
 }
