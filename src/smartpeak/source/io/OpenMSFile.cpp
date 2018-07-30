@@ -9,9 +9,8 @@
 namespace SmartPeak
 {
   void loadStandardsConcentrations(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const std::string& filename,
-    sequenceSegmentHandler& sequenceSegmentHandler_IO,
-    std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards_concentrations,
     const bool verbose = false
   ) const
   {
@@ -25,6 +24,8 @@ namespace SmartPeak
     AbsoluteQuantitationStandardsFile AQSf;
 
     try {
+      // TODO: use ref getter on sequenceSegmentHandler_IO instead?
+      std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards_concentrations;
       AQSf.load(filename, standards_concentrations);
       sequenceSegmentHandler_IO.setStandardsConcentrations(standards_concentrations);
     } catch (const std::exception& e) {
@@ -33,9 +34,8 @@ namespace SmartPeak
   }
 
   void loadQuantitationMethods(
-    const std::string& filename,
     sequenceSegmentHandler& sequenceSegmentHandler_IO,
-    std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods,
+    const std::string& filename,
     const bool verbose = false
   ) const
   {
@@ -49,6 +49,8 @@ namespace SmartPeak
     AbsoluteQuantitationMethodFile AQMf;
 
     try {
+      // TODO: use ref getter on sequenceSegmentHandler_IO instead?
+      std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods;
       AQMf.load(filename, quantitation_methods);
       sequenceSegmentHandler_IO.setQuantitationMethods(quantitation_methods);
     } catch (const std::exception& e) {
@@ -58,94 +60,29 @@ namespace SmartPeak
 
   void loadTraML(
     RawDataHandler& rawDataHandler,
-    const std::string& filename = "",
+    const std::string& filename,
+    const std::string& format,
     const bool verbose = false
   ) const
   {
     if (verbose)
       std::cout << "Loading TraML" << std::endl;
 
-    if (filename.empty())
+    if (filename.empty()
+        || (format != "csv" && format != "traML"))
       return;
 
-    size_t which_ext {0}; // 1 for csv, 2 for traML
-
-    const std::string csv_ext {".csv"};
-    const std::string traml_ext {".traML"};
-
-    if (filename.size() >= csv_ext.size()) {
-      const std::string ext = filename.substr(filename.size() - csv_ext.size());
-      if (ext.compare(csv_ext) == 0)
-        which_ext = 1;
-    }
-    if (filename.size() >= traml_ext.size() && which_ext != 1) {
-      const std::string ext = filename.substr(filename.size() - traml_ext.size());
-      if (ext.compare(traml_ext) == 0)
-        which_ext = 2;
-    }
-
     TargetedExperiment targeted_exp; // # must use "PeptideSequence"
-    if (which_ext == 1) {
+    if (format == "csv") {
       TransitionTSVFile tsvfile;
       tsvfile.convertTSVToTargetedExperiment(filename, FileTypes::Type::TRAML, targeted_exp);
-    } else if (which_ext == 2) {
+    } else {
       TraMLFile tramlfile;
       tramlfile.load(filename, targeted_exp);
-    } else {
-      // TODO: error out? let it continue and have an empty targeted experiment?
     }
 
     rawDataHandler.setTargetedExperiment(targeted_exp);
   }
-
-// DO NOT IMPLEMENT LOAD_TRAFO
-  void load_Trafo(
-    RawDataHandler& rawDataHandler,
-    const bool trafo_csv_i,
-    MRMFeatureFinderScoring_params_I = {},
-    const bool verbose = false
-  ) const
-  {
-    if (verbose)
-      std::cout << "Loading Trafo" << std::endl;
-
-    MRMFeatureFinderScoring_params = MRMFeatureFinderScoring_params_I
-
-    MRMFeatureFinderScoring featurefinder;
-
-    const Param& parameters = featurefinder.getParameters();
-    utilities = Utilities()
-    parameters = utilities.updateParameters(parameters, MRMFeatureFinderScoring_params); // TODO: implement Utilities?
-    featurefinder.setParameters(parameters);
-
-    TransformationDescription trafo;
-    if (trafo_csv_i.empty()) {
-      throw std::invalid_argument("invalid input filename");
-    }
-    // # load and make the transition file for RTNormalization
-    TargetedExperiment targeted_rt_norm;
-    TransitionTSVReader tramlfile;
-    tramlfile.convertTSVToTargetedExperiment(
-      trafo_csv_i.encode('utf-8'), 21, targeted_rt_norm
-      )
-    // # Normalize the RTs
-    // # NOTE: same MRMFeatureFinderScoring params will be used to pickPeaks
-    OpenSwathRTNormalizer RTNormalizer; // TODO: implement class
-    trafo = RTNormalizer.main(
-      rawDataHandler.chromatogram_map,
-      targeted_rt_norm,
-      model_params=None,
-      // # model_params=model_params,
-      model_type="linear",
-      // # model_type="interpolated",
-      min_rsq=0.95,
-      min_coverage=0.6,
-      estimateBestPeptides=True,
-      MRMFeatureFinderScoring_params=parameters
-      )
-    rawDataHandler.setTransformationDescription(trafo); // TODO: implement the setter
-  }
-
 
     //   """Load MzML into an MSExperiment
 
@@ -164,12 +101,12 @@ namespace SmartPeak
     //       msExperiment (TargetedExperiment)
 
     //   """
-  void load_MSExperiment(
+  void loadMSExperiment(
       RawDataHandler& rawDataHandler,
       const std::string& mzML_i,
-      MRMMapping_params_I={},
-      chromatogramExtractor_params_I={},
-      mzML_params_I={},
+      const std::vector<std::map<std::string, std::string>>& MRMMapping_params_I = std::vector<std::map<std::string, std::string>>,
+      const std::vector<std::map<std::string, std::string>>& chromatogramExtractor_params_I = std::vector<std::map<std::string, std::string>>,
+      const std::vector<std::map<std::string, std::string>>& mzML_params_I = std::vector<std::map<std::string, std::string>>,
       const bool verbose = false
   ) const
   {
@@ -178,7 +115,7 @@ namespace SmartPeak
 
     // # load chromatograms
     OpenMS::MSExperiment chromatograms;
-    if (!mzML_i.empty()) {
+    if (mzML_i.size()) {
       if (mzML_params_I.size()) {
         // # convert parameters
         std::map<std::string, Utilities::CastValue> mzML_params;
@@ -187,10 +124,10 @@ namespace SmartPeak
           Utilities::castString(param.at("value"), param.at("type"), c);
           mzML_params.insert(param.at("name"), c);
         }
-        // if mzML_params["format"] == b"ChromeleonFile": NECESSARY? the parser does not care about the extension
-        // mzML_i = mzML_i.replace(".mzML", ".txt")
-        OpenMS::ChromeleonFile chfh;
-        chfh.load(mzML_i, chromatograms);
+        if (mzML_params.count("format") && mzML_params.at("format").s == "ChromeleonFile") {
+          OpenMS::ChromeleonFile chfh;
+          chfh.load(mzML_i, chromatograms);
+        }
       } else {
         OpenMS::FileHandler fh;
         fh.loadExperiment(mzML_i, chromatograms);
@@ -198,20 +135,20 @@ namespace SmartPeak
     }
 
     OpenMS::TargetedExperiment& targeted_exp = rawDataHandler.getTargetedExperiment();
-    if (chromatogramExtractor_params_I.size() && targeted_exp.getTransitions().size()) {
+    if (chromatogramExtractor_params_I.size()) {
       // # convert parameters
       std::map<std::string, Utilities::CastValue> chromatogramExtractor_params;
       for (const std::map<std::string,std::string>& param : chromatogramExtractor_params_I) {
         Utilities::CastValue c;
         Utilities::castString(param.at("value"), param.at("type"), c);
-        mzML_params.insert(param.at("name"), c);
+        chromatogramExtractor_params.insert(param.at("name"), c);
       }
       // # exctract chromatograms
       OpenMS::MSExperiment chromatograms_copy = chromatograms;
       chromatograms.clear(true);
       if (chromatogramExtractor_params.count("extract_precursors")) {
         const std::vector<OpenMS::ReactionMonitoringTransition>& tr_const = targeted_exp.getTransitions();
-        std::vector<OpenMS::ReactionMonitoringTransition>& tr = tr_const;
+        std::vector<OpenMS::ReactionMonitoringTransition> tr = tr_const;
         for (OpenMS::ReactionMonitoringTransition& t : tr) {
           t.setProductMZ(t.getPrecursorMZ());
         }
@@ -225,10 +162,10 @@ namespace SmartPeak
         chromatograms,
         rawDataHandler.getTargetedExperiment(),
         chromatogramExtractor_params.at("extract_window").f,
-        chromatogramExtractor_params['ppm'].b,
+        chromatogramExtractor_params.at("ppm").b,
         transfDescr,
-        chromatogramExtractor_params['rt_extraction_window'].f,
-        chromatogramExtractor_params['filter'].s,
+        chromatogramExtractor_params.at("rt_extraction_window").f,
+        chromatogramExtractor_params.at("filter").s,
       );
     }
     rawDataHandler.setExperiment(chromatograms); // TODO: implement setter
