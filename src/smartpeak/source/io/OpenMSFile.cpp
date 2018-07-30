@@ -20,14 +20,11 @@ namespace SmartPeak
     if (filename.empty())
       return;
 
-    standards_concentrations.clear();
-    AbsoluteQuantitationStandardsFile AQSf;
-
     try {
-      // TODO: use ref getter on sequenceSegmentHandler_IO instead?
-      std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards_concentrations;
-      AQSf.load(filename, standards_concentrations);
-      sequenceSegmentHandler_IO.setStandardsConcentrations(standards_concentrations);
+      AbsoluteQuantitationStandardsFile AQSf;
+      std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards;
+      AQSf.load(filename, standards);
+      sequenceSegmentHandler_IO.setStandardsConcentrations(standards);
     } catch (const std::exception& e) {
       std::cout << e.what();
     }
@@ -45,11 +42,8 @@ namespace SmartPeak
     if (filename.empty())
       return;
 
-    quantitation_methods_.clear();
-    AbsoluteQuantitationMethodFile AQMf;
-
     try {
-      // TODO: use ref getter on sequenceSegmentHandler_IO instead?
+      AbsoluteQuantitationMethodFile AQMf;
       std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods;
       AQMf.load(filename, quantitation_methods);
       sequenceSegmentHandler_IO.setQuantitationMethods(quantitation_methods);
@@ -68,8 +62,7 @@ namespace SmartPeak
     if (verbose)
       std::cout << "Loading TraML" << std::endl;
 
-    if (filename.empty()
-        || (format != "csv" && format != "traML"))
+    if (filename.empty() || (format != "csv" && format != "traML"))
       return;
 
     TargetedExperiment targeted_exp; // # must use "PeptideSequence"
@@ -84,29 +77,12 @@ namespace SmartPeak
     rawDataHandler.setTargetedExperiment(targeted_exp);
   }
 
-    //   """Load MzML into an MSExperiment
-
-    //   Args:
-    //       rawDataHandler (RawDataHandler): sample object; updated in place
-    //       mzML_i (str): filename
-    //       MRMMapping_params_I (list):
-    //           list of key:value parameters for OpenMS::MRMMapping
-    //       chromatogramExtractor_params_I (list):
-    //           list of key:value parameters for OpenMS::ChromatogramExtractor
-    //       mzML_params_I (list):
-    //           list of key:value parameters to trigger the use of different
-    //           file importers (e.g., ChromeleonFile)
-
-    //   Internals:
-    //       msExperiment (TargetedExperiment)
-
-    //   """
   void loadMSExperiment(
       RawDataHandler& rawDataHandler,
       const std::string& mzML_i,
-      const std::vector<std::map<std::string, std::string>>& MRMMapping_params_I = std::vector<std::map<std::string, std::string>>,
-      const std::vector<std::map<std::string, std::string>>& chromatogramExtractor_params_I = std::vector<std::map<std::string, std::string>>,
-      const std::vector<std::map<std::string, std::string>>& mzML_params_I = std::vector<std::map<std::string, std::string>>,
+      const std::vector<std::map<std::string, std::string>>& MRMMapping_params_I = std::vector<std::map<std::string, std::string>>(),
+      const std::vector<std::map<std::string, std::string>>& chromatogramExtractor_params_I = std::vector<std::map<std::string, std::string>>(),
+      const std::vector<std::map<std::string, std::string>>& mzML_params_I = std::vector<std::map<std::string, std::string>>(),
       const bool verbose = false
   ) const
   {
@@ -168,31 +144,20 @@ namespace SmartPeak
         chromatogramExtractor_params.at("filter").s,
       );
     }
-    rawDataHandler.setExperiment(chromatograms); // TODO: implement setter
+    rawDataHandler.setExperiment(chromatograms);
 
     // # map transitions to the chromatograms
     OpenMS::TargetedExperiment& targeted_exp = rawDataHandler.getTargetedExperiment();
-    if (MRMMapping_params_I.size() && targeted_exp.getTransitions().size()) {
+    if (MRMMapping_params_I.size()) {
       // # set up MRMMapping and
       // # parse the MRMMapping params
       OpenMS::MRMMapping mrmmapper;
-      OpenMS::Param& parameters = mrmmapper.getParameters();
-      parameters = utilities.updateParameters(
-        parameters,
+      OpenMS::Param parameters = utilities.updateParameters(
+        mrmmapper.getParameters(),
         MRMMapping_params_I,
       );
       mrmmapper.setParameters(parameters);
       OpenMS::MSExperiment chromatogram_map;
-
-      // # mrmmapper = MRMMapper()
-      // # chromatogram_map = mrmmapper.algorithm(
-      // #     chromatogram_map=chromatograms,
-      // #     targeted=rawDataHandler.targeted,
-      // #     precursor_tolerance=0.0009, #hard-coded for now
-      // #     product_tolerance=0.0009, #hard-coded for now
-      // #     allow_unmapped=True,
-      // #     allow_double_mappings=True
-      // # )
 
       mrmmapper.mapExperiment(
           chromatograms,
@@ -200,7 +165,7 @@ namespace SmartPeak
           chromatogram_map
       );
     }
-    rawDataHandler.chromatogram_map = chromatogram_map; // TODO: update this line, missing setter in RawDataHandler
+    rawDataHandler.setChromatogramMap(chromatogram_map);
   }
 
   void loadSWATHorDIA(
@@ -209,26 +174,16 @@ namespace SmartPeak
       const bool verbose = false
   )
   {
-      """Load SWATH or DIA into an MSExperiment
-
-      Args:
-          rawDataHandler (RawDataHandler): sample object; updated in place
-          dia_csv_i (str): filename
-
-      Internals:
-          msExperiment (TargetedExperiment)
-
-      """
       if (verbose)
         std::cout << "Loading SWATH/DIA files" << std::endl;
 
       // # load in the DIA data
       MSExperiment swath;
       if (!dia_csv_i.empty()) {
-        chromatogramExtractor = OpenSwathChromatogramExtractor() // TODO: implement class
+        chromatogramExtractor = OpenSwathChromatogramExtractor() // TODO: implement class?
         // # read in the DIA data files:
         // # dia_files_i = ...(dia_csv_i)
-        swath = chromatogramExtractor.main( // TODO: and also its methods
+        swath = chromatogramExtractor.main(
           infiles=[],
           targeted=rawDataHandler.targeted,
           extraction_window=0.05,
@@ -239,7 +194,7 @@ namespace SmartPeak
           extraction_function="tophat"
         )
       }
-      rawDataHandler.swath = swath; // TODO: implement setter?
+      rawDataHandler.swath = swath; // TODO: eventually implement setter
   }
 
   void loadFeatureMap(
@@ -259,106 +214,13 @@ namespace SmartPeak
       std::cout << "Loading FeatureMap" << std::endl;
 
     // # Store outfile as featureXML
-    FeatureXMLFile featurexml;
     FeatureMap output;
-    if (!featureXML_i.empty())
+    if (featureXML_i.size()) {
+      FeatureXMLFile featurexml;
       featurexml.load(featureXML_i, output);
-
+    }
     rawDataHandler.setFeatureMap(output);
   }
-
-// SKIP THIS FOR NOW
-  def load_validationData(
-      self,
-      rawDataHandler,
-      referenceData_csv_i=None,
-      db_json_i=None,
-      ReferenceDataMethods_params_I={},
-      const bool verbose = false
-  ):
-      """Load the validation data from file or from a database
-
-      Args:
-          rawDataHandler (RawDataHandler): sample object; updated in place
-          referenceData_csv_i (str): filename of the reference data
-          db_json_i (str): filename of the DB json settings file
-          ReferenceDataMethods_params_I (dict): dictionary of DB query parameters
-
-      """
-      if verbose:
-          print("Loading validation data")
-
-      utilities = Utilities()
-
-      # Parse the input parameters
-      ReferenceDataMethods_dict = {d['name']: utilities.parseString(
-          d['value'], encode_str_I=False) for d in ReferenceDataMethods_params_I}
-      experiment_ids_I = [],
-      sample_names_I = [],
-      sample_types_I = [],
-      acquisition_methods_I = [],
-      quantitation_method_ids_I = [],
-      component_names_I = [],
-      component_group_names_I = [],
-      where_clause_I = '',
-      used__I = True,
-      experiment_limit_I = 10000,
-      mqresultstable_limit_I = 1000000,
-      # settings_filename_I = 'settings.ini',
-      # data_filename_O = ''
-      if "experiment_ids_I" in ReferenceDataMethods_dict.keys():
-          experiment_ids_I = ReferenceDataMethods_dict["experiment_ids_I"]
-      if "sample_names_I" in ReferenceDataMethods_dict.keys():
-          sample_names_I = ReferenceDataMethods_dict["sample_names_I"]
-      if "sample_types_I" in ReferenceDataMethods_dict.keys():
-          sample_types_I = ReferenceDataMethods_dict["sample_types_I"]
-      if "acquisition_methods_I" in ReferenceDataMethods_dict.keys():
-          acquisition_methods_I = ReferenceDataMethods_dict["acquisition_methods_I"]
-      if "quantitation_method_ids_I" in ReferenceDataMethods_dict.keys():
-          quantitation_method_ids_I = ReferenceDataMethods_dict[
-              "quantitation_method_ids_I"]
-      if "component_names_I" in ReferenceDataMethods_dict.keys():
-          component_names_I = ReferenceDataMethods_dict["component_names_I"]
-      if "component_group_names_I" in ReferenceDataMethods_dict.keys():
-          component_group_names_I = ReferenceDataMethods_dict["component_group_names_I"]
-      if "where_clause_I" in ReferenceDataMethods_dict.keys():
-          where_clause_I = ReferenceDataMethods_dict["where_clause_I"]
-      if "used__I" in ReferenceDataMethods_dict.keys():
-          used__I = ReferenceDataMethods_dict["used__I"]
-      if "experiment_limit_I" in ReferenceDataMethods_dict.keys():
-          experiment_limit_I = ReferenceDataMethods_dict["experiment_limit_I"]
-      if "mqresultstable_limit_I" in ReferenceDataMethods_dict.keys():
-          mqresultstable_limit_I = ReferenceDataMethods_dict["mqresultstable_limit_I"]
-      # if "settings_filename_I" in ReferenceDataMethods_dict.keys():
-      #     settings_filename_I = ReferenceDataMethods_dict["settings_filename_I"]
-      # if "data_filename_O" in ReferenceDataMethods_dict.keys():
-      #     data_filename_O = ReferenceDataMethods_dict["data_filename_O"]
-
-      # read in the reference data
-      reference_data = []
-      if (!referenceData_csv_i.empty()) {
-          smartpeak_i = FileReader()
-          smartpeak_i.read_csv(referenceData_csv_i)
-          reference_data = smartpeak_i.getData()
-          smartpeak_i.clear_data()
-      elif db_json_i is not None:
-          referenceDataMethods = ReferenceDataMethods()
-          reference_data = referenceDataMethods.getAndProcess_referenceData_samples(
-              experiment_ids_I=experiment_ids_I,
-              sample_names_I=sample_names_I,
-              sample_types_I=sample_types_I,
-              acquisition_methods_I=acquisition_methods_I,
-              quantitation_method_ids_I=quantitation_method_ids_I,
-              component_names_I=component_names_I,
-              component_group_names_I=component_group_names_I,
-              where_clause_I=where_clause_I,
-              used__I=used__I,
-              experiment_limit_I=experiment_limit_I,
-              mqresultstable_limit_I=mqresultstable_limit_I,
-              settings_filename_I=db_json_i,
-              data_filename_O=''
-          )
-      rawDataHandler.reference_data = reference_data
 
   void loadFeatureFilter(
       RawDataHandler& rawDataHandler,
@@ -367,23 +229,15 @@ namespace SmartPeak
       const bool verbose = false
   )
   {
-    """Load the feature filters
-
-    Args:
-        rawDataHandler (RawDataHandler): sample object; updated in place
-        featureFilterComponents_csv_i (str): filename
-        featureFilterComponentGroups_csv_i (str): filename
-
-    """
     if (verbose)
       std::cout << "Loading feature_filter" << std::endl;
 
     // # read in the parameters for the MRMFeatureQC
     MRMFeatureQC featureQC;
     MRMFeatureQCFile featureQCFile;
-    if (!featureFilterComponents_csv_i.empty())
+    if (featureFilterComponents_csv_i.size())
       featureQCFile.load(featureFilterComponents_csv_i, featureQC, false);
-    if (!featureFilterComponentGroups_csv_i.empty())
+    if (featureFilterComponentGroups_csv_i.size())
       featureQCFile.load(featureFilterComponentGroups_csv_i, featureQC, true);
     rawDataHandler.setFeatureFilter(featureQC);
   }
@@ -395,23 +249,15 @@ namespace SmartPeak
     const bool verbose = false
   )
   {
-    """Load the feature QCs
-
-    Args:
-        rawDataHandler (RawDataHandler): sample object; updated in place
-        featureQCComponents_csv_i (str): filename
-        featureQCComponentGroups_csv_i (str): filename
-
-    """
     if (verbose)
       std::cout << "Loading feature_qc" << std::endl;
 
     // # read in the parameters for the MRMFeatureQC
     MRMFeatureQC featureQC;
     MRMFeatureQCFile featureQCFile;
-    if (!featureQCComponents_csv_i.empty())
+    if (featureQCComponents_csv_i.size())
       featureQCFile.load(featureQCComponents_csv_i, featureQC, false);
-    if (!featureQCComponentGroups_csv_i.empty())
+    if (featureQCComponentGroups_csv_i.size())
       featureQCFile.load(featureQCComponentGroups_csv_i, featureQC, true)
     rawDataHandler.setFeatureQC(featureQC);
   }
@@ -420,22 +266,13 @@ namespace SmartPeak
     RawDataHandler& rawDataHandler, const String& filename, const String& delimiter = ","
   )
   {
-    """Import a rawDataProcessing parameters file
 
-    the rawDataProcessing parameters are read in from a .csv file.
+    if (filename.empty())
+      return;
 
-    Args:
-        rawDataHandler (RawDataHandler)
-
-    """
-
-    // # read in the data
-    if (filename.size()) {
-      fileReader = FileReader() // TODO: port class
-      fileReader.read_openMSParams(filename, delimiter) // TODO: and its methods
-      parse_rawDataProcessingParameters(rawDataHandler, fileReader.getData()); // TODO: check this after FileReader is ported
-      fileReader.clear_data(); // TODO: implement method
-    }
+    FileReader fileReader; // TODO: must implement class
+    fileReader.read_openMSParams(filename, delimiter);
+    parse_rawDataProcessingParameters(rawDataHandler, fileReader.getData());
   }
 
   void parse_rawDataProcessingParameters(
@@ -443,13 +280,6 @@ namespace SmartPeak
     std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_file
   )
   {
-    // """Parse a rawDataProcessing file to ensure all headers are present
-
-    // Args:
-    //     rawDataHandler (RawDataHandler)
-    //     parameters_file (dict): dictionary of parameter
-    // """
-
     // # check for workflow parameters integrity
     std::vector<std::string> required_parameters = {
       "SequenceSegmentPlotter",
@@ -468,8 +298,8 @@ namespace SmartPeak
       "MRMFeatureFilter.filter_MRMFeatures.qc",
     };
     for (const std::string& parameter : required_parameters) {
-      if (!required_parameters.count(parameter)) {
-        required_parameters.emplace(
+      if (!parameters_file.count(parameter)) {
+        parameters_file.emplace(
           parameter,
           std::vector<std::map<std::string, std::string>>() // empty vector
         );
@@ -484,26 +314,16 @@ namespace SmartPeak
       const bool verbose = false
   )
   {
-      // """Store AbsoluteQuantitationMethods
+    if (verbose)
+      std::cout << "storing quantitation methods" << std::endl;
 
-      // Args:
-      //     sequenceSegmentHandler_IO (SampleHandler)
-      //     quantitationMethods_csv_o (str): filename
-
-      // Internals:
-      //     quantitationMethods (list): list of AbsoluteQuantitationMethod objects
-
-      // """
-      if (verbose)
-        std::cout << "storing quantitation methods" << std::endl;
-
-      if (quantitationMethods_csv_o.size()) {
-        AbsoluteQuantitationMethodFile aqmf;
-        aqmf.store(
-          quantitationMethods_csv_o,
-          sequenceSegmentHandler_IO.getQuantitationMethods()
-        );
-      }
+    if (quantitationMethods_csv_o.size()) {
+      AbsoluteQuantitationMethodFile aqmf;
+      aqmf.store(
+        quantitationMethods_csv_o,
+        sequenceSegmentHandler_IO.getQuantitationMethods()
+      );
+    }
   }
 
   void storeFeatureMap(
@@ -513,43 +333,29 @@ namespace SmartPeak
     const bool verbose = false
   )
   {
-    // """Store FeatureMap as .xml and .csv
-
-    // Args:
-    //     rawDataHandler_IO (SampleHandler): sample object; updated in place
-    //     featureXML_o (str): .FeatureXML filename
-    //     feature_csv_o (str): .csv filename
-    // """
     if (verbose)
       std::cout << "Storing FeatureMap" << std::endl;
 
     // # Store outfile as featureXML
     FeatureXMLFile featurexml;
     if (featureXML_o.size())
-      featurexml.store(featureXML_o, rawDataHandler_IO.featureMap); // TODO: implement getter?
+      featurexml.store(featureXML_o, rawDataHandler_IO.getFeatureMap());
 
     // # Store the outfile as csv
-    featurescsv = OpenSwathFeatureXMLToTSV() // implement something?
+    featurescsv = OpenSwathFeatureXMLToTSV() // TODO: implement it?
     if (feature_csv_o.size()) {
       featurescsv.store(
         feature_csv_o,
-        rawDataHandler_IO.featureMap, // TODO: implement getter?
+        rawDataHandler_IO.getFeatureMap(),
         rawDataHandler_IO.getTargetedExperiment(),
-        run_id = rawDataHandler_IO.meta_data['sample_name'], // incomplete from here
-        filename = rawDataHandler_IO.meta_data['filename']
+        rawDataHandler_IO.getMetaData().getSampleName(),
+        rawDataHandler_IO.getMetaData().getFilename()
       );
     }
   }
 
   void storeMzML(self, const std::string& out, const MSExperiment& output)
   {
-    // """
-    // Store as mzML File
-
-    // Args:
-    //     out (str): out filename
-    //     output (): chromatogram object
-    // """
     MzMLFile mzmlf;
     mzmlf.store(out, output);
   }
