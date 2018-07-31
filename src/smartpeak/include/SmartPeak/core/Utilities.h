@@ -39,24 +39,24 @@ public:
       CastValue& cast
     )
     {
-      std::string icase_value;
-      std::transform(value.begin(), value.end(), icase_value.begin(), ::tolower);
-      std::string icase_type;
-      std::transform(type.begin(), type.end(), icase_type.begin(), ::tolower);
+      std::string lowercase_value;
+      std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
+      std::string lowercase_type;
+      std::transform(type.begin(), type.end(), lowercase_type.begin(), ::tolower);
 
-      if (icase_type == "int") {
+      if (lowercase_type == "int") {
         cast.tag = CastValue::INT;
         cast.i = std::stoi(value);
-      } else if (icase_type == "float") {
+      } else if (lowercase_type == "float") {
         cast.tag = CastValue::FLOAT;
         cast.f = (float)std::stof(value);
-      } else if ((icase_type == "bool" || icase_type == "string") && icase_value == "true") {
+      } else if ((lowercase_type == "bool" || lowercase_type == "string") && lowercase_value == "true") {
         cast.tag = CastValue::BOOL;
         cast.b = true;
-      } else if ((icase_type == "bool" || icase_type == "string") && icase_value == "false") {
+      } else if ((lowercase_type == "bool" || lowercase_type == "string") && lowercase_value == "false") {
         cast.tag = CastValue::BOOL;
         cast.b = false;
-      } else if (icase_type == "string") {
+      } else if (lowercase_type == "string") {
         cast.tag = CastValue::STRING;
         cast.s = value;
       } else {
@@ -113,11 +113,11 @@ public:
               break;
             case OpenMS::DataValue::STRING_VALUE:
               const std::string& value = Param_IO.getValue(name);
-              std::string icase_value;
-              std::transform(value.begin(), value.end(), icase_value.begin(), ::tolower);
-              if (icase_value == "true" || icase_value == "false") {
+              std::string lowercase_value;
+              std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
+              if (lowercase_value == "true" || lowercase_value == "false") {
                 c.tag = CastValue::BOOL;
-                c.b = return icase_value == "true";
+                c.b = return lowercase_value == "true";
               } else {
                 c.tag = CastValue::STRING;
                 c.s = Param_IO.getValue(name);
