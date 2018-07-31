@@ -354,7 +354,7 @@ namespace SmartPeak
     }
   }
 
-  void storeMzML(self, const std::string& out, const MSExperiment& output)
+  void storeMzML(const std::string& out, const MSExperiment& output)
   {
     MzMLFile mzmlf;
     mzmlf.store(out, output);
