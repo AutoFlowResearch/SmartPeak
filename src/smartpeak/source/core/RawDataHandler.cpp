@@ -4,19 +4,19 @@
 
 namespace SmartPeak
 {
-  void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& featureMap)
+  void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& feature_map)
   {
-    featureMap_ = featureMap;
+    feature_map_ = feature_map;
   }
 
   OpenMS::FeatureMap& RawDataHandler::getFeatureMap()
   {
-    return featureMap_;
+    return feature_map_;
   }
 
   OpenMS::FeatureMap RawDataHandler::getFeatureMap() const
   {
-    return featureMap_;
+    return feature_map_;
   }
 
   void RawDataHandler::setMetaData(const MetaDataHandler& meta_data)
@@ -124,16 +124,46 @@ namespace SmartPeak
 
   void RawDataHandler::setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps)
   {
-    featureMapHistory_ = feature_maps;
+    feature_map_history_ = feature_maps;
   }
 
   std::vector<OpenMS::FeatureMap>& RawDataHandler::getFeatureMapHistory()
   {
-    return featureMapHistory_;
+    return feature_map_history_;
   }
 
   std::vector<OpenMS::FeatureMap> RawDataHandler::getFeatureMapHistory() const
   {
-    return featureMapHistory_;
+    return feature_map_history_;
+  }
+
+  void RawDataHandler::setExperiment(const OpenMS::MSExperiment& experiment)
+  {
+    experiment_ = experiment;
+  }
+
+  OpenMS::MSExperiment& RawDataHandler::getExperiment()
+  {
+    return experiment_;
+  }
+
+  OpenMS::MSExperiment RawDataHandler::getExperiment() const
+  {
+    return experiment_;
+  }
+
+  void RawDataHandler::setChromatogramMap(const OpenMS::MSExperiment& chromatogram_map)
+  {
+    chromatogram_map_ = chromatogram_map;
+  }
+
+  OpenMS::MSExperiment& RawDataHandler::getChromatogramMap()
+  {
+    return chromatogram_map_;
+  }
+
+  OpenMS::MSExperiment RawDataHandler::getChromatogramMap() const
+  {
+    return chromatogram_map_;
   }
 }

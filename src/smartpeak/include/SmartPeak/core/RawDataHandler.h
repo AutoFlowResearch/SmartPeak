@@ -23,7 +23,7 @@ public:
     RawDataHandler() = default;
     ~RawDataHandler() = default;
 
-    void setFeatureMap(const OpenMS::FeatureMap& featureMap);
+    void setFeatureMap(const OpenMS::FeatureMap& feature_map);
     OpenMS::FeatureMap& getFeatureMap();
     OpenMS::FeatureMap getFeatureMap() const;
 
@@ -36,7 +36,7 @@ public:
     std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters();
     std::map<std::string, std::vector<std::map<std::string, std::string>>> getParameters() const;
 
-    void setTargetedExperiment(const OpenMS::TargetedExperiment& targeted);
+    void setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_exp);
     OpenMS::TargetedExperiment& getTargetedExperiment();
     OpenMS::TargetedExperiment getTargetedExperiment() const;
 
@@ -60,18 +60,26 @@ public:
     std::vector<OpenMS::FeatureMap>& getFeatureMapHistory();
     std::vector<OpenMS::FeatureMap> getFeatureMapHistory() const;
 
+    void setExperiment(const OpenMS::MSExperiment& experiment);
+    OpenMS::MSExperiment& getExperiment();
+    OpenMS::MSExperiment getExperiment() const;
+
+    void setChromatogramMap(const OpenMS::MSExperiment& chromatogram_map);
+    OpenMS::MSExperiment& getChromatogramMap();
+    OpenMS::MSExperiment getChromatogramMap() const;
+
 private:
     // input
-    OpenMS::MSExperiment msExperiment_;
+    OpenMS::MSExperiment experiment_;
     OpenMS::MSExperiment chromatogram_map_;
     OpenMS::TransformationDescription trafo_;
     OpenMS::MSExperiment swath_;
 
     // output
-    OpenMS::FeatureMap featureMap_;
+    OpenMS::FeatureMap feature_map_;
     MetaDataHandler meta_data_;
     std::map<std::string, float> validation_metrics_;
-    std::vector<OpenMS::FeatureMap> featureMapHistory_;
+    std::vector<OpenMS::FeatureMap> feature_map_history_;
 
     // input (reused between RawDataHandlers)
     std::map<std::string, std::vector<std::map<std::string, std::string>>> parameters_;
