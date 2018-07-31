@@ -14,7 +14,7 @@ public:
 
     struct CastValue
     {
-      enum{BOOL, FLOAT, INT, STRING, UNKNOWN} tag;
+      enum{UNKNOWN, BOOL, FLOAT, INT, STRING} tag = UNKNOWN;
       union
       {
         bool b;
@@ -49,7 +49,7 @@ public:
         cast.i = std::stoi(value);
       } else if (lowercase_type == "float") {
         cast.tag = CastValue::FLOAT;
-        cast.f = (float)std::stof(value);
+        cast.f = std::stof(value);
       } else if ((lowercase_type == "bool" || lowercase_type == "string") && lowercase_value == "true") {
         cast.tag = CastValue::BOOL;
         cast.b = true;
@@ -173,41 +173,41 @@ public:
 
       auto isBool = [](const std::string& s) -> bool { return s == "True" || s == "False"; };
 
+      std::cmatch m;
+      std::regex re_integer_number("[+-]?\\d+");
+      std::regex re_float_number("[+-]?\\d+\\.\\d+");
+      std::regex re_bool("true|false", std::regex::icase);
+
+      CastValue c;
       str_O = None
-      try:
-          if str_I.isdigit():
-              str_O = int(str_I)
-          elif str_I[0] == '-' and str_I[1:].isdigit():
-              str_O = int(str_I)
-          elif isfloat(str_I):
-              str_O = float(str_I)
-          // # elif str_I.isdecimal():
-          // #     str_O = float(str_I)
-          // # elif str_I[0]=='-' and str_I[1:].isdecimal():
-          // #     str_O = float(str_I)
-          elif isBool(str_I):
-              str_O = eval(str_I)
-          elif str_I[0] == '[' and str_I[-1] == ']':
-              str_O = []
-              f = StringIO(str_I[1:-1])
-              reader = csv.reader(f, delimiter=',')
-              for row in reader:
-                  for item in row:
-                      str_O.append(self.parseString(item, encode_str_I=encode_str_I))
-          elif str_I[0] == '{' and str_I[-1] == '}':
-              str_O = dict(str_I[1:-1])
-          elif str_I[0] == '(' and str_I[-1] == ')':
-              str_O = tuple(str_I[1:-1])
-          elif str_I[0] in ["'", '"'] and str_I[-1] in ["'", '"']:
-              str_O = eval(str_I)
-              if encode_str_I:
-                  str_O = str_I.encode('utf-8')
-          else:
-              str_O = str_I
-              if encode_str_I:
-                  str_O = str_I.encode('utf-8')
-      except Exception as e:
-          print(e)
+      try {
+        if (std::regex_match(str_I, m, re_integer_number)) { // integer
+          c.tag = CastValue::INT;
+          c.i = std::strtol(m[0], NULL, 10);
+        } else if (std::regex_match(str_I, m, re_float_number)) { // float
+          c.tag = CastValue::FLOAT;
+          c.f = std::strtof(m[0], NULL);
+        } else if (std::regex_match(str_I, m, re_bool)) {  //bool
+          c.tag = CastValue::BOOL;
+          c.b = m[0][0] == 't' || m[0][0] == 'T';
+        } else if (str_I.front() == '[' && str_I.back() == ']') { // list
+                                          str_O = []
+                                          f = StringIO(str_I[1:-1])
+                                          reader = csv.reader(f, delimiter=',')
+                                          for row in reader:
+                                              for item in row:
+                                                  str_O.append(self.parseString(item, encode_str_I=encode_str_I))
+        } else if (str_I[0] in ["'", '"'] and str_I[-1] in ["'", '"']) {
+                                        str_O = eval(str_I)
+                                        if encode_str_I:
+                                            str_O = str_I.encode('utf-8')
+        } else {
+          c.tag = CastValue::STRING;
+          c.s = str_I;
+        }
+      } catch (const std::exception& e) {
+        std::cout << e.what();
+      }
       return str_O
     }
 
