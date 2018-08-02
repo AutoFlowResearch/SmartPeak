@@ -14,13 +14,27 @@ public:
 
     struct CastValue
     {
-      enum{UNKNOWN, BOOL, FLOAT, INT, STRING} tag = UNKNOWN;
+      enum {
+        UNKNOWN,
+        BOOL,
+        FLOAT,
+        INT,
+        STRING,
+        BOOL_LIST,
+        FLOAT_LIST,
+        INT_LIST,
+        STRING_LIST
+      } tag = UNKNOWN;
       union
       {
         bool b;
         float f;
         int i;
         std::string s;
+        std::vector<bool> bl;
+        std::vector<float> fl;
+        std::vector<int> il;
+        std::vector<std::string> sl;
       };
     };
 
@@ -50,12 +64,10 @@ public:
       } else if (lowercase_type == "float") {
         cast.tag = CastValue::FLOAT;
         cast.f = std::stof(value);
-      } else if ((lowercase_type == "bool" || lowercase_type == "string") && lowercase_value == "true") {
+      } else if ((lowercase_type == "bool" || lowercase_type == "string") // TODO: Should we also support "string" type for an aventual `bool`?
+                 && (lowercase_value == "false" || lowercase_value == "true")) {
         cast.tag = CastValue::BOOL;
-        cast.b = true;
-      } else if ((lowercase_type == "bool" || lowercase_type == "string") && lowercase_value == "false") {
-        cast.tag = CastValue::BOOL;
-        cast.b = false;
+        cast.b = lowercase_value == "true";
       } else if (lowercase_type == "string") {
         cast.tag = CastValue::STRING;
         cast.s = value;
@@ -63,7 +75,7 @@ public:
         std::cout << type << " type not supported." << std::endl;
         cast.tag = CastValue::UNKNOWN;
         cast.s = value;
-        throw; // TODO: specify exception
+        throw; // TODO: Should this throw? If so, which exception?
       }
     }
 
@@ -96,8 +108,9 @@ public:
         if (param.count("value")) {
           if (param.count("type")
             self.castString(param["value"], param["type"], c);
-          else:
+          else {
             self.parseString(param['value'], c);
+          }
           // # if not self.checkParameterValue(value):
           // #     continue
         } else {
@@ -117,7 +130,7 @@ public:
               std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
               if (lowercase_value == "true" || lowercase_value == "false") {
                 c.tag = CastValue::BOOL;
-                c.b = return lowercase_value == "true";
+                c.b = lowercase_value == "true";
               } else {
                 c.tag = CastValue::STRING;
                 c.s = Param_IO.getValue(name);
@@ -157,29 +170,14 @@ public:
     //     str: str_O: evaluated string
         
     // """
-    static void parseString(str_I, encode_str_I=True)
+    static void parseString(const std::string& str_I, CastValue& cast)
     {
-      import csv
-      from io import StringIO
-
-      auto isFloat = [](const std::string& s) -> bool {
-        try {
-          std::stof(s);
-          return true;
-        } catch (const std::invalid_argument&) {
-          return false;
-        }
-      };
-
-      auto isBool = [](const std::string& s) -> bool { return s == "True" || s == "False"; };
-
       std::cmatch m;
-      std::regex re_integer_number("[+-]?\\d+");
-      std::regex re_float_number("[+-]?\\d+\\.\\d+");
-      std::regex re_bool("true|false", std::regex::icase);
+      const std::regex re_integer_number("[+-]?\\d+");
+      const std::regex re_float_number("[+-]?\\d+\\.\\d+");
+      const std::regex re_bool("true|false", std::regex::icase);
 
       CastValue c;
-      str_O = None
       try {
         if (std::regex_match(str_I, m, re_integer_number)) { // integer
           c.tag = CastValue::INT;
@@ -191,16 +189,29 @@ public:
           c.tag = CastValue::BOOL;
           c.b = m[0][0] == 't' || m[0][0] == 'T';
         } else if (str_I.front() == '[' && str_I.back() == ']') { // list
-                                          str_O = []
-                                          f = StringIO(str_I[1:-1])
-                                          reader = csv.reader(f, delimiter=',')
-                                          for row in reader:
-                                              for item in row:
-                                                  str_O.append(self.parseString(item, encode_str_I=encode_str_I))
-        } else if (str_I[0] in ["'", '"'] and str_I[-1] in ["'", '"']) {
-                                        str_O = eval(str_I)
-                                        if encode_str_I:
-                                            str_O = str_I.encode('utf-8')
+          std::string stripped;
+          std::for_each(str_I.cbegin(), str_I.cend(), [&stripped](const char c) { // to simplify regex
+            if (c != ' ')
+              stripped.push_back(c);
+          });
+          const std::regex re_integer_list("\\[[+-]?\\d+(?:,[+-]?\\d+)*\\]");
+          const std::regex re_float_list("\\[[+-]?\\d+\\.\\d+(?:,[+-]?\\d+\\.\\d+)*\\]");
+          const std::regex re_bool_list("\\[(?:true|false)(?:,(?:true|false))*\\]", std::regex::icase);
+          if (std::regex_match(str_I, re_integer_list)) {
+            c.tag = CastValue::INT_LIST;
+            parseList(stripped, re_integer_number, c);
+          } else if (std::regex_match(str_I, re_float_list)) {
+            c.tag = CastValue::FLOAT_LIST;
+            parseList(stripped, re_float_number, c);
+          } else if (std::regex_match(str_I, re_bool_list)) {
+            c.tag = CastValue::BOOL_LIST;
+            parseList(stripped, re_bool, c);
+          } else {
+            c.tag = CastValue::STRING_LIST;
+            parseList(stripped, std::regex("[^,]+"), c);
+          }
+        } else if (str_I.front() == str_I.back() && (str_I.front() == '"' || str_I.front() == '\'')) {
+          parseString(str_I.substr(1, str_I.size() - 2), cast);
         } else {
           c.tag = CastValue::STRING;
           c.s = str_I;
@@ -208,7 +219,23 @@ public:
       } catch (const std::exception& e) {
         std::cout << e.what();
       }
-      return str_O
+    }
+
+    static void parseList(const std::string& line, const std::regex& re, CastValue& cast)
+    {
+      std::cregex_iterator matches_begin = std::cregex_iterator(line.cbegin(), line.cend(), re);
+      std::cregex_iterator matches_end = std::cregex_iterator();
+      for (std::cregex_iterator it = matches_begin; it != matches_end; ++it) {
+        if (c.tag == CastValue::BOOL_LIST) {
+          c.bl.push_back(std::regex_match(*it, re));
+        } else if (c.tag == CastValue::FLOAT_LIST) {
+          c.fl.push_back(std::strtof(*it, NULL));
+        } else if (c.tag == CastValue::INT_LIST) {
+          c.il.push_back(std::strtol(*it, NULL, 10));
+        } else { // CastValue::STRING_LIST
+          c.sl.push_back(std::regex_match(*it, re));
+        }
+      }
     }
 
 private:
