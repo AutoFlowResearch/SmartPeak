@@ -2,16 +2,30 @@
 
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
 #include <OpenMS/FORMAT/FileTypes.h>
+#include <OpenMS/FORMAT/ChromeleonFile.h>
 #include <SmartPeak/core/RawDataHandler.h>
+#include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/io/OpenMSFile.h>
 #include <vector>
+#include <OpenMS/FORMAT/AbsoluteQuantitationStandardsFile.h>
+#include <OpenMS/FORMAT/AbsoluteQuantitationMethodFile.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/TransitionTSVFile.h>
+#include <OpenMS/FORMAT/FileTypes.h>
+#include <OpenMS/FORMAT/TraMLFile.h>
+#include <OpenMS/FORMAT/FileHandler.h>
+#include <OpenMS/ANALYSIS/MAPMATCHING/TransformationDescription.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/ChromatogramExtractor.h>
+#include <OpenMS/ANALYSIS/TARGETED/MRMMapping.h>
+#include <OpenMS/FORMAT/FeatureXMLFile.h>
+#include <OpenMS/FORMAT/MRMFeatureQCFile.h>
+#include <OpenMS/FORMAT/MzMLFile.h>
 
 namespace SmartPeak
 {
-  void loadStandardsConcentrations(
+  void OpenMSFile::loadStandardsConcentrations(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const std::string& filename,
-    const bool verbose = false
+    const bool verbose
   ) const
   {
     if (verbose)
@@ -21,7 +35,7 @@ namespace SmartPeak
       return;
 
     try {
-      AbsoluteQuantitationStandardsFile AQSf;
+      OpenMS::AbsoluteQuantitationStandardsFile AQSf;
       std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards;
       AQSf.load(filename, standards);
       sequenceSegmentHandler_IO.setStandardsConcentrations(standards);
@@ -30,10 +44,10 @@ namespace SmartPeak
     }
   }
 
-  void loadQuantitationMethods(
-    sequenceSegmentHandler& sequenceSegmentHandler_IO,
+  void OpenMSFile::loadQuantitationMethods(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const std::string& filename,
-    const bool verbose = false
+    const bool verbose
   ) const
   {
     if (verbose)
@@ -43,7 +57,7 @@ namespace SmartPeak
       return;
 
     try {
-      AbsoluteQuantitationMethodFile AQMf;
+      OpenMS::AbsoluteQuantitationMethodFile AQMf;
       std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods;
       AQMf.load(filename, quantitation_methods);
       sequenceSegmentHandler_IO.setQuantitationMethods(quantitation_methods);
@@ -52,11 +66,11 @@ namespace SmartPeak
     }
   }
 
-  void loadTraML(
+  void OpenMSFile::loadTraML(
     RawDataHandler& rawDataHandler,
     const std::string& filename,
     const std::string& format,
-    const bool verbose = false
+    const bool verbose
   ) const
   {
     if (verbose)
@@ -65,25 +79,25 @@ namespace SmartPeak
     if (filename.empty() || (format != "csv" && format != "traML"))
       return;
 
-    TargetedExperiment targeted_exp; // # must use "PeptideSequence"
+    OpenMS::TargetedExperiment targeted_exp; // # must use "PeptideSequence"
     if (format == "csv") {
-      TransitionTSVFile tsvfile;
-      tsvfile.convertTSVToTargetedExperiment(filename, FileTypes::Type::TRAML, targeted_exp);
+      OpenMS::TransitionTSVFile tsvfile;
+      tsvfile.convertTSVToTargetedExperiment(filename.c_str(), OpenMS::FileTypes::TRAML, targeted_exp);
     } else {
-      TraMLFile tramlfile;
+      OpenMS::TraMLFile tramlfile;
       tramlfile.load(filename, targeted_exp);
     }
 
     rawDataHandler.setTargetedExperiment(targeted_exp);
   }
 
-  void loadMSExperiment(
+  void OpenMSFile::loadMSExperiment(
       RawDataHandler& rawDataHandler,
       const std::string& mzML_i,
-      const std::vector<std::map<std::string, std::string>>& MRMMapping_params_I = std::vector<std::map<std::string, std::string>>(),
-      const std::vector<std::map<std::string, std::string>>& chromatogramExtractor_params_I = std::vector<std::map<std::string, std::string>>(),
-      const std::vector<std::map<std::string, std::string>>& mzML_params_I = std::vector<std::map<std::string, std::string>>(),
-      const bool verbose = false
+      const std::vector<std::map<std::string, std::string>>& MRMMapping_params_I,
+      const std::vector<std::map<std::string, std::string>>& chromatogramExtractor_params_I,
+      const std::vector<std::map<std::string, std::string>>& mzML_params_I,
+      const bool verbose
   ) const
   {
     if (verbose)
@@ -98,7 +112,7 @@ namespace SmartPeak
         for (const std::map<std::string,std::string>& param : mzML_params_I) {
           Utilities::CastValue c;
           Utilities::castString(param.at("value"), param.at("type"), c);
-          mzML_params.insert(param.at("name"), c);
+          mzML_params.emplace(param.at("name"), c);
         }
         if (mzML_params.count("format") && mzML_params.at("format").s == "ChromeleonFile") {
           OpenMS::ChromeleonFile chfh;
@@ -117,7 +131,7 @@ namespace SmartPeak
       for (const std::map<std::string,std::string>& param : chromatogramExtractor_params_I) {
         Utilities::CastValue c;
         Utilities::castString(param.at("value"), param.at("type"), c);
-        chromatogramExtractor_params.insert(param.at("name"), c);
+        chromatogramExtractor_params.emplace(param.at("name"), c);
       }
       // # exctract chromatograms
       OpenMS::MSExperiment chromatograms_copy = chromatograms;
@@ -131,8 +145,8 @@ namespace SmartPeak
         targeted_exp.setTransitions(tr);
         rawDataHandler.setTargetedExperiment(targeted_exp);
       }
-      TransformationDescription transfDescr;
-      ChromatogramExtractor chromatogramExtractor;
+      OpenMS::TransformationDescription transfDescr;
+      OpenMS::ChromatogramExtractor chromatogramExtractor;
       chromatogramExtractor.extractChromatograms(
         chromatograms_copy,
         chromatograms,
@@ -141,20 +155,20 @@ namespace SmartPeak
         chromatogramExtractor_params.at("ppm").b,
         transfDescr,
         chromatogramExtractor_params.at("rt_extraction_window").f,
-        chromatogramExtractor_params.at("filter").s,
+        chromatogramExtractor_params.at("filter").s
       );
     }
     rawDataHandler.setExperiment(chromatograms);
 
     // # map transitions to the chromatograms
-    OpenMS::TargetedExperiment& targeted_exp = rawDataHandler.getTargetedExperiment();
     if (MRMMapping_params_I.size()) {
       // # set up MRMMapping and
       // # parse the MRMMapping params
       OpenMS::MRMMapping mrmmapper;
-      OpenMS::Param parameters = utilities.updateParameters(
-        mrmmapper.getParameters(),
-        MRMMapping_params_I,
+      OpenMS::Param parameters = mrmmapper.getParameters();
+      Utilities::updateParameters(
+        parameters,
+        MRMMapping_params_I
       );
       mrmmapper.setParameters(parameters);
       OpenMS::MSExperiment chromatogram_map;
@@ -164,77 +178,69 @@ namespace SmartPeak
           rawDataHandler.getTargetedExperiment(),
           chromatogram_map
       );
+      rawDataHandler.setChromatogramMap(chromatogram_map);
     }
-    rawDataHandler.setChromatogramMap(chromatogram_map);
   }
 
-  void loadSWATHorDIA(
+  // void OpenMSFile::loadSWATHorDIA(
+  //     RawDataHandler& rawDataHandler,
+  //     const std::string& dia_csv_i,
+  //     const bool verbose
+  // )
+  // {
+  //     if (verbose)
+  //       std::cout << "Loading SWATH/DIA files" << std::endl;
+
+  //     // # load in the DIA data
+  //     OpenMS::MSExperiment swath;
+  //     if (!dia_csv_i.empty()) {
+  //       chromatogramExtractor = OpenSwathChromatogramExtractor() // TODO: implement class?
+  //       // # read in the DIA data files:
+  //       // # dia_files_i = ...(dia_csv_i)
+  //       swath = chromatogramExtractor.main(
+  //         infiles=[],
+  //         targeted=rawDataHandler.targeted,
+  //         extraction_window=0.05,
+  //         min_upper_edge_dist=0.0,
+  //         ppm=False,
+  //         is_swath=False,
+  //         rt_extraction_window=-1,
+  //         extraction_function="tophat"
+  //       )
+  //     }
+  //     rawDataHandler.swath = swath; // TODO: eventually implement setter
+  // }
+
+  void OpenMSFile::loadFeatureMap(
       RawDataHandler& rawDataHandler,
-      const String& dia_csv_i,
-      const bool verbose = false
+      const std::string& featureXML_i,
+      const bool verbose
   )
   {
-      if (verbose)
-        std::cout << "Loading SWATH/DIA files" << std::endl;
-
-      // # load in the DIA data
-      MSExperiment swath;
-      if (!dia_csv_i.empty()) {
-        chromatogramExtractor = OpenSwathChromatogramExtractor() // TODO: implement class?
-        // # read in the DIA data files:
-        // # dia_files_i = ...(dia_csv_i)
-        swath = chromatogramExtractor.main(
-          infiles=[],
-          targeted=rawDataHandler.targeted,
-          extraction_window=0.05,
-          min_upper_edge_dist=0.0,
-          ppm=False,
-          is_swath=False,
-          rt_extraction_window=-1,
-          extraction_function="tophat"
-        )
-      }
-      rawDataHandler.swath = swath; // TODO: eventually implement setter
-  }
-
-  void loadFeatureMap(
-      RawDataHandler& rawDataHandler,
-      const String& featureXML_i,
-      const bool verbose = false
-  )
-  {
-    """Load a FeatureMap
-
-    Args:
-        rawDataHandler (RawDataHandler): sample object; updated in place
-        featureXML_i (str): filename
-
-    """
     if (verbose)
       std::cout << "Loading FeatureMap" << std::endl;
 
-    // # Store outfile as featureXML
-    FeatureMap output;
+    OpenMS::FeatureMap output;
     if (featureXML_i.size()) {
-      FeatureXMLFile featurexml;
+      OpenMS::FeatureXMLFile featurexml;
       featurexml.load(featureXML_i, output);
     }
     rawDataHandler.setFeatureMap(output);
   }
 
-  void loadFeatureFilter(
+  void OpenMSFile::loadFeatureFilter(
       RawDataHandler& rawDataHandler,
-      const String& featureFilterComponents_csv_i = "",
-      const String& featureFilterComponentGroups_csv_i = "",
-      const bool verbose = false
+      const std::string& featureFilterComponents_csv_i,
+      const std::string& featureFilterComponentGroups_csv_i,
+      const bool verbose
   )
   {
     if (verbose)
       std::cout << "Loading feature_filter" << std::endl;
 
     // # read in the parameters for the MRMFeatureQC
-    MRMFeatureQC featureQC;
-    MRMFeatureQCFile featureQCFile;
+    OpenMS::MRMFeatureQC featureQC;
+    OpenMS::MRMFeatureQCFile featureQCFile;
     if (featureFilterComponents_csv_i.size())
       featureQCFile.load(featureFilterComponents_csv_i, featureQC, false);
     if (featureFilterComponentGroups_csv_i.size())
@@ -242,28 +248,28 @@ namespace SmartPeak
     rawDataHandler.setFeatureFilter(featureQC);
   }
 
-  void loadFeatureQC(
+  void OpenMSFile::loadFeatureQC(
     RawDataHandler& rawDataHandler,
-    const String& featureQCComponents_csv_i,
-    const String& featureQCComponentGroups_csv_i,
-    const bool verbose = false
+    const std::string& featureQCComponents_csv_i,
+    const std::string& featureQCComponentGroups_csv_i,
+    const bool verbose
   )
   {
     if (verbose)
       std::cout << "Loading feature_qc" << std::endl;
 
     // # read in the parameters for the MRMFeatureQC
-    MRMFeatureQC featureQC;
-    MRMFeatureQCFile featureQCFile;
+    OpenMS::MRMFeatureQC featureQC;
+    OpenMS::MRMFeatureQCFile featureQCFile;
     if (featureQCComponents_csv_i.size())
       featureQCFile.load(featureQCComponents_csv_i, featureQC, false);
     if (featureQCComponentGroups_csv_i.size())
-      featureQCFile.load(featureQCComponentGroups_csv_i, featureQC, true)
+      featureQCFile.load(featureQCComponentGroups_csv_i, featureQC, true);
     rawDataHandler.setFeatureQC(featureQC);
   }
 
-  void readRawDataProcessingParameters(
-    RawDataHandler& rawDataHandler, const String& filename, const String& delimiter = ","
+  void OpenMSFile::readRawDataProcessingParameters(
+    RawDataHandler& rawDataHandler, const std::string& filename, const std::string& delimiter
   )
   {
 
@@ -275,7 +281,7 @@ namespace SmartPeak
     parse_rawDataProcessingParameters(rawDataHandler, fileReader.getData());
   }
 
-  void parse_rawDataProcessingParameters(
+  void OpenMSFile::parse_rawDataProcessingParameters(
     RawDataHandler& rawDataHandler,
     std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_file
   )
@@ -308,17 +314,17 @@ namespace SmartPeak
     rawDataHandler.setParameters(parameters_file);
   }
 
-  void storeQuantitationMethods(
+  void OpenMSFile::storeQuantitationMethods(
       const SequenceSegmentHandler& sequenceSegmentHandler_IO,
-      const String& quantitationMethods_csv_o,
-      const bool verbose = false
+      const std::string& quantitationMethods_csv_o,
+      const bool verbose
   )
   {
     if (verbose)
       std::cout << "storing quantitation methods" << std::endl;
 
     if (quantitationMethods_csv_o.size()) {
-      AbsoluteQuantitationMethodFile aqmf;
+      OpenMS::AbsoluteQuantitationMethodFile aqmf;
       aqmf.store(
         quantitationMethods_csv_o,
         sequenceSegmentHandler_IO.getQuantitationMethods()
@@ -326,18 +332,18 @@ namespace SmartPeak
     }
   }
 
-  void storeFeatureMap(
+  void OpenMSFile::storeFeatureMap(
     RawDataHandler& rawDataHandler_IO,
     const std::string& featureXML_o,
     const std::string& feature_csv_o,
-    const bool verbose = false
+    const bool verbose
   )
   {
     if (verbose)
       std::cout << "Storing FeatureMap" << std::endl;
 
     // # Store outfile as featureXML
-    FeatureXMLFile featurexml;
+    OpenMS::FeatureXMLFile featurexml;
     if (featureXML_o.size())
       featurexml.store(featureXML_o, rawDataHandler_IO.getFeatureMap());
 
@@ -354,9 +360,9 @@ namespace SmartPeak
     }
   }
 
-  void storeMzML(const std::string& out, const MSExperiment& output)
+  void OpenMSFile::storeMzML(const std::string& out, const OpenMS::MSExperiment& output)
   {
-    MzMLFile mzmlf;
+    OpenMS::MzMLFile mzmlf;
     mzmlf.store(out, output);
   }
 }

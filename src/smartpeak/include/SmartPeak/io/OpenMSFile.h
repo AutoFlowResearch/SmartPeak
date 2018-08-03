@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <SmartPeak/core/SequenceSegmentHandler.h>
+
 namespace SmartPeak
 {
   class OpenMSFile
@@ -17,7 +19,7 @@ public:
     ) const;
 
     void loadQuantitationMethods(
-      sequenceSegmentHandler& sequenceSegmentHandler_IO,
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const std::string& filename,
       const bool verbose = false
     ) const;
@@ -38,34 +40,34 @@ public:
         const bool verbose = false
     ) const;
 
-    void loadSWATHorDIA(
-        RawDataHandler& rawDataHandler,
-        const String& dia_csv_i,
-        const bool verbose = false
-    );
+    // void loadSWATHorDIA(
+    //     RawDataHandler& rawDataHandler,
+    //     const std::string& dia_csv_i,
+    //     const bool verbose = false
+    // );
 
     void loadFeatureMap(
         RawDataHandler& rawDataHandler,
-        const String& featureXML_i,
+        const std::string& featureXML_i,
         const bool verbose = false
     );
 
     void loadFeatureFilter(
         RawDataHandler& rawDataHandler,
-        const String& featureFilterComponents_csv_i = "",
-        const String& featureFilterComponentGroups_csv_i = "",
+        const std::string& featureFilterComponents_csv_i = "",
+        const std::string& featureFilterComponentGroups_csv_i = "",
         const bool verbose = false
     );
 
     void loadFeatureQC(
       RawDataHandler& rawDataHandler,
-      const String& featureQCComponents_csv_i,
-      const String& featureQCComponentGroups_csv_i,
+      const std::string& featureQCComponents_csv_i,
+      const std::string& featureQCComponentGroups_csv_i,
       const bool verbose = false
     );
 
     void readRawDataProcessingParameters(
-      RawDataHandler& rawDataHandler, const String& filename, const String& delimiter = ","
+      RawDataHandler& rawDataHandler, const std::string& filename, const std::string& delimiter = ","
     );
 
     void parse_rawDataProcessingParameters(
@@ -75,7 +77,7 @@ public:
 
     void storeQuantitationMethods(
         const SequenceSegmentHandler& sequenceSegmentHandler_IO,
-        const String& quantitationMethods_csv_o,
+        const std::string& quantitationMethods_csv_o,
         const bool verbose = false
     );
 
@@ -86,7 +88,7 @@ public:
       const bool verbose = false
     );
 
-    void storeMzML(const std::string& out, const MSExperiment& output);
+    void storeMzML(const std::string& out, const OpenMS::MSExperiment& output);
 
 private:
   };
