@@ -207,4 +207,48 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureMapHistory)
   BOOST_CHECK_EQUAL(f3[0].getMetaValue("name2"), "bar");
 }
 
+BOOST_AUTO_TEST_CASE(set_get_Experiment)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::MSExperiment experiment;
+  experiment.setMetaValue("name", "foo");
+
+  rawDataHandler.setExperiment(experiment);
+
+  const OpenMS::MSExperiment experiment2 = rawDataHandler.getExperiment(); // testing copy getter
+  BOOST_CHECK_EQUAL(experiment2.metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(experiment2.getMetaValue("name"), "foo");
+
+  rawDataHandler.getExperiment().setMetaValue("name2", "bar"); // testing reference getter
+
+  const OpenMS::MSExperiment& experiment3 = rawDataHandler.getExperiment();
+  BOOST_CHECK_EQUAL(experiment3.metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(experiment3.getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(experiment3.metaValueExists("name2"), true);
+  BOOST_CHECK_EQUAL(experiment3.getMetaValue("name2"), "bar");
+}
+
+BOOST_AUTO_TEST_CASE(set_get_ChromatogramMap)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::MSExperiment chromatogram_map;
+  chromatogram_map.setMetaValue("name", "foo");
+
+  rawDataHandler.setExperiment(chromatogram_map);
+
+  const OpenMS::MSExperiment chromatogram_map2 = rawDataHandler.getExperiment(); // testing copy getter
+  BOOST_CHECK_EQUAL(chromatogram_map2.metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(chromatogram_map2.getMetaValue("name"), "foo");
+
+  rawDataHandler.getExperiment().setMetaValue("name2", "bar"); // testing reference getter
+
+  const OpenMS::MSExperiment& chromatogram_map3 = rawDataHandler.getExperiment();
+  BOOST_CHECK_EQUAL(chromatogram_map3.metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(chromatogram_map3.getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(chromatogram_map3.metaValueExists("name2"), true);
+  BOOST_CHECK_EQUAL(chromatogram_map3.getMetaValue("name2"), "bar");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
