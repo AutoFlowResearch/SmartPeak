@@ -15,9 +15,36 @@ public:
 
     struct CastValue
     {
-      CastValue() {
-        tag = UNKNOWN;
-        s = "";
+      CastValue() : tag(UNKNOWN), s() {}
+      CastValue(const CastValue& other) {
+        tag = other.tag;
+        switch (other.tag) {
+          case UNKNOWN:
+          case STRING:
+            s = other.s;
+            break;
+          case BOOL:
+            b = other.b;
+            break;
+          case FLOAT:
+            f = other.f;
+            break;
+          case INT:
+            i = other.i;
+            break;
+          case BOOL_LIST:
+            bl = other.bl;
+            break;
+          case FLOAT_LIST:
+            fl = other.fl;
+            break;
+          case INT_LIST:
+            il = other.il;
+            break;
+          case STRING_LIST:
+            sl = other.sl;
+            break;
+        }
       }
       ~CastValue() {}
       enum {
@@ -169,7 +196,7 @@ public:
         // # update the params
         switch (c.tag) {
           case CastValue::BOOL:
-            // Param_IO.setValue(name, c.b, description, tags);
+            Param_IO.setValue(name, c.b, description, tags);
             break;
           case CastValue::FLOAT:
             Param_IO.setValue(OpenMS::String(name), c.f, description, tags);
