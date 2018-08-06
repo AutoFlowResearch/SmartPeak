@@ -2,6 +2,10 @@
 
 #pragma once
 
+#include <map>
+#include <string>
+#include <vector>
+
 namespace SmartPeak
 {
   class FileReader

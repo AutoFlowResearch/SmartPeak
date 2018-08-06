@@ -1,6 +1,6 @@
 // TODO: Add copyright
 
-#include <SmartPeak/io/OpenMSFile.h>
+#include <SmartPeak/io/FileReader.h>
 #include <SmartPeak/io/csv.h>
 
 namespace SmartPeak

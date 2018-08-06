@@ -19,6 +19,7 @@
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>
 #include <OpenMS/FORMAT/MzMLFile.h>
+#include <SmartPeak/io/FileReader.h>
 
 namespace SmartPeak
 {
@@ -269,16 +270,19 @@ namespace SmartPeak
   }
 
   void OpenMSFile::readRawDataProcessingParameters(
-    RawDataHandler& rawDataHandler, const std::string& filename, const std::string& delimiter
+    RawDataHandler& rawDataHandler,
+    const std::string& filename,
+    const std::string& delimiter
   )
   {
 
     if (filename.empty())
       return;
 
-    FileReader fileReader; // TODO: must implement class
-    fileReader.read_openMSParams(filename, delimiter);
-    parse_rawDataProcessingParameters(rawDataHandler, fileReader.getData());
+    std::map<std::string,std::vector<std::map<std::string,std::string>>> parameters;
+    FileReader::parse_OpenMSParams(filename, parameters);
+
+    parse_rawDataProcessingParameters(rawDataHandler, parameters);
   }
 
   void OpenMSFile::parse_rawDataProcessingParameters(
@@ -339,25 +343,25 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-      std::cout << "Storing FeatureMap" << std::endl;
+    // if (verbose)
+    //   std::cout << "Storing FeatureMap" << std::endl;
 
-    // # Store outfile as featureXML
-    OpenMS::FeatureXMLFile featurexml;
-    if (featureXML_o.size())
-      featurexml.store(featureXML_o, rawDataHandler_IO.getFeatureMap());
+    // // # Store outfile as featureXML
+    // OpenMS::FeatureXMLFile featurexml;
+    // if (featureXML_o.size())
+    //   featurexml.store(featureXML_o, rawDataHandler_IO.getFeatureMap());
 
-    // # Store the outfile as csv
-    featurescsv = OpenSwathFeatureXMLToTSV() // TODO: implement it?
-    if (feature_csv_o.size()) {
-      featurescsv.store(
-        feature_csv_o,
-        rawDataHandler_IO.getFeatureMap(),
-        rawDataHandler_IO.getTargetedExperiment(),
-        rawDataHandler_IO.getMetaData().getSampleName(),
-        rawDataHandler_IO.getMetaData().getFilename()
-      );
-    }
+    // // # Store the outfile as csv
+    // featurescsv = OpenSwathFeatureXMLToTSV() // TODO: implement it?
+    // if (feature_csv_o.size()) {
+    //   featurescsv.store(
+    //     feature_csv_o,
+    //     rawDataHandler_IO.getFeatureMap(),
+    //     rawDataHandler_IO.getTargetedExperiment(),
+    //     rawDataHandler_IO.getMetaData().getSampleName(),
+    //     rawDataHandler_IO.getMetaData().getFilename()
+    //   );
+    // }
   }
 
   void OpenMSFile::storeMzML(const std::string& out, const OpenMS::MSExperiment& output)
