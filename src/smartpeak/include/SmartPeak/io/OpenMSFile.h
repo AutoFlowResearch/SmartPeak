@@ -41,12 +41,6 @@ public:
         const bool verbose = false
     ) const;
 
-    // void loadSWATHorDIA(
-    //     RawDataHandler& rawDataHandler,
-    //     const std::string& dia_csv_i,
-    //     const bool verbose = false
-    // );
-
     void loadFeatureMap(
         RawDataHandler& rawDataHandler,
         const std::string& featureXML_i,
@@ -85,7 +79,6 @@ public:
     void storeFeatureMap(
       RawDataHandler& rawDataHandler_IO,
       const std::string& featureXML_o,
-      const std::string& feature_csv_o,
       const bool verbose = false
     );
 

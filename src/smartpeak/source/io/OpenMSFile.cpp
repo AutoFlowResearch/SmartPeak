@@ -183,35 +183,6 @@ namespace SmartPeak
     }
   }
 
-  // void OpenMSFile::loadSWATHorDIA(
-  //     RawDataHandler& rawDataHandler,
-  //     const std::string& dia_csv_i,
-  //     const bool verbose
-  // )
-  // {
-  //     if (verbose)
-  //       std::cout << "Loading SWATH/DIA files" << std::endl;
-
-  //     // # load in the DIA data
-  //     OpenMS::MSExperiment swath;
-  //     if (!dia_csv_i.empty()) {
-  //       chromatogramExtractor = OpenSwathChromatogramExtractor() // TODO: implement class?
-  //       // # read in the DIA data files:
-  //       // # dia_files_i = ...(dia_csv_i)
-  //       swath = chromatogramExtractor.main(
-  //         infiles=[],
-  //         targeted=rawDataHandler.targeted,
-  //         extraction_window=0.05,
-  //         min_upper_edge_dist=0.0,
-  //         ppm=False,
-  //         is_swath=False,
-  //         rt_extraction_window=-1,
-  //         extraction_function="tophat"
-  //       )
-  //     }
-  //     rawDataHandler.swath = swath; // TODO: eventually implement setter
-  // }
-
   void OpenMSFile::loadFeatureMap(
       RawDataHandler& rawDataHandler,
       const std::string& featureXML_i,
@@ -339,29 +310,17 @@ namespace SmartPeak
   void OpenMSFile::storeFeatureMap(
     RawDataHandler& rawDataHandler_IO,
     const std::string& featureXML_o,
-    const std::string& feature_csv_o,
     const bool verbose
   )
   {
-    // if (verbose)
-    //   std::cout << "Storing FeatureMap" << std::endl;
+    if (verbose)
+      std::cout << "Storing FeatureMap" << std::endl;
 
-    // // # Store outfile as featureXML
-    // OpenMS::FeatureXMLFile featurexml;
-    // if (featureXML_o.size())
-    //   featurexml.store(featureXML_o, rawDataHandler_IO.getFeatureMap());
-
-    // // # Store the outfile as csv
-    // featurescsv = OpenSwathFeatureXMLToTSV() // TODO: implement it?
-    // if (feature_csv_o.size()) {
-    //   featurescsv.store(
-    //     feature_csv_o,
-    //     rawDataHandler_IO.getFeatureMap(),
-    //     rawDataHandler_IO.getTargetedExperiment(),
-    //     rawDataHandler_IO.getMetaData().getSampleName(),
-    //     rawDataHandler_IO.getMetaData().getFilename()
-    //   );
-    // }
+    // # Store outfile as featureXML
+    if (featureXML_o.size()) {
+      OpenMS::FeatureXMLFile featurexml;
+      featurexml.store(featureXML_o, rawDataHandler_IO.getFeatureMap());
+    }
   }
 
   void OpenMSFile::storeMzML(const std::string& out, const OpenMS::MSExperiment& output)
