@@ -3,6 +3,7 @@
 #pragma once
 
 #include <SmartPeak/core/SequenceSegmentHandler.h>
+#include <SmartPeak/core/RawDataHandler.h>
 
 namespace SmartPeak
 {
