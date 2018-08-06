@@ -13,22 +13,6 @@ public:
     ~FileReader() = default;
 
     def read_openMSParams(self, filename, delimiter):
-        """read table data from csv file representing
-        representing the method arguments to run the
-        openMS methods
-
-        Args:
-            filename (str): header should include the following:
-                function,
-                name,
-                value,
-                type (optional),
-                tag (optional),
-                description (optional)
-                used_,
-                comment_ (optional)
-
-        """
         self.read_csv(filename, delimiter)
         self.parse_openMSParams()
 
@@ -37,94 +21,66 @@ public:
         std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters
     )
     {
-      """parse parameters from csv file
-
-      Args:
-          data_I (list): e.g. [
-          {'function': 'ConvertTSVToTraML', 'name': '-in', 'value': 'IsolateA1.csv'},
-          {'function': 'ConvertTSVToTraML', 'name': '-out', 'value': 'IsolateA1.traML'},
-          {'function': 'MRMMapper', 'name': '-in', 'value': 'IsolateA1.mzML'},
-          {'function': 'MRMMapper', 'name': '-tr', 'value': 'IsolateA1.traML'},
-          {'function': 'MRMMapper', 'name': '-out', 'value': 'IsolateA1.csv'},
-          {'function': 'MRMMapper', 'name': '-precursor_tolerance','value':0.5},
-          {'function': 'MRMMapper', 'name': '-product_tolerance','value':0.5},
-          {'function': 'MRMMapper', 'name': '-no-strict','value':''},
-          ]
-
-      Returns:
-          dict: data_O: e.g. {
-              'ConvertTSVToTraML':[
-                  {'name':'-in','value':'IsolateA1.csv'},
-                  {'name':'-out','value':'IsolateA1.traML'}
-              ]},
-              {'MRMMapper':[
-                  {'name':'-in','value':'IsolateA1.mzML'},
-                  {'name':'-tr','value':'IsolateA1.traML'},
-                  {'name':'-out','value':'IsolateA1_features.mzML'},
-                  {'name':'-precursor_tolerance','value':0.5},
-                  {'name':'-product_tolerance','value':0.5},
-                  {'name':'-no-strict','value':''}
-              ]}
-      """
+      const std::string s_function {"function"};
+      const std::string s_name {"name"};
+      const std::string s_value {"value"};
+      const std::string s_used {"used_"};
+      const std::string s_type {"type"};
+      const std::string s_tags {"tags"};
+      const std::string s_description {"description"};
+      const std::string s_comment {"comment_"};
 
       parameters.clear();
-      io::CSVReader<7> in(filename);
+      io::CSVReader<8> in(filename);
       in.read_header(
         io::ignore_extra_column,
-        "function",
-        "name",
-        "value",
-        "tag",
-        "description",
-        "type",
-        "used_"
+        s_function,
+        s_name,
+        s_value,
+        s_used,
+        s_type,        // optional
+        s_tags,        // optional
+        s_description, // optional
+        s_comment      // optional
       );
-      bool has_tags = in.has_column("tags");
-      if (!in.has_column("used_"))
-        return;
-      if (!in.has_column("tags"))
-        return;
-      std::string func;
+      if (!in.has_column(s_used)
+          || !in.has_column(s_function)
+          || !in.has_column(s_name)
+          || !in.has_column(s_value))
+      {
+        throw; // TODO: specify exception
+      }
+      const bool has_type = in.has_column(s_type);
+      const bool has_tags = in.has_column(s_tags);
+      const bool has_description = in.has_column(s_description);
+      const bool has_comment = in.has_column(s_comment);
+      std::string function;
       std::string name;
       std::string value;
-      std::string tag;
-      std::string descr;
-      std::string type;
       std::string used;
-      while (in.read_row(func, name, value, tag, descr, type, used)) {
+      std::string type;
+      std::string tags;
+      std::string description;
+      std::string comment;
+      while (in.read_row(function, name, value, used, type, tags, description, comment)) {
         std::transform(used.begin(), used.end(), used.begin(), ::tolower);
         if (used == "false")
           continue;
-        std::map<std::string,std::string> m;
-        m.emplace("name", name);
-        m.emplace("value", value);
-        if (in.has_column()
+        std::map<std::string, std::string> m;
+        m.emplace(s_name, name);
+        m.emplace(s_value, value);
+        if (has_type)
+          m.emplace(s_type, type);
+        if (has_tags)
+          m.emplace(s_tags, tags);
+        if (has_description)
+          m.emplace(s_description, description);
+        if (has_comment)
+          m.emplace(s_comment, type);
+        if (!parameters.count(s_function))
+          parameters.emplace(s_function, std::vector<std::map<std::string,std::string>>());
+        parameters.at(s_function).push_back(m);
       }
-
-      data_I = self.getData()
-      data_O = {}
-      function_current = ''
-      function_params = {}
-      for i, d in enumerate(data_I):
-          // # skip non-used lines
-          if not d['used_'] or d['used_'] == "FALSE":
-              continue
-          // # update function_current
-          function_current = d['function']
-          if function_current not in data_O.keys():
-              data_O[function_current] = []
-          // # make the function parameter line
-          function_param = {}
-          function_param['name'] = d['name']
-          function_param['value'] = d['value']
-          if 'tags' in d.keys():
-              function_param['tags'] = d['tags']
-          if 'description' in d.keys():
-              function_param['description'] = d['description']
-          if 'type' in d.keys():
-              function_param['type'] = d['type']
-          data_O[function_current].append(function_param)
-      self.setData(data_O)
     }
 private:
   };
