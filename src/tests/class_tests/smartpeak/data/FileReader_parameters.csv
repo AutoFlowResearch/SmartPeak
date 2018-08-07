@@ -1,0 +1,7 @@
+function,name,type,value,default,restrictions,description,used_,comment_,comparator,an_ignored_header
+func1,param1,int,-1,-1,,,TRUE,,,
+func1,param2,float,-1,-1,,this is another description,True,,,
+func1,param2,float,-1,-1,,this one won't be used,fAlSe,,,
+func2,param1,float,0.5,,,,tRuE,,,
+func2,param2,bool,FALSE,,,,true,,,
+func3,param1,bool,FALSE,,,,TRUE,,,

@@ -3,7 +3,9 @@
 #define BOOST_TEST_MODULE CSVWriter test suite 
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/CSVWriter.h>
-
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
 #include <SmartPeak/io/csv.h>
 
 using namespace SmartPeak;

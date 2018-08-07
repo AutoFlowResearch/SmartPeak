@@ -1,13 +1,15 @@
 // TODO: Add copyright
 
 #include <SmartPeak/io/FileReader.h>
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
 #include <SmartPeak/io/csv.h>
-
 namespace SmartPeak
 {
   void FileReader::parse_OpenMSParams(
-      const std::string& filename,
-      std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters
+    const std::string& filename,
+    std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters
   )
   {
     const std::string s_function {"function"};
@@ -20,9 +22,17 @@ namespace SmartPeak
     const std::string s_comment {"comment_"};
 
     parameters.clear();
-    io::CSVReader<8> in(filename);
+
+    // io::CSVReader<8, io::trim_chars<' ', '\t'>, io::double_quote_escape<',', '"'>, io::single_line_comment<'#'>> in(filename);
+    io::CSVReader<
+      8,
+      io::trim_chars<' ', '\t'>,
+      io::no_quote_escape<','>, // io::no_quote_escape<','>, // io::double_quote_escape<',', '\"'>,
+      io::no_comment // io::single_line_comment<'#'>
+    > in(filename);
+
     in.read_header(
-      io::ignore_extra_column,
+      io::ignore_extra_column | io::ignore_missing_column,
       s_function,
       s_name,
       s_value,
@@ -68,7 +78,8 @@ namespace SmartPeak
         m.emplace(s_comment, type);
       if (!parameters.count(s_function))
         parameters.emplace(s_function, std::vector<std::map<std::string,std::string>>());
-      parameters.at(s_function).push_back(m);
+      parameters[s_function].push_back(m);
+      printf("pushed: %s, %s, %s\n", function, name, value);
     }
   }
 }
