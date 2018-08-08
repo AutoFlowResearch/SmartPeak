@@ -62,6 +62,7 @@ namespace SmartPeak
     std::string description;
     std::string comment;
     while (in.read_row(function, name, value, used, type, tags, description, comment)) {
+      std::printf("pushed: %s, %s, %s\n", function.c_str(), name.c_str(), value.c_str());
       std::transform(used.begin(), used.end(), used.begin(), ::tolower);
       if (used == "false")
         continue;
@@ -79,7 +80,6 @@ namespace SmartPeak
       if (!parameters.count(s_function))
         parameters.emplace(s_function, std::vector<std::map<std::string,std::string>>());
       parameters[s_function].push_back(m);
-      printf("pushed: %s, %s, %s\n", function, name, value);
     }
   }
 }
