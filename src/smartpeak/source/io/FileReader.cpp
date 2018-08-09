@@ -23,11 +23,10 @@ namespace SmartPeak
 
     parameters.clear();
 
-    // io::CSVReader<8, io::trim_chars<' ', '\t'>, io::double_quote_escape<',', '"'>, io::single_line_comment<'#'>> in(filename);
     io::CSVReader<
       8,
       io::trim_chars<' ', '\t'>,
-      io::no_quote_escape<','>, // io::no_quote_escape<','>, // io::double_quote_escape<',', '\"'>,
+      io::double_quote_escape<',', '\"'>, // io::no_quote_escape<','>, // io::double_quote_escape<',', '\"'>,
       io::no_comment // io::single_line_comment<'#'>
     > in(filename);
 
@@ -62,7 +61,6 @@ namespace SmartPeak
     std::string description;
     std::string comment;
     while (in.read_row(function, name, value, used, type, tags, description, comment)) {
-      std::printf("read: %s, %s, %s\n", function.c_str(), name.c_str(), value.c_str());
       std::transform(used.begin(), used.end(), used.begin(), ::tolower);
       if (used == "false")
         continue;
