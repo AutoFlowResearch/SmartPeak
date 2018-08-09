@@ -11,23 +11,6 @@ using namespace std;
 
 BOOST_AUTO_TEST_SUITE(filereader)
 
-// constructor and destructor are deleted
-
-// BOOST_AUTO_TEST_CASE(constructor)
-// {
-//   FileReader* ptr = nullptr;
-//   FileReader* nullPointer = nullptr;
-//   ptr = new FileReader();
-//   BOOST_CHECK_NE(ptr, nullPointer);
-// }
-
-// BOOST_AUTO_TEST_CASE(destructor)
-// {
-//   FileReader* ptr = nullptr;
-//   ptr = new FileReader();
-//   delete ptr;
-// }
-
 BOOST_AUTO_TEST_CASE(parseopenmsparams)
 {
   const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");
