@@ -2,51 +2,151 @@
 
 #pragma once
 
-#include <OpenMS/KERNEL/FeatureMap.h>
 #include <regex>
+#include <OpenMS/DATASTRUCTURES/Param.h>
 
 namespace SmartPeak
 {
   class Utilities
   {
 public:
-    Utilities() = default;
-    ~Utilities() = default;
+    Utilities() = delete;
+    ~Utilities() = delete;
 
     struct CastValue
     {
       CastValue() : tag(UNKNOWN), s() {}
-      CastValue(const CastValue& other) {
-        tag = other.tag;
+
+      CastValue(const CastValue& other)
+      {
+        *this = other;
+      }
+
+      CastValue& operator=(const CastValue& other)
+      {
+        if (this == &other)
+          return *this;
+        clear();
         switch (other.tag) {
           case UNKNOWN:
           case STRING:
-            s = other.s;
+            setData(other.s);
             break;
           case BOOL:
-            b = other.b;
+            setData(other.b);
             break;
           case FLOAT:
-            f = other.f;
+            setData(other.f);
             break;
           case INT:
-            i = other.i;
+            setData(other.i);
             break;
           case BOOL_LIST:
-            bl = other.bl;
+            setData(other.bl);
             break;
           case FLOAT_LIST:
-            fl = other.fl;
+            setData(other.fl);
             break;
           case INT_LIST:
-            il = other.il;
+            setData(other.il);
             break;
           case STRING_LIST:
-            sl = other.sl;
+            setData(other.sl);
             break;
         }
       }
-      ~CastValue() {}
+
+      void setData(const bool data)
+      {
+        clear();
+        tag = BOOL;
+        b = data;
+      }
+
+      void setData(const float data)
+      {
+        clear();
+        tag = FLOAT;
+        f = data;
+      }
+
+      void setData(const int data)
+      {
+        clear();
+        tag = INT;
+        i = data;
+      }
+
+      void setData(const std::string& data)
+      {
+        clear();
+        new (&s) std::string;
+        tag = STRING;
+        s = data;
+      }
+
+      void setData(const std::vector<bool>& data)
+      {
+        clear();
+        new (&bl) std::vector<bool>;
+        tag = BOOL_LIST;
+        bl = data;
+      }
+
+      void setData(const std::vector<float>& data)
+      {
+        clear();
+        new (&fl) std::vector<float>;
+        tag = FLOAT_LIST;
+        fl = data;
+      }
+
+      void setData(const std::vector<int>& data)
+      {
+        clear();
+        new (&il) std::vector<int>;
+        tag = INT_LIST;
+        il = data;
+      }
+
+      void setData(const std::vector<std::string>& data)
+      {
+        clear();
+        new (&sl) std::vector<std::string>;
+        tag = STRING_LIST;
+        sl = data;
+      }
+
+      ~CastValue()
+      {
+        clear();
+      }
+
+      void clear()
+      {
+        switch (tag) {
+          case UNKNOWN:
+          case STRING:
+            s.~basic_string();
+            break;
+          case BOOL_LIST:
+            bl.~vector();
+            break;
+          case FLOAT_LIST:
+            fl.~vector();
+            break;
+          case INT_LIST:
+            il.~vector();
+            break;
+          case STRING_LIST:
+            sl.~vector();
+            break;
+        }
+        // tag = UNKNOWN;
+        // new (&s) std::string;
+        // s = "";
+      }
+
       enum {
         UNKNOWN,
         BOOL,
@@ -58,8 +158,8 @@ public:
         INT_LIST,
         STRING_LIST
       } tag;
-      union
-      {
+
+      union {
         bool b;
         float f;
         int i;
@@ -84,33 +184,7 @@ public:
       const std::string& value,
       const std::string& type,
       CastValue& cast
-    )
-    {
-      std::string lowercase_value;
-      std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
-      std::string lowercase_type;
-      std::transform(type.begin(), type.end(), lowercase_type.begin(), ::tolower);
-
-      if (lowercase_type == "int") {
-        cast.tag = CastValue::INT;
-        cast.i = std::stoi(value);
-      } else if (lowercase_type == "float") {
-        cast.tag = CastValue::FLOAT;
-        cast.f = std::stof(value);
-      } else if ((lowercase_type == "bool" || lowercase_type == "string") // TODO: Should we also support "string" type for an aventual `bool`?
-                 && (lowercase_value == "false" || lowercase_value == "true")) {
-        cast.tag = CastValue::BOOL;
-        cast.b = lowercase_value == "true";
-      } else if (lowercase_type == "string") {
-        cast.tag = CastValue::STRING;
-        cast.s = value;
-      } else {
-        std::cout << type << " type not supported." << std::endl;
-        cast.tag = CastValue::UNKNOWN;
-        cast.s = value;
-        throw; // TODO: Should this throw? If so, which exception?
-      }
-    }
+    );
 
       // """Update a Param object
       // Args:
@@ -124,92 +198,7 @@ public:
     static void updateParameters(
       OpenMS::Param& Param_IO,
       const std::vector<std::map<std::string, std::string>>& parameters_I
-    )
-    {
-      for (const std::map<std::string,std::string>& param : parameters_I) {
-        const std::string& name {param.at("name")};
-        // # #test:
-        // # if name == 'rt_extraction_window'.encode('utf-8'):
-        // #     print('check')
-        // # check if the param exists
-        if (!Param_IO.exists(name)) {
-          std::cout << "parameter not found: " << name << std::endl;
-          continue;
-        }
-        // # check supplied user parameters
-        CastValue c;
-        if (param.count("value")) {
-          if (param.count("type")) {
-            castString(param.at("value"), param.at("type"), c);
-          } else {
-            parseString(param.at("value"), c);
-          }
-          // # if not self.checkParameterValue(value):
-          // #     continue
-        } else {
-          OpenMS::DataValue::DataType dt = Param_IO.getValue(name).valueType();
-          switch (dt) {
-            case OpenMS::DataValue::DOUBLE_VALUE:
-              c.tag = CastValue::FLOAT;
-              c.f = static_cast<float>(Param_IO.getValue(name));
-              break;
-            case OpenMS::DataValue::INT_VALUE:
-              c.tag = CastValue::INT;
-              c.i = Param_IO.getValue(name);
-              break;
-            case OpenMS::DataValue::STRING_VALUE:
-              {
-                const std::string& value = Param_IO.getValue(name);
-                std::string lowercase_value;
-                std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
-                if (lowercase_value == "true" || lowercase_value == "false") {
-                  c.tag = CastValue::BOOL;
-                  c.b = lowercase_value == "true";
-                } else {
-                  c.tag = CastValue::STRING;
-                  c.s = Param_IO.getValue(name).toString();
-                }
-              }
-              break;
-            default:
-              c.tag = CastValue::UNKNOWN;
-              c.s = Param_IO.getValue(name).toString();
-          }
-        }
-
-        std::string description;
-        if (param.count("description")) {
-          description = param.at("description");
-        } else {
-          description = Param_IO.getDescription(name);
-        }
-
-        // std::vector<std::string> tags;
-        OpenMS::StringList tags;
-        if (param.count("tags")) {
-          for (const OpenMS::String& s : param.at("tags"))
-            tags.push_back(s);
-        } else {
-          for (const OpenMS::String& s : Param_IO.getTags(name))
-            tags.push_back(s);
-        }
-        // # update the params
-        switch (c.tag) {
-          case CastValue::BOOL:
-            Param_IO.setValue(name, c.b, description, tags);
-            break;
-          case CastValue::FLOAT:
-            Param_IO.setValue(OpenMS::String(name), c.f, description, tags);
-            break;
-          case CastValue::INT:
-            Param_IO.setValue(name, c.i, description, tags);
-            break;
-          case CastValue::STRING:
-            Param_IO.setValue(name, c.s, description, tags);
-            break;
-        }
-      }
-    }
+    );
 
     // """Parse string and return the eval
     
@@ -221,78 +210,8 @@ public:
     //     str: str_O: evaluated string
         
     // """
-    static void parseString(const std::string& str_I, CastValue& cast)
-    {
-      std::cmatch m;
-      std::regex re_integer_number("[+-]?\\d+");
-      std::regex re_float_number("[+-]?\\d+\\.\\d+");
-      std::regex re_bool("true|false", std::regex::icase);
+    static void parseString(const std::string& str_I, CastValue& cast);
 
-      CastValue c;
-      try {
-        if (std::regex_match(str_I.c_str(), m, re_integer_number)) { // integer
-          c.tag = CastValue::INT;
-          c.i = std::strtol(m[0].str().c_str(), NULL, 10);
-        } else if (std::regex_match(str_I.c_str(), m, re_float_number)) { // float
-          c.tag = CastValue::FLOAT;
-          c.f = std::strtof(m[0].str().c_str(), NULL);
-        } else if (std::regex_match(str_I.c_str(), m, re_bool)) { //bool
-          c.tag = CastValue::BOOL;
-          c.b = m[0].str()[0] == 't' || m[0].str()[0] == 'T';
-        } else if (str_I.front() == '[' && str_I.back() == ']') { // list
-          std::string stripped;
-          std::for_each(str_I.cbegin(), str_I.cend(), [&stripped](const char c) { // to simplify regex
-            if (c != ' ')
-              stripped.push_back(c);
-          });
-          const std::regex re_integer_list("\\[[+-]?\\d+(?:,[+-]?\\d+)*\\]");
-          const std::regex re_float_list("\\[[+-]?\\d+\\.\\d+(?:,[+-]?\\d+\\.\\d+)*\\]");
-          const std::regex re_bool_list("\\[(?:true|false)(?:,(?:true|false))*\\]", std::regex::icase);
-          if (std::regex_match(str_I, re_integer_list)) {
-            c.tag = CastValue::INT_LIST;
-            parseList(stripped, re_integer_number, c);
-          } else if (std::regex_match(str_I, re_float_list)) {
-            c.tag = CastValue::FLOAT_LIST;
-            parseList(stripped, re_float_number, c);
-          } else if (std::regex_match(str_I, re_bool_list)) {
-            c.tag = CastValue::BOOL_LIST;
-            parseList(stripped, re_bool, c);
-          } else {
-            c.tag = CastValue::STRING_LIST;
-            std::regex re_s("[^,]+");
-            parseList(stripped, re_s, c);
-          }
-        } else if (str_I.front() == str_I.back() && (str_I.front() == '"' || str_I.front() == '\'')) {
-          parseString(str_I.substr(1, str_I.size() - 2), cast);
-        } else {
-          c.tag = CastValue::STRING;
-          c.s = str_I;
-        }
-      } catch (const std::exception& e) {
-        std::cout << e.what();
-      }
-    }
-
-    static void parseList(const std::string& line, std::regex& re, CastValue& cast)
-    {
-      std::sregex_iterator matches_begin = std::sregex_iterator(line.begin(), line.end(), re);
-      std::sregex_iterator matches_end = std::sregex_iterator();
-      for (std::sregex_iterator it = matches_begin; it != matches_end; ++it) {
-        if (cast.tag == CastValue::BOOL_LIST) {
-          cast.bl.push_back(std::regex_match(it->str().c_str(), re));
-        } else if (cast.tag == CastValue::FLOAT_LIST) {
-          cast.fl.push_back(std::strtof(it->str().c_str(), NULL));
-        } else if (cast.tag == CastValue::INT_LIST) {
-          cast.il.push_back(std::strtol(it->str().c_str(), NULL, 10));
-        } else { // CastValue::STRING_LIST
-          std::smatch sm;
-          std::string word = it->str();
-          std::regex_match(word, sm, re);
-          cast.sl.push_back(sm.str());
-        }
-      }
-    }
-
-private:
+    static void parseList(const std::string& line, std::regex& re, CastValue& cast);
   };
 }

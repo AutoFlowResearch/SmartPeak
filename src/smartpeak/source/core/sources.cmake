@@ -10,6 +10,7 @@ set(sources_list
 	SampleHandler.cpp
 	SequenceHandler.cpp
 	SequenceSegmentHandler.cpp
+	Utilities.cpp
 )
 
 ### add path to the filenames
