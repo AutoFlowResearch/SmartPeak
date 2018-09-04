@@ -115,7 +115,7 @@ namespace SmartPeak
           Utilities::castString(param.at("value"), param.at("type"), c);
           mzML_params.emplace(param.at("name"), c);
         }
-        if (mzML_params.count("format") && mzML_params.at("format").s == "ChromeleonFile") {
+        if (mzML_params.count("format") && mzML_params.at("format").s_ == "ChromeleonFile") {
           OpenMS::ChromeleonFile chfh;
           chfh.load(mzML_i, chromatograms);
         }
@@ -152,11 +152,11 @@ namespace SmartPeak
         chromatograms_copy,
         chromatograms,
         rawDataHandler.getTargetedExperiment(),
-        chromatogramExtractor_params.at("extract_window").f,
-        chromatogramExtractor_params.at("ppm").b,
+        chromatogramExtractor_params.at("extract_window").f_,
+        chromatogramExtractor_params.at("ppm").b_,
         transfDescr,
-        chromatogramExtractor_params.at("rt_extraction_window").f,
-        chromatogramExtractor_params.at("filter").s
+        chromatogramExtractor_params.at("rt_extraction_window").f_,
+        chromatogramExtractor_params.at("filter").s_
       );
     }
     rawDataHandler.setExperiment(chromatograms);

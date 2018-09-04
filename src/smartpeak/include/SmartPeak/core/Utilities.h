@@ -4,6 +4,7 @@
 
 #include <regex>
 #include <OpenMS/DATASTRUCTURES/Param.h>
+#include <iostream> // TODO: remove this
 
 namespace SmartPeak
 {
@@ -16,7 +17,7 @@ public:
     class CastValue
     {
     public:
-      CastValue() : tag(UNKNOWN), s(), is_clear(false) {}
+      CastValue() : tag_(UNKNOWN), s_(), is_clear_(false) {}
 
       CastValue(const CastValue& other)
       {
@@ -27,31 +28,31 @@ public:
       {
         if (this == &other)
           return *this;
-        switch (other.tag) {
+        switch (other.tag_) {
           case UNKNOWN:
           case STRING:
-            setTagAndData(other.tag, other.s);
+            setTagAndData(other.tag_, other.s_);
             break;
           case BOOL:
-            setTagAndData(other.tag, other.b);
+            setTagAndData(other.tag_, other.b_);
             break;
           case FLOAT:
-            setTagAndData(other.tag, other.f);
+            setTagAndData(other.tag_, other.f_);
             break;
           case INT:
-            setTagAndData(other.tag, other.i);
+            setTagAndData(other.tag_, other.i_);
             break;
           case BOOL_LIST:
-            setTagAndData(other.tag, other.bl);
+            setTagAndData(other.tag_, other.bl_);
             break;
           case FLOAT_LIST:
-            setTagAndData(other.tag, other.fl);
+            setTagAndData(other.tag_, other.fl_);
             break;
           case INT_LIST:
-            setTagAndData(other.tag, other.il);
+            setTagAndData(other.tag_, other.il_);
             break;
           case STRING_LIST:
-            setTagAndData(other.tag, other.sl);
+            setTagAndData(other.tag_, other.sl_);
             break;
           default:
             throw "Tag type not managed in copy constructor. Implement it.";
@@ -100,31 +101,31 @@ public:
 
       ~CastValue()
       {
-        if (!is_clear)
+        if (!is_clear_)
           clear();
       }
 
       void clear()
       {
-        switch (tag) {
+        switch (tag_) {
           case UNKNOWN:
           case STRING:
-            s.~basic_string();
+            s_.~basic_string();
             break;
           case BOOL_LIST:
-            bl.~vector();
+            bl_.~vector();
             break;
           case FLOAT_LIST:
-            fl.~vector();
+            fl_.~vector();
             break;
           case INT_LIST:
-            il.~vector();
+            il_.~vector();
             break;
           case STRING_LIST:
-            sl.~vector();
+            sl_.~vector();
             break;
         }
-        is_clear = true;
+        is_clear_ = true;
       }
 
       enum Type {
@@ -140,71 +141,71 @@ public:
       };
 
       union {
-        bool b;
-        float f;
-        int i;
-        std::string s;
-        std::vector<bool> bl;
-        std::vector<float> fl;
-        std::vector<int> il;
-        std::vector<std::string> sl;
+        bool b_;
+        float f_;
+        int i_;
+        std::string s_;
+        std::vector<bool> bl_;
+        std::vector<float> fl_;
+        std::vector<int> il_;
+        std::vector<std::string> sl_;
       };
 
       template<typename T>
       void setTagAndData(const CastValue::Type type, const T& data)
       {
         clear();
-        tag = type;
+        tag_ = type;
         setData(data);
-        is_clear = false;
+        is_clear_ = false;
       }
 
     private:
       void setData(const bool data)
       {
-        b = data;
+        b_ = data;
       }
 
       void setData(const float data)
       {
-        f = data;
+        f_ = data;
       }
 
       void setData(const int data)
       {
-        i = data;
+        i_ = data;
       }
 
       void setData(const std::string& data)
       {
-        new (&s) std::string(data);
+        new (&s_) std::string(data);
       }
 
       void setData(const std::vector<bool>& data)
       {
-        new (&bl) std::vector<bool>(data);
+        new (&bl_) std::vector<bool>(data);
       }
 
       void setData(const std::vector<float>& data)
       {
-        new (&fl) std::vector<float>(data);
+        new (&fl_) std::vector<float>(data);
       }
 
       void setData(const std::vector<int>& data)
       {
-        new (&il) std::vector<int>(data);
+        new (&il_) std::vector<int>(data);
       }
 
       void setData(const std::vector<std::string>& data)
       {
-        new (&sl) std::vector<std::string>(data);
+        new (&sl_) std::vector<std::string>(data);
       }
 
-      Type tag;
-      bool is_clear;
+      Type tag_;
+      bool is_clear_;
 
     public:
-      typename CastValue::Type getTag() const { return tag; }
+      CastValue::Type getTag() const { return tag_; }
     };
 
     /**

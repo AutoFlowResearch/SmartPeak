@@ -42,9 +42,9 @@ namespace SmartPeak
   )
   {
     for (const std::map<std::string,std::string>& param : parameters_I) {
-      const std::string& name {param.at("name")};
+      const std::string& name = param.at("name");
       if (!Param_IO.exists(name)) {
-        std::cerr << "parameter not found: " << name << std::endl;
+        std::cout << "Utilities::updateParameters(): parameter \"" << name << "\"not found." << std::endl;
         continue;
       }
       // # check supplied user parameters
@@ -99,16 +99,16 @@ namespace SmartPeak
       // # update the params
       switch (c.getTag()) {
         case CastValue::BOOL:
-          Param_IO.setValue(name, c.b, description, tags);
+          Param_IO.setValue(name, c.b_, description, tags);
           break;
         case CastValue::FLOAT:
-          Param_IO.setValue(OpenMS::String(name), c.f, description, tags);
+          Param_IO.setValue(name, c.f_, description, tags);
           break;
         case CastValue::INT:
-          Param_IO.setValue(name, c.i, description, tags);
+          Param_IO.setValue(name, c.i_, description, tags);
           break;
         case CastValue::STRING:
-          Param_IO.setValue(name, c.s, description, tags);
+          Param_IO.setValue(name, c.s_, description, tags);
           break;
       }
     }
@@ -121,41 +121,40 @@ namespace SmartPeak
     std::regex re_float_number("[+-]?\\d+(?:\\.\\d+)?"); // can match also integers: check for integer before checking for float
     std::regex re_bool("true|false", std::regex::icase);
 
-    CastValue c;
     try {
       if (std::regex_match(str_I.c_str(), m, re_integer_number)) {              // integer
-        c = static_cast<int>(std::strtol(m[0].str().c_str(), NULL, 10));
+        cast = static_cast<int>(std::strtol(m[0].str().c_str(), NULL, 10));
       } else if (std::regex_match(str_I.c_str(), m, re_float_number)) {         // float
-        c = std::strtof(m[0].str().c_str(), NULL);
+        cast = std::strtof(m[0].str().c_str(), NULL);
       } else if (std::regex_match(str_I.c_str(), m, re_bool)) {                 // bool
-        c = m[0].str()[0] == 't' || m[0].str()[0] == 'T';
+        cast = m[0].str()[0] == 't' || m[0].str()[0] == 'T';
       } else if (str_I.front() == '[' && str_I.back() == ']') {                 // list
         std::string stripped;
-        std::for_each(str_I.cbegin(), str_I.cend(), [&stripped](const char c) { // removing spaces to simplify regexs
+        std::for_each(str_I.cbegin() + 1, str_I.cend() - 1, [&stripped](const char c) { // removing spaces to simplify regexs
           if (c != ' ')
             stripped.push_back(c);
         });
-        const std::regex re_integer_list("\\[[+-]?\\d+(?:,[+-]?\\d+)*\\]");
-        const std::regex re_float_list("\\[[+-]?\\d+\\.\\d+(?:,[+-]?\\d+\\.\\d+)*\\]");
-        const std::regex re_bool_list("\\[(?:true|false)(?:,(?:true|false))*\\]", std::regex::icase);
-        if (std::regex_match(str_I, re_integer_list)) {
-          c = std::vector<int>();
-          parseList(stripped, re_integer_number, c);
-        } else if (std::regex_match(str_I, re_float_list)) {
-          c = std::vector<float>();
-          parseList(stripped, re_float_number, c);
-        } else if (std::regex_match(str_I, re_bool_list)) {
-          c = std::vector<bool>();
-          parseList(stripped, re_bool, c);
+        const std::regex re_integer_list("[+-]?\\d+(?:,[+-]?\\d+)*");
+        const std::regex re_float_list("[+-]?\\d+(?:\\.\\d+)?(?:,[+-]?\\d+(?:\\.\\d+)?)*");
+        const std::regex re_bool_list("(?:true|false)(?:,(?:true|false))*", std::regex::icase);
+        if (std::regex_match(stripped, re_integer_list)) {
+          cast = std::vector<int>();
+          parseList(stripped, re_integer_number, cast);
+        } else if (std::regex_match(stripped, re_float_list)) {
+          cast = std::vector<float>();
+          parseList(stripped, re_float_number, cast);
+        } else if (std::regex_match(stripped, re_bool_list)) {
+          cast = std::vector<bool>();
+          parseList(stripped, re_bool, cast);
         } else {
-          c = std::vector<std::string>();
-          std::regex re_s("[^,\\[\\]\"]+");
-          parseList(stripped, re_s, c);
+          cast = std::vector<std::string>();
+          std::regex re_s("\"([^,]+)\"");
+          parseList(str_I, re_s, cast);
         }
-      } else if (str_I.front() == str_I.back() && (str_I.front() == '"' || str_I.front() == '\'')) {
+      } else if (str_I.front() == str_I.back() && (str_I.front() == '"' || str_I.front() == '\'')) { // string
         parseString(str_I.substr(1, str_I.size() - 2), cast);
-      } else {
-        c = std::string(str_I);
+      } else {                                                                                       // default to string
+        cast = str_I;
       }
     } catch (const std::exception& e) {
       std::cerr << e.what();
@@ -168,13 +167,13 @@ namespace SmartPeak
     std::sregex_iterator matches_end = std::sregex_iterator();
     for (std::sregex_iterator it = matches_begin; it != matches_end; ++it) {
       if (cast.getTag() == CastValue::BOOL_LIST) {
-        cast.bl.push_back(it->str()[0] == 't' || it->str()[0] == 'T');
+        cast.bl_.push_back(it->str()[0] == 't' || it->str()[0] == 'T');
       } else if (cast.getTag() == CastValue::FLOAT_LIST) {
-        cast.fl.push_back(std::strtof(it->str().c_str(), NULL));
+        cast.fl_.push_back(std::strtof(it->str().c_str(), NULL));
       } else if (cast.getTag() == CastValue::INT_LIST) {
-        cast.il.push_back(std::strtol(it->str().c_str(), NULL, 10));
+        cast.il_.push_back(std::strtol(it->str().c_str(), NULL, 10));
       } else if (cast.getTag() == CastValue::STRING_LIST) {
-        cast.sl.push_back(it->str());
+        cast.sl_.push_back((*it)[1].str());
       } else {
         throw std::invalid_argument("unexcepted tag type"); // TODO: specify which type of exception
       }
