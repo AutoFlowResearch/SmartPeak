@@ -137,7 +137,7 @@ public:
         FLOAT_LIST,
         INT_LIST,
         STRING_LIST
-      } tag;
+      };
 
       union {
         bool b;
@@ -150,7 +150,6 @@ public:
         std::vector<std::string> sl;
       };
 
-    private:
       template<typename T>
       void setTagAndData(const CastValue::Type type, const T& data)
       {
@@ -160,6 +159,7 @@ public:
         is_clear = false;
       }
 
+    private:
       void setData(const bool data)
       {
         b = data;
@@ -200,7 +200,11 @@ public:
         new (&sl) std::vector<std::string>(data);
       }
 
+      Type tag;
       bool is_clear;
+
+    public:
+      typename CastValue::Type getTag() const { return tag; }
     };
 
     /**

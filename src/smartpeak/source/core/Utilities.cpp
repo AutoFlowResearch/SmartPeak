@@ -31,8 +31,7 @@ namespace SmartPeak
       cast = value;
     } else {
       std::cerr << type << " type not supported." << std::endl;
-      cast = value;
-      cast.tag = CastValue::UNKNOWN;
+      cast.setTagAndData(CastValue::UNKNOWN, value);
       throw; // TODO: Should this throw? If so, which exception?
     }
   }
@@ -78,8 +77,7 @@ namespace SmartPeak
             }
             break;
           default:
-            c = Param_IO.getValue(name).toString();
-            c.tag = CastValue::UNKNOWN;
+            c.setTagAndData(CastValue::UNKNOWN, Param_IO.getValue(name).toString());
         }
       }
 
@@ -99,7 +97,7 @@ namespace SmartPeak
           tags.push_back(s);
       }
       // # update the params
-      switch (c.tag) {
+      switch (c.getTag()) {
         case CastValue::BOOL:
           Param_IO.setValue(name, c.b, description, tags);
           break;
@@ -141,24 +139,23 @@ namespace SmartPeak
         const std::regex re_float_list("\\[[+-]?\\d+\\.\\d+(?:,[+-]?\\d+\\.\\d+)*\\]");
         const std::regex re_bool_list("\\[(?:true|false)(?:,(?:true|false))*\\]", std::regex::icase);
         if (std::regex_match(str_I, re_integer_list)) {
-          c.tag = CastValue::INT_LIST;
+          c = std::vector<int>();
           parseList(stripped, re_integer_number, c);
         } else if (std::regex_match(str_I, re_float_list)) {
-          c.tag = CastValue::FLOAT_LIST;
+          c = std::vector<float>();
           parseList(stripped, re_float_number, c);
         } else if (std::regex_match(str_I, re_bool_list)) {
-          c.tag = CastValue::BOOL_LIST;
+          c = std::vector<bool>();
           parseList(stripped, re_bool, c);
         } else {
-          c.tag = CastValue::STRING_LIST;
+          c = std::vector<std::string>();
           std::regex re_s("[^,\\[\\]\"]+");
           parseList(stripped, re_s, c);
         }
       } else if (str_I.front() == str_I.back() && (str_I.front() == '"' || str_I.front() == '\'')) {
         parseString(str_I.substr(1, str_I.size() - 2), cast);
       } else {
-        c.tag = CastValue::STRING;
-        c.s = str_I;
+        c = std::string(str_I);
       }
     } catch (const std::exception& e) {
       std::cerr << e.what();
@@ -170,13 +167,13 @@ namespace SmartPeak
     std::sregex_iterator matches_begin = std::sregex_iterator(line.begin(), line.end(), re);
     std::sregex_iterator matches_end = std::sregex_iterator();
     for (std::sregex_iterator it = matches_begin; it != matches_end; ++it) {
-      if (cast.tag == CastValue::BOOL_LIST) {
+      if (cast.getTag() == CastValue::BOOL_LIST) {
         cast.bl.push_back(it->str()[0] == 't' || it->str()[0] == 'T');
-      } else if (cast.tag == CastValue::FLOAT_LIST) {
+      } else if (cast.getTag() == CastValue::FLOAT_LIST) {
         cast.fl.push_back(std::strtof(it->str().c_str(), NULL));
-      } else if (cast.tag == CastValue::INT_LIST) {
+      } else if (cast.getTag() == CastValue::INT_LIST) {
         cast.il.push_back(std::strtol(it->str().c_str(), NULL, 10));
-      } else if (cast.tag == CastValue::STRING_LIST) {
+      } else if (cast.getTag() == CastValue::STRING_LIST) {
         cast.sl.push_back(it->str());
       } else {
         throw std::invalid_argument("unexcepted tag type"); // TODO: specify which type of exception
