@@ -13,9 +13,10 @@ public:
     Utilities() = delete;
     ~Utilities() = delete;
 
-    struct CastValue
+    class CastValue
     {
-      CastValue() : tag(UNKNOWN), s() {}
+    public:
+      CastValue() : tag(UNKNOWN), s(), is_clear(false) {}
 
       CastValue(const CastValue& other)
       {
@@ -26,100 +27,81 @@ public:
       {
         if (this == &other)
           return *this;
-        clear();
         switch (other.tag) {
           case UNKNOWN:
           case STRING:
-            setData(other.s);
+            setTagAndData(other.tag, other.s);
             break;
           case BOOL:
-            setData(other.b);
+            setTagAndData(other.tag, other.b);
             break;
           case FLOAT:
-            setData(other.f);
+            setTagAndData(other.tag, other.f);
             break;
           case INT:
-            setData(other.i);
+            setTagAndData(other.tag, other.i);
             break;
           case BOOL_LIST:
-            setData(other.bl);
+            setTagAndData(other.tag, other.bl);
             break;
           case FLOAT_LIST:
-            setData(other.fl);
+            setTagAndData(other.tag, other.fl);
             break;
           case INT_LIST:
-            setData(other.il);
+            setTagAndData(other.tag, other.il);
             break;
           case STRING_LIST:
-            setData(other.sl);
+            setTagAndData(other.tag, other.sl);
             break;
+          default:
+            throw "Tag type not managed in copy constructor. Implement it.";
         }
       }
 
-      void setData(const bool data)
+      CastValue& operator=(const bool data)
       {
-        clear();
-        tag = BOOL;
-        b = data;
+        setTagAndData(BOOL, data);
       }
 
-      void setData(const float data)
+      CastValue& operator=(const float data)
       {
-        clear();
-        tag = FLOAT;
-        f = data;
+        setTagAndData(FLOAT, data);
       }
 
-      void setData(const int data)
+      CastValue& operator=(const int data)
       {
-        clear();
-        tag = INT;
-        i = data;
+        setTagAndData(INT, data);
       }
 
-      void setData(const std::string& data)
+      CastValue& operator=(const std::string& data)
       {
-        clear();
-        new (&s) std::string;
-        tag = STRING;
-        s = data;
+        setTagAndData(STRING, data);
       }
 
-      void setData(const std::vector<bool>& data)
+      CastValue& operator=(const std::vector<bool>& data)
       {
-        clear();
-        new (&bl) std::vector<bool>;
-        tag = BOOL_LIST;
-        bl = data;
+        setTagAndData(BOOL_LIST, data);
       }
 
-      void setData(const std::vector<float>& data)
+      CastValue& operator=(const std::vector<float>& data)
       {
-        clear();
-        new (&fl) std::vector<float>;
-        tag = FLOAT_LIST;
-        fl = data;
+        setTagAndData(FLOAT_LIST, data);
       }
 
-      void setData(const std::vector<int>& data)
+      CastValue& operator=(const std::vector<int>& data)
       {
-        clear();
-        new (&il) std::vector<int>;
-        tag = INT_LIST;
-        il = data;
+        setTagAndData(INT_LIST, data);
       }
 
-      void setData(const std::vector<std::string>& data)
+      CastValue& operator=(const std::vector<std::string>& data)
       {
-        clear();
-        new (&sl) std::vector<std::string>;
-        tag = STRING_LIST;
-        sl = data;
+        setTagAndData(STRING_LIST, data);
       }
 
       ~CastValue()
       {
-        clear();
+        if (!is_clear)
+          clear();
       }
 
       void clear()
@@ -142,12 +124,10 @@ public:
             sl.~vector();
             break;
         }
-        // tag = UNKNOWN;
-        // new (&s) std::string;
-        // s = "";
+        is_clear = true;
       }
 
-      enum {
+      enum Type {
         UNKNOWN,
         BOOL,
         FLOAT,
@@ -169,6 +149,58 @@ public:
         std::vector<int> il;
         std::vector<std::string> sl;
       };
+
+    private:
+      template<typename T>
+      void setTagAndData(const CastValue::Type type, const T& data)
+      {
+        clear();
+        tag = type;
+        setData(data);
+        is_clear = false;
+      }
+
+      void setData(const bool data)
+      {
+        b = data;
+      }
+
+      void setData(const float data)
+      {
+        f = data;
+      }
+
+      void setData(const int data)
+      {
+        i = data;
+      }
+
+      void setData(const std::string& data)
+      {
+        new (&s) std::string(data);
+      }
+
+      void setData(const std::vector<bool>& data)
+      {
+        new (&bl) std::vector<bool>(data);
+      }
+
+      void setData(const std::vector<float>& data)
+      {
+        new (&fl) std::vector<float>(data);
+      }
+
+      void setData(const std::vector<int>& data)
+      {
+        new (&il) std::vector<int>(data);
+      }
+
+      void setData(const std::vector<std::string>& data)
+      {
+        new (&sl) std::vector<std::string>(data);
+      }
+
+      bool is_clear;
     };
 
     /**

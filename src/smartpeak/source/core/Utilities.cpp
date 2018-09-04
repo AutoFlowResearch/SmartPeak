@@ -20,19 +20,18 @@ namespace SmartPeak
     std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
     std::transform(type.begin(), type.end(), lowercase_type.begin(), ::tolower);
 
-    cast.clear();
     if (lowercase_type == "int") {
-      cast.setData(std::stoi(value));
+      cast = std::stoi(value);
     } else if (lowercase_type == "float") {
-      cast.setData(std::stof(value));
+      cast = std::stof(value);
     } else if ((lowercase_type == "bool" || lowercase_type == "string") // TODO: Should we also support "string" type for an aventual `bool`?
                && (lowercase_value == "false" || lowercase_value == "true")) {
-      cast.setData(lowercase_value == "true");
+      cast = lowercase_value == "true";
     } else if (lowercase_type == "string") {
-      cast.setData(value);
+      cast = value;
     } else {
       std::cerr << type << " type not supported." << std::endl;
-      cast.setData(value);
+      cast = value;
       cast.tag = CastValue::UNKNOWN;
       throw; // TODO: Should this throw? If so, which exception?
     }
@@ -61,10 +60,10 @@ namespace SmartPeak
         OpenMS::DataValue::DataType dt = Param_IO.getValue(name).valueType();
         switch (dt) {
           case OpenMS::DataValue::DOUBLE_VALUE:
-            c.setData(static_cast<float>(Param_IO.getValue(name)));
+            c = static_cast<float>(Param_IO.getValue(name));
             break;
           case OpenMS::DataValue::INT_VALUE:
-            c.setData(static_cast<int>(Param_IO.getValue(name)));
+            c = static_cast<int>(Param_IO.getValue(name));
             break;
           case OpenMS::DataValue::STRING_VALUE:
             {
@@ -72,14 +71,14 @@ namespace SmartPeak
               std::string lowercase_value;
               std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
               if (lowercase_value == "true" || lowercase_value == "false") {
-                c.setData(lowercase_value == "true");
+                c = lowercase_value == "true";
               } else {
-                c.setData(Param_IO.getValue(name).toString());
+                c = Param_IO.getValue(name).toString();
               }
             }
             break;
           default:
-            c.setData(Param_IO.getValue(name).toString());
+            c = Param_IO.getValue(name).toString();
             c.tag = CastValue::UNKNOWN;
         }
       }
@@ -91,7 +90,6 @@ namespace SmartPeak
         description = Param_IO.getDescription(name);
       }
 
-      // std::vector<std::string> tags;
       OpenMS::StringList tags;
       if (param.count("tags")) {
         for (const OpenMS::String& s : param.at("tags"))
@@ -122,20 +120,20 @@ namespace SmartPeak
   {
     std::cmatch m;
     std::regex re_integer_number("[+-]?\\d+");
-    std::regex re_float_number("[+-]?\\d+\\.\\d+");
+    std::regex re_float_number("[+-]?\\d+(?:\\.\\d+)?"); // can match also integers: check for integer before checking for float
     std::regex re_bool("true|false", std::regex::icase);
 
     CastValue c;
     try {
-      if (std::regex_match(str_I.c_str(), m, re_integer_number)) { // integer
-        c.setData(static_cast<int>(std::strtol(m[0].str().c_str(), NULL, 10)));
-      } else if (std::regex_match(str_I.c_str(), m, re_float_number)) { // float
-        c.setData(std::strtof(m[0].str().c_str(), NULL));
-      } else if (std::regex_match(str_I.c_str(), m, re_bool)) { //bool
-        c.setData(m[0].str()[0] == 't' || m[0].str()[0] == 'T');
-      } else if (str_I.front() == '[' && str_I.back() == ']') { // list
+      if (std::regex_match(str_I.c_str(), m, re_integer_number)) {              // integer
+        c = static_cast<int>(std::strtol(m[0].str().c_str(), NULL, 10));
+      } else if (std::regex_match(str_I.c_str(), m, re_float_number)) {         // float
+        c = std::strtof(m[0].str().c_str(), NULL);
+      } else if (std::regex_match(str_I.c_str(), m, re_bool)) {                 // bool
+        c = m[0].str()[0] == 't' || m[0].str()[0] == 'T';
+      } else if (str_I.front() == '[' && str_I.back() == ']') {                 // list
         std::string stripped;
-        std::for_each(str_I.cbegin(), str_I.cend(), [&stripped](const char c) { // to simplify regex
+        std::for_each(str_I.cbegin(), str_I.cend(), [&stripped](const char c) { // removing spaces to simplify regexs
           if (c != ' ')
             stripped.push_back(c);
         });
@@ -153,7 +151,7 @@ namespace SmartPeak
           parseList(stripped, re_bool, c);
         } else {
           c.tag = CastValue::STRING_LIST;
-          std::regex re_s("[^,]+");
+          std::regex re_s("[^,\\[\\]\"]+");
           parseList(stripped, re_s, c);
         }
       } else if (str_I.front() == str_I.back() && (str_I.front() == '"' || str_I.front() == '\'')) {
@@ -173,16 +171,15 @@ namespace SmartPeak
     std::sregex_iterator matches_end = std::sregex_iterator();
     for (std::sregex_iterator it = matches_begin; it != matches_end; ++it) {
       if (cast.tag == CastValue::BOOL_LIST) {
-        cast.bl.push_back(std::regex_match(it->str().c_str(), re));
+        cast.bl.push_back(it->str()[0] == 't' || it->str()[0] == 'T');
       } else if (cast.tag == CastValue::FLOAT_LIST) {
         cast.fl.push_back(std::strtof(it->str().c_str(), NULL));
       } else if (cast.tag == CastValue::INT_LIST) {
         cast.il.push_back(std::strtol(it->str().c_str(), NULL, 10));
-      } else { // CastValue::STRING_LIST
-        std::smatch sm;
-        std::string word = it->str();
-        std::regex_match(word, sm, re);
-        cast.sl.push_back(sm.str());
+      } else if (cast.tag == CastValue::STRING_LIST) {
+        cast.sl.push_back(it->str());
+      } else {
+        throw std::invalid_argument("unexcepted tag type"); // TODO: specify which type of exception
       }
     }
   }

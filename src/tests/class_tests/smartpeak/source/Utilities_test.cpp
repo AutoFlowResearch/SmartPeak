@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(castValue_constructor_copyConstructor)
   BOOST_CHECK_EQUAL(c.tag, Utilities::CastValue::UNKNOWN);
   BOOST_CHECK_EQUAL(c.s, "");
 
-  c.setData(7);
+  c = 7;
 
   Utilities::CastValue c2 = c;
   BOOST_CHECK_EQUAL(c2.tag, Utilities::CastValue::INT);
@@ -51,10 +51,61 @@ BOOST_AUTO_TEST_CASE(updateParameters)
 
 BOOST_AUTO_TEST_CASE(parseString)
 {
+  // const vector<string> sl = {"a", "b", "c"};
+  // Utilities::CastValue c;
+  // Utilities::castString(string("35.35"), string("float"), c);
+  // BOOST_CHECK_EQUAL(c.tag, Utilities::CastValue::FLOAT);
+  // BOOST_CHECK_CLOSE(c.f, (float)35.35, 1e-6);
 }
 
 BOOST_AUTO_TEST_CASE(parseList)
 {
+  std::cerr << "ahoy1";
+  const string floats = "[1.1,-2.1,+3.1,4]";
+  std::regex re_float_number("[+-]?\\d+(?:\\.\\d+)?"); // copied from .cpp implementation
+  Utilities::CastValue c;
+  c = std::vector<float>();
+  Utilities::parseList(floats, re_float_number, c);
+  BOOST_CHECK_CLOSE(c.fl[0], (float)1.1, 1e-6);
+  BOOST_CHECK_CLOSE(c.fl[1], (float)-2.1, 1e-6);
+  BOOST_CHECK_CLOSE(c.fl[2], (float)3.1, 1e-6);
+  BOOST_CHECK_CLOSE(c.fl[3], (float)4, 1e-6);
+
+  std::cerr << "ahoy2";
+  const string ints = "[1,-2,+3,4]";
+  std::regex re_integer_number("[+-]?\\d+"); // copied from .cpp implementation
+  c = std::vector<int>();
+  Utilities::parseList(ints, re_integer_number, c);
+  BOOST_CHECK_EQUAL(c.il[0], 1);
+  BOOST_CHECK_EQUAL(c.il[1], -2);
+  BOOST_CHECK_EQUAL(c.il[2], 3);
+  BOOST_CHECK_EQUAL(c.il[3], 4);
+
+  std::cerr << "ahoy3";
+  const string bools = "[true,false,TRuE,fAlSe,TRUE,FALSE]";
+  std::regex re_bool("true|false", std::regex::icase); // copied from .cpp implementation
+  c = std::vector<bool>();
+  Utilities::parseList(bools, re_bool, c);
+  BOOST_CHECK_EQUAL(c.bl[0], true);
+  BOOST_CHECK_EQUAL(c.bl[1], false);
+  BOOST_CHECK_EQUAL(c.bl[2], true);
+  BOOST_CHECK_EQUAL(c.bl[3], false);
+  BOOST_CHECK_EQUAL(c.bl[4], true);
+  BOOST_CHECK_EQUAL(c.bl[5], false);
+
+  std::cerr << "ahoy4";
+  const string strings = "[\"foo\",\"bar\",\"foobar\"]";
+  std::regex re_s("[^,\\[\\]\"]+"); // copied from .cpp implementation
+  c = std::vector<std::string>();
+  Utilities::parseList(strings, re_s, c);
+  BOOST_CHECK_EQUAL(c.sl[0], string("foo"));
+  BOOST_CHECK_EQUAL(c.sl[1], string("bar"));
+  BOOST_CHECK_EQUAL(c.sl[2], string("foobar"));
+
+  std::cerr << "ahoy5";
+  c.clear();
+  // c.tag = Utilities::CastValue::INT;
+  // BOOST_CHECK_THROW(Utilities::parseList(strings, re_s, c), std::invalid_argument());
 }
 
 BOOST_AUTO_TEST_SUITE_END()
