@@ -98,8 +98,8 @@ BOOST_AUTO_TEST_CASE(parseList)
   BOOST_CHECK_EQUAL(c.sl[1], string("bar"));
   BOOST_CHECK_EQUAL(c.sl[2], string("foobar"));
 
-  // c = 2; // to set tag to INT
-  // BOOST_CHECK_THROW(Utilities::parseList(strings, re_s, c), std::invalid_argument());
+  c = 2; // to set tag to INT
+  BOOST_CHECK_THROW(Utilities::parseList(strings, re_s, c), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
