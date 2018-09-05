@@ -124,24 +124,32 @@ namespace SmartPeak
       if (param.count("description")) {
         description = param.at("description");
       } else {
-        description = Param_IO.getDescription(name);
+        try {
+          description = Param_IO.getDescription(name);
+        } catch (const OpenMS::Exception::ElementNotFound&) {
+          // leave description as an empty string
+        }
       }
 
       OpenMS::StringList tags;
       if (param.count("tags")) {
-        for (const OpenMS::String& s : param.at("tags"))
-          tags.push_back(s);
+        const std::string& line = param.at("tags");
+        std::regex re_tag("[^'\",]+");
+        std::sregex_iterator matches_begin = std::sregex_iterator(line.begin(), line.end(), re_tag);
+        std::sregex_iterator matches_end = std::sregex_iterator();
+        for (std::sregex_iterator it = matches_begin; it != matches_end; ++it) {
+          tags.push_back(it->str());
+        }
       } else {
-        for (const OpenMS::String& s : Param_IO.getTags(name))
-          tags.push_back(s);
+        tags = Param_IO.getTags(name);
       }
       // # update the params
       switch (c.getTag()) {
         case CastValue::BOOL:
-          Param_IO.setValue(name, c.b_, description, tags);
+          Param_IO.setValue(name, c.b_ ? "true" : "false", description, tags);
           break;
         case CastValue::FLOAT:
-          Param_IO.setValue(name, c.f_, description, tags);
+          Param_IO.setValue(name, static_cast<double>(c.f_), description, tags);
           break;
         case CastValue::INT:
           Param_IO.setValue(name, c.i_, description, tags);
@@ -149,6 +157,47 @@ namespace SmartPeak
         case CastValue::STRING:
           Param_IO.setValue(name, c.s_, description, tags);
           break;
+        case CastValue::FLOAT_LIST:
+          {
+            std::vector<double> dl;
+            for (const float f : c.fl_) {
+              dl.push_back(f);
+            }
+            Param_IO.setValue(name, dl, description, tags);
+            break;
+          }
+        case CastValue::INT_LIST:
+          {
+            std::vector<int> il;
+            for (const int i : c.il_) {
+              il.push_back(i);
+            }
+            Param_IO.setValue(name, il, description, tags);
+            break;
+          }
+        case CastValue::STRING_LIST:
+          {
+            OpenMS::StringList sl;
+            for (const std::string& s : c.sl_) {
+              sl.push_back(s);
+            }
+            Param_IO.setValue(name, sl, description, tags);
+            break;
+          }
+        case CastValue::BOOL_LIST:
+          {
+            OpenMS::StringList sl;
+            for (const bool b : c.bl_) {
+              sl.push_back(b ? "true" : "false");
+            }
+            Param_IO.setValue(name, sl, description, tags);
+            break;
+          }
+        case CastValue::UNKNOWN:
+          Param_IO.setValue(name, c.s_, description, tags);
+          break;
+        default:
+          throw "case not handled in updateParameters()";
       }
     }
   }

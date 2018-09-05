@@ -47,13 +47,116 @@ BOOST_AUTO_TEST_CASE(castString)
 
 BOOST_AUTO_TEST_CASE(updateParameters)
 {
+  vector<map<string,string>> parameters({
+    {
+      {"name", "param1"},
+      {"type", "int"},
+      {"value", "23"},
+      {"description", "param1 description"},
+      {"tags", "tag1,tag2,tag3"}
+    },
+    {
+      {"name", "param2"},
+      {"type", "float"},
+      {"value", "3.14"},
+      {"tags", "tag4"}
+    },
+    {
+      {"name", "param3"},
+      {"type", "bool"},
+      {"value", "false"}
+    },
+    {
+      {"name", "param4"},
+      {"type", "bool"},
+      {"value", "true"}
+    },
+    {
+      {"name", "param5"},
+      {"type", "string"},
+      {"value", "false"}
+    },
+    {
+      {"name", "param6"},
+      {"type", "string"},
+      {"value", "true"}
+    },
+    {
+      {"name", "param7"},
+      {"type", "string"},
+      {"value", "simply a string"}
+    },
+    {
+      {"name", "param8"},
+      {"value", "simply a string"}
+    },
+    {
+      {"name", "param9"},
+      {"value", "45"}
+    },
+    {
+      {"name", "param10"},
+      {"value", "1.27"}
+    },
+    {
+      {"name", "param11"},
+      {"value", "false"}
+    },
+    {
+      {"name", "param12"},
+      {"value", "true"}
+    },
+    {
+      {"name", "param13"},
+      {"description", "foobar"},
+      {"tags", "tag5"}
+    }
+  });
+
   OpenMS::Param param;
-  vector<map<string,string>> parameters;
-  map<string,string> m = {{"name", "param1"}, {"type", "int"}, {"value", "23"}, {"description", "param1 description"}, {"tags", "tag1,tag2,tag3"}};
-  parameters.push_back(m);
+  param.setValue("param1", 10);
+  param.setValue("param2", 10.1);
+  param.setValue("param3", "true");
+  param.setValue("param4", "false");
+  param.setValue("param5", "true");
+  param.setValue("param6", "false");
+  param.setValue("param7", "abc");
+  param.setValue("param8", "def");
+  param.setValue("param9", 11);
+  param.setValue("param10", 11.1);
+  param.setValue("param11", "true");
+  param.setValue("param12", "false");
+  param.setValue("param13", 44);
+
   Utilities::updateParameters(param, parameters);
-  // BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::INT);
-  // BOOST_CHECK_EQUAL(c.i_, 19);
+  BOOST_CHECK_EQUAL(static_cast<int>(param.getValue("param1")), 23);
+  BOOST_CHECK_EQUAL(param.getDescription("param1"), "param1 description");
+  BOOST_CHECK_EQUAL(param.hasTag("param1", "tag1"), true);
+  BOOST_CHECK_EQUAL(param.hasTag("param1", "tag2"), true);
+  BOOST_CHECK_EQUAL(param.hasTag("param1", "tag3"), true);
+  BOOST_CHECK_EQUAL(param.hasTag("param1", "tag4"), false);
+
+  BOOST_CHECK_CLOSE(static_cast<double>(param.getValue("param2")), (float)3.14, 1e-6);
+  BOOST_CHECK_EQUAL(param.getDescription("param2"), "");
+  BOOST_CHECK_EQUAL(param.hasTag("param2", "tag1"), false);
+  BOOST_CHECK_EQUAL(param.hasTag("param2", "tag4"), true);
+
+  BOOST_CHECK_EQUAL(param.getValue("param3").toBool(), false);
+  BOOST_CHECK_EQUAL(param.getDescription("param3"), "");
+
+  BOOST_CHECK_EQUAL(param.getValue("param4").toBool(), true);
+  BOOST_CHECK_EQUAL(param.getValue("param5").toBool(), false);
+  BOOST_CHECK_EQUAL(param.getValue("param6").toBool(), true);
+  BOOST_CHECK_EQUAL(param.getValue("param7").toString(), "simply a string");
+  BOOST_CHECK_EQUAL(param.getValue("param8").toString(), "simply a string");
+  BOOST_CHECK_EQUAL(static_cast<int>(param.getValue("param9")), 45);
+  BOOST_CHECK_CLOSE(static_cast<double>(param.getValue("param10")), (float)1.27, 1e-6);
+  BOOST_CHECK_EQUAL(param.getValue("param11").toBool(), false);
+  BOOST_CHECK_EQUAL(param.getValue("param12").toBool(), true);
+
+  BOOST_CHECK_EQUAL(static_cast<int>(param.getValue("param13")), 44);
+  BOOST_CHECK_EQUAL(param.getDescription("param13"), "foobar");
+  BOOST_CHECK_EQUAL(param.hasTag("param13", "tag5"), true);
 }
 
 BOOST_AUTO_TEST_CASE(parseString)
