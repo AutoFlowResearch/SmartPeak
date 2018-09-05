@@ -44,7 +44,7 @@ namespace SmartPeak
     for (const std::map<std::string,std::string>& param : parameters_I) {
       const std::string& name = param.at("name");
       if (!Param_IO.exists(name)) {
-        std::cout << "Utilities::updateParameters(): parameter \"" << name << "\"not found." << std::endl;
+        std::cout << "Utilities::updateParameters(): parameter \"" << name << "\" not found." << std::endl;
         continue;
       }
       // # check supplied user parameters
@@ -66,16 +66,55 @@ namespace SmartPeak
             break;
           case OpenMS::DataValue::STRING_VALUE:
             {
-              const std::string& value = Param_IO.getValue(name);
+              const std::string& value = Param_IO.getValue(name).toString();
               std::string lowercase_value;
               std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
               if (lowercase_value == "true" || lowercase_value == "false") {
                 c = lowercase_value == "true";
               } else {
-                c = Param_IO.getValue(name).toString();
+                c = value;
               }
+              break;
+            }
+          case OpenMS::DataValue::DOUBLE_LIST:
+            c = std::vector<float>();
+            for (const double n : Param_IO.getValue(name)) {
+              c.fl.push_back(n);
             }
             break;
+          case OpenMS::DataValue::INT_LIST:
+            c = std::vector<int>();
+            for (const int n : Param_IO.getValue(name)) {
+              c.il.push_back(n);
+            }
+            break;
+          case OpenMS::DataValue::STRING_LIST:
+            {
+              bool strings_are_bools = false;
+              if (Param_IO.getValue(name).size()) {
+                const std::string& value = Param_IO.getValue(name).front();
+                std::string lowercase_value;
+                std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
+                if (lowercase_value == "true" || lowercase_value == "false") {
+                  c = std::vector<bool>();
+                  strings_are_bools = true;
+                }
+              } else {
+                c = std::vector<std::string>();
+              }
+
+              for (const std::string& s : Param_IO.getValue(name)) {
+                if (strings_are_bools) {
+                  std::string lowercase_value;
+                  std::transform(s.begin(), s.end(), lowercase_value.begin(), ::tolower);
+                  c.bl.push_back(s == "true");
+                } else {
+                  c.sl.push_back(s);
+                }
+              }
+
+              break;
+            }
           default:
             c.setTagAndData(CastValue::UNKNOWN, Param_IO.getValue(name).toString());
         }
@@ -126,8 +165,7 @@ namespace SmartPeak
     size_t str_I_start = str_I.find_first_not_of(not_of_set);
     size_t str_I_end = str_I.find_last_not_of(not_of_set);
     std::string trimmed;
-    if (str_I_start != std::string::npos && str_I_start <= str_I_end)
-    {
+    if (str_I_start != std::string::npos && str_I_start <= str_I_end) {
       trimmed = str_I.substr(str_I_start, str_I_end - str_I_start + 1);
     }
 
