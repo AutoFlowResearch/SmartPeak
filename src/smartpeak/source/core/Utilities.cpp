@@ -116,21 +116,31 @@ namespace SmartPeak
 
   void Utilities::parseString(const std::string& str_I, CastValue& cast)
   {
-    std::cmatch m;
     std::regex re_integer_number("[+-]?\\d+");
     std::regex re_float_number("[+-]?\\d+(?:\\.\\d+)?"); // can match also integers: check for integer before checking for float
     std::regex re_bool("true|false", std::regex::icase);
+    std::regex re_s("\"([^,]+)\"");
+    std::smatch m;
+
+    const std::string not_of_set = " ";
+    size_t str_I_start = str_I.find_first_not_of(not_of_set);
+    size_t str_I_end = str_I.find_last_not_of(not_of_set);
+    std::string trimmed;
+    if (str_I_start != std::string::npos && str_I_start <= str_I_end)
+    {
+      trimmed = str_I.substr(str_I_start, str_I_end - str_I_start + 1);
+    }
 
     try {
-      if (std::regex_match(str_I.c_str(), m, re_integer_number)) {              // integer
+      if (std::regex_match(trimmed, m, re_integer_number)) { // integer
         cast = static_cast<int>(std::strtol(m[0].str().c_str(), NULL, 10));
-      } else if (std::regex_match(str_I.c_str(), m, re_float_number)) {         // float
+      } else if (std::regex_match(trimmed, m, re_float_number)) { // float
         cast = std::strtof(m[0].str().c_str(), NULL);
-      } else if (std::regex_match(str_I.c_str(), m, re_bool)) {                 // bool
+      } else if (std::regex_match(trimmed, m, re_bool)) { // bool
         cast = m[0].str()[0] == 't' || m[0].str()[0] == 'T';
-      } else if (str_I.front() == '[' && str_I.back() == ']') {                 // list
+      } else if (trimmed.front() == '[' && trimmed.back() == ']') { // list
         std::string stripped;
-        std::for_each(str_I.cbegin() + 1, str_I.cend() - 1, [&stripped](const char c) { // removing spaces to simplify regexs
+        std::for_each(trimmed.cbegin() + 1, trimmed.cend() - 1, [&stripped](const char c) { // removing spaces to simplify regexs
           if (c != ' ')
             stripped.push_back(c);
         });
@@ -148,13 +158,12 @@ namespace SmartPeak
           parseList(stripped, re_bool, cast);
         } else {
           cast = std::vector<std::string>();
-          std::regex re_s("\"([^,]+)\"");
-          parseList(str_I, re_s, cast);
+          parseList(trimmed, re_s, cast);
         }
-      } else if (str_I.front() == str_I.back() && (str_I.front() == '"' || str_I.front() == '\'')) { // string
-        parseString(str_I.substr(1, str_I.size() - 2), cast);
+      } else if (trimmed.front() == trimmed.back() && (trimmed.front() == '"' || trimmed.front() == '\'')) { // string
+        parseString(trimmed.substr(1, trimmed.size() - 2), cast);
       } else {                                                                                       // default to string
-        cast = str_I;
+        cast = trimmed;
       }
     } catch (const std::exception& e) {
       std::cerr << e.what();

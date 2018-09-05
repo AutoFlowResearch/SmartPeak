@@ -57,23 +57,23 @@ BOOST_AUTO_TEST_CASE(parseString)
   BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::STRING);
   BOOST_CHECK_EQUAL(c.s_, "");
 
-  Utilities::parseString("foo", c);
+  Utilities::parseString(" foo ", c);
   BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::STRING);
   BOOST_CHECK_EQUAL(c.s_, "foo");
 
-  Utilities::parseString("34", c);
+  Utilities::parseString("   34  ", c);
   BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::INT);
   BOOST_CHECK_EQUAL(c.i_, 34);
 
-  Utilities::parseString("7.7", c);
+  Utilities::parseString(" 7.7  ", c);
   BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::FLOAT);
   BOOST_CHECK_CLOSE(c.f_, (float)7.7, 1e-6);
 
-  Utilities::parseString("false", c);
+  Utilities::parseString("  false", c);
   BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::BOOL);
   BOOST_CHECK_EQUAL(c.b_, false);
 
-  Utilities::parseString("true", c);
+  Utilities::parseString("true   ", c);
   BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::BOOL);
   BOOST_CHECK_EQUAL(c.b_, true);
 
