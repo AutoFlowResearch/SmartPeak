@@ -47,6 +47,13 @@ BOOST_AUTO_TEST_CASE(castString)
 
 BOOST_AUTO_TEST_CASE(updateParameters)
 {
+  OpenMS::Param param;
+  vector<map<string,string>> parameters;
+  map<string,string> m = {{"name", "param1"}, {"type", "int"}, {"value", "23"}, {"description", "param1 description"}, {"tags", "tag1,tag2,tag3"}};
+  parameters.push_back(m);
+  Utilities::updateParameters(param, parameters);
+  // BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::INT);
+  // BOOST_CHECK_EQUAL(c.i_, 19);
 }
 
 BOOST_AUTO_TEST_CASE(parseString)

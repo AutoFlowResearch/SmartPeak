@@ -78,21 +78,21 @@ namespace SmartPeak
             }
           case OpenMS::DataValue::DOUBLE_LIST:
             c = std::vector<float>();
-            for (const double n : Param_IO.getValue(name)) {
-              c.fl.push_back(n);
+            for (const double n : Param_IO.getValue(name).toDoubleList()) {
+              c.fl_.push_back(n);
             }
             break;
           case OpenMS::DataValue::INT_LIST:
             c = std::vector<int>();
-            for (const int n : Param_IO.getValue(name)) {
-              c.il.push_back(n);
+            for (const int n : Param_IO.getValue(name).toIntList()) {
+              c.il_.push_back(n);
             }
             break;
           case OpenMS::DataValue::STRING_LIST:
             {
               bool strings_are_bools = false;
-              if (Param_IO.getValue(name).size()) {
-                const std::string& value = Param_IO.getValue(name).front();
+              if (Param_IO.getValue(name).toStringList().size()) {
+                const std::string& value = Param_IO.getValue(name).toStringList().front();
                 std::string lowercase_value;
                 std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
                 if (lowercase_value == "true" || lowercase_value == "false") {
@@ -103,13 +103,13 @@ namespace SmartPeak
                 c = std::vector<std::string>();
               }
 
-              for (const std::string& s : Param_IO.getValue(name)) {
+              for (const std::string& s : Param_IO.getValue(name).toStringList()) {
                 if (strings_are_bools) {
                   std::string lowercase_value;
                   std::transform(s.begin(), s.end(), lowercase_value.begin(), ::tolower);
-                  c.bl.push_back(s == "true");
+                  c.bl_.push_back(s == "true");
                 } else {
-                  c.sl.push_back(s);
+                  c.sl_.push_back(s);
                 }
               }
 
