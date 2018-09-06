@@ -49,15 +49,15 @@ public:
 
     static void loadFeatureFilter(
       RawDataHandler& rawDataHandler,
-      const std::string& filename,
-      const bool is_group,
+      const std::string& filename_components = "",
+      const std::string& filename_components_groups = "",
       const bool verbose = false
     );
 
     static void loadFeatureQC(
       RawDataHandler& rawDataHandler,
-      const std::string& filename,
-      const bool is_group,
+      const std::string& filename_components = "",
+      const std::string& filename_components_groups = "",
       const bool verbose = false
     );
 
@@ -72,16 +72,16 @@ public:
 
     static void storeQuantitationMethods(
       const SequenceSegmentHandler& sequenceSegmentHandler_IO,
-      const std::string& quantitationMethods_csv_o,
+      const std::string& filename,
       const bool verbose = false
     );
 
     static void storeFeatureMap(
       RawDataHandler& rawDataHandler_IO,
-      const std::string& featureXML_o,
+      const std::string& filename,
       const bool verbose = false
     );
 
-    static void storeMzML(const std::string& out, const OpenMS::MSExperiment& output);
+    static void storeMzML(const std::string& filename, const OpenMS::MSExperiment& experiment);
   };
 }

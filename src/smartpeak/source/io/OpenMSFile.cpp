@@ -33,7 +33,7 @@ namespace SmartPeak
       std::cout << "loading standards concentrations" << std::endl;
 
     if (filename.empty())
-      return;
+      throw std::invalid_argument("filename is empty");
 
     try {
       OpenMS::AbsoluteQuantitationStandardsFile AQSf;
@@ -55,7 +55,7 @@ namespace SmartPeak
       std::cout << "Loading quantitation methods" << std::endl;
 
     if (filename.empty())
-      return;
+      throw std::invalid_argument("filename is empty");
 
     try {
       OpenMS::AbsoluteQuantitationMethodFile AQMf;
@@ -77,9 +77,8 @@ namespace SmartPeak
     if (verbose)
       std::cout << "Loading TraML" << std::endl;
 
-    if (filename.empty() || (format != "csv" && format != "traML")) {
-      std::cerr << "loadTraML(): filename is empty.\n";
-      return;
+    if (filename.empty()) {
+      throw std::invalid_argument("filename is empty");
     }
 
     OpenMS::TargetedExperiment targeted_exp; // # must use "PeptideSequence"
@@ -198,7 +197,7 @@ namespace SmartPeak
       std::cout << "Loading FeatureMap" << std::endl;
 
     if (filename.empty())
-      return;
+      throw std::invalid_argument("filename is empty");
 
     OpenMS::FeatureMap fm;
     OpenMS::FeatureXMLFile featurexml;
@@ -208,39 +207,45 @@ namespace SmartPeak
 
   void OpenMSFile::loadFeatureFilter(
     RawDataHandler& rawDataHandler,
-    const std::string& filename,
-    const bool is_group,
+    const std::string& filename_components,
+    const std::string& filename_components_groups,
     const bool verbose
   )
   {
     if (verbose)
       std::cout << "Loading feature_filter" << std::endl;
 
-    if (filename.empty())
-      return;
+    if (filename_components.empty() && filename_components_groups.empty())
+      throw std::invalid_argument("filenames are both empty");
 
     OpenMS::MRMFeatureQC featureQC;
     OpenMS::MRMFeatureQCFile featureQCFile;
-    featureQCFile.load(filename, featureQC, is_group);
+    if (filename_components.size())
+      featureQCFile.load(filename_components, featureQC, false);
+    if (filename_components_groups.size())
+      featureQCFile.load(filename_components_groups, featureQC, true);
     rawDataHandler.setFeatureFilter(featureQC);
   }
 
   void OpenMSFile::loadFeatureQC(
     RawDataHandler& rawDataHandler,
-    const std::string& filename,
-    const bool is_group,
+    const std::string& filename_components,
+    const std::string& filename_components_groups,
     const bool verbose
   )
   {
     if (verbose)
       std::cout << "Loading feature_qc" << std::endl;
 
-    if (filename.empty())
-      return;
+    if (filename_components.empty() && filename_components_groups.empty())
+      throw std::invalid_argument("filenames are both empty");
 
     OpenMS::MRMFeatureQC featureQC;
     OpenMS::MRMFeatureQCFile featureQCFile;
-    featureQCFile.load(filename, featureQC, is_group);
+    if (filename_components.size())
+      featureQCFile.load(filename_components, featureQC, false);
+    if (filename_components_groups.size())
+      featureQCFile.load(filename_components_groups, featureQC, true);
     rawDataHandler.setFeatureQC(featureQC);
   }
 
@@ -250,9 +255,8 @@ namespace SmartPeak
     const std::string& delimiter
   )
   {
-
     if (filename.empty())
-      return;
+      throw std::invalid_argument("filename is empty");
 
     std::map<std::string,std::vector<std::map<std::string,std::string>>> parameters;
     FileReader::parse_OpenMSParams(filename, parameters);
@@ -295,17 +299,20 @@ namespace SmartPeak
 
   void OpenMSFile::storeQuantitationMethods(
       const SequenceSegmentHandler& sequenceSegmentHandler_IO,
-      const std::string& quantitationMethods_csv_o,
+      const std::string& filename,
       const bool verbose
   )
   {
     if (verbose)
       std::cout << "storing quantitation methods" << std::endl;
 
-    if (quantitationMethods_csv_o.size()) {
+    if (filename.empty())
+      throw std::invalid_argument("filename is empty");
+
+    if (filename.size()) {
       OpenMS::AbsoluteQuantitationMethodFile aqmf;
       aqmf.store(
-        quantitationMethods_csv_o,
+        filename,
         sequenceSegmentHandler_IO.getQuantitationMethods()
       );
     }
@@ -313,23 +320,28 @@ namespace SmartPeak
 
   void OpenMSFile::storeFeatureMap(
     RawDataHandler& rawDataHandler_IO,
-    const std::string& featureXML_o,
+    const std::string& filename,
     const bool verbose
   )
   {
     if (verbose)
       std::cout << "Storing FeatureMap" << std::endl;
 
+    if (filename.empty())
+      throw std::invalid_argument("filename is empty");
+
     // # Store outfile as featureXML
-    if (featureXML_o.size()) {
+    if (filename.size()) {
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.store(featureXML_o, rawDataHandler_IO.getFeatureMap());
+      featurexml.store(filename, rawDataHandler_IO.getFeatureMap());
     }
   }
 
-  void OpenMSFile::storeMzML(const std::string& out, const OpenMS::MSExperiment& output)
+  void OpenMSFile::storeMzML(const std::string& filename, const OpenMS::MSExperiment& experiment)
   {
+    if (filename.empty())
+      throw std::invalid_argument("filename is empty");
     OpenMS::MzMLFile mzmlf;
-    mzmlf.store(out, output);
+    mzmlf.store(filename, experiment);
   }
 }
