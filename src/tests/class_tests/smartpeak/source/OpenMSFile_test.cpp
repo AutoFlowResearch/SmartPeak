@@ -131,6 +131,21 @@ BOOST_AUTO_TEST_CASE(loadFeatureMap)
 
 BOOST_AUTO_TEST_CASE(loadFeatureFilter)
 {
+  RawDataHandler rawDataHandler;
+
+  const string pathname1 = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  OpenMSFile::loadFeatureFilter(rawDataHandler, pathname1, false);
+  const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureFilter();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+
+  const string pathname2 = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  OpenMSFile::loadFeatureFilter(rawDataHandler, pathname2, true);
+  const OpenMS::MRMFeatureQC& fQC_group = rawDataHandler.getFeatureFilter();
+
+  BOOST_CHECK_EQUAL(fQC_group.component_group_qcs.size(), 118);
+  BOOST_CHECK_EQUAL(fQC_group.component_group_qcs[0].component_group_name, "arg-L");
 }
 
 BOOST_AUTO_TEST_CASE(loadFeatureQC)
