@@ -27,7 +27,7 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const std::string& filename,
     const bool verbose
-  ) const
+  )
   {
     if (verbose)
       std::cout << "loading standards concentrations" << std::endl;
@@ -49,7 +49,7 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const std::string& filename,
     const bool verbose
-  ) const
+  )
   {
     if (verbose)
       std::cout << "loading quantitation methods" << std::endl;
@@ -72,7 +72,7 @@ namespace SmartPeak
     const std::string& filename,
     const std::string& format,
     const bool verbose
-  ) const
+  )
   {
     if (verbose)
       std::cout << "Loading TraML" << std::endl;
@@ -99,7 +99,7 @@ namespace SmartPeak
       const std::vector<std::map<std::string, std::string>>& chromatogramExtractor_params_I,
       const std::vector<std::map<std::string, std::string>>& mzML_params_I,
       const bool verbose
-  ) const
+  )
   {
     if (verbose)
         std::cout << "Loading mzML" << std::endl;
