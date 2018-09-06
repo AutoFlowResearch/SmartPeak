@@ -48,16 +48,16 @@ public:
     );
 
     static void loadFeatureFilter(
-        RawDataHandler& rawDataHandler,
-        const std::string& featureFilterComponents_csv_i = "",
-        const std::string& featureFilterComponentGroups_csv_i = "",
-        const bool verbose = false
+      RawDataHandler& rawDataHandler,
+      const std::string& filename,
+      const bool is_group,
+      const bool verbose = false
     );
 
     static void loadFeatureQC(
       RawDataHandler& rawDataHandler,
-      const std::string& featureQCComponents_csv_i,
-      const std::string& featureQCComponentGroups_csv_i,
+      const std::string& filename,
+      const bool is_group,
       const bool verbose = false
     );
 

@@ -206,42 +206,40 @@ namespace SmartPeak
   }
 
   void OpenMSFile::loadFeatureFilter(
-      RawDataHandler& rawDataHandler,
-      const std::string& featureFilterComponents_csv_i,
-      const std::string& featureFilterComponentGroups_csv_i,
-      const bool verbose
+    RawDataHandler& rawDataHandler,
+    const std::string& filename,
+    const bool is_group,
+    const bool verbose
   )
   {
     if (verbose)
       std::cout << "Loading feature_filter" << std::endl;
 
-    // # read in the parameters for the MRMFeatureQC
+    if (filename.empty())
+      return;
+
     OpenMS::MRMFeatureQC featureQC;
     OpenMS::MRMFeatureQCFile featureQCFile;
-    if (featureFilterComponents_csv_i.size())
-      featureQCFile.load(featureFilterComponents_csv_i, featureQC, false);
-    if (featureFilterComponentGroups_csv_i.size())
-      featureQCFile.load(featureFilterComponentGroups_csv_i, featureQC, true);
+    featureQCFile.load(filename, featureQC, is_group);
     rawDataHandler.setFeatureFilter(featureQC);
   }
 
   void OpenMSFile::loadFeatureQC(
     RawDataHandler& rawDataHandler,
-    const std::string& featureQCComponents_csv_i,
-    const std::string& featureQCComponentGroups_csv_i,
+    const std::string& filename,
+    const bool is_group,
     const bool verbose
   )
   {
     if (verbose)
       std::cout << "Loading feature_qc" << std::endl;
 
-    // # read in the parameters for the MRMFeatureQC
+    if (filename.empty())
+      return;
+
     OpenMS::MRMFeatureQC featureQC;
     OpenMS::MRMFeatureQCFile featureQCFile;
-    if (featureQCComponents_csv_i.size())
-      featureQCFile.load(featureQCComponents_csv_i, featureQC, false);
-    if (featureQCComponentGroups_csv_i.size())
-      featureQCFile.load(featureQCComponentGroups_csv_i, featureQC, true);
+    featureQCFile.load(filename, featureQC, is_group);
     rawDataHandler.setFeatureQC(featureQC);
   }
 
