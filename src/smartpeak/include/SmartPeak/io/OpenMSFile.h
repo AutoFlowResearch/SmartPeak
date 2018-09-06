@@ -33,18 +33,18 @@ public:
     );
 
     static void loadMSExperiment(
-        RawDataHandler& rawDataHandler,
-        const std::string& mzML_i,
-        const std::vector<std::map<std::string, std::string>>& MRMMapping_params_I = std::vector<std::map<std::string, std::string>>(),
-        const std::vector<std::map<std::string, std::string>>& chromatogramExtractor_params_I = std::vector<std::map<std::string, std::string>>(),
-        const std::vector<std::map<std::string, std::string>>& mzML_params_I = std::vector<std::map<std::string, std::string>>(),
-        const bool verbose = false
+      RawDataHandler& rawDataHandler,
+      const std::string& mzML_i,
+      const std::vector<std::map<std::string, std::string>>& MRMMapping_params_I = std::vector<std::map<std::string, std::string>>(),
+      const std::vector<std::map<std::string, std::string>>& chromatogramExtractor_params_I = std::vector<std::map<std::string, std::string>>(),
+      const std::vector<std::map<std::string, std::string>>& mzML_params_I = std::vector<std::map<std::string, std::string>>(),
+      const bool verbose = false
     );
 
     static void loadFeatureMap(
-        RawDataHandler& rawDataHandler,
-        const std::string& featureXML_i,
-        const bool verbose = false
+      RawDataHandler& rawDataHandler,
+      const std::string& filename,
+      const bool verbose = false
     );
 
     static void loadFeatureFilter(
@@ -71,9 +71,9 @@ public:
     );
 
     static void storeQuantitationMethods(
-        const SequenceSegmentHandler& sequenceSegmentHandler_IO,
-        const std::string& quantitationMethods_csv_o,
-        const bool verbose = false
+      const SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const std::string& quantitationMethods_csv_o,
+      const bool verbose = false
     );
 
     static void storeFeatureMap(

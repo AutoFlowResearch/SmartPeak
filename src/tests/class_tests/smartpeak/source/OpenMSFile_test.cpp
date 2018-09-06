@@ -113,6 +113,20 @@ BOOST_AUTO_TEST_CASE(loadMSExperiment)
 
 BOOST_AUTO_TEST_CASE(loadFeatureMap)
 {
+  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_test_1_io_FileReaderOpenMS.featureXML");
+  RawDataHandler rawDataHandler;
+  OpenMSFile::loadFeatureMap(rawDataHandler, pathname);
+  const OpenMS::FeatureMap& fm = rawDataHandler.getFeatureMap();
+
+  BOOST_CHECK_EQUAL(fm.size(), 481);
+
+  BOOST_CHECK_CLOSE(static_cast<double>(fm[0].getSubordinates()[0].getMetaValue("peak_apex_int")), 266403.0, 1e-6);
+  BOOST_CHECK_EQUAL(fm[0].getSubordinates()[0].getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(fm[0].getSubordinates()[0].getRT()), 15.8944563381195, 1e-6);
+
+  BOOST_CHECK_CLOSE(static_cast<double>(fm[1].getSubordinates()[0].getMetaValue("peak_apex_int")), 3436.0, 1e-6);
+  BOOST_CHECK_EQUAL(fm[1].getSubordinates()[0].getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(fm[1].getSubordinates()[0].getRT()), 16.2997193464915, 1e-6);
 }
 
 BOOST_AUTO_TEST_CASE(loadFeatureFilter)

@@ -189,20 +189,21 @@ namespace SmartPeak
   }
 
   void OpenMSFile::loadFeatureMap(
-      RawDataHandler& rawDataHandler,
-      const std::string& featureXML_i,
-      const bool verbose
+    RawDataHandler& rawDataHandler,
+    const std::string& filename,
+    const bool verbose
   )
   {
     if (verbose)
       std::cout << "Loading FeatureMap" << std::endl;
 
-    OpenMS::FeatureMap output;
-    if (featureXML_i.size()) {
-      OpenMS::FeatureXMLFile featurexml;
-      featurexml.load(featureXML_i, output);
-    }
-    rawDataHandler.setFeatureMap(output);
+    if (filename.empty())
+      return;
+
+    OpenMS::FeatureMap fm;
+    OpenMS::FeatureXMLFile featurexml;
+    featurexml.load(filename, fm);
+    rawDataHandler.setFeatureMap(fm);
   }
 
   void OpenMSFile::loadFeatureFilter(
