@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_SUITE(fileopenms)
 
 BOOST_AUTO_TEST_CASE(loadStandardsConcentrations)
 {
-  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");
+  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv");
   SequenceSegmentHandler ssh;
   OpenMSFile::loadStandardsConcentrations(ssh, pathname);
   const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& rc = ssh.getStandardsConcentrations();
@@ -44,5 +44,15 @@ BOOST_AUTO_TEST_CASE(loadStandardsConcentrations)
   BOOST_CHECK_EQUAL(rc[7].concentration_units, "uM");
   BOOST_CHECK_CLOSE(rc[7].dilution_factor, 1.0, 1e-6);
 }
+
+// BOOST_AUTO_TEST_CASE(loadStandardsConcentrations)
+// {
+//   const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");
+//   SequenceSegmentHandler ssh;
+//   OpenMSFile::loadStandardsConcentrations(ssh, pathname);
+//   const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& rc = ssh.getStandardsConcentrations();
+
+//   BOOST_CHECK_EQUAL(rc.size(), 8);
+// }
 
 BOOST_AUTO_TEST_SUITE_END()
