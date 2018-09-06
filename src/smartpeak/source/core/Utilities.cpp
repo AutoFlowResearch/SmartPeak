@@ -32,7 +32,7 @@ namespace SmartPeak
     } else {
       std::cerr << type << " type not supported." << std::endl;
       cast.setTagAndData(CastValue::UNKNOWN, value);
-      throw; // TODO: Should this throw? If so, which exception?
+      throw std::invalid_argument("type is invalid");
     }
   }
 
@@ -271,7 +271,7 @@ namespace SmartPeak
       } else if (cast.getTag() == CastValue::STRING_LIST) {
         cast.sl_.push_back((*it)[1].str());
       } else {
-        throw std::invalid_argument("unexcepted tag type"); // TODO: specify which type of exception
+        throw std::invalid_argument("unexcepted tag type");
       }
     }
   }
