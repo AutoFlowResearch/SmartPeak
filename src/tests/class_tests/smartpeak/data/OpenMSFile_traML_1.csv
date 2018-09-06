@@ -1,0 +1,21 @@
+ProteinName,FullPeptideName,transition_group_id,transition_name,RetentionTime,Annotation,PrecursorMz,MS1 Res,ProductMz,MS2 Res,Dwell,Fragmentor,Collision Energy,Cell Accelerator Voltage,LibraryIntensity,decoy,PeptideSequence,LabelType,PrecursorCharge,FragmentCharge,FragmentType,FragmentSeriesNumber,quantifying_transition,identifying_transition,detecting_transition,Tr_recalibrated__,RetentionTime_
+arg-L,,arg-L,arg-L.arg-L_1.Heavy,45.85610358,,179,Unit,136,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE,0,0.777687862
+arg-L,,arg-L,arg-L.arg-L_1.Light,46.08966648,,173,Unit,131,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE,0,0.777687862
+orn,,orn,orn.orn_1.Heavy,47.47567266,,136,Unit,89,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE,0.433950676,0.847434382
+orn,,orn,orn.orn_1.Light,47.47567266,,131,Unit,85,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE,0.433950676,0.847434382
+asn-L,,asn-L,asn-L.asn-L_1.Heavy,58.5321882,,135,Unit,118,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE,1.087004012,0.952396075
+asn-L,,asn-L,asn-L.asn-L_1.Light,58.58374554,,131,Unit,114,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE,1.087004012,0.952396075
+asn-L,,asn-L,asn-L.asn-L_2.Light,58.58374554,,131,Unit,95,Unit,,,,,1,0,,Light,1,1,,2,FALSE,FALSE,TRUE,1.087004012,0.952396075
+ser-L,,ser-L,ser-L.ser-L_1.Heavy,58.3913325,,107,Unit,76,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE,1.073007935,0.950146562
+ser-L,,ser-L,ser-L.ser-L_1.Light,58.4970963,,104,Unit,74,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE,1.073007935,0.950146562
+ser-L,,ser-L,ser-L.ser-L_2.Light,58.4970963,,104,Unit,42,Unit,,,,,1,0,,Light,1,1,,2,FALSE,FALSE,TRUE,1.073007935,0.950146562
+citr-L,,citr-L,citr-L.citr-L_1.Heavy,59.57068488,,180,Unit,136,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE,1.181859246,0.967641639
+citr-L,,citr-L,citr-L.citr-L_1.Light,58.95285888,,174,Unit,131,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE,1.181859246,0.967641639
+gln-L,,gln-L,gln-L.gln-L_1.Heavy,58.28284572,,150,Unit,132,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE,1.089683757,0.952826776
+gln-L,,gln-L,gln-L.gln-L_1.Light,58.13317194,,145.001,Unit,127,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE,1.089683757,0.952826776
+gln-L,,gln-L,gln-L.gln-L_2.Light,58.13317194,,145.001,Unit,101,Unit,,,,,1,0,,Light,1,1,,2,FALSE,FALSE,TRUE,1.089683757,0.952826776
+Hexose_Pool_fru_glc-D,,Hexose_Pool_fru_glc-D,Hexose_Pool_fru_glc-D.Hexose_Pool_fru_glc-D_1.Heavy,58.84686762,,185,Unit,61,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE,1.17804808,0.967029091
+Hexose_Pool_fru_glc-D,,Hexose_Pool_fru_glc-D,Hexose_Pool_fru_glc-D.Hexose_Pool_fru_glc-D_1.Light,53.80504752,,179,Unit,59,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE,1.17804808,0.967029091
+Hexose_Pool_fru_glc-D,,Hexose_Pool_fru_glc-D,Hexose_Pool_fru_glc-D.Hexose_Pool_fru_glc-D_2.Light,53.80504752,,179,Unit,89,Unit,,,,,1,0,,Light,1,1,,2,FALSE,FALSE,TRUE,1.17804808,0.967029091
+Lcystin,,Lcystin,Lcystin.Lcystin_1.Heavy,58.89203388,,245,Unit,123,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE,1.190688372,0.969060696
+Lcystin,,Lcystin,Lcystin.Lcystin_1.Light,60.5562828,,239,Unit,120,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE,1.190688372,0.969060696

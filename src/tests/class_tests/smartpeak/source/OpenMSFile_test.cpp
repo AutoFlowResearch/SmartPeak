@@ -85,4 +85,62 @@ BOOST_AUTO_TEST_CASE(loadQuantitationMethods)
   BOOST_CHECK_CLOSE(static_cast<double>(params2.getValue("intercept")), -0.00224781, 1e-6);
 }
 
+BOOST_AUTO_TEST_CASE(loadTraML)
+{
+  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  RawDataHandler rawDataHandler;
+  OpenMSFile::loadTraML(rawDataHandler, pathname, "csv");
+  const std::vector<OpenMS::ReactionMonitoringTransition>& t = rawDataHandler.getTargetedExperiment().getTransitions();
+
+  BOOST_CHECK_EQUAL(t.size(), 20);
+
+  BOOST_CHECK_EQUAL(t[0].getPeptideRef(), "arg-L");
+  BOOST_CHECK_CLOSE(t[0].getPrecursorMZ(), 179.0, 1e-6);
+  BOOST_CHECK_CLOSE(t[0].getProductMZ(), 136.0, 1e-6);
+
+  BOOST_CHECK_EQUAL(t[10].getPeptideRef(), "citr-L");
+  BOOST_CHECK_CLOSE(t[10].getPrecursorMZ(), 180.0, 1e-6);
+  BOOST_CHECK_CLOSE(t[10].getProductMZ(), 136.0, 1e-6);
+
+  BOOST_CHECK_EQUAL(t[19].getPeptideRef(), "Lcystin");
+  BOOST_CHECK_CLOSE(t[19].getPrecursorMZ(), 239.0, 1e-6);
+  BOOST_CHECK_CLOSE(t[19].getProductMZ(), 120.0, 1e-6);
+}
+
+BOOST_AUTO_TEST_CASE(loadMSExperiment)
+{
+}
+
+BOOST_AUTO_TEST_CASE(loadFeatureMap)
+{
+}
+
+BOOST_AUTO_TEST_CASE(loadFeatureFilter)
+{
+}
+
+BOOST_AUTO_TEST_CASE(loadFeatureQC)
+{
+}
+
+BOOST_AUTO_TEST_CASE(readRawDataProcessingParameters)
+{
+}
+
+BOOST_AUTO_TEST_CASE(parse_rawDataProcessingParameters)
+{
+}
+
+BOOST_AUTO_TEST_CASE(storeQuantitationMethods)
+{
+}
+
+BOOST_AUTO_TEST_CASE(storeFeatureMap)
+{
+}
+
+BOOST_AUTO_TEST_CASE(storeMzML)
+{
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -52,7 +52,7 @@ namespace SmartPeak
   )
   {
     if (verbose)
-      std::cout << "loading quantitation methods" << std::endl;
+      std::cout << "Loading quantitation methods" << std::endl;
 
     if (filename.empty())
       return;
@@ -77,16 +77,21 @@ namespace SmartPeak
     if (verbose)
       std::cout << "Loading TraML" << std::endl;
 
-    if (filename.empty() || (format != "csv" && format != "traML"))
+    if (filename.empty() || (format != "csv" && format != "traML")) {
+      std::cerr << "loadTraML(): filename is empty.\n";
       return;
+    }
 
     OpenMS::TargetedExperiment targeted_exp; // # must use "PeptideSequence"
     if (format == "csv") {
       OpenMS::TransitionTSVFile tsvfile;
       tsvfile.convertTSVToTargetedExperiment(filename.c_str(), OpenMS::FileTypes::TRAML, targeted_exp);
-    } else {
+    } else if (format == "traML") {
       OpenMS::TraMLFile tramlfile;
       tramlfile.load(filename, targeted_exp);
+    } else {
+      std::cerr << "loadTraML(): format must either be \"csv\" or \"traML\".\n";
+      return;
     }
 
     rawDataHandler.setTargetedExperiment(targeted_exp);
