@@ -65,6 +65,9 @@ BOOST_AUTO_TEST_CASE(loadQuantitationMethods)
   BOOST_CHECK_CLOSE(aqm[0].getULOQ(), 2.5, 1e-6);
   BOOST_CHECK_CLOSE(aqm[0].getCorrelationCoefficient(), 0.983846949, 1e-6);
   BOOST_CHECK_EQUAL(aqm[0].getNPoints(), 4);
+  const OpenMS::Param params1 = aqm[0].getTransformationModelParams();
+  BOOST_CHECK_CLOSE(static_cast<double>(params1.getValue("slope")), 2.429728323, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(params1.getValue("intercept")), -0.091856745, 1e-6);
 
   BOOST_CHECK_EQUAL(aqm[106].getComponentName(), "xan.xan_1.Light");
   BOOST_CHECK_EQUAL(aqm[106].getFeatureName(), "peak_apex_int");
@@ -77,8 +80,9 @@ BOOST_AUTO_TEST_CASE(loadQuantitationMethods)
   BOOST_CHECK_CLOSE(aqm[106].getULOQ(), 0.16, 1e-6);
   BOOST_CHECK_CLOSE(aqm[106].getCorrelationCoefficient(), 0.994348761, 1e-6);
   BOOST_CHECK_EQUAL(aqm[106].getNPoints(), 6);
-
-  // TODO: test Params ?
+  const OpenMS::Param params2 = aqm[106].getTransformationModelParams();
+  BOOST_CHECK_CLOSE(static_cast<double>(params2.getValue("slope")), 1.084995619, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(params2.getValue("intercept")), -0.00224781, 1e-6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
