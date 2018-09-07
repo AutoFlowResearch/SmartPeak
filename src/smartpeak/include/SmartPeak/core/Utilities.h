@@ -228,10 +228,10 @@ public:
       // Args:
       //     Param_IO (pyopenms.Param): Param object to update
       //     parameters_I (list): list of parameters to update
-          
+
       // Returns:
       //     pyopenms.Param: Param_IO: updated Param object
-      
+
       // """
     static void updateParameters(
       OpenMS::Param& Param_IO,
@@ -239,14 +239,14 @@ public:
     );
 
     // """Parse string and return the eval
-    
+
     // Args:
     //     str_I (str): input string
     //     encode_str_I (bool): encode string as utf-8?
-        
+
     // Returns:
     //     str: str_O: evaluated string
-        
+
     // """
     static void parseString(const std::string& str_I, CastValue& cast);
 
