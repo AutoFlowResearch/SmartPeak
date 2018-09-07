@@ -298,9 +298,9 @@ namespace SmartPeak
   }
 
   void OpenMSFile::storeQuantitationMethods(
-      const SequenceSegmentHandler& sequenceSegmentHandler_IO,
-      const std::string& filename,
-      const bool verbose
+    const SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const std::string& filename,
+    const bool verbose
   )
   {
     if (verbose)
@@ -309,13 +309,11 @@ namespace SmartPeak
     if (filename.empty())
       throw std::invalid_argument("filename is empty");
 
-    if (filename.size()) {
-      OpenMS::AbsoluteQuantitationMethodFile aqmf;
-      aqmf.store(
-        filename,
-        sequenceSegmentHandler_IO.getQuantitationMethods()
-      );
-    }
+    OpenMS::AbsoluteQuantitationMethodFile aqmf;
+    aqmf.store(
+      filename,
+      sequenceSegmentHandler_IO.getQuantitationMethods()
+    );
   }
 
   void OpenMSFile::storeFeatureMap(
@@ -331,16 +329,15 @@ namespace SmartPeak
       throw std::invalid_argument("filename is empty");
 
     // # Store outfile as featureXML
-    if (filename.size()) {
-      OpenMS::FeatureXMLFile featurexml;
-      featurexml.store(filename, rawDataHandler_IO.getFeatureMap());
-    }
+    OpenMS::FeatureXMLFile featurexml;
+    featurexml.store(filename, rawDataHandler_IO.getFeatureMap());
   }
 
   void OpenMSFile::storeMzML(const std::string& filename, const OpenMS::MSExperiment& experiment)
   {
     if (filename.empty())
       throw std::invalid_argument("filename is empty");
+
     OpenMS::MzMLFile mzmlf;
     mzmlf.store(filename, experiment);
   }

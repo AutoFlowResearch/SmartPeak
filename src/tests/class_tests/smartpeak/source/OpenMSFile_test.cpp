@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE(loadFeatureQC)
 
 BOOST_AUTO_TEST_CASE(readRawDataProcessingParameters)
 {
-
+// no tests, it calls FileReader::parseOpenMSParams and OpenMSFile::parseRawDataProcessingParameters
 }
 
 BOOST_AUTO_TEST_CASE(parseRawDataProcessingParameters)
@@ -206,14 +206,17 @@ BOOST_AUTO_TEST_CASE(parseRawDataProcessingParameters)
 
 BOOST_AUTO_TEST_CASE(storeQuantitationMethods)
 {
+// no tests, it wraps OpenMS store function
 }
 
 BOOST_AUTO_TEST_CASE(storeFeatureMap)
 {
+// no tests, it wraps OpenMS store function
 }
 
 BOOST_AUTO_TEST_CASE(storeMzML)
 {
+// no tests, it wraps OpenMS store function
 }
 
 BOOST_AUTO_TEST_SUITE_END()
