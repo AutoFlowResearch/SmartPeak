@@ -8,7 +8,7 @@
 
 namespace SmartPeak
 {
-  void FileReader::parse_OpenMSParams(
+  void FileReader::parseOpenMSParams(
     const std::string& filename,
     std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters
   )

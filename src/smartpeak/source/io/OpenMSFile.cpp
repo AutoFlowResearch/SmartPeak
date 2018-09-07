@@ -259,18 +259,18 @@ namespace SmartPeak
       throw std::invalid_argument("filename is empty");
 
     std::map<std::string,std::vector<std::map<std::string,std::string>>> parameters;
-    FileReader::parse_OpenMSParams(filename, parameters);
+    FileReader::parseOpenMSParams(filename, parameters);
 
-    parse_rawDataProcessingParameters(rawDataHandler, parameters);
+    parseRawDataProcessingParameters(rawDataHandler, parameters);
   }
 
-  void OpenMSFile::parse_rawDataProcessingParameters(
+  void OpenMSFile::parseRawDataProcessingParameters(
     RawDataHandler& rawDataHandler,
     std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_file
   )
   {
     // # check for workflow parameters integrity
-    std::vector<std::string> required_parameters = {
+    const std::vector<std::string> required_parameters = {
       "SequenceSegmentPlotter",
       "FeaturePlotter",
       "AbsoluteQuantitation",

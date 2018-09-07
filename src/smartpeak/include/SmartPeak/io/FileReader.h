@@ -14,7 +14,7 @@ public:
     FileReader() = delete;
     ~FileReader() = delete;
 
-    static void parse_OpenMSParams(
+    static void parseOpenMSParams(
         const std::string& filename,
         std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters
     );

@@ -65,7 +65,7 @@ public:
       RawDataHandler& rawDataHandler, const std::string& filename, const std::string& delimiter = ","
     );
 
-    static void parse_rawDataProcessingParameters(
+    static void parseRawDataProcessingParameters(
       RawDataHandler& rawDataHandler,
       std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_file
     );

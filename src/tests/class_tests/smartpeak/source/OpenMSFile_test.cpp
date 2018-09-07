@@ -163,10 +163,45 @@ BOOST_AUTO_TEST_CASE(loadFeatureQC)
 
 BOOST_AUTO_TEST_CASE(readRawDataProcessingParameters)
 {
+
 }
 
-BOOST_AUTO_TEST_CASE(parse_rawDataProcessingParameters)
+BOOST_AUTO_TEST_CASE(parseRawDataProcessingParameters)
 {
+  RawDataHandler rawDataHandler;
+  std::map<std::string, std::vector<std::map<std::string, std::string>>> params;
+
+  params.emplace("SequenceSegmentPlotter", vector<map<string,string>> {
+    {
+      {"map1_elem1", "value1"},
+      {"map1_elem2", "value2"}
+    },
+    {
+      {"map2_elem1", "value3"}
+    }
+  });
+
+  OpenMSFile::parseRawDataProcessingParameters(rawDataHandler, params);
+  BOOST_CHECK_EQUAL(params.size(), 14);
+  BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
+  BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);
+  BOOST_CHECK_EQUAL(params.count("AbsoluteQuantitation"), 1);
+  BOOST_CHECK_EQUAL(params.count("mzML"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMMapping"), 1);
+  BOOST_CHECK_EQUAL(params.count("ChromatogramExtractor"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureFinderScoring"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureFilter.filter_MRMFeatures"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_qmip"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.schedule_MRMFeatures_qmip"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_score"), 1);
+  BOOST_CHECK_EQUAL(params.count("ReferenceDataMethods.getAndProcess_referenceData_samples"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureFilter.filter_MRMFeatures.qc"), 1);
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter").size(), 2);
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem1"), "value1");
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem2"), "value2");
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[1].at("map2_elem1"), "value3");
+  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeatures.qc").size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(storeQuantitationMethods)

@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(parseopenmsparams)
 {
   const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");
   map<string,vector<map<string,string>>> parameters;
-  FileReader::parse_OpenMSParams(pathname, parameters);
+  FileReader::parseOpenMSParams(pathname, parameters);
   BOOST_CHECK_EQUAL(parameters.size(), 3);
 
   const string func1 {"func1"};
