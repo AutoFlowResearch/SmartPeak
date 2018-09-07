@@ -6,6 +6,7 @@ set(sources_list
 	CSVWriter.cpp
 	FileReader.cpp
 	OpenMSFile.cpp
+	SequenceParser.cpp
 )
 
 ### add path to the filenames

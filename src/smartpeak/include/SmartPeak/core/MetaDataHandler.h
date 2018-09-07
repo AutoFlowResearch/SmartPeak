@@ -14,7 +14,7 @@ public:
     MetaDataHandler() = default;
     ~MetaDataHandler() = default;
 
-    enum struct SampleType
+    enum SampleType
     {
       Unknown = 1,
       Standard,
@@ -26,6 +26,7 @@ public:
     };
 
     static const char* SampleTypeToString(const SampleType sample_type);
+    static SampleType stringToSampleType(const std::string& sample_type);
 
     void setSampleName(const std::string& sample_name);
     std::string& getSampleName();
