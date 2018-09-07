@@ -6,10 +6,13 @@ set(core_executables_list
 	SampleHandler_test
 	SequenceHandler_test
 	SequenceSegmentHandler_test
+	Utilities_test
 )
 
 set(io_executables_list
 	CSVWriter_test
+	FileReader_test
+	OpenMSFile_test
 )
 
 set(simulator_executables_list

@@ -10,6 +10,7 @@ set(sources_list_h
 	SampleHandler.h
 	SequenceHandler.h
 	SequenceSegmentHandler.h
+	Utilities.h
 )
 
 ### add path to the filenames

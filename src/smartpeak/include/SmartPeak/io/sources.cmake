@@ -5,6 +5,8 @@ set(directory include/SmartPeak/io)
 set(sources_list_h
 	csv.h
 	CSVWriter.h
+	FileReader.h
+	OpenMSFile.h
 )
 
 ### add path to the filenames
