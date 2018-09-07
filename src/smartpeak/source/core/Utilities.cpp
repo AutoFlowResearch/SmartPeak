@@ -24,7 +24,7 @@ namespace SmartPeak
       cast = std::stoi(value);
     } else if (lowercase_type == "float") {
       cast = std::stof(value);
-    } else if ((lowercase_type == "bool" || lowercase_type == "string") // TODO: Should we also support "string" type for an aventual `bool`?
+    } else if ((lowercase_type == "bool" || lowercase_type == "string")
                && (lowercase_value == "false" || lowercase_value == "true")) {
       cast = lowercase_value == "true";
     } else if (lowercase_type == "string") {

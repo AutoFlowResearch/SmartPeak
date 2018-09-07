@@ -47,7 +47,7 @@ namespace SmartPeak
         || !in.has_column(s_name)
         || !in.has_column(s_value))
     {
-      throw; // TODO: specify exception
+      throw "Missing required column.";
     }
     const bool has_type = in.has_column(s_type);
     const bool has_tags = in.has_column(s_tags);

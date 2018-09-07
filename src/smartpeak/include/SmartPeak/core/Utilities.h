@@ -4,7 +4,6 @@
 
 #include <regex>
 #include <OpenMS/DATASTRUCTURES/Param.h>
-#include <iostream> // TODO: remove this
 
 namespace SmartPeak
 {
@@ -212,6 +211,8 @@ public:
       Cast a string to the desired type and return the evaluation
 
       The type check is case insensitive.
+
+      @note a value "true" or "false" of type "string" will be converted to bool
 
       @param[in] value input string
       @param[in] type desired type
