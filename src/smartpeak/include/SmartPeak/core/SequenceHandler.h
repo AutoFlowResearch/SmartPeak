@@ -50,7 +50,7 @@ public:
 
     void addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I);
 
-    void getSamplesInSequence(std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const;
+    void getSamplesInSequence(const std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const;
 
     float getMetaValue(
       const OpenMS::Feature& feature,

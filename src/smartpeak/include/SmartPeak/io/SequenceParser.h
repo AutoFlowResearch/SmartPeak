@@ -16,5 +16,28 @@ public:
     static void readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname);
     static void parseSequenceFile(SequenceHandler& sequenceHandler);
 
+    static void makeDataTableFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      const std::vector<std::string>& meta_data_unsorted = std::vector<std::string>({"calculated_concentration"}),
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set({MetaDataHandler::SampleType::Unknown}),
+      std::vector<std::map<std::string,std::string>>& list_dict,
+      std::vector<std::string>& headers_out
+    );
+
+    static void write_dataTableFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      const std::string& filename,
+      const std::vector<std::string>& meta_data_unsorted = std::vector<std::string>({"calculated_concentration"}),
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set({MetaDataHandler::SampleType::Unknown})
+    );
+
+    static void makeDataTableFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      const std::vector<std::string>& meta_data_unsorted = std::vector<std::string>({"calculated_concentration"}),
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set({MetaDataHandler::SampleType::Unknown}),
+      std::vector<std::vector<float>>& data_out,
+      std::set& columns_out,
+      std::set& rows_out
+    );
   };
 }

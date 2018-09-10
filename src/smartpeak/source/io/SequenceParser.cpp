@@ -62,190 +62,193 @@ namespace SmartPeak
       sequenceHandler.addSampleToSequence(rdh.getMetaData(), rdh.getFeatureMap());
     }
   }
+
+  void makeDataTableFromMetaValue(
+    const SequenceHandler& sequenceHandler,
+    const std::vector<std::string>& meta_data_unsorted, // TODO: making a copy of it (no reference) for subsequent sorting?
+    const std::set<MetaDataHandler::SampleType>& sample_types, // TODO: can overload with a vector of strings
+    std::vector<std::map<std::string,std::string>>& list_dict,
+    std::vector<std::string>& headers_out
+  )
+  {
+    std::vector<std::string> meta_data = meta_data_unsorted;
+    std::stable_sort(meta_data.begin(), meta_data.end());
+    std::vector<std::string> headers = {"sample_name", "sample_type", "component_group_name", "component_name"}; // TODO: replace literals with variables
+    headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
+
+    list_dict.clear();
+    for (const SampleHandler& sampleHandler : sequenceHandler.getSequence()) {
+      const MetaDataHandler& mdh = sampleHandler.getMetadata();
+      const MetaDataHandler::SampleType st = mdh.getSampleType(); // TODO: can skip this?
+      if (sample_types.count(st) == 0)
+        continue;
+      const std::string& sample_name = mdh.getSampleName();
+      for (const Feature& feature : sampleHandler.getRawData()) {
+        const std::string& component_group_name = feature.getMetaValue("PeptireRef").toString();
+        for (const Feature& subordinate : feature.getSubordinates()) {
+          std::map<std::string,std::string> row;
+          row.emplace({"sample_type", MetaDataHandler::SampleTypeToString(st)});
+          row.emplace({"sample_name", sample_name});
+          row.emplace({"component_group_name", component_group_name});
+          row.emplace({"component_name", subordinate.getMetaValue().toString()});
+          for (const std::string& meta_value_name : meta_data) {
+            const float datum = sequenceHandler.getMetaValue(feature, subordinate, meta_value_name);
+            row.emplace({meta_value_name, datum}); // TODO: please compare this with code in SequenceWriter.py
+          }
+          list_dict.push_back(row);
+        }
+      }
+    }
+    headers_out = headers;
+  }
+
+  void write_dataTableFromMetaValue(
+    const SequenceHandler& sequenceHandler,
+    const std::string& filename,
+    const std::vector<std::string>& meta_data_unsorted,
+    const std::set<MetaDataHandler::SampleType>& sample_types
+  )
+  {
+    std::vector<std::map<std::string,std::string>> list_dict;
+    std::vector<std::string> headers;
+    makeDataTableFromMetaValue(sequenceHandler, meta_data_unsorted, sample_types, list_dict, headers);
+    std::ofstream f;
+    f.open(filename);
+    if (!f.is_open())
+      throw "could not open file\n";
+    std::string line;
+    for (const std::string& s : headers) {
+      line.append(s);
+      line.push_back(',');
+    }
+    if (line.size()) {
+      line.pop_back();
+    } else {
+      f.close();
+      throw "headers is empty";
+    }
+    line.push_back('\n');
+    f << line;
+    for (const std::map<std::string,std::string>& m : list_dict) {
+      line.clear();
+      for (const std::string& h : headers) {
+        line.append(m.at(h));
+        line.push_back(',');
+      }
+      if (line.size()) {
+        line.pop_back();
+      } else {
+        f.close();
+        throw "line (map) is empty";
+      }
+      line.push_back('\n');
+      f << line;
+    }
+    f.close();
+  }
+
+  void makeDataTableFromMetaValue(
+    const SequenceHandler& sequenceHandler,
+    const std::vector<std::string>& meta_data_unsorted,
+    const std::set<MetaDataHandler::SampleType>& sample_types,
+    std::vector<std::vector<float>>& data_out,
+    std::set& columns_out,
+    std::set& rows_out
+  )
+  {
+    std::set<std::string> columns;
+    std::set<std::string> rows;
+    std::map<std::string,std::map<std::string,float>> data_dict;
+    for (const SampleHandler& sampleHandler : sequenceHandler.getSequence()) {
+      const MetaDataHandler& mdh = sampleHandler.getMetadata();
+      const MetaDataHandler::SampleType st = mdh.getSampleType(); // TODO: can skip this?
+      if (sample_types.count(st) == 0)
+        continue;
+      const std::string& sample_name = mdh.getSampleName();
+      data_dict.insert({sample_name, });
+      for (const std::string& meta_value_name : meta_data) {
+        for (const Feature& feature : sampleHandler.getRawData()) {
+          const std::string& component_group_name = feature.getMetaValue("PeptireRef").toString();
+          for (const Feature& subordinate : feature.getSubordinates()) {
+            if (!subordinate.exists("used_"))
+              continue;
+            const std::string used = subordinate.getMetaValue().toString();
+            if (used.empty())
+              continue;
+            if (used[0] == 'f' || used[0] == 'F')
+              continue;
+            const std::string row_tuple_name = component_group_name + "_" + subordinate.getMetaValue('native_id').toString() + "_" + meta_value_name;
+            const float datum = sequenceHandler.getMetaValue(feature, subordinate, meta_value_name); // TODO: please compare this with code in SequenceWriter.py IT is assumed that datum is present and valid
+            if (data_dict.count(sample_name)) {
+              data_dict.emplace(sample_name, std::map<std::string,float>());
+            data_dict[sample_name].emplace(row_tuple_name, datum);
+            columns.insert(sample_name);
+            rows.insert(row_tuple_name);
+          }
+        }
+      }
+    }
+    size_t i, j;
+    i = j = 0;
+    std::vector<std::vector<float>> data(columns.size(), std::vector<float>(rows.size(), NAN));
+    for (const std::string& row : rows) {
+      for (const std::string& column : columns) {
+        if (data_dict.count(column) && data_dict[sample_name].count(row)) {
+          data[i][j] = data_dict[column][row];
+        }
+        ++j;
+      }
+      ++i;
+    }
+    data_out = data;
+    columns_out = columns;
+    rows_out = rows;
+  }
+
+  void write_dataMatrixFromMetaValue(
+    const SequenceHandler& sequenceHandler,
+    const std::string& filename,
+    const std::vector<std::string>& meta_data_unsorted,
+    const std::set<MetaDataHandler::SampleType>& sample_types
+  )
+  {
+    std::vector<std::vector<float>> data;
+    std::set columns;
+    std::set rows;
+    makeDataTableFromMetaValue(sequenceHandler, meta_data_unsorted, sample_types, data, columns, rows);
+
+    std::ofstream f;
+    f.open(filename);
+    if (!f.is_open())
+      throw "could not open file\n";
+    std::string line;
+    for (const std::string& s : headers) {
+      line.append(s);
+      line.push_back(',');
+    }
+    if (line.size()) {
+      line.pop_back();
+    } else {
+      f.close();
+      throw "headers is empty";
+    }
+    line.push_back('\n');
+    f << line;
+    for (const std::map<std::string,std::string>& m : list_dict) {
+      line.clear();
+      for (const std::string& h : headers) {
+        line.append(m.at(h));
+        line.push_back(',');
+      }
+      if (line.size()) {
+        line.pop_back();
+      } else {
+        f.close();
+        throw "line (map) is empty";
+      }
+      line.push_back('\n');
+      f << line;
+    }
+    f.close();
+  }
 }
-
-// class SequenceWriter():
-//     """A class to write SequenceHandlers"""
-
-//     def makeDataTableFromMetaValue(
-//         self,
-//         sequenceHandler_I,
-//         meta_data=['calculated_concentration'],
-//         sample_types=['Unknown']
-//     ):
-//         """make a data matrix from a feature metaValue for 
-//             specified sample types
-
-//         Args:
-//             sequenceHandler_I (SequenceHandler)
-//             meta_data (list): 
-//                 list of strings specifying the name of the feature metaValue
-//             sample_types (list): list of strings corresponding to sample types
-
-//         Returns:
-//             list: rows: list of dicts
-//             list: list of headers in the order to write to .csv
-//         """
-//         # assign the headers
-//         header = ["sample_name", "sample_type", "component_group_name", "component_name"]
-//         meta_data.sort()
-//         header += meta_data
-
-//         # collect the metaValues
-//         list_dict = []
-//         for d in sequenceHandler_I.sequence:
-//             if d.meta_data['sample_type'] in sample_types:
-//                 sample_name = d.meta_data['sample_name']
-//                 for feature in d.raw_data.featureMap:
-//                     component_group_name = feature.getMetaValue(
-//                         "PeptideRef").decode('utf-8')
-//                     for subordinate in feature.getSubordinates():
-//                         row_dict = {}
-//                         row_dict["sample_type"] = d.meta_data['sample_type']
-//                         row_dict["sample_name"] = sample_name
-//                         row_dict["component_group_name"] = component_group_name
-//                         row_dict["component_name"] = subordinate.getMetaValue(
-//                             'native_id').decode('utf-8')
-//                         for meta_value in meta_data:
-//                             datum = sequenceHandler_I.getMetaValue(
-//                                 feature, subordinate, meta_value)
-//                             if datum and datum is not None:                                
-//                                 if isinstance(datum, bytes):
-//                                     datum = datum.decode('utf-8')
-//                                 row_dict[meta_value] = datum
-//                             else:
-//                                 row_dict[meta_value] = None                    
-//                         list_dict.append(row_dict)
-//         return list_dict, header
-
-//     def write_dataTableFromMetaValue(
-//         self,
-//         sequenceHandler_I,
-//         filename,
-//         meta_data=['calculated_concentration'],
-//         sample_types=['Unknown']
-//     ):
-//         """export data table from feature metaValue to .csv
-
-//         Args:
-//             sequenceHandler_I (SequenceHandler)
-//             filename (string): name of the file
-//             ...
-
-//         """
-
-//         # fixed header order
-//         data_O, header = [], []
-//         data_O, header = self.makeDataTableFromMetaValue(
-//             sequenceHandler_I,
-//             meta_data=meta_data, sample_types=sample_types)        
-
-//         # write dict to csv
-//         with open(filename, 'w', newline='') as f:
-//             writer = csv.DictWriter(f, fieldnames=header)
-//             try:
-//                 writer.writeheader()
-//                 writer.writerows(data_O)
-//             except csv.Error as e:
-//                 sys.exit(e)
-
-//     def makeDataMatrixFromMetaValue(
-//         self,
-//         sequenceHandler_I,
-//         meta_data=['calculated_concentration'],
-//         sample_types=['Unknown']
-//     ):
-//         """make a data matrix from a feature metaValue for 
-//             specified sample types
-
-//         Args:
-//             sequenceHandler_I (SequenceHandler)
-//             meta_data (list): 
-//                 list of strings specifying the name of the feature metaValue
-//             sample_types (list): list of strings corresponding to sample types
-
-//         Returns:
-//             list: columns: list of sample_names
-//             list: rows: 
-//                 list of tuples corresponding to component_name and component_group_name
-//             np.array: data: numpy data array of metaValues
-
-//         """
-
-//         columns = set()
-//         rows = set()
-
-//         # collect the metaValues
-//         data_dict = {}
-//         for d in sequenceHandler_I.sequence:
-//             if d.meta_data['sample_type'] in sample_types:
-//                 sample_name = d.meta_data['sample_name']
-//                 data_dict[sample_name] = {}
-//                 for meta_value in meta_data:
-//                     for feature in d.raw_data.featureMap:
-//                         component_group_name = feature.getMetaValue(
-//                             "PeptideRef").decode('utf-8')
-//                         for subordinate in feature.getSubordinates():
-//                             if subordinate.getMetaValue("used_") is None \
-//                             or subordinate.getMetaValue("used_").decode("utf-8") == "true":
-//                                 row_tuple_name = (
-//                                     component_group_name, 
-//                                     subordinate.getMetaValue(
-//                                         'native_id').decode('utf-8'), meta_value)
-//                                 datum = sequenceHandler_I.getMetaValue(
-//                                     feature, subordinate, meta_value)
-//                                 if datum and datum is not None:                                
-//                                     if isinstance(datum, bytes):
-//                                         datum = datum.decode('utf-8')
-//                                     data_dict[sample_name][row_tuple_name] = datum
-//                                     columns.add(sample_name)
-//                                     rows.add(row_tuple_name)
-//         columns = list(columns)
-//         columns.sort()
-//         rows = list(rows)
-//         rows.sort()
-
-//         # make the data matrix
-//         data = np.empty((len(rows), len(columns)))
-//         data.fill(np.nan)
-//         for i, r in enumerate(rows):
-//             for j, c in enumerate(columns):
-//                 if c in data_dict.keys() and r in data_dict[c].keys():
-//                     data[i, j] = data_dict[c][r]
-
-//         return columns, rows, data
-
-//     def write_dataMatrixFromMetaValue(
-//         self,
-//         sequenceHandler_I,
-//         filename,
-//         meta_data=['calculated_concentration'],
-//         sample_types=['Unknown']
-//     ):
-//         """export data matrix from feature metaValue to .csv
-
-//         Args:
-//             sequenceHandler_I (SequenceHandler)
-//             filename (string): name of the file
-//             meta_data (list): 
-//                 list of strings specifying the name of the feature metaValue
-//             sample_types (list): list of strings corresponding to sample types
-
-//         """
-
-//         data_O = []
-//         columns, rows, data = self.makeDataMatrixFromMetaValue(
-//             sequenceHandler_I,
-//             meta_data=meta_data, sample_types=sample_types)
-//         header = ['component_group_name', 'component_name', 'meta_value'] + columns
-//         for i, r in enumerate(rows):
-//             data_O.append(dict(zip(header, list(r) + list(data[i, :]))))
-        
-//         # write dict to csv
-//         with open(filename, 'w', newline='') as f:
-//             writer = csv.DictWriter(f, fieldnames=header)
-//             try:
-//                 writer.writeheader()
-//                 writer.writerows(data_O)
-//             except csv.Error as e:
-//                 sys.exit(e)
