@@ -165,7 +165,7 @@ namespace SmartPeak
       if (sample_types.count(st) == 0)
         continue;
       const std::string& sample_name = mdh.getSampleName();
-      data_dict.insert({sample_name, });
+      data_dict.insert({sample_name, std::map<std::string,float>()});
       for (const std::string& meta_value_name : meta_data) {
         for (const Feature& feature : sampleHandler.getRawData()) {
           const std::string& component_group_name = feature.getMetaValue("PeptireRef").toString();
@@ -213,9 +213,13 @@ namespace SmartPeak
   )
   {
     std::vector<std::vector<float>> data;
-    std::set columns;
-    std::set rows;
+    std::set<std::string> columns;
+    std::set<std::string> rows;
     makeDataTableFromMetaValue(sequenceHandler, meta_data_unsorted, sample_types, data, columns, rows);
+    std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
+    headers.append(columns);
+
+
 
     std::ofstream f;
     f.open(filename);
@@ -234,10 +238,11 @@ namespace SmartPeak
     }
     line.push_back('\n');
     f << line;
-    for (const std::map<std::string,std::string>& m : list_dict) {
+    size_t i = 0;
+    for (const std::string& row : rows) {
       line.clear();
       for (const std::string& h : headers) {
-        line.append(m.at(h));
+        line.append(data.at(h));
         line.push_back(',');
       }
       if (line.size()) {
