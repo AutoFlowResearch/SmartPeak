@@ -17,26 +17,33 @@ public:
 
     static void makeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
-      const std::vector<std::string>& meta_data_unsorted = std::vector<std::string>({"calculated_concentration"}),
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set({MetaDataHandler::SampleType::Unknown}),
       std::vector<std::map<std::string,std::string>>& list_dict,
-      std::vector<std::string>& headers_out
+      std::vector<std::string>& headers_out,
+      const std::vector<std::string>& meta_data_unsorted = std::vector<std::string>({"calculated_concentration"}),
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
     static void write_dataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
       const std::vector<std::string>& meta_data_unsorted = std::vector<std::string>({"calculated_concentration"}),
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set({MetaDataHandler::SampleType::Unknown})
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
-    static void makeDataTableFromMetaValue(
+    static void makeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
-      const std::vector<std::string>& meta_data_unsorted = std::vector<std::string>({"calculated_concentration"}),
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set({MetaDataHandler::SampleType::Unknown}),
       std::vector<std::vector<float>>& data_out,
-      std::set& columns_out,
-      std::set& rows_out
+      std::set<std::string>& columns_out,
+      std::set<std::string>& rows_out,
+      const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
+    );
+
+    static void write_dataMatrixFromMetaValue(
+      const SequenceHandler& sequenceHandler,
+      const std::string& filename,
+      const std::vector<std::string>& meta_data_unsorted,
+      const std::set<MetaDataHandler::SampleType>& sample_types
     );
   };
 }
