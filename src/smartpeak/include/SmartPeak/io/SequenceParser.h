@@ -14,7 +14,6 @@ public:
     SequenceParser() = delete;
     ~SequenceParser() = delete;
     static void readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname);
-    static void parseSequenceFile(SequenceHandler& sequenceHandler);
 
     static void makeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,

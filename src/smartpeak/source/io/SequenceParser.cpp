@@ -45,21 +45,7 @@ namespace SmartPeak
       mdh.setSequenceSegmentName(sequence_segment_name);
       mdh.setSampleType(MetaDataHandler::stringToSampleType(sample_type));
       mdh.setFilename(filename);
-      RawDataHandler rdh;
-      rdh.setMetaData(mdh);
-      SampleHandler sampleHandler;
-      sampleHandler.setRawData(rdh);
-      sequence.push_back(sampleHandler);
-    }
-
-    sequenceHandler.setSequence(sequence);
-  }
-
-  void SequenceParser::parseSequenceFile(SequenceHandler& sequenceHandler)
-  {
-    for (const SampleHandler& sampleHandler : sequenceHandler.getSequence()) {
-      const RawDataHandler& rdh = sampleHandler.getRawData();
-      sequenceHandler.addSampleToSequence(rdh.getMetaData(), rdh.getFeatureMap());
+      sequenceHandler.addSampleToSequence(mdh, OpenMS::FeatureMap());
     }
   }
 
