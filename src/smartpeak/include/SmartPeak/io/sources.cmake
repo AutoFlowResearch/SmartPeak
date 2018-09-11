@@ -7,6 +7,7 @@ set(sources_list_h
 	CSVWriter.h
 	FileReader.h
 	OpenMSFile.h
+	SequenceParser.h
 )
 
 ### add path to the filenames

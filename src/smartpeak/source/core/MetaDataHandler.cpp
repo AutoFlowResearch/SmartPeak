@@ -7,7 +7,7 @@
 
 namespace SmartPeak
 {
-  const char* MetaDataHandler::SampleTypeToString(SampleType sample_type)
+  const char* MetaDataHandler::SampleTypeToString(const SampleType sample_type)
   {
     switch (sample_type) {
       case SampleType::Unknown:
@@ -25,6 +25,24 @@ namespace SmartPeak
       case SampleType::Unrecognized:
         return "Unrecognized";
     }
+  }
+
+  MetaDataHandler::SampleType MetaDataHandler::stringToSampleType(const std::string& sample_type)
+  {
+    if (sample_type == "Unknown")
+      return SampleType::Unknown;
+    if (sample_type == "Standard")
+      return SampleType::Standard;
+    if (sample_type == "QC")
+      return SampleType::QC;
+    if (sample_type == "Blank")
+      return SampleType::Blank;
+    if (sample_type == "Double Blank")
+      return SampleType::DoubleBlank;
+    if (sample_type == "Solvent")
+      return SampleType::Solvent;
+    if (sample_type == "Unrecognized")
+      return SampleType::Unrecognized;
   }
 
   void MetaDataHandler::setSampleName(const std::string& sample_name_I)

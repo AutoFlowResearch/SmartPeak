@@ -164,7 +164,7 @@ namespace SmartPeak
     sample_to_index_.emplace(meta_data_I.getSampleName(), sequence_.size() - 1);
   }
 
-  void SequenceHandler::getSamplesInSequence(std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const
+  void SequenceHandler::getSamplesInSequence(const std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const
   {
     samples.clear();
 
@@ -181,7 +181,7 @@ namespace SmartPeak
     const std::string& meta_value
   ) const
   {
-    float datum = 0.0;
+    float datum;
 
     if (meta_value == "RT") {
       datum = feature.getRT();
