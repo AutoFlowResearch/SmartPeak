@@ -6,6 +6,7 @@
 #include <SmartPeak/core/SampleGroupHandler.h>
 #include <SmartPeak/core/SampleHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
+#include <SmartPeak/core/Utilities.h>
 
 namespace SmartPeak
 {
@@ -15,60 +16,49 @@ public:
     SequenceHandler() = default;
     ~SequenceHandler() = default;
 
-  void clear();
+    void clear();
 
-  void setFilenames(const std::map<std::string, std::string>& filenames);
+    void setFilenames(const std::map<std::string, std::string>& filenames);
+    std::map<std::string, std::string>& getFilenames();
+    std::map<std::string, std::string> getFilenames() const;
 
-  std::map<std::string, std::string>& getFilenames();
+    void setDirStatic(const std::string& dir_static);
+    std::string& getDirStatic();
+    std::string getDirStatic() const;
 
-  std::map<std::string, std::string> getFilenames() const;
+    void setDirDynamic(const std::string& dir_dynamic);
+    std::string& getDirDynamic();
+    std::string getDirDynamic() const;
 
-  void setDirStatic(const std::string& dir_static);
+    void setSequence(const std::vector<SampleHandler>& sequence);
+    std::vector<SampleHandler>& getSequence();
+    std::vector<SampleHandler> getSequence() const;
 
-  std::string& getDirStatic();
+    void setSequenceSegments(const std::vector<SequenceSegmentHandler>& sequence_segments);
+    std::vector<SequenceSegmentHandler>& getSequenceSegments();
+    std::vector<SequenceSegmentHandler> getSequenceSegments() const;
 
-  std::string getDirStatic() const;
+    void setSampleGroups(const std::vector<SampleGroupHandler>& sample_groups);
+    std::vector<SampleGroupHandler>& getSampleGroups();
+    std::vector<SampleGroupHandler> getSampleGroups() const;
 
-  void setDirDynamic(const std::string& dir_dynamic);
+    std::map<std::string, std::string> getDefaultStaticFilenames(const std::string& dir);
 
-  std::string& getDirDynamic();
+    std::map<std::string, std::string> getDefaultDynamicFilenames(
+      const std::string& dir,
+      std::string& sample_name
+    ) const;
 
-  std::string getDirDynamic() const;
+    void addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I);
 
-  void setSequence(const std::vector<SampleHandler>& sequence);
+    void getSamplesInSequence(const std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const;
 
-  std::vector<SampleHandler>& getSequence();
-
-  std::vector<SampleHandler> getSequence() const;
-
-  void setSequenceSegments(const std::vector<SequenceSegmentHandler>& sequence_segments);
-
-  std::vector<SequenceSegmentHandler>& getSequenceSegments();
-
-  std::vector<SequenceSegmentHandler> getSequenceSegments() const;
-
-  void setSampleGroups(const std::vector<SampleGroupHandler>& sample_groups);
-
-  std::vector<SampleGroupHandler>& getSampleGroups();
-
-  std::vector<SampleGroupHandler> getSampleGroups() const;
-
-  std::map<std::string, std::string> getDefaultStaticFilenames(const std::string& dir);
-
-  std::map<std::string, std::string> getDefaultDynamicFilenames(
-    const std::string& dir,
-    std::string& sample_name
-  ) const;
-
-  void addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I);
-
-  void getSamplesInSequence(std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const;
-
-  float getMetaValue(
-    const OpenMS::Feature& feature,
-    const OpenMS::Feature& subordinate,
-    const std::string& meta_value
-  ) const;
+    void getMetaValue(
+      const OpenMS::Feature& feature,
+      const OpenMS::Feature& subordinate,
+      const std::string& meta_value,
+      Utilities::CastValue cast
+    ) const;
 
 private:
     std::vector<SampleHandler> sequence_;
