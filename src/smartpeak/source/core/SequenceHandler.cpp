@@ -2,6 +2,7 @@
 
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/core/Utilities.h>
 
 namespace SmartPeak
 {
@@ -175,21 +176,21 @@ namespace SmartPeak
     }
   }
 
-  float SequenceHandler::getMetaValue(
+  void SequenceHandler::getMetaValue(
     const OpenMS::Feature& feature,
     const OpenMS::Feature& subordinate,
-    const std::string& meta_value
+    const std::string& meta_value,
+    Utilities::CastValue cast
   ) const
   {
-    float datum;
+    cast.clear();
 
     if (meta_value == "RT") {
-      datum = feature.getRT();
-    } else {
-      datum = feature.metaValueExists(meta_value) ?
-        feature.getMetaValue(meta_value) : subordinate.getMetaValue(meta_value);
+      cast = static_cast<float>(feature.getRT());
+    } else if (feature.metaValueExists(meta_value) && !feature.getMetaValue(meta_value).isEmpty()) {
+      cast = static_cast<float>(feature.getMetaValue(meta_value));
+    } else if (subordinate.metaValueExists(meta_value) && !subordinate.getMetaValue(meta_value).isEmpty()) {
+      cast = static_cast<float>(subordinate.getMetaValue(meta_value));
     }
-
-    return datum;
   }
 }

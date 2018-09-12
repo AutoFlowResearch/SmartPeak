@@ -6,6 +6,7 @@
 #include <SmartPeak/core/SampleGroupHandler.h>
 #include <SmartPeak/core/SampleHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
+#include <SmartPeak/core/Utilities.h>
 
 namespace SmartPeak
 {
@@ -52,10 +53,11 @@ public:
 
     void getSamplesInSequence(const std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const;
 
-    float getMetaValue(
+    void getMetaValue(
       const OpenMS::Feature& feature,
       const OpenMS::Feature& subordinate,
-      const std::string& meta_value
+      const std::string& meta_value,
+      Utilities::CastValue cast
     ) const;
 
 private:

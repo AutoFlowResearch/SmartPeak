@@ -16,6 +16,8 @@ public:
 
     static void readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname);
 
+    // TODO: the following 4 methods are incomplete and untested
+
     static void makeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       std::vector<std::map<std::string,std::string>>& list_dict,
