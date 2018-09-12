@@ -53,7 +53,7 @@ namespace SmartPeak
     }
   }
 
-  void makeDataTableFromMetaValue(
+  void SequenceParser::makeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     std::vector<std::map<std::string,std::string>>& list_dict,
     std::vector<std::string>& headers_out,
@@ -92,7 +92,7 @@ namespace SmartPeak
     headers_out = headers;
   }
 
-  void write_dataTableFromMetaValue(
+  void SequenceParser::write_dataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data_unsorted,
@@ -137,7 +137,7 @@ namespace SmartPeak
     f.close();
   }
 
-  void makeDataMatrixFromMetaValue(
+  void SequenceParser::makeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
     std::vector<std::vector<float>>& data_out,
     std::set<std::string>& columns_out,
@@ -152,25 +152,27 @@ namespace SmartPeak
     for (const SampleHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
       const MetaDataHandler::SampleType st = mdh.getSampleType(); // TODO: can skip this?
-      if (sample_types.count(st) == 0)
+      if (sample_types.count(st) == 0) {
+        std::cout << "makeDataMatrixFromMetaValue(): No sample type of type " << MetaDataHandler::SampleTypeToString(st) << std::endl;
         continue;
+      }
       const std::string& sample_name = mdh.getSampleName();
+      std::cout << "makeDataMatrixFromMetaValue(): sample_name: " << sample_name << std::endl;
       data_dict.insert({sample_name, std::map<std::string,float>()});
       for (const std::string& meta_value_name : meta_data) {
         for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
           const std::string& component_group_name = feature.getMetaValue("PeptireRef").toString();
+          std::cout << "makeDataMatrixFromMetaValue(): component_group_name: " << component_group_name << std::endl;
           for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
             if (!subordinate.metaValueExists("used_"))
               continue;
             const std::string used = subordinate.getMetaValue("used_").toString();
-            if (used.empty())
-              continue;
-            if (used[0] == 'f' || used[0] == 'F')
+            if (used.empty() || used[0] == 'f' || used[0] == 'F')
               continue;
             const std::string row_tuple_name = component_group_name + "_" + subordinate.getMetaValue("native_id").toString() + "_" + meta_value_name;
+            std::cout << "makeDataMatrixFromMetaValue(): row_tuple_name: " << row_tuple_name << std::endl;
             const float datum = sequenceHandler.getMetaValue(feature, subordinate, meta_value_name); // TODO: please compare this with code in SequenceWriter.py IT is assumed that datum is present and valid
-            if (data_dict.count(sample_name))
-              data_dict.emplace(sample_name, std::map<std::string,float>());
+            std::cout << "makeDataMatrixFromMetaValue(): datum: " << datum << std::endl;
             data_dict[sample_name].emplace(row_tuple_name, datum);
             columns.insert(sample_name);
             rows.insert(row_tuple_name);
@@ -195,7 +197,7 @@ namespace SmartPeak
     rows_out = rows;
   }
 
-  void write_dataMatrixFromMetaValue(
+  void SequenceParser::write_dataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data_unsorted,
@@ -209,7 +211,9 @@ namespace SmartPeak
     std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
     headers.insert(headers.end(), columns.begin(), columns.end());
 
-    // std::cout << rows;
+    std::cout << "size rows: " << rows.size() << std::endl;
+    for (const std::string& r : rows)
+      std::cout << r << ", ";
 
     // std::ofstream f;
     // f.open(filename);

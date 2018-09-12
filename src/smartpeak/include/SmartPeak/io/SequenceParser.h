@@ -13,6 +13,7 @@ namespace SmartPeak
 public:
     SequenceParser() = delete;
     ~SequenceParser() = delete;
+
     static void readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname);
 
     static void makeDataTableFromMetaValue(
@@ -42,8 +43,8 @@ public:
     static void write_dataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::vector<std::string>& meta_data_unsorted,
-      const std::set<MetaDataHandler::SampleType>& sample_types
+      const std::vector<std::string>& meta_data_unsorted = std::vector<std::string>({"calculated_concentration"}),
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
   };
 }
