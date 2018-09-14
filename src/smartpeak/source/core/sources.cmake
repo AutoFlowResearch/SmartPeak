@@ -6,6 +6,7 @@ set(sources_list
 	Helloworld.cpp
 	MetaDataHandler.cpp
 	RawDataHandler.cpp
+	RawDataHandlerProcessor.cpp
 	SampleGroupHandler.cpp
 	SampleHandler.cpp
 	SequenceHandler.cpp

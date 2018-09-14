@@ -2,6 +2,7 @@ set(core_executables_list
 	Helloworld_test
 	MetaDataHandler_test
 	RawDataHandler_test
+	RawDataHandlerProcessor_test
 	SampleGroupHandler_test
 	SampleHandler_test
 	SequenceHandler_test

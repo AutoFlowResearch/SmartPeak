@@ -166,4 +166,49 @@ namespace SmartPeak
   {
     return chromatogram_map_;
   }
+
+  void RawDataHandler::setTransformationDescription(const OpenMS::TransformationDescription& trafo)
+  {
+    trafo_ = trafo;
+  }
+
+  OpenMS::TransformationDescription& RawDataHandler::getTransformationDescription()
+  {
+    return trafo_;
+  }
+
+  OpenMS::TransformationDescription RawDataHandler::getTransformationDescription() const
+  {
+    return trafo_;
+  }
+
+  void RawDataHandler::setSWATH(const OpenMS::MSExperiment& swath)
+  {
+    swath_ = swath;
+  }
+
+  OpenMS::MSExperiment& RawDataHandler::getSWATH()
+  {
+    return swath_;
+  }
+
+  OpenMS::MSExperiment RawDataHandler::getSWATH() const
+  {
+    return swath_;
+  }
+
+  void RawDataHandler::setValidationMetrics(const std::map<std::string, float>& validation_metrics)
+  {
+    validation_metrics_ = validation_metrics;
+  }
+
+  std::map<std::string, float>& RawDataHandler::getValidationMetrics()
+  {
+    return validation_metrics_;
+  }
+
+  std::map<std::string, float> RawDataHandler::getValidationMetrics() const
+  {
+    return validation_metrics_;
+  }
 }

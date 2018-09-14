@@ -68,6 +68,18 @@ public:
     OpenMS::MSExperiment& getChromatogramMap();
     OpenMS::MSExperiment getChromatogramMap() const;
 
+    void setTransformationDescription(const OpenMS::TransformationDescription& trafo);
+    OpenMS::TransformationDescription& getTransformationDescription();
+    OpenMS::TransformationDescription getTransformationDescription() const;
+
+    void setSWATH(const OpenMS::MSExperiment& swath);
+    OpenMS::MSExperiment& getSWATH();
+    OpenMS::MSExperiment getSWATH() const;
+
+    void setValidationMetrics(const std::map<std::string, float>& validation_metrics);
+    std::map<std::string, float>& getValidationMetrics();
+    std::map<std::string, float> getValidationMetrics() const;
+
 private:
     // input
     OpenMS::MSExperiment experiment_;

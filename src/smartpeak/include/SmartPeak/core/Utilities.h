@@ -251,5 +251,11 @@ public:
     static void parseString(const std::string& str_I, CastValue& cast);
 
     static void parseList(const std::string& line, std::regex& re, CastValue& cast);
+
+    static void splitString(
+      const std::string& s,
+      const char sep,
+      std::vector<std::string>& out
+    );
   };
 }
