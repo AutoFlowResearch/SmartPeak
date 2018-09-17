@@ -80,6 +80,8 @@ public:
     std::map<std::string, float>& getValidationMetrics();
     std::map<std::string, float> getValidationMetrics() const;
 
+    void clear();
+
 private:
     // input
     OpenMS::MSExperiment experiment_;

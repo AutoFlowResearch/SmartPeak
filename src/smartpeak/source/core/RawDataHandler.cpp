@@ -211,4 +211,24 @@ namespace SmartPeak
   {
     return validation_metrics_;
   }
+
+  void RawDataHandler::clear()
+  {
+    experiment_.clear(true);
+    chromatogram_map_.clear(true);
+    trafo_.~TransformationDescription();
+    trafo_ = OpenMS::TransformationDescription();
+    swath_.clear(true);
+    feature_map_.clear(true);
+    meta_data_.clear();
+    validation_metrics_.clear();
+    feature_map_history_.clear();
+    parameters_.clear();
+    targeted_exp_.clear(true);
+    quantitation_methods_.clear();
+    feature_filter_.~MRMFeatureQC();
+    feature_filter_ = OpenMS::MRMFeatureQC();
+    feature_qc_.~MRMFeatureQC();
+    feature_qc_ = OpenMS::MRMFeatureQC();
+  }
 }

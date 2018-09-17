@@ -13,7 +13,13 @@ using namespace std;
 void load_data()
 {
   RawDataHandler rawDataHandler;
-  string filename_params = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_1_core.csv");
+  OpenMSFile::readRawDataProcessingParameters(
+    rawDataHandler,
+    SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_1_core.csv"),
+    ","
+  );
+  std::map<std::string, std::vector<std::map<std::string, std::string>>> params_1 = rawDataHandler.getParameters();
+  rawDataHandler.clear();
 }
 
 BOOST_AUTO_TEST_SUITE(rawdataprocessor)
