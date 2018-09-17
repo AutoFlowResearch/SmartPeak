@@ -20,58 +20,58 @@ namespace SmartPeak
   class RawDataHandlerProcessor
   {
 public:
-    RawDataHandlerProcessor() = default;
-    ~RawDataHandlerProcessor() = default;
+    RawDataHandlerProcessor() = delete;
+    ~RawDataHandlerProcessor() = delete;
 
-    void pickFeatures(
+    static void pickFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::vector<std::map<std::string, std::string>>& MRMFeatureFinderScoring_params_I,
       const bool verbose_I = false
     );
 
-    void filterFeatures(
+    static void filterFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::vector<std::map<std::string, std::string>>& MRMFeatureFilter_filter_params_I,
       const bool verbose_I = false
     );
 
-    void checkFeatures(
+    static void checkFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::vector<std::map<std::string, std::string>>& MRMFeatureFilter_qc_params_I,
       const bool verbose_I = false
     );
 
-    void selectFeatures(
+    static void selectFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::vector<std::map<std::string, std::string>>& MRMFeatureSelector_select_params_I,
       const std::vector<std::map<std::string, std::string>>& MRMFeatureSelector_schedule_params_I,
       const bool verbose_I = false
     );
 
-    void extractMetaData(
+    static void extractMetaData(
       RawDataHandler& rawDataHandler_IO,
       const bool verbose_I = false
     );
 
-    void validateFeatures(
+    static void validateFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::vector<std::map<std::string, std::string>>& MRMRFeatureValidator_params_I,
       const bool verbose_I = false
     );
 
-    void plotFeatures(
+    static void plotFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::string& filename,
       const std::vector<std::map<std::string, std::string>>& FeaturePlotter_params_I,
       const bool verbose_I = false
     );
 
-    void quantifyComponents(
+    static void quantifyComponents(
       RawDataHandler& rawDataHandler_IO,
       const bool verbose_I = false
     );
 
-    void processRawData(
+    static void processRawData(
       RawDataHandler& rawDataHandler_IO,
       const std::string& raw_data_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
@@ -79,21 +79,21 @@ public:
       const bool verbose_I = false
     );
 
-    bool checkRawDataProcessingWorkflow(
+    static bool checkRawDataProcessingWorkflow(
       const std::vector<std::string>& raw_data_processing_I
     );
 
-    void getDefaultRawDataProcessingWorkflow(
+    static void getDefaultRawDataProcessingWorkflow(
       const MetaDataHandler::SampleType sample_type,
       std::vector<std::string>& default_workflow
     );
 
-    void annotateUsedFeatures(
+    static void annotateUsedFeatures(
       RawDataHandler& rawDataHandler_IO,
       const bool verbose_I = false
     );
 
-    void saveCurrentFeatureMapToHistory(
+    static void saveCurrentFeatureMapToHistory(
       RawDataHandler& rawDataHandler_IO,
       const bool verbose_I = false
     );
