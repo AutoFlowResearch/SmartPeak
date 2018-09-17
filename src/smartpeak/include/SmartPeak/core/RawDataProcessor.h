@@ -17,11 +17,11 @@
 
 namespace SmartPeak
 {
-  class RawDataHandlerProcessor
+  class RawDataProcessor
   {
 public:
-    RawDataHandlerProcessor() = delete;
-    ~RawDataHandlerProcessor() = delete;
+    RawDataProcessor() = delete;
+    ~RawDataProcessor() = delete;
 
     static void pickFeatures(
       RawDataHandler& rawDataHandler_IO,

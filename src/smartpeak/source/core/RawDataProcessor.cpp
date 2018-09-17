@@ -1,6 +1,6 @@
 // TODO: Add copyright
 
-#include <SmartPeak/core/RawDataHandlerProcessor.h>
+#include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/io/OpenMSFile.h>
 #include <SmartPeak/core/Utilities.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
@@ -9,7 +9,7 @@
 
 namespace SmartPeak
 {
-  void RawDataHandlerProcessor::pickFeatures(
+  void RawDataProcessor::pickFeatures(
     RawDataHandler& rawDataHandler_IO,
     const std::vector<std::map<std::string, std::string>>& MRMFeatureFinderScoring_params_I,
     const bool verbose_I
@@ -39,7 +39,7 @@ namespace SmartPeak
     rawDataHandler_IO.setFeatureMap(featureMap);
   }
 
-  void RawDataHandlerProcessor::filterFeatures(
+  void RawDataProcessor::filterFeatures(
     RawDataHandler& rawDataHandler_IO,
     const std::vector<std::map<std::string, std::string>>& MRMFeatureFilter_filter_params_I,
     const bool verbose_I
@@ -72,7 +72,7 @@ namespace SmartPeak
     rawDataHandler_IO.setFeatureMap(featureMap);
   }
 
-  void RawDataHandlerProcessor::checkFeatures(
+  void RawDataProcessor::checkFeatures(
     RawDataHandler& rawDataHandler_IO,
     const std::vector<std::map<std::string, std::string>>& MRMFeatureFilter_qc_params_I,
     const bool verbose_I
@@ -105,7 +105,7 @@ namespace SmartPeak
     rawDataHandler_IO.setFeatureMap(featureMap);
   }
 
-  void RawDataHandlerProcessor::selectFeatures(
+  void RawDataProcessor::selectFeatures(
     RawDataHandler& rawDataHandler_IO,
     const std::vector<std::map<std::string, std::string>>& MRMFeatureSelector_select_params_I,
     const std::vector<std::map<std::string, std::string>>& MRMFeatureSelector_schedule_params_I,
@@ -141,7 +141,7 @@ namespace SmartPeak
     // featureMap.setFeatureMap(featureMap);
   }
 
-  void RawDataHandlerProcessor::extractMetaData(
+  void RawDataProcessor::extractMetaData(
     RawDataHandler& rawDataHandler_IO,
     const bool verbose_I
   )
@@ -181,7 +181,7 @@ namespace SmartPeak
     rawDataHandler_IO.getMetaData().setFilename(filename);
   }
 
-  void RawDataHandlerProcessor::validateFeatures(
+  void RawDataProcessor::validateFeatures(
     RawDataHandler& rawDataHandler_IO,
     const std::vector<std::map<std::string, std::string>>& MRMRFeatureValidator_params_I,
     const bool verbose_I
@@ -213,7 +213,7 @@ namespace SmartPeak
     // featureMap.setValidationMetrics(validation_metrics);
   }
 
-  void RawDataHandlerProcessor::plotFeatures(
+  void RawDataProcessor::plotFeatures(
     RawDataHandler& rawDataHandler_IO,
     const std::string& filename,
     const std::vector<std::map<std::string, std::string>>& FeaturePlotter_params_I,
@@ -238,7 +238,7 @@ namespace SmartPeak
     // );
   }
 
-  void RawDataHandlerProcessor::quantifyComponents(
+  void RawDataProcessor::quantifyComponents(
     RawDataHandler& rawDataHandler_IO,
     const bool verbose_I
   )
@@ -255,7 +255,7 @@ namespace SmartPeak
     }
   }
 
-  void RawDataHandlerProcessor::processRawData(
+  void RawDataProcessor::processRawData(
     RawDataHandler& rawDataHandler_IO,
     const std::string& raw_data_processing_event,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
@@ -354,7 +354,7 @@ namespace SmartPeak
     }
   }
 
-  bool RawDataHandlerProcessor::checkRawDataProcessingWorkflow(
+  bool RawDataProcessor::checkRawDataProcessingWorkflow(
     const std::vector<std::string>& raw_data_processing_I
   )
   {
@@ -383,7 +383,7 @@ namespace SmartPeak
     return is_valid;
   }
 
-  void RawDataHandlerProcessor::getDefaultRawDataProcessingWorkflow(
+  void RawDataProcessor::getDefaultRawDataProcessingWorkflow(
     const MetaDataHandler::SampleType sample_type,
     std::vector<std::string>& default_workflow
   )
@@ -412,7 +412,7 @@ namespace SmartPeak
     }
   }
 
-  void RawDataHandlerProcessor::annotateUsedFeatures(
+  void RawDataProcessor::annotateUsedFeatures(
     RawDataHandler& rawDataHandler_IO,
     const bool verbose_I
   )
@@ -442,7 +442,7 @@ namespace SmartPeak
     rawDataHandler_IO.setFeatureMap(features_annotated);
   }
 
-  void RawDataHandlerProcessor::saveCurrentFeatureMapToHistory(
+  void RawDataProcessor::saveCurrentFeatureMapToHistory(
     RawDataHandler& rawDataHandler_IO,
     const bool verbose_I
   )
