@@ -75,7 +75,7 @@ public:
       RawDataHandler& rawDataHandler_IO,
       const std::string& raw_data_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
-      const std::vector<std::string>& filenames,
+      const std::map<std::string, std::string>& filenames,
       const bool verbose_I = false
     );
 

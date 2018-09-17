@@ -303,12 +303,12 @@ namespace SmartPeak
     } else if (event == "validate_features") {
       std::vector<std::map<std::string, std::string>> params = parameters.at("ReferenceDataMethods.getAndProcess_referenceData_samples");
       const std::string sample_names_I = "['" + rawDataHandler_IO.getMetaData().getSampleName() + "']";
-      std::vector<std::map<std::string, std::string> ReferenceDataMethods_params_I = {
-        {"description", ""},
-        {"name", "sample_names_I"},
-        {"type", "list"},
-        {"value", sample_names_I}
-      });
+      // std::vector<std::map<std::string, std::string> ReferenceDataMethods_params_I = {
+      //   {"description", ""},
+      //   {"name", "sample_names_I"},
+      //   {"type", "list"},
+      //   {"value", sample_names_I}
+      // };
       // OpenMSFile::loadValidationData() not implemented
       validateFeatures(
         rawDataHandler_IO,
@@ -327,7 +327,7 @@ namespace SmartPeak
       OpenMSFile::storeFeatureMap(
         rawDataHandler_IO,
         filenames.at("featureXML_o"),
-        filenames.at("feature_csv_o"),
+        // filenames.at("feature_csv_o"),
         verbose_I
       );
     } else if (event == "plot_features") {
@@ -348,7 +348,7 @@ namespace SmartPeak
         verbose_I
       );
     } else if (event == "clear_feature_history") {
-      rawDataHandler_IO.setFeatureMapHistory(OpenMS::FeatureMap());
+      rawDataHandler_IO.getFeatureMapHistory().clear();
     } else {
       throw "Raw data processing event " + raw_data_processing_event + " was not recognized.";
     }
@@ -422,7 +422,7 @@ namespace SmartPeak
 
     OpenMS::FeatureMap features_annotated;
     for (OpenMS::Feature feature_copy : rawDataHandler_IO.getFeatureMapHistory().back()) {
-      OpenMS::FeatureMap subordinates_annotated;
+      std::vector<OpenMS::Feature> subordinates_annotated;
       for (OpenMS::Feature subordinate_copy : feature_copy.getSubordinates()) {
         subordinate_copy.setMetaValue("used_", "false");
         subordinates_annotated.push_back(subordinate_copy);
@@ -450,7 +450,7 @@ namespace SmartPeak
     if (verbose_I)
       std::cout << "Saving features" << std::endl;
 
-    std::vector<OpenMS::Feature> features_annotated;
+    OpenMS::FeatureMap features_annotated;
 
     for (OpenMS::Feature feature_copy : rawDataHandler_IO.getFeatureMap()) {
       std::vector<OpenMS::Feature> subordinates_annotated;
