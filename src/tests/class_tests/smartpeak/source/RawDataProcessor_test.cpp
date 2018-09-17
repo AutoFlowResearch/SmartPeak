@@ -4,7 +4,7 @@
 
 #define BOOST_TEST_MODULE RawDataHandler test suite
 #include <boost/test/included/unit_test.hpp>
-#include <SmartPeak/core/RawDataHandler.h>
+#include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/io/OpenMSFile.h>
 
 using namespace SmartPeak;
@@ -27,9 +27,37 @@ void load_data(
 
 BOOST_AUTO_TEST_SUITE(rawdataprocessor)
 
-BOOST_AUTO_TEST_CASE(pickFeatures)
+BOOST_AUTO_TEST_CASE(extractMetaData)
 {
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
 
+  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
+
+  const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  OpenMSFile::loadMSExperiment(rawDataHandler, mzML_i, params_1.at("MRMMapping"));
+
+  RawDataProcessor::extractMetaData(rawDataHandler);
+
+  string filename = rawDataHandler.getMetaData().getFilename();
+  filename = filename.substr(filename.find("src/tests"));
+  BOOST_CHECK_EQUAL(filename, "src/tests/class_tests/smartpeak/data/RawDataProcessor_mzML_1.mzML");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMetaData().getSampleName(), "150601_0_BloodProject01_PLT_QC_Broth-1");
 }
+
+// BOOST_AUTO_TEST_CASE(pickFeatures)
+// {
+//   map<string, vector<map<string, string>>> params_1;
+//   map<string, vector<map<string, string>>> params_2;
+//   const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+//   RawDataHandler rawDataHandler;
+//   OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
+//   const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+//   OpenMSFile::loadMSExperiment(rawDataHandler, mzML_i, params_1.at("MRMMapping"));
+//   // TODO: incomplete
+// }
 
 BOOST_AUTO_TEST_SUITE_END()

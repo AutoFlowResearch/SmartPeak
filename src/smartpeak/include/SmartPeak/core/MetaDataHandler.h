@@ -25,7 +25,7 @@ public:
       Unrecognized
     };
 
-    static const char* SampleTypeToString(const SampleType sample_type); // TODO: doesn't return a string, change name
+    static const char* SampleTypeToString(const SampleType sample_type); // TODO: doesn't return a string, fix name or return type
     static SampleType stringToSampleType(const std::string& sample_type);
 
     void setSampleName(const std::string& sample_name);

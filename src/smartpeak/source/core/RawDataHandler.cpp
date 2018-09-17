@@ -216,7 +216,6 @@ namespace SmartPeak
   {
     experiment_.clear(true);
     chromatogram_map_.clear(true);
-    trafo_.~TransformationDescription();
     trafo_ = OpenMS::TransformationDescription();
     swath_.clear(true);
     feature_map_.clear(true);
@@ -226,9 +225,7 @@ namespace SmartPeak
     parameters_.clear();
     targeted_exp_.clear(true);
     quantitation_methods_.clear();
-    feature_filter_.~MRMFeatureQC();
     feature_filter_ = OpenMS::MRMFeatureQC();
-    feature_qc_.~MRMFeatureQC();
     feature_qc_ = OpenMS::MRMFeatureQC();
   }
 }

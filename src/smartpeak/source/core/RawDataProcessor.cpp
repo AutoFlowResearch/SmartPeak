@@ -146,7 +146,6 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    // TODO: Should we rawDataHandler_IO.clear() ?
     if (verbose_I)
       std::cout << "Extracting metadata" << std::endl;
 
@@ -156,17 +155,21 @@ namespace SmartPeak
     // std::string software;
 
     const std::string loaded_file_path = rawDataHandler_IO.getChromatogramMap().getLoadedFilePath();
+
     if (loaded_file_path.size()) {
       const std::string prefix {"file://"};
       filename = !loaded_file_path.find(prefix) ? loaded_file_path.substr(prefix.size()) : loaded_file_path;
     }
 
     OpenMS::DataValue dv_mzml_id = rawDataHandler_IO.getChromatogramMap().getMetaValue("mzml_id");
+
     if (!dv_mzml_id.isEmpty() && dv_mzml_id.toString().size()) {
-      std::string samplename = dv_mzml_id.toString();
+      samplename = dv_mzml_id.toString();
       const size_t pos = samplename.find('-');
       if (pos != std::string::npos)
-        samplename = samplename.substr(pos);
+        samplename = samplename.substr(pos + 1);
+    } else {
+      throw "no sample name?\n";
     }
 
     // const OpenMS::String& instrument_name = rawDataHandler_IO.getChromatogramMap().getInstrument().getName();
