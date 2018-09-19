@@ -279,4 +279,65 @@ BOOST_AUTO_TEST_CASE(checkRawDataProcessingWorkflow)
   BOOST_CHECK_EQUAL(result2, false);
 }
 
+BOOST_AUTO_TEST_CASE(processRawData)
+{
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
+
+  const string featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  const string featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+
+  OpenMSFile::loadFeatureFilter(rawDataHandler, featureFilterComponents_csv_i, featureFilterComponentGroups_csv_i);
+
+  const string quantitationMethods_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv");
+  SequenceSegmentHandler sequenceSegmentHandler_IO;
+  OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler_IO, quantitationMethods_csv_i);
+  rawDataHandler.setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
+
+  OpenMSFile::loadFeatureQC(rawDataHandler, featureFilterComponents_csv_i, featureFilterComponentGroups_csv_i);
+
+  std::vector<std::string> raw_data_processing_events;
+
+  RawDataProcessor::getDefaultRawDataProcessingWorkflow(
+    MetaDataHandler::SampleType::Unknown,
+    raw_data_processing_events
+  );
+
+  const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  const std::map<std::string, std::string> filenames = {{"mzML_i", mzML_i}};
+
+  map<string, vector<map<string, string>>>::iterator it = params_1.find("ChromatogramExtractor");
+  if (it != params_1.end()) {
+    params_1.erase(it);
+  }
+  params_1.emplace("ChromatogramExtractor", vector<map<string, string>>());
+
+  for (const std::string& event : raw_data_processing_events) {
+    RawDataProcessor::processRawData(rawDataHandler, event, params_1, filenames);
+  }
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 9);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
+
+  const OpenMS::Feature& subordinate0 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate0.getMetaValue("peak_apex_int")), 646692.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate0.getMetaValue("native_id").toString(), "Hexose_Pool_fru_glc-D.Hexose_Pool_fru_glc-D_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate0.getRT()), 58.003782501697543, 1e-6);
+
+  const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[0].getSubordinates()[1];
+  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("QC_transition_pass").toString(), "1");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getMetaValue("calculated_concentration")), 3222.7753754156856, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("concentration_units").toString(), "uM");
+
+  const OpenMS::Feature& subordinate2 = rawDataHandler.getFeatureMap()[8].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate0.getMetaValue("peak_apex_int")), 646692.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate0.getMetaValue("native_id").toString(), "Hexose_Pool_fru_glc-D.Hexose_Pool_fru_glc-D_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate0.getRT()), 58.003782501697543, 1e-6);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
