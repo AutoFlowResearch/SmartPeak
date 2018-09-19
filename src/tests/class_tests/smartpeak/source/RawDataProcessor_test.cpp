@@ -2,7 +2,7 @@
 
 #include <SmartPeak/test_config.h>
 
-#define BOOST_TEST_MODULE RawDataHandler test suite
+#define BOOST_TEST_MODULE RawDataProcessor test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/io/OpenMSFile.h>
