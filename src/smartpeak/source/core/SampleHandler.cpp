@@ -7,7 +7,7 @@ namespace SmartPeak
   void SampleHandler::clear()
   {
     meta_data_.clear();
-    // raw_data_.clear(); // TODO: implement .clear() in RawDataHandler
+    raw_data_.clear();
   }
 
   void SampleHandler::setMetaData(const MetaDataHandler& meta_data)

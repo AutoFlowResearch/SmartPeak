@@ -86,8 +86,7 @@ BOOST_AUTO_TEST_CASE(clear)
   sampleHandler.clear();
 
   BOOST_CHECK_EQUAL(sampleHandler.getMetaData().getSampleName(), "");
-  // TODO: remove following line when clear() is fully implemented
-  // BOOST_CHECK_EQUAL(sampleHandler.getRawData().getFeatureMap().getIdentifier(), "");
+  BOOST_CHECK_EQUAL(sampleHandler.getRawData().getFeatureMap().getIdentifier(), "");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
