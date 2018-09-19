@@ -237,4 +237,34 @@ BOOST_AUTO_TEST_CASE(checkFeatures)
   BOOST_CHECK_EQUAL(sub.getMetaValue("QC_transition_pass").toString(), "1");
 }
 
+BOOST_AUTO_TEST_CASE(getDefaultRawDataProcessingWorkflow)
+{
+  std::vector<std::string> workflow;
+
+  RawDataProcessor::getDefaultRawDataProcessingWorkflow(
+    MetaDataHandler::SampleType::Unknown,
+    workflow
+  );
+
+  BOOST_CHECK_EQUAL(workflow.size(), 6);
+  BOOST_CHECK_EQUAL(workflow[0], "load_raw_data");
+  BOOST_CHECK_EQUAL(workflow[1], "pick_features");
+  BOOST_CHECK_EQUAL(workflow[2], "filter_features");
+  BOOST_CHECK_EQUAL(workflow[3], "select_features");
+  BOOST_CHECK_EQUAL(workflow[4], "quantify_features");
+  BOOST_CHECK_EQUAL(workflow[5], "check_features");
+
+  RawDataProcessor::getDefaultRawDataProcessingWorkflow(
+    MetaDataHandler::SampleType::DoubleBlank,
+    workflow
+  );
+
+  BOOST_CHECK_EQUAL(workflow.size(), 5);
+  BOOST_CHECK_EQUAL(workflow[0], "load_raw_data");
+  BOOST_CHECK_EQUAL(workflow[1], "pick_features");
+  BOOST_CHECK_EQUAL(workflow[2], "filter_features");
+  BOOST_CHECK_EQUAL(workflow[3], "select_features");
+  BOOST_CHECK_EQUAL(workflow[4], "check_features");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
