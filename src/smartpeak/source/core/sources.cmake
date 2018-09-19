@@ -11,6 +11,7 @@ set(sources_list
 	SampleHandler.cpp
 	SequenceHandler.cpp
 	SequenceSegmentHandler.cpp
+	SequenceSegmentProcessor.cpp
 	Utilities.cpp
 )
 

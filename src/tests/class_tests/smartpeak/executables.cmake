@@ -7,6 +7,7 @@ set(core_executables_list
 	SampleHandler_test
 	SequenceHandler_test
 	SequenceSegmentHandler_test
+	SequenceSegmentProcessor_test
 	Utilities_test
 )
 

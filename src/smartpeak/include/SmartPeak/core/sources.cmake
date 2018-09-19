@@ -11,6 +11,7 @@ set(sources_list_h
 	SampleHandler.h
 	SequenceHandler.h
 	SequenceSegmentHandler.h
+	SequenceSegmentProcessor.h
 	Utilities.h
 )
 
