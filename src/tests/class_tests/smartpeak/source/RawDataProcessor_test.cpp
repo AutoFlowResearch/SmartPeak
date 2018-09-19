@@ -267,4 +267,16 @@ BOOST_AUTO_TEST_CASE(getDefaultRawDataProcessingWorkflow)
   BOOST_CHECK_EQUAL(workflow[4], "check_features");
 }
 
+BOOST_AUTO_TEST_CASE(checkRawDataProcessingWorkflow)
+{
+  const std::vector<std::string> raw_data_processing1 = {"load_raw_data", "quantify_features"};
+  const std::vector<std::string> raw_data_processing2 = {"fake_event", "another_fake"};
+
+  const bool result1 = RawDataProcessor::checkRawDataProcessingWorkflow(raw_data_processing1);
+  const bool result2 = RawDataProcessor::checkRawDataProcessingWorkflow(raw_data_processing2);
+
+  BOOST_CHECK_EQUAL(result1, true);
+  BOOST_CHECK_EQUAL(result2, false);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

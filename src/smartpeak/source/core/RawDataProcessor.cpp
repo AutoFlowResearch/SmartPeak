@@ -361,7 +361,7 @@ namespace SmartPeak
     const std::vector<std::string>& raw_data_processing_I
   )
   {
-    std::set<std::string> valid_events = {
+    const std::set<std::string> valid_events = {
       "load_raw_data",
       "load_features",
       "pick_features",
