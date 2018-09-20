@@ -1,5 +1,12 @@
 // TODO: Add copyright
 
+#include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/core/MetaDataHandler.h>
+#include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/io/OpenMSFile.h>
+#include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
+#include <OpenMS/METADATA/AbsoluteQuantitationStandards.h>
+
 namespace SmartPeak
 {
   void SequenceSegmentProcessor::getSampleIndicesBySampleType(
@@ -28,7 +35,7 @@ namespace SmartPeak
       std::cout << "Optimizing calibrators." << std::endl;
     }
 
-    const std::vector<size_t> standards_indices;
+    std::vector<size_t> standards_indices;
 
     getSampleIndicesBySampleType(
       sequenceSegmentHandler_IO,
@@ -58,7 +65,7 @@ namespace SmartPeak
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
 
     for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods()) {
-      AbsoluteQuantitationStandards absoluteQuantitationStandards;
+      OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
 
       absoluteQuantitationStandards.getComponentFeatureConcentrations(
@@ -83,16 +90,12 @@ namespace SmartPeak
         feature_concentrations_pruned
       );
 
-      std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>::iterator it =
-        components_to_concentrations.find(row.getComponentName());
-      if (it != components_to_concentrations.end()) {
-        components_to_concentrations.erase(it);
-      }
-      components_to_concentrations.insert(row.getComponentName(), feature_concentrations_pruned);
+      components_to_concentrations.erase(row.getComponentName());
+      components_to_concentrations.insert({row.getComponentName(), feature_concentrations_pruned});
     }
 
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
-    sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantitationMethods);
+    sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
   }
 
   void SequenceSegmentProcessor::plotCalibrators(
@@ -108,16 +111,18 @@ namespace SmartPeak
     if (SequenceSegmentPlotter_params_I.empty() || calibrators_pdf_o.empty())
       throw std::invalid_argument("Parameters or filename are empty.");
 
-    SequenceSegmentPlotter sequenceSegmentPlotter;
-    sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
-    sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
+    // TODO: Uncomment when SequenceSegmentPlotter is implemented
+    throw "TODO: Implement SequenceSegmentPlotter.";
+    // SequenceSegmentPlotter sequenceSegmentPlotter;
+    // sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
+    // sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
   }
 
   void SequenceSegmentProcessor::processSequenceSegment(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const std::string& sequence_segment_processing_event,
-    const std::vector<std::map<std::string, std::string>>& parameters,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
     const std::map<std::string, std::string>& filenames,
     const bool verbose_I
   )
@@ -183,7 +188,7 @@ namespace SmartPeak
     }
   }
 
-  bool RawDataProcessor::checkRawDataProcessingWorkflow(
+  bool SequenceSegmentProcessor::checkRawDataProcessingWorkflow(
     const std::vector<std::string>& sequence_segment_processing
   )
   {
