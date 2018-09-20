@@ -121,4 +121,22 @@ namespace SmartPeak
       QC_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
     }
   }
+
+  void SequenceSegmentProcessor::plotCalibrators(
+    const SequenceSegmentHandler& sequenceSegmentHandler_I,
+    const std::string& calibrators_pdf_o,
+    const std::vector<std::map<std::string, std::string>>& SequenceSegmentPlotter_params_I,
+    const bool verbose_I
+  )
+  {
+    if (verbose_I)
+      std::cout << "Plotting calibrators." << std::endl;
+
+    if (SequenceSegmentPlotter_params_I.empty() || calibrators_pdf_o.empty())
+      throw std::invalid_argument("Parameters or filename are empty.");
+
+    SequenceSegmentPlotter sequenceSegmentPlotter;
+    sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
+    sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
+  }
 }
