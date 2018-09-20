@@ -152,4 +152,34 @@ namespace SmartPeak
       std::cerr << e.what();
     }
   }
+
+  void SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(
+    const MetaDataHandler::SampleType sample_type,
+    std::vector<std::string>& default_workflow
+  )
+  {
+    const std::vector<std::string> opt {
+      "calculate_calibration", // 0
+      "calculate_variability", // 1
+      "calculate_carryover"    // 2
+    };
+    switch (sample_type) {
+      case MetaDataHandler::SampleType::Unknown:
+      case MetaDataHandler::SampleType::Blank:
+      case MetaDataHandler::SampleType::DoubleBlank:
+        default_workflow.clear();
+        break;
+      case MetaDataHandler::SampleType::Standard:
+        default_workflow = { opt[0] };
+        break;
+      case MetaDataHandler::SampleType::QC:
+        default_workflow = { opt[1] };
+        break;
+      case MetaDataHandler::SampleType::Solvent:
+        default_workflow = { opt[2] };
+        break;
+      default:
+        throw "case not handled.";
+    }
+  }
 }
