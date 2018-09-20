@@ -31,4 +31,30 @@ BOOST_AUTO_TEST_CASE(checkSequenceSegmentProcessing)
   BOOST_CHECK_EQUAL(SequenceSegmentProcessor::checkSequenceSegmentProcessing(events2), false);
 }
 
+BOOST_AUTO_TEST_CASE(getDefaultSequenceSegmentProcessingWorkflow)
+{
+  std::vector<std::string> workflow;
+
+  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Unknown, workflow);
+  BOOST_CHECK_EQUAL(workflow.empty(), true);
+
+  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Standard, workflow);
+  BOOST_CHECK_EQUAL(workflow.size(), 1);
+  BOOST_CHECK_EQUAL(workflow[0], "calculate_calibration");
+
+  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::QC, workflow);
+  BOOST_CHECK_EQUAL(workflow.size(), 1);
+  BOOST_CHECK_EQUAL(workflow[0], "calculate_variability");
+
+  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Blank, workflow);
+  BOOST_CHECK_EQUAL(workflow.empty(), true);
+
+  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::DoubleBlank, workflow);
+  BOOST_CHECK_EQUAL(workflow.empty(), true);
+
+  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Solvent, workflow);
+  BOOST_CHECK_EQUAL(workflow.size(), 1);
+  BOOST_CHECK_EQUAL(workflow[0], "calculate_carryover");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
