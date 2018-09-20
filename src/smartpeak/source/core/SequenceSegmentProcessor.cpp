@@ -2,7 +2,7 @@
 
 namespace SmartPeak
 {
-  SequenceSegmentProcessor::getSampleIndicesBySampleType(
+  void SequenceSegmentProcessor::getSampleIndicesBySampleType(
     const SequenceSegmentHandler& sequenceSegmentHandler,
     const SequenceHandler& sequenceHandler,
     const MetaDataHandler::SampleType sampleType,
@@ -17,7 +17,7 @@ namespace SmartPeak
     }
   }
 
-  SequenceSegmentProcessor::optimizeCalibrationCurves(
+  void SequenceSegmentProcessor::optimizeCalibrationCurves(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const std::vector<std::map<std::string, std::string>>& AbsoluteQuantitation_params_I,
@@ -28,8 +28,13 @@ namespace SmartPeak
       std::cout << "Optimizing calibrators." << std::endl;
     }
 
-    const std::vector<size_t> standards_indices = getSampleIndicesBySampleType(
-      sequenceSegmentHandler_IO, sequenceHandler_I, MetaDataHandler::SampleType::Standard
+    const std::vector<size_t> standards_indices;
+
+    getSampleIndicesBySampleType(
+      sequenceSegmentHandler_IO,
+      sequenceHandler_I,
+      MetaDataHandler::SampleType::Standard,
+      standards_indices
     );
 
     if (standards_indices.empty())
@@ -88,5 +93,32 @@ namespace SmartPeak
 
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantitationMethods);
+  }
+
+  void SequenceSegmentProcessor::calculateVariance(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::vector<std::map<std::string, std::string>>& _params_I,
+    const bool verbose_I
+  )
+  {
+    if (verbose_I)
+      std::cout << "Calculating QCs." << std::endl;
+
+    const std::vector<size_t> QC_indices;
+
+    getSampleIndicesBySampleType(
+      sequenceSegmentHandler_IO,
+      sequenceHandler_I, MetaDataHandler::SampleType::QC,
+      QC_indices
+    );
+
+    if (QC_indices.empty())
+      return; // TODO[3]: or throw? print something?
+
+    std::vector<OpenMS::FeatureMap> QC_featureMaps;
+    for (const size_t index : QC_indices) {
+      QC_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+    }
   }
 }
