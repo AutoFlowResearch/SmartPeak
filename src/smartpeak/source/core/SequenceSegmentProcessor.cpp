@@ -182,4 +182,27 @@ namespace SmartPeak
         throw "case not handled.";
     }
   }
+
+  bool RawDataProcessor::checkRawDataProcessingWorkflow(
+    const std::vector<std::string>& sequence_segment_processing
+  )
+  {
+    const std::set<std::string> valid_events = {
+      "calculate_calibration",
+      "calculate_carryover",
+      "calculate_variability",
+      "store_quantitation_methods",
+      "load_quantitation_methods",
+      "store_components_to_concentrations",
+      "plot_calibrators"
+    };
+    bool is_valid = true;
+    for (const std::string& event : sequence_segment_processing) {
+      if (0 == valid_events.count(event)) {
+        std::cout << "Sequence group processing event '" << event << "' is not valid." << std::endl;
+        is_valid = false;
+      }
+    }
+    return is_valid;
+  }
 }
