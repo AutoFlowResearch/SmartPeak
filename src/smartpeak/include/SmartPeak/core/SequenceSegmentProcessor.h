@@ -49,7 +49,7 @@ public:
       std::vector<std::string>& default_workflow
     );
 
-    static bool checkRawDataProcessingWorkflow(
+    static bool checkSequenceSegmentProcessing(
       const std::vector<std::string>& sequence_segment_processing
     );
   };

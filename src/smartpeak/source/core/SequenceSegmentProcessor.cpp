@@ -188,7 +188,7 @@ namespace SmartPeak
     }
   }
 
-  bool SequenceSegmentProcessor::checkRawDataProcessingWorkflow(
+  bool SequenceSegmentProcessor::checkSequenceSegmentProcessing(
     const std::vector<std::string>& sequence_segment_processing
   )
   {
