@@ -38,7 +38,7 @@ public:
 
     static void processSequenceSegment(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
-      const SequenceHandler& sequenceHandler_I,
+      SequenceHandler& sequenceHandler_I,
       const std::string& sequence_segment_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
       const std::map<std::string, std::string>& filenames,

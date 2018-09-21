@@ -313,8 +313,6 @@ BOOST_AUTO_TEST_CASE(optimizeCalibrationCurves)
 
   sequenceSegmentHandler.setSampleIndices(indices);
 
-  // const std::vector<std::map<std::string, std::string>>& aq_params = absquant_params.at("AbsoluteQuantitation");
-
   SequenceSegmentProcessor::optimizeCalibrationCurves(
     sequenceSegmentHandler,
     sequenceHandler,
@@ -363,7 +361,92 @@ BOOST_AUTO_TEST_CASE(plotCalibrators)
 
 BOOST_AUTO_TEST_CASE(processSequenceSegment)
 {
-  // TODO: it simply calls other methods
+  const map<string, vector<map<string, string>>> absquant_params = {{"AbsoluteQuantitation", {
+    {
+      {"name", "min_points"},
+      {"value", "4"}
+    },
+    {
+      {"name", "max_bias"},
+      {"value", "30.0"}
+    },
+    {
+      {"name", "min_correlation_coefficient"},
+      {"value", "0.9"}
+    },
+    {
+      {"name", "max_iters"},
+      {"value", "100"}
+    },
+    {
+      {"name", "outlier_detection_method"},
+      {"value", "iter_jackknife"}
+    },
+    {
+      {"name", "use_chauvenet"},
+      {"value", "false"}
+    }
+  }}};
+
+  const string feature_name = "peak_apex_int";
+  const string transformation_model = "linear";
+  OpenMS::Param param;
+  param.setValue("slope", 1.0);
+  param.setValue("intercept", 0.0);
+  param.setValue("x_weight", "ln(x)");
+  param.setValue("y_weight", "ln(y)");
+  param.setValue("x_datum_min", -1e12);
+  param.setValue("x_datum_max", 1e12);
+  param.setValue("y_datum_min", -1e12);
+  param.setValue("y_datum_max", 1e12);
+
+  vector<OpenMS::AbsoluteQuantitationMethod> quant_methods;
+
+  OpenMS::AbsoluteQuantitationMethod aqm;
+  aqm.setComponentName("ser-L.ser-L_1.Light");
+  aqm.setISName("ser-L.ser-L_1.Heavy");
+  aqm.setFeatureName(feature_name);
+  aqm.setConcentrationUnits("uM");
+  aqm.setTransformationModel(transformation_model);
+  aqm.setTransformationModelParams(param);
+  quant_methods.push_back(aqm);
+
+  aqm.setComponentName("amp.amp_1.Light");
+  aqm.setISName("amp.amp_1.Heavy");
+  quant_methods.push_back(aqm);
+
+  aqm.setComponentName("atp.atp_1.Light");
+  aqm.setISName("atp.atp_1.Heavy");
+  quant_methods.push_back(aqm);
+
+  SequenceSegmentHandler sequenceSegmentHandler;
+
+  sequenceSegmentHandler.setQuantitationMethods(quant_methods);
+
+  vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> runs;
+  SequenceHandler sequenceHandler;
+  make_featuresAndStandardsConcentrations(sequenceHandler, runs);
+  sequenceSegmentHandler.setStandardsConcentrations(runs);
+
+  vector<size_t> indices(sequenceHandler.getSequence().size());
+  std::iota(indices.begin(), indices.end(), 0);
+
+  sequenceSegmentHandler.setSampleIndices(indices);
+
+  SequenceSegmentProcessor::processSequenceSegment(
+    sequenceSegmentHandler,
+    sequenceHandler,
+    "calculate_calibration",
+    absquant_params,
+    map<string, string>()
+  );
+
+  const std::vector<OpenMS::AbsoluteQuantitationMethod>& a = sequenceSegmentHandler.getQuantitationMethods();
+
+  for (const size_t index : sequenceSegmentHandler.getSampleIndices()) {
+    const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs = sequenceHandler.getSequence().at(index).getRawData().getQuantitationMethods();
+    BOOST_CHECK_EQUAL(AQMs.size(), a.size());
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

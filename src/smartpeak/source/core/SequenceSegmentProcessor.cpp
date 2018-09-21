@@ -120,7 +120,7 @@ namespace SmartPeak
 
   void SequenceSegmentProcessor::processSequenceSegment(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
-    const SequenceHandler& sequenceHandler_I,
+    SequenceHandler& sequenceHandler_I,
     const std::string& sequence_segment_processing_event,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
     const std::map<std::string, std::string>& filenames,
@@ -136,7 +136,10 @@ namespace SmartPeak
           verbose_I
         );
         for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices()) {
-          sequenceHandler_I.getSequence().at(index).getRawData()
+          sequenceHandler_I
+            .getSequence()
+            .at(index)
+            .getRawData()
             .setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
         }
       } else if (sequence_segment_processing_event == "store_quantitation_methods") {
