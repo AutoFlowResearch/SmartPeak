@@ -10,7 +10,8 @@ using namespace SmartPeak;
 using namespace std;
 
 void make_featuresAndStandardsConcentrations(
-  vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>
+  SequenceHandler& sequenceHandler_IO,
+  vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& runs
 )
 {
   // ser-L.ser-L_1.Light
@@ -92,12 +93,12 @@ void make_featuresAndStandardsConcentrations(
     runs.push_back(run);
 
     // # amp.amp_1.Light
-    component.setMetaValue("native_id", "amp.amp_1.Light")
-    component.setMetaValue("peak_apex_int", y2[i])
-    IS_component.setMetaValue("native_id", "amp.amp_1.Heavy")
-    IS_component.setMetaValue("peak_apex_int", x2[i])
-    mrm_feature.setSubordinates({component, IS_component})
-    feature_map.push_back(mrm_feature)
+    component.setMetaValue("native_id", "amp.amp_1.Light");
+    component.setMetaValue("peak_apex_int", y2[i]);
+    IS_component.setMetaValue("native_id", "amp.amp_1.Heavy");
+    IS_component.setMetaValue("peak_apex_int", x2[i]);
+    mrm_feature.setSubordinates({component, IS_component});
+    feature_map.push_back(mrm_feature);
 
     run.sample_name = sample_name;
     run.component_name = "amp.amp_1.Light";
@@ -133,7 +134,12 @@ void make_featuresAndStandardsConcentrations(
     meta_data.setSampleType(MetaDataHandler::SampleType::Standard);
     meta_data.setFilename("filename" + std::to_string(i));
     meta_data.setSequenceSegmentName("segment1");
-    //TODO: CONTINUE FROM HERE
+
+    sequenceHandler_IO.addSampleToSequence(meta_data, OpenMS::FeatureMap());
+
+    RawDataHandler rawDataHandler;
+    rawDataHandler.setFeatureMap(feature_map);
+    sequenceHandler_IO.getSequence().at(i).setRawData(rawDataHandler);
   }
 }
 
@@ -263,7 +269,7 @@ BOOST_AUTO_TEST_CASE(optimizeCalibrationCurves)
   }}};
 
   const string feature_name = "peak_apex_int";
-  const string transformation_model = "peak_apex_int";
+  const string transformation_model = "linear";
   OpenMS::Param param;
   param.setValue("slope", 1.0);
   param.setValue("intercept", 0.0);
@@ -293,10 +299,61 @@ BOOST_AUTO_TEST_CASE(optimizeCalibrationCurves)
   aqm.setISName("atp.atp_1.Heavy");
   quant_methods.push_back(aqm);
 
+  SequenceSegmentHandler sequenceSegmentHandler;
+
   sequenceSegmentHandler.setQuantitationMethods(quant_methods);
 
-  runs;
+  vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> runs;
+  SequenceHandler sequenceHandler;
+  make_featuresAndStandardsConcentrations(sequenceHandler, runs);
+  sequenceSegmentHandler.setStandardsConcentrations(runs);
 
+  vector<size_t> indices(sequenceHandler.getSequence().size());
+  std::iota(indices.begin(), indices.end(), 0);
+
+  sequenceSegmentHandler.setSampleIndices(indices);
+
+  // const std::vector<std::map<std::string, std::string>>& aq_params = absquant_params.at("AbsoluteQuantitation");
+
+  SequenceSegmentProcessor::optimizeCalibrationCurves(
+    sequenceSegmentHandler,
+    sequenceHandler,
+    absquant_params.at("AbsoluteQuantitation")
+  );
+
+  const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs = sequenceSegmentHandler.getQuantitationMethods();
+
+  BOOST_CHECK_EQUAL(AQMs.size(), 3);
+
+  BOOST_CHECK_EQUAL(AQMs[0].getComponentName(), "amp.amp_1.Light");
+  BOOST_CHECK_EQUAL(AQMs[0].getISName(), "amp.amp_1.Heavy");
+  BOOST_CHECK_EQUAL(AQMs[0].getFeatureName(), "peak_apex_int");
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("slope")), 0.957996830126945, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("intercept")), -1.0475433871941753, 1e-6);
+  BOOST_CHECK_EQUAL(AQMs[0].getNPoints(), 11);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getCorrelationCoefficient()), 0.9991692616730385, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getLLOQ()), 0.02, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getULOQ()), 40.0, 1e-6);
+
+  BOOST_CHECK_EQUAL(AQMs[1].getComponentName(), "atp.atp_1.Light");
+  BOOST_CHECK_EQUAL(AQMs[1].getISName(), "atp.atp_1.Heavy");
+  BOOST_CHECK_EQUAL(AQMs[1].getFeatureName(), "peak_apex_int");
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("slope")), 0.6230408240794582, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("intercept")), 0.36130172586029285, 1e-6);
+  BOOST_CHECK_EQUAL(AQMs[1].getNPoints(), 6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getCorrelationCoefficient()), 0.9982084021849695, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getLLOQ()), 0.02, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getULOQ()), 40.0, 1e-6);
+
+  BOOST_CHECK_EQUAL(AQMs[2].getComponentName(), "ser-L.ser-L_1.Light");
+  BOOST_CHECK_EQUAL(AQMs[2].getISName(), "ser-L.ser-L_1.Heavy");
+  BOOST_CHECK_EQUAL(AQMs[2].getFeatureName(), "peak_apex_int");
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("slope")), 0.9011392589148208, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("intercept")), 1.8701850759567624, 1e-6);
+  BOOST_CHECK_EQUAL(AQMs[2].getNPoints(), 11);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getCorrelationCoefficient()), 0.9993200722867581, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getLLOQ()), 0.04, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 200.0, 1e-6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

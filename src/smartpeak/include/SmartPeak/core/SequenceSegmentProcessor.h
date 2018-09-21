@@ -25,14 +25,14 @@ public:
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::vector<std::map<std::string, std::string>>& AbsoluteQuantitation_params_I,
-      const bool verbose_I
+      const bool verbose_I = false
     );
 
     static void plotCalibrators(
       const SequenceSegmentHandler& sequenceSegmentHandler_I,
       const std::string& calibrators_pdf_o,
       const std::vector<std::map<std::string, std::string>>& SequenceSegmentPlotter_params_I,
-      const bool verbose_I
+      const bool verbose_I = false
     );
 
     static void processSequenceSegment(
@@ -41,7 +41,7 @@ public:
       const std::string& sequence_segment_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
       const std::map<std::string, std::string>& filenames,
-      const bool verbose_I
+      const bool verbose_I = false
     );
 
     static void getDefaultSequenceSegmentProcessingWorkflow(
