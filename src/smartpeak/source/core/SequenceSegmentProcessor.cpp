@@ -98,25 +98,25 @@ namespace SmartPeak
     sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
   }
 
-  void SequenceSegmentProcessor::plotCalibrators(
-    const SequenceSegmentHandler& sequenceSegmentHandler_I,
-    const std::string& calibrators_pdf_o,
-    const std::vector<std::map<std::string, std::string>>& SequenceSegmentPlotter_params_I,
-    const bool verbose_I
-  )
-  {
-    if (verbose_I)
-      std::cout << "Plotting calibrators." << std::endl;
+  // void SequenceSegmentProcessor::plotCalibrators(
+  //   const SequenceSegmentHandler& sequenceSegmentHandler_I,
+  //   const std::string& calibrators_pdf_o,
+  //   const std::vector<std::map<std::string, std::string>>& SequenceSegmentPlotter_params_I,
+  //   const bool verbose_I
+  // )
+  // {
+  //   if (verbose_I)
+  //     std::cout << "Plotting calibrators." << std::endl;
 
-    if (SequenceSegmentPlotter_params_I.empty() || calibrators_pdf_o.empty())
-      throw std::invalid_argument("Parameters or filename are empty.");
+  //   if (SequenceSegmentPlotter_params_I.empty() || calibrators_pdf_o.empty())
+  //     throw std::invalid_argument("Parameters or filename are empty.");
 
-    // TODO: Uncomment when SequenceSegmentPlotter is implemented
-    throw "TODO: Implement SequenceSegmentPlotter.";
-    // SequenceSegmentPlotter sequenceSegmentPlotter;
-    // sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
-    // sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
-  }
+  //   // TODO: Uncomment when SequenceSegmentPlotter is implemented
+  //   throw "TODO: Implement SequenceSegmentPlotter.";
+  //   SequenceSegmentPlotter sequenceSegmentPlotter;
+  //   sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
+  //   sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
+  // }
 
   void SequenceSegmentProcessor::processSequenceSegment(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
@@ -143,15 +143,15 @@ namespace SmartPeak
         OpenMSFile::storeQuantitationMethods(sequenceSegmentHandler_IO, filenames.at("quantitationMethods_csv_o"), verbose_I);
       } else if (sequence_segment_processing_event == "load_quantitation_methods") {
         OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler_IO, filenames.at("quantitationMethods_csv_i"), verbose_I);
-      } else if (sequence_segment_processing_event == "plot_calibrators") {
+      } /* else if (sequence_segment_processing_event == "plot_calibrators") {
         plotCalibrators(
           sequenceSegmentHandler_IO,
           filenames.at("calibrators_pdf_o"),
           parameters.at("SequenceSegmentPlotter"),
           verbose_I
         );
-      } else {
-        std::cout << "Sequence group processing event " << sequence_segment_processing_event << " was not recognized." << std::endl;
+      } */ else {
+        std::cout << "Sequence group processing event '" << sequence_segment_processing_event << "' was not recognized." << std::endl;
       }
     } catch (const std::exception& e) {
       std::cerr << e.what();

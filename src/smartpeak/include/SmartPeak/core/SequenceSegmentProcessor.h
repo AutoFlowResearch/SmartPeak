@@ -28,12 +28,13 @@ public:
       const bool verbose_I = false
     );
 
-    static void plotCalibrators(
-      const SequenceSegmentHandler& sequenceSegmentHandler_I,
-      const std::string& calibrators_pdf_o,
-      const std::vector<std::map<std::string, std::string>>& SequenceSegmentPlotter_params_I,
-      const bool verbose_I = false
-    );
+    // TODO: Class SequenceSegmentPlotter is missing
+    // static void plotCalibrators(
+    //   const SequenceSegmentHandler& sequenceSegmentHandler_I,
+    //   const std::string& calibrators_pdf_o,
+    //   const std::vector<std::map<std::string, std::string>>& SequenceSegmentPlotter_params_I,
+    //   const bool verbose_I = false
+    // );
 
     static void processSequenceSegment(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,

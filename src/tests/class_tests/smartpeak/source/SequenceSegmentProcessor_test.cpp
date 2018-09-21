@@ -356,4 +356,14 @@ BOOST_AUTO_TEST_CASE(optimizeCalibrationCurves)
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 200.0, 1e-6);
 }
 
+BOOST_AUTO_TEST_CASE(plotCalibrators)
+{
+  // TODO: Implementation is incomplete in .cpp file
+}
+
+BOOST_AUTO_TEST_CASE(processSequenceSegment)
+{
+  // TODO: it simply calls other methods
+}
+
 BOOST_AUTO_TEST_SUITE_END()
