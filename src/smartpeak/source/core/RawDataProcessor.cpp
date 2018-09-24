@@ -296,7 +296,7 @@ namespace SmartPeak
         parameters.at("MRMFeatureFilter.filter_MRMFeatures"),
         verbose_I
       );
-    } else if (event == "select_features") {
+    } /*else if (event == "select_features") {
       selectFeatures(
         rawDataHandler_IO,
         parameters.at("MRMFeatureSelector.select_MRMFeatures_qmip"),
@@ -318,7 +318,7 @@ namespace SmartPeak
         parameters.at("MRMFeatureValidator.validate_MRMFeatures"),
         verbose_I
       );
-    } else if (event == "quantify_features") {
+    }*/ else if (event == "quantify_features") {
       quantifyComponents(rawDataHandler_IO, verbose_I);
     } else if (event == "check_features") {
       checkFeatures(

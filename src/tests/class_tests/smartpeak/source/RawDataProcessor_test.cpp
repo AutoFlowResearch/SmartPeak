@@ -314,6 +314,9 @@ BOOST_AUTO_TEST_CASE(processRawData)
   params_1.emplace("ChromatogramExtractor", vector<map<string, string>>());
 
   for (const std::string& event : raw_data_processing_events) {
+    // TODO: update if-condition when selectFeatures() and/or validateFeatures() is implemented
+    if (event == "select_features" || event == "validate_features")
+      continue;
     RawDataProcessor::processRawData(rawDataHandler, event, params_1, filenames);
   }
 
