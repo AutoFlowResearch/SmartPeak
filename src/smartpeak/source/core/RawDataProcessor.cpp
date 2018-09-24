@@ -16,7 +16,7 @@ namespace SmartPeak
   )
   {
     if (verbose_I)
-      std::cout << "Picking peaks using OpenSWATH" << std::endl;
+      std::cout << "Picking peaks using OpenSWATH." << std::endl;
 
     OpenMS::MRMFeatureFinderScoring featureFinder;
     OpenMS::Param parameters = featureFinder.getParameters();
