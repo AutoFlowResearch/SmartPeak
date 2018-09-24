@@ -335,20 +335,15 @@ BOOST_AUTO_TEST_CASE(processRawData)
   BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "35cgmp.35cgmp_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 628.59474989938735, 1e-6);
 
-  const OpenMS::Feature& subordinate3 = rawDataHandler.getFeatureMap()[49].getSubordinates()[0]; // THIS FAILS, IT IS FOUND AT [200][0]
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getMetaValue("peak_apex_int")), 198161.0, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate3.getMetaValue("native_id").toString(), "glutacon.glutacon_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getRT()), 752.7960037236212, 1e-6);
+  const OpenMS::Feature& subordinate3 = rawDataHandler.getFeatureMap()[49].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getMetaValue("peak_apex_int")), 53935.99999999999, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate3.getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getRT()), 733.9804012544155, 1e-6);
 
-  bool let_pass = true;
-  for (size_t i = 0; i < rawDataHandler.getFeatureMap().size() && let_pass; ++i) {
-    for (size_t j = 0; j < rawDataHandler.getFeatureMap()[i].getSubordinates().size(); ++j) {
-      if (rawDataHandler.getFeatureMap()[i].getSubordinates()[j].getMetaValue("native_id").toString() == "glutacon.glutacon_1.Heavy") {
-        std::cout << "FOUND AT I=" << i << " J=" << j << std::endl; // found at i=200 j=0
-        let_pass = false;
-      }
-    }
-  }
+  const OpenMS::Feature& subordinate4 = rawDataHandler.getFeatureMap()[200].getSubordinates()[0]; // this is [49][0] in python tests
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getMetaValue("peak_apex_int")), 198161.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate4.getMetaValue("native_id").toString(), "glutacon.glutacon_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getRT()), 752.7960037236212, 1e-6);
 }
 
 BOOST_AUTO_TEST_CASE(annotateUsedFeatures)
