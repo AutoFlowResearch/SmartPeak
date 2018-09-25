@@ -69,7 +69,6 @@ namespace SmartPeak
         sequence_segments_dict.emplace(sequence_segment_name, std::vector<size_t>());
       sequence_segments_dict.at(sequence_segment_name).push_back(i);
     }
-    sequence_segments;
     std::vector<SequenceSegmentHandler>& sequence_segments = sequenceHandler_IO.getSequenceSegments();
     sequence_segments.clear();
     for (const std::pair<std::string, std::vector<size_t>>& kv : sequence_segments_dict) {
@@ -77,6 +76,39 @@ namespace SmartPeak
       sequenceSegmentHandler.setSequenceSegmentName(kv.first);
       sequenceSegmentHandler.setSampleIndices(kv.second);
       sequence_segments.push_back(sequenceSegmentHandler);
+    }
+  }
+
+  void SequenceProcessor::processSequence(
+    SequenceHandler& sequenceHandler_IO,
+    const std::vector<std::string>& sample_names_I = std::vector<std::string>(),
+    const std::vector<std::string>& raw_data_processing_methods_I = std::vector<std::string>();
+    const SequenceSegmentHandler& sequenceSegmentHandler_I = SequenceSegmentHandler()
+  )
+  {
+    std::vector<SampleHandler> process_sequence;
+
+    if (sample_names_I.empty()) {
+      process_sequence = sequenceHandler_IO.getSequence();
+    } else {
+      sequenceHandler_IO.getSamplesInSequence(sample_names_I, process_sequence);
+    }
+
+    for (SampleHandler& sample : process_sequence) {
+      std::vector<std::string> raw_data_processing_methods;
+      if (raw_data_processing_methods_I.size()) {
+        raw_data_processing_methods = raw_data_processing_methods_I;
+      } else {
+        RawDataProcessor::getDefaultRawDataProcessingWorkflow(sample.getMetaData().getSampleType(), raw_data_processing_methods);
+      }
+      for (const std::string& event : raw_data_processing_methods) {
+        RawDataProcessor::processRawData(
+          sample.getRawData(),
+          event,
+          sample.getRawData().getParameters(),
+          sequenceHandler_IO.getDefaultDynamicFilenames(sequenceHandler_IO.getDirDynamic(), sample.getMetaData().getSampleName())
+        );
+      }
     }
   }
 }
