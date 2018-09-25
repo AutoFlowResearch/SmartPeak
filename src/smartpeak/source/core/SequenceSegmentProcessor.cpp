@@ -44,16 +44,20 @@ namespace SmartPeak
       standards_indices
     );
 
-    if (standards_indices.empty())
-      return; // TODO[1]: or throw? print something?
+    if (standards_indices.empty()) {
+      std::cout << "standards_indices argument is empty. Returning." << std::endl;
+      return;
+    }
 
     std::vector<OpenMS::FeatureMap> standards_featureMaps;
     for (const size_t index : standards_indices) {
       standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
     }
 
-    if (AbsoluteQuantitation_params_I.empty())
-      return;  // TODO[2]: or throw? print something?
+    if (AbsoluteQuantitation_params_I.empty()) {
+      std::cout << "AbsoluteQuantitation_params_I argument is empty. Returning." << std::endl;
+      return;
+    }
 
     OpenMS::AbsoluteQuantitation absoluteQuantitation;
     OpenMS::Param parameters = absoluteQuantitation.getParameters();

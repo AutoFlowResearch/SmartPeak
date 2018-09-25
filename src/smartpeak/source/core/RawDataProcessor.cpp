@@ -33,8 +33,7 @@ namespace SmartPeak
       rawDataHandler_IO.getSWATH()
     );
 
-    const OpenMS::StringList sl = {rawDataHandler_IO.getMetaData().getSampleName()};
-    featureMap.setPrimaryMSRunPath(sl);
+    featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
 
     rawDataHandler_IO.setFeatureMap(featureMap);
   }
@@ -50,7 +49,7 @@ namespace SmartPeak
 
     if (MRMFeatureFilter_filter_params_I.empty()) {
       std::cout << "No parameters passed to filterFeatures(). Not filtering." << std::endl;
-      throw;
+      return;
     }
 
     OpenMS::MRMFeatureFilter featureFilter;
@@ -66,9 +65,6 @@ namespace SmartPeak
       rawDataHandler_IO.getTargetedExperiment()
     );
 
-    const OpenMS::StringList sl = {rawDataHandler_IO.getMetaData().getSampleName()};
-    featureMap.setPrimaryMSRunPath(sl);
-
     rawDataHandler_IO.setFeatureMap(featureMap);
   }
 
@@ -83,7 +79,7 @@ namespace SmartPeak
 
     if (MRMFeatureFilter_qc_params_I.empty()) {
       std::cout << "No parameters passed to checkFeatures(). Not checking." << std::endl;
-      throw;
+      return;
     }
 
     OpenMS::MRMFeatureFilter featureFilter;
@@ -98,9 +94,6 @@ namespace SmartPeak
       rawDataHandler_IO.getFeatureQC(),
       rawDataHandler_IO.getTargetedExperiment()
     );
-
-    const OpenMS::StringList sl = {rawDataHandler_IO.getMetaData().getSampleName()};
-    featureMap.setPrimaryMSRunPath(sl);
 
     rawDataHandler_IO.setFeatureMap(featureMap);
   }
@@ -132,8 +125,7 @@ namespace SmartPeak
     //     rawDataHandler_IO.getFeatureMap(),
     //     MRMFeatureSelector_select_params_I
     //   );
-    //   const OpenMS::StringList sl = {rawDataHandler_IO.getMetaData().getSampleName()};
-    //   featureMap.setPrimaryMSRunPath(sl);
+    //   featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
     // } else {
     //   throw;
     // }
@@ -210,8 +202,7 @@ namespace SmartPeak
     //   validation_metrics
     // );
 
-    // const OpenMS::StringList sl = {rawDataHandler_IO.getMetaData().getSampleName()};
-    // mapped_features.setPrimaryMSRunPath();
+    // mapped_features.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
     // featureMap.setFeatureMap(mapped_features);
     // featureMap.setValidationMetrics(validation_metrics);
   }
@@ -229,7 +220,7 @@ namespace SmartPeak
     // TODO: Uncomment once FeaturePlotter is ready
 
     // if (FeaturePlotter_params_I.empty() || filename.empty())
-    //   throw;
+    //   return;
 
     // FeaturePlotter featurePlotter;
     // featurePlotter.setParameters(FeaturePlotter_params_I);
@@ -330,7 +321,6 @@ namespace SmartPeak
       OpenMSFile::storeFeatureMap(
         rawDataHandler_IO,
         filenames.at("featureXML_o"),
-        // filenames.at("feature_csv_o"),
         verbose_I
       );
     } else if (event == "plot_features") {
