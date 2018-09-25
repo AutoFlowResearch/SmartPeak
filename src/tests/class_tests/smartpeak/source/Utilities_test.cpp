@@ -17,9 +17,16 @@ BOOST_AUTO_TEST_CASE(castValue_constructor_copyConstructor)
 
   c = 7;
 
+  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::INT);
+  BOOST_CHECK_EQUAL(c.i_, 7);
+
   Utilities::CastValue c2 = c;
   BOOST_CHECK_EQUAL(c2.getTag(), Utilities::CastValue::INT);
   BOOST_CHECK_EQUAL(c2.i_, 7);
+
+  Utilities::CastValue c3(c);
+  BOOST_CHECK_EQUAL(c3.getTag(), Utilities::CastValue::INT);
+  BOOST_CHECK_EQUAL(c3.i_, 7);
 }
 
 BOOST_AUTO_TEST_CASE(castString)

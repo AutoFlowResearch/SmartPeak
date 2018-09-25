@@ -56,46 +56,55 @@ public:
           default:
             throw "Tag type not managed in copy constructor. Implement it.";
         }
+        return *this;
       }
 
       CastValue& operator=(const bool data)
       {
         setTagAndData(BOOL, data);
+        return *this;
       }
 
       CastValue& operator=(const float data)
       {
         setTagAndData(FLOAT, data);
+        return *this;
       }
 
       CastValue& operator=(const int data)
       {
         setTagAndData(INT, data);
+        return *this;
       }
 
       CastValue& operator=(const std::string& data)
       {
         setTagAndData(STRING, data);
+        return *this;
       }
 
       CastValue& operator=(const std::vector<bool>& data)
       {
         setTagAndData(BOOL_LIST, data);
+        return *this;
       }
 
       CastValue& operator=(const std::vector<float>& data)
       {
         setTagAndData(FLOAT_LIST, data);
+        return *this;
       }
 
       CastValue& operator=(const std::vector<int>& data)
       {
         setTagAndData(INT_LIST, data);
+        return *this;
       }
 
       CastValue& operator=(const std::vector<std::string>& data)
       {
         setTagAndData(STRING_LIST, data);
+        return *this;
       }
 
       ~CastValue()
@@ -251,5 +260,11 @@ public:
     static void parseString(const std::string& str_I, CastValue& cast);
 
     static void parseList(const std::string& line, std::regex& re, CastValue& cast);
+
+    static void splitString(
+      const std::string& s,
+      const char sep,
+      std::vector<std::string>& out
+    );
   };
 }

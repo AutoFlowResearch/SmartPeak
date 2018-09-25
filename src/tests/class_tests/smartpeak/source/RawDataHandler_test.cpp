@@ -236,19 +236,65 @@ BOOST_AUTO_TEST_CASE(set_get_ChromatogramMap)
   OpenMS::MSExperiment chromatogram_map;
   chromatogram_map.setMetaValue("name", "foo");
 
-  rawDataHandler.setExperiment(chromatogram_map);
+  rawDataHandler.setChromatogramMap(chromatogram_map);
 
-  const OpenMS::MSExperiment chromatogram_map2 = rawDataHandler.getExperiment(); // testing copy getter
+  const OpenMS::MSExperiment chromatogram_map2 = rawDataHandler.getChromatogramMap(); // testing copy getter
   BOOST_CHECK_EQUAL(chromatogram_map2.metaValueExists("name"), true);
   BOOST_CHECK_EQUAL(chromatogram_map2.getMetaValue("name"), "foo");
 
-  rawDataHandler.getExperiment().setMetaValue("name2", "bar"); // testing reference getter
+  rawDataHandler.getChromatogramMap().setMetaValue("name2", "bar"); // testing reference getter
 
-  const OpenMS::MSExperiment& chromatogram_map3 = rawDataHandler.getExperiment();
+  const OpenMS::MSExperiment& chromatogram_map3 = rawDataHandler.getChromatogramMap();
   BOOST_CHECK_EQUAL(chromatogram_map3.metaValueExists("name"), true);
   BOOST_CHECK_EQUAL(chromatogram_map3.getMetaValue("name"), "foo");
   BOOST_CHECK_EQUAL(chromatogram_map3.metaValueExists("name2"), true);
   BOOST_CHECK_EQUAL(chromatogram_map3.getMetaValue("name2"), "bar");
+}
+
+BOOST_AUTO_TEST_CASE(clear)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::FeatureMap f1;
+  f1.setMetaValue("name", "foo");
+  rawDataHandler.setFeatureMap(f1);
+
+  MetaDataHandler m1;
+  m1.setSampleName("foo");
+  rawDataHandler.setMetaData(m1);
+
+  OpenMS::AbsoluteQuantitationMethod aqm;
+  aqm.setComponentName("foo");
+  vector<OpenMS::AbsoluteQuantitationMethod> AQMs1 = { aqm };
+  rawDataHandler.setQuantitationMethods(AQMs1);
+
+  OpenMS::MRMFeatureQC::ComponentQCs qc;
+  qc.component_name = "foo";
+  OpenMS::MRMFeatureQC fqc1;
+  fqc1.component_qcs.push_back(qc);
+  rawDataHandler.setFeatureFilter(fqc1);
+
+  rawDataHandler.setFeatureQC(fqc1);
+
+  vector<OpenMS::FeatureMap> featureMap_v = { f1 };
+  rawDataHandler.setFeatureMapHistory(featureMap_v);
+
+  OpenMS::MSExperiment experiment;
+  experiment.setMetaValue("name", "foo");
+  rawDataHandler.setExperiment(experiment);
+
+  OpenMS::MSExperiment chromatogram_map;
+  chromatogram_map.setMetaValue("name", "foo");
+  rawDataHandler.setChromatogramMap(chromatogram_map);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMetaData().getSampleName(), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getQuantitationMethods().front().getComponentName(), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureFilter().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureQC().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().front().getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getExperiment().getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getChromatogramMap().getMetaValue("name"), "foo");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

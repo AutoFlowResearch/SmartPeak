@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(loadTraML)
   OpenMSFile::loadTraML(rawDataHandler, pathname, "csv");
   const std::vector<OpenMS::ReactionMonitoringTransition>& t = rawDataHandler.getTargetedExperiment().getTransitions();
 
-  BOOST_CHECK_EQUAL(t.size(), 20);
+  BOOST_CHECK_EQUAL(t.size(), 324);
 
   BOOST_CHECK_EQUAL(t[0].getPeptideRef(), "arg-L");
   BOOST_CHECK_CLOSE(t[0].getPrecursorMZ(), 179.0, 1e-6);

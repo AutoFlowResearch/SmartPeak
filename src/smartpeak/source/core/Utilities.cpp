@@ -275,4 +275,28 @@ namespace SmartPeak
       }
     }
   }
+
+  void Utilities::splitString(
+    const std::string& s,
+    const char sep,
+    std::vector<std::string>& out
+  )
+  {
+    out.clear();
+    size_t l, r;
+    l = r = 0;
+    size_t len = s.size();
+    while (r < len) {
+      if (s[r] == sep) {
+        if (r - l) {
+          out.emplace_back(s.substr(l, r - l));
+        }
+        l = r + 1;
+      }
+      ++r;
+    }
+    if (r != 0 && r - l) {
+      out.emplace_back(s.substr(l));
+    }
+  }
 }

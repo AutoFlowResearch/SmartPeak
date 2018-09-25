@@ -166,4 +166,66 @@ namespace SmartPeak
   {
     return chromatogram_map_;
   }
+
+  void RawDataHandler::setTransformationDescription(const OpenMS::TransformationDescription& trafo)
+  {
+    trafo_ = trafo;
+  }
+
+  OpenMS::TransformationDescription& RawDataHandler::getTransformationDescription()
+  {
+    return trafo_;
+  }
+
+  OpenMS::TransformationDescription RawDataHandler::getTransformationDescription() const
+  {
+    return trafo_;
+  }
+
+  void RawDataHandler::setSWATH(const OpenMS::MSExperiment& swath)
+  {
+    swath_ = swath;
+  }
+
+  OpenMS::MSExperiment& RawDataHandler::getSWATH()
+  {
+    return swath_;
+  }
+
+  OpenMS::MSExperiment RawDataHandler::getSWATH() const
+  {
+    return swath_;
+  }
+
+  void RawDataHandler::setValidationMetrics(const std::map<std::string, float>& validation_metrics)
+  {
+    validation_metrics_ = validation_metrics;
+  }
+
+  std::map<std::string, float>& RawDataHandler::getValidationMetrics()
+  {
+    return validation_metrics_;
+  }
+
+  std::map<std::string, float> RawDataHandler::getValidationMetrics() const
+  {
+    return validation_metrics_;
+  }
+
+  void RawDataHandler::clear()
+  {
+    experiment_.clear(true);
+    chromatogram_map_.clear(true);
+    trafo_ = OpenMS::TransformationDescription();
+    swath_.clear(true);
+    feature_map_.clear(true);
+    meta_data_.clear();
+    validation_metrics_.clear();
+    feature_map_history_.clear();
+    parameters_.clear();
+    targeted_exp_.clear(true);
+    quantitation_methods_.clear();
+    feature_filter_ = OpenMS::MRMFeatureQC();
+    feature_qc_ = OpenMS::MRMFeatureQC();
+  }
 }
