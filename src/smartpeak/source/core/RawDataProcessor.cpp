@@ -33,8 +33,7 @@ namespace SmartPeak
       rawDataHandler_IO.getSWATH()
     );
 
-    const OpenMS::StringList sl = {rawDataHandler_IO.getMetaData().getSampleName()};
-    featureMap.setPrimaryMSRunPath(sl);
+    featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
 
     rawDataHandler_IO.setFeatureMap(featureMap);
   }
@@ -126,8 +125,7 @@ namespace SmartPeak
     //     rawDataHandler_IO.getFeatureMap(),
     //     MRMFeatureSelector_select_params_I
     //   );
-    //   const OpenMS::StringList sl = {rawDataHandler_IO.getMetaData().getSampleName()};
-    //   featureMap.setPrimaryMSRunPath(sl);
+    //   featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
     // } else {
     //   throw;
     // }
@@ -204,8 +202,7 @@ namespace SmartPeak
     //   validation_metrics
     // );
 
-    // const OpenMS::StringList sl = {rawDataHandler_IO.getMetaData().getSampleName()};
-    // mapped_features.setPrimaryMSRunPath();
+    // mapped_features.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
     // featureMap.setFeatureMap(mapped_features);
     // featureMap.setValidationMetrics(validation_metrics);
   }
