@@ -21,6 +21,51 @@ BOOST_AUTO_TEST_CASE(addRawDataHandlerToSequence)
 
 BOOST_AUTO_TEST_CASE(segmentSamplesInSequence)
 {
+  MetaDataHandler meta_data1;
+  meta_data1.setFilename("file1");
+  meta_data1.setSampleName("sample1");
+  meta_data1.setSampleGroupName("sample");
+  meta_data1.setSequenceSegmentName("sequence_segment1");
+  meta_data1.setSampleType(MetaDataHandler::SampleType::Unknown);
+  OpenMS::FeatureMap featuremap1;
+
+  MetaDataHandler meta_data2;
+  meta_data2.setFilename("file2");
+  meta_data2.setSampleName("sample2");
+  meta_data2.setSampleGroupName("sample");
+  meta_data2.setSequenceSegmentName("sequence_segment1");
+  meta_data2.setSampleType(MetaDataHandler::SampleType::Standard);
+  OpenMS::FeatureMap featuremap2;
+
+  MetaDataHandler meta_data3;
+  meta_data3.setFilename("file3");
+  meta_data3.setSampleName("sample3");
+  meta_data3.setSampleGroupName("sample");
+  meta_data3.setSequenceSegmentName("sequence_segment2");
+  meta_data3.setSampleType(MetaDataHandler::SampleType::Unknown);
+  OpenMS::FeatureMap featuremap3;
+
+
+  SequenceHandler sequenceHandler;
+  sequenceHandler.addSampleToSequence(meta_data1, featuremap1);
+  sequenceHandler.addSampleToSequence(meta_data2, featuremap2);
+  sequenceHandler.addSampleToSequence(meta_data3, featuremap3);
+
+  OpenMS::AbsoluteQuantitationMethod aqm;
+  aqm.setComponentName("Test");
+  SequenceSegmentHandler sequenceSegmentHandler;
+  sequenceSegmentHandler.setQuantitationMethods({aqm});
+
+  SequenceProcessor::segmentSamplesInSequence(sequenceHandler, sequenceSegmentHandler);
+
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 2);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSampleIndices().size(), 2);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSampleIndices()[0], 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSampleIndices()[1], 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices().size(), 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices()[0], 2);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().front().getComponentName(), "Test");
 }
 
 BOOST_AUTO_TEST_CASE(processSequence)
