@@ -50,7 +50,7 @@ namespace SmartPeak
 
     if (MRMFeatureFilter_filter_params_I.empty()) {
       std::cout << "No parameters passed to filterFeatures(). Not filtering." << std::endl;
-      throw;
+      return;
     }
 
     OpenMS::MRMFeatureFilter featureFilter;
@@ -83,7 +83,7 @@ namespace SmartPeak
 
     if (MRMFeatureFilter_qc_params_I.empty()) {
       std::cout << "No parameters passed to checkFeatures(). Not checking." << std::endl;
-      throw;
+      return;
     }
 
     OpenMS::MRMFeatureFilter featureFilter;
@@ -330,7 +330,6 @@ namespace SmartPeak
       OpenMSFile::storeFeatureMap(
         rawDataHandler_IO,
         filenames.at("featureXML_o"),
-        // filenames.at("feature_csv_o"),
         verbose_I
       );
     } else if (event == "plot_features") {

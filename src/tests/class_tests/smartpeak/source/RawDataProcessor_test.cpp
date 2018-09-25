@@ -347,6 +347,8 @@ BOOST_AUTO_TEST_CASE(processRawData)
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getMetaValue("peak_apex_int")), 198161.0, 1e-6);
   BOOST_CHECK_EQUAL(subordinate4.getMetaValue("native_id").toString(), "glutacon.glutacon_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getRT()), 752.7960037236212, 1e-6);
+
+  // TODO: add more checks when MRMFeatureSelector is implemented
 }
 
 BOOST_AUTO_TEST_CASE(annotateUsedFeatures)
