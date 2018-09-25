@@ -66,9 +66,6 @@ namespace SmartPeak
       rawDataHandler_IO.getTargetedExperiment()
     );
 
-    const OpenMS::StringList sl = {rawDataHandler_IO.getMetaData().getSampleName()};
-    featureMap.setPrimaryMSRunPath(sl);
-
     rawDataHandler_IO.setFeatureMap(featureMap);
   }
 
@@ -98,9 +95,6 @@ namespace SmartPeak
       rawDataHandler_IO.getFeatureQC(),
       rawDataHandler_IO.getTargetedExperiment()
     );
-
-    const OpenMS::StringList sl = {rawDataHandler_IO.getMetaData().getSampleName()};
-    featureMap.setPrimaryMSRunPath(sl);
 
     rawDataHandler_IO.setFeatureMap(featureMap);
   }
@@ -229,7 +223,7 @@ namespace SmartPeak
     // TODO: Uncomment once FeaturePlotter is ready
 
     // if (FeaturePlotter_params_I.empty() || filename.empty())
-    //   throw;
+    //   return;
 
     // FeaturePlotter featurePlotter;
     // featurePlotter.setParameters(FeaturePlotter_params_I);
