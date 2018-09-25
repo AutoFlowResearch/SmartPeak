@@ -10,6 +10,7 @@ set(sources_list_h
 	SampleGroupHandler.h
 	SampleHandler.h
 	SequenceHandler.h
+	SequenceProcessor.h
 	SequenceSegmentHandler.h
 	SequenceSegmentProcessor.h
 	Utilities.h

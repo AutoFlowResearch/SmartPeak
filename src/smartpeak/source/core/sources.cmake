@@ -10,6 +10,7 @@ set(sources_list
 	SampleGroupHandler.cpp
 	SampleHandler.cpp
 	SequenceHandler.cpp
+	SequenceProcessor.cpp
 	SequenceSegmentHandler.cpp
 	SequenceSegmentProcessor.cpp
 	Utilities.cpp
