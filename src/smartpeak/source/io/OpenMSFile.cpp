@@ -216,7 +216,7 @@ namespace SmartPeak
       std::cout << "Loading feature_filter" << std::endl;
 
     if (filename_components.empty() || filename_components_groups.empty())
-      throw std::invalid_argument("filenames are both empty");
+      throw std::invalid_argument("Name of Feature filter components or Feature filter component groups is missing.");
 
     OpenMS::MRMFeatureQC featureQC;
     OpenMS::MRMFeatureQCFile featureQCFile;
