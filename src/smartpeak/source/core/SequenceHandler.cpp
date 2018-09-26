@@ -170,7 +170,10 @@ namespace SmartPeak
     sample_to_index_.emplace(sample_name, pos);
   }
 
-  void SequenceHandler::getSamplesInSequence(const std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const
+  void SequenceHandler::getSamplesInSequence(
+    const std::vector<std::string>& sample_names,
+    std::vector<SampleHandler>& samples
+  ) const
   {
     samples.clear();
 

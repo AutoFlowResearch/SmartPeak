@@ -88,10 +88,44 @@ BOOST_AUTO_TEST_CASE(getMetaValue)
   BOOST_CHECK_THROW(SequenceHandler::getMetaValue(feature, subordinate, "not_present", result), std::invalid_argument);
 }
 
-// BOOST_AUTO_TEST_CASE(PLEASE_REPLACE_ME)
-// {
-//   SequenceHandler sequenceHandler;
-// }
+BOOST_AUTO_TEST_CASE(getSamplesInSequence)
+{
+  MetaDataHandler meta_data1;
+  meta_data1.setFilename("file1");
+  meta_data1.setSampleName("sample1");
+  meta_data1.setSampleGroupName("sample");
+  meta_data1.setSequenceSegmentName("sequence_segment");
+  meta_data1.setSampleType(MetaDataHandler::SampleType::Unknown);
+
+  MetaDataHandler meta_data2;
+  meta_data2.setFilename("file2");
+  meta_data2.setSampleName("sample2");
+  meta_data2.setSampleGroupName("sample");
+  meta_data2.setSequenceSegmentName("sequence_segment");
+  meta_data2.setSampleType(MetaDataHandler::SampleType::Unknown);
+
+  MetaDataHandler meta_data3;
+  meta_data3.setFilename("file3");
+  meta_data3.setSampleName("sample3");
+  meta_data3.setSampleGroupName("sample");
+  meta_data3.setSequenceSegmentName("sequence_segment");
+  meta_data3.setSampleType(MetaDataHandler::SampleType::Unknown);
+
+  OpenMS::FeatureMap featuremap;
+
+  SequenceHandler sequenceHandler;
+  sequenceHandler.addSampleToSequence(meta_data1, featuremap);
+  sequenceHandler.addSampleToSequence(meta_data2, featuremap);
+  sequenceHandler.addSampleToSequence(meta_data3, featuremap);
+
+  const vector<string> sample_names = {"sample1", "foo", "sample3"};
+  std::vector<SampleHandler> samples;
+
+  sequenceHandler.getSamplesInSequence(sample_names, samples);
+  BOOST_CHECK_EQUAL(samples.size(), 2);
+  BOOST_CHECK_EQUAL(samples[0].getMetaData().getSampleName(), "sample1");
+  BOOST_CHECK_EQUAL(samples[1].getMetaData().getSampleName(), "sample3");
+}
 
 // BOOST_AUTO_TEST_CASE(PLEASE_REPLACE_ME)
 // {

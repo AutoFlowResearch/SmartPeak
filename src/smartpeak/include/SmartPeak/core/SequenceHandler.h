@@ -49,9 +49,15 @@ public:
       std::string& sample_name
     ) const;
 
-    void addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I);
+    void addSampleToSequence(
+      const MetaDataHandler& meta_data_I,
+      const OpenMS::FeatureMap& featureMap_I
+    );
 
-    void getSamplesInSequence(const std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const;
+    void getSamplesInSequence(
+      const std::vector<std::string>& sample_names,
+      std::vector<SampleHandler>& samples
+    ) const;
 
     static void getMetaValue(
       const OpenMS::Feature& feature,
