@@ -14,7 +14,7 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    const std::map<std::string, std::string>& filenames = sequenceHandler_IO.getFilenames();
+    const std::map<std::string, std::string> filenames = sequenceHandler_IO.getFilenames();
     SequenceSegmentHandler sequenceSegmentHandler;
     RawDataHandler rawDataHandler;
 
@@ -30,7 +30,7 @@ namespace SmartPeak
       OpenMSFile::loadFeatureFilter(
         rawDataHandler,
         filenames.at("featureFilterComponents_csv_i"),
-        filenames.at("featureFilterComponents_csv_i"),
+        filenames.at("featureFilterComponentGroups_csv_i"),
         verbose_I
       );
 

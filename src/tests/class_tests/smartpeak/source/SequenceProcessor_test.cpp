@@ -17,6 +17,48 @@ BOOST_AUTO_TEST_CASE(createSequence)
 
 BOOST_AUTO_TEST_CASE(addRawDataHandlerToSequence)
 {
+  MetaDataHandler meta_data1;
+  meta_data1.setFilename("file1");
+  meta_data1.setSampleName("sample1");
+  meta_data1.setSampleGroupName("sample");
+  meta_data1.setSequenceSegmentName("sequence_segment1");
+  meta_data1.setSampleType(MetaDataHandler::SampleType::Unknown);
+
+  MetaDataHandler meta_data2;
+  meta_data2.setFilename("file2");
+  meta_data2.setSampleName("sample2");
+  meta_data2.setSampleGroupName("sample");
+  meta_data2.setSequenceSegmentName("sequence_segment1");
+  meta_data2.setSampleType(MetaDataHandler::SampleType::Standard);
+
+  MetaDataHandler meta_data3;
+  meta_data3.setFilename("file3");
+  meta_data3.setSampleName("sample3");
+  meta_data3.setSampleGroupName("sample");
+  meta_data3.setSequenceSegmentName("sequence_segment2");
+  meta_data3.setSampleType(MetaDataHandler::SampleType::Unknown);
+
+  OpenMS::FeatureMap featuremap1;
+
+  SequenceHandler sequenceHandler;
+  sequenceHandler.addSampleToSequence(meta_data1, featuremap1);
+  sequenceHandler.addSampleToSequence(meta_data2, featuremap1);
+  sequenceHandler.addSampleToSequence(meta_data3, featuremap1);
+
+  RawDataHandler rawDataHandler;
+  OpenMS::FeatureMap featuremap2;
+  featuremap2.setMetaValue("foo", "bar");
+  rawDataHandler.setFeatureMap(featuremap2);
+
+  SequenceProcessor::addRawDataHandlerToSequence(sequenceHandler, rawDataHandler);
+
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 3);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureMap().metaValueExists("foo"), true);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureMap().getMetaValue("foo"), "bar");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().metaValueExists("foo"), true);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().getMetaValue("foo"), "bar");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMap().metaValueExists("foo"), true);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMap().getMetaValue("foo"), "bar");
 }
 
 BOOST_AUTO_TEST_CASE(segmentSamplesInSequence)
