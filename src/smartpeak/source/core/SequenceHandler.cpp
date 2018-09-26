@@ -131,10 +131,10 @@ namespace SmartPeak
 
   std::map<std::string, std::string> SequenceHandler::getDefaultDynamicFilenames(
     const std::string& dir,
-    std::string& sample_name
+    const std::string& sample_name
   ) const
   {
-    std::string features = dir + "/features/" + sample_name;
+    const std::string features = dir + "/features/" + sample_name;
     return {
       {"mzML_i", dir + "/mzML/" + sample_name + ".mzML"},
       {"featureXML_o", features + ".featureXML"},

@@ -46,7 +46,7 @@ public:
 
     std::map<std::string, std::string> getDefaultDynamicFilenames(
       const std::string& dir,
-      std::string& sample_name
+      const std::string& sample_name
     ) const;
 
     void addSampleToSequence(
