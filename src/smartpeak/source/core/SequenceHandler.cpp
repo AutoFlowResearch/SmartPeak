@@ -185,8 +185,8 @@ namespace SmartPeak
     const OpenMS::Feature& feature,
     const OpenMS::Feature& subordinate,
     const std::string& meta_value,
-    Utilities::CastValue cast
-  ) const
+    Utilities::CastValue& cast
+  )
   {
     cast.clear();
 
@@ -196,6 +196,8 @@ namespace SmartPeak
       cast = static_cast<float>(feature.getMetaValue(meta_value));
     } else if (subordinate.metaValueExists(meta_value) && !subordinate.getMetaValue(meta_value).isEmpty()) {
       cast = static_cast<float>(subordinate.getMetaValue(meta_value));
+    } else {
+      throw std::invalid_argument("meta_value \"" + meta_value + "\" not found.");
     }
   }
 }

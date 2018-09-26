@@ -53,12 +53,12 @@ public:
 
     void getSamplesInSequence(const std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const;
 
-    void getMetaValue(
+    static void getMetaValue(
       const OpenMS::Feature& feature,
       const OpenMS::Feature& subordinate,
       const std::string& meta_value,
-      Utilities::CastValue cast
-    ) const;
+      Utilities::CastValue& cast
+    );
 
     std::map<size_t, std::string> index_to_sample_;
     std::map<std::string, size_t> sample_to_index_;

@@ -70,10 +70,23 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
 }
 
-// BOOST_AUTO_TEST_CASE(PLEASE_REPLACE_ME)
-// {
-//   SequenceHandler sequenceHandler;
-// }
+BOOST_AUTO_TEST_CASE(getMetaValue)
+{
+  SequenceHandler sequenceHandler;
+  OpenMS::Feature feature;
+  feature.setRT(16.0);
+  OpenMS::Feature subordinate;
+  subordinate.setMetaValue("calculated_concentration", 10.0);
+
+  Utilities::CastValue result;
+  SequenceHandler::getMetaValue(feature, subordinate, "RT", result);
+  BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
+  BOOST_CHECK_CLOSE(result.f_, 16.0, 1e-6);
+  SequenceHandler::getMetaValue(feature, subordinate, "calculated_concentration", result);
+  BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
+  BOOST_CHECK_CLOSE(result.f_, 10.0, 1e-6);
+  BOOST_CHECK_THROW(SequenceHandler::getMetaValue(feature, subordinate, "not_present", result), std::invalid_argument);
+}
 
 // BOOST_AUTO_TEST_CASE(PLEASE_REPLACE_ME)
 // {
