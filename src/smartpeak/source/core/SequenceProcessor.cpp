@@ -69,10 +69,11 @@ namespace SmartPeak
   )
   {
     const std::vector<SampleHandler>& sequence = sequenceHandler_IO.getSequence();
+
     std::map<std::string, std::vector<size_t>> sequence_segments_dict;
 
     for (size_t i = 0; i < sequence.size(); ++i) {
-      const std::string& sequence_segment_name = sequence[i].getMetaData().getSequenceSegmentName();
+      const std::string sequence_segment_name = sequence[i].getMetaData().getSequenceSegmentName();
       if (0 == sequence_segments_dict.count(sequence_segment_name))
         sequence_segments_dict.emplace(sequence_segment_name, std::vector<size_t>());
       sequence_segments_dict.at(sequence_segment_name).push_back(i);

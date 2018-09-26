@@ -147,9 +147,13 @@ namespace SmartPeak
     };
   }
 
-  void SequenceHandler::addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I)
+  void SequenceHandler::addSampleToSequence(
+    const MetaDataHandler& meta_data_I,
+    const OpenMS::FeatureMap& featureMap_I
+  )
   {
-    MetaDataHandler::validateMetaData(meta_data_I);
+    if (!MetaDataHandler::validateMetaData(meta_data_I))
+      throw std::invalid_argument("Metadata argument is not valid.");
 
     RawDataHandler rdh;
     rdh.setFeatureMap(featureMap_I);

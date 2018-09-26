@@ -27,7 +27,6 @@ BOOST_AUTO_TEST_CASE(segmentSamplesInSequence)
   meta_data1.setSampleGroupName("sample");
   meta_data1.setSequenceSegmentName("sequence_segment1");
   meta_data1.setSampleType(MetaDataHandler::SampleType::Unknown);
-  OpenMS::FeatureMap featuremap1;
 
   MetaDataHandler meta_data2;
   meta_data2.setFilename("file2");
@@ -35,7 +34,6 @@ BOOST_AUTO_TEST_CASE(segmentSamplesInSequence)
   meta_data2.setSampleGroupName("sample");
   meta_data2.setSequenceSegmentName("sequence_segment1");
   meta_data2.setSampleType(MetaDataHandler::SampleType::Standard);
-  OpenMS::FeatureMap featuremap2;
 
   MetaDataHandler meta_data3;
   meta_data3.setFilename("file3");
@@ -43,13 +41,13 @@ BOOST_AUTO_TEST_CASE(segmentSamplesInSequence)
   meta_data3.setSampleGroupName("sample");
   meta_data3.setSequenceSegmentName("sequence_segment2");
   meta_data3.setSampleType(MetaDataHandler::SampleType::Unknown);
-  OpenMS::FeatureMap featuremap3;
 
+  OpenMS::FeatureMap featuremap;
 
   SequenceHandler sequenceHandler;
-  sequenceHandler.addSampleToSequence(meta_data1, featuremap1);
-  sequenceHandler.addSampleToSequence(meta_data2, featuremap2);
-  sequenceHandler.addSampleToSequence(meta_data3, featuremap3);
+  sequenceHandler.addSampleToSequence(meta_data1, featuremap);
+  sequenceHandler.addSampleToSequence(meta_data2, featuremap);
+  sequenceHandler.addSampleToSequence(meta_data3, featuremap);
 
   OpenMS::AbsoluteQuantitationMethod aqm;
   aqm.setComponentName("Test");
@@ -65,7 +63,7 @@ BOOST_AUTO_TEST_CASE(segmentSamplesInSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices().size(), 1);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices()[0], 2);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 1);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().front().getComponentName(), "Test");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "Test");
 }
 
 BOOST_AUTO_TEST_CASE(processSequence)

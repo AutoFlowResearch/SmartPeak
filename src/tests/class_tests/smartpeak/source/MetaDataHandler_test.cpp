@@ -36,16 +36,16 @@ BOOST_AUTO_TEST_CASE(getters_setters)
   BOOST_CHECK_EQUAL(metaDataHandler.getFilename(), "");
 
   // test setters
-  metaDataHandler.setSampleName("1");
-  metaDataHandler.setSampleGroupName("2");
+  metaDataHandler.setSampleName("this is a sample name");
+  metaDataHandler.setSampleGroupName("this is a sample GROUP name");
   metaDataHandler.setSampleType(MetaDataHandler::SampleType::QC);
-  metaDataHandler.setSequenceSegmentName("4");
-  metaDataHandler.setFilename("5");
-  BOOST_CHECK_EQUAL(metaDataHandler.getSampleName(), "1");
-  BOOST_CHECK_EQUAL(metaDataHandler.getSampleGroupName(), "2");
+  metaDataHandler.setSequenceSegmentName("this is a SEQUENCE segment name");
+  metaDataHandler.setFilename("some filename");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSampleName(), "this is a sample name");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSampleGroupName(), "this is a sample GROUP name");
   BOOST_CHECK_EQUAL((int)metaDataHandler.getSampleType(), (int)MetaDataHandler::SampleType::QC);
-  BOOST_CHECK_EQUAL(metaDataHandler.getSequenceSegmentName(), "4");
-  BOOST_CHECK_EQUAL(metaDataHandler.getFilename(), "5");
+  BOOST_CHECK_EQUAL(metaDataHandler.getSequenceSegmentName(), "this is a SEQUENCE segment name");
+  BOOST_CHECK_EQUAL(metaDataHandler.getFilename(), "some filename");
 }
 
 BOOST_AUTO_TEST_CASE(validateMetaData)

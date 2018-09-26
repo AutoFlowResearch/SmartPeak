@@ -13,6 +13,10 @@ namespace SmartPeak
 public:
     MetaDataHandler() = default;
     ~MetaDataHandler() = default;
+    MetaDataHandler(const MetaDataHandler&) = default;
+    MetaDataHandler& operator=(const MetaDataHandler&) = default;
+    MetaDataHandler(MetaDataHandler&&) = default;
+    MetaDataHandler& operator=(MetaDataHandler&&) = default;
 
     enum SampleType
     {

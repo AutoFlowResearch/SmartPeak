@@ -15,6 +15,10 @@ namespace SmartPeak
 public:
     SequenceHandler() = default;
     ~SequenceHandler() = default;
+    SequenceHandler(const SequenceHandler&) = default;
+    SequenceHandler& operator=(const SequenceHandler&) = default;
+    SequenceHandler(SequenceHandler&&) = default;
+    SequenceHandler& operator=(SequenceHandler&&) = default;
 
     void clear();
 
