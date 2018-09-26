@@ -60,10 +60,10 @@ public:
       Utilities::CastValue cast
     ) const;
 
-private:
-    std::vector<SampleHandler> sequence_;
     std::map<size_t, std::string> index_to_sample_;
     std::map<std::string, size_t> sample_to_index_;
+private:
+    std::vector<SampleHandler> sequence_;
     std::vector<SequenceSegmentHandler> sequence_segments_;
     std::vector<SampleGroupHandler> sample_groups_;
 

@@ -159,10 +159,15 @@ namespace SmartPeak
     sh.setRawData(rdh);
 
     sequence_.push_back(sh);
-    index_to_sample_.erase(sequence_.size() - 1);
-    index_to_sample_.emplace(sequence_.size() - 1, meta_data_I.getSampleName());
-    sample_to_index_.erase(meta_data_I.getSampleName());
-    sample_to_index_.emplace(meta_data_I.getSampleName(), sequence_.size() - 1);
+
+    const size_t pos = sequence_.size() - 1;
+    const std::string& sample_name = meta_data_I.getSampleName();
+
+    index_to_sample_.erase(pos);
+    index_to_sample_.emplace(pos, sample_name);
+
+    sample_to_index_.erase(sample_name);
+    sample_to_index_.emplace(sample_name, pos);
   }
 
   void SequenceHandler::getSamplesInSequence(const std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const
