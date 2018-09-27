@@ -5,6 +5,7 @@ set(directory include/SmartPeak/core)
 set(sources_list_h
 	Helloworld.h
 	MetaDataHandler.h
+	MRMFeatureValidator.h
 	RawDataHandler.h
 	RawDataProcessor.h
 	SampleGroupHandler.h
