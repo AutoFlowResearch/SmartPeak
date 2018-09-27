@@ -1,6 +1,6 @@
 // TODO: Add copyright
 
-// #include <SmartPeak/test_config.h>
+#include <SmartPeak/test_config.h>
 
 #define BOOST_TEST_MODULE SequenceProcessor test suite
 #include <boost/test/included/unit_test.hpp>
@@ -13,6 +13,35 @@ BOOST_AUTO_TEST_SUITE(sequenceprocessor)
 
 BOOST_AUTO_TEST_CASE(createSequence)
 {
+  const map<string,string> filenames = {
+    {"sequence_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1.csv")},
+    {"parameters_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_1_core.csv")},
+    {"traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv")},
+    {"featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv")},
+    {"featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv")},
+    {"featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv")},
+    {"featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv")},
+    {"quantitationMethods_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv")},
+    {"standardsConcentrations_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv")}
+  };
+  SequenceHandler sequenceHandler;
+  sequenceHandler.setFilenames(filenames);
+  SequenceProcessor::createSequence(sequenceHandler, ",");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
+  const SampleHandler& sample = sequenceHandler.getSequence()[0];
+  BOOST_CHECK_EQUAL(sample.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(sample.getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(sample.getRawData().getTargetedExperiment().getTransitions().size(), 324);
+  BOOST_CHECK_EQUAL(sample.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
+  BOOST_CHECK_EQUAL(sample.getRawData().getFeatureFilter().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(sample.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(sample.getRawData().getFeatureQC().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(sample.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(sample.getRawData().getQuantitationMethods().size(), 107);
+  BOOST_CHECK_EQUAL(sample.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 107);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
 }
 
 BOOST_AUTO_TEST_CASE(addRawDataHandlerToSequence)
