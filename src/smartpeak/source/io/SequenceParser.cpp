@@ -20,6 +20,7 @@ namespace SmartPeak
 
     io::CSVReader<5, io::trim_chars<>, io::no_quote_escape<','>> in_comma(pathname);
     io::CSVReader<5, io::trim_chars<>, io::no_quote_escape<';'>> in_semicolon(pathname);
+    io::CSVReader<5, io::trim_chars<>, io::no_quote_escape<'\t'>> in_tab(pathname);
 
     if (delimiter == ",") {
       in_comma.read_header(
@@ -39,6 +40,17 @@ namespace SmartPeak
         s_sample_type,
         s_filename
       );
+    } else if (delimiter == "\t") {
+      in_tab.read_header(
+        io::ignore_extra_column,
+        s_sample_name,
+        s_sample_group_name,
+        s_sequence_segment_name,
+        s_sample_type,
+        s_filename
+      );
+    } else {
+      throw std::invalid_argument("Delimiter \"" + delimiter + "\" is not supported.");
     }
 
     std::string sample_name;
@@ -53,6 +65,8 @@ namespace SmartPeak
         is_valid = in_comma.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, filename);
       else if (delimiter == ";")
         is_valid = in_semicolon.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, filename);
+      else if (delimiter == "\t")
+        is_valid = in_tab.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, filename);
       if (!is_valid)
         break;
       MetaDataHandler mdh;
