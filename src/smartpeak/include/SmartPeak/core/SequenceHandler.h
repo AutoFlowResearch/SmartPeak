@@ -58,16 +58,14 @@ public:
       const OpenMS::FeatureMap& featureMap_I
     );
 
-    void getSamplesInSequence(
-      const std::vector<std::string>& sample_names,
-      std::vector<SampleHandler>& samples
+    std::vector<SampleHandler> getSamplesInSequence(
+      const std::vector<std::string>& sample_names
     ) const;
 
-    static void getMetaValue(
+    static Utilities::CastValue getMetaValue(
       const OpenMS::Feature& feature,
       const OpenMS::Feature& subordinate,
-      const std::string& meta_value,
-      Utilities::CastValue& cast
+      const std::string& meta_value
     );
 
     std::map<size_t, std::string> index_to_sample_;

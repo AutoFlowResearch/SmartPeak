@@ -94,8 +94,7 @@ namespace SmartPeak
           row.emplace("component_group_name", component_group_name);
           row.emplace("component_name", subordinate.getMetaValue("native_id").toString());
           for (const std::string& meta_value_name : meta_data) {
-            Utilities::CastValue datum;
-            sequenceHandler.getMetaValue(feature, subordinate, meta_value_name, datum);
+            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
             if (datum.getTag() == Utilities::CastValue::FLOAT)
               row.emplace(meta_value_name, std::to_string(datum.f_)); // TODO: please compare this with code in SequenceWriter.py
           }
@@ -187,8 +186,8 @@ namespace SmartPeak
             // std::cout << "subordinate is not empty and is not false" << std::endl;
             const std::string row_tuple_name = component_group_name + "_" + subordinate.getMetaValue("native_id").toString() + "_" + meta_value_name;
             // std::cout << "makeDataMatrixFromMetaValue(): row_tuple_name: " << row_tuple_name << std::endl;
-            Utilities::CastValue datum;
-            sequenceHandler.getMetaValue(feature, subordinate, meta_value_name, datum); // TODO: please compare this with code in SequenceWriter.py IT is assumed that datum is present and valid
+            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            // TODO: please compare this with code in SequenceWriter.py IT is assumed that datum is present and valid
             if (datum.getTag() == Utilities::CastValue::FLOAT) {
               // std::cout << "makeDataMatrixFromMetaValue(): datum: " << datum.f_ << std::endl;
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);

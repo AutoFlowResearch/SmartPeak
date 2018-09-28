@@ -79,13 +79,13 @@ BOOST_AUTO_TEST_CASE(getMetaValue)
   subordinate.setMetaValue("calculated_concentration", 10.0);
 
   Utilities::CastValue result;
-  SequenceHandler::getMetaValue(feature, subordinate, "RT", result);
+  result = SequenceHandler::getMetaValue(feature, subordinate, "RT");
   BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
   BOOST_CHECK_CLOSE(result.f_, 16.0, 1e-6);
-  SequenceHandler::getMetaValue(feature, subordinate, "calculated_concentration", result);
+  result = SequenceHandler::getMetaValue(feature, subordinate, "calculated_concentration");
   BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
   BOOST_CHECK_CLOSE(result.f_, 10.0, 1e-6);
-  BOOST_CHECK_THROW(SequenceHandler::getMetaValue(feature, subordinate, "not_present", result), std::invalid_argument);
+  BOOST_CHECK_THROW(SequenceHandler::getMetaValue(feature, subordinate, "not_present"), std::invalid_argument);
 }
 
 BOOST_AUTO_TEST_CASE(getSamplesInSequence)
@@ -119,9 +119,9 @@ BOOST_AUTO_TEST_CASE(getSamplesInSequence)
   sequenceHandler.addSampleToSequence(meta_data3, featuremap);
 
   const vector<string> sample_names = {"sample1", "foo", "sample3"};
-  std::vector<SampleHandler> samples;
 
-  sequenceHandler.getSamplesInSequence(sample_names, samples);
+  const std::vector<SampleHandler> samples = sequenceHandler.getSamplesInSequence(sample_names);
+
   BOOST_CHECK_EQUAL(samples.size(), 2);
   BOOST_CHECK_EQUAL(samples[0].getMetaData().getSampleName(), "sample1");
   BOOST_CHECK_EQUAL(samples[1].getMetaData().getSampleName(), "sample3");

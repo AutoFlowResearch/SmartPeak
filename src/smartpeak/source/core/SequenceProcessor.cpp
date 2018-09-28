@@ -102,7 +102,7 @@ namespace SmartPeak
     if (sample_names_I.empty()) {
       process_sequence = sequenceHandler_IO.getSequence();
     } else {
-      sequenceHandler_IO.getSamplesInSequence(sample_names_I, process_sequence);
+      process_sequence = sequenceHandler_IO.getSamplesInSequence(sample_names_I);
     }
 
     for (SampleHandler& sample : process_sequence) {
