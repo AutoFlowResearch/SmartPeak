@@ -130,6 +130,8 @@ namespace SmartPeak
         );
       }
     }
+
+    sequenceHandler_IO.setSequence(process_sequence);
   }
 
   void SequenceProcessor::processSequenceSegments(
@@ -183,5 +185,7 @@ namespace SmartPeak
         );
       }
     }
+
+    sequenceHandler_IO.setSequenceSegments(sequence_segments);
   }
 }
