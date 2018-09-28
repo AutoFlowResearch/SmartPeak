@@ -21,7 +21,7 @@ namespace SmartPeak
     if (filenames.empty()) {
       std::cout << "No filenames in provided SequenceHandler." << std::endl;
     } else {
-      SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.at("sequence_csv_i")); // TODO: should this support delimiter as in python?
+      SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.at("sequence_csv_i"), delimiter);
 
       OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.at("parameters_csv_i"), delimiter);
 

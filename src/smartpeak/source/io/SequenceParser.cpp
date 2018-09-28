@@ -10,7 +10,7 @@
 
 namespace SmartPeak
 {
-  void SequenceParser::readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname)
+  void SequenceParser::readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname, const std::string& delimiter)
   {
     const std::string s_sample_name {"sample_name"};
     const std::string s_sample_group_name {"sample_group_name"};
@@ -18,21 +18,28 @@ namespace SmartPeak
     const std::string s_sample_type {"sample_type"};
     const std::string s_filename {"filename"};
 
-    io::CSVReader<
-      5,
-      io::trim_chars<' ', '\t'>,
-      io::no_quote_escape<','>, // io::no_quote_escape<','>, // io::double_quote_escape<',', '\"'>,
-      io::no_comment // io::single_line_comment<'#'>
-    > in(pathname);
+    io::CSVReader<5, io::trim_chars<>, io::no_quote_escape<','>> in_comma(pathname);
+    io::CSVReader<5, io::trim_chars<>, io::no_quote_escape<';'>> in_semicolon(pathname);
 
-    in.read_header(
-      io::ignore_extra_column, // io::ignore_extra_column | io::ignore_missing_column
-      s_sample_name,
-      s_sample_group_name,
-      s_sequence_segment_name,
-      s_sample_type,
-      s_filename
-    );
+    if (delimiter == ",") {
+      in_comma.read_header(
+        io::ignore_extra_column,
+        s_sample_name,
+        s_sample_group_name,
+        s_sequence_segment_name,
+        s_sample_type,
+        s_filename
+      );
+    } else if (delimiter == ";") {
+      in_semicolon.read_header(
+        io::ignore_extra_column,
+        s_sample_name,
+        s_sample_group_name,
+        s_sequence_segment_name,
+        s_sample_type,
+        s_filename
+      );
+    }
 
     std::string sample_name;
     std::string sample_group_name;
@@ -40,9 +47,14 @@ namespace SmartPeak
     std::string sample_type;
     std::string filename;
 
-    std::vector<SampleHandler> sequence;
-
-    while (in.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, filename)) {
+    while (true) {
+      bool is_valid = false;
+      if (delimiter == ",")
+        is_valid = in_comma.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, filename);
+      else if (delimiter == ";")
+        is_valid = in_semicolon.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, filename);
+      if (!is_valid)
+        break;
       MetaDataHandler mdh;
       mdh.setSampleName(sample_name);
       mdh.setSampleGroupName(sample_group_name);

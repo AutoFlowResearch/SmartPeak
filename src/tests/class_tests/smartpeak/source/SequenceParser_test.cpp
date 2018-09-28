@@ -15,21 +15,37 @@ BOOST_AUTO_TEST_SUITE(sequenceparser)
 
 BOOST_AUTO_TEST_CASE(readSequenceFile)
 {
-  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1.csv");
+  string pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1.csv");
   SequenceHandler sequenceHandler;
-  SequenceParser::readSequenceFile(sequenceHandler, pathname);
-  vector<SampleHandler>& sequence = sequenceHandler.getSequence();
-  BOOST_CHECK_EQUAL(sequence.size(), 6);
-  BOOST_CHECK_EQUAL(sequence[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(sequence[0].getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sequence[0].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence[0].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
-  BOOST_CHECK_EQUAL(sequence[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
-  BOOST_CHECK_EQUAL(sequence[5].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(sequence[5].getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sequence[5].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence[5].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
-  BOOST_CHECK_EQUAL(sequence[5].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  SequenceParser::readSequenceFile(sequenceHandler, pathname, ",");
+  vector<SampleHandler>& sequence1 = sequenceHandler.getSequence();
+  BOOST_CHECK_EQUAL(sequence1.size(), 6);
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSequenceSegmentName(), "Group01");
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
+  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().getSequenceSegmentName(), "Group01");
+  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+
+  sequenceHandler.clear();
+  pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_semicolon.csv");
+  SequenceParser::readSequenceFile(sequenceHandler, pathname, ";");
+  vector<SampleHandler>& sequence2 = sequenceHandler.getSequence();
+  BOOST_CHECK_EQUAL(sequence2.size(), 6);
+  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSequenceSegmentName(), "Group01");
+  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  BOOST_CHECK_EQUAL(sequence2[5].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
+  BOOST_CHECK_EQUAL(sequence2[5].getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(sequence2[5].getMetaData().getSequenceSegmentName(), "Group01");
+  BOOST_CHECK_EQUAL(sequence2[5].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence2[5].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
 }
 
 // BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
