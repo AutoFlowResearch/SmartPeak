@@ -1,0 +1,7 @@
+sample_name	sample_group_name	sequence_segment_name	sample_type	filename
+170808_Jonathan_yeast_Sacc1_1x	Test01	Group01	Unknown	/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML
+170808_Jonathan_yeast_Sacc2_1x	Test01	Group01	Unknown	/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML
+170808_Jonathan_yeast_Sacc3_1x	Test01	Group01	Unknown	/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML
+170808_Jonathan_yeast_Yarr1_1x	Test01	Group01	Unknown	/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML
+170808_Jonathan_yeast_Yarr2_1x	Test01	Group01	Unknown	/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML
+170808_Jonathan_yeast_Yarr3_1x	Test01	Group01	Unknown	/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML

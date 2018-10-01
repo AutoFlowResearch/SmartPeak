@@ -15,6 +15,10 @@ namespace SmartPeak
 public:
     SequenceHandler() = default;
     ~SequenceHandler() = default;
+    SequenceHandler(const SequenceHandler&) = default;
+    SequenceHandler& operator=(const SequenceHandler&) = default;
+    SequenceHandler(SequenceHandler&&) = default;
+    SequenceHandler& operator=(SequenceHandler&&) = default;
 
     void clear();
 
@@ -46,24 +50,28 @@ public:
 
     std::map<std::string, std::string> getDefaultDynamicFilenames(
       const std::string& dir,
-      std::string& sample_name
+      const std::string& sample_name
     ) const;
 
-    void addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I);
+    void addSampleToSequence(
+      const MetaDataHandler& meta_data_I,
+      const OpenMS::FeatureMap& featureMap_I
+    );
 
-    void getSamplesInSequence(const std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const;
+    std::vector<SampleHandler> getSamplesInSequence(
+      const std::vector<std::string>& sample_names
+    ) const;
 
-    void getMetaValue(
+    static Utilities::CastValue getMetaValue(
       const OpenMS::Feature& feature,
       const OpenMS::Feature& subordinate,
-      const std::string& meta_value,
-      Utilities::CastValue cast
-    ) const;
+      const std::string& meta_value
+    );
 
-private:
-    std::vector<SampleHandler> sequence_;
     std::map<size_t, std::string> index_to_sample_;
     std::map<std::string, size_t> sample_to_index_;
+private:
+    std::vector<SampleHandler> sequence_;
     std::vector<SequenceSegmentHandler> sequence_segments_;
     std::vector<SampleGroupHandler> sample_groups_;
 

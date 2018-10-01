@@ -10,7 +10,7 @@
 
 namespace SmartPeak
 {
-  void SequenceParser::readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname)
+  void SequenceParser::readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname, const std::string& delimiter)
   {
     const std::string s_sample_name {"sample_name"};
     const std::string s_sample_group_name {"sample_group_name"};
@@ -18,21 +18,40 @@ namespace SmartPeak
     const std::string s_sample_type {"sample_type"};
     const std::string s_filename {"filename"};
 
-    io::CSVReader<
-      5,
-      io::trim_chars<' ', '\t'>,
-      io::no_quote_escape<','>, // io::no_quote_escape<','>, // io::double_quote_escape<',', '\"'>,
-      io::no_comment // io::single_line_comment<'#'>
-    > in(pathname);
+    io::CSVReader<5, io::trim_chars<>, io::no_quote_escape<','>> in_comma(pathname);
+    io::CSVReader<5, io::trim_chars<>, io::no_quote_escape<';'>> in_semicolon(pathname);
+    io::CSVReader<5, io::trim_chars<>, io::no_quote_escape<'\t'>> in_tab(pathname);
 
-    in.read_header(
-      io::ignore_extra_column, // io::ignore_extra_column | io::ignore_missing_column
-      s_sample_name,
-      s_sample_group_name,
-      s_sequence_segment_name,
-      s_sample_type,
-      s_filename
-    );
+    if (delimiter == ",") {
+      in_comma.read_header(
+        io::ignore_extra_column,
+        s_sample_name,
+        s_sample_group_name,
+        s_sequence_segment_name,
+        s_sample_type,
+        s_filename
+      );
+    } else if (delimiter == ";") {
+      in_semicolon.read_header(
+        io::ignore_extra_column,
+        s_sample_name,
+        s_sample_group_name,
+        s_sequence_segment_name,
+        s_sample_type,
+        s_filename
+      );
+    } else if (delimiter == "\t") {
+      in_tab.read_header(
+        io::ignore_extra_column,
+        s_sample_name,
+        s_sample_group_name,
+        s_sequence_segment_name,
+        s_sample_type,
+        s_filename
+      );
+    } else {
+      throw std::invalid_argument("Delimiter \"" + delimiter + "\" is not supported.");
+    }
 
     std::string sample_name;
     std::string sample_group_name;
@@ -40,9 +59,16 @@ namespace SmartPeak
     std::string sample_type;
     std::string filename;
 
-    std::vector<SampleHandler> sequence;
-
-    while (in.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, filename)) {
+    while (true) {
+      bool is_valid = false;
+      if (delimiter == ",")
+        is_valid = in_comma.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, filename);
+      else if (delimiter == ";")
+        is_valid = in_semicolon.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, filename);
+      else if (delimiter == "\t")
+        is_valid = in_tab.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, filename);
+      if (!is_valid)
+        break;
       MetaDataHandler mdh;
       mdh.setSampleName(sample_name);
       mdh.setSampleGroupName(sample_group_name);
@@ -82,8 +108,7 @@ namespace SmartPeak
           row.emplace("component_group_name", component_group_name);
           row.emplace("component_name", subordinate.getMetaValue("native_id").toString());
           for (const std::string& meta_value_name : meta_data) {
-            Utilities::CastValue datum;
-            sequenceHandler.getMetaValue(feature, subordinate, meta_value_name, datum);
+            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
             if (datum.getTag() == Utilities::CastValue::FLOAT)
               row.emplace(meta_value_name, std::to_string(datum.f_)); // TODO: please compare this with code in SequenceWriter.py
           }
@@ -175,8 +200,8 @@ namespace SmartPeak
             // std::cout << "subordinate is not empty and is not false" << std::endl;
             const std::string row_tuple_name = component_group_name + "_" + subordinate.getMetaValue("native_id").toString() + "_" + meta_value_name;
             // std::cout << "makeDataMatrixFromMetaValue(): row_tuple_name: " << row_tuple_name << std::endl;
-            Utilities::CastValue datum;
-            sequenceHandler.getMetaValue(feature, subordinate, meta_value_name, datum); // TODO: please compare this with code in SequenceWriter.py IT is assumed that datum is present and valid
+            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            // TODO: please compare this with code in SequenceWriter.py IT is assumed that datum is present and valid
             if (datum.getTag() == Utilities::CastValue::FLOAT) {
               // std::cout << "makeDataMatrixFromMetaValue(): datum: " << datum.f_ << std::endl;
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);

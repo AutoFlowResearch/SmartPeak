@@ -124,7 +124,7 @@ namespace SmartPeak
 
   void SequenceSegmentProcessor::processSequenceSegment(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
-    SequenceHandler& sequenceHandler_I,
+    SequenceHandler& sequenceHandler_IO,
     const std::string& sequence_segment_processing_event,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
     const std::map<std::string, std::string>& filenames,
@@ -135,12 +135,12 @@ namespace SmartPeak
       if (sequence_segment_processing_event == "calculate_calibration") {
         optimizeCalibrationCurves(
           sequenceSegmentHandler_IO,
-          sequenceHandler_I,
+          sequenceHandler_IO,
           parameters.at("AbsoluteQuantitation"),
           verbose_I
         );
         for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices()) {
-          sequenceHandler_I
+          sequenceHandler_IO
             .getSequence()
             .at(index)
             .getRawData()
@@ -158,7 +158,7 @@ namespace SmartPeak
           verbose_I
         );
       } */ else {
-        std::cout << "Sequence group processing event '" << sequence_segment_processing_event << "' was not recognized." << std::endl;
+        throw std::invalid_argument("Sequence group processing event \"" + sequence_segment_processing_event + "\" was not recognized.\n");
       }
     } catch (const std::exception& e) {
       std::cerr << e.what();

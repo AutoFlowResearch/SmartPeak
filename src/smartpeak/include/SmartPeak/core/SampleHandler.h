@@ -12,6 +12,10 @@ namespace SmartPeak
 public:
     SampleHandler() = default;
     ~SampleHandler() = default;
+    SampleHandler(const SampleHandler&) = default;
+    SampleHandler& operator=(const SampleHandler&) = default;
+    SampleHandler(SampleHandler&&) = default;
+    SampleHandler& operator=(SampleHandler&&) = default;
 
     void clear();
 

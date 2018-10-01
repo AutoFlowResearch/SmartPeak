@@ -131,10 +131,10 @@ namespace SmartPeak
 
   std::map<std::string, std::string> SequenceHandler::getDefaultDynamicFilenames(
     const std::string& dir,
-    std::string& sample_name
+    const std::string& sample_name
   ) const
   {
-    std::string features = dir + "/features/" + sample_name;
+    const std::string features = dir + "/features/" + sample_name;
     return {
       {"mzML_i", dir + "/mzML/" + sample_name + ".mzML"},
       {"featureXML_o", features + ".featureXML"},
@@ -147,9 +147,13 @@ namespace SmartPeak
     };
   }
 
-  void SequenceHandler::addSampleToSequence(const MetaDataHandler& meta_data_I, const OpenMS::FeatureMap& featureMap_I)
+  void SequenceHandler::addSampleToSequence(
+    const MetaDataHandler& meta_data_I,
+    const OpenMS::FeatureMap& featureMap_I
+  )
   {
-    MetaDataHandler::validateMetaData(meta_data_I);
+    if (!MetaDataHandler::validateMetaData(meta_data_I))
+      throw std::invalid_argument("Metadata argument is not valid.");
 
     RawDataHandler rdh;
     rdh.setFeatureMap(featureMap_I);
@@ -159,31 +163,39 @@ namespace SmartPeak
     sh.setRawData(rdh);
 
     sequence_.push_back(sh);
-    index_to_sample_.erase(sequence_.size() - 1);
-    index_to_sample_.emplace(sequence_.size() - 1, meta_data_I.getSampleName());
-    sample_to_index_.erase(meta_data_I.getSampleName());
-    sample_to_index_.emplace(meta_data_I.getSampleName(), sequence_.size() - 1);
+
+    const size_t pos = sequence_.size() - 1;
+    const std::string& sample_name = meta_data_I.getSampleName();
+
+    index_to_sample_.erase(pos);
+    index_to_sample_.emplace(pos, sample_name);
+
+    sample_to_index_.erase(sample_name);
+    sample_to_index_.emplace(sample_name, pos);
   }
 
-  void SequenceHandler::getSamplesInSequence(const std::vector<std::string>& sample_names, std::vector<SampleHandler>& samples) const
+  std::vector<SampleHandler> SequenceHandler::getSamplesInSequence(
+    const std::vector<std::string>& sample_names
+  ) const
   {
-    samples.clear();
+    std::vector<SampleHandler> samples;
 
     for (const std::string& name : sample_names) {
       if (sample_to_index_.count(name)) {
         samples.push_back(sequence_[sample_to_index_.at(name)]);
       }
     }
+
+    return samples;
   }
 
-  void SequenceHandler::getMetaValue(
+  Utilities::CastValue SequenceHandler::getMetaValue(
     const OpenMS::Feature& feature,
     const OpenMS::Feature& subordinate,
-    const std::string& meta_value,
-    Utilities::CastValue cast
-  ) const
+    const std::string& meta_value
+  )
   {
-    cast.clear();
+    Utilities::CastValue cast;
 
     if (meta_value == "RT") {
       cast = static_cast<float>(feature.getRT());
@@ -191,6 +203,10 @@ namespace SmartPeak
       cast = static_cast<float>(feature.getMetaValue(meta_value));
     } else if (subordinate.metaValueExists(meta_value) && !subordinate.getMetaValue(meta_value).isEmpty()) {
       cast = static_cast<float>(subordinate.getMetaValue(meta_value));
+    } else {
+      throw std::invalid_argument("meta_value \"" + meta_value + "\" not found.");
     }
+
+    return cast;
   }
 }
