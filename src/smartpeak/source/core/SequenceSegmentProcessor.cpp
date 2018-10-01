@@ -158,7 +158,7 @@ namespace SmartPeak
           verbose_I
         );
       } */ else {
-        std::cout << "Sequence group processing event '" << sequence_segment_processing_event << "' was not recognized." << std::endl;
+        throw std::invalid_argument("Sequence group processing event \"" + sequence_segment_processing_event + "\" was not recognized.\n");
       }
     } catch (const std::exception& e) {
       std::cerr << e.what();

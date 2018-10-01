@@ -25,7 +25,7 @@ namespace SmartPeak
 
       OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.at("parameters_csv_i"), delimiter);
 
-      OpenMSFile::loadTraML(rawDataHandler, filenames.at("traML_csv_i"), "csv", verbose_I); // TODO: make sure the format is "csv"
+      OpenMSFile::loadTraML(rawDataHandler, filenames.at("traML_csv_i"), "csv", verbose_I);
 
       OpenMSFile::loadFeatureFilter(
         rawDataHandler,
@@ -49,7 +49,6 @@ namespace SmartPeak
 
     segmentSamplesInSequence(sequenceHandler_IO, sequenceSegmentHandler);
     addRawDataHandlerToSequence(sequenceHandler_IO, rawDataHandler);
-    // TODO: so if filenames is empty, basically the code works on empty data. Is this the desired behavior? This is what would happen in python
   }
 
   void SequenceProcessor::addRawDataHandlerToSequence(
