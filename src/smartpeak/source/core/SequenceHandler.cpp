@@ -174,28 +174,28 @@ namespace SmartPeak
     sample_to_index_.emplace(sample_name, pos);
   }
 
-  void SequenceHandler::getSamplesInSequence(
-    const std::vector<std::string>& sample_names,
-    std::vector<SampleHandler>& samples
+  std::vector<SampleHandler> SequenceHandler::getSamplesInSequence(
+    const std::vector<std::string>& sample_names
   ) const
   {
-    samples.clear();
+    std::vector<SampleHandler> samples;
 
     for (const std::string& name : sample_names) {
       if (sample_to_index_.count(name)) {
         samples.push_back(sequence_[sample_to_index_.at(name)]);
       }
     }
+
+    return samples;
   }
 
-  void SequenceHandler::getMetaValue(
+  Utilities::CastValue SequenceHandler::getMetaValue(
     const OpenMS::Feature& feature,
     const OpenMS::Feature& subordinate,
-    const std::string& meta_value,
-    Utilities::CastValue& cast
+    const std::string& meta_value
   )
   {
-    cast.clear();
+    Utilities::CastValue cast;
 
     if (meta_value == "RT") {
       cast = static_cast<float>(feature.getRT());
@@ -206,5 +206,7 @@ namespace SmartPeak
     } else {
       throw std::invalid_argument("meta_value \"" + meta_value + "\" not found.");
     }
+
+    return cast;
   }
 }

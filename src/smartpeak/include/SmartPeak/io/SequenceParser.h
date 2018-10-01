@@ -14,7 +14,7 @@ public:
     SequenceParser() = delete;
     ~SequenceParser() = delete;
 
-    static void readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname);
+    static void readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname, const std::string& delimiter);
 
     // TODO: the following 4 methods are incomplete and untested
 

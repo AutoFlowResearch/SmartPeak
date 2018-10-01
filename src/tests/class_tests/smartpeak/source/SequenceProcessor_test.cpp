@@ -155,8 +155,11 @@ BOOST_AUTO_TEST_CASE(processSequence)
   sequenceHandler.setDirDynamic(SMARTPEAK_GET_TEST_DATA_PATH(""));
   SequenceProcessor::createSequence(sequenceHandler, ",");
   const vector<string> raw_data_processing_methods = { "load_raw_data" };
-  SequenceProcessor::processSequence(sequenceHandler, raw_data_processing_methods);
-  // TODO: add checks
+  const RawDataHandler& rawDataHandler0 = sequenceHandler.getSequence()[0].getRawData();
+  BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
+  SequenceProcessor::processSequence(sequenceHandler, std::vector<std::string>(), raw_data_processing_methods);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
+  BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 340); // loaded
 }
 
 BOOST_AUTO_TEST_CASE(processSequenceSegments)
@@ -176,8 +179,43 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
   sequenceHandler.setFilenames(filenames);
   sequenceHandler.setDirDynamic(SMARTPEAK_GET_TEST_DATA_PATH(""));
   SequenceProcessor::createSequence(sequenceHandler, ",");
-  SequenceProcessor::processSequenceSegments(sequenceHandler);
-  // TODO: add checks
+  const set<string> raw_data_processing_methods = { "calculate_calibration" };
+  SequenceProcessor::processSequenceSegments(sequenceHandler, std::set<std::string>(), raw_data_processing_methods);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 1);
+
+  const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs = sequenceHandler.getSequenceSegments()[0].getQuantitationMethods();
+
+  BOOST_CHECK_EQUAL(AQMs.size(), 107);
+
+  BOOST_CHECK_EQUAL(AQMs[0].getComponentName(), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(AQMs[0].getISName(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_EQUAL(AQMs[0].getFeatureName(), "peak_apex_int");
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("slope")), 2.429728323, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("intercept")), -0.091856745000000004, 1e-6);
+  BOOST_CHECK_EQUAL(AQMs[0].getNPoints(), 4);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getCorrelationCoefficient()), 0.98384694900000003, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getLLOQ()), 0.25, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getULOQ()), 2.5, 1e-6);
+
+  BOOST_CHECK_EQUAL(AQMs[1].getComponentName(), "35cgmp.35cgmp_1.Light");
+  BOOST_CHECK_EQUAL(AQMs[1].getISName(), "camp.camp_1.Heavy");
+  BOOST_CHECK_EQUAL(AQMs[1].getFeatureName(), "peak_apex_int");
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("slope")), 6.5645316830000002, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("intercept")), -0.0015584049999999999, 1e-6);
+  BOOST_CHECK_EQUAL(AQMs[1].getNPoints(), 10);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getCorrelationCoefficient()), 0.99739781999999999, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getLLOQ()), 0.0002, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getULOQ()), 1.0, 1e-6);
+
+  BOOST_CHECK_EQUAL(AQMs[2].getComponentName(), "6pgc.6pgc_1.Light");
+  BOOST_CHECK_EQUAL(AQMs[2].getISName(), "6pgc.6pgc_1.Heavy");
+  BOOST_CHECK_EQUAL(AQMs[2].getFeatureName(), "peak_apex_int");
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("slope")), 66.39342173, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("intercept")), -0.14264795499999999, 1e-6);
+  BOOST_CHECK_EQUAL(AQMs[2].getNPoints(), 7);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getCorrelationCoefficient()), 0.99547012000000001, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getLLOQ()), 0.008, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 0.8, 1e-6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
