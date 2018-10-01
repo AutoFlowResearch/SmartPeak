@@ -1,0 +1,2 @@
+function,name,type,value,default,restrictions,description,used_,comment_,comparator
+MRMFeatureValidator.validate_MRMFeatures,Tr_window,float,0.05,1,,retention time difference threshold,TRUE,,
