@@ -170,7 +170,24 @@ BOOST_AUTO_TEST_CASE(selectFeatures)
 
 BOOST_AUTO_TEST_CASE(validateFeatures)
 {
-// TODO: Uncomment once MRMFeatureValidator is ready
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  const string featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_3_core_RawDataProcessor.featureXML");
+  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o);
+
+  const string referenceData_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
+  OpenMSFile::loadValidationData(rawDataHandler, referenceData_csv_i);
+
+  RawDataProcessor::validateFeatures(rawDataHandler, params_1.at("MRMFeatureValidator.validate_MRMFeatures"), true);
+
+  const std::map<std::string, float>& validation_metrics = rawDataHandler.getValidationMetrics();
+  // Confusion matrix: [TP, FP, FN, TN] = [0, 155, 0, 0]
+  BOOST_CHECK_CLOSE(validation_metrics.at("accuracy"), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(validation_metrics.at("precision"), 0.0, 1e-3);
+  BOOST_CHECK_EQUAL(std::isnan(validation_metrics.at("recall")), true);
 }
 
 BOOST_AUTO_TEST_CASE(plotFeatures)
@@ -314,8 +331,8 @@ BOOST_AUTO_TEST_CASE(processRawData)
   params_1.emplace("ChromatogramExtractor", vector<map<string, string>>());
 
   for (const std::string& event : raw_data_processing_events) {
-    // TODO: update if-condition when selectFeatures() and/or validateFeatures() is implemented
-    if (event == "select_features" || event == "validate_features")
+    // TODO: update if-condition when selectFeatures() is implemented
+    if (event == "select_features")
       continue;
     RawDataProcessor::processRawData(rawDataHandler, event, params_1, filenames);
   }
