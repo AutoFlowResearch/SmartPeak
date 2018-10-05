@@ -265,12 +265,18 @@ BOOST_AUTO_TEST_CASE(parseList)
 
 BOOST_AUTO_TEST_CASE(calculateValidationMetrics)
 {
+  const vector<int> predicted = {0, 1, 1, 0, 1, 0, 1, 0, 1, 1};
+  const vector<int> actual    = {0, 0, 1, 0, 0, 1, 1, 0, 1, 1};
+  const std::map<std::string, float> metrics = Utilities::calculateValidationMetrics(actual, predicted);
+  BOOST_CHECK_CLOSE(metrics.at("accuracy"), static_cast<float>(0.7), 1e-3);
+  BOOST_CHECK_CLOSE(metrics.at("recall"), static_cast<float>(0.8), 1e-3);
+  BOOST_CHECK_CLOSE(metrics.at("precision"), static_cast<float>(0.66666666), 1e-3);
 }
 
 BOOST_AUTO_TEST_CASE(computeConfusionMatrix)
 {
-  vector<int> predicted = {0, 1, 1, 0, 1, 0, 1, 0, 1, 1};
-  vector<int> actual    = {0, 0, 1, 0, 0, 1, 1, 0, 1, 1};
+  const vector<int> predicted = {0, 1, 1, 0, 1, 0, 1, 0, 1, 1};
+  const vector<int> actual    = {0, 0, 1, 0, 0, 1, 1, 0, 1, 1};
   const std::array<size_t, 4> conf = Utilities::computeConfusionMatrix(actual, predicted);
   BOOST_CHECK_EQUAL(conf[0], 4); // TP
   BOOST_CHECK_EQUAL(conf[1], 2); // FP
