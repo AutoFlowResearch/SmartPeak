@@ -332,7 +332,7 @@ public:
       const bool verbose_I = false
     )
     {
-      const std::array<size_t, 4> conf = computeConfusionMatrix(y_true, y_pred, verbose_I); // [0, 1, 2, 3] = [TP, FP, FN, TN]
+      const std::array<size_t, 4> conf = computeConfusionMatrix(y_true, y_pred, verbose_I);
       const size_t TP = conf[0];
       const size_t FP = conf[1];
       const size_t FN = conf[2];
@@ -357,6 +357,8 @@ public:
     {
       if (y_true.size() != y_pred.size())
         throw std::invalid_argument("Sizes don't match.");
+
+      // Ref: https://en.wikipedia.org/wiki/Confusion_matrix
 
       std::array<size_t, 4> conf = {0, 0, 0, 0}; // TP, FP, FN, TN
       size_t& TP = conf[0];

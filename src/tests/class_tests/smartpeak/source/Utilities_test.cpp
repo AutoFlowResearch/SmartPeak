@@ -263,4 +263,19 @@ BOOST_AUTO_TEST_CASE(parseList)
   BOOST_CHECK_THROW(Utilities::parseList(strings, re_s, c), std::invalid_argument);
 }
 
+BOOST_AUTO_TEST_CASE(calculateValidationMetrics)
+{
+}
+
+BOOST_AUTO_TEST_CASE(computeConfusionMatrix)
+{
+  vector<int> predicted = {0, 1, 1, 0, 1, 0, 1, 0, 1, 1};
+  vector<int> actual    = {0, 0, 1, 0, 0, 1, 1, 0, 1, 1};
+  const std::array<size_t, 4> conf = Utilities::computeConfusionMatrix(actual, predicted);
+  BOOST_CHECK_EQUAL(conf[0], 4); // TP
+  BOOST_CHECK_EQUAL(conf[1], 2); // FP
+  BOOST_CHECK_EQUAL(conf[2], 1); // FN
+  BOOST_CHECK_EQUAL(conf[3], 3); // TN
+}
+
 BOOST_AUTO_TEST_SUITE_END()
