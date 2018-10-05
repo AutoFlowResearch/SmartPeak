@@ -182,7 +182,8 @@ BOOST_AUTO_TEST_CASE(validateFeatures)
   OpenMSFile::loadValidationData(rawDataHandler, referenceData_csv_i);
 
   RawDataProcessor::validateFeatures(rawDataHandler, params_1.at("MRMFeatureValidator.validate_MRMFeatures"), true);
-
+// TODO: the metadata is empty. Should OpenMSFile::loadValidationData() set the metadata in rawDataHandler?
+// E.g. extracting it from one of the rows (eg. the first)
   const std::map<std::string, float>& validation_metrics = rawDataHandler.getValidationMetrics();
   // Confusion matrix: [TP, FP, FN, TN] = [0, 155, 0, 0]
   BOOST_CHECK_CLOSE(validation_metrics.at("accuracy"), 0.0, 1e-3);

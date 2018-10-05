@@ -15,7 +15,8 @@ public:
     static void validate_MRMFeatures(
       const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data_v,
       const OpenMS::FeatureMap& features,
-      OpenMS::FeatureMap& output_filtered,
+      const std::string& sample_name,
+      OpenMS::FeatureMap& output_validated,
       std::map<std::string, float>& validation_metrics,
       const float Tr_window = 1.0,
       const bool verbose_I = false

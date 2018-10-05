@@ -197,13 +197,13 @@ namespace SmartPeak
     MRMFeatureValidator::validate_MRMFeatures(
       rawDataHandler_IO.getReferenceData(),
       rawDataHandler_IO.getFeatureMap(),
+      rawDataHandler_IO.getMetaData().getSampleName(),
       mapped_features,
       validation_metrics,
       std::stof(MRMRFeatureValidator_params_I.front().at("value")),
       verbose_I
     );
 
-    mapped_features.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()}); // TODO: Remove this line?
     rawDataHandler_IO.setFeatureMap(mapped_features);
     rawDataHandler_IO.setValidationMetrics(validation_metrics);
   }
