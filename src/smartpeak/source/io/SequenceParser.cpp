@@ -171,7 +171,7 @@ namespace SmartPeak
     std::vector<std::vector<float>>& data_out,
     std::set<std::string>& columns_out,
     std::set<std::string>& rows_out,
-    const std::vector<std::string>& meta_data,
+    const std::set<std::string>& meta_data,
     const std::set<MetaDataHandler::SampleType>& sample_types
   )
   {
@@ -234,14 +234,14 @@ namespace SmartPeak
   void SequenceParser::write_dataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
-    const std::vector<std::string>& meta_data_unsorted,
+    const std::set<std::string>& meta_data,
     const std::set<MetaDataHandler::SampleType>& sample_types
   )
   {
     std::vector<std::vector<float>> data;
     std::set<std::string> columns;
     std::set<std::string> rows;
-    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_unsorted, sample_types);
+    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data, sample_types);
     std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
     headers.insert(headers.end(), columns.begin(), columns.end());
 
