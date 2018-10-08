@@ -131,11 +131,12 @@ namespace SmartPeak
     std::vector<std::map<std::string,std::string>> list_dict;
     std::vector<std::string> headers;
     makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data, sample_types);
-    std::ofstream f;
-    f.open(filename);
+    std::ofstream f(filename);
     if (!f.is_open())
-      throw "could not open file\n";
+      throw "SequenceParser: could not open file.\n";
+
     std::string line;
+
     for (const std::string& s : headers) {
       line.append(s);
       line.push_back(',');
@@ -144,26 +145,28 @@ namespace SmartPeak
       line.pop_back();
     } else {
       f.close();
-      throw "headers is empty";
+      throw "SequenceParser: headers is empty";
     }
     line.push_back('\n');
     f << line;
+
     for (const std::map<std::string,std::string>& m : list_dict) {
       line.clear();
       for (const std::string& h : headers) {
         line.append(m.at(h));
         line.push_back(',');
       }
-      if (line.size()) {
-        line.pop_back();
-      } else {
+      line.pop_back();
+      if (line.empty()) {
         f.close();
-        throw "line (map) is empty";
+        throw "SequenceParser: line (map) is empty";
       }
       line.push_back('\n');
       f << line;
     }
+
     f.close();
+    // TODO: should this method use throw (there are several of them), or return silently?
   }
 
   void SequenceParser::makeDataMatrixFromMetaValue(
