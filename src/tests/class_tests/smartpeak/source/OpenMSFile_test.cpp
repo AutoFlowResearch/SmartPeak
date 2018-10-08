@@ -6,6 +6,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/OpenMSFile.h>
 #include <SmartPeak/core/Utilities.h>
+#include <OpenMS/FORMAT/MzMLFile.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -110,7 +111,40 @@ BOOST_AUTO_TEST_CASE(loadTraML)
 
 BOOST_AUTO_TEST_CASE(loadMSExperiment)
 {
-// TODO: implement tests once final behaviour is decided
+  // TODO: add more tests once loadMSExperiment is split
+  RawDataHandler rawDataHandler;
+  const std::vector<std::map<std::string, std::string>> mzML_params_I = {
+    {
+      {"name", "apply_baseline_correction"},
+      {"type", "bool"},
+      {"value", "true"}
+    }
+  };
+
+  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_baseline_correction.mzML");
+  OpenMSFile::loadMSExperiment(
+    rawDataHandler,
+    pathname,
+    std::vector<std::map<std::string, std::string>>(),
+    std::vector<std::map<std::string, std::string>>(),
+    mzML_params_I
+  );
+
+  const vector<OpenMS::MSChromatogram>& chromatograms = rawDataHandler.getExperiment().getChromatograms();
+
+  BOOST_CHECK_EQUAL(chromatograms.size(), 2);
+
+  BOOST_CHECK_CLOSE(chromatograms[0][0].getIntensity(), 2.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[0][1].getIntensity(), 3.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[0][2].getIntensity(), 5.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[0][3].getIntensity(), 18.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[0][4].getIntensity(), 0.0, 1e-3);
+
+  BOOST_CHECK_CLOSE(chromatograms[1][0].getIntensity(), 11.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[1][1].getIntensity(), 12.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[1][2].getIntensity(), 6.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[1][3].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[1][4].getIntensity(), 9.0, 1e-3);
 }
 
 BOOST_AUTO_TEST_CASE(loadFeatureMap)
