@@ -5,6 +5,8 @@
 #define BOOST_TEST_MODULE OpenMSFile test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/OpenMSFile.h>
+#include <SmartPeak/core/Utilities.h>
+#include <OpenMS/FORMAT/MzMLFile.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -109,6 +111,40 @@ BOOST_AUTO_TEST_CASE(loadTraML)
 
 BOOST_AUTO_TEST_CASE(loadMSExperiment)
 {
+  // TODO: add more tests once loadMSExperiment is split
+  RawDataHandler rawDataHandler;
+  const std::vector<std::map<std::string, std::string>> mzML_params_I = {
+    {
+      {"name", "apply_baseline_correction"},
+      {"type", "bool"},
+      {"value", "true"}
+    }
+  };
+
+  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_baseline_correction.mzML");
+  OpenMSFile::loadMSExperiment(
+    rawDataHandler,
+    pathname,
+    std::vector<std::map<std::string, std::string>>(),
+    std::vector<std::map<std::string, std::string>>(),
+    mzML_params_I
+  );
+
+  const vector<OpenMS::MSChromatogram>& chromatograms = rawDataHandler.getExperiment().getChromatograms();
+
+  BOOST_CHECK_EQUAL(chromatograms.size(), 2);
+
+  BOOST_CHECK_CLOSE(chromatograms[0][0].getIntensity(), 2.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[0][1].getIntensity(), 3.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[0][2].getIntensity(), 5.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[0][3].getIntensity(), 18.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[0][4].getIntensity(), 0.0, 1e-3);
+
+  BOOST_CHECK_CLOSE(chromatograms[1][0].getIntensity(), 11.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[1][1].getIntensity(), 12.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[1][2].getIntensity(), 6.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[1][3].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms[1][4].getIntensity(), 9.0, 1e-3);
 }
 
 BOOST_AUTO_TEST_CASE(loadFeatureMap)
@@ -159,6 +195,21 @@ BOOST_AUTO_TEST_CASE(loadFeatureQC)
   BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
   BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+}
+
+BOOST_AUTO_TEST_CASE(loadValidationData)
+{
+  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
+  RawDataHandler rawDataHandler;
+
+  OpenMSFile::loadValidationData(rawDataHandler, pathname);
+  const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
+
+  BOOST_CHECK_EQUAL(ref_data.size(), 179);
+  BOOST_CHECK_EQUAL(ref_data[0].at("component_name").s_, "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(ref_data[0].at("area").f_, 932543.098, 1e-3);
+  BOOST_CHECK_EQUAL(ref_data[178].at("component_name").s_, "xan.xan_1.Light");
+  BOOST_CHECK_CLOSE(ref_data[178].at("area").f_, 206951.3035, 1e-3);
 }
 
 BOOST_AUTO_TEST_CASE(readRawDataProcessingParameters)

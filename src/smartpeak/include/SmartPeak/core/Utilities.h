@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <regex>
 #include <OpenMS/DATASTRUCTURES/Param.h>
+#include <iostream>
+#include <regex>
 
 namespace SmartPeak
 {
@@ -17,8 +18,11 @@ public:
     {
     public:
       CastValue() : tag_(UNKNOWN), s_(), is_clear_(false) {}
+      CastValue(const std::string& s) : tag_(STRING), s_(s), is_clear_(false) {}
+      CastValue(const char *s) : tag_(STRING), s_(s), is_clear_(false) {}
+      CastValue(const float f) : tag_(FLOAT), f_(f), is_clear_(true) {}
 
-      CastValue(const CastValue& other)
+      CastValue(const CastValue& other) : tag_(INT), is_clear_(true)
       {
         *this = other;
       }
@@ -59,6 +63,51 @@ public:
         return *this;
       }
 
+      CastValue& operator=(CastValue&& other)
+      {
+        clear();
+        switch (other.tag_) {
+          case UNKNOWN:
+          case STRING:
+            s_ = std::move(other.s_);
+            break;
+          case BOOL:
+            b_ = other.b_;
+            break;
+          case FLOAT:
+            f_ = other.f_;
+            break;
+          case INT:
+            i_ = other.i_;
+            break;
+          case BOOL_LIST:
+            bl_ = std::move(other.bl_);
+            break;
+          case FLOAT_LIST:
+            fl_ = std::move(other.fl_);
+            break;
+          case INT_LIST:
+            il_ = std::move(other.il_);
+            break;
+          case STRING_LIST:
+            sl_ = std::move(other.sl_);
+            break;
+          default:
+            throw "Tag type not managed in move assignment operator. Implement it.";
+        }
+        other.is_clear_ = true;
+        tag_ = other.tag_;
+        is_clear_ = false;
+        return *this;
+      }
+
+      // tag_ and is_clear are being set to these values because the move-assignment
+      // operator that gets called in the body will call clear()
+      CastValue(CastValue&& other) : tag_(INT), is_clear_(true)
+      {
+        *this = std::move(other);
+      }
+
       CastValue& operator=(const bool data)
       {
         setTagAndData(BOOL, data);
@@ -74,6 +123,12 @@ public:
       CastValue& operator=(const int data)
       {
         setTagAndData(INT, data);
+        return *this;
+      }
+
+      CastValue& operator=(const char *data)
+      {
+        setTagAndData(STRING, std::move(std::string(data)));
         return *this;
       }
 
@@ -109,12 +164,14 @@ public:
 
       ~CastValue()
       {
-        if (!is_clear_)
           clear();
       }
 
       void clear()
       {
+        if (is_clear_)
+          return;
+
         switch (tag_) {
           case UNKNOWN:
           case STRING:
@@ -133,10 +190,11 @@ public:
             sl_.~vector();
             break;
         }
+
         is_clear_ = true;
       }
 
-      enum Type {
+      enum Type { // TODO: Implement UNINITIALIZED
         UNKNOWN,
         BOOL,
         FLOAT,
@@ -266,5 +324,66 @@ public:
       const char sep,
       std::vector<std::string>& out
     );
+
+    template<typename T>
+    static std::map<std::string, float> calculateValidationMetrics(
+      const std::vector<T>& y_true,
+      const std::vector<T>& y_pred,
+      const bool verbose_I = false
+    )
+    {
+      const std::array<size_t, 4> conf = computeConfusionMatrix(y_true, y_pred, verbose_I); // [0, 1, 2, 3] = [TP, FP, FN, TN]
+      const size_t TP = conf[0];
+      const size_t FP = conf[1];
+      const size_t FN = conf[2];
+      const size_t TN = conf[3];
+      const float accuracy = (TP + TN) / static_cast<float>(TP + FP + FN + TN);
+      const float recall = TP / static_cast<float>(TP + FN);
+      const float precision = TP / static_cast<float>(TP + FP);
+
+      return {
+        {"accuracy", accuracy},
+        {"recall", recall},
+        {"precision", precision},
+      };
+    }
+
+    template<typename T>
+    static std::array<size_t, 4> computeConfusionMatrix(
+      const std::vector<T>& y_true,
+      const std::vector<T>& y_pred,
+      const bool verbose_I = false
+    )
+    {
+      if (y_true.size() != y_pred.size())
+        throw std::invalid_argument("Sizes don't match.");
+
+      std::array<size_t, 4> conf = {0, 0, 0, 0}; // TP, FP, FN, TN
+      size_t& TP = conf[0];
+      size_t& FP = conf[1];
+      size_t& FN = conf[2];
+      size_t& TN = conf[3];
+      typename std::vector<T>::const_iterator a = y_true.cbegin(); // a = actual
+      typename std::vector<T>::const_iterator p = y_pred.cbegin(); // p = predicted
+
+      for (; a != y_true.cend(); ++a, ++p) {
+        if (*p) { // positives
+          if (*a)
+            ++TP;
+          else
+            ++FP;
+        } else {  // negatives
+          if (*a)
+            ++FN;
+          else
+            ++TN;
+        }
+      }
+
+      if (verbose_I)
+        std::cout << "Confusion matrix: [TP, FP, FN, TN] = [" << TP << ", " << FP << ", " << FN << ", " << TN << "]" << std::endl;
+
+      return conf;
+    }
   };
 }

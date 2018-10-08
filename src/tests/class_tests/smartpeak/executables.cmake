@@ -1,6 +1,7 @@
 set(core_executables_list
 	Helloworld_test
 	MetaDataHandler_test
+	MRMFeatureValidator_test
 	RawDataHandler_test
 	RawDataProcessor_test
 	SampleGroupHandler_test
