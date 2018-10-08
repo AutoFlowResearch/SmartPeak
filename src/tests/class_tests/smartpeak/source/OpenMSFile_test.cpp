@@ -6,6 +6,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/OpenMSFile.h>
 #include <SmartPeak/core/Utilities.h>
+#include <OpenMS/FORMAT/MzMLFile.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -110,7 +111,123 @@ BOOST_AUTO_TEST_CASE(loadTraML)
 
 BOOST_AUTO_TEST_CASE(loadMSExperiment)
 {
-// TODO: implement tests once final behaviour is decided
+  // TODO: add more tests once loadMSExperiment is split
+  RawDataHandler rawDataHandler;
+  std::vector<std::map<std::string, std::string>> mzML_params_I = {
+    {
+      {"name", "apply_baseline_correction"},
+      {"type", "bool"},
+      {"value", "false"}
+    }
+  };
+
+  const string pathname1 = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_baseline_correction.mzML");
+
+  OpenMSFile::loadMSExperiment(
+    rawDataHandler,
+    pathname1,
+    std::vector<std::map<std::string, std::string>>(),
+    std::vector<std::map<std::string, std::string>>(),
+    mzML_params_I
+  );
+
+  const vector<OpenMS::MSChromatogram>& chromatograms1 = rawDataHandler.getExperiment().getChromatograms();
+
+  BOOST_CHECK_EQUAL(chromatograms1.size(), 2);
+
+  BOOST_CHECK_CLOSE(chromatograms1[0][0].getIntensity(), 3.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[0][1].getIntensity(), 4.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[0][2].getIntensity(), 6.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[0][3].getIntensity(), 19.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[0][4].getIntensity(), 1.0, 1e-3);
+
+  BOOST_CHECK_CLOSE(chromatograms1[1][0].getIntensity(), 3.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[1][1].getIntensity(), 4.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[1][2].getIntensity(), -2.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[1][3].getIntensity(), -8.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[1][4].getIntensity(), 1.0, 1e-3);
+
+  mzML_params_I.at(0).at("value") = "true";
+  rawDataHandler.clear();
+
+  OpenMSFile::loadMSExperiment(
+    rawDataHandler,
+    pathname1,
+    std::vector<std::map<std::string, std::string>>(),
+    std::vector<std::map<std::string, std::string>>(),
+    mzML_params_I
+  );
+
+  const vector<OpenMS::MSChromatogram>& chromatograms2 = rawDataHandler.getExperiment().getChromatograms();
+
+  BOOST_CHECK_EQUAL(chromatograms2.size(), 2);
+
+  BOOST_CHECK_CLOSE(chromatograms2[0][0].getIntensity(), 2.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][1].getIntensity(), 3.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][2].getIntensity(), 5.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][3].getIntensity(), 18.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][4].getIntensity(), 0.0, 1e-3);
+
+  BOOST_CHECK_CLOSE(chromatograms2[1][0].getIntensity(), 11.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][1].getIntensity(), 12.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][2].getIntensity(), 6.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][3].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][4].getIntensity(), 9.0, 1e-3);
+
+  mzML_params_I.at(0).at("value") = "false";
+  mzML_params_I.push_back(
+    {
+      {"name", "format"},
+      {"type", "string"},
+      {"value", "ChromeleonFile"}
+    }
+  );
+  rawDataHandler.clear();
+
+  const string pathname2 = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_ChromeleonFile_10ug.txt");
+
+  OpenMSFile::loadMSExperiment(
+    rawDataHandler,
+    pathname2,
+    std::vector<std::map<std::string, std::string>>(),
+    std::vector<std::map<std::string, std::string>>(),
+    mzML_params_I
+  );
+
+  const vector<OpenMS::MSChromatogram>& chromatograms3 = rawDataHandler.getExperiment().getChromatograms();
+
+  BOOST_CHECK_EQUAL(chromatograms3.size(), 1);
+  BOOST_CHECK_EQUAL(chromatograms3[0].size(), 3301);
+
+  BOOST_CHECK_CLOSE(chromatograms3[0][0].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][600].getIntensity(), -0.503815, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][1200].getIntensity(), -0.666694, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][1800].getIntensity(), -0.232843, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][2400].getIntensity(), -0.223644, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][3300].getIntensity(), 0.126958, 1e-3);
+
+  mzML_params_I.at(0).at("value") = "true";
+  rawDataHandler.clear();
+
+  OpenMSFile::loadMSExperiment(
+    rawDataHandler,
+    pathname2,
+    std::vector<std::map<std::string, std::string>>(),
+    std::vector<std::map<std::string, std::string>>(),
+    mzML_params_I
+  );
+
+  const vector<OpenMS::MSChromatogram>& chromatograms4 = rawDataHandler.getExperiment().getChromatograms();
+
+  BOOST_CHECK_EQUAL(chromatograms4.size(), 1);
+  BOOST_CHECK_EQUAL(chromatograms4[0].size(), 3301);
+
+  BOOST_CHECK_CLOSE(chromatograms4[0][0].getIntensity(), 1.004634, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][600].getIntensity(), 0.500819, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][1200].getIntensity(), 0.33794, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][1800].getIntensity(), 0.771791, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][2400].getIntensity(), 0.78099, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][3300].getIntensity(), 1.131592, 1e-3);
 }
 
 BOOST_AUTO_TEST_CASE(loadFeatureMap)

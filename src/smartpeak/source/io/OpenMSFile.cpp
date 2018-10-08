@@ -19,6 +19,7 @@
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>
 #include <OpenMS/FORMAT/MzMLFile.h>
+#include <OpenMS/KERNEL/SpectrumHelper.h>
 #include <SmartPeak/io/FileReader.h>
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
@@ -126,6 +127,15 @@ namespace SmartPeak
         if (mzML_params.count("format") && mzML_params.at("format").s_ == "ChromeleonFile") {
           OpenMS::ChromeleonFile chfh;
           chfh.load(mzML_i, chromatograms);
+        } else {
+          OpenMS::FileHandler fh;
+          fh.loadExperiment(mzML_i, chromatograms);
+        }
+        if (mzML_params.count("apply_baseline_correction") && mzML_params.at("apply_baseline_correction").b_) {
+          std::vector<OpenMS::MSChromatogram>& chroms = chromatograms.getChromatograms();
+          for (OpenMS::MSChromatogram& ch : chroms) {
+            OpenMS::subtractMinimumIntensity(ch);
+          }
         }
       } else {
         OpenMS::FileHandler fh;
