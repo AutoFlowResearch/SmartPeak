@@ -83,24 +83,23 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler,
     std::vector<std::map<std::string,std::string>>& list_dict,
     std::vector<std::string>& headers_out,
-    const std::vector<std::string>& meta_data_unsorted,
+    const std::set<std::string>& meta_data,
     const std::set<MetaDataHandler::SampleType>& sample_types // TODO: can overload with a vector of strings
   )
   {
-    std::vector<std::string> meta_data = meta_data_unsorted;
-    std::stable_sort(meta_data.begin(), meta_data.end());
-    std::vector<std::string> headers = {"sample_name", "sample_type", "component_group_name", "component_name"}; // TODO: replace literals with variables
+    std::vector<std::string> headers = {"sample_name", "sample_type", "component_group_name", "component_name"};
     headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
+    headers_out = headers; // TODO: should headers be unique?
 
     list_dict.clear();
     for (const SampleHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
-      const MetaDataHandler::SampleType st = mdh.getSampleType(); // TODO: can skip this?
+      const MetaDataHandler::SampleType st = mdh.getSampleType();
       if (sample_types.count(st) == 0)
         continue;
       const std::string& sample_name = mdh.getSampleName();
       for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
-        const std::string& component_group_name = feature.getMetaValue("PeptireRef").toString();
+        const std::string component_group_name = feature.getMetaValue("PeptireRef").toString();
         for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
           std::map<std::string,std::string> row;
           row.emplace("sample_type", MetaDataHandler::SampleTypeToString(st));
@@ -109,26 +108,29 @@ namespace SmartPeak
           row.emplace("component_name", subordinate.getMetaValue("native_id").toString());
           for (const std::string& meta_value_name : meta_data) {
             Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            // TODO: Here the python code saves `datum` in any given form (string, float, etc)
+            // What should happen if the extracted datum is not a float? Right now I'm storing an empty string (else case)
             if (datum.getTag() == Utilities::CastValue::FLOAT)
-              row.emplace(meta_value_name, std::to_string(datum.f_)); // TODO: please compare this with code in SequenceWriter.py
+              row.emplace(meta_value_name, std::to_string(datum.f_));
+            else
+              row.emplace(meta_value_name, "");
           }
           list_dict.push_back(row);
         }
       }
     }
-    headers_out = headers;
   }
 
   void SequenceParser::write_dataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
-    const std::vector<std::string>& meta_data_unsorted,
+    const std::set<std::string>& meta_data,
     const std::set<MetaDataHandler::SampleType>& sample_types
   )
   {
     std::vector<std::map<std::string,std::string>> list_dict;
     std::vector<std::string> headers;
-    makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data_unsorted, sample_types);
+    makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data, sample_types);
     std::ofstream f;
     f.open(filename);
     if (!f.is_open())

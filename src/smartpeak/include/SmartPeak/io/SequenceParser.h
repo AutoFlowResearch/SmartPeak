@@ -20,14 +20,14 @@ public:
       const SequenceHandler& sequenceHandler,
       std::vector<std::map<std::string,std::string>>& list_dict,
       std::vector<std::string>& headers_out,
-      const std::vector<std::string>& meta_data_unsorted = std::vector<std::string>({"calculated_concentration"}),
+      const std::set<std::string>& meta_data = std::set<std::string>({"calculated_concentration"}),
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
     static void write_dataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::vector<std::string>& meta_data_unsorted = std::vector<std::string>({"calculated_concentration"}),
+      const std::set<std::string>& meta_data = std::set<std::string>({"calculated_concentration"}),
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
