@@ -8,7 +8,8 @@ namespace SmartPeak
   void MRMFeatureValidator::validate_MRMFeatures(
     const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data_v,
     const OpenMS::FeatureMap& features,
-    OpenMS::FeatureMap& output_filtered,
+    const std::string& sample_name,
+    OpenMS::FeatureMap& output_validated,
     std::map<std::string, float>& validation_metrics,
     const float Tr_window,
     const bool verbose_I
@@ -16,14 +17,21 @@ namespace SmartPeak
   {
     std::vector<int> y_true;
     std::vector<int> y_pred;
-    output_filtered.clear(true);
+    output_validated.clear(true);
+
+    // TODO: need to add in the experiment_id and acquisition_method_id
+    // to feature or as a parameter
+    // reference_data_dict = {
+    // (d['experiment_id'],d['acquisition_method_id'],
+    // d['quantitation_method_id'],d['sample_name'],d['component_name']):d
+    // for d in reference_data}
 
     std::map<std::string, std::map<std::string, Utilities::CastValue>> reference_data;
     for (const std::map<std::string, Utilities::CastValue>& m : reference_data_v) {
+      if (m.at("sample_name").s_ != sample_name)
+        continue;
       const std::string& name = m.at("component_name").s_;
       reference_data[name] = m;
-      // TODO: This silently overwrites eventual rows with the same value for component_name
-      //       Is it the desired behaviour?
     }
 
     for (const OpenMS::Feature& feature : features) {
@@ -69,7 +77,7 @@ namespace SmartPeak
         continue;
       OpenMS::Feature feature_tmp = feature;
       feature_tmp.setSubordinates(subordinates_tmp);
-      output_filtered.push_back(feature_tmp);
+      output_validated.push_back(feature_tmp);
     }
 
     validation_metrics = Utilities::calculateValidationMetrics(y_true, y_pred, verbose_I);

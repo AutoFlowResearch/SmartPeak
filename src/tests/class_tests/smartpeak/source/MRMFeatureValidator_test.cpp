@@ -38,14 +38,15 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
   OpenMS::FeatureMap featureMap;
   featurexml.load(featureXML_i, featureMap);
 
-  OpenMS::FeatureMap output_filtered;
+  OpenMS::FeatureMap output_validated;
   std::map<std::string, float> validation_metrics;
   const float Tr_window = std::stof(params.at("MRMFeatureValidator.validate_MRMFeatures").at(0).at("value"));
 
   MRMFeatureValidator::validate_MRMFeatures(
     ref_data,
     featureMap,
-    output_filtered,
+    "150601_0_BloodProject01_PLT_QC_Broth-1", // info taken from .csv file
+    output_validated,
     validation_metrics,
     Tr_window
   );
