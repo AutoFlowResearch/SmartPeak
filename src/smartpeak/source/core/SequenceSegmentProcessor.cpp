@@ -116,7 +116,6 @@ namespace SmartPeak
   //     throw std::invalid_argument("Parameters or filename are empty.");
 
   //   // TODO: Uncomment when SequenceSegmentPlotter is implemented
-  //   throw "TODO: Implement SequenceSegmentPlotter.";
   //   SequenceSegmentPlotter sequenceSegmentPlotter;
   //   sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
   //   sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);

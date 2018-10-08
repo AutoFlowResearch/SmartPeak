@@ -61,6 +61,12 @@ public:
       const bool verbose = false
     );
 
+    static void loadValidationData(
+      RawDataHandler& rawDataHandler,
+      const std::string& referenceData_csv_i,
+      const bool verbose = false
+    );
+
     static void readRawDataProcessingParameters(
       RawDataHandler& rawDataHandler, const std::string& filename, const std::string& delimiter = ","
     );

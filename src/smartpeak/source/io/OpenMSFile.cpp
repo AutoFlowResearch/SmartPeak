@@ -20,6 +20,10 @@
 #include <OpenMS/FORMAT/MRMFeatureQCFile.h>
 #include <OpenMS/FORMAT/MzMLFile.h>
 #include <SmartPeak/io/FileReader.h>
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
 
 namespace SmartPeak
 {
@@ -97,12 +101,12 @@ namespace SmartPeak
   }
 
   void OpenMSFile::loadMSExperiment(
-      RawDataHandler& rawDataHandler,
-      const std::string& mzML_i,
-      const std::vector<std::map<std::string, std::string>>& MRMMapping_params_I,
-      const std::vector<std::map<std::string, std::string>>& chromatogramExtractor_params_I,
-      const std::vector<std::map<std::string, std::string>>& mzML_params_I,
-      const bool verbose
+    RawDataHandler& rawDataHandler,
+    const std::string& mzML_i,
+    const std::vector<std::map<std::string, std::string>>& MRMMapping_params_I,
+    const std::vector<std::map<std::string, std::string>>& chromatogramExtractor_params_I,
+    const std::vector<std::map<std::string, std::string>>& mzML_params_I,
+    const bool verbose
   )
   {
     if (verbose)
@@ -247,6 +251,120 @@ namespace SmartPeak
     if (filename_components_groups.size())
       featureQCFile.load(filename_components_groups, featureQC, true);
     rawDataHandler.setFeatureQC(featureQC);
+  }
+
+  void OpenMSFile::loadValidationData(
+    RawDataHandler& rawDataHandler,
+    const std::string& referenceData_csv_i,
+    const bool verbose
+  )
+  {
+    if (verbose)
+      std::cout << "Loading validation data" << std::endl;
+
+    if (referenceData_csv_i.empty())
+      throw std::invalid_argument("Filename is empty.");
+
+    io::CSVReader<16, io::trim_chars<>, io::no_quote_escape<','>> in(referenceData_csv_i);
+
+    const std::string s_original_filename {"original_filename"};
+    const std::string s_sample_name {"sample_name"};
+    const std::string s_sample_type {"sample_type"};
+    const std::string s_acquisition_date_and_time {"acquisition_date_and_time"};
+    const std::string s_acq_method_name {"acq_method_name"};
+    const std::string s_component_name {"component_name"};
+    const std::string s_component_group_name {"component_group_name"};
+    const std::string s_retention_time {"retention_time"};
+    const std::string s_start_time {"start_time"};
+    const std::string s_end_time {"end_time"};
+    const std::string s_used {"used_"};
+    const std::string s_calculated_concentration {"calculated_concentration"};
+    const std::string s_experiment_id {"experiment_id"};
+    const std::string s_acquisition_method_id {"acquisition_method_id"};
+    const std::string s_height {"height"};
+    const std::string s_area {"area"};
+
+    in.read_header(
+      io::ignore_extra_column,
+      s_original_filename,
+      s_sample_name,
+      s_sample_type,
+      s_acquisition_date_and_time,
+      s_acq_method_name,
+      s_component_name,
+      s_component_group_name,
+      s_retention_time,
+      s_start_time,
+      s_end_time,
+      s_used,
+      s_calculated_concentration,
+      s_experiment_id,
+      s_acquisition_method_id,
+      s_height,
+      s_area
+    );
+
+    std::string original_filename;
+    std::string sample_name;
+    std::string sample_type;
+    std::string acquisition_date_and_time;
+    std::string acq_method_name;
+    std::string component_name;
+    std::string component_group_name;
+    float retention_time;
+    float start_time;
+    float end_time;
+    std::string used;
+    float calculated_concentration;
+    std::string experiment_id;
+    std::string acquisition_method_id;
+    float height;
+    float area;
+
+    std::vector<std::map<std::string, Utilities::CastValue>> reference_data;
+
+    while (in.read_row(
+      original_filename,
+      sample_name,
+      sample_type,
+      acquisition_date_and_time,
+      acq_method_name,
+      component_name,
+      component_group_name,
+      retention_time,
+      start_time,
+      end_time,
+      used,
+      calculated_concentration,
+      experiment_id,
+      acquisition_method_id,
+      height,
+      area
+    )) {
+      std::transform(used.begin(), used.end(), used.begin(), ::tolower);
+      if (used == "false")
+        continue;
+      std::map<std::string, Utilities::CastValue> m;
+      m.emplace(s_original_filename, original_filename);
+      m.emplace(s_sample_name, sample_name);
+      m.emplace(s_sample_type, sample_type);
+      m.emplace(s_acquisition_date_and_time, acquisition_date_and_time);
+      m.emplace(s_acq_method_name, acq_method_name);
+      m.emplace(s_component_name, component_name);
+      m.emplace(s_component_group_name, component_group_name);
+      m.emplace(s_retention_time, retention_time);
+      m.emplace(s_start_time, start_time);
+      m.emplace(s_end_time, end_time);
+      m.emplace(s_used, used);
+      m.emplace(s_calculated_concentration, calculated_concentration);
+      m.emplace(s_experiment_id, experiment_id);
+      m.emplace(s_acquisition_method_id, acquisition_method_id);
+      m.emplace(s_height, height);
+      m.emplace(s_area, area);
+      reference_data.push_back(std::move(m));
+    }
+
+    rawDataHandler.setReferenceData(reference_data);
   }
 
   void OpenMSFile::readRawDataProcessingParameters(

@@ -251,6 +251,43 @@ BOOST_AUTO_TEST_CASE(set_get_ChromatogramMap)
   BOOST_CHECK_EQUAL(chromatogram_map3.getMetaValue("name2"), "bar");
 }
 
+BOOST_AUTO_TEST_CASE(set_get_ReferenceData)
+{
+  RawDataHandler rawDataHandler;
+  std::vector<std::map<std::string, Utilities::CastValue>> data;
+  Utilities::CastValue c("bar");
+
+  map<string, Utilities::CastValue> m /*= {{"foo", c}}*/;
+  m.emplace("foo", c);
+  c = "bar2";
+  m.emplace("foo2", c);
+  data.push_back(m);
+
+  rawDataHandler.setReferenceData(data);
+
+  const std::vector<std::map<std::string, Utilities::CastValue>> data2 = rawDataHandler.getReferenceData(); // testing copy getter
+
+  BOOST_CHECK_EQUAL(data2.size(), 1);
+  BOOST_CHECK_EQUAL(data2[0].count("foo"), 1);
+  BOOST_CHECK_EQUAL(data2[0].at("foo").s_, "bar");
+  BOOST_CHECK_EQUAL(data2[0].count("foo2"), 1);
+  BOOST_CHECK_EQUAL(data2[0].at("foo2").s_, "bar2");
+
+  c = "bar3";
+
+  rawDataHandler.getReferenceData().push_back({{"foo3", c}}); // testing reference getter
+
+  const std::vector<std::map<std::string, Utilities::CastValue>>& data3 = rawDataHandler.getReferenceData();
+
+  BOOST_CHECK_EQUAL(data3.size(), 2);
+  BOOST_CHECK_EQUAL(data3[0].count("foo"), 1);
+  BOOST_CHECK_EQUAL(data3[0].at("foo").s_, "bar");
+  BOOST_CHECK_EQUAL(data3[0].count("foo2"), 1);
+  BOOST_CHECK_EQUAL(data3[0].at("foo2").s_, "bar2");
+  BOOST_CHECK_EQUAL(data3[1].count("foo3"), 1);
+  BOOST_CHECK_EQUAL(data3[1].at("foo3").s_, "bar3");
+}
+
 BOOST_AUTO_TEST_CASE(clear)
 {
   RawDataHandler rawDataHandler;

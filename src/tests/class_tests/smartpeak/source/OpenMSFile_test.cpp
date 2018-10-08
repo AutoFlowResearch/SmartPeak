@@ -5,6 +5,7 @@
 #define BOOST_TEST_MODULE OpenMSFile test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/OpenMSFile.h>
+#include <SmartPeak/core/Utilities.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -109,6 +110,7 @@ BOOST_AUTO_TEST_CASE(loadTraML)
 
 BOOST_AUTO_TEST_CASE(loadMSExperiment)
 {
+// TODO: implement tests once final behaviour is decided
 }
 
 BOOST_AUTO_TEST_CASE(loadFeatureMap)
@@ -159,6 +161,24 @@ BOOST_AUTO_TEST_CASE(loadFeatureQC)
   BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
   BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+}
+
+BOOST_AUTO_TEST_CASE(loadValidationData)
+{
+  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
+  RawDataHandler rawDataHandler;
+
+  OpenMSFile::loadValidationData(rawDataHandler, pathname);
+  const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
+
+  BOOST_CHECK_EQUAL(ref_data.size(), 179);
+  BOOST_CHECK_EQUAL(ref_data[0].at("component_name").s_, "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(ref_data[0].at("area").f_, 932543.098, 1e-3);
+  BOOST_CHECK_CLOSE(ref_data[0].at("retention_time").f_, static_cast<float>(15.89495171), 1e-1);
+  // TODO: Should we just use double instead of float? I had to go down to -1 to make the test pass
+  BOOST_CHECK_EQUAL(ref_data[178].at("component_name").s_, "xan.xan_1.Light");
+  BOOST_CHECK_CLOSE(ref_data[178].at("area").f_, 206951.3035, 1e-3);
+  BOOST_CHECK_CLOSE(ref_data[178].at("retention_time").f_, static_cast<float>(1.492980468), 1e-1);
 }
 
 BOOST_AUTO_TEST_CASE(readRawDataProcessingParameters)

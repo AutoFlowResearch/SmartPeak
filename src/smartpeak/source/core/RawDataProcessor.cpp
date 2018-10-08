@@ -1,11 +1,12 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/RawDataProcessor.h>
-#include <SmartPeak/io/OpenMSFile.h>
+#include <SmartPeak/core/MRMFeatureValidator.h>
 #include <SmartPeak/core/Utilities.h>
-#include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
+#include <SmartPeak/io/OpenMSFile.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>
+#include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 
 namespace SmartPeak
 {
@@ -185,26 +186,26 @@ namespace SmartPeak
     if (verbose_I)
       std::cout << "Validating features" << std::endl;
 
-    // TODO: Uncomment once MRMFeatureValidator is ready
+    if (MRMRFeatureValidator_params_I.empty()) {
+      std::cout << "No parameters passed to validateFeatures(). Not validating." << std::endl;
+      return;
+    }
 
-    // if (MRMRFeatureValidator_params_I.empty())
-    //   throw;
+    OpenMS::FeatureMap mapped_features;
+    std::map<std::string, float> validation_metrics; // keys: accuracy, recall, precision
 
-    // OpenMS::FeatureMap mapped_features;
-    // std::map<std::string, float> validation_metrics; // keys: AUC, accuracy, recall, precision
-    
-    // MRMFeatureValidator featureValidator;
-    // featureValidator.validate_MRMFeatures(
-    //   rawDataHandler_IO.getReferenceData(),
-    //   rawDataHandler_IO.getFeatureMap(),
-    //   std::stof(MRMRFeatureValidator_params_I.front().at("value")),
-    //   mapped_features,
-    //   validation_metrics
-    // );
+    MRMFeatureValidator::validate_MRMFeatures(
+      rawDataHandler_IO.getReferenceData(),
+      rawDataHandler_IO.getFeatureMap(),
+      rawDataHandler_IO.getMetaData().getSampleName(),
+      mapped_features,
+      validation_metrics,
+      std::stof(MRMRFeatureValidator_params_I.front().at("value")), // TODO: While this probably works, it might be nice to add some check that the parameter passed is the desired one
+      verbose_I
+    );
 
-    // mapped_features.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
-    // featureMap.setFeatureMap(mapped_features);
-    // featureMap.setValidationMetrics(validation_metrics);
+    rawDataHandler_IO.setFeatureMap(mapped_features);
+    rawDataHandler_IO.setValidationMetrics(validation_metrics);
   }
 
   void RawDataProcessor::plotFeatures(
@@ -294,22 +295,14 @@ namespace SmartPeak
         parameters.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"),
         verbose_I
       );
-    } else if (event == "validate_features") {
-      std::vector<std::map<std::string, std::string>> params = parameters.at("ReferenceDataMethods.getAndProcess_referenceData_samples");
-      const std::string sample_names_I = "['" + rawDataHandler_IO.getMetaData().getSampleName() + "']";
-      // std::vector<std::map<std::string, std::string> ReferenceDataMethods_params_I = {
-      //   {"description", ""},
-      //   {"name", "sample_names_I"},
-      //   {"type", "list"},
-      //   {"value", sample_names_I}
-      // };
-      // OpenMSFile::loadValidationData() not implemented
+    }*/ else if (event == "validate_features") {
+      OpenMSFile::loadValidationData(rawDataHandler_IO, filenames.at("referenceData_csv_i"));
       validateFeatures(
         rawDataHandler_IO,
         parameters.at("MRMFeatureValidator.validate_MRMFeatures"),
         verbose_I
       );
-    }*/ else if (event == "quantify_features") {
+    } else if (event == "quantify_features") {
       quantifyComponents(rawDataHandler_IO, verbose_I);
     } else if (event == "check_features") {
       checkFeatures(

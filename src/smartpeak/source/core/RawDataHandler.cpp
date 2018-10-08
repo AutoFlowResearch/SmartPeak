@@ -65,17 +65,20 @@ namespace SmartPeak
     return targeted_exp_;
   }
 
-  // RawDataHandler::setReferenceData(, reference_data)
-  // {
-  //   """Set the reference_data"""
-  //   .reference_data = reference_data
-  // }
+  void RawDataHandler::setReferenceData(const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data)
+  {
+    reference_data_ = reference_data;
+  }
 
-  // RawDataHandler::getReferenceData()
-  // {
-  //   """Return the reference_data"""
-  //   return .reference_data
-  // }
+  std::vector<std::map<std::string, Utilities::CastValue>>& RawDataHandler::getReferenceData()
+  {
+    return reference_data_;
+  }
+
+  std::vector<std::map<std::string, Utilities::CastValue>> RawDataHandler::getReferenceData() const
+  {
+    return reference_data_;
+  }
 
   void RawDataHandler::setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods)
   {

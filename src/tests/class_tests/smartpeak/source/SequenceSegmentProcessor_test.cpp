@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_CASE(optimizeCalibrationCurves)
 
 BOOST_AUTO_TEST_CASE(plotCalibrators)
 {
-  // TODO: Implementation is incomplete in .cpp file
+  // TODO: Implementation plotCalibrators
 }
 
 BOOST_AUTO_TEST_CASE(processSequenceSegment)

@@ -5,6 +5,7 @@ set(directory source/core)
 set(sources_list
 	Helloworld.cpp
 	MetaDataHandler.cpp
+	MRMFeatureValidator.cpp
 	RawDataHandler.cpp
 	RawDataProcessor.cpp
 	SampleGroupHandler.cpp

@@ -2,14 +2,15 @@
 
 #pragma once
 
-#include <OpenMS/KERNEL/FeatureMap.h>
-#include <OpenMS/ANALYSIS/TARGETED/TargetedExperiment.h>
-#include <OpenMS/KERNEL/MSExperiment.h>
+#include <OpenMS/ANALYSIS/MAPMATCHING/TransformationDescription.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureQC.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
-#include <OpenMS/ANALYSIS/MAPMATCHING/TransformationDescription.h>
+#include <OpenMS/ANALYSIS/TARGETED/TargetedExperiment.h>
+#include <OpenMS/KERNEL/FeatureMap.h>
+#include <OpenMS/KERNEL/MSExperiment.h>
 
 #include <SmartPeak/core/MetaDataHandler.h>
+#include <SmartPeak/core/Utilities.h>
 
 #include <map>
 #include <vector>
@@ -40,9 +41,9 @@ public:
     OpenMS::TargetedExperiment& getTargetedExperiment();
     OpenMS::TargetedExperiment getTargetedExperiment() const;
 
-    // [TODO: need to update this at some point...]
-    // setReferenceData(, reference_data);
-    // getReferenceData();
+    void setReferenceData(const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data);
+    std::vector<std::map<std::string, Utilities::CastValue>>& getReferenceData();
+    std::vector<std::map<std::string, Utilities::CastValue>> getReferenceData() const;
 
     void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods);
     std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods();
@@ -98,7 +99,7 @@ private:
     // input (reused between RawDataHandlers)
     std::map<std::string, std::vector<std::map<std::string, std::string>>> parameters_;
     OpenMS::TargetedExperiment targeted_exp_;
-    // self.reference_data = None
+    std::vector<std::map<std::string, Utilities::CastValue>> reference_data_;
     std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods_;
     OpenMS::MRMFeatureQC feature_filter_;
     OpenMS::MRMFeatureQC feature_qc_;
