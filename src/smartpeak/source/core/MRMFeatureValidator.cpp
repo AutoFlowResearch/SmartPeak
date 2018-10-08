@@ -28,11 +28,10 @@ namespace SmartPeak
 
     std::map<std::string, std::map<std::string, Utilities::CastValue>> reference_data;
     for (const std::map<std::string, Utilities::CastValue>& m : reference_data_v) {
-      if (m.at("sample_name").s_ == sample_name) {
-        const std::string& name = m.at("component_name").s_;
-        reference_data[name] = m;
-      }
-      // TODO: What if the condition is false?
+      if (m.at("sample_name").s_ != sample_name)
+        continue;
+      const std::string& name = m.at("component_name").s_;
+      reference_data[name] = m;
     }
 
     for (const OpenMS::Feature& feature : features) {

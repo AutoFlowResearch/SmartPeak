@@ -200,7 +200,7 @@ namespace SmartPeak
       rawDataHandler_IO.getMetaData().getSampleName(),
       mapped_features,
       validation_metrics,
-      std::stof(MRMRFeatureValidator_params_I.front().at("value")),
+      std::stof(MRMRFeatureValidator_params_I.front().at("value")), // TODO: While this probably works, it might be nice to add some check that the parameter passed is the desired one
       verbose_I
     );
 
