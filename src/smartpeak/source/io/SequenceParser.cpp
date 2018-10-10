@@ -81,7 +81,7 @@ namespace SmartPeak
 
   void SequenceParser::makeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
-    std::vector<std::map<std::string,std::string>>& list_dict,
+    std::vector<std::map<std::string,std::string>>& list_dict, // TODO: Should the map map to a CastValue, instead of a string?
     std::vector<std::string>& headers_out,
     const std::set<std::string>& meta_data,
     const std::set<MetaDataHandler::SampleType>& sample_types // TODO: can overload with a vector of strings
@@ -98,18 +98,29 @@ namespace SmartPeak
       if (sample_types.count(st) == 0)
         continue;
       const std::string& sample_name = mdh.getSampleName();
-      for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
-        const std::string component_group_name = feature.getMetaValue("PeptireRef").toString();
+      const RawDataHandler& rawDataHandler = sampleHandler.getRawData();
+      for (const OpenMS::Feature& feature : rawDataHandler.getFeatureMap()) {
+      // for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
+        if (!feature.metaValueExists("PeptideRef") || feature.getMetaValue("PeptideRef").isEmpty()) {
+          std::cout << "component_group_name is absent or empty. Skipping this feature." << std::endl;
+          continue;
+        }
+        const std::string component_group_name = feature.getMetaValue("PeptideRef");
         for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
           std::map<std::string,std::string> row;
           row.emplace("sample_type", MetaDataHandler::SampleTypeToString(st));
           row.emplace("sample_name", sample_name);
           row.emplace("component_group_name", component_group_name);
-          row.emplace("component_name", subordinate.getMetaValue("native_id").toString());
+          if (!subordinate.metaValueExists("native_id") || subordinate.getMetaValue("native_id").isEmpty()) {
+            std::cout << "component_name is absent or empty. Skipping this subordinate." << std::endl;
+            continue;
+          }
+          const std::string component_name = subordinate.getMetaValue("native_id");
+          row.emplace("component_name", component_name);
           for (const std::string& meta_value_name : meta_data) {
             Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-            // TODO: Here the python code saves `datum` in any given form (string, float, etc)
-            // What should happen if the extracted datum is not a float? Right now I'm storing an empty string (else case)
+            // TODO: What if SequenceHandler::getMetaValue() cannot find the metavalue?
+            // Currently it prints an error but continues, returning an empty CastValue
             if (datum.getTag() == Utilities::CastValue::FLOAT)
               row.emplace(meta_value_name, std::to_string(datum.f_));
             else
