@@ -84,15 +84,23 @@ namespace SmartPeak
 
   void SequenceParser::makeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
-    std::vector<std::map<std::string,std::string>>& list_dict, // TODO: Should the map map to a CastValue, instead of a string?
+    std::vector<std::map<std::string,std::string>>& list_dict,
     std::vector<std::string>& headers_out,
-    const std::set<std::string>& meta_data,
+    const std::vector<std::string>& meta_data,
     const std::set<MetaDataHandler::SampleType>& sample_types // TODO: can overload with a vector of strings
   )
   {
     std::vector<std::string> headers = {"sample_name", "sample_type", "component_group_name", "component_name"};
     headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
-    headers_out = headers; // TODO: should headers be unique?
+    for (size_t i = 0; i < headers.size() - 1; ++i) { // checking headers are unique, stable (maintaining the same positions)
+      for (size_t j = i + 1; j < headers.size(); ) {
+        if (headers[i] == headers[j])
+          headers.erase(headers.begin() + j);
+        else
+          ++j;
+      }
+    }
+    headers_out = headers;
 
     list_dict.clear();
     for (const SampleHandler& sampleHandler : sequenceHandler.getSequence()) {
@@ -105,7 +113,7 @@ namespace SmartPeak
       for (const OpenMS::Feature& feature : rawDataHandler.getFeatureMap()) {
       // for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
         if (!feature.metaValueExists(s_PeptideRef) || feature.getMetaValue(s_PeptideRef).isEmpty()) {
-          std::cout << "component_group_name is absent or empty. Skipping this feature." << std::endl;
+          // std::cout << "component_group_name is absent or empty. Skipping this feature." << std::endl; // Log it, instead
           continue;
         }
         const std::string component_group_name = feature.getMetaValue(s_PeptideRef);
@@ -122,9 +130,8 @@ namespace SmartPeak
           row.emplace("component_name", component_name);
           for (const std::string& meta_value_name : meta_data) {
             Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-            // TODO: What if SequenceHandler::getMetaValue() cannot find the metavalue?
-            // Currently it prints an error but continues, returning an empty CastValue
             if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0)
+              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
               row.emplace(meta_value_name, std::to_string(datum.f_));
             else
               row.emplace(meta_value_name, "");
@@ -135,10 +142,10 @@ namespace SmartPeak
     }
   }
 
-  void SequenceParser::write_dataTableFromMetaValue(
+  void SequenceParser::writeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
-    const std::set<std::string>& meta_data,
+    const std::vector<std::string>& meta_data,
     const std::set<MetaDataHandler::SampleType>& sample_types
   )
   {
@@ -147,7 +154,7 @@ namespace SmartPeak
     makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data, sample_types);
     std::ofstream f(filename);
     if (!f.is_open())
-      throw "SequenceParser: write_dataTableFromMetaValue could not open file.\n";
+      throw "SequenceParser: writeDataTableFromMetaValue could not open file.\n";
 
     std::string line;
 
@@ -159,7 +166,8 @@ namespace SmartPeak
       line.pop_back();
     } else {
       f.close();
-      throw "SequenceParser: headers is empty";
+      std::cout << "SequenceParser: headers is empty\n";
+      return;
     }
     line.push_back('\n');
     f << line;
@@ -173,14 +181,14 @@ namespace SmartPeak
       line.pop_back();
       if (line.empty()) {
         f.close();
-        throw "SequenceParser: line (map) is empty";
+        std::cout << "SequenceParser: line (map) is empty\n";
+        break;
       }
       line.push_back('\n');
       f << line;
     }
 
     f.close();
-    // TODO: should this method use throw (there are several of them), or return silently?
   }
 
   void SequenceParser::makeDataMatrixFromMetaValue(
@@ -188,7 +196,7 @@ namespace SmartPeak
     std::vector<std::vector<float>>& data_out,
     std::vector<std::string>& columns_out,
     std::vector<Row>& rows_out,
-    const std::set<std::string>& meta_data,
+    const std::vector<std::string>& meta_data,
     const std::set<MetaDataHandler::SampleType>& sample_types
   )
   {
@@ -252,10 +260,10 @@ namespace SmartPeak
     data_out = std::move(data);
   }
 
-  void SequenceParser::write_dataMatrixFromMetaValue(
+  void SequenceParser::writeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
-    const std::set<std::string>& meta_data,
+    const std::vector<std::string>& meta_data,
     const std::set<MetaDataHandler::SampleType>& sample_types
   )
   {
@@ -268,7 +276,7 @@ namespace SmartPeak
 
     std::ofstream f(filename);
     if (!f.is_open())
-      throw "SequenceParser: write_dataMatrixFromMetaValue could not open file.\n";
+      throw "SequenceParser: writeDataMatrixFromMetaValue could not open file.\n";
 
     std::string line;
     for (const std::string& h : headers) {
@@ -283,7 +291,8 @@ namespace SmartPeak
       line = rows[i].component_group_name + "," + rows[i].component_name + "," + rows[i].meta_value_name;
       for (size_t j = 0; j < data.at(i).size(); ++j) {
         line.push_back(',');
-        line.append(std::to_string(data[i][j])); // TODO: some precision is lost with to_string(). value is rounded at 1e-6. is this ok?
+        // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+        line.append(std::to_string(data[i][j]));
       }
       line.push_back('\n');
       f << line;

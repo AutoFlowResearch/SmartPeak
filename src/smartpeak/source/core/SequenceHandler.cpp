@@ -205,7 +205,8 @@ namespace SmartPeak
       cast = static_cast<float>(subordinate.getMetaValue(meta_value));
     } else {
       // throw std::invalid_argument("meta_value \"" + meta_value + "\" not found.");
-      std::cout << "meta_value \"" + meta_value + "\" not found.\n";
+      std::cout << "meta_value \"" + meta_value + "\" not found.\n"; // Log?
+      cast = "";
     }
 
     return cast;

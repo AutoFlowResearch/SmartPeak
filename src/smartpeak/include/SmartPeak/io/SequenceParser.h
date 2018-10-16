@@ -17,20 +17,19 @@ public:
 
     static void readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname, const std::string& delimiter);
 
-    // TODO: the following 4 methods are incomplete and untested
-
+    // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
     static void makeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       std::vector<std::map<std::string,std::string>>& list_dict,
       std::vector<std::string>& headers_out,
-      const std::set<std::string>& meta_data = std::set<std::string>({"calculated_concentration"}),
+      const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
-    static void write_dataTableFromMetaValue(
+    static void writeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::set<std::string>& meta_data = std::set<std::string>({"calculated_concentration"}),
+      const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
@@ -60,14 +59,15 @@ public:
       std::vector<std::vector<float>>& data_out,
       std::vector<std::string>& columns_out,
       std::vector<Row>& rows_out,
-      const std::set<std::string>& meta_data = std::set<std::string>({"calculated_concentration"}),
+      const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
-    static void write_dataMatrixFromMetaValue(
+    // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
+    static void writeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::set<std::string>& meta_data = std::set<std::string>({"calculated_concentration"}),
+      const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
   };

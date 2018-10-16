@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
 
   vector<map<string,string>> data_out;
   vector<string> headers_out;
-  const set<string> meta_data = {"peak_apex_int", "logSN"};
+  const vector<string> meta_data = {"peak_apex_int", "logSN"};
   const set<MetaDataHandler::SampleType> sample_types = {MetaDataHandler::SampleType::Unknown};
 
   SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types);
@@ -111,12 +111,11 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
   BOOST_CHECK_EQUAL(headers_out[3], "component_name");
-  BOOST_CHECK_EQUAL(headers_out[4], "logSN");
-  BOOST_CHECK_EQUAL(headers_out[5], "peak_apex_int");
+  BOOST_CHECK_EQUAL(headers_out[4], "peak_apex_int");
+  BOOST_CHECK_EQUAL(headers_out[5], "logSN");
 
-  const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_write_dataTableFromMetaValue.csv");
-  SequenceParser::write_dataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
-  // TODO: not really testing the output of the write
+  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataTableFromMetaValue.csv");
+  // SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
 }
 
 BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
@@ -151,7 +150,7 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   std::vector<std::string> columns_out;
   std::vector<SequenceParser::Row> rows_out;
 
-  const set<string> meta_data = {"calculated_concentration"};
+  const vector<string> meta_data = {"calculated_concentration"};
   const set<MetaDataHandler::SampleType> sample_types = {MetaDataHandler::SampleType::Unknown};
 
   SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types);
@@ -163,9 +162,8 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   BOOST_CHECK_CLOSE(data_out.front().front(), 1.28478575, 1e-3);
   BOOST_CHECK_CLOSE(data_out.back().back(), 1.57220089, 1e-3);
 
-  const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_write_dataMatrixFromMetaValue.csv");
-  SequenceParser::write_dataMatrixFromMetaValue(sequenceHandler, pathname_output);
-  // TODO: not really testing the output of the write
+  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataMatrixFromMetaValue.csv");
+  // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
