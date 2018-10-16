@@ -6,7 +6,7 @@
 #define CSV_IO_NO_THREAD
 #endif
 #include <SmartPeak/io/csv.h>
-#include <fstream>
+#include <SmartPeak/io/CSVWriter.h>
 
 namespace SmartPeak
 {
@@ -152,43 +152,17 @@ namespace SmartPeak
     std::vector<std::map<std::string,std::string>> list_dict;
     std::vector<std::string> headers;
     makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data, sample_types);
-    std::ofstream f(filename);
-    if (!f.is_open())
-      throw "SequenceParser: writeDataTableFromMetaValue could not open file.\n";
 
-    std::string line;
-
-    for (const std::string& s : headers) {
-      line.append(s);
-      line.push_back(',');
-    }
-    if (line.size()) {
-      line.pop_back();
-    } else {
-      f.close();
-      std::cout << "SequenceParser: headers is empty\n";
-      return;
-    }
-    line.push_back('\n');
-    f << line;
+    CSVWriter writer(filename, ",");
+    writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     for (const std::map<std::string,std::string>& m : list_dict) {
-      line.clear();
+      std::vector<std::string> line;
       for (const std::string& h : headers) {
-        line.append(m.at(h));
-        line.push_back(',');
+        line.push_back(m.at(h));
       }
-      line.pop_back();
-      if (line.empty()) {
-        f.close();
-        std::cout << "SequenceParser: line (map) is empty\n";
-        break;
-      }
-      line.push_back('\n');
-      f << line;
+      writer.writeDataInRow(line.cbegin(), line.cend());
     }
-
-    f.close();
   }
 
   void SequenceParser::makeDataMatrixFromMetaValue(
@@ -271,33 +245,23 @@ namespace SmartPeak
     std::vector<std::string> columns;
     std::vector<Row> rows;
     makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data, sample_types);
+
     std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
     headers.insert(headers.end(), columns.begin(), columns.end());
 
-    std::ofstream f(filename);
-    if (!f.is_open())
-      throw "SequenceParser: writeDataMatrixFromMetaValue could not open file.\n";
-
-    std::string line;
-    for (const std::string& h : headers) {
-      line.append(h);
-      line.push_back(',');
-    }
-    line.pop_back();
-    line.push_back('\n');
-    f << line;
+    CSVWriter writer(filename, ",");
+    writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     for (size_t i = 0; i < rows.size(); ++i) {
-      line = rows[i].component_group_name + "," + rows[i].component_name + "," + rows[i].meta_value_name;
+      std::vector<std::string> line;
+      line.push_back(rows[i].component_group_name);
+      line.push_back(rows[i].component_name);
+      line.push_back(rows[i].meta_value_name);
       for (size_t j = 0; j < data.at(i).size(); ++j) {
-        line.push_back(',');
         // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-        line.append(std::to_string(data[i][j]));
+        line.emplace_back(std::to_string(data[i][j]));
       }
-      line.push_back('\n');
-      f << line;
+      writer.writeDataInRow(line.cbegin(), line.cend());
     }
-
-    f.close();
   }
 }
