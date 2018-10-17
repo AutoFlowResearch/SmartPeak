@@ -79,13 +79,18 @@ BOOST_AUTO_TEST_CASE(getMetaValue)
   subordinate.setMetaValue("calculated_concentration", 10.0);
 
   Utilities::CastValue result;
+
   result = SequenceHandler::getMetaValue(feature, subordinate, "RT");
   BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
   BOOST_CHECK_CLOSE(result.f_, 16.0, 1e-6);
+
   result = SequenceHandler::getMetaValue(feature, subordinate, "calculated_concentration");
   BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
   BOOST_CHECK_CLOSE(result.f_, 10.0, 1e-6);
-  BOOST_CHECK_THROW(SequenceHandler::getMetaValue(feature, subordinate, "not_present"), std::invalid_argument);
+
+  result = SequenceHandler::getMetaValue(feature, subordinate, "absent_meta_value");
+  BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::STRING);
+  BOOST_CHECK_EQUAL(result.s_, "");
 }
 
 BOOST_AUTO_TEST_CASE(getSamplesInSequence)
