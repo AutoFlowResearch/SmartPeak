@@ -12,8 +12,8 @@ BOOST_AUTO_TEST_SUITE(utilities)
 BOOST_AUTO_TEST_CASE(castValue_constructor_copyConstructor)
 {
   Utilities::CastValue c;
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::UNKNOWN);
-  BOOST_CHECK_EQUAL(c.s_, "");
+  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::UNINITIALIZED);
+  BOOST_CHECK_EQUAL(c.b_, false);
 
   c = 7;
 

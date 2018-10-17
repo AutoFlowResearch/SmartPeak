@@ -17,14 +17,19 @@ public:
     class CastValue
     {
     public:
-      CastValue() : tag_(UNKNOWN), s_(), is_clear_(false) {}
+      CastValue() : tag_(UNINITIALIZED), b_(false), is_clear_(true) {}
       CastValue(const std::string& s) : tag_(STRING), s_(s), is_clear_(false) {}
       CastValue(const char *s) : tag_(STRING), s_(s), is_clear_(false) {}
       CastValue(const float f) : tag_(FLOAT), f_(f), is_clear_(true) {}
 
-      CastValue(const CastValue& other) : tag_(INT), is_clear_(true)
+      CastValue(const CastValue& other) : tag_(UNINITIALIZED), b_(false), is_clear_(true)
       {
         *this = other;
+      }
+
+      CastValue(CastValue&& other) : tag_(UNINITIALIZED), b_(false), is_clear_(true)
+      {
+        *this = std::move(other);
       }
 
       CastValue& operator=(const CastValue& other)
@@ -36,6 +41,7 @@ public:
           case STRING:
             setTagAndData(other.tag_, other.s_);
             break;
+          case UNINITIALIZED:
           case BOOL:
             setTagAndData(other.tag_, other.b_);
             break;
@@ -58,19 +64,23 @@ public:
             setTagAndData(other.tag_, other.sl_);
             break;
           default:
-            throw "Tag type not managed in copy constructor. Implement it.";
+            throw "Tag type not managed in copy assignment constructor. Implement it.";
         }
         return *this;
       }
 
       CastValue& operator=(CastValue&& other)
       {
+        if (this == &other)
+          return *this;
         clear();
         switch (other.tag_) {
           case UNKNOWN:
           case STRING:
-            s_ = std::move(other.s_);
+            new (&s_) std::string(std::move(other.s_));
+            is_clear_ = false;
             break;
+          case UNINITIALIZED:
           case BOOL:
             b_ = other.b_;
             break;
@@ -81,31 +91,29 @@ public:
             i_ = other.i_;
             break;
           case BOOL_LIST:
-            bl_ = std::move(other.bl_);
+            new (&bl_) std::vector<bool>(std::move(other.bl_));
+            is_clear_ = false;
             break;
           case FLOAT_LIST:
-            fl_ = std::move(other.fl_);
+            new (&fl_) std::vector<float>(std::move(other.fl_));
+            is_clear_ = false;
             break;
           case INT_LIST:
-            il_ = std::move(other.il_);
+            new (&il_) std::vector<int>(std::move(other.il_));
+            is_clear_ = false;
             break;
           case STRING_LIST:
-            sl_ = std::move(other.sl_);
+            new (&sl_) std::vector<std::string>(std::move(other.sl_));
+            is_clear_ = false;
             break;
           default:
             throw "Tag type not managed in move assignment operator. Implement it.";
         }
-        other.is_clear_ = true;
         tag_ = other.tag_;
-        is_clear_ = false;
+        other.tag_ = UNINITIALIZED;
+        other.is_clear_ = true;
+        other.b_ = false;
         return *this;
-      }
-
-      // tag_ and is_clear are being set to these values because the move-assignment
-      // operator that gets called in the body will call clear()
-      CastValue(CastValue&& other) : tag_(INT), is_clear_(true)
-      {
-        *this = std::move(other);
       }
 
       CastValue& operator=(const bool data)
@@ -164,7 +172,7 @@ public:
 
       ~CastValue()
       {
-          clear();
+        clear();
       }
 
       void clear()
@@ -194,7 +202,8 @@ public:
         is_clear_ = true;
       }
 
-      enum Type { // TODO: Implement UNINITIALIZED
+      enum Type {
+        UNINITIALIZED,
         UNKNOWN,
         BOOL,
         FLOAT,
@@ -223,7 +232,6 @@ public:
         clear();
         tag_ = type;
         setData(data);
-        is_clear_ = false;
       }
 
     private:
@@ -245,26 +253,31 @@ public:
       void setData(const std::string& data)
       {
         new (&s_) std::string(data);
+        is_clear_ = false;
       }
 
       void setData(const std::vector<bool>& data)
       {
         new (&bl_) std::vector<bool>(data);
+        is_clear_ = false;
       }
 
       void setData(const std::vector<float>& data)
       {
         new (&fl_) std::vector<float>(data);
+        is_clear_ = false;
       }
 
       void setData(const std::vector<int>& data)
       {
         new (&il_) std::vector<int>(data);
+        is_clear_ = false;
       }
 
       void setData(const std::vector<std::string>& data)
       {
         new (&sl_) std::vector<std::string>(data);
+        is_clear_ = false;
       }
 
       Type tag_;
