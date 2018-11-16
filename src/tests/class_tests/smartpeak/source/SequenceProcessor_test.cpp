@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
   sequenceHandler.setFilenames(filenames);
   sequenceHandler.setDirDynamic(SMARTPEAK_GET_TEST_DATA_PATH(""));
   SequenceProcessor::createSequence(sequenceHandler, ",");
-  const set<string> raw_data_processing_methods = { "calculate_calibration" };
+  const vector<string> raw_data_processing_methods = { "calculate_calibration" };
   SequenceProcessor::processSequenceSegments(sequenceHandler, std::set<std::string>(), raw_data_processing_methods);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 1);
 
