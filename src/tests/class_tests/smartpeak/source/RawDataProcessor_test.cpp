@@ -15,8 +15,8 @@ void load_data(
   std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_2
 )
 {
-  const string pathname1 = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_1_core.csv");
-  const string pathname2 = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_2.csv");
+  const string pathname1 = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_1_core_tmpFix.csv");
+  const string pathname2 = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_2_tmpFix.csv");
   RawDataHandler rawDataHandler;
   OpenMSFile::readRawDataProcessingParameters(rawDataHandler, pathname1, ",");
   params_1 = rawDataHandler.getParameters();
