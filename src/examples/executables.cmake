@@ -15,8 +15,15 @@ set(cuda_executables_list
   CUDA_example
 )
 
+set(pipeline_executables_list
+  LCMS_MRM_Standards_example
+  LCMS_MRM_Unknown_example
+  LCMS_MRM_Validation_example
+)
+
 ### collect example executables
 set(EXAMPLE_executables
-  ${ml_executables_list}
-  ${cuda_executables_list}
+#  ${ml_executables_list}
+#  ${cuda_executables_list}
+  ${pipeline_executables_list}
 )
