@@ -9,24 +9,24 @@
 using namespace SmartPeak;
 using namespace std;
 
-static const std::string example_dir = "/home/pasdom/SmartPeak2/examples"; // TODO: redefine it
+static const std::string example_data_dir = "/home/pasdom/SmartPeak2/src/examples/data/"; // TODO: redefine it
 
 void test_main_HPLC_UV_Standards()
 {
-  example_LCMS_MRM_Standards(example_dir + "HPLC_UV_Standards", ",");
+  example_LCMS_MRM_Standards(example_data_dir + "HPLC_UV_Standards", ",");
 
   RawDataHandler rawDataHandler;
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_dir + "HPLC_UV_Standards/features/100ug.featureXML"
+    example_data_dir + "HPLC_UV_Standards/features/100ug.featureXML"
   );
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_dir + "HPLC_UV_Standards/features/100ug_test.featureXML"
+    example_data_dir + "HPLC_UV_Standards/features/100ug_test.featureXML"
   );
 
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();

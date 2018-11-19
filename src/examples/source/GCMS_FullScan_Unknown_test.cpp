@@ -9,24 +9,24 @@
 using namespace SmartPeak;
 using namespace std;
 
-static const std::string example_dir = "/home/pasdom/SmartPeak2/examples"; // TODO: redefine it
+static const std::string example_data_dir = "/home/pasdom/SmartPeak2/src/examples/data/"; // TODO: redefine it
 
 void test_main_GCMS_FullScan_Unknown()
 {
-  example_LCMS_MRM_Unknowns(example_dir + "GCMS_FullScan_Unknowns", ",");
+  example_LCMS_MRM_Unknowns(example_data_dir + "GCMS_FullScan_Unknowns", ",");
 
   RawDataHandler rawDataHandler;
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_dir + "GCMS_FullScan_Unknowns/features/GCMS_FullScan.featureXML"
+    example_data_dir + "GCMS_FullScan_Unknowns/features/GCMS_FullScan.featureXML"
   );
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_dir + "GCMS_FullScan_Unknowns/features/GCMS_FullScan_test.featureXML"
+    example_data_dir + "GCMS_FullScan_Unknowns/features/GCMS_FullScan_test.featureXML"
   );
 
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();

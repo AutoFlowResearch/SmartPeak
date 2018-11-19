@@ -9,24 +9,24 @@
 using namespace SmartPeak;
 using namespace std;
 
-static const std::string example_dir = "/home/pasdom/SmartPeak2/examples"; // TODO: redefine it
+static const std::string example_data_dir = "/home/pasdom/SmartPeak2/src/examples/data/"; // TODO: redefine it
 
 void test_main_HPLC_UV_Unknown()
 {
-  example_LCMS_MRM_Unknowns(example_dir + "HPLC_UV_Unknowns", ",");
+  example_LCMS_MRM_Unknowns(example_data_dir + "HPLC_UV_Unknowns", ",");
 
   RawDataHandler rawDataHandler;
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_dir + "HPLC_UV_Unknowns/features/20171013_HMP_C61_ISO_P1_GA1_UV_VIS_2.featureXML"
+    example_data_dir + "HPLC_UV_Unknowns/features/20171013_HMP_C61_ISO_P1_GA1_UV_VIS_2.featureXML"
   );
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_dir + "HPLC_UV_Unknowns/features/20171013_HMP_C61_ISO_P1_GA1_UV_VIS_2_test.featureXML"
+    example_data_dir + "HPLC_UV_Unknowns/features/20171013_HMP_C61_ISO_P1_GA1_UV_VIS_2_test.featureXML"
   );
 
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
