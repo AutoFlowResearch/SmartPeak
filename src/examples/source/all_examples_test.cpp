@@ -138,7 +138,7 @@ const std::string example_dir = "/home/pasdom/SmartPeak2/examples"; // TODO: red
 
 // test_main_HPLC_UV_Standards
 {
-  example_LCMS_MRM_Unknowns(example_dir + "HPLC_UV_Standards", ",");
+  example_LCMS_MRM_Standards(example_dir + "HPLC_UV_Standards", ",");
 
   RawDataHandler rawDataHandler;
 
@@ -169,7 +169,7 @@ const std::string example_dir = "/home/pasdom/SmartPeak2/examples"; // TODO: red
 
 // test_main_LCMS_MRM_Standards
 {
-  example_LCMS_MRM_Unknowns(example_dir + "LCMS_MRM_Standards", ",");
+  example_LCMS_MRM_Standards(example_dir + "LCMS_MRM_Standards", ",");
 
   RawDataHandler rawDataHandler;
 
