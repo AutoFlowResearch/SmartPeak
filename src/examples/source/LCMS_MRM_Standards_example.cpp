@@ -46,7 +46,7 @@ void example_LCMS_MRM_Standards(
 
   SequenceProcessor::processSequenceSegments(
     sequenceHandler,
-    std::vector<std::string>(),
+    std::set<std::string>(),
     sequence_segment_processing_methods,
     true
   );
