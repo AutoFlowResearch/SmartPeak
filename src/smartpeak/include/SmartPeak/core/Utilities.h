@@ -5,6 +5,7 @@
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <iostream>
 #include <regex>
+#define maxFunc(a,b) (((a) > (b)) ? (a) : (b))
 
 namespace SmartPeak
 {
@@ -399,6 +400,23 @@ public:
         std::cout << "Confusion matrix: [TP, FP, FN, TN] = [" << TP << ", " << FP << ", " << FN << ", " << TN << "]" << std::endl;
 
       return conf;
+    }
+
+    /**
+      @brief Test absolute and relative closeness of values
+
+      References: http://realtimecollisiondetection.net/blog/?p=89
+
+      @param: lhs Left Hand Side to compare
+      @param: rhs Right Hand Side to Compare
+      @param: rel_tol Relative Tolerance threshold
+      @param: abs_tol Absolute Tolerance threshold
+
+      @returns True or False
+    */
+    template<typename T>
+    bool assert_close(const T& lhs, const T& rhs, T rel_tol = 1e-4, T abs_tol = 1e-4) {
+      return (std::fabs(lhs - rhs) <= maxFunc(abs_tol, rel_tol * maxFunc(std::fabs(lhs), std::fabs(rhs)) ));
     }
   };
 }
