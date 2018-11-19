@@ -415,7 +415,8 @@ public:
       @returns True or False
     */
     template<typename T>
-    bool assert_close(const T& lhs, const T& rhs, T rel_tol = 1e-4, T abs_tol = 1e-4) {
+    static bool assert_close(const T& lhs, const T& rhs, double rel_tol = 1e-4, double abs_tol = 1e-4)
+    {
       return (std::fabs(lhs - rhs) <= maxFunc(abs_tol, rel_tol * maxFunc(std::fabs(lhs), std::fabs(rhs)) ));
     }
   };

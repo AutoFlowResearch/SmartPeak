@@ -5,6 +5,12 @@ project("SmartPeak_class_examples_smartpeak")
 
 message(STATUS "building examples...")
 
+# #------------------------------------------------------------------------------
+# # Configure examples file to get the TEST_DATA_PATH into the examples
+# set(CF_SMARTPEAK_EXAMPLES_DATA_PATH "${PROJECT_SOURCE_DIR}/examples/data/")
+# set(CONFIGURED_EXAMPLES_CONFIG_H "${PROJECT_BINARY_DIR}/include/SmartPeak/test_config.h")
+# configure_file(${PROJECT_SOURCE_DIR}/include/SmartPeak/test_config.h.in ${CONFIGURED_EXAMPLES_CONFIG_H})
+
 #------------------------------------------------------------------------------
 # get the test executables
 include(executables.cmake)
@@ -16,6 +22,49 @@ set(SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES "${PROJECT_BINARY_DIR}/inclu
 set(SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES "${SmartPeak_INCLUDE_DIRECTORIES}")
 include_directories(${SMARTPEAK_EXAMPLES_INTERNAL_INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SMARTPEAK_EXAMPLES_EXTERNAL_INCLUDE_DIRECTORIES})
+
+#------------------------------------------------------------------------------
+# OpenMS
+#------------------------------------------------------------------------------
+find_package(OpenMS REQUIRED)
+
+# check whether the OpenMS package was found
+if (OpenMS_FOUND)
+  # check if the variable containing the include directories is defined
+  if(NOT OpenMS_INCLUDE_DIRECTORIES)
+    set(_message "The variable \${OpenMS_INCLUDE_DIRECTORIES} is not defined.")
+    set(_message "${_message}This CMakeLists.txt and your build of OpenMS seem incompatible.")
+    set(_message "${_message}Please use the latest version from the OpenMS release!")
+    message(FATAL_ERROR ${_message})
+  endif()
+  ## include directories for OpenMS headers (and contrib)
+  #       OpenMS_GUI -> ${OpenMS_GUI_INCLUDE_DIRECTORIES}
+  include_directories(${OpenMS_INCLUDE_DIRECTORIES})
+
+  ## append precompiler macros and compiler flags specific to OpenMS
+  ## Warning: this could be harmful to your project. Check this if problems occur.
+  ## Also, use this to add your own compiler flags, e.g. for OpenMP support.
+  ## e.g. for Visual Studio use /openmp
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPENMS_ADDCXX_FLAGS}")
+
+else(OpenMS_FOUND)
+  message(FATAL_ERROR "OpenMSConfig.cmake file not found!")
+endif(OpenMS_FOUND)
+
+#------------------------------------------------------------------------------
+# OpenMS QT5 dependencies
+#------------------------------------------------------------------------------
+find_package(Qt5 COMPONENTS Core Network REQUIRED)
+
+if (NOT Qt5Network_FOUND)
+  message(STATUS "QtNetwork module not found!")
+  message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
+endif()
+
+if (NOT Qt5Core_FOUND)
+  message(STATUS "QtCore module not found!")
+  message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
+endif()
 
 #------------------------------------------------------------------------------
 # disable optimization for examples for gcc like compilers
@@ -34,7 +83,7 @@ add_dependencies(PIPELINE_EXAMPLES ${pipeline_executables_list})
 # Add the actual examples
 foreach(_examples ${EXAMPLE_executables})
   add_executable(${_examples} source/${_examples})
-  target_link_libraries(${_examples} ${SmartPeak_LIBRARIES})
+  target_link_libraries(${_examples} ${SmartPeak_LIBRARIES} OpenMS)
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
   # see https://sourceforge.net/apps/trac/open-ms/ticket/280 for details)
   if (OPENMP_FOUND AND NOT MSVC AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
