@@ -125,8 +125,13 @@ namespace SmartPeak
           mzML_params.emplace(param.at("name"), c);
         }
         if (mzML_params.count("format") && mzML_params.at("format").s_ == "ChromeleonFile") {
+          const size_t pos = mzML_i.rfind(".");
+          std::string txt_name = mzML_i;
+          if (pos != std::string::npos) {
+            txt_name.replace(txt_name.cbegin() + pos + 1, txt_name.cend(), "txt"); // replace extension
+          }
           OpenMS::ChromeleonFile chfh;
-          chfh.load(mzML_i, chromatograms);
+          chfh.load(txt_name, chromatograms);
         } else {
           OpenMS::FileHandler fh;
           fh.loadExperiment(mzML_i, chromatograms);
