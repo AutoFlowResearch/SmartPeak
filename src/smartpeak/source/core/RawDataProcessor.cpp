@@ -6,6 +6,8 @@
 #include <SmartPeak/io/OpenMSFile.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureScheduler.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 
 namespace SmartPeak
@@ -109,29 +111,33 @@ namespace SmartPeak
     if (verbose_I)
       std::cout << "Selecting picked features" << std::endl;
 
-    // TODO: Uncomment once MRMFeatureSelector is ready
+    OpenMS::FeatureMap output;
 
-    // MRMFeatureSelector featureSelector;
-    // OpenMS::FeatureMap featureMap;
+    if (MRMFeatureSelector_schedule_params_I.size()) {
+      OpenMS::MRMFeatureScheduler scheduler;
 
-    // if (MRMFeatureSelector_schedule_params_I.size()) {
-    //   featureSelector.schedule_MRMFeatures_qmip(
-    //     rawDataHandler_IO.getFeatureMap(),
-    //     rawDataHandler_IO.getTargetedExperiment(),
-    //     MRMFeatureSelector_schedule_params_I,
-    //     MRMFeatureSelector_select_params_I
-    //   );
-    // } else if (MRMFeatureSelector_schedule_params_I.size()) {
-    //   featureSelector.select_MRMFeatures_score(
-    //     rawDataHandler_IO.getFeatureMap(),
-    //     MRMFeatureSelector_select_params_I
-    //   );
-    //   featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
-    // } else {
-    //   throw;
-    // }
+      scheduler.setSchedulerParameters(
+        Utilities::extractSelectorParameters(MRMFeatureSelector_schedule_params_I, MRMFeatureSelector_select_params_I)
+      );
 
-    // featureMap.setFeatureMap(featureMap);
+      scheduler.scheduleMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output);
+
+    } else if (MRMFeatureSelector_schedule_params_I.size()) {
+      OpenMS::MRMFeatureScheduler scheduler;
+
+      scheduler.setSchedulerParameters(
+        Utilities::extractSelectorParameters(MRMFeatureSelector_schedule_params_I, MRMFeatureSelector_select_params_I)
+      );
+
+      scheduler.scheduleMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output);
+
+      output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()}); // TODO: remove this?
+
+    } else {
+      throw std::invalid_argument("Argument 'select params' nor 'schedule params' not passed.");
+    }
+
+    rawDataHandler_IO.setFeatureMap(output);
   }
 
   void RawDataProcessor::extractMetaData(
@@ -288,14 +294,14 @@ namespace SmartPeak
         parameters.at("MRMFeatureFilter.filter_MRMFeatures"),
         verbose_I
       );
-    } /*else if (event == "select_features") {
+    } else if (event == "select_features") {
       selectFeatures(
         rawDataHandler_IO,
         parameters.at("MRMFeatureSelector.select_MRMFeatures_qmip"),
         parameters.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"),
         verbose_I
       );
-    }*/ else if (event == "validate_features") {
+    } else if (event == "validate_features") {
       OpenMSFile::loadValidationData(rawDataHandler_IO, filenames.at("referenceData_csv_i"));
       validateFeatures(
         rawDataHandler_IO,
