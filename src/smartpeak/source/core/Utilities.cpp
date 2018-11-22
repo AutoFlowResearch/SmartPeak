@@ -276,13 +276,12 @@ namespace SmartPeak
     }
   }
 
-  void Utilities::splitString(
+  std::vector<std::string> Utilities::splitString(
     const std::string& s,
-    const char sep,
-    std::vector<std::string>& out
+    const char sep
   )
   {
-    out.clear();
+    std::vector<std::string> out;
     size_t l, r;
     l = r = 0;
     size_t len = s.size();
@@ -298,5 +297,6 @@ namespace SmartPeak
     if (r != 0 && r - l) {
       out.emplace_back(s.substr(l));
     }
+    return out;
   }
 }
