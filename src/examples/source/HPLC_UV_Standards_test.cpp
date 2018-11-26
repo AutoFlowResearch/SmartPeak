@@ -31,7 +31,10 @@ void test_main_HPLC_UV_Standards()
 
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 
-  assert(fm1.size() == 0);
+cout << "fm1 size: " << fm1.size() << endl;
+cout << "fm2 size: " << fm2.size() << endl;
+
+  assert(fm1.size() == 8);
   assert(fm1.size() == fm2.size());
 
   const OpenMS::Feature& f1 = fm1[0].getSubordinates()[0];
