@@ -18,8 +18,11 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    if (verbose_I)
-      std::cout << "Picking peaks using OpenSWATH." << std::endl;
+    if (verbose_I) {
+      std::cout << "START pickFeatures" << std::endl;
+      std::cout << "Experiment size: " << rawDataHandler_IO.getChromatogramMap().size() << std::endl;
+      // std::cout << "Picking peaks using OpenSWATH." << std::endl;
+    }
 
     OpenMS::MRMFeatureFinderScoring featureFinder;
     OpenMS::Param parameters = featureFinder.getParameters();
@@ -39,6 +42,11 @@ namespace SmartPeak
     featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
 
     rawDataHandler_IO.setFeatureMap(featureMap);
+
+    if (verbose_I) {
+      std::cout << "pickFeatures: output size: " << featureMap.size() << std::endl;
+      std::cout << "END pickFeatures\n" << std::endl;
+    }
   }
 
   void RawDataProcessor::filterFeatures(
@@ -47,8 +55,11 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    if (verbose_I)
-      std::cout << "Filtering picked features" << std::endl;
+    if (verbose_I) {
+      std::cout << "START filterFeatures" << std::endl;
+      std::cout << "filterFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
+      // std::cout << "Filtering picked features" << std::endl;
+    }
 
     if (MRMFeatureFilter_filter_params_I.empty()) {
       std::cout << "No parameters passed to filterFeatures(). Not filtering." << std::endl;
@@ -69,6 +80,11 @@ namespace SmartPeak
     );
 
     rawDataHandler_IO.setFeatureMap(featureMap);
+
+    if (verbose_I) {
+      std::cout << "filterFeatures: output size: " << featureMap.size() << std::endl;
+      std::cout << "END filterFeatures\n" << std::endl;
+    }
   }
 
   void RawDataProcessor::checkFeatures(
@@ -77,8 +93,11 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    if (verbose_I)
-      std::cout << "Checking picked features" << std::endl;
+    if (verbose_I) {
+      std::cout << "START checkFeatures" << std::endl;
+      std::cout << "checkFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
+      // std::cout << "Checking picked features" << std::endl;
+    }
 
     if (MRMFeatureFilter_qc_params_I.empty()) {
       std::cout << "No parameters passed to checkFeatures(). Not checking." << std::endl;
@@ -99,6 +118,11 @@ namespace SmartPeak
     );
 
     rawDataHandler_IO.setFeatureMap(featureMap);
+
+    if (verbose_I) {
+      std::cout << "checkFeatures: output size: " << featureMap.size() << std::endl;
+      std::cout << "END checkFeatures\n" << std::endl;
+    }
   }
 
   void RawDataProcessor::selectFeatures(
@@ -113,26 +137,17 @@ namespace SmartPeak
 
     OpenMS::FeatureMap output;
 
+    const std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
+      Utilities::extractSelectorParameters(MRMFeatureSelector_schedule_params_I, MRMFeatureSelector_select_params_I);
+
+    OpenMS::MRMFeatureScheduler scheduler;
+    scheduler.setSchedulerParameters(p);
+
     if (MRMFeatureSelector_schedule_params_I.size()) {
-      OpenMS::MRMFeatureScheduler scheduler;
-
-      scheduler.setSchedulerParameters(
-        Utilities::extractSelectorParameters(MRMFeatureSelector_schedule_params_I, MRMFeatureSelector_select_params_I)
-      );
-
       scheduler.scheduleMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output);
-
     } else if (MRMFeatureSelector_schedule_params_I.size()) {
-      OpenMS::MRMFeatureScheduler scheduler;
-
-      scheduler.setSchedulerParameters(
-        Utilities::extractSelectorParameters(MRMFeatureSelector_schedule_params_I, MRMFeatureSelector_select_params_I)
-      );
-
       scheduler.scheduleMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output);
-
       output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()}); // TODO: remove this?
-
     } else {
       throw std::invalid_argument("Argument 'select params' nor 'schedule params' not passed.");
     }
@@ -244,8 +259,11 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    if (verbose_I)
-      std::cout << "Quantifying features" << std::endl;
+    if (verbose_I) {
+      std::cout << "START quantifyComponents" << std::endl;
+      std::cout << "Processing # quantitation methods: " << rawDataHandler_IO.getQuantitationMethods().size() << std::endl;
+      // std::cout << "Quantifying features" << std::endl;
+    }
 
     try {
       OpenMS::AbsoluteQuantitation aq;
@@ -253,6 +271,10 @@ namespace SmartPeak
       aq.quantifyComponents(rawDataHandler_IO.getFeatureMap());
     } catch (const std::exception& e) {
       std::cerr << e.what();
+    }
+
+    if (verbose_I) {
+      std::cout << "END quantifyComponents" << std::endl;
     }
   }
 
