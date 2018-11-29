@@ -110,8 +110,10 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-        std::cout << "Loading mzML" << std::endl;
+    if (verbose) {
+      std::cout << "START loadMSExperiment" << std::endl;
+      // std::cout << "Loading mzML" << std::endl;
+    }
 
     // # load chromatograms
     OpenMS::MSExperiment chromatograms;
@@ -145,6 +147,10 @@ namespace SmartPeak
       } else {
         OpenMS::FileHandler fh;
         fh.loadExperiment(mzML_i, chromatograms);
+      }
+
+      if (verbose) {
+        std::cout << "END loadMSExperiment\n" << std::endl;
       }
     }
 

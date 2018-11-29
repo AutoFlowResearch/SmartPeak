@@ -4,10 +4,10 @@
 #include <SmartPeak/core/MRMFeatureValidator.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/io/OpenMSFile.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMBatchFeatureSelector.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureScheduler.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 
 namespace SmartPeak
@@ -132,27 +132,32 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    if (verbose_I)
-      std::cout << "Selecting picked features" << std::endl;
+    if (verbose_I) {
+      std::cout << "START selectFeatures" << std::endl;
+      std::cout << "selectFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
+      // std::cout << "Selecting picked features" << std::endl;
+    }
 
     OpenMS::FeatureMap output;
 
-    const std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
+    std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
       Utilities::extractSelectorParameters(MRMFeatureSelector_schedule_params_I, MRMFeatureSelector_select_params_I);
 
-    OpenMS::MRMFeatureScheduler scheduler;
-    scheduler.setSchedulerParameters(p);
-
     if (MRMFeatureSelector_schedule_params_I.size()) {
-      scheduler.scheduleMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output);
+      OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
     } else if (MRMFeatureSelector_schedule_params_I.size()) {
-      scheduler.scheduleMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output);
+      OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
       output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()}); // TODO: remove this?
     } else {
       throw std::invalid_argument("Argument 'select params' nor 'schedule params' not passed.");
     }
 
     rawDataHandler_IO.setFeatureMap(output);
+
+    if (verbose_I) {
+      std::cout << "selectFeatures: output size: " << output.size() << std::endl;
+      std::cout << "END selectFeatures\n" << std::endl;
+    }
   }
 
   void RawDataProcessor::extractMetaData(

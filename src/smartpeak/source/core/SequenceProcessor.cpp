@@ -116,10 +116,15 @@ namespace SmartPeak
         );
       }
 
-      for (const std::string& event : raw_data_processing_methods) {
+      const size_t n = raw_data_processing_methods.size();
+
+      for (size_t i = 0; i < n; ++i) {
+        if (verbose_I) {
+          std::cout << "[" << (i + 1) << "/" << n << "]" << std::endl;
+        }
         RawDataProcessor::processRawData(
           sample.getRawData(),
-          event,
+          raw_data_processing_methods[i], // event
           sample.getRawData().getParameters(),
           sequenceHandler_IO.getDefaultDynamicFilenames(
             sequenceHandler_IO.getDirDynamic(),

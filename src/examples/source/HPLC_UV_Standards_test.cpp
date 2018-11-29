@@ -37,12 +37,25 @@ cout << "fm2 size: " << fm2.size() << endl;
   assert(fm1.size() == 8);
   assert(fm1.size() == fm2.size());
 
-  const OpenMS::Feature& f1 = fm1[0].getSubordinates()[0];
-  const OpenMS::Feature& f2 = fm2[0].getSubordinates()[0];
+cout << "fm1[0].getSubordinates().size(): " << fm1[0].getSubordinates().size() << endl;
+cout << "fm1[0].getSubordinates().size(): " << fm2[0].getSubordinates().size() << endl;
+  assert(fm1[0].getSubordinates().size() == 2);
+  assert(fm1[0].getSubordinates().size() == fm2[0].getSubordinates().size());
+  const OpenMS::Feature* f1 = &fm1[0].getSubordinates()[0];
+  const OpenMS::Feature* f2 = &fm2[0].getSubordinates()[0];
+  assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
+  assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
 
-  assert(f1.getMetaValue("native_id") == f2.getMetaValue("native_id"));
-  assert(Utilities::assert_close((double)f1.getMetaValue("peak_apex_int"), (double)f2.getMetaValue("peak_apex_int")));
-  assert(Utilities::assert_close((double)f1.getRT(), (double)f2.getRT()));
+cout << "fm1[6].getSubordinates().size(): " << fm1[6].getSubordinates().size() << endl;
+cout << "fm1[6].getSubordinates().size(): " << fm2[6].getSubordinates().size() << endl;
+  assert(fm1[6].getSubordinates().size() == 2);
+  assert(fm1[6].getSubordinates().size() == fm2[6].getSubordinates().size());
+  f1 = &fm1[6].getSubordinates()[0];
+  f2 = &fm2[6].getSubordinates()[0];
+  assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
+  assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
 }
 
 int main(int argc, char **argv)

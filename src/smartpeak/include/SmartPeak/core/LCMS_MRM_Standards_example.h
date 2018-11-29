@@ -19,7 +19,7 @@ void example_LCMS_MRM_Standards(
 
   std::vector<std::string> raw_data_processing_methods = {
     "load_raw_data",
-    // # "load_features", 
+    // # "load_features",
     "pick_features",
     "filter_features",
     "filter_features",
@@ -36,9 +36,9 @@ void example_LCMS_MRM_Standards(
     true
   );
 
-  std::vector<std::string> sequence_segment_processing_methods = {
+  const std::vector<std::string> sequence_segment_processing_methods = {
     "calculate_calibration",
-    "plot_calibrators",
+  // "plot_calibrators",
     "store_quantitation_methods",
   // # "load_quantitation_methods",
   // # "store_components_to_concentrations"
