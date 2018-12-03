@@ -31,15 +31,41 @@ void test_main_HPLC_UV_Unknown()
 
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 
-  assert(fm1.size() == 0);
+cout << "fm1 size: " << fm1.size() << endl;
+cout << "fm2 size: " << fm2.size() << endl;
+
+  assert(fm1.size() == 9);
   assert(fm1.size() == fm2.size());
 
-  const OpenMS::Feature& f1 = fm1[0].getSubordinates()[0];
-  const OpenMS::Feature& f2 = fm2[0].getSubordinates()[0];
+  assert(fm1[0].getSubordinates().size() == 2);
+  assert(fm1[0].getSubordinates().size() == fm2[0].getSubordinates().size());
+  const OpenMS::Feature* f1 = &fm1[0].getSubordinates()[0];
+  const OpenMS::Feature* f2 = &fm2[0].getSubordinates()[0];
 
-  assert(f1.getMetaValue("native_id") == f2.getMetaValue("native_id"));
-  assert(Utilities::assert_close((double)f1.getMetaValue("peak_apex_int"), (double)f2.getMetaValue("peak_apex_int")));
-  assert(Utilities::assert_close((double)f1.getRT(), (double)f2.getRT()));
+cout << "fm1sub size: " << fm1[0].getSubordinates().size() << endl;
+cout << "fm2sub size: " << fm2[0].getSubordinates().size() << endl;
+
+cout << "native_id: " << f1->getMetaValue("native_id") << endl;
+cout << "peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
+cout << "getRT: " << f1->getRT() << endl;
+  assert(f1->getMetaValue("native_id") == "5-HTP");
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 19.8419150936099));
+  assert(Utilities::assert_close((double)f1->getRT(), 2.02693));
+  assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
+  assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
+
+  f1 = &fm1[6].getSubordinates()[0];
+  f2 = &fm2[6].getSubordinates()[0];
+cout << "native_id: " << f1->getMetaValue("native_id") << endl;
+cout << "peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
+cout << "getRT: " << f1->getRT() << endl;
+  assert(f1->getMetaValue("native_id") == "Serotonin");
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 1.12071600181173));
+  assert(Utilities::assert_close((double)f1->getRT(), 1.88778));
+  assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
+  assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
 }
 
 int main(int argc, char **argv)
