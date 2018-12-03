@@ -46,6 +46,9 @@ void test_main_HPLC_UV_Standards()
   assert(fm1[6].getSubordinates().size() == fm2[6].getSubordinates().size());
   f1 = &fm1[6].getSubordinates()[0];
   f2 = &fm2[6].getSubordinates()[0];
+  assert(f1->getMetaValue("native_id") == "Tryptamine");
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 36.9685460263344));
+  assert(Utilities::assert_close((double)f1->getRT(), 3.43251273956299));
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
