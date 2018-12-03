@@ -79,8 +79,6 @@ namespace SmartPeak
       rawDataHandler_IO.getTargetedExperiment()
     );
 
-    rawDataHandler_IO.setFeatureMap(featureMap);
-
     if (verbose_I) {
       std::cout << "filterFeatures: output size: " << featureMap.size() << std::endl;
       std::cout << "END filterFeatures\n" << std::endl;
@@ -145,9 +143,10 @@ namespace SmartPeak
 
     if (MRMFeatureSelector_schedule_params_I.size()) {
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
+      output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
     } else if (MRMFeatureSelector_schedule_params_I.size()) {
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
-      output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()}); // TODO: remove this?
+      output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
     } else {
       throw std::invalid_argument("Argument 'select params' nor 'schedule params' not passed.");
     }
