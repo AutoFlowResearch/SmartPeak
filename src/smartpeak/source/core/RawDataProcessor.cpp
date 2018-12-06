@@ -139,13 +139,13 @@ namespace SmartPeak
 
     if (MRMFeatureSelector_schedule_params_I.size()) {
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
-      output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
     } else if (MRMFeatureSelector_schedule_params_I.size()) {
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
-      output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
     } else {
-      throw std::invalid_argument("Argument 'select params' nor 'schedule params' not passed.");
+      throw std::invalid_argument("Both arguments 'select params' and 'schedule params' are empty.");
     }
+
+    output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
 
     rawDataHandler_IO.setFeatureMap(output);
 

@@ -112,7 +112,6 @@ namespace SmartPeak
   {
     if (verbose) {
       std::cout << "START loadMSExperiment" << std::endl;
-      // std::cout << "Loading mzML" << std::endl;
     }
 
     // # load chromatograms
