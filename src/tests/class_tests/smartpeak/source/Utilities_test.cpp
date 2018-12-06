@@ -284,4 +284,53 @@ BOOST_AUTO_TEST_CASE(computeConfusionMatrix)
   BOOST_CHECK_EQUAL(conf[3], 3); // TN
 }
 
+BOOST_AUTO_TEST_CASE(extractSelectorParameters)
+{
+  const std::vector<std::map<std::string, std::string>> params = {
+    { {"name", "nn_thresholds"}, {"type", "list"}, {"value", "[4,4]"} },
+    { {"name", "locality_weights"}, {"type", "list"}, {"value", "[False,False,False,True]"} },
+    { {"name", "select_transition_groups"}, {"type", "list"}, {"value", "[True,True,True,True]"} },
+    { {"name", "segment_window_lengths"}, {"type", "list"}, {"value", "[8,-1]"} },
+    { {"name", "segment_step_lengths"}, {"type", "list"}, {"value", "[4,-1]"} },
+    { {"name", "select_highest_counts"}, {"type", "list"}, {"value", "[False,False,False,False]"} },
+    { {"name", "variable_types"}, {"type", "list"}, {"value", "['integer','integer','integer','integer']"} },
+    { {"name", "optimal_thresholds"}, {"type", "list"}, {"value", "[0.5,0.5,0.5,0.5]"} }
+  };
+
+  const std::vector<std::map<std::string, std::string>> score_weights = {
+    { {"name", "var_log_sn_score"}, {"type", "string"}, {"value", "lambda score: 1/score"} },
+    { {"name", "peak_apices_sum"}, {"type", "string"}, {"value", "lambda score: 1/log10(score)"} }
+  };
+
+  std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> v =
+    Utilities::extractSelectorParameters(params, score_weights);
+
+  const OpenMS::MRMFeatureSelector::SelectorParameters* p = &v[0];
+
+  BOOST_CHECK_EQUAL(v.size(), 2);
+
+  BOOST_CHECK_EQUAL(p->nn_threshold, 4);
+  BOOST_CHECK_EQUAL(p->locality_weight, false);
+  BOOST_CHECK_EQUAL(p->select_transition_group, true);
+  BOOST_CHECK_EQUAL(p->segment_window_length, 8);
+  BOOST_CHECK_EQUAL(p->segment_step_length, 4);
+  BOOST_CHECK_EQUAL(p->variable_type == OpenMS::MRMFeatureSelector::VariableType::INTEGER, true);
+  BOOST_CHECK_CLOSE(p->optimal_threshold, 0.5, 1e-6);
+  BOOST_CHECK_EQUAL(p->score_weights.size(), 2);
+  BOOST_CHECK_EQUAL(p->score_weights.at("var_log_sn_score") == OpenMS::MRMFeatureSelector::LambdaScore::INVERSE, true);
+  BOOST_CHECK_EQUAL(p->score_weights.at("peak_apices_sum") == OpenMS::MRMFeatureSelector::LambdaScore::INVERSE_LOG10, true);
+
+  ++p;
+  BOOST_CHECK_EQUAL(p->nn_threshold, 4);
+  BOOST_CHECK_EQUAL(p->locality_weight, false);
+  BOOST_CHECK_EQUAL(p->select_transition_group, true);
+  BOOST_CHECK_EQUAL(p->segment_window_length, -1);
+  BOOST_CHECK_EQUAL(p->segment_step_length, -1);
+  BOOST_CHECK_EQUAL(p->variable_type == OpenMS::MRMFeatureSelector::VariableType::INTEGER, true);
+  BOOST_CHECK_CLOSE(p->optimal_threshold, 0.5, 1e-6);
+  BOOST_CHECK_EQUAL(p->score_weights.size(), 2);
+  BOOST_CHECK_EQUAL(p->score_weights.at("var_log_sn_score") == OpenMS::MRMFeatureSelector::LambdaScore::INVERSE, true);
+  BOOST_CHECK_EQUAL(p->score_weights.at("peak_apices_sum") == OpenMS::MRMFeatureSelector::LambdaScore::INVERSE_LOG10, true);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
