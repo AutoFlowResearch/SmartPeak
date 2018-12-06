@@ -132,9 +132,11 @@ namespace SmartPeak
             txt_name.replace(txt_name.cbegin() + pos + 1, txt_name.cend(), "txt"); // replace extension
           }
           OpenMS::ChromeleonFile chfh;
+          std::cout << "loadMSExperiment(): loading " << txt_name << std::endl;
           chfh.load(txt_name, chromatograms);
         } else {
           OpenMS::FileHandler fh;
+          std::cout << "loadMSExperiment(): loading " << mzML_i << std::endl;
           fh.loadExperiment(mzML_i, chromatograms);
         }
         if (mzML_params.count("apply_baseline_correction") && mzML_params.at("apply_baseline_correction").b_) {
@@ -145,11 +147,8 @@ namespace SmartPeak
         }
       } else {
         OpenMS::FileHandler fh;
+        std::cout << "loadMSExperiment(): loading " << mzML_i << std::endl;
         fh.loadExperiment(mzML_i, chromatograms);
-      }
-
-      if (verbose) {
-        std::cout << "END loadMSExperiment\n" << std::endl;
       }
     }
 
@@ -208,6 +207,10 @@ namespace SmartPeak
           chromatogram_map
       );
       rawDataHandler.setChromatogramMap(chromatogram_map);
+    }
+
+    if (verbose) {
+      std::cout << "END loadMSExperiment" << std::endl;
     }
   }
 
