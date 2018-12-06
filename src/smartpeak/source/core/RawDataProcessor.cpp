@@ -21,7 +21,6 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "START pickFeatures" << std::endl;
       std::cout << "Experiment size: " << rawDataHandler_IO.getChromatogramMap().size() << std::endl;
-      // std::cout << "Picking peaks using OpenSWATH." << std::endl;
     }
 
     OpenMS::MRMFeatureFinderScoring featureFinder;
@@ -58,7 +57,6 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "START filterFeatures" << std::endl;
       std::cout << "filterFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
-      // std::cout << "Filtering picked features" << std::endl;
     }
 
     if (MRMFeatureFilter_filter_params_I.empty()) {
@@ -94,7 +92,6 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "START checkFeatures" << std::endl;
       std::cout << "checkFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
-      // std::cout << "Checking picked features" << std::endl;
     }
 
     if (MRMFeatureFilter_qc_params_I.empty()) {
@@ -133,7 +130,6 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "START selectFeatures" << std::endl;
       std::cout << "selectFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
-      // std::cout << "Selecting picked features" << std::endl;
     }
 
     OpenMS::FeatureMap output;
@@ -266,7 +262,6 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "START quantifyComponents" << std::endl;
       std::cout << "Processing # quantitation methods: " << rawDataHandler_IO.getQuantitationMethods().size() << std::endl;
-      // std::cout << "Quantifying features" << std::endl;
     }
 
     try {
