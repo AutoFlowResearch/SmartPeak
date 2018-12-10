@@ -48,7 +48,7 @@ namespace SmartPeak
       AQSf.load(filename, standards);
       sequenceSegmentHandler_IO.setStandardsConcentrations(standards);
     } catch (const std::exception& e) {
-      std::cout << e.what();
+      std::cout << "loadStandardsConcentrations(): " << e.what() << std::endl;
     }
 
     if (verbose) {
@@ -129,8 +129,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START loadMSExperiment"
-        << "\nloadMSExperiment(): loading " << mzML_i << std::endl;
+      std::cout << "START loadMSExperiment" << std::endl;
     }
 
     // # load chromatograms
@@ -510,7 +509,7 @@ namespace SmartPeak
   {
     if (verbose) {
       std::cout << "START storeQuantitationMethods"
-        << "\nstoreQuantitationMethods(): loading " << filename << std::endl;
+        << "\nstoreQuantitationMethods(): storing " << filename << std::endl;
     }
 
     if (filename.empty())
@@ -535,7 +534,7 @@ namespace SmartPeak
   {
     if (verbose) {
       std::cout << "START storeFeatureMap"
-        << "\nstoreFeatureMap(): loading " << filename << std::endl;
+        << "\nstoreFeatureMap(): storing " << filename << std::endl;
     }
 
     if (filename.empty())
@@ -558,7 +557,7 @@ namespace SmartPeak
   {
     if (verbose) {
       std::cout << "START storeMzML"
-        << "\nstoreMzML(): loading " << filename << std::endl;
+        << "\nstoreMzML(): storing " << filename << std::endl;
     }
 
     if (filename.empty())

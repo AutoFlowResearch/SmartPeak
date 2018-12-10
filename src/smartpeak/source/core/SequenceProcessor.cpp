@@ -14,6 +14,10 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
+    if (verbose_I) {
+      std::cout << "START createSequence()" << std::endl;
+    }
+
     const std::map<std::string, std::string> filenames = sequenceHandler_IO.getFilenames();
     SequenceSegmentHandler sequenceSegmentHandler;
     RawDataHandler rawDataHandler;
@@ -49,6 +53,10 @@ namespace SmartPeak
 
     segmentSamplesInSequence(sequenceHandler_IO, sequenceSegmentHandler);
     addRawDataHandlerToSequence(sequenceHandler_IO, rawDataHandler);
+
+    if (verbose_I) {
+      std::cout << "END createSequence()" << std::endl;
+    }
   }
 
   void SequenceProcessor::addRawDataHandlerToSequence(
@@ -120,7 +128,7 @@ namespace SmartPeak
 
       for (size_t i = 0; i < n; ++i) {
         if (verbose_I) {
-          std::cout << "[" << (i + 1) << "/" << n << "]" << std::endl;
+          std::cout << "\n[" << (i + 1) << "/" << n << "]" << std::endl;
         }
         RawDataProcessor::processRawData(
           sample.getRawData(),

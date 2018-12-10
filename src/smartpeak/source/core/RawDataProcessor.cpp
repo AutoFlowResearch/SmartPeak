@@ -44,7 +44,7 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "pickFeatures: output size: " << featureMap.size() << std::endl;
-      std::cout << "END pickFeatures\n" << std::endl;
+      std::cout << "END pickFeatures" << std::endl;
     }
   }
 
@@ -79,7 +79,7 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "filterFeatures: output size: " << featureMap.size() << std::endl;
-      std::cout << "END filterFeatures\n" << std::endl;
+      std::cout << "END filterFeatures" << std::endl;
     }
   }
 
@@ -116,7 +116,7 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "checkFeatures: output size: " << featureMap.size() << std::endl;
-      std::cout << "END checkFeatures\n" << std::endl;
+      std::cout << "END checkFeatures" << std::endl;
     }
   }
 
@@ -151,7 +151,7 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "selectFeatures: output size: " << output.size() << std::endl;
-      std::cout << "END selectFeatures\n" << std::endl;
+      std::cout << "END selectFeatures" << std::endl;
     }
   }
 

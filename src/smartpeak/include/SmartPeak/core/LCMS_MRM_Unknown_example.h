@@ -15,7 +15,7 @@ void example_LCMS_MRM_Unknowns(
   sequenceHandler.setDirStatic(dir_I);
   sequenceHandler.setDirDynamic(dir_I);
 
-  SequenceProcessor::createSequence(sequenceHandler, delimiter_I);
+  SequenceProcessor::createSequence(sequenceHandler, delimiter_I, true);
 
   const std::vector<std::string> raw_data_processing_methods = {
     "load_raw_data",

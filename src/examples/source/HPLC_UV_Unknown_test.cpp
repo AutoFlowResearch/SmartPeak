@@ -13,7 +13,7 @@ static const std::string example_data_dir = "/home/pasdom/SmartPeak2/src/example
 
 void test_main_HPLC_UV_Unknown()
 {
-  example_LCMS_MRM_Unknowns(example_data_dir + "HPLC_UV_Unknowns", ",");
+  example_LCMS_MRM_Unknowns(example_data_dir + "HPLC_UV_Unknowns", ",", true);
 
   RawDataHandler rawDataHandler;
 

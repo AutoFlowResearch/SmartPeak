@@ -15,7 +15,12 @@ public:
     static constexpr char const * const s_PeptideRef {"PeptideRef"};
     static constexpr char const * const s_native_id {"native_id"};
 
-    static void readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname, const std::string& delimiter);
+    static void readSequenceFile(
+      SequenceHandler& sequenceHandler,
+      const std::string& pathname,
+      const std::string& delimiter,
+      const bool verbose = true
+    );
 
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
     static void makeDataTableFromMetaValue(
@@ -30,7 +35,8 @@ public:
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
       const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown}),
+      const bool verbose = true
     );
 
     struct Row
@@ -68,7 +74,8 @@ public:
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
       const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown}),
+      const bool verbose = true
     );
   };
 }
