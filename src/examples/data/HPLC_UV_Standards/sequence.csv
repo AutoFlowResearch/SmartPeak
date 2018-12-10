@@ -1,0 +1,15 @@
+sample_name,sample_group_name,sequence_segment_name,sample_type,filename
+0p5ug,group1,sequence1,Standard,0p5ug
+1ug,group1,sequence1,Standard,1ug
+2p5ug,group1,sequence1,Standard,2p5ug
+5ug,group1,sequence1,Standard,5ug
+10ug,group1,sequence1,Standard,10ug
+25ug,group1,sequence1,Standard,25ug
+50ug,group1,sequence1,Standard,50ug
+100ug,group1,sequence1,Standard,100ug
+250ug,group1,sequence1,Standard,250ug
+500ug,group1,sequence1,Standard,500ug
+750ug,group1,sequence1,Standard,750ug
+1000ug,group1,sequence1,Standard,1000ug
+2500ug,group1,sequence1,Standard,2500ug
+5000ug,group1,sequence1,Standard,5000ug
