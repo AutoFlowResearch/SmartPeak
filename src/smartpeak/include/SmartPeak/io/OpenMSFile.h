@@ -68,12 +68,16 @@ public:
     );
 
     static void readRawDataProcessingParameters(
-      RawDataHandler& rawDataHandler, const std::string& filename, const std::string& delimiter = ","
+      RawDataHandler& rawDataHandler,
+      const std::string& filename,
+      const std::string& delimiter = ",",
+      const bool verbose = false
     );
 
     static void parseRawDataProcessingParameters(
       RawDataHandler& rawDataHandler,
-      std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_file
+      std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_file,
+      const bool verbose = false
     );
 
     static void storeQuantitationMethods(
@@ -88,6 +92,10 @@ public:
       const bool verbose = false
     );
 
-    static void storeMzML(const std::string& filename, const OpenMS::MSExperiment& experiment);
+    static void storeMzML(
+      const std::string& filename,
+      const OpenMS::MSExperiment& experiment,
+      const bool verbose = false
+    );
   };
 }
