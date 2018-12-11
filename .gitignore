@@ -37,3 +37,7 @@ build*/
 # VS
 .vscode/
 .vs/
+
+src/examples/data/*/FeatureSummary.csv
+src/examples/data/*/SequenceSummary.csv
+cmake-build-debug/
