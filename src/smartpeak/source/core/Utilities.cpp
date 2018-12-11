@@ -330,6 +330,13 @@ namespace SmartPeak
       params_map.emplace(m.at("name"), values);
     }
 
+    /*
+    * The user might erroneously provide different numbers of values for each parameter.
+    * e.g. 4 elements for `nn_thresholds`, but only 2 for `select_transition_groups`.
+    * In that case, the following loop extracts the lowest `.size()` between all
+    * user-provided parameters.
+    */
+    // TODO: throw instead, and update parameters.csv files in all folders
     size_t n_elems = std::numeric_limits<size_t>::max();
     for (const std::pair<std::string, std::vector<std::string>>& p : params_map) {
       n_elems = std::min(n_elems, p.second.size());
@@ -351,6 +358,7 @@ namespace SmartPeak
           parameters.segment_step_length = std::stoi(p.second[i]);
         } else if (param_name == "select_highest_counts") {
           // not implemented in OpenMS::MRMFeatureSelector
+          throw invalid_argument("extractSelectorParameters(): the parameter 'select_highest_counts' is not supported.\n");
         } else if (param_name == "variable_types") {
           parameters.variable_type = p.second[i].front() == 'C' || p.second[i].front() == 'c'
                                      ? OpenMS::MRMFeatureSelector::VariableType::CONTINUOUS
@@ -358,7 +366,7 @@ namespace SmartPeak
         } else if (param_name == "optimal_thresholds") {
           parameters.optimal_threshold = std::stod(p.second[i]);
         } else {
-          std::cerr << "\nparam_name \"" << param_name << "\" not valid. Check that selector's settings are properly set." << std::endl;
+          throw std::invalid_argument("param_name not valid. Check that selector's settings are properly set. Check: " + param_name + "\n");
         }
       }
 
