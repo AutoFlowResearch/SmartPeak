@@ -15,7 +15,7 @@ namespace SmartPeak
   )
   {
     if (verbose_I) {
-      std::cout << "START createSequence()" << std::endl;
+      std::cout << "==== START createSequence()" << std::endl;
     }
 
     const std::map<std::string, std::string> filenames = sequenceHandler_IO.getFilenames();
@@ -55,7 +55,7 @@ namespace SmartPeak
     addRawDataHandlerToSequence(sequenceHandler_IO, rawDataHandler);
 
     if (verbose_I) {
-      std::cout << "END createSequence()" << std::endl;
+      std::cout << "==== END   createSequence()" << std::endl;
     }
   }
 

@@ -35,7 +35,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START loadStandardsConcentrations"
+      std::cout << "==== START loadStandardsConcentrations"
         << "\nloadStandardsConcentrations(): loading " << filename << std::endl;
     }
 
@@ -52,7 +52,7 @@ namespace SmartPeak
     }
 
     if (verbose) {
-      std::cout << "END loadStandardsConcentrations" << std::endl;
+      std::cout << "==== END   loadStandardsConcentrations" << std::endl;
     }
   }
 
@@ -63,7 +63,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START loadQuantitationMethods"
+      std::cout << "==== START loadQuantitationMethods"
         << "\nloadQuantitationMethods(): loading " << filename << std::endl;
     }
 
@@ -80,7 +80,7 @@ namespace SmartPeak
     }
 
     if (verbose) {
-      std::cout << "END loadQuantitationMethods" << std::endl;
+      std::cout << "==== END   loadQuantitationMethods" << std::endl;
     }
   }
 
@@ -92,7 +92,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START loadTraML"
+      std::cout << "==== START loadTraML"
         << "\nloadTraML(): loading " << filename << "; format: " << format << std::endl;
     }
 
@@ -115,7 +115,7 @@ namespace SmartPeak
     rawDataHandler.setTargetedExperiment(targeted_exp);
 
     if (verbose) {
-      std::cout << "END loadTraML" << std::endl;
+      std::cout << "==== END   loadTraML" << std::endl;
     }
   }
 
@@ -129,7 +129,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START loadMSExperiment" << std::endl;
+      std::cout << "==== START loadMSExperiment" << std::endl;
     }
 
     // # load chromatograms
@@ -228,7 +228,7 @@ namespace SmartPeak
     }
 
     if (verbose) {
-      std::cout << "END loadMSExperiment" << std::endl;
+      std::cout << "==== END   loadMSExperiment" << std::endl;
     }
   }
 
@@ -239,7 +239,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START loadFeatureMap"
+      std::cout << "==== START loadFeatureMap"
         << "\nloadFeatureMap(): loading " << filename << std::endl;
     }
 
@@ -252,7 +252,7 @@ namespace SmartPeak
     rawDataHandler.setFeatureMap(fm);
 
     if (verbose) {
-      std::cout << "END loadFeatureMap" << std::endl;
+      std::cout << "==== END   loadFeatureMap" << std::endl;
     }
   }
 
@@ -264,7 +264,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START loadFeatureFilter"
+      std::cout << "==== START loadFeatureFilter"
         << "\nloadFeatureFilter(): loading " << filename_components << " and "
         << filename_components_groups << std::endl;
     }
@@ -281,7 +281,7 @@ namespace SmartPeak
     rawDataHandler.setFeatureFilter(featureQC);
 
     if (verbose) {
-      std::cout << "END loadFeatureFilter" << std::endl;
+      std::cout << "==== END   loadFeatureFilter" << std::endl;
     }
   }
 
@@ -293,7 +293,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START loadFeatureQC"
+      std::cout << "==== START loadFeatureQC"
         << "\nloadFeatureQC(): loading " << filename_components << " and "
         << filename_components_groups << std::endl;
     }
@@ -310,7 +310,7 @@ namespace SmartPeak
     rawDataHandler.setFeatureQC(featureQC);
 
     if (verbose) {
-      std::cout << "END loadFeatureQC" << std::endl;
+      std::cout << "==== END   loadFeatureQC" << std::endl;
     }
   }
 
@@ -321,7 +321,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START loadValidationData"
+      std::cout << "==== START loadValidationData"
         << "\nloadValidationData(): loading " << referenceData_csv_i << std::endl;
     }
 
@@ -430,7 +430,7 @@ namespace SmartPeak
     rawDataHandler.setReferenceData(reference_data);
 
     if (verbose) {
-      std::cout << "END loadValidationData" << std::endl;
+      std::cout << "==== END   loadValidationData" << std::endl;
     }
   }
 
@@ -442,7 +442,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START readRawDataProcessingParameters"
+      std::cout << "==== START readRawDataProcessingParameters"
         << "\nreadRawDataProcessingParameters(): loading " << filename << std::endl;
     }
 
@@ -455,7 +455,7 @@ namespace SmartPeak
     parseRawDataProcessingParameters(rawDataHandler, parameters);
 
     if (verbose) {
-      std::cout << "END readRawDataProcessingParameters" << std::endl;
+      std::cout << "==== END   readRawDataProcessingParameters" << std::endl;
     }
   }
 
@@ -466,7 +466,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START parseRawDataProcessingParameters" << std::endl;
+      std::cout << "==== START parseRawDataProcessingParameters" << std::endl;
     }
 
     // # check for workflow parameters integrity
@@ -497,7 +497,7 @@ namespace SmartPeak
     rawDataHandler.setParameters(parameters_file);
 
     if (verbose) {
-      std::cout << "END parseRawDataProcessingParameters" << std::endl;
+      std::cout << "==== END   parseRawDataProcessingParameters" << std::endl;
     }
   }
 
@@ -508,7 +508,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START storeQuantitationMethods"
+      std::cout << "==== START storeQuantitationMethods"
         << "\nstoreQuantitationMethods(): storing " << filename << std::endl;
     }
 
@@ -522,7 +522,7 @@ namespace SmartPeak
     );
 
     if (verbose) {
-      std::cout << "END storeQuantitationMethods" << std::endl;
+      std::cout << "==== END   storeQuantitationMethods" << std::endl;
     }
   }
 
@@ -533,7 +533,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START storeFeatureMap"
+      std::cout << "==== START storeFeatureMap"
         << "\nstoreFeatureMap(): storing " << filename << std::endl;
     }
 
@@ -545,7 +545,7 @@ namespace SmartPeak
     featurexml.store(filename, rawDataHandler_IO.getFeatureMap());
 
     if (verbose) {
-      std::cout << "END storeFeatureMap" << std::endl;
+      std::cout << "==== END   storeFeatureMap" << std::endl;
     }
   }
 
@@ -556,7 +556,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START storeMzML"
+      std::cout << "==== START storeMzML"
         << "\nstoreMzML(): storing " << filename << std::endl;
     }
 
@@ -567,7 +567,7 @@ namespace SmartPeak
     mzmlf.store(filename, experiment);
 
     if (verbose) {
-      std::cout << "END storeMzML" << std::endl;
+      std::cout << "==== END   storeMzML" << std::endl;
     }
   }
 }

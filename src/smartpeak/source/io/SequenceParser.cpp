@@ -18,7 +18,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START readSequenceFile()"
+      std::cout << "==== START readSequenceFile()"
         << "\nreadSequenceFile(): loading " << pathname << std::endl;
     }
 
@@ -92,7 +92,7 @@ namespace SmartPeak
     }
 
     if (verbose) {
-      std::cout << "END readSequenceFile()" << std::endl;
+      std::cout << "==== END   readSequenceFile()" << std::endl;
     }
   }
 
@@ -165,7 +165,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START writeDataTableFromMetaValue()"
+      std::cout << "==== START writeDataTableFromMetaValue()"
         << "\nwriteDataTableFromMetaValue(): storing " << filename << std::endl;
     }
 
@@ -185,7 +185,7 @@ namespace SmartPeak
     }
 
     if (verbose) {
-      std::cout << "END writeDataTableFromMetaValue()" << std::endl;
+      std::cout << "==== END   writeDataTableFromMetaValue()" << std::endl;
     }
   }
 
@@ -267,7 +267,7 @@ namespace SmartPeak
   )
   {
     if (verbose) {
-      std::cout << "START writeDataMatrixFromMetaValue()"
+      std::cout << "==== START writeDataMatrixFromMetaValue()"
         << "\nwriteDataMatrixFromMetaValue(): storing " << filename << std::endl;
     }
 
@@ -295,7 +295,7 @@ namespace SmartPeak
     }
 
     if (verbose) {
-      std::cout << "END writeDataMatrixFromMetaValue()" << std::endl;
+      std::cout << "==== END   writeDataMatrixFromMetaValue()" << std::endl;
     }
   }
 }

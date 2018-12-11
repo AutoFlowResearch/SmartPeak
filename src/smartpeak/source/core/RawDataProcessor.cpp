@@ -19,7 +19,7 @@ namespace SmartPeak
   )
   {
     if (verbose_I) {
-      std::cout << "START pickFeatures" << std::endl;
+      std::cout << "==== START pickFeatures" << std::endl;
       std::cout << "Experiment size: " << rawDataHandler_IO.getChromatogramMap().size() << std::endl;
     }
 
@@ -44,7 +44,7 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "pickFeatures: output size: " << featureMap.size() << std::endl;
-      std::cout << "END pickFeatures" << std::endl;
+      std::cout << "==== END   pickFeatures" << std::endl;
     }
   }
 
@@ -55,7 +55,7 @@ namespace SmartPeak
   )
   {
     if (verbose_I) {
-      std::cout << "START filterFeatures" << std::endl;
+      std::cout << "==== START filterFeatures" << std::endl;
       std::cout << "filterFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
     }
 
@@ -79,7 +79,7 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "filterFeatures: output size: " << featureMap.size() << std::endl;
-      std::cout << "END filterFeatures" << std::endl;
+      std::cout << "==== END   filterFeatures" << std::endl;
     }
   }
 
@@ -90,7 +90,7 @@ namespace SmartPeak
   )
   {
     if (verbose_I) {
-      std::cout << "START checkFeatures" << std::endl;
+      std::cout << "==== START checkFeatures" << std::endl;
       std::cout << "checkFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
     }
 
@@ -116,7 +116,7 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "checkFeatures: output size: " << featureMap.size() << std::endl;
-      std::cout << "END checkFeatures" << std::endl;
+      std::cout << "==== END   checkFeatures" << std::endl;
     }
   }
 
@@ -128,7 +128,7 @@ namespace SmartPeak
   )
   {
     if (verbose_I) {
-      std::cout << "START selectFeatures" << std::endl;
+      std::cout << "==== START selectFeatures" << std::endl;
       std::cout << "selectFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
     }
 
@@ -151,7 +151,7 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "selectFeatures: output size: " << output.size() << std::endl;
-      std::cout << "END selectFeatures" << std::endl;
+      std::cout << "==== END   selectFeatures" << std::endl;
     }
   }
 
@@ -260,7 +260,7 @@ namespace SmartPeak
   )
   {
     if (verbose_I) {
-      std::cout << "START quantifyComponents" << std::endl;
+      std::cout << "==== START quantifyComponents" << std::endl;
       std::cout << "Processing # quantitation methods: " << rawDataHandler_IO.getQuantitationMethods().size() << std::endl;
     }
 
@@ -273,7 +273,7 @@ namespace SmartPeak
     }
 
     if (verbose_I) {
-      std::cout << "END quantifyComponents" << std::endl;
+      std::cout << "==== END   quantifyComponents" << std::endl;
     }
   }
 
