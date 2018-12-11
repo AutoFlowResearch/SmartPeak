@@ -115,6 +115,7 @@ MRMFeatureFilter.filter_MRMFeatures.qc,report_tic,string,FALSE,FALSE,true; false
 FeaturePlotter,export_format,string,pdf,pdf,,The export format of the plot,TRUE
 FeaturePlotter,annotate_features,bool,TRUE,,,Annotate peaks with features,TRUE
 mzML,format,string,ChromeleonFile,Chromeleon,,An alternative format to load an experiment from,TRUE
+mzML,zero_baseline,bool,TRUE,FALSE,,Normalize the baseline so that the minimum intensity value is 0,TRUE
 SequenceSegmentPlotter,export_format,string,pdf,pdf,,The export format of the plot,TRUE
 SequenceSegmentPlotter,annotate_features,bool,TRUE,,,Annotate peaks with features,TRUE
 AbsoluteQuantitation,min_points,int,4,4,,The minimum number of calibrator points.,TRUE
