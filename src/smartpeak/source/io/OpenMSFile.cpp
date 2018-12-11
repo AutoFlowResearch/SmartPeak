@@ -157,7 +157,7 @@ namespace SmartPeak
           std::cout << "loadMSExperiment(): loading " << mzML_i << std::endl;
           fh.loadExperiment(mzML_i, chromatograms);
         }
-        if (mzML_params.count("apply_baseline_correction") && mzML_params.at("apply_baseline_correction").b_) {
+        if (mzML_params.count("zero_baseline") && mzML_params.at("zero_baseline").b_) {
           std::vector<OpenMS::MSChromatogram>& chroms = chromatograms.getChromatograms();
           for (OpenMS::MSChromatogram& ch : chroms) {
             OpenMS::subtractMinimumIntensity(ch);
