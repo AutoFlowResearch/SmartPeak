@@ -1,0 +1,12 @@
+IS_name,component_name,feature_name,concentration_units,llod,ulod,lloq,uloq,correlation_coefficient,actual_concentration,n_points,transformation_model,transformation_model_param_slope,transformation_model_param_intercept,transformation_model_param_x_weight,transformation_model_param_y_weight,transformation_model_param_x_datum_min,transformation_model_param_x_datum_max,transformation_model_param_y_datum_min,transformation_model_param_y_datum_max,transformation_model_param_symmetric_regression
+,Serotonin,intensity,ug/mL,0,0,0,0,0,0,0,linear,1,0,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15,FALSE
+,5-HTP,intensity,ug/mL,0,0,0,0,0,0,0,linear,1,0,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15,FALSE
+,Tryptophan,intensity,ug/mL,0,0,0,0,0,0,0,linear,1,0,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15,FALSE
+,Tryptamine,intensity,ug/mL,0,0,0,0,0,0,0,linear,1,0,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15,FALSE
+,Acetylserotonin,intensity,ug/mL,0,0,0,0,0,0,0,linear,1,0,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15,FALSE
+,Riboflavin,intensity,ug/mL,0,0,0,0,0,0,0,linear,1,0,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15,FALSE
+,5-hydroxyindole,intensity,ug/mL,0,0,0,0,0,0,0,linear,1,0,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15,FALSE
+,Antranilicacid,intensity,ug/mL,0,0,0,0,0,0,0,linear,1,0,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15,FALSE
+,Melatonin,intensity,ug/mL,0,0,0,0,0,0,0,linear,1,0,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15,FALSE
+,Acetyltryptamine,intensity,ug/mL,0,0,0,0,0,0,0,linear,1,0,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15,FALSE
+,Indole,intensity,ug/mL,0,0,0,0,0,0,0,linear,1,0,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15,FALSE
