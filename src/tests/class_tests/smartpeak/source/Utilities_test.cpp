@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_CASE(extractSelectorParameters)
     { {"name", "select_transition_groups"}, {"type", "list"}, {"value", "[True,True,True,True]"} },
     { {"name", "segment_window_lengths"}, {"type", "list"}, {"value", "[8,-1]"} },
     { {"name", "segment_step_lengths"}, {"type", "list"}, {"value", "[4,-1]"} },
-    { {"name", "select_highest_counts"}, {"type", "list"}, {"value", "[False,False,False,False]"} },
+    // { {"name", "select_highest_counts"}, {"type", "list"}, {"value", "[False,False,False,False]"} },
     { {"name", "variable_types"}, {"type", "list"}, {"value", "['integer','integer','integer','integer']"} },
     { {"name", "optimal_thresholds"}, {"type", "list"}, {"value", "[0.5,0.5,0.5,0.5]"} }
   };

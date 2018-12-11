@@ -358,7 +358,8 @@ namespace SmartPeak
           parameters.segment_step_length = std::stoi(p.second[i]);
         } else if (param_name == "select_highest_counts") {
           // not implemented in OpenMS::MRMFeatureSelector
-          throw invalid_argument("extractSelectorParameters(): the parameter 'select_highest_counts' is not supported.\n");
+          // TODO: enable the throw? It would need updating all .csv parameters files
+          // throw std::invalid_argument("extractSelectorParameters(): the parameter 'select_highest_counts' is not supported.\n");
         } else if (param_name == "variable_types") {
           parameters.variable_type = p.second[i].front() == 'C' || p.second[i].front() == 'c'
                                      ? OpenMS::MRMFeatureSelector::VariableType::CONTINUOUS
