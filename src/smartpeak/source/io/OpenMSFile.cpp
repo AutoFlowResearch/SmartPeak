@@ -48,7 +48,7 @@ namespace SmartPeak
       AQSf.load(filename, standards);
       sequenceSegmentHandler_IO.setStandardsConcentrations(standards);
     } catch (const std::exception& e) {
-      std::cout << "loadStandardsConcentrations(): " << e.what() << std::endl;
+      std::cerr << "loadStandardsConcentrations(): " << e.what() << std::endl;
     }
 
     if (verbose) {
@@ -76,7 +76,7 @@ namespace SmartPeak
       AQMf.load(filename, quantitation_methods);
       sequenceSegmentHandler_IO.setQuantitationMethods(quantitation_methods);
     } catch (const std::exception& e) {
-      std::cout << e.what();
+      std::cerr << "loadQuantitationMethods(): " << e.what() << std::endl;
     }
 
     if (verbose) {

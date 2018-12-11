@@ -269,7 +269,7 @@ namespace SmartPeak
       aq.setQuantMethods(rawDataHandler_IO.getQuantitationMethods());
       aq.quantifyComponents(rawDataHandler_IO.getFeatureMap());
     } catch (const std::exception& e) {
-      std::cerr << e.what();
+      std::cerr << "quantifyComponents(): " << e.what() << std::endl;
     }
 
     if (verbose_I) {

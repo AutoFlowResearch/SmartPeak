@@ -160,7 +160,7 @@ namespace SmartPeak
         throw std::invalid_argument("Sequence group processing event \"" + sequence_segment_processing_event + "\" was not recognized.\n");
       }
     } catch (const std::exception& e) {
-      std::cerr << e.what();
+      std::cerr << "processSequenceSegment(): " << e.what() << std::endl;
     }
   }
 
