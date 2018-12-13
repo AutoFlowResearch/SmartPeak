@@ -111,3 +111,6 @@ src/examples/data/LCMS_MRM_Standards/features/150516_CM3_Level7.featureXML
 src/examples/data/LCMS_MRM_Standards/features/150516_CM3_Level8.featureXML
 src/examples/data/LCMS_MRM_Standards/features/150516_CM3_Level9.featureXML
 src/examples/data/LCMS_MRM_Standards/features/segment1_quantitationMethods.csv
+src/examples/data/LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x.featureXML
+src/examples/data/LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc2_1x.featureXML
+src/examples/data/LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc3_1x.featureXML
