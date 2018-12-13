@@ -114,3 +114,4 @@ src/examples/data/LCMS_MRM_Standards/features/segment1_quantitationMethods.csv
 src/examples/data/LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x.featureXML
 src/examples/data/LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc2_1x.featureXML
 src/examples/data/LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc3_1x.featureXML
+src/examples/data/GCMS_SIM_Unknowns/features/GCMS_SIM.featureXML
