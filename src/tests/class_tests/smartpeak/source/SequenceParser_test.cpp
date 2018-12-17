@@ -84,6 +84,10 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
     metaDataHandler.setSampleType(MetaDataHandler::SampleType::Unknown);
     metaDataHandler.setSampleGroupName("sample_group");
     metaDataHandler.setSequenceSegmentName("sequence_segment");
+    metaDataHandler.acq_method_name = "6";
+    metaDataHandler.inj_volume = 7.0;
+    metaDataHandler.inj_volume_units = "8";
+    metaDataHandler.batch_name = "9";
 
     const string featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
     RawDataHandler rawDataHandler;
@@ -106,16 +110,30 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(data_out.at(0).at("component_name"), "23dpg.23dpg_1.Heavy");
   BOOST_CHECK_EQUAL(data_out.at(0).at("peak_apex_int"), std::to_string(235.0));
   BOOST_CHECK_EQUAL(data_out.at(0).at("logSN"), std::to_string(3.52866193485212));
-  BOOST_CHECK_EQUAL(headers_out.size(), 6);
+  BOOST_CHECK_EQUAL(headers_out.size(), 19);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
   BOOST_CHECK_EQUAL(headers_out[3], "component_name");
-  BOOST_CHECK_EQUAL(headers_out[4], "peak_apex_int");
-  BOOST_CHECK_EQUAL(headers_out[5], "logSN");
+  BOOST_CHECK_EQUAL(headers_out[4], "batch_name");
+  BOOST_CHECK_EQUAL(headers_out[5], "rack_number");
+  BOOST_CHECK_EQUAL(headers_out[6], "plate_number");
+  BOOST_CHECK_EQUAL(headers_out[7], "pos_number");
+  BOOST_CHECK_EQUAL(headers_out[8], "inj_number");
+  BOOST_CHECK_EQUAL(headers_out[9], "dilution_factor");
+  BOOST_CHECK_EQUAL(headers_out[10], "inj_volume");
+  BOOST_CHECK_EQUAL(headers_out[11], "inj_volume_units");
+  BOOST_CHECK_EQUAL(headers_out[12], "operator_name");
+  BOOST_CHECK_EQUAL(headers_out[13], "acq_method_name");
+  BOOST_CHECK_EQUAL(headers_out[14], "proc_method_name");
+  BOOST_CHECK_EQUAL(headers_out[15], "original_filename");
+  BOOST_CHECK_EQUAL(headers_out[16], "acquisition_date_and_time");
+  // metadata
+  BOOST_CHECK_EQUAL(headers_out[17], "peak_apex_int");
+  BOOST_CHECK_EQUAL(headers_out[18], "logSN");
 
-  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataTableFromMetaValue.csv");
-  // SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
+  const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataTableFromMetaValue.csv");
+  SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
 }
 
 BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
@@ -138,6 +156,10 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
     metaDataHandler.setSampleType(MetaDataHandler::SampleType::Unknown);
     metaDataHandler.setSampleGroupName("sample_group");
     metaDataHandler.setSequenceSegmentName("sequence_segment");
+    metaDataHandler.acq_method_name = "6";
+    metaDataHandler.inj_volume = 7.0;
+    metaDataHandler.inj_volume_units = "8";
+    metaDataHandler.batch_name = "9";
 
     const string featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
     RawDataHandler rawDataHandler;
@@ -162,8 +184,8 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   BOOST_CHECK_CLOSE(data_out.front().front(), 1.28478575, 1e-3);
   BOOST_CHECK_CLOSE(data_out.back().back(), 1.57220089, 1e-3);
 
-  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataMatrixFromMetaValue.csv");
-  // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
+  const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataMatrixFromMetaValue.csv");
+  SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
