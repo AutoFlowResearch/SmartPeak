@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <ctime>
 
 namespace SmartPeak
 {
@@ -32,6 +33,15 @@ public:
     static const char* SampleTypeToString(const SampleType sample_type); // TODO: doesn't return a string, fix name or return type
     static SampleType stringToSampleType(const std::string& sample_type);
 
+    /*
+    * TODO:
+    * All properties are now public.
+    * Keeping the getters / setters for retro-compatibility.
+    * Given the high number of properties, I prefer to remove the getters / setters
+    * at some point because their current implementation represents more a
+    * premature optimization than an actual advantage (KISS and YAGNI principles).
+    */
+
     void setSampleName(const std::string& sample_name);
     std::string& getSampleName();
     std::string getSampleName() const;
@@ -56,11 +66,27 @@ public:
 
     void clear();
 
-private:
+    // required
     std::string sample_name_;
     std::string sample_group_name_;
     std::string sequence_segment_name_;
-    std::string filename_;
+    std::string original_filename_;
     SampleType sample_type_ = SampleType::Unknown;
+    std::string acq_method_name;
+    float inj_volume = -1.0;
+    std::string inj_volume_units;
+    std::string batch_name;
+
+    // optional
+    int rack_number = -1;
+    int plate_number = -1;
+    int pos_number = -1;
+    int inj_number = -1;
+    float dilution_factor = -1.0;
+    std::string instrument;
+    std::string operator_name;
+    std::string proc_method_name;
+    std::tm acquisition_date_and_time = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    std::string calculated_concentration_units;
   };
 }

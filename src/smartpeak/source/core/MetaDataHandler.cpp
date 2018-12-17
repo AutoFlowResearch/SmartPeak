@@ -92,17 +92,17 @@ namespace SmartPeak
 
   void MetaDataHandler::setFilename(const std::string& filename_I)
   {
-    filename_ = filename_I;
+    original_filename_ = filename_I;
   }
 
   std::string& MetaDataHandler::getFilename()
   {
-    return filename_;
+    return original_filename_;
   }
 
   std::string MetaDataHandler::getFilename() const
   {
-    return filename_;
+    return original_filename_;
   }
 
   void MetaDataHandler::setSampleType(SampleType sample_type)
@@ -122,38 +122,52 @@ namespace SmartPeak
 
   bool MetaDataHandler::validateMetaData(const MetaDataHandler& meta_data)
   {
-    std::vector<std::string> sample_types =
-      {"Unknown", "Standard", "QC", "Blank", "Double Blank", "Solvent"};
+    // std::vector<std::string> sample_types {"Unknown", "Standard", "QC", "Blank", "Double Blank", "Solvent"};
 
     bool is_valid { true };
 
     if (meta_data.getSampleName().empty()) {
-      std::cout << "SequenceFile Error: sample_name must be specified." << std::endl;
-      // throw std::runtime_error("sample name");
+      std::cerr << "SequenceFile Error: sample_name must be specified." << std::endl;
       is_valid = false;
     }
 
     if (meta_data.getSampleGroupName().empty()) {
-      std::cout << "SequenceFile Error: sample_group_name must be specified." << std::endl;
-      // throw std::runtime_error("sample group name");
+      std::cerr << "SequenceFile Error: sample_group_name must be specified." << std::endl;
       is_valid = false;
     }
 
     if (meta_data.getSequenceSegmentName().empty()) {
-      std::cout << "SequenceFile Error: sequence_segment_name must be specified." << std::endl;
-      // throw std::runtime_error("sequence segment name");
+      std::cerr << "SequenceFile Error: sequence_segment_name must be specified." << std::endl;
       is_valid = false;
     }
 
     if (meta_data.getFilename().empty()) {
-      std::cout << "SequenceFile Error: filename must be specified." << std::endl;
-      // throw std::runtime_error("filename");
+      std::cerr << "SequenceFile Error: original_filename must be specified." << std::endl;
       is_valid = false;
     }
 
     if (meta_data.getSampleType() == SampleType::Unrecognized) {
-      std::cout << "SequenceFile Error: sample type could not be recognized." << std::endl;
-      // throw std::runtime_error("filename");
+      std::cerr << "SequenceFile Error: sample type could not be recognized." << std::endl;
+      is_valid = false;
+    }
+
+    if (meta_data.acq_method_name.empty()) {
+      std::cerr << "SequenceFile Error: acq_method_name must be specified." << std::endl;
+      is_valid = false;
+    }
+
+    if (meta_data.inj_volume == -1.0) {
+      std::cerr << "SequenceFile Error: no value for inj_volume." << std::endl;
+      is_valid = false;
+    }
+
+    if (meta_data.inj_volume_units.empty()) {
+      std::cerr << "SequenceFile Error: inj_volume_units must be specified." << std::endl;
+      is_valid = false;
+    }
+
+    if (meta_data.batch_name.empty()) {
+      std::cerr << "SequenceFile Error: batch_name must be specified." << std::endl;
       is_valid = false;
     }
 
@@ -165,7 +179,23 @@ namespace SmartPeak
     sample_name_.clear();
     sample_group_name_.clear();
     sequence_segment_name_.clear();
-    filename_.clear();
+    original_filename_.clear();
     sample_type_ = SampleType::Unknown;
+    acq_method_name.clear();
+    inj_volume = -1.0;
+    inj_volume_units.clear();
+    batch_name.clear();
+
+    // optional
+    rack_number = -1;
+    plate_number = -1;
+    pos_number = -1;
+    inj_number = -1;
+    dilution_factor = -1.0;
+    instrument.clear();
+    operator_name.clear();
+    proc_method_name.clear();
+    acquisition_date_and_time = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    calculated_concentration_units.clear();
   }
 }
