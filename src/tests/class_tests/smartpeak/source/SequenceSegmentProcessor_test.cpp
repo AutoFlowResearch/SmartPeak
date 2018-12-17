@@ -134,6 +134,10 @@ void make_featuresAndStandardsConcentrations(
     meta_data.setSampleType(MetaDataHandler::SampleType::Standard);
     meta_data.setFilename("filename" + std::to_string(i));
     meta_data.setSequenceSegmentName("segment1");
+    meta_data.acq_method_name = "6";
+    meta_data.inj_volume = 7.0;
+    meta_data.inj_volume_units = "8";
+    meta_data.batch_name = "9";
 
     sequenceHandler_IO.addSampleToSequence(meta_data, OpenMS::FeatureMap());
 
@@ -199,6 +203,10 @@ BOOST_AUTO_TEST_CASE(getSampleIndicesBySampleType)
   meta_data1.setSampleGroupName("sample");
   meta_data1.setSequenceSegmentName("sequence_segment");
   meta_data1.setSampleType(MetaDataHandler::SampleType::Unknown);
+  meta_data1.acq_method_name = "6";
+  meta_data1.inj_volume = 7.0;
+  meta_data1.inj_volume_units = "8";
+  meta_data1.batch_name = "9";
   OpenMS::FeatureMap featuremap1;
 
   MetaDataHandler meta_data2;
@@ -207,6 +215,10 @@ BOOST_AUTO_TEST_CASE(getSampleIndicesBySampleType)
   meta_data2.setSampleGroupName("sample");
   meta_data2.setSequenceSegmentName("sequence_segment");
   meta_data2.setSampleType(MetaDataHandler::SampleType::Standard);
+  meta_data2.acq_method_name = "6";
+  meta_data2.inj_volume = 7.0;
+  meta_data2.inj_volume_units = "8";
+  meta_data2.batch_name = "9";
   OpenMS::FeatureMap featuremap2;
 
   MetaDataHandler meta_data3;
@@ -215,6 +227,10 @@ BOOST_AUTO_TEST_CASE(getSampleIndicesBySampleType)
   meta_data3.setSampleGroupName("sample");
   meta_data3.setSequenceSegmentName("sequence_segment");
   meta_data3.setSampleType(MetaDataHandler::SampleType::Unknown);
+  meta_data3.acq_method_name = "6";
+  meta_data3.inj_volume = 7.0;
+  meta_data3.inj_volume_units = "8";
+  meta_data3.batch_name = "9";
   OpenMS::FeatureMap featuremap3;
 
   SequenceHandler sequenceHandler;
