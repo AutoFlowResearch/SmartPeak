@@ -87,6 +87,5 @@ public:
     std::string operator_name;
     std::string proc_method_name;
     std::tm acquisition_date_and_time = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-    std::string calculated_concentration_units;
   };
 }

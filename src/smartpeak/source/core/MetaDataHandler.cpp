@@ -196,6 +196,5 @@ namespace SmartPeak
     operator_name.clear();
     proc_method_name.clear();
     acquisition_date_and_time = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-    calculated_concentration_units.clear();
   }
 }
