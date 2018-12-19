@@ -1,2 +1,2 @@
-sample_name,sample_group_name,sequence_segment_name,data_dir,sample_type,comments,acquisition_method,processing_method,rack_code,plate_code,vial_position,rack_position,plate_position,injection_volume,dilution_factor,weight_to_volume,set_name,filename
-GCMS_SIM,group1,group1,/home/user/code/examples/GCMS_SIM,Unknown,,,,,,,,,,,,,GCMS_SIM.mzML
+sample_name,sample_group_name,sequence_segment_name,sample_type,original_filename,batch_name,rack_number,plate_number,pos_number,inj_number,dilution_factor,inj_volume,inj_volume_units,operator_name,acq_method_name,proc_method_name,acquisition_date_and_time
+GCMS_SIM,group1,group1,Unknown,GCMS_SIM.mzML,BatchName,,,,,,3,uL,,MethodName,,
