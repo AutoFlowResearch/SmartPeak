@@ -154,7 +154,7 @@ namespace SmartPeak
       is_valid = false;
     }
 
-    if (meta_data.inj_volume == -1.0) {
+    if (meta_data.inj_volume <= 0.0) {
       std::cerr << "SequenceFile Error: no value for inj_volume." << std::endl;
       is_valid = false;
     }
