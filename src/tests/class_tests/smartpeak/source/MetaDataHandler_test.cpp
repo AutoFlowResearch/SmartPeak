@@ -1,4 +1,4 @@
-// TODO: Add copyright
+/**TODO:  Add copyright*/
 
 #define BOOST_TEST_MODULE MetaDataHandler test suite
 #include <boost/test/included/unit_test.hpp>
@@ -54,13 +54,8 @@ BOOST_AUTO_TEST_CASE(validateMetaData)
 
   m.setSampleName("1");
   m.setSampleGroupName("2");
-  // m.setSampleType(MetaDataHandler::SampleType::Unknown);
   m.setSequenceSegmentName("4");
   m.setFilename("5");
-  m.acq_method_name = "6";
-  m.inj_volume = 7.0;
-  m.inj_volume_units = "8";
-  m.batch_name = "9";
   BOOST_CHECK_EQUAL(MetaDataHandler::validateMetaData(m), true);
 
   m.setSampleType(MetaDataHandler::SampleType::Unknown);
@@ -86,13 +81,9 @@ BOOST_AUTO_TEST_CASE(clear)
 
   m.setSampleName("1");
   m.setSampleGroupName("2");
+  m.setSequenceSegmentName("3");
+  m.setFilename("4");
   m.setSampleType(MetaDataHandler::SampleType::QC);
-  m.setSequenceSegmentName("4");
-  m.setFilename("5");
-  m.acq_method_name = "6";
-  m.inj_volume = 7.0;
-  m.inj_volume_units = "8";
-  m.batch_name = "9";
 
   m.clear();
 
@@ -101,10 +92,6 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK_EQUAL((int)m.getSampleType(), (int)MetaDataHandler::SampleType::Unknown);
   BOOST_CHECK_EQUAL(m.getSequenceSegmentName(), "");
   BOOST_CHECK_EQUAL(m.getFilename(), "");
-  BOOST_CHECK_EQUAL(m.acq_method_name, "");
-  BOOST_CHECK_EQUAL(m.inj_volume, -1.0);
-  BOOST_CHECK_EQUAL(m.inj_volume_units, "");
-  BOOST_CHECK_EQUAL(m.batch_name, "");
 }
 
 BOOST_AUTO_TEST_CASE(SampleTypeToString)

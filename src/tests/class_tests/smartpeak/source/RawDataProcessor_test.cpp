@@ -44,23 +44,10 @@ BOOST_AUTO_TEST_CASE(extractMetaData)
 
   RawDataProcessor::extractMetaData(rawDataHandler);
 
-  const MetaDataHandler& metaDataHandler = rawDataHandler.getMetaData();
-
-  string filename = metaDataHandler.getFilename();
+  string filename = rawDataHandler.getMetaData().getFilename();
   filename = filename.substr(filename.find("src/tests")); // otherwise it would contain /home/username/SmartPeak2/
   BOOST_CHECK_EQUAL(filename, "src/tests/class_tests/smartpeak/data/RawDataProcessor_mzML_1.mzML");
-  BOOST_CHECK_EQUAL(metaDataHandler.getSampleName(), "150601_0_BloodProject01_PLT_QC_Broth-1");
-
-  BOOST_CHECK_EQUAL(metaDataHandler.proc_method_name, "Analyst");
-  BOOST_CHECK_EQUAL(metaDataHandler.instrument, "QTRAP 5500");
-  // BOOST_CHECK_EQUAL(rawDataHandler.acq_method_name, "");
-  BOOST_CHECK_EQUAL(metaDataHandler.operator_name, "");
-  BOOST_CHECK_EQUAL(metaDataHandler.acquisition_date_and_time.tm_mday, 10);
-  BOOST_CHECK_EQUAL(metaDataHandler.acquisition_date_and_time.tm_mon, 06);
-  BOOST_CHECK_EQUAL(metaDataHandler.acquisition_date_and_time.tm_year, 2015);
-  BOOST_CHECK_EQUAL(metaDataHandler.acquisition_date_and_time.tm_hour, 01);
-  BOOST_CHECK_EQUAL(metaDataHandler.acquisition_date_and_time.tm_min, 14);
-  BOOST_CHECK_EQUAL(metaDataHandler.acquisition_date_and_time.tm_sec, 10);
+  BOOST_CHECK_EQUAL(rawDataHandler.getMetaData().getSampleName(), "150601_0_BloodProject01_PLT_QC_Broth-1");
 }
 
 BOOST_AUTO_TEST_CASE(pickFeatures)
