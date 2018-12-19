@@ -119,6 +119,7 @@ namespace SmartPeak
     MetaDataHandler t; // as in temporary
     std::string t_date;
     std::string t_sample_type;
+    size_t row_number = 1;
 
     while (true) {
       bool is_valid = false;
@@ -151,11 +152,19 @@ namespace SmartPeak
       std::stringstream iss(t_date, std::ios_base::in);
       iss >> adt.tm_mday >> adt.tm_mon >> adt.tm_year >> adt.tm_hour >> adt.tm_min >> adt.tm_sec;
 
+      if (t.inj_number <= 0) {
+        t.inj_number = row_number;
+        if (verbose) {
+          std::cout << "No inj_number value found. Set to row number: " << row_number << "\n";
+        }
+      }
+
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
 
       t.clear();
       t_date.clear();
       t_sample_type.clear();
+      ++row_number;
     }
 
     if (verbose) {
