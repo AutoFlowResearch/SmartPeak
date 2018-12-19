@@ -162,8 +162,9 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(headers_out[17], "peak_apex_int");
   BOOST_CHECK_EQUAL(headers_out[18], "logSN");
 
-  const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataTableFromMetaValue.csv");
-  SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
+  // write sequence to output
+  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataTableFromMetaValue.csv");
+  // SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
 }
 
 BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
@@ -214,8 +215,9 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   BOOST_CHECK_CLOSE(data_out.front().front(), 1.28478575, 1e-3);
   BOOST_CHECK_CLOSE(data_out.back().back(), 1.57220089, 1e-3);
 
-  const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataMatrixFromMetaValue.csv");
-  SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
+  // write sequence to output
+  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataMatrixFromMetaValue.csv");
+  // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
