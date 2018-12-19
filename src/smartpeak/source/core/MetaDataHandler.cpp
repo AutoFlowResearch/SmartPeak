@@ -1,9 +1,7 @@
-/**TODO:  Add copyright*/
+// TODO: Add copyright
 
 #include <SmartPeak/core/MetaDataHandler.h>
-
-#include <vector>
-#include <algorithm>
+#include <iostream>
 
 namespace SmartPeak
 {
@@ -47,77 +45,77 @@ namespace SmartPeak
 
   void MetaDataHandler::setSampleName(const std::string& sample_name_I)
   {
-    sample_name_ = sample_name_I;
+    sample_name = sample_name_I;
   }
 
   std::string& MetaDataHandler::getSampleName()
   {
-    return sample_name_;
+    return sample_name;
   }
 
   std::string MetaDataHandler::getSampleName() const
   {
-    return sample_name_;
+    return sample_name;
   }
 
   void MetaDataHandler::setSampleGroupName(const std::string& sample_group_name_I)
   {
-    sample_group_name_ = sample_group_name_I;
+    sample_group_name = sample_group_name_I;
   }
 
   std::string& MetaDataHandler::getSampleGroupName()
   {
-    return sample_group_name_;
+    return sample_group_name;
   }
 
   std::string MetaDataHandler::getSampleGroupName() const
   {
-    return sample_group_name_;
+    return sample_group_name;
   }
 
   void MetaDataHandler::setSequenceSegmentName(const std::string& sequence_segment_name_I)
   {
-    sequence_segment_name_ = sequence_segment_name_I;
+    sequence_segment_name = sequence_segment_name_I;
   }
 
   std::string& MetaDataHandler::getSequenceSegmentName()
   {
-    return sequence_segment_name_;
+    return sequence_segment_name;
   }
 
   std::string MetaDataHandler::getSequenceSegmentName() const
   {
-    return sequence_segment_name_;
+    return sequence_segment_name;
   }
 
   void MetaDataHandler::setFilename(const std::string& filename_I)
   {
-    original_filename_ = filename_I;
+    original_filename = filename_I;
   }
 
   std::string& MetaDataHandler::getFilename()
   {
-    return original_filename_;
+    return original_filename;
   }
 
   std::string MetaDataHandler::getFilename() const
   {
-    return original_filename_;
+    return original_filename;
   }
 
-  void MetaDataHandler::setSampleType(SampleType sample_type)
+  void MetaDataHandler::setSampleType(SampleType sample_type_I)
   {
-    sample_type_ = sample_type;
+    sample_type = sample_type_I;
   }
 
   MetaDataHandler::SampleType& MetaDataHandler::getSampleType()
   {
-    return sample_type_;
+    return sample_type;
   }
 
   MetaDataHandler::SampleType MetaDataHandler::getSampleType() const
   {
-    return sample_type_;
+    return sample_type;
   }
 
   bool MetaDataHandler::validateMetaData(const MetaDataHandler& meta_data)
@@ -176,11 +174,11 @@ namespace SmartPeak
 
   void MetaDataHandler::clear()
   {
-    sample_name_.clear();
-    sample_group_name_.clear();
-    sequence_segment_name_.clear();
-    original_filename_.clear();
-    sample_type_ = SampleType::Unknown;
+    sample_name.clear();
+    sample_group_name.clear();
+    sequence_segment_name.clear();
+    original_filename.clear();
+    sample_type = SampleType::Unknown;
     acq_method_name.clear();
     inj_volume = -1.0;
     inj_volume_units.clear();

@@ -1,4 +1,4 @@
-/**TODO:  Add copyright*/
+// TODO: Add copyright
 
 #define BOOST_TEST_MODULE MetaDataHandler test suite
 #include <boost/test/included/unit_test.hpp>

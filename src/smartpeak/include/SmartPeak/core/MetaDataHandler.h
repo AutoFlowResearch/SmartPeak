@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <iostream>
 #include <string>
 #include <ctime>
 
@@ -42,23 +41,23 @@ public:
     * premature optimization than an actual advantage (KISS and YAGNI principles).
     */
 
-    void setSampleName(const std::string& sample_name);
+    void setSampleName(const std::string& sample_name_I);
     std::string& getSampleName();
     std::string getSampleName() const;
 
-    void setSampleGroupName(const std::string& sample_group_name);
+    void setSampleGroupName(const std::string& sample_group_name_I);
     std::string& getSampleGroupName();
     std::string getSampleGroupName() const;
 
-    void setSequenceSegmentName(const std::string& sequence_segment_name);
+    void setSequenceSegmentName(const std::string& sequence_segment_name_I);
     std::string& getSequenceSegmentName();
     std::string getSequenceSegmentName() const;
 
-    void setFilename(const std::string& filename);
+    void setFilename(const std::string& filename_I);
     std::string& getFilename();
     std::string getFilename() const;
 
-    void setSampleType(SampleType sample_type);
+    void setSampleType(SampleType sample_type_I);
     SampleType& getSampleType();
     SampleType getSampleType() const;
 
@@ -67,11 +66,11 @@ public:
     void clear();
 
     // required
-    std::string sample_name_;
-    std::string sample_group_name_;
-    std::string sequence_segment_name_;
-    std::string original_filename_;
-    SampleType sample_type_ = SampleType::Unknown;
+    std::string sample_name;
+    std::string sample_group_name;
+    std::string sequence_segment_name;
+    std::string original_filename;
+    SampleType sample_type = SampleType::Unknown;
     std::string acq_method_name;
     float inj_volume = -1.0;
     std::string inj_volume_units;
