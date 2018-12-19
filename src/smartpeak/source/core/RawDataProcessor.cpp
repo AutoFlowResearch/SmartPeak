@@ -165,6 +165,8 @@ namespace SmartPeak
 
     std::string filename;
     std::string samplename;
+    // std::string instrument;
+    // std::string software;
 
     const std::string loaded_file_path = rawDataHandler_IO.getChromatogramMap().getLoadedFilePath();
 
@@ -184,44 +186,16 @@ namespace SmartPeak
       throw "no sample name?\n";
     }
 
-    const OpenMS::MSExperiment& chromatogram_map = rawDataHandler_IO.getChromatogramMap();
+    // const OpenMS::String& instrument_name = rawDataHandler_IO.getChromatogramMap().getInstrument().getName();
+    // if (instrument_name.size()) {
+    //   instrument = instrument_name;
+    //   const OpenMS::String& software_name = rawDataHandler_IO.getChromatogramMap().getInstrument().getSoftware().getName();
+    //   if (software_name.size())
+    //     software = software_name;
+    // }
 
-    MetaDataHandler& metaDataHandler = rawDataHandler_IO.getMetaData();
-
-    if (metaDataHandler.getSampleName().empty())
-      metaDataHandler.setSampleName(samplename);
-
-    if (metaDataHandler.getFilename().empty())
-      metaDataHandler.setFilename(filename);
-
-    if (metaDataHandler.proc_method_name.empty())
-      metaDataHandler.proc_method_name = chromatogram_map.getInstrument().getSoftware().getName();
-
-    if (metaDataHandler.instrument.empty())
-      metaDataHandler.instrument = chromatogram_map.getInstrument().getName();
-
-    if (metaDataHandler.operator_name.empty() && chromatogram_map.getContacts().size())
-      metaDataHandler.operator_name = chromatogram_map.getContacts()[0].getLastName() + " " + chromatogram_map.getContacts()[0].getFirstName();
-
-    if (metaDataHandler.acquisition_date_and_time.tm_year == 0) {
-      // some noise because OpenMS uses uint and the standard library uses int (for time structure's members)
-      struct { OpenMS::UInt tm_mon, tm_mday, tm_year, tm_hour, tm_min, tm_sec; } dt_uint;
-      rawDataHandler_IO.getChromatogramMap().getDateTime().get(
-        dt_uint.tm_mon,
-        dt_uint.tm_mday,
-        dt_uint.tm_year,
-        dt_uint.tm_hour,
-        dt_uint.tm_min,
-        dt_uint.tm_sec
-      );
-      std::tm& dt_int = metaDataHandler.acquisition_date_and_time;
-      dt_int.tm_year = dt_uint.tm_year;
-      dt_int.tm_mon = dt_uint.tm_mon;
-      dt_int.tm_mday = dt_uint.tm_mday;
-      dt_int.tm_hour = dt_uint.tm_hour;
-      dt_int.tm_min = dt_uint.tm_min;
-      dt_int.tm_sec = dt_uint.tm_sec;
-    }
+    rawDataHandler_IO.getMetaData().setSampleName(samplename);
+    rawDataHandler_IO.getMetaData().setFilename(filename);
   }
 
   void RawDataProcessor::validateFeatures(
