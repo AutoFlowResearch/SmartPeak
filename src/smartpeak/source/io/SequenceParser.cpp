@@ -138,20 +138,23 @@ namespace SmartPeak
       bool is_valid = false;
 
       if (delimiter == s_comma) {
-        is_valid = in_comma.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, original_filename,
-          proc_method_name, rack_number, plate_number, pos_number, inj_number, dilution_factor,
-          acq_method_name, operator_name, acquisition_date_and_time,
-          inj_volume, inj_volume_units, batch_name);
+        is_valid = in_comma.read_row(sample_name, sample_group_name,
+          sequence_segment_name, sample_type, original_filename, proc_method_name,
+          rack_number, plate_number, pos_number, inj_number, dilution_factor,
+          acq_method_name, operator_name, acquisition_date_and_time, inj_volume,
+          inj_volume_units, batch_name);
       } else if (delimiter == s_semicolon) {
-        is_valid = in_semicolon.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, original_filename,
-          proc_method_name, rack_number, plate_number, pos_number, inj_number, dilution_factor,
-          acq_method_name, operator_name, acquisition_date_and_time,
-          inj_volume, inj_volume_units, batch_name);
+        is_valid = in_semicolon.read_row(sample_name, sample_group_name,
+          sequence_segment_name, sample_type, original_filename, proc_method_name,
+          rack_number, plate_number, pos_number, inj_number, dilution_factor,
+          acq_method_name, operator_name, acquisition_date_and_time, inj_volume,
+          inj_volume_units, batch_name);
       } else if (delimiter == s_tab) {
-        is_valid = in_tab.read_row(sample_name, sample_group_name, sequence_segment_name, sample_type, original_filename,
-          proc_method_name, rack_number, plate_number, pos_number, inj_number, dilution_factor,
-          acq_method_name, operator_name, acquisition_date_and_time,
-          inj_volume, inj_volume_units, batch_name);
+        is_valid = in_tab.read_row(sample_name, sample_group_name,
+          sequence_segment_name, sample_type, original_filename, proc_method_name,
+          rack_number, plate_number, pos_number, inj_number, dilution_factor,
+          acq_method_name, operator_name, acquisition_date_and_time, inj_volume,
+          inj_volume_units, batch_name);
       }
 
       if (!is_valid)
