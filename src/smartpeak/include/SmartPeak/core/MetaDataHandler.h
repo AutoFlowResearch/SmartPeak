@@ -81,8 +81,8 @@ public:
     int rack_number = -1;
     int plate_number = -1;
     int pos_number = -1;
-    int inj_number = -1;
-    float dilution_factor = -1.0;
+    int inj_number = -1; // default: row number (starts from 1)
+    float dilution_factor = 1.0;
     std::string instrument;
     std::string operator_name;
     std::string proc_method_name;

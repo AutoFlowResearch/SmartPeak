@@ -191,7 +191,7 @@ namespace SmartPeak
     plate_number = -1;
     pos_number = -1;
     inj_number = -1;
-    dilution_factor = -1.0;
+    dilution_factor = 1.0;
     instrument.clear();
     operator_name.clear();
     proc_method_name.clear();
