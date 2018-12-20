@@ -5,11 +5,11 @@ project("SmartPeak_class_examples_smartpeak")
 
 message(STATUS "building examples...")
 
-# #------------------------------------------------------------------------------
-# # Configure examples file to get the TEST_DATA_PATH into the examples
-# set(CF_SMARTPEAK_EXAMPLES_DATA_PATH "${PROJECT_SOURCE_DIR}/examples/data/")
-# set(CONFIGURED_EXAMPLES_CONFIG_H "${PROJECT_BINARY_DIR}/include/SmartPeak/test_config.h")
-# configure_file(${PROJECT_SOURCE_DIR}/include/SmartPeak/test_config.h.in ${CONFIGURED_EXAMPLES_CONFIG_H})
+#------------------------------------------------------------------------------
+# Configure examples file to get the TEST_DATA_PATH into the examples
+set(CF_SMARTPEAK_EXAMPLES_DATA_PATH "${PROJECT_SOURCE_DIR}/data/")
+set(CONFIGURED_EXAMPLES_CONFIG_H "${PROJECT_BINARY_DIR}/include/SmartPeak/test_config.h")
+configure_file(${PROJECT_SOURCE_DIR}/include/SmartPeak/test_config.h.in ${CONFIGURED_EXAMPLES_CONFIG_H})
 
 #------------------------------------------------------------------------------
 # get the test executables

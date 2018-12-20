@@ -1,6 +1,6 @@
 // TODO: Add copyright
 
-// #include <SmartPeak/test_config.h>
+#include <SmartPeak/test_config.h>
 
 #include <SmartPeak/core/LCMS_MRM_Unknown_example.h>
 #include <SmartPeak/core/Utilities.h>
@@ -9,24 +9,22 @@
 using namespace SmartPeak;
 using namespace std;
 
-static const std::string example_data_dir = "/home/pasdom/SmartPeak2/src/examples/data/"; // TODO: redefine it
-
 void test_main_GCMS_FullScan_Unknown()
 {
-  example_LCMS_MRM_Unknowns(example_data_dir + "GCMS_FullScan_Unknowns", ",");
+  example_LCMS_MRM_Unknowns(SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_FullScan_Unknowns"), ",");
 
   RawDataHandler rawDataHandler;
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_data_dir + "GCMS_FullScan_Unknowns/features/GCMS_FullScan.featureXML"
+    SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_FullScan_Unknowns/features/GCMS_FullScan.featureXML")
   );
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_data_dir + "GCMS_FullScan_Unknowns/features/GCMS_FullScan_test.featureXML"
+    SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_FullScan_Unknowns/features/GCMS_FullScan_test.featureXML")
   );
 
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
