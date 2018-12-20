@@ -1,6 +1,6 @@
 // TODO: Add copyright
 
-// #include <SmartPeak/test_config.h>
+#include <SmartPeak/test_config.h>
 
 #include <SmartPeak/core/LCMS_MRM_Standards_example.h>
 #include <SmartPeak/core/Utilities.h>
@@ -9,24 +9,22 @@
 using namespace SmartPeak;
 using namespace std;
 
-static const std::string example_data_dir = "/home/pasdom/SmartPeak2/src/examples/data/"; // TODO: redefine it
-
 void test_main_HPLC_UV_Standards()
 {
-  example_LCMS_MRM_Standards(example_data_dir + "HPLC_UV_Standards", ",");
+  example_LCMS_MRM_Standards(SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards"), ",");
 
   RawDataHandler rawDataHandler;
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_data_dir + "HPLC_UV_Standards/features/100ug.featureXML"
+    SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug.featureXML")
   );
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_data_dir + "HPLC_UV_Standards/features/100ug_test.featureXML"
+    SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_test.featureXML")
   );
 
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();

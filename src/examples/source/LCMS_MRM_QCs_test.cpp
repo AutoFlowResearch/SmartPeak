@@ -1,6 +1,6 @@
 // TODO: Add copyright
 
-// #include <SmartPeak/test_config.h>
+#include <SmartPeak/test_config.h>
 
 #include <SmartPeak/core/LCMS_MRM_Unknown_example.h>
 #include <SmartPeak/core/Utilities.h>
@@ -9,24 +9,22 @@
 using namespace SmartPeak;
 using namespace std;
 
-static const std::string example_data_dir = "/home/pasdom/SmartPeak2/src/examples/data/"; // TODO: redefine it
-
 void test_main_LCMS_MRM_QCs()
 {
-  example_LCMS_MRM_Unknowns(example_data_dir + "LCMS_MRM_QCs", ",");
+  example_LCMS_MRM_Unknowns(SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs"), ",");
 
   RawDataHandler rawDataHandler;
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_data_dir + "LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1.featureXML"
+    SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1.featureXML")
   );
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    example_data_dir + "LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1_test.featureXML"
+    SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1_test.featureXML")
   );
 
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
