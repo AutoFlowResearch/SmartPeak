@@ -1,4 +1,4 @@
-sample_name,sample_group_name,sequence_segment_name,sample_type,filename
-170808_Jonathan_yeast_Sacc1_1x,group1,sequence1,Unknown,170808_Jonathan_yeast_Sacc1_1x.mzML
-170808_Jonathan_yeast_Sacc2_1x,group1,sequence1,Unknown,170808_Jonathan_yeast_Sacc2_1x.mzML
-170808_Jonathan_yeast_Sacc3_1x,group1,sequence1,Unknown,170808_Jonathan_yeast_Sacc3_1x.mzML
+sample_name,sample_group_name,sequence_segment_name,sample_type,original_filename,batch_name,rack_number,plate_number,pos_number,inj_number,dilution_factor,inj_volume,inj_volume_units,operator_name,acq_method_name,proc_method_name,acquisition_date_and_time
+170808_Jonathan_yeast_Sacc1_1x,group1,sequence1,Unknown,170808_Jonathan_yeast_Sacc1_1x.mzML,BatchName,,,,,,3,uL,,MethodName,,
+170808_Jonathan_yeast_Sacc2_1x,group1,sequence1,Unknown,170808_Jonathan_yeast_Sacc2_1x.mzML,BatchName,,,,,,3,uL,,MethodName,,
+170808_Jonathan_yeast_Sacc3_1x,group1,sequence1,Unknown,170808_Jonathan_yeast_Sacc3_1x.mzML,BatchName,,,,,,3,uL,,MethodName,,
