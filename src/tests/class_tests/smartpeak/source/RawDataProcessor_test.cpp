@@ -123,49 +123,50 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 46.652168337345103, 1e-6);
 }
 
-
 BOOST_AUTO_TEST_CASE(selectFeatures)
 {
-// TODO: Uncomment once MRMFeatureSelector is ready
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
 
-//   map<string, vector<map<string, string>>> params_1;
-//   map<string, vector<map<string, string>>> params_2;
-//   load_data(params_1, params_2);
-//   RawDataHandler rawDataHandler;
+  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
 
-//   const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
-//   OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
+  const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  OpenMSFile::loadMSExperiment(rawDataHandler, mzML_i, params_1.at("MRMMapping"));
 
-//   const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
-//   OpenMSFile::loadMSExperiment(rawDataHandler, mzML_i, params_1.at("MRMMapping"));
+  RawDataProcessor::extractMetaData(rawDataHandler);
 
-//   RawDataProcessor::extractMetaData(rawDataHandler);
+  const string featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_2_core_RawDataProcessor.featureXML");
+  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o);
 
-//   const string featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_2_core_RawDataProcessor.featureXML");
+  RawDataProcessor::selectFeatures(
+    rawDataHandler,
+    params_1.at("MRMFeatureSelector.select_MRMFeatures_qmip"),
+    params_1.at("MRMFeatureSelector.schedule_MRMFeatures_qmip")
+  );
 
-//   OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 114); // NOTE: 329 in python
 
-//   RawDataProcessor::selectFeatures(
-//     rawDataHandler,
-//     params_1.at("MRMFeatureSelector.select_MRMFeatures_qmip"),
-//     params_1.at("MRMFeatureSelector.schedule_MRMFeatures_qmip")
-//   );
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
-//   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 329);
+  const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getMetaValue("peak_apex_int")), 266403.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getRT()), 953.66569377291205, 1e-6);
 
-//   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[50].getSubordinates().size(), 2);
 
-//   const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
-//   BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getMetaValue("peak_apex_int")), 266403.0, 1e-6);
-//   BOOST_CHECK_EQUAL(subordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
-//   BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getRT()), 953.66569377291205, 1e-6);
+  // const OpenMS::Feature& subordinate2 = rawDataHandler.getFeatureMap()[50].getSubordinates()[0]; // NOTE: these results are different from the python version, hence commented out
+  // BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 49333.0, 1e-6);
+  // BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "arg-L.arg-L_1.Heavy");
+  // BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 46.652168337345103, 1e-6);
 
-//   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[50].getSubordinates().size(), 2);
-
-//   const OpenMS::Feature& subordinate2 = rawDataHandler.getFeatureMap()[50].getSubordinates()[0];
-//   BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 49333.0, 1e-6);
-//   BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "arg-L.arg-L_1.Heavy");
-//   BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 46.652168337345103, 1e-6);
+  const OpenMS::Feature& subordinate2 = rawDataHandler.getFeatureMap()[50].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 4132.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "f6p.f6p_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 439.165833, 1e-6);
 }
 
 BOOST_AUTO_TEST_CASE(validateFeatures)

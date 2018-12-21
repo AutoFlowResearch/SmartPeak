@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(loadMSExperiment)
   RawDataHandler rawDataHandler;
   std::vector<std::map<std::string, std::string>> mzML_params_I = {
     {
-      {"name", "apply_baseline_correction"},
+      {"name", "zero_baseline"},
       {"type", "bool"},
       {"value", "false"}
     }

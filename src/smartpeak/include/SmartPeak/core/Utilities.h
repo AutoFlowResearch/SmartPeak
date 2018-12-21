@@ -2,9 +2,11 @@
 
 #pragma once
 
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <iostream>
 #include <regex>
+#define maxFunc(a,b) (((a) > (b)) ? (a) : (b))
 
 namespace SmartPeak
 {
@@ -332,10 +334,9 @@ public:
 
     static void parseList(const std::string& line, std::regex& re, CastValue& cast);
 
-    static void splitString(
+    static std::vector<std::string> splitString(
       const std::string& s,
-      const char sep,
-      std::vector<std::string>& out
+      const char sep
     );
 
     template<typename T>
@@ -400,5 +401,28 @@ public:
 
       return conf;
     }
+
+    /**
+      @brief Test absolute and relative closeness of values
+
+      References: http://realtimecollisiondetection.net/blog/?p=89
+
+      @param: lhs Left Hand Side to compare
+      @param: rhs Right Hand Side to Compare
+      @param: rel_tol Relative Tolerance threshold
+      @param: abs_tol Absolute Tolerance threshold
+
+      @returns True or False
+    */
+    template<typename T>
+    static bool assert_close(const T& lhs, const T& rhs, double rel_tol = 1e-4, double abs_tol = 1e-4)
+    {
+      return (std::fabs(lhs - rhs) <= maxFunc(abs_tol, rel_tol * maxFunc(std::fabs(lhs), std::fabs(rhs)) ));
+    }
+
+    static std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> extractSelectorParameters(
+      const std::vector<std::map<std::string, std::string>>& params,
+      const std::vector<std::map<std::string, std::string>>& score_weights
+    );
   };
 }

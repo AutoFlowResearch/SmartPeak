@@ -1,0 +1,23 @@
+ProteinName,FullPeptideName,transition_group_id,transition_name,RetentionTime,Annotation,PrecursorMz,MS1 Res,ProductMz,MS2 Res,Dwell,Fragmentor,Collision Energy,Cell Accelerator Voltage,LibraryIntensity,decoy,PeptideSequence,LabelType,PrecursorCharge,FragmentCharge,FragmentType,FragmentSeriesNumber,quantifying_transition,identifying_transition,detecting_transition
+Serotonin,,Serotonin,Serotonin,1.87,112.2,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+5-HTP,,5-HTP,5-HTP,2.04,122.4,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+Tryptophan,,Tryptophan,Tryptophan,3.43,205.8,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+Tryptamine,,Tryptamine,Tryptamine,3.8,228,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+Acetylserotonin,,Acetylserotonin,Acetylserotonin,5.07,304.2,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+Riboflavin,,Riboflavin,Riboflavin,5.28,316.8,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+5-hydroxyindole,,5-hydroxyindole,5-hydroxyindole,5.65,339,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+Antranilicacid,,Antranilicacid,Antranilicacid,6.31,378.6,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+Melatonin,,Melatonin,Melatonin,6.96,417.6,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+Acetyltryptamine,,Acetyltryptamine,Acetyltryptamine,7.3,438,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+Indole,,Indole,Indole,9.03,541.8,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+Serotonin,,Serotonin,Serotonin2,1.87,112.2,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,2,TRUE,FALSE,TRUE
+5-HTP,,5-HTP,5-HTP2,2.04,122.4,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,2,TRUE,FALSE,TRUE
+Tryptophan,,Tryptophan,Tryptophan2,3.43,205.8,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,2,TRUE,FALSE,TRUE
+Tryptamine,,Tryptamine,Tryptamine2,3.8,228,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,2,TRUE,FALSE,TRUE
+Acetylserotonin,,Acetylserotonin,Acetylserotonin2,5.07,304.2,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,2,TRUE,FALSE,TRUE
+Riboflavin,,Riboflavin,Riboflavin2,5.28,316.8,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,2,TRUE,FALSE,TRUE
+5-hydroxyindole,,5-hydroxyindole,5-hydroxyindole2,5.65,339,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,2,TRUE,FALSE,TRUE
+Antranilicacid,,Antranilicacid,Antranilicacid2,6.31,378.6,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,2,TRUE,FALSE,TRUE
+Melatonin,,Melatonin,Melatonin2,6.96,417.6,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,2,TRUE,FALSE,TRUE
+Acetyltryptamine,,Acetyltryptamine,Acetyltryptamine2,7.3,438,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,2,TRUE,FALSE,TRUE
+Indole,,Indole,Indole2,9.03,541.8,0,Unit,0,Unit,,,,,1,0,,Light,1,1,,2,TRUE,FALSE,TRUE

@@ -34,8 +34,10 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-      std::cout << "loading standards concentrations" << std::endl;
+    if (verbose) {
+      std::cout << "==== START loadStandardsConcentrations"
+        << "\nloadStandardsConcentrations(): loading " << filename << std::endl;
+    }
 
     if (filename.empty())
       throw std::invalid_argument("filename is empty");
@@ -46,7 +48,11 @@ namespace SmartPeak
       AQSf.load(filename, standards);
       sequenceSegmentHandler_IO.setStandardsConcentrations(standards);
     } catch (const std::exception& e) {
-      std::cout << e.what();
+      std::cerr << "loadStandardsConcentrations(): " << e.what() << std::endl;
+    }
+
+    if (verbose) {
+      std::cout << "==== END   loadStandardsConcentrations" << std::endl;
     }
   }
 
@@ -56,8 +62,10 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-      std::cout << "Loading quantitation methods" << std::endl;
+    if (verbose) {
+      std::cout << "==== START loadQuantitationMethods"
+        << "\nloadQuantitationMethods(): loading " << filename << std::endl;
+    }
 
     if (filename.empty())
       throw std::invalid_argument("filename is empty");
@@ -68,7 +76,11 @@ namespace SmartPeak
       AQMf.load(filename, quantitation_methods);
       sequenceSegmentHandler_IO.setQuantitationMethods(quantitation_methods);
     } catch (const std::exception& e) {
-      std::cout << e.what();
+      std::cerr << "loadQuantitationMethods(): " << e.what() << std::endl;
+    }
+
+    if (verbose) {
+      std::cout << "==== END   loadQuantitationMethods" << std::endl;
     }
   }
 
@@ -79,8 +91,10 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-      std::cout << "Loading TraML" << std::endl;
+    if (verbose) {
+      std::cout << "==== START loadTraML"
+        << "\nloadTraML(): loading " << filename << "; format: " << format << std::endl;
+    }
 
     if (filename.empty()) {
       throw std::invalid_argument("filename is empty");
@@ -99,6 +113,10 @@ namespace SmartPeak
     }
 
     rawDataHandler.setTargetedExperiment(targeted_exp);
+
+    if (verbose) {
+      std::cout << "==== END   loadTraML" << std::endl;
+    }
   }
 
   void OpenMSFile::loadMSExperiment(
@@ -110,8 +128,9 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-        std::cout << "Loading mzML" << std::endl;
+    if (verbose) {
+      std::cout << "==== START loadMSExperiment" << std::endl;
+    }
 
     // # load chromatograms
     OpenMS::MSExperiment chromatograms;
@@ -125,13 +144,20 @@ namespace SmartPeak
           mzML_params.emplace(param.at("name"), c);
         }
         if (mzML_params.count("format") && mzML_params.at("format").s_ == "ChromeleonFile") {
+          const size_t pos = mzML_i.rfind(".");
+          std::string txt_name = mzML_i;
+          if (pos != std::string::npos) {
+            txt_name.replace(txt_name.cbegin() + pos + 1, txt_name.cend(), "txt"); // replace extension
+          }
           OpenMS::ChromeleonFile chfh;
-          chfh.load(mzML_i, chromatograms);
+          std::cout << "loadMSExperiment(): loading " << txt_name << std::endl;
+          chfh.load(txt_name, chromatograms);
         } else {
           OpenMS::FileHandler fh;
+          std::cout << "loadMSExperiment(): loading " << mzML_i << std::endl;
           fh.loadExperiment(mzML_i, chromatograms);
         }
-        if (mzML_params.count("apply_baseline_correction") && mzML_params.at("apply_baseline_correction").b_) {
+        if (mzML_params.count("zero_baseline") && mzML_params.at("zero_baseline").b_) {
           std::vector<OpenMS::MSChromatogram>& chroms = chromatograms.getChromatograms();
           for (OpenMS::MSChromatogram& ch : chroms) {
             OpenMS::subtractMinimumIntensity(ch);
@@ -139,6 +165,7 @@ namespace SmartPeak
         }
       } else {
         OpenMS::FileHandler fh;
+        std::cout << "loadMSExperiment(): loading " << mzML_i << std::endl;
         fh.loadExperiment(mzML_i, chromatograms);
       }
     }
@@ -199,6 +226,10 @@ namespace SmartPeak
       );
       rawDataHandler.setChromatogramMap(chromatogram_map);
     }
+
+    if (verbose) {
+      std::cout << "==== END   loadMSExperiment" << std::endl;
+    }
   }
 
   void OpenMSFile::loadFeatureMap(
@@ -207,8 +238,10 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-      std::cout << "Loading FeatureMap" << std::endl;
+    if (verbose) {
+      std::cout << "==== START loadFeatureMap"
+        << "\nloadFeatureMap(): loading " << filename << std::endl;
+    }
 
     if (filename.empty())
       throw std::invalid_argument("filename is empty");
@@ -217,6 +250,10 @@ namespace SmartPeak
     OpenMS::FeatureXMLFile featurexml;
     featurexml.load(filename, fm);
     rawDataHandler.setFeatureMap(fm);
+
+    if (verbose) {
+      std::cout << "==== END   loadFeatureMap" << std::endl;
+    }
   }
 
   void OpenMSFile::loadFeatureFilter(
@@ -226,8 +263,11 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-      std::cout << "Loading feature_filter" << std::endl;
+    if (verbose) {
+      std::cout << "==== START loadFeatureFilter"
+        << "\nloadFeatureFilter(): loading " << filename_components << " and "
+        << filename_components_groups << std::endl;
+    }
 
     if (filename_components.empty() || filename_components_groups.empty())
       throw std::invalid_argument("Name of Feature filter components or Feature filter component groups is missing.");
@@ -239,6 +279,10 @@ namespace SmartPeak
     if (filename_components_groups.size())
       featureQCFile.load(filename_components_groups, featureQC, true);
     rawDataHandler.setFeatureFilter(featureQC);
+
+    if (verbose) {
+      std::cout << "==== END   loadFeatureFilter" << std::endl;
+    }
   }
 
   void OpenMSFile::loadFeatureQC(
@@ -248,8 +292,11 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-      std::cout << "Loading feature_qc" << std::endl;
+    if (verbose) {
+      std::cout << "==== START loadFeatureQC"
+        << "\nloadFeatureQC(): loading " << filename_components << " and "
+        << filename_components_groups << std::endl;
+    }
 
     if (filename_components.empty() && filename_components_groups.empty())
       throw std::invalid_argument("filenames are both empty");
@@ -261,6 +308,10 @@ namespace SmartPeak
     if (filename_components_groups.size())
       featureQCFile.load(filename_components_groups, featureQC, true);
     rawDataHandler.setFeatureQC(featureQC);
+
+    if (verbose) {
+      std::cout << "==== END   loadFeatureQC" << std::endl;
+    }
   }
 
   void OpenMSFile::loadValidationData(
@@ -269,8 +320,10 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-      std::cout << "Loading validation data" << std::endl;
+    if (verbose) {
+      std::cout << "==== START loadValidationData"
+        << "\nloadValidationData(): loading " << referenceData_csv_i << std::endl;
+    }
 
     if (referenceData_csv_i.empty())
       throw std::invalid_argument("Filename is empty.");
@@ -375,14 +428,24 @@ namespace SmartPeak
     }
 
     rawDataHandler.setReferenceData(reference_data);
+
+    if (verbose) {
+      std::cout << "==== END   loadValidationData" << std::endl;
+    }
   }
 
   void OpenMSFile::readRawDataProcessingParameters(
     RawDataHandler& rawDataHandler,
     const std::string& filename,
-    const std::string& delimiter
+    const std::string& delimiter,
+    const bool verbose
   )
   {
+    if (verbose) {
+      std::cout << "==== START readRawDataProcessingParameters"
+        << "\nreadRawDataProcessingParameters(): loading " << filename << std::endl;
+    }
+
     if (filename.empty())
       throw std::invalid_argument("filename is empty");
 
@@ -390,13 +453,22 @@ namespace SmartPeak
     FileReader::parseOpenMSParams(filename, parameters);
 
     parseRawDataProcessingParameters(rawDataHandler, parameters);
+
+    if (verbose) {
+      std::cout << "==== END   readRawDataProcessingParameters" << std::endl;
+    }
   }
 
   void OpenMSFile::parseRawDataProcessingParameters(
     RawDataHandler& rawDataHandler,
-    std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_file
+    std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_file,
+    const bool verbose
   )
   {
+    if (verbose) {
+      std::cout << "==== START parseRawDataProcessingParameters" << std::endl;
+    }
+
     // # check for workflow parameters integrity
     const std::vector<std::string> required_parameters = {
       "SequenceSegmentPlotter",
@@ -423,6 +495,10 @@ namespace SmartPeak
       }
     }
     rawDataHandler.setParameters(parameters_file);
+
+    if (verbose) {
+      std::cout << "==== END   parseRawDataProcessingParameters" << std::endl;
+    }
   }
 
   void OpenMSFile::storeQuantitationMethods(
@@ -431,8 +507,10 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-      std::cout << "storing quantitation methods" << std::endl;
+    if (verbose) {
+      std::cout << "==== START storeQuantitationMethods"
+        << "\nstoreQuantitationMethods(): storing " << filename << std::endl;
+    }
 
     if (filename.empty())
       throw std::invalid_argument("filename is empty");
@@ -442,6 +520,10 @@ namespace SmartPeak
       filename,
       sequenceSegmentHandler_IO.getQuantitationMethods()
     );
+
+    if (verbose) {
+      std::cout << "==== END   storeQuantitationMethods" << std::endl;
+    }
   }
 
   void OpenMSFile::storeFeatureMap(
@@ -450,8 +532,10 @@ namespace SmartPeak
     const bool verbose
   )
   {
-    if (verbose)
-      std::cout << "Storing FeatureMap" << std::endl;
+    if (verbose) {
+      std::cout << "==== START storeFeatureMap"
+        << "\nstoreFeatureMap(): storing " << filename << std::endl;
+    }
 
     if (filename.empty())
       throw std::invalid_argument("filename is empty");
@@ -459,14 +543,31 @@ namespace SmartPeak
     // # Store outfile as featureXML
     OpenMS::FeatureXMLFile featurexml;
     featurexml.store(filename, rawDataHandler_IO.getFeatureMap());
+
+    if (verbose) {
+      std::cout << "==== END   storeFeatureMap" << std::endl;
+    }
   }
 
-  void OpenMSFile::storeMzML(const std::string& filename, const OpenMS::MSExperiment& experiment)
+  void OpenMSFile::storeMzML(
+    const std::string& filename,
+    const OpenMS::MSExperiment& experiment,
+    const bool verbose
+  )
   {
+    if (verbose) {
+      std::cout << "==== START storeMzML"
+        << "\nstoreMzML(): storing " << filename << std::endl;
+    }
+
     if (filename.empty())
       throw std::invalid_argument("filename is empty");
 
     OpenMS::MzMLFile mzmlf;
     mzmlf.store(filename, experiment);
+
+    if (verbose) {
+      std::cout << "==== END   storeMzML" << std::endl;
+    }
   }
 }

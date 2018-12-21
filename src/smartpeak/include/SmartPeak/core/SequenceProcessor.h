@@ -17,7 +17,7 @@ public:
     static void createSequence(
       SequenceHandler& sequenceHandler_IO,
       const std::string& delimiter = ",",
-      const bool verbose_I = false
+      const bool verbose_I = true
     );
 
     static void addRawDataHandlerToSequence(
@@ -34,14 +34,14 @@ public:
       SequenceHandler& sequenceHandler_IO,
       const std::vector<std::string>& sample_names_I = std::vector<std::string>(),
       const std::vector<std::string>& raw_data_processing_methods_I = std::vector<std::string>(),
-      const bool verbose_I = false
+      const bool verbose_I = true
     );
 
     static void processSequenceSegments(
       SequenceHandler& sequenceHandler_IO,
       const std::set<std::string>& sequence_segment_names = std::set<std::string>(),
-      const std::set<std::string>& sequence_segment_processing_methods_I = std::set<std::string>(),
-      const bool verbose_I = false
+      const std::vector<std::string>& sequence_segment_processing_methods_I = std::vector<std::string>(),
+      const bool verbose_I = true
     );
   };
 }

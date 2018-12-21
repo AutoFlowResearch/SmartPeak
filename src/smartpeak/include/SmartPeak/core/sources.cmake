@@ -4,6 +4,9 @@ set(directory include/SmartPeak/core)
 ### list all header files of the directory here
 set(sources_list_h
 	Helloworld.h
+	LCMS_MRM_Standards_example.h
+	LCMS_MRM_Unknown_example.h
+	LCMS_MRM_Validation_example.h
 	MetaDataHandler.h
 	MRMFeatureValidator.h
 	RawDataHandler.h

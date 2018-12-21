@@ -1,0 +1,4 @@
+sample_name,sample_group_name,sequence_segment_name,sample_type,filename
+170808_Jonathan_yeast_Sacc1_1x,group1,sequence1,Unknown,170808_Jonathan_yeast_Sacc1_1x.mzML
+170808_Jonathan_yeast_Sacc2_1x,group1,sequence1,Unknown,170808_Jonathan_yeast_Sacc2_1x.mzML
+170808_Jonathan_yeast_Sacc3_1x,group1,sequence1,Unknown,170808_Jonathan_yeast_Sacc3_1x.mzML

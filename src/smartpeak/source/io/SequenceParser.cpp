@@ -10,8 +10,18 @@
 
 namespace SmartPeak
 {
-  void SequenceParser::readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname, const std::string& delimiter)
+  void SequenceParser::readSequenceFile(
+    SequenceHandler& sequenceHandler,
+    const std::string& pathname,
+    const std::string& delimiter,
+    const bool verbose
+  )
   {
+    if (verbose) {
+      std::cout << "==== START readSequenceFile()"
+        << "\nreadSequenceFile(): loading " << pathname << std::endl;
+    }
+
     const std::string s_sample_name {"sample_name"};
     const std::string s_sample_group_name {"sample_group_name"};
     const std::string s_sequence_segment_name {"sequence_segment_name"};
@@ -80,6 +90,10 @@ namespace SmartPeak
       mdh.setFilename(filename);
       sequenceHandler.addSampleToSequence(mdh, OpenMS::FeatureMap());
     }
+
+    if (verbose) {
+      std::cout << "==== END   readSequenceFile()" << std::endl;
+    }
   }
 
   void SequenceParser::makeDataTableFromMetaValue(
@@ -146,9 +160,15 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types
+    const std::set<MetaDataHandler::SampleType>& sample_types,
+    const bool verbose
   )
   {
+    if (verbose) {
+      std::cout << "==== START writeDataTableFromMetaValue()"
+        << "\nwriteDataTableFromMetaValue(): storing " << filename << std::endl;
+    }
+
     std::vector<std::map<std::string,std::string>> list_dict;
     std::vector<std::string> headers;
     makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data, sample_types);
@@ -162,6 +182,10 @@ namespace SmartPeak
         line.push_back(m.at(h));
       }
       writer.writeDataInRow(line.cbegin(), line.cend());
+    }
+
+    if (verbose) {
+      std::cout << "==== END   writeDataTableFromMetaValue()" << std::endl;
     }
   }
 
@@ -238,9 +262,15 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types
+    const std::set<MetaDataHandler::SampleType>& sample_types,
+    const bool verbose
   )
   {
+    if (verbose) {
+      std::cout << "==== START writeDataMatrixFromMetaValue()"
+        << "\nwriteDataMatrixFromMetaValue(): storing " << filename << std::endl;
+    }
+
     std::vector<std::vector<float>> data;
     std::vector<std::string> columns;
     std::vector<Row> rows;
@@ -262,6 +292,10 @@ namespace SmartPeak
         line.emplace_back(std::to_string(data[i][j]));
       }
       writer.writeDataInRow(line.cbegin(), line.cend());
+    }
+
+    if (verbose) {
+      std::cout << "==== END   writeDataMatrixFromMetaValue()" << std::endl;
     }
   }
 }

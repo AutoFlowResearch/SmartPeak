@@ -253,7 +253,7 @@ namespace SmartPeak
         cast = trimmed;
       }
     } catch (const std::exception& e) {
-      std::cerr << e.what();
+      std::cerr << "parseString(): " << e.what() << std::endl;
     }
   }
 
@@ -276,13 +276,12 @@ namespace SmartPeak
     }
   }
 
-  void Utilities::splitString(
+  std::vector<std::string> Utilities::splitString(
     const std::string& s,
-    const char sep,
-    std::vector<std::string>& out
+    const char sep
   )
   {
-    out.clear();
+    std::vector<std::string> out;
     size_t l, r;
     l = r = 0;
     size_t len = s.size();
@@ -298,5 +297,101 @@ namespace SmartPeak
     if (r != 0 && r - l) {
       out.emplace_back(s.substr(l));
     }
+    return out;
+  }
+
+  std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> Utilities::extractSelectorParameters(
+    const std::vector<std::map<std::string, std::string>>& params,
+    const std::vector<std::map<std::string, std::string>>& score_weights
+  )
+  {
+    // const std::vector<std::string> param_names = {
+    //   "nn_thresholds",
+    //   "locality_weights",
+    //   "select_transition_groups",
+    //   "segment_window_lengths",
+    //   "segment_step_lengths",
+    //   "select_highest_counts",
+    //   "variable_types",
+    //   "optimal_thresholds"
+    // };
+    std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> v;
+    // auto it = std::find_if(params.cbegin(), params.cend(), [](auto& m){ return m.at("name") == "segment_window_lengths"; });
+    // int n_elems = std::count(it->value.cbegin(), it->value.cend(), ',') + 1;
+
+    std::map<std::string, std::vector<std::string>> params_map;
+
+    for (const std::map<std::string, std::string>& m : params) {
+      if (params_map.count(m.at("name"))) {
+        throw std::invalid_argument("Did not expect to see the same info (\"" + m.at("name") + "\") defined multiple times.");
+      }
+      const std::string s = m.at("value");
+      std::vector<std::string> values = splitString(s.substr(1, s.size() - 2), ',');
+      params_map.emplace(m.at("name"), values);
+    }
+
+    /*
+    * The user might erroneously provide different numbers of values for each parameter.
+    * e.g. 4 elements for `nn_thresholds`, but only 2 for `select_transition_groups`.
+    * In that case, the following loop extracts the lowest `.size()` between all
+    * user-provided parameters.
+    */
+    // TODO: throw instead, and update parameters.csv files in all folders
+    size_t n_elems = std::numeric_limits<size_t>::max();
+    for (const std::pair<std::string, std::vector<std::string>>& p : params_map) {
+      n_elems = std::min(n_elems, p.second.size());
+    }
+
+    for (size_t i = 0; i < n_elems; ++i) {
+      OpenMS::MRMFeatureSelector::SelectorParameters parameters;
+      for (const std::pair<std::string, std::vector<std::string>>& p : params_map) {
+        const std::string& param_name = p.first;
+        if (param_name == "nn_thresholds" ) {
+          parameters.nn_threshold = std::stoi(p.second[i]);
+        } else if (param_name == "locality_weights") {
+          parameters.locality_weight = p.second[i].front() == 'T' || p.second[i].front() == 't';
+        } else if (param_name == "select_transition_groups") {
+          parameters.select_transition_group = p.second[i].front() == 'T' || p.second[i].front() == 't';
+        } else if (param_name == "segment_window_lengths") {
+          parameters.segment_window_length = std::stoi(p.second[i]);
+        } else if (param_name == "segment_step_lengths") {
+          parameters.segment_step_length = std::stoi(p.second[i]);
+        } else if (param_name == "select_highest_counts") {
+          // not implemented in OpenMS::MRMFeatureSelector
+          // TODO: enable the throw? It would need updating all .csv parameters files
+          // throw std::invalid_argument("extractSelectorParameters(): the parameter 'select_highest_counts' is not supported.\n");
+        } else if (param_name == "variable_types") {
+          parameters.variable_type = p.second[i].front() == 'C' || p.second[i].front() == 'c'
+                                     ? OpenMS::MRMFeatureSelector::VariableType::CONTINUOUS
+                                     : OpenMS::MRMFeatureSelector::VariableType::INTEGER;
+        } else if (param_name == "optimal_thresholds") {
+          parameters.optimal_threshold = std::stod(p.second[i]);
+        } else {
+          throw std::invalid_argument("param_name not valid. Check that selector's settings are properly set. Check: " + param_name + "\n");
+        }
+      }
+
+      for (const std::map<std::string, std::string>& sw : score_weights) {
+        OpenMS::MRMFeatureSelector::LambdaScore ls;
+        if (sw.at("value") == "lambda score: score*1.0") {
+          ls = OpenMS::MRMFeatureSelector::LambdaScore::LINEAR;
+        } else if (sw.at("value") == "lambda score: 1/score") {
+          ls = OpenMS::MRMFeatureSelector::LambdaScore::INVERSE;
+        } else if (sw.at("value") == "lambda score: log(score)") {
+          ls = OpenMS::MRMFeatureSelector::LambdaScore::LOG;
+        } else if (sw.at("value") == "lambda score: 1/log(score)") {
+          ls = OpenMS::MRMFeatureSelector::LambdaScore::INVERSE_LOG;
+        } else if (sw.at("value") == "lambda score: 1/log10(score)") {
+          ls = OpenMS::MRMFeatureSelector::LambdaScore::INVERSE_LOG10;
+        } else {
+          throw std::invalid_argument("lambda score not recognized: " + sw.at("value") + "\n");
+        }
+        parameters.score_weights.emplace(sw.at("name"), ls);
+      }
+
+      v.emplace_back(parameters);
+    }
+
+    return v;
   }
 }

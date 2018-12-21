@@ -1,0 +1,9 @@
+
+#ifndef SMARTPEAK_EXAMPLE_CONFIG_H
+#define SMARTPEAK_EXAMPLE_CONFIG_H
+
+// Macro to construct a c string containing the complete path to the test data
+#define SMARTPEAK_GET_EXAMPLES_DATA_PATH(filename) (std::string("@CF_SMARTPEAK_EXAMPLES_DATA_PATH@") + filename).c_str()
+#define SMARTPEAK_GET_EXAMPLES_DATA_PATH_MESSAGE(prefix,filename,suffix) (prefix + std::string("@CF_SMARTPEAK_EXAMPLES_DATA_PATH@") + filename + suffix).c_str()
+
+#endif // SMARTPEAK_EXAMPLE_CONFIG_H
