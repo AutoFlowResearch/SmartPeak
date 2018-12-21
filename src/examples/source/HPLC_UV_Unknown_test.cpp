@@ -64,6 +64,16 @@ void test_main_HPLC_UV_Unknown()
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
+
+cout << "\n\nSTART ENTIRE OUTPUT FOR DEBUGGING" << endl;
+for (const OpenMS::Feature& f : fm1) {
+  // cout << f.getMetaValue("native_id") << "\t" << f.getMetaValue("peak_apex_int") << "\t" << f.getRT() << "\n";
+  for (const OpenMS::Feature& sub : f.getSubordinates()) {
+    cout << sub.getMetaValue("native_id") << "\t\t" << sub.getMetaValue("peak_apex_int") << "\t\t" << sub.getRT() << "\n";
+  }
+  cout << "\n";
+}
+cout << "END ENTIRE OUTPUT FOR DEBUGGING" << endl;
 }
 
 int main(int argc, char **argv)
