@@ -118,4 +118,22 @@ BOOST_AUTO_TEST_CASE(SampleTypeToString)
   BOOST_CHECK_EQUAL(MetaDataHandler::SampleTypeToString(MetaDataHandler::SampleType::Unrecognized), "Unrecognized");
 }
 
+BOOST_AUTO_TEST_CASE(getInjectionName)
+{
+  MetaDataHandler m;
+
+  m.setSampleName("SampleName");
+  m.inj_number = 14;
+  m.batch_name = "BatchName";
+  m.acquisition_date_and_time = {};
+  m.acquisition_date_and_time.tm_sec = 55;
+  m.acquisition_date_and_time.tm_min = 40;
+  m.acquisition_date_and_time.tm_hour = 15;
+  m.acquisition_date_and_time.tm_mday = 31;
+  m.acquisition_date_and_time.tm_mon = 0; // months since January
+  m.acquisition_date_and_time.tm_year = 119; // years since 1900
+
+  BOOST_CHECK_EQUAL(m.getInjectionName(), "SampleName_14_BatchName_2019-01-31_154055");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

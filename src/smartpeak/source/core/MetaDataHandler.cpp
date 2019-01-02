@@ -195,4 +195,18 @@ namespace SmartPeak
     proc_method_name.clear();
     acquisition_date_and_time = {0, 0, 0, 0, 0, 0, 0, 0, 0};
   }
+
+  std::string MetaDataHandler::getInjectionName() const
+  {
+    std::string name(sample_name + "_" + std::to_string(inj_number) + "_" + batch_name + "_");
+    char time_repr[64];
+    // ISO 8601 date format, without colons (for Windows filesystems compatibility)
+    // i.e. "2019-01-23_164055"
+    const size_t bytes_written = strftime(time_repr, 64, "%Y-%m-%d_%H%M%S", &acquisition_date_and_time);
+    if (bytes_written != 17) {
+      throw "Unexpected number of characters written into the array.";
+    }
+    name.append(time_repr);
+    return name;
+  }
 }

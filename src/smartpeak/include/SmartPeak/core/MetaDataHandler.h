@@ -65,6 +65,8 @@ public:
 
     void clear();
 
+    std::string getInjectionName() const;
+
     // required
     std::string sample_name;
     std::string sample_group_name;
