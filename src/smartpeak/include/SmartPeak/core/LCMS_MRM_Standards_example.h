@@ -12,7 +12,7 @@ void example_LCMS_MRM_Standards(
 {
   SequenceHandler sequenceHandler;
 
-  sequenceHandler.setDirStatic(dir_I);
+  sequenceHandler.setFilenames(SequenceHandler::getDefaultStaticFilenames(dir_I));
   sequenceHandler.setDirDynamic(dir_I);
 
   SequenceProcessor::createSequence(sequenceHandler, delimiter_I);

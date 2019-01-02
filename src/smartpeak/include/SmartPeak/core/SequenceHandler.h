@@ -13,6 +13,48 @@ namespace SmartPeak
   class SequenceHandler
   {
 public:
+    struct Filenames
+    {
+      std::string sequence_csv_i;
+      std::string parameters_csv_i;
+      std::string traML_csv_i;
+      std::string featureFilterComponents_csv_i;
+      std::string featureFilterComponentGroups_csv_i;
+      std::string featureQCComponents_csv_i;
+      std::string featureQCComponentGroups_csv_i;
+      std::string quantitationMethods_csv_i;
+      std::string standardsConcentrations_csv_i;
+      std::string mzML_i;
+      std::string featureXML_o;
+      std::string feature_csv_o;
+      std::string featureXML_i;
+      std::string features_pdf_o;
+      std::string calibrators_pdf_o;
+      std::string quantitationMethods_csv_o;
+      std::string componentsToConcentrations_csv_o;
+
+      void clear()
+      {
+        sequence_csv_i.clear();
+        parameters_csv_i.clear();
+        traML_csv_i.clear();
+        featureFilterComponents_csv_i.clear();
+        featureFilterComponentGroups_csv_i.clear();
+        featureQCComponents_csv_i.clear();
+        featureQCComponentGroups_csv_i;
+        quantitationMethods_csv_i.clear();
+        standardsConcentrations_csv_i.clear();
+        mzML_i.clear();
+        featureXML_o.clear();
+        feature_csv_o.clear();
+        featureXML_i.clear();
+        features_pdf_o.clear();
+        calibrators_pdf_o.clear();
+        quantitationMethods_csv_o.clear();
+        componentsToConcentrations_csv_o.clear();
+      }
+    };
+
     SequenceHandler() = default;
     ~SequenceHandler() = default;
     SequenceHandler(const SequenceHandler&) = default;
@@ -46,12 +88,12 @@ public:
     std::vector<SampleGroupHandler>& getSampleGroups();
     std::vector<SampleGroupHandler> getSampleGroups() const;
 
-    std::map<std::string, std::string> getDefaultStaticFilenames(const std::string& dir);
+    static std::map<std::string, std::string> getDefaultStaticFilenames(const std::string& dir);
 
-    std::map<std::string, std::string> getDefaultDynamicFilenames(
+    static std::map<std::string, std::string> getDefaultDynamicFilenames(
       const std::string& dir,
       const std::string& sample_name
-    ) const;
+    );
 
     void addSampleToSequence(
       const MetaDataHandler& meta_data_I,
@@ -70,6 +112,7 @@ public:
 
     std::map<size_t, std::string> index_to_sample_;
     std::map<std::string, size_t> sample_to_index_;
+    Filenames filenames_struct_;
 private:
     std::vector<SampleHandler> sequence_;
     std::vector<SequenceSegmentHandler> sequence_segments_;

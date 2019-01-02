@@ -20,6 +20,7 @@ namespace SmartPeak
     dir_static_.clear();
     dir_dynamic_.clear();
     filenames_.clear();
+    filenames_struct_.clear();
   }
 
   void SequenceHandler::setFilenames(const std::map<std::string, std::string>& filenames)
@@ -40,7 +41,6 @@ namespace SmartPeak
   void SequenceHandler::setDirStatic(const std::string& dir_static)
   {
     dir_static_ = dir_static;
-    setFilenames(getDefaultStaticFilenames(dir_static));
   }
 
   std::string& SequenceHandler::getDirStatic()
@@ -132,7 +132,7 @@ namespace SmartPeak
   std::map<std::string, std::string> SequenceHandler::getDefaultDynamicFilenames(
     const std::string& dir,
     const std::string& sample_name
-  ) const
+  )
   {
     const std::string features = dir + "/features/" + sample_name;
     return {
