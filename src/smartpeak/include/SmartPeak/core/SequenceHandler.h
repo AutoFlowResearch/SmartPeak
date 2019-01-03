@@ -73,13 +73,6 @@ public:
     std::vector<SampleGroupHandler>& getSampleGroups();
     std::vector<SampleGroupHandler> getSampleGroups() const;
 
-    static std::map<std::string, std::string> getDefaultStaticFilenames(const std::string& dir);
-
-    static std::map<std::string, std::string> getDefaultDynamicFilenames(
-      const std::string& dir,
-      const std::string& sample_name
-    );
-
     void addSampleToSequence(
       const MetaDataHandler& meta_data_I,
       const OpenMS::FeatureMap& featureMap_I
