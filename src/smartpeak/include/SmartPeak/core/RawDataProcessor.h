@@ -11,6 +11,7 @@
 #include <SmartPeak/core/RawDataHandler.h>
 
 #include <SmartPeak/core/MetaDataHandler.h>
+#include <SmartPeak/core/SequenceHandler.h>
 
 #include <map>
 #include <vector>
@@ -75,7 +76,7 @@ public:
       RawDataHandler& rawDataHandler_IO,
       const std::string& raw_data_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
-      const std::map<std::string, std::string>& filenames,
+      const SequenceHandler::Filenames& filenames,
       const bool verbose_I = false
     );
 

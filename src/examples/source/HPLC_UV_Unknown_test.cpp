@@ -11,7 +11,10 @@ using namespace std;
 
 void test_main_HPLC_UV_Unknown()
 {
-  example_LCMS_MRM_Unknowns(SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Unknowns"), ",", true);
+  const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Unknowns");
+  const SequenceHandler::Filenames static_filenames = SequenceHandler::Filenames::getDefaultStaticFilenames(main_dir);
+
+  example_LCMS_MRM_Unknowns(main_dir, static_filenames, ",", true);
 
   RawDataHandler rawDataHandler;
 

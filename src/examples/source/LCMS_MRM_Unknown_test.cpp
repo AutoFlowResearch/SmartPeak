@@ -11,7 +11,10 @@ using namespace std;
 
 void test_main_LCMS_MRM_Unknown()
 {
-  example_LCMS_MRM_Unknowns(SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns"), ",");
+  const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns");
+  const SequenceHandler::Filenames static_filenames = SequenceHandler::Filenames::getDefaultStaticFilenames(main_dir);
+
+  example_LCMS_MRM_Unknowns(main_dir, static_filenames, ",");
 
   RawDataHandler rawDataHandler;
 

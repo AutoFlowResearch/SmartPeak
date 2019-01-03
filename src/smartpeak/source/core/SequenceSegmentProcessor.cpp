@@ -126,7 +126,7 @@ namespace SmartPeak
     SequenceHandler& sequenceHandler_IO,
     const std::string& sequence_segment_processing_event,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
-    const std::map<std::string, std::string>& filenames,
+    const SequenceHandler::Filenames& filenames,
     const bool verbose_I
   )
   {
@@ -146,9 +146,9 @@ namespace SmartPeak
             .setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
         }
       } else if (sequence_segment_processing_event == "store_quantitation_methods") {
-        OpenMSFile::storeQuantitationMethods(sequenceSegmentHandler_IO, filenames.at("quantitationMethods_csv_o"), verbose_I);
+        OpenMSFile::storeQuantitationMethods(sequenceSegmentHandler_IO, filenames.quantitationMethods_csv_o, verbose_I);
       } else if (sequence_segment_processing_event == "load_quantitation_methods") {
-        OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler_IO, filenames.at("quantitationMethods_csv_i"), verbose_I);
+        OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler_IO, filenames.quantitationMethods_csv_i, verbose_I);
       } /* else if (sequence_segment_processing_event == "plot_calibrators") {
         plotCalibrators(
           sequenceSegmentHandler_IO,

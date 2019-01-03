@@ -307,7 +307,7 @@ namespace SmartPeak
     RawDataHandler& rawDataHandler_IO,
     const std::string& raw_data_processing_event,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
-    const std::map<std::string, std::string>& filenames,
+    const SequenceHandler::Filenames& filenames,
     const bool verbose_I
   )
   {
@@ -316,7 +316,7 @@ namespace SmartPeak
       // fileReaderOpenMS.load_SWATHorDIA(rawDataHandler_IO, {})
       OpenMSFile::loadMSExperiment(
         rawDataHandler_IO,
-        filenames.at("mzML_i"),
+        filenames.mzML_i,
         parameters.at("MRMMapping"),
         parameters.at("ChromatogramExtractor"),
         parameters.at("mzML"),
@@ -326,7 +326,7 @@ namespace SmartPeak
     } else if (event == "load_features") {
       OpenMSFile::loadFeatureMap(
         rawDataHandler_IO,
-        filenames.at("featureXML_i"),
+        filenames.featureXML_i,
         verbose_I
       );
     } else if (event == "pick_features") {
@@ -349,7 +349,7 @@ namespace SmartPeak
         verbose_I
       );
     } else if (event == "validate_features") {
-      OpenMSFile::loadValidationData(rawDataHandler_IO, filenames.at("referenceData_csv_i"));
+      OpenMSFile::loadValidationData(rawDataHandler_IO, filenames.referenceData_csv_i);
       validateFeatures(
         rawDataHandler_IO,
         parameters.at("MRMFeatureValidator.validate_MRMFeatures"),
@@ -366,13 +366,13 @@ namespace SmartPeak
     } else if (event == "store_features") {
       OpenMSFile::storeFeatureMap(
         rawDataHandler_IO,
-        filenames.at("featureXML_o"),
+        filenames.featureXML_o,
         verbose_I
       );
     } else if (event == "plot_features") {
       plotFeatures(
         rawDataHandler_IO,
-        filenames.at("features_pdf_o"),
+        filenames.features_pdf_o,
         parameters.at("FeaturePlotter"),
         verbose_I
       );

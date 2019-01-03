@@ -10,6 +10,7 @@ namespace SmartPeak
 {
   void SequenceProcessor::createSequence(
     SequenceHandler& sequenceHandler_IO,
+    const SequenceHandler::Filenames& filenames,
     const std::string& delimiter,
     const bool verbose_I
   )
@@ -18,38 +19,33 @@ namespace SmartPeak
       std::cout << "==== START createSequence()" << std::endl;
     }
 
-    const std::map<std::string, std::string> filenames = sequenceHandler_IO.getFilenames();
     SequenceSegmentHandler sequenceSegmentHandler;
     RawDataHandler rawDataHandler;
 
-    if (filenames.empty()) {
-      std::cout << "No filenames in provided SequenceHandler." << std::endl;
-    } else {
-      SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.at("sequence_csv_i"), delimiter);
+    SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
 
-      OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.at("parameters_csv_i"), delimiter);
+    OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.parameters_csv_i, delimiter);
 
-      OpenMSFile::loadTraML(rawDataHandler, filenames.at("traML_csv_i"), "csv", verbose_I);
+    OpenMSFile::loadTraML(rawDataHandler, filenames.traML_csv_i, "csv", verbose_I);
 
-      OpenMSFile::loadFeatureFilter(
-        rawDataHandler,
-        filenames.at("featureFilterComponents_csv_i"),
-        filenames.at("featureFilterComponentGroups_csv_i"),
-        verbose_I
-      );
+    OpenMSFile::loadFeatureFilter(
+      rawDataHandler,
+      filenames.featureFilterComponents_csv_i,
+      filenames.featureFilterComponentGroups_csv_i,
+      verbose_I
+    );
 
-      OpenMSFile::loadFeatureQC(
-        rawDataHandler,
-        filenames.at("featureQCComponents_csv_i"),
-        filenames.at("featureQCComponentGroups_csv_i"),
-        verbose_I
-      );
+    OpenMSFile::loadFeatureQC(
+      rawDataHandler,
+      filenames.featureQCComponents_csv_i,
+      filenames.featureQCComponentGroups_csv_i,
+      verbose_I
+    );
 
-      OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler, filenames.at("quantitationMethods_csv_i"), verbose_I);
-      OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, filenames.at("standardsConcentrations_csv_i"), verbose_I);
+    OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler, filenames.quantitationMethods_csv_i, verbose_I);
+    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, filenames.standardsConcentrations_csv_i, verbose_I);
 
-      rawDataHandler.setQuantitationMethods(sequenceSegmentHandler.getQuantitationMethods());
-    }
+    rawDataHandler.setQuantitationMethods(sequenceSegmentHandler.getQuantitationMethods());
 
     segmentSamplesInSequence(sequenceHandler_IO, sequenceSegmentHandler);
     addRawDataHandlerToSequence(sequenceHandler_IO, rawDataHandler);
@@ -134,7 +130,7 @@ namespace SmartPeak
           sample.getRawData(),
           raw_data_processing_methods[i], // event
           sample.getRawData().getParameters(),
-          sequenceHandler_IO.getDefaultDynamicFilenames(
+          SequenceHandler::Filenames::getDefaultDynamicFilenames(
             sequenceHandler_IO.getDirDynamic(),
             sample.getMetaData().getSampleName()
           ),
@@ -192,7 +188,10 @@ namespace SmartPeak
             .at(sequence_segment.getSampleIndices().front())
             .getRawData()
             .getParameters(), // assuming that all parameters are the same for each sample in the sequence segment!
-          sequenceHandler_IO.getDefaultDynamicFilenames(sequenceHandler_IO.getDirDynamic(), sequence_segment.getSequenceSegmentName()),
+          SequenceHandler::Filenames::getDefaultDynamicFilenames(
+            sequenceHandler_IO.getDirDynamic(),
+            sequence_segment.getSequenceSegmentName()
+          ),
           verbose_I
         );
       }

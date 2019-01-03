@@ -6,16 +6,16 @@ using namespace SmartPeak;
 
 void example_LCMS_MRM_Unknowns(
   const std::string& dir_I,
+  const SequenceHandler::Filenames& static_filenames,
   const std::string& delimiter_I = ",",
   const bool verbose_I = false
 )
 {
   SequenceHandler sequenceHandler;
 
-  sequenceHandler.setFilenames(SequenceHandler::getDefaultStaticFilenames(dir_I));
   sequenceHandler.setDirDynamic(dir_I);
 
-  SequenceProcessor::createSequence(sequenceHandler, delimiter_I, true);
+  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true);
 
   const std::vector<std::string> raw_data_processing_methods = {
     "load_raw_data",
@@ -38,20 +38,16 @@ void example_LCMS_MRM_Unknowns(
     verbose_I
   );
 
-  const std::string sequenceSummary_csv_i = dir_I + "/SequenceSummary.csv";
-
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,
-    sequenceSummary_csv_i,
+    static_filenames.sequenceSummary_csv_o,
     {"calculated_concentration"},
     {MetaDataHandler::SampleType::Unknown}
   );
 
-  const std::string featureSummary_csv_i = dir_I + "/FeatureSummary.csv";
-
   SequenceParser::writeDataTableFromMetaValue(
     sequenceHandler,
-    featureSummary_csv_i,
+    static_filenames.featureSummary_csv_o,
     { // TODO: add new matadata values for compatibility with industry reporting standards
       // TODO: add them in all other "example" files calling this method
       "peak_apex_int", "total_width", "width_at_50", "tailing_factor", "asymmetry_factor",

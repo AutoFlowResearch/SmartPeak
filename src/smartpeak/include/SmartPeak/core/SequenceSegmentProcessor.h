@@ -41,7 +41,7 @@ public:
       SequenceHandler& sequenceHandler_IO,
       const std::string& sequence_segment_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
-      const std::map<std::string, std::string>& filenames,
+      const SequenceHandler::Filenames& filenames,
       const bool verbose_I = false
     );
 

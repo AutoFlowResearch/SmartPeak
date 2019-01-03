@@ -24,6 +24,7 @@ public:
       std::string featureQCComponentGroups_csv_i;
       std::string quantitationMethods_csv_i;
       std::string standardsConcentrations_csv_i;
+      std::string referenceData_csv_i;
       std::string mzML_i;
       std::string featureXML_o;
       std::string feature_csv_o;
@@ -32,27 +33,19 @@ public:
       std::string calibrators_pdf_o;
       std::string quantitationMethods_csv_o;
       std::string componentsToConcentrations_csv_o;
+      std::string sequenceSummary_csv_o;
+      std::string featureSummary_csv_o;
 
-      void clear()
-      {
-        sequence_csv_i.clear();
-        parameters_csv_i.clear();
-        traML_csv_i.clear();
-        featureFilterComponents_csv_i.clear();
-        featureFilterComponentGroups_csv_i.clear();
-        featureQCComponents_csv_i.clear();
-        featureQCComponentGroups_csv_i;
-        quantitationMethods_csv_i.clear();
-        standardsConcentrations_csv_i.clear();
-        mzML_i.clear();
-        featureXML_o.clear();
-        feature_csv_o.clear();
-        featureXML_i.clear();
-        features_pdf_o.clear();
-        calibrators_pdf_o.clear();
-        quantitationMethods_csv_o.clear();
-        componentsToConcentrations_csv_o.clear();
-      }
+      static Filenames getDefaultStaticFilenames(
+        const std::string& dir
+      );
+
+      static Filenames getDefaultDynamicFilenames(
+        const std::string& dir,
+        const std::string& sample_name
+      );
+
+      void clear();
     };
 
     SequenceHandler() = default;
@@ -63,14 +56,6 @@ public:
     SequenceHandler& operator=(SequenceHandler&&) = default;
 
     void clear();
-
-    void setFilenames(const std::map<std::string, std::string>& filenames);
-    std::map<std::string, std::string>& getFilenames();
-    std::map<std::string, std::string> getFilenames() const;
-
-    void setDirStatic(const std::string& dir_static);
-    std::string& getDirStatic();
-    std::string getDirStatic() const;
 
     void setDirDynamic(const std::string& dir_dynamic);
     std::string& getDirDynamic();
@@ -112,14 +97,11 @@ public:
 
     std::map<size_t, std::string> index_to_sample_;
     std::map<std::string, size_t> sample_to_index_;
-    Filenames filenames_struct_;
 private:
     std::vector<SampleHandler> sequence_;
     std::vector<SequenceSegmentHandler> sequence_segments_;
     std::vector<SampleGroupHandler> sample_groups_;
 
-    std::string dir_static_;
     std::string dir_dynamic_;
-    std::map<std::string, std::string> filenames_;
   };
 }

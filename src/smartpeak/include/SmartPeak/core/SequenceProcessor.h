@@ -16,6 +16,7 @@ public:
 
     static void createSequence(
       SequenceHandler& sequenceHandler_IO,
+      const SequenceHandler::Filenames& filenames,
       const std::string& delimiter = ",",
       const bool verbose_I = true
     );

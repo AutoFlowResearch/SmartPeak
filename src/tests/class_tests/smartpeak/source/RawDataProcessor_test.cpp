@@ -337,8 +337,8 @@ BOOST_AUTO_TEST_CASE(processRawData)
     raw_data_processing_events
   );
 
-  const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
-  const std::map<std::string, std::string> filenames = {{"mzML_i", mzML_i}};
+  SequenceHandler::Filenames filenames;
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
 
   map<string, vector<map<string, string>>>::iterator it = params_1.find("ChromatogramExtractor");
   if (it != params_1.end()) {
