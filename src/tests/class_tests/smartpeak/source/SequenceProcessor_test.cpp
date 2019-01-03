@@ -168,12 +168,20 @@ BOOST_AUTO_TEST_CASE(segmentSamplesInSequence)
 BOOST_AUTO_TEST_CASE(processSequence)
 {
   SequenceHandler sequenceHandler;
-  sequenceHandler.setDirDynamic(SMARTPEAK_GET_TEST_DATA_PATH(""));
   SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",");
   const vector<string> raw_data_processing_methods = { "load_raw_data" };
   const RawDataHandler& rawDataHandler0 = sequenceHandler.getSequence()[0].getRawData();
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
-  SequenceProcessor::processSequence(sequenceHandler, std::vector<std::string>(), raw_data_processing_methods);
+
+  std::vector<SequenceHandler::Filenames> dynamic_filenames;
+  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
+    dynamic_filenames.push_back(SequenceHandler::Filenames::getDefaultDynamicFilenames(
+      SMARTPEAK_GET_TEST_DATA_PATH(""),
+      sample.getMetaData().getSampleName()
+    ));
+  }
+
+  SequenceProcessor::processSequence(sequenceHandler, dynamic_filenames, std::vector<std::string>(), raw_data_processing_methods);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 340); // loaded
 }
@@ -181,10 +189,18 @@ BOOST_AUTO_TEST_CASE(processSequence)
 BOOST_AUTO_TEST_CASE(processSequenceSegments)
 {
   SequenceHandler sequenceHandler;
-  sequenceHandler.setDirDynamic(SMARTPEAK_GET_TEST_DATA_PATH(""));
   SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",");
   const vector<string> raw_data_processing_methods = { "calculate_calibration" };
-  SequenceProcessor::processSequenceSegments(sequenceHandler, std::set<std::string>(), raw_data_processing_methods);
+
+  std::vector<SequenceHandler::Filenames> dynamic_filenames;
+  for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
+    dynamic_filenames.push_back(SequenceHandler::Filenames::getDefaultDynamicFilenames(
+      SMARTPEAK_GET_TEST_DATA_PATH(""),
+      sequence_segment.getSequenceSegmentName()
+    ));
+  }
+
+  SequenceProcessor::processSequenceSegments(sequenceHandler, dynamic_filenames, std::set<std::string>(), raw_data_processing_methods);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 1);
 
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs = sequenceHandler.getSequenceSegments()[0].getQuantitationMethods();

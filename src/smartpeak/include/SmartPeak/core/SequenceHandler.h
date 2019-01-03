@@ -57,10 +57,6 @@ public:
 
     void clear();
 
-    void setDirDynamic(const std::string& dir_dynamic);
-    std::string& getDirDynamic();
-    std::string getDirDynamic() const;
-
     void setSequence(const std::vector<SampleHandler>& sequence);
     std::vector<SampleHandler>& getSequence();
     std::vector<SampleHandler> getSequence() const;
@@ -94,7 +90,5 @@ private:
     std::vector<SampleHandler> sequence_;
     std::vector<SequenceSegmentHandler> sequence_segments_;
     std::vector<SampleGroupHandler> sample_groups_;
-
-    std::string dir_dynamic_;
   };
 }

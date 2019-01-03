@@ -16,23 +16,6 @@ namespace SmartPeak
     sample_to_index_.clear();
     sequence_segments_.clear();
     sample_groups_.clear();
-
-    dir_dynamic_.clear();
-  }
-
-  void SequenceHandler::setDirDynamic(const std::string& dir_dynamic)
-  {
-    dir_dynamic_ = dir_dynamic;
-  }
-
-  std::string& SequenceHandler::getDirDynamic()
-  {
-    return dir_dynamic_;
-  }
-
-  std::string SequenceHandler::getDirDynamic() const
-  {
-    return dir_dynamic_;
   }
 
   void SequenceHandler::setSequence(const std::vector<SampleHandler>& sequence)

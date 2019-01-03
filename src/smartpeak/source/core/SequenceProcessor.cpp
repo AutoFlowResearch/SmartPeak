@@ -95,6 +95,7 @@ namespace SmartPeak
 
   void SequenceProcessor::processSequence(
     SequenceHandler& sequenceHandler_IO,
+    const std::vector<SequenceHandler::Filenames>& filenames,
     const std::vector<std::string>& sample_names_I,
     const std::vector<std::string>& raw_data_processing_methods_I,
     const bool verbose_I
@@ -108,7 +109,12 @@ namespace SmartPeak
       process_sequence = sequenceHandler_IO.getSamplesInSequence(sample_names_I);
     }
 
-    for (SampleHandler& sample : process_sequence) {
+    if (filenames.size() != process_sequence.size()) {
+      throw std::invalid_argument("The number of provided filenames locations is not correct.");
+    }
+
+    for (size_t j = 0; j < process_sequence.size(); ++j) {
+      SampleHandler& sample = process_sequence[j];
       std::vector<std::string> raw_data_processing_methods;
 
       if (raw_data_processing_methods_I.size()) {
@@ -130,10 +136,7 @@ namespace SmartPeak
           sample.getRawData(),
           raw_data_processing_methods[i], // event
           sample.getRawData().getParameters(),
-          SequenceHandler::Filenames::getDefaultDynamicFilenames(
-            sequenceHandler_IO.getDirDynamic(),
-            sample.getMetaData().getSampleName()
-          ),
+          filenames[j],
           verbose_I
         );
       }
@@ -144,6 +147,7 @@ namespace SmartPeak
 
   void SequenceProcessor::processSequenceSegments(
     SequenceHandler& sequenceHandler_IO,
+    const std::vector<SequenceHandler::Filenames>& filenames,
     const std::set<std::string>& sequence_segment_names,
     const std::vector<std::string>& sequence_segment_processing_methods_I,
     const bool verbose_I
@@ -161,7 +165,12 @@ namespace SmartPeak
       }
     }
 
-    for (SequenceSegmentHandler& sequence_segment : sequence_segments) { // for each sequence segment
+    if (filenames.size() != sequence_segments.size()) {
+      throw std::invalid_argument("The number of provided filenames locations is not correct.");
+    }
+
+    for (size_t j = 0; j < sequence_segments.size(); ++j) { // for each sequence segment
+      SequenceSegmentHandler& sequence_segment = sequence_segments[j];
       std::vector<std::string> sequence_segment_processing_methods;
 
       // collect its methods
@@ -188,10 +197,7 @@ namespace SmartPeak
             .at(sequence_segment.getSampleIndices().front())
             .getRawData()
             .getParameters(), // assuming that all parameters are the same for each sample in the sequence segment!
-          SequenceHandler::Filenames::getDefaultDynamicFilenames(
-            sequenceHandler_IO.getDirDynamic(),
-            sequence_segment.getSequenceSegmentName()
-          ),
+          filenames[j],
           verbose_I
         );
       }

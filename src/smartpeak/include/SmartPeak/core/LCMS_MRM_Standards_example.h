@@ -7,14 +7,11 @@ using namespace SmartPeak;
 void example_LCMS_MRM_Standards(
   const std::string& dir_I,
   const SequenceHandler::Filenames& static_filenames,
-  // const std::vector<SequenceHandler::Filenames>& dynamic_filenames,
   const std::string& delimiter_I = ",",
   const bool verbose_I = false
 )
 {
   SequenceHandler sequenceHandler;
-
-  sequenceHandler.setDirDynamic(dir_I);
 
   SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I);
 
@@ -30,8 +27,16 @@ void example_LCMS_MRM_Standards(
     // # "plot_features"
   };
 
+  std::vector<SequenceHandler::Filenames> dynamic_filenames1;
+  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
+    dynamic_filenames1.push_back(
+      SequenceHandler::Filenames::getDefaultDynamicFilenames(dir_I, sample.getMetaData().getSampleName())
+    );
+  }
+
   SequenceProcessor::processSequence(
     sequenceHandler,
+    dynamic_filenames1,
     std::vector<std::string>(),
     raw_data_processing_methods,
     true
@@ -45,8 +50,16 @@ void example_LCMS_MRM_Standards(
   // # "store_components_to_concentrations"
   };
 
+  std::vector<SequenceHandler::Filenames> dynamic_filenames2;
+  for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
+    dynamic_filenames2.push_back(
+      SequenceHandler::Filenames::getDefaultDynamicFilenames(dir_I, sequence_segment.getSequenceSegmentName())
+    );
+  }
+
   SequenceProcessor::processSequenceSegments(
     sequenceHandler,
+    dynamic_filenames2,
     std::set<std::string>(),
     sequence_segment_processing_methods,
     true
@@ -59,8 +72,16 @@ void example_LCMS_MRM_Standards(
     // # "plot_features"
   };
 
+  std::vector<SequenceHandler::Filenames> dynamic_filenames3;
+  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
+    dynamic_filenames3.push_back(
+      SequenceHandler::Filenames::getDefaultDynamicFilenames(dir_I, sample.getMetaData().getSampleName())
+    );
+  }
+
   SequenceProcessor::processSequence(
     sequenceHandler,
+    dynamic_filenames3,
     std::vector<std::string>(),
     raw_data_processing_methods,
     true

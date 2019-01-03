@@ -13,8 +13,6 @@ void example_LCMS_MRM_Validation(
 {
   SequenceHandler sequenceHandler;
 
-  sequenceHandler.setDirDynamic(dir_I);
-
   SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I);
 
   std::vector<std::string> raw_data_processing_methods = {
@@ -30,8 +28,16 @@ void example_LCMS_MRM_Validation(
     // # "plot_features"
   };
 
+  std::vector<SequenceHandler::Filenames> dynamic_filenames;
+  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
+    dynamic_filenames.push_back(
+      SequenceHandler::Filenames::getDefaultDynamicFilenames(dir_I, sample.getMetaData().getSampleName())
+    );
+  }
+
   SequenceProcessor::processSequence(
     sequenceHandler,
+    dynamic_filenames,
     std::vector<std::string>(),
     raw_data_processing_methods,
     true

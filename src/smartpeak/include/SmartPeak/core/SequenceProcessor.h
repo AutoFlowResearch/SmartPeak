@@ -33,6 +33,7 @@ public:
 
     static void processSequence(
       SequenceHandler& sequenceHandler_IO,
+      const std::vector<SequenceHandler::Filenames>& filenames,
       const std::vector<std::string>& sample_names_I = std::vector<std::string>(),
       const std::vector<std::string>& raw_data_processing_methods_I = std::vector<std::string>(),
       const bool verbose_I = true
@@ -40,6 +41,7 @@ public:
 
     static void processSequenceSegments(
       SequenceHandler& sequenceHandler_IO,
+      const std::vector<SequenceHandler::Filenames>& filenames,
       const std::set<std::string>& sequence_segment_names = std::set<std::string>(),
       const std::vector<std::string>& sequence_segment_processing_methods_I = std::vector<std::string>(),
       const bool verbose_I = true
