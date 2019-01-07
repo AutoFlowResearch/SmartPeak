@@ -1,6 +1,7 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/OpenMSFile.h>
@@ -10,7 +11,7 @@ namespace SmartPeak
 {
   void SequenceProcessor::createSequence(
     SequenceHandler& sequenceHandler_IO,
-    const SequenceHandler::Filenames& filenames,
+    const Filenames& filenames,
     const std::string& delimiter,
     const bool verbose_I
   )
@@ -95,7 +96,7 @@ namespace SmartPeak
 
   void SequenceProcessor::processSequence(
     SequenceHandler& sequenceHandler_IO,
-    const std::vector<SequenceHandler::Filenames>& filenames,
+    const std::vector<Filenames>& filenames,
     const std::vector<std::string>& sample_names_I,
     const std::vector<std::string>& raw_data_processing_methods_I,
     const bool verbose_I
@@ -147,7 +148,7 @@ namespace SmartPeak
 
   void SequenceProcessor::processSequenceSegments(
     SequenceHandler& sequenceHandler_IO,
-    const std::vector<SequenceHandler::Filenames>& filenames,
+    const std::vector<Filenames>& filenames,
     const std::set<std::string>& sequence_segment_names,
     const std::vector<std::string>& sequence_segment_processing_methods_I,
     const bool verbose_I

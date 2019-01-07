@@ -6,7 +6,7 @@ using namespace SmartPeak;
 
 void example_LCMS_MRM_Validation(
   const std::string& dir_I,
-  const SequenceHandler::Filenames& static_filenames,
+  const Filenames& static_filenames,
   const std::string& delimiter_I = ",",
   const bool verbose_I = false
 )
@@ -28,10 +28,10 @@ void example_LCMS_MRM_Validation(
     // # "plot_features"
   };
 
-  std::vector<SequenceHandler::Filenames> dynamic_filenames;
+  std::vector<Filenames> dynamic_filenames;
   for (const SampleHandler& sample : sequenceHandler.getSequence()) {
     dynamic_filenames.push_back(
-      SequenceHandler::Filenames::getDefaultDynamicFilenames(dir_I, sample.getMetaData().getSampleName())
+      Filenames::getDefaultDynamicFilenames(dir_I, sample.getMetaData().getSampleName())
     );
   }
 

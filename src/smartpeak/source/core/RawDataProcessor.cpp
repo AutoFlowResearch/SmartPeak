@@ -1,6 +1,7 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MRMFeatureValidator.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/io/OpenMSFile.h>
@@ -307,7 +308,7 @@ namespace SmartPeak
     RawDataHandler& rawDataHandler_IO,
     const std::string& raw_data_processing_event,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
-    const SequenceHandler::Filenames& filenames,
+    const Filenames& filenames,
     const bool verbose_I
   )
   {

@@ -451,7 +451,7 @@ BOOST_AUTO_TEST_CASE(processSequenceSegment)
     sequenceHandler,
     "calculate_calibration",
     absquant_params,
-    SequenceHandler::Filenames()
+    Filenames()
   );
 
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& a = sequenceSegmentHandler.getQuantitationMethods();

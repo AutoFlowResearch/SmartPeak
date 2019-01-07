@@ -5,14 +5,15 @@
 #define BOOST_TEST_MODULE SequenceProcessor test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/Filenames.h>
 
 using namespace SmartPeak;
 using namespace std;
 
-SequenceHandler::Filenames generateTestFilenames()
+Filenames generateTestFilenames()
 {
   const std::string dir = SMARTPEAK_GET_TEST_DATA_PATH("");
-  SequenceHandler::Filenames filenames;
+  Filenames filenames;
   filenames.sequence_csv_i                     = dir + "SequenceParser_sequence_1.csv";
   filenames.parameters_csv_i                   = dir + "RawDataProcessor_params_1_core.csv";
   filenames.traML_csv_i                        = dir + "OpenMSFile_traML_1.csv";
@@ -173,9 +174,9 @@ BOOST_AUTO_TEST_CASE(processSequence)
   const RawDataHandler& rawDataHandler0 = sequenceHandler.getSequence()[0].getRawData();
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
 
-  std::vector<SequenceHandler::Filenames> dynamic_filenames;
+  std::vector<Filenames> dynamic_filenames;
   for (const SampleHandler& sample : sequenceHandler.getSequence()) {
-    dynamic_filenames.push_back(SequenceHandler::Filenames::getDefaultDynamicFilenames(
+    dynamic_filenames.push_back(Filenames::getDefaultDynamicFilenames(
       SMARTPEAK_GET_TEST_DATA_PATH(""),
       sample.getMetaData().getSampleName()
     ));
@@ -192,9 +193,9 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
   SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",");
   const vector<string> raw_data_processing_methods = { "calculate_calibration" };
 
-  std::vector<SequenceHandler::Filenames> dynamic_filenames;
+  std::vector<Filenames> dynamic_filenames;
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
-    dynamic_filenames.push_back(SequenceHandler::Filenames::getDefaultDynamicFilenames(
+    dynamic_filenames.push_back(Filenames::getDefaultDynamicFilenames(
       SMARTPEAK_GET_TEST_DATA_PATH(""),
       sequence_segment.getSequenceSegmentName()
     ));

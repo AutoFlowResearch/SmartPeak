@@ -1,6 +1,7 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/io/OpenMSFile.h>
@@ -126,7 +127,7 @@ namespace SmartPeak
     SequenceHandler& sequenceHandler_IO,
     const std::string& sequence_segment_processing_event,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
-    const SequenceHandler::Filenames& filenames,
+    const Filenames& filenames,
     const bool verbose_I
   )
   {

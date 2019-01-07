@@ -2,9 +2,10 @@
 
 #pragma once
 
-#include <SmartPeak/core/SequenceSegmentHandler.h>
+#include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/core/SequenceSegmentHandler.h>
 
 namespace SmartPeak
 {
@@ -41,7 +42,7 @@ public:
       SequenceHandler& sequenceHandler_IO,
       const std::string& sequence_segment_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
-      const SequenceHandler::Filenames& filenames,
+      const Filenames& filenames,
       const bool verbose_I = false
     );
 
