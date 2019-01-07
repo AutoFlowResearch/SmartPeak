@@ -96,7 +96,7 @@ namespace SmartPeak
 
   void SequenceProcessor::processSequence(
     SequenceHandler& sequenceHandler_IO,
-    const std::vector<Filenames>& filenames,
+    const std::map<std::string, Filenames>& filenames,
     const std::vector<std::string>& sample_names_I,
     const std::vector<std::string>& raw_data_processing_methods_I,
     const bool verbose_I
@@ -137,7 +137,7 @@ namespace SmartPeak
           sample.getRawData(),
           raw_data_processing_methods[i], // event
           sample.getRawData().getParameters(),
-          filenames[j],
+          filenames.at(sample.getMetaData().getSampleName()),
           verbose_I
         );
       }
@@ -148,7 +148,7 @@ namespace SmartPeak
 
   void SequenceProcessor::processSequenceSegments(
     SequenceHandler& sequenceHandler_IO,
-    const std::vector<Filenames>& filenames,
+    const std::map<std::string, Filenames>& filenames,
     const std::set<std::string>& sequence_segment_names,
     const std::vector<std::string>& sequence_segment_processing_methods_I,
     const bool verbose_I
@@ -198,7 +198,7 @@ namespace SmartPeak
             .at(sequence_segment.getSampleIndices().front())
             .getRawData()
             .getParameters(), // assuming that all parameters are the same for each sample in the sequence segment!
-          filenames[j],
+          filenames.at(sequence_segment.getSequenceSegmentName()),
           verbose_I
         );
       }

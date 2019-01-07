@@ -28,11 +28,10 @@ void example_LCMS_MRM_Validation(
     // # "plot_features"
   };
 
-  std::vector<Filenames> dynamic_filenames;
+  std::map<std::string, Filenames> dynamic_filenames;
   for (const SampleHandler& sample : sequenceHandler.getSequence()) {
-    dynamic_filenames.push_back(
-      Filenames::getDefaultDynamicFilenames(dir_I, sample.getMetaData().getSampleName())
-    );
+    const std::string& key = sample.getMetaData().getSampleName();
+    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(dir_I, key);
   }
 
   SequenceProcessor::processSequence(

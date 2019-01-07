@@ -42,7 +42,7 @@ public:
     */
 
     void setSampleName(const std::string& sample_name_I);
-    std::string& getSampleName();
+    // std::string& getSampleName();
     std::string getSampleName() const;
 
     void setSampleGroupName(const std::string& sample_group_name_I);

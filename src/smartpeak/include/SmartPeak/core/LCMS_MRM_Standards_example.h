@@ -27,11 +27,10 @@ void example_LCMS_MRM_Standards(
     // # "plot_features"
   };
 
-  std::vector<Filenames> dynamic_filenames1;
+  std::map<std::string, Filenames> dynamic_filenames1;
   for (const SampleHandler& sample : sequenceHandler.getSequence()) {
-    dynamic_filenames1.push_back(
-      Filenames::getDefaultDynamicFilenames(dir_I, sample.getMetaData().getSampleName())
-    );
+    const std::string& key = sample.getMetaData().getSampleName();
+    dynamic_filenames1[key] = Filenames::getDefaultDynamicFilenames(dir_I, key);
   }
 
   SequenceProcessor::processSequence(
@@ -50,11 +49,10 @@ void example_LCMS_MRM_Standards(
   // # "store_components_to_concentrations"
   };
 
-  std::vector<Filenames> dynamic_filenames2;
+  std::map<std::string, Filenames> dynamic_filenames2;
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
-    dynamic_filenames2.push_back(
-      Filenames::getDefaultDynamicFilenames(dir_I, sequence_segment.getSequenceSegmentName())
-    );
+    const std::string& key = sequence_segment.getSequenceSegmentName();
+    dynamic_filenames2[key] = Filenames::getDefaultDynamicFilenames(dir_I, key);
   }
 
   SequenceProcessor::processSequenceSegments(
@@ -72,11 +70,10 @@ void example_LCMS_MRM_Standards(
     // # "plot_features"
   };
 
-  std::vector<Filenames> dynamic_filenames3;
+  std::map<std::string, Filenames> dynamic_filenames3;
   for (const SampleHandler& sample : sequenceHandler.getSequence()) {
-    dynamic_filenames3.push_back(
-      Filenames::getDefaultDynamicFilenames(dir_I, sample.getMetaData().getSampleName())
-    );
+    const std::string& key = sample.getMetaData().getSampleName();
+    dynamic_filenames3[key] = Filenames::getDefaultDynamicFilenames(dir_I, key);
   }
 
   SequenceProcessor::processSequence(

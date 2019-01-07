@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE(sequenceprocessor)
 BOOST_AUTO_TEST_CASE(createSequence)
 {
   SequenceHandler sequenceHandler;
-  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",");
+  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
   const SampleHandler& sample = sequenceHandler.getSequence()[0];
   BOOST_CHECK_EQUAL(sample.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
@@ -169,17 +169,16 @@ BOOST_AUTO_TEST_CASE(segmentSamplesInSequence)
 BOOST_AUTO_TEST_CASE(processSequence)
 {
   SequenceHandler sequenceHandler;
-  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",");
+  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
   const vector<string> raw_data_processing_methods = { "load_raw_data" };
   const RawDataHandler& rawDataHandler0 = sequenceHandler.getSequence()[0].getRawData();
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
 
-  std::vector<Filenames> dynamic_filenames;
+  std::map<std::string, Filenames> dynamic_filenames;
   for (const SampleHandler& sample : sequenceHandler.getSequence()) {
-    dynamic_filenames.push_back(Filenames::getDefaultDynamicFilenames(
-      SMARTPEAK_GET_TEST_DATA_PATH(""),
-      sample.getMetaData().getSampleName()
-    ));
+    const std::string key = sample.getMetaData().getSampleName();
+    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+      SMARTPEAK_GET_TEST_DATA_PATH(""), key);
   }
 
   SequenceProcessor::processSequence(sequenceHandler, dynamic_filenames, std::vector<std::string>(), raw_data_processing_methods);
@@ -190,15 +189,14 @@ BOOST_AUTO_TEST_CASE(processSequence)
 BOOST_AUTO_TEST_CASE(processSequenceSegments)
 {
   SequenceHandler sequenceHandler;
-  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",");
+  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
   const vector<string> raw_data_processing_methods = { "calculate_calibration" };
 
-  std::vector<Filenames> dynamic_filenames;
+  std::map<std::string, Filenames> dynamic_filenames;
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
-    dynamic_filenames.push_back(Filenames::getDefaultDynamicFilenames(
-      SMARTPEAK_GET_TEST_DATA_PATH(""),
-      sequence_segment.getSequenceSegmentName()
-    ));
+    const std::string key = sequence_segment.getSequenceSegmentName();
+    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+      SMARTPEAK_GET_TEST_DATA_PATH(""), key);
   }
 
   SequenceProcessor::processSequenceSegments(sequenceHandler, dynamic_filenames, std::set<std::string>(), raw_data_processing_methods);
