@@ -175,10 +175,15 @@ BOOST_AUTO_TEST_CASE(processSequence)
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
 
   std::map<std::string, Filenames> dynamic_filenames;
+  const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   for (const SampleHandler& sample : sequenceHandler.getSequence()) {
     const std::string key = sample.getMetaData().getSampleName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-      SMARTPEAK_GET_TEST_DATA_PATH(""), key);
+      path + "mzML/",
+      path + "features/",
+      path + "features/",
+      key
+    );
   }
 
   SequenceProcessor::processSequence(sequenceHandler, dynamic_filenames, std::vector<std::string>(), raw_data_processing_methods);
@@ -193,10 +198,15 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
   const vector<string> raw_data_processing_methods = { "calculate_calibration" };
 
   std::map<std::string, Filenames> dynamic_filenames;
+  const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string key = sequence_segment.getSequenceSegmentName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-      SMARTPEAK_GET_TEST_DATA_PATH(""), key);
+      path + "mzML/",
+      path + "features/",
+      path + "features/",
+      key
+    );
   }
 
   SequenceProcessor::processSequenceSegments(sequenceHandler, dynamic_filenames, std::set<std::string>(), raw_data_processing_methods);

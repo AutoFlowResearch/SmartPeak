@@ -32,7 +32,12 @@ void example_LCMS_MRM_Unknowns(
   std::map<std::string, Filenames> dynamic_filenames;
   for (const SampleHandler& sample : sequenceHandler.getSequence()) {
     const std::string& key = sample.getMetaData().getSampleName();
-    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(dir_I, key);
+    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+      dir_I + "mzML/",
+      dir_I + "features/",
+      dir_I + "features/",
+      key
+    );
   }
 
   SequenceProcessor::processSequence(
