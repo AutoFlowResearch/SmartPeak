@@ -24,7 +24,6 @@ public:
     std::string feature_csv_o;
     std::string featureXML_i;
     std::string features_pdf_o;
-    std::string calibrators_pdf_o;
     std::string quantitationMethods_csv_o;
     std::string componentsToConcentrations_csv_o;
     std::string sequenceSummary_csv_o;
@@ -35,7 +34,9 @@ public:
     );
 
     static Filenames getDefaultDynamicFilenames(
-      const std::string& dir,
+      const std::string& mzml_input_path,
+      const std::string& features_input_path,
+      const std::string& output_path,
       const std::string& sample_name
     );
 

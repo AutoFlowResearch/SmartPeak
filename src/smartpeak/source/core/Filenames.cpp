@@ -26,20 +26,23 @@ namespace SmartPeak
   }
 
   Filenames Filenames::getDefaultDynamicFilenames(
-    const std::string& dir,
-    const std::string& injection_name
+    const std::string& mzml_input_path,
+    const std::string& features_input_path,
+    const std::string& output_path,
+    const std::string& sample_name
   )
   {
-    const std::string partial_pathname = dir + "/features/" + injection_name;
     Filenames dynamic_filenames;
-    dynamic_filenames.mzML_i = dir + "/mzML/" + injection_name + ".mzML"; // goes to its own map
-    dynamic_filenames.featureXML_o = partial_pathname + ".featureXML";
-    dynamic_filenames.feature_csv_o = partial_pathname + ".csv";
-    dynamic_filenames.featureXML_i = partial_pathname + ".featureXML"; // goes to its own map
-    dynamic_filenames.features_pdf_o = partial_pathname;
-    dynamic_filenames.calibrators_pdf_o = partial_pathname;
-    dynamic_filenames.quantitationMethods_csv_o = partial_pathname + "_quantitationMethods.csv";
-    dynamic_filenames.componentsToConcentrations_csv_o = partial_pathname + "_componentsToConcentrations.csv";
+    dynamic_filenames.mzML_i       = mzml_input_path + sample_name + ".mzML";
+    dynamic_filenames.featureXML_i = features_input_path + sample_name + ".featureXML";
+
+    const std::string prefix = output_path + sample_name;
+    dynamic_filenames.featureXML_o                     = prefix + ".featureXML";
+    dynamic_filenames.feature_csv_o                    = prefix + ".csv";
+    dynamic_filenames.features_pdf_o                   = prefix;
+    dynamic_filenames.quantitationMethods_csv_o        = prefix + "_quantitationMethods.csv";
+    dynamic_filenames.componentsToConcentrations_csv_o = prefix + "_componentsToConcentrations.csv";
+
     return dynamic_filenames;
   }
 
@@ -60,7 +63,6 @@ namespace SmartPeak
     feature_csv_o.clear();
     featureXML_i.clear();
     features_pdf_o.clear();
-    calibrators_pdf_o.clear();
     quantitationMethods_csv_o.clear();
     componentsToConcentrations_csv_o.clear();
     sequenceSummary_csv_o.clear();
