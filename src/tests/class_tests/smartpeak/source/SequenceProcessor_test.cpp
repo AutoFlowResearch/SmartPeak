@@ -177,11 +177,12 @@ BOOST_AUTO_TEST_CASE(processSequence)
   std::map<std::string, Filenames> dynamic_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   for (const SampleHandler& sample : sequenceHandler.getSequence()) {
-    const std::string key = sample.getMetaData().getSampleName();
+    const std::string key = sample.getMetaData().getInjectionName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
       path + "mzML/",
       path + "features/",
       path + "features/",
+      sample.getMetaData().getSampleName(),
       key
     );
   }
@@ -205,6 +206,7 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
       path + "mzML/",
       path + "features/",
       path + "features/",
+      key,
       key
     );
   }

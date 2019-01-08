@@ -137,7 +137,7 @@ namespace SmartPeak
           sample.getRawData(),
           raw_data_processing_methods[i], // event
           sample.getRawData().getParameters(),
-          filenames.at(sample.getMetaData().getSampleName()),
+          filenames.at(sample.getMetaData().getInjectionName()),
           verbose_I
         );
       }

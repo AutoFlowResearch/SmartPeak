@@ -37,7 +37,8 @@ public:
       const std::string& mzml_input_path,
       const std::string& features_input_path,
       const std::string& output_path,
-      const std::string& sample_name
+      const std::string& input_inj_name,
+      const std::string& output_inj_name
     );
 
     void clear();

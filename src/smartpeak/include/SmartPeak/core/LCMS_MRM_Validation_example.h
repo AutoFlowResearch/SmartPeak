@@ -30,11 +30,12 @@ void example_LCMS_MRM_Validation(
 
   std::map<std::string, Filenames> dynamic_filenames;
   for (const SampleHandler& sample : sequenceHandler.getSequence()) {
-    const std::string& key = sample.getMetaData().getSampleName();
+    const std::string& key = sample.getMetaData().getInjectionName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-      dir_I + "mzML/",
-      dir_I + "features/",
-      dir_I + "features/",
+      dir_I + "/mzML/",
+      dir_I + "/features/",
+      dir_I + "/features/",
+      sample.getMetaData().getSampleName(),
       key
     );
   }
