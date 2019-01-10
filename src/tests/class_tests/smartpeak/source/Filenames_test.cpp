@@ -11,9 +11,19 @@ using namespace std;
 
 BOOST_AUTO_TEST_SUITE(filenames)
 
+BOOST_AUTO_TEST_CASE(getDefaultStaticFilenames)
+{
+// TODO: check that the method returns what is expected
+}
+
+BOOST_AUTO_TEST_CASE(getDefaultDynamicFilenames)
+{
+// TODO: check that the method returns what is expected
+}
+
 BOOST_AUTO_TEST_CASE(clear)
 {
-// should initialize a Filename with some values and then verify that .clear() resets it
+// TODO: should initialize a Filename with some values and then verify that .clear() resets it
 }
 
 BOOST_AUTO_TEST_SUITE_END()
