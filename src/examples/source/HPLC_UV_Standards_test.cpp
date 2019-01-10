@@ -21,7 +21,7 @@ void test_main_HPLC_UV_Standards()
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug.featureXML")
+    SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_8_BatchName_1900-01-00_000000.featureXML")
   );
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();

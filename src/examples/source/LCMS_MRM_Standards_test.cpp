@@ -21,7 +21,7 @@ void test_main_LCMS_MRM_Standards()
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Standards/features/150516_CM1_Level1.featureXML")
+    SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Standards/features/150516_CM1_Level1_1_BatchName_1900-01-00_000000.featureXML")
   );
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
