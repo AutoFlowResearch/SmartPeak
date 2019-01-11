@@ -452,21 +452,21 @@ namespace SmartPeak
     std::map<std::string,std::vector<std::map<std::string,std::string>>> parameters;
     FileReader::parseOpenMSParams(filename, parameters);
 
-    parseRawDataProcessingParameters(rawDataHandler, parameters);
+    sanitizeRawDataProcessorParameters(rawDataHandler, parameters);
 
     if (verbose) {
       std::cout << "==== END   readRawDataProcessingParameters" << std::endl;
     }
   }
 
-  void OpenMSFile::parseRawDataProcessingParameters(
+  void OpenMSFile::sanitizeRawDataProcessorParameters(
     RawDataHandler& rawDataHandler,
     std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_file,
     const bool verbose
   )
   {
     if (verbose) {
-      std::cout << "==== START parseRawDataProcessingParameters" << std::endl;
+      std::cout << "==== START sanitizeRawDataProcessorParameters" << std::endl;
     }
 
     // # check for workflow parameters integrity
@@ -497,7 +497,7 @@ namespace SmartPeak
     rawDataHandler.setParameters(parameters_file);
 
     if (verbose) {
-      std::cout << "==== END   parseRawDataProcessingParameters" << std::endl;
+      std::cout << "==== END   sanitizeRawDataProcessorParameters" << std::endl;
     }
   }
 
