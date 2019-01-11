@@ -81,19 +81,19 @@ namespace SmartPeak
     sequence_.push_back(sh);
 
     const size_t pos = sequence_.size() - 1;
-    const std::string& sample_name = meta_data_I.getSampleName();
+    const std::string& sample_name = meta_data_I.getInjectionName();
 
     index_to_sample_[pos] = sample_name;
     sample_to_index_[sample_name] = pos;
   }
 
   std::vector<SampleHandler> SequenceHandler::getSamplesInSequence(
-    const std::vector<std::string>& sample_names
+    const std::vector<std::string>& injection_names
   ) const
   {
     std::vector<SampleHandler> samples;
 
-    for (const std::string& name : sample_names) {
+    for (const std::string& name : injection_names) {
       if (sample_to_index_.count(name)) {
         samples.push_back(sequence_[sample_to_index_.at(name)]);
       }

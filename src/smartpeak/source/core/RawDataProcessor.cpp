@@ -39,7 +39,7 @@ namespace SmartPeak
       rawDataHandler_IO.getSWATH()
     );
 
-    featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
+    featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
 
     rawDataHandler_IO.setFeatureMap(featureMap);
 
@@ -146,7 +146,7 @@ namespace SmartPeak
       throw std::invalid_argument("Both arguments 'select params' and 'schedule params' are empty.");
     }
 
-    output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
+    output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
 
     rawDataHandler_IO.setFeatureMap(output);
 
