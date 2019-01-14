@@ -7,6 +7,7 @@ set(sources_list
 	FileReader.cpp
 	OpenMSFile.cpp
 	SequenceParser.cpp
+	WorkflowWizard.cpp
 )
 
 ### add path to the filenames
