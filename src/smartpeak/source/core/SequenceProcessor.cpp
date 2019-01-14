@@ -97,17 +97,17 @@ namespace SmartPeak
   void SequenceProcessor::processSequence(
     SequenceHandler& sequenceHandler_IO,
     const std::map<std::string, Filenames>& filenames,
-    const std::vector<std::string>& sample_names_I,
+    const std::vector<std::string>& injection_names,
     const std::vector<std::string>& raw_data_processing_methods_I,
     const bool verbose_I
   )
   {
     std::vector<SampleHandler> process_sequence;
 
-    if (sample_names_I.empty()) {
+    if (injection_names.empty()) {
       process_sequence = sequenceHandler_IO.getSequence();
     } else {
-      process_sequence = sequenceHandler_IO.getSamplesInSequence(sample_names_I);
+      process_sequence = sequenceHandler_IO.getSamplesInSequence(injection_names);
     }
 
     if (filenames.size() != process_sequence.size()) {
