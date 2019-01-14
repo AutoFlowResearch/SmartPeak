@@ -25,7 +25,7 @@ namespace SmartPeak
 
     SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
 
-    OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.parameters_csv_i, delimiter);
+    OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.parameters_csv_i);
 
     OpenMSFile::loadTraML(rawDataHandler, filenames.traML_csv_i, "csv", verbose_I);
 
