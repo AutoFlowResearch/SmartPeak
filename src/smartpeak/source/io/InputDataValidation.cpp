@@ -1,6 +1,6 @@
 // TODO: Add copyright
 
-#include <SmartPeak/io/WorkflowWizard.h>
+#include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/io/FileReader.h>
@@ -11,13 +11,13 @@
 
 namespace SmartPeak
 {
-  bool WorkflowWizard::fileExists(const std::string& filepath)
+  bool InputDataValidation::fileExists(const std::string& filepath)
   {
     std::ifstream ifs(filepath);
     return ifs.is_open();
   }
 
-  bool WorkflowWizard::isValidFilename(const std::string& filename, const std::string& member_name)
+  bool InputDataValidation::isValidFilename(const std::string& filename, const std::string& member_name)
   {
     std::cout << "[" << member_name << "]: ";
     if (filename.size()) {
@@ -30,7 +30,7 @@ namespace SmartPeak
     }
   }
 
-  void WorkflowWizard::validateFilenames(const Filenames& filenames)
+  void InputDataValidation::validateFilenames(const Filenames& filenames)
   {
     std::cout << "Filenames validation\n";
     isValidFilename(filenames.sequence_csv_i, "sequence_csv_i");
@@ -54,7 +54,7 @@ namespace SmartPeak
     isValidFilename(filenames.featureSummary_csv_o, "featureSummary_csv_o");
   }
 
-  std::string WorkflowWizard::getSequenceInfo(
+  std::string InputDataValidation::getSequenceInfo(
     const std::string& filename,
     const std::string& delimiter,
     const bool verbose
@@ -83,7 +83,7 @@ namespace SmartPeak
     return oss.str();
   }
 
-  std::string WorkflowWizard::getParametersInfo(const std::string& filename, const bool verbose)
+  std::string InputDataValidation::getParametersInfo(const std::string& filename, const bool verbose)
   {
     if (verbose) {
       std::cout << "==== START getParametersInfo" << std::endl;
@@ -107,7 +107,7 @@ namespace SmartPeak
     return oss.str();
   }
 
-  std::string WorkflowWizard::getTraMLInfo(
+  std::string InputDataValidation::getTraMLInfo(
     const std::string& filename,
     const std::string& format, // TODO: implement some logic to automatically find out the format? i.e. check if extension is .csv or .traML
     const bool verbose
@@ -144,7 +144,7 @@ namespace SmartPeak
     return oss.str();
   }
 
-  std::string WorkflowWizard::getFeatureFilterComponentsAndGroupsInfo(
+  std::string InputDataValidation::getFeatureFilterComponentsAndGroupsInfo(
     const std::string& filename_components,
     const std::string& filename_components_groups,
     const bool verbose
@@ -194,7 +194,7 @@ namespace SmartPeak
     return oss.str();
   }
 
-  std::string WorkflowWizard::getFeatureQCComponentsAndGroupsInfo(
+  std::string InputDataValidation::getFeatureQCComponentsAndGroupsInfo(
     const std::string& filename_components,
     const std::string& filename_components_groups,
     const bool verbose
@@ -244,7 +244,7 @@ namespace SmartPeak
     return oss.str();
   }
 
-  std::string WorkflowWizard::getQuantitationMethodsInfo(
+  std::string InputDataValidation::getQuantitationMethodsInfo(
     const std::string& filename,
     const bool verbose
   )
@@ -289,7 +289,7 @@ namespace SmartPeak
     return oss.str();
   }
 
-  std::string WorkflowWizard::getStandardsConcentrationsInfo(
+  std::string InputDataValidation::getStandardsConcentrationsInfo(
     const std::string& filename,
     const bool verbose
   )

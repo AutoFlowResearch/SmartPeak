@@ -8,11 +8,11 @@
 
 namespace SmartPeak
 {
-  class WorkflowWizard
+  class InputDataValidation
   {
 public:
-    WorkflowWizard() = delete;
-    ~WorkflowWizard() = delete;
+    InputDataValidation() = delete;
+    ~InputDataValidation() = delete;
 
     static bool fileExists(const std::string& filepath);
     static bool isValidFilename(const std::string& filename, const std::string& member_name);

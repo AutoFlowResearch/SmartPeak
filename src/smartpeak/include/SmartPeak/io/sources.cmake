@@ -8,7 +8,7 @@ set(sources_list_h
 	FileReader.h
 	OpenMSFile.h
 	SequenceParser.h
-	WorkflowWizard.h
+	InputDataValidation.h
 )
 
 ### add path to the filenames

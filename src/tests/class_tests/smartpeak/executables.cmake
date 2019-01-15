@@ -18,7 +18,7 @@ set(io_executables_list
 	FileReader_test
 	OpenMSFile_test
 	SequenceParser_test
-	WorkflowWizard_test
+	InputDataValidation_test
 )
 
 set(simulator_executables_list
