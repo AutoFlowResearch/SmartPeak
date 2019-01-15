@@ -346,6 +346,10 @@ public:
       const bool verbose_I = false
     )
     {
+      if (y_true.empty() || y_pred.empty()) {
+        throw std::invalid_argument("Actual and predicted values' vectors cannot be empty.");
+      }
+
       const std::array<size_t, 4> conf = computeConfusionMatrix(y_true, y_pred, verbose_I);
       const size_t TP = conf[0];
       const size_t FP = conf[1];

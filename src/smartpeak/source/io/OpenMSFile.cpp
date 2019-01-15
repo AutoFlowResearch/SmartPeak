@@ -328,10 +328,10 @@ namespace SmartPeak
     if (referenceData_csv_i.empty())
       throw std::invalid_argument("Filename is empty.");
 
-    io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(referenceData_csv_i);
+    io::CSVReader<16, io::trim_chars<>, io::no_quote_escape<','>> in(referenceData_csv_i);
 
     const std::string s_original_filename {"original_filename"};
-    const std::string s_sample_name_short {"sample_name_short"};
+    const std::string s_sample_name {"sample_name"};
     const std::string s_sample_type {"sample_type"};
     const std::string s_acquisition_date_and_time {"acquisition_date_and_time"};
     const std::string s_acq_method_name {"acq_method_name"};
@@ -346,12 +346,11 @@ namespace SmartPeak
     const std::string s_acquisition_method_id {"acquisition_method_id"};
     const std::string s_height {"height"};
     const std::string s_area {"area"};
-    const std::string s_injection_name {"injection_name"};
 
     in.read_header(
       io::ignore_extra_column,
       s_original_filename,
-      s_sample_name_short,
+      s_sample_name,
       s_sample_type,
       s_acquisition_date_and_time,
       s_acq_method_name,
@@ -365,12 +364,11 @@ namespace SmartPeak
       s_experiment_id,
       s_acquisition_method_id,
       s_height,
-      s_area,
-      s_injection_name
+      s_area
     );
 
     std::string original_filename;
-    std::string sample_name_short;
+    std::string sample_name;
     std::string sample_type;
     std::string acquisition_date_and_time;
     std::string acq_method_name;
@@ -385,13 +383,14 @@ namespace SmartPeak
     std::string acquisition_method_id;
     float height;
     float area;
-    std::string injection_name;
 
     std::vector<std::map<std::string, Utilities::CastValue>> reference_data;
 
+    int row_number = 1;
+
     while (in.read_row(
       original_filename,
-      sample_name_short,
+      sample_name,
       sample_type,
       acquisition_date_and_time,
       acq_method_name,
@@ -405,15 +404,14 @@ namespace SmartPeak
       experiment_id,
       acquisition_method_id,
       height,
-      area,
-      injection_name
+      area
     )) {
       std::transform(used.begin(), used.end(), used.begin(), ::tolower);
       if (used == "false")
         continue;
       std::map<std::string, Utilities::CastValue> m;
       m.emplace(s_original_filename, original_filename);
-      m.emplace(s_sample_name_short, sample_name_short);
+      m.emplace(s_sample_name, sample_name);
       m.emplace(s_sample_type, sample_type);
       m.emplace(s_acquisition_date_and_time, acquisition_date_and_time);
       m.emplace(s_acq_method_name, acq_method_name);
@@ -428,7 +426,11 @@ namespace SmartPeak
       m.emplace(s_acquisition_method_id, acquisition_method_id);
       m.emplace(s_height, height);
       m.emplace(s_area, area);
-      m.emplace(s_injection_name, injection_name);
+      MetaDataHandler mdh;
+      mdh.sample_name = sample_name;
+      mdh.inj_number = row_number++;
+      mdh.batch_name = experiment_id;
+      m.emplace("injection_name", mdh.getInjectionName());
       reference_data.push_back(std::move(m));
     }
 
