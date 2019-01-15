@@ -231,8 +231,9 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    if (verbose_I)
-      std::cout << "Validating features" << std::endl;
+    if (verbose_I) {
+      std::cout << "==== START validateFeatures" << std::endl;
+    }
 
     if (MRMRFeatureValidator_params_I.empty()) {
       std::cout << "No parameters passed to validateFeatures(). Not validating." << std::endl;
@@ -245,7 +246,7 @@ namespace SmartPeak
     MRMFeatureValidator::validate_MRMFeatures(
       rawDataHandler_IO.getReferenceData(),
       rawDataHandler_IO.getFeatureMap(),
-      rawDataHandler_IO.getMetaData().getSampleName(),
+      rawDataHandler_IO.getMetaData().getInjectionName(),
       mapped_features,
       validation_metrics,
       std::stof(MRMRFeatureValidator_params_I.front().at("value")), // TODO: While this probably works, it might be nice to add some check that the parameter passed is the desired one
@@ -254,6 +255,10 @@ namespace SmartPeak
 
     rawDataHandler_IO.setFeatureMap(mapped_features);
     rawDataHandler_IO.setValidationMetrics(validation_metrics);
+
+    if (verbose_I) {
+      std::cout << "==== END   validateFeatures" << std::endl;
+    }
   }
 
   void RawDataProcessor::plotFeatures(
