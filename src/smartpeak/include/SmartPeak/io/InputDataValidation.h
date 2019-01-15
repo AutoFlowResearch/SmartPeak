@@ -28,19 +28,13 @@ public:
 
     static std::string getTraMLInfo(
       const std::string& filename,
-      const std::string& format,
       const bool verbose
     );
 
-    static std::string getFeatureFilterComponentsAndGroupsInfo(
+    static std::string getComponentsAndGroupsInfo(
       const std::string& filename_components,
       const std::string& filename_components_groups,
-      const bool verbose
-    );
-
-    static std::string getFeatureQCComponentsAndGroupsInfo(
-      const std::string& filename_components,
-      const std::string& filename_components_groups,
+      const bool is_feature_filter, // else is feature qc
       const bool verbose
     );
 

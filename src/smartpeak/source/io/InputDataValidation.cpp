@@ -109,7 +109,6 @@ namespace SmartPeak
 
   std::string InputDataValidation::getTraMLInfo(
     const std::string& filename,
-    const std::string& format, // TODO: implement some logic to automatically find out the format? i.e. check if extension is .csv or .traML
     const bool verbose
   )
   {
@@ -118,7 +117,7 @@ namespace SmartPeak
     }
 
     RawDataHandler rawDataHandler;
-    OpenMSFile::loadTraML(rawDataHandler, filename, format, verbose);
+    OpenMSFile::loadTraML(rawDataHandler, filename, "csv", verbose);
     const OpenMS::TargetedExperiment targeted_exp = rawDataHandler.getTargetedExperiment();
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions = targeted_exp.getTransitions();
 
@@ -144,25 +143,37 @@ namespace SmartPeak
     return oss.str();
   }
 
-  std::string InputDataValidation::getFeatureFilterComponentsAndGroupsInfo(
+  std::string InputDataValidation::getComponentsAndGroupsInfo(
     const std::string& filename_components,
     const std::string& filename_components_groups,
+    const bool is_feature_filter, // else is feature qc
     const bool verbose
   )
   {
     if (verbose) {
-      std::cout << "==== START getFeatureFilterComponentsAndGroupsInfo" << std::endl;
+      std::cout << "==== START getComponentsAndGroupsInfo" << std::endl;
     }
 
     RawDataHandler rawDataHandler;
-    OpenMSFile::loadFeatureFilter(
-      rawDataHandler,
-      filename_components,
-      filename_components_groups,
-      verbose
-    );
+    if (is_feature_filter) {
+      OpenMSFile::loadFeatureFilter(
+        rawDataHandler,
+        filename_components,
+        filename_components_groups,
+        verbose
+      );
+    } else {
+      OpenMSFile::loadFeatureQC(
+        rawDataHandler,
+        filename_components,
+        filename_components_groups,
+        verbose
+      );
+    }
 
-    const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureFilter();
+    const OpenMS::MRMFeatureQC& featureQC = is_feature_filter
+      ? rawDataHandler.getFeatureFilter()
+      : rawDataHandler.getFeatureQC();
 
     std::ostringstream oss;
     oss << "Number of ComponentQCs: " << featureQC.component_qcs.size();
@@ -188,57 +199,7 @@ namespace SmartPeak
     }
 
     if (verbose) {
-      std::cout << "==== END   getFeatureFilterComponentsAndGroupsInfo" << std::endl;
-    }
-
-    return oss.str();
-  }
-
-  std::string InputDataValidation::getFeatureQCComponentsAndGroupsInfo(
-    const std::string& filename_components,
-    const std::string& filename_components_groups,
-    const bool verbose
-  )
-  {
-    if (verbose) {
-      std::cout << "==== START getFeatureQCComponentsAndGroupsInfo" << std::endl;
-    }
-
-    RawDataHandler rawDataHandler;
-    OpenMSFile::loadFeatureQC(
-      rawDataHandler,
-      filename_components,
-      filename_components_groups,
-      verbose
-    );
-
-    const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
-
-    std::ostringstream oss;
-    oss << "Number of ComponentQCs: " << featureQC.component_qcs.size();
-    oss << "Number of ComponentGroupQCs: " << featureQC.component_group_qcs.size();
-
-    oss << "Listing ComponentQCs' information: \n";
-    for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureQC.component_qcs) {
-      oss << qc.component_name
-        << " RT[" << qc.retention_time_l << "," << qc.retention_time_u << "]"
-        << " INT[" << qc.intensity_l << "," << qc.intensity_u << "]"
-        << " OQ[" << qc.overall_quality_l << "," << qc.overall_quality_u << "]"
-        << " and # of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
-    }
-
-    oss << "Listing ComponentGroupQCs' information: \n";
-    for (const OpenMS::MRMFeatureQC::ComponentGroupQCs& qc : featureQC.component_group_qcs) {
-      oss << qc.component_group_name
-        << " RT[" << qc.retention_time_l << "," << qc.retention_time_u << "]"
-        << " INT[" << qc.intensity_l << "," << qc.intensity_u << "]"
-        << " OQ[" << qc.overall_quality_l << "," << qc.overall_quality_u << "]"
-        // TODO: show more info? i.e. the group-related info
-        << " and # of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
-    }
-
-    if (verbose) {
-      std::cout << "==== END   getFeatureQCComponentsAndGroupsInfo" << std::endl;
+      std::cout << "==== END   getComponentsAndGroupsInfo" << std::endl;
     }
 
     return oss.str();
