@@ -118,8 +118,8 @@ namespace SmartPeak
 
     RawDataHandler rawDataHandler;
     OpenMSFile::loadTraML(rawDataHandler, filename, "csv", verbose);
-    const OpenMS::TargetedExperiment targeted_exp = rawDataHandler.getTargetedExperiment();
-    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions = targeted_exp.getTransitions();
+    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
+      rawDataHandler.getTargetedExperiment().getTransitions();
 
     std::ostringstream oss;
     oss << "Number of transitions: " << transitions.size();
@@ -294,15 +294,15 @@ namespace SmartPeak
   }
 
   bool sampleNamesAreConsistent(
-    const std::string& sequence_file_name,
+    const std::string& sequence_filename,
     const std::string& delimiter,
-    const std::string& standards_file_name
+    const std::string& standards_filename
   )
   {
     SequenceHandler sequenceHandler;
     SequenceSegmentHandler sequenceSegmentHandler;
 
-    SequenceParser::readSequenceFile(sequenceHandler, sequence_file_name, delimiter, false);
+    SequenceParser::readSequenceFile(sequenceHandler, sequence_filename, delimiter, false);
     OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, filename, false);/
 
     const std::vector<SampleHandler>& samples = sequenceHandler.getSequence();
@@ -310,12 +310,11 @@ namespace SmartPeak
       sequenceSegmentHandler.getStandardsConcentrations();
 
     std::set<std::string> names1(samples.size());
+    std::set<std::string> names2(standards.size());
 
     for (size_t i = 0; i < samples.size(); ++i) {
       names1.insert(samples[i].getMetaData().sample_name);
     }
-
-    std::set<std::string> names2(standards.size());
 
     for (size_t i = 0; i < standards.size(); ++i) {
       names2.insert(standards[i].sample_name);
@@ -339,7 +338,126 @@ namespace SmartPeak
     return names1.empty() && names2.empty();
   }
 
-  bool componentNamesAreConsistent() {}
+  bool componentNamesAreConsistent(
+    const std::string& traML_filename,
+    const std::string& featureFilter_filename,
+    const std::string& featureQC_filename,
+    const std::string& quantitationMethods_filename,
+    const std::string& standardConcentrations_filename
+  )
+  {
+    RawDataHandler rawDataHandler;
+    SequenceSegmentHandler sequenceSegmentHandler;
+
+    OpenMSFile::loadTraML(rawDataHandler, filename, "csv", false);
+    OpenMSFile::loadFeatureFilter(
+      rawDataHandler,
+      featureFilter_filename,
+      "",
+      false
+    );
+    OpenMSFile::loadFeatureQC(
+      rawDataHandler,
+      featureQC_filename,
+      "",
+      false
+    );
+    OpenMSFile::loadQuantitationMethods(
+      sequenceSegmentHandler,
+      quantitationMethods_filename,
+      false
+    );
+    OpenMSFile::loadStandardsConcentrations(
+      sequenceSegmentHandler,
+      standardConcentrations_filename,
+      false
+    );
+
+    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
+      rawDataHandler.getTargetedExperiment().getTransitions();
+    const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
+    const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
+    const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
+      sequenceSegmentHandler.getQuantitationMethods();
+    const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
+      sequenceSegmentHandler.getStandardsConcentrations();
+
+
+    std::set<std::string> names1(transitions.size());
+    std::set<std::string> names2(featureFilter.size());
+    std::set<std::string> names3(featureQC.size());
+    std::set<std::string> names4(quantitation_methods.size());
+    std::set<std::string> names5(standards.size());
+
+    for (size_t i = 0; i < transitions.size(); ++i) {
+      names1.insert(transitions[i].getName()); // or getNativeID, getPeptideRef, getCompoundRef
+    }
+
+    for (size_t i = 0; i < featureFilter.component_qcs.size(); ++i) {
+      names2.insert(featureFilter.component_qcs[i].component_name);
+    }
+
+    for (size_t i = 0; i < featureQC.component_qcs.size(); ++i) {
+      names3.insert(featureQC.component_qcs[i].component_name);
+    }
+
+    for (size_t i = 0; i < quantitation_methods.size(); ++i) {
+      names4.insert(quantitation_methods[i].getComponentName());
+    }
+
+    for (size_t i = 0; i < standards.size(); ++i) {
+      names5.insert(standards[i].component_name);
+    }
+
+    std::set<std::string>::const_iterator to_remove1 = std::remove_if(
+      names1.begin(),
+      names1.end(),
+      [&names2, &names3, &names4, &names5] (const std::string& s) {
+        return names2.count(s) && names3.count(s) && names4.count(s) && names5.count(s);
+      }
+    );
+
+    std::set<std::string>::const_iterator to_remove2 = std::remove_if(
+      names2.begin(),
+      names2.end(),
+      [&names1, &names3, &names4, &names5] (const std::string& s) {
+        return names1.count(s) && names3.count(s) && names4.count(s) && names5.count(s);
+      }
+    );
+
+    std::set<std::string>::const_iterator to_remove3 = std::remove_if(
+      names3.begin(),
+      names3.end(),
+      [&names1, &names2, &names4, &names5] (const std::string& s) {
+        return names1.count(s) && names2.count(s) && names4.count(s) && names5.count(s);
+      }
+    );
+
+    std::set<std::string>::const_iterator to_remove4 = std::remove_if(
+      names4.begin(),
+      names4.end(),
+      [&names1, &names2, &names3, &names5] (const std::string& s) {
+        return names1.count(s) && names2.count(s) && names3.count(s) && names5.count(s);
+      }
+    );
+
+    std::set<std::string>::const_iterator to_remove5 = std::remove_if(
+      names5.begin(),
+      names5.end(),
+      [&names1, &names2, &names3, &names4] (const std::string& s) {
+        return names1.count(s) && names2.count(s) && names3.count(s) && names4.count(s);
+      }
+    );
+
+    names1.erase(to_remove1, names1.end());
+    names2.erase(to_remove2, names2.end());
+    names3.erase(to_remove3, names3.end());
+    names4.erase(to_remove4, names4.end());
+    names5.erase(to_remove5, names5.end());
+
+    return names1.empty() && names2.empty() && names3.empty() && names4.empty() && names5.empty();
+  }
+
   bool componentNameGroupsAreConsistent() {}
   bool heavyComponentsAreConsistent() {}
 }
