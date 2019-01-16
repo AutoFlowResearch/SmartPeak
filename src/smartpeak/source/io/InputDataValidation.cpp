@@ -303,7 +303,7 @@ namespace SmartPeak
     SequenceSegmentHandler sequenceSegmentHandler;
 
     SequenceParser::readSequenceFile(sequenceHandler, sequence_filename, delimiter, false);
-    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, filename, false);/
+    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, standards_filename, false);/
 
     const std::vector<SampleHandler>& samples = sequenceHandler.getSequence();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
@@ -349,29 +349,11 @@ namespace SmartPeak
     RawDataHandler rawDataHandler;
     SequenceSegmentHandler sequenceSegmentHandler;
 
-    OpenMSFile::loadTraML(rawDataHandler, filename, "csv", false);
-    OpenMSFile::loadFeatureFilter(
-      rawDataHandler,
-      featureFilter_filename,
-      "",
-      false
-    );
-    OpenMSFile::loadFeatureQC(
-      rawDataHandler,
-      featureQC_filename,
-      "",
-      false
-    );
-    OpenMSFile::loadQuantitationMethods(
-      sequenceSegmentHandler,
-      quantitationMethods_filename,
-      false
-    );
-    OpenMSFile::loadStandardsConcentrations(
-      sequenceSegmentHandler,
-      standardConcentrations_filename,
-      false
-    );
+    OpenMSFile::loadTraML(rawDataHandler, traML_filename, "csv", false);
+    OpenMSFile::loadFeatureFilter(rawDataHandler, featureFilter_filename, "", false);
+    OpenMSFile::loadFeatureQC(rawDataHandler, featureQC_filename, "", false);
+    OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler, quantitationMethods_filename, false);
+    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, standardConcentrations_filename, false);
 
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
@@ -390,7 +372,7 @@ namespace SmartPeak
     std::set<std::string> names5(standards.size());
 
     for (size_t i = 0; i < transitions.size(); ++i) {
-      names1.insert(transitions[i].getName()); // or getNativeID, getPeptideRef, getCompoundRef
+      names1.insert(transitions[i].getPeptideRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
     }
 
     for (size_t i = 0; i < featureFilter.component_qcs.size(); ++i) {
@@ -481,15 +463,15 @@ namespace SmartPeak
     std::set<std::string> names3(featureQC.size());
 
     for (size_t i = 0; i < transitions.size(); ++i) {
-      names1.insert(transitions[i].getName()); // or getNativeID, getPeptideRef, getCompoundRef
+      names1.insert(transitions[i].getCompoundRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
     }
 
     for (size_t i = 0; i < featureFilter.component_group_qcs.size(); ++i) {
-      names2.insert(featureFilter.component_group_qcs[i].component_name);
+      names2.insert(featureFilter.component_group_qcs[i].component_group_name);
     }
 
     for (size_t i = 0; i < featureQC.component_group_qcs.size(); ++i) {
-      names3.insert(featureQC.component_group_qcs[i].component_name);
+      names3.insert(featureQC.component_group_qcs[i].component_group_name);
     }
 
     std::set<std::string>::const_iterator to_remove1 = std::remove_if(
@@ -523,5 +505,70 @@ namespace SmartPeak
     return names1.empty() && names2.empty() && names3.empty();
   }
 
-  bool heavyComponentsAreConsistent() {}
+  bool heavyComponentsAreConsistent(
+    const std::string& traML_filename,
+    const std::string& quantitationMethods_filename,
+    const std::string& standardConcentrations_filename
+  )
+  {
+    RawDataHandler rawDataHandler;
+    SequenceSegmentHandler sequenceSegmentHandler;
+
+    OpenMSFile::loadTraML(rawDataHandler, traML_filename, "csv", false);
+    OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler, quantitationMethods_filename, false);
+    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, standardConcentrations_filename, false);
+
+    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
+      rawDataHandler.getTargetedExperiment().getTransitions();
+    const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
+      sequenceSegmentHandler.getQuantitationMethods();
+    const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
+      sequenceSegmentHandler.getStandardsConcentrations();
+
+    std::set<std::string> names1(transitions.size());
+    std::set<std::string> names4(quantitation_methods.size());
+    std::set<std::string> names5(standards.size());
+
+    for (size_t i = 0; i < transitions.size(); ++i) {
+      names1.insert(transitions[i].getPeptideRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
+    }
+
+    for (size_t i = 0; i < quantitation_methods.size(); ++i) {
+      names4.insert(quantitation_methods[i].getComponentName());
+    }
+
+    for (size_t i = 0; i < standards.size(); ++i) {
+      names5.insert(standards[i].component_name);
+    }
+
+    std::set<std::string>::const_iterator to_remove1 = std::remove_if(
+      names1.begin(),
+      names1.end(),
+      [&names4, &names5] (const std::string& s) {
+        return names4.count(s) && names5.count(s);
+      }
+    );
+
+    std::set<std::string>::const_iterator to_remove4 = std::remove_if(
+      names4.begin(),
+      names4.end(),
+      [&names1, &names5] (const std::string& s) {
+        return names1.count(s) && names5.count(s);
+      }
+    );
+
+    std::set<std::string>::const_iterator to_remove5 = std::remove_if(
+      names5.begin(),
+      names5.end(),
+      [&names1, &names4] (const std::string& s) {
+        return names1.count(s) && names4.count(s);
+      }
+    );
+
+    names1.erase(to_remove1, names1.end());
+    names4.erase(to_remove4, names4.end());
+    names5.erase(to_remove5, names5.end());
+
+    return names1.empty() && names4.empty() && names5.empty();
+  }
 }
