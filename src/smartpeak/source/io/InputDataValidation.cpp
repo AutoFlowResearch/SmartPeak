@@ -458,6 +458,70 @@ namespace SmartPeak
     return names1.empty() && names2.empty() && names3.empty() && names4.empty() && names5.empty();
   }
 
-  bool componentNameGroupsAreConsistent() {}
+  bool componentNameGroupsAreConsistent(
+    const std::string& traML_filename,
+    const std::string& featureFilter_filename,
+    const std::string& featureQC_filename
+  )
+  {
+    RawDataHandler rawDataHandler;
+    SequenceSegmentHandler sequenceSegmentHandler;
+
+    OpenMSFile::loadTraML(rawDataHandler, filename, "csv", false);
+    OpenMSFile::loadFeatureFilter(rawDataHandler, "", featureFilter_filename, false);
+    OpenMSFile::loadFeatureQC(rawDataHandler, "", featureQC_filename, false);
+
+    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
+      rawDataHandler.getTargetedExperiment().getTransitions();
+    const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
+    const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
+
+    std::set<std::string> names1(transitions.size());
+    std::set<std::string> names2(featureFilter.size());
+    std::set<std::string> names3(featureQC.size());
+
+    for (size_t i = 0; i < transitions.size(); ++i) {
+      names1.insert(transitions[i].getName()); // or getNativeID, getPeptideRef, getCompoundRef
+    }
+
+    for (size_t i = 0; i < featureFilter.component_group_qcs.size(); ++i) {
+      names2.insert(featureFilter.component_group_qcs[i].component_name);
+    }
+
+    for (size_t i = 0; i < featureQC.component_group_qcs.size(); ++i) {
+      names3.insert(featureQC.component_group_qcs[i].component_name);
+    }
+
+    std::set<std::string>::const_iterator to_remove1 = std::remove_if(
+      names1.begin(),
+      names1.end(),
+      [&names2, &names3] (const std::string& s) {
+        return names2.count(s) && names3.count(s);
+      }
+    );
+
+    std::set<std::string>::const_iterator to_remove2 = std::remove_if(
+      names2.begin(),
+      names2.end(),
+      [&names1, &names3] (const std::string& s) {
+        return names1.count(s) && names3.count(s);
+      }
+    );
+
+    std::set<std::string>::const_iterator to_remove3 = std::remove_if(
+      names3.begin(),
+      names3.end(),
+      [&names1, &names2] (const std::string& s) {
+        return names1.count(s) && names2.count(s);
+      }
+    );
+
+    names1.erase(to_remove1, names1.end());
+    names2.erase(to_remove2, names2.end());
+    names3.erase(to_remove3, names3.end());
+
+    return names1.empty() && names2.empty() && names3.empty();
+  }
+
   bool heavyComponentsAreConsistent() {}
 }
