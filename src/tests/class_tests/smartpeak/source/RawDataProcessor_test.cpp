@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE(validateFeatures)
   OpenMSFile::loadValidationData(rawDataHandler, referenceData_csv_i);
 
   rawDataHandler.getMetaData().sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file
-  rawDataHandler.getMetaData().inj_number = 1;
+  rawDataHandler.getMetaData().inj_number = 1439953;
   rawDataHandler.getMetaData().batch_name = "BloodProject01";
 
   RawDataProcessor::validateFeatures(rawDataHandler, params_1.at("MRMFeatureValidator.validate_MRMFeatures"), true);

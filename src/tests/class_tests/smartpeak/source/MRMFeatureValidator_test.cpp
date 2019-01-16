@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
 
   MetaDataHandler mdh;
   mdh.sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file
-  mdh.inj_number = 3;
+  mdh.inj_number = 1440119;
   mdh.batch_name = "BloodProject01";
 
   MRMFeatureValidator::validate_MRMFeatures(
