@@ -65,7 +65,7 @@ namespace SmartPeak
     }
 
     SequenceHandler sequenceHandler;
-    SequenceParser::readSequenceFile(sequenceHandler, filename, delimiter);
+    SequenceParser::readSequenceFile(sequenceHandler, filename, delimiter, verbose);
 
     std::ostringstream oss;
     oss << "Number of samples in the sequence file: " << sequenceHandler.getSequence().size() << "\n";
@@ -292,4 +292,54 @@ namespace SmartPeak
 
     return oss.str();
   }
+
+  bool sampleNamesAreConsistent(
+    const std::string& sequence_file_name,
+    const std::string& delimiter,
+    const std::string& standards_file_name
+  )
+  {
+    SequenceHandler sequenceHandler;
+    SequenceSegmentHandler sequenceSegmentHandler;
+
+    SequenceParser::readSequenceFile(sequenceHandler, sequence_file_name, delimiter, false);
+    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, filename, false);/
+
+    const std::vector<SampleHandler>& samples = sequenceHandler.getSequence();
+    const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
+      sequenceSegmentHandler.getStandardsConcentrations();
+
+    std::set<std::string> names1(samples.size());
+
+    for (size_t i = 0; i < samples.size(); ++i) {
+      names1.insert(samples[i].getMetaData().sample_name);
+    }
+
+    std::set<std::string> names2(standards.size());
+
+    for (size_t i = 0; i < standards.size(); ++i) {
+      names2.insert(standards[i].sample_name);
+    }
+
+    std::set<std::string>::const_iterator to_remove1 = std::remove_if(
+      names1.begin(),
+      names1.end(),
+      [&names2](const std::string& s){ return names2.count(s); }
+    );
+
+    std::set<std::string>::const_iterator to_remove2 = std::remove_if(
+      names2.begin(),
+      names2.end(),
+      [&names1](const std::string& s){ return names1.count(s); }
+    );
+
+    names1.erase(to_remove1, names1.end());
+    names2.erase(to_remove2, names2.end());
+
+    return names1.empty() && names2.empty();
+  }
+
+  bool componentNamesAreConsistent() {}
+  bool componentNameGroupsAreConsistent() {}
+  bool heavyComponentsAreConsistent() {}
 }
