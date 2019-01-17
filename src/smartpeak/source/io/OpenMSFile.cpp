@@ -269,10 +269,10 @@ namespace SmartPeak
         << filename_components_groups << std::endl;
     }
 
-    if (filename_components.empty() || filename_components_groups.empty())
-      throw std::invalid_argument("Name of Feature filter components or Feature filter component groups is missing.");
+    if (filename_components.empty() && filename_components_groups.empty())
+      throw std::invalid_argument("filenames are both empty");
 
-    OpenMS::MRMFeatureQC featureQC;
+    OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureFilter();
     OpenMS::MRMFeatureQCFile featureQCFile;
     if (filename_components.size())
       featureQCFile.load(filename_components, featureQC, false);
@@ -301,7 +301,7 @@ namespace SmartPeak
     if (filename_components.empty() && filename_components_groups.empty())
       throw std::invalid_argument("filenames are both empty");
 
-    OpenMS::MRMFeatureQC featureQC;
+    OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
     OpenMS::MRMFeatureQCFile featureQCFile;
     if (filename_components.size())
       featureQCFile.load(filename_components, featureQC, false);
