@@ -394,80 +394,60 @@ namespace SmartPeak
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
       sequenceSegmentHandler.getStandardsConcentrations();
 
-
     std::set<std::string> names1;
     std::set<std::string> names2;
     std::set<std::string> names3;
     std::set<std::string> names4;
     std::set<std::string> names5;
 
-    for (size_t i = 0; i < transitions.size(); ++i) {
-      names1.insert(transitions[i].getPeptideRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
+    for (const OpenMS::ReactionMonitoringTransition& transition : transitions) {
+      names1.insert(transition.getPeptideRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
     }
 
-    for (size_t i = 0; i < featureFilter.component_qcs.size(); ++i) {
-      names2.insert(featureFilter.component_qcs[i].component_name);
+    for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureFilter.component_qcs) {
+      names2.insert(qc.component_name);
     }
 
-    for (size_t i = 0; i < featureQC.component_qcs.size(); ++i) {
-      names3.insert(featureQC.component_qcs[i].component_name);
+    for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureQC.component_qcs) {
+      names3.insert(qc.component_name);
     }
 
-    for (size_t i = 0; i < quantitation_methods.size(); ++i) {
-      names4.insert(quantitation_methods[i].getComponentName());
+    for (const OpenMS::AbsoluteQuantitationMethod& aqm : quantitation_methods) {
+      names4.insert(aqm.getComponentName());
     }
 
-    for (size_t i = 0; i < standards.size(); ++i) {
-      names5.insert(standards[i].component_name);
+    for (const OpenMS::AbsoluteQuantitationStandards::runConcentration& run : standards) {
+      names5.insert(run.component_name);
     }
 
-    std::set<std::string>::iterator to_remove1 = std::remove_if(
-      names1.begin(),
-      names1.end(),
-      [&names2, &names3, &names4, &names5] (std::string& s) {
-        return names2.count(s) && names3.count(s) && names4.count(s) && names5.count(s);
-      }
-    );
+    std::vector<bool> check_passed(20);
 
-    std::set<std::string>::iterator to_remove2 = std::remove_if(
-      names2.begin(),
-      names2.end(),
-      [&names1, &names3, &names4, &names5] (std::string& s) {
-        return names1.count(s) && names3.count(s) && names4.count(s) && names5.count(s);
-      }
-    );
+    check_passed[0] = validateNamesInFiles(names1, names2, traML_filename, featureFilter_filename);
+    check_passed[1] = validateNamesInFiles(names1, names3, traML_filename, featureQC_filename);
+    check_passed[2] = validateNamesInFiles(names1, names4, traML_filename, quantitationMethods_filename);
+    check_passed[3] = validateNamesInFiles(names1, names5, traML_filename, standardConcentrations_filename);
 
-    std::set<std::string>::iterator to_remove3 = std::remove_if(
-      names3.begin(),
-      names3.end(),
-      [&names1, &names2, &names4, &names5] (std::string& s) {
-        return names1.count(s) && names2.count(s) && names4.count(s) && names5.count(s);
-      }
-    );
+    check_passed[4] = validateNamesInFiles(names2, names1, featureFilter_filename, traML_filename);
+    check_passed[5] = validateNamesInFiles(names2, names3, featureFilter_filename, featureQC_filename);
+    check_passed[6] = validateNamesInFiles(names2, names4, featureFilter_filename, quantitationMethods_filename);
+    check_passed[7] = validateNamesInFiles(names2, names5, featureFilter_filename, standardConcentrations_filename);
 
-    std::set<std::string>::iterator to_remove4 = std::remove_if(
-      names4.begin(),
-      names4.end(),
-      [&names1, &names2, &names3, &names5] (std::string& s) {
-        return names1.count(s) && names2.count(s) && names3.count(s) && names5.count(s);
-      }
-    );
+    check_passed[8] = validateNamesInFiles(names3, names1, featureQC_filename, traML_filename);
+    check_passed[9] = validateNamesInFiles(names3, names2, featureQC_filename, featureFilter_filename);
+    check_passed[10] = validateNamesInFiles(names3, names4, featureQC_filename, quantitationMethods_filename);
+    check_passed[11] = validateNamesInFiles(names3, names5, featureQC_filename, standardConcentrations_filename);
 
-    std::set<std::string>::iterator to_remove5 = std::remove_if(
-      names5.begin(),
-      names5.end(),
-      [&names1, &names2, &names3, &names4] (std::string& s) {
-        return names1.count(s) && names2.count(s) && names3.count(s) && names4.count(s);
-      }
-    );
+    check_passed[12] = validateNamesInFiles(names4, names1, quantitationMethods_filename, traML_filename);
+    check_passed[13] = validateNamesInFiles(names4, names2, quantitationMethods_filename, featureFilter_filename);
+    check_passed[14] = validateNamesInFiles(names4, names3, quantitationMethods_filename, featureQC_filename);
+    check_passed[15] = validateNamesInFiles(names4, names5, quantitationMethods_filename, standardConcentrations_filename);
 
-    names1.erase(to_remove1, names1.end());
-    names2.erase(to_remove2, names2.end());
-    names3.erase(to_remove3, names3.end());
-    names4.erase(to_remove4, names4.end());
-    names5.erase(to_remove5, names5.end());
+    check_passed[16] = validateNamesInFiles(names5, names1, standardConcentrations_filename, traML_filename);
+    check_passed[17] = validateNamesInFiles(names5, names2, standardConcentrations_filename, featureFilter_filename);
+    check_passed[18] = validateNamesInFiles(names5, names3, standardConcentrations_filename, featureQC_filename);
+    check_passed[19] = validateNamesInFiles(names5, names4, standardConcentrations_filename, quantitationMethods_filename);
 
-    return names1.empty() && names2.empty() && names3.empty() && names4.empty() && names5.empty();
+    return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
 
   bool InputDataValidation::componentNameGroupsAreConsistent(
@@ -492,47 +472,30 @@ namespace SmartPeak
     std::set<std::string> names2;
     std::set<std::string> names3;
 
-    for (size_t i = 0; i < transitions.size(); ++i) {
-      names1.insert(transitions[i].getCompoundRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
+    for (const OpenMS::ReactionMonitoringTransition& transition : transitions) {
+      names1.insert(transition.getCompoundRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
     }
 
-    for (size_t i = 0; i < featureFilter.component_group_qcs.size(); ++i) {
-      names2.insert(featureFilter.component_group_qcs[i].component_group_name);
+    for (const OpenMS::MRMFeatureQC::ComponentGroupQCs& qc : featureFilter.component_group_qcs) {
+      names2.insert(qc.component_group_name);
     }
 
-    for (size_t i = 0; i < featureQC.component_group_qcs.size(); ++i) {
-      names3.insert(featureQC.component_group_qcs[i].component_group_name);
+    for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureQC.component_group_qcs) {
+      names3.insert(qc.component_group_name);
     }
 
-    std::set<std::string>::iterator to_remove1 = std::remove_if(
-      names1.begin(),
-      names1.end(),
-      [&names2, &names3] (std::string& s) {
-        return names2.count(s) && names3.count(s);
-      }
-    );
+    std::vector<bool> check_passed(6);
 
-    std::set<std::string>::iterator to_remove2 = std::remove_if(
-      names2.begin(),
-      names2.end(),
-      [&names1, &names3] (std::string& s) {
-        return names1.count(s) && names3.count(s);
-      }
-    );
+    check_passed[0] = validateNamesInFiles(names1, names2, traML_filename, featureFilter_filename);
+    check_passed[1] = validateNamesInFiles(names1, names3, traML_filename, featureQC_filename);
 
-    std::set<std::string>::iterator to_remove3 = std::remove_if(
-      names3.begin(),
-      names3.end(),
-      [&names1, &names2] (std::string& s) {
-        return names1.count(s) && names2.count(s);
-      }
-    );
+    check_passed[2] = validateNamesInFiles(names2, names1, featureFilter_filename, traML_filename);
+    check_passed[3] = validateNamesInFiles(names2, names3, featureFilter_filename, featureQC_filename);
 
-    names1.erase(to_remove1, names1.end());
-    names2.erase(to_remove2, names2.end());
-    names3.erase(to_remove3, names3.end());
+    check_passed[4] = validateNamesInFiles(names3, names1, featureQC_filename, traML_filename);
+    check_passed[5] = validateNamesInFiles(names3, names2, featureQC_filename, featureFilter_filename);
 
-    return names1.empty() && names2.empty() && names3.empty();
+    return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
 
   bool InputDataValidation::heavyComponentsAreConsistent(
@@ -559,46 +522,29 @@ namespace SmartPeak
     std::set<std::string> names4;
     std::set<std::string> names5;
 
-    for (size_t i = 0; i < transitions.size(); ++i) {
-      names1.insert(transitions[i].getPeptideRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
+    for (const OpenMS::ReactionMonitoringTransition& transition : transitions) {
+      names1.insert(transition.getPeptideRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
     }
 
-    for (size_t i = 0; i < quantitation_methods.size(); ++i) {
-      names4.insert(quantitation_methods[i].getComponentName());
+    for (const OpenMS::AbsoluteQuantitationMethod& aqm : quantitation_methods) {
+      names4.insert(aqm.getComponentName());
     }
 
-    for (size_t i = 0; i < standards.size(); ++i) {
-      names5.insert(standards[i].component_name);
+    for (const OpenMS::AbsoluteQuantitationStandards::runConcentration& run : standards) {
+      names5.insert(run.component_name);
     }
 
-    std::set<std::string>::iterator to_remove1 = std::remove_if(
-      names1.begin(),
-      names1.end(),
-      [&names4, &names5] (std::string& s) {
-        return names4.count(s) && names5.count(s);
-      }
-    );
+    std::vector<bool> check_passed(6);
 
-    std::set<std::string>::iterator to_remove4 = std::remove_if(
-      names4.begin(),
-      names4.end(),
-      [&names1, &names5] (std::string& s) {
-        return names1.count(s) && names5.count(s);
-      }
-    );
+    check_passed[2] = validateNamesInFiles(names1, names4, traML_filename, quantitationMethods_filename);
+    check_passed[3] = validateNamesInFiles(names1, names5, traML_filename, standardConcentrations_filename);
 
-    std::set<std::string>::iterator to_remove5 = std::remove_if(
-      names5.begin(),
-      names5.end(),
-      [&names1, &names4] (std::string& s) {
-        return names1.count(s) && names4.count(s);
-      }
-    );
+    check_passed[12] = validateNamesInFiles(names4, names1, quantitationMethods_filename, traML_filename);
+    check_passed[15] = validateNamesInFiles(names4, names5, quantitationMethods_filename, standardConcentrations_filename);
 
-    names1.erase(to_remove1, names1.end());
-    names4.erase(to_remove4, names4.end());
-    names5.erase(to_remove5, names5.end());
+    check_passed[16] = validateNamesInFiles(names5, names1, standardConcentrations_filename, traML_filename);
+    check_passed[19] = validateNamesInFiles(names5, names4, standardConcentrations_filename, quantitationMethods_filename);
 
-    return names1.empty() && names4.empty() && names5.empty();
+    return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
 }
