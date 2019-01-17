@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
 
   MetaDataHandler mdh;
   mdh.sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file
-  mdh.inj_number = 1440119;
+  mdh.inj_number = 1;
   mdh.batch_name = "BloodProject01";
 
   MRMFeatureValidator::validate_MRMFeatures(
@@ -56,9 +56,9 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
     Tr_window
   );
 
-  BOOST_CHECK_CLOSE(validation_metrics.at("accuracy"), 1.0, 1e-3);
+  BOOST_CHECK_CLOSE(validation_metrics.at("accuracy"), 0.987096786, 1e-3);
   BOOST_CHECK_CLOSE(validation_metrics.at("recall"), 1.0, 1e-3);
-  BOOST_CHECK_CLOSE(validation_metrics.at("precision"), 1.0, 1e-3);
+  BOOST_CHECK_CLOSE(validation_metrics.at("precision"), 0.987096786, 1e-3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
