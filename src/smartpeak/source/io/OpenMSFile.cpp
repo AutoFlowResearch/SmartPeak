@@ -330,7 +330,7 @@ namespace SmartPeak
 
     io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(referenceData_csv_i);
 
-    const std::string s_id {"id"};
+    const std::string s_sample_index {"sample_index"};
     const std::string s_original_filename {"original_filename"};
     const std::string s_sample_name {"sample_name"};
     const std::string s_sample_type {"sample_type"};
@@ -350,7 +350,7 @@ namespace SmartPeak
 
     in.read_header(
       io::ignore_extra_column,
-      s_id,
+      s_sample_index,
       s_original_filename,
       s_sample_name,
       s_sample_type,
@@ -369,7 +369,7 @@ namespace SmartPeak
       s_area
     );
 
-    int id;
+    int sample_index;
     std::string original_filename;
     std::string sample_name;
     std::string sample_type;
@@ -390,7 +390,7 @@ namespace SmartPeak
     std::vector<std::map<std::string, Utilities::CastValue>> reference_data;
 
     while (in.read_row(
-      id,
+      sample_index,
       original_filename,
       sample_name,
       sample_type,
@@ -412,7 +412,7 @@ namespace SmartPeak
       if (used == "false")
         continue;
       std::map<std::string, Utilities::CastValue> m;
-      m.emplace(s_id, id);
+      m.emplace(s_sample_index, sample_index);
       m.emplace(s_original_filename, original_filename);
       m.emplace(s_sample_name, sample_name);
       m.emplace(s_sample_type, sample_type);
@@ -431,7 +431,7 @@ namespace SmartPeak
       m.emplace(s_area, area);
       MetaDataHandler mdh;
       mdh.sample_name = sample_name;
-      mdh.inj_number = id;
+      mdh.inj_number = sample_index;
       mdh.batch_name = experiment_id;
       m.emplace("injection_name", mdh.getInjectionName());
       reference_data.push_back(std::move(m));
