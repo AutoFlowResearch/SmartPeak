@@ -73,5 +73,23 @@ public:
       const std::string& quantitationMethods_filename,
       const std::string& standardConcentrations_filename
     );
+
+    static bool validateNamesInFiles(
+      const std::set<std::string>& names1,
+      const std::set<std::string>& names2,
+      const std::string& filename1,
+      const std::string& filename2
+    );
+
+    static std::vector<std::string> findMissingNames(
+      const std::string& names,
+      const std::string& bucket
+    );
+
+    static void logMissingNames(
+      const std::vector<std::string>& missing_names,
+      const std::string& filename1,
+      const std::string& filename2
+    );
   };
 }
