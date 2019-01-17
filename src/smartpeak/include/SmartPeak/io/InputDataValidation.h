@@ -47,5 +47,31 @@ public:
       const std::string& filename,
       const bool verbose
     );
+
+    static bool sampleNamesAreConsistent(
+      const std::string& sequence_filename,
+      const std::string& delimiter,
+      const std::string& standards_filename
+    );
+
+    static bool componentNamesAreConsistent(
+      const std::string& traML_filename,
+      const std::string& featureFilter_filename,
+      const std::string& featureQC_filename,
+      const std::string& quantitationMethods_filename,
+      const std::string& standardConcentrations_filename
+    );
+
+    static bool componentNameGroupsAreConsistent(
+      const std::string& traML_filename,
+      const std::string& featureFilter_filename,
+      const std::string& featureQC_filename
+    );
+
+    static bool heavyComponentsAreConsistent(
+      const std::string& traML_filename,
+      const std::string& quantitationMethods_filename,
+      const std::string& standardConcentrations_filename
+    );
   };
 }

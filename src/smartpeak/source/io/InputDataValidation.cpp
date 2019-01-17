@@ -293,7 +293,7 @@ namespace SmartPeak
     return oss.str();
   }
 
-  bool sampleNamesAreConsistent(
+  bool InputDataValidation::sampleNamesAreConsistent(
     const std::string& sequence_filename,
     const std::string& delimiter,
     const std::string& standards_filename
@@ -303,42 +303,72 @@ namespace SmartPeak
     SequenceSegmentHandler sequenceSegmentHandler;
 
     SequenceParser::readSequenceFile(sequenceHandler, sequence_filename, delimiter, false);
-    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, standards_filename, false);/
+    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, standards_filename, false);
 
     const std::vector<SampleHandler>& samples = sequenceHandler.getSequence();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
       sequenceSegmentHandler.getStandardsConcentrations();
 
-    std::set<std::string> names1(samples.size());
-    std::set<std::string> names2(standards.size());
+    std::set<std::string> names1;
+    std::set<std::string> names2;
 
-    for (size_t i = 0; i < samples.size(); ++i) {
-      names1.insert(samples[i].getMetaData().sample_name);
+    for (const SampleHandler& sample : samples) {
+      names1.insert(sample.getMetaData().sample_name);
     }
 
-    for (size_t i = 0; i < standards.size(); ++i) {
-      names2.insert(standards[i].sample_name);
+    for (const OpenMS::AbsoluteQuantitationStandards::runConcentration& run : standards) {
+      names2.insert(run.sample_name);
     }
 
-    std::set<std::string>::const_iterator to_remove1 = std::remove_if(
-      names1.begin(),
-      names1.end(),
-      [&names2](const std::string& s){ return names2.count(s); }
-    );
+    const bool check_passed1 = validateNamesInFiles(names1, names2, sequence_filename, standards_filename);
+    const bool check_passed2 = validateNamesInFiles(names2, names1, standards_filename, sequence_filename);
 
-    std::set<std::string>::const_iterator to_remove2 = std::remove_if(
-      names2.begin(),
-      names2.end(),
-      [&names1](const std::string& s){ return names1.count(s); }
-    );
-
-    names1.erase(to_remove1, names1.end());
-    names2.erase(to_remove2, names2.end());
-
-    return names1.empty() && names2.empty();
+    return check_passed1 && check_passed2;
   }
 
-  bool componentNamesAreConsistent(
+  bool InputDataValidation::validateNamesInFiles(
+    const std::set<std::string>& names1,
+    const std::set<std::string>& names2,
+    const std::string& filename1,
+    const std::string& filename2
+  )
+  {
+    std::vector<std::string> missing1 = findMissingNames(names1, names2);
+    std::vector<std::string> missing2 = findMissingNames(names2, names1);
+    std::cout << logMissingNames(missing1, filename1, filename2);
+    std::cout << logMissingNames(missing2, filename2, filename1);
+    return missing1.empty() && missing2.empty();
+  }
+
+  std::vector<std::string> InputDataValidation::findMissingNames(
+    const std::string& names,
+    const std::string& bucket
+  )
+  {
+    std::vector<std::string> missing;
+    std::set_difference(names.begin(), names.end(), bucket.begin(), bucket.end(),
+      std::inserter(missing, missing.end()));
+    return missing;
+  }
+
+  void InputDataValidation::logMissingNames(
+    const std::vector<std::string>& missing_names,
+    const std::string& filename1,
+    const std::string& filename2
+  )
+  {
+    std::ostringstream oss;
+    oss << "Names of \"" << filename1 << "\"";
+    oss << "Verifying names of [" << filename1 << "] in [" << filename2 << "]: ";
+    oss << missing.size() << " mismatches.\n";
+    for (size_t i = 0; i < missing.size(); ++i) {
+      oss << "[" << (i + 1) << "] " << missing[i] << "\n";
+    }
+    oss << "\n";
+    return oss.str();
+  }
+
+  bool InputDataValidation::componentNamesAreConsistent(
     const std::string& traML_filename,
     const std::string& featureFilter_filename,
     const std::string& featureQC_filename,
@@ -365,11 +395,11 @@ namespace SmartPeak
       sequenceSegmentHandler.getStandardsConcentrations();
 
 
-    std::set<std::string> names1(transitions.size());
-    std::set<std::string> names2(featureFilter.size());
-    std::set<std::string> names3(featureQC.size());
-    std::set<std::string> names4(quantitation_methods.size());
-    std::set<std::string> names5(standards.size());
+    std::set<std::string> names1;
+    std::set<std::string> names2;
+    std::set<std::string> names3;
+    std::set<std::string> names4;
+    std::set<std::string> names5;
 
     for (size_t i = 0; i < transitions.size(); ++i) {
       names1.insert(transitions[i].getPeptideRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
@@ -391,42 +421,42 @@ namespace SmartPeak
       names5.insert(standards[i].component_name);
     }
 
-    std::set<std::string>::const_iterator to_remove1 = std::remove_if(
+    std::set<std::string>::iterator to_remove1 = std::remove_if(
       names1.begin(),
       names1.end(),
-      [&names2, &names3, &names4, &names5] (const std::string& s) {
+      [&names2, &names3, &names4, &names5] (std::string& s) {
         return names2.count(s) && names3.count(s) && names4.count(s) && names5.count(s);
       }
     );
 
-    std::set<std::string>::const_iterator to_remove2 = std::remove_if(
+    std::set<std::string>::iterator to_remove2 = std::remove_if(
       names2.begin(),
       names2.end(),
-      [&names1, &names3, &names4, &names5] (const std::string& s) {
+      [&names1, &names3, &names4, &names5] (std::string& s) {
         return names1.count(s) && names3.count(s) && names4.count(s) && names5.count(s);
       }
     );
 
-    std::set<std::string>::const_iterator to_remove3 = std::remove_if(
+    std::set<std::string>::iterator to_remove3 = std::remove_if(
       names3.begin(),
       names3.end(),
-      [&names1, &names2, &names4, &names5] (const std::string& s) {
+      [&names1, &names2, &names4, &names5] (std::string& s) {
         return names1.count(s) && names2.count(s) && names4.count(s) && names5.count(s);
       }
     );
 
-    std::set<std::string>::const_iterator to_remove4 = std::remove_if(
+    std::set<std::string>::iterator to_remove4 = std::remove_if(
       names4.begin(),
       names4.end(),
-      [&names1, &names2, &names3, &names5] (const std::string& s) {
+      [&names1, &names2, &names3, &names5] (std::string& s) {
         return names1.count(s) && names2.count(s) && names3.count(s) && names5.count(s);
       }
     );
 
-    std::set<std::string>::const_iterator to_remove5 = std::remove_if(
+    std::set<std::string>::iterator to_remove5 = std::remove_if(
       names5.begin(),
       names5.end(),
-      [&names1, &names2, &names3, &names4] (const std::string& s) {
+      [&names1, &names2, &names3, &names4] (std::string& s) {
         return names1.count(s) && names2.count(s) && names3.count(s) && names4.count(s);
       }
     );
@@ -440,7 +470,7 @@ namespace SmartPeak
     return names1.empty() && names2.empty() && names3.empty() && names4.empty() && names5.empty();
   }
 
-  bool componentNameGroupsAreConsistent(
+  bool InputDataValidation::componentNameGroupsAreConsistent(
     const std::string& traML_filename,
     const std::string& featureFilter_filename,
     const std::string& featureQC_filename
@@ -449,7 +479,7 @@ namespace SmartPeak
     RawDataHandler rawDataHandler;
     SequenceSegmentHandler sequenceSegmentHandler;
 
-    OpenMSFile::loadTraML(rawDataHandler, filename, "csv", false);
+    OpenMSFile::loadTraML(rawDataHandler, traML_filename, "csv", false);
     OpenMSFile::loadFeatureFilter(rawDataHandler, "", featureFilter_filename, false);
     OpenMSFile::loadFeatureQC(rawDataHandler, "", featureQC_filename, false);
 
@@ -458,9 +488,9 @@ namespace SmartPeak
     const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
     const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
 
-    std::set<std::string> names1(transitions.size());
-    std::set<std::string> names2(featureFilter.size());
-    std::set<std::string> names3(featureQC.size());
+    std::set<std::string> names1;
+    std::set<std::string> names2;
+    std::set<std::string> names3;
 
     for (size_t i = 0; i < transitions.size(); ++i) {
       names1.insert(transitions[i].getCompoundRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
@@ -474,26 +504,26 @@ namespace SmartPeak
       names3.insert(featureQC.component_group_qcs[i].component_group_name);
     }
 
-    std::set<std::string>::const_iterator to_remove1 = std::remove_if(
+    std::set<std::string>::iterator to_remove1 = std::remove_if(
       names1.begin(),
       names1.end(),
-      [&names2, &names3] (const std::string& s) {
+      [&names2, &names3] (std::string& s) {
         return names2.count(s) && names3.count(s);
       }
     );
 
-    std::set<std::string>::const_iterator to_remove2 = std::remove_if(
+    std::set<std::string>::iterator to_remove2 = std::remove_if(
       names2.begin(),
       names2.end(),
-      [&names1, &names3] (const std::string& s) {
+      [&names1, &names3] (std::string& s) {
         return names1.count(s) && names3.count(s);
       }
     );
 
-    std::set<std::string>::const_iterator to_remove3 = std::remove_if(
+    std::set<std::string>::iterator to_remove3 = std::remove_if(
       names3.begin(),
       names3.end(),
-      [&names1, &names2] (const std::string& s) {
+      [&names1, &names2] (std::string& s) {
         return names1.count(s) && names2.count(s);
       }
     );
@@ -505,7 +535,7 @@ namespace SmartPeak
     return names1.empty() && names2.empty() && names3.empty();
   }
 
-  bool heavyComponentsAreConsistent(
+  bool InputDataValidation::heavyComponentsAreConsistent(
     const std::string& traML_filename,
     const std::string& quantitationMethods_filename,
     const std::string& standardConcentrations_filename
@@ -525,9 +555,9 @@ namespace SmartPeak
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
       sequenceSegmentHandler.getStandardsConcentrations();
 
-    std::set<std::string> names1(transitions.size());
-    std::set<std::string> names4(quantitation_methods.size());
-    std::set<std::string> names5(standards.size());
+    std::set<std::string> names1;
+    std::set<std::string> names4;
+    std::set<std::string> names5;
 
     for (size_t i = 0; i < transitions.size(); ++i) {
       names1.insert(transitions[i].getPeptideRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
@@ -541,26 +571,26 @@ namespace SmartPeak
       names5.insert(standards[i].component_name);
     }
 
-    std::set<std::string>::const_iterator to_remove1 = std::remove_if(
+    std::set<std::string>::iterator to_remove1 = std::remove_if(
       names1.begin(),
       names1.end(),
-      [&names4, &names5] (const std::string& s) {
+      [&names4, &names5] (std::string& s) {
         return names4.count(s) && names5.count(s);
       }
     );
 
-    std::set<std::string>::const_iterator to_remove4 = std::remove_if(
+    std::set<std::string>::iterator to_remove4 = std::remove_if(
       names4.begin(),
       names4.end(),
-      [&names1, &names5] (const std::string& s) {
+      [&names1, &names5] (std::string& s) {
         return names1.count(s) && names5.count(s);
       }
     );
 
-    std::set<std::string>::const_iterator to_remove5 = std::remove_if(
+    std::set<std::string>::iterator to_remove5 = std::remove_if(
       names5.begin(),
       names5.end(),
-      [&names1, &names4] (const std::string& s) {
+      [&names1, &names4] (std::string& s) {
         return names1.count(s) && names4.count(s);
       }
     );
