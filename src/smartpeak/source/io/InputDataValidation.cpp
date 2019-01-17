@@ -341,8 +341,8 @@ namespace SmartPeak
   }
 
   std::vector<std::string> InputDataValidation::findMissingNames(
-    const std::string& names,
-    const std::string& bucket
+    const std::set<std::string>& names,
+    const std::set<std::string>& bucket
   )
   {
     std::vector<std::string> missing;
@@ -351,7 +351,7 @@ namespace SmartPeak
     return missing;
   }
 
-  void InputDataValidation::logMissingNames(
+  std::string InputDataValidation::logMissingNames(
     const std::vector<std::string>& missing_names,
     const std::string& filename1,
     const std::string& filename2
@@ -360,9 +360,9 @@ namespace SmartPeak
     std::ostringstream oss;
     oss << "Names of \"" << filename1 << "\"";
     oss << "Verifying names of [" << filename1 << "] in [" << filename2 << "]: ";
-    oss << missing.size() << " mismatches.\n";
-    for (size_t i = 0; i < missing.size(); ++i) {
-      oss << "[" << (i + 1) << "] " << missing[i] << "\n";
+    oss << missing_names.size() << " mismatches.\n";
+    for (size_t i = 0; i < missing_names.size(); ++i) {
+      oss << "[" << (i + 1) << "] " << missing_names[i] << "\n";
     }
     oss << "\n";
     return oss.str();
@@ -480,7 +480,7 @@ namespace SmartPeak
       names2.insert(qc.component_group_name);
     }
 
-    for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureQC.component_group_qcs) {
+    for (const OpenMS::MRMFeatureQC::ComponentGroupQCs& qc : featureQC.component_group_qcs) {
       names3.insert(qc.component_group_name);
     }
 
