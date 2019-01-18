@@ -488,37 +488,38 @@ namespace SmartPeak
     const std::string& filename2
   )
   {
-    std::vector<std::string> missing1 = findMissingNames(names1, names2);
-    std::vector<std::string> missing2 = findMissingNames(names2, names1);
+    const std::set<std::string> missing1 = findMissingNames(names1, names2);
+    const std::set<std::string> missing2 = findMissingNames(names2, names1);
     std::cout << logMissingNames(missing1, filename1, filename2);
     std::cout << logMissingNames(missing2, filename2, filename1);
     return missing1.empty() && missing2.empty();
   }
 
-  std::vector<std::string> InputDataValidation::findMissingNames(
+  std::set<std::string> InputDataValidation::findMissingNames(
     const std::set<std::string>& names,
     const std::set<std::string>& bucket
   )
   {
-    std::vector<std::string> missing;
+    std::set<std::string> missing;
     std::set_difference(names.begin(), names.end(), bucket.begin(), bucket.end(),
       std::inserter(missing, missing.end()));
     return missing;
   }
 
   std::string InputDataValidation::logMissingNames(
-    const std::vector<std::string>& missing_names,
+    const std::set<std::string>& missing_names,
     const std::string& filename1,
     const std::string& filename2
   )
   {
     std::ostringstream oss;
-    oss << "\nVERIFYING NAMES\n"
+    oss << "\nComparing names...\n"
       << "      From: " << filename1 << "\n"
       << "        To: " << filename2 << "\n"
       << "Mismatches: " << missing_names.size() << "\n";
-    for (size_t i = 0; i < missing_names.size(); ++i) {
-      oss << "[" << (i + 1) << "] " << missing_names[i] << "\n";
+    size_t i = 1;
+    for (const std::string& name : missing_names) {
+      oss << "[" << i++ << "] " << name << "\n";
     }
     oss << "\n";
     return oss.str();

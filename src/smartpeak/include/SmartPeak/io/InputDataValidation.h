@@ -81,13 +81,13 @@ public:
       const std::string& filename2
     );
 
-    static std::vector<std::string> findMissingNames(
+    static std::set<std::string> findMissingNames(
       const std::set<std::string>& names,
       const std::set<std::string>& bucket
     );
 
     static std::string logMissingNames(
-      const std::vector<std::string>& missing_names,
+      const std::set<std::string>& missing_names,
       const std::string& filename1,
       const std::string& filename2
     );
