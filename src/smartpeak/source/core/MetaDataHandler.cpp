@@ -48,10 +48,10 @@ namespace SmartPeak
     sample_name = sample_name_I;
   }
 
-  std::string& MetaDataHandler::getSampleName()
-  {
-    return sample_name;
-  }
+  // std::string& MetaDataHandler::getSampleName()
+  // {
+  //   return sample_name;
+  // }
 
   std::string MetaDataHandler::getSampleName() const
   {

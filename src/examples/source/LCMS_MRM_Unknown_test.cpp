@@ -3,6 +3,7 @@
 #include <SmartPeak/test_config.h>
 
 #include <SmartPeak/core/LCMS_MRM_Unknown_example.h>
+#include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/io/OpenMSFile.h>
 
@@ -11,13 +12,16 @@ using namespace std;
 
 void test_main_LCMS_MRM_Unknown()
 {
-  example_LCMS_MRM_Unknowns(SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns"), ",");
+  const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns");
+  const Filenames static_filenames = Filenames::getDefaultStaticFilenames(main_dir);
+
+  example_LCMS_MRM_Unknowns(main_dir, static_filenames, ",");
 
   RawDataHandler rawDataHandler;
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x.featureXML")
+    SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_1_BatchName_1900-01-00_000000.featureXML")
   );
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();

@@ -3,6 +3,7 @@ set(directory source/core)
 
 ### list all filenames of the directory here
 set(sources_list
+	Filenames.cpp
 	Helloworld.cpp
 	MetaDataHandler.cpp
 	MRMFeatureValidator.cpp

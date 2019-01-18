@@ -8,7 +8,7 @@ namespace SmartPeak
   void MRMFeatureValidator::validate_MRMFeatures(
     const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data_v,
     const OpenMS::FeatureMap& features,
-    const std::string& sample_name,
+    const std::string& injection_name,
     OpenMS::FeatureMap& output_validated,
     std::map<std::string, float>& validation_metrics,
     const float Tr_window,
@@ -19,16 +19,9 @@ namespace SmartPeak
     std::vector<int> y_pred;
     output_validated.clear(true);
 
-    // TODO: need to add in the experiment_id and acquisition_method_id
-    // to feature or as a parameter
-    // reference_data_dict = {
-    // (d['experiment_id'],d['acquisition_method_id'],
-    // d['quantitation_method_id'],d['sample_name'],d['component_name']):d
-    // for d in reference_data}
-
     std::map<std::string, std::map<std::string, Utilities::CastValue>> reference_data;
     for (const std::map<std::string, Utilities::CastValue>& m : reference_data_v) {
-      if (m.at("sample_name").s_ != sample_name)
+      if (m.at("injection_name").s_ != injection_name)
         continue;
       const std::string& name = m.at("component_name").s_;
       reference_data[name] = m;

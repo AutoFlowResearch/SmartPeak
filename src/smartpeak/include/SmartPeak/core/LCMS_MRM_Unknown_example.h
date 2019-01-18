@@ -6,16 +6,14 @@ using namespace SmartPeak;
 
 void example_LCMS_MRM_Unknowns(
   const std::string& dir_I,
+  const Filenames& static_filenames,
   const std::string& delimiter_I = ",",
   const bool verbose_I = false
 )
 {
   SequenceHandler sequenceHandler;
 
-  sequenceHandler.setDirStatic(dir_I);
-  sequenceHandler.setDirDynamic(dir_I);
-
-  SequenceProcessor::createSequence(sequenceHandler, delimiter_I, true);
+  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true);
 
   const std::vector<std::string> raw_data_processing_methods = {
     "load_raw_data",
@@ -31,27 +29,36 @@ void example_LCMS_MRM_Unknowns(
     // "plot_features"
   };
 
+  std::map<std::string, Filenames> dynamic_filenames;
+  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
+    const std::string& key = sample.getMetaData().getInjectionName();
+    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+      dir_I + "/mzML/",
+      dir_I + "/features/",
+      dir_I + "/features/",
+      sample.getMetaData().getSampleName(),
+      key
+    );
+  }
+
   SequenceProcessor::processSequence(
     sequenceHandler,
+    dynamic_filenames,
     std::vector<std::string>(),
     raw_data_processing_methods,
     verbose_I
   );
 
-  const std::string sequenceSummary_csv_i = dir_I + "/SequenceSummary.csv";
-
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,
-    sequenceSummary_csv_i,
+    static_filenames.sequenceSummary_csv_o,
     {"calculated_concentration"},
     {MetaDataHandler::SampleType::Unknown}
   );
 
-  const std::string featureSummary_csv_i = dir_I + "/FeatureSummary.csv";
-
   SequenceParser::writeDataTableFromMetaValue(
     sequenceHandler,
-    featureSummary_csv_i,
+    static_filenames.featureSummary_csv_o,
     { // TODO: add new matadata values for compatibility with industry reporting standards
       // TODO: add them in all other "example" files calling this method
       "peak_apex_int", "total_width", "width_at_50", "tailing_factor", "asymmetry_factor",

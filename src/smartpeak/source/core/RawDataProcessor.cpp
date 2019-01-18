@@ -1,6 +1,7 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MRMFeatureValidator.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/io/OpenMSFile.h>
@@ -38,7 +39,7 @@ namespace SmartPeak
       rawDataHandler_IO.getSWATH()
     );
 
-    featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
+    featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
 
     rawDataHandler_IO.setFeatureMap(featureMap);
 
@@ -145,7 +146,7 @@ namespace SmartPeak
       throw std::invalid_argument("Both arguments 'select params' and 'schedule params' are empty.");
     }
 
-    output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getSampleName()});
+    output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
 
     rawDataHandler_IO.setFeatureMap(output);
 
@@ -230,8 +231,9 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    if (verbose_I)
-      std::cout << "Validating features" << std::endl;
+    if (verbose_I) {
+      std::cout << "==== START validateFeatures" << std::endl;
+    }
 
     if (MRMRFeatureValidator_params_I.empty()) {
       std::cout << "No parameters passed to validateFeatures(). Not validating." << std::endl;
@@ -244,7 +246,7 @@ namespace SmartPeak
     MRMFeatureValidator::validate_MRMFeatures(
       rawDataHandler_IO.getReferenceData(),
       rawDataHandler_IO.getFeatureMap(),
-      rawDataHandler_IO.getMetaData().getSampleName(),
+      rawDataHandler_IO.getMetaData().getInjectionName(),
       mapped_features,
       validation_metrics,
       std::stof(MRMRFeatureValidator_params_I.front().at("value")), // TODO: While this probably works, it might be nice to add some check that the parameter passed is the desired one
@@ -253,6 +255,10 @@ namespace SmartPeak
 
     rawDataHandler_IO.setFeatureMap(mapped_features);
     rawDataHandler_IO.setValidationMetrics(validation_metrics);
+
+    if (verbose_I) {
+      std::cout << "==== END   validateFeatures" << std::endl;
+    }
   }
 
   void RawDataProcessor::plotFeatures(
@@ -307,7 +313,7 @@ namespace SmartPeak
     RawDataHandler& rawDataHandler_IO,
     const std::string& raw_data_processing_event,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
-    const std::map<std::string, std::string>& filenames,
+    const Filenames& filenames,
     const bool verbose_I
   )
   {
@@ -316,7 +322,7 @@ namespace SmartPeak
       // fileReaderOpenMS.load_SWATHorDIA(rawDataHandler_IO, {})
       OpenMSFile::loadMSExperiment(
         rawDataHandler_IO,
-        filenames.at("mzML_i"),
+        filenames.mzML_i,
         parameters.at("MRMMapping"),
         parameters.at("ChromatogramExtractor"),
         parameters.at("mzML"),
@@ -326,7 +332,7 @@ namespace SmartPeak
     } else if (event == "load_features") {
       OpenMSFile::loadFeatureMap(
         rawDataHandler_IO,
-        filenames.at("featureXML_i"),
+        filenames.featureXML_i,
         verbose_I
       );
     } else if (event == "pick_features") {
@@ -349,7 +355,7 @@ namespace SmartPeak
         verbose_I
       );
     } else if (event == "validate_features") {
-      OpenMSFile::loadValidationData(rawDataHandler_IO, filenames.at("referenceData_csv_i"));
+      OpenMSFile::loadValidationData(rawDataHandler_IO, filenames.referenceData_csv_i);
       validateFeatures(
         rawDataHandler_IO,
         parameters.at("MRMFeatureValidator.validate_MRMFeatures"),
@@ -366,13 +372,13 @@ namespace SmartPeak
     } else if (event == "store_features") {
       OpenMSFile::storeFeatureMap(
         rawDataHandler_IO,
-        filenames.at("featureXML_o"),
+        filenames.featureXML_o,
         verbose_I
       );
     } else if (event == "plot_features") {
       plotFeatures(
         rawDataHandler_IO,
-        filenames.at("features_pdf_o"),
+        filenames.features_pdf_o,
         parameters.at("FeaturePlotter"),
         verbose_I
       );

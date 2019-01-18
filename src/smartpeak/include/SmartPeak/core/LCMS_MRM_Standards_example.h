@@ -6,16 +6,14 @@ using namespace SmartPeak;
 
 void example_LCMS_MRM_Standards(
   const std::string& dir_I,
+  const Filenames& static_filenames,
   const std::string& delimiter_I = ",",
   const bool verbose_I = false
 )
 {
   SequenceHandler sequenceHandler;
 
-  sequenceHandler.setDirStatic(dir_I);
-  sequenceHandler.setDirDynamic(dir_I);
-
-  SequenceProcessor::createSequence(sequenceHandler, delimiter_I);
+  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I);
 
   std::vector<std::string> raw_data_processing_methods = {
     "load_raw_data",
@@ -29,8 +27,21 @@ void example_LCMS_MRM_Standards(
     // # "plot_features"
   };
 
+  std::map<std::string, Filenames> dynamic_filenames1;
+  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
+    const std::string& key = sample.getMetaData().getInjectionName();
+    dynamic_filenames1[key] = Filenames::getDefaultDynamicFilenames(
+      dir_I + "/mzML/",
+      dir_I + "/features/",
+      dir_I + "/features/",
+      sample.getMetaData().getSampleName(),
+      key
+    );
+  }
+
   SequenceProcessor::processSequence(
     sequenceHandler,
+    dynamic_filenames1,
     std::vector<std::string>(),
     raw_data_processing_methods,
     true
@@ -44,8 +55,21 @@ void example_LCMS_MRM_Standards(
   // # "store_components_to_concentrations"
   };
 
+  std::map<std::string, Filenames> dynamic_filenames2;
+  for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
+    const std::string& key = sequence_segment.getSequenceSegmentName();
+    dynamic_filenames2[key] = Filenames::getDefaultDynamicFilenames(
+      dir_I + "/mzML/",
+      dir_I + "/features/",
+      dir_I + "/features/",
+      key,
+      key
+    );
+  }
+
   SequenceProcessor::processSequenceSegments(
     sequenceHandler,
+    dynamic_filenames2,
     std::set<std::string>(),
     sequence_segment_processing_methods,
     true
@@ -58,27 +82,36 @@ void example_LCMS_MRM_Standards(
     // # "plot_features"
   };
 
+  std::map<std::string, Filenames> dynamic_filenames3;
+  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
+    const std::string& key = sample.getMetaData().getInjectionName();
+    dynamic_filenames3[key] = Filenames::getDefaultDynamicFilenames(
+      dir_I + "/mzML/",
+      dir_I + "/features/",
+      dir_I + "/features/",
+      sample.getMetaData().getSampleName(),
+      key
+    );
+  }
+
   SequenceProcessor::processSequence(
     sequenceHandler,
+    dynamic_filenames3,
     std::vector<std::string>(),
     raw_data_processing_methods,
     true
   );
 
-  const std::string sequenceSummary_csv_i = dir_I + "/SequenceSummary.csv";
-
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,
-    sequenceSummary_csv_i,
+    static_filenames.sequenceSummary_csv_o,
     {"calculated_concentration"},
     {MetaDataHandler::SampleType::Standard}
   );
 
-  const std::string featureSummary_csv_i = dir_I + "/FeatureSummary.csv";
-
   SequenceParser::writeDataTableFromMetaValue(
     sequenceHandler,
-    featureSummary_csv_i,
+    static_filenames.featureSummary_csv_o,
     {
       "peak_apex_int", "total_width", "width_at_50", "tailing_factor", "asymmetry_factor",
       "baseline_delta_2_height", "points_across_baseline", "points_across_half_height",

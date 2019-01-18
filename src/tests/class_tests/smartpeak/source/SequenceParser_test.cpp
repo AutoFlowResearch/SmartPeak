@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(data_out.at(0).at("component_name"), "23dpg.23dpg_1.Heavy");
   BOOST_CHECK_EQUAL(data_out.at(0).at("peak_apex_int"), std::to_string(235.0));
   BOOST_CHECK_EQUAL(data_out.at(0).at("logSN"), std::to_string(3.52866193485212));
-  BOOST_CHECK_EQUAL(headers_out.size(), 19);
+  BOOST_CHECK_EQUAL(headers_out.size(), 20);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
@@ -158,9 +158,10 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(headers_out[14], "proc_method_name");
   BOOST_CHECK_EQUAL(headers_out[15], "original_filename");
   BOOST_CHECK_EQUAL(headers_out[16], "acquisition_date_and_time");
+  BOOST_CHECK_EQUAL(headers_out[17], "injection_name");
   // metadata
-  BOOST_CHECK_EQUAL(headers_out[17], "peak_apex_int");
-  BOOST_CHECK_EQUAL(headers_out[18], "logSN");
+  BOOST_CHECK_EQUAL(headers_out[18], "peak_apex_int");
+  BOOST_CHECK_EQUAL(headers_out[19], "logSN");
 
   // write sequence to output
   // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataTableFromMetaValue.csv");

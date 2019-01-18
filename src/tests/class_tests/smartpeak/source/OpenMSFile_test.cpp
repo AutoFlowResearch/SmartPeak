@@ -304,10 +304,10 @@ BOOST_AUTO_TEST_CASE(loadValidationData)
 
 BOOST_AUTO_TEST_CASE(readRawDataProcessingParameters)
 {
-// no tests, it calls FileReader::parseOpenMSParams and OpenMSFile::parseRawDataProcessingParameters
+// no tests, it calls FileReader::parseOpenMSParams and OpenMSFile::sanitizeRawDataProcessorParameters
 }
 
-BOOST_AUTO_TEST_CASE(parseRawDataProcessingParameters)
+BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
 {
   RawDataHandler rawDataHandler;
   std::map<std::string, std::vector<std::map<std::string, std::string>>> params;
@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_CASE(parseRawDataProcessingParameters)
     }
   });
 
-  OpenMSFile::parseRawDataProcessingParameters(rawDataHandler, params);
+  OpenMSFile::sanitizeRawDataProcessorParameters(rawDataHandler, params);
   BOOST_CHECK_EQUAL(params.size(), 14);
   BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);

@@ -3,6 +3,7 @@ set(directory include/SmartPeak/core)
 
 ### list all header files of the directory here
 set(sources_list_h
+	Filenames.h
 	Helloworld.h
 	LCMS_MRM_Standards_example.h
 	LCMS_MRM_Unknown_example.h

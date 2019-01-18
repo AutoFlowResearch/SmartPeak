@@ -22,18 +22,6 @@ public:
 
     void clear();
 
-    void setFilenames(const std::map<std::string, std::string>& filenames);
-    std::map<std::string, std::string>& getFilenames();
-    std::map<std::string, std::string> getFilenames() const;
-
-    void setDirStatic(const std::string& dir_static);
-    std::string& getDirStatic();
-    std::string getDirStatic() const;
-
-    void setDirDynamic(const std::string& dir_dynamic);
-    std::string& getDirDynamic();
-    std::string getDirDynamic() const;
-
     void setSequence(const std::vector<SampleHandler>& sequence);
     std::vector<SampleHandler>& getSequence();
     std::vector<SampleHandler> getSequence() const;
@@ -46,20 +34,13 @@ public:
     std::vector<SampleGroupHandler>& getSampleGroups();
     std::vector<SampleGroupHandler> getSampleGroups() const;
 
-    std::map<std::string, std::string> getDefaultStaticFilenames(const std::string& dir);
-
-    std::map<std::string, std::string> getDefaultDynamicFilenames(
-      const std::string& dir,
-      const std::string& sample_name
-    ) const;
-
     void addSampleToSequence(
       const MetaDataHandler& meta_data_I,
       const OpenMS::FeatureMap& featureMap_I
     );
 
     std::vector<SampleHandler> getSamplesInSequence(
-      const std::vector<std::string>& sample_names
+      const std::vector<std::string>& injection_names
     ) const;
 
     static Utilities::CastValue getMetaValue(
@@ -74,9 +55,5 @@ private:
     std::vector<SampleHandler> sequence_;
     std::vector<SequenceSegmentHandler> sequence_segments_;
     std::vector<SampleGroupHandler> sample_groups_;
-
-    std::string dir_static_;
-    std::string dir_dynamic_;
-    std::map<std::string, std::string> filenames_;
   };
 }

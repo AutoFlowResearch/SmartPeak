@@ -184,7 +184,7 @@ namespace SmartPeak
       "sample_name", "sample_type", "component_group_name", "component_name", "batch_name",
       "rack_number", "plate_number", "pos_number", "inj_number", "dilution_factor", "inj_volume",
       "inj_volume_units", "operator_name", "acq_method_name", "proc_method_name",
-      "original_filename", "acquisition_date_and_time"
+      "original_filename", "acquisition_date_and_time", "injection_name"
     };
     headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
     for (size_t i = 0; i < headers.size() - 1; ++i) { // checking headers are unique, stable (maintaining the same positions)
@@ -236,10 +236,11 @@ namespace SmartPeak
           row.emplace("acquisition_date_and_time", std::to_string(adt.tm_year) +
             "-" + std::to_string(adt.tm_mon) + "-" + std::to_string(adt.tm_mday) +
             " " + std::to_string(adt.tm_hour) + ":" + std::to_string(adt.tm_min) +
-            ":" + std::to_string(adt.tm_sec));
+            ":" + std::to_string(adt.tm_sec)); // TODO: implement some function in Utilities that returns the same representation for this time info, everywhere in the codebase
           row.emplace("inj_volume", std::to_string(mdh.inj_volume));
           row.emplace("inj_volume_units", mdh.inj_volume_units);
           row.emplace("batch_name", mdh.batch_name);
+          row.emplace("injection_name", mdh.getInjectionName());
           for (const std::string& meta_value_name : meta_data) {
             Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
             if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0)

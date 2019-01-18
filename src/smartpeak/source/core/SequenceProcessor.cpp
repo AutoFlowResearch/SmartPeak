@@ -1,6 +1,7 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/OpenMSFile.h>
@@ -10,6 +11,7 @@ namespace SmartPeak
 {
   void SequenceProcessor::createSequence(
     SequenceHandler& sequenceHandler_IO,
+    const Filenames& filenames,
     const std::string& delimiter,
     const bool verbose_I
   )
@@ -18,38 +20,33 @@ namespace SmartPeak
       std::cout << "==== START createSequence()" << std::endl;
     }
 
-    const std::map<std::string, std::string> filenames = sequenceHandler_IO.getFilenames();
     SequenceSegmentHandler sequenceSegmentHandler;
     RawDataHandler rawDataHandler;
 
-    if (filenames.empty()) {
-      std::cout << "No filenames in provided SequenceHandler." << std::endl;
-    } else {
-      SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.at("sequence_csv_i"), delimiter);
+    SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
 
-      OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.at("parameters_csv_i"), delimiter);
+    OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.parameters_csv_i, delimiter);
 
-      OpenMSFile::loadTraML(rawDataHandler, filenames.at("traML_csv_i"), "csv", verbose_I);
+    OpenMSFile::loadTraML(rawDataHandler, filenames.traML_csv_i, "csv", verbose_I);
 
-      OpenMSFile::loadFeatureFilter(
-        rawDataHandler,
-        filenames.at("featureFilterComponents_csv_i"),
-        filenames.at("featureFilterComponentGroups_csv_i"),
-        verbose_I
-      );
+    OpenMSFile::loadFeatureFilter(
+      rawDataHandler,
+      filenames.featureFilterComponents_csv_i,
+      filenames.featureFilterComponentGroups_csv_i,
+      verbose_I
+    );
 
-      OpenMSFile::loadFeatureQC(
-        rawDataHandler,
-        filenames.at("featureQCComponents_csv_i"),
-        filenames.at("featureQCComponentGroups_csv_i"),
-        verbose_I
-      );
+    OpenMSFile::loadFeatureQC(
+      rawDataHandler,
+      filenames.featureQCComponents_csv_i,
+      filenames.featureQCComponentGroups_csv_i,
+      verbose_I
+    );
 
-      OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler, filenames.at("quantitationMethods_csv_i"), verbose_I);
-      OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, filenames.at("standardsConcentrations_csv_i"), verbose_I);
+    OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler, filenames.quantitationMethods_csv_i, verbose_I);
+    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, filenames.standardsConcentrations_csv_i, verbose_I);
 
-      rawDataHandler.setQuantitationMethods(sequenceSegmentHandler.getQuantitationMethods());
-    }
+    rawDataHandler.setQuantitationMethods(sequenceSegmentHandler.getQuantitationMethods());
 
     segmentSamplesInSequence(sequenceHandler_IO, sequenceSegmentHandler);
     addRawDataHandlerToSequence(sequenceHandler_IO, rawDataHandler);
@@ -99,20 +96,26 @@ namespace SmartPeak
 
   void SequenceProcessor::processSequence(
     SequenceHandler& sequenceHandler_IO,
-    const std::vector<std::string>& sample_names_I,
+    const std::map<std::string, Filenames>& filenames,
+    const std::vector<std::string>& injection_names,
     const std::vector<std::string>& raw_data_processing_methods_I,
     const bool verbose_I
   )
   {
     std::vector<SampleHandler> process_sequence;
 
-    if (sample_names_I.empty()) {
+    if (injection_names.empty()) {
       process_sequence = sequenceHandler_IO.getSequence();
     } else {
-      process_sequence = sequenceHandler_IO.getSamplesInSequence(sample_names_I);
+      process_sequence = sequenceHandler_IO.getSamplesInSequence(injection_names);
     }
 
-    for (SampleHandler& sample : process_sequence) {
+    if (filenames.size() != process_sequence.size()) {
+      throw std::invalid_argument("The number of provided filenames locations is not correct.");
+    }
+
+    for (size_t j = 0; j < process_sequence.size(); ++j) {
+      SampleHandler& sample = process_sequence[j];
       std::vector<std::string> raw_data_processing_methods;
 
       if (raw_data_processing_methods_I.size()) {
@@ -134,10 +137,7 @@ namespace SmartPeak
           sample.getRawData(),
           raw_data_processing_methods[i], // event
           sample.getRawData().getParameters(),
-          sequenceHandler_IO.getDefaultDynamicFilenames(
-            sequenceHandler_IO.getDirDynamic(),
-            sample.getMetaData().getSampleName()
-          ),
+          filenames.at(sample.getMetaData().getInjectionName()),
           verbose_I
         );
       }
@@ -148,6 +148,7 @@ namespace SmartPeak
 
   void SequenceProcessor::processSequenceSegments(
     SequenceHandler& sequenceHandler_IO,
+    const std::map<std::string, Filenames>& filenames,
     const std::set<std::string>& sequence_segment_names,
     const std::vector<std::string>& sequence_segment_processing_methods_I,
     const bool verbose_I
@@ -165,7 +166,12 @@ namespace SmartPeak
       }
     }
 
-    for (SequenceSegmentHandler& sequence_segment : sequence_segments) { // for each sequence segment
+    if (filenames.size() != sequence_segments.size()) {
+      throw std::invalid_argument("The number of provided filenames locations is not correct.");
+    }
+
+    for (size_t j = 0; j < sequence_segments.size(); ++j) { // for each sequence segment
+      SequenceSegmentHandler& sequence_segment = sequence_segments[j];
       std::vector<std::string> sequence_segment_processing_methods;
 
       // collect its methods
@@ -192,7 +198,7 @@ namespace SmartPeak
             .at(sequence_segment.getSampleIndices().front())
             .getRawData()
             .getParameters(), // assuming that all parameters are the same for each sample in the sequence segment!
-          sequenceHandler_IO.getDefaultDynamicFilenames(sequenceHandler_IO.getDirDynamic(), sequence_segment.getSequenceSegmentName()),
+          filenames.at(sequence_segment.getSequenceSegmentName()),
           verbose_I
         );
       }

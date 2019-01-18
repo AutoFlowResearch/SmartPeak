@@ -42,18 +42,23 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
   std::map<std::string, float> validation_metrics;
   const float Tr_window = std::stof(params.at("MRMFeatureValidator.validate_MRMFeatures").at(0).at("value"));
 
+  MetaDataHandler mdh;
+  mdh.sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file
+  mdh.inj_number = 1;
+  mdh.batch_name = "BloodProject01";
+
   MRMFeatureValidator::validate_MRMFeatures(
     ref_data,
     featureMap,
-    "150601_0_BloodProject01_PLT_QC_Broth-1", // info taken from .csv file
+    mdh.getInjectionName(),
     output_validated,
     validation_metrics,
     Tr_window
   );
 
-  BOOST_CHECK_CLOSE(validation_metrics.at("accuracy"), 0.98709677419354835, 1e-3);
+  BOOST_CHECK_CLOSE(validation_metrics.at("accuracy"), 0.987096786, 1e-3);
   BOOST_CHECK_CLOSE(validation_metrics.at("recall"), 1.0, 1e-3);
-  BOOST_CHECK_CLOSE(validation_metrics.at("precision"), 0.98709677419354835, 1e-3);
+  BOOST_CHECK_CLOSE(validation_metrics.at("precision"), 0.987096786, 1e-3);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

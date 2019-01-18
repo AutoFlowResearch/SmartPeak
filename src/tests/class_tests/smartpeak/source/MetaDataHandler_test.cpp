@@ -125,7 +125,6 @@ BOOST_AUTO_TEST_CASE(getInjectionName)
   m.setSampleName("SampleName");
   m.inj_number = 14;
   m.batch_name = "BatchName";
-  m.acquisition_date_and_time = {};
   m.acquisition_date_and_time.tm_sec = 55;
   m.acquisition_date_and_time.tm_min = 40;
   m.acquisition_date_and_time.tm_hour = 15;

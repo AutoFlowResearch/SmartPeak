@@ -74,7 +74,7 @@ public:
       const bool verbose = true
     );
 
-    static void parseRawDataProcessingParameters(
+    static void sanitizeRawDataProcessorParameters(
       RawDataHandler& rawDataHandler,
       std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters_file,
       const bool verbose = true

@@ -8,9 +8,10 @@
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureQC.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
 #include <OpenMS/ANALYSIS/MAPMATCHING/TransformationDescription.h>
-#include <SmartPeak/core/RawDataHandler.h>
 
+#include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
+#include <SmartPeak/core/RawDataHandler.h>
 
 #include <map>
 #include <vector>
@@ -75,7 +76,7 @@ public:
       RawDataHandler& rawDataHandler_IO,
       const std::string& raw_data_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
-      const std::map<std::string, std::string>& filenames,
+      const Filenames& filenames,
       const bool verbose_I = false
     );
 
