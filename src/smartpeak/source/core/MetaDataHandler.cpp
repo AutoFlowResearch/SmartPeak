@@ -5,7 +5,7 @@
 
 namespace SmartPeak
 {
-  const char* MetaDataHandler::SampleTypeToString(const SampleType sample_type)
+  std::string MetaDataHandler::SampleTypeToString(const SampleType sample_type)
   {
     switch (sample_type) {
       case SampleType::Unknown:
