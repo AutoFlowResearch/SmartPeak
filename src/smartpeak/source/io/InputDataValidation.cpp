@@ -325,49 +325,6 @@ namespace SmartPeak
     return check_passed;
   }
 
-  bool InputDataValidation::validateNamesInFiles(
-    const std::set<std::string>& names1,
-    const std::set<std::string>& names2,
-    const std::string& filename1,
-    const std::string& filename2
-  )
-  {
-    std::vector<std::string> missing1 = findMissingNames(names1, names2);
-    std::vector<std::string> missing2 = findMissingNames(names2, names1);
-    std::cout << logMissingNames(missing1, filename1, filename2);
-    std::cout << logMissingNames(missing2, filename2, filename1);
-    return missing1.empty() && missing2.empty();
-  }
-
-  std::vector<std::string> InputDataValidation::findMissingNames(
-    const std::set<std::string>& names,
-    const std::set<std::string>& bucket
-  )
-  {
-    std::vector<std::string> missing;
-    std::set_difference(names.begin(), names.end(), bucket.begin(), bucket.end(),
-      std::inserter(missing, missing.end()));
-    return missing;
-  }
-
-  std::string InputDataValidation::logMissingNames(
-    const std::vector<std::string>& missing_names,
-    const std::string& filename1,
-    const std::string& filename2
-  )
-  {
-    std::ostringstream oss;
-    oss << "\nVERIFYING NAMES\n"
-      << "      From: " << filename1 << "\n"
-      << "        To: " << filename2 << "\n"
-      << "Mismatches: " << missing_names.size() << "\n";
-    for (size_t i = 0; i < missing_names.size(); ++i) {
-      oss << "[" << (i + 1) << "] " << missing_names[i] << "\n";
-    }
-    oss << "\n";
-    return oss.str();
-  }
-
   bool InputDataValidation::componentNamesAreConsistent(
     const std::string& traML_filename,
     const std::string& featureFilter_filename,
@@ -522,5 +479,48 @@ namespace SmartPeak
     check_passed[2] = validateNamesInFiles(names2, names3, quantitationMethods_filename, standardConcentrations_filename);
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
+  }
+
+  bool InputDataValidation::validateNamesInFiles(
+    const std::set<std::string>& names1,
+    const std::set<std::string>& names2,
+    const std::string& filename1,
+    const std::string& filename2
+  )
+  {
+    std::vector<std::string> missing1 = findMissingNames(names1, names2);
+    std::vector<std::string> missing2 = findMissingNames(names2, names1);
+    std::cout << logMissingNames(missing1, filename1, filename2);
+    std::cout << logMissingNames(missing2, filename2, filename1);
+    return missing1.empty() && missing2.empty();
+  }
+
+  std::vector<std::string> InputDataValidation::findMissingNames(
+    const std::set<std::string>& names,
+    const std::set<std::string>& bucket
+  )
+  {
+    std::vector<std::string> missing;
+    std::set_difference(names.begin(), names.end(), bucket.begin(), bucket.end(),
+      std::inserter(missing, missing.end()));
+    return missing;
+  }
+
+  std::string InputDataValidation::logMissingNames(
+    const std::vector<std::string>& missing_names,
+    const std::string& filename1,
+    const std::string& filename2
+  )
+  {
+    std::ostringstream oss;
+    oss << "\nVERIFYING NAMES\n"
+      << "      From: " << filename1 << "\n"
+      << "        To: " << filename2 << "\n"
+      << "Mismatches: " << missing_names.size() << "\n";
+    for (size_t i = 0; i < missing_names.size(); ++i) {
+      oss << "[" << (i + 1) << "] " << missing_names[i] << "\n";
+    }
+    oss << "\n";
+    return oss.str();
   }
 }
