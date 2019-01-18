@@ -69,11 +69,11 @@ namespace SmartPeak
 
     std::ostringstream oss;
     oss << "Number of samples in the sequence file: " << sequenceHandler.getSequence().size() << "\n";
-    oss << "Listing injections' names: \n";
+    oss << "Listing injections' name and type: \n";
 
     for (const SampleHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& sample_meta_data = sampleHandler.getMetaData();
-      oss << sample_meta_data.getInjectionName() << '\n';
+      oss << sample_meta_data.getInjectionName() << "\t" << MetaDataHandler::SampleTypeToString(sample_meta_data.sample_type) << "\n";
     }
 
     if (verbose) {
