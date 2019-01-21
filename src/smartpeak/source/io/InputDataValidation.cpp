@@ -125,15 +125,19 @@ namespace SmartPeak
     oss << "Number of transitions: " << transitions.size();
     oss << "Listing transitions' information: \n";
 
-    const std::string delimiter = ", ";
+    const std::string delimiter = "\n";
 
     for (const OpenMS::ReactionMonitoringTransition& t : transitions) {
-      oss << t.getName() << delimiter
-        << t.getNativeID() << delimiter
-        << t.getPeptideRef() << delimiter
-        << t.getCompoundRef() << delimiter
-        << t.getPrecursorMZ() << delimiter
-        << t.getProductMZ();
+      const std::string rt = t.getRetentionTime().isRTset()
+        ? std::to_string(t.getRetentionTime().getRT())
+        : "NA";
+      oss << "Transition:\t" << t.getName() << delimiter
+        << "Native ID:\t" << t.getNativeID() << delimiter
+        << "Peptide Ref:\t" << t.getPeptideRef() << delimiter
+        << "Compound Ref:\t" << t.getCompoundRef() << delimiter
+        << "Precursor MZ:\t" << t.getPrecursorMZ() << delimiter
+        << "Product MZ:\t" << t.getProductMZ() << delimiter
+        << "Transition RT:\t" << rt << "\n\n";
     }
 
     if (verbose) {
@@ -194,7 +198,6 @@ namespace SmartPeak
         << " RT[" << qc.retention_time_l << "," << qc.retention_time_u << "]"
         << " INT[" << qc.intensity_l << "," << qc.intensity_u << "]"
         << " OQ[" << qc.overall_quality_l << "," << qc.overall_quality_u << "]"
-        // TODO: show more info? i.e. the group-related info
         << " and # of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
     }
 
@@ -229,18 +232,25 @@ namespace SmartPeak
 
     oss << "Listing quantitation methods' information: \n";
 
-    const std::string delimiter = ", ";
+    const std::string delimiter = "\n";
 
     for (const OpenMS::AbsoluteQuantitationMethod& qm : quantitation_methods) {
-      oss << qm.getComponentName() << delimiter
-        << qm.getFeatureName() << delimiter
-        << qm.getISName() << delimiter
-        << "LOD[" << qm.getLLOD() << "," << qm.getULOD() << delimiter
-        << "LOQ[" << qm.getLLOQ() << "," << qm.getULOQ() << delimiter
-        << "#points[" << qm.getNPoints() << "]" << delimiter
-        << "corr_coeff[" << qm.getCorrelationCoefficient() << "]" << delimiter
-        << "conc_units[" << qm.getConcentrationUnits() << "]" << delimiter
-        << "transf_model[" << qm.getTransformationModel() << "]\n";
+      oss << "Component name:\t" << qm.getComponentName() << delimiter
+        << "Feature name:\t" << qm.getFeatureName() << delimiter
+        << "IS name:\t"      << qm.getISName() << delimiter
+        << "LOD:\t["         << qm.getLLOD() << ", " << qm.getULOD() << "]" << delimiter
+        << "LOQ:\t["         << qm.getLLOQ() << ", " << qm.getULOQ() << "]" << delimiter
+        << "N. points:\t"    << qm.getNPoints() << delimiter
+        << "Corr. coeff.:\t"   << qm.getCorrelationCoefficient() << delimiter
+        << "Conc. units:\t"   << qm.getConcentrationUnits() << delimiter
+        << "Transf. model:\t" << qm.getTransformationModel() << delimiter;
+      if (qm.getTransformationModelParams().size()) {
+        oss << "Transf. model params:\n";
+        for (const OpenMS::Param::ParamEntry& param : qm.getTransformationModelParams()) {
+          oss << "  " << param.name << ":\t" << param.value << "\n";
+        }
+      }
+      oss << "\n";
     }
 
     if (verbose) {
