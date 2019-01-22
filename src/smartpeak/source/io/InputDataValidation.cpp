@@ -8,6 +8,7 @@
 #include <SmartPeak/io/SequenceParser.h>
 #include <fstream>
 #include <string>
+#include <unordered_map>
 
 namespace SmartPeak
 {
@@ -121,6 +122,14 @@ namespace SmartPeak
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
 
+    const std::vector<OpenMS::TargetedExperiment::Peptide>& peptides =
+      rawDataHandler.getTargetedExperiment().getPeptides();
+
+    std::unordered_map<std::string, double> rts;
+    for (const OpenMS::TargetedExperiment::Peptide& peptide : peptides) {
+      rts[peptide.id] = peptide.hasRetentionTime() ? peptide.getRetentionTime() : -1.0;
+    }
+
     std::ostringstream oss;
     oss << "Number of transitions: " << transitions.size();
     oss << "Listing transitions' information: \n";
@@ -128,16 +137,13 @@ namespace SmartPeak
     const std::string delimiter = "\n";
 
     for (const OpenMS::ReactionMonitoringTransition& t : transitions) {
-      const std::string rt = t.getRetentionTime().isRTset()
-        ? std::to_string(t.getRetentionTime().getRT())
-        : "NA";
       oss << "Transition:\t" << t.getName() << delimiter
         << "Native ID:\t" << t.getNativeID() << delimiter
         << "Peptide Ref:\t" << t.getPeptideRef() << delimiter
         << "Compound Ref:\t" << t.getCompoundRef() << delimiter
         << "Precursor MZ:\t" << t.getPrecursorMZ() << delimiter
         << "Product MZ:\t" << t.getProductMZ() << delimiter
-        << "Transition RT:\t" << rt << "\n\n";
+        << "Transition RT:\t" << rts.at(t.getPeptideRef()) << "\n\n";
     }
 
     if (verbose) {
