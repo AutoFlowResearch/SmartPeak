@@ -52,7 +52,7 @@ namespace SmartPeak
       std::cerr << "loadStandardsConcentrations(): " << e.what() << std::endl;
     }
 
-    std::cout << InputDataValidation::getStandardsConcentrationsInfo(sequenceSegmentHandler_IO, verbose);
+    std::cout << InputDataValidation::getStandardsConcentrationsInfo(sequenceSegmentHandler_IO);
 
     if (verbose) {
       std::cout << "==== END   loadStandardsConcentrations" << std::endl;
@@ -82,7 +82,7 @@ namespace SmartPeak
       std::cerr << "loadQuantitationMethods(): " << e.what() << std::endl;
     }
 
-    std::cout << InputDataValidation::getQuantitationMethodsInfo(sequenceSegmentHandler_IO, verbose);
+    std::cout << InputDataValidation::getQuantitationMethodsInfo(sequenceSegmentHandler_IO);
 
     if (verbose) {
       std::cout << "==== END   loadQuantitationMethods" << std::endl;
@@ -119,7 +119,7 @@ namespace SmartPeak
 
     rawDataHandler.setTargetedExperiment(targeted_exp);
 
-    std::cout << InputDataValidation::getTraMLInfo(rawDataHandler, verbose);
+    std::cout << InputDataValidation::getTraMLInfo(rawDataHandler);
 
     if (verbose) {
       std::cout << "==== END   loadTraML" << std::endl;
@@ -287,7 +287,7 @@ namespace SmartPeak
       featureQCFile.load(filename_components_groups, featureQC, true);
     rawDataHandler.setFeatureFilter(featureQC);
 
-    std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler, true, verbose);
+    std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler, true);
 
     if (verbose) {
       std::cout << "==== END   loadFeatureFilter" << std::endl;
@@ -318,7 +318,7 @@ namespace SmartPeak
       featureQCFile.load(filename_components_groups, featureQC, true);
     rawDataHandler.setFeatureQC(featureQC);
 
-    std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler, false, verbose);
+    std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler, false);
 
     if (verbose) {
       std::cout << "==== END   loadFeatureQC" << std::endl;

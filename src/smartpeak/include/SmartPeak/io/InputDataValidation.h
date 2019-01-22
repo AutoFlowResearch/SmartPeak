@@ -20,34 +20,28 @@ public:
 
     static std::string getSequenceInfo(
       const SequenceHandler& sequenceHandler,
-      const std::string& delimiter,
-      const bool verbose
+      const std::string& delimiter
     );
 
     static std::string getParametersInfo(
-      const std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters,
-      const bool verbose
+      const std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters
     );
 
     static std::string getTraMLInfo(
-      const RawDataHandler& rawDataHandler,
-      const bool verbose
+      const RawDataHandler& rawDataHandler
     );
 
     static std::string getComponentsAndGroupsInfo(
       const RawDataHandler& rawDataHandler,
-      const bool is_feature_filter, // else is feature qc
-      const bool verbose
+      const bool is_feature_filter // else is feature qc
     );
 
     static std::string getQuantitationMethodsInfo(
-      const SequenceSegmentHandler& sequenceSegmentHandler,
-      const bool verbose
+      const SequenceSegmentHandler& sequenceSegmentHandler
     );
 
     static std::string getStandardsConcentrationsInfo(
-      const SequenceSegmentHandler& sequenceSegmentHandler,
-      const bool verbose
+      const SequenceSegmentHandler& sequenceSegmentHandler
     );
 
     static bool sampleNamesAreConsistent(

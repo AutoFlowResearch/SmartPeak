@@ -57,14 +57,9 @@ namespace SmartPeak
 
   std::string InputDataValidation::getSequenceInfo(
     const SequenceHandler& sequenceHandler,
-    const std::string& delimiter,
-    const bool verbose
+    const std::string& delimiter
   )
   {
-    if (verbose) {
-      std::cout << "==== START getSequenceInfo" << std::endl;
-    }
-
     std::ostringstream oss;
     oss << "Number of samples in the sequence file: " << sequenceHandler.getSequence().size() << "\n";
     oss << "Listing injections' name and type: \n";
@@ -74,46 +69,28 @@ namespace SmartPeak
       oss << sample_meta_data.getInjectionName() << "\t" << MetaDataHandler::SampleTypeToString(sample_meta_data.sample_type) << "\n";
     }
 
-    if (verbose) {
-      std::cout << "==== END   getSequenceInfo" << std::endl;
-    }
-
     return oss.str();
   }
 
   std::string InputDataValidation::getParametersInfo(
-    const std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters,
-    const bool verbose
+    const std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters
   )
   {
-    if (verbose) {
-      std::cout << "==== START getParametersInfo" << std::endl;
-    }
-
     std::ostringstream oss;
-    oss << "Number of functions affected by the parameters: " << parameters.size();
+    oss << "Number of functions affected by the parameters: " << parameters.size() << "\n";
     oss << "Listing the functions' names and number of parameters: \n";
 
     for (const std::pair<std::string,std::vector<std::map<std::string,std::string>>>& p : parameters) {
       oss << p.first << ": " << p.second.size() << "\n";
     }
 
-    if (verbose) {
-      std::cout << "==== END   getParametersInfo" << std::endl;
-    }
-
     return oss.str();
   }
 
   std::string InputDataValidation::getTraMLInfo(
-    const RawDataHandler& rawDataHandler,
-    const bool verbose
+    const RawDataHandler& rawDataHandler
   )
   {
-    if (verbose) {
-      std::cout << "==== START getTraMLInfo" << std::endl;
-    }
-
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
 
@@ -132,17 +109,16 @@ namespace SmartPeak
     const std::string delimiter = "\n";
 
     for (const OpenMS::ReactionMonitoringTransition& t : transitions) {
+      const std::string rt = rts.count(t.getPeptideRef())
+        ? std::to_string(rts[t.getPeptideRef()])
+        : "Peptide not found";
       oss << "Transition:\t" << t.getName() << delimiter
         << "Native ID:\t" << t.getNativeID() << delimiter
         << "Peptide Ref:\t" << t.getPeptideRef() << delimiter
         << "Compound Ref:\t" << t.getCompoundRef() << delimiter
         << "Precursor MZ:\t" << t.getPrecursorMZ() << delimiter
         << "Product MZ:\t" << t.getProductMZ() << delimiter
-        << "Transition RT:\t" << rts.at(t.getPeptideRef()) << "\n\n";
-    }
-
-    if (verbose) {
-      std::cout << "==== END   getTraMLInfo" << std::endl;
+        << "Transition RT:\t" << rt << "\n\n";
     }
 
     return oss.str();
@@ -150,56 +126,42 @@ namespace SmartPeak
 
   std::string InputDataValidation::getComponentsAndGroupsInfo(
     const RawDataHandler& rawDataHandler,
-    const bool is_feature_filter, // else is feature qc
-    const bool verbose
+    const bool is_feature_filter // else is feature qc
   )
   {
-    if (verbose) {
-      std::cout << "==== START getComponentsAndGroupsInfo" << std::endl;
-    }
-
     const OpenMS::MRMFeatureQC& featureQC = is_feature_filter
       ? rawDataHandler.getFeatureFilter()
       : rawDataHandler.getFeatureQC();
 
     std::ostringstream oss;
-    oss << "Number of ComponentQCs: " << featureQC.component_qcs.size();
-    oss << "Number of ComponentGroupQCs: " << featureQC.component_group_qcs.size();
+    oss << "Number of ComponentQCs: " << featureQC.component_qcs.size() << "\n";
+    oss << "Number of ComponentGroupQCs: " << featureQC.component_group_qcs.size() << "\n";
 
-    oss << "Listing ComponentQCs' information: \n";
+    oss << "Listing ComponentQCs' information:\n";
     for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureQC.component_qcs) {
       oss << qc.component_name
-        << " RT[" << qc.retention_time_l << "," << qc.retention_time_u << "]"
-        << " INT[" << qc.intensity_l << "," << qc.intensity_u << "]"
-        << " OQ[" << qc.overall_quality_l << "," << qc.overall_quality_u << "]"
-        << " and # of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
+        << "\tRT[" << qc.retention_time_l << ", " << qc.retention_time_u << "]"
+        << "\tINT[" << qc.intensity_l << ", " << qc.intensity_u << "]"
+        << "\tOQ[" << qc.overall_quality_l << ", " << qc.overall_quality_u << "]"
+        << "\tn. of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
     }
 
-    oss << "Listing ComponentGroupQCs' information: \n";
+    oss << "Listing ComponentGroupQCs' information:\n";
     for (const OpenMS::MRMFeatureQC::ComponentGroupQCs& qc : featureQC.component_group_qcs) {
       oss << qc.component_group_name
-        << " RT[" << qc.retention_time_l << "," << qc.retention_time_u << "]"
-        << " INT[" << qc.intensity_l << "," << qc.intensity_u << "]"
-        << " OQ[" << qc.overall_quality_l << "," << qc.overall_quality_u << "]"
-        << " and # of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
-    }
-
-    if (verbose) {
-      std::cout << "==== END   getComponentsAndGroupsInfo" << std::endl;
+        << "\tRT[" << qc.retention_time_l << ", " << qc.retention_time_u << "]"
+        << "\tINT[" << qc.intensity_l << ", " << qc.intensity_u << "]"
+        << "\tOQ[" << qc.overall_quality_l << ", " << qc.overall_quality_u << "]"
+        << "\tn. of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
     }
 
     return oss.str();
   }
 
   std::string InputDataValidation::getQuantitationMethodsInfo(
-    const SequenceSegmentHandler& sequenceSegmentHandler,
-    const bool verbose
+    const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    if (verbose) {
-      std::cout << "==== START getQuantitationMethodsInfo" << std::endl;
-    }
-
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
       sequenceSegmentHandler.getQuantitationMethods();
 
@@ -229,22 +191,13 @@ namespace SmartPeak
       oss << "\n";
     }
 
-    if (verbose) {
-      std::cout << "==== END   getQuantitationMethodsInfo" << std::endl;
-    }
-
     return oss.str();
   }
 
   std::string InputDataValidation::getStandardsConcentrationsInfo(
-    const SequenceSegmentHandler& sequenceSegmentHandler,
-    const bool verbose
+    const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    if (verbose) {
-      std::cout << "==== START getStandardsConcentrationsInfo" << std::endl;
-    }
-
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
       sequenceSegmentHandler.getStandardsConcentrations();
 
@@ -263,10 +216,6 @@ namespace SmartPeak
         << conc.IS_actual_concentration << delimiter
         << conc.concentration_units << delimiter
         << conc.dilution_factor << '\n';
-    }
-
-    if (verbose) {
-      std::cout << "==== END   getStandardsConcentrationsInfo" << std::endl;
     }
 
     return oss.str();
