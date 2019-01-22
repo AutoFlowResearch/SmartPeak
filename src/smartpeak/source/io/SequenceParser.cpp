@@ -7,6 +7,7 @@
 #endif
 #include <SmartPeak/io/csv.h>
 #include <SmartPeak/io/CSVWriter.h>
+#include <SmartPeak/io/InputDataValidation.h>
 #include <ctime>
 
 namespace SmartPeak
@@ -166,6 +167,8 @@ namespace SmartPeak
       t_sample_type.clear();
       ++row_number;
     }
+
+    std::cout << InputDataValidation::getSequenceInfo(sequenceHandler, delimiter, verbose);
 
     if (verbose) {
       std::cout << "==== END   readSequenceFile()" << std::endl;

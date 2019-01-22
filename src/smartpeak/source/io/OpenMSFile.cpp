@@ -5,6 +5,7 @@
 #include <OpenMS/FORMAT/ChromeleonFile.h>
 #include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/OpenMSFile.h>
 #include <vector>
 #include <OpenMS/FORMAT/AbsoluteQuantitationStandardsFile.h>
@@ -51,6 +52,8 @@ namespace SmartPeak
       std::cerr << "loadStandardsConcentrations(): " << e.what() << std::endl;
     }
 
+    std::cout << InputDataValidation::getStandardsConcentrationsInfo(sequenceSegmentHandler_IO, verbose);
+
     if (verbose) {
       std::cout << "==== END   loadStandardsConcentrations" << std::endl;
     }
@@ -78,6 +81,8 @@ namespace SmartPeak
     } catch (const std::exception& e) {
       std::cerr << "loadQuantitationMethods(): " << e.what() << std::endl;
     }
+
+    std::cout << InputDataValidation::getQuantitationMethodsInfo(sequenceSegmentHandler_IO, verbose);
 
     if (verbose) {
       std::cout << "==== END   loadQuantitationMethods" << std::endl;
@@ -113,6 +118,8 @@ namespace SmartPeak
     }
 
     rawDataHandler.setTargetedExperiment(targeted_exp);
+
+    std::cout << InputDataValidation::getTraMLInfo(rawDataHandler, verbose);
 
     if (verbose) {
       std::cout << "==== END   loadTraML" << std::endl;
@@ -280,6 +287,8 @@ namespace SmartPeak
       featureQCFile.load(filename_components_groups, featureQC, true);
     rawDataHandler.setFeatureFilter(featureQC);
 
+    std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler, true, verbose);
+
     if (verbose) {
       std::cout << "==== END   loadFeatureFilter" << std::endl;
     }
@@ -308,6 +317,8 @@ namespace SmartPeak
     if (filename_components_groups.size())
       featureQCFile.load(filename_components_groups, featureQC, true);
     rawDataHandler.setFeatureQC(featureQC);
+
+    std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler, false, verbose);
 
     if (verbose) {
       std::cout << "==== END   loadFeatureQC" << std::endl;

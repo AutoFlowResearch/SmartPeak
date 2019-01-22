@@ -5,6 +5,7 @@
 #define CSV_IO_NO_THREAD
 #endif
 #include <SmartPeak/io/csv.h>
+#include <SmartPeak/io/InputDataValidation.h>
 
 namespace SmartPeak
 {
@@ -80,5 +81,7 @@ namespace SmartPeak
         parameters.emplace(function, std::vector<std::map<std::string,std::string>>());
       parameters[function].push_back(m);
     }
+
+    std::cout << InputDataValidation::getParametersInfo(parameters, false);
   }
 }
