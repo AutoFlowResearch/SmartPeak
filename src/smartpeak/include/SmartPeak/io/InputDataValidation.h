@@ -19,32 +19,34 @@ public:
     static void validateFilenames(const Filenames& filenames);
 
     static std::string getSequenceInfo(
-      const std::string& filename,
+      const SequenceHandler& sequenceHandler,
       const std::string& delimiter,
       const bool verbose
     );
 
-    static std::string getParametersInfo(const std::string& filename, const bool verbose);
+    static std::string getParametersInfo(
+      const std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters,
+      const bool verbose
+    );
 
     static std::string getTraMLInfo(
-      const std::string& filename,
+      const RawDataHandler& rawDataHandler,
       const bool verbose
     );
 
     static std::string getComponentsAndGroupsInfo(
-      const std::string& filename_components,
-      const std::string& filename_components_groups,
+      const RawDataHandler& rawDataHandler,
       const bool is_feature_filter, // else is feature qc
       const bool verbose
     );
 
     static std::string getQuantitationMethodsInfo(
-      const std::string& filename,
+      const SequenceSegmentHandler& sequenceSegmentHandler,
       const bool verbose
     );
 
     static std::string getStandardsConcentrationsInfo(
-      const std::string& filename,
+      const SequenceSegmentHandler& sequenceSegmentHandler,
       const bool verbose
     );
 

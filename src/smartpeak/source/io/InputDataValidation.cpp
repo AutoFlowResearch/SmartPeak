@@ -56,7 +56,7 @@ namespace SmartPeak
   }
 
   std::string InputDataValidation::getSequenceInfo(
-    const std::string& filename,
+    const SequenceHandler& sequenceHandler,
     const std::string& delimiter,
     const bool verbose
   )
@@ -64,9 +64,6 @@ namespace SmartPeak
     if (verbose) {
       std::cout << "==== START getSequenceInfo" << std::endl;
     }
-
-    SequenceHandler sequenceHandler;
-    SequenceParser::readSequenceFile(sequenceHandler, filename, delimiter, verbose);
 
     std::ostringstream oss;
     oss << "Number of samples in the sequence file: " << sequenceHandler.getSequence().size() << "\n";
@@ -84,14 +81,14 @@ namespace SmartPeak
     return oss.str();
   }
 
-  std::string InputDataValidation::getParametersInfo(const std::string& filename, const bool verbose)
+  std::string InputDataValidation::getParametersInfo(
+    const std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters,
+    const bool verbose
+  )
   {
     if (verbose) {
       std::cout << "==== START getParametersInfo" << std::endl;
     }
-
-    std::map<std::string,std::vector<std::map<std::string,std::string>>> parameters;
-    FileReader::parseOpenMSParams(filename, parameters);
 
     std::ostringstream oss;
     oss << "Number of functions affected by the parameters: " << parameters.size();
@@ -109,7 +106,7 @@ namespace SmartPeak
   }
 
   std::string InputDataValidation::getTraMLInfo(
-    const std::string& filename,
+    const RawDataHandler& rawDataHandler,
     const bool verbose
   )
   {
@@ -117,8 +114,6 @@ namespace SmartPeak
       std::cout << "==== START getTraMLInfo" << std::endl;
     }
 
-    RawDataHandler rawDataHandler;
-    OpenMSFile::loadTraML(rawDataHandler, filename, "csv", verbose);
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
 
@@ -154,31 +149,13 @@ namespace SmartPeak
   }
 
   std::string InputDataValidation::getComponentsAndGroupsInfo(
-    const std::string& filename_components,
-    const std::string& filename_components_groups,
+    const RawDataHandler& rawDataHandler,
     const bool is_feature_filter, // else is feature qc
     const bool verbose
   )
   {
     if (verbose) {
       std::cout << "==== START getComponentsAndGroupsInfo" << std::endl;
-    }
-
-    RawDataHandler rawDataHandler;
-    if (is_feature_filter) {
-      OpenMSFile::loadFeatureFilter(
-        rawDataHandler,
-        filename_components,
-        filename_components_groups,
-        verbose
-      );
-    } else {
-      OpenMSFile::loadFeatureQC(
-        rawDataHandler,
-        filename_components,
-        filename_components_groups,
-        verbose
-      );
     }
 
     const OpenMS::MRMFeatureQC& featureQC = is_feature_filter
@@ -215,20 +192,13 @@ namespace SmartPeak
   }
 
   std::string InputDataValidation::getQuantitationMethodsInfo(
-    const std::string& filename,
+    const SequenceSegmentHandler& sequenceSegmentHandler,
     const bool verbose
   )
   {
     if (verbose) {
       std::cout << "==== START getQuantitationMethodsInfo" << std::endl;
     }
-
-    SequenceSegmentHandler sequenceSegmentHandler;
-    OpenMSFile::loadQuantitationMethods(
-      sequenceSegmentHandler,
-      filename,
-      verbose
-    );
 
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
       sequenceSegmentHandler.getQuantitationMethods();
@@ -267,20 +237,13 @@ namespace SmartPeak
   }
 
   std::string InputDataValidation::getStandardsConcentrationsInfo(
-    const std::string& filename,
+    const SequenceSegmentHandler& sequenceSegmentHandler,
     const bool verbose
   )
   {
     if (verbose) {
       std::cout << "==== START getStandardsConcentrationsInfo" << std::endl;
     }
-
-    SequenceSegmentHandler sequenceSegmentHandler;
-    OpenMSFile::loadStandardsConcentrations(
-      sequenceSegmentHandler,
-      filename,
-      verbose
-    );
 
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
       sequenceSegmentHandler.getStandardsConcentrations();
