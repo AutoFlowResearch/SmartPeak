@@ -109,12 +109,13 @@ namespace SmartPeak
     const std::string delimiter = "\n";
 
     for (const OpenMS::ReactionMonitoringTransition& t : transitions) {
-      const std::string rt = rts.count(t.getPeptideRef())
-        ? std::to_string(rts[t.getPeptideRef()])
+      const std::string peptide_ref = t.getPeptideRef();
+      const std::string rt = rts.count(peptide_ref)
+        ? std::to_string(rts[peptide_ref])
         : "Peptide not found";
       oss << "Transition:\t" << t.getName() << delimiter
         << "Native ID:\t" << t.getNativeID() << delimiter
-        << "Peptide Ref:\t" << t.getPeptideRef() << delimiter
+        << "Peptide Ref:\t" << peptide_ref << delimiter
         << "Compound Ref:\t" << t.getCompoundRef() << delimiter
         << "Precursor MZ:\t" << t.getPrecursorMZ() << delimiter
         << "Product MZ:\t" << t.getProductMZ() << delimiter
@@ -202,7 +203,7 @@ namespace SmartPeak
       sequenceSegmentHandler.getStandardsConcentrations();
 
     std::ostringstream oss;
-    oss << "Number of standards concentrations: " << standards.size();
+    oss << "Number of standards concentrations: " << standards.size() << "\n";
 
     oss << "Listing standards concentrations' information: \n";
 
