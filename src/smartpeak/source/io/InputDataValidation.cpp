@@ -222,17 +222,10 @@ namespace SmartPeak
   }
 
   bool InputDataValidation::sampleNamesAreConsistent(
-    const std::string& sequence_filename,
-    const std::string& delimiter,
-    const std::string& standards_filename
+    const SequenceHandler& sequenceHandler,
+    const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    SequenceHandler sequenceHandler;
-    SequenceSegmentHandler sequenceSegmentHandler;
-
-    SequenceParser::readSequenceFile(sequenceHandler, sequence_filename, delimiter, false);
-    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, standards_filename, false);
-
     const std::vector<SampleHandler>& samples = sequenceHandler.getSequence();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
       sequenceSegmentHandler.getStandardsConcentrations();
@@ -248,28 +241,16 @@ namespace SmartPeak
       names2.insert(run.sample_name);
     }
 
-    const bool check_passed = validateNamesInFiles(names1, names2, sequence_filename, standards_filename);
+    const bool check_passed = validateNamesInStructures(names1, names2, "SEQUENCE", "STANDARDS");
 
     return check_passed;
   }
 
   bool InputDataValidation::componentNamesAreConsistent(
-    const std::string& traML_filename,
-    const std::string& featureFilter_filename,
-    const std::string& featureQC_filename,
-    const std::string& quantitationMethods_filename,
-    const std::string& standardConcentrations_filename
+    const RawDataHandler& rawDataHandler,
+    const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    RawDataHandler rawDataHandler;
-    SequenceSegmentHandler sequenceSegmentHandler;
-
-    OpenMSFile::loadTraML(rawDataHandler, traML_filename, "csv", false);
-    OpenMSFile::loadFeatureFilter(rawDataHandler, featureFilter_filename, "", false);
-    OpenMSFile::loadFeatureQC(rawDataHandler, featureQC_filename, "", false);
-    OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler, quantitationMethods_filename, false);
-    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, standardConcentrations_filename, false);
-
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
     const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
@@ -307,33 +288,25 @@ namespace SmartPeak
 
     std::vector<bool> check_passed(10);
 
-    check_passed[0] = validateNamesInFiles(names1, names2, traML_filename, featureFilter_filename);
-    check_passed[1] = validateNamesInFiles(names1, names3, traML_filename, featureQC_filename);
-    check_passed[2] = validateNamesInFiles(names1, names4, traML_filename, quantitationMethods_filename);
-    check_passed[3] = validateNamesInFiles(names1, names5, traML_filename, standardConcentrations_filename);
-    check_passed[4] = validateNamesInFiles(names2, names3, featureFilter_filename, featureQC_filename);
-    check_passed[5] = validateNamesInFiles(names2, names4, featureFilter_filename, quantitationMethods_filename);
-    check_passed[6] = validateNamesInFiles(names2, names5, featureFilter_filename, standardConcentrations_filename);
-    check_passed[7] = validateNamesInFiles(names3, names4, featureQC_filename, quantitationMethods_filename);
-    check_passed[8] = validateNamesInFiles(names3, names5, featureQC_filename, standardConcentrations_filename);
-    check_passed[9] = validateNamesInFiles(names4, names5, quantitationMethods_filename, standardConcentrations_filename);
+    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER");
+    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC");
+    check_passed[2] = validateNamesInStructures(names1, names4, "TRAML", "QUANTITATIONMETHODS");
+    check_passed[3] = validateNamesInStructures(names1, names5, "TRAML", "STANDARDS");
+    check_passed[4] = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
+    check_passed[5] = validateNamesInStructures(names2, names4, "FEATUREFILTER", "QUANTITATIONMETHODS");
+    check_passed[6] = validateNamesInStructures(names2, names5, "FEATUREFILTER", "STANDARDS");
+    check_passed[7] = validateNamesInStructures(names3, names4, "FEATUREQC", "QUANTITATIONMETHODS");
+    check_passed[8] = validateNamesInStructures(names3, names5, "FEATUREQC", "STANDARDS");
+    check_passed[9] = validateNamesInStructures(names4, names5, "QUANTITATIONMETHODS", "STANDARDS");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
 
   bool InputDataValidation::componentNameGroupsAreConsistent(
-    const std::string& traML_filename,
-    const std::string& featureFilter_filename,
-    const std::string& featureQC_filename
+    const RawDataHandler& rawDataHandler,
+    const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    RawDataHandler rawDataHandler;
-    SequenceSegmentHandler sequenceSegmentHandler;
-
-    OpenMSFile::loadTraML(rawDataHandler, traML_filename, "csv", false);
-    OpenMSFile::loadFeatureFilter(rawDataHandler, "", featureFilter_filename, false);
-    OpenMSFile::loadFeatureQC(rawDataHandler, "", featureQC_filename, false);
-
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
     const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
@@ -357,26 +330,18 @@ namespace SmartPeak
 
     std::vector<bool> check_passed(3);
 
-    check_passed[0] = validateNamesInFiles(names1, names2, traML_filename, featureFilter_filename);
-    check_passed[1] = validateNamesInFiles(names1, names3, traML_filename, featureQC_filename);
-    check_passed[2] = validateNamesInFiles(names2, names3, featureFilter_filename, featureQC_filename);
+    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER");
+    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC");
+    check_passed[2] = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
 
   bool InputDataValidation::heavyComponentsAreConsistent(
-    const std::string& traML_filename,
-    const std::string& quantitationMethods_filename,
-    const std::string& standardConcentrations_filename
+    const RawDataHandler& rawDataHandler,
+    const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    RawDataHandler rawDataHandler;
-    SequenceSegmentHandler sequenceSegmentHandler;
-
-    OpenMSFile::loadTraML(rawDataHandler, traML_filename, "csv", false);
-    OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler, quantitationMethods_filename, false);
-    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, standardConcentrations_filename, false);
-
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
@@ -402,24 +367,24 @@ namespace SmartPeak
 
     std::vector<bool> check_passed(3);
 
-    check_passed[0] = validateNamesInFiles(names1, names2, traML_filename, quantitationMethods_filename);
-    check_passed[1] = validateNamesInFiles(names1, names3, traML_filename, standardConcentrations_filename);
-    check_passed[2] = validateNamesInFiles(names2, names3, quantitationMethods_filename, standardConcentrations_filename);
+    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "QUANTITATIONMETHODS");
+    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "STANDARDS");
+    check_passed[2] = validateNamesInStructures(names2, names3, "QUANTITATIONMETHODS", "STANDARDS");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
 
-  bool InputDataValidation::validateNamesInFiles(
+  bool InputDataValidation::validateNamesInStructures(
     const std::set<std::string>& names1,
     const std::set<std::string>& names2,
-    const std::string& filename1,
-    const std::string& filename2
+    const std::string& structure_ref1,
+    const std::string& structure_ref2
   )
   {
     const std::set<std::string> missing1 = findMissingNames(names1, names2);
     const std::set<std::string> missing2 = findMissingNames(names2, names1);
-    std::cout << logMissingNames(missing1, filename1, filename2);
-    std::cout << logMissingNames(missing2, filename2, filename1);
+    std::cout << logMissingNames(missing1, structure_ref1, structure_ref2);
+    std::cout << logMissingNames(missing2, structure_ref2, structure_ref1);
     return missing1.empty() && missing2.empty();
   }
 
@@ -436,14 +401,14 @@ namespace SmartPeak
 
   std::string InputDataValidation::logMissingNames(
     const std::set<std::string>& missing_names,
-    const std::string& filename1,
-    const std::string& filename2
+    const std::string& structure_ref1,
+    const std::string& structure_ref2
   )
   {
     std::ostringstream oss;
     oss << "\nComparing names...\n"
-      << "      From: " << filename1 << "\n"
-      << "        To: " << filename2 << "\n"
+      << "      From: " << structure_ref1 << "\n"
+      << "        To: " << structure_ref2 << "\n"
       << "Mismatches: " << missing_names.size() << "\n";
     size_t i = 1;
     for (const std::string& name : missing_names) {

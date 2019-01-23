@@ -45,36 +45,30 @@ public:
     );
 
     static bool sampleNamesAreConsistent(
-      const std::string& sequence_filename,
-      const std::string& delimiter,
-      const std::string& standards_filename
+      const SequenceHandler& sequenceHandler,
+      const SequenceSegmentHandler& sequenceSegmentHandler
     );
 
     static bool componentNamesAreConsistent(
-      const std::string& traML_filename,
-      const std::string& featureFilter_filename,
-      const std::string& featureQC_filename,
-      const std::string& quantitationMethods_filename,
-      const std::string& standardConcentrations_filename
+      const RawDataHandler& rawDataHandler,
+      const SequenceSegmentHandler& sequenceSegmentHandler
     );
 
     static bool componentNameGroupsAreConsistent(
-      const std::string& traML_filename,
-      const std::string& featureFilter_filename,
-      const std::string& featureQC_filename
+      const RawDataHandler& rawDataHandler,
+      const SequenceSegmentHandler& sequenceSegmentHandler
     );
 
     static bool heavyComponentsAreConsistent(
-      const std::string& traML_filename,
-      const std::string& quantitationMethods_filename,
-      const std::string& standardConcentrations_filename
+      const RawDataHandler& rawDataHandler,
+      const SequenceSegmentHandler& sequenceSegmentHandler
     );
 
-    static bool validateNamesInFiles(
+    static bool validateNamesInStructures(
       const std::set<std::string>& names1,
       const std::set<std::string>& names2,
-      const std::string& filename1,
-      const std::string& filename2
+      const std::string& structure_ref1,
+      const std::string& structure_ref2
     );
 
     static std::set<std::string> findMissingNames(
@@ -84,8 +78,8 @@ public:
 
     static std::string logMissingNames(
       const std::set<std::string>& missing_names,
-      const std::string& filename1,
-      const std::string& filename2
+      const std::string& structure_ref1,
+      const std::string& structure_ref2
     );
   };
 }
