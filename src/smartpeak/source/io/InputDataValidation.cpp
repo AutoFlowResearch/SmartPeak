@@ -91,25 +91,25 @@ namespace SmartPeak
     const RawDataHandler& rawDataHandler
   )
   {
-    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
+    const std::vector<OpenMS::ReactionMonitoringTransition> transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
 
-    const std::vector<OpenMS::TargetedExperiment::Peptide>& peptides =
+    const std::vector<OpenMS::TargetedExperiment::Peptide> peptides =
       rawDataHandler.getTargetedExperiment().getPeptides();
+
+    std::ostringstream oss;
+    oss << "Number of transitions: " << transitions.size() << "\n";
+    oss << "Listing transitions' information:\n";
 
     std::unordered_map<std::string, double> rts;
     for (const OpenMS::TargetedExperiment::Peptide& peptide : peptides) {
-      rts[peptide.id] = peptide.hasRetentionTime() ? peptide.getRetentionTime() : -1.0;
+      rts[peptide.id] = peptide.getRetentionTime();
     }
-
-    std::ostringstream oss;
-    oss << "Number of transitions: " << transitions.size();
-    oss << "Listing transitions' information: \n";
 
     const std::string delimiter = "\n";
 
     for (const OpenMS::ReactionMonitoringTransition& t : transitions) {
-      const std::string peptide_ref = t.getPeptideRef();
+      const std::string& peptide_ref = t.getPeptideRef();
       const std::string rt = rts.count(peptide_ref)
         ? std::to_string(rts[peptide_ref])
         : "Peptide not found";
@@ -252,13 +252,13 @@ namespace SmartPeak
     const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
+    const std::vector<OpenMS::ReactionMonitoringTransition> transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
-    const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
-    const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
-    const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
+    const OpenMS::MRMFeatureQC featureFilter = rawDataHandler.getFeatureFilter();
+    const OpenMS::MRMFeatureQC featureQC = rawDataHandler.getFeatureQC();
+    const std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods =
       sequenceSegmentHandler.getQuantitationMethods();
-    const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
+    const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards =
       sequenceSegmentHandler.getStandardsConcentrations();
 
     std::set<std::string> names1;
@@ -308,10 +308,10 @@ namespace SmartPeak
     const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
+    const std::vector<OpenMS::ReactionMonitoringTransition> transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
-    const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
-    const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
+    const OpenMS::MRMFeatureQC featureFilter = rawDataHandler.getFeatureFilter();
+    const OpenMS::MRMFeatureQC featureQC = rawDataHandler.getFeatureQC();
 
     std::set<std::string> names1;
     std::set<std::string> names2;
@@ -343,11 +343,11 @@ namespace SmartPeak
     const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
+    const std::vector<OpenMS::ReactionMonitoringTransition> transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
-    const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
+    const std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods =
       sequenceSegmentHandler.getQuantitationMethods();
-    const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
+    const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards =
       sequenceSegmentHandler.getStandardsConcentrations();
 
     std::set<std::string> names1;
