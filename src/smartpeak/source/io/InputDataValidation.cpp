@@ -384,8 +384,12 @@ namespace SmartPeak
   {
     const std::set<std::string> missing1 = findMissingNames(names1, names2);
     const std::set<std::string> missing2 = findMissingNames(names2, names1);
-    std::cout << logMissingNames(missing1, structure_ref1, structure_ref2);
-    std::cout << logMissingNames(missing2, structure_ref2, structure_ref1);
+    if (missing1.size()) {
+      std::cout << logMissingNames(missing1, structure_ref1, structure_ref2);
+    }
+    if (missing2.size()) {
+      std::cout << logMissingNames(missing2, structure_ref2, structure_ref1);
+    }
     return missing1.empty() && missing2.empty();
   }
 
