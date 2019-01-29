@@ -168,7 +168,7 @@ namespace SmartPeak
       ++row_number;
     }
 
-    std::cout << InputDataValidation::getSequenceInfo(sequenceHandler, delimiter);
+    // std::cout << InputDataValidation::getSequenceInfo(sequenceHandler, delimiter);
 
     if (verbose) {
       std::cout << "==== END   readSequenceFile()" << std::endl;

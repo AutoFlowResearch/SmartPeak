@@ -82,6 +82,6 @@ namespace SmartPeak
       parameters[function].push_back(m);
     }
 
-    std::cout << InputDataValidation::getParametersInfo(parameters);
+    // std::cout << InputDataValidation::getParametersInfo(parameters);
   }
 }
