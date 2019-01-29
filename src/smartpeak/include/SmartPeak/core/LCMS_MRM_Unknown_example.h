@@ -59,12 +59,12 @@ void example_LCMS_MRM_Unknowns(
   SequenceParser::writeDataTableFromMetaValue(
     sequenceHandler,
     static_filenames.featureSummary_csv_o,
-    { // TODO: add new matadata values for compatibility with industry reporting standards
-      // TODO: add them in all other "example" files calling this method
-      "peak_apex_int", "total_width", "width_at_50", "tailing_factor", "asymmetry_factor",
-      "baseline_delta_2_height", "points_across_baseline", "points_across_half_height",
-      "logSN", "calculated_concentration", "QC_transition_message", "QC_transition_pass",
-      "QC_transition_score", "QC_transition_group_message", "QC_transition_group_score"
+    {
+      "peak_apex_int", "total_width", "width_at_50", "tailing_factor",
+      "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
+      "points_across_half_height", "logSN", "calculated_concentration",
+      "QC_transition_message", "QC_transition_pass", "QC_transition_score",
+      "QC_transition_group_message", "QC_transition_group_score"
     },
     {MetaDataHandler::SampleType::Unknown}
   );
