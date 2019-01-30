@@ -91,10 +91,10 @@ namespace SmartPeak
     const RawDataHandler& rawDataHandler
   )
   {
-    const std::vector<OpenMS::ReactionMonitoringTransition> transitions =
+    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
 
-    const std::vector<OpenMS::TargetedExperiment::Peptide> peptides =
+    const std::vector<OpenMS::TargetedExperiment::Peptide>& peptides =
       rawDataHandler.getTargetedExperiment().getPeptides();
 
     std::ostringstream oss;
@@ -252,13 +252,13 @@ namespace SmartPeak
     const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    const std::vector<OpenMS::ReactionMonitoringTransition> transitions =
+    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
-    const OpenMS::MRMFeatureQC featureFilter = rawDataHandler.getFeatureFilter();
-    const OpenMS::MRMFeatureQC featureQC = rawDataHandler.getFeatureQC();
-    const std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods =
+    const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
+    const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
+    const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
       sequenceSegmentHandler.getQuantitationMethods();
-    const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards =
+    const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
       sequenceSegmentHandler.getStandardsConcentrations();
 
     std::set<std::string> names1;
@@ -308,10 +308,10 @@ namespace SmartPeak
     const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    const std::vector<OpenMS::ReactionMonitoringTransition> transitions =
+    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
-    const OpenMS::MRMFeatureQC featureFilter = rawDataHandler.getFeatureFilter();
-    const OpenMS::MRMFeatureQC featureQC = rawDataHandler.getFeatureQC();
+    const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
+    const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
 
     std::set<std::string> names1;
     std::set<std::string> names2;
@@ -343,11 +343,11 @@ namespace SmartPeak
     const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    const std::vector<OpenMS::ReactionMonitoringTransition> transitions =
+    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
-    const std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods =
+    const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
       sequenceSegmentHandler.getQuantitationMethods();
-    const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards =
+    const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
       sequenceSegmentHandler.getStandardsConcentrations();
 
     std::set<std::string> names1;
