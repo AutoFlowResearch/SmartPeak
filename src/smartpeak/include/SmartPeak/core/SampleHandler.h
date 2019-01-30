@@ -22,12 +22,12 @@ public:
     void setMetaData(const MetaDataHandler& meta_data);
 
     MetaDataHandler& getMetaData();
-    MetaDataHandler getMetaData() const;
+    const MetaDataHandler& getMetaData() const;
 
     void setRawData(const RawDataHandler& raw_data);
 
     RawDataHandler& getRawData();
-    RawDataHandler getRawData() const;
+    const RawDataHandler& getRawData() const;
 
 private:
     MetaDataHandler meta_data_;

@@ -31,13 +31,13 @@ BOOST_AUTO_TEST_CASE(set_get_SampleGroupName)
 
   sg.setSampleGroupName(foo);
 
-  const string name1 = sg.getSampleGroupName(); // testing copy getter
+  const string& name1 = sg.getSampleGroupName(); // testing const getter
   BOOST_CHECK_EQUAL(name1, foo);
 
   const string bar {"bar"};
   sg.getSampleGroupName() = bar;
 
-  string& name2 = sg.getSampleGroupName(); // testing reference getter
+  string& name2 = sg.getSampleGroupName(); // testing non-const getter
   BOOST_CHECK_EQUAL(name2, bar);
 }
 
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(set_get_SampleIndices)
 
   sg.setSampleIndices(si1);
 
-  const vector<size_t> si2 = sg.getSampleIndices(); // testing copy getter
+  const vector<size_t>& si2 = sg.getSampleIndices(); // testing const getter
   BOOST_CHECK_EQUAL(si2.size(), 3);
   BOOST_CHECK_EQUAL(si2[0], 1);
   BOOST_CHECK_EQUAL(si2[1], 3);
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(set_get_SampleIndices)
 
   sg.getSampleIndices()[1] = 2;
 
-  const vector<size_t>& si3 = sg.getSampleIndices(); // testing reference getter
+  const vector<size_t>& si3 = sg.getSampleIndices(); // testing non-const getter
   BOOST_CHECK_EQUAL(si3.size(), 3);
   BOOST_CHECK_EQUAL(si3[1], 2);
 }

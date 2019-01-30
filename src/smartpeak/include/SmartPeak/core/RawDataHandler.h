@@ -26,60 +26,60 @@ public:
 
     void setFeatureMap(const OpenMS::FeatureMap& feature_map);
     OpenMS::FeatureMap& getFeatureMap();
-    OpenMS::FeatureMap getFeatureMap() const;
+    const OpenMS::FeatureMap& getFeatureMap() const;
 
     void setMetaData(const MetaDataHandler& meta_data);
     MetaDataHandler& getMetaData();
-    MetaDataHandler getMetaData() const;
+    const MetaDataHandler& getMetaData() const;
 
     void setParameters(
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters);
     std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters();
-    std::map<std::string, std::vector<std::map<std::string, std::string>>> getParameters() const;
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters() const;
 
     void setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_exp);
     OpenMS::TargetedExperiment& getTargetedExperiment();
-    OpenMS::TargetedExperiment getTargetedExperiment() const;
+    const OpenMS::TargetedExperiment& getTargetedExperiment() const;
 
     void setReferenceData(const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data);
     std::vector<std::map<std::string, Utilities::CastValue>>& getReferenceData();
-    std::vector<std::map<std::string, Utilities::CastValue>> getReferenceData() const;
+    const std::vector<std::map<std::string, Utilities::CastValue>>& getReferenceData() const;
 
     void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods);
     std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods();
-    std::vector<OpenMS::AbsoluteQuantitationMethod> getQuantitationMethods() const;
+    const std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods() const;
 
     void setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter);
     OpenMS::MRMFeatureQC& getFeatureFilter();
-    OpenMS::MRMFeatureQC getFeatureFilter() const;
+    const OpenMS::MRMFeatureQC& getFeatureFilter() const;
 
     void setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc);
     OpenMS::MRMFeatureQC& getFeatureQC();
-    OpenMS::MRMFeatureQC getFeatureQC() const;
+    const OpenMS::MRMFeatureQC& getFeatureQC() const;
 
     void setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps);
     std::vector<OpenMS::FeatureMap>& getFeatureMapHistory();
-    std::vector<OpenMS::FeatureMap> getFeatureMapHistory() const;
+    const std::vector<OpenMS::FeatureMap>& getFeatureMapHistory() const;
 
     void setExperiment(const OpenMS::MSExperiment& experiment);
     OpenMS::MSExperiment& getExperiment();
-    OpenMS::MSExperiment getExperiment() const;
+    const OpenMS::MSExperiment& getExperiment() const;
 
     void setChromatogramMap(const OpenMS::MSExperiment& chromatogram_map);
     OpenMS::MSExperiment& getChromatogramMap();
-    OpenMS::MSExperiment getChromatogramMap() const;
+    const OpenMS::MSExperiment& getChromatogramMap() const;
 
     void setTransformationDescription(const OpenMS::TransformationDescription& trafo);
     OpenMS::TransformationDescription& getTransformationDescription();
-    OpenMS::TransformationDescription getTransformationDescription() const;
+    const OpenMS::TransformationDescription& getTransformationDescription() const;
 
     void setSWATH(const OpenMS::MSExperiment& swath);
     OpenMS::MSExperiment& getSWATH();
-    OpenMS::MSExperiment getSWATH() const;
+    const OpenMS::MSExperiment& getSWATH() const;
 
     void setValidationMetrics(const std::map<std::string, float>& validation_metrics);
     std::map<std::string, float>& getValidationMetrics();
-    std::map<std::string, float> getValidationMetrics() const;
+    const std::map<std::string, float>& getValidationMetrics() const;
 
     void clear();
 

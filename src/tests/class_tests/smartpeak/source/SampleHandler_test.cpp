@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(set_get_MetaData)
 
   sampleHandler.setMetaData(mdh1);
 
-  const MetaDataHandler mdh2 = sampleHandler.getMetaData();
+  const MetaDataHandler& mdh2 = sampleHandler.getMetaData();
   BOOST_CHECK_EQUAL(mdh2.getSampleName(), "1");
 
   mdh1.setSampleGroupName("2");
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(set_get_RawData)
 
   sampleHandler.setRawData(rdh1);
 
-  const RawDataHandler rdh2 = sampleHandler.getRawData();
+  const RawDataHandler& rdh2 = sampleHandler.getRawData();
   BOOST_CHECK_EQUAL(rdh2.getFeatureMap().getIdentifier(), "1");
 
   f1.setIdentifier("2");
