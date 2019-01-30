@@ -5,6 +5,7 @@
 #include <OpenMS/FORMAT/ChromeleonFile.h>
 #include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/OpenMSFile.h>
 #include <vector>
 #include <OpenMS/FORMAT/AbsoluteQuantitationStandardsFile.h>
@@ -51,6 +52,8 @@ namespace SmartPeak
       std::cerr << "loadStandardsConcentrations(): " << e.what() << std::endl;
     }
 
+    // std::cout << InputDataValidation::getStandardsConcentrationsInfo(sequenceSegmentHandler_IO);
+
     if (verbose) {
       std::cout << "==== END   loadStandardsConcentrations" << std::endl;
     }
@@ -78,6 +81,8 @@ namespace SmartPeak
     } catch (const std::exception& e) {
       std::cerr << "loadQuantitationMethods(): " << e.what() << std::endl;
     }
+
+    // std::cout << InputDataValidation::getQuantitationMethodsInfo(sequenceSegmentHandler_IO);
 
     if (verbose) {
       std::cout << "==== END   loadQuantitationMethods" << std::endl;
@@ -113,6 +118,8 @@ namespace SmartPeak
     }
 
     rawDataHandler.setTargetedExperiment(targeted_exp);
+
+    // std::cout << InputDataValidation::getTraMLInfo(rawDataHandler);
 
     if (verbose) {
       std::cout << "==== END   loadTraML" << std::endl;
@@ -269,16 +276,18 @@ namespace SmartPeak
         << filename_components_groups << std::endl;
     }
 
-    if (filename_components.empty() || filename_components_groups.empty())
-      throw std::invalid_argument("Name of Feature filter components or Feature filter component groups is missing.");
+    if (filename_components.empty() && filename_components_groups.empty())
+      throw std::invalid_argument("filenames are both empty");
 
-    OpenMS::MRMFeatureQC featureQC;
+    OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureFilter();
     OpenMS::MRMFeatureQCFile featureQCFile;
     if (filename_components.size())
       featureQCFile.load(filename_components, featureQC, false);
     if (filename_components_groups.size())
       featureQCFile.load(filename_components_groups, featureQC, true);
     rawDataHandler.setFeatureFilter(featureQC);
+
+    // std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler, true);
 
     if (verbose) {
       std::cout << "==== END   loadFeatureFilter" << std::endl;
@@ -301,13 +310,15 @@ namespace SmartPeak
     if (filename_components.empty() && filename_components_groups.empty())
       throw std::invalid_argument("filenames are both empty");
 
-    OpenMS::MRMFeatureQC featureQC;
+    OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
     OpenMS::MRMFeatureQCFile featureQCFile;
     if (filename_components.size())
       featureQCFile.load(filename_components, featureQC, false);
     if (filename_components_groups.size())
       featureQCFile.load(filename_components_groups, featureQC, true);
     rawDataHandler.setFeatureQC(featureQC);
+
+    // std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler, false);
 
     if (verbose) {
       std::cout << "==== END   loadFeatureQC" << std::endl;
@@ -447,7 +458,6 @@ namespace SmartPeak
   void OpenMSFile::readRawDataProcessingParameters(
     RawDataHandler& rawDataHandler,
     const std::string& filename,
-    const std::string& delimiter,
     const bool verbose
   )
   {

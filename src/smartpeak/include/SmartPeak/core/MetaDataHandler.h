@@ -29,7 +29,7 @@ public:
       Unrecognized
     };
 
-    static const char* SampleTypeToString(const SampleType sample_type); // TODO: doesn't return a string, fix name or return type
+    static std::string SampleTypeToString(const SampleType sample_type);
     static SampleType stringToSampleType(const std::string& sample_type);
 
     /*

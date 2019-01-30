@@ -4,6 +4,7 @@
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/OpenMSFile.h>
 #include <SmartPeak/io/SequenceParser.h>
 
@@ -25,7 +26,7 @@ namespace SmartPeak
 
     SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
 
-    OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.parameters_csv_i, delimiter);
+    OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.parameters_csv_i);
 
     OpenMSFile::loadTraML(rawDataHandler, filenames.traML_csv_i, "csv", verbose_I);
 
@@ -50,6 +51,11 @@ namespace SmartPeak
 
     segmentSamplesInSequence(sequenceHandler_IO, sequenceSegmentHandler);
     addRawDataHandlerToSequence(sequenceHandler_IO, rawDataHandler);
+
+    InputDataValidation::sampleNamesAreConsistent(sequenceHandler_IO, sequenceSegmentHandler);
+    InputDataValidation::componentNamesAreConsistent(rawDataHandler, sequenceSegmentHandler);
+    InputDataValidation::componentNameGroupsAreConsistent(rawDataHandler, sequenceSegmentHandler);
+    InputDataValidation::heavyComponentsAreConsistent(rawDataHandler, sequenceSegmentHandler);
 
     if (verbose_I) {
       std::cout << "==== END   createSequence()" << std::endl;
@@ -83,8 +89,7 @@ namespace SmartPeak
       sequence_segments_dict.at(sequence_segment_name).push_back(i);
     }
 
-    std::vector<SequenceSegmentHandler>& sequence_segments = sequenceHandler_IO.getSequenceSegments();
-    sequence_segments.clear();
+    std::vector<SequenceSegmentHandler> sequence_segments;
 
     for (const std::pair<std::string, std::vector<size_t>>& kv : sequence_segments_dict) {
       SequenceSegmentHandler sequenceSegmentHandler = sequenceSegmentHandler_I;
@@ -92,6 +97,8 @@ namespace SmartPeak
       sequenceSegmentHandler.setSampleIndices(kv.second);
       sequence_segments.push_back(sequenceSegmentHandler);
     }
+
+    sequenceHandler_IO.setSequenceSegments(sequence_segments);
   }
 
   void SequenceProcessor::processSequence(

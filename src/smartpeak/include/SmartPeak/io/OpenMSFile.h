@@ -70,7 +70,6 @@ public:
     static void readRawDataProcessingParameters(
       RawDataHandler& rawDataHandler,
       const std::string& filename,
-      const std::string& delimiter = ",",
       const bool verbose = true
     );
 
