@@ -28,7 +28,7 @@ namespace SmartPeak
     return sequence_;
   }
 
-  std::vector<SampleHandler> SequenceHandler::getSequence() const
+  const std::vector<SampleHandler>& SequenceHandler::getSequence() const
   {
     return sequence_;
   }
@@ -43,7 +43,7 @@ namespace SmartPeak
     return sequence_segments_;
   }
 
-  std::vector<SequenceSegmentHandler> SequenceHandler::getSequenceSegments() const
+  const std::vector<SequenceSegmentHandler>& SequenceHandler::getSequenceSegments() const
   {
     return sequence_segments_;
   }
@@ -58,7 +58,7 @@ namespace SmartPeak
     return sample_groups_;
   }
 
-  std::vector<SampleGroupHandler> SequenceHandler::getSampleGroups() const
+  const std::vector<SampleGroupHandler>& SequenceHandler::getSampleGroups() const
   {
     return sample_groups_;
   }

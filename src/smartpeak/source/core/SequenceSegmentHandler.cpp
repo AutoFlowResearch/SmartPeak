@@ -23,7 +23,7 @@ namespace SmartPeak
     return sequence_segment_name_;
   }
 
-  std::string SequenceSegmentHandler::getSequenceSegmentName() const
+  const std::string& SequenceSegmentHandler::getSequenceSegmentName() const
   {
     return sequence_segment_name_;
   }
@@ -38,7 +38,7 @@ namespace SmartPeak
     return sample_indices_;
   }
 
-  std::vector<size_t> SequenceSegmentHandler::getSampleIndices() const
+  const std::vector<size_t>& SequenceSegmentHandler::getSampleIndices() const
   {
     return sample_indices_;
   }
@@ -53,7 +53,7 @@ namespace SmartPeak
     return standards_concentrations_;
   }
 
-  std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> SequenceSegmentHandler::getStandardsConcentrations() const
+  const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& SequenceSegmentHandler::getStandardsConcentrations() const
   {
     return standards_concentrations_;
   }
@@ -68,7 +68,7 @@ namespace SmartPeak
     return quantitation_methods_;
   }
 
-  std::vector<OpenMS::AbsoluteQuantitationMethod> SequenceSegmentHandler::getQuantitationMethods() const
+  const std::vector<OpenMS::AbsoluteQuantitationMethod>& SequenceSegmentHandler::getQuantitationMethods() const
   {
     return quantitation_methods_;
   }
@@ -86,7 +86,7 @@ namespace SmartPeak
     return components_to_concentrations_;
   }
 
-  std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>
+  const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
   SequenceSegmentHandler::getComponentsToConcentrations() const
   {
     return components_to_concentrations_;

@@ -14,7 +14,7 @@ namespace SmartPeak
     return sample_group_name_;
   }
 
-  std::string SampleGroupHandler::getSampleGroupName() const
+  const std::string& SampleGroupHandler::getSampleGroupName() const
   {
     return sample_group_name_;
   }
@@ -29,7 +29,7 @@ namespace SmartPeak
     return sample_indices_;
   }
 
-  std::vector<size_t> SampleGroupHandler::getSampleIndices() const
+  const std::vector<size_t>& SampleGroupHandler::getSampleIndices() const
   {
     return sample_indices_;
   }

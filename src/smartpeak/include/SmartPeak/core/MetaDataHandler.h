@@ -42,24 +42,24 @@ public:
     */
 
     void setSampleName(const std::string& sample_name_I);
-    // std::string& getSampleName();
-    std::string getSampleName() const;
+    std::string& getSampleName();
+    const std::string& getSampleName() const;
 
     void setSampleGroupName(const std::string& sample_group_name_I);
     std::string& getSampleGroupName();
-    std::string getSampleGroupName() const;
+    const std::string& getSampleGroupName() const;
 
     void setSequenceSegmentName(const std::string& sequence_segment_name_I);
     std::string& getSequenceSegmentName();
-    std::string getSequenceSegmentName() const;
+    const std::string& getSequenceSegmentName() const;
 
     void setFilename(const std::string& filename_I);
     std::string& getFilename();
-    std::string getFilename() const;
+    const std::string& getFilename() const;
 
     void setSampleType(SampleType sample_type_I);
     SampleType& getSampleType();
-    SampleType getSampleType() const;
+    const SampleType& getSampleType() const;
 
     static bool validateMetaData(const MetaDataHandler& meta_data);
 

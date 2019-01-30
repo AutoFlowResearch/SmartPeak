@@ -48,12 +48,12 @@ namespace SmartPeak
     sample_name = sample_name_I;
   }
 
-  // std::string& MetaDataHandler::getSampleName()
-  // {
-  //   return sample_name;
-  // }
+  std::string& MetaDataHandler::getSampleName()
+  {
+    return sample_name;
+  }
 
-  std::string MetaDataHandler::getSampleName() const
+  const std::string& MetaDataHandler::getSampleName() const
   {
     return sample_name;
   }
@@ -68,7 +68,7 @@ namespace SmartPeak
     return sample_group_name;
   }
 
-  std::string MetaDataHandler::getSampleGroupName() const
+  const std::string& MetaDataHandler::getSampleGroupName() const
   {
     return sample_group_name;
   }
@@ -83,7 +83,7 @@ namespace SmartPeak
     return sequence_segment_name;
   }
 
-  std::string MetaDataHandler::getSequenceSegmentName() const
+  const std::string& MetaDataHandler::getSequenceSegmentName() const
   {
     return sequence_segment_name;
   }
@@ -98,7 +98,7 @@ namespace SmartPeak
     return original_filename;
   }
 
-  std::string MetaDataHandler::getFilename() const
+  const std::string& MetaDataHandler::getFilename() const
   {
     return original_filename;
   }
@@ -113,7 +113,7 @@ namespace SmartPeak
     return sample_type;
   }
 
-  MetaDataHandler::SampleType MetaDataHandler::getSampleType() const
+  const MetaDataHandler::SampleType& MetaDataHandler::getSampleType() const
   {
     return sample_type;
   }
