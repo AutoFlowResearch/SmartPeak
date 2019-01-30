@@ -33,11 +33,11 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureMap)
 
   rawDataHandler.setFeatureMap(f1);
 
-  const OpenMS::FeatureMap f2 = rawDataHandler.getFeatureMap(); // testing copy getter
+  const OpenMS::FeatureMap& f2 = rawDataHandler.getFeatureMap(); // testing const getter
   BOOST_CHECK_EQUAL(f2.metaValueExists("name"), true);
   BOOST_CHECK_EQUAL(f2.getMetaValue("name"), "foo");
 
-  rawDataHandler.getFeatureMap().setMetaValue("name2", "bar"); // testing reference getter
+  rawDataHandler.getFeatureMap().setMetaValue("name2", "bar"); // testing non-const getter
 
   const OpenMS::FeatureMap& f3 = rawDataHandler.getFeatureMap();
   BOOST_CHECK_EQUAL(f3.metaValueExists("name"), true);
@@ -56,11 +56,11 @@ BOOST_AUTO_TEST_CASE(set_get_MetaData)
 
   rawDataHandler.setMetaData(m1);
 
-  const MetaDataHandler m2 = rawDataHandler.getMetaData(); // testing copy getter
+  const MetaDataHandler& m2 = rawDataHandler.getMetaData(); // testing const getter
   BOOST_CHECK_EQUAL(m2.getSampleName(), name);
 
   const string group_name {"bar"};
-  rawDataHandler.getMetaData().setSampleGroupName(group_name); // testing reference getter
+  rawDataHandler.getMetaData().setSampleGroupName(group_name); // testing non-const getter
 
   const MetaDataHandler& m3 = rawDataHandler.getMetaData();
   BOOST_CHECK_EQUAL(m3.getSampleName(), name);
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(set_get_Parameters)
 
   rawDataHandler.setParameters(parameters1);
 
-  const map<string, vector<map<string, string>>> parameters2 = rawDataHandler.getParameters();
+  const map<string, vector<map<string, string>>>& parameters2 = rawDataHandler.getParameters();
   BOOST_CHECK_EQUAL(parameters2.count(name1), 1);
   BOOST_CHECK_EQUAL(parameters2.at(name1).size(), 1);
   BOOST_CHECK_EQUAL(parameters2.at(name1)[0].count("name"), 1);
@@ -117,12 +117,12 @@ BOOST_AUTO_TEST_CASE(set_get_QuantitationMethods)
 
   rawDataHandler.setQuantitationMethods(AQMs1);
 
-  const vector<OpenMS::AbsoluteQuantitationMethod> AQMs2 = rawDataHandler.getQuantitationMethods(); // testing copy getter
+  const vector<OpenMS::AbsoluteQuantitationMethod>& AQMs2 = rawDataHandler.getQuantitationMethods(); // testing const getter
   BOOST_CHECK_EQUAL(AQMs2.size(), 1);
   BOOST_CHECK_EQUAL(AQMs2[0].getComponentName(), name);
 
   const string feature_name {"bar"};
-  rawDataHandler.getQuantitationMethods()[0].setFeatureName(feature_name); // testing reference getter
+  rawDataHandler.getQuantitationMethods()[0].setFeatureName(feature_name); // testing non-const getter
 
   const vector<OpenMS::AbsoluteQuantitationMethod>& AQMs3 = rawDataHandler.getQuantitationMethods();
   BOOST_CHECK_EQUAL(AQMs3[0].getComponentName(), name);
@@ -142,12 +142,12 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureFilter)
 
   rawDataHandler.setFeatureFilter(fqc1);
 
-  const OpenMS::MRMFeatureQC fqc2 = rawDataHandler.getFeatureFilter(); // testing copy getter
+  const OpenMS::MRMFeatureQC& fqc2 = rawDataHandler.getFeatureFilter(); // testing const getter
   BOOST_CHECK_EQUAL(fqc2.component_qcs.size(), 1);
   BOOST_CHECK_EQUAL(fqc2.component_qcs[0].component_name, name);
 
   const double rt_low {4.0};
-  rawDataHandler.getFeatureFilter().component_qcs[0].retention_time_l = rt_low; // testing reference getter
+  rawDataHandler.getFeatureFilter().component_qcs[0].retention_time_l = rt_low; // testing non-const getter
 
   const OpenMS::MRMFeatureQC& fqc3 = rawDataHandler.getFeatureFilter();
   BOOST_CHECK_EQUAL(fqc3.component_qcs.size(), 1);
@@ -168,12 +168,12 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureQC)
 
   rawDataHandler.setFeatureQC(fqc1);
 
-  const OpenMS::MRMFeatureQC fqc2 = rawDataHandler.getFeatureQC(); // testing copy getter
+  const OpenMS::MRMFeatureQC& fqc2 = rawDataHandler.getFeatureQC(); // testing const getter
   BOOST_CHECK_EQUAL(fqc2.component_qcs.size(), 1);
   BOOST_CHECK_EQUAL(fqc2.component_qcs[0].component_name, name);
 
   const double rt_low {4.0};
-  rawDataHandler.getFeatureQC().component_qcs[0].retention_time_l = rt_low; // testing reference getter
+  rawDataHandler.getFeatureQC().component_qcs[0].retention_time_l = rt_low; // testing non-const getter
 
   const OpenMS::MRMFeatureQC& fqc3 = rawDataHandler.getFeatureQC();
   BOOST_CHECK_EQUAL(fqc3.component_qcs.size(), 1);
@@ -192,12 +192,12 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureMapHistory)
 
   rawDataHandler.setFeatureMapHistory(f1);
 
-  const vector<OpenMS::FeatureMap> f2 = rawDataHandler.getFeatureMapHistory(); // testing copy getter
+  const vector<OpenMS::FeatureMap>& f2 = rawDataHandler.getFeatureMapHistory(); // testing const getter
   BOOST_CHECK_EQUAL(f2.size(), 1);
   BOOST_CHECK_EQUAL(f2[0].metaValueExists("name"), true);
   BOOST_CHECK_EQUAL(f2[0].getMetaValue("name"), "foo");
 
-  rawDataHandler.getFeatureMapHistory()[0].setMetaValue("name2", "bar"); // testing reference getter
+  rawDataHandler.getFeatureMapHistory()[0].setMetaValue("name2", "bar"); // testing non-const getter
 
   const vector<OpenMS::FeatureMap>& f3 = rawDataHandler.getFeatureMapHistory();
   BOOST_CHECK_EQUAL(f3.size(), 1);
@@ -216,11 +216,11 @@ BOOST_AUTO_TEST_CASE(set_get_Experiment)
 
   rawDataHandler.setExperiment(experiment);
 
-  const OpenMS::MSExperiment experiment2 = rawDataHandler.getExperiment(); // testing copy getter
+  const OpenMS::MSExperiment& experiment2 = rawDataHandler.getExperiment(); // testing const getter
   BOOST_CHECK_EQUAL(experiment2.metaValueExists("name"), true);
   BOOST_CHECK_EQUAL(experiment2.getMetaValue("name"), "foo");
 
-  rawDataHandler.getExperiment().setMetaValue("name2", "bar"); // testing reference getter
+  rawDataHandler.getExperiment().setMetaValue("name2", "bar"); // testing non-const getter
 
   const OpenMS::MSExperiment& experiment3 = rawDataHandler.getExperiment();
   BOOST_CHECK_EQUAL(experiment3.metaValueExists("name"), true);
@@ -238,11 +238,11 @@ BOOST_AUTO_TEST_CASE(set_get_ChromatogramMap)
 
   rawDataHandler.setChromatogramMap(chromatogram_map);
 
-  const OpenMS::MSExperiment chromatogram_map2 = rawDataHandler.getChromatogramMap(); // testing copy getter
+  const OpenMS::MSExperiment& chromatogram_map2 = rawDataHandler.getChromatogramMap(); // testing const getter
   BOOST_CHECK_EQUAL(chromatogram_map2.metaValueExists("name"), true);
   BOOST_CHECK_EQUAL(chromatogram_map2.getMetaValue("name"), "foo");
 
-  rawDataHandler.getChromatogramMap().setMetaValue("name2", "bar"); // testing reference getter
+  rawDataHandler.getChromatogramMap().setMetaValue("name2", "bar"); // testing non-const getter
 
   const OpenMS::MSExperiment& chromatogram_map3 = rawDataHandler.getChromatogramMap();
   BOOST_CHECK_EQUAL(chromatogram_map3.metaValueExists("name"), true);
@@ -265,7 +265,7 @@ BOOST_AUTO_TEST_CASE(set_get_ReferenceData)
 
   rawDataHandler.setReferenceData(data);
 
-  const std::vector<std::map<std::string, Utilities::CastValue>> data2 = rawDataHandler.getReferenceData(); // testing copy getter
+  const std::vector<std::map<std::string, Utilities::CastValue>>& data2 = rawDataHandler.getReferenceData();
 
   BOOST_CHECK_EQUAL(data2.size(), 1);
   BOOST_CHECK_EQUAL(data2[0].count("foo"), 1);
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE(set_get_ReferenceData)
 
   c = "bar3";
 
-  rawDataHandler.getReferenceData().push_back({{"foo3", c}}); // testing reference getter
+  rawDataHandler.getReferenceData().push_back({{"foo3", c}});
 
   const std::vector<std::map<std::string, Utilities::CastValue>>& data3 = rawDataHandler.getReferenceData();
 

@@ -14,7 +14,7 @@ namespace SmartPeak
     return feature_map_;
   }
 
-  OpenMS::FeatureMap RawDataHandler::getFeatureMap() const
+  const OpenMS::FeatureMap& RawDataHandler::getFeatureMap() const
   {
     return feature_map_;
   }
@@ -29,7 +29,7 @@ namespace SmartPeak
     return meta_data_;
   }
 
-  MetaDataHandler RawDataHandler::getMetaData() const
+  const MetaDataHandler& RawDataHandler::getMetaData() const
   {
     return meta_data_;
   }
@@ -45,7 +45,7 @@ namespace SmartPeak
     return parameters_;
   }
 
-  std::map<std::string, std::vector<std::map<std::string, std::string>>> RawDataHandler::getParameters() const
+  const std::map<std::string, std::vector<std::map<std::string, std::string>>>& RawDataHandler::getParameters() const
   {
     return parameters_;
   }
@@ -60,7 +60,7 @@ namespace SmartPeak
     return targeted_exp_;
   }
 
-  OpenMS::TargetedExperiment RawDataHandler::getTargetedExperiment() const
+  const OpenMS::TargetedExperiment& RawDataHandler::getTargetedExperiment() const
   {
     return targeted_exp_;
   }
@@ -75,7 +75,7 @@ namespace SmartPeak
     return reference_data_;
   }
 
-  std::vector<std::map<std::string, Utilities::CastValue>> RawDataHandler::getReferenceData() const
+  const std::vector<std::map<std::string, Utilities::CastValue>>& RawDataHandler::getReferenceData() const
   {
     return reference_data_;
   }
@@ -90,7 +90,7 @@ namespace SmartPeak
     return quantitation_methods_;
   }
 
-  std::vector<OpenMS::AbsoluteQuantitationMethod> RawDataHandler::getQuantitationMethods() const
+  const std::vector<OpenMS::AbsoluteQuantitationMethod>& RawDataHandler::getQuantitationMethods() const
   {
     return quantitation_methods_;
   }
@@ -105,7 +105,7 @@ namespace SmartPeak
     return feature_filter_;
   }
 
-  OpenMS::MRMFeatureQC RawDataHandler::getFeatureFilter() const
+  const OpenMS::MRMFeatureQC& RawDataHandler::getFeatureFilter() const
   {
     return feature_filter_;
   }
@@ -120,7 +120,7 @@ namespace SmartPeak
     return feature_qc_;
   }
 
-  OpenMS::MRMFeatureQC RawDataHandler::getFeatureQC() const
+  const OpenMS::MRMFeatureQC& RawDataHandler::getFeatureQC() const
   {
     return feature_qc_;
   }
@@ -135,7 +135,7 @@ namespace SmartPeak
     return feature_map_history_;
   }
 
-  std::vector<OpenMS::FeatureMap> RawDataHandler::getFeatureMapHistory() const
+  const std::vector<OpenMS::FeatureMap>& RawDataHandler::getFeatureMapHistory() const
   {
     return feature_map_history_;
   }
@@ -150,7 +150,7 @@ namespace SmartPeak
     return experiment_;
   }
 
-  OpenMS::MSExperiment RawDataHandler::getExperiment() const
+  const OpenMS::MSExperiment& RawDataHandler::getExperiment() const
   {
     return experiment_;
   }
@@ -165,7 +165,7 @@ namespace SmartPeak
     return chromatogram_map_;
   }
 
-  OpenMS::MSExperiment RawDataHandler::getChromatogramMap() const
+  const OpenMS::MSExperiment& RawDataHandler::getChromatogramMap() const
   {
     return chromatogram_map_;
   }
@@ -180,7 +180,7 @@ namespace SmartPeak
     return trafo_;
   }
 
-  OpenMS::TransformationDescription RawDataHandler::getTransformationDescription() const
+  const OpenMS::TransformationDescription& RawDataHandler::getTransformationDescription() const
   {
     return trafo_;
   }
@@ -195,7 +195,7 @@ namespace SmartPeak
     return swath_;
   }
 
-  OpenMS::MSExperiment RawDataHandler::getSWATH() const
+  const OpenMS::MSExperiment& RawDataHandler::getSWATH() const
   {
     return swath_;
   }
@@ -210,7 +210,7 @@ namespace SmartPeak
     return validation_metrics_;
   }
 
-  std::map<std::string, float> RawDataHandler::getValidationMetrics() const
+  const std::map<std::string, float>& RawDataHandler::getValidationMetrics() const
   {
     return validation_metrics_;
   }

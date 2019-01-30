@@ -24,15 +24,15 @@ public:
 
     void setSequence(const std::vector<SampleHandler>& sequence);
     std::vector<SampleHandler>& getSequence();
-    std::vector<SampleHandler> getSequence() const;
+    const std::vector<SampleHandler>& getSequence() const;
 
     void setSequenceSegments(const std::vector<SequenceSegmentHandler>& sequence_segments);
     std::vector<SequenceSegmentHandler>& getSequenceSegments();
-    std::vector<SequenceSegmentHandler> getSequenceSegments() const;
+    const std::vector<SequenceSegmentHandler>& getSequenceSegments() const;
 
     void setSampleGroups(const std::vector<SampleGroupHandler>& sample_groups);
     std::vector<SampleGroupHandler>& getSampleGroups();
-    std::vector<SampleGroupHandler> getSampleGroups() const;
+    const std::vector<SampleGroupHandler>& getSampleGroups() const;
 
     void addSampleToSequence(
       const MetaDataHandler& meta_data_I,

@@ -20,7 +20,7 @@ namespace SmartPeak
     return meta_data_;
   }
 
-  MetaDataHandler SampleHandler::getMetaData() const
+  const MetaDataHandler& SampleHandler::getMetaData() const
   {
     return meta_data_;
   }
@@ -35,7 +35,7 @@ namespace SmartPeak
     return raw_data_;
   }
 
-  RawDataHandler SampleHandler::getRawData() const
+  const RawDataHandler& SampleHandler::getRawData() const
   {
     return raw_data_;
   }

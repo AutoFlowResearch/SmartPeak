@@ -31,12 +31,12 @@ BOOST_AUTO_TEST_CASE(set_get_SequenceSegmentName)
 
   ssh.setSequenceSegmentName(foo);
 
-  const string name1 = ssh.getSequenceSegmentName(); // testing copy getter
+  const string& name1 = ssh.getSequenceSegmentName(); // testing const getter
   BOOST_CHECK_EQUAL(name1, foo);
 
   const string bar {"bar"};
   ssh.getSequenceSegmentName() = bar;
-  const string& name2 = ssh.getSequenceSegmentName(); // testing reference getter
+  const string& name2 = ssh.getSequenceSegmentName(); // testing non-const getter
   BOOST_CHECK_EQUAL(name2, bar);
 }
 
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(set_get_SampleIndices)
 
   ssh.setSampleIndices(si1);
 
-  const vector<size_t> si2 = ssh.getSampleIndices(); // testing copy getter
+  const vector<size_t>& si2 = ssh.getSampleIndices(); // testing const getter
   BOOST_CHECK_EQUAL(si2.size(), 3);
   BOOST_CHECK_EQUAL(si2[0], 1);
   BOOST_CHECK_EQUAL(si2[1], 3);
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(set_get_SampleIndices)
 
   ssh.getSampleIndices()[1] = 2;
 
-  const vector<size_t>& si3 = ssh.getSampleIndices(); // testing reference getter
+  const vector<size_t>& si3 = ssh.getSampleIndices(); // testing non-const getter
   BOOST_CHECK_EQUAL(si3.size(), 3);
   BOOST_CHECK_EQUAL(si3[1], 2);
 }
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(set_get_StandardsConcentrations)
 
   ssh.setStandardsConcentrations(runs1);
 
-  const vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> runs2 = ssh.getStandardsConcentrations();
+  const vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& runs2 = ssh.getStandardsConcentrations();
   BOOST_CHECK_EQUAL(runs2.size(), 1);
   BOOST_CHECK_EQUAL(runs2[0].sample_name, foo);
 
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(set_get_QuantitationMethods)
 
   ssh.setQuantitationMethods(qms1);
 
-  const vector<OpenMS::AbsoluteQuantitationMethod> qms2 = ssh.getQuantitationMethods();
+  const vector<OpenMS::AbsoluteQuantitationMethod>& qms2 = ssh.getQuantitationMethods();
   BOOST_CHECK_EQUAL(qms2.size(), 1);
   BOOST_CHECK_EQUAL(qms2[0].getComponentName(), foo);
 
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(set_get_ComponentsToConcentrations)
 
   ssh.setComponentsToConcentrations(m1);
 
-  const map<string, vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>
+  const map<string, vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>>&
     m2 = ssh.getComponentsToConcentrations();
   BOOST_CHECK_EQUAL(m2.size(), 1);
   BOOST_CHECK_EQUAL(m2.count(foo), 1);
