@@ -337,7 +337,7 @@ BOOST_AUTO_TEST_CASE(processRawData)
     RawDataProcessor::processRawData(rawDataHandler, event, params_1, filenames);
   }
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 329);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 114);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& subordinate0 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
@@ -351,21 +351,19 @@ BOOST_AUTO_TEST_CASE(processRawData)
   BOOST_CHECK_EQUAL(subordinate1.getMetaValue("concentration_units").toString(), "uM");
 
   const OpenMS::Feature& subordinate2 = rawDataHandler.getFeatureMap()[8].getSubordinates()[0];
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 163.0, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "35cgmp.35cgmp_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 628.59474989938735, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 2780997.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "Pool_2pg_3pg.Pool_2pg_3pg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 832.69577069044112, 1e-6);
 
   const OpenMS::Feature& subordinate3 = rawDataHandler.getFeatureMap()[49].getSubordinates()[0];
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getMetaValue("peak_apex_int")), 53935.99999999999, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate3.getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getRT()), 733.9804012544155, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getMetaValue("peak_apex_int")), 217684.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate3.getMetaValue("native_id").toString(), "f1p.f1p_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getRT()), 602.45962461757676, 1e-6);
 
-  const OpenMS::Feature& subordinate4 = rawDataHandler.getFeatureMap()[200].getSubordinates()[0]; // this is [49][0] in python tests
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getMetaValue("peak_apex_int")), 198161.0, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate4.getMetaValue("native_id").toString(), "glutacon.glutacon_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getRT()), 752.7960037236212, 1e-6);
-
-  // TODO: add more checks when MRMFeatureSelector is implemented
+  const OpenMS::Feature& subordinate4 = rawDataHandler.getFeatureMap()[113].getSubordinates()[0]; // this is [49][0] in python tests
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getMetaValue("peak_apex_int")), 4066240.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate4.getMetaValue("native_id").toString(), "xan.xan_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getRT()), 89.418783654689776, 1e-6);
 }
 
 BOOST_AUTO_TEST_CASE(annotateUsedFeatures)
