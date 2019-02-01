@@ -15,17 +15,12 @@ void example_LCMS_MRM_Validation(
 
   SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I);
 
-  std::vector<std::string> raw_data_processing_methods = {
-    "load_raw_data",
-    // # "load_features",
-    "pick_features",
-    "filter_features",
-    "select_features",
-    "validate_features",
-    // # "quantify_features",
-    // # "check_features",
-    // # "store_features",
-    // # "plot_features"
+  const std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods = {
+    RawDataProcessor::LOAD_RAW_DATA,
+    RawDataProcessor::PICK_FEATURES,
+    RawDataProcessor::FILTER_FEATURES,
+    RawDataProcessor::SELECT_FEATURES,
+    RawDataProcessor::VALIDATE_FEATURES
   };
 
   std::map<std::string, Filenames> dynamic_filenames;

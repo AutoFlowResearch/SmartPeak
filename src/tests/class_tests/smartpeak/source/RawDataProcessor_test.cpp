@@ -270,44 +270,30 @@ BOOST_AUTO_TEST_CASE(checkFeatures)
 
 BOOST_AUTO_TEST_CASE(getDefaultRawDataProcessingWorkflow)
 {
-  std::vector<std::string> workflow;
+  std::vector<RawDataProcessor::RawDataProcMethod> workflow;
 
-  RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-    MetaDataHandler::SampleType::Unknown,
-    workflow
+  workflow = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
+    MetaDataHandler::SampleType::Unknown
   );
 
   BOOST_CHECK_EQUAL(workflow.size(), 6);
-  BOOST_CHECK_EQUAL(workflow[0], "load_raw_data");
-  BOOST_CHECK_EQUAL(workflow[1], "pick_features");
-  BOOST_CHECK_EQUAL(workflow[2], "filter_features");
-  BOOST_CHECK_EQUAL(workflow[3], "select_features");
-  BOOST_CHECK_EQUAL(workflow[4], "quantify_features");
-  BOOST_CHECK_EQUAL(workflow[5], "check_features");
+  BOOST_CHECK_EQUAL(workflow[0], RawDataProcessor::LOAD_RAW_DATA);
+  BOOST_CHECK_EQUAL(workflow[1], RawDataProcessor::PICK_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[2], RawDataProcessor::FILTER_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[3], RawDataProcessor::SELECT_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[4], RawDataProcessor::QUANTIFY_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[5], RawDataProcessor::CHECK_FEATURES);
 
-  RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-    MetaDataHandler::SampleType::DoubleBlank,
-    workflow
+  workflow = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
+    MetaDataHandler::SampleType::DoubleBlank
   );
 
   BOOST_CHECK_EQUAL(workflow.size(), 5);
-  BOOST_CHECK_EQUAL(workflow[0], "load_raw_data");
-  BOOST_CHECK_EQUAL(workflow[1], "pick_features");
-  BOOST_CHECK_EQUAL(workflow[2], "filter_features");
-  BOOST_CHECK_EQUAL(workflow[3], "select_features");
-  BOOST_CHECK_EQUAL(workflow[4], "check_features");
-}
-
-BOOST_AUTO_TEST_CASE(checkRawDataProcessingWorkflow)
-{
-  const std::vector<std::string> raw_data_processing1 = {"load_raw_data", "quantify_features"};
-  const std::vector<std::string> raw_data_processing2 = {"fake_event", "another_fake"};
-
-  const bool result1 = RawDataProcessor::checkRawDataProcessingWorkflow(raw_data_processing1);
-  const bool result2 = RawDataProcessor::checkRawDataProcessingWorkflow(raw_data_processing2);
-
-  BOOST_CHECK_EQUAL(result1, true);
-  BOOST_CHECK_EQUAL(result2, false);
+  BOOST_CHECK_EQUAL(workflow[0], RawDataProcessor::LOAD_RAW_DATA);
+  BOOST_CHECK_EQUAL(workflow[1], RawDataProcessor::PICK_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[2], RawDataProcessor::FILTER_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[3], RawDataProcessor::SELECT_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[4], RawDataProcessor::CHECK_FEATURES);
 }
 
 BOOST_AUTO_TEST_CASE(processRawData)
@@ -332,11 +318,10 @@ BOOST_AUTO_TEST_CASE(processRawData)
 
   OpenMSFile::loadFeatureQC(rawDataHandler, featureFilterComponents_csv_i, featureFilterComponentGroups_csv_i);
 
-  std::vector<std::string> raw_data_processing_events;
+  std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_events;
 
-  RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-    MetaDataHandler::SampleType::Unknown,
-    raw_data_processing_events
+  raw_data_processing_events = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
+    MetaDataHandler::SampleType::Unknown
   );
 
   Filenames filenames;
@@ -348,10 +333,7 @@ BOOST_AUTO_TEST_CASE(processRawData)
   }
   params_1.emplace("ChromatogramExtractor", vector<map<string, string>>());
 
-  for (const std::string& event : raw_data_processing_events) {
-    // TODO: update if-condition when selectFeatures() is implemented
-    if (event == "select_features")
-      continue;
+  for (const RawDataProcessor::RawDataProcMethod event : raw_data_processing_events) {
     RawDataProcessor::processRawData(rawDataHandler, event, params_1, filenames);
   }
 

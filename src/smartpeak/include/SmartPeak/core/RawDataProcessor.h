@@ -24,6 +24,24 @@ public:
     RawDataProcessor() = delete;
     ~RawDataProcessor() = delete;
 
+    enum RawDataProcMethod {
+      LOAD_RAW_DATA = 1,
+      LOAD_FEATURES,
+      PICK_FEATURES,
+      FILTER_FEATURES,
+      SELECT_FEATURES,
+      VALIDATE_FEATURES,
+      QUANTIFY_FEATURES,
+      CHECK_FEATURES,
+      STORE_FEATURES,
+      PLOT_FEATURES,
+      SAVE_FEATURES,
+      ANNOTATE_USED_FEATURES,
+      CLEAR_FEATURE_HISTORY,
+    };
+
+    // static RawDataProcMethod convertEventStringToEnum(const std::string& event);
+
     static void pickFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::vector<std::map<std::string, std::string>>& MRMFeatureFinderScoring_params_I,
@@ -74,19 +92,14 @@ public:
 
     static void processRawData(
       RawDataHandler& rawDataHandler_IO,
-      const std::string& raw_data_processing_event,
+      const RawDataProcMethod raw_data_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
       const Filenames& filenames,
       const bool verbose_I = false
     );
 
-    static bool checkRawDataProcessingWorkflow(
-      const std::vector<std::string>& raw_data_processing_I
-    );
-
-    static void getDefaultRawDataProcessingWorkflow(
-      const MetaDataHandler::SampleType sample_type,
-      std::vector<std::string>& default_workflow
+    static std::vector<RawDataProcMethod> getDefaultRawDataProcessingWorkflow(
+      const MetaDataHandler::SampleType sample_type
     );
 
     static void annotateUsedFeatures(

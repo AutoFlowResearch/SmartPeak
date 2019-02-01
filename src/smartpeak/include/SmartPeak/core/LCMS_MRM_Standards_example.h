@@ -15,16 +15,14 @@ void example_LCMS_MRM_Standards(
 
   SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I);
 
-  std::vector<std::string> raw_data_processing_methods = {
-    "load_raw_data",
-    // # "load_features",
-    "pick_features",
-    "filter_features",
-    "filter_features",
-    "select_features",
-    "check_features",
-    "store_features",
-    // # "plot_features"
+  std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods = {
+    RawDataProcessor::LOAD_RAW_DATA,
+    RawDataProcessor::PICK_FEATURES,
+    RawDataProcessor::FILTER_FEATURES,
+    RawDataProcessor::FILTER_FEATURES,
+    RawDataProcessor::SELECT_FEATURES,
+    RawDataProcessor::CHECK_FEATURES,
+    RawDataProcessor::STORE_FEATURES
   };
 
   std::map<std::string, Filenames> dynamic_filenames1;
@@ -76,10 +74,9 @@ void example_LCMS_MRM_Standards(
   );
 
   raw_data_processing_methods = {
-    "quantify_features",
-    "check_features",
-    "store_features",
-    // # "plot_features"
+    RawDataProcessor::QUANTIFY_FEATURES,
+    RawDataProcessor::CHECK_FEATURES,
+    RawDataProcessor::STORE_FEATURES
   };
 
   std::map<std::string, Filenames> dynamic_filenames3;

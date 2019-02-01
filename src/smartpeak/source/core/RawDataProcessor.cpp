@@ -269,7 +269,7 @@ namespace SmartPeak
   )
   {
     if (verbose_I)
-      std::cout << "Plotting peaks with features" << std::endl;
+      std::cout << "Plotting peaks with features (NOT IMPLEMENTED)" << std::endl;
 
     // TODO: Uncomment once FeaturePlotter is ready
 
@@ -311,14 +311,14 @@ namespace SmartPeak
 
   void RawDataProcessor::processRawData(
     RawDataHandler& rawDataHandler_IO,
-    const std::string& raw_data_processing_event,
+    const RawDataProcMethod raw_data_processing_event,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
     const Filenames& filenames,
     const bool verbose_I
   )
   {
-    const std::string& event = raw_data_processing_event;
-    if (event == "load_raw_data") {
+    const RawDataProcMethod event = raw_data_processing_event;
+    if (event == LOAD_RAW_DATA) {
       // fileReaderOpenMS.load_SWATHorDIA(rawDataHandler_IO, {})
       OpenMSFile::loadMSExperiment(
         rawDataHandler_IO,
@@ -329,129 +329,95 @@ namespace SmartPeak
         verbose_I
       );
       // fileReaderOpenMS.load_Trafo(); # skip, no transformation of RT
-    } else if (event == "load_features") {
+    } else if (event == LOAD_FEATURES) {
       OpenMSFile::loadFeatureMap(
         rawDataHandler_IO,
         filenames.featureXML_i,
         verbose_I
       );
-    } else if (event == "pick_features") {
+    } else if (event == PICK_FEATURES) {
       pickFeatures(
         rawDataHandler_IO,
         parameters.at("MRMFeatureFinderScoring"),
         verbose_I
       );
-    } else if (event == "filter_features") {
+    } else if (event == FILTER_FEATURES) {
       filterFeatures(
         rawDataHandler_IO,
         parameters.at("MRMFeatureFilter.filter_MRMFeatures"),
         verbose_I
       );
-    } else if (event == "select_features") {
+    } else if (event == SELECT_FEATURES) {
       selectFeatures(
         rawDataHandler_IO,
         parameters.at("MRMFeatureSelector.select_MRMFeatures_qmip"),
         parameters.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"),
         verbose_I
       );
-    } else if (event == "validate_features") {
+    } else if (event == VALIDATE_FEATURES) {
       OpenMSFile::loadValidationData(rawDataHandler_IO, filenames.referenceData_csv_i);
       validateFeatures(
         rawDataHandler_IO,
         parameters.at("MRMFeatureValidator.validate_MRMFeatures"),
         verbose_I
       );
-    } else if (event == "quantify_features") {
+    } else if (event == QUANTIFY_FEATURES) {
       quantifyComponents(rawDataHandler_IO, verbose_I);
-    } else if (event == "check_features") {
+    } else if (event == CHECK_FEATURES) {
       checkFeatures(
         rawDataHandler_IO,
         parameters.at("MRMFeatureFilter.filter_MRMFeatures.qc"),
         verbose_I
       );
-    } else if (event == "store_features") {
+    } else if (event == STORE_FEATURES) {
       OpenMSFile::storeFeatureMap(
         rawDataHandler_IO,
         filenames.featureXML_o,
         verbose_I
       );
-    } else if (event == "plot_features") {
+    } else if (event == PLOT_FEATURES) {
       plotFeatures(
         rawDataHandler_IO,
         filenames.features_pdf_o,
         parameters.at("FeaturePlotter"),
         verbose_I
       );
-    } else if (event == "save_features") {
+    } else if (event == SAVE_FEATURES) {
       saveCurrentFeatureMapToHistory(
         rawDataHandler_IO,
         verbose_I
       );
-    } else if (event == "annotate_used_features") {
+    } else if (event == ANNOTATE_USED_FEATURES) {
       annotateUsedFeatures(
         rawDataHandler_IO,
         verbose_I
       );
-    } else if (event == "clear_feature_history") {
+    } else if (event == CLEAR_FEATURE_HISTORY) {
       rawDataHandler_IO.getFeatureMapHistory().clear();
-    } else {
-      throw "Raw data processing event " + raw_data_processing_event + " was not recognized.";
     }
   }
 
-  bool RawDataProcessor::checkRawDataProcessingWorkflow(
-    const std::vector<std::string>& raw_data_processing_I
+  std::vector<RawDataProcessor::RawDataProcMethod> RawDataProcessor::getDefaultRawDataProcessingWorkflow(
+    const MetaDataHandler::SampleType sample_type
   )
   {
-    const std::set<std::string> valid_events = {
-      "load_raw_data",
-      "load_features",
-      "pick_features",
-      "filter_features",
-      "select_features",
-      "validate_features",
-      "quantify_features",
-      "check_features",
-      "plot_features",
-      "store_features",
-      "save_features",
-      "annotate_used_features",
-      "clear_feature_history"
-    };
-    bool is_valid = true;
-    for (const std::string& event : raw_data_processing_I) {
-      if (0 == valid_events.count(event)) {
-        std::cout << "Raw data processing event '" << event << "' is not valid." << std::endl;
-        is_valid = false;
-      }
-    }
-    return is_valid;
-  }
-
-  void RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-    const MetaDataHandler::SampleType sample_type,
-    std::vector<std::string>& default_workflow
-  )
-  {
-    const std::vector<std::string> opt {
-      "load_raw_data",     // 0
-      "pick_features",     // 1
-      "filter_features",   // 2
-      "select_features",   // 3
-      "quantify_features", // 4
-      "check_features"     // 5
+    const std::vector<RawDataProcMethod> opt {
+      LOAD_RAW_DATA,     // 0
+      PICK_FEATURES,     // 1
+      FILTER_FEATURES,   // 2
+      SELECT_FEATURES,   // 3
+      QUANTIFY_FEATURES, // 4
+      CHECK_FEATURES     // 5
     };
     switch (sample_type) {
       case MetaDataHandler::SampleType::Unknown:
       case MetaDataHandler::SampleType::Standard:
       case MetaDataHandler::SampleType::QC:
       case MetaDataHandler::SampleType::Blank:
-        default_workflow = opt;
-        break;
+        return opt;
       case MetaDataHandler::SampleType::DoubleBlank:
       case MetaDataHandler::SampleType::Solvent:
-        default_workflow = {opt[0], opt[1], opt[2], opt[3], opt[5]};
-        break;
+        return {opt[0], opt[1], opt[2], opt[3], opt[5]};
       default:
         throw "case not handled.";
     }
@@ -508,4 +474,38 @@ namespace SmartPeak
 
     rawDataHandler_IO.getFeatureMapHistory().push_back(features_annotated);
   }
+
+  // TODO: implemented in error (thought it'd be necessary). Eventually remove it.
+  // RawDataProcessor::RawDataProcMethod RawDataProcessor::convertEventStringToEnum(const std::string& event)
+  // {
+  //   if (event == "load_raw_data") {
+  //     return LOAD_RAW_DATA;
+  //   } else if (event == "load_features") {
+  //     return LOAD_FEATURES;
+  //   } else if (event == "pick_features") {
+  //     return PICK_FEATURES;
+  //   } else if (event == "filter_features") {
+  //     return FILTER_FEATURES;
+  //   } else if (event == "select_features") {
+  //     return SELECT_FEATURES;
+  //   } else if (event == "validate_features") {
+  //     return VALIDATE_FEATURES;
+  //   } else if (event == "quantify_features") {
+  //     return QUANTIFY_FEATURES;
+  //   } else if (event == "check_features") {
+  //     return CHECK_FEATURES;
+  //   } else if (event == "store_features") {
+  //     return STORE_FEATURES;
+  //   } else if (event == "plot_features") {
+  //     return PLOT_FEATURES;
+  //   } else if (event == "save_features") {
+  //     return SAVE_FEATURES;
+  //   } else if (event == "annotate_used_features") {
+  //     return ANNOTATE_USED_FEATURES;
+  //   } else if (event == "clear_feature_history") {
+  //     return CLEAR_FEATURE_HISTORY;
+  //   } else {
+  //     throw "Raw data processing event " + event + " is not recognized.";
+  //   }
+  // }
 }

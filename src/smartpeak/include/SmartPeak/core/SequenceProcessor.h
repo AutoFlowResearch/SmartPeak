@@ -3,6 +3,7 @@
 #pragma once
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataHandler.h>
+#include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
 #include <vector>
@@ -36,7 +37,7 @@ public:
       SequenceHandler& sequenceHandler_IO,
       const std::map<std::string, Filenames>& filenames,
       const std::vector<std::string>& injection_names = std::vector<std::string>(),
-      const std::vector<std::string>& raw_data_processing_methods_I = std::vector<std::string>(),
+      const std::vector<RawDataProcessor::RawDataProcMethod>& raw_data_processing_methods_I = std::vector<RawDataProcessor::RawDataProcMethod>(),
       const bool verbose_I = true
     );
 

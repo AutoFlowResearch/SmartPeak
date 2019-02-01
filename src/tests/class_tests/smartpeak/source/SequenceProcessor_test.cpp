@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
 {
   SequenceHandler sequenceHandler;
   SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
-  const vector<string> raw_data_processing_methods = { "load_raw_data" };
+  const vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods = { RawDataProcessor::LOAD_RAW_DATA };
   const RawDataHandler& rawDataHandler0 = sequenceHandler.getSequence()[0].getRawData();
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
 

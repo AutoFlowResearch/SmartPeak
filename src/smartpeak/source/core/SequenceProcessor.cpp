@@ -105,7 +105,7 @@ namespace SmartPeak
     SequenceHandler& sequenceHandler_IO,
     const std::map<std::string, Filenames>& filenames,
     const std::vector<std::string>& injection_names,
-    const std::vector<std::string>& raw_data_processing_methods_I,
+    const std::vector<RawDataProcessor::RawDataProcMethod>& raw_data_processing_methods_I,
     const bool verbose_I
   )
   {
@@ -123,14 +123,13 @@ namespace SmartPeak
 
     for (size_t j = 0; j < process_sequence.size(); ++j) {
       SampleHandler& sample = process_sequence[j];
-      std::vector<std::string> raw_data_processing_methods;
+      std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods;
 
       if (raw_data_processing_methods_I.size()) {
         raw_data_processing_methods = raw_data_processing_methods_I;
       } else {
-        RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-          sample.getMetaData().getSampleType(),
-          raw_data_processing_methods
+        raw_data_processing_methods = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
+          sample.getMetaData().getSampleType()
         );
       }
 
