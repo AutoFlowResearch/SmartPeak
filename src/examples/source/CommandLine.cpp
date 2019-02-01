@@ -1,17 +1,23 @@
 #include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
+#include <SmartPeak/io/SequenceParser.h>
 #include <algorithm>
-#include <iostream>
 #include <cstdlib>
-#include <regex>
 #include <fstream>
+#include <iostream>
+#include <regex>
+#include <unordered_map>
 
 // This will be updated during runtime: an absolute path will be prefixed to it.
 std::string PATHNAMES = "pathnames.txt";
+const size_t BUF_SIZE = 1048576;
 
 using namespace SmartPeak;
 
 Filenames getStaticFilenamesInput(const std::string& sequence_pathname);
+std::vector<RawDataProcessor::RawDataProcMethod> getRawDataProcMethodsInput();
 void generatePathnamesTxt(const std::string& pathname, const Filenames& f, const std::vector<bool>& is_valid);
 std::string getPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
 void updateFilenames(Filenames& f, const std::string& pathname);
@@ -32,6 +38,63 @@ int main(int argc, char **argv)
     std::cin >> sequence_pathname;
   }
   const Filenames static_filenames = getStaticFilenamesInput(sequence_pathname);
+
+  const bool verbose_I = true;
+
+  SequenceHandler sequenceHandler;
+  SequenceProcessor::createSequence(sequenceHandler, static_filenames, ",", verbose_I);
+
+  const std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods =
+    getRawDataProcMethodsInput();
+
+  const std::string directory = getDirectoryFromAbsolutePathname(sequence_pathname);
+  const std::string mzML_dir = directory + "/mzML";
+  const std::string features_in_dir = directory + "/features";
+  const std::string features_out_dir = directory + "/features";
+
+  std::cout << "Input .mzML files are searched in: " << mzML_dir;
+  std::cout << "Input .featureXML files are searched in: " << features_in_dir;
+  std::cout << "Output .featureXML files are stored in: " << features_out_dir;
+
+  std::map<std::string, Filenames> dynamic_filenames;
+  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
+    const std::string& key = sample.getMetaData().getInjectionName();
+    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+      mzML_dir,
+      features_in_dir,
+      features_out_dir,
+      sample.getMetaData().getSampleName(),
+      key
+    );
+  }
+
+  SequenceProcessor::processSequence(
+    sequenceHandler,
+    dynamic_filenames,
+    std::vector<std::string>(),
+    raw_data_processing_methods,
+    verbose_I
+  );
+
+  SequenceParser::writeDataMatrixFromMetaValue(
+    sequenceHandler,
+    static_filenames.sequenceSummary_csv_o,
+    {"calculated_concentration"},
+    {MetaDataHandler::SampleType::Unknown}
+  );
+
+  SequenceParser::writeDataTableFromMetaValue(
+    sequenceHandler,
+    static_filenames.featureSummary_csv_o,
+    {
+      "peak_apex_int", "total_width", "width_at_50", "tailing_factor",
+      "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
+      "points_across_half_height", "logSN", "calculated_concentration",
+      "QC_transition_message", "QC_transition_pass", "QC_transition_score",
+      "QC_transition_group_message", "QC_transition_group_score"
+    },
+    {MetaDataHandler::SampleType::Unknown}
+  );
 }
 
 Filenames getStaticFilenamesInput(const std::string& sequence_pathname)
@@ -108,10 +171,9 @@ void updateFilenames(Filenames& f, const std::string& pathname)
 {
   std::ifstream stream(pathname);
   const std::regex re("([a-zA-Z_]+):([^\\s]*)");
-  const size_t buf_size = 1048576;
-  char line[buf_size];
+  char line[BUF_SIZE];
   std::smatch match;
-  while (stream.getline(line, buf_size)) {
+  while (stream.getline(line, BUF_SIZE)) {
     // std::regex_match cannot work with temporary objects
     // https://stackoverflow.com/questions/32164501/error-use-of-deleted-function-bool-regex-match-with-gcc-5-2-0
     // Hence "string_line" is used
@@ -161,4 +223,100 @@ void updateFilenames(Filenames& f, const std::string& pathname)
 std::string getDirectoryFromAbsolutePathname(const std::string& pathname)
 {
   return pathname.substr(0, pathname.find_last_of("/"));
+}
+
+std::vector<RawDataProcessor::RawDataProcMethod> getRawDataProcMethodsInput()
+{
+  const std::unordered_map<int, RawDataProcessor::RawDataProcMethod> n_to_method {
+    {1, RawDataProcessor::LOAD_RAW_DATA},
+    {2, RawDataProcessor::LOAD_FEATURES},
+    {3, RawDataProcessor::PICK_FEATURES},
+    {4, RawDataProcessor::FILTER_FEATURES},
+    {5, RawDataProcessor::SELECT_FEATURES},
+    {6, RawDataProcessor::VALIDATE_FEATURES},
+    {7, RawDataProcessor::QUANTIFY_FEATURES},
+    {8, RawDataProcessor::CHECK_FEATURES},
+    {9, RawDataProcessor::STORE_FEATURES},
+    {10, RawDataProcessor::PLOT_FEATURES},
+    {11, RawDataProcessor::SAVE_FEATURES},
+    {12, RawDataProcessor::ANNOTATE_USED_FEATURES},
+    {13, RawDataProcessor::CLEAR_FEATURE_HISTORY}
+  };
+  std::vector<RawDataProcessor::RawDataProcMethod> methods;
+  char line_array[BUF_SIZE];
+  std::istringstream iss;
+
+print_methods_menu:
+  methods.clear();
+  std::cout << "Please select the sequence of methods you want to run.\n" <<
+    "You can select the same method multiple times. Separate choices by a space.\n" <<
+    "You can also select a preset, instead of constructing a custom workflow.\n" <<
+    "Available choices are:\n" <<
+    "[1] LOAD_RAW_DATA\n" <<
+    "[2] LOAD_FEATURES\n" <<
+    "[3] PICK_FEATURES\n" <<
+    "[4] FILTER_FEATURES\n" <<
+    "[5] SELECT_FEATURES\n" <<
+    "[6] VALIDATE_FEATURES\n" <<
+    "[7] QUANTIFY_FEATURES\n" <<
+    "[8] CHECK_FEATURES\n" <<
+    "[9] STORE_FEATURES\n" <<
+    "[10] PLOT_FEATURES\n" <<
+    "[11] SAVE_FEATURES\n" <<
+    "[12] ANNOTATE_USED_FEATURES\n" <<
+    "[13] CLEAR_FEATURE_HISTORY\n\n" <<
+    "[14] Preset: Unknowns\n" <<
+    "[15] Preset: Validation\n" <<
+    "[16] Preset: Standards (not implemented, yet)\n\n" <<
+    "Choose the methods (example: > 1 3 4 4 5 7 8 9) and press Enter:\n" <<
+    "> ";
+  std::cin.getline(line_array, BUF_SIZE);
+  iss.str(line_array);
+  for (int n; iss >> n;) {
+    if (iss.fail()) {
+      std::cout << "Unexpected data in input.\n";
+      std::exit(EXIT_FAILURE);
+    }
+    if (n < 1 || n > 16) {
+      std::cout << "One or more options are not available, try again.\n";
+      goto print_methods_menu;
+    }
+    if (n >= 1 && n <= 13) {
+      methods.push_back(n_to_method.at(n));
+    } else {
+      if (n == 14) {
+        methods = {
+          RawDataProcessor::LOAD_RAW_DATA,
+          RawDataProcessor::PICK_FEATURES,
+          RawDataProcessor::FILTER_FEATURES,
+          RawDataProcessor::FILTER_FEATURES,
+          RawDataProcessor::SELECT_FEATURES,
+          RawDataProcessor::QUANTIFY_FEATURES,
+          RawDataProcessor::CHECK_FEATURES,
+          RawDataProcessor::STORE_FEATURES
+        };
+      } else if (n == 15) {
+        methods = {
+          RawDataProcessor::LOAD_RAW_DATA,
+          RawDataProcessor::PICK_FEATURES,
+          RawDataProcessor::FILTER_FEATURES,
+          RawDataProcessor::SELECT_FEATURES,
+          RawDataProcessor::VALIDATE_FEATURES
+        };
+      } else {
+        methods = {
+          RawDataProcessor::LOAD_RAW_DATA,
+          RawDataProcessor::PICK_FEATURES,
+          RawDataProcessor::FILTER_FEATURES,
+          RawDataProcessor::FILTER_FEATURES,
+          RawDataProcessor::SELECT_FEATURES,
+          RawDataProcessor::CHECK_FEATURES,
+          RawDataProcessor::STORE_FEATURES
+        };
+        throw "Standards workflow is not implemented, yet.\n";
+      }
+      break;
+    }
+  }
+  return methods;
 }
