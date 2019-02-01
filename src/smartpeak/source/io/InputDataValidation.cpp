@@ -20,7 +20,7 @@ namespace SmartPeak
 
   bool InputDataValidation::isValidFilename(const std::string& filename, const std::string& member_name)
   {
-    std::cout << "[" << member_name << "]: ";
+    std::cout << "[" << member_name << "]:\t";
     if (filename.size()) {
       const bool is_valid = fileExists(filename);
       std::cout << filename << ":\t" << (is_valid ? "SUCCESS" : "FAILURE") << '\n';
