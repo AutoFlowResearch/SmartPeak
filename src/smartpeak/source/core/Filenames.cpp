@@ -19,7 +19,7 @@ namespace SmartPeak
     static_filenames.featureQCComponentGroups_csv_i = dir + "/featureQCComponentGroups.csv";
     static_filenames.quantitationMethods_csv_i = dir + "/quantitationMethods.csv";
     static_filenames.standardsConcentrations_csv_i = dir + "/standardsConcentrations.csv";
-    static_filenames.referenceData_csv_i = dir + "referenceData.csv";
+    static_filenames.referenceData_csv_i = dir + "/referenceData.csv";
     static_filenames.sequenceSummary_csv_o = dir + "/SequenceSummary.csv";
     static_filenames.featureSummary_csv_o = dir + "/FeatureSummary.csv";
     return static_filenames;
