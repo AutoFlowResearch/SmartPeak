@@ -248,10 +248,12 @@ std::vector<RawDataProcessor::RawDataProcMethod> getRawDataProcMethodsInput()
 
 print_methods_menu:
   methods.clear();
-  std::cout << "Please select the sequence of methods you want to run.\n" <<
-    "You can select the same method multiple times. Separate choices by a space.\n" <<
-    "You can also select a preset, instead of constructing a custom workflow.\n" <<
-    "Available choices are:\n" <<
+  std::cout << "\n\n\n" <<
+    "Please select the sequence of methods you want to run.\n" <<
+    "You can select the same method multiple times." <<
+    "Separate selected methods with a space.\n" <<
+    "You can also select a preset, instead of constructing a custom workflow.\n\n" <<
+    "Available methods are:\n" <<
     "[1] LOAD_RAW_DATA\n" <<
     "[2] LOAD_FEATURES\n" <<
     "[3] PICK_FEATURES\n" <<
@@ -268,8 +270,9 @@ print_methods_menu:
     "[14] Preset: Unknowns\n" <<
     "[15] Preset: Validation\n" <<
     "[16] Preset: Standards (not implemented, yet)\n\n" <<
-    "Choose the methods (example: > 1 3 4 4 5 7 8 9) and press Enter:\n" <<
+    "Select the methods (example: > 1 3 4 4 5 7 8 9) and press Enter:\n" <<
     "> ";
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
   std::cin.getline(line_array, BUF_SIZE);
   iss.str(line_array);
   for (int n; iss >> n;) {
