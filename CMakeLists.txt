@@ -31,7 +31,7 @@ endif()
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 # Set C++ version
-SET(CMAKE_CXX_STANDARD 11)
+SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #------------------------------------------------------------------------------

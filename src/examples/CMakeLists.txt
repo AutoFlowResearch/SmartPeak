@@ -83,7 +83,7 @@ add_dependencies(PIPELINE_EXAMPLES ${pipeline_executables_list})
 # Add the actual examples
 foreach(_examples ${EXAMPLE_executables})
   add_executable(${_examples} source/${_examples})
-  target_link_libraries(${_examples} ${SmartPeak_LIBRARIES} OpenMS)
+  target_link_libraries(${_examples} ${SmartPeak_LIBRARIES} OpenMS stdc++fs)
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
   # see https://sourceforge.net/apps/trac/open-ms/ticket/280 for details)
   if (OPENMP_FOUND AND NOT MSVC AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
