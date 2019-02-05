@@ -21,7 +21,6 @@ class CommandLine
 public:
   // This will be updated during runtime: an absolute path will be prefixed to it.
   std::string PATHNAMES = "pathnames.txt";
-  const size_t BUF_SIZE = 1048576;
   std::string sequence_pathname_;
 
   Filenames getStaticFilenamesInput(const std::string& sequence_pathname)
@@ -98,14 +97,10 @@ public:
   {
     std::ifstream stream(pathname);
     const std::regex re("([a-zA-Z_]+):([^\\s]*)");
-    char line[BUF_SIZE];
     std::smatch match;
-    while (stream.getline(line, BUF_SIZE)) {
-      // std::regex_match cannot work with temporary objects
-      // https://stackoverflow.com/questions/32164501/error-use-of-deleted-function-bool-regex-match-with-gcc-5-2-0
-      // Hence "string_line" is used
-      const std::string string_line = line;
-      const bool matched = std::regex_match(string_line, match, re);
+    std::string line;
+    while (std::getline(stream, line)) {
+      const bool matched = std::regex_match(line, match, re);
       if (matched == false) {
         std::cout << "\n\nregex did not match with the extracted line: " << line << "\n" <<
           "Please make sure that the format is correct.\n";
@@ -170,10 +165,10 @@ public:
       {13, RawDataProcessor::CLEAR_FEATURE_HISTORY}
     };
     std::vector<RawDataProcessor::RawDataProcMethod> methods;
-    char line_array[BUF_SIZE];
+    std::string line;
     std::istringstream iss;
 
-  print_methods_menu:
+  getRawDataProcMethodsInput_menu:
     methods.clear();
     std::cout << "\n\n\n" <<
       "Please select the sequence of methods you want to run.\n" <<
@@ -197,11 +192,10 @@ public:
       "[14] Preset: Unknowns\n" <<
       "[15] Preset: Validation\n" <<
       "[16] Preset: Standards (not implemented, yet)\n\n" <<
-      "Select the methods (example: > 1 3 4 4 5 7 8 9) and press Enter:\n" <<
-      "> ";
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    std::cin.getline(line_array, BUF_SIZE);
-    iss.str(line_array);
+      "Select the methods (example: > 1 3 4 4 5 7 8 9) and press Enter:\n";
+
+    line = getLineInput("> ");
+    iss.str(line);
     for (int n; iss >> n;) {
       if (iss.fail()) {
         std::cout << "Unexpected data in input.\n";
@@ -209,7 +203,7 @@ public:
       }
       if (n < 1 || n > 16) {
         std::cout << "One or more options are not available, try again.\n";
-        goto print_methods_menu;
+        goto getRawDataProcMethodsInput_menu;
       }
       if (n >= 1 && n <= 13) {
         methods.push_back(n_to_method.at(n));
@@ -253,13 +247,59 @@ public:
 
   void setSequencePathnameFromInput()
   {
-    std::cout << "\n\nPlease provide the pathname for the sequence file.\n"
-      << "Example:\n"
-      // << "> /home/user/data/some_sequence_file.csv\n\n"
-      << "> /home/pasdom/SmartPeak2/src/examples/data/HPLC_UV_Standards/sequence.csv\n\n"
-      << "Enter the absolute pathname:\n"
-      << "> ";
-    std::cin >> sequence_pathname_;
+    std::cout << "\n\nPlease provide the pathname for the sequence file.\n" <<
+      "Example:\n" <<
+      // "> /home/user/data/some_sequence_file.csv\n\n" <<
+      "> /home/pasdom/SmartPeak2/src/examples/data/HPLC_UV_Standards/sequence.csv\n\n" <<
+      "Enter the absolute pathname:\n";
+    while (true) {
+      sequence_pathname_ = getLineInput("> ");
+      if (sequence_pathname_.size()) {
+        break;
+      } else {
+        std::cout << "Input cannot be empty.\n";
+      }
+    }
+  }
+
+  std::string getLineInput(const std::string& message = "")
+  {
+    if (message.size()) {
+      std::cout << message;
+    }
+    std::string line;
+    std::getline(std::cin, line);
+    return line;
+  }
+
+  MetaDataHandler::SampleType getSampleTypeInput()
+  {
+    std::cout << "Please select the sample type. Insert its index:\n" <<
+      "[1] Unknown\n" <<
+      "[2] Standard\n" <<
+      "[3] QC\n" <<
+      "[4] Blank\n" <<
+      "[5] DoubleBlank\n" <<
+      "[6] Solvent\n";
+    while (true) {
+      const std::string line = getLineInput("> ");
+      switch (std::stoi(line)) {
+        case 1:
+          return MetaDataHandler::Unknown;
+        case 2:
+          return MetaDataHandler::Standard;
+        case 3:
+          return MetaDataHandler::QC;
+        case 4:
+          return MetaDataHandler::Blank;
+        case 5:
+          return MetaDataHandler::DoubleBlank;
+        case 6:
+          return MetaDataHandler::Solvent;
+        default:
+          std::cout << "Sample type is incorrect. Try again.\n";
+      }
+    }
   }
 
   CommandLine(int argc, char **argv)
@@ -282,14 +322,16 @@ public:
     const std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods =
       getRawDataProcMethodsInput();
 
-    const std::string directory = getDirectoryFromAbsolutePathname(sequence_pathname_);
+    // const std::string directory = getDirectoryFromAbsolutePathname(sequence_pathname_);
+    const std::string directory = fs::path(sequence_pathname_).parent_path().string();
     const std::string mzML_dir = directory + "/mzML";
     const std::string features_in_dir = directory + "/features";
     const std::string features_out_dir = directory + "/features";
 
-    std::cout << "Input .mzML files are searched in: " << mzML_dir;
-    std::cout << "Input .featureXML files are searched in: " << features_in_dir;
-    std::cout << "Output .featureXML files are stored in: " << features_out_dir;
+    std::cout << "\n\n" <<
+      "Input .mzML files are searched in:\t" << mzML_dir << '\n' <<
+      "Input .featureXML files are searched in:\t" << features_in_dir << '\n' <<
+      "Output .featureXML files are stored in:\t" << features_out_dir << '\n';
 
     std::map<std::string, Filenames> dynamic_filenames;
     for (const SampleHandler& sample : sequenceHandler.getSequence()) {
@@ -303,6 +345,19 @@ public:
       );
     }
 
+    std::cout << "\nChoose if summary files should be stored at the end of the pipeline.\n";
+    const std::string answer1 = getLineInput("SequenceSummary.csv? [y]/n\n");
+    MetaDataHandler::SampleType sampleType1;
+    if (answer1.empty() || answer1 == "y") {
+      sampleType1 = getSampleTypeInput();
+    }
+
+    const std::string answer2 = getLineInput("FeatureSummary.csv? [y]/n\n");
+    MetaDataHandler::SampleType sampleType2;
+    if (answer2.empty() || answer2 == "y") {
+      sampleType2 = getSampleTypeInput();
+    }
+
     SequenceProcessor::processSequence(
       sequenceHandler,
       dynamic_filenames,
@@ -311,25 +366,33 @@ public:
       verbose_I
     );
 
-    SequenceParser::writeDataMatrixFromMetaValue(
-      sequenceHandler,
-      static_filenames.sequenceSummary_csv_o,
-      {"calculated_concentration"},
-      {MetaDataHandler::SampleType::Unknown}
-    );
+    if (answer1.empty() || answer1 == "y") {
+      const std::string pathname = directory + "/SequenceSummary.csv";
+      SequenceParser::writeDataMatrixFromMetaValue(
+        sequenceHandler,
+        pathname,
+        {"calculated_concentration"},
+        {sampleType1}
+      );
+      std::cout << "SequenceSummary.csv file has been stored at: " << pathname << '\n';
+    }
 
-    SequenceParser::writeDataTableFromMetaValue(
-      sequenceHandler,
-      static_filenames.featureSummary_csv_o,
-      {
-        "peak_apex_int", "total_width", "width_at_50", "tailing_factor",
-        "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
-        "points_across_half_height", "logSN", "calculated_concentration",
-        "QC_transition_message", "QC_transition_pass", "QC_transition_score",
-        "QC_transition_group_message", "QC_transition_group_score"
-      },
-      {MetaDataHandler::SampleType::Unknown}
-    );
+    if (answer2.empty() || answer2 == "y") {
+      const std::string pathname = directory + "/FeatureSummary.csv";
+      SequenceParser::writeDataTableFromMetaValue(
+        sequenceHandler,
+        pathname,
+        {
+          "peak_apex_int", "total_width", "width_at_50", "tailing_factor",
+          "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
+          "points_across_half_height", "logSN", "calculated_concentration",
+          "QC_transition_message", "QC_transition_pass", "QC_transition_score",
+          "QC_transition_group_message", "QC_transition_group_score"
+        },
+        {sampleType2}
+      );
+      std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
+    }
   }
 };
 
@@ -338,5 +401,3 @@ int main(int argc, char **argv)
   CommandLine cli(argc, argv);
   return 0;
 }
-
-
