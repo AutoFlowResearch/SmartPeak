@@ -16,11 +16,11 @@ namespace fs = std::experimental::filesystem;
 
 using namespace SmartPeak;
 
-class CommandLine
+class CommandLine final
 {
 public:
   // This will be updated during runtime: an absolute path will be prefixed to it.
-  std::string PATHNAMES = "pathnames.txt";
+  std::string pathnamesTxtPath_ = "pathnames.txt";
   std::string sequence_pathname_;
 
   Filenames buildStaticFilenames()
@@ -29,18 +29,18 @@ public:
     Filenames f = Filenames::getDefaultStaticFilenames(directory);
     f.sequence_csv_i = sequence_pathname_;
 
-    PATHNAMES = directory + "/" + std::string(PATHNAMES);
+    pathnamesTxtPath_ = directory + "/" + std::string(pathnamesTxtPath_);
 
-    if (InputDataValidation::fileExists(PATHNAMES)) {
+    if (InputDataValidation::fileExists(pathnamesTxtPath_)) {
       std::cout << "\n\n" <<
-        "File " << PATHNAMES << " was found in the directory. This file contains information about where the various experiment's files are found.\n\n" <<
+        "File " << pathnamesTxtPath_ << " was found in the directory. This file contains information about where the various experiment's files are found.\n\n" <<
         "Should its values be used to search for pathnames? [y]/n\n";
       const std::string in = getLineInput("> ");
       if (in.empty() || in.front() == 'y') {
-        updateFilenames(f, PATHNAMES);
-        std::cout << "Values in " << PATHNAMES << ": USED\n";
+        updateFilenames(f, pathnamesTxtPath_);
+        std::cout << "Values in " << pathnamesTxtPath_ << ": USED\n";
       } else {
-        std::cout << "Values in " << PATHNAMES << ": IGNORED\n";
+        std::cout << "Values in " << pathnamesTxtPath_ << ": IGNORED\n";
       }
     }
 
@@ -62,9 +62,9 @@ public:
       [](const bool arg){ return false == arg; });
 
     if (something_has_failed) {
-      generatePathnamesTxt(PATHNAMES, f, is_valid);
+      generatePathnamesTxt(pathnamesTxtPath_, f, is_valid);
       std::cout << "\n\nOne or more files were not found.\n" <<
-        "The file " << PATHNAMES <<
+        "The file " << pathnamesTxtPath_ <<
         " has been generated for you to fix pathnames.\n" <<
         "The incorrect information has been replaced with an empty value.\n" <<
         "If you want a pathname to be ignored, then remove its value and leave only the label.\n" <<
@@ -111,7 +111,8 @@ public:
     while (std::getline(stream, line)) {
       const bool matched = std::regex_match(line, match, re);
       if (matched == false) {
-        std::cout << "\n\nregex did not match with the extracted line: " << line << "\n" <<
+        std::cout << "\n\n" <<
+          "Regex did not match with the line: " << line << "\n" <<
           "Please make sure that the format is correct.\n";
         std::exit(EXIT_FAILURE);
       }
@@ -143,7 +144,7 @@ public:
       } else if (label == "reference_data") {
         f.referenceData_csv_i = value;
       } else {
-        std::cout << "\n\nlabel is not valid: " << label << "\n";
+        std::cout << "\n\nLabel is not valid: " << label << "\n";
         std::exit(EXIT_FAILURE);
       }
     }
