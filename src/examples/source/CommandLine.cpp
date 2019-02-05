@@ -23,21 +23,29 @@ public:
   std::string PATHNAMES = "pathnames.txt";
   std::string sequence_pathname_;
 
-  Filenames getStaticFilenamesInput(const std::string& sequence_pathname)
+  Filenames buildStaticFilenames()
   {
-    const std::string directory = getDirectoryFromAbsolutePathname(sequence_pathname);
+    const std::string directory = fs::path(sequence_pathname_).parent_path().string();
     Filenames f = Filenames::getDefaultStaticFilenames(directory);
-    f.sequence_csv_i = sequence_pathname;
+    f.sequence_csv_i = sequence_pathname_;
 
     PATHNAMES = directory + "/" + std::string(PATHNAMES);
 
     if (InputDataValidation::fileExists(PATHNAMES)) {
-      std::cout << "File " << PATHNAMES << " was found.\n" <<
-        "Its values will be used to search for pathnames.\n\n";
-      updateFilenames(f, PATHNAMES);
+      std::cout << "\n\n" <<
+        "File " << PATHNAMES << " was found in the directory. This file contains information about where the various experiment's files are found.\n\n" <<
+        "Should its values be used to search for pathnames? [y]/n\n";
+      const std::string in = getLineInput("> ");
+      if (in.empty() || in.front() == 'y') {
+        updateFilenames(f, PATHNAMES);
+        std::cout << "Values in " << PATHNAMES << ": USED\n";
+      } else {
+        std::cout << "Values in " << PATHNAMES << ": IGNORED\n";
+      }
     }
 
-    std::cout << "The following list of file was searched for:\n";
+    std::cout << "\n\n" <<
+      "The following list of file was searched for:\n";
     std::vector<bool> is_valid(10);
     is_valid[0] = InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence");
     is_valid[1] = InputDataValidation::isValidFilename(f.parameters_csv_i, "parameters");
@@ -75,7 +83,8 @@ public:
       std::exit(EXIT_FAILURE);
     }
     std::vector<bool>::const_iterator it = is_valid.cbegin();
-    ofs << "sequence:"                  << getPathnameOrPlaceholder(f.sequence_csv_i, *it++) <<
+    ofs <<
+      "sequence:"                 << getPathnameOrPlaceholder(f.sequence_csv_i, *it++) <<
       "parameters:"               << getPathnameOrPlaceholder(f.parameters_csv_i, *it++) <<
       "traml:"                    << getPathnameOrPlaceholder(f.traML_csv_i, *it++) <<
       "feature_filter_c:"         << getPathnameOrPlaceholder(f.featureFilterComponents_csv_i, *it++) <<
@@ -138,13 +147,6 @@ public:
         std::exit(EXIT_FAILURE);
       }
     }
-  }
-
-  // It doesn't return the last slash
-  // It is assumed that the file is not found in the root directory /
-  std::string getDirectoryFromAbsolutePathname(const std::string& pathname)
-  {
-    return pathname.substr(0, pathname.find_last_of("/"));
   }
 
   std::vector<RawDataProcessor::RawDataProcMethod> getRawDataProcMethodsInput()
@@ -312,9 +314,9 @@ public:
       setSequencePathnameFromInput();
     }
 
-    const Filenames static_filenames = getStaticFilenamesInput(sequence_pathname_);
+    const Filenames static_filenames = buildStaticFilenames();
 
-    const bool verbose_I = true;
+    const bool verbose_I = false;
 
     SequenceHandler sequenceHandler;
     SequenceProcessor::createSequence(sequenceHandler, static_filenames, ",", verbose_I);
@@ -322,8 +324,8 @@ public:
     const std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods =
       getRawDataProcMethodsInput();
 
-    // const std::string directory = getDirectoryFromAbsolutePathname(sequence_pathname_);
     const std::string directory = fs::path(sequence_pathname_).parent_path().string();
+    // TODO: ask for the three following pathnames instead of hardcoding them
     const std::string mzML_dir = directory + "/mzML";
     const std::string features_in_dir = directory + "/features";
     const std::string features_out_dir = directory + "/features";
@@ -345,16 +347,17 @@ public:
       );
     }
 
-    std::cout << "\nChoose if summary files should be stored at the end of the pipeline.\n";
-    const std::string answer1 = getLineInput("SequenceSummary.csv? [y]/n\n");
+    std::cout << "\n\n" <<
+      "Choose if summary files should be stored when computation is done.\n";
+    const std::string answer1 = getLineInput("\nSequenceSummary.csv? [y]/n\n");
     MetaDataHandler::SampleType sampleType1;
-    if (answer1.empty() || answer1 == "y") {
+    if (answer1.empty() || answer1.front() == 'y') {
       sampleType1 = getSampleTypeInput();
     }
 
-    const std::string answer2 = getLineInput("FeatureSummary.csv? [y]/n\n");
+    const std::string answer2 = getLineInput("\nFeatureSummary.csv? [y]/n\n");
     MetaDataHandler::SampleType sampleType2;
-    if (answer2.empty() || answer2 == "y") {
+    if (answer2.empty() || answer2.front() == 'y') {
       sampleType2 = getSampleTypeInput();
     }
 
@@ -366,7 +369,7 @@ public:
       verbose_I
     );
 
-    if (answer1.empty() || answer1 == "y") {
+    if (answer1.empty() || answer1.front() == 'y') {
       const std::string pathname = directory + "/SequenceSummary.csv";
       SequenceParser::writeDataMatrixFromMetaValue(
         sequenceHandler,
@@ -377,7 +380,7 @@ public:
       std::cout << "SequenceSummary.csv file has been stored at: " << pathname << '\n';
     }
 
-    if (answer2.empty() || answer2 == "y") {
+    if (answer2.empty() || answer2.front() == 'y') {
       const std::string pathname = directory + "/FeatureSummary.csv";
       SequenceParser::writeDataTableFromMetaValue(
         sequenceHandler,
