@@ -197,7 +197,9 @@ public:
       "[16] Preset: Standards (not implemented, yet)\n\n" <<
       "Select the methods (example: > 1 3 4 4 5 7 8 9) and press Enter:\n";
 
-    line = getLineInput("> ");
+    do {
+      line = getLineInput("> ");
+    } while (line.empty());
     iss.str(line);
     for (int n; iss >> n;) {
       if (iss.fail()) {
