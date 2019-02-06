@@ -45,12 +45,9 @@ void example_LCMS_MRM_Standards(
     true
   );
 
-  const std::vector<std::string> sequence_segment_processing_methods = {
-    "calculate_calibration",
-  // "plot_calibrators",
-    "store_quantitation_methods",
-  // # "load_quantitation_methods",
-  // # "store_components_to_concentrations"
+  const std::vector<SequenceSegmentProcessor::SeqSegProcMethod> sequence_segment_processing_methods = {
+    SequenceSegmentProcessor::CALCULATE_CALIBRATION,
+    SequenceSegmentProcessor::STORE_QUANTITATION_METHODS,
   };
 
   std::map<std::string, Filenames> dynamic_filenames2;

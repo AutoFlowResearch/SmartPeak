@@ -196,7 +196,8 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
 {
   SequenceHandler sequenceHandler;
   SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
-  const vector<string> raw_data_processing_methods = { "calculate_calibration" };
+  const vector<SequenceSegmentProcessor::SeqSegProcMethod> raw_data_processing_methods =
+    { SequenceSegmentProcessor::CALCULATE_CALIBRATION };
 
   std::map<std::string, Filenames> dynamic_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");

@@ -155,7 +155,7 @@ namespace SmartPeak
     SequenceHandler& sequenceHandler_IO,
     const std::map<std::string, Filenames>& filenames,
     const std::set<std::string>& sequence_segment_names,
-    const std::vector<std::string>& sequence_segment_processing_methods_I,
+    const std::vector<SequenceSegmentProcessor::SeqSegProcMethod>& sequence_segment_processing_methods_I,
     const bool verbose_I
   )
   {
@@ -176,7 +176,7 @@ namespace SmartPeak
     }
 
     for (SequenceSegmentHandler& sequence_segment : sequence_segments) {
-      std::vector<std::string> sequence_segment_processing_methods;
+      std::vector<SequenceSegmentProcessor::SeqSegProcMethod> sequence_segment_processing_methods;
 
       // collect its methods
       if (sequence_segment_processing_methods_I.size()) {
@@ -185,14 +185,13 @@ namespace SmartPeak
         for (const size_t sample_index : sequence_segment.getSampleIndices()) {
           const MetaDataHandler::SampleType sample_type =
             sequenceHandler_IO.getSequence().at(sample_index).getMetaData().getSampleType();
-          std::vector<std::string> workflow;
-          SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(sample_type, workflow);
-          sequence_segment_processing_methods = workflow;
+          sequence_segment_processing_methods =
+            SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(sample_type);
         }
       }
 
       // and process them
-      for (const std::string& event : sequence_segment_processing_methods) {
+      for (const SequenceSegmentProcessor::SeqSegProcMethod event : sequence_segment_processing_methods) {
         SequenceSegmentProcessor::processSequenceSegment(
           sequence_segment,
           sequenceHandler_IO,

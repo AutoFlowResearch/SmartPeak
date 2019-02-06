@@ -15,6 +15,12 @@ public:
     SequenceSegmentProcessor() = delete;
     ~SequenceSegmentProcessor() = delete;
 
+    enum SeqSegProcMethod {
+      CALCULATE_CALIBRATION = 1,
+      STORE_QUANTITATION_METHODS,
+      LOAD_QUANTITATION_METHODS,
+    };
+
     static void getSampleIndicesBySampleType(
       const SequenceSegmentHandler& sequenceSegmentHandler,
       const SequenceHandler& sequenceHandler,
@@ -40,15 +46,14 @@ public:
     static void processSequenceSegment(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       SequenceHandler& sequenceHandler_IO,
-      const std::string& sequence_segment_processing_event,
+      const SeqSegProcMethod sequence_segment_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
       const Filenames& filenames,
       const bool verbose_I = false
     );
 
-    static void getDefaultSequenceSegmentProcessingWorkflow(
-      const MetaDataHandler::SampleType sample_type,
-      std::vector<std::string>& default_workflow
+    static std::vector<SeqSegProcMethod> getDefaultSequenceSegmentProcessingWorkflow(
+      const MetaDataHandler::SampleType sample_type
     );
 
     static bool checkSequenceSegmentProcessing(

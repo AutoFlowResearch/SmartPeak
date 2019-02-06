@@ -6,6 +6,7 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
+#include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <vector>
 
 namespace SmartPeak
@@ -37,7 +38,8 @@ public:
       SequenceHandler& sequenceHandler_IO,
       const std::map<std::string, Filenames>& filenames,
       const std::vector<std::string>& injection_names = std::vector<std::string>(),
-      const std::vector<RawDataProcessor::RawDataProcMethod>& raw_data_processing_methods_I = std::vector<RawDataProcessor::RawDataProcMethod>(),
+      const std::vector<RawDataProcessor::RawDataProcMethod>& raw_data_processing_methods_I =
+        std::vector<RawDataProcessor::RawDataProcMethod>(),
       const bool verbose_I = true
     );
 
@@ -45,7 +47,8 @@ public:
       SequenceHandler& sequenceHandler_IO,
       const std::map<std::string, Filenames>& filenames,
       const std::set<std::string>& sequence_segment_names = std::set<std::string>(),
-      const std::vector<std::string>& sequence_segment_processing_methods_I = std::vector<std::string>(),
+      const std::vector<SequenceSegmentProcessor::SeqSegProcMethod>& sequence_segment_processing_methods_I =
+        std::vector<SequenceSegmentProcessor::SeqSegProcMethod>(),
       const bool verbose_I = true
     );
   };
