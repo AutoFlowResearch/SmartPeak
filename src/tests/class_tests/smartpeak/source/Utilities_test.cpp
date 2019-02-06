@@ -284,6 +284,38 @@ BOOST_AUTO_TEST_CASE(computeConfusionMatrix)
   BOOST_CHECK_EQUAL(conf[3], 3); // TN
 }
 
+BOOST_AUTO_TEST_CASE(trimString)
+{
+  std::string s;
+
+  s = Utilities::trimString(""); // empty string
+  BOOST_CHECK_EQUAL(s, "");
+
+  s = Utilities::trimString(" \f\n\r\t\v \f\n\r\t\v \f\n\r\t\v"); // only whitespaces
+  BOOST_CHECK_EQUAL(s, "");
+
+  s = Utilities::trimString("this is a string"); // no whitespaces
+  BOOST_CHECK_EQUAL(s, "this is a string");
+
+  s = Utilities::trimString(" \f\n\r\t\vwhitespaces on BOTH sides\v\t\r\n\f ");
+  BOOST_CHECK_EQUAL(s, "whitespaces on BOTH sides");
+
+  s = Utilities::trimString(" \f\n\r\t\vonly on the LEFT side");
+  BOOST_CHECK_EQUAL(s, "only on the LEFT side");
+
+  s = Utilities::trimString("only on the RIGHT side\v\t\r\n\f ");
+  BOOST_CHECK_EQUAL(s, "only on the RIGHT side");
+
+  s = Utilities::trimString("             let's do one more\t\t\t ");
+  BOOST_CHECK_EQUAL(s, "let's do one more");
+
+  s = Utilities::trimString("AEIOU but this will stay UOIEA", "AEIOU "); // with whitespaces argument
+  BOOST_CHECK_EQUAL(s, "but this will stay");
+
+  s = Utilities::trimString(" \t nothing will be removed\v", ""); // with empty whitespaces argument
+  BOOST_CHECK_EQUAL(s, " \t nothing will be removed\v");
+}
+
 BOOST_AUTO_TEST_CASE(extractSelectorParameters)
 {
   const std::vector<std::map<std::string, std::string>> params = {

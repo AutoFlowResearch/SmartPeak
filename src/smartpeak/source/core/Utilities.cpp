@@ -1,9 +1,10 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/Utilities.h>
-#include <regex>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <iostream>
+#include <regex>
+#include <unordered_set>
 
 namespace SmartPeak
 {
@@ -298,6 +299,28 @@ namespace SmartPeak
       words.emplace_back(s.substr(l));
     }
     return words;
+  }
+
+  std::string Utilities::trimString(
+    const std::string& s,
+    const std::string& whitespaces
+  )
+  {
+    if (s.empty()) {
+      return s;
+    }
+
+    const std::unordered_set<char> characters(whitespaces.cbegin(), whitespaces.cend());
+
+    int l, r;
+
+    for (l = 0; static_cast<size_t>(l) < s.size() && characters.count(s[l]); ++l)
+      ;
+
+    for (r = s.size() - 1; r >= 0 && characters.count(s[r]); --r)
+      ;
+
+    return s.substr(l, r - l + 1);
   }
 
   std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> Utilities::extractSelectorParameters(

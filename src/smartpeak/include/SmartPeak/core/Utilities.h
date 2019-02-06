@@ -6,6 +6,7 @@
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <iostream>
 #include <regex>
+#include <unordered_set>
 #define maxFunc(a,b) (((a) > (b)) ? (a) : (b))
 
 namespace SmartPeak
@@ -337,6 +338,11 @@ public:
     static std::vector<std::string> splitString(
       const std::string& s,
       const char sep
+    );
+
+    static std::string trimString(
+      const std::string& s,
+      const std::string& whitespaces = " \f\n\r\t\v" // std::isspace()
     );
 
     template<typename T>
