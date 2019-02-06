@@ -274,6 +274,7 @@ public:
     }
     std::string line;
     std::getline(std::cin, line);
+    line = Utilities::trimString(line);
     return line;
   }
 
