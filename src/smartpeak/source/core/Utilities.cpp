@@ -281,23 +281,23 @@ namespace SmartPeak
     const char sep
   )
   {
-    std::vector<std::string> out;
+    std::vector<std::string> words;
     size_t l, r;
     l = r = 0;
-    size_t len = s.size();
+    const size_t len = s.size();
     while (r < len) {
       if (s[r] == sep) {
         if (r - l) {
-          out.emplace_back(s.substr(l, r - l));
+          words.emplace_back(s.substr(l, r - l));
         }
         l = r + 1;
       }
       ++r;
     }
     if (r != 0 && r - l) {
-      out.emplace_back(s.substr(l));
+      words.emplace_back(s.substr(l));
     }
-    return out;
+    return words;
   }
 
   std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> Utilities::extractSelectorParameters(
