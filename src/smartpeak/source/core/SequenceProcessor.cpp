@@ -121,8 +121,7 @@ namespace SmartPeak
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
-    for (size_t j = 0; j < process_sequence.size(); ++j) {
-      SampleHandler& sample = process_sequence[j];
+    for (SampleHandler& sample : process_sequence) {
       std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods;
 
       if (raw_data_processing_methods_I.size()) {
@@ -176,8 +175,7 @@ namespace SmartPeak
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
-    for (size_t j = 0; j < sequence_segments.size(); ++j) { // for each sequence segment
-      SequenceSegmentHandler& sequence_segment = sequence_segments[j];
+    for (SequenceSegmentHandler& sequence_segment : sequence_segments) {
       std::vector<std::string> sequence_segment_processing_methods;
 
       // collect its methods
