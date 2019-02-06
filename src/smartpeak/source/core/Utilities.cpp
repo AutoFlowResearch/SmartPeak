@@ -317,7 +317,7 @@ namespace SmartPeak
     for (l = 0; static_cast<size_t>(l) < s.size() && characters.count(s[l]); ++l)
       ;
 
-    for (r = s.size() - 1; r >= 0 && characters.count(s[r]); --r)
+    for (r = s.size() - 1; r >= l && characters.count(s[r]); --r)
       ;
 
     return s.substr(l, r - l + 1);
