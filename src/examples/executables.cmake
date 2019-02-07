@@ -6,6 +6,7 @@ set(pipeline_executables_list
   LCMS_MRM_QCs_test
   LCMS_MRM_Standards_test
   LCMS_MRM_Unknown_test
+  Validation_test
 )
 
 set(interactive_executables_list
