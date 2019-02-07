@@ -40,7 +40,7 @@ public:
     );
 
     std::vector<SampleHandler> getSamplesInSequence(
-      const std::vector<std::string>& injection_names
+      const std::set<std::string>& injection_names
     ) const;
 
     static Utilities::CastValue getMetaValue(

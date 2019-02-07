@@ -368,7 +368,7 @@ public:
     SequenceProcessor::processSequence(
       sequenceHandler,
       dynamic_filenames,
-      std::vector<std::string>(),
+      std::set<std::string>(),
       raw_data_processing_methods,
       verbose_I
     );

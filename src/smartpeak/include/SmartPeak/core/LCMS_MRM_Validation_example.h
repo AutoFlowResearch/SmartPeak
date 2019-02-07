@@ -38,7 +38,7 @@ void example_LCMS_MRM_Validation(
   SequenceProcessor::processSequence(
     sequenceHandler,
     dynamic_filenames,
-    std::vector<std::string>(),
+    std::set<std::string>(),
     raw_data_processing_methods,
     true
   );

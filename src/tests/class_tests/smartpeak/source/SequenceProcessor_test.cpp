@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
     );
   }
 
-  SequenceProcessor::processSequence(sequenceHandler, dynamic_filenames, std::vector<std::string>(), raw_data_processing_methods);
+  SequenceProcessor::processSequence(sequenceHandler, dynamic_filenames, std::set<std::string>(), raw_data_processing_methods);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 340); // loaded
 }

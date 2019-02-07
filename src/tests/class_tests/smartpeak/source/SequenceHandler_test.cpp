@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(getSamplesInSequence)
   sequenceHandler.addSampleToSequence(meta_data2, featuremap);
   sequenceHandler.addSampleToSequence(meta_data3, featuremap);
 
-  const vector<string> injection_names = {
+  const set<string> injection_names = {
     "sample1_-1_9_1900-01-00_000000",
     "foo",
     "sample3_-1_9_1900-01-00_000000"

@@ -37,7 +37,7 @@ public:
     static void processSequence(
       SequenceHandler& sequenceHandler_IO,
       const std::map<std::string, Filenames>& filenames,
-      const std::vector<std::string>& injection_names = std::vector<std::string>(),
+      const std::set<std::string>& injection_names = std::set<std::string>(),
       const std::vector<RawDataProcessor::RawDataProcMethod>& raw_data_processing_methods_I =
         std::vector<RawDataProcessor::RawDataProcMethod>(),
       const bool verbose_I = true

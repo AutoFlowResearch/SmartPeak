@@ -104,7 +104,7 @@ namespace SmartPeak
   void SequenceProcessor::processSequence(
     SequenceHandler& sequenceHandler_IO,
     const std::map<std::string, Filenames>& filenames,
-    const std::vector<std::string>& injection_names,
+    const std::set<std::string>& injection_names,
     const std::vector<RawDataProcessor::RawDataProcMethod>& raw_data_processing_methods_I,
     const bool verbose_I
   )

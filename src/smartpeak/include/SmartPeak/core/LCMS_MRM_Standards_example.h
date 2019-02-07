@@ -40,7 +40,7 @@ void example_LCMS_MRM_Standards(
   SequenceProcessor::processSequence(
     sequenceHandler,
     dynamic_filenames1,
-    std::vector<std::string>(),
+    std::set<std::string>(),
     raw_data_processing_methods,
     true
   );
@@ -91,7 +91,7 @@ void example_LCMS_MRM_Standards(
   SequenceProcessor::processSequence(
     sequenceHandler,
     dynamic_filenames3,
-    std::vector<std::string>(),
+    std::set<std::string>(),
     raw_data_processing_methods,
     true
   );

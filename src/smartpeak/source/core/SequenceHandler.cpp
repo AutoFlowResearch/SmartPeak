@@ -88,7 +88,7 @@ namespace SmartPeak
   }
 
   std::vector<SampleHandler> SequenceHandler::getSamplesInSequence(
-    const std::vector<std::string>& injection_names
+    const std::set<std::string>& injection_names
   ) const
   {
     std::vector<SampleHandler> samples;
