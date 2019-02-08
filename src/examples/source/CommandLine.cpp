@@ -97,7 +97,8 @@ public:
 
     if (InputDataValidation::fileExists(pathnamesFilePath)) {
       std::cout << "\n\n" <<
-        "File " << pathnamesFilePath << " was found in the directory. This file contains information about where the various experiment's files are found.\n\n" <<
+        "File " << pathnamesFilePath << " was found in the same directory. " <<
+        "This file contains information about where the various experiment's files are found.\n\n" <<
         "Should its values be used to search for pathnames? [y]/n\n";
       const std::string in = getLineInput("> ");
       std::cout << '\n';
@@ -147,16 +148,16 @@ public:
     }
     std::vector<bool>::const_iterator it = is_valid.cbegin();
     ofs <<
-      "sequence:"                 << getPathnameOrPlaceholder(f.sequence_csv_i, *it++) <<
-      "parameters:"               << getPathnameOrPlaceholder(f.parameters_csv_i, *it++) <<
-      "traml:"                    << getPathnameOrPlaceholder(f.traML_csv_i, *it++) <<
-      "feature_filter_c:"         << getPathnameOrPlaceholder(f.featureFilterComponents_csv_i, *it++) <<
-      "feature_filter_c_groups:"  << getPathnameOrPlaceholder(f.featureFilterComponentGroups_csv_i, *it++) <<
-      "feature_qc_c:"             << getPathnameOrPlaceholder(f.featureQCComponents_csv_i, *it++) <<
-      "feature_qc_c_groups:"      << getPathnameOrPlaceholder(f.featureQCComponentGroups_csv_i, *it++) <<
-      "quantitation_methods:"     << getPathnameOrPlaceholder(f.quantitationMethods_csv_i, *it++) <<
-      "standards_concentrations:" << getPathnameOrPlaceholder(f.standardsConcentrations_csv_i, *it++) <<
-      "reference_data:"           << getPathnameOrPlaceholder(f.referenceData_csv_i, *it++);
+      "sequence="                 << getPathnameOrPlaceholder(f.sequence_csv_i, *it++) <<
+      "parameters="               << getPathnameOrPlaceholder(f.parameters_csv_i, *it++) <<
+      "traml="                    << getPathnameOrPlaceholder(f.traML_csv_i, *it++) <<
+      "feature_filter_c="         << getPathnameOrPlaceholder(f.featureFilterComponents_csv_i, *it++) <<
+      "feature_filter_c_groups="  << getPathnameOrPlaceholder(f.featureFilterComponentGroups_csv_i, *it++) <<
+      "feature_qc_c="             << getPathnameOrPlaceholder(f.featureQCComponents_csv_i, *it++) <<
+      "feature_qc_c_groups="      << getPathnameOrPlaceholder(f.featureQCComponentGroups_csv_i, *it++) <<
+      "quantitation_methods="     << getPathnameOrPlaceholder(f.quantitationMethods_csv_i, *it++) <<
+      "standards_concentrations=" << getPathnameOrPlaceholder(f.standardsConcentrations_csv_i, *it++) <<
+      "reference_data="           << getPathnameOrPlaceholder(f.referenceData_csv_i, *it++);
   }
 
   std::string getPathnameOrPlaceholder(const std::string& pathname, const bool is_valid)
@@ -168,7 +169,7 @@ public:
   void updateFilenames(Filenames& f, const std::string& pathname)
   {
     std::ifstream stream(pathname);
-    const std::regex re("([a-zA-Z_]+):([^\\s]*)");
+    const std::regex re("([a-zA-Z_]+)=([^\\s]*)");
     std::smatch match;
     std::string line;
     while (std::getline(stream, line)) {
@@ -184,7 +185,7 @@ public:
       if (match.size() == 3) { // the entire match is at index 0, and parenthesized sub-matches start from index 1
         label = match[1].str();
         value = match[2].str();
-        // std::cout << label << ":" << value << '\n';
+        // std::cout << label << "=" << value << '\n';
       }
       if (label == "sequence") {
         f.sequence_csv_i = value;
@@ -254,7 +255,8 @@ public:
       "[10] PLOT_FEATURES (not implemented)\n" <<
       "[11] SAVE_FEATURES\n" <<
       "[12] ANNOTATE_USED_FEATURES\n" <<
-      "[13] CLEAR_FEATURE_HISTORY\n\n" <<
+      "[13] CLEAR_FEATURE_HISTORY\n" <<
+      "[14] Cancel (go back to main menu)\n\n" <<
       "Select the methods (example: > 1 3 4 4 5 7 8 9) and press Enter:\n";
 
     do {
@@ -264,9 +266,12 @@ public:
     iss.str(line);
 
     for (int n; iss >> n;) {
-      if (n < 1 || n > 13 || n == 10) {
+      if (n < 1 || n > 14 || n == 10) {
         std::cout << "One or more options are not available, try again.\n";
         goto getRawDataProcMethodsInput_menu;
+      }
+      if (n == 14) {
+        return {};
       }
       methods.push_back(n_to_method.at(n));
     }
@@ -296,6 +301,7 @@ public:
       "[1] CALCULATE_CALIBRATION\n" <<
       "[2] STORE_QUANTITATION_METHODS\n" <<
       "[3] LOAD_QUANTITATION_METHODS\n" <<
+      "[4] Cancel (go back to main menu)\n\n" <<
       "Select the methods (example: > 1 2 3) and press Enter:\n";
 
     do {
@@ -305,9 +311,12 @@ public:
     iss.str(line);
 
     for (int n; iss >> n;) {
-      if (n < 1 || n > 3) {
+      if (n < 1 || n > 4) {
         std::cout << "One or more options are not available, try again.\n";
         goto getSeqSegProcMethodsInput_menu;
+      }
+      if (n == 4) {
+        return {};
       }
       methods.push_back(n_to_method.at(n));
     }
@@ -323,7 +332,13 @@ public:
       // "> /home/user/data/some_sequence_file.csv\n\n" <<
       "> /home/pasdom/SmartPeak2/src/examples/data/HPLC_UV_Standards/sequence.csv\n\n" <<
       "Enter the absolute pathname:\n";
-    sequence_pathname_ = getLineInput("> ", false);
+    while (true) {
+      sequence_pathname_ = getLineInput("> ", false);
+      if (fs::exists(sequence_pathname_)) {
+        break;
+      }
+      std::cout << "The file does not exist. Try again.\n";
+    }
   }
 
   std::string getLineInput(const std::string& message = "", const bool canBeEmpty = true)
@@ -371,7 +386,7 @@ public:
 
   CommandLine(int argc, char **argv)
   {
-    if (argc == 2) {
+    if (argc == 2 && fs::exists(argv[1])) {
       sequence_pathname_ = argv[1];
     } else if (fs::exists("sequence.csv")) {
       sequence_pathname_ = fs::current_path().string() + std::string("/sequence.csv");
@@ -398,7 +413,8 @@ public:
       "[3] Add Sequence Segment Processing\t[" << countCommands(Command::SequenceSegmentMethod) << "]\n" <<
       "[4] SequenceSummary.csv\t[" << (storeSequenceSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
       "[5] FeatureSummary.csv\t[" << (storeFeatureSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
-      "[6] Run the pipeline and exit\n";
+      "[6] Run the pipeline and exit\n\n" <<
+      "Please select your action.\n";
   }
 
   int countCommands(Command::CommandType type)
@@ -428,7 +444,11 @@ public:
     case 2:
     {
       Command cmd;
-      cmd.setMethods(getRawDataProcMethodsInput());
+      const std::vector<RawDataProcessor::RawDataProcMethod> methods = getRawDataProcMethodsInput();
+      if (methods.empty()) {
+        break;
+      }
+      cmd.setMethods(methods);
 
       std::string mzML_dir = main_dir_ + "/mzML";
       std::cout << "\nPath for 'mzML' files is currently:\t" << mzML_dir << '\n';
@@ -477,7 +497,11 @@ public:
     case 3:
     {
       Command cmd;
-      cmd.setMethods(getSeqSegProcMethodsInput());
+      const std::vector<SequenceSegmentProcessor::SeqSegProcMethod> methods = getSeqSegProcMethodsInput();
+      if (methods.empty()) {
+        break;
+      }
+      cmd.setMethods(methods);
 
       std::string mzML_dir = main_dir_ + "/mzML";
       std::cout << "\nPath for 'mzML' files is currently:\t" << mzML_dir << '\n';
