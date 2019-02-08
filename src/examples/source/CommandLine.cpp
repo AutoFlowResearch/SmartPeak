@@ -22,7 +22,8 @@ public:
   public:
     Command() : type(RawDataMethod), raw() {}
 
-    ~Command() {
+    ~Command()
+    {
       switch (type) {
       case RawDataMethod:
         raw.~vector();
@@ -33,17 +34,36 @@ public:
       }
     }
 
-    Command(const Command& cmd) {
-      type = cmd.type;
-      if (type == RawDataMethod) {
-        raw = cmd.raw;
+    Command(const Command& other) : type(other.type), raw()
+    {
+      if (other.type == RawDataMethod) {
+        raw = other.raw;
       } else {
-        segment = cmd.segment;
+        raw.~vector();
+        new (&segment) std::vector(other.segment);
       }
-      dynamic_filenames = cmd.dynamic_filenames;
+      dynamic_filenames = other.dynamic_filenames;
     }
 
     enum CommandType { RawDataMethod, SequenceSegmentMethod } type;
+
+    void setMethods(const std::vector<RawDataProcessor::RawDataProcMethod>& methods)
+    {
+      if (type != RawDataMethod) {
+        segment.~vector();
+        type = RawDataMethod;
+      }
+      raw = methods;
+    }
+
+    void setMethods(const std::vector<SequenceSegmentProcessor::SeqSegProcMethod>& methods)
+    {
+      if (type != SequenceSegmentMethod) {
+        raw.~vector();
+        type = SequenceSegmentMethod;
+      }
+      segment = methods;
+    }
 
     union {
       std::vector<RawDataProcessor::RawDataProcMethod> raw;
@@ -54,7 +74,7 @@ public:
   };
 
   // This will be updated during runtime: an absolute path will be prefixed to it.
-  std::string                 pathnamesTxtPath_     = "pathnames.txt";
+  std::string                 pathnamesFilename_    = "pathnames.txt";
   std::string                 sequence_pathname_    = "";
   std::string                 main_dir_             = "";
   bool                        storeSequenceSummary_ = false;
@@ -73,19 +93,19 @@ public:
     f = Filenames::getDefaultStaticFilenames(main_dir_);
     f.sequence_csv_i = sequence_pathname_;
 
-    pathnamesTxtPath_ = main_dir_ + "/" + std::string(pathnamesTxtPath_);
+    const std::string pathnamesFilePath = main_dir_ + "/" + std::string(pathnamesFilename_);
 
-    if (InputDataValidation::fileExists(pathnamesTxtPath_)) {
+    if (InputDataValidation::fileExists(pathnamesFilePath)) {
       std::cout << "\n\n" <<
-        "File " << pathnamesTxtPath_ << " was found in the directory. This file contains information about where the various experiment's files are found.\n\n" <<
+        "File " << pathnamesFilePath << " was found in the directory. This file contains information about where the various experiment's files are found.\n\n" <<
         "Should its values be used to search for pathnames? [y]/n\n";
       const std::string in = getLineInput("> ");
       std::cout << '\n';
       if (in.empty() || in.front() == 'y') {
-        updateFilenames(f, pathnamesTxtPath_);
-        std::cout << "Values in " << pathnamesTxtPath_ << ": USED\n";
+        updateFilenames(f, pathnamesFilePath);
+        std::cout << "Values in " << pathnamesFilePath << ": USED\n";
       } else {
-        std::cout << "Values in " << pathnamesTxtPath_ << ": IGNORED\n";
+        std::cout << "Values in " << pathnamesFilePath << ": IGNORED\n";
       }
     }
 
@@ -107,9 +127,9 @@ public:
       [](const bool arg){ return false == arg; });
 
     if (something_has_failed) {
-      generatePathnamesTxt(pathnamesTxtPath_, f, is_valid);
+      generatePathnamesTxt(pathnamesFilePath, f, is_valid);
       std::cout << "\n\nOne or more files were not found.\n" <<
-        "The file " << pathnamesTxtPath_ <<
+        "The file " << pathnamesFilePath <<
         " has been generated for you to fix pathnames.\n" <<
         "The incorrect information has been replaced with an empty value.\n" <<
         "If you want a pathname to be ignored, then remove its value and leave only the label.\n" <<
@@ -217,7 +237,7 @@ public:
   getRawDataProcMethodsInput_menu:
     methods.clear();
 
-    std::cout << "\n\n\n" <<
+    std::cout << "\n\n" <<
       "Please select the sequence of methods you want to run.\n" <<
       "You can select the same method multiple times." <<
       "Separate selected methods with a space.\n" <<
@@ -268,14 +288,14 @@ public:
   getSeqSegProcMethodsInput_menu:
     methods.clear();
 
-    std::cout << "\n\n\n" <<
+    std::cout << "\n\n" <<
       "Please select the sequence of methods you want to run.\n" <<
       "You can select the same method multiple times." <<
       "Separate selected methods with a space.\n" <<
       "Available methods are:\n" <<
-      "[1] LOAD_RAW_DATA\n" <<
-      "[2] LOAD_FEATURES\n" <<
-      "[3] PICK_FEATURES\n" <<
+      "[1] CALCULATE_CALIBRATION\n" <<
+      "[2] STORE_QUANTITATION_METHODS\n" <<
+      "[3] LOAD_QUANTITATION_METHODS\n" <<
       "Select the methods (example: > 1 2 3) and press Enter:\n";
 
     do {
@@ -297,7 +317,8 @@ public:
 
   void setSequencePathnameFromInput()
   {
-    std::cout << "\n\nPlease provide the pathname for the sequence file.\n" <<
+    std::cout << "\n\n" <<
+      "Please provide the pathname for the sequence file.\n" <<
       "Example:\n" <<
       // "> /home/user/data/some_sequence_file.csv\n\n" <<
       "> /home/pasdom/SmartPeak2/src/examples/data/HPLC_UV_Standards/sequence.csv\n\n" <<
@@ -370,13 +391,13 @@ public:
 
   void printMenu()
   {
-    std::cout << "\n\n\n" <<
+    std::cout << "\n\n" <<
       "SmartPeak main menu\n" <<
       "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n" <<
       "[2] Add Raw Data Processing\t[" << countCommands(Command::RawDataMethod) << "]\n" <<
       "[3] Add Sequence Segment Processing\t[" << countCommands(Command::SequenceSegmentMethod) << "]\n" <<
       "[4] SequenceSummary.csv\t[" << (storeSequenceSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
-      "[5] FeatureSummary.csv\t[" << (storeFeatureSummary_ ? "EN" : "DIS") << "ABLED]\n";
+      "[5] FeatureSummary.csv\t[" << (storeFeatureSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
       "[6] Run the pipeline and exit\n";
   }
 
@@ -407,11 +428,10 @@ public:
     case 2:
     {
       Command cmd;
-      cmd.type = Command::RawDataMethod;
-      cmd.raw = getRawDataProcMethodsInput();
+      cmd.setMethods(getRawDataProcMethodsInput());
 
       std::string mzML_dir = main_dir_ + "/mzML";
-      std::cout << "Path for 'mzML' files is currently:\t" << mzML_dir << '\n';
+      std::cout << "\nPath for 'mzML' files is currently:\t" << mzML_dir << '\n';
       std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
       std::string path_input = getLineInput("> ");
       if (path_input.size()) {
@@ -419,7 +439,7 @@ public:
       }
 
       std::string features_in_dir = main_dir_ + "/features";
-      std::cout << "Path for 'INPUT features' files is currently:\t" << features_in_dir << '\n';
+      std::cout << "\nPath for 'INPUT features' files is currently:\t" << features_in_dir << '\n';
       std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
       path_input = getLineInput("> ");
       if (path_input.size()) {
@@ -427,7 +447,7 @@ public:
       }
 
       std::string features_out_dir = main_dir_ + "/features";
-      std::cout << "Path for 'OUTPUT features' files is currently:\t" << features_out_dir << '\n';
+      std::cout << "\nPath for 'OUTPUT features' files is currently:\t" << features_out_dir << '\n';
       std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
       path_input = getLineInput("> ");
       if (path_input.size()) {
@@ -457,11 +477,10 @@ public:
     case 3:
     {
       Command cmd;
-      cmd.type = Command::SequenceSegmentMethod;
-      cmd.segment = getSeqSegProcMethodsInput();
+      cmd.setMethods(getSeqSegProcMethodsInput());
 
       std::string mzML_dir = main_dir_ + "/mzML";
-      std::cout << "Path for 'mzML' files is currently:\t" << mzML_dir << '\n';
+      std::cout << "\nPath for 'mzML' files is currently:\t" << mzML_dir << '\n';
       std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
       std::string path_input = getLineInput("> ");
       if (path_input.size()) {
@@ -469,7 +488,7 @@ public:
       }
 
       std::string features_in_dir = main_dir_ + "/features";
-      std::cout << "Path for 'INPUT features' files is currently:\t" << features_in_dir << '\n';
+      std::cout << "\nPath for 'INPUT features' files is currently:\t" << features_in_dir << '\n';
       std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
       path_input = getLineInput("> ");
       if (path_input.size()) {
@@ -477,7 +496,7 @@ public:
       }
 
       std::string features_out_dir = main_dir_ + "/features";
-      std::cout << "Path for 'OUTPUT features' files is currently:\t" << features_out_dir << '\n';
+      std::cout << "\nPath for 'OUTPUT features' files is currently:\t" << features_out_dir << '\n';
       std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
       path_input = getLineInput("> ");
       if (path_input.size()) {
