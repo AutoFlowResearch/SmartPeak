@@ -79,7 +79,7 @@ public:
   std::string                 main_dir_             = "";
   bool                        storeSequenceSummary_ = false;
   bool                        storeFeatureSummary_  = false;
-  bool                        verbose_              = false;
+  bool                        verbose_              = true;
   MetaDataHandler::SampleType sequenceSummaryType_  = MetaDataHandler::Unknown;
   MetaDataHandler::SampleType featureSummaryType_   = MetaDataHandler::Unknown;
   std::vector<Command>        commands_;
@@ -377,7 +377,7 @@ public:
 
   MetaDataHandler::SampleType getSampleTypeInput()
   {
-    std::cout << "Please select the sample type. Insert its index:\n" <<
+    std::cout << "\nPlease select the sample type. Insert its index:\n" <<
       "[1] Unknown\n" <<
       "[2] Standard\n" <<
       "[3] QC\n" <<
