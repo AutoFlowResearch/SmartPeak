@@ -19,7 +19,7 @@ public:
       SequenceHandler& sequenceHandler,
       const std::string& pathname,
       const std::string& delimiter,
-      const bool verbose = true
+      const bool verbose = false
     );
 
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
@@ -36,7 +36,7 @@ public:
       const std::string& filename,
       const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown}),
-      const bool verbose = true
+      const bool verbose = false
     );
 
     struct Row
@@ -75,7 +75,7 @@ public:
       const std::string& filename,
       const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown}),
-      const bool verbose = true
+      const bool verbose = false
     );
   };
 }

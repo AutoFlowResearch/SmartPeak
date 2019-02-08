@@ -21,7 +21,7 @@ public:
       SequenceHandler& sequenceHandler_IO,
       const Filenames& filenames,
       const std::string& delimiter = ",",
-      const bool verbose_I = true
+      const bool verbose_I = false
     );
 
     static void addRawDataHandlerToSequence(
@@ -40,7 +40,7 @@ public:
       const std::set<std::string>& injection_names = std::set<std::string>(),
       const std::vector<RawDataProcessor::RawDataProcMethod>& raw_data_processing_methods_I =
         std::vector<RawDataProcessor::RawDataProcMethod>(),
-      const bool verbose_I = true
+      const bool verbose_I = false
     );
 
     static void processSequenceSegments(
@@ -49,7 +49,7 @@ public:
       const std::set<std::string>& sequence_segment_names = std::set<std::string>(),
       const std::vector<SequenceSegmentProcessor::SeqSegProcMethod>& sequence_segment_processing_methods_I =
         std::vector<SequenceSegmentProcessor::SeqSegProcMethod>(),
-      const bool verbose_I = true
+      const bool verbose_I = false
     );
   };
 }
