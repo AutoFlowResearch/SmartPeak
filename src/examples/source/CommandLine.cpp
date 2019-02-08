@@ -91,6 +91,7 @@ public:
     Filenames& f = static_filenames_;
     main_dir_ = fs::path(sequence_pathname_).parent_path().string();
     f = Filenames::getDefaultStaticFilenames(main_dir_);
+    clearNonExistantDefaultGeneratedFilenames(f);
     f.sequence_csv_i = sequence_pathname_;
 
     const std::string pathnamesFilePath = main_dir_ + "/" + std::string(pathnamesFilename_);
@@ -136,6 +137,26 @@ public:
         "If you want a pathname to be ignored, then remove its value and leave only the label.\n" <<
         "Make sure that the pathnames are correct and run the application again.\n";
       std::exit(EXIT_FAILURE);
+    }
+  }
+
+  void clearNonExistantDefaultGeneratedFilenames(Filenames& f)
+  {
+    clearNonExistantFilename(f.parameters_csv_i);
+    clearNonExistantFilename(f.traML_csv_i);
+    clearNonExistantFilename(f.featureFilterComponents_csv_i);
+    clearNonExistantFilename(f.featureFilterComponentGroups_csv_i);
+    clearNonExistantFilename(f.featureQCComponents_csv_i);
+    clearNonExistantFilename(f.featureQCComponentGroups_csv_i);
+    clearNonExistantFilename(f.quantitationMethods_csv_i);
+    clearNonExistantFilename(f.standardsConcentrations_csv_i);
+    clearNonExistantFilename(f.referenceData_csv_i);
+  }
+
+  void clearNonExistantFilename(std::string& filename)
+  {
+    if (fs::exists(filename) == false) {
+      filename.clear();
     }
   }
 
