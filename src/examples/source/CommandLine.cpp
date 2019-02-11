@@ -75,8 +75,11 @@ public:
 
   // This will be updated during runtime: an absolute path will be prefixed to it.
   std::string                 pathnamesFilename_    = "pathnames.txt";
-  std::string                 sequence_pathname_    = "";
-  std::string                 main_dir_             = "";
+  std::string                 sequence_pathname_;
+  std::string                 main_dir_;
+  std::string                 mzML_dir_;
+  std::string                 features_in_dir_;
+  std::string                 features_out_dir_;
   bool                        storeSequenceSummary_ = false;
   bool                        storeFeatureSummary_  = false;
   bool                        verbose_              = true;
@@ -471,42 +474,46 @@ public:
       }
       cmd.setMethods(methods);
 
-      std::string mzML_dir = main_dir_ + "/mzML";
-      std::cout << "\nPath for 'mzML' files is currently:\t" << mzML_dir << '\n';
-      std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
-      std::string path_input = getLineInput("> ");
-      if (path_input.size()) {
-        mzML_dir = path_input;
+      if (mzML_dir_.empty()) {
+        mzML_dir_ = main_dir_ + "/mzML";
+        std::cout << "\nPath for 'mzML' files is currently:\t" << mzML_dir_ << '\n';
+        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
+        const std::string path_input = getLineInput("> ");
+        if (path_input.size()) {
+          mzML_dir_ = path_input;
+        }
+        std::cout << "Input .mzML files are searched in:\t" << mzML_dir_ << '\n';
       }
 
-      std::string features_in_dir = main_dir_ + "/features";
-      std::cout << "\nPath for 'INPUT features' files is currently:\t" << features_in_dir << '\n';
-      std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
-      path_input = getLineInput("> ");
-      if (path_input.size()) {
-        features_in_dir = path_input;
+      if (features_in_dir_.empty()) {
+        features_in_dir_ = main_dir_ + "/features";
+        std::cout << "\nPath for 'INPUT features' files is currently:\t" << features_in_dir_ << '\n';
+        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
+        const std::string path_input = getLineInput("> ");
+        if (path_input.size()) {
+          features_in_dir_ = path_input;
+        }
+        std::cout << "Input .featureXML files are searched in:\t" << features_in_dir_ << '\n';
       }
 
-      std::string features_out_dir = main_dir_ + "/features";
-      std::cout << "\nPath for 'OUTPUT features' files is currently:\t" << features_out_dir << '\n';
-      std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
-      path_input = getLineInput("> ");
-      if (path_input.size()) {
-        features_out_dir = path_input;
+      if (features_out_dir_.empty()) {
+        features_out_dir_ = main_dir_ + "/features";
+        std::cout << "\nPath for 'OUTPUT features' files is currently:\t" << features_out_dir_ << '\n';
+        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
+        const std::string path_input = getLineInput("> ");
+        if (path_input.size()) {
+          features_out_dir_ = path_input;
+        }
+        std::cout << "Output .featureXML files are stored in:\t" << features_out_dir_ << '\n';
       }
-
-      std::cout << "\n\n" <<
-        "Input .mzML files are searched in:\t" << mzML_dir << '\n' <<
-        "Input .featureXML files are searched in:\t" << features_in_dir << '\n' <<
-        "Output .featureXML files are stored in:\t" << features_out_dir << '\n';
 
       std::map<std::string, Filenames>& dynamic_filenames = cmd.dynamic_filenames;
       for (const SampleHandler& sample : sequenceHandler_.getSequence()) {
         const std::string& key = sample.getMetaData().getInjectionName();
         dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-          mzML_dir,
-          features_in_dir,
-          features_out_dir,
+          mzML_dir_,
+          features_in_dir_,
+          features_out_dir_,
           sample.getMetaData().getSampleName(),
           key
         );
@@ -524,42 +531,46 @@ public:
       }
       cmd.setMethods(methods);
 
-      std::string mzML_dir = main_dir_ + "/mzML";
-      std::cout << "\nPath for 'mzML' files is currently:\t" << mzML_dir << '\n';
-      std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
-      std::string path_input = getLineInput("> ");
-      if (path_input.size()) {
-        mzML_dir = path_input;
+      if (mzML_dir_.empty()) {
+        mzML_dir_ = main_dir_ + "/mzML";
+        std::cout << "\nPath for 'mzML' files is currently:\t" << mzML_dir_ << '\n';
+        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
+        const std::string path_input = getLineInput("> ");
+        if (path_input.size()) {
+          mzML_dir_ = path_input;
+        }
+        std::cout << "Input .mzML files are searched in:\t" << mzML_dir_ << '\n';
       }
 
-      std::string features_in_dir = main_dir_ + "/features";
-      std::cout << "\nPath for 'INPUT features' files is currently:\t" << features_in_dir << '\n';
-      std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
-      path_input = getLineInput("> ");
-      if (path_input.size()) {
-        features_in_dir = path_input;
+      if (features_in_dir_.empty()) {
+        features_in_dir_ = main_dir_ + "/features";
+        std::cout << "\nPath for 'INPUT features' files is currently:\t" << features_in_dir_ << '\n';
+        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
+        const std::string path_input = getLineInput("> ");
+        if (path_input.size()) {
+          features_in_dir_ = path_input;
+        }
+        std::cout << "Input .featureXML files are searched in:\t" << features_in_dir_ << '\n';
       }
 
-      std::string features_out_dir = main_dir_ + "/features";
-      std::cout << "\nPath for 'OUTPUT features' files is currently:\t" << features_out_dir << '\n';
-      std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
-      path_input = getLineInput("> ");
-      if (path_input.size()) {
-        features_out_dir = path_input;
+      if (features_out_dir_.empty()) {
+        features_out_dir_ = main_dir_ + "/features";
+        std::cout << "\nPath for 'OUTPUT features' files is currently:\t" << features_out_dir_ << '\n';
+        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
+        const std::string path_input = getLineInput("> ");
+        if (path_input.size()) {
+          features_out_dir_ = path_input;
+        }
+        std::cout << "Output .featureXML files are stored in:\t" << features_out_dir_ << '\n';
       }
-
-      std::cout << "\n\n" <<
-        "Input .mzML files are searched in:\t" << mzML_dir << '\n' <<
-        "Input .featureXML files are searched in:\t" << features_in_dir << '\n' <<
-        "Output .featureXML files are stored in:\t" << features_out_dir << '\n';
 
       std::map<std::string, Filenames>& dynamic_filenames = cmd.dynamic_filenames;
       for (const SequenceSegmentHandler& sequence_segment : sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();
         dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-          mzML_dir,
-          features_in_dir,
-          features_out_dir,
+          mzML_dir_,
+          features_in_dir_,
+          features_out_dir_,
           key,
           key
         );
