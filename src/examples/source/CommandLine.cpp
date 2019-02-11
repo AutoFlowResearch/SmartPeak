@@ -20,54 +20,23 @@ class CommandLine final {
 public:
   class Command {
   public:
-    Command() : type(RawDataMethod), raw() {}
-
-    ~Command()
-    {
-      switch (type) {
-      case RawDataMethod:
-        raw.~vector();
-        break;
-      case SequenceSegmentMethod:
-        segment.~vector();
-        break;
-      }
-    }
-
-    Command(const Command& other) : type(other.type), raw()
-    {
-      if (other.type == RawDataMethod) {
-        raw = other.raw;
-      } else {
-        raw.~vector();
-        new (&segment) std::vector(other.segment);
-      }
-      dynamic_filenames = other.dynamic_filenames;
-    }
-
     enum CommandType { RawDataMethod, SequenceSegmentMethod } type;
 
-    void setMethods(const std::vector<RawDataProcessor::RawDataProcMethod>& methods)
+    void setMethod(const RawDataProcessor::RawDataProcMethod method)
     {
-      if (type != RawDataMethod) {
-        segment.~vector();
-        type = RawDataMethod;
-      }
-      raw = methods;
+      type = RawDataMethod;
+      raw_data_method = method;
     }
 
-    void setMethods(const std::vector<SequenceSegmentProcessor::SeqSegProcMethod>& methods)
+    void setMethod(const SequenceSegmentProcessor::SeqSegProcMethod method)
     {
-      if (type != SequenceSegmentMethod) {
-        raw.~vector();
-        type = SequenceSegmentMethod;
-      }
-      segment = methods;
+      type = SequenceSegmentMethod;
+      seq_seg_method = method;
     }
 
     union {
-      std::vector<RawDataProcessor::RawDataProcMethod> raw;
-      std::vector<SequenceSegmentProcessor::SeqSegProcMethod> segment;
+      RawDataProcessor::RawDataProcMethod raw_data_method;
+      SequenceSegmentProcessor::SeqSegProcMethod seq_seg_method;
     };
 
     std::map<std::string, Filenames> dynamic_filenames;
@@ -238,9 +207,9 @@ public:
     }
   }
 
-  std::vector<RawDataProcessor::RawDataProcMethod> getRawDataProcMethodsInput()
+  std::vector<Command> getMethodsInput()
   {
-    const std::unordered_map<int, RawDataProcessor::RawDataProcMethod> n_to_method {
+    const std::unordered_map<int, RawDataProcessor::RawDataProcMethod> n_to_raw_data_method {
       {1, RawDataProcessor::LOAD_RAW_DATA},
       {2, RawDataProcessor::LOAD_FEATURES},
       {3, RawDataProcessor::PICK_FEATURES},
@@ -255,12 +224,14 @@ public:
       {12, RawDataProcessor::ANNOTATE_USED_FEATURES},
       {13, RawDataProcessor::CLEAR_FEATURE_HISTORY}
     };
-    std::vector<RawDataProcessor::RawDataProcMethod> methods;
+    const std::unordered_map<int, SequenceSegmentProcessor::SeqSegProcMethod> n_to_seq_seg_method {
+      {14, SequenceSegmentProcessor::CALCULATE_CALIBRATION},
+      {15, SequenceSegmentProcessor::STORE_QUANTITATION_METHODS},
+      {16, SequenceSegmentProcessor::LOAD_QUANTITATION_METHODS},
+    };
+    std::vector<Command> methods;
     std::string line;
     std::istringstream iss;
-
-  getRawDataProcMethodsInput_menu:
-    methods.clear();
 
     std::cout << "\n\n" <<
       "Please select the sequence of methods you want to run.\n" <<
@@ -280,6 +251,9 @@ public:
       "[11] SAVE_FEATURES\n" <<
       "[12] ANNOTATE_USED_FEATURES\n" <<
       "[13] CLEAR_FEATURE_HISTORY\n" <<
+      "[14] CALCULATE_CALIBRATION\n" <<
+      "[15] STORE_QUANTITATION_METHODS\n" <<
+      "[16] LOAD_QUANTITATION_METHODS\n" <<
       "[M] Main menu\n\n" <<
       "Select the methods (example: > 1 3 4 4 5 7 8 9) and press Enter:\n";
 
@@ -287,62 +261,34 @@ public:
       line = getLineInput("> ");
     } while (line.empty());
 
-    iss.str(line);
-
-    for (int n; iss >> n;) {
-      if (n < 1 || n > 14 || n == 10) {
-        std::cout << "One or more options are not available, try again.\n";
-        goto getRawDataProcMethodsInput_menu;
-      }
-      if (n == 14) {
-        return {};
-      }
-      methods.push_back(n_to_method.at(n));
+    if (line[0] == 'M' || line[0] == 'm') {
+      return {};
     }
 
-    return methods;
-  }
-
-  std::vector<SequenceSegmentProcessor::SeqSegProcMethod> getSeqSegProcMethodsInput()
-  {
-    const std::unordered_map<int, SequenceSegmentProcessor::SeqSegProcMethod> n_to_method {
-      {1, SequenceSegmentProcessor::CALCULATE_CALIBRATION},
-      {2, SequenceSegmentProcessor::STORE_QUANTITATION_METHODS},
-      {3, SequenceSegmentProcessor::LOAD_QUANTITATION_METHODS},
-    };
-    std::vector<SequenceSegmentProcessor::SeqSegProcMethod> methods;
-    std::string line;
-    std::istringstream iss;
-
-  getSeqSegProcMethodsInput_menu:
-    methods.clear();
-
-    std::cout << "\n\n" <<
-      "Please select the sequence of methods you want to run.\n" <<
-      "You can select the same method multiple times." <<
-      "Separate selected methods with a space.\n" <<
-      "Available methods are:\n" <<
-      "[1] CALCULATE_CALIBRATION\n" <<
-      "[2] STORE_QUANTITATION_METHODS\n" <<
-      "[3] LOAD_QUANTITATION_METHODS\n" <<
-      "[M] Main menu\n\n" <<
-      "Select the methods (example: > 1 2 3) and press Enter:\n";
-
-    do {
-      line = getLineInput("> ");
-    } while (line.empty());
-
     iss.str(line);
 
     for (int n; iss >> n;) {
-      if (n < 1 || n > 4) {
-        std::cout << "One or more options are not available, try again.\n";
-        goto getSeqSegProcMethodsInput_menu;
+      if (n < 1 || n > 16 || n == 10) { // TODO: update this if plotting is implemented
+        std::cout << "Skipping: " << n << '\n';
+        continue;
       }
-      if (n == 4) {
-        return {};
+      Command cmd;
+      if (n >= 1 && n <= 13) {
+        cmd.setMethod(n_to_raw_data_method.at(n));
+      } else {
+        cmd.setMethod(n_to_seq_seg_method.at(n));
       }
-      methods.push_back(n_to_method.at(n));
+      for (const SampleHandler& sample : sequenceHandler_.getSequence()) {
+        const std::string& key = sample.getMetaData().getInjectionName();
+        cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+          mzML_dir_,
+          features_in_dir_,
+          features_out_dir_,
+          sample.getMetaData().getSampleName(),
+          key
+        );
+      }
+      methods.push_back(cmd);
     }
 
     return methods;
@@ -433,19 +379,12 @@ public:
     std::cout << "\n\n" <<
       "SmartPeak Main menu\n" <<
       "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n" <<
-      "[2] Add Raw Data Processing\t[" << countCommands(Command::RawDataMethod) << "]\n" <<
-      "[3] Add Sequence Segment Processing\t[" << countCommands(Command::SequenceSegmentMethod) << "]\n" <<
-      "[4] SequenceSummary.csv\t[" << (storeSequenceSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
-      "[5] FeatureSummary.csv\t[" << (storeFeatureSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
-      "[6] Run the pipeline\n" <<
+      "[2] Add processing step to pipeline\n"
+      "[3] SequenceSummary.csv\t[" << (storeSequenceSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
+      "[4] FeatureSummary.csv\t[" << (storeFeatureSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
+      "[5] Run the pipeline\n" <<
       "[E] Exit SmartPeak\n\n" <<
       "Please select your action.\n";
-  }
-
-  int countCommands(Command::CommandType type)
-  {
-    return std::count_if(commands_.cbegin(), commands_.cend(),
-      [type](const Command& cmd){ return cmd.type == type; });
   }
 
   void parseCommand(const std::string& line)
@@ -471,13 +410,6 @@ public:
       break;
     case 2:
     {
-      Command cmd;
-      const std::vector<RawDataProcessor::RawDataProcMethod> methods = getRawDataProcMethodsInput();
-      if (methods.empty()) {
-        break;
-      }
-      cmd.setMethods(methods);
-
       if (mzML_dir_.empty()) {
         mzML_dir_ = main_dir_ + "/mzML";
         std::cout << "\nPath for 'mzML' files is currently:\t" << mzML_dir_ << '\n';
@@ -486,7 +418,6 @@ public:
         if (path_input.size()) {
           mzML_dir_ = path_input;
         }
-        std::cout << "Input .mzML files are searched in:\t" << mzML_dir_ << '\n';
       }
 
       if (features_in_dir_.empty()) {
@@ -497,7 +428,6 @@ public:
         if (path_input.size()) {
           features_in_dir_ = path_input;
         }
-        std::cout << "Input .featureXML files are searched in:\t" << features_in_dir_ << '\n';
       }
 
       if (features_out_dir_.empty()) {
@@ -508,101 +438,35 @@ public:
         if (path_input.size()) {
           features_out_dir_ = path_input;
         }
-        std::cout << "Output .featureXML files are stored in:\t" << features_out_dir_ << '\n';
       }
 
-      std::map<std::string, Filenames>& dynamic_filenames = cmd.dynamic_filenames;
-      for (const SampleHandler& sample : sequenceHandler_.getSequence()) {
-        const std::string& key = sample.getMetaData().getInjectionName();
-        dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-          mzML_dir_,
-          features_in_dir_,
-          features_out_dir_,
-          sample.getMetaData().getSampleName(),
-          key
-        );
+      const std::vector<Command> methods = getMethodsInput();
+      if (methods.empty()) {
+        break;
       }
-
-      commands_.push_back(cmd);
+      commands_.insert(commands_.end(), methods.begin(), methods.end());
       break;
     }
     case 3:
-    {
-      Command cmd;
-      const std::vector<SequenceSegmentProcessor::SeqSegProcMethod> methods = getSeqSegProcMethodsInput();
-      if (methods.empty()) {
-        break;
-      }
-      cmd.setMethods(methods);
-
-      if (mzML_dir_.empty()) {
-        mzML_dir_ = main_dir_ + "/mzML";
-        std::cout << "\nPath for 'mzML' files is currently:\t" << mzML_dir_ << '\n';
-        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
-        const std::string path_input = getLineInput("> ");
-        if (path_input.size()) {
-          mzML_dir_ = path_input;
-        }
-        std::cout << "Input .mzML files are searched in:\t" << mzML_dir_ << '\n';
-      }
-
-      if (features_in_dir_.empty()) {
-        features_in_dir_ = main_dir_ + "/features";
-        std::cout << "\nPath for 'INPUT features' files is currently:\t" << features_in_dir_ << '\n';
-        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
-        const std::string path_input = getLineInput("> ");
-        if (path_input.size()) {
-          features_in_dir_ = path_input;
-        }
-        std::cout << "Input .featureXML files are searched in:\t" << features_in_dir_ << '\n';
-      }
-
-      if (features_out_dir_.empty()) {
-        features_out_dir_ = main_dir_ + "/features";
-        std::cout << "\nPath for 'OUTPUT features' files is currently:\t" << features_out_dir_ << '\n';
-        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
-        const std::string path_input = getLineInput("> ");
-        if (path_input.size()) {
-          features_out_dir_ = path_input;
-        }
-        std::cout << "Output .featureXML files are stored in:\t" << features_out_dir_ << '\n';
-      }
-
-      std::map<std::string, Filenames>& dynamic_filenames = cmd.dynamic_filenames;
-      for (const SequenceSegmentHandler& sequence_segment : sequenceHandler_.getSequenceSegments()) {
-        const std::string& key = sequence_segment.getSequenceSegmentName();
-        dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-          mzML_dir_,
-          features_in_dir_,
-          features_out_dir_,
-          key,
-          key
-        );
-      }
-
-      commands_.push_back(cmd);
-      break;
-    }
-    case 4:
       storeSequenceSummary_ = !storeSequenceSummary_;
       if (storeSequenceSummary_) {
         sequenceSummaryType_ = getSampleTypeInput();
       }
       break;
-    case 5:
+    case 4:
       storeFeatureSummary_ = !storeFeatureSummary_;
       if (storeFeatureSummary_) {
         featureSummaryType_ = getSampleTypeInput();
       }
       break;
-    case 6:
+    case 5:
       for (const Command& cmd : commands_) {
         if (cmd.type == Command::RawDataMethod) {
           SequenceProcessor::processSequence(
             sequenceHandler_,
             cmd.dynamic_filenames,
             std::set<std::string>(),
-            cmd.raw,
+            {cmd.raw_data_method},
             verbose_
           );
         } else {
@@ -610,7 +474,7 @@ public:
             sequenceHandler_,
             cmd.dynamic_filenames,
             std::set<std::string>(),
-            cmd.segment,
+            {cmd.seq_seg_method},
             verbose_
           );
         }
