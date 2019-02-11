@@ -280,7 +280,7 @@ public:
       "[11] SAVE_FEATURES\n" <<
       "[12] ANNOTATE_USED_FEATURES\n" <<
       "[13] CLEAR_FEATURE_HISTORY\n" <<
-      "[14] Cancel (go back to main menu)\n\n" <<
+      "[M] Main menu\n\n" <<
       "Select the methods (example: > 1 3 4 4 5 7 8 9) and press Enter:\n";
 
     do {
@@ -325,7 +325,7 @@ public:
       "[1] CALCULATE_CALIBRATION\n" <<
       "[2] STORE_QUANTITATION_METHODS\n" <<
       "[3] LOAD_QUANTITATION_METHODS\n" <<
-      "[4] Cancel (go back to main menu)\n\n" <<
+      "[M] Main menu\n\n" <<
       "Select the methods (example: > 1 2 3) and press Enter:\n";
 
     do {
@@ -431,13 +431,14 @@ public:
   void printMenu()
   {
     std::cout << "\n\n" <<
-      "SmartPeak main menu\n" <<
+      "SmartPeak Main menu\n" <<
       "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n" <<
       "[2] Add Raw Data Processing\t[" << countCommands(Command::RawDataMethod) << "]\n" <<
       "[3] Add Sequence Segment Processing\t[" << countCommands(Command::SequenceSegmentMethod) << "]\n" <<
       "[4] SequenceSummary.csv\t[" << (storeSequenceSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
       "[5] FeatureSummary.csv\t[" << (storeFeatureSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
-      "[6] Run the pipeline and exit\n\n" <<
+      "[6] Run the pipeline\n" <<
+      "[E] Exit SmartPeak\n\n" <<
       "Please select your action.\n";
   }
 
@@ -454,6 +455,9 @@ public:
     try {
       opt = std::stoi(line);
     } catch (const std::invalid_argument&) {
+      if (line[0] == 'E' || line[0] == 'e') {
+        std::exit(EXIT_SUCCESS);
+      }
       std::cout << "Bad input. Try again.\n";
       return;
     }
@@ -637,7 +641,6 @@ public:
         );
         std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
       }
-      std::exit(EXIT_SUCCESS);
     }
   }
 };
