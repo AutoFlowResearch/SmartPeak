@@ -42,21 +42,20 @@ public:
     std::map<std::string, Filenames> dynamic_filenames;
   };
 
-  // This will be updated during runtime: an absolute path will be prefixed to it.
-  std::string                 pathnamesFilename_    = "pathnames.txt";
-  std::string                 sequence_pathname_;
-  std::string                 main_dir_;
-  std::string                 mzML_dir_;
-  std::string                 features_in_dir_;
-  std::string                 features_out_dir_;
-  bool                        storeSequenceSummary_ = false;
-  bool                        storeFeatureSummary_  = false;
-  bool                        verbose_              = true;
-  MetaDataHandler::SampleType sequenceSummaryType_  = MetaDataHandler::Unknown;
-  MetaDataHandler::SampleType featureSummaryType_   = MetaDataHandler::Unknown;
-  std::vector<Command>        commands_;
-  Filenames                   static_filenames_;
-  SequenceHandler             sequenceHandler_;
+  std::string                           pathnamesFilename_    = "pathnames.txt";
+  std::string                           sequence_pathname_;
+  std::string                           main_dir_;
+  std::string                           mzML_dir_;
+  std::string                           features_in_dir_;
+  std::string                           features_out_dir_;
+  bool                                  storeSequenceSummary_ = false;
+  bool                                  storeFeatureSummary_  = false;
+  bool                                  verbose_              = true;
+  std::set<MetaDataHandler::SampleType> sequenceSummaryTypes_;
+  std::set<MetaDataHandler::SampleType> featureSummaryTypes_;
+  std::vector<Command>                  commands_;
+  Filenames                             static_filenames_;
+  SequenceHandler                       sequenceHandler_;
 
   void buildStaticFilenames()
   {
@@ -324,34 +323,59 @@ public:
     return line;
   }
 
-  MetaDataHandler::SampleType getSampleTypeInput()
+  std::set<MetaDataHandler::SampleType> getSampleTypesInput()
   {
-    std::cout << "\nPlease select the sample type. Insert its index:\n" <<
+    std::cout << "\nPlease select the sample types. Insert the indexes separated by a space:\n" <<
       "[1] Unknown\n" <<
       "[2] Standard\n" <<
       "[3] QC\n" <<
       "[4] Blank\n" <<
       "[5] DoubleBlank\n" <<
-      "[6] Solvent\n";
-    while (true) {
-      const std::string line = getLineInput("> ");
-      switch (std::stoi(line)) {
+      "[6] Solvent\n" <<
+      "[M] Main menu\n\n";
+
+    std::string line;
+
+    do {
+      line = getLineInput("> ");
+    } while (line.empty());
+
+    if (line[0] == 'M' || line[0] == 'm') {
+      return {};
+    }
+
+    std::istringstream iss;
+    iss.str(line);
+    std::set<MetaDataHandler::SampleType> sample_types;
+
+    for (int n; iss >> n;) {
+      if (n < 1 || n > 6) {
+        std::cout << "Skipping: " << n << '\n';
+        continue;
+      }
+      switch (n) {
         case 1:
-          return MetaDataHandler::Unknown;
+          sample_types.insert(MetaDataHandler::Unknown);
+          break;
         case 2:
-          return MetaDataHandler::Standard;
+          sample_types.insert(MetaDataHandler::Standard);
+          break;
         case 3:
-          return MetaDataHandler::QC;
+          sample_types.insert(MetaDataHandler::QC);
+          break;
         case 4:
-          return MetaDataHandler::Blank;
+          sample_types.insert(MetaDataHandler::Blank);
+          break;
         case 5:
-          return MetaDataHandler::DoubleBlank;
+          sample_types.insert(MetaDataHandler::DoubleBlank);
+          break;
         case 6:
-          return MetaDataHandler::Solvent;
-        default:
-          std::cout << "Sample type is incorrect. Try again.\n";
+          sample_types.insert(MetaDataHandler::Solvent);
+          break;
       }
     }
+
+    return sample_types;
   }
 
   CommandLine(int argc, char **argv)
@@ -450,13 +474,13 @@ public:
     case 3:
       storeSequenceSummary_ = !storeSequenceSummary_;
       if (storeSequenceSummary_) {
-        sequenceSummaryType_ = getSampleTypeInput();
+        sequenceSummaryTypes_ = getSampleTypesInput();
       }
       break;
     case 4:
       storeFeatureSummary_ = !storeFeatureSummary_;
       if (storeFeatureSummary_) {
-        featureSummaryType_ = getSampleTypeInput();
+        featureSummaryTypes_ = getSampleTypesInput();
       }
       break;
     case 5:
@@ -485,7 +509,7 @@ public:
           sequenceHandler_,
           pathname,
           {"calculated_concentration"},
-          {sequenceSummaryType_}
+          sequenceSummaryTypes_
         );
         std::cout << "SequenceSummary.csv file has been stored at: " << pathname << '\n';
       }
@@ -501,10 +525,11 @@ public:
             "QC_transition_message", "QC_transition_pass", "QC_transition_score",
             "QC_transition_group_message", "QC_transition_group_score"
           },
-          {featureSummaryType_}
+          featureSummaryTypes_
         );
         std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
       }
+      break;
     }
   }
 };
