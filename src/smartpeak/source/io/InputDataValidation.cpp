@@ -414,7 +414,7 @@ namespace SmartPeak
     oss << "\nComparing names...\n"
       << "      From: " << structure_ref1 << "\n"
       << "        To: " << structure_ref2 << "\n"
-      << "Mismatches: " << missing_names.size() << "\n";
+      << "Missing: " << missing_names.size() << "\n";
     size_t i = 1;
     for (const std::string& name : missing_names) {
       oss << "[" << i++ << "] " << name << "\n";
