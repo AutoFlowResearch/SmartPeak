@@ -62,6 +62,54 @@ public:
   Filenames                             static_filenames_;
   SequenceHandler                       sequenceHandler_;
 
+  const std::unordered_map<int, RawDataProcessor::RawDataProcMethod> n_to_raw_data_method_ {
+    {1, RawDataProcessor::LOAD_RAW_DATA},
+    {2, RawDataProcessor::LOAD_FEATURES},
+    {3, RawDataProcessor::PICK_FEATURES},
+    {4, RawDataProcessor::FILTER_FEATURES},
+    {5, RawDataProcessor::SELECT_FEATURES},
+    {6, RawDataProcessor::VALIDATE_FEATURES},
+    {7, RawDataProcessor::QUANTIFY_FEATURES},
+    {8, RawDataProcessor::CHECK_FEATURES},
+    {9, RawDataProcessor::STORE_FEATURES},
+    {10, RawDataProcessor::PLOT_FEATURES},
+    {11, RawDataProcessor::SAVE_FEATURES},
+    {12, RawDataProcessor::ANNOTATE_USED_FEATURES},
+    {13, RawDataProcessor::CLEAR_FEATURE_HISTORY}
+  };
+  const std::unordered_map<int, SequenceSegmentProcessor::SeqSegProcMethod> n_to_seq_seg_method_ {
+    {14, SequenceSegmentProcessor::CALCULATE_CALIBRATION},
+    {15, SequenceSegmentProcessor::STORE_QUANTITATION_METHODS},
+    {16, SequenceSegmentProcessor::LOAD_QUANTITATION_METHODS},
+  };
+  const std::string main_menu_ = "\n\n"
+    "Please insert the sequence of methods to run.\n"
+    "You can choose the same method multiple times.\n"
+    "Separate chosen methods with a space.\n\n"
+    "[1]  Load raw data\n"
+    "[2]  Load features\n"
+    "[3]  Pick features\n"
+    "[4]  Filter features\n"
+    "[5]  Select features\n"
+    "[6]  Validate features\n"
+    "[7]  Quantify features\n"
+    "[8]  Check features\n"
+    "[9]  Store features\n"
+    "[10] Plot features (not implemented)\n"
+    "[11] Save features\n"
+    "[12] Annotate used features\n"
+    "[13] Clear feature history\n"
+    "[14] Calculate calibration\n"
+    "[15] Store quantitation methods\n"
+    "[16] Load quantitation methods\n"
+    "[17] Write SequenceSummary.csv\n"
+    "[18] Write FeatureSummary.csv\n"
+    "[M]  Main menu\n\n"
+    "Some presets:\n"
+    "Unknowns: 1 3 4 4 5 7 8 9 17 18\n"
+    "Standards: 1 3 4 4 5 8 9 14 15 7 8 9 17 18\n"
+    "Validation: 1 3 4 5 6 17 18\n\n";
+
   void buildStaticFilenames()
   {
     Filenames& f = static_filenames_;
@@ -213,57 +261,11 @@ public:
 
   std::vector<Command> getMethodsInput()
   {
-    const std::unordered_map<int, RawDataProcessor::RawDataProcMethod> n_to_raw_data_method {
-      {1, RawDataProcessor::LOAD_RAW_DATA},
-      {2, RawDataProcessor::LOAD_FEATURES},
-      {3, RawDataProcessor::PICK_FEATURES},
-      {4, RawDataProcessor::FILTER_FEATURES},
-      {5, RawDataProcessor::SELECT_FEATURES},
-      {6, RawDataProcessor::VALIDATE_FEATURES},
-      {7, RawDataProcessor::QUANTIFY_FEATURES},
-      {8, RawDataProcessor::CHECK_FEATURES},
-      {9, RawDataProcessor::STORE_FEATURES},
-      {10, RawDataProcessor::PLOT_FEATURES},
-      {11, RawDataProcessor::SAVE_FEATURES},
-      {12, RawDataProcessor::ANNOTATE_USED_FEATURES},
-      {13, RawDataProcessor::CLEAR_FEATURE_HISTORY}
-    };
-    const std::unordered_map<int, SequenceSegmentProcessor::SeqSegProcMethod> n_to_seq_seg_method {
-      {14, SequenceSegmentProcessor::CALCULATE_CALIBRATION},
-      {15, SequenceSegmentProcessor::STORE_QUANTITATION_METHODS},
-      {16, SequenceSegmentProcessor::LOAD_QUANTITATION_METHODS},
-    };
     std::vector<Command> methods;
     std::string line;
     std::istringstream iss;
 
-    std::cout << "\n\n" <<
-      "Please insert the sequence of methods to run.\n" <<
-      "You can choose the same method multiple times.\n" <<
-      "Separate chosen methods with a space.\n\n" <<
-      "[1]  Load raw data\n" <<
-      "[2]  Load features\n" <<
-      "[3]  Pick features\n" <<
-      "[4]  Filter features\n" <<
-      "[5]  Select features\n" <<
-      "[6]  Validate features\n" <<
-      "[7]  Quantify features\n" <<
-      "[8]  Check features\n" <<
-      "[9]  Store features\n" <<
-      "[10] Plot features (not implemented)\n" <<
-      "[11] Save features\n" <<
-      "[12] Annotate used features\n" <<
-      "[13] Clear feature history\n" <<
-      "[14] Calculate calibration\n" <<
-      "[15] Store quantitation methods\n" <<
-      "[16] Load quantitation methods\n" <<
-      "[17] Write SequenceSummary.csv\n" <<
-      "[18] Write FeatureSummary.csv\n" <<
-      "[M]  Main menu\n\n" <<
-      "Some presets:\n" <<
-      "Unknowns: 1 3 4 4 5 7 8 9 17 18\n" <<
-      "Standards: 1 3 4 4 5 8 9 14 15 7 8 9 17 18\n" <<
-      "Validation: 1 3 4 5 6 17 18\n\n";
+    std::cout << main_menu_;
 
     do {
       line = getLineInput("> ");
@@ -282,7 +284,7 @@ public:
       }
       Command cmd;
       if (n >= 1 && n <= 13) {
-        cmd.setMethod(n_to_raw_data_method.at(n));
+        cmd.setMethod(n_to_raw_data_method_.at(n));
         for (const SampleHandler& sample : sequenceHandler_.getSequence()) {
           const std::string& key = sample.getMetaData().getInjectionName();
           cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
@@ -294,7 +296,7 @@ public:
           );
         }
       } else if (n >= 14 && n <= 16) {
-        cmd.setMethod(n_to_seq_seg_method.at(n));
+        cmd.setMethod(n_to_seq_seg_method_.at(n));
         for (const SequenceSegmentHandler& sequence_segment : sequenceHandler_.getSequenceSegments()) {
           const std::string& key = sequence_segment.getSequenceSegmentName();
           cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
@@ -533,10 +535,45 @@ public:
     std::cout << "\n\n" <<
       "SmartPeak Main menu\n" <<
       "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n" <<
-      "[2] Add processing step to pipeline\n"
+      "[2] Add processing step to pipeline [" << getPipelineString() << "]\n"
       "[3] Run the pipeline\n" <<
       "[E] Exit SmartPeak\n\n" <<
       "Please select your action.\n";
+  }
+
+  std::string getPipelineString()
+  {
+    std::string s;
+    for (const Command& cmd : commands_) {
+      if (cmd.type == Command::RawDataMethod) {
+        const std::unordered_map<int, RawDataProcessor::RawDataProcMethod>::const_iterator
+        it = std::find_if(
+          n_to_raw_data_method_.cbegin(),
+          n_to_raw_data_method_.cend(),
+          [&cmd](const std::pair<int, RawDataProcessor::RawDataProcMethod>& p)
+            { return p.second == cmd.raw_data_method; }
+        );
+        s.append(std::to_string(it->first));
+      } else if (cmd.type == Command::SequenceSegmentMethod) {
+        const std::unordered_map<int, SequenceSegmentProcessor::SeqSegProcMethod>::const_iterator
+        it = std::find_if(
+          n_to_seq_seg_method_.cbegin(),
+          n_to_seq_seg_method_.cend(),
+          [&cmd](const std::pair<int, SequenceSegmentProcessor::SeqSegProcMethod>& p)
+            { return p.second == cmd.seq_seg_method; }
+        );
+        s.append(std::to_string(it->first));
+      } else if(cmd.type == Command::WriteSequenceSummary) {
+        s.append("17");
+      } else if(cmd.type == Command::WriteFeatureSummary) {
+        s.append("18");
+      }
+      s.append(" ");
+    }
+    if (s.size()) {
+      s.pop_back();
+    }
+    return s;
   }
 
   void parseCommand(const std::string& line)
