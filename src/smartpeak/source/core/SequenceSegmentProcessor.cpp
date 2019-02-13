@@ -33,7 +33,7 @@ namespace SmartPeak
   )
   {
     if (verbose_I) {
-      std::cout << "Optimizing calibrators." << std::endl;
+      std::cout << "==== START optimizeCalibrationCurves" << std::endl;
     }
 
     std::vector<size_t> standards_indices;
@@ -101,6 +101,10 @@ namespace SmartPeak
 
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
+
+    if (verbose_I) {
+      std::cout << "==== END   optimizeCalibrationCurves" << std::endl;
+    }
   }
 
   // void SequenceSegmentProcessor::plotCalibrators(
