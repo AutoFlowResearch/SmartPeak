@@ -20,7 +20,12 @@ class CommandLine final {
 public:
   class Command {
   public:
-    enum CommandType { RawDataMethod, SequenceSegmentMethod } type;
+    enum CommandType {
+      RawDataMethod,
+      SequenceSegmentMethod,
+      WriteSequenceSummary,
+      WriteFeatureSummary
+    } type;
 
     void setMethod(const RawDataProcessor::RawDataProcMethod method)
     {
@@ -42,17 +47,17 @@ public:
     std::map<std::string, Filenames> dynamic_filenames;
   };
 
-  std::string                           pathnamesFilename_    = "pathnames.txt";
+  std::string                           pathnamesFilename_       = "pathnames.txt";
   std::string                           sequence_pathname_;
   std::string                           main_dir_;
   std::string                           mzML_dir_;
   std::string                           features_in_dir_;
   std::string                           features_out_dir_;
-  bool                                  storeSequenceSummary_ = false;
-  bool                                  storeFeatureSummary_  = false;
-  bool                                  verbose_              = true;
+  bool                                  verbose_                 = true;
   std::set<MetaDataHandler::SampleType> sequenceSummaryTypes_;
   std::set<MetaDataHandler::SampleType> featureSummaryTypes_;
+  std::vector<std::string>              sequenceSummaryMetaData_;
+  std::vector<std::string>              featureSummaryMetaData_;
   std::vector<Command>                  commands_;
   Filenames                             static_filenames_;
   SequenceHandler                       sequenceHandler_;
@@ -233,28 +238,32 @@ public:
     std::istringstream iss;
 
     std::cout << "\n\n" <<
-      "Please select the sequence of methods you want to run.\n" <<
-      "You can select the same method multiple times." <<
-      "Separate selected methods with a space.\n" <<
-      "Available methods are:\n" <<
-      "[1] LOAD_RAW_DATA\n" <<
-      "[2] LOAD_FEATURES\n" <<
-      "[3] PICK_FEATURES\n" <<
-      "[4] FILTER_FEATURES\n" <<
-      "[5] SELECT_FEATURES\n" <<
-      "[6] VALIDATE_FEATURES\n" <<
-      "[7] QUANTIFY_FEATURES\n" <<
-      "[8] CHECK_FEATURES\n" <<
-      "[9] STORE_FEATURES\n" <<
-      "[10] PLOT_FEATURES (not implemented)\n" <<
-      "[11] SAVE_FEATURES\n" <<
-      "[12] ANNOTATE_USED_FEATURES\n" <<
-      "[13] CLEAR_FEATURE_HISTORY\n" <<
-      "[14] CALCULATE_CALIBRATION\n" <<
-      "[15] STORE_QUANTITATION_METHODS\n" <<
-      "[16] LOAD_QUANTITATION_METHODS\n" <<
-      "[M] Main menu\n\n" <<
-      "Select the methods (example: > 1 3 4 4 5 7 8 9) and press Enter:\n";
+      "Please insert the sequence of methods to run.\n" <<
+      "You can choose the same method multiple times.\n" <<
+      "Separate chosen methods with a space.\n\n" <<
+      "[1]  Load raw data\n" <<
+      "[2]  Load features\n" <<
+      "[3]  Pick features\n" <<
+      "[4]  Filter features\n" <<
+      "[5]  Select features\n" <<
+      "[6]  Validate features\n" <<
+      "[7]  Quantify features\n" <<
+      "[8]  Check features\n" <<
+      "[9]  Store features\n" <<
+      "[10] Plot features (not implemented)\n" <<
+      "[11] Save features\n" <<
+      "[12] Annotate used features\n" <<
+      "[13] Clear feature history\n" <<
+      "[14] Calculate calibration\n" <<
+      "[15] Store quantitation methods\n" <<
+      "[16] Load quantitation methods\n" <<
+      "[17] Write SequenceSummary.csv\n" <<
+      "[18] Write FeatureSummary.csv\n" <<
+      "[M]  Main menu\n\n" <<
+      "Some presets:\n" <<
+      "Unknowns: 1 3 4 4 5 7 8 9 17 18\n" <<
+      "Standards: 1 3 4 4 5 8 9 14 15 7 8 9 17 18\n" <<
+      "Validation: 1 3 4 5 6 17 18\n\n";
 
     do {
       line = getLineInput("> ");
@@ -267,25 +276,43 @@ public:
     iss.str(line);
 
     for (int n; iss >> n;) {
-      if (n < 1 || n > 16 || n == 10) { // TODO: update this if plotting is implemented
+      if (n < 1 || n > 18 || n == 10) { // TODO: update this if plotting is implemented
         std::cout << "Skipping: " << n << '\n';
         continue;
       }
       Command cmd;
       if (n >= 1 && n <= 13) {
         cmd.setMethod(n_to_raw_data_method.at(n));
-      } else {
+        for (const SampleHandler& sample : sequenceHandler_.getSequence()) {
+          const std::string& key = sample.getMetaData().getInjectionName();
+          cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+            mzML_dir_,
+            features_in_dir_,
+            features_out_dir_,
+            sample.getMetaData().getSampleName(),
+            key
+          );
+        }
+      } else if (n >= 14 && n <= 16) {
         cmd.setMethod(n_to_seq_seg_method.at(n));
-      }
-      for (const SampleHandler& sample : sequenceHandler_.getSequence()) {
-        const std::string& key = sample.getMetaData().getInjectionName();
-        cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-          mzML_dir_,
-          features_in_dir_,
-          features_out_dir_,
-          sample.getMetaData().getSampleName(),
-          key
-        );
+        for (const SequenceSegmentHandler& sequence_segment : sequenceHandler_.getSequenceSegments()) {
+          const std::string& key = sequence_segment.getSequenceSegmentName();
+          cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+            mzML_dir_,
+            features_in_dir_,
+            features_out_dir_,
+            key,
+            key
+          );
+        }
+      } else if (n == 17) {
+        cmd.type = Command::WriteSequenceSummary;
+        sequenceSummaryMetaData_ = getMetaDataInput("\nSequenceSummary.csv\n");
+        sequenceSummaryTypes_ = getSampleTypesInput();
+      } else {
+        cmd.type = Command::WriteFeatureSummary;
+        featureSummaryMetaData_ = getMetaDataInput("\nFeatureSummary.csv\n");
+        featureSummaryTypes_ = getSampleTypesInput();
       }
       methods.push_back(cmd);
     }
@@ -378,6 +405,109 @@ public:
     return sample_types;
   }
 
+  std::vector<std::string> getMetaDataInput(
+    const std::string& title
+  )
+  {
+    std::cout << title <<
+      "Please select the metadata. Insert the indexes separated by a space:\n" <<
+      "[1]  Asymmetry factor\n" <<
+      "[2]  Baseline delta/height\n" <<
+      "[3]  Calculated concentration\n" <<
+      "[4]  Log(Signal/Noise)\n" <<
+      "[5]  Peak apex intensity\n" <<
+      "[6]  Points across baseline\n" <<
+      "[7]  Points across half height\n" <<
+      "[8]  QC transition pass\n" <<
+      "[9]  QC transition message\n" <<
+      "[10] QC transition score\n" <<
+      "[11] QC transition group message\n" <<
+      "[12] QC transition group score\n" <<
+      "[13] Tailing factor\n" <<
+      "[14] Total width\n" <<
+      "[15] Width at 50% peak's height\n" <<
+      "[16] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15\n" <<
+      "[M]  Main menu\n\n";
+
+    std::string line;
+
+    do {
+      line = getLineInput("> ");
+    } while (line.empty());
+
+    if (line[0] == 'M' || line[0] == 'm') {
+      return {};
+    }
+
+    std::istringstream iss;
+    iss.str(line);
+    std::vector<std::string> metadata;
+
+    for (int n; iss >> n;) {
+      if (n < 1 || n > 16) {
+        std::cout << "Skipping: " << n << '\n';
+        continue;
+      }
+      switch (n) {
+      case 1:
+        metadata.push_back("asymmetry_factor");
+        break;
+      case 2:
+        metadata.push_back("baseline_delta_2_height");
+        break;
+      case 3:
+        metadata.push_back("calculated_concentration");
+        break;
+      case 4:
+        metadata.push_back("logSN");
+        break;
+      case 5:
+        metadata.push_back("peak_apex_int");
+        break;
+      case 6:
+        metadata.push_back("points_across_baseline");
+        break;
+      case 7:
+        metadata.push_back("points_across_half_height");
+        break;
+      case 8:
+        metadata.push_back("QC_transition_pass");
+        break;
+      case 9:
+        metadata.push_back("QC_transition_message");
+        break;
+      case 10:
+        metadata.push_back("QC_transition_score");
+        break;
+      case 11:
+        metadata.push_back("QC_transition_group_message");
+        break;
+      case 12:
+        metadata.push_back("QC_transition_group_score");
+        break;
+      case 13:
+        metadata.push_back("tailing_factor");
+        break;
+      case 14:
+        metadata.push_back("total_width");
+        break;
+      case 15:
+        metadata.push_back("width_at_50");
+        break;
+      case 16:
+        metadata = {
+          "peak_apex_int", "total_width", "width_at_50", "tailing_factor",
+          "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
+          "points_across_half_height", "logSN", "calculated_concentration",
+          "QC_transition_message", "QC_transition_pass", "QC_transition_score",
+          "QC_transition_group_message", "QC_transition_group_score"
+        };
+        break;
+      }
+    }
+    return metadata;
+  }
+
   CommandLine(int argc, char **argv)
   {
     if (argc == 2 && fs::exists(argv[1])) {
@@ -404,9 +534,7 @@ public:
       "SmartPeak Main menu\n" <<
       "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n" <<
       "[2] Add processing step to pipeline\n"
-      "[3] SequenceSummary.csv\t[" << (storeSequenceSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
-      "[4] FeatureSummary.csv\t[" << (storeFeatureSummary_ ? "EN" : "DIS") << "ABLED]\n" <<
-      "[5] Run the pipeline\n" <<
+      "[3] Run the pipeline\n" <<
       "[E] Exit SmartPeak\n\n" <<
       "Please select your action.\n";
   }
@@ -429,6 +557,7 @@ public:
     case 1:
       setSequencePathnameFromInput();
       buildStaticFilenames();
+      commands_.clear();
       sequenceHandler_.clear();
       SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", verbose_);
       break;
@@ -436,8 +565,8 @@ public:
     {
       if (mzML_dir_.empty()) {
         mzML_dir_ = main_dir_ + "/mzML";
-        std::cout << "\nPath for 'mzML' files is currently:\t" << mzML_dir_ << '\n';
-        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
+        std::cout << "\nPath for 'mzML':\t" << mzML_dir_ << '\n';
+        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
         const std::string path_input = getLineInput("> ");
         if (path_input.size()) {
           mzML_dir_ = path_input;
@@ -446,8 +575,8 @@ public:
 
       if (features_in_dir_.empty()) {
         features_in_dir_ = main_dir_ + "/features";
-        std::cout << "\nPath for 'INPUT features' files is currently:\t" << features_in_dir_ << '\n';
-        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
+        std::cout << "\nPath for 'INPUT features':\t" << features_in_dir_ << '\n';
+        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
         const std::string path_input = getLineInput("> ");
         if (path_input.size()) {
           features_in_dir_ = path_input;
@@ -456,8 +585,8 @@ public:
 
       if (features_out_dir_.empty()) {
         features_out_dir_ = main_dir_ + "/features";
-        std::cout << "\nPath for 'OUTPUT features' files is currently:\t" << features_out_dir_ << '\n';
-        std::cout << "Enter an absolute pathname if you want to change it, or just press Enter if you accept it.\n";
+        std::cout << "\nPath for 'OUTPUT features':\t" << features_out_dir_ << '\n';
+        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
         const std::string path_input = getLineInput("> ");
         if (path_input.size()) {
           features_out_dir_ = path_input;
@@ -472,64 +601,63 @@ public:
       break;
     }
     case 3:
-      storeSequenceSummary_ = !storeSequenceSummary_;
-      if (storeSequenceSummary_) {
-        sequenceSummaryTypes_ = getSampleTypesInput();
-      }
-      break;
-    case 4:
-      storeFeatureSummary_ = !storeFeatureSummary_;
-      if (storeFeatureSummary_) {
-        featureSummaryTypes_ = getSampleTypesInput();
-      }
-      break;
-    case 5:
-      for (const Command& cmd : commands_) {
+    {
+      size_t i = 0;
+      while (i < commands_.size()) {
+        const Command::CommandType type = commands_[i].type;
+        size_t j = i + 1;
+        for (; type == commands_[j].type; ++j)
+        {
+          // empty body
+        }
+        const Command& cmd = commands_[i];
         if (cmd.type == Command::RawDataMethod) {
+          std::vector<RawDataProcessor::RawDataProcMethod> raw_methods;
+          std::transform(commands_.begin() + i, commands_.begin() + j, std::back_inserter(raw_methods),
+            [](const Command& command){ return command.raw_data_method; });
           SequenceProcessor::processSequence(
             sequenceHandler_,
             cmd.dynamic_filenames,
             std::set<std::string>(),
-            {cmd.raw_data_method},
+            raw_methods,
             verbose_
           );
-        } else {
+        } else if (cmd.type == Command::SequenceSegmentMethod) {
+          std::vector<SequenceSegmentProcessor::SeqSegProcMethod> seq_seg_methods;
+          std::transform(commands_.begin() + i, commands_.begin() + j, std::back_inserter(seq_seg_methods),
+            [](const Command& command){ return command.seq_seg_method; });
           SequenceProcessor::processSequenceSegments(
             sequenceHandler_,
             cmd.dynamic_filenames,
             std::set<std::string>(),
-            {cmd.seq_seg_method},
+            seq_seg_methods,
             verbose_
           );
+        } else if (cmd.type == Command::WriteSequenceSummary) {
+          const std::string pathname = main_dir_ + "/SequenceSummary.csv";
+          SequenceParser::writeDataMatrixFromMetaValue(
+            sequenceHandler_,
+            pathname,
+            sequenceSummaryMetaData_,
+            sequenceSummaryTypes_
+          );
+          std::cout << "SequenceSummary.csv file has been stored at: " << pathname << '\n';
+        } else if (cmd.type == Command::WriteFeatureSummary) {
+          const std::string pathname = main_dir_ + "/FeatureSummary.csv";
+          SequenceParser::writeDataTableFromMetaValue(
+            sequenceHandler_,
+            pathname,
+            featureSummaryMetaData_,
+            featureSummaryTypes_
+          );
+          std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
         }
-      }
-      if (storeSequenceSummary_) {
-        const std::string pathname = main_dir_ + "/SequenceSummary.csv";
-        SequenceParser::writeDataMatrixFromMetaValue(
-          sequenceHandler_,
-          pathname,
-          {"calculated_concentration"},
-          sequenceSummaryTypes_
-        );
-        std::cout << "SequenceSummary.csv file has been stored at: " << pathname << '\n';
-      }
-      if (storeFeatureSummary_) {
-        const std::string pathname = main_dir_ + "/FeatureSummary.csv";
-        SequenceParser::writeDataTableFromMetaValue(
-          sequenceHandler_,
-          pathname,
-          {
-            "peak_apex_int", "total_width", "width_at_50", "tailing_factor",
-            "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
-            "points_across_half_height", "logSN", "calculated_concentration",
-            "QC_transition_message", "QC_transition_pass", "QC_transition_score",
-            "QC_transition_group_message", "QC_transition_group_score"
-          },
-          featureSummaryTypes_
-        );
-        std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
+        i = j;
       }
       break;
+    }
+    default:
+      std::cout << "\nBad input. Try again.\n";
     }
   }
 };
