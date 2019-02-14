@@ -68,7 +68,8 @@ public:
       const std::set<std::string>& names1,
       const std::set<std::string>& names2,
       const std::string& structure_ref1,
-      const std::string& structure_ref2
+      const std::string& structure_ref2,
+      const bool check_both_directions = true
     );
 
     static std::set<std::string> findMissingNames(

@@ -242,7 +242,7 @@ namespace SmartPeak
       names2.insert(run.sample_name);
     }
 
-    const bool check_passed = validateNamesInStructures(names1, names2, "SEQUENCE", "STANDARDS");
+    const bool check_passed = validateNamesInStructures(names1, names2, "SEQUENCE", "STANDARDS", false);
 
     return check_passed;
   }
@@ -289,16 +289,16 @@ namespace SmartPeak
 
     std::vector<bool> check_passed(10);
 
-    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER");
-    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC");
-    check_passed[2] = validateNamesInStructures(names1, names4, "TRAML", "QUANTITATIONMETHODS");
-    check_passed[3] = validateNamesInStructures(names1, names5, "TRAML", "STANDARDS");
-    check_passed[4] = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
-    check_passed[5] = validateNamesInStructures(names2, names4, "FEATUREFILTER", "QUANTITATIONMETHODS");
-    check_passed[6] = validateNamesInStructures(names2, names5, "FEATUREFILTER", "STANDARDS");
-    check_passed[7] = validateNamesInStructures(names3, names4, "FEATUREQC", "QUANTITATIONMETHODS");
-    check_passed[8] = validateNamesInStructures(names3, names5, "FEATUREQC", "STANDARDS");
-    check_passed[9] = validateNamesInStructures(names4, names5, "QUANTITATIONMETHODS", "STANDARDS");
+    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
+    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
+    check_passed[2] = validateNamesInStructures(names1, names4, "TRAML", "QUANTITATIONMETHODS", false);
+    check_passed[3] = validateNamesInStructures(names1, names5, "TRAML", "STANDARDS", false);
+    // check_passed[4] = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
+    // check_passed[5] = validateNamesInStructures(names2, names4, "FEATUREFILTER", "QUANTITATIONMETHODS");
+    // check_passed[6] = validateNamesInStructures(names2, names5, "FEATUREFILTER", "STANDARDS");
+    // check_passed[7] = validateNamesInStructures(names3, names4, "FEATUREQC", "QUANTITATIONMETHODS");
+    // check_passed[8] = validateNamesInStructures(names3, names5, "FEATUREQC", "STANDARDS");
+    // check_passed[9] = validateNamesInStructures(names4, names5, "QUANTITATIONMETHODS", "STANDARDS");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
@@ -331,9 +331,9 @@ namespace SmartPeak
 
     std::vector<bool> check_passed(3);
 
-    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER");
-    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC");
-    check_passed[2] = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
+    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
+    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
+    // check_passed[2] = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
@@ -368,9 +368,9 @@ namespace SmartPeak
 
     std::vector<bool> check_passed(3);
 
-    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "QUANTITATIONMETHODS");
-    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "STANDARDS");
-    check_passed[2] = validateNamesInStructures(names2, names3, "QUANTITATIONMETHODS", "STANDARDS");
+    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "QUANTITATIONMETHODS", false);
+    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "STANDARDS", false);
+    // check_passed[2] = validateNamesInStructures(names2, names3, "QUANTITATIONMETHODS", "STANDARDS");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
@@ -379,16 +379,20 @@ namespace SmartPeak
     const std::set<std::string>& names1,
     const std::set<std::string>& names2,
     const std::string& structure_ref1,
-    const std::string& structure_ref2
+    const std::string& structure_ref2,
+    const bool check_both_directions
   )
   {
     const std::set<std::string> missing1 = findMissingNames(names1, names2);
-    const std::set<std::string> missing2 = findMissingNames(names2, names1);
     if (missing1.size()) {
       std::cout << logMissingNames(missing1, structure_ref1, structure_ref2);
     }
-    if (missing2.size()) {
-      std::cout << logMissingNames(missing2, structure_ref2, structure_ref1);
+    std::set<std::string> missing2;
+    if (check_both_directions) {
+      missing2 = findMissingNames(names2, names1);
+      if (missing2.size()) {
+        std::cout << logMissingNames(missing2, structure_ref2, structure_ref1);
+      }
     }
     return missing1.empty() && missing2.empty();
   }
