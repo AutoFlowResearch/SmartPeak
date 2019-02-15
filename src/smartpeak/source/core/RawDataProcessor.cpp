@@ -182,7 +182,7 @@ namespace SmartPeak
       if (pos != std::string::npos)
         samplename = samplename.substr(pos + 1);
     } else {
-      throw "no sample name?\n";
+      throw "no mzml_id found\n";
     }
 
     const OpenMS::MSExperiment& chromatogram_map = rawDataHandler_IO.getChromatogramMap();

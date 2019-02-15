@@ -27,13 +27,13 @@ void example_LCMS_MRM_Unknowns(
   };
 
   std::map<std::string, Filenames> dynamic_filenames;
-  for (const InjectionHandler& sample : sequenceHandler.getSequence()) {
-    const std::string& key = sample.getMetaData().getInjectionName();
+  for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+    const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
-      sample.getMetaData().getSampleName(),
+      injection.getMetaData().getSampleName(),
       key
     );
   }

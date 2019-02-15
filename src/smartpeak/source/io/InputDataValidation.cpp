@@ -234,8 +234,8 @@ namespace SmartPeak
     std::set<std::string> names1;
     std::set<std::string> names2;
 
-    for (const InjectionHandler& sample : samples) {
-      names1.insert(sample.getMetaData().sample_name);
+    for (const InjectionHandler& injection : samples) {
+      names1.insert(injection.getMetaData().sample_name);
     }
 
     for (const OpenMS::AbsoluteQuantitationStandards::runConcentration& run : standards) {

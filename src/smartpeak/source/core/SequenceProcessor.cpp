@@ -67,9 +67,9 @@ namespace SmartPeak
     const RawDataHandler& rawDataHandler
   )
   {
-    for (InjectionHandler& sample : sequenceHandler_IO.getSequence()) {
-      sample.setRawData(rawDataHandler);
-      sample.getRawData().setMetaData(sample.getMetaData());
+    for (InjectionHandler& injection : sequenceHandler_IO.getSequence()) {
+      injection.setRawData(rawDataHandler);
+      injection.getRawData().setMetaData(injection.getMetaData());
     }
   }
 
@@ -121,14 +121,14 @@ namespace SmartPeak
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
-    for (InjectionHandler& sample : process_sequence) {
+    for (InjectionHandler& injection : process_sequence) {
       std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods;
 
       if (raw_data_processing_methods_I.size()) {
         raw_data_processing_methods = raw_data_processing_methods_I;
       } else {
         raw_data_processing_methods = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-          sample.getMetaData().getSampleType()
+          injection.getMetaData().getSampleType()
         );
       }
 
@@ -139,10 +139,10 @@ namespace SmartPeak
           std::cout << "\n[" << (i + 1) << "/" << n << "]" << std::endl;
         }
         RawDataProcessor::processRawData(
-          sample.getRawData(),
+          injection.getRawData(),
           raw_data_processing_methods[i], // event
-          sample.getRawData().getParameters(),
-          filenames.at(sample.getMetaData().getInjectionName()),
+          injection.getRawData().getParameters(),
+          filenames.at(injection.getMetaData().getInjectionName()),
           verbose_I
         );
       }
@@ -200,7 +200,7 @@ namespace SmartPeak
             .getSequence()
             .at(sequence_segment.getSampleIndices().front())
             .getRawData()
-            .getParameters(), // assuming that all parameters are the same for each sample in the sequence segment!
+            .getParameters(), // assuming that all parameters are the same for each injection in the sequence segment!
           filenames.at(sequence_segment.getSequenceSegmentName()),
           verbose_I
         );

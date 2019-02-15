@@ -285,13 +285,13 @@ public:
       Command cmd;
       if (n >= 1 && n <= 13) {
         cmd.setMethod(n_to_raw_data_method_.at(n));
-        for (const InjectionHandler& sample : sequenceHandler_.getSequence()) {
-          const std::string& key = sample.getMetaData().getInjectionName();
+        for (const InjectionHandler& injection : sequenceHandler_.getSequence()) {
+          const std::string& key = injection.getMetaData().getInjectionName();
           cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
             mzML_dir_,
             features_in_dir_,
             features_out_dir_,
-            sample.getMetaData().getSampleName(),
+            injection.getMetaData().getSampleName(),
             key
           );
         }

@@ -33,17 +33,17 @@ BOOST_AUTO_TEST_CASE(createSequence)
   SequenceHandler sequenceHandler;
   SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
-  const InjectionHandler& sample = sequenceHandler.getSequence()[0];
-  BOOST_CHECK_EQUAL(sample.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(sample.getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sample.getRawData().getTargetedExperiment().getTransitions().size(), 324);
-  BOOST_CHECK_EQUAL(sample.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
-  BOOST_CHECK_EQUAL(sample.getRawData().getFeatureFilter().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(sample.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(sample.getRawData().getFeatureQC().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(sample.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(sample.getRawData().getQuantitationMethods().size(), 107);
-  BOOST_CHECK_EQUAL(sample.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
+  const InjectionHandler& injection = sequenceHandler.getSequence()[0];
+  BOOST_CHECK_EQUAL(injection.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(injection.getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(injection.getRawData().getTargetedExperiment().getTransitions().size(), 324);
+  BOOST_CHECK_EQUAL(injection.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
+  BOOST_CHECK_EQUAL(injection.getRawData().getFeatureFilter().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection.getRawData().getFeatureQC().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection.getRawData().getQuantitationMethods().size(), 107);
+  BOOST_CHECK_EQUAL(injection.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 1);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 107);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
@@ -176,13 +176,13 @@ BOOST_AUTO_TEST_CASE(processSequence)
 
   std::map<std::string, Filenames> dynamic_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
-  for (const InjectionHandler& sample : sequenceHandler.getSequence()) {
-    const std::string key = sample.getMetaData().getInjectionName();
+  for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+    const std::string key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
       path + "mzML/",
       path + "features/",
       path + "features/",
-      sample.getMetaData().getSampleName(),
+      injection.getMetaData().getSampleName(),
       key
     );
   }
