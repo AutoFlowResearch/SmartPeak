@@ -10,7 +10,7 @@ set(sources_list
 	RawDataHandler.cpp
 	RawDataProcessor.cpp
 	SampleGroupHandler.cpp
-	SampleHandler.cpp
+	InjectionHandler.cpp
 	SequenceHandler.cpp
 	SequenceProcessor.cpp
 	SequenceSegmentHandler.cpp

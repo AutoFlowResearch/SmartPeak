@@ -67,7 +67,7 @@ namespace SmartPeak
     const RawDataHandler& rawDataHandler
   )
   {
-    for (SampleHandler& sample : sequenceHandler_IO.getSequence()) {
+    for (InjectionHandler& sample : sequenceHandler_IO.getSequence()) {
       sample.setRawData(rawDataHandler);
       sample.getRawData().setMetaData(sample.getMetaData());
     }
@@ -78,7 +78,7 @@ namespace SmartPeak
     const SequenceSegmentHandler& sequenceSegmentHandler_I
   )
   {
-    const std::vector<SampleHandler>& sequence = sequenceHandler_IO.getSequence();
+    const std::vector<InjectionHandler>& sequence = sequenceHandler_IO.getSequence();
 
     std::map<std::string, std::vector<size_t>> sequence_segments_dict;
 
@@ -109,7 +109,7 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    std::vector<SampleHandler> process_sequence;
+    std::vector<InjectionHandler> process_sequence;
 
     if (injection_names.empty()) {
       process_sequence = sequenceHandler_IO.getSequence();
@@ -121,7 +121,7 @@ namespace SmartPeak
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
-    for (SampleHandler& sample : process_sequence) {
+    for (InjectionHandler& sample : process_sequence) {
       std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods;
 
       if (raw_data_processing_methods_I.size()) {

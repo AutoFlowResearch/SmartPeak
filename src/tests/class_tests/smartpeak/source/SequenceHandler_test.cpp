@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(getSamplesInSequence)
     "sample3_-1_9_1900-01-00_000000"
   };
 
-  const std::vector<SampleHandler> samples = sequenceHandler.getSamplesInSequence(injection_names);
+  const std::vector<InjectionHandler> samples = sequenceHandler.getSamplesInSequence(injection_names);
 
   BOOST_CHECK_EQUAL(samples.size(), 2);
   BOOST_CHECK_EQUAL(samples[0].getMetaData().getSampleName(), "sample1");

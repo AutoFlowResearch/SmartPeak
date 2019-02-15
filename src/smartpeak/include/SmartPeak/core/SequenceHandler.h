@@ -4,7 +4,7 @@
 
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SampleGroupHandler.h>
-#include <SmartPeak/core/SampleHandler.h>
+#include <SmartPeak/core/InjectionHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
 #include <SmartPeak/core/Utilities.h>
 
@@ -22,9 +22,9 @@ public:
 
     void clear();
 
-    void setSequence(const std::vector<SampleHandler>& sequence);
-    std::vector<SampleHandler>& getSequence();
-    const std::vector<SampleHandler>& getSequence() const;
+    void setSequence(const std::vector<InjectionHandler>& sequence);
+    std::vector<InjectionHandler>& getSequence();
+    const std::vector<InjectionHandler>& getSequence() const;
 
     void setSequenceSegments(const std::vector<SequenceSegmentHandler>& sequence_segments);
     std::vector<SequenceSegmentHandler>& getSequenceSegments();
@@ -39,7 +39,7 @@ public:
       const OpenMS::FeatureMap& featureMap_I
     );
 
-    std::vector<SampleHandler> getSamplesInSequence(
+    std::vector<InjectionHandler> getSamplesInSequence(
       const std::set<std::string>& injection_names
     ) const;
 
@@ -52,7 +52,7 @@ public:
     std::map<size_t, std::string> index_to_sample_;
     std::map<std::string, size_t> sample_to_index_;
 private:
-    std::vector<SampleHandler> sequence_;
+    std::vector<InjectionHandler> sequence_;
     std::vector<SequenceSegmentHandler> sequence_segments_;
     std::vector<SampleGroupHandler> sample_groups_;
   };

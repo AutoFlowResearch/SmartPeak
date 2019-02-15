@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   string pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1.csv");
   SequenceHandler sequenceHandler;
   SequenceParser::readSequenceFile(sequenceHandler, pathname, ",");
-  vector<SampleHandler>& sequence1 = sequenceHandler.getSequence();
+  vector<InjectionHandler>& sequence1 = sequenceHandler.getSequence();
   BOOST_CHECK_EQUAL(sequence1.size(), 6);
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleGroupName(), "Test01");
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   sequenceHandler.clear();
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_semicolon.csv");
   SequenceParser::readSequenceFile(sequenceHandler, pathname, ";");
-  vector<SampleHandler>& sequence2 = sequenceHandler.getSequence();
+  vector<InjectionHandler>& sequence2 = sequenceHandler.getSequence();
   BOOST_CHECK_EQUAL(sequence2.size(), 6);
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleGroupName(), "Test01");
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   sequenceHandler.clear();
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_tab.csv");
   SequenceParser::readSequenceFile(sequenceHandler, pathname, "\t");
-  vector<SampleHandler>& sequence3 = sequenceHandler.getSequence();
+  vector<InjectionHandler>& sequence3 = sequenceHandler.getSequence();
   BOOST_CHECK_EQUAL(sequence3.size(), 6);
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleGroupName(), "Test01");

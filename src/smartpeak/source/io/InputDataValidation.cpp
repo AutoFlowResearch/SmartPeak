@@ -64,7 +64,7 @@ namespace SmartPeak
     oss << "Number of samples in the sequence file: " << sequenceHandler.getSequence().size() << "\n";
     oss << "Listing injections' name and type: \n";
 
-    for (const SampleHandler& sampleHandler : sequenceHandler.getSequence()) {
+    for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& sample_meta_data = sampleHandler.getMetaData();
       oss << sample_meta_data.getInjectionName() << "\t" << MetaDataHandler::SampleTypeToString(sample_meta_data.sample_type) << "\n";
     }
@@ -227,14 +227,14 @@ namespace SmartPeak
     const SequenceSegmentHandler& sequenceSegmentHandler
   )
   {
-    const std::vector<SampleHandler>& samples = sequenceHandler.getSequence();
+    const std::vector<InjectionHandler>& samples = sequenceHandler.getSequence();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
       sequenceSegmentHandler.getStandardsConcentrations();
 
     std::set<std::string> names1;
     std::set<std::string> names2;
 
-    for (const SampleHandler& sample : samples) {
+    for (const InjectionHandler& sample : samples) {
       names1.insert(sample.getMetaData().sample_name);
     }
 

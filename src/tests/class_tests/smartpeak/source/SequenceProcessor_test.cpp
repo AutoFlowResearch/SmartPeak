@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   SequenceHandler sequenceHandler;
   SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
-  const SampleHandler& sample = sequenceHandler.getSequence()[0];
+  const InjectionHandler& sample = sequenceHandler.getSequence()[0];
   BOOST_CHECK_EQUAL(sample.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(sample.getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sample.getRawData().getTargetedExperiment().getTransitions().size(), 324);
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
 
   std::map<std::string, Filenames> dynamic_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
-  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
+  for (const InjectionHandler& sample : sequenceHandler.getSequence()) {
     const std::string key = sample.getMetaData().getInjectionName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
       path + "mzML/",

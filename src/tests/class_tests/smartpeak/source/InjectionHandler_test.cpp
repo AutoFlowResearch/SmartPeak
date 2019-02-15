@@ -1,8 +1,8 @@
 /**TODO: Add copyright*/
 
-#define BOOST_TEST_MODULE SampleHandler test suite
+#define BOOST_TEST_MODULE InjectionHandler test suite
 #include <boost/test/included/unit_test.hpp>
-#include <SmartPeak/core/SampleHandler.h>
+#include <SmartPeak/core/InjectionHandler.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 
 using namespace SmartPeak;
@@ -12,22 +12,22 @@ BOOST_AUTO_TEST_SUITE(samplehandler)
 
 BOOST_AUTO_TEST_CASE(constructor)
 {
-  SampleHandler* ptr = nullptr;
-  SampleHandler* nullPointer = nullptr;
-  ptr = new SampleHandler();
+  InjectionHandler* ptr = nullptr;
+  InjectionHandler* nullPointer = nullptr;
+  ptr = new InjectionHandler();
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
 BOOST_AUTO_TEST_CASE(destructor)
 {
-  SampleHandler* ptr = nullptr;
-  ptr = new SampleHandler();
+  InjectionHandler* ptr = nullptr;
+  ptr = new InjectionHandler();
   delete ptr;
 }
 
 BOOST_AUTO_TEST_CASE(set_get_MetaData)
 {
-  SampleHandler sampleHandler;
+  InjectionHandler sampleHandler;
 
   MetaDataHandler mdh1;
   mdh1.setSampleName("1");
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(set_get_MetaData)
 
 BOOST_AUTO_TEST_CASE(set_get_RawData)
 {
-  SampleHandler sampleHandler;
+  InjectionHandler sampleHandler;
 
   OpenMS::FeatureMap f1;
   f1.setIdentifier("1");
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(set_get_RawData)
 
 BOOST_AUTO_TEST_CASE(clear)
 {
-  SampleHandler sampleHandler;
+  InjectionHandler sampleHandler;
 
   MetaDataHandler mdh1;
   OpenMS::FeatureMap f1;
