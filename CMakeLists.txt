@@ -31,7 +31,7 @@ endif()
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 # Set C++ version
-SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #------------------------------------------------------------------------------
@@ -156,8 +156,13 @@ elseif (CMAKE_BUILD_TYPE EQUAL Release)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
 endif()
 
-# prevent error "You must build your code with position independent code if Qt was built with..
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+# Windows/Linux specif issues
+if (WIN32)
+  add_compile_definitions(NOMINMAX)
+else()
+  # prevent error "You must build your code with position independent code if Qt was built with..
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+endif()
 
 #------------------------------------------------------------------------------
 # Enable STL debug mode (GCC only)

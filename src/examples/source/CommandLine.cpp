@@ -10,7 +10,7 @@
 #include <regex>
 #include <unordered_map>
 #include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
+namespace fs = std::experimental::filesystem; // stdc++fs.lib is not available on Windows
 // #include <filesystem> // requires gcc 8, the default is 7.3.0 in ubuntu 18.04
 // namespace fs = std::filesystem;
 
