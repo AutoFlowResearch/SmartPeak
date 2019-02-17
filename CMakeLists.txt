@@ -3,8 +3,8 @@
 # --------------------------------------------------------------------------
 # TODO: license
 # --------------------------------------------------------------------------
-# $Maintainer: Douglas McCloseky
-# $Author: Douglas McCloseky
+# $Maintainer: Douglas McCloskey
+# $Author: Douglas McCloskey
 # --------------------------------------------------------------------------
 
 cmake_minimum_required(VERSION 3.8.2 FATAL_ERROR)
@@ -156,11 +156,11 @@ elseif (CMAKE_BUILD_TYPE EQUAL Release)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
 endif()
 
-# Windows/Linux specif issues
+# Windows/Linux specific issues
 if (WIN32)
   add_compile_definitions(NOMINMAX)
 else()
-  # prevent error "You must build your code with position independent code if Qt was built with..
+  # prevent error position independent code error with QT on Linux
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()
 

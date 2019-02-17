@@ -2,7 +2,7 @@
 
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/Filenames.h>
-#include <SmartPeak/core/MRMFeatureValidator.h>
+#include <SmartPeak/algorithm/MRMFeatureValidator.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/io/OpenMSFile.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMBatchFeatureSelector.h>
