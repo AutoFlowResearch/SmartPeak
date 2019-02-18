@@ -105,7 +105,7 @@ public:
     "[17] Write SequenceSummary.csv\n"
     "[18] Write FeatureSummary.csv\n"
     "[M]  Main menu\n\n"
-    "Some presets:\n"
+    "Presets:\n"
     "Unknowns: 1 3 4 4 5 7 8 9 17 18\n"
     "Standards: 1 3 4 4 5 8 9 14 15 7 8 9 17 18\n"
     "Validation: 1 3 4 5 6 17 18\n\n";
@@ -428,18 +428,13 @@ public:
       "[13] Tailing factor\n" <<
       "[14] Total width\n" <<
       "[15] Width at 50% peak's height\n" <<
-      "[16] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15\n" <<
-      "[M]  Main menu\n\n";
+      "[16] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15\n\n";
 
     std::string line;
 
     do {
       line = getLineInput("> ");
     } while (line.empty());
-
-    if (line[0] == 'M' || line[0] == 'm') {
-      return {};
-    }
 
     std::istringstream iss;
     iss.str(line);
