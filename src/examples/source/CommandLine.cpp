@@ -9,10 +9,16 @@
 #include <iostream>
 #include <regex>
 #include <unordered_map>
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem; // stdc++fs.lib is not available on Windows
-// #include <filesystem> // requires gcc 8, the default is 7.3.0 in ubuntu 18.04
-// namespace fs = std::filesystem;
+
+#ifdef _WIN32
+  // https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/getcwd-wgetcwd
+  #include <direct.h>
+  auto mygetcwd = &_getcwd;
+#else
+  // http://pubs.opengroup.org/onlinepubs/9699919799/functions/getcwd.html
+  #include <unistd.h>
+  auto mygetcwd = &getcwd;
+#endif
 
 using namespace SmartPeak;
 
@@ -105,7 +111,7 @@ public:
     "[17] Write SequenceSummary.csv\n"
     "[18] Write FeatureSummary.csv\n"
     "[M]  Main menu\n\n"
-    "Some presets:\n"
+    "Presets:\n"
     "Unknowns: 1 3 4 4 5 7 8 9 17 18\n"
     "Standards: 1 3 4 4 5 8 9 14 15 7 8 9 17 18\n"
     "Validation: 1 3 4 5 6 17 18\n\n";
@@ -113,7 +119,7 @@ public:
   void buildStaticFilenames()
   {
     Filenames& f = static_filenames_;
-    main_dir_ = fs::path(sequence_pathname_).parent_path().string();
+    main_dir_ = sequence_pathname_.substr(0, sequence_pathname_.find_last_of('/'));
     f = Filenames::getDefaultStaticFilenames(main_dir_);
     clearNonExistantDefaultGeneratedFilenames(f);
     f.sequence_csv_i = sequence_pathname_;
@@ -179,7 +185,7 @@ public:
 
   void clearNonExistantFilename(std::string& filename)
   {
-    if (fs::exists(filename) == false) {
+    if (InputDataValidation::fileExists(filename) == false) {
       filename.clear();
     }
   }
@@ -332,7 +338,7 @@ public:
       "Enter the absolute pathname:\n";
     while (true) {
       sequence_pathname_ = getLineInput("> ", false);
-      if (fs::exists(sequence_pathname_)) {
+      if (InputDataValidation::fileExists(sequence_pathname_)) {
         break;
       }
       std::cout << "The file does not exist. Try again.\n";
@@ -428,18 +434,13 @@ public:
       "[13] Tailing factor\n" <<
       "[14] Total width\n" <<
       "[15] Width at 50% peak's height\n" <<
-      "[16] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15\n" <<
-      "[M]  Main menu\n\n";
+      "[16] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15\n\n";
 
     std::string line;
 
     do {
       line = getLineInput("> ");
     } while (line.empty());
-
-    if (line[0] == 'M' || line[0] == 'm') {
-      return {};
-    }
 
     std::istringstream iss;
     iss.str(line);
@@ -512,10 +513,14 @@ public:
 
   CommandLine(int argc, char **argv)
   {
-    if (argc == 2 && fs::exists(argv[1])) {
+    if (argc == 2 && InputDataValidation::fileExists(argv[1])) { // sequence.csv abs. path passed as argument
       sequence_pathname_ = argv[1];
-    } else if (fs::exists("sequence.csv")) {
-      sequence_pathname_ = fs::current_path().string() + std::string("/sequence.csv");
+    } else if (InputDataValidation::fileExists("sequence.csv")) { // or found in the same folder of the executable
+      char cwd_buf[33000];
+      if (!mygetcwd(cwd_buf, 33000)) {
+        throw "\ngetcwd failed.\n";
+      }
+      sequence_pathname_ = std::string(cwd_buf) + std::string("/sequence.csv");
     } else {
       setSequencePathnameFromInput();
     }
@@ -535,7 +540,7 @@ public:
     std::cout << "\n\n" <<
       "SmartPeak Main menu\n" <<
       "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n" <<
-      "[2] Add processing step to pipeline [" << getPipelineString() << "]\n"
+      "[2] Set processing steps [" << getPipelineString() << "]\n"
       "[3] Run the pipeline\n" <<
       "[E] Exit SmartPeak\n\n" <<
       "Please select your action.\n";
@@ -632,9 +637,10 @@ public:
 
       const std::vector<Command> methods = getMethodsInput();
       if (methods.empty()) {
+        std::cout << "\nPipeline not modified.\n";
         break;
       }
-      commands_.insert(commands_.end(), methods.begin(), methods.end());
+      commands_ = methods;
       break;
     }
     case 3:
