@@ -530,7 +530,7 @@ public:
     std::cout << "\n\n" <<
       "SmartPeak Main menu\n" <<
       "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n" <<
-      "[2] Add processing step to pipeline [" << getPipelineString() << "]\n"
+      "[2] Set processing steps [" << getPipelineString() << "]\n"
       "[3] Run the pipeline\n" <<
       "[E] Exit SmartPeak\n\n" <<
       "Please select your action.\n";
@@ -627,9 +627,10 @@ public:
 
       const std::vector<Command> methods = getMethodsInput();
       if (methods.empty()) {
+        std::cout << "\nPipeline not modified.\n";
         break;
       }
-      commands_.insert(commands_.end(), methods.begin(), methods.end());
+      commands_ = methods;
       break;
     }
     case 3:
