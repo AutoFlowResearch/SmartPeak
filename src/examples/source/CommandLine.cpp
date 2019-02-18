@@ -9,10 +9,16 @@
 #include <iostream>
 #include <regex>
 #include <unordered_map>
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-// #include <filesystem> // requires gcc 8, the default is 7.3.0 in ubuntu 18.04
-// namespace fs = std::filesystem;
+
+#ifdef _WIN32
+  // https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/getcwd-wgetcwd
+  #include <direct.h>
+  auto mygetcwd = &_getcwd;
+#else
+  // http://pubs.opengroup.org/onlinepubs/9699919799/functions/getcwd.html
+  #include <unistd.h>
+  auto mygetcwd = &getcwd;
+#endif
 
 using namespace SmartPeak;
 
@@ -113,7 +119,7 @@ public:
   void buildStaticFilenames()
   {
     Filenames& f = static_filenames_;
-    main_dir_ = fs::path(sequence_pathname_).parent_path().string();
+    main_dir_ = sequence_pathname_.substr(0, sequence_pathname_.find_last_of('/'));
     f = Filenames::getDefaultStaticFilenames(main_dir_);
     clearNonExistantDefaultGeneratedFilenames(f);
     f.sequence_csv_i = sequence_pathname_;
@@ -179,7 +185,7 @@ public:
 
   void clearNonExistantFilename(std::string& filename)
   {
-    if (fs::exists(filename) == false) {
+    if (InputDataValidation::fileExists(filename) == false) {
       filename.clear();
     }
   }
@@ -332,7 +338,7 @@ public:
       "Enter the absolute pathname:\n";
     while (true) {
       sequence_pathname_ = getLineInput("> ", false);
-      if (fs::exists(sequence_pathname_)) {
+      if (InputDataValidation::fileExists(sequence_pathname_)) {
         break;
       }
       std::cout << "The file does not exist. Try again.\n";
@@ -507,10 +513,14 @@ public:
 
   CommandLine(int argc, char **argv)
   {
-    if (argc == 2 && fs::exists(argv[1])) {
+    if (argc == 2 && InputDataValidation::fileExists(argv[1])) { // sequence.csv abs. path passed as argument
       sequence_pathname_ = argv[1];
-    } else if (fs::exists("sequence.csv")) {
-      sequence_pathname_ = fs::current_path().string() + std::string("/sequence.csv");
+    } else if (InputDataValidation::fileExists("sequence.csv")) { // or found in the same folder of the executable
+      char cwd_buf[33000];
+      if (!mygetcwd(cwd_buf, 33000)) {
+        throw "\ngetcwd failed.\n";
+      }
+      sequence_pathname_ = std::string(cwd_buf) + std::string("/sequence.csv");
     } else {
       setSequencePathnameFromInput();
     }
