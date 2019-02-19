@@ -299,18 +299,18 @@ namespace SmartPeak
       names5.insert(run.component_name);
     }
 
-    std::vector<bool> check_passed(10);
+    std::vector<bool> check_passed(4);
 
-    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
-    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
-    check_passed[2] = validateNamesInStructures(names1, names4, "TRAML", "QUANTITATIONMETHODS", false);
-    check_passed[3] = validateNamesInStructures(names1, names5, "TRAML", "STANDARDS", false);
-    // check_passed[4] = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
-    // check_passed[5] = validateNamesInStructures(names2, names4, "FEATUREFILTER", "QUANTITATIONMETHODS");
-    // check_passed[6] = validateNamesInStructures(names2, names5, "FEATUREFILTER", "STANDARDS");
-    // check_passed[7] = validateNamesInStructures(names3, names4, "FEATUREQC", "QUANTITATIONMETHODS");
-    // check_passed[8] = validateNamesInStructures(names3, names5, "FEATUREQC", "STANDARDS");
-    // check_passed[9] = validateNamesInStructures(names4, names5, "QUANTITATIONMETHODS", "STANDARDS");
+    check_passed.at(0) = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
+    check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
+    check_passed.at(2) = validateNamesInStructures(names1, names4, "TRAML", "QUANTITATIONMETHODS", false);
+    check_passed.at(3) = validateNamesInStructures(names1, names5, "TRAML", "STANDARDS", false);
+    // check_passed.at(4) = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
+    // check_passed.at(5) = validateNamesInStructures(names2, names4, "FEATUREFILTER", "QUANTITATIONMETHODS");
+    // check_passed.at(6) = validateNamesInStructures(names2, names5, "FEATUREFILTER", "STANDARDS");
+    // check_passed.at(7) = validateNamesInStructures(names3, names4, "FEATUREQC", "QUANTITATIONMETHODS");
+    // check_passed.at(8) = validateNamesInStructures(names3, names5, "FEATUREQC", "STANDARDS");
+    // check_passed.at(9) = validateNamesInStructures(names4, names5, "QUANTITATIONMETHODS", "STANDARDS");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
@@ -341,11 +341,11 @@ namespace SmartPeak
       names3.insert(qc.component_group_name);
     }
 
-    std::vector<bool> check_passed(3);
+    std::vector<bool> check_passed(2);
 
-    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
-    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
-    // check_passed[2] = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
+    check_passed.at(0) = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
+    check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
+    // check_passed.at(2) = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
@@ -377,11 +377,11 @@ namespace SmartPeak
       names3.insert(run.component_name);
     }
 
-    std::vector<bool> check_passed(3);
+    std::vector<bool> check_passed(2);
 
-    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "QUANTITATIONMETHODS", false);
-    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "STANDARDS", false);
-    // check_passed[2] = validateNamesInStructures(names2, names3, "QUANTITATIONMETHODS", "STANDARDS");
+    check_passed.at(0) = validateNamesInStructures(names1, names2, "TRAML", "QUANTITATIONMETHODS", false);
+    check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "STANDARDS", false);
+    // check_passed.at(2) = validateNamesInStructures(names2, names3, "QUANTITATIONMETHODS", "STANDARDS");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
