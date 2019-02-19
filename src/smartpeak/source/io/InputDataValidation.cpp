@@ -236,13 +236,12 @@ namespace SmartPeak
   }
 
   bool InputDataValidation::sampleNamesAreConsistent(
-    const SequenceHandler& sequenceHandler,
-    const SequenceSegmentHandler& sequenceSegmentHandler
+    const SequenceHandler& sequenceHandler
   )
   {
     const std::vector<InjectionHandler>& samples = sequenceHandler.getSequence();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
-      sequenceSegmentHandler.getStandardsConcentrations();
+      sequenceHandler.getSequenceSegments().front().getStandardsConcentrations();
 
     std::set<std::string> names1;
     std::set<std::string> names2;
@@ -261,18 +260,18 @@ namespace SmartPeak
   }
 
   bool InputDataValidation::componentNamesAreConsistent(
-    const RawDataHandler& rawDataHandler,
-    const SequenceSegmentHandler& sequenceSegmentHandler
+    const SequenceHandler& sequenceHandler
   )
   {
+    const RawDataHandler& rawDataHandler = sequenceHandler.getSequence().front().getRawData();
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
     const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
     const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
-      sequenceSegmentHandler.getQuantitationMethods();
+      sequenceHandler.getSequenceSegments().front().getQuantitationMethods();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
-      sequenceSegmentHandler.getStandardsConcentrations();
+      sequenceHandler.getSequenceSegments().front().getStandardsConcentrations();
 
     std::set<std::string> names1;
     std::set<std::string> names2;
@@ -317,10 +316,10 @@ namespace SmartPeak
   }
 
   bool InputDataValidation::componentNameGroupsAreConsistent(
-    const RawDataHandler& rawDataHandler,
-    const SequenceSegmentHandler& sequenceSegmentHandler
+    const SequenceHandler& sequenceHandler
   )
   {
+    const RawDataHandler& rawDataHandler = sequenceHandler.getSequence().front().getRawData();
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
     const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
@@ -352,16 +351,15 @@ namespace SmartPeak
   }
 
   bool InputDataValidation::heavyComponentsAreConsistent(
-    const RawDataHandler& rawDataHandler,
-    const SequenceSegmentHandler& sequenceSegmentHandler
+    const SequenceHandler& sequenceHandler
   )
   {
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
-      rawDataHandler.getTargetedExperiment().getTransitions();
+      sequenceHandler.getSequence().front().getRawData().getTargetedExperiment().getTransitions();
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
-      sequenceSegmentHandler.getQuantitationMethods();
+      sequenceHandler.getSequenceSegments().front().getQuantitationMethods();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
-      sequenceSegmentHandler.getStandardsConcentrations();
+      sequenceHandler.getSequenceSegments().front().getStandardsConcentrations();
 
     std::set<std::string> names1;
     std::set<std::string> names2;

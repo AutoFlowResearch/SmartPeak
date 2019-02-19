@@ -52,10 +52,10 @@ namespace SmartPeak
     segmentSamplesInSequence(sequenceHandler_IO, sequenceSegmentHandler);
     addRawDataHandlerToSequence(sequenceHandler_IO, rawDataHandler);
 
-    InputDataValidation::sampleNamesAreConsistent(sequenceHandler_IO, sequenceSegmentHandler);
-    InputDataValidation::componentNamesAreConsistent(rawDataHandler, sequenceSegmentHandler);
-    InputDataValidation::componentNameGroupsAreConsistent(rawDataHandler, sequenceSegmentHandler);
-    InputDataValidation::heavyComponentsAreConsistent(rawDataHandler, sequenceSegmentHandler);
+    InputDataValidation::sampleNamesAreConsistent(sequenceHandler_IO);
+    InputDataValidation::componentNamesAreConsistent(sequenceHandler_IO);
+    InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler_IO);
+    InputDataValidation::heavyComponentsAreConsistent(sequenceHandler_IO);
 
     if (verbose_I) {
       std::cout << "==== END   createSequence()" << std::endl;
