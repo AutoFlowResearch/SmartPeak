@@ -61,14 +61,17 @@ namespace SmartPeak
   )
   {
     std::ostringstream oss;
-    oss << "Number of samples in the sequence file: " << sequenceHandler.getSequence().size() << "\n";
-    oss << "Listing injections' name and type: \n";
+    oss << "==== START getSequenceInfo\n" <<
+      "Number of samples in the sequence file: " <<
+      sequenceHandler.getSequence().size() <<
+      "\nListing injections' name and type:\n";
 
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& sample_meta_data = sampleHandler.getMetaData();
       oss << sample_meta_data.getInjectionName() << "\t" << MetaDataHandler::SampleTypeToString(sample_meta_data.sample_type) << "\n";
     }
 
+    oss << "==== END   getSequenceInfo\n";
     return oss.str();
   }
 
@@ -77,13 +80,15 @@ namespace SmartPeak
   )
   {
     std::ostringstream oss;
-    oss << "Number of functions affected by the parameters: " << parameters.size() << "\n";
-    oss << "Listing the functions' names and number of parameters: \n";
+    oss << "==== START getParametersInfo\n" <<
+      "Number of functions affected by the parameters: " << parameters.size() <<
+      "\nListing the functions' names and number of parameters:\n";
 
     for (const std::pair<std::string,std::vector<std::map<std::string,std::string>>>& p : parameters) {
       oss << p.first << ": " << p.second.size() << "\n";
     }
 
+    oss << "==== END   getParametersInfo\n";
     return oss.str();
   }
 
@@ -98,8 +103,9 @@ namespace SmartPeak
       rawDataHandler.getTargetedExperiment().getPeptides();
 
     std::ostringstream oss;
-    oss << "Number of transitions: " << transitions.size() << "\n";
-    oss << "Listing transitions' information:\n";
+    oss << "==== START getTraMLInfo\n" <<
+      "Number of transitions: " << transitions.size() <<
+      "\nListing transitions' information:\n";
 
     std::unordered_map<std::string, double> rts;
     for (const OpenMS::TargetedExperiment::Peptide& peptide : peptides) {
@@ -122,6 +128,7 @@ namespace SmartPeak
         << "Transition RT:\t" << rt << "\n\n";
     }
 
+    oss << "==== END   getTraMLInfo\n";
     return oss.str();
   }
 
@@ -135,8 +142,10 @@ namespace SmartPeak
       : rawDataHandler.getFeatureQC();
 
     std::ostringstream oss;
-    oss << "Number of ComponentQCs: " << featureQC.component_qcs.size() << "\n";
-    oss << "Number of ComponentGroupQCs: " << featureQC.component_group_qcs.size() << "\n";
+    oss << "==== START getComponentsAndGroupsInfo " <<
+      (is_feature_filter ? "(FeatureFilter)" : "(FeatureQC)") << "\n" <<
+      "Number of ComponentQCs: " << featureQC.component_qcs.size() << "\n" <<
+      "Number of ComponentGroupQCs: " << featureQC.component_group_qcs.size() << "\n";
 
     oss << "Listing ComponentQCs' information:\n";
     for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureQC.component_qcs) {
@@ -156,6 +165,8 @@ namespace SmartPeak
         << "\tn. of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
     }
 
+    oss << "==== END   getComponentsAndGroupsInfo " <<
+      (is_feature_filter ? "(FeatureFilter)" : "(FeatureQC)") << "\n";
     return oss.str();
   }
 
@@ -167,22 +178,22 @@ namespace SmartPeak
       sequenceSegmentHandler.getQuantitationMethods();
 
     std::ostringstream oss;
-    oss << "Number of quantitation methods: " << quantitation_methods.size();
-
-    oss << "Listing quantitation methods' information: \n";
+    oss << "==== START getQuantitationMethodsInfo\n" <<
+      "Number of quantitation methods: " << quantitation_methods.size() << "\n" <<
+      "Listing quantitation methods' information:\n";
 
     const std::string delimiter = "\n";
 
     for (const OpenMS::AbsoluteQuantitationMethod& qm : quantitation_methods) {
-      oss << "Component name:\t" << qm.getComponentName() << delimiter
-        << "Feature name:\t" << qm.getFeatureName() << delimiter
-        << "IS name:\t"      << qm.getISName() << delimiter
-        << "LOD:\t["         << qm.getLLOD() << ", " << qm.getULOD() << "]" << delimiter
-        << "LOQ:\t["         << qm.getLLOQ() << ", " << qm.getULOQ() << "]" << delimiter
-        << "N. points:\t"    << qm.getNPoints() << delimiter
-        << "Corr. coeff.:\t"   << qm.getCorrelationCoefficient() << delimiter
-        << "Conc. units:\t"   << qm.getConcentrationUnits() << delimiter
-        << "Transf. model:\t" << qm.getTransformationModel() << delimiter;
+      oss << "Component name:\t" << qm.getComponentName() << delimiter <<
+        "Feature name:\t"  << qm.getFeatureName() << delimiter <<
+        "IS name:\t"       << qm.getISName() << delimiter <<
+        "LOD:\t["          << qm.getLLOD() << ", " << qm.getULOD() << "]" << delimiter <<
+        "LOQ:\t["          << qm.getLLOQ() << ", " << qm.getULOQ() << "]" << delimiter <<
+        "N. points:\t"     << qm.getNPoints() << delimiter <<
+        "Corr. coeff.:\t"  << qm.getCorrelationCoefficient() << delimiter <<
+        "Conc. units:\t"   << qm.getConcentrationUnits() << delimiter <<
+        "Transf. model:\t" << qm.getTransformationModel() << delimiter;
       if (qm.getTransformationModelParams().size()) {
         oss << "Transf. model params:\n";
         for (const OpenMS::Param::ParamEntry& param : qm.getTransformationModelParams()) {
@@ -192,6 +203,7 @@ namespace SmartPeak
       oss << "\n";
     }
 
+    oss << "==== END   getQuantitationMethodsInfo\n";
     return oss.str();
   }
 
@@ -203,9 +215,9 @@ namespace SmartPeak
       sequenceSegmentHandler.getStandardsConcentrations();
 
     std::ostringstream oss;
-    oss << "Number of standards concentrations: " << standards.size() << "\n";
-
-    oss << "Listing standards concentrations' information: \n";
+    oss << "==== START getStandardsConcentrationsInfo\n" <<
+      "Number of standards concentrations: " << standards.size() << "\n" <<
+      "Listing standards concentrations' information:\n";
 
     const std::string delimiter = ", ";
 
@@ -219,6 +231,7 @@ namespace SmartPeak
         << conc.dilution_factor << '\n';
     }
 
+    oss << "==== END   getStandardsConcentrationsInfo\n";
     return oss.str();
   }
 
