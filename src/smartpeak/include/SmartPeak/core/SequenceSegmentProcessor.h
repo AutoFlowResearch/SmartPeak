@@ -22,7 +22,7 @@ public:
     };
 
     /**
-      Return all samples that belong to a given sample type.
+      Return all injection indices that belong to a given sample type.
 
       @param[in] sequenceSegmentHandler Sequence segment handler
       @param[in] sequenceHandler Sequence handler

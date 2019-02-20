@@ -18,7 +18,7 @@ public:
     ~SequenceProcessor() = delete;
 
     /**
-      Create a new session from files or wizard.
+      Create a new sequence from files or wizard.
 
       @param[in,out] sequenceHandler_IO Sequence handler
       @param[in] filenames Pathnames to load
@@ -58,7 +58,7 @@ public:
     );
 
     /**
-      Process a sequence of samples.
+      Apply a processing workflow to all injections in a sequence.
 
       @param[in,out] sequenceHandler_IO Sequence handler
       @param[in] filenames Mapping from injection names to pathnames
@@ -76,7 +76,7 @@ public:
     );
 
     /**
-      Process a sequence of samples by sequence groups.
+      Apply a processing workflow to all injections in a sequence segment.
 
       @param[in,out] sequenceHandler_IO Sequence handler
       @param[in] filenames Mapping from sequence groups names to pathnames
