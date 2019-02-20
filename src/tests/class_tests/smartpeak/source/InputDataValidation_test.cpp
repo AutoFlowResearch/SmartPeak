@@ -29,4 +29,17 @@ BOOST_AUTO_TEST_CASE(isValidFilename)
   BOOST_CHECK_EQUAL(InputDataValidation::isValidFilename(pathname, "an empty pathname"), true);  // not provided
 }
 
+BOOST_AUTO_TEST_CASE(validateNamesInStructures)
+{
+  const set<string> s1 = {"1", "2", "3"};
+  const set<string> s2 = {"1", "2", "4"};
+  const set<string> s3 = {"1", "2", "3", "4"};
+  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s1, s1, "", "", true), true); // check itself
+  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s1, s2, "", "", false), false); // s1 -> s2, "3" is missing
+  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s2, s1, "", "", false), false); // s1 -> s2, "4" is missing
+  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s2, s1, "", "", true), false); // s1 <-> s2, "3" and "4" are missing
+  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s1, s3, "", "", false), true); // s1 -> s3, no name is missing
+  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s1, s3, "", "", true), false); // s1 <-> s3, "4" is missing
+}
+
 BOOST_AUTO_TEST_SUITE_END()

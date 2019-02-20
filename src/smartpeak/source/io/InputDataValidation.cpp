@@ -31,30 +31,6 @@ namespace SmartPeak
     }
   }
 
-  void InputDataValidation::validateFilenames(const Filenames& filenames)
-  {
-    std::cout << "Filenames validation\n";
-    isValidFilename(filenames.sequence_csv_i, "sequence_csv_i");
-    isValidFilename(filenames.parameters_csv_i, "parameters_csv_i");
-    isValidFilename(filenames.traML_csv_i, "traML_csv_i");
-    isValidFilename(filenames.featureFilterComponents_csv_i, "featureFilterComponents_csv_i");
-    isValidFilename(filenames.featureFilterComponentGroups_csv_i, "featureFilterComponentGroups_csv_i");
-    isValidFilename(filenames.featureQCComponents_csv_i, "featureQCComponents_csv_i");
-    isValidFilename(filenames.featureQCComponentGroups_csv_i, "featureQCComponentGroups_csv_i");
-    isValidFilename(filenames.quantitationMethods_csv_i, "quantitationMethods_csv_i");
-    isValidFilename(filenames.standardsConcentrations_csv_i, "standardsConcentrations_csv_i");
-    isValidFilename(filenames.referenceData_csv_i, "referenceData_csv_i");
-    isValidFilename(filenames.mzML_i, "mzML_i");
-    isValidFilename(filenames.featureXML_o, "featureXML_o");
-    isValidFilename(filenames.feature_csv_o, "feature_csv_o");
-    isValidFilename(filenames.featureXML_i, "featureXML_i");
-    isValidFilename(filenames.features_pdf_o, "features_pdf_o");
-    isValidFilename(filenames.quantitationMethods_csv_o, "quantitationMethods_csv_o");
-    isValidFilename(filenames.componentsToConcentrations_csv_o, "componentsToConcentrations_csv_o");
-    isValidFilename(filenames.sequenceSummary_csv_o, "sequenceSummary_csv_o");
-    isValidFilename(filenames.featureSummary_csv_o, "featureSummary_csv_o");
-  }
-
   std::string InputDataValidation::getSequenceInfo(
     const SequenceHandler& sequenceHandler,
     const std::string& delimiter
