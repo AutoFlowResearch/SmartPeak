@@ -17,6 +17,14 @@ public:
     SequenceProcessor() = delete;
     ~SequenceProcessor() = delete;
 
+    /**
+      Create a new session from files or wizard.
+
+      @param[in,out] sequenceHandler_IO Sequence handler
+      @param[in] filenames Pathnames to load
+      @param[in] delimiter String delimiter of the imported file
+      @param[in] verbose_I Verbosity
+    */
     static void createSequence(
       SequenceHandler& sequenceHandler_IO,
       const Filenames& filenames,
@@ -24,31 +32,64 @@ public:
       const bool verbose_I = false
     );
 
+    /**
+      Add template RawDataHandler to all samples in the sequence and copy all
+      meta_data to the RawDataHandler.
+
+      @param[in,out] sequenceHandler_IO Sequence handler
+      @param[in] rawDataHandler Raw Data Handler
+    */
     static void addRawDataHandlerToSequence(
       SequenceHandler& sequenceHandler_IO,
       const RawDataHandler& rawDataHandler
     );
 
+    /**
+      Segment samples in a sequence.
+
+      An optional template SequenceSegmentHandler can be added to all segments.
+
+      @param[in,out] sequenceHandler_IO Sequence handler
+      @param[in] sequenceSegmentHandler_I Optional template SequenceSegmentHandler
+    */
     static void segmentSamplesInSequence(
       SequenceHandler& sequenceHandler_IO,
       const SequenceSegmentHandler& sequenceSegmentHandler_I = SequenceSegmentHandler()
     );
 
+    /**
+      Process a sequence of samples.
+
+      @param[in,out] sequenceHandler_IO Sequence handler
+      @param[in] filenames Mapping from injection names to pathnames
+      @param[in] injection_names Injections to select from the sequence
+      @param[in] raw_data_processing_methods_I Events to process
+      @param[in] verbose_I Verbosity
+    */
     static void processSequence(
       SequenceHandler& sequenceHandler_IO,
       const std::map<std::string, Filenames>& filenames,
-      const std::set<std::string>& injection_names = std::set<std::string>(),
-      const std::vector<RawDataProcessor::RawDataProcMethod>& raw_data_processing_methods_I =
-        std::vector<RawDataProcessor::RawDataProcMethod>(),
+      const std::set<std::string>& injection_names = {},
+      const std::vector<RawDataProcessor::RawDataProcMethod>&
+        raw_data_processing_methods_I = {},
       const bool verbose_I = false
     );
 
+    /**
+      Process a sequence of samples by sequence groups.
+
+      @param[in,out] sequenceHandler_IO Sequence handler
+      @param[in] filenames Mapping from sequence groups names to pathnames
+      @param[in] sequence_segment_names Sequence groups to select from the sequence
+      @param[in] sequence_segment_processing_methods_I Events to process
+      @param[in] verbose_I Verbosity
+    */
     static void processSequenceSegments(
       SequenceHandler& sequenceHandler_IO,
       const std::map<std::string, Filenames>& filenames,
-      const std::set<std::string>& sequence_segment_names = std::set<std::string>(),
-      const std::vector<SequenceSegmentProcessor::SeqSegProcMethod>& sequence_segment_processing_methods_I =
-        std::vector<SequenceSegmentProcessor::SeqSegProcMethod>(),
+      const std::set<std::string>& sequence_segment_names = {},
+      const std::vector<SequenceSegmentProcessor::SeqSegProcMethod>&
+        sequence_segment_processing_methods_I = {},
       const bool verbose_I = false
     );
   };

@@ -6,12 +6,29 @@
 
 namespace SmartPeak
 {
+  /// MRMFeatureFilter performs validation on features (FeatureMap)
   class MRMFeatureValidator
   {
 public:
     MRMFeatureValidator() = delete;
     ~MRMFeatureValidator() = delete;
 
+    /**
+      Map reference data to FeatureMap.
+
+      @note Potential code optimizations:
+      - identify True Negatives and False Negatives (can be problematic due to
+        selection of peaks not in the quantification target list...)
+      - add in plots and other visualizations
+
+      @param[in] reference_data_v Reference data
+      @param[in] features Features
+      @param[in] injection_name Injection name
+      @param[out] output_validated Validated features
+      @param[out] validation_metrics Validation metrics
+      @param[in] Tr_window Retention time difference threshold
+      @param[in] verbose_I Verbosity
+    */
     static void validate_MRMFeatures(
       const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data_v,
       const OpenMS::FeatureMap& features,
