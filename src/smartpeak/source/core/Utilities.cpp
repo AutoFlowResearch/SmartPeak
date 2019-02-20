@@ -48,7 +48,7 @@ namespace SmartPeak
         std::cout << "Utilities::updateParameters(): parameter \"" << name << "\" not found." << std::endl;
         continue;
       }
-      // # check supplied user parameters
+      // check supplied user parameters
       CastValue c;
       if (param.count("value")) {
         if (param.count("type")) {
@@ -144,7 +144,7 @@ namespace SmartPeak
       } else {
         tags = Param_IO.getTags(name);
       }
-      // # update the params
+      // update the params
       switch (c.getTag()) {
         case CastValue::BOOL:
           Param_IO.setValue(name, c.b_ ? "true" : "false", description, tags);

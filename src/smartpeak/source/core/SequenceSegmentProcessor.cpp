@@ -38,6 +38,7 @@ namespace SmartPeak
 
     std::vector<size_t> standards_indices;
 
+    // get all standards
     getSampleIndicesBySampleType(
       sequenceSegmentHandler_IO,
       sequenceHandler_I,
@@ -45,6 +46,7 @@ namespace SmartPeak
       standards_indices
     );
 
+    // check if there are any standards to calculate the calibrators from
     if (standards_indices.empty()) {
       std::cout << "standards_indices argument is empty. Returning." << std::endl;
       return;
@@ -60,6 +62,7 @@ namespace SmartPeak
       return;
     }
 
+    // add in the method parameters
     OpenMS::AbsoluteQuantitation absoluteQuantitation;
     OpenMS::Param parameters = absoluteQuantitation.getParameters();
     Utilities::updateParameters(parameters, AbsoluteQuantitation_params_I);
@@ -70,6 +73,7 @@ namespace SmartPeak
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
 
     for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods()) {
+      // map standards to features
       OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
 
@@ -80,6 +84,7 @@ namespace SmartPeak
         feature_concentrations
       );
 
+      // remove features with an actual concentration of 0.0 or less
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_pruned;
       for (const OpenMS::AbsoluteQuantitationStandards::featureConcentration& feature : feature_concentrations) {
         if (feature.actual_concentration > 0.0) {
@@ -87,9 +92,11 @@ namespace SmartPeak
         }
       }
 
+      // remove components without any points
       if (feature_concentrations_pruned.empty())
         continue;
 
+      // find the optimal calibration curve for each component
       absoluteQuantitation.optimizeSingleCalibrationCurve(
         row.getComponentName(),
         feature_concentrations_pruned
@@ -99,6 +106,7 @@ namespace SmartPeak
       components_to_concentrations.insert({row.getComponentName(), feature_concentrations_pruned});
     }
 
+    // store results
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
 
@@ -136,12 +144,14 @@ namespace SmartPeak
   )
   {
     if (sequence_segment_processing_event == CALCULATE_CALIBRATION) {
+      // optimize the calibrators
       optimizeCalibrationCurves(
         sequenceSegmentHandler_IO,
         sequenceHandler_IO,
         parameters.at("AbsoluteQuantitation"),
         verbose_I
       );
+      // update each sample in the sequence segment with the updated quantitationMethods
       for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices()) {
         sequenceHandler_IO
           .getSequence()
