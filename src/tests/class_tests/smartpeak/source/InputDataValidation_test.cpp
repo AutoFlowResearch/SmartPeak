@@ -42,4 +42,30 @@ BOOST_AUTO_TEST_CASE(validateNamesInStructures)
   BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s1, s3, "", "", true), false); // s1 <-> s3, "4" is missing
 }
 
+BOOST_AUTO_TEST_CASE(findMissingNames)
+{
+  const set<string> s1 = {"1", "2", "3"};
+  const set<string> s2 = {"1", "2", "4"};
+  const set<string> s3 = {"1", "2", "3", "4"};
+  set<string> result;
+
+  result = InputDataValidation::findMissingNames(s1, s1);
+  BOOST_CHECK_EQUAL(result.size(), 0);
+
+  result = InputDataValidation::findMissingNames(s1, s2);
+  BOOST_CHECK_EQUAL(result.size(), 1);
+  BOOST_CHECK_EQUAL(result.count("3"), 1);
+
+  result = InputDataValidation::findMissingNames(s2, s1);
+  BOOST_CHECK_EQUAL(result.size(), 1);
+  BOOST_CHECK_EQUAL(result.count("4"), 1);
+
+  result = InputDataValidation::findMissingNames(s1, s3);
+  BOOST_CHECK_EQUAL(result.size(), 0);
+
+  result = InputDataValidation::findMissingNames(s3, s1);
+  BOOST_CHECK_EQUAL(result.size(), 1);
+  BOOST_CHECK_EQUAL(result.count("4"), 1);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
