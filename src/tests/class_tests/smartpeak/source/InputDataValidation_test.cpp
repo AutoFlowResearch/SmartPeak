@@ -11,9 +11,22 @@ using namespace std;
 
 BOOST_AUTO_TEST_SUITE(inputdatavalidation)
 
-BOOST_AUTO_TEST_CASE(readSequenceFile)
+BOOST_AUTO_TEST_CASE(fileExists)
 {
-// TODO: implement all tests
+  string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv");
+  BOOST_CHECK_EQUAL(InputDataValidation::fileExists(pathname), true);
+  pathname = SMARTPEAK_GET_TEST_DATA_PATH("this_does_not_exist.csv");
+  BOOST_CHECK_EQUAL(InputDataValidation::fileExists(pathname), false);
+}
+
+BOOST_AUTO_TEST_CASE(isValidFilename)
+{
+  string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv");
+  BOOST_CHECK_EQUAL(InputDataValidation::isValidFilename(pathname, "some standards file"), true);  // success
+  pathname = SMARTPEAK_GET_TEST_DATA_PATH("this_does_not_exist.csv");
+  BOOST_CHECK_EQUAL(InputDataValidation::isValidFilename(pathname, "a file that does not exist"), false); // failure
+  pathname.clear();
+  BOOST_CHECK_EQUAL(InputDataValidation::isValidFilename(pathname, "an empty pathname"), true);  // not provided
 }
 
 BOOST_AUTO_TEST_SUITE_END()
