@@ -1,6 +1,6 @@
 // TODO: Add copyright
 
-#include <SmartPeak/core/MRMFeatureValidator.h>
+#include <SmartPeak/algorithm/MRMFeatureValidator.h>
 #include <SmartPeak/core/Utilities.h>
 
 namespace SmartPeak

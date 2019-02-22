@@ -9,7 +9,6 @@ set(sources_list_h
 	LCMS_MRM_Unknown_example.h
 	LCMS_MRM_Validation_example.h
 	MetaDataHandler.h
-	MRMFeatureValidator.h
 	RawDataHandler.h
 	RawDataProcessor.h
 	SampleGroupHandler.h

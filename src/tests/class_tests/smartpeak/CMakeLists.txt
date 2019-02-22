@@ -97,7 +97,7 @@ add_dependencies(IO_TEST ${io_executables_list})
 
 # algorithm
 add_custom_target(ALGORITHM_TEST)
-add_dependencies(ALGORITHM_TEST ${simulator_executables_list})
+add_dependencies(ALGORITHM_TEST ${algorithm_executables_list})
 
 #------------------------------------------------------------------------------
 # Add the actual tests

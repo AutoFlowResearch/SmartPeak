@@ -6,7 +6,6 @@ set(sources_list
 	Filenames.cpp
 	Helloworld.cpp
 	MetaDataHandler.cpp
-	MRMFeatureValidator.cpp
 	RawDataHandler.cpp
 	RawDataProcessor.cpp
 	SampleGroupHandler.cpp

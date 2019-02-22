@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(constructor)
 BOOST_AUTO_TEST_CASE(destructor) 
 {
   CSVWriter* ptr = nullptr;
-	ptr = new CSVWriter();
+  ptr = new CSVWriter();
   delete ptr;
 }
 
@@ -57,11 +57,11 @@ BOOST_AUTO_TEST_CASE(writeDataInRow)
 
   // Write the data to file
   headers = {"Column1", "Column2", "Column3"};
-	csvwriter.writeDataInRow(headers.begin(), headers.end());
+  csvwriter.writeDataInRow(headers.begin(), headers.end());
   line = {"a", "b", "c" };
-	csvwriter.writeDataInRow(line.begin(), line.end());
+  csvwriter.writeDataInRow(line.begin(), line.end());
   line = {"1", "2", "3" };
-	csvwriter.writeDataInRow(line.begin(), line.end());
+  csvwriter.writeDataInRow(line.begin(), line.end());
 
   // Read the data back in
   io::CSVReader<3> test_in(filename);
