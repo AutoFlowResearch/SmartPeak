@@ -66,7 +66,7 @@ public:
       const bool verbose_I = false
     );
 
-    /** Check that the features pass the QCs.
+    /** Flag features that do not pass the filter QCs.
 
       @param[in,out] rawDataHandler_IO Raw data file class
       @param[in] MRMFeatureFilter_qc_params_I Dictionary of parameter names, values, descriptions, and tags
