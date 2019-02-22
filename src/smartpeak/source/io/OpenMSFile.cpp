@@ -457,7 +457,6 @@ namespace SmartPeak
       mdh.sample_name = sample_name;
       mdh.inj_number = sample_index;
       mdh.batch_name = experiment_id;
-			//mdh.acquisition_date_and_time = acquisition_date_and_time;
       m.emplace("injection_name", mdh.getInjectionName());
       reference_data.push_back(std::move(m));
     }

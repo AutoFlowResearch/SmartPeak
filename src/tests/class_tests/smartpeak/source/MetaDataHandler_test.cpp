@@ -34,8 +34,8 @@ BOOST_AUTO_TEST_CASE(getters_setters)
   BOOST_CHECK_EQUAL((int)metaDataHandler.getSampleType(), (int)MetaDataHandler::SampleType::Unknown);
   BOOST_CHECK_EQUAL(metaDataHandler.getSequenceSegmentName(), "");
   BOOST_CHECK_EQUAL(metaDataHandler.getFilename(), "");
-	BOOST_CHECK_EQUAL(metaDataHandler.getAcquisitionDateAndTime(), "1900-01-01_000000");
-	BOOST_CHECK_EQUAL(metaDataHandler.getInjectionName(), "_-1__1900-01-01_000000");
+  BOOST_CHECK_EQUAL(metaDataHandler.getAcquisitionDateAndTimeAsString(), "1900-01-01_000000");
+  BOOST_CHECK_EQUAL(metaDataHandler.getInjectionName(), "_-1__1900-01-01_000000");
 
   // test setters
   metaDataHandler.setSampleName("this is a sample name");
@@ -43,14 +43,15 @@ BOOST_AUTO_TEST_CASE(getters_setters)
   metaDataHandler.setSampleType(MetaDataHandler::SampleType::QC);
   metaDataHandler.setSequenceSegmentName("this is a SEQUENCE segment name");
   metaDataHandler.setFilename("some filename");
-	metaDataHandler.setAcquisitionDateAndTime("09-06-2015  17:14:00");
+  metaDataHandler.batch_name = "SomeBatchName";
+  metaDataHandler.setAcquisitionDateAndTimeFromString("09-06-2015  17:14:00", "%m-%d-%Y %H:%M:%S");
   BOOST_CHECK_EQUAL(metaDataHandler.getSampleName(), "this is a sample name");
   BOOST_CHECK_EQUAL(metaDataHandler.getSampleGroupName(), "this is a sample GROUP name");
   BOOST_CHECK_EQUAL((int)metaDataHandler.getSampleType(), (int)MetaDataHandler::SampleType::QC);
   BOOST_CHECK_EQUAL(metaDataHandler.getSequenceSegmentName(), "this is a SEQUENCE segment name");
   BOOST_CHECK_EQUAL(metaDataHandler.getFilename(), "some filename");
-	BOOST_CHECK_EQUAL(metaDataHandler.getAcquisitionDateAndTime(), "2015-09-06_171400");
-	BOOST_CHECK_EQUAL(metaDataHandler.getInjectionName(), "this is a sample name_-1_2015-09-06_171400");
+  BOOST_CHECK_EQUAL(metaDataHandler.getAcquisitionDateAndTimeAsString(), "2015-09-06_171400");
+  BOOST_CHECK_EQUAL(metaDataHandler.getInjectionName(), "this is a sample name_-1_SomeBatchName_2015-09-06_171400");
 }
 
 BOOST_AUTO_TEST_CASE(validateMetaData)
@@ -98,7 +99,7 @@ BOOST_AUTO_TEST_CASE(clear)
   m.inj_volume = 7.0;
   m.inj_volume_units = "8";
   m.batch_name = "9";
-	m.acquisition_date_and_time = { 1, 1,1, 1, 1, 1, 1, 1, 1 };
+  m.acquisition_date_and_time = { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
   m.clear();
 
@@ -111,7 +112,7 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK_EQUAL(m.inj_volume, -1.0);
   BOOST_CHECK_EQUAL(m.inj_volume_units, "");
   BOOST_CHECK_EQUAL(m.batch_name, "");
-	BOOST_CHECK_EQUAL(m.getAcquisitionDateAndTime(), "1900-01-01_000000");
+  BOOST_CHECK_EQUAL(m.getAcquisitionDateAndTimeAsString(), "1900-01-01_000000");
 }
 
 BOOST_AUTO_TEST_CASE(SampleTypeToString)

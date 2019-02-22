@@ -226,7 +226,7 @@ namespace SmartPeak
         cast = std::strtof(m[0].str().c_str(), NULL);
       } else if (std::regex_match(trimmed, m, re_bool)) { // bool
         cast = m[0].str()[0] == 't' || m[0].str()[0] == 'T';
-      } else if (!trimmed.empty() && trimmed.front() == '[' && trimmed.back() == ']') { // list
+      } else if (trimmed.size() && trimmed.front() == '[' && trimmed.back() == ']') { // list
         std::string stripped;
         std::for_each(trimmed.cbegin() + 1, trimmed.cend() - 1, [&stripped](const char c) { // removing spaces to simplify regexs
           if (c != ' ')
@@ -248,9 +248,9 @@ namespace SmartPeak
           cast = std::vector<std::string>();
           parseList(trimmed, re_s, cast);
         }
-      } else if (!trimmed.empty() && trimmed.front() == trimmed.back() && (trimmed.front() == '"' || trimmed.front() == '\'')) { // string
+      } else if (trimmed.size() && trimmed.front() == trimmed.back() && (trimmed.front() == '"' || trimmed.front() == '\'')) { // string
         parseString(trimmed.substr(1, trimmed.size() - 2), cast);
-      } else {                                                                                       // default to string
+      } else { // default to string
         cast = trimmed;
       }
     } catch (const std::exception& e) {

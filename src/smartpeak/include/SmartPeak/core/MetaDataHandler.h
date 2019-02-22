@@ -67,8 +67,12 @@ public:
 
     std::string getInjectionName() const;
 
-		void setAcquisitionDateAndTime(const std::string& acquisition_date_and_time, std::string format = "%m-%d-%Y %H:%M:%S");
-		std::string getAcquisitionDateAndTime(std::string format = "%Y-%m-%d_%H%M%S") const;
+    void setAcquisitionDateAndTimeFromString(
+      const std::string& acquisition_date_and_time,
+      const std::string& format = "%Y-%m-%d_%H%M%S" // from less specific to more specific. Otherwise: "%m-%d-%Y %H:%M:%S"
+    );
+
+    std::string getAcquisitionDateAndTimeAsString(const std::string& format = "%Y-%m-%d_%H%M%S") const;
 
     // required
     std::string sample_name;
