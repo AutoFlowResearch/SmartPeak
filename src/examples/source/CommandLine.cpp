@@ -30,7 +30,14 @@ public:
       RawDataMethod,
       SequenceSegmentMethod,
       WriteSequenceSummary,
-      WriteFeatureSummary
+      WriteFeatureSummary,
+      GetSequenceInfo,
+      GetParametersInfo,
+      GetTraMLInfo,
+      GetFeatureFilterInfo,
+      GetFeatureQCInfo,
+      GetQuantMethodsInfo,
+      GetStandardsConcInfo,
     } type;
 
     void setMethod(const RawDataProcessor::RawDataProcMethod method)
@@ -88,28 +95,62 @@ public:
     {15, SequenceSegmentProcessor::STORE_QUANTITATION_METHODS},
     {16, SequenceSegmentProcessor::LOAD_QUANTITATION_METHODS},
   };
+  enum ProcOpt {
+    OPT_LOAD_RAW_DATA = 1,
+    OPT_LOAD_FEATURES,
+    OPT_PICK_FEATURES,
+    OPT_FILTER_FEATURES,
+    OPT_SELECT_FEATURES,
+    OPT_VALIDATE_FEATURES,
+    OPT_QUANTIFY_FEATURES,
+    OPT_STORE_FEATURES,
+    OPT_CHECK_FEATURES,
+    OPT_PLOT_FEATURES,
+    OPT_SAVE_FEATURES,
+    OPT_ANNOTATE_USED_FEATURES,
+    OPT_CLEAR_FEATURE_HISTORY,
+    OPT_CALCULATE_CALIBRATION,
+    OPT_STORE_QUANTITATION_METHODS,
+    OPT_LOAD_QUANTITATION_METHODS,
+    OPT_WRITE_SEQUENCE_SUMMARY,
+    OPT_WRITE_FEATURE_SUMMARY,
+    OPT_GET_SEQUENCE_INFO,
+    OPT_GET_PARAMETERS_INFO,
+    OPT_GET_TRAML_INFO,
+    OPT_GET_COMP_N_GROUPS_FILTER_INFO,
+    OPT_GET_COMP_N_GROUPS_QC_INFO,
+    OPT_GET_QUANT_METHODS_INFO,
+    OPT_GET_STANDARDS_CONC_INFO,
+  };
   const std::string main_menu_ = "\n\n"
     "Please insert the sequence of methods to run.\n"
     "You can choose the same method multiple times.\n"
     "Separate chosen methods with a space.\n\n"
-    "[1]  Load raw data\n"
-    "[2]  Load features\n"
-    "[3]  Pick features\n"
-    "[4]  Filter features\n"
-    "[5]  Select features\n"
-    "[6]  Validate features\n"
-    "[7]  Quantify features\n"
-    "[8]  Check features\n"
-    "[9]  Store features\n"
-    "[10] Plot features (not implemented)\n"
-    "[11] Save features\n"
-    "[12] Annotate used features\n"
-    "[13] Clear feature history\n"
-    "[14] Calculate calibration\n"
-    "[15] Store quantitation methods\n"
-    "[16] Load quantitation methods\n"
-    "[17] Write SequenceSummary.csv\n"
-    "[18] Write FeatureSummary.csv\n"
+    "[" + std::to_string(OPT_LOAD_RAW_DATA) + "]  Load raw data\n"
+    "[" + std::to_string(OPT_LOAD_FEATURES) + "]  Load features\n"
+    "[" + std::to_string(OPT_PICK_FEATURES) + "]  Pick features\n"
+    "[" + std::to_string(OPT_FILTER_FEATURES) + "]  Filter features\n"
+    "[" + std::to_string(OPT_SELECT_FEATURES) + "]  Select features\n"
+    "[" + std::to_string(OPT_VALIDATE_FEATURES) + "]  Validate features\n"
+    "[" + std::to_string(OPT_QUANTIFY_FEATURES) + "]  Quantify features\n"
+    "[" + std::to_string(OPT_CHECK_FEATURES) + "]  Check features\n"
+    "[" + std::to_string(OPT_STORE_FEATURES) + "]  Store features\n"
+    "[" + std::to_string(OPT_PLOT_FEATURES) + "] Plot features (not implemented)\n"
+    "[" + std::to_string(OPT_SAVE_FEATURES) + "] Save features\n"
+    "[" + std::to_string(OPT_ANNOTATE_USED_FEATURES) + "] Annotate used features\n"
+    "[" + std::to_string(OPT_CLEAR_FEATURE_HISTORY) + "] Clear feature history\n"
+    "[" + std::to_string(OPT_CALCULATE_CALIBRATION) + "] Calculate calibration\n"
+    "[" + std::to_string(OPT_STORE_QUANTITATION_METHODS) + "] Store quantitation methods\n"
+    "[" + std::to_string(OPT_LOAD_QUANTITATION_METHODS) + "] Load quantitation methods\n"
+    "[" + std::to_string(OPT_WRITE_SEQUENCE_SUMMARY) + "] Write SequenceSummary.csv\n"
+    "[" + std::to_string(OPT_WRITE_FEATURE_SUMMARY) + "] Write FeatureSummary.csv\n"
+    "[" + std::to_string(OPT_GET_SEQUENCE_INFO) + "] Print sequence info\n"
+    "[" + std::to_string(OPT_GET_PARAMETERS_INFO) + "] Print parameters info\n"
+    "[" + std::to_string(OPT_GET_TRAML_INFO) + "] Print TraML info\n"
+    "[" + std::to_string(OPT_GET_COMP_N_GROUPS_FILTER_INFO) + "] Print components and components groups (FeatureFilter) info\n"
+    "[" + std::to_string(OPT_GET_COMP_N_GROUPS_QC_INFO) + "] Print components and components groups (FeatureQC) info\n"
+    "[" + std::to_string(OPT_GET_QUANT_METHODS_INFO) + "] Print quantitation methods info\n"
+    "[" + std::to_string(OPT_GET_STANDARDS_CONC_INFO) + "] Print standards concentrations info\n"
     "[M]  Main menu\n\n"
     "Presets:\n"
     "Unknowns: 1 3 4 4 5 7 8 9 17 18\n"
@@ -284,7 +325,7 @@ public:
     iss.str(line);
 
     for (int n; iss >> n;) {
-      if (n < 1 || n > 18 || n == 10) { // TODO: update this if plotting is implemented
+      if (n < 1 || n > 25 || n == 10) { // TODO: update this if plotting is implemented
         std::cout << "Skipping: " << n << '\n';
         continue;
       }
@@ -317,10 +358,27 @@ public:
         cmd.type = Command::WriteSequenceSummary;
         sequenceSummaryMetaData_ = getMetaDataInput("\nSequenceSummary.csv\n");
         sequenceSummaryTypes_ = getSampleTypesInput();
-      } else {
+      } else if (n == 18) {
         cmd.type = Command::WriteFeatureSummary;
         featureSummaryMetaData_ = getMetaDataInput("\nFeatureSummary.csv\n");
         featureSummaryTypes_ = getSampleTypesInput();
+      } else if (n == 19) {
+        cmd.type = Command::GetSequenceInfo;
+      } else if (n == 20) {
+        cmd.type = Command::GetParametersInfo;
+      } else if (n == 21) {
+        cmd.type = Command::GetTraMLInfo;
+      } else if (n == 22) {
+        cmd.type = Command::GetFeatureFilterInfo;
+      } else if (n == 23) {
+        cmd.type = Command::GetFeatureQCInfo;
+      } else if (n == 24) {
+        cmd.type = Command::GetQuantMethodsInfo;
+      } else if (n == 25) {
+        cmd.type = Command::GetStandardsConcInfo;
+      } else {
+        std::cout << "\ninvalid option\n";
+        continue;
       }
       methods.push_back(cmd);
     }
@@ -569,9 +627,25 @@ public:
         );
         s.append(std::to_string(it->first));
       } else if(cmd.type == Command::WriteSequenceSummary) {
-        s.append("17");
+        s.append(std::to_string(OPT_WRITE_SEQUENCE_SUMMARY));
       } else if(cmd.type == Command::WriteFeatureSummary) {
-        s.append("18");
+        s.append(std::to_string(OPT_WRITE_FEATURE_SUMMARY));
+      } else if(cmd.type == Command::GetSequenceInfo) {
+        s.append(std::to_string(OPT_GET_SEQUENCE_INFO));
+      } else if(cmd.type == Command::GetParametersInfo) {
+        s.append(std::to_string(OPT_GET_PARAMETERS_INFO));
+      } else if(cmd.type == Command::GetTraMLInfo) {
+        s.append(std::to_string(OPT_GET_TRAML_INFO));
+      } else if(cmd.type == Command::GetFeatureFilterInfo) {
+        s.append(std::to_string(OPT_GET_COMP_N_GROUPS_FILTER_INFO));
+      } else if(cmd.type == Command::GetFeatureQCInfo) {
+        s.append(std::to_string(OPT_GET_COMP_N_GROUPS_QC_INFO));
+      } else if(cmd.type == Command::GetQuantMethodsInfo) {
+        s.append(std::to_string(OPT_GET_QUANT_METHODS_INFO));
+      } else if(cmd.type == Command::GetStandardsConcInfo) {
+        s.append(std::to_string(OPT_GET_STANDARDS_CONC_INFO));
+      } else {
+        throw "\nunsupported step\n";
       }
       s.append(" ");
     }
@@ -694,6 +768,28 @@ public:
             featureSummaryTypes_
           );
           std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
+        } else if (cmd.type == Command::GetSequenceInfo) {
+          std::cout << InputDataValidation::getSequenceInfo(sequenceHandler_, ",") << "\n";
+        } else if (cmd.type == Command::GetParametersInfo) {
+          std::cout << InputDataValidation::getParametersInfo(
+            sequenceHandler_.getSequence().front().getRawData().getParameters()) << "\n";
+        } else if (cmd.type == Command::GetTraMLInfo) {
+          std::cout << InputDataValidation::getTraMLInfo(
+            sequenceHandler_.getSequence().front().getRawData()) << "\n";
+        } else if (cmd.type == Command::GetFeatureFilterInfo) {
+          std::cout << InputDataValidation::getComponentsAndGroupsInfo(
+            sequenceHandler_.getSequence().front().getRawData(), true) << "\n";
+        } else if (cmd.type == Command::GetFeatureQCInfo) {
+          std::cout << InputDataValidation::getComponentsAndGroupsInfo(
+            sequenceHandler_.getSequence().front().getRawData(), false) << "\n";
+        } else if (cmd.type == Command::GetQuantMethodsInfo) {
+          std::cout << InputDataValidation::getQuantitationMethodsInfo(
+            sequenceHandler_.getSequenceSegments().front()) << "\n";
+        } else if (cmd.type == Command::GetStandardsConcInfo) {
+          std::cout << InputDataValidation::getStandardsConcentrationsInfo(
+            sequenceHandler_.getSequenceSegments().front()) << "\n";
+        } else {
+          std::cout << "\ninvalid command\n";
         }
         i = j;
       }

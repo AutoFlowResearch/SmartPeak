@@ -61,14 +61,17 @@ namespace SmartPeak
   )
   {
     std::ostringstream oss;
-    oss << "Number of samples in the sequence file: " << sequenceHandler.getSequence().size() << "\n";
-    oss << "Listing injections' name and type: \n";
+    oss << "==== START getSequenceInfo\n" <<
+      "Number of samples in the sequence file: " <<
+      sequenceHandler.getSequence().size() <<
+      "\nListing injections' name and type:\n";
 
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& sample_meta_data = sampleHandler.getMetaData();
       oss << sample_meta_data.getInjectionName() << "\t" << MetaDataHandler::SampleTypeToString(sample_meta_data.sample_type) << "\n";
     }
 
+    oss << "==== END   getSequenceInfo\n";
     return oss.str();
   }
 
@@ -77,13 +80,15 @@ namespace SmartPeak
   )
   {
     std::ostringstream oss;
-    oss << "Number of functions affected by the parameters: " << parameters.size() << "\n";
-    oss << "Listing the functions' names and number of parameters: \n";
+    oss << "==== START getParametersInfo\n" <<
+      "Number of functions affected by the parameters: " << parameters.size() <<
+      "\nListing the functions' names and number of parameters:\n";
 
     for (const std::pair<std::string,std::vector<std::map<std::string,std::string>>>& p : parameters) {
       oss << p.first << ": " << p.second.size() << "\n";
     }
 
+    oss << "==== END   getParametersInfo\n";
     return oss.str();
   }
 
@@ -98,8 +103,9 @@ namespace SmartPeak
       rawDataHandler.getTargetedExperiment().getPeptides();
 
     std::ostringstream oss;
-    oss << "Number of transitions: " << transitions.size() << "\n";
-    oss << "Listing transitions' information:\n";
+    oss << "==== START getTraMLInfo\n" <<
+      "Number of transitions: " << transitions.size() <<
+      "\nListing transitions' information:\n";
 
     std::unordered_map<std::string, double> rts;
     for (const OpenMS::TargetedExperiment::Peptide& peptide : peptides) {
@@ -122,6 +128,7 @@ namespace SmartPeak
         << "Transition RT:\t" << rt << "\n\n";
     }
 
+    oss << "==== END   getTraMLInfo\n";
     return oss.str();
   }
 
@@ -135,8 +142,10 @@ namespace SmartPeak
       : rawDataHandler.getFeatureQC();
 
     std::ostringstream oss;
-    oss << "Number of ComponentQCs: " << featureQC.component_qcs.size() << "\n";
-    oss << "Number of ComponentGroupQCs: " << featureQC.component_group_qcs.size() << "\n";
+    oss << "==== START getComponentsAndGroupsInfo " <<
+      (is_feature_filter ? "(FeatureFilter)" : "(FeatureQC)") << "\n" <<
+      "Number of ComponentQCs: " << featureQC.component_qcs.size() << "\n" <<
+      "Number of ComponentGroupQCs: " << featureQC.component_group_qcs.size() << "\n";
 
     oss << "Listing ComponentQCs' information:\n";
     for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureQC.component_qcs) {
@@ -156,6 +165,8 @@ namespace SmartPeak
         << "\tn. of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
     }
 
+    oss << "==== END   getComponentsAndGroupsInfo " <<
+      (is_feature_filter ? "(FeatureFilter)" : "(FeatureQC)") << "\n";
     return oss.str();
   }
 
@@ -167,22 +178,22 @@ namespace SmartPeak
       sequenceSegmentHandler.getQuantitationMethods();
 
     std::ostringstream oss;
-    oss << "Number of quantitation methods: " << quantitation_methods.size();
-
-    oss << "Listing quantitation methods' information: \n";
+    oss << "==== START getQuantitationMethodsInfo\n" <<
+      "Number of quantitation methods: " << quantitation_methods.size() << "\n" <<
+      "Listing quantitation methods' information:\n";
 
     const std::string delimiter = "\n";
 
     for (const OpenMS::AbsoluteQuantitationMethod& qm : quantitation_methods) {
-      oss << "Component name:\t" << qm.getComponentName() << delimiter
-        << "Feature name:\t" << qm.getFeatureName() << delimiter
-        << "IS name:\t"      << qm.getISName() << delimiter
-        << "LOD:\t["         << qm.getLLOD() << ", " << qm.getULOD() << "]" << delimiter
-        << "LOQ:\t["         << qm.getLLOQ() << ", " << qm.getULOQ() << "]" << delimiter
-        << "N. points:\t"    << qm.getNPoints() << delimiter
-        << "Corr. coeff.:\t"   << qm.getCorrelationCoefficient() << delimiter
-        << "Conc. units:\t"   << qm.getConcentrationUnits() << delimiter
-        << "Transf. model:\t" << qm.getTransformationModel() << delimiter;
+      oss << "Component name:\t" << qm.getComponentName() << delimiter <<
+        "Feature name:\t"  << qm.getFeatureName() << delimiter <<
+        "IS name:\t"       << qm.getISName() << delimiter <<
+        "LOD:\t["          << qm.getLLOD() << ", " << qm.getULOD() << "]" << delimiter <<
+        "LOQ:\t["          << qm.getLLOQ() << ", " << qm.getULOQ() << "]" << delimiter <<
+        "N. points:\t"     << qm.getNPoints() << delimiter <<
+        "Corr. coeff.:\t"  << qm.getCorrelationCoefficient() << delimiter <<
+        "Conc. units:\t"   << qm.getConcentrationUnits() << delimiter <<
+        "Transf. model:\t" << qm.getTransformationModel() << delimiter;
       if (qm.getTransformationModelParams().size()) {
         oss << "Transf. model params:\n";
         for (const OpenMS::Param::ParamEntry& param : qm.getTransformationModelParams()) {
@@ -192,6 +203,7 @@ namespace SmartPeak
       oss << "\n";
     }
 
+    oss << "==== END   getQuantitationMethodsInfo\n";
     return oss.str();
   }
 
@@ -203,9 +215,9 @@ namespace SmartPeak
       sequenceSegmentHandler.getStandardsConcentrations();
 
     std::ostringstream oss;
-    oss << "Number of standards concentrations: " << standards.size() << "\n";
-
-    oss << "Listing standards concentrations' information: \n";
+    oss << "==== START getStandardsConcentrationsInfo\n" <<
+      "Number of standards concentrations: " << standards.size() << "\n" <<
+      "Listing standards concentrations' information:\n";
 
     const std::string delimiter = ", ";
 
@@ -219,17 +231,17 @@ namespace SmartPeak
         << conc.dilution_factor << '\n';
     }
 
+    oss << "==== END   getStandardsConcentrationsInfo\n";
     return oss.str();
   }
 
   bool InputDataValidation::sampleNamesAreConsistent(
-    const SequenceHandler& sequenceHandler,
-    const SequenceSegmentHandler& sequenceSegmentHandler
+    const SequenceHandler& sequenceHandler
   )
   {
     const std::vector<InjectionHandler>& samples = sequenceHandler.getSequence();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
-      sequenceSegmentHandler.getStandardsConcentrations();
+      sequenceHandler.getSequenceSegments().front().getStandardsConcentrations();
 
     std::set<std::string> names1;
     std::set<std::string> names2;
@@ -248,18 +260,18 @@ namespace SmartPeak
   }
 
   bool InputDataValidation::componentNamesAreConsistent(
-    const RawDataHandler& rawDataHandler,
-    const SequenceSegmentHandler& sequenceSegmentHandler
+    const SequenceHandler& sequenceHandler
   )
   {
+    const RawDataHandler& rawDataHandler = sequenceHandler.getSequence().front().getRawData();
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
     const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
     const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
-      sequenceSegmentHandler.getQuantitationMethods();
+      sequenceHandler.getSequenceSegments().front().getQuantitationMethods();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
-      sequenceSegmentHandler.getStandardsConcentrations();
+      sequenceHandler.getSequenceSegments().front().getStandardsConcentrations();
 
     std::set<std::string> names1;
     std::set<std::string> names2;
@@ -287,27 +299,27 @@ namespace SmartPeak
       names5.insert(run.component_name);
     }
 
-    std::vector<bool> check_passed(10);
+    std::vector<bool> check_passed(4);
 
-    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
-    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
-    check_passed[2] = validateNamesInStructures(names1, names4, "TRAML", "QUANTITATIONMETHODS", false);
-    check_passed[3] = validateNamesInStructures(names1, names5, "TRAML", "STANDARDS", false);
-    // check_passed[4] = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
-    // check_passed[5] = validateNamesInStructures(names2, names4, "FEATUREFILTER", "QUANTITATIONMETHODS");
-    // check_passed[6] = validateNamesInStructures(names2, names5, "FEATUREFILTER", "STANDARDS");
-    // check_passed[7] = validateNamesInStructures(names3, names4, "FEATUREQC", "QUANTITATIONMETHODS");
-    // check_passed[8] = validateNamesInStructures(names3, names5, "FEATUREQC", "STANDARDS");
-    // check_passed[9] = validateNamesInStructures(names4, names5, "QUANTITATIONMETHODS", "STANDARDS");
+    check_passed.at(0) = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
+    check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
+    check_passed.at(2) = validateNamesInStructures(names1, names4, "TRAML", "QUANTITATIONMETHODS", false);
+    check_passed.at(3) = validateNamesInStructures(names1, names5, "TRAML", "STANDARDS", false);
+    // check_passed.at(4) = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
+    // check_passed.at(5) = validateNamesInStructures(names2, names4, "FEATUREFILTER", "QUANTITATIONMETHODS");
+    // check_passed.at(6) = validateNamesInStructures(names2, names5, "FEATUREFILTER", "STANDARDS");
+    // check_passed.at(7) = validateNamesInStructures(names3, names4, "FEATUREQC", "QUANTITATIONMETHODS");
+    // check_passed.at(8) = validateNamesInStructures(names3, names5, "FEATUREQC", "STANDARDS");
+    // check_passed.at(9) = validateNamesInStructures(names4, names5, "QUANTITATIONMETHODS", "STANDARDS");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
 
   bool InputDataValidation::componentNameGroupsAreConsistent(
-    const RawDataHandler& rawDataHandler,
-    const SequenceSegmentHandler& sequenceSegmentHandler
+    const SequenceHandler& sequenceHandler
   )
   {
+    const RawDataHandler& rawDataHandler = sequenceHandler.getSequence().front().getRawData();
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
     const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
@@ -329,26 +341,25 @@ namespace SmartPeak
       names3.insert(qc.component_group_name);
     }
 
-    std::vector<bool> check_passed(3);
+    std::vector<bool> check_passed(2);
 
-    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
-    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
-    // check_passed[2] = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
+    check_passed.at(0) = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
+    check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
+    // check_passed.at(2) = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
 
   bool InputDataValidation::heavyComponentsAreConsistent(
-    const RawDataHandler& rawDataHandler,
-    const SequenceSegmentHandler& sequenceSegmentHandler
+    const SequenceHandler& sequenceHandler
   )
   {
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
-      rawDataHandler.getTargetedExperiment().getTransitions();
+      sequenceHandler.getSequence().front().getRawData().getTargetedExperiment().getTransitions();
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
-      sequenceSegmentHandler.getQuantitationMethods();
+      sequenceHandler.getSequenceSegments().front().getQuantitationMethods();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
-      sequenceSegmentHandler.getStandardsConcentrations();
+      sequenceHandler.getSequenceSegments().front().getStandardsConcentrations();
 
     std::set<std::string> names1;
     std::set<std::string> names2;
@@ -366,11 +377,11 @@ namespace SmartPeak
       names3.insert(run.component_name);
     }
 
-    std::vector<bool> check_passed(3);
+    std::vector<bool> check_passed(2);
 
-    check_passed[0] = validateNamesInStructures(names1, names2, "TRAML", "QUANTITATIONMETHODS", false);
-    check_passed[1] = validateNamesInStructures(names1, names3, "TRAML", "STANDARDS", false);
-    // check_passed[2] = validateNamesInStructures(names2, names3, "QUANTITATIONMETHODS", "STANDARDS");
+    check_passed.at(0) = validateNamesInStructures(names1, names2, "TRAML", "QUANTITATIONMETHODS", false);
+    check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "STANDARDS", false);
+    // check_passed.at(2) = validateNamesInStructures(names2, names3, "QUANTITATIONMETHODS", "STANDARDS");
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }

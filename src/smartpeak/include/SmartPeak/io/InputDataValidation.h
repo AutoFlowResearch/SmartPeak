@@ -45,23 +45,19 @@ public:
     );
 
     static bool sampleNamesAreConsistent(
-      const SequenceHandler& sequenceHandler,
-      const SequenceSegmentHandler& sequenceSegmentHandler
+      const SequenceHandler& sequenceHandler
     );
 
     static bool componentNamesAreConsistent(
-      const RawDataHandler& rawDataHandler,
-      const SequenceSegmentHandler& sequenceSegmentHandler
+      const SequenceHandler& sequenceHandler
     );
 
     static bool componentNameGroupsAreConsistent(
-      const RawDataHandler& rawDataHandler,
-      const SequenceSegmentHandler& sequenceSegmentHandler
+      const SequenceHandler& sequenceHandler
     );
 
     static bool heavyComponentsAreConsistent(
-      const RawDataHandler& rawDataHandler,
-      const SequenceSegmentHandler& sequenceSegmentHandler
+      const SequenceHandler& sequenceHandler
     );
 
     static bool validateNamesInStructures(
