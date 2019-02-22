@@ -21,7 +21,7 @@ void test_main_GCMS_SIM_Unknown()
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_SIM_Unknowns/features/GCMS_SIM.featureXML")
+    SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_SIM_Unknowns/features/GCMS_SIM_1_BatchName_1900-01-01_000000.featureXML")
   );
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
