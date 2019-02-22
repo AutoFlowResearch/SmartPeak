@@ -1,6 +1,6 @@
 // TODO: Add copyright
 
-#include <SmartPeak/core/MRMFeatureValidator.h>
+#include <SmartPeak/algorithm/MRMFeatureValidator.h>
 #include <SmartPeak/core/Utilities.h>
 
 namespace SmartPeak
@@ -21,8 +21,9 @@ namespace SmartPeak
 
     std::map<std::string, std::map<std::string, Utilities::CastValue>> reference_data;
     for (const std::map<std::string, Utilities::CastValue>& m : reference_data_v) {
-      if (m.at("injection_name").s_ != injection_name)
+      if (m.at("injection_name").s_ != injection_name) {
         continue;
+      }
       const std::string& name = m.at("component_name").s_;
       reference_data[name] = m;
     }
@@ -31,8 +32,9 @@ namespace SmartPeak
       std::vector<OpenMS::Feature> subordinates_tmp;
       for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
         bool fc_pass = false;
-        if (!subordinate.metaValueExists("native_id"))
+        if (!subordinate.metaValueExists("native_id")) {
           throw "native_id info is missing.";
+        }
         const std::string reference_data_key = subordinate.getMetaValue("native_id").toString();
         OpenMS::Feature subordinate_copy = subordinate;
 
@@ -42,6 +44,7 @@ namespace SmartPeak
           continue;
         }
 
+        // extract and format rt information
         const float reference_rt = reference_data[reference_data_key]["retention_time"].f_;
 
         if (0.0 == reference_rt) {
@@ -50,24 +53,33 @@ namespace SmartPeak
         const float feature_rt = feature.getRT();
         const float feature_leftWidth = static_cast<float>(feature.getMetaValue("leftWidth"));
         const float feature_rightWidth = static_cast<float>(feature.getMetaValue("rightWidth"));
-        if (std::fabs(reference_rt - feature_rt) < Tr_window)
+        // validate the retention time
+        if (std::fabs(reference_rt - feature_rt) < Tr_window ||
+            (reference_rt > feature_leftWidth &&
+             reference_rt < feature_rightWidth)) {
           fc_pass = true;
-        if (reference_rt > feature_leftWidth && reference_rt < feature_rightWidth)
-          fc_pass = true;
-        if (fc_pass) {
+        }
+        // other validation parameters
+        // NOTE: if there are no other validation parameters that are
+        // transition-specific, there is no need to loop
+        // through each transition
+        if (fc_pass) { // True Positive
           subordinate_copy.setMetaValue("validation", "TP");
           subordinates_tmp.push_back(subordinate_copy);
           y_pred.push_back(1);
           y_true.push_back(1);
-        } else {
+        } else {       // False Positive
           subordinate_copy.setMetaValue("validation", "FP");
           subordinates_tmp.push_back(subordinate_copy);
           y_pred.push_back(1);
           y_true.push_back(0);
         }
       }
-      if (subordinates_tmp.empty())
+      // check that subordinates were found
+      if (subordinates_tmp.empty()) {
         continue;
+      }
+      // copy out all feature values
       OpenMS::Feature feature_tmp = feature;
       feature_tmp.setSubordinates(subordinates_tmp);
       output_validated.push_back(feature_tmp);

@@ -7,15 +7,15 @@
 
 namespace SmartPeak
 {
-  class SampleHandler
+  class InjectionHandler
   {
 public:
-    SampleHandler() = default;
-    ~SampleHandler() = default;
-    SampleHandler(const SampleHandler&) = default;
-    SampleHandler& operator=(const SampleHandler&) = default;
-    SampleHandler(SampleHandler&&) = default;
-    SampleHandler& operator=(SampleHandler&&) = default;
+    InjectionHandler() = default;
+    ~InjectionHandler() = default;
+    InjectionHandler(const InjectionHandler&) = default;
+    InjectionHandler& operator=(const InjectionHandler&) = default;
+    InjectionHandler(InjectionHandler&&) = default;
+    InjectionHandler& operator=(InjectionHandler&&) = default;
 
     void clear();
 

@@ -45,30 +45,27 @@ public:
     );
 
     static bool sampleNamesAreConsistent(
-      const SequenceHandler& sequenceHandler,
-      const SequenceSegmentHandler& sequenceSegmentHandler
+      const SequenceHandler& sequenceHandler
     );
 
     static bool componentNamesAreConsistent(
-      const RawDataHandler& rawDataHandler,
-      const SequenceSegmentHandler& sequenceSegmentHandler
+      const SequenceHandler& sequenceHandler
     );
 
     static bool componentNameGroupsAreConsistent(
-      const RawDataHandler& rawDataHandler,
-      const SequenceSegmentHandler& sequenceSegmentHandler
+      const SequenceHandler& sequenceHandler
     );
 
     static bool heavyComponentsAreConsistent(
-      const RawDataHandler& rawDataHandler,
-      const SequenceSegmentHandler& sequenceSegmentHandler
+      const SequenceHandler& sequenceHandler
     );
 
     static bool validateNamesInStructures(
       const std::set<std::string>& names1,
       const std::set<std::string>& names2,
       const std::string& structure_ref1,
-      const std::string& structure_ref2
+      const std::string& structure_ref2,
+      const bool check_both_directions = true
     );
 
     static std::set<std::string> findMissingNames(

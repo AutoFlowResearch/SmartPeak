@@ -24,24 +24,67 @@ public:
     RawDataProcessor() = delete;
     ~RawDataProcessor() = delete;
 
+    enum RawDataProcMethod {
+      LOAD_RAW_DATA = 1,
+      LOAD_FEATURES,
+      PICK_FEATURES,
+      FILTER_FEATURES,
+      SELECT_FEATURES,
+      VALIDATE_FEATURES,
+      QUANTIFY_FEATURES,
+      CHECK_FEATURES,
+      STORE_FEATURES,
+      PLOT_FEATURES,
+      SAVE_FEATURES,
+      ANNOTATE_USED_FEATURES,
+      CLEAR_FEATURE_HISTORY,
+    };
+
+    // static RawDataProcMethod convertEventStringToEnum(const std::string& event);
+
+    /** Run the openSWATH workflow for a single raw data file.
+
+      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in] MRMFeatureFinderScoring_params_I Dictionary of parameter names, values, descriptions, and tags
+      @param[in] verbose_I Verbosity
+    */
     static void pickFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::vector<std::map<std::string, std::string>>& MRMFeatureFinderScoring_params_I,
       const bool verbose_I = false
     );
 
+    /** Filter features that do not pass the filter QCs.
+
+      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in] MRMFeatureFilter_filter_params_I Dictionary of parameter names, values, descriptions, and tags
+      @param[in] verbose_I Verbosity
+    */
     static void filterFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::vector<std::map<std::string, std::string>>& MRMFeatureFilter_filter_params_I,
       const bool verbose_I = false
     );
 
+    /** Flag features that do not pass the filter QCs.
+
+      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in] MRMFeatureFilter_qc_params_I Dictionary of parameter names, values, descriptions, and tags
+      @param[in] verbose_I Verbosity
+    */
     static void checkFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::vector<std::map<std::string, std::string>>& MRMFeatureFilter_qc_params_I,
       const bool verbose_I = false
     );
 
+    /** Run the openSWATH post processing filtering workflow for a single sample.
+
+      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in] MRMFeatureSelector_select_params_I Dictionary of parameter names, values, descriptions, and tags
+      @param[in] MRMFeatureSelector_schedule_params_I Dictionary of parameter names, values, descriptions, and tags
+      @param[in] verbose_I Verbosity
+    */
     static void selectFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::vector<std::map<std::string, std::string>>& MRMFeatureSelector_select_params_I,
@@ -49,17 +92,35 @@ public:
       const bool verbose_I = false
     );
 
+    /** Extracts metadata from the chromatogram.
+
+      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in] verbose_I Verbosity
+    */
     static void extractMetaData(
       RawDataHandler& rawDataHandler_IO,
       const bool verbose_I = false
     );
 
+    /** Validate the selected peaks against reference data.
+
+      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in] MRMRFeatureValidator_params_I Dictionary of parameter names, values, descriptions, and tags
+      @param[in] verbose_I Verbosity
+    */
     static void validateFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::vector<std::map<std::string, std::string>>& MRMRFeatureValidator_params_I,
       const bool verbose_I = false
     );
 
+    /** Export plots of peaks with features annotated.
+
+      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in] filename Output filename
+      @param[in] FeaturePlotter_params_I Dictionary of parameter names, values, descriptions, and tags
+      @param[in] verbose_I Verbosity
+    */
     static void plotFeatures(
       RawDataHandler& rawDataHandler_IO,
       const std::string& filename,
@@ -67,33 +128,57 @@ public:
       const bool verbose_I = false
     );
 
+    /** Quantify all unknown samples based on the quantitationMethod.
+
+      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in] verbose_I Verbosity
+    */
     static void quantifyComponents(
       RawDataHandler& rawDataHandler_IO,
       const bool verbose_I = false
     );
 
+    /** Apply processing event to a RawDataHandler.
+
+      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in] raw_data_processing_event Processing event to apply
+      @param[in] MRMRFeatureValidator_params_I Dictionary of parameter names, values, descriptions, and tags
+      @param[in] filenames Info about where data should be read from or written to
+      @param[in] verbose_I Verbosity
+    */
     static void processRawData(
       RawDataHandler& rawDataHandler_IO,
-      const std::string& raw_data_processing_event,
+      const RawDataProcMethod raw_data_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
       const Filenames& filenames,
       const bool verbose_I = false
     );
 
-    static bool checkRawDataProcessingWorkflow(
-      const std::vector<std::string>& raw_data_processing_I
+    /** Return the default workflow parameters for a given sample type.
+
+      @param[in] sample_type Sample type
+    */
+    static std::vector<RawDataProcMethod> getDefaultRawDataProcessingWorkflow(
+      const MetaDataHandler::SampleType sample_type
     );
 
-    static void getDefaultRawDataProcessingWorkflow(
-      const MetaDataHandler::SampleType sample_type,
-      std::vector<std::string>& default_workflow
-    );
+    /** Annotate the most recent featureMap in the history with the
+      filtered/selected features of the current featureMap and then replace the
+      current featureMap with the annotated one.
 
+      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in] verbose_I Verbosity
+    */
     static void annotateUsedFeatures(
       RawDataHandler& rawDataHandler_IO,
       const bool verbose_I = false
     );
 
+    /** Save the current featureMap to the history.
+
+      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in] verbose_I Verbosity
+    */
     static void saveCurrentFeatureMapToHistory(
       RawDataHandler& rawDataHandler_IO,
       const bool verbose_I = false

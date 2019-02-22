@@ -15,28 +15,25 @@ void example_LCMS_MRM_Unknowns(
 
   SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true);
 
-  const std::vector<std::string> raw_data_processing_methods = {
-    "load_raw_data",
-    // "load_features",
-    "pick_features",
-    "filter_features",
-    "filter_features",
-    "select_features",
-    // "validate_features",
-    "quantify_features",
-    "check_features",
-    "store_features",
-    // "plot_features"
+  const std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods = {
+    RawDataProcessor::LOAD_RAW_DATA,
+    RawDataProcessor::PICK_FEATURES,
+    RawDataProcessor::FILTER_FEATURES,
+    RawDataProcessor::FILTER_FEATURES,
+    RawDataProcessor::SELECT_FEATURES,
+    RawDataProcessor::QUANTIFY_FEATURES,
+    RawDataProcessor::CHECK_FEATURES,
+    RawDataProcessor::STORE_FEATURES
   };
 
   std::map<std::string, Filenames> dynamic_filenames;
-  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
-    const std::string& key = sample.getMetaData().getInjectionName();
+  for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+    const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
-      sample.getMetaData().getSampleName(),
+      injection.getMetaData().getSampleName(),
       key
     );
   }
@@ -44,7 +41,7 @@ void example_LCMS_MRM_Unknowns(
   SequenceProcessor::processSequence(
     sequenceHandler,
     dynamic_filenames,
-    std::vector<std::string>(),
+    std::set<std::string>(),
     raw_data_processing_methods,
     verbose_I
   );
@@ -59,12 +56,12 @@ void example_LCMS_MRM_Unknowns(
   SequenceParser::writeDataTableFromMetaValue(
     sequenceHandler,
     static_filenames.featureSummary_csv_o,
-    { // TODO: add new matadata values for compatibility with industry reporting standards
-      // TODO: add them in all other "example" files calling this method
-      "peak_apex_int", "total_width", "width_at_50", "tailing_factor", "asymmetry_factor",
-      "baseline_delta_2_height", "points_across_baseline", "points_across_half_height",
-      "logSN", "calculated_concentration", "QC_transition_message", "QC_transition_pass",
-      "QC_transition_score", "QC_transition_group_message", "QC_transition_group_score"
+    {
+      "peak_apex_int", "total_width", "width_at_50", "tailing_factor",
+      "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
+      "points_across_half_height", "logSN", "calculated_concentration",
+      "QC_transition_message", "QC_transition_pass", "QC_transition_score",
+      "QC_transition_group_message", "QC_transition_group_score"
     },
     {MetaDataHandler::SampleType::Unknown}
   );

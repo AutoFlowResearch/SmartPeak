@@ -67,6 +67,13 @@ public:
 
     std::string getInjectionName() const;
 
+    void setAcquisitionDateAndTimeFromString(
+      const std::string& acquisition_date_and_time,
+      const std::string& format = "%Y-%m-%d_%H%M%S" // from less specific to more specific. Otherwise: "%m-%d-%Y %H:%M:%S"
+    );
+
+    std::string getAcquisitionDateAndTimeAsString(const std::string& format = "%Y-%m-%d_%H%M%S") const;
+
     // required
     std::string sample_name;
     std::string sample_group_name;
@@ -87,6 +94,7 @@ public:
     std::string instrument;
     std::string operator_name;
     std::string proc_method_name;
-    std::tm acquisition_date_and_time = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    std::tm acquisition_date_and_time = { 0, 0, 0, 1, 0, 0, 0, 0, 0 }; // Need to start at Day 1 of the month
   };
+
 }

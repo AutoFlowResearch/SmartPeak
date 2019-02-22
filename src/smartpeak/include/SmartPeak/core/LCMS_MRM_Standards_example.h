@@ -15,26 +15,24 @@ void example_LCMS_MRM_Standards(
 
   SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I);
 
-  std::vector<std::string> raw_data_processing_methods = {
-    "load_raw_data",
-    // # "load_features",
-    "pick_features",
-    "filter_features",
-    "filter_features",
-    "select_features",
-    "check_features",
-    "store_features",
-    // # "plot_features"
+  std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods = {
+    RawDataProcessor::LOAD_RAW_DATA,
+    RawDataProcessor::PICK_FEATURES,
+    RawDataProcessor::FILTER_FEATURES,
+    RawDataProcessor::FILTER_FEATURES,
+    RawDataProcessor::SELECT_FEATURES,
+    RawDataProcessor::CHECK_FEATURES,
+    RawDataProcessor::STORE_FEATURES
   };
 
   std::map<std::string, Filenames> dynamic_filenames1;
-  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
-    const std::string& key = sample.getMetaData().getInjectionName();
+  for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+    const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames1[key] = Filenames::getDefaultDynamicFilenames(
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
-      sample.getMetaData().getSampleName(),
+      injection.getMetaData().getSampleName(),
       key
     );
   }
@@ -42,17 +40,14 @@ void example_LCMS_MRM_Standards(
   SequenceProcessor::processSequence(
     sequenceHandler,
     dynamic_filenames1,
-    std::vector<std::string>(),
+    std::set<std::string>(),
     raw_data_processing_methods,
     true
   );
 
-  const std::vector<std::string> sequence_segment_processing_methods = {
-    "calculate_calibration",
-  // "plot_calibrators",
-    "store_quantitation_methods",
-  // # "load_quantitation_methods",
-  // # "store_components_to_concentrations"
+  const std::vector<SequenceSegmentProcessor::SeqSegProcMethod> sequence_segment_processing_methods = {
+    SequenceSegmentProcessor::CALCULATE_CALIBRATION,
+    SequenceSegmentProcessor::STORE_QUANTITATION_METHODS,
   };
 
   std::map<std::string, Filenames> dynamic_filenames2;
@@ -76,20 +71,19 @@ void example_LCMS_MRM_Standards(
   );
 
   raw_data_processing_methods = {
-    "quantify_features",
-    "check_features",
-    "store_features",
-    // # "plot_features"
+    RawDataProcessor::QUANTIFY_FEATURES,
+    RawDataProcessor::CHECK_FEATURES,
+    RawDataProcessor::STORE_FEATURES
   };
 
   std::map<std::string, Filenames> dynamic_filenames3;
-  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
-    const std::string& key = sample.getMetaData().getInjectionName();
+  for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+    const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames3[key] = Filenames::getDefaultDynamicFilenames(
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
-      sample.getMetaData().getSampleName(),
+      injection.getMetaData().getSampleName(),
       key
     );
   }
@@ -97,7 +91,7 @@ void example_LCMS_MRM_Standards(
   SequenceProcessor::processSequence(
     sequenceHandler,
     dynamic_filenames3,
-    std::vector<std::string>(),
+    std::set<std::string>(),
     raw_data_processing_methods,
     true
   );

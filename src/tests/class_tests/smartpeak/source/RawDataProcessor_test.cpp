@@ -270,44 +270,30 @@ BOOST_AUTO_TEST_CASE(checkFeatures)
 
 BOOST_AUTO_TEST_CASE(getDefaultRawDataProcessingWorkflow)
 {
-  std::vector<std::string> workflow;
+  std::vector<RawDataProcessor::RawDataProcMethod> workflow;
 
-  RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-    MetaDataHandler::SampleType::Unknown,
-    workflow
+  workflow = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
+    MetaDataHandler::SampleType::Unknown
   );
 
   BOOST_CHECK_EQUAL(workflow.size(), 6);
-  BOOST_CHECK_EQUAL(workflow[0], "load_raw_data");
-  BOOST_CHECK_EQUAL(workflow[1], "pick_features");
-  BOOST_CHECK_EQUAL(workflow[2], "filter_features");
-  BOOST_CHECK_EQUAL(workflow[3], "select_features");
-  BOOST_CHECK_EQUAL(workflow[4], "quantify_features");
-  BOOST_CHECK_EQUAL(workflow[5], "check_features");
+  BOOST_CHECK_EQUAL(workflow[0], RawDataProcessor::LOAD_RAW_DATA);
+  BOOST_CHECK_EQUAL(workflow[1], RawDataProcessor::PICK_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[2], RawDataProcessor::FILTER_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[3], RawDataProcessor::SELECT_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[4], RawDataProcessor::QUANTIFY_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[5], RawDataProcessor::CHECK_FEATURES);
 
-  RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-    MetaDataHandler::SampleType::DoubleBlank,
-    workflow
+  workflow = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
+    MetaDataHandler::SampleType::DoubleBlank
   );
 
   BOOST_CHECK_EQUAL(workflow.size(), 5);
-  BOOST_CHECK_EQUAL(workflow[0], "load_raw_data");
-  BOOST_CHECK_EQUAL(workflow[1], "pick_features");
-  BOOST_CHECK_EQUAL(workflow[2], "filter_features");
-  BOOST_CHECK_EQUAL(workflow[3], "select_features");
-  BOOST_CHECK_EQUAL(workflow[4], "check_features");
-}
-
-BOOST_AUTO_TEST_CASE(checkRawDataProcessingWorkflow)
-{
-  const std::vector<std::string> raw_data_processing1 = {"load_raw_data", "quantify_features"};
-  const std::vector<std::string> raw_data_processing2 = {"fake_event", "another_fake"};
-
-  const bool result1 = RawDataProcessor::checkRawDataProcessingWorkflow(raw_data_processing1);
-  const bool result2 = RawDataProcessor::checkRawDataProcessingWorkflow(raw_data_processing2);
-
-  BOOST_CHECK_EQUAL(result1, true);
-  BOOST_CHECK_EQUAL(result2, false);
+  BOOST_CHECK_EQUAL(workflow[0], RawDataProcessor::LOAD_RAW_DATA);
+  BOOST_CHECK_EQUAL(workflow[1], RawDataProcessor::PICK_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[2], RawDataProcessor::FILTER_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[3], RawDataProcessor::SELECT_FEATURES);
+  BOOST_CHECK_EQUAL(workflow[4], RawDataProcessor::CHECK_FEATURES);
 }
 
 BOOST_AUTO_TEST_CASE(processRawData)
@@ -332,11 +318,10 @@ BOOST_AUTO_TEST_CASE(processRawData)
 
   OpenMSFile::loadFeatureQC(rawDataHandler, featureFilterComponents_csv_i, featureFilterComponentGroups_csv_i);
 
-  std::vector<std::string> raw_data_processing_events;
+  std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_events;
 
-  RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-    MetaDataHandler::SampleType::Unknown,
-    raw_data_processing_events
+  raw_data_processing_events = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
+    MetaDataHandler::SampleType::Unknown
   );
 
   Filenames filenames;
@@ -348,14 +333,11 @@ BOOST_AUTO_TEST_CASE(processRawData)
   }
   params_1.emplace("ChromatogramExtractor", vector<map<string, string>>());
 
-  for (const std::string& event : raw_data_processing_events) {
-    // TODO: update if-condition when selectFeatures() is implemented
-    if (event == "select_features")
-      continue;
+  for (const RawDataProcessor::RawDataProcMethod event : raw_data_processing_events) {
     RawDataProcessor::processRawData(rawDataHandler, event, params_1, filenames);
   }
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 329);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 114);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& subordinate0 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
@@ -369,21 +351,19 @@ BOOST_AUTO_TEST_CASE(processRawData)
   BOOST_CHECK_EQUAL(subordinate1.getMetaValue("concentration_units").toString(), "uM");
 
   const OpenMS::Feature& subordinate2 = rawDataHandler.getFeatureMap()[8].getSubordinates()[0];
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 163.0, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "35cgmp.35cgmp_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 628.59474989938735, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 2780997.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "Pool_2pg_3pg.Pool_2pg_3pg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 832.69577069044112, 1e-6);
 
   const OpenMS::Feature& subordinate3 = rawDataHandler.getFeatureMap()[49].getSubordinates()[0];
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getMetaValue("peak_apex_int")), 53935.99999999999, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate3.getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getRT()), 733.9804012544155, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getMetaValue("peak_apex_int")), 217684.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate3.getMetaValue("native_id").toString(), "f1p.f1p_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate3.getRT()), 602.45962461757676, 1e-6);
 
-  const OpenMS::Feature& subordinate4 = rawDataHandler.getFeatureMap()[200].getSubordinates()[0]; // this is [49][0] in python tests
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getMetaValue("peak_apex_int")), 198161.0, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate4.getMetaValue("native_id").toString(), "glutacon.glutacon_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getRT()), 752.7960037236212, 1e-6);
-
-  // TODO: add more checks when MRMFeatureSelector is implemented
+  const OpenMS::Feature& subordinate4 = rawDataHandler.getFeatureMap()[113].getSubordinates()[0]; // this is [49][0] in python tests
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getMetaValue("peak_apex_int")), 4066240.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate4.getMetaValue("native_id").toString(), "xan.xan_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getRT()), 89.418783654689776, 1e-6);
 }
 
 BOOST_AUTO_TEST_CASE(annotateUsedFeatures)

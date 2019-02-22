@@ -1,4 +1,5 @@
 set(pipeline_executables_list
+  CommandLine
   GCMS_FullScan_Unknown_test
   GCMS_SIM_Unknown_test
   HPLC_UV_Standards_test

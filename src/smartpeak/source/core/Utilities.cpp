@@ -1,9 +1,10 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/Utilities.h>
-#include <regex>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <iostream>
+#include <regex>
+#include <unordered_set>
 
 namespace SmartPeak
 {
@@ -47,7 +48,7 @@ namespace SmartPeak
         std::cout << "Utilities::updateParameters(): parameter \"" << name << "\" not found." << std::endl;
         continue;
       }
-      // # check supplied user parameters
+      // check supplied user parameters
       CastValue c;
       if (param.count("value")) {
         if (param.count("type")) {
@@ -143,7 +144,7 @@ namespace SmartPeak
       } else {
         tags = Param_IO.getTags(name);
       }
-      // # update the params
+      // update the params
       switch (c.getTag()) {
         case CastValue::BOOL:
           Param_IO.setValue(name, c.b_ ? "true" : "false", description, tags);
@@ -225,7 +226,7 @@ namespace SmartPeak
         cast = std::strtof(m[0].str().c_str(), NULL);
       } else if (std::regex_match(trimmed, m, re_bool)) { // bool
         cast = m[0].str()[0] == 't' || m[0].str()[0] == 'T';
-      } else if (trimmed.front() == '[' && trimmed.back() == ']') { // list
+      } else if (trimmed.size() && trimmed.front() == '[' && trimmed.back() == ']') { // list
         std::string stripped;
         std::for_each(trimmed.cbegin() + 1, trimmed.cend() - 1, [&stripped](const char c) { // removing spaces to simplify regexs
           if (c != ' ')
@@ -247,9 +248,9 @@ namespace SmartPeak
           cast = std::vector<std::string>();
           parseList(trimmed, re_s, cast);
         }
-      } else if (trimmed.front() == trimmed.back() && (trimmed.front() == '"' || trimmed.front() == '\'')) { // string
+      } else if (trimmed.size() && trimmed.front() == trimmed.back() && (trimmed.front() == '"' || trimmed.front() == '\'')) { // string
         parseString(trimmed.substr(1, trimmed.size() - 2), cast);
-      } else {                                                                                       // default to string
+      } else { // default to string
         cast = trimmed;
       }
     } catch (const std::exception& e) {
@@ -281,23 +282,45 @@ namespace SmartPeak
     const char sep
   )
   {
-    std::vector<std::string> out;
+    std::vector<std::string> words;
     size_t l, r;
     l = r = 0;
-    size_t len = s.size();
+    const size_t len = s.size();
     while (r < len) {
       if (s[r] == sep) {
         if (r - l) {
-          out.emplace_back(s.substr(l, r - l));
+          words.emplace_back(s.substr(l, r - l));
         }
         l = r + 1;
       }
       ++r;
     }
     if (r != 0 && r - l) {
-      out.emplace_back(s.substr(l));
+      words.emplace_back(s.substr(l));
     }
-    return out;
+    return words;
+  }
+
+  std::string Utilities::trimString(
+    const std::string& s,
+    const std::string& whitespaces
+  )
+  {
+    if (s.empty()) {
+      return s;
+    }
+
+    const std::unordered_set<char> characters(whitespaces.cbegin(), whitespaces.cend());
+
+    int l, r;
+
+    for (l = 0; static_cast<size_t>(l) < s.size() && characters.count(s[l]); ++l)
+      ;
+
+    for (r = s.size() - 1; r >= l && characters.count(s[r]); --r)
+      ;
+
+    return s.substr(l, r - l + 1);
   }
 
   std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> Utilities::extractSelectorParameters(

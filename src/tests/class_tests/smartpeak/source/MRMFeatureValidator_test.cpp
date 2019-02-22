@@ -4,7 +4,7 @@
 
 #define BOOST_TEST_MODULE MRMFeatureValidator test suite
 #include <boost/test/included/unit_test.hpp>
-#include <SmartPeak/core/MRMFeatureValidator.h>
+#include <SmartPeak/algorithm/MRMFeatureValidator.h>
 
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
 #include <SmartPeak/io/FileReader.h>

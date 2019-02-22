@@ -40,8 +40,10 @@ namespace SmartPeak
         << "\nloadStandardsConcentrations(): loading " << filename << std::endl;
     }
 
-    if (filename.empty())
-      throw std::invalid_argument("filename is empty");
+    if (filename.empty()) {
+      std::cout << "loadStandardsConcentrations(): filename is empty\n";
+      return;
+    }
 
     try {
       OpenMS::AbsoluteQuantitationStandardsFile AQSf;
@@ -70,8 +72,10 @@ namespace SmartPeak
         << "\nloadQuantitationMethods(): loading " << filename << std::endl;
     }
 
-    if (filename.empty())
-      throw std::invalid_argument("filename is empty");
+    if (filename.empty()) {
+      std::cout << "loadQuantitationMethods(): filename is empty\n";
+      return;
+    }
 
     try {
       OpenMS::AbsoluteQuantitationMethodFile AQMf;
@@ -102,7 +106,8 @@ namespace SmartPeak
     }
 
     if (filename.empty()) {
-      throw std::invalid_argument("filename is empty");
+      std::cout << "loadTraML(): filename is empty\n";
+      return;
     }
 
     OpenMS::TargetedExperiment targeted_exp; // # must use "PeptideSequence"
@@ -250,8 +255,10 @@ namespace SmartPeak
         << "\nloadFeatureMap(): loading " << filename << std::endl;
     }
 
-    if (filename.empty())
-      throw std::invalid_argument("filename is empty");
+    if (filename.empty()) {
+      std::cout << "loadFeatureMap(): filename is empty\n";
+      return;
+    }
 
     OpenMS::FeatureMap fm;
     OpenMS::FeatureXMLFile featurexml;
@@ -276,8 +283,10 @@ namespace SmartPeak
         << filename_components_groups << std::endl;
     }
 
-    if (filename_components.empty() && filename_components_groups.empty())
-      throw std::invalid_argument("filenames are both empty");
+    if (filename_components.empty() && filename_components_groups.empty()) {
+      std::cout << "loadFeatureFilter(): filenames are both empty\n";
+      return;
+    }
 
     OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureFilter();
     OpenMS::MRMFeatureQCFile featureQCFile;
@@ -307,8 +316,10 @@ namespace SmartPeak
         << filename_components_groups << std::endl;
     }
 
-    if (filename_components.empty() && filename_components_groups.empty())
-      throw std::invalid_argument("filenames are both empty");
+    if (filename_components.empty() && filename_components_groups.empty()) {
+      std::cout << "loadFeatureQC(): filenames are both empty\n";
+      return;
+    }
 
     OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
     OpenMS::MRMFeatureQCFile featureQCFile;
@@ -336,8 +347,10 @@ namespace SmartPeak
         << "\nloadValidationData(): loading " << referenceData_csv_i << std::endl;
     }
 
-    if (referenceData_csv_i.empty())
-      throw std::invalid_argument("Filename is empty.");
+    if (referenceData_csv_i.empty()) {
+      std::cout << "loadValidationData(): filename is empty\n";
+      return;
+    }
 
     io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(referenceData_csv_i);
 
@@ -466,8 +479,10 @@ namespace SmartPeak
         << "\nreadRawDataProcessingParameters(): loading " << filename << std::endl;
     }
 
-    if (filename.empty())
-      throw std::invalid_argument("filename is empty");
+    if (filename.empty()) {
+      std::cout << "readRawDataProcessingParameters(): filename is empty\n";
+      return;
+    }
 
     std::map<std::string,std::vector<std::map<std::string,std::string>>> parameters;
     FileReader::parseOpenMSParams(filename, parameters);
@@ -532,8 +547,10 @@ namespace SmartPeak
         << "\nstoreQuantitationMethods(): storing " << filename << std::endl;
     }
 
-    if (filename.empty())
-      throw std::invalid_argument("filename is empty");
+    if (filename.empty()) {
+      std::cout << "storeQuantitationMethods(): filename is empty\n";
+      return;
+    }
 
     OpenMS::AbsoluteQuantitationMethodFile aqmf;
     aqmf.store(
@@ -557,8 +574,10 @@ namespace SmartPeak
         << "\nstoreFeatureMap(): storing " << filename << std::endl;
     }
 
-    if (filename.empty())
-      throw std::invalid_argument("filename is empty");
+    if (filename.empty()) {
+      std::cout << "storeFeatureMap(): filename is empty\n";
+      return;
+    }
 
     // # Store outfile as featureXML
     OpenMS::FeatureXMLFile featurexml;
@@ -580,8 +599,10 @@ namespace SmartPeak
         << "\nstoreMzML(): storing " << filename << std::endl;
     }
 
-    if (filename.empty())
-      throw std::invalid_argument("filename is empty");
+    if (filename.empty()) {
+      std::cout << "storeMzML(): filename is empty\n";
+      return;
+    }
 
     OpenMS::MzMLFile mzmlf;
     mzmlf.store(filename, experiment);

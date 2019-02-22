@@ -70,8 +70,8 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
 
   BOOST_CHECK_EQUAL(sequenceHandler.index_to_sample_.size(), 3);
   BOOST_CHECK_EQUAL(sequenceHandler.sample_to_index_.size(), 3);
-  BOOST_CHECK_EQUAL(sequenceHandler.index_to_sample_.at(1), "sample2_-1_9_1900-01-00_000000");
-  BOOST_CHECK_EQUAL(sequenceHandler.sample_to_index_.at("sample2_-1_9_1900-01-00_000000"), 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.index_to_sample_.at(1), "sample2_-1_9_1900-01-01_000000");
+  BOOST_CHECK_EQUAL(sequenceHandler.sample_to_index_.at("sample2_-1_9_1900-01-01_000000"), 1);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 3);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getMetaData().getSequenceSegmentName(), "sequence_segment1");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getMetaData().getSampleName(), "sample1");
@@ -147,13 +147,13 @@ BOOST_AUTO_TEST_CASE(getSamplesInSequence)
   sequenceHandler.addSampleToSequence(meta_data2, featuremap);
   sequenceHandler.addSampleToSequence(meta_data3, featuremap);
 
-  const vector<string> injection_names = {
-    "sample1_-1_9_1900-01-00_000000",
+  const set<string> injection_names = {
+    "sample1_-1_9_1900-01-01_000000",
     "foo",
-    "sample3_-1_9_1900-01-00_000000"
+    "sample3_-1_9_1900-01-01_000000"
   };
 
-  const std::vector<SampleHandler> samples = sequenceHandler.getSamplesInSequence(injection_names);
+  const std::vector<InjectionHandler> samples = sequenceHandler.getSamplesInSequence(injection_names);
 
   BOOST_CHECK_EQUAL(samples.size(), 2);
   BOOST_CHECK_EQUAL(samples[0].getMetaData().getSampleName(), "sample1");

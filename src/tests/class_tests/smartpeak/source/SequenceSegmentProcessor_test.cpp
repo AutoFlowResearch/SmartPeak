@@ -171,28 +171,26 @@ BOOST_AUTO_TEST_CASE(checkSequenceSegmentProcessing)
 
 BOOST_AUTO_TEST_CASE(getDefaultSequenceSegmentProcessingWorkflow)
 {
-  std::vector<std::string> workflow;
+  vector<SequenceSegmentProcessor::SeqSegProcMethod> workflow;
 
-  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Unknown, workflow);
+  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Unknown);
   BOOST_CHECK_EQUAL(workflow.empty(), true);
 
-  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Standard, workflow);
+  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Standard);
   BOOST_CHECK_EQUAL(workflow.size(), 1);
-  BOOST_CHECK_EQUAL(workflow[0], "calculate_calibration");
+  BOOST_CHECK_EQUAL(workflow[0], SequenceSegmentProcessor::CALCULATE_CALIBRATION);
 
-  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::QC, workflow);
-  BOOST_CHECK_EQUAL(workflow.size(), 1);
-  BOOST_CHECK_EQUAL(workflow[0], "calculate_variability");
+  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::QC);
+  BOOST_CHECK_EQUAL(workflow.empty(), true); // TODO: CALCULATE_VARIABILITY
 
-  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Blank, workflow);
+  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Blank);
   BOOST_CHECK_EQUAL(workflow.empty(), true);
 
-  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::DoubleBlank, workflow);
+  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::DoubleBlank);
   BOOST_CHECK_EQUAL(workflow.empty(), true);
 
-  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Solvent, workflow);
-  BOOST_CHECK_EQUAL(workflow.size(), 1);
-  BOOST_CHECK_EQUAL(workflow[0], "calculate_carryover");
+  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Solvent);
+  BOOST_CHECK_EQUAL(workflow.empty(), true); // TODO: CALCULATE_CARRYOVER
 }
 
 BOOST_AUTO_TEST_CASE(getSampleIndicesBySampleType)
@@ -449,7 +447,7 @@ BOOST_AUTO_TEST_CASE(processSequenceSegment)
   SequenceSegmentProcessor::processSequenceSegment(
     sequenceSegmentHandler,
     sequenceHandler,
-    "calculate_calibration",
+    SequenceSegmentProcessor::CALCULATE_CALIBRATION,
     absquant_params,
     Filenames()
   );

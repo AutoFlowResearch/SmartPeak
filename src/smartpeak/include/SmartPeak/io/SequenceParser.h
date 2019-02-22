@@ -19,7 +19,7 @@ public:
       SequenceHandler& sequenceHandler,
       const std::string& pathname,
       const std::string& delimiter,
-      const bool verbose = true
+      const bool verbose = false
     );
 
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
@@ -27,16 +27,16 @@ public:
       const SequenceHandler& sequenceHandler,
       std::vector<std::map<std::string,std::string>>& list_dict,
       std::vector<std::string>& headers_out,
-      const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
+      const std::vector<std::string>& meta_data = {"calculated_concentration"},
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
     static void writeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
+      const std::vector<std::string>& meta_data = {"calculated_concentration"},
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown}),
-      const bool verbose = true
+      const bool verbose = false
     );
 
     struct Row
@@ -65,7 +65,7 @@ public:
       std::vector<std::vector<float>>& data_out,
       std::vector<std::string>& columns_out,
       std::vector<Row>& rows_out,
-      const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
+      const std::vector<std::string>& meta_data = {"calculated_concentration"},
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
@@ -73,9 +73,9 @@ public:
     static void writeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::vector<std::string>& meta_data = std::vector<std::string>({"calculated_concentration"}),
+      const std::vector<std::string>& meta_data = {"calculated_concentration"},
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown}),
-      const bool verbose = true
+      const bool verbose = false
     );
   };
 }

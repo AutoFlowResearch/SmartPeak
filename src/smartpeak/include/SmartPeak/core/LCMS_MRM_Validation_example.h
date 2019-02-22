@@ -15,27 +15,22 @@ void example_LCMS_MRM_Validation(
 
   SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I);
 
-  std::vector<std::string> raw_data_processing_methods = {
-    "load_raw_data",
-    // # "load_features",
-    "pick_features",
-    "filter_features",
-    "select_features",
-    "validate_features",
-    // # "quantify_features",
-    // # "check_features",
-    // # "store_features",
-    // # "plot_features"
+  const std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods = {
+    RawDataProcessor::LOAD_RAW_DATA,
+    RawDataProcessor::PICK_FEATURES,
+    RawDataProcessor::FILTER_FEATURES,
+    RawDataProcessor::SELECT_FEATURES,
+    RawDataProcessor::VALIDATE_FEATURES
   };
 
   std::map<std::string, Filenames> dynamic_filenames;
-  for (const SampleHandler& sample : sequenceHandler.getSequence()) {
-    const std::string& key = sample.getMetaData().getInjectionName();
+  for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+    const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
-      sample.getMetaData().getSampleName(),
+      injection.getMetaData().getSampleName(),
       key
     );
   }
@@ -43,7 +38,7 @@ void example_LCMS_MRM_Validation(
   SequenceProcessor::processSequence(
     sequenceHandler,
     dynamic_filenames,
-    std::vector<std::string>(),
+    std::set<std::string>(),
     raw_data_processing_methods,
     true
   );
@@ -59,10 +54,9 @@ void example_LCMS_MRM_Validation(
     sequenceHandler,
     static_filenames.featureSummary_csv_o,
     {
-      "peak_apex_int", "total_width", "width_at_50",
-      "tailing_factor", "asymmetry_factor", "baseline_delta_2_height",
-      "points_across_baseline", "points_across_half_height", "logSN",
-      "calculated_concentration",
+      "peak_apex_int", "total_width", "width_at_50", "tailing_factor",
+      "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
+      "points_across_half_height", "logSN", "calculated_concentration",
       "QC_transition_message", "QC_transition_pass", "QC_transition_score",
       "QC_transition_group_message", "QC_transition_group_score"
     },

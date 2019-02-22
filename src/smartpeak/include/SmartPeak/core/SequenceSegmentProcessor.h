@@ -15,6 +15,20 @@ public:
     SequenceSegmentProcessor() = delete;
     ~SequenceSegmentProcessor() = delete;
 
+    enum SeqSegProcMethod {
+      CALCULATE_CALIBRATION = 1,
+      STORE_QUANTITATION_METHODS,
+      LOAD_QUANTITATION_METHODS,
+    };
+
+    /**
+      Return all injection indices that belong to a given sample type.
+
+      @param[in] sequenceSegmentHandler Sequence segment handler
+      @param[in] sequenceHandler Sequence handler
+      @param[in] sampleType Sample type filter
+      @param[out] sampleIndices Output sample indices
+    */
     static void getSampleIndicesBySampleType(
       const SequenceSegmentHandler& sequenceSegmentHandler,
       const SequenceHandler& sequenceHandler,
@@ -22,6 +36,14 @@ public:
       std::vector<size_t>& sampleIndices
     );
 
+    /**
+      Optimize the calibration curve for all components.
+
+      @param[in,out] sequenceSegmentHandler_IO Sequence segment handler
+      @param[in] sequenceHandler_I Sequence handler
+      @param[in] AbsoluteQuantitation_params_I Parameters
+      @param[in] verbose_I Verbosity
+    */
     static void optimizeCalibrationCurves(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
@@ -37,20 +59,39 @@ public:
     //   const bool verbose_I = false
     // );
 
+    /**
+      Apply processing methods to a raw data handler.
+
+      @param[in,out] sequenceSegmentHandler_IO Sequence segment handler
+      @param[in] sequenceHandler_IO Sequence handler
+      @param[in] sequence_segment_processing_event Event to process
+      @param[in] parameters Parameters
+      @param[in] filenames Pathnames info
+      @param[in] verbose_I Verbosity
+    */
     static void processSequenceSegment(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       SequenceHandler& sequenceHandler_IO,
-      const std::string& sequence_segment_processing_event,
+      const SeqSegProcMethod sequence_segment_processing_event,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
       const Filenames& filenames,
       const bool verbose_I = false
     );
 
-    static void getDefaultSequenceSegmentProcessingWorkflow(
-      const MetaDataHandler::SampleType sample_type,
-      std::vector<std::string>& default_workflow
+    /**
+      Return the default workflow events for a given sequence.
+
+      @param[in] sample_type Sample type
+    */
+    static std::vector<SeqSegProcMethod> getDefaultSequenceSegmentProcessingWorkflow(
+      const MetaDataHandler::SampleType sample_type
     );
 
+    /**
+      Check the sequence processing steps.
+
+      @param[in] sequence_segment_processing List of sequence group processing events
+    */
     static bool checkSequenceSegmentProcessing(
       const std::vector<std::string>& sequence_segment_processing
     );

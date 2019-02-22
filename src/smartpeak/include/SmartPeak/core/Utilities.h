@@ -6,6 +6,7 @@
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <iostream>
 #include <regex>
+#include <unordered_set>
 #define maxFunc(a,b) (((a) > (b)) ? (a) : (b))
 
 namespace SmartPeak
@@ -290,7 +291,7 @@ public:
     };
 
     /**
-      Cast a string to the desired type and return the evaluation
+      Cast a string to the desired type and return the evaluation.
 
       The type check is case insensitive.
 
@@ -306,30 +307,31 @@ public:
       CastValue& cast
     );
 
-      // """Update a Param object
-      // Args:
-      //     Param_IO (pyopenms.Param): Param object to update
-      //     parameters_I (list): list of parameters to update
+    /**
+      Update a Param object.
 
-      // Returns:
-      //     pyopenms.Param: Param_IO: updated Param object
+      The type check is case insensitive.
 
-      // """
+      @note a value "true" or "false" of type "string" will be converted to bool
+
+      @param[in,out] Param_IO OpenMS' Param object to update
+      @param[in] parameters_I List of parameters to update
+    */
     static void updateParameters(
       OpenMS::Param& Param_IO,
       const std::vector<std::map<std::string, std::string>>& parameters_I
     );
 
-    // """Parse string and return the eval
+    /**
+      Parse string and return the eval.
 
-    // Args:
-    //     str_I (str): input string
-    //     encode_str_I (bool): encode string as utf-8?
+      The type check is case insensitive.
 
-    // Returns:
-    //     str: str_O: evaluated string
+      @note a value "true" or "false" of type "string" will be converted to bool
 
-    // """
+      @param[in] str_I Input string
+      @param[out] cast The evaluated string
+    */
     static void parseString(const std::string& str_I, CastValue& cast);
 
     static void parseList(const std::string& line, std::regex& re, CastValue& cast);
@@ -337,6 +339,11 @@ public:
     static std::vector<std::string> splitString(
       const std::string& s,
       const char sep
+    );
+
+    static std::string trimString(
+      const std::string& s,
+      const std::string& whitespaces = " \f\n\r\t\v" // std::isspace()
     );
 
     template<typename T>

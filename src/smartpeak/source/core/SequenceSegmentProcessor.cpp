@@ -33,11 +33,12 @@ namespace SmartPeak
   )
   {
     if (verbose_I) {
-      std::cout << "Optimizing calibrators." << std::endl;
+      std::cout << "==== START optimizeCalibrationCurves" << std::endl;
     }
 
     std::vector<size_t> standards_indices;
 
+    // get all standards
     getSampleIndicesBySampleType(
       sequenceSegmentHandler_IO,
       sequenceHandler_I,
@@ -45,6 +46,7 @@ namespace SmartPeak
       standards_indices
     );
 
+    // check if there are any standards to calculate the calibrators from
     if (standards_indices.empty()) {
       std::cout << "standards_indices argument is empty. Returning." << std::endl;
       return;
@@ -60,6 +62,7 @@ namespace SmartPeak
       return;
     }
 
+    // add in the method parameters
     OpenMS::AbsoluteQuantitation absoluteQuantitation;
     OpenMS::Param parameters = absoluteQuantitation.getParameters();
     Utilities::updateParameters(parameters, AbsoluteQuantitation_params_I);
@@ -70,6 +73,7 @@ namespace SmartPeak
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
 
     for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods()) {
+      // map standards to features
       OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
 
@@ -80,6 +84,7 @@ namespace SmartPeak
         feature_concentrations
       );
 
+      // remove features with an actual concentration of 0.0 or less
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_pruned;
       for (const OpenMS::AbsoluteQuantitationStandards::featureConcentration& feature : feature_concentrations) {
         if (feature.actual_concentration > 0.0) {
@@ -87,9 +92,11 @@ namespace SmartPeak
         }
       }
 
+      // remove components without any points
       if (feature_concentrations_pruned.empty())
         continue;
 
+      // find the optimal calibration curve for each component
       absoluteQuantitation.optimizeSingleCalibrationCurve(
         row.getComponentName(),
         feature_concentrations_pruned
@@ -99,8 +106,13 @@ namespace SmartPeak
       components_to_concentrations.insert({row.getComponentName(), feature_concentrations_pruned});
     }
 
+    // store results
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
+
+    if (verbose_I) {
+      std::cout << "==== END   optimizeCalibrationCurves" << std::endl;
+    }
   }
 
   // void SequenceSegmentProcessor::plotCalibrators(
@@ -125,73 +137,58 @@ namespace SmartPeak
   void SequenceSegmentProcessor::processSequenceSegment(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     SequenceHandler& sequenceHandler_IO,
-    const std::string& sequence_segment_processing_event,
+    const SeqSegProcMethod sequence_segment_processing_event,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
     const Filenames& filenames,
     const bool verbose_I
   )
   {
-    try {
-      if (sequence_segment_processing_event == "calculate_calibration") {
-        optimizeCalibrationCurves(
-          sequenceSegmentHandler_IO,
-          sequenceHandler_IO,
-          parameters.at("AbsoluteQuantitation"),
-          verbose_I
-        );
-        for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices()) {
-          sequenceHandler_IO
-            .getSequence()
-            .at(index)
-            .getRawData()
-            .setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
-        }
-      } else if (sequence_segment_processing_event == "store_quantitation_methods") {
-        OpenMSFile::storeQuantitationMethods(sequenceSegmentHandler_IO, filenames.quantitationMethods_csv_o, verbose_I);
-      } else if (sequence_segment_processing_event == "load_quantitation_methods") {
-        OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler_IO, filenames.quantitationMethods_csv_i, verbose_I);
-      } /* else if (sequence_segment_processing_event == "plot_calibrators") {
-        plotCalibrators(
-          sequenceSegmentHandler_IO,
-          filenames.at("calibrators_pdf_o"),
-          parameters.at("SequenceSegmentPlotter"),
-          verbose_I
-        );
-      } */ else {
-        throw std::invalid_argument("Sequence group processing event \"" + sequence_segment_processing_event + "\" was not recognized.\n");
+    if (sequence_segment_processing_event == CALCULATE_CALIBRATION) {
+      // optimize the calibrators
+      optimizeCalibrationCurves(
+        sequenceSegmentHandler_IO,
+        sequenceHandler_IO,
+        parameters.at("AbsoluteQuantitation"),
+        verbose_I
+      );
+      // update each sample in the sequence segment with the updated quantitationMethods
+      for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices()) {
+        sequenceHandler_IO
+          .getSequence()
+          .at(index)
+          .getRawData()
+          .setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
       }
-    } catch (const std::exception& e) {
-      std::cerr << "processSequenceSegment(): " << e.what() << std::endl;
+    } else if (sequence_segment_processing_event == STORE_QUANTITATION_METHODS) {
+      OpenMSFile::storeQuantitationMethods(sequenceSegmentHandler_IO, filenames.quantitationMethods_csv_o, verbose_I);
+    } else if (sequence_segment_processing_event == LOAD_QUANTITATION_METHODS) {
+      OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler_IO, filenames.quantitationMethods_csv_i, verbose_I);
+    } else {
+      throw std::invalid_argument("Sequence segment processing event was not recognized. Value: " +
+        std::to_string(sequence_segment_processing_event) + "\n");
     }
   }
 
-  void SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(
-    const MetaDataHandler::SampleType sample_type,
-    std::vector<std::string>& default_workflow
+  std::vector<SequenceSegmentProcessor::SeqSegProcMethod>
+  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(
+    const MetaDataHandler::SampleType sample_type
   )
   {
-    const std::vector<std::string> opt {
-      "calculate_calibration", // 0
-      "calculate_variability", // 1
-      "calculate_carryover"    // 2
-    };
     switch (sample_type) {
       case MetaDataHandler::SampleType::Unknown:
       case MetaDataHandler::SampleType::Blank:
       case MetaDataHandler::SampleType::DoubleBlank:
-        default_workflow.clear();
-        break;
+        return {};
       case MetaDataHandler::SampleType::Standard:
-        default_workflow = { opt[0] };
-        break;
+        return { CALCULATE_CALIBRATION };
       case MetaDataHandler::SampleType::QC:
-        default_workflow = { opt[1] };
-        break;
+        return {};
+        // return { CALCULATE_VARIABILITY };
       case MetaDataHandler::SampleType::Solvent:
-        default_workflow = { opt[2] };
-        break;
+        return {};
+        // return { CALCULATE_CARRYOVER };
       default:
-        throw "case not handled.";
+        throw "Sample Type case not handled.\n";
     }
   }
 

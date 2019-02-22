@@ -201,7 +201,7 @@ namespace SmartPeak
     headers_out = headers;
 
     list_dict.clear();
-    for (const SampleHandler& sampleHandler : sequenceHandler.getSequence()) {
+    for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
       const MetaDataHandler::SampleType st = mdh.getSampleType();
       if (sample_types.count(st) == 0)
@@ -304,7 +304,7 @@ namespace SmartPeak
     std::set<Row,Row_less> rows;
     std::map<std::string,std::map<Row,float,Row_less>> data_dict;
 
-    for (const SampleHandler& sampleHandler : sequenceHandler.getSequence()) {
+    for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
       const MetaDataHandler::SampleType st = mdh.getSampleType();
       if (sample_types.count(st) == 0) {
