@@ -722,8 +722,8 @@ public:
       size_t i = 0;
       while (i < commands_.size()) {
         const Command::CommandType type = commands_[i].type;
-        size_t j = i + 1;
-        for (; type == commands_[j].type; ++j)
+        size_t j = i;
+        for (; j < commands_.size() && type == commands_[j].type; ++j)
         {
           // empty body
         }
@@ -791,7 +791,7 @@ public:
         } else {
           std::cout << "\ninvalid command\n";
         }
-        i = j;
+        i = j + i;
       }
       break;
     }
