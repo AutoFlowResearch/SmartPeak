@@ -234,7 +234,7 @@ namespace SmartPeak
     const std::string& format
   )
   {
-    struct tm tm;
+    struct tm tm = { 0, 0, 0, 1, 0, 0, 0, 0, 0 };
     if (strptime(acquisition_datetime.data(), format.data(), &tm) == NULL) {
       throw "Could not convert string to date time object.";
     }
