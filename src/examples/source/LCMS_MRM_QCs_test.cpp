@@ -21,7 +21,7 @@ void test_main_LCMS_MRM_QCs()
 
   OpenMSFile::loadFeatureMap(
     rawDataHandler,
-    SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1.featureXML")
+    SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1_1_BatchName_1900-01-01_000000.featureXML")
   );
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
