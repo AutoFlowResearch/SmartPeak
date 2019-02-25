@@ -187,7 +187,7 @@ namespace SmartPeak
       "sample_name", "sample_type", "component_group_name", "component_name", "batch_name",
       "rack_number", "plate_number", "pos_number", "inj_number", "dilution_factor", "inj_volume",
       "inj_volume_units", "operator_name", "acq_method_name", "proc_method_name",
-      "original_filename", "acquisition_date_and_time", "injection_name"
+      "original_filename", "acquisition_date_and_time", "injection_name", "used_"
     };
     headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
     for (size_t i = 0; i < headers.size() - 1; ++i) { // checking headers are unique, stable (maintaining the same positions)
@@ -220,7 +220,9 @@ namespace SmartPeak
           row.emplace("sample_type", MetaDataHandler::SampleTypeToString(st));
           row.emplace("sample_name", sample_name);
           row.emplace("component_group_name", component_group_name);
-          if (!subordinate.metaValueExists(s_native_id) || subordinate.getMetaValue(s_native_id).isEmpty()) {
+          if (!subordinate.metaValueExists(s_native_id) ||
+              subordinate.getMetaValue(s_native_id).isEmpty() ||
+              subordinate.getMetaValue(s_native_id).toString().empty()) {
             std::cout << "component_name is absent or empty. Skipping this subordinate." << std::endl;
             continue;
           }
@@ -235,15 +237,15 @@ namespace SmartPeak
           row.emplace("acq_method_name", mdh.acq_method_name);
           row.emplace("operator_name", mdh.operator_name);
           row.emplace("original_filename", mdh.original_filename);
-          const std::tm& adt = mdh.acquisition_date_and_time;
-          row.emplace("acquisition_date_and_time", std::to_string(adt.tm_year) +
-            "-" + std::to_string(adt.tm_mon) + "-" + std::to_string(adt.tm_mday) +
-            " " + std::to_string(adt.tm_hour) + ":" + std::to_string(adt.tm_min) +
-            ":" + std::to_string(adt.tm_sec)); // TODO: implement some function in Utilities that returns the same representation for this time info, everywhere in the codebase
+          row.emplace("acquisition_date_and_time", mdh.getAcquisitionDateAndTimeAsString());
           row.emplace("inj_volume", std::to_string(mdh.inj_volume));
           row.emplace("inj_volume_units", mdh.inj_volume_units);
           row.emplace("batch_name", mdh.batch_name);
           row.emplace("injection_name", mdh.getInjectionName());
+          row.emplace(
+            "used_",
+            subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
+          );
           for (const std::string& meta_value_name : meta_data) {
             Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
             if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0)

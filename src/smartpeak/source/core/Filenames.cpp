@@ -35,7 +35,8 @@ namespace SmartPeak
   {
     Filenames dynamic_filenames;
     dynamic_filenames.mzML_i       = mzml_input_path + "/" + input_inj_name + ".mzML";
-    dynamic_filenames.featureXML_i = features_input_path + "/" + input_inj_name + ".featureXML";
+    dynamic_filenames.featureXML_i = features_input_path + "/" + output_inj_name + ".featureXML";
+    // NOTE: input featureXML is almost always derived from the output featureXML
 
     const std::string prefix = output_path + "/" + output_inj_name;
     dynamic_filenames.featureXML_o                     = prefix + ".featureXML";
@@ -55,7 +56,7 @@ namespace SmartPeak
     featureFilterComponents_csv_i.clear();
     featureFilterComponentGroups_csv_i.clear();
     featureQCComponents_csv_i.clear();
-    featureQCComponentGroups_csv_i;
+    featureQCComponentGroups_csv_i.clear();
     quantitationMethods_csv_i.clear();
     standardsConcentrations_csv_i.clear();
     referenceData_csv_i.clear();

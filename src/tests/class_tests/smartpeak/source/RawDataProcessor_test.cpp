@@ -195,9 +195,11 @@ BOOST_AUTO_TEST_CASE(validateFeatures)
   const string referenceData_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
   OpenMSFile::loadValidationData(rawDataHandler, referenceData_csv_i);
 
-  rawDataHandler.getMetaData().sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file
-  rawDataHandler.getMetaData().inj_number = 1;
-  rawDataHandler.getMetaData().batch_name = "BloodProject01";
+  MetaDataHandler& mdh = rawDataHandler.getMetaData();
+  mdh.sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file
+  mdh.inj_number = 1;
+  mdh.batch_name = "BloodProject01";
+  mdh.setAcquisitionDateAndTimeFromString("09-06-2015 17:14", "%m-%d-%Y %H:%M");
 
   RawDataProcessor::validateFeatures(rawDataHandler, params_1.at("MRMFeatureValidator.validate_MRMFeatures"), true);
 
