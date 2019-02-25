@@ -70,7 +70,7 @@ public:
     void setAcquisitionDateAndTimeFromString(
       const std::string& acquisition_date_and_time,
       const std::string& format = "%Y-%m-%d_%H%M%S" // from less specific to more specific.
-                                                    // NOTE: Excel defaults are the following "%m-%d-%Y %H:%M" and "%m-%d-%Y %H:%M:%S" 
+      // NOTE: Assuming Excel defaults as "%m-%d-%Y %H:%M" and "%m-%d-%Y %H:%M:%S" (locale-dependent)
     );
 
     std::string getAcquisitionDateAndTimeAsString(const std::string& format = "%Y-%m-%d_%H%M%S") const;
