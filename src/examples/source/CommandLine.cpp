@@ -103,7 +103,7 @@ public:
     OPT_SELECT_FEATURES,
     OPT_VALIDATE_FEATURES,
     OPT_QUANTIFY_FEATURES,
-		OPT_CHECK_FEATURES,
+    OPT_CHECK_FEATURES,
     OPT_STORE_FEATURES,
     OPT_PLOT_FEATURES,
     OPT_SAVE_FEATURES,
@@ -482,7 +482,7 @@ public:
       "[3]  Calculated concentration\n" <<
       "[4]  Log(Signal/Noise)\n" <<
       "[5]  Peak apex intensity\n" <<
-			"[6]  Peak area\n" <<
+      "[6]  Peak area\n" <<
       "[7]  Points across baseline\n" <<
       "[8]  Points across half height\n" <<
       "[9]  QC transition pass\n" <<
@@ -526,10 +526,11 @@ public:
       case 5:
         metadata.push_back("peak_apex_int");
         break;
-			case 6:
-				metadata.push_back("peak_area"); // "intensity" attribute of a subordinate feature
-				// NOTE: there is als an "intensity" attribute at the feature level which is the sum of all subordinate feature "intensities"
-				break;
+      case 6:
+        metadata.push_back("peak_area"); // "intensity" attribute of a subordinate feature
+        // NOTE: there is also an "intensity" attribute at the feature level
+        // which is the sum of all subordinate feature "intensities"
+        break;
       case 7:
         metadata.push_back("points_across_baseline");
         break;
@@ -727,9 +728,8 @@ public:
       size_t i = 0;
       while (i < commands_.size()) {
         const Command::CommandType type = commands_[i].type;
-        size_t j = i;
-        for (; j < commands_.size() && type == commands_[j].type; ++j)
-        {
+        size_t j = i + 1;
+        for (; j < commands_.size() && type == commands_[j].type; ++j) {
           // empty body
         }
         const Command& cmd = commands_[i];
@@ -796,7 +796,7 @@ public:
         } else {
           std::cout << "\ninvalid command\n";
         }
-        i = j + i;
+        i = j;
       }
       break;
     }
