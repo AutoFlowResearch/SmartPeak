@@ -87,9 +87,9 @@ BOOST_AUTO_TEST_CASE(getMetaValue)
   SequenceHandler sequenceHandler;
   OpenMS::Feature feature;
   feature.setRT(16.0);
-	feature.setIntensity(1.0e4);
+  feature.setIntensity(1.0e4);
   OpenMS::Feature subordinate;
-	subordinate.setIntensity(1.0e2);
+  subordinate.setIntensity(1.0e2);
   subordinate.setMetaValue("calculated_concentration", 10.0);
 
   Utilities::CastValue result;
@@ -98,13 +98,13 @@ BOOST_AUTO_TEST_CASE(getMetaValue)
   BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
   BOOST_CHECK_CLOSE(result.f_, 16.0, 1e-6);
 
-	result = SequenceHandler::getMetaValue(feature, subordinate, "intensity");
-	BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
-	BOOST_CHECK_CLOSE(result.f_, 1.0e4, 1e-6);
+  result = SequenceHandler::getMetaValue(feature, subordinate, "intensity");
+  BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
+  BOOST_CHECK_CLOSE(result.f_, 1.0e4, 1e-6);
 
-	result = SequenceHandler::getMetaValue(feature, subordinate, "peak_area");
-	BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
-	BOOST_CHECK_CLOSE(result.f_, 1.0e2, 1e-6);
+  result = SequenceHandler::getMetaValue(feature, subordinate, "peak_area");
+  BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
+  BOOST_CHECK_CLOSE(result.f_, 1.0e2, 1e-6);
 
   result = SequenceHandler::getMetaValue(feature, subordinate, "calculated_concentration");
   BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
