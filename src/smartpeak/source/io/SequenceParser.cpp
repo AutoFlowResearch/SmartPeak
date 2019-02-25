@@ -220,7 +220,9 @@ namespace SmartPeak
           row.emplace("sample_type", MetaDataHandler::SampleTypeToString(st));
           row.emplace("sample_name", sample_name);
           row.emplace("component_group_name", component_group_name);
-          if (!subordinate.metaValueExists(s_native_id) || subordinate.getMetaValue(s_native_id).isEmpty()) {
+          if (!subordinate.metaValueExists(s_native_id) ||
+              subordinate.getMetaValue(s_native_id).isEmpty() ||
+              subordinate.getMetaValue(s_native_id).toString().empty()) {
             std::cout << "component_name is absent or empty. Skipping this subordinate." << std::endl;
             continue;
           }
@@ -235,16 +237,15 @@ namespace SmartPeak
           row.emplace("acq_method_name", mdh.acq_method_name);
           row.emplace("operator_name", mdh.operator_name);
           row.emplace("original_filename", mdh.original_filename);
-          const std::tm& adt = mdh.acquisition_date_and_time;
           row.emplace("acquisition_date_and_time", mdh.getAcquisitionDateAndTimeAsString());
           row.emplace("inj_volume", std::to_string(mdh.inj_volume));
           row.emplace("inj_volume_units", mdh.inj_volume_units);
           row.emplace("batch_name", mdh.batch_name);
           row.emplace("injection_name", mdh.getInjectionName());
-          if (subordinate.metaValueExists("used_") && !subordinate.getMetaValue("used_").isEmpty())
-            row.emplace("used_", subordinate.getMetaValue("used_"));
-          else
-            row.emplace("used_", "");
+          row.emplace(
+            "used_",
+            subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
+          );
           for (const std::string& meta_value_name : meta_data) {
             Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
             if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0)
