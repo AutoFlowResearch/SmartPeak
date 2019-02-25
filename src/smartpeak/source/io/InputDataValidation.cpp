@@ -352,9 +352,10 @@ namespace SmartPeak
       names2.insert(run.IS_component_name);
     }
 
-    std::cout << "==== END   heavyComponentsAreConsistent" << std::endl;
+    const bool check_passed = validateNamesInStructures(names1, names2, "QUANTITATIONMETHODS", "STANDARDS", false);
 
-    return validateNamesInStructures(names1, names2, "QUANTITATIONMETHODS", "STANDARDS", false);
+    std::cout << "==== END   heavyComponentsAreConsistent" << std::endl;
+    return check_passed;
   }
 
   bool InputDataValidation::validateNamesInStructures(
