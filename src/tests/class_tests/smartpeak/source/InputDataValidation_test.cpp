@@ -5,6 +5,8 @@
 #define BOOST_TEST_MODULE InputDataValidation test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/InputDataValidation.h>
+#include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/SequenceProcessor.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -67,5 +69,52 @@ BOOST_AUTO_TEST_CASE(findMissingNames)
   BOOST_CHECK_EQUAL(result.size(), 1);
   BOOST_CHECK_EQUAL(result.count("4"), 1);
 }
+
+BOOST_AUTO_TEST_CASE(sampleNamesAreConsistent)
+{
+  SequenceHandler sequenceHandler;
+  const std::string main_dir = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
+  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+
+  bool result;
+
+  result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
+  BOOST_CHECK_EQUAL(result, true);
+
+  filenames.sequence_csv_i = main_dir + "/sequence_missing.csv";
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+
+  result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
+  BOOST_CHECK_EQUAL(result, false); // missing sample: 150516_CM3_Level900
+}
+
+// BOOST_AUTO_TEST_CASE(componentNamesAreConsistent)
+// {
+//   SequenceHandler sequenceHandler;
+//   const std::string main_dir = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
+//   // Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir + "/LCMS_MRM_Standards");
+//   Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir + "/Fake_workflow");
+//   SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+
+//   bool result;
+
+//   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
+//   BOOST_CHECK_EQUAL(result, true);
+
+//   result = InputDataValidation::componentNamesAreConsistent(sequenceHandler);
+//   BOOST_CHECK_EQUAL(result, true);
+
+//   result = InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler);
+//   BOOST_CHECK_EQUAL(result, true);
+
+//   result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
+//   BOOST_CHECK_EQUAL(result, true); // g6p.g6p_2.Heavy is missing
+
+//   std::vector<OpenMS::ReactionMonitoringTransition> transitions =
+//     sequenceHandler.getSequence().front().getRawData().getTargetedExperiment().getTransitions();
+
+//   // remove all missing component names and repeat the test
+// }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,0 +1,11 @@
+ProteinName,FullPeptideName,transition_group_id,transition_name,RetentionTime,Annotation,PrecursorMz,MS1 Res,ProductMz,MS2 Res,Dwell,Fragmentor,Collision Energy,Cell Accelerator Voltage,LibraryIntensity,decoy,PeptideSequence,LabelType,PrecursorCharge,FragmentCharge,FragmentType,FragmentSeriesNumber,quantifying_transition,identifying_transition,detecting_transition
+arg-L,,arg-L,arg-L.arg-L_1.Heavy,45.85610358,,179,Unit,136,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE
+arg-L,,arg-L,arg-L.arg-L_1.Light,46.08966648,,173,Unit,131,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+orn,,orn,orn.orn_1.Heavy,47.47567266,,136,Unit,89,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE
+orn,,orn,orn.orn_1.Light,47.47567266,,131,Unit,85,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+asn-L,,asn-L,asn-L.asn-L_1.Heavy,58.5321882,,135,Unit,118,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE
+asn-L,,asn-L,asn-L.asn-L_1.Light,58.58374554,,131,Unit,114,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+asn-L,,asn-L,asn-L.asn-L_2.Light,58.58374554,,131,Unit,95,Unit,,,,,1,0,,Light,1,1,,2,FALSE,FALSE,TRUE
+ser-L,,ser-L,ser-L.ser-L_1.Heavy,58.3913325,,107,Unit,76,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE
+ser-L,,ser-L,ser-L.ser-L_1.Light,58.4970963,,104,Unit,74,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
+ser-L,,ser-L,ser-L.ser-L_2.Light,58.4970963,,104,Unit,42,Unit,,,,,1,0,,Light,1,1,,2,FALSE,FALSE,TRUE
