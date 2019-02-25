@@ -3,6 +3,13 @@
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <iostream>
 
+// required for strptime on Windows
+#ifdef _WIN32
+#include <time.h>
+#include <iomanip>
+#include <sstream>
+#endif
+
 namespace SmartPeak
 {
   std::string MetaDataHandler::SampleTypeToString(const SampleType sample_type)
@@ -193,20 +200,57 @@ namespace SmartPeak
     instrument.clear();
     operator_name.clear();
     proc_method_name.clear();
-    acquisition_date_and_time = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    acquisition_date_and_time = { 0, 0, 0, 1, 0, 0, 0, 0, 0 };
   }
 
   std::string MetaDataHandler::getInjectionName() const
   {
     std::string name(sample_name + "_" + std::to_string(inj_number) + "_" + batch_name + "_");
+    name.append(getAcquisitionDateAndTimeAsString());
+    return name;
+  }
+
+#ifdef _WIN32
+  // https://stackoverflow.com/questions/321849/strptime-equivalent-on-windows
+  char* strptime(const char* s, const char* f, struct tm* tm) {
+    // Isn't the C++ standard lib nice? std::get_time is defined such that its
+    // format parameters are the exact same as strptime. Of course, we have to
+    // create a string stream first, and imbue it with the current C locale, and
+    // we also have to make sure we return the right things if it fails, or
+    // if it succeeds, but this is still far simpler an implementation than any
+    // of the versions in any of the C standard libraries.
+    std::istringstream input(s);
+    input.imbue(std::locale(setlocale(LC_ALL, nullptr)));
+    input >> std::get_time(tm, f);
+    if (input.fail()) {
+      return nullptr;
+    }
+    return (char*)(s + input.tellg());
+  }
+#endif
+
+  void MetaDataHandler::setAcquisitionDateAndTimeFromString(
+    const std::string& acquisition_datetime,
+    const std::string& format
+  )
+  {
+    struct tm tm = { 0, 0, 0, 1, 0, 0, 0, 0, 0 };
+    if (strptime(acquisition_datetime.data(), format.data(), &tm) == NULL) {
+      throw "Could not convert string to date time object.";
+    }
+    acquisition_date_and_time = tm;
+  }
+
+  std::string MetaDataHandler::getAcquisitionDateAndTimeAsString(const std::string& format) const
+  {
     char time_repr[64];
     // ISO 8601 date format, without colons (for Windows filesystems compatibility)
     // i.e. "2019-01-23_164055"
-    const size_t bytes_written = strftime(time_repr, 64, "%Y-%m-%d_%H%M%S", &acquisition_date_and_time);
+    const size_t bytes_written = strftime(time_repr, 64, format.data(), &acquisition_date_and_time);
     if (bytes_written != 17) {
       throw "Unexpected number of characters written into the array.";
     }
-    name.append(time_repr);
-    return name;
+    std::string acquisition_datetime(time_repr);
+    return acquisition_datetime;
   }
 }

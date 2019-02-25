@@ -1,7 +1,7 @@
 set(core_executables_list
+	Filenames_test
 	Helloworld_test
 	MetaDataHandler_test
-	MRMFeatureValidator_test
 	RawDataHandler_test
 	RawDataProcessor_test
 	SampleGroupHandler_test
@@ -21,15 +21,13 @@ set(io_executables_list
 	InputDataValidation_test
 )
 
-set(simulator_executables_list
-	ChromatogramSimulator_test
-	EMGModel_test
-	PeakSimulator_test
+set(algorithm_executables_list
+	MRMFeatureValidator_test
 )
 
 ### collect test executables
 set(TEST_executables
 	${core_executables_list}
 	${io_executables_list}
-	${simulator_executables_list}
+	${algorithm_executables_list}
 )

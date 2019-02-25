@@ -4,7 +4,7 @@
 
 #define BOOST_TEST_MODULE MRMFeatureValidator test suite
 #include <boost/test/included/unit_test.hpp>
-#include <SmartPeak/core/MRMFeatureValidator.h>
+#include <SmartPeak/algorithm/MRMFeatureValidator.h>
 
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
 #include <SmartPeak/io/FileReader.h>
@@ -46,6 +46,7 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
   mdh.sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file
   mdh.inj_number = 1;
   mdh.batch_name = "BloodProject01";
+  mdh.setAcquisitionDateAndTimeFromString("09-06-2015 17:14", "%m-%d-%Y %H:%M");
 
   MRMFeatureValidator::validate_MRMFeatures(
     ref_data,

@@ -70,8 +70,8 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
 
   BOOST_CHECK_EQUAL(sequenceHandler.index_to_sample_.size(), 3);
   BOOST_CHECK_EQUAL(sequenceHandler.sample_to_index_.size(), 3);
-  BOOST_CHECK_EQUAL(sequenceHandler.index_to_sample_.at(1), "sample2_-1_9_1900-01-00_000000");
-  BOOST_CHECK_EQUAL(sequenceHandler.sample_to_index_.at("sample2_-1_9_1900-01-00_000000"), 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.index_to_sample_.at(1), "sample2_-1_9_1900-01-01_000000");
+  BOOST_CHECK_EQUAL(sequenceHandler.sample_to_index_.at("sample2_-1_9_1900-01-01_000000"), 1);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 3);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getMetaData().getSequenceSegmentName(), "sequence_segment1");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getMetaData().getSampleName(), "sample1");
@@ -87,7 +87,9 @@ BOOST_AUTO_TEST_CASE(getMetaValue)
   SequenceHandler sequenceHandler;
   OpenMS::Feature feature;
   feature.setRT(16.0);
+  feature.setIntensity(1.0e4);
   OpenMS::Feature subordinate;
+  subordinate.setIntensity(1.0e2);
   subordinate.setMetaValue("calculated_concentration", 10.0);
 
   Utilities::CastValue result;
@@ -95,6 +97,14 @@ BOOST_AUTO_TEST_CASE(getMetaValue)
   result = SequenceHandler::getMetaValue(feature, subordinate, "RT");
   BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
   BOOST_CHECK_CLOSE(result.f_, 16.0, 1e-6);
+
+  result = SequenceHandler::getMetaValue(feature, subordinate, "intensity");
+  BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
+  BOOST_CHECK_CLOSE(result.f_, 1.0e4, 1e-6);
+
+  result = SequenceHandler::getMetaValue(feature, subordinate, "peak_area");
+  BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
+  BOOST_CHECK_CLOSE(result.f_, 1.0e2, 1e-6);
 
   result = SequenceHandler::getMetaValue(feature, subordinate, "calculated_concentration");
   BOOST_CHECK_EQUAL(result.getTag(), Utilities::CastValue::Type::FLOAT);
@@ -148,9 +158,9 @@ BOOST_AUTO_TEST_CASE(getSamplesInSequence)
   sequenceHandler.addSampleToSequence(meta_data3, featuremap);
 
   const set<string> injection_names = {
-    "sample1_-1_9_1900-01-00_000000",
+    "sample1_-1_9_1900-01-01_000000",
     "foo",
-    "sample3_-1_9_1900-01-00_000000"
+    "sample3_-1_9_1900-01-01_000000"
   };
 
   const std::vector<InjectionHandler> samples = sequenceHandler.getSamplesInSequence(injection_names);

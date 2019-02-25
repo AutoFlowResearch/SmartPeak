@@ -103,8 +103,8 @@ public:
     OPT_SELECT_FEATURES,
     OPT_VALIDATE_FEATURES,
     OPT_QUANTIFY_FEATURES,
-    OPT_STORE_FEATURES,
     OPT_CHECK_FEATURES,
+    OPT_STORE_FEATURES,
     OPT_PLOT_FEATURES,
     OPT_SAVE_FEATURES,
     OPT_ANNOTATE_USED_FEATURES,
@@ -482,17 +482,19 @@ public:
       "[3]  Calculated concentration\n" <<
       "[4]  Log(Signal/Noise)\n" <<
       "[5]  Peak apex intensity\n" <<
-      "[6]  Points across baseline\n" <<
-      "[7]  Points across half height\n" <<
-      "[8]  QC transition pass\n" <<
-      "[9]  QC transition message\n" <<
-      "[10] QC transition score\n" <<
-      "[11] QC transition group message\n" <<
-      "[12] QC transition group score\n" <<
-      "[13] Tailing factor\n" <<
-      "[14] Total width\n" <<
-      "[15] Width at 50% peak's height\n" <<
-      "[16] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15\n\n";
+      "[6]  Peak area\n" <<
+      "[7]  Points across baseline\n" <<
+      "[8]  Points across half height\n" <<
+      "[9]  QC transition pass\n" <<
+      "[10] QC transition message\n" <<
+      "[11] QC transition score\n" <<
+      "[12] QC transition group message\n" <<
+      "[13] QC transition group score\n" <<
+      "[14] Tailing factor\n" <<
+      "[15] Total width\n" <<
+      "[16] Width at 50% peak's height\n" <<
+      "[17] Retention time\n" <<
+      "[18] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17\n\n";
 
     std::string line;
 
@@ -505,7 +507,7 @@ public:
     std::vector<std::string> metadata;
 
     for (int n; iss >> n;) {
-      if (n < 1 || n > 16) {
+      if (n < 1 || n > 18) {
         std::cout << "Skipping: " << n << '\n';
         continue;
       }
@@ -526,42 +528,50 @@ public:
         metadata.push_back("peak_apex_int");
         break;
       case 6:
-        metadata.push_back("points_across_baseline");
+        metadata.push_back("peak_area"); // "intensity" attribute of a subordinate feature
+        // NOTE: there is also an "intensity" attribute at the feature level
+        // which is the sum of all subordinate feature "intensities"
         break;
       case 7:
-        metadata.push_back("points_across_half_height");
+        metadata.push_back("points_across_baseline");
         break;
       case 8:
-        metadata.push_back("QC_transition_pass");
+        metadata.push_back("points_across_half_height");
         break;
       case 9:
-        metadata.push_back("QC_transition_message");
+        metadata.push_back("QC_transition_pass");
         break;
       case 10:
-        metadata.push_back("QC_transition_score");
+        metadata.push_back("QC_transition_message");
         break;
       case 11:
-        metadata.push_back("QC_transition_group_message");
+        metadata.push_back("QC_transition_score");
         break;
       case 12:
-        metadata.push_back("QC_transition_group_score");
+        metadata.push_back("QC_transition_group_message");
         break;
       case 13:
-        metadata.push_back("tailing_factor");
+        metadata.push_back("QC_transition_group_score");
         break;
       case 14:
-        metadata.push_back("total_width");
+        metadata.push_back("tailing_factor");
         break;
       case 15:
-        metadata.push_back("width_at_50");
+        metadata.push_back("total_width");
         break;
       case 16:
+        metadata.push_back("width_at_50");
+        break;
+      case 17:
+        metadata.push_back("RT");
+        break;
+      case 18:
         metadata = {
-          "peak_apex_int", "total_width", "width_at_50", "tailing_factor",
+          "peak_apex_int", "peak_area", "total_width", "width_at_50", "tailing_factor",
           "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
           "points_across_half_height", "logSN", "calculated_concentration",
           "QC_transition_message", "QC_transition_pass", "QC_transition_score",
-          "QC_transition_group_message", "QC_transition_group_score"
+          "QC_transition_group_message", "QC_transition_group_score", "RT"
         };
         break;
       }
@@ -723,8 +733,7 @@ public:
       while (i < commands_.size()) {
         const Command::CommandType type = commands_[i].type;
         size_t j = i + 1;
-        for (; type == commands_[j].type; ++j)
-        {
+        for (; j < commands_.size() && type == commands_[j].type; ++j) {
           // empty body
         }
         const Command& cmd = commands_[i];
