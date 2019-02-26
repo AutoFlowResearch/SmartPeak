@@ -1,0 +1,12 @@
+IS_name,component_name,feature_name,concentration_units,llod,ulod,lloq,uloq,correlation_coefficient,n_points,transformation_model,transformation_model_param_slope,transformation_model_param_intercept,transformation_model_param_symmetric_regression,transformation_model_param_x_weight,transformation_model_param_y_weight,transformation_model_param_x_datum_min,transformation_model_param_x_datum_max,transformation_model_param_y_datum_min,transformation_model_param_y_datum_max
+arg-L.arg-L_1.Heavy,arg-L.arg-L_1.Light,peak_apex_int,uM,,,,,,,linear,1,0,FALSE,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15
+arg-L.arg-L_1.Heavy,orn.orn_1.Light,peak_apex_int,uM,,,,,,,linear,1,0,FALSE,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15
+ser-L.ser-L_1.Heavy,his-L.his-L_1.Light,peak_apex_int,uM,,,,,,,linear,1,0,FALSE,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15
+ser-L.ser-L_1.Heavy,his-L.his-L_2.Light,peak_apex_int,uM,,,,,,,linear,1,0,FALSE,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15
+asn-L.asn-L_1.Heavy,asn-L.asn-L_1.Light,peak_apex_int,uM,,,,,,,linear,1,0,FALSE,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15
+asn-L.asn-L_1.Heavy,asn-L.asn-L_2.Light,peak_apex_int,uM,,,,,,,linear,1,0,FALSE,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15
+ser-L.ser-L_1.Heavy,ser-L.ser-L_1.Light,peak_apex_int,uM,,,,,,,linear,1,0,FALSE,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15
+ser-L.ser-L_1.Heavy,ser-L.ser-L_2.Light,peak_apex_int,uM,,,,,,,linear,1,0,FALSE,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15
+citr-L.citr-L_1.Heavy,citr-L.citr-L_1.Light,peak_apex_int,uM,,,,,,,linear,1,0,FALSE,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15
+gln-L.gln-L_1.Heavy,gln-L.gln-L_1.Light,peak_apex_int,uM,,,,,,,linear,1,0,FALSE,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15
+fakeISName,gln-L.gln-L_1.Light,peak_apex_int,uM,,,,,,,linear,1,0,FALSE,ln(x),ln(y),-1.00E+15,1.00E+15,-1.00E+15,1.00E+15

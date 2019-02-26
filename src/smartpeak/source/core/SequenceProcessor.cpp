@@ -14,6 +14,7 @@ namespace SmartPeak
     SequenceHandler& sequenceHandler_IO,
     const Filenames& filenames,
     const std::string& delimiter,
+    const bool checkConsistency,
     const bool verbose_I
   )
   {
@@ -57,10 +58,12 @@ namespace SmartPeak
     segmentSamplesInSequence(sequenceHandler_IO, sequenceSegmentHandler);
     addRawDataHandlerToSequence(sequenceHandler_IO, rawDataHandler);
 
-    InputDataValidation::sampleNamesAreConsistent(sequenceHandler_IO);
-    InputDataValidation::componentNamesAreConsistent(sequenceHandler_IO);
-    InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler_IO);
-    InputDataValidation::heavyComponentsAreConsistent(sequenceHandler_IO);
+    if (checkConsistency) {
+      InputDataValidation::sampleNamesAreConsistent(sequenceHandler_IO);
+      InputDataValidation::componentNamesAreConsistent(sequenceHandler_IO);
+      InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler_IO);
+      InputDataValidation::heavyComponentsAreConsistent(sequenceHandler_IO);
+    }
 
     if (verbose_I) {
       std::cout << "==== END   createSequence()" << std::endl;

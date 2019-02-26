@@ -1,0 +1,9 @@
+sample_name,component_name,IS_component_name,actual_concentration,IS_actual_concentration,concentration_units,dilution_factor
+150516_CM1_Level1,arg-L.arg-L_1.Light,arg-L.arg-L_1.Heavy,0,1,uM,1
+150516_CM1_Level1,ser-L.ser-L_1.Light,ser-L.ser-L_1.Heavy,0,1,uM,1
+150516_CM1_Level10,asn-L.asn-L_1.Light,asn-L.asn-L_1.Heavy,0,1,uM,1
+150516_CM1_Level10,citr-L.citr-L_1.Light,citr-L.citr-L_1.Heavy,0,1,uM,1
+150516_CM1_Level10,gln-L.gln-L_1.Light,gln-L.gln-L_1.Heavy,0,1,uM,1
+150516_CM1_Level1,asn-L.asn-L_2.Light,asn-L.asn-L_1.Heavy,0,1,uM,1
+150516_CM1_Level1,orn.orn_1.Light,orn.orn_1.Heavy,0,1,uM,1
+150516_CM1_Level1,ser-L.ser-L_2.Light,ser-L.ser-L_1.Heavy,0,1,uM,1

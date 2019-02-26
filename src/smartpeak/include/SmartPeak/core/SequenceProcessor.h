@@ -23,12 +23,14 @@ public:
       @param[in,out] sequenceHandler_IO Sequence handler
       @param[in] filenames Pathnames to load
       @param[in] delimiter String delimiter of the imported file
+      @param[in] checkConsistency Check consistency of data contained in files
       @param[in] verbose_I Verbosity
     */
     static void createSequence(
       SequenceHandler& sequenceHandler_IO,
       const Filenames& filenames,
       const std::string& delimiter = ",",
+      const bool checkConsistency = true,
       const bool verbose_I = false
     );
 

@@ -31,30 +31,6 @@ namespace SmartPeak
     }
   }
 
-  void InputDataValidation::validateFilenames(const Filenames& filenames)
-  {
-    std::cout << "Filenames validation\n";
-    isValidFilename(filenames.sequence_csv_i, "sequence_csv_i");
-    isValidFilename(filenames.parameters_csv_i, "parameters_csv_i");
-    isValidFilename(filenames.traML_csv_i, "traML_csv_i");
-    isValidFilename(filenames.featureFilterComponents_csv_i, "featureFilterComponents_csv_i");
-    isValidFilename(filenames.featureFilterComponentGroups_csv_i, "featureFilterComponentGroups_csv_i");
-    isValidFilename(filenames.featureQCComponents_csv_i, "featureQCComponents_csv_i");
-    isValidFilename(filenames.featureQCComponentGroups_csv_i, "featureQCComponentGroups_csv_i");
-    isValidFilename(filenames.quantitationMethods_csv_i, "quantitationMethods_csv_i");
-    isValidFilename(filenames.standardsConcentrations_csv_i, "standardsConcentrations_csv_i");
-    isValidFilename(filenames.referenceData_csv_i, "referenceData_csv_i");
-    isValidFilename(filenames.mzML_i, "mzML_i");
-    isValidFilename(filenames.featureXML_o, "featureXML_o");
-    isValidFilename(filenames.feature_csv_o, "feature_csv_o");
-    isValidFilename(filenames.featureXML_i, "featureXML_i");
-    isValidFilename(filenames.features_pdf_o, "features_pdf_o");
-    isValidFilename(filenames.quantitationMethods_csv_o, "quantitationMethods_csv_o");
-    isValidFilename(filenames.componentsToConcentrations_csv_o, "componentsToConcentrations_csv_o");
-    isValidFilename(filenames.sequenceSummary_csv_o, "sequenceSummary_csv_o");
-    isValidFilename(filenames.featureSummary_csv_o, "featureSummary_csv_o");
-  }
-
   std::string InputDataValidation::getSequenceInfo(
     const SequenceHandler& sequenceHandler,
     const std::string& delimiter
@@ -120,9 +96,9 @@ namespace SmartPeak
         ? std::to_string(rts[peptide_ref])
         : "Peptide not found";
       oss << "Transition:\t" << t.getName() << delimiter
-        << "Native ID:\t" << t.getNativeID() << delimiter
+        // << "Native ID:\t" << t.getNativeID() << delimiter
         << "Peptide Ref:\t" << peptide_ref << delimiter
-        << "Compound Ref:\t" << t.getCompoundRef() << delimiter
+        // << "Compound Ref:\t" << t.getCompoundRef() << delimiter
         << "Precursor MZ:\t" << t.getPrecursorMZ() << delimiter
         << "Product MZ:\t" << t.getProductMZ() << delimiter
         << "Transition RT:\t" << rt << "\n\n";
@@ -239,6 +215,8 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler
   )
   {
+    std::cout << "==== START sampleNamesAreConsistent\n";
+
     const std::vector<InjectionHandler>& samples = sequenceHandler.getSequence();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
       sequenceHandler.getSequenceSegments().front().getStandardsConcentrations();
@@ -256,6 +234,7 @@ namespace SmartPeak
 
     const bool check_passed = validateNamesInStructures(names1, names2, "SEQUENCE", "STANDARDS", false);
 
+    std::cout << "==== END   sampleNamesAreConsistent" << std::endl;
     return check_passed;
   }
 
@@ -263,6 +242,8 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler
   )
   {
+    std::cout << "==== START componentNamesAreConsistent\n";
+
     const RawDataHandler& rawDataHandler = sequenceHandler.getSequence().front().getRawData();
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
@@ -280,7 +261,7 @@ namespace SmartPeak
     std::set<std::string> names5;
 
     for (const OpenMS::ReactionMonitoringTransition& transition : transitions) {
-      names1.insert(transition.getPeptideRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
+      names1.insert(transition.getName());
     }
 
     for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureFilter.component_qcs) {
@@ -305,12 +286,8 @@ namespace SmartPeak
     check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
     check_passed.at(2) = validateNamesInStructures(names1, names4, "TRAML", "QUANTITATIONMETHODS", false);
     check_passed.at(3) = validateNamesInStructures(names1, names5, "TRAML", "STANDARDS", false);
-    // check_passed.at(4) = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
-    // check_passed.at(5) = validateNamesInStructures(names2, names4, "FEATUREFILTER", "QUANTITATIONMETHODS");
-    // check_passed.at(6) = validateNamesInStructures(names2, names5, "FEATUREFILTER", "STANDARDS");
-    // check_passed.at(7) = validateNamesInStructures(names3, names4, "FEATUREQC", "QUANTITATIONMETHODS");
-    // check_passed.at(8) = validateNamesInStructures(names3, names5, "FEATUREQC", "STANDARDS");
-    // check_passed.at(9) = validateNamesInStructures(names4, names5, "QUANTITATIONMETHODS", "STANDARDS");
+
+    std::cout << "==== END   componentNamesAreConsistent" << std::endl;
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
@@ -319,6 +296,8 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler
   )
   {
+    std::cout << "==== START componentNameGroupsAreConsistent\n";
+
     const RawDataHandler& rawDataHandler = sequenceHandler.getSequence().front().getRawData();
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
       rawDataHandler.getTargetedExperiment().getTransitions();
@@ -330,7 +309,7 @@ namespace SmartPeak
     std::set<std::string> names3;
 
     for (const OpenMS::ReactionMonitoringTransition& transition : transitions) {
-      names1.insert(transition.getCompoundRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
+      names1.insert(transition.getPeptideRef());
     }
 
     for (const OpenMS::MRMFeatureQC::ComponentGroupQCs& qc : featureFilter.component_group_qcs) {
@@ -345,7 +324,8 @@ namespace SmartPeak
 
     check_passed.at(0) = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
     check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
-    // check_passed.at(2) = validateNamesInStructures(names2, names3, "FEATUREFILTER", "FEATUREQC");
+
+    std::cout << "==== END   componentNameGroupsAreConsistent" << std::endl;
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
@@ -354,8 +334,8 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler
   )
   {
-    const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
-      sequenceHandler.getSequence().front().getRawData().getTargetedExperiment().getTransitions();
+    std::cout << "==== START heavyComponentsAreConsistent\n";
+
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
       sequenceHandler.getSequenceSegments().front().getQuantitationMethods();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
@@ -363,27 +343,19 @@ namespace SmartPeak
 
     std::set<std::string> names1;
     std::set<std::string> names2;
-    std::set<std::string> names3;
-
-    for (const OpenMS::ReactionMonitoringTransition& transition : transitions) {
-      names1.insert(transition.getPeptideRef()); // getName, getNativeID, getPeptideRef, getCompoundRef
-    }
 
     for (const OpenMS::AbsoluteQuantitationMethod& aqm : quantitation_methods) {
-      names2.insert(aqm.getComponentName());
+      names1.insert(aqm.getISName());
     }
 
     for (const OpenMS::AbsoluteQuantitationStandards::runConcentration& run : standards) {
-      names3.insert(run.component_name);
+      names2.insert(run.IS_component_name);
     }
 
-    std::vector<bool> check_passed(2);
+    const bool check_passed = validateNamesInStructures(names1, names2, "QUANTITATIONMETHODS", "STANDARDS", false);
 
-    check_passed.at(0) = validateNamesInStructures(names1, names2, "TRAML", "QUANTITATIONMETHODS", false);
-    check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "STANDARDS", false);
-    // check_passed.at(2) = validateNamesInStructures(names2, names3, "QUANTITATIONMETHODS", "STANDARDS");
-
-    return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
+    std::cout << "==== END   heavyComponentsAreConsistent" << std::endl;
+    return check_passed;
   }
 
   bool InputDataValidation::validateNamesInStructures(

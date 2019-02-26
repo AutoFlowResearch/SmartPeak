@@ -13,7 +13,7 @@ void example_LCMS_MRM_Standards(
 {
   SequenceHandler sequenceHandler;
 
-  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I);
+  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true, true);
 
   std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods = {
     RawDataProcessor::LOAD_RAW_DATA,
