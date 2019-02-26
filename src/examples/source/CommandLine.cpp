@@ -594,7 +594,7 @@ public:
     }
 
     buildStaticFilenames();
-    SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", verbose_);
+    SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
 
     while (true) {
       printMenu();
@@ -685,7 +685,7 @@ public:
       buildStaticFilenames();
       commands_.clear();
       sequenceHandler_.clear();
-      SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", verbose_);
+      SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
       break;
     case 2:
     {

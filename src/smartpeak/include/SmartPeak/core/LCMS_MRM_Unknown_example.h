@@ -13,7 +13,7 @@ void example_LCMS_MRM_Unknowns(
 {
   SequenceHandler sequenceHandler;
 
-  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true);
+  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true, true);
 
   const std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods = {
     RawDataProcessor::LOAD_RAW_DATA,

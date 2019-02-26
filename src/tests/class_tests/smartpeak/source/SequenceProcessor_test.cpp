@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE(sequenceprocessor)
 BOOST_AUTO_TEST_CASE(createSequence)
 {
   SequenceHandler sequenceHandler;
-  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
+  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", true, false);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
   const InjectionHandler& injection = sequenceHandler.getSequence()[0];
   BOOST_CHECK_EQUAL(injection.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE(segmentSamplesInSequence)
 BOOST_AUTO_TEST_CASE(processSequence)
 {
   SequenceHandler sequenceHandler;
-  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
+  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", true, false);
   const vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods = { RawDataProcessor::LOAD_RAW_DATA };
   const RawDataHandler& rawDataHandler0 = sequenceHandler.getSequence()[0].getRawData();
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
 BOOST_AUTO_TEST_CASE(processSequenceSegments)
 {
   SequenceHandler sequenceHandler;
-  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
+  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", true, false);
   const vector<SequenceSegmentProcessor::SeqSegProcMethod> raw_data_processing_methods =
     { SequenceSegmentProcessor::CALCULATE_CALIBRATION };
 

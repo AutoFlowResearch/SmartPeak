@@ -9,3 +9,4 @@ asn-L,,asn-L,asn-L.asn-L_2.Light,58.58374554,,131,Unit,95,Unit,,,,,1,0,,Light,1,
 ser-L,,ser-L,ser-L.ser-L_1.Heavy,58.3913325,,107,Unit,76,Unit,,,,,1,0,,Heavy,1,1,,1,TRUE,FALSE,TRUE
 ser-L,,ser-L,ser-L.ser-L_1.Light,58.4970963,,104,Unit,74,Unit,,,,,1,0,,Light,1,1,,1,TRUE,FALSE,TRUE
 ser-L,,ser-L,ser-L.ser-L_2.Light,58.4970963,,104,Unit,42,Unit,,,,,1,0,,Light,1,1,,2,FALSE,FALSE,TRUE
+fakeGroup,,fakeGroup,ser-L.ser-L_2.Light,58.4970963,,104,Unit,42,Unit,,,,,1,0,,Light,1,1,,2,FALSE,FALSE,TRUE

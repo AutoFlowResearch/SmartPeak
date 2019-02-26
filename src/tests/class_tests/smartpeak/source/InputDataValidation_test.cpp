@@ -11,6 +11,8 @@
 using namespace SmartPeak;
 using namespace std;
 
+const std::string main_dir = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
+
 BOOST_AUTO_TEST_SUITE(inputdatavalidation)
 
 BOOST_AUTO_TEST_CASE(fileExists)
@@ -73,9 +75,8 @@ BOOST_AUTO_TEST_CASE(findMissingNames)
 BOOST_AUTO_TEST_CASE(sampleNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
-  const std::string main_dir = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
   Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
-  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
 
   bool result;
 
@@ -83,38 +84,64 @@ BOOST_AUTO_TEST_CASE(sampleNamesAreConsistent)
   BOOST_CHECK_EQUAL(result, true);
 
   filenames.sequence_csv_i = main_dir + "/sequence_missing.csv";
-  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
 
   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
   BOOST_CHECK_EQUAL(result, false); // missing sample: 150516_CM3_Level900
 }
 
-// BOOST_AUTO_TEST_CASE(componentNamesAreConsistent)
-// {
-//   SequenceHandler sequenceHandler;
-//   const std::string main_dir = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
-//   // Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir + "/LCMS_MRM_Standards");
-//   Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir + "/Fake_workflow");
-//   SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+BOOST_AUTO_TEST_CASE(componentNamesAreConsistent)
+{
+  SequenceHandler sequenceHandler;
+  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
 
-//   bool result;
+  bool result;
 
-//   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
-//   BOOST_CHECK_EQUAL(result, true);
+  result = InputDataValidation::componentNamesAreConsistent(sequenceHandler);
+  BOOST_CHECK_EQUAL(result, true);
 
-//   result = InputDataValidation::componentNamesAreConsistent(sequenceHandler);
-//   BOOST_CHECK_EQUAL(result, true);
+  filenames.traML_csv_i = main_dir + "/traML_missing.csv";
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
 
-//   result = InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler);
-//   BOOST_CHECK_EQUAL(result, true);
+  result = InputDataValidation::componentNamesAreConsistent(sequenceHandler);
+  BOOST_CHECK_EQUAL(result, false);
+}
 
-//   result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
-//   BOOST_CHECK_EQUAL(result, true); // g6p.g6p_2.Heavy is missing
+BOOST_AUTO_TEST_CASE(componentNameGroupsAreConsistent)
+{
+  SequenceHandler sequenceHandler;
+  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
 
-//   std::vector<OpenMS::ReactionMonitoringTransition> transitions =
-//     sequenceHandler.getSequence().front().getRawData().getTargetedExperiment().getTransitions();
+  bool result;
 
-//   // remove all missing component names and repeat the test
-// }
+  result = InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler);
+  BOOST_CHECK_EQUAL(result, true);
+
+  filenames.traML_csv_i = main_dir + "/traML_missing.csv";
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
+
+  result = InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler);
+  BOOST_CHECK_EQUAL(result, false);
+}
+
+BOOST_AUTO_TEST_CASE(heavyComponentsAreConsistent)
+{
+  SequenceHandler sequenceHandler;
+  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
+
+  bool result;
+
+  result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
+  BOOST_CHECK_EQUAL(result, true);
+
+  filenames.quantitationMethods_csv_i = main_dir + "/quantitationMethods_missing.csv";
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
+
+  result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
+  BOOST_CHECK_EQUAL(result, false); // g6p.g6p_2.Heavy is missing
+}
 
 BOOST_AUTO_TEST_SUITE_END()
