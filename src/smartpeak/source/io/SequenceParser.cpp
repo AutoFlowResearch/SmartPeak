@@ -121,6 +121,7 @@ namespace SmartPeak
     std::string t_date;
     std::string t_sample_type;
     size_t row_number = 1;
+    bool inj_numbers_equal_row_numbers = false;
 
     while (true) {
       bool is_valid = false;
@@ -155,9 +156,7 @@ namespace SmartPeak
 
       if (t.inj_number <= 0) {
         t.inj_number = row_number;
-        if (verbose) {
-          std::cout << "No inj_number value found. Set to row number: " << row_number << "\n";
-        }
+        inj_numbers_equal_row_numbers = true;
       }
 
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
@@ -169,6 +168,10 @@ namespace SmartPeak
     }
 
     // std::cout << InputDataValidation::getSequenceInfo(sequenceHandler, delimiter);
+
+    if (inj_numbers_equal_row_numbers) {
+      std::cout << "One or more inj_number values were not found. These have been replaced with their row numbers.\n";
+    }
 
     if (verbose) {
       std::cout << "==== END   readSequenceFile()" << std::endl;
