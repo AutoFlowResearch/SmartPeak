@@ -57,9 +57,9 @@ public:
     OpenMS::MRMFeatureQC& getFeatureQC();
     const OpenMS::MRMFeatureQC& getFeatureQC() const;
 
-    void setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps);
-    std::vector<OpenMS::FeatureMap>& getFeatureMapHistory();
-    const std::vector<OpenMS::FeatureMap>& getFeatureMapHistory() const;
+    void setFeatureMapHistory(const OpenMS::FeatureMap& feature_map_history);
+    OpenMS::FeatureMap& getFeatureMapHistory();
+    const OpenMS::FeatureMap& getFeatureMapHistory() const;
 
     void setExperiment(const OpenMS::MSExperiment& experiment);
     OpenMS::MSExperiment& getExperiment();
@@ -83,18 +83,26 @@ public:
 
     void clear();
 
+    /** Update the Feature map history based on the
+      filtered, selected, or new features in the current featureMap.
+
+      All new features are initialized as "used_" = True with the "modified_" attribute set to the current time-stamp.
+      All removed features are changed to "used_" = False with the "modified_" attribute set to the current time-stamp.
+    */
+    void updateFeatureMapHistory();
+
 private:
     // input
-    OpenMS::MSExperiment experiment_;
-    OpenMS::MSExperiment chromatogram_map_;
+    OpenMS::MSExperiment experiment_;  ///< Raw MS data derived from the mzML file
+    OpenMS::MSExperiment chromatogram_map_;  ///< MS data annotated with transition information derived from the TraML file
     OpenMS::TransformationDescription trafo_;
     OpenMS::MSExperiment swath_;
 
     // output
-    OpenMS::FeatureMap feature_map_;
+    OpenMS::FeatureMap feature_map_; ///< The most recently generated set of features for the experiment
+    OpenMS::FeatureMap feature_map_history_; ///< A record of all changes that have occured to the features in the experiment
     MetaDataHandler meta_data_;
     std::map<std::string, float> validation_metrics_;
-    std::vector<OpenMS::FeatureMap> feature_map_history_;
 
     // input (reused between RawDataHandlers)
     std::map<std::string, std::vector<std::map<std::string, std::string>>> parameters_;

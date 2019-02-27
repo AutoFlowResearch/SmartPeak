@@ -3,6 +3,7 @@
 #define BOOST_TEST_MODULE RawDataHandler test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/RawDataHandler.h>
+#include <SmartPeak/io/OpenMSFile.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -37,9 +38,47 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureMap)
   BOOST_CHECK_EQUAL(f2.metaValueExists("name"), true);
   BOOST_CHECK_EQUAL(f2.getMetaValue("name"), "foo");
 
+  const OpenMS::FeatureMap& f2_annotated = rawDataHandler.getFeatureMapHistory(); // testing annotated feature map const getter
+  BOOST_CHECK_EQUAL(f2_annotated.metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(f2_annotated.getMetaValue("name"), "foo");
+
   rawDataHandler.getFeatureMap().setMetaValue("name2", "bar"); // testing non-const getter
 
   const OpenMS::FeatureMap& f3 = rawDataHandler.getFeatureMap();
+  BOOST_CHECK_EQUAL(f3.metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(f3.getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(f3.metaValueExists("name2"), true);
+  BOOST_CHECK_EQUAL(f3.getMetaValue("name2"), "bar");
+
+  BOOST_CHECK_EQUAL(f2_annotated.metaValueExists("name"), true); // check that the annotated feature map has not been changed
+  BOOST_CHECK_EQUAL(f2_annotated.getMetaValue("name"), "foo");
+
+  rawDataHandler.getFeatureMapHistory().setMetaValue("name2", "bar"); // testing annotated feature map non-const getter
+
+  const OpenMS::FeatureMap& f3_annotated = rawDataHandler.getFeatureMap();
+
+  BOOST_CHECK_EQUAL(f3_annotated.metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(f3_annotated.getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(f3_annotated.metaValueExists("name2"), true);
+  BOOST_CHECK_EQUAL(f3_annotated.getMetaValue("name2"), "bar");
+}
+
+BOOST_AUTO_TEST_CASE(set_get_FeatureMapHistory)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::FeatureMap f1;
+  f1.setMetaValue("name", "foo");
+
+  rawDataHandler.setFeatureMapHistory(f1);
+
+  const OpenMS::FeatureMap& f2 = rawDataHandler.getFeatureMapHistory(); // testing const getter
+  BOOST_CHECK_EQUAL(f2.metaValueExists("name"), true);
+  BOOST_CHECK_EQUAL(f2.getMetaValue("name"), "foo");
+
+  rawDataHandler.getFeatureMapHistory().setMetaValue("name2", "bar"); // testing non-const getter
+
+  const OpenMS::FeatureMap& f3 = rawDataHandler.getFeatureMapHistory();
   BOOST_CHECK_EQUAL(f3.metaValueExists("name"), true);
   BOOST_CHECK_EQUAL(f3.getMetaValue("name"), "foo");
   BOOST_CHECK_EQUAL(f3.metaValueExists("name2"), true);
@@ -181,32 +220,6 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureQC)
   BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
 }
 
-BOOST_AUTO_TEST_CASE(set_get_FeatureMapHistory)
-{
-  RawDataHandler rawDataHandler;
-
-  OpenMS::FeatureMap f;
-  f.setMetaValue("name", "foo");
-  vector<OpenMS::FeatureMap> f1;
-  f1.push_back(f);
-
-  rawDataHandler.setFeatureMapHistory(f1);
-
-  const vector<OpenMS::FeatureMap>& f2 = rawDataHandler.getFeatureMapHistory(); // testing const getter
-  BOOST_CHECK_EQUAL(f2.size(), 1);
-  BOOST_CHECK_EQUAL(f2[0].metaValueExists("name"), true);
-  BOOST_CHECK_EQUAL(f2[0].getMetaValue("name"), "foo");
-
-  rawDataHandler.getFeatureMapHistory()[0].setMetaValue("name2", "bar"); // testing non-const getter
-
-  const vector<OpenMS::FeatureMap>& f3 = rawDataHandler.getFeatureMapHistory();
-  BOOST_CHECK_EQUAL(f3.size(), 1);
-  BOOST_CHECK_EQUAL(f3[0].metaValueExists("name"), true);
-  BOOST_CHECK_EQUAL(f3[0].getMetaValue("name"), "foo");
-  BOOST_CHECK_EQUAL(f3[0].metaValueExists("name2"), true);
-  BOOST_CHECK_EQUAL(f3[0].getMetaValue("name2"), "bar");
-}
-
 BOOST_AUTO_TEST_CASE(set_get_Experiment)
 {
   RawDataHandler rawDataHandler;
@@ -313,7 +326,7 @@ BOOST_AUTO_TEST_CASE(clear)
 
   rawDataHandler.setFeatureQC(fqc1);
 
-  vector<OpenMS::FeatureMap> featureMap_v = { f1 };
+  OpenMS::FeatureMap featureMap_v = f1;
   rawDataHandler.setFeatureMapHistory(featureMap_v);
 
   OpenMS::MSExperiment experiment;
@@ -329,9 +342,47 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK_EQUAL(rawDataHandler.getQuantitationMethods().front().getComponentName(), "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureFilter().component_qcs.front().component_name, "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureQC().component_qcs.front().component_name, "foo");
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().front().getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().getMetaValue("name"), "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getExperiment().getMetaValue("name"), "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getChromatogramMap().getMetaValue("name"), "foo");
+}
+
+BOOST_AUTO_TEST_CASE(updateFeatureMapHistory)
+{
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+
+  OpenMS::FeatureMap f1, f1_annotated;
+
+  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
+
+  const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  OpenMSFile::loadMSExperiment(rawDataHandler, mzML_i, params_1.at("MRMMapping"));
+
+  RawDataProcessor::extractMetaData(rawDataHandler);
+
+  const string featureXML_o1 = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_1_core_RawDataProcessor.featureXML");
+  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o1);
+
+  RawDataProcessor::saveCurrentFeatureMapToHistory(rawDataHandler);
+
+  const string featureXML_o3 = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_3_core_RawDataProcessor.featureXML");
+  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o3);
+
+  RawDataProcessor::updateFeatureMapHistory(rawDataHandler);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 481);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
+
+  const OpenMS::Feature& subordinate0 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
+  BOOST_CHECK_EQUAL(subordinate0.getMetaValue("used_").toBool(), true);
+  BOOST_CHECK_EQUAL(subordinate0.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+
+  const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[50].getSubordinates()[0];
+  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("used_").toBool(), false);
+  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

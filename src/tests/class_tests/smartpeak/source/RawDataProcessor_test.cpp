@@ -368,43 +368,6 @@ BOOST_AUTO_TEST_CASE(processRawData)
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getRT()), 89.418783654689776, 1e-6);
 }
 
-BOOST_AUTO_TEST_CASE(annotateUsedFeatures)
-{
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
-  load_data(params_1, params_2);
-  RawDataHandler rawDataHandler;
-
-  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
-  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
-
-  const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
-  OpenMSFile::loadMSExperiment(rawDataHandler, mzML_i, params_1.at("MRMMapping"));
-
-  RawDataProcessor::extractMetaData(rawDataHandler);
-
-  const string featureXML_o1 = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_1_core_RawDataProcessor.featureXML");
-  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o1);
-
-  RawDataProcessor::saveCurrentFeatureMapToHistory(rawDataHandler);
-
-  const string featureXML_o3 = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_3_core_RawDataProcessor.featureXML");
-  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o3);
-
-  RawDataProcessor::annotateUsedFeatures(rawDataHandler);
-
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 481);
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
-
-  const OpenMS::Feature& subordinate0 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
-  BOOST_CHECK_EQUAL(subordinate0.getMetaValue("used_").toBool(), true);
-  BOOST_CHECK_EQUAL(subordinate0.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
-
-  const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[50].getSubordinates()[0];
-  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("used_").toBool(), false);
-  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
-}
-
 BOOST_AUTO_TEST_CASE(saveCurrentFeatureMapToHistory)
 {
   map<string, vector<map<string, string>>> params_1;

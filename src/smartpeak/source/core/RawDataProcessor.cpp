@@ -70,13 +70,15 @@ namespace SmartPeak
     Utilities::updateParameters(parameters, MRMFeatureFilter_filter_params_I);
     featureFilter.setParameters(parameters);
 
-    OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
+    OpenMS::FeatureMap featureMap = rawDataHandler_IO.getFeatureMap();
 
     featureFilter.FilterFeatureMap(
       featureMap,
       rawDataHandler_IO.getFeatureFilter(),
       rawDataHandler_IO.getTargetedExperiment()
     );
+
+    rawDataHandler_IO.setFeatureMap(featureMap);
 
     if (verbose_I) {
       std::cout << "filterFeatures: output size: " << featureMap.size() << std::endl;
@@ -263,7 +265,6 @@ namespace SmartPeak
 
   void RawDataProcessor::plotFeatures(
     RawDataHandler& rawDataHandler_IO,
-    const std::string& filename,
     const std::vector<std::map<std::string, std::string>>& FeaturePlotter_params_I,
     const bool verbose_I
   )
@@ -382,19 +383,7 @@ namespace SmartPeak
         parameters.at("FeaturePlotter"),
         verbose_I
       );
-    } else if (event == SAVE_FEATURES) {
-      saveCurrentFeatureMapToHistory(
-        rawDataHandler_IO,
-        verbose_I
-      );
-    } else if (event == ANNOTATE_USED_FEATURES) {
-      annotateUsedFeatures(
-        rawDataHandler_IO,
-        verbose_I
-      );
-    } else if (event == CLEAR_FEATURE_HISTORY) {
-      rawDataHandler_IO.getFeatureMapHistory().clear();
-    }
+    } 
   }
 
   std::vector<RawDataProcessor::RawDataProcMethod> RawDataProcessor::getDefaultRawDataProcessingWorkflow(
@@ -421,58 +410,6 @@ namespace SmartPeak
       default:
         throw "case not handled.";
     }
-  }
-
-  void RawDataProcessor::annotateUsedFeatures(
-    RawDataHandler& rawDataHandler_IO,
-    const bool verbose_I
-  )
-  {
-    if (verbose_I)
-      std::cout << "Annotating used features" << std::endl;
-
-    OpenMS::FeatureMap features_annotated;
-    for (OpenMS::Feature feature_copy : rawDataHandler_IO.getFeatureMapHistory().back()) {
-      std::vector<OpenMS::Feature> subordinates_annotated;
-      for (OpenMS::Feature subordinate_copy : feature_copy.getSubordinates()) {
-        subordinate_copy.setMetaValue("used_", "false");
-        subordinates_annotated.push_back(subordinate_copy);
-      }
-      for (const OpenMS::Feature& feature_select : rawDataHandler_IO.getFeatureMap()) {
-        if (feature_select.getUniqueId() != feature_copy.getUniqueId())
-          continue;
-        for (OpenMS::Feature& subordinate_copy : subordinates_annotated) {
-          subordinate_copy.setMetaValue("used_", "true");
-        }
-        break;
-      }
-      feature_copy.setSubordinates(subordinates_annotated);
-      features_annotated.push_back(feature_copy);
-    }
-
-    rawDataHandler_IO.setFeatureMap(features_annotated);
-  }
-
-  void RawDataProcessor::saveCurrentFeatureMapToHistory(
-    RawDataHandler& rawDataHandler_IO,
-    const bool verbose_I
-  )
-  {
-    if (verbose_I)
-      std::cout << "Saving features" << std::endl;
-
-    OpenMS::FeatureMap features_annotated;
-
-    for (OpenMS::Feature feature_copy : rawDataHandler_IO.getFeatureMap()) {
-      std::vector<OpenMS::Feature> subordinates_annotated;
-      for (OpenMS::Feature subordinate_copy : feature_copy.getSubordinates()) {
-        subordinates_annotated.push_back(subordinate_copy);
-      }
-      feature_copy.setSubordinates(subordinates_annotated);
-      features_annotated.push_back(feature_copy);
-    }
-
-    rawDataHandler_IO.getFeatureMapHistory().push_back(features_annotated);
   }
 
   // TODO: implemented in error (thought it'd be necessary). Eventually remove it.

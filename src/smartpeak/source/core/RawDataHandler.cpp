@@ -1,12 +1,20 @@
 /**TODO:  Add copyright*/
 
 #include <SmartPeak/core/RawDataHandler.h>
+#include <ctime> // time format
+#include <chrono> // current time
 
 namespace SmartPeak
 {
   void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& feature_map)
   {
     feature_map_ = feature_map;
+    if (feature_map_history_ != feature_map_) {
+      updateFeatureMapHistory();
+    }
+    else {
+      setFeatureMapHistory(feature_map);
+    }
   }
 
   OpenMS::FeatureMap& RawDataHandler::getFeatureMap()
@@ -125,17 +133,17 @@ namespace SmartPeak
     return feature_qc_;
   }
 
-  void RawDataHandler::setFeatureMapHistory(const std::vector<OpenMS::FeatureMap>& feature_maps)
+  void RawDataHandler::setFeatureMapHistory(const OpenMS::FeatureMap& feature_map_history)
   {
-    feature_map_history_ = feature_maps;
+    feature_map_history_ = feature_map_history;
   }
 
-  std::vector<OpenMS::FeatureMap>& RawDataHandler::getFeatureMapHistory()
+  OpenMS::FeatureMap& RawDataHandler::getFeatureMapHistory()
   {
     return feature_map_history_;
   }
 
-  const std::vector<OpenMS::FeatureMap>& RawDataHandler::getFeatureMapHistory() const
+  const OpenMS::FeatureMap& RawDataHandler::getFeatureMapHistory() const
   {
     return feature_map_history_;
   }
@@ -222,13 +230,79 @@ namespace SmartPeak
     trafo_ = OpenMS::TransformationDescription();
     swath_.clear(true);
     feature_map_.clear(true);
+    feature_map_history_.clear(true);
     meta_data_.clear();
     validation_metrics_.clear();
-    feature_map_history_.clear();
     parameters_.clear();
     targeted_exp_.clear(true);
     quantitation_methods_.clear();
     feature_filter_ = OpenMS::MRMFeatureQC();
     feature_qc_ = OpenMS::MRMFeatureQC();
+  }
+
+  void RawDataHandler::updateFeatureMapHistory()
+  {
+    // Current time stamp
+    std::chrono::time_point<std::chrono::system_clock> time_now = std::chrono::system_clock::now();
+    std::time_t time_now_t = std::chrono::system_clock::to_time_t(time_now);
+    std::tm now_tm = *std::localtime(&time_now_t);
+    char timestamp_char[64];
+    std::strftime(timestamp_char, 64, "%Y-%m-%d-%H-%M-%S", &now_tm);
+    std::string timestamp(timestamp_char);
+
+    // Get all feature IDs
+    std::set<OpenMS::UInt> unique_ids;
+    for (const OpenMS::Feature& feature_copy : feature_map_history_) { unique_ids.insert(feature_copy.getUniqueId()); }
+
+    // "Remove" filtered/non-selected features and "Add" new features via "used_" and "modified" feature metadata attributes
+    std::vector<OpenMS::Feature> new_features;
+    for (OpenMS::Feature& feature_copy : feature_map_history_) {
+      for (const OpenMS::Feature& feature_select : feature_map_) {
+        if (feature_select.getUniqueId() == feature_copy.getUniqueId() && feature_select.getMetaValue("PeptideRef") == feature_copy.getMetaValue("PeptideRef")) { // Matching feature
+          std::vector<OpenMS::Feature> new_subordinates;
+          for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
+            for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) {
+              if (subordinate_select.getUniqueId() == subordinate_copy.getUniqueId() && subordinate_select.getMetaValue("native_id") == subordinate_copy.getMetaValue("native_id")) { // Matching subordinate
+                subordinate_copy.setMetaValue("used_", "true");
+                subordinate_copy.setMetaValue("modified_", timestamp);
+              }
+              else if (subordinate_select.getMetaValue("native_id") == subordinate_copy.getMetaValue("native_id")) { // Removed subordinate
+                subordinate_copy.setMetaValue("used_", "false");
+                subordinate_copy.setMetaValue("modified_", timestamp);
+              }
+              else { // New subordinate
+                OpenMS::Feature new_subordinate = subordinate_select;
+                new_subordinate.setMetaValue("used_", "true");
+                new_subordinate.setMetaValue("modified_", timestamp);
+                new_subordinates.push_back(new_subordinate);
+              }
+            }
+          }
+          if (new_subordinates.size() > 0) {
+            for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
+              new_subordinates.push_back(subordinate_copy);
+            }
+            feature_copy.setSubordinates(new_subordinates);
+          }
+          break;
+        }
+        else if ( unique_ids.count(feature_select.getUniqueId()) == 0) { // New Feature
+          OpenMS::Feature new_feature = feature_select;
+          for (OpenMS::Feature& subordinate_new : new_feature.getSubordinates()) {
+            subordinate_new.setMetaValue("used_", "true");
+            subordinate_new.setMetaValue("modified_", timestamp);
+          }
+          new_features.push_back(new_feature);
+          break;
+        }
+      }
+    }
+
+    // Add in the new features to the feature history
+    if (new_features.size() > 0) {
+      for (OpenMS::Feature& feature_new : new_features) {
+        feature_map_history_.push_back(feature_new);
+      }
+    }
   }
 }
