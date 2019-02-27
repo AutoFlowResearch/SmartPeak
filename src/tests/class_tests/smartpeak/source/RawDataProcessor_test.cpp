@@ -368,42 +368,4 @@ BOOST_AUTO_TEST_CASE(processRawData)
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getRT()), 89.418783654689776, 1e-6);
 }
 
-BOOST_AUTO_TEST_CASE(saveCurrentFeatureMapToHistory)
-{
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
-  load_data(params_1, params_2);
-  RawDataHandler rawDataHandler;
-
-  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
-  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
-
-  const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
-  OpenMSFile::loadMSExperiment(rawDataHandler, mzML_i, params_1.at("MRMMapping"));
-
-  RawDataProcessor::extractMetaData(rawDataHandler);
-
-  const string featureXML_o1 = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_1_core_RawDataProcessor.featureXML");
-  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o1);
-
-  RawDataProcessor::saveCurrentFeatureMapToHistory(rawDataHandler);
-
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 1);
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().back().size(), 481);
-
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().back()[0].getSubordinates().size(), 3);
-
-  const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMapHistory().back()[0].getSubordinates()[0];
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getMetaValue("peak_apex_int")), 266403.0, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getRT()), 953.665693772912, 1e-6);
-
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().back()[50].getSubordinates().size(), 2);
-
-  const OpenMS::Feature& subordinate2 = rawDataHandler.getFeatureMapHistory().back()[50].getSubordinates()[0];
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 0.0, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 1067.54472965431, 1e-6);
-}
-
 BOOST_AUTO_TEST_SUITE_END()

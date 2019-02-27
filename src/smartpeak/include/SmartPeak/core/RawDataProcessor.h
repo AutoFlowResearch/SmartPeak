@@ -151,5 +151,12 @@ public:
       const Filenames& filenames,
       const bool verbose_I = false
     );
+
+    /** Return the default workflow parameters for a given sample type.
+      @param[in] sample_type Sample type
+    */
+    static std::vector<RawDataProcMethod> getDefaultRawDataProcessingWorkflow(
+      const MetaDataHandler::SampleType sample_type
+    );
   };
 }

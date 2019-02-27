@@ -9,12 +9,6 @@ namespace SmartPeak
   void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& feature_map)
   {
     feature_map_ = feature_map;
-    if (feature_map_history_ != feature_map_) {
-      updateFeatureMapHistory();
-    }
-    else {
-      setFeatureMapHistory(feature_map);
-    }
   }
 
   OpenMS::FeatureMap& RawDataHandler::getFeatureMap()
@@ -250,58 +244,81 @@ namespace SmartPeak
     std::strftime(timestamp_char, 64, "%Y-%m-%d-%H-%M-%S", &now_tm);
     std::string timestamp(timestamp_char);
 
-    // Get all feature IDs
-    std::set<OpenMS::UInt> unique_ids;
-    for (const OpenMS::Feature& feature_copy : feature_map_history_) { unique_ids.insert(feature_copy.getUniqueId()); }
-
-    // "Remove" filtered/non-selected features and "Add" new features via "used_" and "modified" feature metadata attributes
-    std::vector<OpenMS::Feature> new_features;
-    for (OpenMS::Feature& feature_copy : feature_map_history_) {
-      for (const OpenMS::Feature& feature_select : feature_map_) {
-        if (feature_select.getUniqueId() == feature_copy.getUniqueId() && feature_select.getMetaValue("PeptideRef") == feature_copy.getMetaValue("PeptideRef")) { // Matching feature
-          std::vector<OpenMS::Feature> new_subordinates;
-          for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
-            for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) {
-              if (subordinate_select.getUniqueId() == subordinate_copy.getUniqueId() && subordinate_select.getMetaValue("native_id") == subordinate_copy.getMetaValue("native_id")) { // Matching subordinate
-                subordinate_copy.setMetaValue("used_", "true");
-                subordinate_copy.setMetaValue("modified_", timestamp);
-              }
-              else if (subordinate_select.getMetaValue("native_id") == subordinate_copy.getMetaValue("native_id")) { // Removed subordinate
-                subordinate_copy.setMetaValue("used_", "false");
-                subordinate_copy.setMetaValue("modified_", timestamp);
-              }
-              else { // New subordinate
-                OpenMS::Feature new_subordinate = subordinate_select;
-                new_subordinate.setMetaValue("used_", "true");
-                new_subordinate.setMetaValue("modified_", timestamp);
-                new_subordinates.push_back(new_subordinate);
-              }
-            }
-          }
-          if (new_subordinates.size() > 0) {
-            for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
-              new_subordinates.push_back(subordinate_copy);
-            }
-            feature_copy.setSubordinates(new_subordinates);
-          }
-          break;
-        }
-        else if ( unique_ids.count(feature_select.getUniqueId()) == 0) { // New Feature
-          OpenMS::Feature new_feature = feature_select;
-          for (OpenMS::Feature& subordinate_new : new_feature.getSubordinates()) {
-            subordinate_new.setMetaValue("used_", "true");
-            subordinate_new.setMetaValue("modified_", timestamp);
-          }
-          new_features.push_back(new_feature);
-          break;
+    // Case 1: Copy the current featuremap and timestamp
+    if (feature_map_history_.size() == 0) {
+      feature_map_history_ = feature_map_;  // ensures PrimaryMSRunPath is copied
+      for (OpenMS::Feature& feature_new : feature_map_history_) {
+        for (OpenMS::Feature& subordinate_new : feature_new.getSubordinates()) {
+          subordinate_new.setMetaValue("used_", "true");
+          subordinate_new.setMetaValue("timestamp_", timestamp);
         }
       }
     }
 
-    // Add in the new features to the feature history
-    if (new_features.size() > 0) {
-      for (OpenMS::Feature& feature_new : new_features) {
-        feature_map_history_.push_back(feature_new);
+    // Case 2: Update the featuremap history based on the current featuremap
+    else {
+      // Get all feature IDs
+      std::set<OpenMS::UInt> unique_ids_history, unique_ids_features;
+      for (const OpenMS::Feature& feature_copy : feature_map_history_) { unique_ids_history.insert(feature_copy.getUniqueId()); }
+      for (const OpenMS::Feature& feature_select : feature_map_) { unique_ids_features.insert(feature_select.getUniqueId()); }
+
+      // "Remove" filtered/non-selected features and "Add" new features via "used_" and "timestamp_" feature metadata attributes
+      std::vector<OpenMS::Feature> new_features;
+      for (OpenMS::Feature& feature_copy : feature_map_history_) {
+        if (unique_ids_features.count(feature_copy.getUniqueId()) == 0) { // Removed feature
+          for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
+            subordinate_copy.setMetaValue("used_", "false");
+            subordinate_copy.setMetaValue("timestamp_", timestamp);
+          }
+          continue;
+        }
+        for (const OpenMS::Feature& feature_select : feature_map_) {
+          if (feature_select.getUniqueId() == feature_copy.getUniqueId() && feature_select.getMetaValue("PeptideRef") == feature_copy.getMetaValue("PeptideRef")) { // Matching feature
+            std::vector<OpenMS::Feature> new_subordinates;
+            for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
+              for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) {
+                if (subordinate_select.getUniqueId() == subordinate_copy.getUniqueId() && 
+                  subordinate_select.getMetaValue("native_id") == subordinate_copy.getMetaValue("native_id")) { // Matching subordinate
+                  subordinate_copy.setMetaValue("used_", "true");
+                  subordinate_copy.setMetaValue("timestamp_", timestamp);
+                }
+                else if (subordinate_select.getMetaValue("native_id") == subordinate_copy.getMetaValue("native_id")) { // Removed subordinate
+                  subordinate_copy.setMetaValue("used_", "false");
+                  subordinate_copy.setMetaValue("timestamp_", timestamp);
+                }
+                else { // New subordinate
+                  OpenMS::Feature new_subordinate = subordinate_select;
+                  new_subordinate.setMetaValue("used_", "true");
+                  new_subordinate.setMetaValue("timestamp_", timestamp);
+                  new_subordinates.push_back(new_subordinate);
+                }
+              }
+            }
+            if (new_subordinates.size() > 0) {
+              for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
+                new_subordinates.insert(new_subordinates.begin(), subordinate_copy);
+              }
+              feature_copy.setSubordinates(new_subordinates);
+            }
+            break;
+          }
+          else if (unique_ids_history.count(feature_select.getUniqueId()) == 0) { // New Feature
+            OpenMS::Feature new_feature = feature_select;
+            for (OpenMS::Feature& subordinate_new : new_feature.getSubordinates()) {
+              subordinate_new.setMetaValue("used_", "true");
+              subordinate_new.setMetaValue("timestamp_", timestamp);
+            }
+            new_features.push_back(new_feature);
+            break;
+          }
+        }
+      }
+
+      // Add in the new features to the feature history
+      if (new_features.size() > 0) {
+        for (OpenMS::Feature& feature_new : new_features) {
+          feature_map_history_.push_back(feature_new);
+        }
       }
     }
   }

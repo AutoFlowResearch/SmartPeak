@@ -39,9 +39,9 @@ namespace SmartPeak
       rawDataHandler_IO.getSWATH()
     );
 
-    featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
-
+    featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});  // NOTE: needed for calculate_calibration
     rawDataHandler_IO.setFeatureMap(featureMap);
+    rawDataHandler_IO.updateFeatureMapHistory();
 
     if (verbose_I) {
       std::cout << "pickFeatures: output size: " << featureMap.size() << std::endl;
@@ -70,7 +70,7 @@ namespace SmartPeak
     Utilities::updateParameters(parameters, MRMFeatureFilter_filter_params_I);
     featureFilter.setParameters(parameters);
 
-    OpenMS::FeatureMap featureMap = rawDataHandler_IO.getFeatureMap();
+    OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
 
     featureFilter.FilterFeatureMap(
       featureMap,
@@ -78,7 +78,7 @@ namespace SmartPeak
       rawDataHandler_IO.getTargetedExperiment()
     );
 
-    rawDataHandler_IO.setFeatureMap(featureMap);
+    rawDataHandler_IO.updateFeatureMapHistory();
 
     if (verbose_I) {
       std::cout << "filterFeatures: output size: " << featureMap.size() << std::endl;
@@ -115,7 +115,7 @@ namespace SmartPeak
       rawDataHandler_IO.getTargetedExperiment()
     );
 
-    rawDataHandler_IO.setFeatureMap(featureMap);
+    rawDataHandler_IO.updateFeatureMapHistory();
 
     if (verbose_I) {
       std::cout << "checkFeatures: output size: " << featureMap.size() << std::endl;
@@ -151,6 +151,7 @@ namespace SmartPeak
     output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
 
     rawDataHandler_IO.setFeatureMap(output);
+    rawDataHandler_IO.updateFeatureMapHistory();
 
     if (verbose_I) {
       std::cout << "selectFeatures: output size: " << output.size() << std::endl;
@@ -379,7 +380,6 @@ namespace SmartPeak
     } else if (event == PLOT_FEATURES) {
       plotFeatures(
         rawDataHandler_IO,
-        filenames.features_pdf_o,
         parameters.at("FeaturePlotter"),
         verbose_I
       );
@@ -435,12 +435,6 @@ namespace SmartPeak
   //     return STORE_FEATURES;
   //   } else if (event == "plot_features") {
   //     return PLOT_FEATURES;
-  //   } else if (event == "save_features") {
-  //     return SAVE_FEATURES;
-  //   } else if (event == "annotate_used_features") {
-  //     return ANNOTATE_USED_FEATURES;
-  //   } else if (event == "clear_feature_history") {
-  //     return CLEAR_FEATURE_HISTORY;
   //   } else {
   //     throw "Raw data processing event " + event + " is not recognized.";
   //   }
