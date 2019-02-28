@@ -583,7 +583,7 @@ namespace SmartPeak
 
     // # Store outfile as featureXML
     OpenMS::FeatureXMLFile featurexml;
-    featurexml.store(filename, rawDataHandler_IO.getFeatureMap());
+    featurexml.store(filename, rawDataHandler_IO.getFeatureMapHistory());
 
     if (verbose) {
       std::cout << "==== END   storeFeatureMap" << std::endl;
