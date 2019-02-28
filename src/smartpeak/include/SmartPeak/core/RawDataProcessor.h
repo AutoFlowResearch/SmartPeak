@@ -38,7 +38,7 @@ namespace SmartPeak
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
-      const bool verbose_I = false) = 0;
+      const bool verbose_I = false) const = 0;
 
   protected:
     int id_ = 0;  ///< the raw data processor class ID
@@ -57,10 +57,17 @@ namespace SmartPeak
       Depending upon user specifications, the mzML file will be mapped to the TraML file
       and/or various pre-processing methods will be run to extract out the data.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+    /** Extracts metadata from the chromatogram.
+    */
+    static void extractMetaData(
+      RawDataHandler& rawDataHandler_IO,
       const bool verbose_I = false
     );
 
@@ -78,12 +85,12 @@ namespace SmartPeak
 
     /** Run the openSWATH workflow for a single raw data file.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 2;
@@ -99,12 +106,12 @@ namespace SmartPeak
 
     /** Read in the features from disk.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    )  const;
 
   protected:
     int id_ = 3;
@@ -120,12 +127,12 @@ namespace SmartPeak
 
     /** Write the features to disk.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 4;
@@ -141,12 +148,12 @@ namespace SmartPeak
 
     /** Run the openSWATH pick peaking and scoring workflow for a single raw data file.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 5;
@@ -162,12 +169,12 @@ namespace SmartPeak
 
     /** Filter features that do not pass the filter QCs.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 6;
@@ -183,12 +190,12 @@ namespace SmartPeak
 
     /** Flag features that do not pass the filter QCs.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 7;
@@ -204,38 +211,17 @@ namespace SmartPeak
 
     /** Select features using the MRMFeatureSelection algorithm.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 8;
     std::string name_ = "SELECT_FEATURES";
     std::string description_ = "Run the peak selection/alignment algorithm.";
-  };
-
-  class ExtractMetaData : public RawDataProcessor
-  {
-  public:
-    using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
-
-    /** Extracts metadata from the chromatogram.
-    */
-    static void process(
-      RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    );
-
-  protected:
-    int id_ = -1;  // Not currently available to the user
-    std::string name_ = "EXTRACT_METADATA";
-    std::string description_ = "Extracts metadata from the chromatogram.";
   };
 
   class ValidateFeatures : public RawDataProcessor
@@ -246,12 +232,12 @@ namespace SmartPeak
 
     /** Validate the selected peaks against reference data.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 9;
@@ -267,12 +253,12 @@ namespace SmartPeak
 
     /** Quantify all unknown samples based on the quantitationMethod.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 10;
@@ -288,12 +274,12 @@ namespace SmartPeak
 
     /** Validate the selected peaks against reference data.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 11;
@@ -309,18 +295,18 @@ namespace SmartPeak
 
     /** Load the transitions from the TraML file.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 12;
     std::string name_ = "LOAD_TRANSITIONS";
     std::string description_ = "Load the transitions for the SRM experiments from the TraML file.";
-  };
+  } const;
 
   class LoadFeatureFilters : public RawDataProcessor
   {
@@ -330,12 +316,12 @@ namespace SmartPeak
 
     /** Load the component and component group transition filters from file.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 13;
@@ -351,12 +337,12 @@ namespace SmartPeak
 
     /** Load the component and component group transition QCs from file.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 14;
@@ -372,12 +358,12 @@ namespace SmartPeak
 
     /** Load the validation data from file.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
 
   protected:
     int id_ = 15;
@@ -393,10 +379,15 @@ namespace SmartPeak
 
     /** Load the data processing parameters from file.
     */
-    static void process(
+    void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+    static void sanitizeParameters(
+      RawDataHandler& rawDataHandler_IO,
+      std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const bool verbose_I = false
     );
 
