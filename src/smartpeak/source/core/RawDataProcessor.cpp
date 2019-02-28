@@ -14,8 +14,17 @@
 #include <OpenMS/ANALYSIS/TARGETED/MRMMapping.h>
 #include <OpenMS/KERNEL/SpectrumHelper.h>
 
+#include <OpenMS/FORMAT/MRMFeatureQCFile.h>  // load featureFilter and featureQC
+#include <OpenMS/ANALYSIS/OPENSWATH/TransitionTSVFile.h>  // load traML
 #include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
 #include <SmartPeak/io/InputDataValidation.h> // check filenames and headers
+
+// load validation data and parameters
+#include <SmartPeak/io/FileReader.h>
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
 
 // feature selection
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
@@ -559,6 +568,340 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "==== END   quantifyComponents" << std::endl;
+    }
+  }
+  
+  void LoadTransitions::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  ) {
+    // TODO: move to parameters at some point
+    std::string format = "csv";
+    if (verbose_I) {
+      std::cout << "==== START loadTraML"
+        << "\nloadTraML(): loading " << filenames.traML_csv_i << "; format: " << format << std::endl;
+    }
+
+    if (filenames.traML_csv_i.empty()) {
+      std::cout << "loadTraML(): filename is empty\n";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(filenames.traML_csv_i)) {
+      std::cout << "loadTraML(): file not found\n";
+      return;
+    }
+
+    try {
+      // must use "PeptideSequence"
+      if (format == "csv") {
+        OpenMS::TransitionTSVFile tsvfile;
+        tsvfile.convertTSVToTargetedExperiment(
+          filenames.traML_csv_i.c_str(),
+          OpenMS::FileTypes::TRAML,
+          rawDataHandler_IO.getTargetedExperiment()
+        );
+      }
+      else if (format == "traML") {
+        OpenMS::TraMLFile tramlfile;
+        tramlfile.load(filenames.traML_csv_i, rawDataHandler_IO.getTargetedExperiment());
+      }
+      else {
+        std::cerr << "loadTraML(): format must either be \"csv\" or \"traML\".\n";
+        return;
+      }
+    }
+    catch (const std::exception& e) {
+      std::cerr << "loadTraML(): " << e.what() << std::endl;
+      rawDataHandler_IO.getTargetedExperiment().clear(true);
+      std::cerr << "loadTraML(): targeted experiment clear" << std::endl;
+    }
+
+    // std::cout << InputDataValidation::getTraMLInfo(rawDataHandler_IO);
+
+    if (verbose_I) {
+      std::cout << "==== END   loadTraML" << std::endl;
+    }
+  }
+
+  void LoadFeatureFilters::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  ) {
+    if (verbose_I) {
+      std::cout << "==== START loadFeatureFilter"
+        << "\nloadFeatureFilter(): loading " << filename_components << " and "
+        << filename_components_groups << std::endl;
+    }
+
+    if (filename_components.empty() && filename_components_groups.empty()) {
+      std::cout << "loadFeatureFilter(): filenames are both empty\n";
+      return;
+    }
+
+    if (filename_components.size() &&
+      !InputDataValidation::fileExists(filename_components)) {
+      std::cout << "loadFeatureFilter(): file not found (" << filename_components << ")\n";
+      return;
+    }
+
+    if (filename_components_groups.size() &&
+      !InputDataValidation::fileExists(filename_components_groups)) {
+      std::cout << "loadFeatureFilter(): file not found (" << filename_components_groups << ")\n";
+      return;
+    }
+
+    try {
+      OpenMS::MRMFeatureQCFile featureQCFile;
+      if (filename_components.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.load(filename_components, rawDataHandler_IO.getFeatureFilter(), false);
+      }
+      if (filename_components_groups.size()) {
+        featureQCFile.load(filename_components_groups, rawDataHandler_IO.getFeatureFilter(), true);
+      }
+    }
+    catch (const std::exception& e) {
+      std::cerr << "loadFeatureFilter(): " << e.what() << std::endl;
+      rawDataHandler_IO.getFeatureFilter().component_qcs.clear();
+      rawDataHandler_IO.getFeatureFilter().component_group_qcs.clear();
+      rawDataHandler_IO.getFeatureFilter().component_group_pair_qcs.clear();
+      std::cerr << "loadFeatureFilter(): feature filter clear" << std::endl;
+    }
+
+    // std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler_IO, true);
+
+    if (verbose_I) {
+      std::cout << "==== END   loadFeatureFilter" << std::endl;
+    }
+  }
+
+  void LoadFeatureQCs::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  ) {
+    if (verbose_I) {
+      std::cout << "==== START loadFeatureQC"
+        << "\nloadFeatureQC(): loading " << filename_components << " and "
+        << filename_components_groups << std::endl;
+    }
+
+    if (filename_components.empty() && filename_components_groups.empty()) {
+      std::cout << "loadFeatureQC(): filenames are both empty\n";
+      return;
+    }
+
+    if (filename_components.size() &&
+      !InputDataValidation::fileExists(filename_components)) {
+      std::cout << "loadFeatureQC(): file not found (" << filename_components << ")\n";
+      return;
+    }
+
+    if (filename_components_groups.size() &&
+      !InputDataValidation::fileExists(filename_components_groups)) {
+      std::cout << "loadFeatureQC(): file not found (" << filename_components_groups << ")\n";
+      return;
+    }
+
+    try {
+      OpenMS::MRMFeatureQCFile featureQCFile;
+      if (filename_components.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.load(filename_components, rawDataHandler_IO.getFeatureQC(), false);
+      }
+      if (filename_components_groups.size()) {
+        featureQCFile.load(filename_components_groups, rawDataHandler_IO.getFeatureQC(), true);
+      }
+    }
+    catch (const std::exception& e) {
+      std::cerr << "loadFeatureQC(): " << e.what() << std::endl;
+      rawDataHandler_IO.getFeatureQC().component_qcs.clear();
+      rawDataHandler_IO.getFeatureQC().component_group_qcs.clear();
+      rawDataHandler_IO.getFeatureQC().component_group_pair_qcs.clear();
+      std::cerr << "loadFeatureQC(): feature qc clear" << std::endl;
+    }
+
+    // std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler_IO, false);
+
+    if (verbose_I) {
+      std::cout << "==== END   loadFeatureQC" << std::endl;
+    }
+  }
+
+  void LoadValidationData::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  ) {
+    if (verbose_I) {
+      std::cout << "==== START loadValidationData"
+        << "\nloadValidationData(): loading " << filenames.referenceData_csv_i << std::endl;
+    }
+
+    if (filenames.referenceData_csv_i.empty()) {
+      std::cout << "loadValidationData(): filename is empty\n";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(filenames.referenceData_csv_i)) {
+      std::cout << "loadValidationData(): file not found\n";
+      return;
+    }
+
+    io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(filenames.referenceData_csv_i);
+
+    const std::string s_sample_index{ "sample_index" };
+    const std::string s_original_filename{ "original_filename" };
+    const std::string s_sample_name{ "sample_name" };
+    const std::string s_sample_type{ "sample_type" };
+    const std::string s_acquisition_date_and_time{ "acquisition_date_and_time" };
+    const std::string s_acq_method_name{ "acq_method_name" };
+    const std::string s_component_name{ "component_name" };
+    const std::string s_component_group_name{ "component_group_name" };
+    const std::string s_retention_time{ "retention_time" };
+    const std::string s_start_time{ "start_time" };
+    const std::string s_end_time{ "end_time" };
+    const std::string s_used{ "used_" };
+    const std::string s_calculated_concentration{ "calculated_concentration" };
+    const std::string s_experiment_id{ "experiment_id" };
+    const std::string s_acquisition_method_id{ "acquisition_method_id" };
+    const std::string s_height{ "height" };
+    const std::string s_area{ "area" };
+
+    in.read_header(
+      io::ignore_extra_column,
+      s_sample_index,
+      s_original_filename,
+      s_sample_name,
+      s_sample_type,
+      s_acquisition_date_and_time,
+      s_acq_method_name,
+      s_component_name,
+      s_component_group_name,
+      s_retention_time,
+      s_start_time,
+      s_end_time,
+      s_used,
+      s_calculated_concentration,
+      s_experiment_id,
+      s_acquisition_method_id,
+      s_height,
+      s_area
+    );
+
+    int sample_index;
+    std::string original_filename;
+    std::string sample_name;
+    std::string sample_type;
+    std::string acquisition_date_and_time;
+    std::string acq_method_name;
+    std::string component_name;
+    std::string component_group_name;
+    float retention_time;
+    float start_time;
+    float end_time;
+    std::string used;
+    float calculated_concentration;
+    std::string experiment_id;
+    std::string acquisition_method_id;
+    float height;
+    float area;
+
+    std::vector<std::map<std::string, Utilities::CastValue>> reference_data;
+
+    while (in.read_row(
+      sample_index,
+      original_filename,
+      sample_name,
+      sample_type,
+      acquisition_date_and_time,
+      acq_method_name,
+      component_name,
+      component_group_name,
+      retention_time,
+      start_time,
+      end_time,
+      used,
+      calculated_concentration,
+      experiment_id,
+      acquisition_method_id,
+      height,
+      area
+    )) {
+      std::transform(used.begin(), used.end(), used.begin(), ::tolower);
+      if (used == "false")
+        continue;
+      std::map<std::string, Utilities::CastValue> m;
+      m.emplace(s_sample_index, sample_index);
+      m.emplace(s_original_filename, original_filename);
+      m.emplace(s_sample_name, sample_name);
+      m.emplace(s_sample_type, sample_type);
+      m.emplace(s_acquisition_date_and_time, acquisition_date_and_time);
+      m.emplace(s_acq_method_name, acq_method_name);
+      m.emplace(s_component_name, component_name);
+      m.emplace(s_component_group_name, component_group_name);
+      m.emplace(s_retention_time, retention_time);
+      m.emplace(s_start_time, start_time);
+      m.emplace(s_end_time, end_time);
+      m.emplace(s_used, used);
+      m.emplace(s_calculated_concentration, calculated_concentration);
+      m.emplace(s_experiment_id, experiment_id);
+      m.emplace(s_acquisition_method_id, acquisition_method_id);
+      m.emplace(s_height, height);
+      m.emplace(s_area, area);
+      MetaDataHandler mdh;
+      mdh.sample_name = sample_name;
+      mdh.inj_number = sample_index;
+      mdh.batch_name = experiment_id;
+      mdh.setAcquisitionDateAndTimeFromString(acquisition_date_and_time, "%m-%d-%Y %H:%M");
+      m.emplace("injection_name", mdh.getInjectionName());
+      reference_data.push_back(std::move(m));
+    }
+
+    rawDataHandler_IO.setReferenceData(reference_data);
+
+    if (verbose_I) {
+      std::cout << "==== END   loadValidationData" << std::endl;
+    }
+  }
+
+  void LoadParameters::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  ) {
+    if (verbose_I) {
+      std::cout << "==== START readRawDataProcessingParameters"
+        << "\nreadRawDataProcessingParameters(): loading " << filenames.parameters_csv_i << std::endl;
+    }
+
+    if (filenames.parameters_csv_i.empty()) {
+      std::cout << "readRawDataProcessingParameters(): filename is empty\n";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(filenames.parameters_csv_i)) {
+      std::cout << "readRawDataProcessingParameters(): file not found\n";
+      return;
+    }
+
+    try {
+      std::map<std::string, std::vector<std::map<std::string, std::string>>> parameters;
+      FileReader::parseOpenMSParams(filenames.parameters_csv_i, parameters);
+      sanitizeRawDataProcessorParameters(rawDataHandler_IO, parameters);
+    }
+    catch (const std::exception& e) {
+      std::cerr << "readRawDataProcessingParameters(): " << e.what() << std::endl;
+    }
+
+    if (verbose_I) {
+      std::cout << "==== END   readRawDataProcessingParameters" << std::endl;
     }
   }
 }

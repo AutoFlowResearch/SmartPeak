@@ -384,4 +384,25 @@ namespace SmartPeak
     std::string name_ = "LOAD_VALIDATION_DATA";
     std::string description_ = "Load the validation data from file.";
   };
+
+  class LoadParameters : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+    using RawDataProcessor::~RawDataProcessor;
+
+    /** Load the data processing parameters from file.
+    */
+    static void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    );
+
+  protected:
+    int id_ = 16;
+    std::string name_ = "LOAD_PARAMETERS";
+    std::string description_ = "Load the data processing parameters from file.";
+  };
 }
