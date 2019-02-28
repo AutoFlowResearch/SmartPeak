@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(pickFeatures)
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate1.getRT()), 953.665693772912, 1e-6);
   BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
 
-  const OpenMS::Feature& hsubordinate2 = rawDataHandler.getFeatureMap()[50].getSubordinates()[0];
+  const OpenMS::Feature& hsubordinate2 = rawDataHandler.getFeatureMapHistory()[50].getSubordinates()[0];
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getMetaValue("peak_apex_int")), 0.0, 1e-6);
   BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 1067.5447296543123, 1e-6);
