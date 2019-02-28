@@ -13,9 +13,10 @@
 
 namespace SmartPeak
 {
-  void RawDataProcessor::pickFeatures(
+  void PickFeatures::processRawData(
     RawDataHandler& rawDataHandler_IO,
-    const std::vector<std::map<std::string, std::string>>& MRMFeatureFinderScoring_params_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
     const bool verbose_I
   )
   {
@@ -24,9 +25,14 @@ namespace SmartPeak
       std::cout << "Experiment size: " << rawDataHandler_IO.getChromatogramMap().size() << std::endl;
     }
 
+    if (params_I.find("MRMFeatureFinderScoring") != params_I.end() && params_I.at("MRMFeatureFinderScoring").empty()) {
+      std::cout << "No parameters passed to PickFeatures. Not picking." << std::endl;
+      return;
+    }
+
     OpenMS::MRMFeatureFinderScoring featureFinder;
     OpenMS::Param parameters = featureFinder.getParameters();
-    Utilities::updateParameters(parameters, MRMFeatureFinderScoring_params_I);
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFinderScoring"));
     featureFinder.setParameters(parameters);
 
     OpenMS::FeatureMap featureMap;
@@ -51,9 +57,10 @@ namespace SmartPeak
     }
   }
 
-  void RawDataProcessor::filterFeatures(
+  void FilterFeatures::processRawData(
     RawDataHandler& rawDataHandler_IO,
-    const std::vector<std::map<std::string, std::string>>& MRMFeatureFilter_filter_params_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
     const bool verbose_I
   )
   {
@@ -62,14 +69,14 @@ namespace SmartPeak
       std::cout << "filterFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
     }
 
-    if (MRMFeatureFilter_filter_params_I.empty()) {
-      std::cout << "No parameters passed to filterFeatures(). Not filtering." << std::endl;
+    if (params_I.find("MRMFeatureFilter.filter_MRMFeatures") != params_I.end() && params_I.at("MRMFeatureFilter.filter_MRMFeatures").empty()) {
+      std::cout << "No parameters passed to filterFeatures. Not filtering." << std::endl;
       return;
     }
 
     OpenMS::MRMFeatureFilter featureFilter;
     OpenMS::Param parameters = featureFilter.getParameters();
-    Utilities::updateParameters(parameters, MRMFeatureFilter_filter_params_I);
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeatures"));
     featureFilter.setParameters(parameters);
 
     OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
@@ -88,9 +95,10 @@ namespace SmartPeak
     }
   }
 
-  void RawDataProcessor::checkFeatures(
+  void CheckFeatures::processRawData(
     RawDataHandler& rawDataHandler_IO,
-    const std::vector<std::map<std::string, std::string>>& MRMFeatureFilter_qc_params_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
     const bool verbose_I
   )
   {
@@ -99,14 +107,14 @@ namespace SmartPeak
       std::cout << "checkFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
     }
 
-    if (MRMFeatureFilter_qc_params_I.empty()) {
-      std::cout << "No parameters passed to checkFeatures(). Not checking." << std::endl;
+    if (params_I.find("MRMFeatureFilter.filter_MRMFeatures.qc") != params_I.end() && params_I.at("MRMFeatureFilter.filter_MRMFeatures.qc").empty()) {
+      std::cout << "No parameters passed to checkFeatures. Not checking." << std::endl;
       return;
     }
 
     OpenMS::MRMFeatureFilter featureFilter;
     OpenMS::Param parameters = featureFilter.getParameters();
-    Utilities::updateParameters(parameters, MRMFeatureFilter_qc_params_I);
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeatures.qc"));
     featureFilter.setParameters(parameters);
 
     OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
@@ -125,10 +133,10 @@ namespace SmartPeak
     }
   }
 
-  void RawDataProcessor::selectFeatures(
+  void SelectFeatures::processRawData(
     RawDataHandler& rawDataHandler_IO,
-    const std::vector<std::map<std::string, std::string>>& MRMFeatureSelector_select_params_I,
-    const std::vector<std::map<std::string, std::string>>& MRMFeatureSelector_schedule_params_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
     const bool verbose_I
   )
   {
@@ -137,14 +145,21 @@ namespace SmartPeak
       std::cout << "selectFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
     }
 
+    if (params_I.find("MRMFeatureSelector.schedule_MRMFeatures_qmip") != params_I.end() &&
+      params_I.find("MRMFeatureSelector.schedule_MRMFeatures_score") != params_I.end()) {
+      std::cout << "No parameters passed to selectFeatures. Not selecting." << std::endl;
+      return;
+    }
+
     OpenMS::FeatureMap output;
-
-    std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
-      Utilities::extractSelectorParameters(MRMFeatureSelector_schedule_params_I, MRMFeatureSelector_select_params_I);
-
-    if (MRMFeatureSelector_schedule_params_I.size()) {
+    
+    if (params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip").size()) {
+      std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
+        Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"), params_I.at("MRMFeatureSelector.select_MRMFeatures_qmip"));
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
-    } else if (MRMFeatureSelector_schedule_params_I.size()) {
+    } else if (params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score").size()) {
+      std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
+        Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
     } else {
       throw std::invalid_argument("Both arguments 'select params' and 'schedule params' are empty.");
@@ -161,8 +176,10 @@ namespace SmartPeak
     }
   }
 
-  void RawDataProcessor::extractMetaData(
+  void ExtractMetaData::processRawData(
     RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
     const bool verbose_I
   )
   {
@@ -230,9 +247,10 @@ namespace SmartPeak
     }
   }
 
-  void RawDataProcessor::validateFeatures(
+  void ValidateFeatures::processRawData(
     RawDataHandler& rawDataHandler_IO,
-    const std::vector<std::map<std::string, std::string>>& MRMRFeatureValidator_params_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
     const bool verbose_I
   )
   {
@@ -240,8 +258,8 @@ namespace SmartPeak
       std::cout << "==== START validateFeatures" << std::endl;
     }
 
-    if (MRMRFeatureValidator_params_I.empty()) {
-      std::cout << "No parameters passed to validateFeatures(). Not validating." << std::endl;
+    if (params_I.find("MRMFeatureValidator.validate_MRMFeatures") != params_I.end() && params_I.at("MRMFeatureValidator.validate_MRMFeatures").empty()) {
+      std::cout << "No parameters passed to validateFeatures. Not validating." << std::endl;
       return;
     }
 
@@ -254,7 +272,7 @@ namespace SmartPeak
       rawDataHandler_IO.getMetaData().getInjectionName(),
       mapped_features,
       validation_metrics,
-      std::stof(MRMRFeatureValidator_params_I.front().at("value")), // TODO: While this probably works, it might be nice to add some check that the parameter passed is the desired one
+      std::stof(params_I.at("MRMFeatureValidator.validate_MRMFeatures").front().at("value")), // TODO: While this probably works, it might be nice to add some check that the parameter passed is the desired one
       verbose_I
     );
 
@@ -266,9 +284,10 @@ namespace SmartPeak
     }
   }
 
-  void RawDataProcessor::plotFeatures(
+  void PlotFeatures::processRawData(
     RawDataHandler& rawDataHandler_IO,
-    const std::vector<std::map<std::string, std::string>>& FeaturePlotter_params_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
     const bool verbose_I
   )
   {
@@ -290,8 +309,10 @@ namespace SmartPeak
     // );
   }
 
-  void RawDataProcessor::quantifyComponents(
+  void QuantifyFeatures::processRawData(
     RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
     const bool verbose_I
   )
   {
@@ -313,133 +334,4 @@ namespace SmartPeak
       std::cout << "==== END   quantifyComponents" << std::endl;
     }
   }
-
-  void RawDataProcessor::processRawData(
-    RawDataHandler& rawDataHandler_IO,
-    const RawDataProcMethod raw_data_processing_event,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
-    const Filenames& filenames,
-    const bool verbose_I
-  )
-  {
-    const RawDataProcMethod event = raw_data_processing_event;
-    if (event == LOAD_RAW_DATA) {
-      // fileReaderOpenMS.load_SWATHorDIA(rawDataHandler_IO, {})
-      OpenMSFile::loadMSExperiment(
-        rawDataHandler_IO,
-        filenames.mzML_i,
-        parameters.at("MRMMapping"),
-        parameters.at("ChromatogramExtractor"),
-        parameters.at("mzML"),
-        verbose_I
-      );
-      // fileReaderOpenMS.load_Trafo(); # skip, no transformation of RT
-    } else if (event == LOAD_FEATURES) {
-      OpenMSFile::loadFeatureMap(
-        rawDataHandler_IO,
-        filenames.featureXML_i,
-        verbose_I
-      );
-    } else if (event == PICK_FEATURES) {
-      pickFeatures(
-        rawDataHandler_IO,
-        parameters.at("MRMFeatureFinderScoring"),
-        verbose_I
-      );
-    } else if (event == FILTER_FEATURES) {
-      filterFeatures(
-        rawDataHandler_IO,
-        parameters.at("MRMFeatureFilter.filter_MRMFeatures"),
-        verbose_I
-      );
-    } else if (event == SELECT_FEATURES) {
-      selectFeatures(
-        rawDataHandler_IO,
-        parameters.at("MRMFeatureSelector.select_MRMFeatures_qmip"),
-        parameters.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"),
-        verbose_I
-      );
-    } else if (event == VALIDATE_FEATURES) {
-      OpenMSFile::loadValidationData(rawDataHandler_IO, filenames.referenceData_csv_i);
-      validateFeatures(
-        rawDataHandler_IO,
-        parameters.at("MRMFeatureValidator.validate_MRMFeatures"),
-        verbose_I
-      );
-    } else if (event == QUANTIFY_FEATURES) {
-      quantifyComponents(rawDataHandler_IO, verbose_I);
-    } else if (event == CHECK_FEATURES) {
-      checkFeatures(
-        rawDataHandler_IO,
-        parameters.at("MRMFeatureFilter.filter_MRMFeatures.qc"),
-        verbose_I
-      );
-    } else if (event == STORE_FEATURES) {
-      OpenMSFile::storeFeatureMap(
-        rawDataHandler_IO,
-        filenames.featureXML_o,
-        verbose_I
-      );
-    } else if (event == PLOT_FEATURES) {
-      plotFeatures(
-        rawDataHandler_IO,
-        parameters.at("FeaturePlotter"),
-        verbose_I
-      );
-    } 
-  }
-
-  std::vector<RawDataProcessor::RawDataProcMethod> RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-    const MetaDataHandler::SampleType sample_type
-  )
-  {
-    const std::vector<RawDataProcMethod> opt {
-      LOAD_RAW_DATA,     // 0
-      PICK_FEATURES,     // 1
-      FILTER_FEATURES,   // 2
-      SELECT_FEATURES,   // 3
-      QUANTIFY_FEATURES, // 4
-      CHECK_FEATURES     // 5
-    };
-    switch (sample_type) {
-      case MetaDataHandler::SampleType::Unknown:
-      case MetaDataHandler::SampleType::Standard:
-      case MetaDataHandler::SampleType::QC:
-      case MetaDataHandler::SampleType::Blank:
-        return opt;
-      case MetaDataHandler::SampleType::DoubleBlank:
-      case MetaDataHandler::SampleType::Solvent:
-        return {opt[0], opt[1], opt[2], opt[3], opt[5]};
-      default:
-        throw "case not handled.";
-    }
-  }
-
-  // TODO: implemented in error (thought it'd be necessary). Eventually remove it.
-  // RawDataProcessor::RawDataProcMethod RawDataProcessor::convertEventStringToEnum(const std::string& event)
-  // {
-  //   if (event == "load_raw_data") {
-  //     return LOAD_RAW_DATA;
-  //   } else if (event == "load_features") {
-  //     return LOAD_FEATURES;
-  //   } else if (event == "pick_features") {
-  //     return PICK_FEATURES;
-  //   } else if (event == "filter_features") {
-  //     return FILTER_FEATURES;
-  //   } else if (event == "select_features") {
-  //     return SELECT_FEATURES;
-  //   } else if (event == "validate_features") {
-  //     return VALIDATE_FEATURES;
-  //   } else if (event == "quantify_features") {
-  //     return QUANTIFY_FEATURES;
-  //   } else if (event == "check_features") {
-  //     return CHECK_FEATURES;
-  //   } else if (event == "store_features") {
-  //     return STORE_FEATURES;
-  //   } else if (event == "plot_features") {
-  //     return PLOT_FEATURES;
-  //   } else {
-  //     throw "Raw data processing event " + event + " is not recognized.";
-  //   }
-  // }
 }
