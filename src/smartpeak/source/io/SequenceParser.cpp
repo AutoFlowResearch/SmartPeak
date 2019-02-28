@@ -24,6 +24,16 @@ namespace SmartPeak
         << "\nreadSequenceFile(): loading " << pathname << std::endl;
     }
 
+    if (pathname.empty()) {
+      std::cout << "readSequenceFile(): pathname is empty\n";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(pathname)) {
+      std::cout << "readSequenceFile(): file not found\n";
+      return;
+    }
+
     const std::string s_sample_name {"sample_name"};
     const std::string s_sample_group_name {"sample_group_name"};
     const std::string s_sequence_segment_name {"sequence_segment_name"};
