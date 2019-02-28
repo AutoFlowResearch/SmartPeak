@@ -673,7 +673,7 @@ namespace SmartPeak
     try {
       // Store outfile as featureXML
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.store(filename, rawDataHandler_IO.getFeatureMap());
+      featurexml.store(filename, rawDataHandler_IO.getFeatureMapHistory());
     } catch (const std::exception& e) {
       std::cerr << "storeFeatureMap(): " << e.what() << std::endl;
     }
