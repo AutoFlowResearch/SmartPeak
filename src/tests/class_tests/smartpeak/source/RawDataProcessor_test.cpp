@@ -352,7 +352,7 @@ BOOST_AUTO_TEST_CASE(getDefaultRawDataProcessingWorkflow)
   BOOST_CHECK_EQUAL(workflow[4], RawDataProcessor::CHECK_FEATURES);
 }
 
-BOOST_AUTO_TEST_CASE(processRawData)
+BOOST_AUTO_TEST_CASE(process)
 {
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
@@ -390,7 +390,7 @@ BOOST_AUTO_TEST_CASE(processRawData)
   params_1.emplace("ChromatogramExtractor", vector<map<string, string>>());
 
   for (const RawDataProcessor::RawDataProcMethod event : raw_data_processing_events) {
-    RawDataProcessor::processRawData(rawDataHandler, event, params_1, filenames);
+    RawDataProcessor::process(rawDataHandler, event, params_1, filenames);
   }
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 114); // test feature_map_
