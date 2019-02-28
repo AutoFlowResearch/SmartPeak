@@ -45,13 +45,18 @@ namespace SmartPeak
       return;
     }
 
+    if (!InputDataValidation::fileExists(filename)) {
+      std::cout << "loadStandardsConcentrations(): file not found\n";
+      return;
+    }
+
     try {
       OpenMS::AbsoluteQuantitationStandardsFile AQSf;
-      std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards;
-      AQSf.load(filename, standards);
-      sequenceSegmentHandler_IO.setStandardsConcentrations(standards);
+      AQSf.load(filename, sequenceSegmentHandler_IO.getStandardsConcentrations());
     } catch (const std::exception& e) {
       std::cerr << "loadStandardsConcentrations(): " << e.what() << std::endl;
+      sequenceSegmentHandler_IO.getStandardsConcentrations().clear();
+      std::cerr << "loadStandardsConcentrations(): standards concentrations clear" << std::endl;
     }
 
     // std::cout << InputDataValidation::getStandardsConcentrationsInfo(sequenceSegmentHandler_IO);
@@ -77,13 +82,18 @@ namespace SmartPeak
       return;
     }
 
+    if (!InputDataValidation::fileExists(filename)) {
+      std::cout << "loadQuantitationMethods(): file not found\n";
+      return;
+    }
+
     try {
       OpenMS::AbsoluteQuantitationMethodFile AQMf;
-      std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods;
-      AQMf.load(filename, quantitation_methods);
-      sequenceSegmentHandler_IO.setQuantitationMethods(quantitation_methods);
+      AQMf.load(filename, sequenceSegmentHandler_IO.getQuantitationMethods());
     } catch (const std::exception& e) {
       std::cerr << "loadQuantitationMethods(): " << e.what() << std::endl;
+      sequenceSegmentHandler_IO.getQuantitationMethods().clear();
+      std::cerr << "loadQuantitationMethods(): quantitation methods clear" << std::endl;
     }
 
     // std::cout << InputDataValidation::getQuantitationMethodsInfo(sequenceSegmentHandler_IO);
@@ -110,19 +120,32 @@ namespace SmartPeak
       return;
     }
 
-    OpenMS::TargetedExperiment targeted_exp; // # must use "PeptideSequence"
-    if (format == "csv") {
-      OpenMS::TransitionTSVFile tsvfile;
-      tsvfile.convertTSVToTargetedExperiment(filename.c_str(), OpenMS::FileTypes::TRAML, targeted_exp);
-    } else if (format == "traML") {
-      OpenMS::TraMLFile tramlfile;
-      tramlfile.load(filename, targeted_exp);
-    } else {
-      std::cerr << "loadTraML(): format must either be \"csv\" or \"traML\".\n";
+    if (!InputDataValidation::fileExists(filename)) {
+      std::cout << "loadTraML(): file not found\n";
       return;
     }
 
-    rawDataHandler.setTargetedExperiment(targeted_exp);
+    try {
+      // must use "PeptideSequence"
+      if (format == "csv") {
+        OpenMS::TransitionTSVFile tsvfile;
+        tsvfile.convertTSVToTargetedExperiment(
+          filename.c_str(),
+          OpenMS::FileTypes::TRAML,
+          rawDataHandler.getTargetedExperiment()
+        );
+      } else if (format == "traML") {
+        OpenMS::TraMLFile tramlfile;
+        tramlfile.load(filename, rawDataHandler.getTargetedExperiment());
+      } else {
+        std::cerr << "loadTraML(): format must either be \"csv\" or \"traML\".\n";
+        return;
+      }
+    } catch (const std::exception& e) {
+      std::cerr << "loadTraML(): " << e.what() << std::endl;
+      rawDataHandler.getTargetedExperiment().clear(true);
+      std::cerr << "loadTraML(): targeted experiment clear" << std::endl;
+    }
 
     // std::cout << InputDataValidation::getTraMLInfo(rawDataHandler);
 
@@ -260,11 +283,20 @@ namespace SmartPeak
       return;
     }
 
-    OpenMS::FeatureMap fm;
-    OpenMS::FeatureXMLFile featurexml;
-    featurexml.load(filename, fm);
-    rawDataHandler.setFeatureMap(fm);
-    rawDataHandler.updateFeatureMapHistory();
+    if (!InputDataValidation::fileExists(filename)) {
+      std::cout << "loadFeatureMap(): file not found\n";
+      return;
+    }
+
+    try {
+      OpenMS::FeatureXMLFile featurexml;
+      featurexml.load(filename, rawDataHandler.getFeatureMap());
+      rawDataHandler.updateFeatureMapHistory();
+    } catch (const std::exception& e) {
+      std::cerr << "loadFeatureMap(): " << e.what() << std::endl;
+      rawDataHandler.getFeatureMap().clear();
+      std::cerr << "loadFeatureMap(): feature map clear" << std::endl;
+    }
 
     if (verbose) {
       std::cout << "==== END   loadFeatureMap" << std::endl;
@@ -289,13 +321,33 @@ namespace SmartPeak
       return;
     }
 
-    OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureFilter();
-    OpenMS::MRMFeatureQCFile featureQCFile;
-    if (filename_components.size())
-      featureQCFile.load(filename_components, featureQC, false);
-    if (filename_components_groups.size())
-      featureQCFile.load(filename_components_groups, featureQC, true);
-    rawDataHandler.setFeatureFilter(featureQC);
+    if (filename_components.size() &&
+        !InputDataValidation::fileExists(filename_components)) {
+      std::cout << "loadFeatureFilter(): file not found (" << filename_components << ")\n";
+      return;
+    }
+
+    if (filename_components_groups.size() &&
+        !InputDataValidation::fileExists(filename_components_groups)) {
+      std::cout << "loadFeatureFilter(): file not found (" << filename_components_groups << ")\n";
+      return;
+    }
+
+    try {
+      OpenMS::MRMFeatureQCFile featureQCFile;
+      if (filename_components.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.load(filename_components, rawDataHandler.getFeatureFilter(), false);
+      }
+      if (filename_components_groups.size()) {
+        featureQCFile.load(filename_components_groups, rawDataHandler.getFeatureFilter(), true);
+      }
+    } catch (const std::exception& e) {
+      std::cerr << "loadFeatureFilter(): " << e.what() << std::endl;
+      rawDataHandler.getFeatureFilter().component_qcs.clear();
+      rawDataHandler.getFeatureFilter().component_group_qcs.clear();
+      rawDataHandler.getFeatureFilter().component_group_pair_qcs.clear();
+      std::cerr << "loadFeatureFilter(): feature filter clear" << std::endl;
+    }
 
     // std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler, true);
 
@@ -322,13 +374,33 @@ namespace SmartPeak
       return;
     }
 
-    OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
-    OpenMS::MRMFeatureQCFile featureQCFile;
-    if (filename_components.size())
-      featureQCFile.load(filename_components, featureQC, false);
-    if (filename_components_groups.size())
-      featureQCFile.load(filename_components_groups, featureQC, true);
-    rawDataHandler.setFeatureQC(featureQC);
+    if (filename_components.size() &&
+        !InputDataValidation::fileExists(filename_components)) {
+      std::cout << "loadFeatureQC(): file not found (" << filename_components << ")\n";
+      return;
+    }
+
+    if (filename_components_groups.size() &&
+        !InputDataValidation::fileExists(filename_components_groups)) {
+      std::cout << "loadFeatureQC(): file not found (" << filename_components_groups << ")\n";
+      return;
+    }
+
+    try {
+      OpenMS::MRMFeatureQCFile featureQCFile;
+      if (filename_components.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.load(filename_components, rawDataHandler.getFeatureQC(), false);
+      }
+      if (filename_components_groups.size()) {
+        featureQCFile.load(filename_components_groups, rawDataHandler.getFeatureQC(), true);
+      }
+    } catch (const std::exception& e) {
+      std::cerr << "loadFeatureQC(): " << e.what() << std::endl;
+      rawDataHandler.getFeatureQC().component_qcs.clear();
+      rawDataHandler.getFeatureQC().component_group_qcs.clear();
+      rawDataHandler.getFeatureQC().component_group_pair_qcs.clear();
+      std::cerr << "loadFeatureQC(): feature qc clear" << std::endl;
+    }
 
     // std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler, false);
 
@@ -339,21 +411,26 @@ namespace SmartPeak
 
   void OpenMSFile::loadValidationData(
     RawDataHandler& rawDataHandler,
-    const std::string& referenceData_csv_i,
+    const std::string& filename,
     const bool verbose
   )
   {
     if (verbose) {
       std::cout << "==== START loadValidationData"
-        << "\nloadValidationData(): loading " << referenceData_csv_i << std::endl;
+        << "\nloadValidationData(): loading " << filename << std::endl;
     }
 
-    if (referenceData_csv_i.empty()) {
+    if (filename.empty()) {
       std::cout << "loadValidationData(): filename is empty\n";
       return;
     }
 
-    io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(referenceData_csv_i);
+    if (!InputDataValidation::fileExists(filename)) {
+      std::cout << "loadValidationData(): file not found\n";
+      return;
+    }
+
+    io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(filename);
 
     const std::string s_sample_index {"sample_index"};
     const std::string s_original_filename {"original_filename"};
@@ -486,10 +563,18 @@ namespace SmartPeak
       return;
     }
 
-    std::map<std::string,std::vector<std::map<std::string,std::string>>> parameters;
-    FileReader::parseOpenMSParams(filename, parameters);
+    if (!InputDataValidation::fileExists(filename)) {
+      std::cout << "readRawDataProcessingParameters(): file not found\n";
+      return;
+    }
 
-    sanitizeRawDataProcessorParameters(rawDataHandler, parameters);
+    try {
+      std::map<std::string,std::vector<std::map<std::string,std::string>>> parameters;
+      FileReader::parseOpenMSParams(filename, parameters);
+      sanitizeRawDataProcessorParameters(rawDataHandler, parameters);
+    } catch (const std::exception& e) {
+      std::cerr << "readRawDataProcessingParameters(): " << e.what() << std::endl;
+    }
 
     if (verbose) {
       std::cout << "==== END   readRawDataProcessingParameters" << std::endl;
@@ -554,11 +639,15 @@ namespace SmartPeak
       return;
     }
 
-    OpenMS::AbsoluteQuantitationMethodFile aqmf;
-    aqmf.store(
-      filename,
-      sequenceSegmentHandler_IO.getQuantitationMethods()
-    );
+    try {
+      OpenMS::AbsoluteQuantitationMethodFile aqmf;
+      aqmf.store(
+        filename,
+        sequenceSegmentHandler_IO.getQuantitationMethods()
+      );
+    } catch (const std::exception& e) {
+      std::cerr << "storeQuantitationMethods(): " << e.what() << std::endl;
+    }
 
     if (verbose) {
       std::cout << "==== END   storeQuantitationMethods" << std::endl;
@@ -581,9 +670,13 @@ namespace SmartPeak
       return;
     }
 
-    // # Store outfile as featureXML
-    OpenMS::FeatureXMLFile featurexml;
-    featurexml.store(filename, rawDataHandler_IO.getFeatureMapHistory());
+    try {
+      // Store outfile as featureXML
+      OpenMS::FeatureXMLFile featurexml;
+      featurexml.store(filename, rawDataHandler_IO.getFeatureMapHistory());
+    } catch (const std::exception& e) {
+      std::cerr << "storeFeatureMap(): " << e.what() << std::endl;
+    }
 
     if (verbose) {
       std::cout << "==== END   storeFeatureMap" << std::endl;
@@ -606,8 +699,12 @@ namespace SmartPeak
       return;
     }
 
-    OpenMS::MzMLFile mzmlf;
-    mzmlf.store(filename, experiment);
+    try {
+      OpenMS::MzMLFile mzmlfile;
+      mzmlfile.store(filename, experiment);
+    } catch (const std::exception& e) {
+      std::cerr << "storeMzML(): " << e.what() << std::endl;
+    }
 
     if (verbose) {
       std::cout << "==== END   storeMzML" << std::endl;
