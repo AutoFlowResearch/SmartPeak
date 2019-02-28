@@ -264,6 +264,7 @@ namespace SmartPeak
     OpenMS::FeatureXMLFile featurexml;
     featurexml.load(filename, fm);
     rawDataHandler.setFeatureMap(fm);
+    rawDataHandler.updateFeatureMapHistory();
 
     if (verbose) {
       std::cout << "==== END   loadFeatureMap" << std::endl;

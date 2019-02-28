@@ -302,6 +302,7 @@ namespace SmartPeak
       OpenMS::AbsoluteQuantitation aq;
       aq.setQuantMethods(rawDataHandler_IO.getQuantitationMethods());
       aq.quantifyComponents(rawDataHandler_IO.getFeatureMap());
+      rawDataHandler_IO.updateFeatureMapHistory();
     } catch (const std::exception& e) {
       std::cerr << "quantifyComponents(): " << e.what() << std::endl;
     }

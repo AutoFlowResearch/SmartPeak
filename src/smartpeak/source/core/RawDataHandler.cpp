@@ -249,8 +249,12 @@ namespace SmartPeak
       feature_map_history_ = feature_map_;  // ensures PrimaryMSRunPath is copied
       for (OpenMS::Feature& feature_new : feature_map_history_) {
         for (OpenMS::Feature& subordinate_new : feature_new.getSubordinates()) {
-          subordinate_new.setMetaValue("used_", "true");
-          subordinate_new.setMetaValue("timestamp_", timestamp);
+          if (!subordinate_new.metaValueExists("used_")) { // prevents overwriting feature_maps with existing "used_" attributes
+            subordinate_new.setMetaValue("used_", "true");
+          }
+          if (!subordinate_new.metaValueExists("timestamp_")) { // prevents overwriting feature_maps with existing "timestamp_" attributes
+            subordinate_new.setMetaValue("timestamp_", timestamp);
+          }
         }
       }
     }
@@ -305,6 +309,7 @@ namespace SmartPeak
               for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) {
                 if (subordinate_select.getUniqueId() == subordinate_copy.getUniqueId() && 
                   subordinate_select.getMetaValue("native_id") == subordinate_copy.getMetaValue("native_id")) { // Matching subordinate
+                  subordinate_copy = subordinate_select; // copy over changed meta values from the current feature map subordinate
                   subordinate_copy.setMetaValue("used_", "true");
                   subordinate_copy.setMetaValue("timestamp_", timestamp);
                   break; // break the loop and move on to the next subordinate from the history
