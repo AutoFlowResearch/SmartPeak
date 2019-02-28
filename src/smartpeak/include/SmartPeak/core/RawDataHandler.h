@@ -88,6 +88,8 @@ public:
 
       All new features are initialized as "used_" = True with the "modified_" attribute set to the current time-stamp.
       All removed features are changed to "used_" = False with the "modified_" attribute set to the current time-stamp.
+
+      ASSUMPTIONS: the unique ID attribute is set within OpenMS
     */
     void updateFeatureMapHistory();
 

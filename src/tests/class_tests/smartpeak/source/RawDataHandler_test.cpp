@@ -339,6 +339,7 @@ BOOST_AUTO_TEST_CASE(updateFeatureMapHistory)
   fm1.setPrimaryMSRunPath({"sample_1"});
   OpenMS::Feature f1, f2, s1a, s1b, s2a, s2b;
   f1.setMetaValue("PeptideRef", "component_group_1");  
+  f1.setUniqueId("f_1"); // ASSUMPTION: unique id attribute will be set within OpenMS
   s1a.setMetaValue("native_id", "component_1a");
   f1.setSubordinates({s1a});
   fm1.push_back(f1);
@@ -348,6 +349,7 @@ BOOST_AUTO_TEST_CASE(updateFeatureMapHistory)
   // Test empty feature_map_history
   rawDataHandler.updateFeatureMapHistory();
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 1);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getUniqueId(), 1);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("PeptideRef"), "component_group_1");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 1);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0].getMetaValue("native_id"), "component_1a");
@@ -360,6 +362,7 @@ BOOST_AUTO_TEST_CASE(updateFeatureMapHistory)
   rawDataHandler.setFeatureMap(fm1);
   rawDataHandler.updateFeatureMapHistory();
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 1);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getUniqueId(), 1);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("PeptideRef"), "component_group_1");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 2);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0].getMetaValue("native_id"), "component_1a");
@@ -373,6 +376,7 @@ BOOST_AUTO_TEST_CASE(updateFeatureMapHistory)
   rawDataHandler.setFeatureMap(fm1);
   rawDataHandler.updateFeatureMapHistory();
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 1);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getUniqueId(), 1);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("PeptideRef"), "component_group_1");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 2);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0].getMetaValue("native_id"), "component_1a");
@@ -382,20 +386,23 @@ BOOST_AUTO_TEST_CASE(updateFeatureMapHistory)
 
   // Test new feature
   f2.setMetaValue("PeptideRef", "component_group_2");
+  f2.setUniqueId("f_2"); // ASSUMPTION: unique id attribute will be set within OpenMS
   s2a.setMetaValue("native_id", "component_2a");
   s2b.setMetaValue("native_id", "component_2b");
-  f2.setSubordinates({ s1a, s2b });
+  f2.setSubordinates({ s2a, s2b });
   fm1.push_back(f2);
 
   rawDataHandler.setFeatureMap(fm1);
   rawDataHandler.updateFeatureMapHistory();
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 2);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getUniqueId(), 1);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("PeptideRef"), "component_group_1");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 2);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0].getMetaValue("native_id"), "component_1a");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0].getMetaValue("used_").toBool(), true);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[1].getMetaValue("native_id"), "component_1b");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[1].getMetaValue("used_").toBool(), false);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[1].getUniqueId(), 2);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[1].getMetaValue("PeptideRef"), "component_group_2");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[1].getSubordinates().size(), 2);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[1].getSubordinates()[0].getMetaValue("native_id"), "component_2a");
@@ -410,12 +417,14 @@ BOOST_AUTO_TEST_CASE(updateFeatureMapHistory)
   rawDataHandler.setFeatureMap(fm1);
   rawDataHandler.updateFeatureMapHistory();
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 2);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getUniqueId(), 1);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("PeptideRef"), "component_group_1");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 2);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0].getMetaValue("native_id"), "component_1a");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0].getMetaValue("used_").toBool(), false);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[1].getMetaValue("native_id"), "component_1b");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[1].getMetaValue("used_").toBool(), false);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[1].getUniqueId(), 2);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[1].getMetaValue("PeptideRef"), "component_group_2");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[1].getSubordinates().size(), 2);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[1].getSubordinates()[0].getMetaValue("native_id"), "component_2a");
