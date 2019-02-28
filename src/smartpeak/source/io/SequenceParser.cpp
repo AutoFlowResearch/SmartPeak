@@ -211,8 +211,8 @@ namespace SmartPeak
         continue;
       const std::string& sample_name = mdh.getSampleName();
       const RawDataHandler& rawDataHandler = sampleHandler.getRawData();
-      for (const OpenMS::Feature& feature : rawDataHandler.getFeatureMap()) {
-      // for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
+      for (const OpenMS::Feature& feature : rawDataHandler.getFeatureMapHistory()) { // feature_map_history is needed in order to export all "used_" = true and false features
+      // for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMapHistory()) {
         if (!feature.metaValueExists(s_PeptideRef) || feature.getMetaValue(s_PeptideRef).isEmpty()) {
           // std::cout << "component_group_name is absent or empty. Skipping this feature." << std::endl; // Log it, instead
           continue;
@@ -319,7 +319,7 @@ namespace SmartPeak
       data_dict.insert({sample_name, std::map<Row,float,Row_less>()});
       for (const std::string& meta_value_name : meta_data) {
         const RawDataHandler& rawDataHandler = sampleHandler.getRawData();
-        for (const OpenMS::Feature& feature : rawDataHandler.getFeatureMap()) {
+        for (const OpenMS::Feature& feature : rawDataHandler.getFeatureMap()) { // feature_map_history is not needed here as we are only interested in the current/"used" features
         // for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
           const std::string& component_group_name = feature.getMetaValue(s_PeptideRef).toString();
           for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
