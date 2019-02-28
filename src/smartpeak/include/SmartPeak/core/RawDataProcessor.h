@@ -300,4 +300,88 @@ namespace SmartPeak
     std::string name_ = "PLOT_FEATURES";
     std::string description_ = "Plot the raw chromatogram with selected peaks overlaid.";
   };
+
+  class LoadTransitions : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+    using RawDataProcessor::~RawDataProcessor;
+
+    /** Load the transitions from the TraML file.
+    */
+    static void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    );
+
+  protected:
+    int id_ = 12;
+    std::string name_ = "LOAD_TRANSITIONS";
+    std::string description_ = "Load the transitions for the SRM experiments from the TraML file.";
+  };
+
+  class LoadFeatureFilters : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+    using RawDataProcessor::~RawDataProcessor;
+
+    /** Load the component and component group transition filters from file.
+    */
+    static void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    );
+
+  protected:
+    int id_ = 13;
+    std::string name_ = "LOAD_FEATURE_FILTERS";
+    std::string description_ = "Load the component and component group transition filters from file.";
+  };
+
+  class LoadFeatureQCs : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+    using RawDataProcessor::~RawDataProcessor;
+
+    /** Load the component and component group transition QCs from file.
+    */
+    static void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    );
+
+  protected:
+    int id_ = 14;
+    std::string name_ = "LOAD_FEATURE_QCS";
+    std::string description_ = "Load the component and component group transition QC specifications from file.";
+  };
+
+  class LoadValidationData : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+    using RawDataProcessor::~RawDataProcessor;
+
+    /** Load the validation data from file.
+    */
+    static void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    );
+
+  protected:
+    int id_ = 15;
+    std::string name_ = "LOAD_VALIDATION_DATA";
+    std::string description_ = "Load the validation data from file.";
+  };
 }
