@@ -2,18 +2,245 @@
 
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/Filenames.h>
-#include <SmartPeak/algorithm/MRMFeatureValidator.h>
 #include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/io/OpenMSFile.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/MRMBatchFeatureSelector.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>
+
+// load/store raw data
+#include <OpenMS/FORMAT/FileTypes.h>
+#include <OpenMS/FORMAT/ChromeleonFile.h>
+#include <OpenMS/FORMAT/TraMLFile.h>  // load traML as well
+#include <OpenMS/FORMAT/FileHandler.h>
+#include <OpenMS/FORMAT/MzMLFile.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/ChromatogramExtractor.h>
+#include <OpenMS/ANALYSIS/TARGETED/MRMMapping.h>
+#include <OpenMS/KERNEL/SpectrumHelper.h>
+
+#include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
+#include <SmartPeak/io/InputDataValidation.h> // check filenames and headers
+
+// feature selection
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
-#include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMBatchFeatureSelector.h>
+
+#include <SmartPeak/algorithm/MRMFeatureValidator.h>  // feature validaiton
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>  // feature filter/QC
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>  // feature picker
+#include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h> // feature quantification
 
 namespace SmartPeak
 {
-  void PickFeatures::processRawData(
+  void LoadRawData::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  )
+  {
+    if (verbose_I) {
+      std::cout << "==== START loadMSExperiment" << std::endl;
+    }
+
+    // # load chromatograms
+    OpenMS::MSExperiment chromatograms;
+    if (filenames.mzML_i.size()) {
+      if (params_I.at("mzML").size()) {
+        // # convert parameters
+        std::map<std::string, Utilities::CastValue> mzML_params;
+        for (const std::map<std::string, std::string>& param : params_I.at("mzML")) {
+          Utilities::CastValue c;
+          Utilities::castString(param.at("value"), param.at("type"), c);
+          mzML_params.emplace(param.at("name"), c);
+        }
+        if (mzML_params.count("format") && mzML_params.at("format").s_ == "ChromeleonFile") {
+          const size_t pos = filenames.mzML_i.rfind(".");
+          std::string txt_name = filenames.mzML_i;
+          if (pos != std::string::npos) {
+            txt_name.replace(txt_name.cbegin() + pos + 1, txt_name.cend(), "txt"); // replace extension
+          }
+          OpenMS::ChromeleonFile chfh;
+          std::cout << "loadMSExperiment(): loading " << txt_name << std::endl;
+          chfh.load(txt_name, chromatograms);
+        }
+        else {
+          OpenMS::FileHandler fh;
+          std::cout << "loadMSExperiment(): loading " << filenames.mzML_i << std::endl;
+          fh.loadExperiment(filenames.mzML_i, chromatograms);
+        }
+        if (mzML_params.count("zero_baseline") && mzML_params.at("zero_baseline").b_) {
+          std::vector<OpenMS::MSChromatogram>& chroms = chromatograms.getChromatograms();
+          for (OpenMS::MSChromatogram& ch : chroms) {
+            OpenMS::subtractMinimumIntensity(ch);
+          }
+        }
+      }
+      else {
+        OpenMS::FileHandler fh;
+        std::cout << "loadMSExperiment(): loading " << filenames.mzML_i << std::endl;
+        fh.loadExperiment(filenames.mzML_i, chromatograms);
+      }
+    }
+
+    OpenMS::TargetedExperiment& targeted_exp = rawDataHandler_IO.getTargetedExperiment();
+    if (params_I.at("ChromatogramExtractor").size()) {
+      // # convert parameters
+      std::map<std::string, Utilities::CastValue> chromatogramExtractor_params;
+      for (const std::map<std::string, std::string>& param : params_I.at("ChromatogramExtractor")) {
+        Utilities::CastValue c;
+        Utilities::castString(param.at("value"), param.at("type"), c);
+        chromatogramExtractor_params.emplace(param.at("name"), c);
+      }
+      // # exctract chromatograms
+      OpenMS::MSExperiment chromatograms_copy = chromatograms;
+      chromatograms.clear(true);
+      if (chromatogramExtractor_params.count("extract_precursors")) {
+        const std::vector<OpenMS::ReactionMonitoringTransition>& tr_const = targeted_exp.getTransitions();
+        std::vector<OpenMS::ReactionMonitoringTransition> tr = tr_const;
+        for (OpenMS::ReactionMonitoringTransition& t : tr) {
+          t.setProductMZ(t.getPrecursorMZ());
+        }
+        targeted_exp.setTransitions(tr);
+        rawDataHandler_IO.setTargetedExperiment(targeted_exp);
+      }
+      OpenMS::TransformationDescription transfDescr;
+      OpenMS::ChromatogramExtractor chromatogramExtractor;
+      chromatogramExtractor.extractChromatograms(
+        chromatograms_copy,
+        chromatograms,
+        rawDataHandler_IO.getTargetedExperiment(),
+        chromatogramExtractor_params.at("extract_window").f_,
+        chromatogramExtractor_params.at("ppm").b_,
+        transfDescr,
+        chromatogramExtractor_params.at("rt_extraction_window").f_,
+        chromatogramExtractor_params.at("filter").s_
+      );
+    }
+    rawDataHandler_IO.setExperiment(chromatograms);
+
+    // # map transitions to the chromatograms
+    if (params_I.at("MRMMapping").size()) {
+      // # set up MRMMapping and
+      // # parse the MRMMapping params
+      OpenMS::MRMMapping mrmmapper;
+      OpenMS::Param parameters = mrmmapper.getParameters();
+      Utilities::updateParameters(
+        parameters,
+        params_I.at("MRMMapping")
+      );
+      mrmmapper.setParameters(parameters);
+      OpenMS::MSExperiment chromatogram_map;
+
+      mrmmapper.mapExperiment(
+        chromatograms,
+        rawDataHandler_IO.getTargetedExperiment(),
+        chromatogram_map
+      );
+      rawDataHandler_IO.setChromatogramMap(chromatogram_map);
+    }
+
+    if (verbose_I) {
+      std::cout << "==== END   loadMSExperiment" << std::endl;
+    }
+  }
+
+  void StoreRawData::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  )
+  {
+    if (verbose_I) {
+      std::cout << "==== START storeMzML"
+        << "\nstoreMzML(): storing " << filenames.mzML_i << std::endl;
+    }
+
+    if (filenames.mzML_i.empty()) {
+      std::cout << "storeMzML(): filename is empty\n";
+      return;
+    }
+
+    try {
+      OpenMS::MzMLFile mzmlfile;
+      mzmlfile.store(filenames.mzML_i, rawDataHandler_IO.getChromatogramMap());
+    }
+    catch (const std::exception& e) {
+      std::cerr << "storeMzML(): " << e.what() << std::endl;
+    }
+
+    if (verbose_I) {
+      std::cout << "==== END   storeMzML" << std::endl;
+    }
+  }
+
+  void LoadFeatures::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  )
+  {
+    if (verbose_I) {
+      std::cout << "==== START loadFeatureMap"
+        << "\nloadFeatureMap(): loading " << filenames.featureXML_i << std::endl;
+    }
+
+    if (filenames.featureXML_i.empty()) {
+      std::cout << "loadFeatureMap(): filename is empty\n";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(filenames.featureXML_i)) {
+      std::cout << "loadFeatureMap(): file not found\n";
+      return;
+    }
+
+    try {
+      OpenMS::FeatureXMLFile featurexml;
+      featurexml.load(filenames.featureXML_i, rawDataHandler_IO.getFeatureMap());
+      rawDataHandler_IO.updateFeatureMapHistory();
+    }
+    catch (const std::exception& e) {
+      std::cerr << "loadFeatureMap(): " << e.what() << std::endl;
+      rawDataHandler_IO.getFeatureMap().clear();
+      std::cerr << "loadFeatureMap(): feature map clear" << std::endl;
+    }
+
+    if (verbose_I) {
+      std::cout << "==== END   loadFeatureMap" << std::endl;
+    }
+  }
+
+  void StoreFeatures::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  )
+  {
+    if (verbose_I) {
+      std::cout << "==== START storeFeatureMap"
+        << "\nstoreFeatureMap(): storing " << filenames.featureXML_o << std::endl;
+    }
+
+    if (filenames.featureXML_o.empty()) {
+      std::cout << "storeFeatureMap(): filename is empty\n";
+      return;
+    }
+
+    try {
+      // Store outfile as featureXML
+      OpenMS::FeatureXMLFile featurexml;
+      featurexml.store(filenames.featureXML_o, rawDataHandler_IO.getFeatureMapHistory());
+    }
+    catch (const std::exception& e) {
+      std::cerr << "storeFeatureMap(): " << e.what() << std::endl;
+    }
+
+    if (verbose_I) {
+      std::cout << "==== END   storeFeatureMap" << std::endl;
+    }
+  }
+
+  void PickFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames,
@@ -55,7 +282,7 @@ namespace SmartPeak
     }
   }
 
-  void FilterFeatures::processRawData(
+  void FilterFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames,
@@ -93,7 +320,7 @@ namespace SmartPeak
     }
   }
 
-  void CheckFeatures::processRawData(
+  void CheckFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames,
@@ -131,7 +358,7 @@ namespace SmartPeak
     }
   }
 
-  void SelectFeatures::processRawData(
+  void SelectFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames,
@@ -174,7 +401,7 @@ namespace SmartPeak
     }
   }
 
-  void ExtractMetaData::processRawData(
+  void ExtractMetaData::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames,
@@ -245,7 +472,7 @@ namespace SmartPeak
     }
   }
 
-  void ValidateFeatures::processRawData(
+  void ValidateFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames,
@@ -282,7 +509,7 @@ namespace SmartPeak
     }
   }
 
-  void PlotFeatures::processRawData(
+  void PlotFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames,
@@ -307,7 +534,7 @@ namespace SmartPeak
     // );
   }
 
-  void QuantifyFeatures::processRawData(
+  void QuantifyFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames,

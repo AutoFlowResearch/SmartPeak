@@ -34,7 +34,7 @@ namespace SmartPeak
       @param[in] params_I Dictionary of parameter names, values, descriptions, and tags
       @param[in] filenames Info about where data should be read from or written to
     */
-    virtual void processRawData(
+    virtual void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -57,7 +57,7 @@ namespace SmartPeak
       Depending upon user specifications, the mzML file will be mapped to the TraML file
       and/or various pre-processing methods will be run to extract out the data.
     */
-    static void processRawData(
+    static void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -71,14 +71,14 @@ namespace SmartPeak
   };
 
   class StoreRawData : public RawDataProcessor
-  { // TODO
+  {
   public:
     using RawDataProcessor::RawDataProcessor;
     using RawDataProcessor::~RawDataProcessor;
 
     /** Run the openSWATH workflow for a single raw data file.
     */
-    static void processRawData(
+    static void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -86,7 +86,7 @@ namespace SmartPeak
     );
 
   protected:
-    int id_ = 0;
+    int id_ = 2;
     std::string name_ = "STORE_RAW_DATA";
     std::string description_ = "Store the processed raw data mzML file to disk.";
   };
@@ -99,7 +99,7 @@ namespace SmartPeak
 
     /** Read in the features from disk.
     */
-    static void processRawData(
+    static void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -107,7 +107,7 @@ namespace SmartPeak
     );
 
   protected:
-    int id_ = 2;
+    int id_ = 3;
     std::string name_ = "LOAD_FEATURES";
     std::string description_ = "Read in the features from disk.";
   };
@@ -120,7 +120,7 @@ namespace SmartPeak
 
     /** Write the features to disk.
     */
-    static void processRawData(
+    static void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -128,7 +128,7 @@ namespace SmartPeak
     );
 
   protected:
-    int id_ = 9;
+    int id_ = 4;
     std::string name_ = "STORE_FEATURES";
     std::string description_ = "Write the features to disk.";
   };
@@ -141,7 +141,7 @@ namespace SmartPeak
 
     /** Run the openSWATH pick peaking and scoring workflow for a single raw data file.
     */
-    static void processRawData(
+    static void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -149,7 +149,7 @@ namespace SmartPeak
     );
 
   protected:
-    int id_ = 3;
+    int id_ = 5;
     std::string name_ = "PICK_FEATURES";
     std::string description_ = "Run the peak picking algorithm.";
   };
@@ -162,7 +162,7 @@ namespace SmartPeak
 
     /** Filter features that do not pass the filter QCs.
     */
-    static void processRawData(
+    static void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -170,7 +170,7 @@ namespace SmartPeak
     );
 
   protected:
-    int id_ = 4;
+    int id_ = 6;
     std::string name_ = "FILTER_FEATURES";
     std::string description_ = "Filter transitions and transitions groups based on a user defined criteria.";
   };
@@ -183,7 +183,7 @@ namespace SmartPeak
 
     /** Flag features that do not pass the filter QCs.
     */
-    static void processRawData(
+    static void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -191,7 +191,7 @@ namespace SmartPeak
     );
 
   protected:
-    int id_ = 8;
+    int id_ = 7;
     std::string name_ = "CHECK_FEATURES";
     std::string description_ = "Flag and score transitions and transition groups based on a user defined criteria.";
   };
@@ -204,7 +204,7 @@ namespace SmartPeak
 
     /** Select features using the MRMFeatureSelection algorithm.
     */
-    static void processRawData(
+    static void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -212,7 +212,7 @@ namespace SmartPeak
     );
 
   protected:
-    int id_ = 5;
+    int id_ = 8;
     std::string name_ = "SELECT_FEATURES";
     std::string description_ = "Run the peak selection/alignment algorithm.";
   };
@@ -225,7 +225,7 @@ namespace SmartPeak
 
     /** Extracts metadata from the chromatogram.
     */
-    static void processRawData(
+    static void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -233,7 +233,7 @@ namespace SmartPeak
     );
 
   protected:
-    int id_ = 0;
+    int id_ = -1;  // Not currently available to the user
     std::string name_ = "EXTRACT_METADATA";
     std::string description_ = "Extracts metadata from the chromatogram.";
   };
@@ -246,7 +246,7 @@ namespace SmartPeak
 
     /** Validate the selected peaks against reference data.
     */
-    static void processRawData(
+    static void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -254,30 +254,9 @@ namespace SmartPeak
     );
 
   protected:
-    int id_ = 6;
+    int id_ = 9;
     std::string name_ = "VALIDATE_FEATURES";
     std::string description_ = "Compare selected features to a reference data set.";
-  };
-
-  class PlotFeatures : public RawDataProcessor
-  {
-  public:
-    using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
-
-    /** Validate the selected peaks against reference data.
-    */
-    static void processRawData(
-      RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    );
-
-  protected:
-    int id_ = 10;
-    std::string name_ = "PLOT_FEATURES";
-    std::string description_ = "Plot the raw chromatogram with selected peaks overlaid.";
   };
 
   class QuantifyFeatures : public RawDataProcessor
@@ -288,7 +267,7 @@ namespace SmartPeak
 
     /** Quantify all unknown samples based on the quantitationMethod.
     */
-    static void processRawData(
+    static void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
@@ -296,8 +275,29 @@ namespace SmartPeak
     );
 
   protected:
-    int id_ = 7;
+    int id_ = 10;
     std::string name_ = "QUANTIFY_FEATURES";
     std::string description_ = "Apply a calibration model defined in quantitationMethods to each transition.";
+  };
+
+  class PlotFeatures : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+    using RawDataProcessor::~RawDataProcessor;
+
+    /** Validate the selected peaks against reference data.
+    */
+    static void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    );
+
+  protected:
+    int id_ = 11;
+    std::string name_ = "PLOT_FEATURES";
+    std::string description_ = "Plot the raw chromatogram with selected peaks overlaid.";
   };
 }
