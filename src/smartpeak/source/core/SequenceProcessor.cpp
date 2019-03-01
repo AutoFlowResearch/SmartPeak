@@ -160,7 +160,7 @@ namespace SmartPeak
     SequenceHandler& sequenceHandler_IO,
     const std::map<std::string, Filenames>& filenames,
     const std::set<std::string>& sequence_segment_names,
-    const std::vector<SequenceSegmentProcessor::SeqSegProcMethod>& sequence_segment_processing_methods_I,
+    const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& sequence_segment_processing_methods_I,
     const bool verbose_I
   )
   {
@@ -182,26 +182,17 @@ namespace SmartPeak
 
     // process by sequence segment
     for (SequenceSegmentHandler& sequence_segment : sequence_segments) {
-      std::vector<SequenceSegmentProcessor::SeqSegProcMethod> sequence_segment_processing_methods;
 
       // handle user-desired sequence_segment_processing_methods
-      if (sequence_segment_processing_methods_I.size()) {
-        sequence_segment_processing_methods = sequence_segment_processing_methods_I;
-      } else {
-        for (const size_t sample_index : sequence_segment.getSampleIndices()) {
-          const MetaDataHandler::SampleType sample_type =
-            sequenceHandler_IO.getSequence().at(sample_index).getMetaData().getSampleType();
-          sequence_segment_processing_methods =
-            SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(sample_type);
-        }
-      }
+      if (!sequence_segment_processing_methods_I.size()) {
+        throw "no sequence segment processing methods given.\n";
+      } 
 
       // process the sequence segment
-      for (const SequenceSegmentProcessor::SeqSegProcMethod event : sequence_segment_processing_methods) {
-        SequenceSegmentProcessor::processSequenceSegment(
+      for (const std::shared_ptr<SequenceSegmentProcessor> sequence_segment_processing_method : sequence_segment_processing_methods_I) {
+        sequence_segment_processing_method->process(
           sequence_segment,
           sequenceHandler_IO,
-          event,
           sequenceHandler_IO
             .getSequence()
             .at(sequence_segment.getSampleIndices().front())

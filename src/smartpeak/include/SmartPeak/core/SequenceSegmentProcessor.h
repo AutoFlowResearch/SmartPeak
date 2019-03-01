@@ -71,7 +71,7 @@ namespace SmartPeak
 
   protected:
     int id_ = 1;
-    std::string name_ = "CALCULATE_CALIBRATION_CURVES";
+    std::string name_ = "CALCULATE_CALIBRATION";
     std::string description_ = "Determine the optimal relationship between known sample concentration and measured intensity.";
   };
 
