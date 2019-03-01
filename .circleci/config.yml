@@ -10,10 +10,11 @@ jobs:
 
     steps:
       - checkout
-      - run: |
-          apt-get update && 
-          apt install -y qt5-default libboost-dev libeigen3-dev libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev libglpk-dev seqan-dev
 
+      - run: |
+          apt-get update
+      - run: | 
+          apt-get install -y cmake qt5-default libboost-dev libeigen3-dev libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev libglpk-dev seqan-dev
       - run:
           command: |
             cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
