@@ -16,7 +16,7 @@ jobs:
           apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev libglpk-dev seqan-dev
       - run: |
           cd ~ &&
-          git clone --branch chore/replace_boost_regex git@github.com:biosustain/OpenMS.git &&
+          git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git &&
           cd OpenMS &&
           cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
           make -j4 OpenMS
