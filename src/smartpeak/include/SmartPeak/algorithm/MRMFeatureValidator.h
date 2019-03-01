@@ -10,8 +10,12 @@ namespace SmartPeak
   class MRMFeatureValidator
   {
 public:
-    MRMFeatureValidator() = delete;
-    ~MRMFeatureValidator() = delete;
+    MRMFeatureValidator()                                      = delete;
+    ~MRMFeatureValidator()                                     = delete;
+    MRMFeatureValidator(const MRMFeatureValidator&)            = delete;
+    MRMFeatureValidator& operator=(const MRMFeatureValidator&) = delete;
+    MRMFeatureValidator(MRMFeatureValidator&&)                 = delete;
+    MRMFeatureValidator& operator=(MRMFeatureValidator&&)      = delete;
 
     /**
       Map reference data to FeatureMap.

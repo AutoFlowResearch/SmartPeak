@@ -12,8 +12,6 @@ namespace SmartPeak
   void SequenceHandler::clear()
   {
     sequence_.clear();
-    index_to_sample_.clear();
-    sample_to_index_.clear();
     sequence_segments_.clear();
     sample_groups_.clear();
   }
@@ -79,12 +77,6 @@ namespace SmartPeak
     sh.setRawData(rdh);
 
     sequence_.push_back(sh);
-
-    const size_t pos = sequence_.size() - 1;
-    const std::string& sample_name = meta_data_I.getInjectionName();
-
-    index_to_sample_[pos] = sample_name;
-    sample_to_index_[sample_name] = pos;
   }
 
   std::vector<InjectionHandler> SequenceHandler::getSamplesInSequence(
@@ -94,8 +86,17 @@ namespace SmartPeak
     std::vector<InjectionHandler> samples;
 
     for (const std::string& name : injection_names) {
-      if (sample_to_index_.count(name)) {
-        samples.push_back(sequence_[sample_to_index_.at(name)]);
+      const std::vector<InjectionHandler>::const_iterator it =
+        find_if(
+          sequence_.cbegin(),
+          sequence_.cend(),
+          [&name](const InjectionHandler& injection)
+          {
+            return injection.getMetaData().getInjectionName() == name;
+          }
+        );
+      if (it != sequence_.cend()) {
+        samples.push_back(*it);
       }
     }
 

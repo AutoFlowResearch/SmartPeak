@@ -21,8 +21,12 @@ namespace SmartPeak
   class RawDataProcessor
   {
 public:
-    RawDataProcessor() = delete;
-    ~RawDataProcessor() = delete;
+    RawDataProcessor()                                   = delete;
+    ~RawDataProcessor()                                  = delete;
+    RawDataProcessor(const RawDataProcessor&)            = delete;
+    RawDataProcessor& operator=(const RawDataProcessor&) = delete;
+    RawDataProcessor(RawDataProcessor&&)                 = delete;
+    RawDataProcessor& operator=(RawDataProcessor&&)      = delete;
 
     enum RawDataProcMethod {
       LOAD_RAW_DATA = 1,

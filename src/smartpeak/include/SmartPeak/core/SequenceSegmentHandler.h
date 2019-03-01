@@ -10,9 +10,6 @@ namespace SmartPeak
   class SequenceSegmentHandler
   {
 public:
-    SequenceSegmentHandler() = default;
-    ~SequenceSegmentHandler() = default;
-
     void clear();
 
     void setSequenceSegmentName(const std::string& sequence_segment_name);

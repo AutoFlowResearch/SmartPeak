@@ -9,8 +9,12 @@ namespace SmartPeak
   class SequenceParser
   {
 public:
-    SequenceParser() = delete;
-    ~SequenceParser() = delete;
+    SequenceParser()                                 = delete;
+    ~SequenceParser()                                = delete;
+    SequenceParser(const SequenceParser&)            = delete;
+    SequenceParser& operator=(const SequenceParser&) = delete;
+    SequenceParser(SequenceParser&&)                 = delete;
+    SequenceParser& operator=(SequenceParser&&)      = delete;
 
     static constexpr char const * const s_PeptideRef {"PeptideRef"};
     static constexpr char const * const s_native_id {"native_id"};
@@ -42,10 +46,17 @@ public:
     struct Row
     {
       Row() = default;
+      ~Row() = default;
+      Row(const Row&) = default;
+      Row& operator=(const Row&) = default;
+      Row(Row&&) = default;
+      Row& operator=(Row&&) = default;
+
       Row(const std::string& cgn, const std::string& cn, const std::string& mvn) :
         component_group_name(cgn),
         component_name(cn),
         meta_value_name(mvn) {}
+
       std::string component_group_name;
       std::string component_name;
       std::string meta_value_name;

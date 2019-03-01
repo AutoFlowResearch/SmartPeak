@@ -11,8 +11,12 @@ namespace SmartPeak
   class InputDataValidation
   {
 public:
-    InputDataValidation() = delete;
-    ~InputDataValidation() = delete;
+    InputDataValidation()                                      = delete;
+    ~InputDataValidation()                                     = delete;
+    InputDataValidation(const InputDataValidation&)            = delete;
+    InputDataValidation& operator=(const InputDataValidation&) = delete;
+    InputDataValidation(InputDataValidation&&)                 = delete;
+    InputDataValidation& operator=(InputDataValidation&&)      = delete;
 
     static bool fileExists(const std::string& filepath);
     static bool isValidFilename(const std::string& filename, const std::string& member_name);

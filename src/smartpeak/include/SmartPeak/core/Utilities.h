@@ -14,8 +14,12 @@ namespace SmartPeak
   class Utilities
   {
 public:
-    Utilities() = delete;
-    ~Utilities() = delete;
+    Utilities()                            = delete;
+    ~Utilities()                           = delete;
+    Utilities(const Utilities&)            = delete;
+    Utilities& operator=(const Utilities&) = delete;
+    Utilities(Utilities&&)                 = delete;
+    Utilities& operator=(Utilities&&)      = delete;
 
     class CastValue
     {

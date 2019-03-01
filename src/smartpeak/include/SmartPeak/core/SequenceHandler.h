@@ -13,13 +13,6 @@ namespace SmartPeak
   class SequenceHandler
   {
 public:
-    SequenceHandler() = default;
-    ~SequenceHandler() = default;
-    SequenceHandler(const SequenceHandler&) = default;
-    SequenceHandler& operator=(const SequenceHandler&) = default;
-    SequenceHandler(SequenceHandler&&) = default;
-    SequenceHandler& operator=(SequenceHandler&&) = default;
-
     void clear();
 
     void setSequence(const std::vector<InjectionHandler>& sequence);
@@ -49,8 +42,6 @@ public:
       const std::string& meta_value
     );
 
-    std::map<size_t, std::string> index_to_sample_;
-    std::map<std::string, size_t> sample_to_index_;
 private:
     std::vector<InjectionHandler> sequence_;
     std::vector<SequenceSegmentHandler> sequence_segments_;

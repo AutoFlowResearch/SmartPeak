@@ -14,8 +14,12 @@ namespace SmartPeak
   class SequenceProcessor
   {
 public:
-    SequenceProcessor() = delete;
-    ~SequenceProcessor() = delete;
+    SequenceProcessor()                                    = delete;
+    ~SequenceProcessor()                                   = delete;
+    SequenceProcessor(const SequenceProcessor&)            = delete;
+    SequenceProcessor& operator=(const SequenceProcessor&) = delete;
+    SequenceProcessor(SequenceProcessor&&)                 = delete;
+    SequenceProcessor& operator=(SequenceProcessor&&)      = delete;
 
     /**
       Create a new sequence from files or wizard.

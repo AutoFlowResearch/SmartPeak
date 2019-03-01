@@ -10,13 +10,6 @@ namespace SmartPeak
   class InjectionHandler
   {
 public:
-    InjectionHandler() = default;
-    ~InjectionHandler() = default;
-    InjectionHandler(const InjectionHandler&) = default;
-    InjectionHandler& operator=(const InjectionHandler&) = default;
-    InjectionHandler(InjectionHandler&&) = default;
-    InjectionHandler& operator=(InjectionHandler&&) = default;
-
     void clear();
 
     void setMetaData(const MetaDataHandler& meta_data);

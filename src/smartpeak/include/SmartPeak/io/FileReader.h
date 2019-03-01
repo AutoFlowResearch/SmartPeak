@@ -11,8 +11,12 @@ namespace SmartPeak
   class FileReader
   {
 public:
-    FileReader() = delete;
-    ~FileReader() = delete;
+    FileReader()                             = delete;
+    ~FileReader()                            = delete;
+    FileReader(const FileReader&)            = delete;
+    FileReader& operator=(const FileReader&) = delete;
+    FileReader(FileReader&&)                 = delete;
+    FileReader& operator=(FileReader&&)      = delete;
 
     /**
       Parse parameters from csv file.
@@ -65,8 +69,8 @@ public:
         }
     */
     static void parseOpenMSParams(
-        const std::string& filename,
-        std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters
+      const std::string& filename,
+      std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters
     );
   };
 }

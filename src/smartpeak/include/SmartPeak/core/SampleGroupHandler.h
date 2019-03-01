@@ -10,9 +10,6 @@ namespace SmartPeak
   class SampleGroupHandler
   {
 public:
-    SampleGroupHandler() = default;
-    ~SampleGroupHandler() = default;
-
     void setSampleGroupName(const std::string& sample_group_name);
     std::string& getSampleGroupName();
     const std::string& getSampleGroupName() const;

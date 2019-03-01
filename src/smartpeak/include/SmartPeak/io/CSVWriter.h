@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <unsupported/Eigen/CXX11/Tensor>
-
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -20,9 +18,13 @@ namespace SmartPeak
   class CSVWriter
   {
 public:
-    CSVWriter() = default; ///< Default constructor
-    ~CSVWriter() = default; ///< Default destructor
     CSVWriter(const std::string& filename, std::string delm = ",");
+    CSVWriter()                            = default; ///< Default constructor
+    ~CSVWriter()                           = default; ///< Default destructor
+    CSVWriter(const CSVWriter&)            = default;
+    CSVWriter& operator=(const CSVWriter&) = default;
+    CSVWriter(CSVWriter&&)                 = default;
+    CSVWriter& operator=(CSVWriter&&)      = default;
 
     void setFilename(const std::string& filename); ///< filename setter
     std::string getFilename() const; ///< filename getter

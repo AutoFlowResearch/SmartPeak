@@ -12,8 +12,12 @@ namespace SmartPeak
   class SequenceSegmentProcessor
   {
 public:
-    SequenceSegmentProcessor() = delete;
-    ~SequenceSegmentProcessor() = delete;
+    SequenceSegmentProcessor()                                           = delete;
+    ~SequenceSegmentProcessor()                                          = delete;
+    SequenceSegmentProcessor(const SequenceSegmentProcessor&)            = delete;
+    SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor&) = delete;
+    SequenceSegmentProcessor(SequenceSegmentProcessor&&)                 = delete;
+    SequenceSegmentProcessor& operator=(SequenceSegmentProcessor&&)      = delete;
 
     enum SeqSegProcMethod {
       CALCULATE_CALIBRATION = 1,

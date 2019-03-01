@@ -10,8 +10,12 @@ namespace SmartPeak
   class OpenMSFile
   {
 public:
-    OpenMSFile() = delete;
-    ~OpenMSFile() = delete;
+    OpenMSFile()                             = delete;
+    ~OpenMSFile()                            = delete;
+    OpenMSFile(const OpenMSFile&)            = delete;
+    OpenMSFile& operator=(const OpenMSFile&) = delete;
+    OpenMSFile(OpenMSFile&&)                 = delete;
+    OpenMSFile& operator=(OpenMSFile&&)      = delete;
 
     static void loadStandardsConcentrations(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
