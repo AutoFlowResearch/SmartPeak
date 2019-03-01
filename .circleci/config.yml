@@ -6,7 +6,7 @@ jobs:
     docker:
       - image: ubuntu:18.04
 
-    working_directory: ~/
+    working_directory: ~/SmartPeak2
 
     steps:
       - checkout
@@ -16,7 +16,7 @@ jobs:
 
       - run:
           command: |
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DCMAKE_BUILD_TYPE=Debug ~/
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
             make -j4
 
 workflows:
