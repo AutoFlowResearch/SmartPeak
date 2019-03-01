@@ -58,11 +58,13 @@ BOOST_AUTO_TEST_CASE(processorLoadRawData)
 
   // TEST CASE 1:  mzML with out baseline correction
   RawDataHandler rawDataHandler;
-  std::vector<std::map<std::string, std::string>> mzML_params = {
+  std::map<std::string, std::string> params_tmp = { // Must be initialized step by step due to Compiler Error C2665 on Windows...
     {"name", "zero_baseline"},
     {"type", "bool"},
     {"value", "false"}
   };
+  std::vector<std::map<std::string, std::string>> mzML_params;
+  mzML_params.push_back(params_tmp);
   std::map<std::string, std::vector<std::map<std::string, std::string>>> params_I;
   params_I.emplace("mzML", mzML_params);
 
@@ -454,121 +456,121 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureQCs)
   BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
 }
 
-///**
-//  LoadValidationData Tests
-//*/
-//BOOST_AUTO_TEST_CASE(constructorLoadValidationData)
-//{
-//  LoadValidationData* ptrLoadValidationData = nullptr;
-//  LoadValidationData* nullPointerLoadValidationData = nullptr;
-//  BOOST_CHECK_EQUAL(ptrLoadValidationData, nullPointerLoadValidationData);
-//}
-//
-//BOOST_AUTO_TEST_CASE(destructorLoadValidationData)
-//{
-//  LoadValidationData* ptrLoadValidationData = nullptr;
-//  ptrLoadValidationData = new LoadValidationData();
-//  delete ptrLoadValidationData;
-//}
-//
-//BOOST_AUTO_TEST_CASE(gettersLoadValidationData)
-//{
-//  LoadValidationData processor;
-//
-//  BOOST_CHECK_EQUAL(processor.getID(), 15);
-//  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_VALIDATION_DATA");
-//}
-//
-//BOOST_AUTO_TEST_CASE(processLoadValidationData)
-//{
-//  Filenames filenames;
-//  filenames.referenceData_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
-//  RawDataHandler rawDataHandler;
-//
-//  LoadValidationData loadValidationData;
-//  loadValidationData.process(rawDataHandler, {}, filenames);
-//  const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
-//
-//  BOOST_CHECK_EQUAL(ref_data.size(), 179);
-//  BOOST_CHECK_EQUAL(ref_data[0].at("component_name").s_, "23dpg.23dpg_1.Heavy");
-//  BOOST_CHECK_CLOSE(ref_data[0].at("area").f_, 932543.098, 1e-3);
-//  BOOST_CHECK_CLOSE(ref_data[0].at("retention_time").f_, static_cast<float>(15.89495171), 1e-1);
-//  BOOST_CHECK_EQUAL(ref_data[0].at("acquisition_date_and_time").s_, "09-06-2015 17:14");
-//  // TODO: Should we just use double instead of float? I had to go down to -1 to make the test pass
-//  BOOST_CHECK_EQUAL(ref_data[178].at("component_name").s_, "xan.xan_1.Light");
-//  BOOST_CHECK_CLOSE(ref_data[178].at("area").f_, 206951.3035, 1e-3);
-//  BOOST_CHECK_CLOSE(ref_data[178].at("retention_time").f_, static_cast<float>(1.492980468), 1e-1);
-//  BOOST_CHECK_EQUAL(ref_data[178].at("acquisition_date_and_time").s_, "09-06-2015 17:14");
-//}
+/**
+  LoadValidationData Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadValidationData)
+{
+  LoadValidationData* ptrLoadValidationData = nullptr;
+  LoadValidationData* nullPointerLoadValidationData = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadValidationData, nullPointerLoadValidationData);
+}
 
-///**
-//  LoadParameters Tests
-//*/
-//BOOST_AUTO_TEST_CASE(constructorLoadParameters)
-//{
-//  LoadParameters* ptrLoadParameters = nullptr;
-//  LoadParameters* nullPointerLoadParameters = nullptr;
-//  BOOST_CHECK_EQUAL(ptrLoadParameters, nullPointerLoadParameters);
-//}
-//
-//BOOST_AUTO_TEST_CASE(destructorLoadParameters)
-//{
-//  LoadParameters* ptrLoadParameters = nullptr;
-//  ptrLoadParameters = new LoadParameters();
-//  delete ptrLoadParameters;
-//}
-//
-//BOOST_AUTO_TEST_CASE(gettersLoadParameters)
-//{
-//  LoadParameters processor;
-//
-//  BOOST_CHECK_EQUAL(processor.getID(), 16);
-//  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_PARAMETERS");
-//}
-//
-//BOOST_AUTO_TEST_CASE(processLoadParameters)
-//{
-//  // no tests, it calls FileReader::parseOpenMSParams and OpenMSFile::sanitizeRawDataProcessorParameters
-//}
-//
-//BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
-//{
-//  RawDataHandler rawDataHandler;
-//  std::map<std::string, std::vector<std::map<std::string, std::string>>> params;
-//
-//  params.emplace("SequenceSegmentPlotter", vector<map<string, string>> {
-//    {
-//      {"map1_elem1", "value1"},
-//      { "map1_elem2", "value2" }
-//    },
-//    {
-//      {"map2_elem1", "value3"}
-//    }
-//  });
-//
-//  LoadParameters loadParameters;
-//  loadParameters.sanitizeParameters(rawDataHandler, params);
-//  BOOST_CHECK_EQUAL(params.size(), 14);
-//  BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
-//  BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);
-//  BOOST_CHECK_EQUAL(params.count("AbsoluteQuantitation"), 1);
-//  BOOST_CHECK_EQUAL(params.count("mzML"), 1);
-//  BOOST_CHECK_EQUAL(params.count("MRMMapping"), 1);
-//  BOOST_CHECK_EQUAL(params.count("ChromatogramExtractor"), 1);
-//  BOOST_CHECK_EQUAL(params.count("MRMFeatureFinderScoring"), 1);
-//  BOOST_CHECK_EQUAL(params.count("MRMFeatureFilter.filter_MRMFeatures"), 1);
-//  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_qmip"), 1);
-//  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.schedule_MRMFeatures_qmip"), 1);
-//  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_score"), 1);
-//  BOOST_CHECK_EQUAL(params.count("ReferenceDataMethods.getAndProcess_referenceData_samples"), 1);
-//  BOOST_CHECK_EQUAL(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
-//  BOOST_CHECK_EQUAL(params.count("MRMFeatureFilter.filter_MRMFeatures.qc"), 1);
-//  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter").size(), 2);
-//  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem1"), "value1");
-//  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem2"), "value2");
-//  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[1].at("map2_elem1"), "value3");
-//  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeatures.qc").size(), 0);
-//}
+BOOST_AUTO_TEST_CASE(destructorLoadValidationData)
+{
+  LoadValidationData* ptrLoadValidationData = nullptr;
+  ptrLoadValidationData = new LoadValidationData();
+  delete ptrLoadValidationData;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadValidationData)
+{
+  LoadValidationData processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 15);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_VALIDATION_DATA");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadValidationData)
+{
+  Filenames filenames;
+  filenames.referenceData_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
+  RawDataHandler rawDataHandler;
+
+  LoadValidationData loadValidationData;
+  loadValidationData.process(rawDataHandler, {}, filenames);
+  const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
+
+  BOOST_CHECK_EQUAL(ref_data.size(), 179);
+  BOOST_CHECK_EQUAL(ref_data[0].at("component_name").s_, "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(ref_data[0].at("area").f_, 932543.098, 1e-3);
+  BOOST_CHECK_CLOSE(ref_data[0].at("retention_time").f_, static_cast<float>(15.89495171), 1e-1);
+  BOOST_CHECK_EQUAL(ref_data[0].at("acquisition_date_and_time").s_, "09-06-2015 17:14");
+  // TODO: Should we just use double instead of float? I had to go down to -1 to make the test pass
+  BOOST_CHECK_EQUAL(ref_data[178].at("component_name").s_, "xan.xan_1.Light");
+  BOOST_CHECK_CLOSE(ref_data[178].at("area").f_, 206951.3035, 1e-3);
+  BOOST_CHECK_CLOSE(ref_data[178].at("retention_time").f_, static_cast<float>(1.492980468), 1e-1);
+  BOOST_CHECK_EQUAL(ref_data[178].at("acquisition_date_and_time").s_, "09-06-2015 17:14");
+}
+
+/**
+  LoadParameters Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadParameters)
+{
+  LoadParameters* ptrLoadParameters = nullptr;
+  LoadParameters* nullPointerLoadParameters = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadParameters, nullPointerLoadParameters);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadParameters)
+{
+  LoadParameters* ptrLoadParameters = nullptr;
+  ptrLoadParameters = new LoadParameters();
+  delete ptrLoadParameters;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadParameters)
+{
+  LoadParameters processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 16);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_PARAMETERS");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadParameters)
+{
+  // no tests, it calls FileReader::parseOpenMSParams and OpenMSFile::sanitizeRawDataProcessorParameters
+}
+
+BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
+{
+  RawDataHandler rawDataHandler;
+  std::map<std::string, std::vector<std::map<std::string, std::string>>> params;
+
+  params.emplace("SequenceSegmentPlotter", vector<map<string, string>> {
+    {
+      {"map1_elem1", "value1"},
+      { "map1_elem2", "value2" }
+    },
+    {
+      {"map2_elem1", "value3"}
+    }
+  });
+
+  LoadParameters loadParameters;
+  loadParameters.sanitizeParameters(rawDataHandler, params);
+  BOOST_CHECK_EQUAL(params.size(), 14);
+  BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
+  BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);
+  BOOST_CHECK_EQUAL(params.count("AbsoluteQuantitation"), 1);
+  BOOST_CHECK_EQUAL(params.count("mzML"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMMapping"), 1);
+  BOOST_CHECK_EQUAL(params.count("ChromatogramExtractor"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureFinderScoring"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureFilter.filter_MRMFeatures"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_qmip"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.schedule_MRMFeatures_qmip"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_score"), 1);
+  BOOST_CHECK_EQUAL(params.count("ReferenceDataMethods.getAndProcess_referenceData_samples"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureFilter.filter_MRMFeatures.qc"), 1);
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter").size(), 2);
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem1"), "value1");
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem2"), "value2");
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[1].at("map2_elem1"), "value3");
+  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeatures.qc").size(), 0);
+}
 
 // TODO:  Add all other class specific tests and change the name of the test cases
 
