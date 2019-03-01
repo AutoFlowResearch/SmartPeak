@@ -1,6 +1,6 @@
 // TODO: Add copyright
 
-// #include <SmartPeak/test_config.h>
+ #include <SmartPeak/test_config.h>
 
 #define BOOST_TEST_MODULE SequenceSegmentProcessor test suite
 #include <boost/test/included/unit_test.hpp>
@@ -149,48 +149,29 @@ void make_featuresAndStandardsConcentrations(
 
 BOOST_AUTO_TEST_SUITE(sequencesegmentprocessor)
 
-BOOST_AUTO_TEST_CASE(checkSequenceSegmentProcessing)
+/**
+  CalculateCalibration Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorCalculateCalibration)
 {
-  const std::vector<std::string> events1 = {
-    "calculate_calibration",
-    "calculate_carryover",
-    "calculate_variability",
-    "store_quantitation_methods",
-    "load_quantitation_methods",
-    "store_components_to_concentrations",
-    "plot_calibrators"
-  };
-  BOOST_CHECK_EQUAL(SequenceSegmentProcessor::checkSequenceSegmentProcessing(events1), true);
-
-  const std::vector<std::string> events2 = {
-    "calculate_calibration",
-    "carryover"
-  };
-  BOOST_CHECK_EQUAL(SequenceSegmentProcessor::checkSequenceSegmentProcessing(events2), false);
+  CalculateCalibration* ptrCalculateCalibration = nullptr;
+  CalculateCalibration* nullPointerCalculateCalibration = nullptr;
+  BOOST_CHECK_EQUAL(ptrCalculateCalibration, nullPointerCalculateCalibration);
 }
 
-BOOST_AUTO_TEST_CASE(getDefaultSequenceSegmentProcessingWorkflow)
+BOOST_AUTO_TEST_CASE(destructorCalculateCalibration)
 {
-  vector<SequenceSegmentProcessor::SeqSegProcMethod> workflow;
+  CalculateCalibration* ptrCalculateCalibration = nullptr;
+  ptrCalculateCalibration = new CalculateCalibration();
+  delete ptrCalculateCalibration;
+}
 
-  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Unknown);
-  BOOST_CHECK_EQUAL(workflow.empty(), true);
+BOOST_AUTO_TEST_CASE(gettersCalculateCalibration)
+{
+  CalculateCalibration processor;
 
-  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Standard);
-  BOOST_CHECK_EQUAL(workflow.size(), 1);
-  BOOST_CHECK_EQUAL(workflow[0], SequenceSegmentProcessor::CALCULATE_CALIBRATION);
-
-  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::QC);
-  BOOST_CHECK_EQUAL(workflow.empty(), true); // TODO: CALCULATE_VARIABILITY
-
-  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Blank);
-  BOOST_CHECK_EQUAL(workflow.empty(), true);
-
-  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::DoubleBlank);
-  BOOST_CHECK_EQUAL(workflow.empty(), true);
-
-  workflow = SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(MetaDataHandler::SampleType::Solvent);
-  BOOST_CHECK_EQUAL(workflow.empty(), true); // TODO: CALCULATE_CARRYOVER
+  BOOST_CHECK_EQUAL(processor.getID(), 1);
+  BOOST_CHECK_EQUAL(processor.getName(), "CALCULATE_CALIBRATION");
 }
 
 BOOST_AUTO_TEST_CASE(getSampleIndicesBySampleType)
@@ -250,8 +231,9 @@ BOOST_AUTO_TEST_CASE(getSampleIndicesBySampleType)
   BOOST_CHECK_EQUAL(sample_indices[1], 2);
 }
 
-BOOST_AUTO_TEST_CASE(optimizeCalibrationCurves)
+BOOST_AUTO_TEST_CASE(processCalculateCalibration)
 {
+  // Pre-requisites: set up the parameters and data structures for testing
   const map<string, vector<map<string, string>>> absquant_params = {{"AbsoluteQuantitation", {
     {
       {"name", "min_points"},
@@ -324,11 +306,9 @@ BOOST_AUTO_TEST_CASE(optimizeCalibrationCurves)
 
   sequenceSegmentHandler.setSampleIndices(indices);
 
-  SequenceSegmentProcessor::optimizeCalibrationCurves(
-    sequenceSegmentHandler,
-    sequenceHandler,
-    absquant_params.at("AbsoluteQuantitation")
-  );
+  // Test calculate calibration
+  CalculateCalibration calculateCalibration;
+  calculateCalibration.process(sequenceSegmentHandler, sequenceHandler, absquant_params, Filenames());
 
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs = sequenceSegmentHandler.getQuantitationMethods();
 
@@ -365,99 +345,192 @@ BOOST_AUTO_TEST_CASE(optimizeCalibrationCurves)
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 200.0, 1e-6);
 }
 
-BOOST_AUTO_TEST_CASE(plotCalibrators)
+/**
+  PlotCalibrators Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorPlotCalibrators)
+{
+  PlotCalibrators* ptrPlotCalibrators = nullptr;
+  PlotCalibrators* nullPointerPlotCalibrators = nullptr;
+  BOOST_CHECK_EQUAL(ptrPlotCalibrators, nullPointerPlotCalibrators);
+}
+
+BOOST_AUTO_TEST_CASE(destructorPlotCalibrators)
+{
+  PlotCalibrators* ptrPlotCalibrators = nullptr;
+  ptrPlotCalibrators = new PlotCalibrators();
+  delete ptrPlotCalibrators;
+}
+
+BOOST_AUTO_TEST_CASE(gettersPlotCalibrators)
+{
+  PlotCalibrators processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 5);
+  BOOST_CHECK_EQUAL(processor.getName(), "PLOT_CALIBRATORS");
+}
+
+BOOST_AUTO_TEST_CASE(processPlotCalibrators)
 {
   // TODO: Implementation plotCalibrators
 }
 
-BOOST_AUTO_TEST_CASE(processSequenceSegment)
+/**
+  LoadStandardsConcentrations Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadStandardsConcentrations)
 {
-  const map<string, vector<map<string, string>>> absquant_params = {{"AbsoluteQuantitation", {
-    {
-      {"name", "min_points"},
-      {"value", "4"}
-    },
-    {
-      {"name", "max_bias"},
-      {"value", "30.0"}
-    },
-    {
-      {"name", "min_correlation_coefficient"},
-      {"value", "0.9"}
-    },
-    {
-      {"name", "max_iters"},
-      {"value", "100"}
-    },
-    {
-      {"name", "outlier_detection_method"},
-      {"value", "iter_jackknife"}
-    },
-    {
-      {"name", "use_chauvenet"},
-      {"value", "false"}
-    }
-  }}};
+  LoadStandardsConcentrations* ptrLoadStandardsConcentrations = nullptr;
+  LoadStandardsConcentrations* nullPointerLoadStandardsConcentrations = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadStandardsConcentrations, nullPointerLoadStandardsConcentrations);
+}
 
-  const string feature_name = "peak_apex_int";
-  const string transformation_model = "linear";
-  OpenMS::Param param;
-  param.setValue("slope", 1.0);
-  param.setValue("intercept", 0.0);
-  param.setValue("x_weight", "ln(x)");
-  param.setValue("y_weight", "ln(y)");
-  param.setValue("x_datum_min", -1e12);
-  param.setValue("x_datum_max", 1e12);
-  param.setValue("y_datum_min", -1e12);
-  param.setValue("y_datum_max", 1e12);
+BOOST_AUTO_TEST_CASE(destructorLoadStandardsConcentrations)
+{
+  LoadStandardsConcentrations* ptrLoadStandardsConcentrations = nullptr;
+  ptrLoadStandardsConcentrations = new LoadStandardsConcentrations();
+  delete ptrLoadStandardsConcentrations;
+}
 
-  vector<OpenMS::AbsoluteQuantitationMethod> quant_methods;
+BOOST_AUTO_TEST_CASE(gettersLoadStandardsConcentrations)
+{
+  LoadStandardsConcentrations processor;
 
-  OpenMS::AbsoluteQuantitationMethod aqm;
-  aqm.setComponentName("ser-L.ser-L_1.Light");
-  aqm.setISName("ser-L.ser-L_1.Heavy");
-  aqm.setFeatureName(feature_name);
-  aqm.setConcentrationUnits("uM");
-  aqm.setTransformationModel(transformation_model);
-  aqm.setTransformationModelParams(param);
-  quant_methods.push_back(aqm);
+  BOOST_CHECK_EQUAL(processor.getID(), 2);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_STANDARDS_CONCENTRATIONS");
+}
 
-  aqm.setComponentName("amp.amp_1.Light");
-  aqm.setISName("amp.amp_1.Heavy");
-  quant_methods.push_back(aqm);
+BOOST_AUTO_TEST_CASE(processLoadStandardsConcentrations)
+{
+  Filenames filenames;
+  filenames.standardsConcentrations_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv");
+  SequenceSegmentHandler ssh;
+  LoadStandardsConcentrations loadStandardsConcentrations;
+  loadStandardsConcentrations.process(ssh, SequenceHandler(), {}, filenames);
+  const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& rc = ssh.getStandardsConcentrations();
 
-  aqm.setComponentName("atp.atp_1.Light");
-  aqm.setISName("atp.atp_1.Heavy");
-  quant_methods.push_back(aqm);
+  BOOST_CHECK_EQUAL(rc.size(), 8);
 
-  SequenceSegmentHandler sequenceSegmentHandler;
+  BOOST_CHECK_EQUAL(rc[0].sample_name, "150516_CM1_Level1");
+  BOOST_CHECK_EQUAL(rc[0].component_name, "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(rc[0].IS_component_name, "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(rc[0].actual_concentration, 0.0, 1e-6);
+  BOOST_CHECK_CLOSE(rc[0].IS_actual_concentration, 1.0, 1e-6);
+  BOOST_CHECK_EQUAL(rc[0].concentration_units, "uM");
+  BOOST_CHECK_CLOSE(rc[0].dilution_factor, 1.0, 1e-6);
 
-  sequenceSegmentHandler.setQuantitationMethods(quant_methods);
+  BOOST_CHECK_EQUAL(rc[4].sample_name, "150516_CM3_Level9");
+  BOOST_CHECK_EQUAL(rc[4].component_name, "ump.ump_2.Light");
+  BOOST_CHECK_EQUAL(rc[4].IS_component_name, "ump.ump_1.Heavy");
+  BOOST_CHECK_CLOSE(rc[4].actual_concentration, 0.016, 1e-6);
+  BOOST_CHECK_CLOSE(rc[4].IS_actual_concentration, 1.0, 1e-6);
+  BOOST_CHECK_EQUAL(rc[4].concentration_units, "uM");
+  BOOST_CHECK_CLOSE(rc[4].dilution_factor, 1.0, 1e-6);
 
-  vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> runs;
-  SequenceHandler sequenceHandler;
-  make_featuresAndStandardsConcentrations(sequenceHandler, runs);
-  sequenceSegmentHandler.setStandardsConcentrations(runs);
+  BOOST_CHECK_EQUAL(rc[7].sample_name, "150516_CM3_Level9");
+  BOOST_CHECK_EQUAL(rc[7].component_name, "utp.utp_2.Light");
+  BOOST_CHECK_EQUAL(rc[7].IS_component_name, "utp.utp_1.Heavy");
+  BOOST_CHECK_CLOSE(rc[7].actual_concentration, 0.0, 1e-6);
+  BOOST_CHECK_CLOSE(rc[7].IS_actual_concentration, 1.0, 1e-6);
+  BOOST_CHECK_EQUAL(rc[7].concentration_units, "uM");
+  BOOST_CHECK_CLOSE(rc[7].dilution_factor, 1.0, 1e-6);
+}
 
-  vector<size_t> indices(sequenceHandler.getSequence().size());
-  std::iota(indices.begin(), indices.end(), 0);
+/**
+  LoadQuantitationMethods Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadQuantitationMethods)
+{
+  LoadQuantitationMethods* ptrLoadQuantitationMethods = nullptr;
+  LoadQuantitationMethods* nullPointerLoadQuantitationMethods = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadQuantitationMethods, nullPointerLoadQuantitationMethods);
+}
 
-  sequenceSegmentHandler.setSampleIndices(indices);
+BOOST_AUTO_TEST_CASE(destructorLoadQuantitationMethods)
+{
+  LoadQuantitationMethods* ptrLoadQuantitationMethods = nullptr;
+  ptrLoadQuantitationMethods = new LoadQuantitationMethods();
+  delete ptrLoadQuantitationMethods;
+}
 
-  SequenceSegmentProcessor::processSequenceSegment(
-    sequenceSegmentHandler,
-    sequenceHandler,
-    SequenceSegmentProcessor::CALCULATE_CALIBRATION,
-    absquant_params,
-    Filenames()
-  );
+BOOST_AUTO_TEST_CASE(gettersLoadQuantitationMethods)
+{
+  LoadQuantitationMethods processor;
 
-  const std::vector<OpenMS::AbsoluteQuantitationMethod>& a = sequenceSegmentHandler.getQuantitationMethods();
+  BOOST_CHECK_EQUAL(processor.getID(), 3);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_QUANTITATION_METHODS");
+}
 
-  for (const size_t index : sequenceSegmentHandler.getSampleIndices()) {
-    const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs = sequenceHandler.getSequence().at(index).getRawData().getQuantitationMethods();
-    BOOST_CHECK_EQUAL(AQMs.size(), a.size());
-  }
+BOOST_AUTO_TEST_CASE(processLoadQuantitationMethods)
+{
+  Filenames filenames;
+  filenames.quantitationMethods_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv");
+  SequenceSegmentHandler ssh;
+  LoadQuantitationMethods loadQuantitationMethods;
+  loadQuantitationMethods.process(ssh, SequenceHandler(), {}, filenames);
+  const std::vector<OpenMS::AbsoluteQuantitationMethod>& aqm = ssh.getQuantitationMethods();
+
+  BOOST_CHECK_EQUAL(aqm.size(), 107);
+
+  BOOST_CHECK_EQUAL(aqm[0].getComponentName(), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(aqm[0].getFeatureName(), "peak_apex_int");
+  BOOST_CHECK_EQUAL(aqm[0].getISName(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_EQUAL(aqm[0].getConcentrationUnits(), "uM");
+  BOOST_CHECK_EQUAL(aqm[0].getTransformationModel(), "linear");
+  BOOST_CHECK_CLOSE(aqm[0].getLLOD(), 0.0, 1e-6);
+  BOOST_CHECK_CLOSE(aqm[0].getULOD(), 0.0, 1e-6);
+  BOOST_CHECK_CLOSE(aqm[0].getLLOQ(), 0.25, 1e-6);
+  BOOST_CHECK_CLOSE(aqm[0].getULOQ(), 2.5, 1e-6);
+  BOOST_CHECK_CLOSE(aqm[0].getCorrelationCoefficient(), 0.983846949, 1e-6);
+  BOOST_CHECK_EQUAL(aqm[0].getNPoints(), 4);
+  const OpenMS::Param params1 = aqm[0].getTransformationModelParams();
+  BOOST_CHECK_CLOSE(static_cast<double>(params1.getValue("slope")), 2.429728323, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(params1.getValue("intercept")), -0.091856745, 1e-6);
+
+  BOOST_CHECK_EQUAL(aqm[106].getComponentName(), "xan.xan_1.Light");
+  BOOST_CHECK_EQUAL(aqm[106].getFeatureName(), "peak_apex_int");
+  BOOST_CHECK_EQUAL(aqm[106].getISName(), "xan.xan_1.Heavy");
+  BOOST_CHECK_EQUAL(aqm[106].getConcentrationUnits(), "uM");
+  BOOST_CHECK_EQUAL(aqm[106].getTransformationModel(), "linear");
+  BOOST_CHECK_CLOSE(aqm[106].getLLOD(), 0.0, 1e-6);
+  BOOST_CHECK_CLOSE(aqm[106].getULOD(), 0.0, 1e-6);
+  BOOST_CHECK_CLOSE(aqm[106].getLLOQ(), 0.004, 1e-6);
+  BOOST_CHECK_CLOSE(aqm[106].getULOQ(), 0.16, 1e-6);
+  BOOST_CHECK_CLOSE(aqm[106].getCorrelationCoefficient(), 0.994348761, 1e-6);
+  BOOST_CHECK_EQUAL(aqm[106].getNPoints(), 6);
+  const OpenMS::Param params2 = aqm[106].getTransformationModelParams();
+  BOOST_CHECK_CLOSE(static_cast<double>(params2.getValue("slope")), 1.084995619, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(params2.getValue("intercept")), -0.00224781, 1e-6);
+}
+
+/**
+  StoreQuantitationMethods Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorStoreQuantitationMethods)
+{
+  StoreQuantitationMethods* ptrStoreQuantitationMethods = nullptr;
+  StoreQuantitationMethods* nullPointerStoreQuantitationMethods = nullptr;
+  BOOST_CHECK_EQUAL(ptrStoreQuantitationMethods, nullPointerStoreQuantitationMethods);
+}
+
+BOOST_AUTO_TEST_CASE(destructorStoreQuantitationMethods)
+{
+  StoreQuantitationMethods* ptrStoreQuantitationMethods = nullptr;
+  ptrStoreQuantitationMethods = new StoreQuantitationMethods();
+  delete ptrStoreQuantitationMethods;
+}
+
+BOOST_AUTO_TEST_CASE(gettersStoreQuantitationMethods)
+{
+  StoreQuantitationMethods processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 4);
+  BOOST_CHECK_EQUAL(processor.getName(), "STORE_QUANTITATION_METHODS");
+}
+
+BOOST_AUTO_TEST_CASE(processStoreQuantitationMethods)
+{
+  // no tests, it wraps OpenMS store function
 }
 
 BOOST_AUTO_TEST_SUITE_END()
