@@ -5,7 +5,6 @@
 #include <SmartPeak/core/LCMS_MRM_Standards_example.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/io/OpenMSFile.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -18,18 +17,15 @@ void test_main_HPLC_UV_Standards()
   example_LCMS_MRM_Standards(main_dir, static_filenames, ",");
 
   RawDataHandler rawDataHandler;
-
-  OpenMSFile::loadFeatureMap(
-    rawDataHandler,
-    SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_8_BatchName_1900-01-01_000000.featureXML")
-  );
+  LoadFeatures loadFeatures;
+  Filenames filenames;
+  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_8_BatchName_1900-01-01_000000.featureXML");
+  loadFeatures.process(rawDataHandler, {}, filenames);
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
-  OpenMSFile::loadFeatureMap(
-    rawDataHandler,
-    SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_test.featureXML")
-  );
+  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_test.featureXML");
+  loadFeatures.process(rawDataHandler, {}, filenames);
 
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 

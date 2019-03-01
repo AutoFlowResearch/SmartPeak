@@ -9,7 +9,7 @@
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
 #include <SmartPeak/io/FileReader.h>
 #include <SmartPeak/core/RawDataHandler.h>
-#include <SmartPeak/io/OpenMSFile.h>
+#include <SmartPeak/core/RawDataProcessor.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -18,7 +18,8 @@ BOOST_AUTO_TEST_SUITE(mrmfeaturevalidator)
 
 BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
 {
-  const string referenceData_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
+  Filenames filenames;
+  filenames.referenceData_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
   const string featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_test_1_algorithm_MRMFeatureValidator.featureXML");
   const string filename_params = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_test_pyTOPP_MRMFeatureValidator_params.csv");
 
@@ -29,7 +30,8 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
   BOOST_CHECK_EQUAL(params["MRMFeatureValidator.validate_MRMFeatures"].size(), 1);
 
   RawDataHandler rawDataHandler;
-  OpenMSFile::loadValidationData(rawDataHandler, referenceData_csv_i);
+  LoadValidationData loadValidationData;
+  loadValidationData.process(rawDataHandler, {}, filenames);
   const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
 
   BOOST_CHECK_EQUAL(ref_data.size(), 179);

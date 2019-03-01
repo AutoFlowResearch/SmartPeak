@@ -5,7 +5,6 @@ set(directory source/io)
 set(sources_list
 	CSVWriter.cpp
 	FileReader.cpp
-	OpenMSFile.cpp
 	SequenceParser.cpp
 	InputDataValidation.cpp
 )

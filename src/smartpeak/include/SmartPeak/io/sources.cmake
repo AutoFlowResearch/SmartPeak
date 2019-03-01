@@ -6,7 +6,6 @@ set(sources_list_h
 	csv.h
 	CSVWriter.h
 	FileReader.h
-	OpenMSFile.h
 	SequenceParser.h
 	InputDataValidation.h
 )

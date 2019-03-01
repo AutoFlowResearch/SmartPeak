@@ -5,8 +5,8 @@
 #define BOOST_TEST_MODULE SequenceParser test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/SequenceParser.h>
-#include <SmartPeak/io/OpenMSFile.h>
 #include <SmartPeak/core/MetaDataHandler.h>
+#include <SmartPeak/core/RawDataProcessor.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -119,9 +119,11 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
     metaDataHandler.inj_volume_units = "8";
     metaDataHandler.batch_name = "9";
 
-    const string featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
+    Filenames filenames;
+    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
     RawDataHandler rawDataHandler;
-    OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_i);
+    LoadFeatures loadFeatures;
+    loadFeatures.process(rawDataHandler, {}, filenames);
 
     sequenceHandler.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
   }
@@ -194,9 +196,11 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
     metaDataHandler.inj_volume_units = "8";
     metaDataHandler.batch_name = "9";
 
-    const string featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
+    Filenames filenames;
+    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
     RawDataHandler rawDataHandler;
-    OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_i);
+    LoadFeatures loadFeatures;
+    loadFeatures.process(rawDataHandler, {}, filenames);
 
     sequenceHandler.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
   }

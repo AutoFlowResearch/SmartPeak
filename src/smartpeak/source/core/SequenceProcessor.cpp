@@ -5,7 +5,6 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
-#include <SmartPeak/io/OpenMSFile.h>
 #include <SmartPeak/io/SequenceParser.h>
 
 namespace SmartPeak
@@ -28,28 +27,24 @@ namespace SmartPeak
     SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
 
     // load rawDataHandler files (applies to the whole session)
-    OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.parameters_csv_i);
+    LoadParameters loadParameters;
+    loadParameters.process(rawDataHandler, {}, filenames);
 
-    OpenMSFile::loadTraML(rawDataHandler, filenames.traML_csv_i, "csv", verbose_I);
+    LoadTransitions loadTransitions;
+    loadTransitions.process(rawDataHandler, {}, filenames, verbose_I);
 
-    OpenMSFile::loadFeatureFilter(
-      rawDataHandler,
-      filenames.featureFilterComponents_csv_i,
-      filenames.featureFilterComponentGroups_csv_i,
-      verbose_I
-    );
+    LoadFeatureFilters LoadFeatureFilters;
+    LoadFeatureFilters.process(rawDataHandler, {}, filenames, verbose_I);
 
-    OpenMSFile::loadFeatureQC(
-      rawDataHandler,
-      filenames.featureQCComponents_csv_i,
-      filenames.featureQCComponentGroups_csv_i,
-      verbose_I
-    );
+    LoadFeatureQCs loadFeatureQCs;
+    loadFeatureQCs.process(rawDataHandler, {}, filenames, verbose_I);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
 
     // load sequenceSegmentHandler files
-    OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler, filenames.quantitationMethods_csv_i, verbose_I);
-    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, filenames.standardsConcentrations_csv_i, verbose_I);
+    LoadQuantitationMethods loadQuantitationMethods;
+    loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames, verbose_I);
+    LoadStandardsConcentrations loadStandardsConcentrations;
+    loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames, verbose_I);
 
     // copy over the quantitation methods to the rawDataHandler
     rawDataHandler.setQuantitationMethods(sequenceSegmentHandler.getQuantitationMethods());

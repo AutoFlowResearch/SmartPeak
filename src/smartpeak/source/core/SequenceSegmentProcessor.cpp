@@ -4,7 +4,6 @@
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SequenceHandler.h>
-#include <SmartPeak/io/OpenMSFile.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 #include <OpenMS/METADATA/AbsoluteQuantitationStandards.h>
 #include <SmartPeak/io/InputDataValidation.h>

@@ -15,15 +15,15 @@ void example_LCMS_MRM_Unknowns(
 
   SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true, true);
 
-  const std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods = {
-    RawDataProcessor::LOAD_RAW_DATA,
-    RawDataProcessor::PICK_FEATURES,
-    RawDataProcessor::FILTER_FEATURES,
-    RawDataProcessor::FILTER_FEATURES,
-    RawDataProcessor::SELECT_FEATURES,
-    RawDataProcessor::QUANTIFY_FEATURES,
-    RawDataProcessor::CHECK_FEATURES,
-    RawDataProcessor::STORE_FEATURES
+  const std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
+    std::shared_ptr<RawDataProcessor>(new LoadRawData()),
+    std::shared_ptr<RawDataProcessor>(new PickFeatures()),
+    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
+    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
+    std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
+    std::shared_ptr<RawDataProcessor>(new QuantifyFeatures()),
+    std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
+    std::shared_ptr<RawDataProcessor>(new StoreFeatures())
   };
 
   std::map<std::string, Filenames> dynamic_filenames;
