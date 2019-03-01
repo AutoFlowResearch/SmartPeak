@@ -52,10 +52,8 @@ public:
       seq_seg_method = method;
     }
 
-    union {
-      std::shared_ptr<RawDataProcessor> raw_data_method;
-      std::shared_ptr<SequenceSegmentProcessor> seq_seg_method;
-    };
+    std::shared_ptr<RawDataProcessor> raw_data_method;
+    std::shared_ptr<SequenceSegmentProcessor> seq_seg_method;
 
     std::map<std::string, Filenames> dynamic_filenames;
   };
