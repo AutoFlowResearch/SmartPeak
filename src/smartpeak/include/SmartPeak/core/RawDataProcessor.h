@@ -24,9 +24,9 @@ namespace SmartPeak
     RawDataProcessor() = default;
     ~RawDataProcessor() = default;
 
-    int getID() const { return id_; };  ///< get the raw data processor class ID
-    std::string getName() const { return name_; };  ///< get the raw data processor class name
-    std::string getDescription() const { return description_; };  ///< get the raw data processor class description
+    virtual int getID() const = 0;  ///< get the raw data processor class ID
+    virtual std::string getName() const = 0;  ///< get the raw data processor class name
+    virtual std::string getDescription() const = 0;  ///< get the raw data processor class description
 
     /** Interface to all raw data processing methods.
 
@@ -39,18 +39,16 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false) const = 0;
-
-  protected:
-    int id_ = 0;  ///< the raw data processor class ID
-    std::string name_ = "";  ///< the raw data processor class name
-    std::string description_ = "";  ///< the raw data processor class description
   };
 
   class LoadRawData : public RawDataProcessor
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Read in raw data mzML file from disk.
 
@@ -81,7 +79,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Run the openSWATH workflow for a single raw data file.
     */
@@ -102,7 +103,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Read in the features from disk.
     */
@@ -123,7 +127,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Write the features to disk.
     */
@@ -144,7 +151,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Run the openSWATH pick peaking and scoring workflow for a single raw data file.
     */
@@ -165,7 +175,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Filter features that do not pass the filter QCs.
     */
@@ -186,7 +199,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Flag features that do not pass the filter QCs.
     */
@@ -207,7 +223,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Select features using the MRMFeatureSelection algorithm.
     */
@@ -228,7 +247,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Validate the selected peaks against reference data.
     */
@@ -249,7 +271,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Quantify all unknown samples based on the quantitationMethod.
     */
@@ -270,7 +295,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Validate the selected peaks against reference data.
     */
@@ -291,7 +319,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Load the transitions from the TraML file.
     */
@@ -312,7 +343,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Load the component and component group transition filters from file.
     */
@@ -333,7 +367,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Load the component and component group transition QCs from file.
     */
@@ -354,7 +391,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Load the validation data from file.
     */
@@ -375,7 +415,10 @@ namespace SmartPeak
   {
   public:
     using RawDataProcessor::RawDataProcessor;
-    using RawDataProcessor::~RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /** Load the data processing parameters from file.
     */
