@@ -35,7 +35,7 @@ void test_main_GCMS_SIM_Unknown()
 
 cout << "fm1 size: " << fm1.size() << endl;
 cout << "fm2 size: " << fm2.size() << endl;
-  assert(fm1.size() == 18);
+  assert(fm1.size() == 104);
   assert(fm1.size() == fm2.size());
 
 cout << "fm1[0].getSubordinates().size(): " << fm1[0].getSubordinates().size() << endl;
@@ -60,9 +60,9 @@ cout << "0 0 getRT: " << f1->getRT() << endl;
 cout << "6 0 native_id: " << f1->getMetaValue("native_id") << endl;
 cout << "6 0 peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
 cout << "6 0 getRT: " << f1->getRT() << endl;
-  assert(f1->getMetaValue("native_id") == "Fumarate_245");
-  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 28430716.6524279));
-  assert(Utilities::assert_close((double)f1->getRT(), 574.329));
+  assert(f1->getMetaValue("native_id") == "Citrate_465");
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 15897314.05744395));
+  assert(Utilities::assert_close((double)f1->getRT(), 822.811));
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
@@ -72,9 +72,9 @@ cout << "6 0 getRT: " << f1->getRT() << endl;
 cout << "15 0 native_id: " << f1->getMetaValue("native_id") << endl;
 cout << "15 0 peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
 cout << "15 0 getRT: " << f1->getRT() << endl;
-  assert(f1->getMetaValue("native_id") == "S7P_358");
-  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 1363866.62798859));
-  assert(Utilities::assert_close((double)f1->getRT(), 1067.84));
+  assert(f1->getMetaValue("native_id") == "DHAP_400");
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 111147.9981487931));
+  assert(Utilities::assert_close((double)f1->getRT(), 931.702));
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
