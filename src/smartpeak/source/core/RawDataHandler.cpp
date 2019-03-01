@@ -1,4 +1,4 @@
-/**TODO:  Add copyright*/
+// TODO: Add copyright
 
 #include <SmartPeak/core/RawDataHandler.h>
 #include <ctime> // time format
@@ -245,8 +245,8 @@ namespace SmartPeak
     std::string timestamp(timestamp_char);
 
     // Case 1: Copy the current featuremap and timestamp
-    if (feature_map_history_.size() == 0) {
-      feature_map_history_ = feature_map_;  // ensures PrimaryMSRunPath is copied
+    if (feature_map_history_.empty()) {
+      feature_map_history_ = feature_map_; // ensures PrimaryMSRunPath is copied
       for (OpenMS::Feature& feature_new : feature_map_history_) {
         for (OpenMS::Feature& subordinate_new : feature_new.getSubordinates()) {
           if (!subordinate_new.metaValueExists("used_")) { // prevents overwriting feature_maps with existing "used_" attributes
@@ -260,20 +260,24 @@ namespace SmartPeak
     }
 
     // Case 2: "Remove" filtered/non-selected features and "Add" new features via "used_" and "timestamp_" feature metadata attributes
-    else {      
+    else {
       std::vector<OpenMS::Feature> new_features;
       std::set<OpenMS::UInt> unique_ids_feat_history, unique_ids_feat_select; // Get all feature IDs
-      for (const OpenMS::Feature& feature_copy : feature_map_history_) { unique_ids_feat_history.insert(feature_copy.getUniqueId()); }
-      for (const OpenMS::Feature& feature_select : feature_map_) { 
-        unique_ids_feat_select.insert(feature_select.getUniqueId()); 
-        if (unique_ids_feat_history.count(feature_select.getUniqueId()) == 0) { // New Feature
-          OpenMS::Feature new_feature = feature_select;
-          for (OpenMS::Feature& subordinate_new : new_feature.getSubordinates()) {
-            subordinate_new.setMetaValue("used_", "true");
-            subordinate_new.setMetaValue("timestamp_", timestamp);
-          }
-          new_features.push_back(new_feature);  // add the new feature to the list; we will add them to the history at the end
+      for (const OpenMS::Feature& feature_copy : feature_map_history_) {
+        unique_ids_feat_history.insert(feature_copy.getUniqueId());
+      }
+      for (const OpenMS::Feature& feature_select : feature_map_) {
+        unique_ids_feat_select.insert(feature_select.getUniqueId());
+        if (unique_ids_feat_history.count(feature_select.getUniqueId())) {
+          continue;
         }
+        // New Feature
+        OpenMS::Feature new_feature = feature_select;
+        for (OpenMS::Feature& subordinate_new : new_feature.getSubordinates()) {
+          subordinate_new.setMetaValue("used_", "true");
+          subordinate_new.setMetaValue("timestamp_", timestamp);
+        }
+        new_features.push_back(new_feature); // add the new feature to the list; we will add them to the history at the end
       }
 
       for (OpenMS::Feature& feature_copy : feature_map_history_) {
@@ -286,12 +290,12 @@ namespace SmartPeak
         }
         for (const OpenMS::Feature& feature_select : feature_map_) {
           if (feature_select.getUniqueId() == feature_copy.getUniqueId() && feature_select.getMetaValue("PeptideRef") == feature_copy.getMetaValue("PeptideRef")) { // Matching feature
-            
+
             std::vector<OpenMS::Feature> new_subordinates;
-            std::set<std::string> unique_ids_sub_history, unique_ids_sub_select;  // get the unique subordinate names (and not unique ids!)
+            std::set<std::string> unique_ids_sub_history, unique_ids_sub_select; // get the unique subordinate names (and not unique ids!)
             for (const OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) { unique_ids_sub_history.insert(subordinate_copy.getMetaValue("native_id")); }
-            for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) { 
-              unique_ids_sub_select.insert(subordinate_select.getMetaValue("native_id")); 
+            for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) {
+              unique_ids_sub_select.insert(subordinate_select.getMetaValue("native_id"));
               if (unique_ids_sub_history.count(subordinate_select.getMetaValue("native_id")) == 0) { // New subordinate
                 OpenMS::Feature new_subordinate = subordinate_select;
                 new_subordinate.setMetaValue("used_", "true");
@@ -304,19 +308,19 @@ namespace SmartPeak
               if (unique_ids_sub_select.count(subordinate_copy.getMetaValue("native_id")) == 0) { // Removed subordinate
                 subordinate_copy.setMetaValue("used_", "false");
                 subordinate_copy.setMetaValue("timestamp_", timestamp);
-                continue;  // move on to the next subordinate from the history
+                continue; // move on to the next subordinate from the history
               }
               for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) {
-                if (subordinate_select.getUniqueId() == subordinate_copy.getUniqueId() && 
+                if (subordinate_select.getUniqueId() == subordinate_copy.getUniqueId() &&
                   subordinate_select.getMetaValue("native_id") == subordinate_copy.getMetaValue("native_id")) { // Matching subordinate
                   subordinate_copy = subordinate_select; // copy over changed meta values from the current feature map subordinate
                   subordinate_copy.setMetaValue("used_", "true");
                   subordinate_copy.setMetaValue("timestamp_", timestamp);
                   break; // break the loop and move on to the next subordinate from the history
-                } 
+                }
               }
             }
-            if (new_subordinates.size() > 0) {  // append new subordinates to the existing subordinates list
+            if (new_subordinates.size() > 0) { // append new subordinates to the existing subordinates list
               for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
                 new_subordinates.insert(new_subordinates.begin(), subordinate_copy);
               }
@@ -328,7 +332,7 @@ namespace SmartPeak
       }
 
       // Add in the new features to the feature history
-      if (new_features.size() > 0) {
+      if (new_features.size()) {
         for (OpenMS::Feature& feature_new : new_features) {
           feature_map_history_.push_back(feature_new);
         }

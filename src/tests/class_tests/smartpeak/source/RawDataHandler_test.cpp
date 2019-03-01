@@ -310,8 +310,7 @@ BOOST_AUTO_TEST_CASE(clear)
 
   rawDataHandler.setFeatureQC(fqc1);
 
-  OpenMS::FeatureMap featureMap_v = f1;
-  rawDataHandler.setFeatureMapHistory(featureMap_v);
+  rawDataHandler.setFeatureMapHistory(f1);
 
   OpenMS::MSExperiment experiment;
   experiment.setMetaValue("name", "foo");

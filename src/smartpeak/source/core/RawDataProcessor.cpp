@@ -39,7 +39,9 @@ namespace SmartPeak
       rawDataHandler_IO.getSWATH()
     );
 
-    featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});  // NOTE: needed for calculate_calibration
+    // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
+    featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
+
     rawDataHandler_IO.setFeatureMap(featureMap);
     rawDataHandler_IO.updateFeatureMapHistory();
 

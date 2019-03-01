@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(pickFeatures)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 481);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
-  const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];  // feature_map
+  const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0]; // feature_map_
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getMetaValue("peak_apex_int")), 266403.0, 1e-6);
   BOOST_CHECK_EQUAL(subordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getRT()), 953.665693772912, 1e-6);
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(pickFeatures)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 481);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
 
-  const OpenMS::Feature& hsubordinate1 = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0]; // feature_map_history
+  const OpenMS::Feature& hsubordinate1 = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0]; // feature_map_history_
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate1.getMetaValue("peak_apex_int")), 266403.0, 1e-6);
   BOOST_CHECK_EQUAL(hsubordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate1.getRT()), 953.665693772912, 1e-6);
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
 
   RawDataProcessor::filterFeatures(rawDataHandler, params_1.at("MRMFeatureFilter.filter_MRMFeatures"));
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 329); // Test feature_map
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 329); // Test feature_map_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
   BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 46.652168337345103, 1e-6);
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 481); // Test feature_map_history
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 481); // Test feature_map_history_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& hsubordinate1 = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0];
@@ -190,7 +190,7 @@ BOOST_AUTO_TEST_CASE(selectFeatures)
     params_1.at("MRMFeatureSelector.schedule_MRMFeatures_qmip")
   );
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 114); // Test feature_map
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 114); // Test feature_map_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
@@ -205,7 +205,7 @@ BOOST_AUTO_TEST_CASE(selectFeatures)
   BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "f6p.f6p_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 439.165833, 1e-6);
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 329); // Test feature_map_history
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 329); // Test feature_map_history_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& hsubordinate1 = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0];
@@ -393,7 +393,7 @@ BOOST_AUTO_TEST_CASE(processRawData)
     RawDataProcessor::processRawData(rawDataHandler, event, params_1, filenames);
   }
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 114); // test feature_map
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 114); // test feature_map_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& subordinate0 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
@@ -421,7 +421,7 @@ BOOST_AUTO_TEST_CASE(processRawData)
   BOOST_CHECK_EQUAL(subordinate4.getMetaValue("native_id").toString(), "xan.xan_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate4.getRT()), 89.418783654689776, 1e-6);
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 481); // test feature_map_history
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 481); // test feature_map_history_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& hsubordinate1 = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[1];
