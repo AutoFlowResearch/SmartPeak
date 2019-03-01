@@ -115,7 +115,7 @@ namespace SmartPeak
     SequenceHandler& sequenceHandler_IO,
     const std::map<std::string, Filenames>& filenames,
     const std::set<std::string>& injection_names,
-    const std::vector<RawDataProcessor::RawDataProcMethod>& raw_data_processing_methods_I,
+    const std::vector<std::shared_ptr<RawDataProcessor>>& raw_data_processing_methods_I,
     const bool verbose_I
   )
   {
@@ -133,31 +133,23 @@ namespace SmartPeak
     }
 
     for (InjectionHandler& injection : process_sequence) {
-      std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods;
 
       // handle user-desired raw_data_processing_methods
-      if (raw_data_processing_methods_I.size()) {
-        raw_data_processing_methods = raw_data_processing_methods_I;
-      } else {
-        raw_data_processing_methods = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-          injection.getMetaData().getSampleType()
-        );
+      if (raw_data_processing_methods_I.size() == 0) {
+        throw "no raw data processing methods given.\n";
       }
 
-      const size_t n = raw_data_processing_methods.size();
+      const size_t n = raw_data_processing_methods_I.size();
 
       // process the samples
       for (size_t i = 0; i < n; ++i) {
         if (verbose_I) {
           std::cout << "\n[" << (i + 1) << "/" << n << "]" << std::endl;
         }
-        RawDataProcessor::processRawData(
-          injection.getRawData(),
-          raw_data_processing_methods[i], // event
-          injection.getRawData().getParameters(),
-          filenames.at(injection.getMetaData().getInjectionName()),
-          verbose_I
-        );
+        raw_data_processing_methods_I[i]->process(injection.getRawData(), 
+          injection.getRawData().getParameters(), 
+          filenames.at(injection.getMetaData().getInjectionName()), 
+          verbose_I);
       }
     }
 
