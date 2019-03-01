@@ -11,15 +11,27 @@ namespace SmartPeak
 {
   class SequenceSegmentProcessor
   {
-public:
-    SequenceSegmentProcessor() = delete;
-    ~SequenceSegmentProcessor() = delete;
+  public:
+    SequenceSegmentProcessor() = default;
+    ~SequenceSegmentProcessor() = default;
 
-    enum SeqSegProcMethod {
-      CALCULATE_CALIBRATION = 1,
-      STORE_QUANTITATION_METHODS,
-      LOAD_QUANTITATION_METHODS,
-    };
+    virtual int getID() const = 0;  ///< get the raw data processor class ID
+    virtual std::string getName() const = 0;  ///< get the raw data processor class name
+    virtual std::string getDescription() const = 0;  ///< get the raw data processor class description
+
+    /** Interface to all  sequence segment processing methods.
+
+      @param[in,out] sequenceSegmentHandler_IO Sequence segment handler
+      @param[in] sequenceHandler_I Sequence handler
+      @param[in] params_I Dictionary of parameter names, values, descriptions, and tags
+      @param[in] filenames Info about where data should be read from or written to
+    */
+    virtual void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false) const = 0;
 
     /**
       Return all injection indices that belong to a given sample type.
@@ -35,65 +47,137 @@ public:
       const MetaDataHandler::SampleType sampleType,
       std::vector<size_t>& sampleIndices
     );
+  };
+
+  class CalculateCalibration : public SequenceSegmentProcessor
+  {
+  public:
+    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /**
       Optimize the calibration curve for all components.
-
-      @param[in,out] sequenceSegmentHandler_IO Sequence segment handler
-      @param[in] sequenceHandler_I Sequence handler
-      @param[in] AbsoluteQuantitation_params_I Parameters
-      @param[in] verbose_I Verbosity
     */
-    static void optimizeCalibrationCurves(
+    void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::vector<std::map<std::string, std::string>>& AbsoluteQuantitation_params_I,
-      const bool verbose_I = false
-    );
-
-    // TODO: Class SequenceSegmentPlotter is missing
-    // static void plotCalibrators(
-    //   const SequenceSegmentHandler& sequenceSegmentHandler_I,
-    //   const std::string& calibrators_pdf_o,
-    //   const std::vector<std::map<std::string, std::string>>& SequenceSegmentPlotter_params_I,
-    //   const bool verbose_I = false
-    // );
-
-    /**
-      Apply processing methods to a raw data handler.
-
-      @param[in,out] sequenceSegmentHandler_IO Sequence segment handler
-      @param[in] sequenceHandler_IO Sequence handler
-      @param[in] sequence_segment_processing_event Event to process
-      @param[in] parameters Parameters
-      @param[in] filenames Pathnames info
-      @param[in] verbose_I Verbosity
-    */
-    static void processSequenceSegment(
-      SequenceSegmentHandler& sequenceSegmentHandler_IO,
-      SequenceHandler& sequenceHandler_IO,
-      const SeqSegProcMethod sequence_segment_processing_event,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
-    );
+    ) const;
+
+  protected:
+    int id_ = 1;
+    std::string name_ = "CALCULATE_CALIBRATION_CURVES";
+    std::string description_ = "Determine the optimal relationship between known sample concentration and measured intensity.";
+  };
+
+  class LoadStandardsConcentrations : public SequenceSegmentProcessor
+  {
+  public:
+    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /**
-      Return the default workflow events for a given sequence.
-
-      @param[in] sample_type Sample type
+      Load the standards concentration file.
     */
-    static std::vector<SeqSegProcMethod> getDefaultSequenceSegmentProcessingWorkflow(
-      const MetaDataHandler::SampleType sample_type
-    );
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 2;
+    std::string name_ = "LOAD_STANDARDS_CONCENTRATIONS";
+    std::string description_ = "Load the standards concentrations file that gives the relationship between injection, component, and known concentration from disk.";
+  };
+
+  class LoadQuantitationMethods : public SequenceSegmentProcessor
+  {
+  public:
+    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
 
     /**
-      Check the sequence processing steps.
-
-      @param[in] sequence_segment_processing List of sequence group processing events
+      Load the quantitation methods file.
     */
-    static bool checkSequenceSegmentProcessing(
-      const std::vector<std::string>& sequence_segment_processing
-    );
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 3;
+    std::string name_ = "LOAD_QUANTITATION_METHODS";
+    std::string description_ = "Load each transitions calibration model defined in quantitationMethods from disk.";
+  };
+
+  class StoreQuantitationMethods : public SequenceSegmentProcessor
+  {
+  public:
+    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /**
+      Write the quantitation methods to disk.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 4;
+    std::string name_ = "STORE_QUANTITATION_METHODS";
+    std::string description_ = "Write each transitions calibration model to disk for later use.";
+  };
+
+  class PlotCalibrators : public SequenceSegmentProcessor
+  {
+  public:
+    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /**
+      Plot the calibration points for each component.
+
+      NOTE: Not yet implemented
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 5;
+    std::string name_ = "PLOT_CALIBRATORS";
+    std::string description_ = "Plot the calibration points for each component where the x-axis is concentration ratio and the y-axis is intensity ratio.";
   };
 }

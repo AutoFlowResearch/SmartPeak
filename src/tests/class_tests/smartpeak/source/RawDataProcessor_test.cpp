@@ -67,6 +67,8 @@ BOOST_AUTO_TEST_CASE(processorLoadRawData)
   mzML_params.push_back(params_tmp);
   std::map<std::string, std::vector<std::map<std::string, std::string>>> params_I;
   params_I.emplace("mzML", mzML_params);
+  params_I.emplace("ChromatogramExtractor", std::vector<std::map<std::string, std::string>>());
+  params_I.emplace("MRMMapping", std::vector<std::map<std::string, std::string>>());
 
   Filenames filenames;
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_baseline_correction.mzML");
