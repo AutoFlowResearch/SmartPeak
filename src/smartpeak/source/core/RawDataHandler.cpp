@@ -289,45 +289,59 @@ namespace SmartPeak
           continue; // move on to the next feature in the history
         }
         for (const OpenMS::Feature& feature_select : feature_map_) {
-          if (feature_select.getUniqueId() == feature_copy.getUniqueId() && feature_select.getMetaValue("PeptideRef") == feature_copy.getMetaValue("PeptideRef")) { // Matching feature
-
-            std::vector<OpenMS::Feature> new_subordinates;
-            std::set<std::string> unique_ids_sub_history, unique_ids_sub_select; // get the unique subordinate names (and not unique ids!)
-            for (const OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) { unique_ids_sub_history.insert(subordinate_copy.getMetaValue("native_id")); }
-            for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) {
-              unique_ids_sub_select.insert(subordinate_select.getMetaValue("native_id"));
-              if (unique_ids_sub_history.count(subordinate_select.getMetaValue("native_id")) == 0) { // New subordinate
-                OpenMS::Feature new_subordinate = subordinate_select;
-                new_subordinate.setMetaValue("used_", "true");
-                new_subordinate.setMetaValue("timestamp_", timestamp);
-                new_subordinates.push_back(new_subordinate); // add the new subordinate to the list; we will add them to the feature subordinate list at the end
-              }
-            }
-
-            for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
-              if (unique_ids_sub_select.count(subordinate_copy.getMetaValue("native_id")) == 0) { // Removed subordinate
-                subordinate_copy.setMetaValue("used_", "false");
-                subordinate_copy.setMetaValue("timestamp_", timestamp);
-                continue; // move on to the next subordinate from the history
-              }
-              for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) {
-                if (subordinate_select.getUniqueId() == subordinate_copy.getUniqueId() &&
-                  subordinate_select.getMetaValue("native_id") == subordinate_copy.getMetaValue("native_id")) { // Matching subordinate
-                  subordinate_copy = subordinate_select; // copy over changed meta values from the current feature map subordinate
-                  subordinate_copy.setMetaValue("used_", "true");
-                  subordinate_copy.setMetaValue("timestamp_", timestamp);
-                  break; // break the loop and move on to the next subordinate from the history
-                }
-              }
-            }
-            if (new_subordinates.size() > 0) { // append new subordinates to the existing subordinates list
-              for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
-                new_subordinates.insert(new_subordinates.begin(), subordinate_copy);
-              }
-              feature_copy.setSubordinates(new_subordinates);
-            }
-            break; // break the loop and move on to the next feature in the history
+          // skip feature if any of the following is true:
+          // - unique ids differ
+          // - peptide refs differ
+          if (feature_select.getUniqueId() != feature_copy.getUniqueId() ||
+              feature_select.getMetaValue("PeptideRef") !=
+               feature_copy.getMetaValue("PeptideRef")) {
+            continue;
           }
+
+          // Matching feature
+          std::vector<OpenMS::Feature> new_subordinates;
+          // get the unique subordinate names (and not unique ids!)
+          std::set<std::string> unique_ids_sub_history, unique_ids_sub_select;
+          for (const OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
+            unique_ids_sub_history.insert(subordinate_copy.getMetaValue("native_id"));
+          }
+          for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) {
+            unique_ids_sub_select.insert(subordinate_select.getMetaValue("native_id"));
+            if (unique_ids_sub_history.count(subordinate_select.getMetaValue("native_id"))) {
+              continue;
+            }
+            // New subordinate
+            OpenMS::Feature new_subordinate = subordinate_select;
+            new_subordinate.setMetaValue("used_", "true");
+            new_subordinate.setMetaValue("timestamp_", timestamp);
+            // add the new subordinate to the list; we will add them to the feature subordinate list at the end
+            new_subordinates.push_back(new_subordinate);
+          }
+
+          for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
+            if (0 == unique_ids_sub_select.count(subordinate_copy.getMetaValue("native_id"))) { // Removed subordinate
+              subordinate_copy.setMetaValue("used_", "false");
+              subordinate_copy.setMetaValue("timestamp_", timestamp);
+              continue; // move on to the next subordinate from the history
+            }
+            for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) {
+              if (subordinate_select.getUniqueId() == subordinate_copy.getUniqueId() &&
+                  subordinate_select.getMetaValue("native_id") ==
+                    subordinate_copy.getMetaValue("native_id")) { // Matching subordinate
+                subordinate_copy = subordinate_select; // copy over changed meta values from the current feature map subordinate
+                subordinate_copy.setMetaValue("used_", "true");
+                subordinate_copy.setMetaValue("timestamp_", timestamp);
+                break; // break the loop and move on to the next subordinate from the history
+              }
+            }
+          }
+          if (new_subordinates.size()) { // append new subordinates to the existing subordinates list
+            for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
+              new_subordinates.insert(new_subordinates.begin(), subordinate_copy);
+            }
+            feature_copy.setSubordinates(new_subordinates);
+          }
+          break; // break the loop and move on to the next feature in the history
         }
       }
 
