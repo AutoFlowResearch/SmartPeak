@@ -16,7 +16,6 @@ set(core_executables_list
 set(io_executables_list
 	CSVWriter_test
 	FileReader_test
-	OpenMSFile_test
 	SequenceParser_test
 	InputDataValidation_test
 )

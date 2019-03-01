@@ -5,7 +5,6 @@
 #include <SmartPeak/core/LCMS_MRM_Unknown_example.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/io/OpenMSFile.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -18,18 +17,15 @@ void test_main_LCMS_MRM_QCs()
   example_LCMS_MRM_Unknowns(main_dir, static_filenames, ",");
 
   RawDataHandler rawDataHandler;
-
-  OpenMSFile::loadFeatureMap(
-    rawDataHandler,
-    SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1_1_BatchName_1900-01-01_000000.featureXML")
-  );
+  LoadFeatures loadFeatures;
+  Filenames filenames;
+  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1_1_BatchName_1900-01-01_000000.featureXML");
+  loadFeatures.process(rawDataHandler, {}, filenames);
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
-  OpenMSFile::loadFeatureMap(
-    rawDataHandler,
-    SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1_test.featureXML")
-  );
+  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1_test.featureXML");
+  loadFeatures.process(rawDataHandler, {}, filenames);
 
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 
