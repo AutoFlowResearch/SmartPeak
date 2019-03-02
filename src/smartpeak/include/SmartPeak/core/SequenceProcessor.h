@@ -40,31 +40,6 @@ public:
     );
 
     /**
-      Add template RawDataHandler to all samples in the sequence and copy all
-      meta_data to the RawDataHandler.
-
-      @param[in,out] sequenceHandler_IO Sequence handler
-      @param[in] rawDataHandler Raw Data Handler
-    */
-    static void addRawDataHandlerToSequence(
-      SequenceHandler& sequenceHandler_IO,
-      const RawDataHandler& rawDataHandler
-    );
-
-    /**
-      Segment samples in a sequence.
-
-      An optional template SequenceSegmentHandler can be added to all segments.
-
-      @param[in,out] sequenceHandler_IO Sequence handler
-      @param[in] sequenceSegmentHandler_I Optional template SequenceSegmentHandler
-    */
-    static void segmentSamplesInSequence(
-      SequenceHandler& sequenceHandler_IO,
-      const SequenceSegmentHandler& sequenceSegmentHandler_I = SequenceSegmentHandler()
-    );
-
-    /**
       Apply a processing workflow to all injections in a sequence.
 
       @param[in,out] sequenceHandler_IO Sequence handler

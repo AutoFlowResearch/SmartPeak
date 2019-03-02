@@ -21,10 +21,8 @@ namespace SmartPeak
       std::cout << "==== START createSequence()" << std::endl;
     }
 
-    RawDataHandler rawDataHandler;
-    SequenceSegmentHandler sequenceSegmentHandler;
-
     SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
+    RawDataHandler& rawDataHandler = sequenceHandler_IO.getSequence()[0].getRawData();
 
     // load rawDataHandler files (applies to the whole session)
     LoadParameters loadParameters;
@@ -41,17 +39,12 @@ namespace SmartPeak
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
 
     // load sequenceSegmentHandler files
-    LoadQuantitationMethods loadQuantitationMethods;
-    loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames, verbose_I);
-    LoadStandardsConcentrations loadStandardsConcentrations;
-    loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames, verbose_I);
-
-    // copy over the quantitation methods to the rawDataHandler
-    rawDataHandler.setQuantitationMethods(sequenceSegmentHandler.getQuantitationMethods());
-
-    // initialize the sequence
-    segmentSamplesInSequence(sequenceHandler_IO, sequenceSegmentHandler);
-    addRawDataHandlerToSequence(sequenceHandler_IO, rawDataHandler);
+    for (SequenceSegmentHandler& sequenceSegmentHandler: sequenceHandler_IO.getSequenceSegments()) {
+      LoadQuantitationMethods loadQuantitationMethods;
+      loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames, verbose_I);
+      LoadStandardsConcentrations loadStandardsConcentrations;
+      loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames, verbose_I);
+    }
 
     if (checkConsistency) {
       InputDataValidation::sampleNamesAreConsistent(sequenceHandler_IO);
@@ -63,47 +56,6 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "==== END   createSequence()" << std::endl;
     }
-  }
-
-  void SequenceProcessor::addRawDataHandlerToSequence(
-    SequenceHandler& sequenceHandler_IO,
-    const RawDataHandler& rawDataHandler
-  )
-  {
-    for (InjectionHandler& injection : sequenceHandler_IO.getSequence()) {
-      // copy the object to persist the data
-      injection.setRawData(rawDataHandler);
-      // update the metadata for the rawDataHandler
-      injection.getRawData().setMetaData(injection.getMetaData());
-    }
-  }
-
-  void SequenceProcessor::segmentSamplesInSequence(
-    SequenceHandler& sequenceHandler_IO,
-    const SequenceSegmentHandler& sequenceSegmentHandler_I
-  )
-  {
-    const std::vector<InjectionHandler>& sequence = sequenceHandler_IO.getSequence();
-
-    std::map<std::string, std::vector<size_t>> sequence_segments_dict;
-
-    for (size_t i = 0; i < sequence.size(); ++i) {
-      const std::string sequence_segment_name = sequence[i].getMetaData().getSequenceSegmentName();
-      if (0 == sequence_segments_dict.count(sequence_segment_name))
-        sequence_segments_dict.emplace(sequence_segment_name, std::vector<size_t>());
-      sequence_segments_dict.at(sequence_segment_name).push_back(i);
-    }
-
-    std::vector<SequenceSegmentHandler> sequence_segments;
-
-    for (const std::pair<std::string, std::vector<size_t>>& kv : sequence_segments_dict) {
-      SequenceSegmentHandler sequenceSegmentHandler = sequenceSegmentHandler_I;
-      sequenceSegmentHandler.setSequenceSegmentName(kv.first);
-      sequenceSegmentHandler.setSampleIndices(kv.second);
-      sequence_segments.push_back(sequenceSegmentHandler);
-    }
-
-    sequenceHandler_IO.setSequenceSegments(sequence_segments);
   }
 
   void SequenceProcessor::processSequence(
