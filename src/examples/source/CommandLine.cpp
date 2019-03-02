@@ -40,22 +40,20 @@ public:
       GetStandardsConcInfo,
     } type;
 
-    void setMethod(const RawDataProcessor::RawDataProcMethod method)
+    void setMethod(const std::shared_ptr<RawDataProcessor> method)
     {
       type = RawDataMethod;
       raw_data_method = method;
     }
 
-    void setMethod(const SequenceSegmentProcessor::SeqSegProcMethod method)
+    void setMethod(const std::shared_ptr<SequenceSegmentProcessor> method)
     {
       type = SequenceSegmentMethod;
       seq_seg_method = method;
     }
 
-    union {
-      RawDataProcessor::RawDataProcMethod raw_data_method;
-      SequenceSegmentProcessor::SeqSegProcMethod seq_seg_method;
-    };
+    std::shared_ptr<RawDataProcessor> raw_data_method;
+    std::shared_ptr<SequenceSegmentProcessor> seq_seg_method;
 
     std::map<std::string, Filenames> dynamic_filenames;
   };
@@ -75,22 +73,22 @@ public:
   Filenames                             static_filenames_;
   SequenceHandler                       sequenceHandler_;
 
-  const std::unordered_map<int, RawDataProcessor::RawDataProcMethod> n_to_raw_data_method_ {
-    {1, RawDataProcessor::LOAD_RAW_DATA},
-    {2, RawDataProcessor::LOAD_FEATURES},
-    {3, RawDataProcessor::PICK_FEATURES},
-    {4, RawDataProcessor::FILTER_FEATURES},
-    {5, RawDataProcessor::SELECT_FEATURES},
-    {6, RawDataProcessor::VALIDATE_FEATURES},
-    {7, RawDataProcessor::QUANTIFY_FEATURES},
-    {8, RawDataProcessor::CHECK_FEATURES},
-    {9, RawDataProcessor::STORE_FEATURES},
-    {10, RawDataProcessor::PLOT_FEATURES},
+  const std::unordered_map<int, std::shared_ptr<RawDataProcessor>> n_to_raw_data_method_ {
+    {1, std::shared_ptr<RawDataProcessor>(new LoadRawData())},
+    {2, std::shared_ptr<RawDataProcessor>(new LoadFeatures())},
+    {3, std::shared_ptr<RawDataProcessor>(new PickFeatures())},
+    {4, std::shared_ptr<RawDataProcessor>(new FilterFeatures())},
+    {5, std::shared_ptr<RawDataProcessor>(new SelectFeatures())},
+    {6, std::shared_ptr<RawDataProcessor>(new ValidateFeatures())},
+    {7, std::shared_ptr<RawDataProcessor>(new QuantifyFeatures())},
+    {8, std::shared_ptr<RawDataProcessor>(new CheckFeatures())},
+    {9, std::shared_ptr<RawDataProcessor>(new StoreFeatures())},
+    {10, std::shared_ptr<RawDataProcessor>(new PlotFeatures())},
   };
-  const std::unordered_map<int, SequenceSegmentProcessor::SeqSegProcMethod> n_to_seq_seg_method_ {
-    {11, SequenceSegmentProcessor::CALCULATE_CALIBRATION},
-    {12, SequenceSegmentProcessor::STORE_QUANTITATION_METHODS},
-    {13, SequenceSegmentProcessor::LOAD_QUANTITATION_METHODS},
+  const std::unordered_map<int, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
+    {11, std::shared_ptr<SequenceSegmentProcessor>(new CalculateCalibration())},
+    {12, std::shared_ptr<SequenceSegmentProcessor>(new StoreQuantitationMethods())},
+    {13, std::shared_ptr<SequenceSegmentProcessor>(new LoadQuantitationMethods())},
   };
   enum ProcOpt {
     OPT_LOAD_RAW_DATA = 1,
@@ -610,20 +608,20 @@ public:
     std::string s;
     for (const Command& cmd : commands_) {
       if (cmd.type == Command::RawDataMethod) {
-        const std::unordered_map<int, RawDataProcessor::RawDataProcMethod>::const_iterator
+        const std::unordered_map<int, std::shared_ptr<RawDataProcessor>>::const_iterator
         it = std::find_if(
           n_to_raw_data_method_.cbegin(),
           n_to_raw_data_method_.cend(),
-          [&cmd](const std::pair<int, RawDataProcessor::RawDataProcMethod>& p)
+          [&cmd](const std::pair<int, std::shared_ptr<RawDataProcessor>>& p)
             { return p.second == cmd.raw_data_method; }
         );
         s.append(std::to_string(it->first));
       } else if (cmd.type == Command::SequenceSegmentMethod) {
-        const std::unordered_map<int, SequenceSegmentProcessor::SeqSegProcMethod>::const_iterator
+        const std::unordered_map<int, std::shared_ptr<SequenceSegmentProcessor>>::const_iterator
         it = std::find_if(
           n_to_seq_seg_method_.cbegin(),
           n_to_seq_seg_method_.cend(),
-          [&cmd](const std::pair<int, SequenceSegmentProcessor::SeqSegProcMethod>& p)
+          [&cmd](const std::pair<int, std::shared_ptr<SequenceSegmentProcessor>>& p)
             { return p.second == cmd.seq_seg_method; }
         );
         s.append(std::to_string(it->first));
@@ -729,7 +727,7 @@ public:
         }
         const Command& cmd = commands_[i];
         if (cmd.type == Command::RawDataMethod) {
-          std::vector<RawDataProcessor::RawDataProcMethod> raw_methods;
+          std::vector<std::shared_ptr<RawDataProcessor>> raw_methods;
           std::transform(commands_.begin() + i, commands_.begin() + j, std::back_inserter(raw_methods),
             [](const Command& command){ return command.raw_data_method; });
           SequenceProcessor::processSequence(
@@ -740,7 +738,7 @@ public:
             verbose_
           );
         } else if (cmd.type == Command::SequenceSegmentMethod) {
-          std::vector<SequenceSegmentProcessor::SeqSegProcMethod> seq_seg_methods;
+          std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
           std::transform(commands_.begin() + i, commands_.begin() + j, std::back_inserter(seq_seg_methods),
             [](const Command& command){ return command.seq_seg_method; });
           SequenceProcessor::processSequenceSegments(

@@ -15,14 +15,14 @@ void example_LCMS_MRM_Standards(
 
   SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true, true);
 
-  std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods = {
-    RawDataProcessor::LOAD_RAW_DATA,
-    RawDataProcessor::PICK_FEATURES,
-    RawDataProcessor::FILTER_FEATURES,
-    RawDataProcessor::FILTER_FEATURES,
-    RawDataProcessor::SELECT_FEATURES,
-    RawDataProcessor::CHECK_FEATURES,
-    RawDataProcessor::STORE_FEATURES
+  std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
+    std::shared_ptr<RawDataProcessor>(new LoadRawData()),
+    std::shared_ptr<RawDataProcessor>(new PickFeatures()),
+    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
+    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
+    std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
+    std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
+    std::shared_ptr<RawDataProcessor>(new StoreFeatures())
   };
 
   std::map<std::string, Filenames> dynamic_filenames1;
@@ -45,9 +45,9 @@ void example_LCMS_MRM_Standards(
     true
   );
 
-  const std::vector<SequenceSegmentProcessor::SeqSegProcMethod> sequence_segment_processing_methods = {
-    SequenceSegmentProcessor::CALCULATE_CALIBRATION,
-    SequenceSegmentProcessor::STORE_QUANTITATION_METHODS,
+  const std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods = {
+    std::shared_ptr<SequenceSegmentProcessor>(new CalculateCalibration()),
+    std::shared_ptr<SequenceSegmentProcessor>(new StoreQuantitationMethods()),
   };
 
   std::map<std::string, Filenames> dynamic_filenames2;
@@ -71,9 +71,9 @@ void example_LCMS_MRM_Standards(
   );
 
   raw_data_processing_methods = {
-    RawDataProcessor::QUANTIFY_FEATURES,
-    RawDataProcessor::CHECK_FEATURES,
-    RawDataProcessor::STORE_FEATURES
+    std::shared_ptr<RawDataProcessor>(new QuantifyFeatures()),
+    std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
+    std::shared_ptr<RawDataProcessor>(new StoreFeatures())
   };
 
   std::map<std::string, Filenames> dynamic_filenames3;

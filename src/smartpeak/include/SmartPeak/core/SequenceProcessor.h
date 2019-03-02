@@ -8,6 +8,7 @@
 #include <SmartPeak/core/SequenceSegmentHandler.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <vector>
+#include <memory>
 
 namespace SmartPeak
 {
@@ -76,7 +77,7 @@ public:
       SequenceHandler& sequenceHandler_IO,
       const std::map<std::string, Filenames>& filenames,
       const std::set<std::string>& injection_names = {},
-      const std::vector<RawDataProcessor::RawDataProcMethod>&
+      const std::vector<std::shared_ptr<RawDataProcessor>>&
         raw_data_processing_methods_I = {},
       const bool verbose_I = false
     );
@@ -94,7 +95,7 @@ public:
       SequenceHandler& sequenceHandler_IO,
       const std::map<std::string, Filenames>& filenames,
       const std::set<std::string>& sequence_segment_names = {},
-      const std::vector<SequenceSegmentProcessor::SeqSegProcMethod>&
+      const std::vector<std::shared_ptr<SequenceSegmentProcessor>>&
         sequence_segment_processing_methods_I = {},
       const bool verbose_I = false
     );

@@ -20,147 +20,423 @@ namespace SmartPeak
 {
   class RawDataProcessor
   {
-public:
-    RawDataProcessor()                                   = delete;
-    ~RawDataProcessor()                                  = delete;
-    RawDataProcessor(const RawDataProcessor&)            = delete;
-    RawDataProcessor& operator=(const RawDataProcessor&) = delete;
-    RawDataProcessor(RawDataProcessor&&)                 = delete;
-    RawDataProcessor& operator=(RawDataProcessor&&)      = delete;
+  public:
+    RawDataProcessor() = default;
+    ~RawDataProcessor() = default;
 
-    enum RawDataProcMethod {
-      LOAD_RAW_DATA = 1,
-      LOAD_FEATURES,
-      PICK_FEATURES,
-      FILTER_FEATURES,
-      SELECT_FEATURES,
-      VALIDATE_FEATURES,
-      QUANTIFY_FEATURES,
-      CHECK_FEATURES,
-      STORE_FEATURES,
-      PLOT_FEATURES,
-    };
+    virtual int getID() const = 0;  ///< get the raw data processor class ID
+    virtual std::string getName() const = 0;  ///< get the raw data processor class name
+    virtual std::string getDescription() const = 0;  ///< get the raw data processor class description
 
-    // static RawDataProcMethod convertEventStringToEnum(const std::string& event);
-
-    /** Run the openSWATH workflow for a single raw data file.
+    /** Interface to all raw data processing methods.
 
       @param[in,out] rawDataHandler_IO Raw data file class
-      @param[in] MRMFeatureFinderScoring_params_I Dictionary of parameter names, values, descriptions, and tags
-      @param[in] verbose_I Verbosity
+      @param[in] params_I Dictionary of parameter names, values, descriptions, and tags
+      @param[in] filenames Info about where data should be read from or written to
     */
-    static void pickFeatures(
+    virtual void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::vector<std::map<std::string, std::string>>& MRMFeatureFinderScoring_params_I,
-      const bool verbose_I = false
-    );
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false) const = 0;
+  };
 
-    /** Filter features that do not pass the filter QCs.
+  class LoadRawData : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
 
-      @param[in,out] rawDataHandler_IO Raw data file class
-      @param[in] MRMFeatureFilter_filter_params_I Dictionary of parameter names, values, descriptions, and tags
-      @param[in] verbose_I Verbosity
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Read in raw data mzML file from disk.
+
+      Depending upon user specifications, the mzML file will be mapped to the TraML file
+      and/or various pre-processing methods will be run to extract out the data.
     */
-    static void filterFeatures(
+    void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::vector<std::map<std::string, std::string>>& MRMFeatureFilter_filter_params_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
       const bool verbose_I = false
-    );
-
-    /** Flag features that do not pass the filter QCs.
-
-      @param[in,out] rawDataHandler_IO Raw data file class
-      @param[in] MRMFeatureFilter_qc_params_I Dictionary of parameter names, values, descriptions, and tags
-      @param[in] verbose_I Verbosity
-    */
-    static void checkFeatures(
-      RawDataHandler& rawDataHandler_IO,
-      const std::vector<std::map<std::string, std::string>>& MRMFeatureFilter_qc_params_I,
-      const bool verbose_I = false
-    );
-
-    /** Run the openSWATH post processing filtering workflow for a single sample.
-
-      @note TODO: Break into seperate methods or change the logic of how selection algorithms are chosen
-
-      @param[in,out] rawDataHandler_IO Raw data file class
-      @param[in] MRMFeatureSelector_select_params_I Dictionary of parameter names, values, descriptions, and tags
-      @param[in] MRMFeatureSelector_schedule_params_I Dictionary of parameter names, values, descriptions, and tags
-      @param[in] verbose_I Verbosity
-    */
-    static void selectFeatures(
-      RawDataHandler& rawDataHandler_IO,
-      const std::vector<std::map<std::string, std::string>>& MRMFeatureSelector_select_params_I,
-      const std::vector<std::map<std::string, std::string>>& MRMFeatureSelector_schedule_params_I,
-      const bool verbose_I = false
-    );
+    ) const;
 
     /** Extracts metadata from the chromatogram.
-
-      @param[in,out] rawDataHandler_IO Raw data file class
-      @param[in] verbose_I Verbosity
     */
     static void extractMetaData(
       RawDataHandler& rawDataHandler_IO,
       const bool verbose_I = false
     );
 
-    /** Validate the selected peaks against reference data.
+  protected:
+    int id_ = 1;
+    std::string name_ = "LOAD_RAW_DATA";
+    std::string description_ = "Read in raw data mzML file from disk.";
+  };
 
-      @param[in,out] rawDataHandler_IO Raw data file class
-      @param[in] MRMRFeatureValidator_params_I Dictionary of parameter names, values, descriptions, and tags
-      @param[in] verbose_I Verbosity
+  class StoreRawData : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Run the openSWATH workflow for a single raw data file.
     */
-    static void validateFeatures(
+    void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::vector<std::map<std::string, std::string>>& MRMRFeatureValidator_params_I,
-      const bool verbose_I = false
-    );
-
-    /** Export plots of peaks with features annotated.
-
-      @param[in,out] rawDataHandler_IO Raw data file class
-      @param[in] filename Output filename
-      @param[in] FeaturePlotter_params_I Dictionary of parameter names, values, descriptions, and tags
-      @param[in] verbose_I Verbosity
-    */
-    static void plotFeatures(
-      RawDataHandler& rawDataHandler_IO,
-      const std::vector<std::map<std::string, std::string>>& FeaturePlotter_params_I,
-      const bool verbose_I = false
-    );
-
-    /** Quantify all unknown samples based on the quantitationMethod.
-
-      @param[in,out] rawDataHandler_IO Raw data file class
-      @param[in] verbose_I Verbosity
-    */
-    static void quantifyComponents(
-      RawDataHandler& rawDataHandler_IO,
-      const bool verbose_I = false
-    );
-
-    /** Apply processing event to a RawDataHandler.
-
-      @param[in,out] rawDataHandler_IO Raw data file class
-      @param[in] raw_data_processing_event Processing event to apply
-      @param[in] MRMRFeatureValidator_params_I Dictionary of parameter names, values, descriptions, and tags
-      @param[in] filenames Info about where data should be read from or written to
-      @param[in] verbose_I Verbosity
-    */
-    static void processRawData(
-      RawDataHandler& rawDataHandler_IO,
-      const RawDataProcMethod raw_data_processing_event,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames,
       const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 2;
+    std::string name_ = "STORE_RAW_DATA";
+    std::string description_ = "Store the processed raw data mzML file to disk.";
+  };
+
+  class LoadFeatures : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Read in the features from disk.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    )  const;
+
+  protected:
+    int id_ = 3;
+    std::string name_ = "LOAD_FEATURES";
+    std::string description_ = "Read in the features from disk.";
+  };
+
+  class StoreFeatures : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Write the features to disk.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 4;
+    std::string name_ = "STORE_FEATURES";
+    std::string description_ = "Write the features to disk.";
+  };
+
+  class PickFeatures : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Run the openSWATH pick peaking and scoring workflow for a single raw data file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 5;
+    std::string name_ = "PICK_FEATURES";
+    std::string description_ = "Run the peak picking algorithm.";
+  };
+
+  class FilterFeatures : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Filter features that do not pass the filter QCs.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 6;
+    std::string name_ = "FILTER_FEATURES";
+    std::string description_ = "Filter transitions and transitions groups based on a user defined criteria.";
+  };
+
+  class CheckFeatures : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Flag features that do not pass the filter QCs.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 7;
+    std::string name_ = "CHECK_FEATURES";
+    std::string description_ = "Flag and score transitions and transition groups based on a user defined criteria.";
+  };
+
+  class SelectFeatures : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Select features using the MRMFeatureSelection algorithm.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 8;
+    std::string name_ = "SELECT_FEATURES";
+    std::string description_ = "Run the peak selection/alignment algorithm.";
+  };
+
+  class ValidateFeatures : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Validate the selected peaks against reference data.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 9;
+    std::string name_ = "VALIDATE_FEATURES";
+    std::string description_ = "Compare selected features to a reference data set.";
+  };
+
+  class QuantifyFeatures : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Quantify all unknown samples based on the quantitationMethod.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 10;
+    std::string name_ = "QUANTIFY_FEATURES";
+    std::string description_ = "Apply a calibration model defined in quantitationMethods to each transition.";
+  };
+
+  class PlotFeatures : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Validate the selected peaks against reference data.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 11;
+    std::string name_ = "PLOT_FEATURES";
+    std::string description_ = "Plot the raw chromatogram with selected peaks overlaid.";
+  };
+
+  class LoadTransitions : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Load the transitions from the TraML file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 12;
+    std::string name_ = "LOAD_TRANSITIONS";
+    std::string description_ = "Load the transitions for the SRM experiments from the TraML file.";
+  } const;
+
+  class LoadFeatureFilters : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Load the component and component group transition filters from file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 13;
+    std::string name_ = "LOAD_FEATURE_FILTERS";
+    std::string description_ = "Load the component and component group transition filters from file.";
+  };
+
+  class LoadFeatureQCs : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Load the component and component group transition QCs from file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 14;
+    std::string name_ = "LOAD_FEATURE_QCS";
+    std::string description_ = "Load the component and component group transition QC specifications from file.";
+  };
+
+  class LoadValidationData : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Load the validation data from file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 15;
+    std::string name_ = "LOAD_VALIDATION_DATA";
+    std::string description_ = "Load the validation data from file.";
+  };
+
+  class LoadParameters : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Load the data processing parameters from file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+    static void sanitizeParameters(
+      RawDataHandler& rawDataHandler_IO,
+      std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const bool verbose_I = false
     );
 
-    /** Return the default workflow parameters for a given sample type.
-      @param[in] sample_type Sample type
-    */
-    static std::vector<RawDataProcMethod> getDefaultRawDataProcessingWorkflow(
-      const MetaDataHandler::SampleType sample_type
-    );
+  protected:
+    int id_ = 16;
+    std::string name_ = "LOAD_PARAMETERS";
+    std::string description_ = "Load the data processing parameters from file.";
   };
 }

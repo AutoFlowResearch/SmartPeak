@@ -5,7 +5,7 @@
 #define BOOST_TEST_MODULE RawDataProcessor test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/RawDataProcessor.h>
-#include <SmartPeak/io/OpenMSFile.h>
+#include <SmartPeak/core/SequenceSegmentProcessor.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -15,20 +15,151 @@ void load_data(
   std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_2
 )
 {
-  const string pathname1 = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_1_core_tmpFix.csv");
-  const string pathname2 = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_2_tmpFix.csv");
+  Filenames filenames1, filenames2;
+  filenames1.parameters_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_1_core_tmpFix.csv");
+  filenames2.parameters_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_2_tmpFix.csv");
   RawDataHandler rawDataHandler;
-  OpenMSFile::readRawDataProcessingParameters(rawDataHandler, pathname1, ",");
+  LoadParameters loadParameters;
+  loadParameters.process(rawDataHandler, {}, filenames1);
   params_1 = rawDataHandler.getParameters();
   rawDataHandler.clear();
-  OpenMSFile::readRawDataProcessingParameters(rawDataHandler, pathname2, ",");
+  loadParameters.process(rawDataHandler, {}, filenames2);
   params_2 = rawDataHandler.getParameters();
 }
 
 BOOST_AUTO_TEST_SUITE(rawdataprocessor)
 
+/**
+  LoadRawData Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadRawData)
+{
+  LoadRawData* ptrLoadRawData = nullptr;
+  LoadRawData* nullPointerLoadRawData = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadRawData, nullPointerLoadRawData);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadRawData)
+{
+  LoadRawData* ptrLoadRawData = nullptr;
+  ptrLoadRawData = new LoadRawData();
+  delete ptrLoadRawData;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadRawData)
+{
+  LoadRawData processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 1);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_RAW_DATA");
+}
+
+BOOST_AUTO_TEST_CASE(processorLoadRawData)
+{  // TODO: add more tests once loadMSExperiment is split
+  LoadRawData processor;
+
+  // TEST CASE 1:  mzML with out baseline correction
+  RawDataHandler rawDataHandler;
+  std::map<std::string, std::string> params_tmp = { // Must be initialized step by step due to Compiler Error C2665 on Windows...
+    {"name", "zero_baseline"},
+    {"type", "bool"},
+    {"value", "false"}
+  };
+  std::vector<std::map<std::string, std::string>> mzML_params;
+  mzML_params.push_back(params_tmp);
+  std::map<std::string, std::vector<std::map<std::string, std::string>>> params_I;
+  params_I.emplace("mzML", mzML_params);
+  params_I.emplace("ChromatogramExtractor", std::vector<std::map<std::string, std::string>>());
+  params_I.emplace("MRMMapping", std::vector<std::map<std::string, std::string>>());
+
+  Filenames filenames;
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_baseline_correction.mzML");
+  processor.process(rawDataHandler, params_I, filenames);
+
+  const vector<OpenMS::MSChromatogram>& chromatograms1 = rawDataHandler.getExperiment().getChromatograms();
+
+  BOOST_CHECK_EQUAL(chromatograms1.size(), 2);
+
+  BOOST_CHECK_CLOSE(chromatograms1[0][0].getIntensity(), 3.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[0][1].getIntensity(), 4.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[0][2].getIntensity(), 6.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[0][3].getIntensity(), 19.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[0][4].getIntensity(), 1.0, 1e-3);
+
+  BOOST_CHECK_CLOSE(chromatograms1[1][0].getIntensity(), 3.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[1][1].getIntensity(), 4.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[1][2].getIntensity(), -2.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[1][3].getIntensity(), -8.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1[1][4].getIntensity(), 1.0, 1e-3);
+
+  // TEST CASE 2:  mzML with baseline correction
+  params_I.at("mzML")[0].at("value") = "true";
+  rawDataHandler.clear();
+  processor.process(rawDataHandler, params_I, filenames);
+
+  const vector<OpenMS::MSChromatogram>& chromatograms2 = rawDataHandler.getExperiment().getChromatograms();
+
+  BOOST_CHECK_EQUAL(chromatograms2.size(), 2);
+
+  BOOST_CHECK_CLOSE(chromatograms2[0][0].getIntensity(), 2.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][1].getIntensity(), 3.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][2].getIntensity(), 5.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][3].getIntensity(), 18.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][4].getIntensity(), 0.0, 1e-3);
+
+  BOOST_CHECK_CLOSE(chromatograms2[1][0].getIntensity(), 11.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][1].getIntensity(), 12.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][2].getIntensity(), 6.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][3].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][4].getIntensity(), 9.0, 1e-3);
+
+  // TEST CASE 3:  Chromeleon file format
+  params_I.at("mzML")[0].at("value") = "false";
+  params_I.at("mzML").push_back(
+    {
+      {"name", "format"},
+      {"type", "string"},
+      {"value", "ChromeleonFile"}
+    }
+  );
+  rawDataHandler.clear();
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_ChromeleonFile_10ug.txt");
+  processor.process(rawDataHandler, params_I, filenames);
+
+  const vector<OpenMS::MSChromatogram>& chromatograms3 = rawDataHandler.getExperiment().getChromatograms();
+
+  BOOST_CHECK_EQUAL(chromatograms3.size(), 1);
+  BOOST_CHECK_EQUAL(chromatograms3[0].size(), 3301);
+
+  BOOST_CHECK_CLOSE(chromatograms3[0][0].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][600].getIntensity(), -0.503815, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][1200].getIntensity(), -0.666694, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][1800].getIntensity(), -0.232843, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][2400].getIntensity(), -0.223644, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][3300].getIntensity(), 0.126958, 1e-3);
+
+  // TEST CASE 3:  Chromeleon file format with baseline correction
+  params_I.at("mzML")[0].at("value") = "true";
+  rawDataHandler.clear();
+  processor.process(rawDataHandler, params_I, filenames);
+
+  const vector<OpenMS::MSChromatogram>& chromatograms4 = rawDataHandler.getExperiment().getChromatograms();
+
+  BOOST_CHECK_EQUAL(chromatograms4.size(), 1);
+  BOOST_CHECK_EQUAL(chromatograms4[0].size(), 3301);
+
+  BOOST_CHECK_CLOSE(chromatograms4[0][0].getIntensity(), 1.004634, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][600].getIntensity(), 0.500819, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][1200].getIntensity(), 0.33794, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][1800].getIntensity(), 0.771791, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][2400].getIntensity(), 0.78099, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][3300].getIntensity(), 1.131592, 1e-3);
+}
+
 BOOST_AUTO_TEST_CASE(extractMetaData)
 {
+
+  // Pre-requisites: load the parameters
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
@@ -36,18 +167,23 @@ BOOST_AUTO_TEST_CASE(extractMetaData)
   BOOST_CHECK_EQUAL(params_2.size(), 15);
   RawDataHandler rawDataHandler;
 
-  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
-  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
+  // Pre-requisites: load the transitions and raw data
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, {}, filenames);
 
-  const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
-  OpenMSFile::loadMSExperiment(rawDataHandler, mzML_i, params_1.at("MRMMapping"));
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
 
-  RawDataProcessor::extractMetaData(rawDataHandler);
+  // Test 1
+  LoadRawData::extractMetaData(rawDataHandler);
 
   const MetaDataHandler& metaDataHandler = rawDataHandler.getMetaData();
 
   string filename = metaDataHandler.getFilename();
-  filename = filename.substr(filename.find("src/tests")); // otherwise it would contain /home/username/SmartPeak2/
+  filename = filename.substr(filename.find("src/tests")); // otherwise it would contain /home/username/SmartPeak2/ on Linux
   BOOST_CHECK_EQUAL(filename, "src/tests/class_tests/smartpeak/data/RawDataProcessor_mzML_1.mzML");
   BOOST_CHECK_EQUAL(metaDataHandler.getSampleName(), "150601_0_BloodProject01_PLT_QC_Broth-1");
 
@@ -63,21 +199,429 @@ BOOST_AUTO_TEST_CASE(extractMetaData)
   BOOST_CHECK_EQUAL(metaDataHandler.acquisition_date_and_time.tm_sec, 10);
 }
 
+/**
+  StoreRawData Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorStoreRawData)
+{
+  StoreRawData* ptrStoreRawData = nullptr;
+  StoreRawData* nullPointerStoreRawData = nullptr;
+  BOOST_CHECK_EQUAL(ptrStoreRawData, nullPointerStoreRawData);
+}
+
+BOOST_AUTO_TEST_CASE(destructorStoreRawData)
+{
+  StoreRawData* ptrStoreRawData = nullptr;
+  ptrStoreRawData = new StoreRawData();
+  delete ptrStoreRawData;
+}
+
+BOOST_AUTO_TEST_CASE(gettersStoreRawData)
+{
+  StoreRawData processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 2);
+  BOOST_CHECK_EQUAL(processor.getName(), "STORE_RAW_DATA");
+}
+
+BOOST_AUTO_TEST_CASE(processStoreRawData)
+{
+  // no tests, it wraps OpenMS store function
+}
+
+/**
+  LoadFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadFeatures)
+{
+  LoadFeatures* ptrLoadFeatures = nullptr;
+  LoadFeatures* nullPointerLoadFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadFeatures, nullPointerLoadFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadFeatures)
+{
+  LoadFeatures* ptrLoadFeatures = nullptr;
+  ptrLoadFeatures = new LoadFeatures();
+  delete ptrLoadFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadFeatures)
+{
+  LoadFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 3);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURES");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadFeatures)
+{
+  Filenames filenames;
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_test_1_io_FileReaderOpenMS.featureXML");
+  RawDataHandler rawDataHandler;
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, {}, filenames);
+
+  const OpenMS::FeatureMap& fm = rawDataHandler.getFeatureMap(); // Test feature_map
+  BOOST_CHECK_EQUAL(fm.size(), 481);
+
+  BOOST_CHECK_CLOSE(static_cast<double>(fm[0].getSubordinates()[0].getMetaValue("peak_apex_int")), 266403.0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(fm[0].getSubordinates()[0].getRT()), 15.8944563381195, 1e-6);
+  BOOST_CHECK_EQUAL(fm[0].getSubordinates()[0].getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(fm[0].getMetaValue("peak_apices_sum")), 583315.0, 1e-6);
+  BOOST_CHECK_EQUAL(fm[0].getMetaValue("PeptideRef").toString(), "23dpg");
+
+  BOOST_CHECK_CLOSE(static_cast<double>(fm[1].getSubordinates()[0].getMetaValue("peak_apex_int")), 3436.0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(fm[1].getSubordinates()[0].getRT()), 16.2997193464915, 1e-6);
+  BOOST_CHECK_EQUAL(fm[1].getSubordinates()[0].getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(fm[1].getMetaValue("peak_apices_sum")), 13859.0, 1e-6);
+  BOOST_CHECK_EQUAL(fm[1].getMetaValue("PeptideRef").toString(), "23dpg");
+
+  const OpenMS::FeatureMap& fmh = rawDataHandler.getFeatureMapHistory(); // Test feature_map_history
+  BOOST_CHECK_EQUAL(fmh.size(), 481);
+
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[0].getSubordinates()[0].getMetaValue("peak_apex_int")), 266403.0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[0].getSubordinates()[0].getRT()), 15.8944563381195, 1e-6);
+  BOOST_CHECK_EQUAL(fmh[0].getSubordinates()[0].getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[0].getMetaValue("peak_apices_sum")), 583315.0, 1e-6);
+  BOOST_CHECK_EQUAL(fmh[0].getMetaValue("PeptideRef").toString(), "23dpg");
+  BOOST_CHECK(fmh[0].getSubordinates()[0].getMetaValue("used_").toBool());
+
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[1].getSubordinates()[0].getMetaValue("peak_apex_int")), 3436.0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[1].getSubordinates()[0].getRT()), 16.2997193464915, 1e-6);
+  BOOST_CHECK_EQUAL(fmh[1].getSubordinates()[0].getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[1].getMetaValue("peak_apices_sum")), 13859.0, 1e-6);
+  BOOST_CHECK_EQUAL(fmh[1].getMetaValue("PeptideRef").toString(), "23dpg");
+  BOOST_CHECK(fmh[1].getSubordinates()[0].getMetaValue("used_").toBool());
+}
+
+/**
+  StoreFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorStoreFeatures)
+{
+  StoreFeatures* ptrStoreFeatures = nullptr;
+  StoreFeatures* nullPointerStoreFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrStoreFeatures, nullPointerStoreFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorStoreFeatures)
+{
+  StoreFeatures* ptrStoreFeatures = nullptr;
+  ptrStoreFeatures = new StoreFeatures();
+  delete ptrStoreFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersStoreFeatures)
+{
+  StoreFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 4);
+  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURES");
+}
+
+BOOST_AUTO_TEST_CASE(processStoreFeatures)
+{
+  // no tests, it wraps OpenMS store function
+}
+
+/**
+  LoadTransitions Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadTransitions)
+{
+  LoadTransitions* ptrLoadTransitions = nullptr;
+  LoadTransitions* nullPointerLoadTransitions = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadTransitions, nullPointerLoadTransitions);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadTransitions)
+{
+  LoadTransitions* ptrLoadTransitions = nullptr;
+  ptrLoadTransitions = new LoadTransitions();
+  delete ptrLoadTransitions;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadTransitions)
+{
+  LoadTransitions processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 12);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_TRANSITIONS");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadTransitions)
+{
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  RawDataHandler rawDataHandler;
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, {}, filenames);
+  const std::vector<OpenMS::ReactionMonitoringTransition>& t = rawDataHandler.getTargetedExperiment().getTransitions();
+
+  BOOST_CHECK_EQUAL(t.size(), 324);
+
+  BOOST_CHECK_EQUAL(t[0].getPeptideRef(), "arg-L");
+  BOOST_CHECK_CLOSE(t[0].getPrecursorMZ(), 179.0, 1e-6);
+  BOOST_CHECK_CLOSE(t[0].getProductMZ(), 136.0, 1e-6);
+
+  BOOST_CHECK_EQUAL(t[10].getPeptideRef(), "citr-L");
+  BOOST_CHECK_CLOSE(t[10].getPrecursorMZ(), 180.0, 1e-6);
+  BOOST_CHECK_CLOSE(t[10].getProductMZ(), 136.0, 1e-6);
+
+  BOOST_CHECK_EQUAL(t[19].getPeptideRef(), "Lcystin");
+  BOOST_CHECK_CLOSE(t[19].getPrecursorMZ(), 239.0, 1e-6);
+  BOOST_CHECK_CLOSE(t[19].getProductMZ(), 120.0, 1e-6);
+}
+
+/**
+  LoadFeatureFilters Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadFeatureFilters)
+{
+  LoadFeatureFilters* ptrLoadFeatureFilters = nullptr;
+  LoadFeatureFilters* nullPointerLoadFeatureFilters = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadFeatureFilters, nullPointerLoadFeatureFilters);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadFeatureFilters)
+{
+  LoadFeatureFilters* ptrLoadFeatureFilters = nullptr;
+  ptrLoadFeatureFilters = new LoadFeatureFilters();
+  delete ptrLoadFeatureFilters;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadFeatureFilters)
+{
+  LoadFeatureFilters processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 13);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_FILTERS");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadFeatureFilters)
+{
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+
+  LoadFeatureFilters loadFeatureFilters;
+  loadFeatureFilters.process(rawDataHandler, {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureFilter();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+}
+
+/**
+  LoadFeatureQCs Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadFeatureQCs)
+{
+  LoadFeatureQCs* ptrLoadFeatureQCs = nullptr;
+  LoadFeatureQCs* nullPointerLoadFeatureQCs = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadFeatureQCs, nullPointerLoadFeatureQCs);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadFeatureQCs)
+{
+  LoadFeatureQCs* ptrLoadFeatureQCs = nullptr;
+  ptrLoadFeatureQCs = new LoadFeatureQCs();
+  delete ptrLoadFeatureQCs;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadFeatureQCs)
+{
+  LoadFeatureQCs processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 14);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_QCS");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadFeatureQCs)
+{
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+
+  LoadFeatureQCs loadFeatureQCs;
+  loadFeatureQCs.process(rawDataHandler, {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureQC();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+}
+
+/**
+  LoadValidationData Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadValidationData)
+{
+  LoadValidationData* ptrLoadValidationData = nullptr;
+  LoadValidationData* nullPointerLoadValidationData = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadValidationData, nullPointerLoadValidationData);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadValidationData)
+{
+  LoadValidationData* ptrLoadValidationData = nullptr;
+  ptrLoadValidationData = new LoadValidationData();
+  delete ptrLoadValidationData;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadValidationData)
+{
+  LoadValidationData processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 15);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_VALIDATION_DATA");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadValidationData)
+{
+  Filenames filenames;
+  filenames.referenceData_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
+  RawDataHandler rawDataHandler;
+
+  LoadValidationData loadValidationData;
+  loadValidationData.process(rawDataHandler, {}, filenames);
+  const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
+
+  BOOST_CHECK_EQUAL(ref_data.size(), 179);
+  BOOST_CHECK_EQUAL(ref_data[0].at("component_name").s_, "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(ref_data[0].at("area").f_, 932543.098, 1e-3);
+  BOOST_CHECK_CLOSE(ref_data[0].at("retention_time").f_, static_cast<float>(15.89495171), 1e-1);
+  BOOST_CHECK_EQUAL(ref_data[0].at("acquisition_date_and_time").s_, "09-06-2015 17:14");
+  // TODO: Should we just use double instead of float? I had to go down to -1 to make the test pass
+  BOOST_CHECK_EQUAL(ref_data[178].at("component_name").s_, "xan.xan_1.Light");
+  BOOST_CHECK_CLOSE(ref_data[178].at("area").f_, 206951.3035, 1e-3);
+  BOOST_CHECK_CLOSE(ref_data[178].at("retention_time").f_, static_cast<float>(1.492980468), 1e-1);
+  BOOST_CHECK_EQUAL(ref_data[178].at("acquisition_date_and_time").s_, "09-06-2015 17:14");
+}
+
+/**
+  LoadParameters Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadParameters)
+{
+  LoadParameters* ptrLoadParameters = nullptr;
+  LoadParameters* nullPointerLoadParameters = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadParameters, nullPointerLoadParameters);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadParameters)
+{
+  LoadParameters* ptrLoadParameters = nullptr;
+  ptrLoadParameters = new LoadParameters();
+  delete ptrLoadParameters;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadParameters)
+{
+  LoadParameters processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 16);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_PARAMETERS");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadParameters)
+{
+  // no tests, it calls FileReader::parseOpenMSParams and OpenMSFile::sanitizeRawDataProcessorParameters
+}
+
+BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
+{
+  RawDataHandler rawDataHandler;
+  std::map<std::string, std::vector<std::map<std::string, std::string>>> params;
+
+  params.emplace("SequenceSegmentPlotter", vector<map<string, string>> {
+    {
+      {"map1_elem1", "value1"},
+      { "map1_elem2", "value2" }
+    },
+    {
+      {"map2_elem1", "value3"}
+    }
+  });
+
+  LoadParameters loadParameters;
+  loadParameters.sanitizeParameters(rawDataHandler, params);
+  BOOST_CHECK_EQUAL(params.size(), 14);
+  BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
+  BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);
+  BOOST_CHECK_EQUAL(params.count("AbsoluteQuantitation"), 1);
+  BOOST_CHECK_EQUAL(params.count("mzML"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMMapping"), 1);
+  BOOST_CHECK_EQUAL(params.count("ChromatogramExtractor"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureFinderScoring"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureFilter.filter_MRMFeatures"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_qmip"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.schedule_MRMFeatures_qmip"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_score"), 1);
+  BOOST_CHECK_EQUAL(params.count("ReferenceDataMethods.getAndProcess_referenceData_samples"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureFilter.filter_MRMFeatures.qc"), 1);
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter").size(), 2);
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem1"), "value1");
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem2"), "value2");
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[1].at("map2_elem1"), "value3");
+  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeatures.qc").size(), 0);
+}
+
+/**
+  PickFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorPickFeatures)
+{
+  PickFeatures* ptrPickFeatures = nullptr;
+  PickFeatures* nullPointerPickFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrPickFeatures, nullPointerPickFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorPickFeatures)
+{
+  PickFeatures* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new PickFeatures();
+  delete ptrPickFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersPickFeatures)
+{
+  PickFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 5);
+  BOOST_CHECK_EQUAL(processor.getName(), "PICK_FEATURES");
+}
+
 BOOST_AUTO_TEST_CASE(pickFeatures)
 {
+  // Pre-requisites: load the parameters and associated raw data
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
-  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
-  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
 
-  const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
-  OpenMSFile::loadMSExperiment(rawDataHandler, mzML_i, params_1.at("MRMMapping"));
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler,params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
 
-  RawDataProcessor::extractMetaData(rawDataHandler);
-  RawDataProcessor::pickFeatures(rawDataHandler, params_1.at("MRMFeatureFinderScoring"));
+  // Test pick features
+  PickFeatures pickFeatures;
+  pickFeatures.process(rawDataHandler, params_1, filenames);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 481);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
@@ -108,30 +652,61 @@ BOOST_AUTO_TEST_CASE(pickFeatures)
   BOOST_CHECK(hsubordinate2.getMetaValue("used_").toBool());
 }
 
+/**
+  FilterFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorFilterFeatures)
+{
+  FilterFeatures* ptrFilterFeatures = nullptr;
+  FilterFeatures* nullPointerFilterFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrFilterFeatures, nullPointerFilterFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorFilterFeatures)
+{
+  FilterFeatures* ptrFilterFeatures = nullptr;
+  ptrFilterFeatures = new FilterFeatures();
+  delete ptrFilterFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersFilterFeatures)
+{
+  FilterFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 6);
+  BOOST_CHECK_EQUAL(processor.getName(), "FILTER_FEATURES");
+}
+
 BOOST_AUTO_TEST_CASE(filterFeatures)
 {
+  // Pre-requisites: load the parameters and associated raw data
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
-  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
-  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
 
-  const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
-  OpenMSFile::loadMSExperiment(rawDataHandler, mzML_i, params_1.at("MRMMapping"));
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler,params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
 
-  RawDataProcessor::extractMetaData(rawDataHandler);
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_1_core_RawDataProcessor.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  const string featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_1_core_RawDataProcessor.featureXML");
-  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o);
+  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  LoadFeatureFilters loadFeatureFilters;
+  loadFeatureFilters.process(rawDataHandler, params_1, filenames);
 
-  const string featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
-  const string featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-
-  OpenMSFile::loadFeatureFilter(rawDataHandler, featureFilterComponents_csv_i, featureFilterComponentGroups_csv_i);
-
-  RawDataProcessor::filterFeatures(rawDataHandler, params_1.at("MRMFeatureFilter.filter_MRMFeatures"));
+  // Test feature filter
+  FilterFeatures filterFeatures;
+  filterFeatures.process(rawDataHandler, params_1, filenames);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 329); // Test feature_map_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
@@ -166,29 +741,56 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
   BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
 }
 
+/**
+  SelectFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorSelectFeatures)
+{
+  SelectFeatures* ptrSelectFeatures = nullptr;
+  SelectFeatures* nullPointerSelectFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrSelectFeatures, nullPointerSelectFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorSelectFeatures)
+{
+  SelectFeatures* ptrSelectFeatures = nullptr;
+  ptrSelectFeatures = new SelectFeatures();
+  delete ptrSelectFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersSelectFeatures)
+{
+  SelectFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 8);
+  BOOST_CHECK_EQUAL(processor.getName(), "SELECT_FEATURES");
+}
+
 BOOST_AUTO_TEST_CASE(selectFeatures)
 {
+  // Pre-requisites: load the parameters and associated raw data
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
-  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
-  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
 
-  const string mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
-  OpenMSFile::loadMSExperiment(rawDataHandler, mzML_i, params_1.at("MRMMapping"));
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler,params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
 
-  RawDataProcessor::extractMetaData(rawDataHandler);
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_2_core_RawDataProcessor.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  const string featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_2_core_RawDataProcessor.featureXML");
-  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o);
-
-  RawDataProcessor::selectFeatures(
-    rawDataHandler,
-    params_1.at("MRMFeatureSelector.select_MRMFeatures_qmip"),
-    params_1.at("MRMFeatureSelector.schedule_MRMFeatures_qmip")
-  );
+  // Test select features
+  SelectFeatures selectFeatures;
+  selectFeatures.process(rawDataHandler, params_1, filenames);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 114); // Test feature_map_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
@@ -223,18 +825,47 @@ BOOST_AUTO_TEST_CASE(selectFeatures)
   BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
 }
 
+/**
+  ValidateFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorValidateFeatures)
+{
+  ValidateFeatures* ptrValidateFeatures = nullptr;
+  ValidateFeatures* nullPointerValidateFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrValidateFeatures, nullPointerValidateFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorValidateFeatures)
+{
+  ValidateFeatures* ptrValidateFeatures = nullptr;
+  ptrValidateFeatures = new ValidateFeatures();
+  delete ptrValidateFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersValidateFeatures)
+{
+  ValidateFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 9);
+  BOOST_CHECK_EQUAL(processor.getName(), "VALIDATE_FEATURES");
+}
+
 BOOST_AUTO_TEST_CASE(validateFeatures)
 {
+  // Pre-requisites: load the parameters and associated raw data
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
-  const string featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_3_core_RawDataProcessor.featureXML");
-  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o);
+  Filenames filenames;
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_3_core_RawDataProcessor.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  const string referenceData_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
-  OpenMSFile::loadValidationData(rawDataHandler, referenceData_csv_i);
+  filenames.referenceData_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
+  LoadValidationData loadValidationData;
+  loadValidationData.process(rawDataHandler, params_1, filenames);
 
   MetaDataHandler& mdh = rawDataHandler.getMetaData();
   mdh.sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file
@@ -242,7 +873,9 @@ BOOST_AUTO_TEST_CASE(validateFeatures)
   mdh.batch_name = "BloodProject01";
   mdh.setAcquisitionDateAndTimeFromString("09-06-2015 17:14", "%m-%d-%Y %H:%M");
 
-  RawDataProcessor::validateFeatures(rawDataHandler, params_1.at("MRMFeatureValidator.validate_MRMFeatures"), true);
+  // Test validate features
+  ValidateFeatures validateFeatures;
+  validateFeatures.process(rawDataHandler, params_1, filenames, true);
 
   const std::map<std::string, float>& validation_metrics = rawDataHandler.getValidationMetrics();
   // Confusion matrix: [TP, FP, FN, TN] = [0, 155, 0, 0]
@@ -250,27 +883,83 @@ BOOST_AUTO_TEST_CASE(validateFeatures)
   BOOST_CHECK_CLOSE(validation_metrics.at("precision"), 0.0, 1e-3);
   BOOST_CHECK_EQUAL(std::isnan(validation_metrics.at("recall")), true);
 }
+/**
+  PlotFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorPlotFeatures)
+{
+  PlotFeatures* ptrPlotFeatures = nullptr;
+  PlotFeatures* nullPointerPlotFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrPlotFeatures, nullPointerPlotFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorPlotFeatures)
+{
+  PlotFeatures* ptrPlotFeatures = nullptr;
+  ptrPlotFeatures = new PlotFeatures();
+  delete ptrPlotFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersPlotFeatures)
+{
+  PlotFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 11);
+  BOOST_CHECK_EQUAL(processor.getName(), "PLOT_FEATURES");
+}
 
 BOOST_AUTO_TEST_CASE(plotFeatures)
 {
 // TODO: Uncomment once FeaturePlotter is ready
 }
 
+/**
+  QuantifyFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorQuantifyFeatures)
+{
+  QuantifyFeatures* ptrQuantifyFeatures = nullptr;
+  QuantifyFeatures* nullPointerQuantifyFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrQuantifyFeatures, nullPointerQuantifyFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorQuantifyFeatures)
+{
+  QuantifyFeatures* ptrQuantifyFeatures = nullptr;
+  ptrQuantifyFeatures = new QuantifyFeatures();
+  delete ptrQuantifyFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersQuantifyFeatures)
+{
+  QuantifyFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 10);
+  BOOST_CHECK_EQUAL(processor.getName(), "QUANTIFY_FEATURES");
+}
+
 BOOST_AUTO_TEST_CASE(quantifyComponents)
 {
-  const string quantitationMethods_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv");
+  // Pre-requisites: load the parameters and associated raw data
+  Filenames filenames;
+  filenames.quantitationMethods_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv");
   SequenceSegmentHandler sequenceSegmentHandler_IO;
-  OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler_IO, quantitationMethods_csv_i);
+  
+  LoadQuantitationMethods loadQuantitationMethods;
+  loadQuantitationMethods.process(sequenceSegmentHandler_IO, SequenceHandler(), {}, filenames);
 
   RawDataHandler rawDataHandler;
   rawDataHandler.setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
 
-  const string featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_3_core_RawDataProcessor.featureXML");
-  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o);
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_3_core_RawDataProcessor.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, {}, filenames);
 
-  RawDataProcessor::quantifyComponents(rawDataHandler);
+  // Test quantify features
+  QuantifyFeatures quantifyFeatures;
+  quantifyFeatures.process(rawDataHandler, {}, filenames);
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 98);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 98);  // Test feature_map
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& sub = rawDataHandler.getFeatureMap()[0].getSubordinates()[1];
@@ -278,7 +967,7 @@ BOOST_AUTO_TEST_CASE(quantifyComponents)
   BOOST_CHECK_CLOSE(static_cast<double>(sub.getMetaValue("calculated_concentration")), 0.44335812456518986, 1e-6);
   BOOST_CHECK_EQUAL(sub.getMetaValue("concentration_units").toString(), "uM");
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 98);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 98); // Test feature_history
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& hsub = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[1];
@@ -288,25 +977,56 @@ BOOST_AUTO_TEST_CASE(quantifyComponents)
   BOOST_CHECK(hsub.getMetaValue("used_").toBool());
 }
 
+/**
+  CheckFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorCheckFeatures)
+{
+  CheckFeatures* ptrCheckFeatures = nullptr;
+  CheckFeatures* nullPointerCheckFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrCheckFeatures, nullPointerCheckFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorCheckFeatures)
+{
+  CheckFeatures* ptrCheckFeatures = nullptr;
+  ptrCheckFeatures = new CheckFeatures();
+  delete ptrCheckFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersCheckFeatures)
+{
+  CheckFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 7);
+  BOOST_CHECK_EQUAL(processor.getName(), "CHECK_FEATURES");
+}
+
 BOOST_AUTO_TEST_CASE(checkFeatures)
 {
+  // Pre-requisites: load the parameters and associated raw data
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
-  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
-  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
 
-  const string featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_3_core_RawDataProcessor.featureXML");
-  OpenMSFile::loadFeatureMap(rawDataHandler, featureXML_o);
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_3_core_RawDataProcessor.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  const string featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
-  const string featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  LoadFeatureQCs loadFeatureQCs;
+  loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
-  OpenMSFile::loadFeatureQC(rawDataHandler, featureFilterComponents_csv_i, featureFilterComponentGroups_csv_i);
-
-  RawDataProcessor::checkFeatures(rawDataHandler, params_1.at("MRMFeatureFilter.filter_MRMFeatures.qc"));
+  // Test check features
+  CheckFeatures checkFeatures;
+  checkFeatures.process(rawDataHandler, params_1, filenames);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 98);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
@@ -324,74 +1044,54 @@ BOOST_AUTO_TEST_CASE(checkFeatures)
   BOOST_CHECK(hsub.getMetaValue("used_").toBool());
 }
 
-BOOST_AUTO_TEST_CASE(getDefaultRawDataProcessingWorkflow)
+BOOST_AUTO_TEST_CASE(process)
 {
-  std::vector<RawDataProcessor::RawDataProcMethod> workflow;
-
-  workflow = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-    MetaDataHandler::SampleType::Unknown
-  );
-
-  BOOST_CHECK_EQUAL(workflow.size(), 6);
-  BOOST_CHECK_EQUAL(workflow[0], RawDataProcessor::LOAD_RAW_DATA);
-  BOOST_CHECK_EQUAL(workflow[1], RawDataProcessor::PICK_FEATURES);
-  BOOST_CHECK_EQUAL(workflow[2], RawDataProcessor::FILTER_FEATURES);
-  BOOST_CHECK_EQUAL(workflow[3], RawDataProcessor::SELECT_FEATURES);
-  BOOST_CHECK_EQUAL(workflow[4], RawDataProcessor::QUANTIFY_FEATURES);
-  BOOST_CHECK_EQUAL(workflow[5], RawDataProcessor::CHECK_FEATURES);
-
-  workflow = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-    MetaDataHandler::SampleType::DoubleBlank
-  );
-
-  BOOST_CHECK_EQUAL(workflow.size(), 5);
-  BOOST_CHECK_EQUAL(workflow[0], RawDataProcessor::LOAD_RAW_DATA);
-  BOOST_CHECK_EQUAL(workflow[1], RawDataProcessor::PICK_FEATURES);
-  BOOST_CHECK_EQUAL(workflow[2], RawDataProcessor::FILTER_FEATURES);
-  BOOST_CHECK_EQUAL(workflow[3], RawDataProcessor::SELECT_FEATURES);
-  BOOST_CHECK_EQUAL(workflow[4], RawDataProcessor::CHECK_FEATURES);
-}
-
-BOOST_AUTO_TEST_CASE(processRawData)
-{
+  // Pre-requisites: load the parameters and associated raw data
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
-  const string traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
-  OpenMSFile::loadTraML(rawDataHandler, traML_csv_i, "csv");
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
 
-  const string featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
-  const string featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  LoadFeatureFilters loadFeatureFilters;
+  loadFeatureFilters.process(rawDataHandler, params_1, filenames);
 
-  OpenMSFile::loadFeatureFilter(rawDataHandler, featureFilterComponents_csv_i, featureFilterComponentGroups_csv_i);
-
-  const string quantitationMethods_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv");
+  filenames.quantitationMethods_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv");
   SequenceSegmentHandler sequenceSegmentHandler_IO;
-  OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler_IO, quantitationMethods_csv_i);
+  LoadQuantitationMethods loadQuantitationMethods;
+  loadQuantitationMethods.process(sequenceSegmentHandler_IO, SequenceHandler(), {}, filenames);
   rawDataHandler.setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
 
-  OpenMSFile::loadFeatureQC(rawDataHandler, featureFilterComponents_csv_i, featureFilterComponentGroups_csv_i);
+  LoadFeatureQCs loadFeatureQCs;
+  loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
-  std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_events;
-
-  raw_data_processing_events = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-    MetaDataHandler::SampleType::Unknown
-  );
-
-  Filenames filenames;
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
-
   map<string, vector<map<string, string>>>::iterator it = params_1.find("ChromatogramExtractor");
   if (it != params_1.end()) {
     params_1.erase(it);
   }
   params_1.emplace("ChromatogramExtractor", vector<map<string, string>>());
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
 
-  for (const RawDataProcessor::RawDataProcMethod event : raw_data_processing_events) {
-    RawDataProcessor::processRawData(rawDataHandler, event, params_1, filenames);
-  }
+  // Test integrated workflow: pickFeatures, filterFeatures, SelectFeatures, quantifyFeatures, and checkFeatures
+  PickFeatures pickFeatures;
+  pickFeatures.process(rawDataHandler, params_1, filenames);
+  FilterFeatures filterFeatures;
+  filterFeatures.process(rawDataHandler, params_1, filenames);
+  SelectFeatures selectFeatures;
+  selectFeatures.process(rawDataHandler, params_1, filenames);
+  QuantifyFeatures quantifyFeatures;
+  quantifyFeatures.process(rawDataHandler, params_1, filenames);
+  CheckFeatures checkFeatures;
+  checkFeatures.process(rawDataHandler, params_1, filenames);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 114); // test feature_map_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);

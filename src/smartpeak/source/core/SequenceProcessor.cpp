@@ -5,7 +5,6 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
-#include <SmartPeak/io/OpenMSFile.h>
 #include <SmartPeak/io/SequenceParser.h>
 
 namespace SmartPeak
@@ -28,28 +27,24 @@ namespace SmartPeak
     SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
 
     // load rawDataHandler files (applies to the whole session)
-    OpenMSFile::readRawDataProcessingParameters(rawDataHandler, filenames.parameters_csv_i);
+    LoadParameters loadParameters;
+    loadParameters.process(rawDataHandler, {}, filenames);
 
-    OpenMSFile::loadTraML(rawDataHandler, filenames.traML_csv_i, "csv", verbose_I);
+    LoadTransitions loadTransitions;
+    loadTransitions.process(rawDataHandler, {}, filenames, verbose_I);
 
-    OpenMSFile::loadFeatureFilter(
-      rawDataHandler,
-      filenames.featureFilterComponents_csv_i,
-      filenames.featureFilterComponentGroups_csv_i,
-      verbose_I
-    );
+    LoadFeatureFilters LoadFeatureFilters;
+    LoadFeatureFilters.process(rawDataHandler, {}, filenames, verbose_I);
 
-    OpenMSFile::loadFeatureQC(
-      rawDataHandler,
-      filenames.featureQCComponents_csv_i,
-      filenames.featureQCComponentGroups_csv_i,
-      verbose_I
-    );
+    LoadFeatureQCs loadFeatureQCs;
+    loadFeatureQCs.process(rawDataHandler, {}, filenames, verbose_I);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
 
     // load sequenceSegmentHandler files
-    OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler, filenames.quantitationMethods_csv_i, verbose_I);
-    OpenMSFile::loadStandardsConcentrations(sequenceSegmentHandler, filenames.standardsConcentrations_csv_i, verbose_I);
+    LoadQuantitationMethods loadQuantitationMethods;
+    loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames, verbose_I);
+    LoadStandardsConcentrations loadStandardsConcentrations;
+    loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames, verbose_I);
 
     // copy over the quantitation methods to the rawDataHandler
     rawDataHandler.setQuantitationMethods(sequenceSegmentHandler.getQuantitationMethods());
@@ -115,7 +110,7 @@ namespace SmartPeak
     SequenceHandler& sequenceHandler_IO,
     const std::map<std::string, Filenames>& filenames,
     const std::set<std::string>& injection_names,
-    const std::vector<RawDataProcessor::RawDataProcMethod>& raw_data_processing_methods_I,
+    const std::vector<std::shared_ptr<RawDataProcessor>>& raw_data_processing_methods_I,
     const bool verbose_I
   )
   {
@@ -133,31 +128,23 @@ namespace SmartPeak
     }
 
     for (InjectionHandler& injection : process_sequence) {
-      std::vector<RawDataProcessor::RawDataProcMethod> raw_data_processing_methods;
 
       // handle user-desired raw_data_processing_methods
-      if (raw_data_processing_methods_I.size()) {
-        raw_data_processing_methods = raw_data_processing_methods_I;
-      } else {
-        raw_data_processing_methods = RawDataProcessor::getDefaultRawDataProcessingWorkflow(
-          injection.getMetaData().getSampleType()
-        );
+      if (raw_data_processing_methods_I.size() == 0) {
+        throw "no raw data processing methods given.\n";
       }
 
-      const size_t n = raw_data_processing_methods.size();
+      const size_t n = raw_data_processing_methods_I.size();
 
       // process the samples
       for (size_t i = 0; i < n; ++i) {
         if (verbose_I) {
           std::cout << "\n[" << (i + 1) << "/" << n << "]" << std::endl;
         }
-        RawDataProcessor::processRawData(
-          injection.getRawData(),
-          raw_data_processing_methods[i], // event
-          injection.getRawData().getParameters(),
-          filenames.at(injection.getMetaData().getInjectionName()),
-          verbose_I
-        );
+        raw_data_processing_methods_I[i]->process(injection.getRawData(), 
+          injection.getRawData().getParameters(), 
+          filenames.at(injection.getMetaData().getInjectionName()), 
+          verbose_I);
       }
     }
 
@@ -168,7 +155,7 @@ namespace SmartPeak
     SequenceHandler& sequenceHandler_IO,
     const std::map<std::string, Filenames>& filenames,
     const std::set<std::string>& sequence_segment_names,
-    const std::vector<SequenceSegmentProcessor::SeqSegProcMethod>& sequence_segment_processing_methods_I,
+    const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& sequence_segment_processing_methods_I,
     const bool verbose_I
   )
   {
@@ -190,26 +177,17 @@ namespace SmartPeak
 
     // process by sequence segment
     for (SequenceSegmentHandler& sequence_segment : sequence_segments) {
-      std::vector<SequenceSegmentProcessor::SeqSegProcMethod> sequence_segment_processing_methods;
 
       // handle user-desired sequence_segment_processing_methods
-      if (sequence_segment_processing_methods_I.size()) {
-        sequence_segment_processing_methods = sequence_segment_processing_methods_I;
-      } else {
-        for (const size_t sample_index : sequence_segment.getSampleIndices()) {
-          const MetaDataHandler::SampleType sample_type =
-            sequenceHandler_IO.getSequence().at(sample_index).getMetaData().getSampleType();
-          sequence_segment_processing_methods =
-            SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(sample_type);
-        }
-      }
+      if (!sequence_segment_processing_methods_I.size()) {
+        throw "no sequence segment processing methods given.\n";
+      } 
 
       // process the sequence segment
-      for (const SequenceSegmentProcessor::SeqSegProcMethod event : sequence_segment_processing_methods) {
-        SequenceSegmentProcessor::processSequenceSegment(
+      for (const std::shared_ptr<SequenceSegmentProcessor> sequence_segment_processing_method : sequence_segment_processing_methods_I) {
+        sequence_segment_processing_method->process(
           sequence_segment,
           sequenceHandler_IO,
-          event,
           sequenceHandler_IO
             .getSequence()
             .at(sequence_segment.getSampleIndices().front())

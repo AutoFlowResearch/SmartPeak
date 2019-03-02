@@ -4,9 +4,11 @@
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SequenceHandler.h>
-#include <SmartPeak/io/OpenMSFile.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 #include <OpenMS/METADATA/AbsoluteQuantitationStandards.h>
+#include <SmartPeak/io/InputDataValidation.h>
+#include <OpenMS/FORMAT/AbsoluteQuantitationStandardsFile.h>
+#include <OpenMS/FORMAT/AbsoluteQuantitationMethodFile.h>
 
 namespace SmartPeak
 {
@@ -25,13 +27,13 @@ namespace SmartPeak
     }
   }
 
-  void SequenceSegmentProcessor::optimizeCalibrationCurves(
+  void CalculateCalibration::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::vector<std::map<std::string, std::string>>& AbsoluteQuantitation_params_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
     const bool verbose_I
-  )
-  {
+  ) const {
     if (verbose_I) {
       std::cout << "==== START optimizeCalibrationCurves" << std::endl;
     }
@@ -39,7 +41,7 @@ namespace SmartPeak
     std::vector<size_t> standards_indices;
 
     // get all standards
-    getSampleIndicesBySampleType(
+    this->getSampleIndicesBySampleType(
       sequenceSegmentHandler_IO,
       sequenceHandler_I,
       MetaDataHandler::SampleType::Standard,
@@ -57,7 +59,7 @@ namespace SmartPeak
       standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
     }
 
-    if (AbsoluteQuantitation_params_I.empty()) {
+    if (params_I.at("AbsoluteQuantitation").empty()) {
       std::cout << "AbsoluteQuantitation_params_I argument is empty. Returning." << std::endl;
       return;
     }
@@ -65,7 +67,7 @@ namespace SmartPeak
     // add in the method parameters
     OpenMS::AbsoluteQuantitation absoluteQuantitation;
     OpenMS::Param parameters = absoluteQuantitation.getParameters();
-    Utilities::updateParameters(parameters, AbsoluteQuantitation_params_I);
+    Utilities::updateParameters(parameters, params_I.at("AbsoluteQuantitation"));
     absoluteQuantitation.setParameters(parameters);
 
     absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
@@ -115,103 +117,135 @@ namespace SmartPeak
     }
   }
 
-  // void SequenceSegmentProcessor::plotCalibrators(
-  //   const SequenceSegmentHandler& sequenceSegmentHandler_I,
-  //   const std::string& calibrators_pdf_o,
-  //   const std::vector<std::map<std::string, std::string>>& SequenceSegmentPlotter_params_I,
-  //   const bool verbose_I
-  // )
-  // {
-  //   if (verbose_I)
-  //     std::cout << "Plotting calibrators." << std::endl;
-
-  //   if (SequenceSegmentPlotter_params_I.empty() || calibrators_pdf_o.empty())
-  //     throw std::invalid_argument("Parameters or filename are empty.");
-
-  //   // TODO: Uncomment when SequenceSegmentPlotter is implemented
-  //   SequenceSegmentPlotter sequenceSegmentPlotter;
-  //   sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
-  //   sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
-  // }
-
-  void SequenceSegmentProcessor::processSequenceSegment(
+  void LoadStandardsConcentrations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
-    SequenceHandler& sequenceHandler_IO,
-    const SeqSegProcMethod sequence_segment_processing_event,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters,
+    const SequenceHandler& sequenceHandler_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames,
     const bool verbose_I
-  )
+  ) const {
+    if (verbose_I) {
+      std::cout << "==== START loadStandardsConcentrations"
+        << "\nloadStandardsConcentrations(): loading " << filenames.standardsConcentrations_csv_i << std::endl;
+    }
+
+    if (filenames.standardsConcentrations_csv_i.empty()) {
+      std::cout << "loadStandardsConcentrations(): filename is empty\n";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(filenames.standardsConcentrations_csv_i)) {
+      std::cout << "loadStandardsConcentrations(): file not found\n";
+      return;
+    }
+
+    try {
+      OpenMS::AbsoluteQuantitationStandardsFile AQSf;
+      AQSf.load(filenames.standardsConcentrations_csv_i, sequenceSegmentHandler_IO.getStandardsConcentrations());
+    }
+    catch (const std::exception& e) {
+      std::cerr << "loadStandardsConcentrations(): " << e.what() << std::endl;
+      sequenceSegmentHandler_IO.getStandardsConcentrations().clear();
+      std::cerr << "loadStandardsConcentrations(): standards concentrations clear" << std::endl;
+    }
+
+    // std::cout << InputDataValidation::getStandardsConcentrationsInfo(sequenceSegmentHandler_IO);
+
+    if (verbose_I) {
+      std::cout << "==== END   loadStandardsConcentrations" << std::endl;
+    }
+  }
+
+  void LoadQuantitationMethods::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  ) const
   {
-    if (sequence_segment_processing_event == CALCULATE_CALIBRATION) {
-      // optimize the calibrators
-      optimizeCalibrationCurves(
-        sequenceSegmentHandler_IO,
-        sequenceHandler_IO,
-        parameters.at("AbsoluteQuantitation"),
-        verbose_I
+    if (verbose_I) {
+      std::cout << "==== START loadQuantitationMethods"
+        << "\nloadQuantitationMethods(): loading " << filenames.quantitationMethods_csv_i << std::endl;
+    }
+
+    if (filenames.quantitationMethods_csv_i.empty()) {
+      std::cout << "loadQuantitationMethods(): filename is empty\n";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(filenames.quantitationMethods_csv_i)) {
+      std::cout << "loadQuantitationMethods(): file not found\n";
+      return;
+    }
+
+    try {
+      OpenMS::AbsoluteQuantitationMethodFile AQMf;
+      AQMf.load(filenames.quantitationMethods_csv_i, sequenceSegmentHandler_IO.getQuantitationMethods());
+    }
+    catch (const std::exception& e) {
+      std::cerr << "loadQuantitationMethods(): " << e.what() << std::endl;
+      sequenceSegmentHandler_IO.getQuantitationMethods().clear();
+      std::cerr << "loadQuantitationMethods(): quantitation methods clear" << std::endl;
+    }
+
+    // std::cout << InputDataValidation::getQuantitationMethodsInfo(sequenceSegmentHandler_IO);
+
+    if (verbose_I) {
+      std::cout << "==== END   loadQuantitationMethods" << std::endl;
+    }
+  }
+
+  void StoreQuantitationMethods::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  ) const
+  {
+    if (verbose_I) {
+      std::cout << "==== START storeQuantitationMethods"
+        << "\nstoreQuantitationMethods(): storing " << filenames.quantitationMethods_csv_o << std::endl;
+    }
+
+    if (filenames.quantitationMethods_csv_o.empty()) {
+      std::cout << "storeQuantitationMethods(): filename is empty\n";
+      return;
+    }
+
+    try {
+      OpenMS::AbsoluteQuantitationMethodFile aqmf;
+      aqmf.store(
+        filenames.quantitationMethods_csv_o,
+        sequenceSegmentHandler_IO.getQuantitationMethods()
       );
-      // update each sample in the sequence segment with the updated quantitationMethods
-      for (const size_t index : sequenceSegmentHandler_IO.getSampleIndices()) {
-        sequenceHandler_IO
-          .getSequence()
-          .at(index)
-          .getRawData()
-          .setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
-      }
-    } else if (sequence_segment_processing_event == STORE_QUANTITATION_METHODS) {
-      OpenMSFile::storeQuantitationMethods(sequenceSegmentHandler_IO, filenames.quantitationMethods_csv_o, verbose_I);
-    } else if (sequence_segment_processing_event == LOAD_QUANTITATION_METHODS) {
-      OpenMSFile::loadQuantitationMethods(sequenceSegmentHandler_IO, filenames.quantitationMethods_csv_i, verbose_I);
-    } else {
-      throw std::invalid_argument("Sequence segment processing event was not recognized. Value: " +
-        std::to_string(sequence_segment_processing_event) + "\n");
+    }
+    catch (const std::exception& e) {
+      std::cerr << "storeQuantitationMethods(): " << e.what() << std::endl;
+    }
+
+    if (verbose_I) {
+      std::cout << "==== END   storeQuantitationMethods" << std::endl;
     }
   }
 
-  std::vector<SequenceSegmentProcessor::SeqSegProcMethod>
-  SequenceSegmentProcessor::getDefaultSequenceSegmentProcessingWorkflow(
-    const MetaDataHandler::SampleType sample_type
-  )
-  {
-    switch (sample_type) {
-      case MetaDataHandler::SampleType::Unknown:
-      case MetaDataHandler::SampleType::Blank:
-      case MetaDataHandler::SampleType::DoubleBlank:
-        return {};
-      case MetaDataHandler::SampleType::Standard:
-        return { CALCULATE_CALIBRATION };
-      case MetaDataHandler::SampleType::QC:
-        return {};
-        // return { CALCULATE_VARIABILITY };
-      case MetaDataHandler::SampleType::Solvent:
-        return {};
-        // return { CALCULATE_CARRYOVER };
-      default:
-        throw "Sample Type case not handled.\n";
-    }
-  }
+   void PlotCalibrators::process(
+     SequenceSegmentHandler& sequenceSegmentHandler_IO,
+     const SequenceHandler& sequenceHandler_I,
+     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+     const Filenames& filenames,
+     const bool verbose_I
+   ) const {
+     if (verbose_I)
+       std::cout << "Plotting calibrators." << std::endl;
 
-  bool SequenceSegmentProcessor::checkSequenceSegmentProcessing(
-    const std::vector<std::string>& sequence_segment_processing
-  )
-  {
-    const std::set<std::string> valid_events = {
-      "calculate_calibration",
-      "calculate_carryover",
-      "calculate_variability",
-      "store_quantitation_methods",
-      "load_quantitation_methods",
-      "store_components_to_concentrations",
-      "plot_calibrators"
-    };
-    bool is_valid = true;
-    for (const std::string& event : sequence_segment_processing) {
-      if (0 == valid_events.count(event)) {
-        std::cout << "Sequence group processing event '" << event << "' is not valid." << std::endl;
-        is_valid = false;
-      }
-    }
-    return is_valid;
-  }
+     if (params_I.at("SequenceSegmentPlotter").empty());
+       throw std::invalid_argument("Parameters or filename are empty.");
+
+     //// TODO: Uncomment when SequenceSegmentPlotter is implemented
+     //SequenceSegmentPlotter sequenceSegmentPlotter;
+     //sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
+     //sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
+   }
 }
