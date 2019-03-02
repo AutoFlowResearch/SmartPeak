@@ -13,17 +13,19 @@ public:
     void clear();
 
     void setMetaData(const MetaDataHandler& meta_data);
+    void setMetaData(std::shared_ptr<MetaDataHandler>& meta_data);
 
     MetaDataHandler& getMetaData();
     const MetaDataHandler& getMetaData() const;
 
     void setRawData(const RawDataHandler& raw_data);
+    void setRawData(std::shared_ptr<RawDataHandler>& raw_data);
 
     RawDataHandler& getRawData();
     const RawDataHandler& getRawData() const;
 
 private:
-    MetaDataHandler meta_data_;
-    RawDataHandler raw_data_;
+    std::shared_ptr<MetaDataHandler> meta_data_ = nullptr;
+    std::shared_ptr<RawDataHandler> raw_data_ = nullptr;
   };
 }

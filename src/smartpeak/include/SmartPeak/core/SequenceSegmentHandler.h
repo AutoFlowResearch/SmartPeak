@@ -25,6 +25,7 @@ public:
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& getStandardsConcentrations() const;
 
     void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods);
+    void setQuantitationMethods(std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& quantitation_methods);
     std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods();
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods() const;
 
@@ -40,9 +41,9 @@ public:
 
 private:
     std::string sequence_segment_name_;
-    std::vector<size_t> sample_indices_;
+    std::vector<size_t> sample_indices_;  ///< The indices of each injection; this could be replaced with `std::shared_ptr<InjectionHandler>` to save the map lookup
     std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards_concentrations_;
-    std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods_;
+    std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> quantitation_methods_ = nullptr;  ///< Transition quantitation methods; shared between all raw data handlers in the sequence segment
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations_;
   };
 }

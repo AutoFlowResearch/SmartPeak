@@ -9,7 +9,7 @@ namespace SmartPeak
     sequence_segment_name_.clear();
     sample_indices_.clear();
     standards_concentrations_.clear();
-    quantitation_methods_.clear();
+    if (quantitation_methods_!=nullptr) quantitation_methods_->clear();
     components_to_concentrations_.clear();
   }
 
@@ -60,17 +60,22 @@ namespace SmartPeak
 
   void SequenceSegmentHandler::setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods)
   {
+    quantitation_methods_.reset(new std::vector<OpenMS::AbsoluteQuantitationMethod>(quantitation_methods));
+  }
+
+  void SequenceSegmentHandler::setQuantitationMethods(std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& quantitation_methods)
+  {
     quantitation_methods_ = quantitation_methods;
   }
 
   std::vector<OpenMS::AbsoluteQuantitationMethod>& SequenceSegmentHandler::getQuantitationMethods()
   {
-    return quantitation_methods_;
+    return *(quantitation_methods_.get());
   }
 
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& SequenceSegmentHandler::getQuantitationMethods() const
   {
-    return quantitation_methods_;
+    return *(quantitation_methods_.get());
   }
 
   void SequenceSegmentHandler::setComponentsToConcentrations(

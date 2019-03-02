@@ -327,6 +327,17 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().getMetaValue("name"), "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getExperiment().getMetaValue("name"), "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getChromatogramMap().getMetaValue("name"), "foo");
+
+  rawDataHandler.clear();
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getMetaData().getSampleName(), "");
+  BOOST_CHECK_EQUAL(rawDataHandler.getQuantitationMethods().size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureFilter().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureQC().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getExperiment().size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getChromatogramMap().size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(updateFeatureMapHistory)

@@ -23,108 +23,143 @@ namespace SmartPeak
 
   void RawDataHandler::setMetaData(const MetaDataHandler& meta_data)
   {
+    meta_data_.reset(new MetaDataHandler(meta_data));
+  }
+
+  void RawDataHandler::setMetaData(std::shared_ptr<MetaDataHandler>& meta_data)
+  {
     meta_data_ = meta_data;
   }
 
   MetaDataHandler& RawDataHandler::getMetaData()
   {
-    return meta_data_;
+    return *(meta_data_.get());
   }
 
   const MetaDataHandler& RawDataHandler::getMetaData() const
   {
-    return meta_data_;
+    return *(meta_data_.get());
   }
 
   void RawDataHandler::setParameters(
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters)
+  {
+    parameters_.reset(new std::map<std::string, std::vector<std::map<std::string, std::string>>>(parameters));
+  }
+
+  void RawDataHandler::setParameters(std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& parameters)
   {
     parameters_ = parameters;
   }
 
   std::map<std::string, std::vector<std::map<std::string, std::string>>>& RawDataHandler::getParameters()
   {
-    return parameters_;
+    return *(parameters_.get());
   }
 
   const std::map<std::string, std::vector<std::map<std::string, std::string>>>& RawDataHandler::getParameters() const
   {
-    return parameters_;
+    return *(parameters_.get());
   }
 
   void RawDataHandler::setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_exp)
+  {
+    targeted_exp_.reset(new OpenMS::TargetedExperiment(targeted_exp));
+  }
+
+  void RawDataHandler::setTargetedExperiment(std::shared_ptr<OpenMS::TargetedExperiment>& targeted_exp)
   {
     targeted_exp_ = targeted_exp;
   }
 
   OpenMS::TargetedExperiment& RawDataHandler::getTargetedExperiment()
   {
-    return targeted_exp_;
+    return *(targeted_exp_.get());
   }
 
   const OpenMS::TargetedExperiment& RawDataHandler::getTargetedExperiment() const
   {
-    return targeted_exp_;
+    return *(targeted_exp_.get());
   }
 
   void RawDataHandler::setReferenceData(const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data)
+  {
+    reference_data_.reset(new std::vector<std::map<std::string, Utilities::CastValue>>(reference_data));
+  }
+
+  void RawDataHandler::setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>& reference_data)
   {
     reference_data_ = reference_data;
   }
 
   std::vector<std::map<std::string, Utilities::CastValue>>& RawDataHandler::getReferenceData()
   {
-    return reference_data_;
+    return *(reference_data_.get());
   }
 
   const std::vector<std::map<std::string, Utilities::CastValue>>& RawDataHandler::getReferenceData() const
   {
-    return reference_data_;
+    return *(reference_data_.get());
   }
 
   void RawDataHandler::setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods)
+  {
+    quantitation_methods_.reset(new std::vector<OpenMS::AbsoluteQuantitationMethod>(quantitation_methods));
+  }
+
+  void RawDataHandler::setQuantitationMethods(std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& quantitation_methods)
   {
     quantitation_methods_ = quantitation_methods;
   }
 
   std::vector<OpenMS::AbsoluteQuantitationMethod>& RawDataHandler::getQuantitationMethods()
   {
-    return quantitation_methods_;
+    return *(quantitation_methods_.get());
   }
 
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& RawDataHandler::getQuantitationMethods() const
   {
-    return quantitation_methods_;
+    return *(quantitation_methods_.get());
   }
 
   void RawDataHandler::setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter)
+  {
+    feature_filter_.reset(new OpenMS::MRMFeatureQC(feature_filter));
+  }
+
+  void RawDataHandler::setFeatureFilter(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_filter)
   {
     feature_filter_ = feature_filter;
   }
 
   OpenMS::MRMFeatureQC& RawDataHandler::getFeatureFilter()
   {
-    return feature_filter_;
+    return *(feature_filter_.get());
   }
 
   const OpenMS::MRMFeatureQC& RawDataHandler::getFeatureFilter() const
   {
-    return feature_filter_;
+    return *(feature_filter_.get());
   }
 
   void RawDataHandler::setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc)
+  {
+    feature_qc_.reset(new OpenMS::MRMFeatureQC(feature_qc));
+  }
+
+  void RawDataHandler::setFeatureQC(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_qc)
   {
     feature_qc_ = feature_qc;
   }
 
   OpenMS::MRMFeatureQC& RawDataHandler::getFeatureQC()
   {
-    return feature_qc_;
+    return *(feature_qc_.get());
   }
 
   const OpenMS::MRMFeatureQC& RawDataHandler::getFeatureQC() const
   {
-    return feature_qc_;
+    return *(feature_qc_.get());
   }
 
   void RawDataHandler::setFeatureMapHistory(const OpenMS::FeatureMap& feature_map_history)
@@ -225,13 +260,13 @@ namespace SmartPeak
     swath_.clear(true);
     feature_map_.clear(true);
     feature_map_history_.clear(true);
-    meta_data_.clear();
+    if (meta_data_!=nullptr) meta_data_->clear();
     validation_metrics_.clear();
-    parameters_.clear();
-    targeted_exp_.clear(true);
-    quantitation_methods_.clear();
-    feature_filter_ = OpenMS::MRMFeatureQC();
-    feature_qc_ = OpenMS::MRMFeatureQC();
+    if (parameters_!=nullptr) parameters_->clear();
+    if (targeted_exp_!=nullptr) targeted_exp_->clear(true);
+    if (quantitation_methods_ != nullptr) quantitation_methods_->clear();
+    if (feature_filter_ != nullptr) feature_filter_ = std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC());
+    if (feature_qc_ != nullptr) feature_qc_ = std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC());
   }
 
   void RawDataHandler::updateFeatureMapHistory()

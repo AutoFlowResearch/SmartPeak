@@ -26,31 +26,39 @@ public:
     const OpenMS::FeatureMap& getFeatureMap() const;
 
     void setMetaData(const MetaDataHandler& meta_data);
+    void setMetaData(std::shared_ptr<MetaDataHandler>& meta_data);
     MetaDataHandler& getMetaData();
     const MetaDataHandler& getMetaData() const;
 
     void setParameters(
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters);
+    void setParameters(
+      std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& parameters);
     std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters();
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters() const;
 
     void setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_exp);
+    void setTargetedExperiment(std::shared_ptr<OpenMS::TargetedExperiment>& targeted_exp);
     OpenMS::TargetedExperiment& getTargetedExperiment();
     const OpenMS::TargetedExperiment& getTargetedExperiment() const;
 
     void setReferenceData(const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data);
+    void setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>& reference_data);
     std::vector<std::map<std::string, Utilities::CastValue>>& getReferenceData();
     const std::vector<std::map<std::string, Utilities::CastValue>>& getReferenceData() const;
 
     void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods);
+    void setQuantitationMethods(std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& quantitation_methods);
     std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods();
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods() const;
 
     void setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter);
+    void setFeatureFilter(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_filter);
     OpenMS::MRMFeatureQC& getFeatureFilter();
     const OpenMS::MRMFeatureQC& getFeatureFilter() const;
 
     void setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc);
+    void setFeatureQC(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_qc);
     OpenMS::MRMFeatureQC& getFeatureQC();
     const OpenMS::MRMFeatureQC& getFeatureQC() const;
 
@@ -94,21 +102,21 @@ private:
     // input
     OpenMS::MSExperiment experiment_;  ///< Raw MS data derived from the mzML file
     OpenMS::MSExperiment chromatogram_map_;  ///< MS data annotated with transition information derived from the TraML file
-    OpenMS::TransformationDescription trafo_;
+    OpenMS::TransformationDescription trafo_;  ///< Mapping of retention time values; currently not used (maybe shared between all raw data handlers)
     OpenMS::MSExperiment swath_;
 
     // output
     OpenMS::FeatureMap feature_map_; ///< The most recently generated set of features for the experiment
     OpenMS::FeatureMap feature_map_history_; ///< A record of all changes that have occured to the features in the experiment
-    MetaDataHandler meta_data_;
+    std::shared_ptr<MetaDataHandler> meta_data_;  ///< sample meta data; shared between the injection handler and the raw data handler
     std::map<std::string, float> validation_metrics_;
 
     // input (reused between RawDataHandlers)
-    std::map<std::string, std::vector<std::map<std::string, std::string>>> parameters_;
-    OpenMS::TargetedExperiment targeted_exp_;
-    std::vector<std::map<std::string, Utilities::CastValue>> reference_data_;
-    std::vector<OpenMS::AbsoluteQuantitationMethod> quantitation_methods_;
-    OpenMS::MRMFeatureQC feature_filter_;
-    OpenMS::MRMFeatureQC feature_qc_;
+    std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>> parameters_ = nullptr;  ///< algorithm parameters; shared between all raw data handlers in the sequence
+    std::shared_ptr<OpenMS::TargetedExperiment> targeted_exp_ = nullptr;  ///< transitions for the SRM experiments; shared between all raw data handlers in the sequence
+    std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>> reference_data_ = nullptr;  ///< Reference data to compare algorithm accuracy; shared between all raw data handlers in the sequence
+    std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> quantitation_methods_ = nullptr;  ///< Transition quantitation methods; shared between all raw data handlers in the sequence segment
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_filter_ = nullptr;  ///< Feature Filters; shared between all raw data handlers in the sequence
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_qc_ = nullptr;  ///< Feature QCs; shared between all raw data handlers in the sequence
   };
 }
