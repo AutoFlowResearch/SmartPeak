@@ -576,7 +576,30 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeatures.qc").size(), 0);
 }
 
-// TODO:  Add all other class specific tests and change the name of the test cases
+/**
+  PickFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorPickFeatures)
+{
+  PickFeatures* ptrPickFeatures = nullptr;
+  PickFeatures* nullPointerPickFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrPickFeatures, nullPointerPickFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorPickFeatures)
+{
+  PickFeatures* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new PickFeatures();
+  delete ptrPickFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersPickFeatures)
+{
+  PickFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 5);
+  BOOST_CHECK_EQUAL(processor.getName(), "PICK_FEATURES");
+}
 
 BOOST_AUTO_TEST_CASE(pickFeatures)
 {
@@ -627,6 +650,31 @@ BOOST_AUTO_TEST_CASE(pickFeatures)
   BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 1067.5447296543123, 1e-6);
   BOOST_CHECK(hsubordinate2.getMetaValue("used_").toBool());
+}
+
+/**
+  FilterFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorFilterFeatures)
+{
+  FilterFeatures* ptrFilterFeatures = nullptr;
+  FilterFeatures* nullPointerFilterFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrFilterFeatures, nullPointerFilterFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorFilterFeatures)
+{
+  FilterFeatures* ptrFilterFeatures = nullptr;
+  ptrFilterFeatures = new FilterFeatures();
+  delete ptrFilterFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersFilterFeatures)
+{
+  FilterFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 6);
+  BOOST_CHECK_EQUAL(processor.getName(), "FILTER_FEATURES");
 }
 
 BOOST_AUTO_TEST_CASE(filterFeatures)
@@ -693,6 +741,31 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
   BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
 }
 
+/**
+  SelectFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorSelectFeatures)
+{
+  SelectFeatures* ptrSelectFeatures = nullptr;
+  SelectFeatures* nullPointerSelectFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrSelectFeatures, nullPointerSelectFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorSelectFeatures)
+{
+  SelectFeatures* ptrSelectFeatures = nullptr;
+  ptrSelectFeatures = new SelectFeatures();
+  delete ptrSelectFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersSelectFeatures)
+{
+  SelectFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 8);
+  BOOST_CHECK_EQUAL(processor.getName(), "SELECT_FEATURES");
+}
+
 BOOST_AUTO_TEST_CASE(selectFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
@@ -752,6 +825,31 @@ BOOST_AUTO_TEST_CASE(selectFeatures)
   BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
 }
 
+/**
+  ValidateFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorValidateFeatures)
+{
+  ValidateFeatures* ptrValidateFeatures = nullptr;
+  ValidateFeatures* nullPointerValidateFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrValidateFeatures, nullPointerValidateFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorValidateFeatures)
+{
+  ValidateFeatures* ptrValidateFeatures = nullptr;
+  ptrValidateFeatures = new ValidateFeatures();
+  delete ptrValidateFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersValidateFeatures)
+{
+  ValidateFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 9);
+  BOOST_CHECK_EQUAL(processor.getName(), "VALIDATE_FEATURES");
+}
+
 BOOST_AUTO_TEST_CASE(validateFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
@@ -785,10 +883,59 @@ BOOST_AUTO_TEST_CASE(validateFeatures)
   BOOST_CHECK_CLOSE(validation_metrics.at("precision"), 0.0, 1e-3);
   BOOST_CHECK_EQUAL(std::isnan(validation_metrics.at("recall")), true);
 }
+/**
+  PlotFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorPlotFeatures)
+{
+  PlotFeatures* ptrPlotFeatures = nullptr;
+  PlotFeatures* nullPointerPlotFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrPlotFeatures, nullPointerPlotFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorPlotFeatures)
+{
+  PlotFeatures* ptrPlotFeatures = nullptr;
+  ptrPlotFeatures = new PlotFeatures();
+  delete ptrPlotFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersPlotFeatures)
+{
+  PlotFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 11);
+  BOOST_CHECK_EQUAL(processor.getName(), "PLOT_FEATURES");
+}
 
 BOOST_AUTO_TEST_CASE(plotFeatures)
 {
 // TODO: Uncomment once FeaturePlotter is ready
+}
+
+/**
+  QuantifyFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorQuantifyFeatures)
+{
+  QuantifyFeatures* ptrQuantifyFeatures = nullptr;
+  QuantifyFeatures* nullPointerQuantifyFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrQuantifyFeatures, nullPointerQuantifyFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorQuantifyFeatures)
+{
+  QuantifyFeatures* ptrQuantifyFeatures = nullptr;
+  ptrQuantifyFeatures = new QuantifyFeatures();
+  delete ptrQuantifyFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersQuantifyFeatures)
+{
+  QuantifyFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 10);
+  BOOST_CHECK_EQUAL(processor.getName(), "QUANTIFY_FEATURES");
 }
 
 BOOST_AUTO_TEST_CASE(quantifyComponents)
@@ -828,6 +975,31 @@ BOOST_AUTO_TEST_CASE(quantifyComponents)
   BOOST_CHECK_CLOSE(static_cast<double>(hsub.getMetaValue("calculated_concentration")), 0.44335812456518986, 1e-6);
   BOOST_CHECK_EQUAL(hsub.getMetaValue("concentration_units").toString(), "uM");
   BOOST_CHECK(hsub.getMetaValue("used_").toBool());
+}
+
+/**
+  CheckFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorCheckFeatures)
+{
+  CheckFeatures* ptrCheckFeatures = nullptr;
+  CheckFeatures* nullPointerCheckFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrCheckFeatures, nullPointerCheckFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorCheckFeatures)
+{
+  CheckFeatures* ptrCheckFeatures = nullptr;
+  ptrCheckFeatures = new CheckFeatures();
+  delete ptrCheckFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersCheckFeatures)
+{
+  CheckFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 7);
+  BOOST_CHECK_EQUAL(processor.getName(), "CHECK_FEATURES");
 }
 
 BOOST_AUTO_TEST_CASE(checkFeatures)
