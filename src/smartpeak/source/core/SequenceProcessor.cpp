@@ -66,13 +66,11 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    std::vector<InjectionHandler> process_sequence;
+    std::vector<InjectionHandler>& process_sequence = sequenceHandler_IO.getSamplesInSequence(injection_names);
 
     // handle user-desired samples
     if (injection_names.empty()) {
       process_sequence = sequenceHandler_IO.getSequence();
-    } else {
-      process_sequence = sequenceHandler_IO.getSamplesInSequence(injection_names);
     }
 
     if (filenames.size() != process_sequence.size()) {
@@ -99,8 +97,6 @@ namespace SmartPeak
           verbose_I);
       }
     }
-
-    sequenceHandler_IO.setSequence(process_sequence);
   }
 
   void SequenceProcessor::processSequenceSegments(

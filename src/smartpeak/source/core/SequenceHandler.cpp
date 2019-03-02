@@ -68,9 +68,11 @@ namespace SmartPeak
   {
     if (!MetaDataHandler::validateMetaData(meta_data_I))
       throw std::invalid_argument("Metadata argument is not valid.");
+    std::shared_ptr<MetaDataHandler> meta_data_ptr(new MetaDataHandler(meta_data_I));
 
     // initialize the raw data
     RawDataHandler rdh;
+    rdh.setMetaData(meta_data_ptr);
     rdh.setFeatureMap(featureMap_I);
     rdh.updateFeatureMapHistory();
 
@@ -135,7 +137,7 @@ namespace SmartPeak
 
     // intialize the meta data
     InjectionHandler sh;
-    sh.setMetaData(meta_data_I);
+    sh.setMetaData(meta_data_ptr);
     sh.setRawData(rdh);
 
     sequence_.push_back(sh);
