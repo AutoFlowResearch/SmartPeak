@@ -36,6 +36,7 @@ BOOST_AUTO_TEST_CASE(set_get_MetaData)
 
   const MetaDataHandler& mdh2 = injectionHandler.getMetaData();
   BOOST_CHECK_EQUAL(mdh2.getSampleName(), "1");
+  BOOST_CHECK_EQUAL(injectionHandler.getMetaDataShared()->getSampleName(), "1");
 
   mdh1.setSampleGroupName("2");
   injectionHandler.getMetaData() = mdh1;
@@ -43,6 +44,8 @@ BOOST_AUTO_TEST_CASE(set_get_MetaData)
   const MetaDataHandler& mdh3 = injectionHandler.getMetaData();
   BOOST_CHECK_EQUAL(mdh3.getSampleName(), "1");
   BOOST_CHECK_EQUAL(mdh3.getSampleGroupName(), "2");
+  BOOST_CHECK_EQUAL(injectionHandler.getMetaDataShared()->getSampleName(), "1");
+  BOOST_CHECK_EQUAL(injectionHandler.getMetaDataShared()->getSampleGroupName(), "2");
 
   // Quick sanity check of pointer relationships
   std::shared_ptr<MetaDataHandler> mdh4(new MetaDataHandler(mdh1));
@@ -71,6 +74,7 @@ BOOST_AUTO_TEST_CASE(set_get_RawData)
 
   const RawDataHandler& rdh2 = injectionHandler.getRawData();
   BOOST_CHECK_EQUAL(rdh2.getFeatureMap().getIdentifier(), "1");
+  BOOST_CHECK_EQUAL(injectionHandler.getRawDataShared()->getFeatureMap().getIdentifier(), "1");
 
   f1.setIdentifier("2");
   rdh1.setFeatureMap(f1);
@@ -78,6 +82,7 @@ BOOST_AUTO_TEST_CASE(set_get_RawData)
 
   const RawDataHandler& rdh3 = injectionHandler.getRawData();
   BOOST_CHECK_EQUAL(rdh3.getFeatureMap().getIdentifier(), "2");
+  BOOST_CHECK_EQUAL(injectionHandler.getRawDataShared()->getFeatureMap().getIdentifier(), "2");
 }
 
 BOOST_AUTO_TEST_CASE(clear)

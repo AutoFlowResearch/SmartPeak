@@ -29,6 +29,7 @@ public:
     void setMetaData(std::shared_ptr<MetaDataHandler>& meta_data);
     MetaDataHandler& getMetaData();
     const MetaDataHandler& getMetaData() const;
+    std::shared_ptr<MetaDataHandler>& getMetaDataShared();
 
     void setParameters(
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters);
@@ -36,31 +37,37 @@ public:
       std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& parameters);
     std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters();
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters() const;
+    std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& getParametersShared();
 
     void setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_exp);
     void setTargetedExperiment(std::shared_ptr<OpenMS::TargetedExperiment>& targeted_exp);
     OpenMS::TargetedExperiment& getTargetedExperiment();
     const OpenMS::TargetedExperiment& getTargetedExperiment() const;
+    std::shared_ptr<OpenMS::TargetedExperiment>& getTargetedExperimentShared();
 
     void setReferenceData(const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data);
     void setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>& reference_data);
     std::vector<std::map<std::string, Utilities::CastValue>>& getReferenceData();
     const std::vector<std::map<std::string, Utilities::CastValue>>& getReferenceData() const;
+    std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>& getReferenceDataShared();
 
     void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods);
     void setQuantitationMethods(std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& quantitation_methods);
     std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods();
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods() const;
+    std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& getQuantitationMethodsShared();
 
     void setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter);
     void setFeatureFilter(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_filter);
     OpenMS::MRMFeatureQC& getFeatureFilter();
     const OpenMS::MRMFeatureQC& getFeatureFilter() const;
+    std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureFilterShared();
 
     void setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc);
     void setFeatureQC(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_qc);
     OpenMS::MRMFeatureQC& getFeatureQC();
     const OpenMS::MRMFeatureQC& getFeatureQC() const;
+    std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureQCShared();
 
     void setFeatureMapHistory(const OpenMS::FeatureMap& feature_map_history);
     OpenMS::FeatureMap& getFeatureMapHistory();

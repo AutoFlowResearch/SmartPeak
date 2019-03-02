@@ -28,6 +28,7 @@ public:
     void setQuantitationMethods(std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& quantitation_methods);
     std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods();
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods() const;
+    std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& getQuantitationMethodsShared();
 
     void setComponentsToConcentrations(
       const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations

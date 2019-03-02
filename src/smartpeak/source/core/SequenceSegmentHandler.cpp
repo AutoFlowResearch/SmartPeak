@@ -78,6 +78,11 @@ namespace SmartPeak
     return *(quantitation_methods_.get());
   }
 
+  std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& SequenceSegmentHandler::getQuantitationMethodsShared()
+  {
+    return quantitation_methods_;
+  }
+
   void SequenceSegmentHandler::setComponentsToConcentrations(
     const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations
   )

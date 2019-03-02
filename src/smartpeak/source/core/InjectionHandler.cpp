@@ -30,6 +30,11 @@ namespace SmartPeak
     return *(meta_data_.get());
   }
 
+  std::shared_ptr<MetaDataHandler>& InjectionHandler::getMetaDataShared()
+  {
+    return meta_data_;
+  }
+
   void InjectionHandler::setRawData(const RawDataHandler& raw_data)
   {
     raw_data_.reset(new RawDataHandler(raw_data));
@@ -48,5 +53,9 @@ namespace SmartPeak
   const RawDataHandler& InjectionHandler::getRawData() const
   {
     return *(raw_data_.get());
+  }
+  std::shared_ptr<RawDataHandler>& InjectionHandler::getRawDataShared()
+  {
+    return raw_data_;
   }
 }

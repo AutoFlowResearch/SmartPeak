@@ -80,6 +80,8 @@ BOOST_AUTO_TEST_CASE(set_get_MetaData)
 
   const MetaDataHandler& m2 = rawDataHandler.getMetaData(); // testing const getter
   BOOST_CHECK_EQUAL(m2.getSampleName(), name);
+  std::shared_ptr<MetaDataHandler> m2shared = rawDataHandler.getMetaDataShared();
+  BOOST_CHECK_EQUAL(m2shared->getSampleName(), name);
 
   const string group_name {"bar"};
   rawDataHandler.getMetaData().setSampleGroupName(group_name); // testing non-const getter
@@ -87,6 +89,9 @@ BOOST_AUTO_TEST_CASE(set_get_MetaData)
   const MetaDataHandler& m3 = rawDataHandler.getMetaData();
   BOOST_CHECK_EQUAL(m3.getSampleName(), name);
   BOOST_CHECK_EQUAL(m3.getSampleGroupName(), group_name);
+  std::shared_ptr<MetaDataHandler> m3shared = rawDataHandler.getMetaDataShared();
+  BOOST_CHECK_EQUAL(m3shared->getSampleName(), name);
+  BOOST_CHECK_EQUAL(m3shared->getSampleGroupName(), group_name);
 }
 
 BOOST_AUTO_TEST_CASE(set_get_Parameters)
@@ -112,6 +117,13 @@ BOOST_AUTO_TEST_CASE(set_get_Parameters)
   BOOST_CHECK_EQUAL(parameters2.at(name1)[0].at("name"), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(parameters2.at(name1)[0].count("value"), 1);
   BOOST_CHECK_EQUAL(parameters2.at(name1)[0].at("value"), "-1");
+  std::shared_ptr< map<string, vector<map<string, string>>>> parameters2shared = rawDataHandler.getParametersShared();
+  BOOST_CHECK_EQUAL(parameters2shared->count(name1), 1);
+  BOOST_CHECK_EQUAL(parameters2shared->at(name1).size(), 1);
+  BOOST_CHECK_EQUAL(parameters2shared->at(name1)[0].count("name"), 1);
+  BOOST_CHECK_EQUAL(parameters2shared->at(name1)[0].at("name"), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(parameters2shared->at(name1)[0].count("value"), 1);
+  BOOST_CHECK_EQUAL(parameters2shared->at(name1)[0].at("value"), "-1");
 
   rawDataHandler.getParameters().at(name1)[0].insert({"type", "int"});
 
@@ -124,6 +136,15 @@ BOOST_AUTO_TEST_CASE(set_get_Parameters)
   BOOST_CHECK_EQUAL(parameters3.at(name1)[0].at("value"), "-1");
   BOOST_CHECK_EQUAL(parameters3.at(name1)[0].count("type"), 1);
   BOOST_CHECK_EQUAL(parameters3.at(name1)[0].at("type"), "int");
+  std::shared_ptr< map<string, vector<map<string, string>>>> parameters3shared = rawDataHandler.getParametersShared();
+  BOOST_CHECK_EQUAL(parameters3shared->count(name1), 1);
+  BOOST_CHECK_EQUAL(parameters3shared->at(name1).size(), 1);
+  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].count("name"), 1);
+  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].at("name"), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].count("value"), 1);
+  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].at("value"), "-1");
+  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].count("type"), 1);
+  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].at("type"), "int");
 }
 
 BOOST_AUTO_TEST_CASE(set_get_QuantitationMethods)
@@ -142,6 +163,9 @@ BOOST_AUTO_TEST_CASE(set_get_QuantitationMethods)
   const vector<OpenMS::AbsoluteQuantitationMethod>& AQMs2 = rawDataHandler.getQuantitationMethods(); // testing const getter
   BOOST_CHECK_EQUAL(AQMs2.size(), 1);
   BOOST_CHECK_EQUAL(AQMs2[0].getComponentName(), name);
+  std::shared_ptr<vector<OpenMS::AbsoluteQuantitationMethod>>& AQMs2shared = rawDataHandler.getQuantitationMethodsShared(); // testing shared_ptr getter
+  BOOST_CHECK_EQUAL(AQMs2shared->size(), 1);
+  BOOST_CHECK_EQUAL(AQMs2shared->at(0).getComponentName(), name);
 
   const string feature_name {"bar"};
   rawDataHandler.getQuantitationMethods()[0].setFeatureName(feature_name); // testing non-const getter
@@ -149,6 +173,9 @@ BOOST_AUTO_TEST_CASE(set_get_QuantitationMethods)
   const vector<OpenMS::AbsoluteQuantitationMethod>& AQMs3 = rawDataHandler.getQuantitationMethods();
   BOOST_CHECK_EQUAL(AQMs3[0].getComponentName(), name);
   BOOST_CHECK_EQUAL(AQMs3[0].getFeatureName(), feature_name);
+  std::shared_ptr<vector<OpenMS::AbsoluteQuantitationMethod>>& AQMs3shared = rawDataHandler.getQuantitationMethodsShared(); // testing shared_ptr getter
+  BOOST_CHECK_EQUAL(AQMs3shared->at(0).getComponentName(), name);
+  BOOST_CHECK_EQUAL(AQMs3shared->at(0).getFeatureName(), feature_name);
 }
 
 BOOST_AUTO_TEST_CASE(set_get_FeatureFilter)
@@ -167,6 +194,9 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureFilter)
   const OpenMS::MRMFeatureQC& fqc2 = rawDataHandler.getFeatureFilter(); // testing const getter
   BOOST_CHECK_EQUAL(fqc2.component_qcs.size(), 1);
   BOOST_CHECK_EQUAL(fqc2.component_qcs[0].component_name, name);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc2shared = rawDataHandler.getFeatureFilterShared(); // testing shared_ptr getter
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs[0].component_name, name);
 
   const double rt_low {4.0};
   rawDataHandler.getFeatureFilter().component_qcs[0].retention_time_l = rt_low; // testing non-const getter
@@ -175,6 +205,10 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureFilter)
   BOOST_CHECK_EQUAL(fqc3.component_qcs.size(), 1);
   BOOST_CHECK_EQUAL(fqc3.component_qcs[0].component_name, name);
   BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc3shared = rawDataHandler.getFeatureFilterShared();
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].retention_time_l, rt_low);
 }
 
 BOOST_AUTO_TEST_CASE(set_get_FeatureQC)
@@ -193,6 +227,9 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureQC)
   const OpenMS::MRMFeatureQC& fqc2 = rawDataHandler.getFeatureQC(); // testing const getter
   BOOST_CHECK_EQUAL(fqc2.component_qcs.size(), 1);
   BOOST_CHECK_EQUAL(fqc2.component_qcs[0].component_name, name);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc2shared = rawDataHandler.getFeatureQCShared(); // testing shared_ptr getter
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs[0].component_name, name);
 
   const double rt_low {4.0};
   rawDataHandler.getFeatureQC().component_qcs[0].retention_time_l = rt_low; // testing non-const getter
@@ -201,6 +238,10 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureQC)
   BOOST_CHECK_EQUAL(fqc3.component_qcs.size(), 1);
   BOOST_CHECK_EQUAL(fqc3.component_qcs[0].component_name, name);
   BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc3shared = rawDataHandler.getFeatureQCShared();
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].retention_time_l, rt_low);
 }
 
 BOOST_AUTO_TEST_CASE(set_get_Experiment)
