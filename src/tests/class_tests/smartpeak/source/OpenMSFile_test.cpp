@@ -235,8 +235,8 @@ BOOST_AUTO_TEST_CASE(loadFeatureMap)
   const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_test_1_io_FileReaderOpenMS.featureXML");
   RawDataHandler rawDataHandler;
   OpenMSFile::loadFeatureMap(rawDataHandler, pathname);
-  const OpenMS::FeatureMap& fm = rawDataHandler.getFeatureMap();
 
+  const OpenMS::FeatureMap& fm = rawDataHandler.getFeatureMap();
   BOOST_CHECK_EQUAL(fm.size(), 481);
 
   BOOST_CHECK_CLOSE(static_cast<double>(fm[0].getSubordinates()[0].getMetaValue("peak_apex_int")), 266403.0, 1e-6);
@@ -250,6 +250,23 @@ BOOST_AUTO_TEST_CASE(loadFeatureMap)
   BOOST_CHECK_EQUAL(fm[1].getSubordinates()[0].getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(fm[1].getMetaValue("peak_apices_sum")), 13859.0, 1e-6);
   BOOST_CHECK_EQUAL(fm[1].getMetaValue("PeptideRef").toString(), "23dpg");
+
+  const OpenMS::FeatureMap& fmh = rawDataHandler.getFeatureMapHistory();
+  BOOST_CHECK_EQUAL(fmh.size(), 481);
+
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[0].getSubordinates()[0].getMetaValue("peak_apex_int")), 266403.0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[0].getSubordinates()[0].getRT()), 15.8944563381195, 1e-6);
+  BOOST_CHECK_EQUAL(fmh[0].getSubordinates()[0].getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[0].getMetaValue("peak_apices_sum")), 583315.0, 1e-6);
+  BOOST_CHECK_EQUAL(fmh[0].getMetaValue("PeptideRef").toString(), "23dpg");
+  BOOST_CHECK(fmh[0].getSubordinates()[0].getMetaValue("used_").toBool());
+
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[1].getSubordinates()[0].getMetaValue("peak_apex_int")), 3436.0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[1].getSubordinates()[0].getRT()), 16.2997193464915, 1e-6);
+  BOOST_CHECK_EQUAL(fmh[1].getSubordinates()[0].getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(fmh[1].getMetaValue("peak_apices_sum")), 13859.0, 1e-6);
+  BOOST_CHECK_EQUAL(fmh[1].getMetaValue("PeptideRef").toString(), "23dpg");
+  BOOST_CHECK(fmh[1].getSubordinates()[0].getMetaValue("used_").toBool());
 }
 
 BOOST_AUTO_TEST_CASE(loadFeatureFilter)

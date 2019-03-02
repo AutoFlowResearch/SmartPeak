@@ -71,6 +71,7 @@ namespace SmartPeak
 
     RawDataHandler rdh;
     rdh.setFeatureMap(featureMap_I);
+    rdh.updateFeatureMapHistory();
 
     InjectionHandler sh;
     sh.setMetaData(meta_data_I);

@@ -35,9 +35,10 @@ void test_main_LCMS_MRM_Standards()
 
 cout << "fm1 size: " << fm1.size() << endl;
 cout << "fm2 size: " << fm2.size() << endl;
-  assert(fm1.size() == 96);
+  assert(fm1.size() == 474);
   assert(fm1.size() == fm2.size());
 
+cout << "fm1[0].getSubordinates().size(): " << fm1[0].getSubordinates().size() << endl;
   assert(fm1[0].getSubordinates().size() == 3);
   assert(fm1[0].getSubordinates().size() == fm2[0].getSubordinates().size());
 
@@ -58,9 +59,9 @@ cout << "getRT: " << f1->getRT() << endl;
 cout << "native_id: " << f1->getMetaValue("native_id") << endl;
 cout << "peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
 cout << "getRT: " << f1->getRT() << endl;
-  assert(f1->getMetaValue("native_id") == "glyc3p.glyc3p_1.Heavy");
-  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 109050.905197622));
-  assert(Utilities::assert_close((double)f1->getRT(), 443.224));
+  assert(f1->getMetaValue("native_id") == "actp.actp_1.Heavy");
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 1243.60135267906071));
+  assert(Utilities::assert_close((double)f1->getRT(), 783.112));
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
@@ -70,9 +71,9 @@ cout << "getRT: " << f1->getRT() << endl;
 cout << "native_id: " << f1->getMetaValue("native_id") << endl;
 cout << "peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
 cout << "getRT: " << f1->getRT() << endl;
-  assert(f1->getMetaValue("native_id") == "Lcystin.Lcystin_1.Heavy");
-  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 2178355.10070436));
-  assert(Utilities::assert_close((double)f1->getRT(), 58.6905));
+  assert(f1->getMetaValue("native_id") == "2mcit.2mcit_1.Heavy");
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 317.268888002715244));
+  assert(Utilities::assert_close((double)f1->getRT(), 837.177));
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));

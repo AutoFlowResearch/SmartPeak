@@ -291,6 +291,7 @@ namespace SmartPeak
     try {
       OpenMS::FeatureXMLFile featurexml;
       featurexml.load(filename, rawDataHandler.getFeatureMap());
+      rawDataHandler.updateFeatureMapHistory();
     } catch (const std::exception& e) {
       std::cerr << "loadFeatureMap(): " << e.what() << std::endl;
       rawDataHandler.getFeatureMap().clear();
@@ -672,7 +673,7 @@ namespace SmartPeak
     try {
       // Store outfile as featureXML
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.store(filename, rawDataHandler_IO.getFeatureMap());
+      featurexml.store(filename, rawDataHandler_IO.getFeatureMapHistory());
     } catch (const std::exception& e) {
       std::cerr << "storeFeatureMap(): " << e.what() << std::endl;
     }

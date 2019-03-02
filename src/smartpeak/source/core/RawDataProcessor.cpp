@@ -39,9 +39,11 @@ namespace SmartPeak
       rawDataHandler_IO.getSWATH()
     );
 
+    // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
     featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
 
     rawDataHandler_IO.setFeatureMap(featureMap);
+    rawDataHandler_IO.updateFeatureMapHistory();
 
     if (verbose_I) {
       std::cout << "pickFeatures: output size: " << featureMap.size() << std::endl;
@@ -78,6 +80,8 @@ namespace SmartPeak
       rawDataHandler_IO.getTargetedExperiment()
     );
 
+    rawDataHandler_IO.updateFeatureMapHistory();
+
     if (verbose_I) {
       std::cout << "filterFeatures: output size: " << featureMap.size() << std::endl;
       std::cout << "==== END   filterFeatures" << std::endl;
@@ -113,7 +117,7 @@ namespace SmartPeak
       rawDataHandler_IO.getTargetedExperiment()
     );
 
-    rawDataHandler_IO.setFeatureMap(featureMap);
+    rawDataHandler_IO.updateFeatureMapHistory();
 
     if (verbose_I) {
       std::cout << "checkFeatures: output size: " << featureMap.size() << std::endl;
@@ -149,6 +153,7 @@ namespace SmartPeak
     output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
 
     rawDataHandler_IO.setFeatureMap(output);
+    rawDataHandler_IO.updateFeatureMapHistory();
 
     if (verbose_I) {
       std::cout << "selectFeatures: output size: " << output.size() << std::endl;
@@ -263,7 +268,6 @@ namespace SmartPeak
 
   void RawDataProcessor::plotFeatures(
     RawDataHandler& rawDataHandler_IO,
-    const std::string& filename,
     const std::vector<std::map<std::string, std::string>>& FeaturePlotter_params_I,
     const bool verbose_I
   )
@@ -300,6 +304,7 @@ namespace SmartPeak
       OpenMS::AbsoluteQuantitation aq;
       aq.setQuantMethods(rawDataHandler_IO.getQuantitationMethods());
       aq.quantifyComponents(rawDataHandler_IO.getFeatureMap());
+      rawDataHandler_IO.updateFeatureMapHistory();
     } catch (const std::exception& e) {
       std::cerr << "quantifyComponents(): " << e.what() << std::endl;
     }
@@ -378,23 +383,10 @@ namespace SmartPeak
     } else if (event == PLOT_FEATURES) {
       plotFeatures(
         rawDataHandler_IO,
-        filenames.features_pdf_o,
         parameters.at("FeaturePlotter"),
         verbose_I
       );
-    } else if (event == SAVE_FEATURES) {
-      saveCurrentFeatureMapToHistory(
-        rawDataHandler_IO,
-        verbose_I
-      );
-    } else if (event == ANNOTATE_USED_FEATURES) {
-      annotateUsedFeatures(
-        rawDataHandler_IO,
-        verbose_I
-      );
-    } else if (event == CLEAR_FEATURE_HISTORY) {
-      rawDataHandler_IO.getFeatureMapHistory().clear();
-    }
+    } 
   }
 
   std::vector<RawDataProcessor::RawDataProcMethod> RawDataProcessor::getDefaultRawDataProcessingWorkflow(
@@ -423,58 +415,6 @@ namespace SmartPeak
     }
   }
 
-  void RawDataProcessor::annotateUsedFeatures(
-    RawDataHandler& rawDataHandler_IO,
-    const bool verbose_I
-  )
-  {
-    if (verbose_I)
-      std::cout << "Annotating used features" << std::endl;
-
-    OpenMS::FeatureMap features_annotated;
-    for (OpenMS::Feature feature_copy : rawDataHandler_IO.getFeatureMapHistory().back()) {
-      std::vector<OpenMS::Feature> subordinates_annotated;
-      for (OpenMS::Feature subordinate_copy : feature_copy.getSubordinates()) {
-        subordinate_copy.setMetaValue("used_", "false");
-        subordinates_annotated.push_back(subordinate_copy);
-      }
-      for (const OpenMS::Feature& feature_select : rawDataHandler_IO.getFeatureMap()) {
-        if (feature_select.getUniqueId() != feature_copy.getUniqueId())
-          continue;
-        for (OpenMS::Feature& subordinate_copy : subordinates_annotated) {
-          subordinate_copy.setMetaValue("used_", "true");
-        }
-        break;
-      }
-      feature_copy.setSubordinates(subordinates_annotated);
-      features_annotated.push_back(feature_copy);
-    }
-
-    rawDataHandler_IO.setFeatureMap(features_annotated);
-  }
-
-  void RawDataProcessor::saveCurrentFeatureMapToHistory(
-    RawDataHandler& rawDataHandler_IO,
-    const bool verbose_I
-  )
-  {
-    if (verbose_I)
-      std::cout << "Saving features" << std::endl;
-
-    OpenMS::FeatureMap features_annotated;
-
-    for (OpenMS::Feature feature_copy : rawDataHandler_IO.getFeatureMap()) {
-      std::vector<OpenMS::Feature> subordinates_annotated;
-      for (OpenMS::Feature subordinate_copy : feature_copy.getSubordinates()) {
-        subordinates_annotated.push_back(subordinate_copy);
-      }
-      feature_copy.setSubordinates(subordinates_annotated);
-      features_annotated.push_back(feature_copy);
-    }
-
-    rawDataHandler_IO.getFeatureMapHistory().push_back(features_annotated);
-  }
-
   // TODO: implemented in error (thought it'd be necessary). Eventually remove it.
   // RawDataProcessor::RawDataProcMethod RawDataProcessor::convertEventStringToEnum(const std::string& event)
   // {
@@ -498,12 +438,6 @@ namespace SmartPeak
   //     return STORE_FEATURES;
   //   } else if (event == "plot_features") {
   //     return PLOT_FEATURES;
-  //   } else if (event == "save_features") {
-  //     return SAVE_FEATURES;
-  //   } else if (event == "annotate_used_features") {
-  //     return ANNOTATE_USED_FEATURES;
-  //   } else if (event == "clear_feature_history") {
-  //     return CLEAR_FEATURE_HISTORY;
   //   } else {
   //     throw "Raw data processing event " + event + " is not recognized.";
   //   }

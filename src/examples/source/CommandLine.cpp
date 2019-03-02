@@ -86,14 +86,11 @@ public:
     {8, RawDataProcessor::CHECK_FEATURES},
     {9, RawDataProcessor::STORE_FEATURES},
     {10, RawDataProcessor::PLOT_FEATURES},
-    {11, RawDataProcessor::SAVE_FEATURES},
-    {12, RawDataProcessor::ANNOTATE_USED_FEATURES},
-    {13, RawDataProcessor::CLEAR_FEATURE_HISTORY}
   };
   const std::unordered_map<int, SequenceSegmentProcessor::SeqSegProcMethod> n_to_seq_seg_method_ {
-    {14, SequenceSegmentProcessor::CALCULATE_CALIBRATION},
-    {15, SequenceSegmentProcessor::STORE_QUANTITATION_METHODS},
-    {16, SequenceSegmentProcessor::LOAD_QUANTITATION_METHODS},
+    {11, SequenceSegmentProcessor::CALCULATE_CALIBRATION},
+    {12, SequenceSegmentProcessor::STORE_QUANTITATION_METHODS},
+    {13, SequenceSegmentProcessor::LOAD_QUANTITATION_METHODS},
   };
   enum ProcOpt {
     OPT_LOAD_RAW_DATA = 1,
@@ -106,9 +103,6 @@ public:
     OPT_CHECK_FEATURES,
     OPT_STORE_FEATURES,
     OPT_PLOT_FEATURES,
-    OPT_SAVE_FEATURES,
-    OPT_ANNOTATE_USED_FEATURES,
-    OPT_CLEAR_FEATURE_HISTORY,
     OPT_CALCULATE_CALIBRATION,
     OPT_STORE_QUANTITATION_METHODS,
     OPT_LOAD_QUANTITATION_METHODS,
@@ -136,9 +130,6 @@ public:
     "[" + std::to_string(OPT_CHECK_FEATURES) + "]  Check features\n"
     "[" + std::to_string(OPT_STORE_FEATURES) + "]  Store features\n"
     "[" + std::to_string(OPT_PLOT_FEATURES) + "] Plot features (not implemented)\n"
-    "[" + std::to_string(OPT_SAVE_FEATURES) + "] Save features\n"
-    "[" + std::to_string(OPT_ANNOTATE_USED_FEATURES) + "] Annotate used features\n"
-    "[" + std::to_string(OPT_CLEAR_FEATURE_HISTORY) + "] Clear feature history\n"
     "[" + std::to_string(OPT_CALCULATE_CALIBRATION) + "] Calculate calibration\n"
     "[" + std::to_string(OPT_STORE_QUANTITATION_METHODS) + "] Store quantitation methods\n"
     "[" + std::to_string(OPT_LOAD_QUANTITATION_METHODS) + "] Load quantitation methods\n"
@@ -153,9 +144,9 @@ public:
     "[" + std::to_string(OPT_GET_STANDARDS_CONC_INFO) + "] Print standards concentrations info\n"
     "[M]  Main menu\n\n"
     "Presets:\n"
-    "Unknowns: 1 3 4 4 5 7 8 9 17 18\n"
-    "Standards: 1 3 4 4 5 8 9 14 15 7 8 9 17 18\n"
-    "Validation: 1 3 4 5 6 17 18\n\n";
+    "Unknowns: 1 3 4 4 5 7 8 9 14 15\n"
+    "Standards: 1 3 4 4 5 8 9 11 12 7 8 9 14 15\n"
+    "Validation: 1 3 4 5 6 14 15\n\n";
 
   void buildStaticFilenames()
   {
@@ -325,12 +316,12 @@ public:
     iss.str(line);
 
     for (int n; iss >> n;) {
-      if (n < 1 || n > 25 || n == 10) { // TODO: update this if plotting is implemented
+      if (n < 1 || n > 22 || n == 10) { // TODO: update this if plotting is implemented
         std::cout << "Skipping: " << n << '\n';
         continue;
       }
       Command cmd;
-      if (n >= 1 && n <= 13) {
+      if (n >= 1 && n <= 10) {
         cmd.setMethod(n_to_raw_data_method_.at(n));
         for (const InjectionHandler& injection : sequenceHandler_.getSequence()) {
           const std::string& key = injection.getMetaData().getInjectionName();
@@ -342,7 +333,7 @@ public:
             key
           );
         }
-      } else if (n >= 14 && n <= 16) {
+      } else if (n >= 11 && n <= 13) {
         cmd.setMethod(n_to_seq_seg_method_.at(n));
         for (const SequenceSegmentHandler& sequence_segment : sequenceHandler_.getSequenceSegments()) {
           const std::string& key = sequence_segment.getSequenceSegmentName();
@@ -354,27 +345,27 @@ public:
             key
           );
         }
-      } else if (n == 17) {
+      } else if (n == 14) {
         cmd.type = Command::WriteSequenceSummary;
         sequenceSummaryMetaData_ = getMetaDataInput("\nSequenceSummary.csv\n");
         sequenceSummaryTypes_ = getSampleTypesInput();
-      } else if (n == 18) {
+      } else if (n == 15) {
         cmd.type = Command::WriteFeatureSummary;
         featureSummaryMetaData_ = getMetaDataInput("\nFeatureSummary.csv\n");
         featureSummaryTypes_ = getSampleTypesInput();
-      } else if (n == 19) {
+      } else if (n == 16) {
         cmd.type = Command::GetSequenceInfo;
-      } else if (n == 20) {
+      } else if (n == 17) {
         cmd.type = Command::GetParametersInfo;
-      } else if (n == 21) {
+      } else if (n == 18) {
         cmd.type = Command::GetTraMLInfo;
-      } else if (n == 22) {
+      } else if (n == 19) {
         cmd.type = Command::GetFeatureFilterInfo;
-      } else if (n == 23) {
+      } else if (n == 20) {
         cmd.type = Command::GetFeatureQCInfo;
-      } else if (n == 24) {
+      } else if (n == 21) {
         cmd.type = Command::GetQuantMethodsInfo;
-      } else if (n == 25) {
+      } else if (n == 22) {
         cmd.type = Command::GetStandardsConcInfo;
       } else {
         std::cout << "\ninvalid option\n";

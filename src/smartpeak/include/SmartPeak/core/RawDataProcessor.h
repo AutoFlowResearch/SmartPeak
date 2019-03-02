@@ -39,9 +39,6 @@ public:
       CHECK_FEATURES,
       STORE_FEATURES,
       PLOT_FEATURES,
-      SAVE_FEATURES,
-      ANNOTATE_USED_FEATURES,
-      CLEAR_FEATURE_HISTORY,
     };
 
     // static RawDataProcMethod convertEventStringToEnum(const std::string& event);
@@ -83,6 +80,8 @@ public:
     );
 
     /** Run the openSWATH post processing filtering workflow for a single sample.
+
+      @note TODO: Break into seperate methods or change the logic of how selection algorithms are chosen
 
       @param[in,out] rawDataHandler_IO Raw data file class
       @param[in] MRMFeatureSelector_select_params_I Dictionary of parameter names, values, descriptions, and tags
@@ -127,7 +126,6 @@ public:
     */
     static void plotFeatures(
       RawDataHandler& rawDataHandler_IO,
-      const std::string& filename,
       const std::vector<std::map<std::string, std::string>>& FeaturePlotter_params_I,
       const bool verbose_I = false
     );
@@ -159,33 +157,10 @@ public:
     );
 
     /** Return the default workflow parameters for a given sample type.
-
       @param[in] sample_type Sample type
     */
     static std::vector<RawDataProcMethod> getDefaultRawDataProcessingWorkflow(
       const MetaDataHandler::SampleType sample_type
-    );
-
-    /** Annotate the most recent featureMap in the history with the
-      filtered/selected features of the current featureMap and then replace the
-      current featureMap with the annotated one.
-
-      @param[in,out] rawDataHandler_IO Raw data file class
-      @param[in] verbose_I Verbosity
-    */
-    static void annotateUsedFeatures(
-      RawDataHandler& rawDataHandler_IO,
-      const bool verbose_I = false
-    );
-
-    /** Save the current featureMap to the history.
-
-      @param[in,out] rawDataHandler_IO Raw data file class
-      @param[in] verbose_I Verbosity
-    */
-    static void saveCurrentFeatureMapToHistory(
-      RawDataHandler& rawDataHandler_IO,
-      const bool verbose_I = false
     );
   };
 }

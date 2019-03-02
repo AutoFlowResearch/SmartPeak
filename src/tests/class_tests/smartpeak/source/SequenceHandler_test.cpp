@@ -75,6 +75,8 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getMetaData().getSampleGroupName(), "sample");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().metaValueExists("foo"), true);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().getMetaValue("foo"), "bar");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMapHistory().metaValueExists("foo"), true);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMapHistory().getMetaValue("foo"), "bar");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
 }
 
