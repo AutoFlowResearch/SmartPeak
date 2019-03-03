@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(injection5.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 0);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 14);
   BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 107);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
 
-  // Test non shared resources
+  // Test non-shared resources
   injection0.getMetaData().setSampleName("modified");
   BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "modified");
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");

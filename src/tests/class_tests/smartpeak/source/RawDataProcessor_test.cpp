@@ -553,7 +553,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   });
 
   LoadParameters loadParameters;
-  loadParameters.sanitizeParameters(rawDataHandler, params);
+  loadParameters.sanitizeParameters(params);
   BOOST_CHECK_EQUAL(params.size(), 14);
   BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);

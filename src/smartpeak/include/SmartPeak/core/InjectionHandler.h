@@ -10,6 +10,7 @@ namespace SmartPeak
   class InjectionHandler
   {
 public:
+    InjectionHandler();  ///< constructor to initialize shared resources
     void clear();
 
     void setMetaData(const MetaDataHandler& meta_data);

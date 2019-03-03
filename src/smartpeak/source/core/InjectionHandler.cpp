@@ -4,6 +4,12 @@
 
 namespace SmartPeak
 {
+  InjectionHandler::InjectionHandler():
+    meta_data_(new MetaDataHandler()),
+    raw_data_(new RawDataHandler())
+  {
+  }
+
   void InjectionHandler::clear()
   {
     if (meta_data_!=nullptr) meta_data_->clear();

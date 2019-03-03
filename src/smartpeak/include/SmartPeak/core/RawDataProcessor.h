@@ -429,7 +429,6 @@ namespace SmartPeak
       const bool verbose_I = false
     ) const;
     static void sanitizeParameters(
-      RawDataHandler& rawDataHandler_IO,
       std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const bool verbose_I = false
     );

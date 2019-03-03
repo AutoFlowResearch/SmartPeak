@@ -6,6 +6,17 @@
 
 namespace SmartPeak
 {
+  RawDataHandler::RawDataHandler() :
+    meta_data_(new MetaDataHandler()),
+    parameters_(new std::map<std::string, std::vector<std::map<std::string, std::string>>>()),
+    targeted_exp_(new OpenMS::TargetedExperiment()),
+    reference_data_(new std::vector<std::map<std::string, Utilities::CastValue>>()),
+    quantitation_methods_(new std::vector<OpenMS::AbsoluteQuantitationMethod>()),
+    feature_filter_(new OpenMS::MRMFeatureQC()),
+    feature_qc_(new OpenMS::MRMFeatureQC())
+  {
+  }
+
   void RawDataHandler::setFeatureMap(const OpenMS::FeatureMap& feature_map)
   {
     feature_map_ = feature_map;

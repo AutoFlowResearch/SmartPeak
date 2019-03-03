@@ -77,6 +77,8 @@ namespace SmartPeak
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
+    // [OPTIMIZATION: add-in parallel execution here using 
+    //  `std::vector<std::future>>`, `std::packaged_task`, `std::thread`, and thread count/retrieval pattern]
     for (InjectionHandler& injection : process_sequence) {
 
       // handle user-desired raw_data_processing_methods

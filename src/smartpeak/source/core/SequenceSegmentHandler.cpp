@@ -4,6 +4,11 @@
 
 namespace SmartPeak
 {
+  SequenceSegmentHandler::SequenceSegmentHandler():
+    quantitation_methods_(new std::vector<OpenMS::AbsoluteQuantitationMethod>())
+  {
+  }
+
   void SequenceSegmentHandler::clear()
   {
     sequence_segment_name_.clear();
