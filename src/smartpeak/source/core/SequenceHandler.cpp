@@ -92,7 +92,7 @@ namespace SmartPeak
       // look up the sequence segment, 
       // add the sample index to the sequence segment list of injection indices
       // and copy over the quantitation method
-      std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> absQuantMethods_ptr = nullptr;
+      std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> absQuantMethods_ptr(new std::vector<OpenMS::AbsoluteQuantitationMethod>());
       bool found_seq_seg = false;
       for (SequenceSegmentHandler& sequenceSegmentHandler : sequence_segments_) {
         if (meta_data_I.getSequenceSegmentName() == sequenceSegmentHandler.getSequenceSegmentName()) {
@@ -105,11 +105,9 @@ namespace SmartPeak
         rdh.setQuantitationMethods(absQuantMethods_ptr);
       }
       else {  // New sequence segment
-        absQuantMethods_ptr.reset(new std::vector<OpenMS::AbsoluteQuantitationMethod>());
-
         // initialize the sequence segment
         SequenceSegmentHandler sequenceSegmentHandler;
-        sequenceSegmentHandler.setSampleIndices({ 0 }); // first index of the sequence
+        sequenceSegmentHandler.setSampleIndices({ sequence_.size() }); // index = the size of the sequence
         sequenceSegmentHandler.setQuantitationMethods(absQuantMethods_ptr);
         sequenceSegmentHandler.setSequenceSegmentName(meta_data_I.getSequenceSegmentName());
         sequence_segments_.push_back(sequenceSegmentHandler);
@@ -118,11 +116,12 @@ namespace SmartPeak
       }
     }
     else {
-      rdh.setParameters(std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>(new std::map<std::string, std::vector<std::map<std::string, std::string>>>()));
-      rdh.setFeatureFilter(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
-      rdh.setFeatureQC(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
-      rdh.setTargetedExperiment(std::shared_ptr<OpenMS::TargetedExperiment>(new OpenMS::TargetedExperiment()));
-      rdh.setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>(new std::vector<std::map<std::string, Utilities::CastValue>>()));
+      // Not needed because the constructors initialize the shared pointers
+      //rdh.setParameters(std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>(new std::map<std::string, std::vector<std::map<std::string, std::string>>>()));
+      //rdh.setFeatureFilter(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
+      //rdh.setFeatureQC(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
+      //rdh.setTargetedExperiment(std::shared_ptr<OpenMS::TargetedExperiment>(new OpenMS::TargetedExperiment()));
+      //rdh.setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>(new std::vector<std::map<std::string, Utilities::CastValue>>()));
 
       // initialize the sequence segment
       SequenceSegmentHandler sequenceSegmentHandler;

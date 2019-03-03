@@ -37,6 +37,7 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   meta_data1.inj_volume_units = "8";
   meta_data1.batch_name = "9";
   OpenMS::FeatureMap featuremap1;
+  featuremap1.setMetaValue("foo1", "bar1");
 
   MetaDataHandler meta_data2;
   meta_data2.setFilename("file2");
@@ -49,7 +50,7 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   meta_data2.inj_volume_units = "8";
   meta_data2.batch_name = "9";
   OpenMS::FeatureMap featuremap2;
-  featuremap2.setMetaValue("foo", "bar");
+  featuremap2.setMetaValue("foo2", "bar2");
 
   MetaDataHandler meta_data3;
   meta_data3.setFilename("file3");
@@ -62,6 +63,7 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   meta_data3.inj_volume_units = "8";
   meta_data3.batch_name = "9";
   OpenMS::FeatureMap featuremap3;
+  featuremap3.setMetaValue("foo3", "bar3");
 
   SequenceHandler sequenceHandler;
   sequenceHandler.addSampleToSequence(meta_data1, featuremap1);
@@ -71,13 +73,96 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 3);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getMetaData().getSequenceSegmentName(), "sequence_segment1");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getMetaData().getSampleName(), "sample1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureMap().metaValueExists("foo1"), true);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureMap().getMetaValue("foo1"), "bar1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureMapHistory().metaValueExists("foo1"), true);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureMapHistory().getMetaValue("foo1"), "bar1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getParameters().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getTargetedExperiment().getTransitions().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureFilter().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureQC().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getQuantitationMethods().size(), 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getMetaData().getSequenceSegmentName(), "sequence_segment2");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getMetaData().getSampleGroupName(), "sample");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().metaValueExists("foo"), true);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().getMetaValue("foo"), "bar");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMapHistory().metaValueExists("foo"), true);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMapHistory().getMetaValue("foo"), "bar");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().metaValueExists("foo2"), true);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().getMetaValue("foo2"), "bar2");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMapHistory().metaValueExists("foo2"), true);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMapHistory().getMetaValue("foo2"), "bar2");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getParameters().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getTargetedExperiment().getTransitions().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureFilter().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureQC().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getQuantitationMethods().size(), 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSequenceSegmentName(), "sequence_segment3");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSampleGroupName(), "sample");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMap().metaValueExists("foo3"), true);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMap().getMetaValue("foo3"), "bar3");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMapHistory().metaValueExists("foo3"), true);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMapHistory().getMetaValue("foo3"), "bar3");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getParameters().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getTargetedExperiment().getTransitions().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureFilter().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureQC().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getQuantitationMethods().size(), 0);
+
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSequenceSegmentName(), "sequence_segment1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSampleIndices().size(), 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSampleIndices()[0], 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSequenceSegmentName(), "sequence_segment2");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getQuantitationMethods().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices().size(), 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices()[0], 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[2].getSequenceSegmentName(), "sequence_segment3");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[2].getQuantitationMethods().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[2].getSampleIndices().size(), 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[2].getSampleIndices()[0], 2);
+
+  // Test non-shared resources
+  InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
+  injection0.getMetaData().setSampleName("samp1");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "samp1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getMetaData().getSampleName(), "samp1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getMetaData().getSampleName(), "sample2");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSampleName(), "sample3");
+  // TODO: What happens if the user modifies the sequence segment name?
+  //       Need to implement a method that re-organizes the sequence segments if the sequence segment name attribute is modified!
+
+  // Test shared resources across all raw data handlers
+  std::map<std::string, std::string> param1; param1.emplace("name", "param1");  // Wow!... MSVC does not like list initializers...
+  std::vector<std::map<std::string, std::string>> params; params.push_back(param1);
+  std::map<std::string, std::vector<std::map<std::string, std::string>>> parameters; parameters.emplace("MRMFeatureFinderScoring", params);
+  injection0.getRawData().getParameters() = parameters;
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "param1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "param1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "param1");
+  OpenMS::ReactionMonitoringTransition srm;
+  srm.setPeptideRef("arg-L");
+  injection0.getRawData().getTargetedExperiment().setTransitions({srm});
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
+  injection0.getRawData().getFeatureFilter().component_qcs.resize(1);
+  injection0.getRawData().getFeatureFilter().component_qcs[0].component_name = "arg-L.arg-L_1.Heavy";
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  injection0.getRawData().getFeatureQC().component_qcs.resize(1);
+  injection0.getRawData().getFeatureQC().component_qcs[0].component_name = "arg-L.arg-L_1.Light";
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
+
+  // Test shared resources across sequence segment handlers
+  sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().resize(1);
+  sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].setComponentName("23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getQuantitationMethods().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getQuantitationMethods().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getQuantitationMethods().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[2].getQuantitationMethods().size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(getMetaValue)
