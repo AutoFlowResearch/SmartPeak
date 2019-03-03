@@ -880,9 +880,8 @@ namespace SmartPeak
     }
 
     try {
-      std::map<std::string, std::vector<std::map<std::string, std::string>>> parameters;
-      FileReader::parseOpenMSParams(filenames.parameters_csv_i, parameters);
-      sanitizeParameters(rawDataHandler_IO, parameters);
+      FileReader::parseOpenMSParams(filenames.parameters_csv_i, rawDataHandler_IO.getParameters());
+      sanitizeParameters(rawDataHandler_IO.getParameters());
     }
     catch (const std::exception& e) {
       std::cerr << "readRawDataProcessingParameters(): " << e.what() << std::endl;
@@ -894,7 +893,6 @@ namespace SmartPeak
   }
 
   void LoadParameters::sanitizeParameters(
-    RawDataHandler& rawDataHandler_IO,
     std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const bool verbose_I
   ) {
@@ -927,7 +925,6 @@ namespace SmartPeak
         );
       }
     }
-    rawDataHandler_IO.setParameters(params_I);
 
     if (verbose_I) {
       std::cout << "==== END   sanitizeRawDataProcessorParameters" << std::endl;

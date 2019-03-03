@@ -97,6 +97,9 @@ BOOST_AUTO_TEST_CASE(set_get_QuantitationMethods)
   const vector<OpenMS::AbsoluteQuantitationMethod>& qms2 = ssh.getQuantitationMethods();
   BOOST_CHECK_EQUAL(qms2.size(), 1);
   BOOST_CHECK_EQUAL(qms2[0].getComponentName(), foo);
+  std::shared_ptr<vector<OpenMS::AbsoluteQuantitationMethod>>& qms2shared = ssh.getQuantitationMethodsShared();
+  BOOST_CHECK_EQUAL(qms2shared->size(), 1);
+  BOOST_CHECK_EQUAL(qms2shared->at(0).getComponentName(), foo);
 
   const string bar {"bar"};
   ssh.getQuantitationMethods()[0].setFeatureName(bar);
@@ -104,6 +107,10 @@ BOOST_AUTO_TEST_CASE(set_get_QuantitationMethods)
   BOOST_CHECK_EQUAL(qms3.size(), 1);
   BOOST_CHECK_EQUAL(qms3[0].getComponentName(), foo);
   BOOST_CHECK_EQUAL(qms3[0].getFeatureName(), bar);
+  std::shared_ptr<vector<OpenMS::AbsoluteQuantitationMethod>>& qms3shared = ssh.getQuantitationMethodsShared();
+  BOOST_CHECK_EQUAL(qms3shared->size(), 1);
+  BOOST_CHECK_EQUAL(qms3shared->at(0).getComponentName(), foo);
+  BOOST_CHECK_EQUAL(qms3shared->at(0).getFeatureName(), bar);
 }
 
 BOOST_AUTO_TEST_CASE(set_get_ComponentsToConcentrations)

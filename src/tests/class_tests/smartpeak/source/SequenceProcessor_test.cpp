@@ -32,138 +32,67 @@ BOOST_AUTO_TEST_CASE(createSequence)
 {
   SequenceHandler sequenceHandler;
   SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", true, false);
+
+  // Test initialization of the sequence
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
-  const InjectionHandler& injection = sequenceHandler.getSequence()[0];
-  BOOST_CHECK_EQUAL(injection.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(injection.getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(injection.getRawData().getTargetedExperiment().getTransitions().size(), 324);
-  BOOST_CHECK_EQUAL(injection.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
-  BOOST_CHECK_EQUAL(injection.getRawData().getFeatureFilter().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection.getRawData().getFeatureQC().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection.getRawData().getQuantitationMethods().size(), 107);
-  BOOST_CHECK_EQUAL(injection.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
+  InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
+  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 14);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions().size(), 324);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureFilter().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureQC().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods().size(), 107);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
+  InjectionHandler& injection5 = sequenceHandler.getSequence()[5];
+  BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
+  BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 14);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions().size(), 324);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureFilter().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureQC().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getQuantitationMethods().size(), 107);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 1);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 107);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
-}
 
-BOOST_AUTO_TEST_CASE(addRawDataHandlerToSequence)
-{
-  MetaDataHandler meta_data1;
-  meta_data1.setFilename("file1");
-  meta_data1.setSampleName("sample1");
-  meta_data1.setSampleGroupName("sample");
-  meta_data1.setSequenceSegmentName("sequence_segment1");
-  meta_data1.setSampleType(MetaDataHandler::SampleType::Unknown);
-  meta_data1.acq_method_name = "6";
-  meta_data1.inj_volume = 7.0;
-  meta_data1.inj_volume_units = "8";
-  meta_data1.batch_name = "9";
+  // Test non-shared resources
+  injection0.getMetaData().setSampleName("modified");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "modified");
+  BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
 
-  MetaDataHandler meta_data2;
-  meta_data2.setFilename("file2");
-  meta_data2.setSampleName("sample2");
-  meta_data2.setSampleGroupName("sample");
-  meta_data2.setSequenceSegmentName("sequence_segment1");
-  meta_data2.setSampleType(MetaDataHandler::SampleType::Standard);
-  meta_data2.acq_method_name = "6";
-  meta_data2.inj_volume = 7.0;
-  meta_data2.inj_volume_units = "8";
-  meta_data2.batch_name = "9";
+  // Test shared resources between all raw data handlers
+  injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name") = "modified";
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "modified");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "modified");
+  auto transitions = injection0.getRawData().getTargetedExperiment().getTransitions();
+  transitions[0].setPeptideRef("arg-L-mod");
+  injection0.getRawData().getTargetedExperiment().setTransitions(transitions);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L-mod");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L-mod");
+  injection0.getRawData().getFeatureFilter().component_qcs[0].component_name = "arg-L.arg-L_1.Heavy-mod";
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-mod");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-mod");
+  injection0.getRawData().getFeatureQC().component_qcs[0].component_name = "arg-L.arg-L_1.Heavy-modified";
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-modified");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-modified");
 
-  MetaDataHandler meta_data3;
-  meta_data3.setFilename("file3");
-  meta_data3.setSampleName("sample3");
-  meta_data3.setSampleGroupName("sample");
-  meta_data3.setSequenceSegmentName("sequence_segment2");
-  meta_data3.setSampleType(MetaDataHandler::SampleType::Unknown);
-  meta_data3.acq_method_name = "6";
-  meta_data3.inj_volume = 7.0;
-  meta_data3.inj_volume_units = "8";
-  meta_data3.batch_name = "9";
-
-  OpenMS::FeatureMap featuremap1;
-
-  SequenceHandler sequenceHandler;
-  sequenceHandler.addSampleToSequence(meta_data1, featuremap1);
-  sequenceHandler.addSampleToSequence(meta_data2, featuremap1);
-  sequenceHandler.addSampleToSequence(meta_data3, featuremap1);
-
-  RawDataHandler rawDataHandler;
-  OpenMS::FeatureMap featuremap2;
-  featuremap2.setMetaValue("foo", "bar");
-  rawDataHandler.setFeatureMap(featuremap2);
-
-  SequenceProcessor::addRawDataHandlerToSequence(sequenceHandler, rawDataHandler);
-
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 3);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureMap().metaValueExists("foo"), true);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureMap().getMetaValue("foo"), "bar");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().metaValueExists("foo"), true);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().getMetaValue("foo"), "bar");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMap().metaValueExists("foo"), true);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMap().getMetaValue("foo"), "bar");
-}
-
-BOOST_AUTO_TEST_CASE(segmentSamplesInSequence)
-{
-  MetaDataHandler meta_data1;
-  meta_data1.setFilename("file1");
-  meta_data1.setSampleName("sample1");
-  meta_data1.setSampleGroupName("sample");
-  meta_data1.setSequenceSegmentName("sequence_segment1");
-  meta_data1.setSampleType(MetaDataHandler::SampleType::Unknown);
-  meta_data1.acq_method_name = "6";
-  meta_data1.inj_volume = 7.0;
-  meta_data1.inj_volume_units = "8";
-  meta_data1.batch_name = "9";
-
-  MetaDataHandler meta_data2;
-  meta_data2.setFilename("file2");
-  meta_data2.setSampleName("sample2");
-  meta_data2.setSampleGroupName("sample");
-  meta_data2.setSequenceSegmentName("sequence_segment1");
-  meta_data2.setSampleType(MetaDataHandler::SampleType::Standard);
-  meta_data2.acq_method_name = "6";
-  meta_data2.inj_volume = 7.0;
-  meta_data2.inj_volume_units = "8";
-  meta_data2.batch_name = "9";
-
-  MetaDataHandler meta_data3;
-  meta_data3.setFilename("file3");
-  meta_data3.setSampleName("sample3");
-  meta_data3.setSampleGroupName("sample");
-  meta_data3.setSequenceSegmentName("sequence_segment2");
-  meta_data3.setSampleType(MetaDataHandler::SampleType::Unknown);
-  meta_data3.acq_method_name = "6";
-  meta_data3.inj_volume = 7.0;
-  meta_data3.inj_volume_units = "8";
-  meta_data3.batch_name = "9";
-
-  OpenMS::FeatureMap featuremap;
-
-  SequenceHandler sequenceHandler;
-  sequenceHandler.addSampleToSequence(meta_data1, featuremap);
-  sequenceHandler.addSampleToSequence(meta_data2, featuremap);
-  sequenceHandler.addSampleToSequence(meta_data3, featuremap);
-
-  OpenMS::AbsoluteQuantitationMethod aqm;
-  aqm.setComponentName("Test");
-  SequenceSegmentHandler sequenceSegmentHandler;
-  sequenceSegmentHandler.setQuantitationMethods({aqm});
-
-  SequenceProcessor::segmentSamplesInSequence(sequenceHandler, sequenceSegmentHandler);
-
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 2);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSampleIndices().size(), 2);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSampleIndices()[0], 0);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSampleIndices()[1], 1);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices().size(), 1);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices()[0], 2);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 1);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "Test");
+  // Test shared resources between sequence segment handlers
+  injection0.getRawData().getQuantitationMethods()[0].setComponentName("23dpg.23dpg_1.Light-mod");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
 }
 
 BOOST_AUTO_TEST_CASE(processSequence)
