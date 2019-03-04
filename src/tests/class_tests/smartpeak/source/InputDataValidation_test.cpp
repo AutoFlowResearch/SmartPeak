@@ -102,7 +102,10 @@ BOOST_AUTO_TEST_CASE(componentNamesAreConsistent)
   BOOST_CHECK_EQUAL(result, true);
 
   filenames.traML_csv_i = main_dir + "/traML_missing.csv";
-  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
+  // SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
+  RawDataHandler& rawData0 = sequenceHandler.getSequence().front().getRawData();
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawData0, {}, filenames);
 
   result = InputDataValidation::componentNamesAreConsistent(sequenceHandler);
   BOOST_CHECK_EQUAL(result, false);
@@ -120,7 +123,10 @@ BOOST_AUTO_TEST_CASE(componentNameGroupsAreConsistent)
   BOOST_CHECK_EQUAL(result, true);
 
   filenames.traML_csv_i = main_dir + "/traML_missing.csv";
-  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
+  //SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
+  RawDataHandler& rawData0 = sequenceHandler.getSequence().front().getRawData();
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawData0, {}, filenames);
 
   result = InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler);
   BOOST_CHECK_EQUAL(result, false);
@@ -138,7 +144,10 @@ BOOST_AUTO_TEST_CASE(heavyComponentsAreConsistent)
   BOOST_CHECK_EQUAL(result, true);
 
   filenames.quantitationMethods_csv_i = main_dir + "/quantitationMethods_missing.csv";
-  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
+  //SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
+  SequenceSegmentHandler& seqSeg0 = sequenceHandler.getSequenceSegments().front();
+  LoadQuantitationMethods loadQuantitationMethods;
+  loadQuantitationMethods.process(seqSeg0, SequenceHandler(), {}, filenames);
 
   result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
   BOOST_CHECK_EQUAL(result, false); // g6p.g6p_2.Heavy is missing
