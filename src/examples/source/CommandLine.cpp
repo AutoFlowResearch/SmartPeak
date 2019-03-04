@@ -4,6 +4,7 @@
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -145,6 +146,323 @@ public:
     "Unknowns: 1 3 4 4 5 7 8 9 14 15\n"
     "Standards: 1 3 4 4 5 8 9 11 12 7 8 9 14 15\n"
     "Validation: 1 3 4 5 6 14 15\n\n";
+
+  void menuMain()
+  {
+    std::cout <<
+      "\n\n"
+      "Main\n"
+      "[1] File\n"
+      "[2] Edit\n"
+      "[3] View\n"
+      "[4] Actions\n"
+      "[5] Help\n\n";
+
+    std::string in;
+  menuMain_label:
+    in = getLineInput("> ", false);
+
+    if      ("1" == in) {
+      menuFile();
+    }
+    else if ("2" == in) {
+      menuEdit();
+    }
+    else if ("3" == in) {
+      menuView();
+    }
+    else if ("4" == in) {
+      menuActions();
+    }
+    else if ("5" == in) {
+      menuHelp();
+    }
+    else {
+      goto menuMain_label;
+    }
+  }
+
+  void menuFile()
+  {
+    std::cout <<
+      "\n\n"
+      "Main | File\n"
+      "[1] New session\n"
+      "[2] Load session\n"
+      "[3] Save session\n"
+      "[4] Import file\n"
+      "[5] Export file\n"
+      "[M] Main menu\n"
+      "[E] Exit\n\n";
+
+    std::string in;
+  menuFile_label:
+    in = getLineInput("> ", false);
+
+    if      ("1" == in) {
+    }
+    else if ("2" == in) {
+    }
+    else if ("3" == in) {
+    }
+    else if ("4" == in) {
+      menuImportFile();
+    }
+    else if ("5" == in) {
+    }
+    else if ("m" == in || "M" == in) {
+      // empty
+    }
+    else if ("e" == in || "E" == in) {
+      exitSmartPeak();
+    }
+    else {
+      goto menuFile_label;
+    }
+  }
+
+  void menuImportFile()
+  {
+    std::cout <<
+      "\n\n"
+      "Main | File | Import file\n"
+      "[1] Sequence\n"
+      "[2] TraML\n"
+      "[3] Quantitation methods\n"
+      "[4] Standards concentrations\n"
+      "[5] Component filters\n"
+      "[6] Component group filters\n"
+      "[7] Component QCs\n"
+      "[8] Component group QCs\n"
+      "[9] Parameters\n"
+      "[M] Main menu\n\n";
+
+    std::string in;
+  menuImportFile_label:
+    in = getLineInput("> ", false);
+
+    if      ("1" == in) {
+      setSequencePathnameFromInput();
+      sequenceHandler_.clear();
+      std::cout << "Data has been cleared.\n";
+      SequenceParser::readSequenceFile(sequenceHandler_, static_filenames_.sequence_csv_i, ",", verbose_);
+    }
+    else if ("2" == in) {
+      LoadTransitions loadTransitions;
+      loadTransitions.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+    }
+    else if ("3" == in) {
+    }
+    else if ("4" == in) {
+    }
+    else if ("5" == in) {
+      LoadFeatureFilters loadFeatureFilters;
+      const std::string backup = static_filenames_.featureFilterComponentGroups_csv_i;
+      loadFeatureFilters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+      static_filenames_.featureFilterComponentGroups_csv_i = backup;
+    }
+    else if ("6" == in) {
+      LoadFeatureFilters loadFeatureFilters;
+      const std::string backup = static_filenames_.featureFilterComponents_csv_i;
+      loadFeatureFilters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+      static_filenames_.featureFilterComponents_csv_i = backup;
+    }
+    else if ("7" == in) {
+      LoadFeatureQCs loadFeatureQCs;
+      const std::string backup = static_filenames_.featureQCComponentGroups_csv_i;
+      loadFeatureQCs.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+      static_filenames_.featureQCComponentGroups_csv_i = backup;
+    }
+    else if ("8" == in) {
+      LoadFeatureQCs loadFeatureQCs;
+      const std::string backup = static_filenames_.featureQCComponents_csv_i;
+      loadFeatureQCs.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+      static_filenames_.featureQCComponents_csv_i = backup;
+    }
+    else if ("9" == in) {
+      LoadParameters loadParameters;
+      loadParameters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+    }
+    else if ("m" == in || "M" == in) {
+      // empty
+    }
+    else {
+      goto menuImportFile_label;
+    }
+  }
+
+  void menuEdit()
+  {
+    std::cout <<
+      "\n\n"
+      "Main | Edit\n"
+      "[1]  Undo\n"
+      "[2]  Redo\n"
+      "[3]  Cut\n"
+      "[4]  Copy\n"
+      "[5]  Paste\n"
+      "    ------------------------\n"
+      "[6]  Sequence\n"
+      "[7]  TraML\n"
+      "[8]  Quantitation methods\n"
+      "[9]  Standards concentrations\n"
+      "[10] Component filters\n"
+      "[11] Component group filters\n"
+      "[12] Component QCs\n"
+      "[13] Component group QCs\n"
+      "[14] Parameters\n"
+      "    ------------------------\n"
+      "[15] Workflow\n"
+      "[M] Main menu\n\n";
+
+    std::string in;
+  menuEdit_label:
+    in = getLineInput("> ", false);
+
+    if      ("1" == in) {
+    }
+    else if ("2" == in) {
+    }
+    else if ("3" == in) {
+    }
+    else if ("4" == in) {
+    }
+    else if ("5" == in) {
+    }
+    else if ("6" == in) {
+    }
+    else if ("7" == in) {
+    }
+    else if ("8" == in) {
+    }
+    else if ("9" == in) {
+    }
+    else if ("10" == in) {
+    }
+    else if ("11" == in) {
+    }
+    else if ("12" == in) {
+    }
+    else if ("13" == in) {
+    }
+    else if ("14" == in) {
+    }
+    else if ("15" == in) {
+    }
+    else if ("m" == in || "M" == in) {
+      // empty
+    }
+    else {
+      goto menuEdit_label;
+    }
+  }
+
+  void menuView()
+  {
+    std::cout <<
+      "\n\n"
+      "Main | View\n"
+      "[1] Sequence status\n"
+      "[2] Workflow wizard\n"
+      "[3] Feature plot\n"
+      "[4] Metric plot\n"
+      "[5] Feature summary\n"
+      "[6] Sequence summary\n"
+      "[7] Log\n"
+      "[M] Main menu\n\n";
+
+    std::string in;
+  menuView_label:
+    in = getLineInput("> ", false);
+
+    if      ("1" == in) {
+    }
+    else if ("2" == in) {
+    }
+    else if ("3" == in) {
+    }
+    else if ("4" == in) {
+    }
+    else if ("5" == in) {
+    }
+    else if ("6" == in) {
+    }
+    else if ("7" == in) {
+    }
+    else if ("m" == in || "M" == in) {
+      // empty
+    }
+    else {
+      goto menuView_label;
+    }
+  }
+
+  void menuActions()
+  {
+    std::cout <<
+      "\n\n"
+      "Main | Actions\n"
+      "[1] Run command\n"
+      "[2] Run workflow\n"
+      "[3] Quick info\n"
+      "[4] Report\n"
+      "[M] Main menu\n\n";
+
+    std::string in;
+  menuActions_label:
+    in = getLineInput("> ", false);
+
+    if      ("1" == in) {
+    }
+    else if ("2" == in) {
+    }
+    else if ("3" == in) {
+    }
+    else if ("4" == in) {
+    }
+    else if ("m" == in || "M" == in) {
+      // empty
+    }
+    else {
+      goto menuActions_label;
+    }
+  }
+
+  void menuHelp()
+  {
+    std::cout <<
+      "\n\n"
+      "Main | Help\n"
+      "[1] About\n"
+      "[2] Documentation\n"
+      "[3] Version\n"
+      "[M] Main menu\n\n";
+
+    std::string in;
+  menuHelp_label:
+    in = getLineInput("> ", false);
+
+    if      ("1" == in) {
+    }
+    else if ("2" == in) {
+    }
+    else if ("3" == in) {
+    }
+    else if ("m" == in || "M" == in) {
+      // empty
+    }
+    else {
+      goto menuHelp_label;
+    }
+  }
+
+  void exitSmartPeak()
+  {
+    const std::string in = getLineInput("\nExit SmartPeak? [y/N]\n> ");
+    if (std::tolower(in.front()) == 'y') {
+      std::exit(EXIT_SUCCESS);
+    }
+  }
 
   void buildStaticFilenames()
   {
@@ -298,20 +616,16 @@ public:
   std::vector<Command> getMethodsInput()
   {
     std::vector<Command> methods;
-    std::string line;
-    std::istringstream iss;
 
     std::cout << main_menu_;
 
-    do {
-      line = getLineInput("> ");
-    } while (line.empty());
+    const std::string line = getLineInput("> ", false);
 
     if (line[0] == 'M' || line[0] == 'm') {
       return {};
     }
 
-    iss.str(line);
+    std::istringstream iss {line};
 
     for (int n; iss >> n;) {
       if (n < 1 || n > 22 || n == 10) { // TODO: update this if plotting is implemented
@@ -426,8 +740,7 @@ public:
       return {};
     }
 
-    std::istringstream iss;
-    iss.str(line);
+    std::istringstream iss {line};
     std::set<MetaDataHandler::SampleType> sample_types;
 
     for (int n; iss >> n;) {
@@ -586,9 +899,10 @@ public:
     SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
 
     while (true) {
-      printMenu();
-      const std::string line = getLineInput("> ", false);
-      parseCommand(line);
+      // printMenu();
+      // const std::string line = getLineInput("> ", false);
+      menuMain();
+      // parseCommand(line);
     }
   }
 
@@ -603,6 +917,8 @@ public:
       "Please select your action.\n";
   }
 
+  // Returns a string representation of the workflow steps
+  // i.e. 1 2 3 4 5 5 18
   std::string getPipelineString()
   {
     std::string s;
@@ -664,7 +980,7 @@ public:
       if (line[0] == 'E' || line[0] == 'e') {
         std::exit(EXIT_SUCCESS);
       }
-      std::cout << "Bad input. Try again.\n";
+      std::cout << "Invalid input. Try again.\n";
       return;
     }
 
@@ -794,7 +1110,7 @@ public:
       break;
     }
     default:
-      std::cout << "\nBad input. Try again.\n";
+      std::cout << "\nInvalid input. Try again.\n";
     }
   }
 };
