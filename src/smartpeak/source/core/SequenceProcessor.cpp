@@ -83,23 +83,30 @@ namespace SmartPeak
     if (raw_data_processing_methods_I.size() == 0) {
       throw "no raw data processing methods given.\n";
     }
+    std::vector<RawDataProcessor*> raw_data_processing_methods;
+    for (const std::shared_ptr<RawDataProcessor>& raw_data_processing_method : raw_data_processing_methods_I) {
+      raw_data_processing_methods.push_back(raw_data_processing_method.get());
+    }
 
     const int n_hard_threads = std::thread::hardware_concurrency();  // TODO: add an option in the parameters for the number of cores to use
     std::vector<std::future<bool>> task_results;
     int thread_cnt = 0, injection_cnt = 0;
     for (InjectionHandler& injection : process_sequence) {
+
       // encapsulate in a packaged_task
-      std::packaged_task<bool (InjectionHandler,
-          std::vector<std::shared_ptr<RawDataProcessor>>,
-          Filenames, bool
+      std::packaged_task<bool (InjectionHandler*,
+          std::vector<RawDataProcessor*>,
+          Filenames*, bool
           )> task(SequenceProcessor::processSequence_);
+
+      Filenames filenames_inj = filenames.at(injection.getMetaData().getInjectionName());
 
       // launch the thread
         task_results.push_back(task.get_future());
         std::thread task_thread(std::move(task),
-          std::ref(injection), 
-          std::ref(raw_data_processing_methods_I), 
-          std::ref(filenames.at(injection.getMetaData().getInjectionName())),
+          &injection, 
+          std::ref(raw_data_processing_methods),
+          &filenames_inj,
           std::ref(verbose_I));
         task_thread.detach();
 
@@ -132,9 +139,9 @@ namespace SmartPeak
   }
 
   bool SequenceProcessor::processSequence_(
-    InjectionHandler& injection,
-    const Filenames& filenames,
-    const std::vector<std::shared_ptr<RawDataProcessor>>& raw_data_processing_methods_I,
+    InjectionHandler* injection,
+    const std::vector<RawDataProcessor*>& raw_data_processing_methods_I,
+    const Filenames* filenames,
     const bool verbose_I){
 
     try {
@@ -143,9 +150,9 @@ namespace SmartPeak
         if (verbose_I) {
           std::cout << "\n[" << (i + 1) << "/" << raw_data_processing_methods_I.size() << "]" << std::endl;
         }
-        raw_data_processing_methods_I[i]->process(injection.getRawData(),
-          injection.getRawData().getParameters(),
-          filenames,
+        raw_data_processing_methods_I[i]->process(injection->getRawData(),
+          injection->getRawData().getParameters(),
+          *filenames,
           verbose_I);
       }
       return true;

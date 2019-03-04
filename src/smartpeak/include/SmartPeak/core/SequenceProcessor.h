@@ -58,9 +58,9 @@ public:
     );
 
     static bool processSequence_(
-      InjectionHandler& injection,
-      const Filenames& filenames,
-      const std::vector<std::shared_ptr<RawDataProcessor>>& raw_data_processing_methods_I,
+      InjectionHandler* injection,
+      const std::vector<RawDataProcessor*>& raw_data_processing_methods_I,
+      const Filenames* filenames,
       const bool verbose_I = false);
 
     /**
