@@ -585,6 +585,7 @@ namespace SmartPeak
     try {
       // must use "PeptideSequence"
       if (format == "csv") {
+        rawDataHandler_IO.getTargetedExperiment().clear(true);  // Transitions are appended to the existing experiment in OpenMS
         OpenMS::TransitionTSVFile tsvfile;
         tsvfile.convertTSVToTargetedExperiment(
           filenames.traML_csv_i.c_str(),
@@ -593,6 +594,7 @@ namespace SmartPeak
         );
       }
       else if (format == "traML") {
+        rawDataHandler_IO.getTargetedExperiment().clear(true);
         OpenMS::TraMLFile tramlfile;
         tramlfile.load(filenames.traML_csv_i, rawDataHandler_IO.getTargetedExperiment());
       }
