@@ -241,6 +241,7 @@ public:
   menuImportFile_label:
     in = getLineInput("> ", false);
 
+
     if      ("1" == in) {
       setSequencePathnameFromInput();
       sequenceHandler_.clear();
