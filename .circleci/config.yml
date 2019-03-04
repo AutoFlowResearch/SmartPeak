@@ -7,7 +7,7 @@ jobs:
       - image: ubuntu:18.04
 
     working_directory: ~/SmartPeak2
-
+ 
     steps:
       - checkout
       - run: |
