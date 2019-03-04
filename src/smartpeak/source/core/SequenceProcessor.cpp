@@ -6,6 +6,8 @@
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/SequenceParser.h>
+#include <thread>
+#include <future>
 
 namespace SmartPeak
 {
@@ -77,27 +79,80 @@ namespace SmartPeak
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
-    // [OPTIMIZATION: add-in parallel execution here using 
-    //  `std::vector<std::future>>`, `std::packaged_task`, `std::thread`, and thread count/retrieval pattern]
+    // handle user-desired raw_data_processing_methods
+    if (raw_data_processing_methods_I.size() == 0) {
+      throw "no raw data processing methods given.\n";
+    }
+
+    const int n_hard_threads = std::thread::hardware_concurrency();  // TODO: add an option in the parameters for the number of cores to use
+    std::vector<std::future<bool>> task_results;
+    int thread_cnt = 0, injection_cnt = 0;
     for (InjectionHandler& injection : process_sequence) {
+      // encapsulate in a packaged_task
+      std::packaged_task<bool (InjectionHandler,
+          std::vector<std::shared_ptr<RawDataProcessor>>,
+          Filenames, bool
+          )> task(SequenceProcessor::processSequence_);
 
-      // handle user-desired raw_data_processing_methods
-      if (raw_data_processing_methods_I.size() == 0) {
-        throw "no raw data processing methods given.\n";
-      }
+      // launch the thread
+        task_results.push_back(task.get_future());
+        std::thread task_thread(std::move(task),
+          std::ref(injection), 
+          std::ref(raw_data_processing_methods_I), 
+          std::ref(filenames.at(injection.getMetaData().getInjectionName())),
+          std::ref(verbose_I));
+        task_thread.detach();
 
-      const size_t n = raw_data_processing_methods_I.size();
-
-      // process the samples
-      for (size_t i = 0; i < n; ++i) {
-        if (verbose_I) {
-          std::cout << "\n[" << (i + 1) << "/" << n << "]" << std::endl;
+      // retrieve the results
+      if (thread_cnt == n_hard_threads - 1 || injection_cnt == process_sequence.size() - 1)
+      {
+        for (auto& task_result : task_results)
+        {
+          if (task_result.valid())
+          {
+            try
+            {
+              task_result.get();
+            }
+            catch (std::exception& e)
+            {
+              printf("Exception: %s", e.what());
+            }
+          }
         }
-        raw_data_processing_methods_I[i]->process(injection.getRawData(), 
-          injection.getRawData().getParameters(), 
-          filenames.at(injection.getMetaData().getInjectionName()), 
+        task_results.clear();
+        thread_cnt = 0;
+      }
+      else
+      {
+        ++thread_cnt;
+      }
+      ++injection_cnt;
+    }
+  }
+
+  bool SequenceProcessor::processSequence_(
+    InjectionHandler& injection,
+    const Filenames& filenames,
+    const std::vector<std::shared_ptr<RawDataProcessor>>& raw_data_processing_methods_I,
+    const bool verbose_I){
+
+    try {
+    // process the samples
+      for (size_t i = 0; i < raw_data_processing_methods_I.size(); ++i) {
+        if (verbose_I) {
+          std::cout << "\n[" << (i + 1) << "/" << raw_data_processing_methods_I.size() << "]" << std::endl;
+        }
+        raw_data_processing_methods_I[i]->process(injection.getRawData(),
+          injection.getRawData().getParameters(),
+          filenames,
           verbose_I);
       }
+      return true;
+    }
+    catch (std::exception& e) {
+      // TODO
+      return false;
     }
   }
 

@@ -57,6 +57,12 @@ public:
       const bool verbose_I = false
     );
 
+    static bool processSequence_(
+      InjectionHandler& injection,
+      const Filenames& filenames,
+      const std::vector<std::shared_ptr<RawDataProcessor>>& raw_data_processing_methods_I,
+      const bool verbose_I = false);
+
     /**
       Apply a processing workflow to all injections in a sequence segment.
 
