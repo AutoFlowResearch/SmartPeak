@@ -337,7 +337,7 @@ namespace SmartPeak
     int id_ = 12;
     std::string name_ = "LOAD_TRANSITIONS";
     std::string description_ = "Load the transitions for the SRM experiments from the TraML file.";
-  } const;
+  };
 
   class LoadFeatureFilters : public RawDataProcessor
   {

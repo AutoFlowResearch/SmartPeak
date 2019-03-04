@@ -66,7 +66,7 @@ namespace SmartPeak
     const bool verbose_I
   )
   {
-    std::vector<InjectionHandler>& process_sequence = sequenceHandler_IO.getSamplesInSequence(injection_names);
+    std::vector<InjectionHandler> process_sequence = sequenceHandler_IO.getSamplesInSequence(injection_names);
 
     // handle user-desired samples
     if (injection_names.empty()) {
