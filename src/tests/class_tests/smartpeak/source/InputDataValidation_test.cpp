@@ -102,6 +102,7 @@ BOOST_AUTO_TEST_CASE(componentNamesAreConsistent)
   BOOST_CHECK_EQUAL(result, true);
 
   filenames.traML_csv_i = main_dir + "/traML_missing.csv";
+  // SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
   RawDataHandler& rawData0 = sequenceHandler.getSequence().front().getRawData();
   LoadTransitions loadTransitions;
   loadTransitions.process(rawData0, {}, filenames);
