@@ -429,8 +429,24 @@ public:
     else if ("4" == in) {
     }
     else if ("5" == in) {
+      const std::string pathname = main_dir_ + "/FeatureSummary.csv";
+      SequenceParser::writeDataTableFromMetaValue(
+        sequenceHandler_,
+        pathname,
+        featureSummaryMetaData_,
+        featureSummaryTypes_
+      );
+      std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
     }
     else if ("6" == in) {
+      const std::string pathname = main_dir_ + "/SequenceSummary.csv";
+      SequenceParser::writeDataMatrixFromMetaValue(
+        sequenceHandler_,
+        pathname,
+        sequenceSummaryMetaData_,
+        sequenceSummaryTypes_
+      );
+      std::cout << "SequenceSummary.csv file has been stored at: " << pathname << '\n';
     }
     else if ("7" == in) {
     }
@@ -500,22 +516,6 @@ public:
       std::cout << "\nWorkflow completed.\n";
     }
     else if ("4" == in) {
-      std::string pathname = main_dir_ + "/SequenceSummary.csv";
-      SequenceParser::writeDataMatrixFromMetaValue(
-        sequenceHandler_,
-        pathname,
-        sequenceSummaryMetaData_,
-        sequenceSummaryTypes_
-      );
-      std::cout << "SequenceSummary.csv file has been stored at: " << pathname << '\n';
-      pathname = main_dir_ + "/FeatureSummary.csv";
-      SequenceParser::writeDataTableFromMetaValue(
-        sequenceHandler_,
-        pathname,
-        featureSummaryMetaData_,
-        featureSummaryTypes_
-      );
-      std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
     }
     else if ("m" == in || "M" == in) {
       // empty
