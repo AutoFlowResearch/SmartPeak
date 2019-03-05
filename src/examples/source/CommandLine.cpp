@@ -424,6 +424,7 @@ public:
     if      ("1" == in) {
     }
     else if ("2" == in) {
+      std::cout << getPipelineString();
     }
     else if ("3" == in) {
     }
