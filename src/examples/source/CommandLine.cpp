@@ -253,8 +253,16 @@ public:
       loadTransitions.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
     }
     else if ("3" == in) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : sequenceHandler_.getSequenceSegments()) {
+        LoadQuantitationMethods loadQuantitationMethods;
+        loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, static_filenames_, verbose_);
+      }
     }
     else if ("4" == in) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : sequenceHandler_.getSequenceSegments()) {
+        LoadStandardsConcentrations loadStandardsConcentrations;
+        loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, static_filenames_, verbose_);
+      }
     }
     else if ("5" == in) {
       LoadFeatureFilters loadFeatureFilters;
