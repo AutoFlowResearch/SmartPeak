@@ -476,8 +476,6 @@ public:
     if      ("1" == in) {
     }
     else if ("2" == in) {
-    }
-    else if ("3" == in) {
       size_t i = 0;
       while (i < commands_.size()) {
         const Command::CommandType type = commands_[i].type;
@@ -514,6 +512,8 @@ public:
         i = j;
       }
       std::cout << "\nWorkflow completed.\n";
+    }
+    else if ("3" == in) {
     }
     else if ("4" == in) {
     }
