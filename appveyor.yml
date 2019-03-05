@@ -8,6 +8,6 @@ configuration:
 install:
     - git submodule update --init --recursive
 before_build:
-    - cmake -G "Visual Studio 15 2017 Win64" .
+    - cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DCMAKE_BUILD_TYPE=Debug
 build:
-  project: $(APPVEYOR_BUILD_FOLDER)\$(APPVEYOR_PROJECT_NAME).sln
+  project: $(APPVEYOR_BUILD_FOLDER)/$(APPVEYOR_PROJECT_NAME).sln
