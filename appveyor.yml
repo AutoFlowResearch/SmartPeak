@@ -14,9 +14,9 @@ before_build:
     - ps: cd foo
     - echo %CD%
     - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
-    - pc: cd C:\projects\OpenMS-build
-    - cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build
-    - cd C:\projects\smartpeak2
+    - ps: cd C:\projects\OpenMS-build
+    - cmake -DBOOST_ROOT=C:\Libraries\boost_1_69_0 -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build
+    - ps: cd C:\projects\smartpeak2
     - cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DCMAKE_BUILD_TYPE=Debug
 build:
   project: $(APPVEYOR_BUILD_FOLDER)/$(APPVEYOR_PROJECT_NAME).sln
