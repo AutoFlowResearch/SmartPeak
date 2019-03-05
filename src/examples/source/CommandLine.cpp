@@ -357,6 +357,42 @@ public:
     else if ("14" == in) {
     }
     else if ("15" == in) {
+      if (mzML_dir_.empty()) {
+        mzML_dir_ = main_dir_ + "/mzML";
+        std::cout << "\nPath for 'mzML':\t" << mzML_dir_ << '\n';
+        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
+        const std::string path_input = getLineInput("> ");
+        if (path_input.size()) {
+          mzML_dir_ = path_input;
+        }
+      }
+
+      if (features_in_dir_.empty()) {
+        features_in_dir_ = main_dir_ + "/features";
+        std::cout << "\nPath for 'INPUT features':\t" << features_in_dir_ << '\n';
+        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
+        const std::string path_input = getLineInput("> ");
+        if (path_input.size()) {
+          features_in_dir_ = path_input;
+        }
+      }
+
+      if (features_out_dir_.empty()) {
+        features_out_dir_ = main_dir_ + "/features";
+        std::cout << "\nPath for 'OUTPUT features':\t" << features_out_dir_ << '\n';
+        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
+        const std::string path_input = getLineInput("> ");
+        if (path_input.size()) {
+          features_out_dir_ = path_input;
+        }
+      }
+
+      const std::vector<Command> methods = getMethodsInput();
+      if (methods.empty()) {
+        std::cout << "\nPipeline not modified.\n";
+      } else {
+        commands_ = methods;
+      }
     }
     else if ("m" == in || "M" == in) {
       // empty
