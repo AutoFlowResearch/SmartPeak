@@ -19,14 +19,14 @@ jobs:
           git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git &&
           cd OpenMS &&
           cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
-          make -j8 OpenMS
+          make -j4 OpenMS
       - run:
           command: |
             cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
-            make -j8
+            make -j4
       - run:
           command: |
-            ctest -j8
+            ctest -j4
 
 workflows:
   version: 2
