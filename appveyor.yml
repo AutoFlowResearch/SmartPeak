@@ -8,6 +8,11 @@ configuration:
 install:
     - git submodule update --init --recursive
 before_build:
+    - echo %CD%
+    - mkdir foo
+    - echo %CD%
+    - ps: cd foo
+    - echo %CD%
     - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
     - C:\projects\OpenMS-build
     - cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build
