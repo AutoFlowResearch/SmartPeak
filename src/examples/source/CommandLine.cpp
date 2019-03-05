@@ -426,6 +426,42 @@ public:
     else if ("2" == in) {
     }
     else if ("3" == in) {
+      size_t i = 0;
+      while (i < commands_.size()) {
+        const Command::CommandType type = commands_[i].type;
+        size_t j = i + 1;
+        for (; j < commands_.size() && type == commands_[j].type; ++j) {
+          // empty body
+        }
+        const Command& cmd = commands_[i];
+        if (cmd.type == Command::RawDataMethod) {
+          std::vector<std::shared_ptr<RawDataProcessor>> raw_methods;
+          std::transform(commands_.begin() + i, commands_.begin() + j, std::back_inserter(raw_methods),
+            [](const Command& command){ return command.raw_data_method; });
+          SequenceProcessor::processSequence(
+            sequenceHandler_,
+            cmd.dynamic_filenames,
+            std::set<std::string>(),
+            raw_methods,
+            verbose_
+          );
+        } else if (cmd.type == Command::SequenceSegmentMethod) {
+          std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
+          std::transform(commands_.begin() + i, commands_.begin() + j, std::back_inserter(seq_seg_methods),
+            [](const Command& command){ return command.seq_seg_method; });
+          SequenceProcessor::processSequenceSegments(
+            sequenceHandler_,
+            cmd.dynamic_filenames,
+            std::set<std::string>(),
+            seq_seg_methods,
+            verbose_
+          );
+        } else {
+          std::cout << "\nSkipping a command.\n";
+        }
+        i = j;
+      }
+      std::cout << "\nWorkflow completed.\n";
     }
     else if ("4" == in) {
       std::string pathname = main_dir_ + "/SequenceSummary.csv";
