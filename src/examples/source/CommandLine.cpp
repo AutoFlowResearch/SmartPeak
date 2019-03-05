@@ -246,6 +246,7 @@ public:
       setSequencePathnameFromInput();
       sequenceHandler_.clear();
       std::cout << "Data has been cleared.\n";
+      static_filenames_.sequence_csv_i = sequence_pathname_;
       SequenceParser::readSequenceFile(sequenceHandler_, static_filenames_.sequence_csv_i, ",", verbose_);
     }
     else if ("2" == in) {
@@ -788,12 +789,16 @@ public:
 
   void setSequencePathnameFromInput()
   {
-    std::cout << "\n\n" <<
-      "Please provide the pathname for the sequence file.\n" <<
-      "Example:\n" <<
-      // "> /home/user/data/some_sequence_file.csv\n\n" <<
-      "> /home/pasdom/SmartPeak2/src/examples/data/HPLC_UV_Standards/sequence.csv\n\n" <<
-      "Enter the absolute pathname:\n";
+    std::cout << "\n\nSet the sequence file pathname.\n";
+    if (sequence_pathname_.size()) {
+      std::cout << "Current: " << sequence_pathname_ << "\n\n";
+    } else {
+      std::cout <<
+        "Example:\n"
+        // "> /home/user/data/some_sequence_file.csv\n\n"
+        "> /home/pasdom/SmartPeak2/src/examples/data/HPLC_UV_Standards/sequence.csv\n\n";
+    }
+    std::cout << "Enter the absolute pathname:\n";
     while (true) {
       sequence_pathname_ = getLineInput("> ", false);
       if (InputDataValidation::fileExists(sequence_pathname_)) {
