@@ -1,5 +1,8 @@
 version: '1.0.{build}'
 image: Visual Studio 2017
+environment:
+  XercesC_INCLUDE_DIRS: $(WINDOWS_DEPENDENCIES_DIR)\xercesc\build\native\include
+  XercesC_LIBRARIES: $(WINDOWS_DEPENDENCIES_DIR)\xercesc\build\native\lib\x64\v110\Release
 platform:
   - x64
 configuration:
