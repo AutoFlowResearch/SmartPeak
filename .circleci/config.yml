@@ -27,7 +27,7 @@ jobs:
       - run:
           command: |
             ctest -j4
-
+  
 workflows:
   version: 2
   build-deploy:
