@@ -13,6 +13,8 @@ before_build:
     - ps: cd foo
     - echo %CD%
     - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
+    - IF %CACHE%==FALSE curl -k --connect-timeout 60 --max-time 1200 -s -O https://download.gforge.liris.cnrs.fr/meppbin/windows/vs2015/MEPP/packages/redo/xerces-c-3.1.2.rar
+    - IF %CACHE%==FALSE 7z x xerces-c-3.1
     - ps: cd C:\projects\OpenMS-build
     - cmake -DBOOST_ROOT=C:\Libraries\boost_1_69_0 -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build
     #- ps: cd C:\projects\smartpeak2
