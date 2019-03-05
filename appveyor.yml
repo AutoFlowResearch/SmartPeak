@@ -4,7 +4,6 @@ platform:
   - x64
 configuration:
   - Release
-  - Debug
 install:
     - git submodule update --init --recursive
 before_build:
