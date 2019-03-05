@@ -186,7 +186,7 @@ public:
   {
     std::cout <<
       "\n\n"
-      "Main | File\n"
+      "Main > File\n"
       "[1] New session\n"
       "[2] Load session\n"
       "[3] Save session\n"
@@ -225,7 +225,7 @@ public:
   {
     std::cout <<
       "\n\n"
-      "Main | File | Import file\n"
+      "Main > File > Import file\n"
       "[1] Sequence\n"
       "[2] TraML\n"
       "[3] Quantitation methods\n"
@@ -305,7 +305,7 @@ public:
   {
     std::cout <<
       "\n\n"
-      "Main | Edit\n"
+      "Main > Edit\n"
       "[1]  Undo\n"
       "[2]  Redo\n"
       "[3]  Cut\n"
@@ -407,7 +407,7 @@ public:
   {
     std::cout <<
       "\n\n"
-      "Main | View\n"
+      "Main > View\n"
       "[1] Sequence status\n"
       "[2] Workflow wizard\n"
       "[3] Feature plot\n"
@@ -464,7 +464,7 @@ public:
   {
     std::cout <<
       "\n\n"
-      "Main | Actions\n"
+      "Main > Actions\n"
       "[1] Run command\n"
       "[2] Run workflow\n"
       "[3] Quick info\n"
@@ -531,7 +531,7 @@ public:
   {
     std::cout <<
       "\n\n"
-      "Main | Help\n"
+      "Main > Help\n"
       "[1] About\n"
       "[2] Documentation\n"
       "[3] Version\n"
