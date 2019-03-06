@@ -245,7 +245,6 @@ public:
       setSequencePathnameFromInput();
       buildStaticFilenames();
       sequenceHandler_.clear();
-      std::cout << "Data has been cleared.\n";
       SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
     }
     else if ("2" == in) {
@@ -915,7 +914,8 @@ public:
 
   std::set<MetaDataHandler::SampleType> getSampleTypesInput()
   {
-    std::cout << "\nPlease select the sample types. Insert the indexes separated by a space:\n"
+    std::cout <<
+      "\nPlease select the sample types. Insert the indexes separated by a space:\n"
       "[1] Unknown\n"
       "[2] Standard\n"
       "[3] QC\n"
@@ -1075,25 +1075,31 @@ public:
     return metadata;
   }
 
-  // Initializes the sequence structure
-  CommandLine(int argc, char **argv)
-  {
-    // Three ways of setting `sequence_pathname_`
-    if (argc == 2 && InputDataValidation::fileExists(argv[1])) { // sequence.csv abs. path passed as argument
-      sequence_pathname_ = argv[1];
-    } else if (InputDataValidation::fileExists("sequence.csv")) { // or found in the same folder of the executable
-      char cwd_buf[33000];
-      if (!mygetcwd(cwd_buf, 33000)) {
-        throw "\ngetcwd failed.\n";
-      }
-      sequence_pathname_ = std::string(cwd_buf) + std::string("/sequence.csv");
-    } else {
-      setSequencePathnameFromInput();
-    }
+  // // Initializes the sequence structure
+  // CommandLine(int argc, char **argv)
+  // {
+  //   // Three ways of setting `sequence_pathname_`
+  //   if (argc == 2 && InputDataValidation::fileExists(argv[1])) { // sequence.csv abs. path passed as argument
+  //     sequence_pathname_ = argv[1];
+  //   } else if (InputDataValidation::fileExists("sequence.csv")) { // or found in the same folder of the executable
+  //     char cwd_buf[33000];
+  //     if (!mygetcwd(cwd_buf, 33000)) {
+  //       throw "\ngetcwd failed.\n";
+  //     }
+  //     sequence_pathname_ = std::string(cwd_buf) + std::string("/sequence.csv");
+  //   } else {
+  //     setSequencePathnameFromInput();
+  //   }
+  //   buildStaticFilenames();
+  //   SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
+  // }
 
-    buildStaticFilenames();
-    SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
-  }
+  CommandLine()                                    = default;
+  ~CommandLine()                                   = default;
+  CommandLine(const CommandLine& other)            = delete;
+  CommandLine& operator=(const CommandLine& other) = delete;
+  CommandLine(CommandLine&& other)                 = delete;
+  CommandLine& operator=(CommandLine&& other)      = delete;
 
   void runApp() {
     while (true) {
@@ -1157,7 +1163,8 @@ public:
 
 int main(int argc, char **argv)
 {
-  CommandLine cli(argc, argv);
+  // CommandLine cli(argc, argv);
+  CommandLine cli;
   cli.runApp();
   return 0;
 }
