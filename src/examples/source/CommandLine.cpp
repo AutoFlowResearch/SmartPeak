@@ -241,55 +241,74 @@ public:
   menuImportFile_label:
     in = getLineInput("> ", false);
 
-
     if      ("1" == in) {
       setSequencePathnameFromInput();
+      buildStaticFilenames();
       sequenceHandler_.clear();
       std::cout << "Data has been cleared.\n";
-      static_filenames_.sequence_csv_i = sequence_pathname_;
-      SequenceParser::readSequenceFile(sequenceHandler_, static_filenames_.sequence_csv_i, ",", verbose_);
+      SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
     }
     else if ("2" == in) {
+      const std::string pathname = getPathnameFromInput();
+      static_filenames_.traML_csv_i = pathname;
       LoadTransitions loadTransitions;
       loadTransitions.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
     }
     else if ("3" == in) {
+      const std::string pathname = getPathnameFromInput();
+      static_filenames_.quantitationMethods_csv_i = pathname;
       for (SequenceSegmentHandler& sequenceSegmentHandler : sequenceHandler_.getSequenceSegments()) {
         LoadQuantitationMethods loadQuantitationMethods;
         loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, static_filenames_, verbose_);
       }
     }
     else if ("4" == in) {
+      const std::string pathname = getPathnameFromInput();
+      static_filenames_.standardsConcentrations_csv_i = pathname;
       for (SequenceSegmentHandler& sequenceSegmentHandler : sequenceHandler_.getSequenceSegments()) {
         LoadStandardsConcentrations loadStandardsConcentrations;
         loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, static_filenames_, verbose_);
       }
     }
     else if ("5" == in) {
+      const std::string pathname = getPathnameFromInput();
+      static_filenames_.featureFilterComponents_csv_i = pathname;
       LoadFeatureFilters loadFeatureFilters;
       const std::string backup = static_filenames_.featureFilterComponentGroups_csv_i;
+      static_filenames_.featureFilterComponentGroups_csv_i.clear();
       loadFeatureFilters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
       static_filenames_.featureFilterComponentGroups_csv_i = backup;
     }
     else if ("6" == in) {
+      const std::string pathname = getPathnameFromInput();
+      static_filenames_.featureFilterComponentGroups_csv_i = pathname;
       LoadFeatureFilters loadFeatureFilters;
       const std::string backup = static_filenames_.featureFilterComponents_csv_i;
+      static_filenames_.featureFilterComponents_csv_i.clear();
       loadFeatureFilters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
       static_filenames_.featureFilterComponents_csv_i = backup;
     }
     else if ("7" == in) {
+      const std::string pathname = getPathnameFromInput();
+      static_filenames_.featureQCComponents_csv_i = pathname;
       LoadFeatureQCs loadFeatureQCs;
       const std::string backup = static_filenames_.featureQCComponentGroups_csv_i;
+      static_filenames_.featureQCComponentGroups_csv_i.clear();
       loadFeatureQCs.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
       static_filenames_.featureQCComponentGroups_csv_i = backup;
     }
     else if ("8" == in) {
+      const std::string pathname = getPathnameFromInput();
+      static_filenames_.featureQCComponentGroups_csv_i = pathname;
       LoadFeatureQCs loadFeatureQCs;
       const std::string backup = static_filenames_.featureQCComponents_csv_i;
+      static_filenames_.featureQCComponents_csv_i.clear();
       loadFeatureQCs.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
       static_filenames_.featureQCComponents_csv_i = backup;
     }
     else if ("9" == in) {
+      const std::string pathname = getPathnameFromInput();
+      static_filenames_.parameters_csv_i = pathname;
       LoadParameters loadParameters;
       loadParameters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
     }
@@ -823,6 +842,20 @@ public:
     return line;
   }
 
+  std::string getPathnameFromInput()
+  {
+    std::string pathname;
+    std::cout << "Pathname: ";
+    while (true) {
+      pathname = getLineInput("> ", false);
+      if (InputDataValidation::fileExists(pathname)) {
+        break;
+      }
+      std::cout << "The file does not exist. Try again.\n";
+    }
+    return pathname;
+  }
+
   std::set<MetaDataHandler::SampleType> getSampleTypesInput()
   {
     std::cout << "\nPlease select the sample types. Insert the indexes separated by a space:\n" <<
@@ -987,6 +1020,7 @@ public:
 
   CommandLine(int argc, char **argv)
   {
+    // Three ways of setting `sequence_pathname_`
     if (argc == 2 && InputDataValidation::fileExists(argv[1])) { // sequence.csv abs. path passed as argument
       sequence_pathname_ = argv[1];
     } else if (InputDataValidation::fileExists("sequence.csv")) { // or found in the same folder of the executable
@@ -1010,16 +1044,16 @@ public:
     }
   }
 
-  void printMenu()
-  {
-    std::cout << "\n\n" <<
-      "SmartPeak Main menu\n" <<
-      "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n" <<
-      "[2] Set processing steps [" << getPipelineString() << "]\n"
-      "[3] Run the pipeline\n" <<
-      "[E] Exit SmartPeak\n\n" <<
-      "Please select your action.\n";
-  }
+  // void printMenu()
+  // {
+  //   std::cout << "\n\n" <<
+  //     "SmartPeak Main menu\n" <<
+  //     "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n" <<
+  //     "[2] Set processing steps [" << getPipelineString() << "]\n"
+  //     "[3] Run the pipeline\n" <<
+  //     "[E] Exit SmartPeak\n\n" <<
+  //     "Please select your action.\n";
+  // }
 
   // Returns a string representation of the workflow steps
   // i.e. 1 2 3 4 5 5 18
