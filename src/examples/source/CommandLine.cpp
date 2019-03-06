@@ -1075,6 +1075,7 @@ public:
     return metadata;
   }
 
+  // Initializes the sequence structure
   CommandLine(int argc, char **argv)
   {
     // Three ways of setting `sequence_pathname_`
@@ -1092,25 +1093,13 @@ public:
 
     buildStaticFilenames();
     SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
-
-    while (true) {
-      // printMenu();
-      // const std::string line = getLineInput("> ", false);
-      menuMain();
-      // parseCommand(line);
-    }
   }
 
-  // void printMenu()
-  // {
-  //   std::cout << "\n\n"
-  //     "SmartPeak Main menu\n"
-  //     "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n"
-  //     "[2] Set processing steps [" << getPipelineString() << "]\n"
-  //     "[3] Run the pipeline\n"
-  //     "[E] Exit SmartPeak\n\n"
-  //     "Please select your action.\n";
-  // }
+  void runApp() {
+    while (true) {
+      menuMain();
+    }
+  }
 
   // Returns a string representation of the workflow steps
   // i.e. 1 2 3 4 5 5 18
@@ -1164,155 +1153,12 @@ public:
     }
     return s;
   }
-
-  void parseCommand(const std::string& line)
-  {
-    int opt;
-
-    try {
-      opt = std::stoi(line);
-    } catch (const std::invalid_argument&) {
-      if (line[0] == 'E' || line[0] == 'e') {
-        std::exit(EXIT_SUCCESS);
-      }
-      std::cout << "Invalid input. Try again.\n";
-      return;
-    }
-
-    switch (opt) {
-    case 1:
-      setSequencePathnameFromInput();
-      buildStaticFilenames();
-      commands_.clear();
-      sequenceHandler_.clear();
-      SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
-      break;
-    case 2:
-    {
-      if (mzML_dir_.empty()) {
-        mzML_dir_ = main_dir_ + "/mzML";
-        std::cout << "\nPath for 'mzML':\t" << mzML_dir_ << '\n';
-        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
-        const std::string path_input = getLineInput("> ");
-        if (path_input.size()) {
-          mzML_dir_ = path_input;
-        }
-      }
-
-      if (features_in_dir_.empty()) {
-        features_in_dir_ = main_dir_ + "/features";
-        std::cout << "\nPath for 'INPUT features':\t" << features_in_dir_ << '\n';
-        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
-        const std::string path_input = getLineInput("> ");
-        if (path_input.size()) {
-          features_in_dir_ = path_input;
-        }
-      }
-
-      if (features_out_dir_.empty()) {
-        features_out_dir_ = main_dir_ + "/features";
-        std::cout << "\nPath for 'OUTPUT features':\t" << features_out_dir_ << '\n';
-        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
-        const std::string path_input = getLineInput("> ");
-        if (path_input.size()) {
-          features_out_dir_ = path_input;
-        }
-      }
-
-      const std::vector<Command> methods = getMethodsInput();
-      if (methods.empty()) {
-        std::cout << "\nPipeline not modified.\n";
-        break;
-      }
-      commands_ = methods;
-      break;
-    }
-    case 3:
-    {
-      size_t i = 0;
-      while (i < commands_.size()) {
-        const Command::CommandType type = commands_[i].type;
-        size_t j = i + 1;
-        for (; j < commands_.size() && type == commands_[j].type; ++j) {
-          // empty body
-        }
-        const Command& cmd = commands_[i];
-        if (cmd.type == Command::RawDataMethod) {
-          std::vector<std::shared_ptr<RawDataProcessor>> raw_methods;
-          std::transform(commands_.begin() + i, commands_.begin() + j, std::back_inserter(raw_methods),
-            [](const Command& command){ return command.raw_data_method; });
-          SequenceProcessor::processSequence(
-            sequenceHandler_,
-            cmd.dynamic_filenames,
-            std::set<std::string>(),
-            raw_methods,
-            verbose_
-          );
-        } else if (cmd.type == Command::SequenceSegmentMethod) {
-          std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
-          std::transform(commands_.begin() + i, commands_.begin() + j, std::back_inserter(seq_seg_methods),
-            [](const Command& command){ return command.seq_seg_method; });
-          SequenceProcessor::processSequenceSegments(
-            sequenceHandler_,
-            cmd.dynamic_filenames,
-            std::set<std::string>(),
-            seq_seg_methods,
-            verbose_
-          );
-        } else if (cmd.type == Command::WriteSequenceSummary) {
-          const std::string pathname = main_dir_ + "/SequenceSummary.csv";
-          SequenceParser::writeDataMatrixFromMetaValue(
-            sequenceHandler_,
-            pathname,
-            sequenceSummaryMetaData_,
-            sequenceSummaryTypes_
-          );
-          std::cout << "SequenceSummary.csv file has been stored at: " << pathname << '\n';
-        } else if (cmd.type == Command::WriteFeatureSummary) {
-          const std::string pathname = main_dir_ + "/FeatureSummary.csv";
-          SequenceParser::writeDataTableFromMetaValue(
-            sequenceHandler_,
-            pathname,
-            featureSummaryMetaData_,
-            featureSummaryTypes_
-          );
-          std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
-        } else if (cmd.type == Command::GetSequenceInfo) {
-          std::cout << InputDataValidation::getSequenceInfo(sequenceHandler_, ",") << "\n";
-        } else if (cmd.type == Command::GetParametersInfo) {
-          std::cout << InputDataValidation::getParametersInfo(
-            sequenceHandler_.getSequence().front().getRawData().getParameters()) << "\n";
-        } else if (cmd.type == Command::GetTraMLInfo) {
-          std::cout << InputDataValidation::getTraMLInfo(
-            sequenceHandler_.getSequence().front().getRawData()) << "\n";
-        } else if (cmd.type == Command::GetFeatureFilterInfo) {
-          std::cout << InputDataValidation::getComponentsAndGroupsInfo(
-            sequenceHandler_.getSequence().front().getRawData(), true) << "\n";
-        } else if (cmd.type == Command::GetFeatureQCInfo) {
-          std::cout << InputDataValidation::getComponentsAndGroupsInfo(
-            sequenceHandler_.getSequence().front().getRawData(), false) << "\n";
-        } else if (cmd.type == Command::GetQuantMethodsInfo) {
-          std::cout << InputDataValidation::getQuantitationMethodsInfo(
-            sequenceHandler_.getSequenceSegments().front()) << "\n";
-        } else if (cmd.type == Command::GetStandardsConcInfo) {
-          std::cout << InputDataValidation::getStandardsConcentrationsInfo(
-            sequenceHandler_.getSequenceSegments().front()) << "\n";
-        } else {
-          std::cout << "\ninvalid command\n";
-        }
-        i = j;
-      }
-      break;
-    }
-    default:
-      std::cout << "\nInvalid input. Try again.\n";
-    }
-  }
 };
 
 int main(int argc, char **argv)
 {
   CommandLine cli(argc, argv);
+  cli.runApp();
   return 0;
 }
 
