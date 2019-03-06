@@ -615,10 +615,14 @@ public:
     in = getLineInput("> ", false);
 
     if      ("1" == in) {
+      std::cout << "SmartPeak2 about message\n";
     }
     else if ("2" == in) {
+      std::cout << "SmartPeak2 documentation message\n";
     }
     else if ("3" == in) {
+      // TODO: macro with commit revision? sha1sum of source file?
+      std::cout << "SmartPeak2 version message\n";
     }
     else if ("m" == in || "M" == in) {
       // empty
@@ -647,9 +651,9 @@ public:
     const std::string pathnamesFilePath = main_dir_ + "/" + std::string(pathnamesFilename_);
 
     if (InputDataValidation::fileExists(pathnamesFilePath)) {
-      std::cout << "\n\n" <<
-        "File " << pathnamesFilePath << " was found in the same directory. " <<
-        "This file contains information about where the various experiment's files are found.\n\n" <<
+      std::cout << "\n\n"
+        "File " << pathnamesFilePath << " was found in the same directory. "
+        "This file contains information about where the various experiment's files are found.\n\n"
         "Should its values be used to search for pathnames? [y]/n\n";
       const std::string in = getLineInput("> ");
       std::cout << '\n';
@@ -661,7 +665,7 @@ public:
       }
     }
 
-    std::cout << "\n\n" <<
+    std::cout << "\n\n"
       "The following list of file was searched for:\n";
     std::vector<bool> is_valid(10);
     is_valid[0] = InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence");
@@ -680,11 +684,11 @@ public:
 
     if (something_has_failed) {
       generatePathnamesTxt(pathnamesFilePath, f, is_valid);
-      std::cout << "\n\nOne or more files were not found.\n" <<
+      std::cout << "\n\nOne or more files were not found.\n"
         "The file " << pathnamesFilePath <<
-        " has been generated for you to fix pathnames.\n" <<
-        "The incorrect information has been replaced with an empty value.\n" <<
-        "If you want a pathname to be ignored, then remove its value and leave only the label.\n" <<
+        " has been generated for you to fix pathnames.\n"
+        "The incorrect information has been replaced with an empty value.\n"
+        "If you want a pathname to be ignored, then remove its value and leave only the label.\n"
         "Make sure that the pathnames are correct and run the application again.\n";
       std::exit(EXIT_FAILURE);
     }
@@ -746,8 +750,8 @@ public:
     while (std::getline(stream, line)) {
       const bool matched = std::regex_match(line, match, re);
       if (matched == false) {
-        std::cout << "\n\n" <<
-          "Regex did not match with the line: " << line << "\n" <<
+        std::cout << "\n\n"
+          "Regex did not match with the line: " << line << "\n"
           "Please make sure that the format is correct.\n";
         std::exit(EXIT_FAILURE);
       }
@@ -911,13 +915,13 @@ public:
 
   std::set<MetaDataHandler::SampleType> getSampleTypesInput()
   {
-    std::cout << "\nPlease select the sample types. Insert the indexes separated by a space:\n" <<
-      "[1] Unknown\n" <<
-      "[2] Standard\n" <<
-      "[3] QC\n" <<
-      "[4] Blank\n" <<
-      "[5] DoubleBlank\n" <<
-      "[6] Solvent\n" <<
+    std::cout << "\nPlease select the sample types. Insert the indexes separated by a space:\n"
+      "[1] Unknown\n"
+      "[2] Standard\n"
+      "[3] QC\n"
+      "[4] Blank\n"
+      "[5] DoubleBlank\n"
+      "[6] Solvent\n"
       "[M] Main menu\n\n";
 
     std::string line;
@@ -968,24 +972,24 @@ public:
   )
   {
     std::cout << title <<
-      "Please select the metadata. Insert the indexes separated by a space:\n" <<
-      "[1]  Asymmetry factor\n" <<
-      "[2]  Baseline delta/height\n" <<
-      "[3]  Calculated concentration\n" <<
-      "[4]  Log(Signal/Noise)\n" <<
-      "[5]  Peak apex intensity\n" <<
-      "[6]  Peak area\n" <<
-      "[7]  Points across baseline\n" <<
-      "[8]  Points across half height\n" <<
-      "[9]  QC transition pass\n" <<
-      "[10] QC transition message\n" <<
-      "[11] QC transition score\n" <<
-      "[12] QC transition group message\n" <<
-      "[13] QC transition group score\n" <<
-      "[14] Tailing factor\n" <<
-      "[15] Total width\n" <<
-      "[16] Width at 50% peak's height\n" <<
-      "[17] Retention time\n" <<
+      "Please select the metadata. Insert the indexes separated by a space:\n"
+      "[1]  Asymmetry factor\n"
+      "[2]  Baseline delta/height\n"
+      "[3]  Calculated concentration\n"
+      "[4]  Log(Signal/Noise)\n"
+      "[5]  Peak apex intensity\n"
+      "[6]  Peak area\n"
+      "[7]  Points across baseline\n"
+      "[8]  Points across half height\n"
+      "[9]  QC transition pass\n"
+      "[10] QC transition message\n"
+      "[11] QC transition score\n"
+      "[12] QC transition group message\n"
+      "[13] QC transition group score\n"
+      "[14] Tailing factor\n"
+      "[15] Total width\n"
+      "[16] Width at 50% peak's height\n"
+      "[17] Retention time\n"
       "[18] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17\n\n";
 
     std::string line;
@@ -1099,12 +1103,12 @@ public:
 
   // void printMenu()
   // {
-  //   std::cout << "\n\n" <<
-  //     "SmartPeak Main menu\n" <<
-  //     "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n" <<
+  //   std::cout << "\n\n"
+  //     "SmartPeak Main menu\n"
+  //     "[1] Set sequence.csv pathname\t[\"" << sequence_pathname_ << "\"]\n"
   //     "[2] Set processing steps [" << getPipelineString() << "]\n"
-  //     "[3] Run the pipeline\n" <<
-  //     "[E] Exit SmartPeak\n\n" <<
+  //     "[3] Run the pipeline\n"
+  //     "[E] Exit SmartPeak\n\n"
   //     "Please select your action.\n";
   // }
 
