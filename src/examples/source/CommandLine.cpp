@@ -535,6 +535,7 @@ public:
       std::cout << "\nWorkflow completed.\n";
     }
     else if ("3" == in) {
+      menuQuickInfo();
     }
     else if ("4" == in) {
     }
@@ -546,6 +547,58 @@ public:
     }
   }
 
+  void menuQuickInfo()
+  {
+    std::cout <<
+      "\n\n"
+      "Main > Actions > Quick Info\n"
+      "[1] Sequence\n"
+      "[2] TraML\n"
+      "[3] Quantitation methods\n"
+      "[4] Standards concentrations\n"
+      "[5] Feature filters\n"
+      "[6] Feature QC\n"
+      "[7] Parameters\n"
+      "[M] Main menu\n\n";
+
+    std::string in;
+  menuQuickInfo_label:
+    in = getLineInput("> ", false);
+
+    if      ("1" == in) {
+      std::cout << InputDataValidation::getSequenceInfo(sequenceHandler_, ",") << "\n";
+    }
+    else if ("2" == in) {
+      std::cout << InputDataValidation::getTraMLInfo(
+        sequenceHandler_.getSequence().front().getRawData()) << "\n";
+    }
+    else if ("3" == in) {
+      std::cout << InputDataValidation::getQuantitationMethodsInfo(
+        sequenceHandler_.getSequenceSegments().front()) << "\n";
+    }
+    else if ("4" == in) {
+      std::cout << InputDataValidation::getStandardsConcentrationsInfo(
+        sequenceHandler_.getSequenceSegments().front()) << "\n";
+    }
+    else if ("5" == in) {
+      std::cout << InputDataValidation::getComponentsAndGroupsInfo(
+        sequenceHandler_.getSequence().front().getRawData(), true) << "\n";
+    }
+    else if ("6" == in) {
+      std::cout << InputDataValidation::getComponentsAndGroupsInfo(
+        sequenceHandler_.getSequence().front().getRawData(), false) << "\n";
+    }
+    else if ("7" == in) {
+      std::cout << InputDataValidation::getParametersInfo(
+        sequenceHandler_.getSequence().front().getRawData().getParameters()) << "\n";
+    }
+    else if ("m" == in || "M" == in) {
+      // empty
+    }
+    else {
+      goto menuQuickInfo_label;
+    }
+  }
 
   void menuHelp()
   {
