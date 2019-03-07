@@ -4,27 +4,20 @@ param(
 )
 
 $install_path = $dir+"\"
-$zlib_lib = $install_path+'zlib.lib.zip'
-$zlib_dl = $src.AbsoluteUri
+$xsd_msi = $install_path+'xsd-4.0.msi'
+$xsd_dl = $src.AbsoluteUri
 
-if((Test-Path $zlib_lib) -eq $false) {
-    Write-Verbose "Downloading compiled zlib library"
-    Write-Verbose $zlib_dl' -> '$zlib_lib
-    (new-object System.Net.WebClient).DownloadFile($zlib_dl,$zlib_lib)
+if((Test-Path $xsd_msi) -eq $false) {
+    Write-Verbose "Downloading xsd package"
+    Write-Verbose $xsd_dl
+    Write-Verbose $xsd_msi
+    (new-object System.Net.WebClient).DownloadFile($xsd_dl,$xsd_msi)
 }
 
-$lib = $install_path+"lib\"
-$shell = new-object -com shell.application
-$zip = $shell.NameSpace($zlib_lib)
-if((Test-Path $lib) -eq $false) {
-    New-Item $lib -type directory
-}
-$zlib_file = $lib+"zlib.lib"
-if((Test-Path $zlib_file) -eq $false) {
-    Write-Verbose "Extracting zip archive"
-    foreach($item in $zip.items())
-    {
-      $shell.NameSpace($lib).copyhere($item)
-    }
-    Write-Verbose "Done."
+$xsd_i = $install_path+"xsd"
+if((Test-Path $xsd_i) -eq $false) {
+  # Install xsd+xerces-c package
+  Write-Verbose "Installing $xsd_msi"
+  msiexec /passive BASEDIR=$xsd_i /i $xsd_msi /lp xsd.log
+  Write-Verbose "Done."
 }
