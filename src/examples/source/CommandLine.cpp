@@ -30,15 +30,6 @@ public:
     enum CommandType {
       RawDataMethod,
       SequenceSegmentMethod,
-      WriteSequenceSummary,
-      WriteFeatureSummary,
-      GetSequenceInfo,
-      GetParametersInfo,
-      GetTraMLInfo,
-      GetFeatureFilterInfo,
-      GetFeatureQCInfo,
-      GetQuantMethodsInfo,
-      GetStandardsConcInfo,
     } type;
 
     void setMethod(const std::shared_ptr<RawDataProcessor> method)
@@ -105,15 +96,6 @@ public:
     OPT_CALCULATE_CALIBRATION,
     OPT_STORE_QUANTITATION_METHODS,
     OPT_LOAD_QUANTITATION_METHODS,
-    OPT_WRITE_SEQUENCE_SUMMARY,
-    OPT_WRITE_FEATURE_SUMMARY,
-    OPT_GET_SEQUENCE_INFO,
-    OPT_GET_PARAMETERS_INFO,
-    OPT_GET_TRAML_INFO,
-    OPT_GET_COMP_N_GROUPS_FILTER_INFO,
-    OPT_GET_COMP_N_GROUPS_QC_INFO,
-    OPT_GET_QUANT_METHODS_INFO,
-    OPT_GET_STANDARDS_CONC_INFO,
   };
   const std::string main_menu_ = "\n\n"
     "Please insert the sequence of methods to run.\n"
@@ -132,20 +114,11 @@ public:
     "[" + std::to_string(OPT_CALCULATE_CALIBRATION) + "] Calculate calibration\n"
     "[" + std::to_string(OPT_STORE_QUANTITATION_METHODS) + "] Store quantitation methods\n"
     "[" + std::to_string(OPT_LOAD_QUANTITATION_METHODS) + "] Load quantitation methods\n"
-    "[" + std::to_string(OPT_WRITE_SEQUENCE_SUMMARY) + "] Write SequenceSummary.csv\n"
-    "[" + std::to_string(OPT_WRITE_FEATURE_SUMMARY) + "] Write FeatureSummary.csv\n"
-    "[" + std::to_string(OPT_GET_SEQUENCE_INFO) + "] Print sequence info\n"
-    "[" + std::to_string(OPT_GET_PARAMETERS_INFO) + "] Print parameters info\n"
-    "[" + std::to_string(OPT_GET_TRAML_INFO) + "] Print TraML info\n"
-    "[" + std::to_string(OPT_GET_COMP_N_GROUPS_FILTER_INFO) + "] Print components and components groups (FeatureFilter) info\n"
-    "[" + std::to_string(OPT_GET_COMP_N_GROUPS_QC_INFO) + "] Print components and components groups (FeatureQC) info\n"
-    "[" + std::to_string(OPT_GET_QUANT_METHODS_INFO) + "] Print quantitation methods info\n"
-    "[" + std::to_string(OPT_GET_STANDARDS_CONC_INFO) + "] Print standards concentrations info\n"
     "[M]  Main menu\n\n"
     "Presets:\n"
-    "Unknowns: 1 3 4 4 5 7 8 9 14 15\n"
-    "Standards: 1 3 4 4 5 8 9 11 12 7 8 9 14 15\n"
-    "Validation: 1 3 4 5 6 14 15\n\n";
+    "Unknowns: 1 3 4 4 5 7 8 9\n"
+    "Standards: 1 3 4 4 5 8 9 11 12 7 8 9\n"
+    "Validation: 1 3 4 5 6\n\n";
 
   void menuMain()
   {
@@ -529,7 +502,7 @@ public:
             verbose_
           );
         } else {
-          std::cout << "\nSkipping a command.\n";
+          std::cout << "\nSkipping a command: " << cmd.type << "\n";
         }
         i = j;
       }
@@ -859,7 +832,7 @@ public:
     std::istringstream iss {line};
 
     for (int n; iss >> n;) {
-      if (n < 1 || n > 22 || n == 10) { // TODO: update this if plotting is implemented
+      if (n < 1 || n > 13 || n == 10) { // TODO: update this if plotting is implemented
         std::cout << "Skipping: " << n << '\n';
         continue;
       }
@@ -888,28 +861,6 @@ public:
             key
           );
         }
-      } else if (n == 14) {
-        cmd.type = Command::WriteSequenceSummary;
-        sequenceSummaryMetaData_ = getMetaDataInput("\nSequenceSummary.csv\n");
-        sequenceSummaryTypes_ = getSampleTypesInput();
-      } else if (n == 15) {
-        cmd.type = Command::WriteFeatureSummary;
-        featureSummaryMetaData_ = getMetaDataInput("\nFeatureSummary.csv\n");
-        featureSummaryTypes_ = getSampleTypesInput();
-      } else if (n == 16) {
-        cmd.type = Command::GetSequenceInfo;
-      } else if (n == 17) {
-        cmd.type = Command::GetParametersInfo;
-      } else if (n == 18) {
-        cmd.type = Command::GetTraMLInfo;
-      } else if (n == 19) {
-        cmd.type = Command::GetFeatureFilterInfo;
-      } else if (n == 20) {
-        cmd.type = Command::GetFeatureQCInfo;
-      } else if (n == 21) {
-        cmd.type = Command::GetQuantMethodsInfo;
-      } else if (n == 22) {
-        cmd.type = Command::GetStandardsConcInfo;
       } else {
         std::cout << "\ninvalid option\n";
         continue;
@@ -1189,24 +1140,6 @@ public:
             { return p.second == cmd.seq_seg_method; }
         );
         s.append(std::to_string(it->first));
-      } else if(cmd.type == Command::WriteSequenceSummary) {
-        s.append(std::to_string(OPT_WRITE_SEQUENCE_SUMMARY));
-      } else if(cmd.type == Command::WriteFeatureSummary) {
-        s.append(std::to_string(OPT_WRITE_FEATURE_SUMMARY));
-      } else if(cmd.type == Command::GetSequenceInfo) {
-        s.append(std::to_string(OPT_GET_SEQUENCE_INFO));
-      } else if(cmd.type == Command::GetParametersInfo) {
-        s.append(std::to_string(OPT_GET_PARAMETERS_INFO));
-      } else if(cmd.type == Command::GetTraMLInfo) {
-        s.append(std::to_string(OPT_GET_TRAML_INFO));
-      } else if(cmd.type == Command::GetFeatureFilterInfo) {
-        s.append(std::to_string(OPT_GET_COMP_N_GROUPS_FILTER_INFO));
-      } else if(cmd.type == Command::GetFeatureQCInfo) {
-        s.append(std::to_string(OPT_GET_COMP_N_GROUPS_QC_INFO));
-      } else if(cmd.type == Command::GetQuantMethodsInfo) {
-        s.append(std::to_string(OPT_GET_QUANT_METHODS_INFO));
-      } else if(cmd.type == Command::GetStandardsConcInfo) {
-        s.append(std::to_string(OPT_GET_STANDARDS_CONC_INFO));
       } else {
         throw "\nunsupported step\n";
       }
