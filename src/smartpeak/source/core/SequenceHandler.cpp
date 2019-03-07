@@ -176,7 +176,7 @@ namespace SmartPeak
 
     if (meta_value == "RT") {
       cast = static_cast<float>(feature.getRT());
-    }	else if (meta_value == "intensity") { // Sum of each subordinate intensity
+    } else if (meta_value == "intensity") { // Sum of each subordinate intensity
       cast = static_cast<float>(feature.getIntensity());
     } else if (meta_value == "peak_area") { // Subordinate intensity (also called "peak area)
       cast = static_cast<float>(subordinate.getIntensity());
