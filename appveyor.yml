@@ -11,6 +11,7 @@ cache:
     - xsd-4.0.msi -> appveyor.yml
 install:
     - git submodule update --init --recursive
+    - mkdir C:\projects\deps
     - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
 before_build:
     - echo %CD%
