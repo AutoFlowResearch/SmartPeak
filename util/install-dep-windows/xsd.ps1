@@ -7,6 +7,9 @@ $install_path = $dir+"\"
 $xsd_msi = $install_path+'xsd-4.0.msi'
 $xsd_dl = $src.AbsoluteUri
 
+Write-Verbose $xsd_dl
+Write-Verbose $xsd_msi
+
 if((Test-Path $xsd_msi) -eq $false) {
     Write-Verbose "Downloading xsd package"
     Write-Verbose $xsd_dl
