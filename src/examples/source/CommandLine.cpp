@@ -243,9 +243,11 @@ public:
 
     if      ("1" == in) {
       setSequencePathnameFromInput();
-      buildStaticFilenames();
-      sequenceHandler_.clear();
-      SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
+      const bool pathnamesAreCorrect = buildStaticFilenames();
+      if (pathnamesAreCorrect) {
+        sequenceHandler_.clear();
+        SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
+      }
     }
     else if ("2" == in) {
       const std::string pathname = getPathnameFromInput();
@@ -639,7 +641,7 @@ public:
     }
   }
 
-  void buildStaticFilenames()
+  bool buildStaticFilenames()
   {
     Filenames& f = static_filenames_;
     main_dir_ = sequence_pathname_.substr(0, sequence_pathname_.find_last_of('/'));
@@ -651,14 +653,14 @@ public:
 
     if (InputDataValidation::fileExists(pathnamesFilePath)) {
       std::cout << "\n\n"
-        "File " << pathnamesFilePath << " was found in the same directory. "
-        "This file contains information about where the various experiment's files are found.\n\n"
-        "Should its values be used to search for pathnames? [y]/n\n";
+        "The following file was found in the current working directory:\n" <<
+        pathnamesFilePath << "\n"
+        "Should the pathnames be used to search for the input files? [Y/n]\n";
       const std::string in = getLineInput("> ");
       std::cout << '\n';
       if (in.empty() || in.front() == 'y') {
-        updateFilenames(f, pathnamesFilePath);
         std::cout << "Values in " << pathnamesFilePath << ": USED\n";
+        updateFilenames(f, pathnamesFilePath);
       } else {
         std::cout << "Values in " << pathnamesFilePath << ": IGNORED\n";
       }
@@ -666,37 +668,72 @@ public:
 
     std::cout << "\n\n"
       "The following list of file was searched for:\n";
-    std::vector<bool> is_valid(10);
+    std::vector<InputDataValidation::Validity> is_valid(10);
     is_valid[0] = InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence");
     is_valid[1] = InputDataValidation::isValidFilename(f.parameters_csv_i, "parameters");
     is_valid[2] = InputDataValidation::isValidFilename(f.traML_csv_i, "traml");
-    is_valid[3] = InputDataValidation::isValidFilename(f.featureFilterComponents_csv_i, "feature_filter_c");
-    is_valid[4] = InputDataValidation::isValidFilename(f.featureFilterComponentGroups_csv_i, "feature_filter_c_groups");
-    is_valid[5] = InputDataValidation::isValidFilename(f.featureQCComponents_csv_i, "feature_qc_c");
-    is_valid[6] = InputDataValidation::isValidFilename(f.featureQCComponentGroups_csv_i, "feature_qc_c_groups");
-    is_valid[7] = InputDataValidation::isValidFilename(f.quantitationMethods_csv_i, "quantitation_methods");
-    is_valid[8] = InputDataValidation::isValidFilename(f.standardsConcentrations_csv_i, "standards_concentrations");
-    is_valid[9] = InputDataValidation::isValidFilename(f.referenceData_csv_i, "reference_data");
+    is_valid[3] = InputDataValidation::isValidFilename(f.featureFilterComponents_csv_i, "featureFilter");
+    is_valid[4] = InputDataValidation::isValidFilename(f.featureFilterComponentGroups_csv_i, "featureFilterGroups");
+    is_valid[5] = InputDataValidation::isValidFilename(f.featureQCComponents_csv_i, "featureQC");
+    is_valid[6] = InputDataValidation::isValidFilename(f.featureQCComponentGroups_csv_i, "featureQCGroups");
+    is_valid[7] = InputDataValidation::isValidFilename(f.quantitationMethods_csv_i, "quantitationMethods");
+    is_valid[8] = InputDataValidation::isValidFilename(f.standardsConcentrations_csv_i, "standardsConcentrations");
+    is_valid[9] = InputDataValidation::isValidFilename(f.referenceData_csv_i, "referenceData");
 
-    const bool something_has_failed = std::any_of(is_valid.cbegin(), is_valid.cend(),
-      [](const bool arg){ return false == arg; });
+    std::cout << "\n\n";
 
-    if (something_has_failed) {
+    const bool requiredPathnamesAreValidBool = requiredPathnamesAreValid(is_valid);
+
+    const bool otherPathnamesAreFine = std::all_of(
+      is_valid.cbegin() + 3,
+      is_valid.cend(),
+      [](const InputDataValidation::Validity& arg)
+        { return arg.validity != InputDataValidation::Validity::invalid; });
+
+    if (!requiredPathnamesAreValidBool || !otherPathnamesAreFine) {
       generatePathnamesTxt(pathnamesFilePath, f, is_valid);
-      std::cout << "\n\nOne or more files were not found.\n"
-        "The file " << pathnamesFilePath <<
-        " has been generated for you to fix pathnames.\n"
-        "The incorrect information has been replaced with an empty value.\n"
-        "If you want a pathname to be ignored, then remove its value and leave only the label.\n"
-        "Make sure that the pathnames are correct and run the application again.\n";
-      std::exit(EXIT_FAILURE);
+      std::cout << "\n\nERROR!!!\n";
+      if (!otherPathnamesAreFine) {
+        std::cout <<
+          "One or more pathnames searches resulted in \"FAILURE\"s.\n"
+          "A file has been generated for you to fix the pathnames:\n"
+          " - " << pathnamesFilePath << "\n"
+          "The incorrect information has been replaced with an empty value.\n"
+          "If a pathname is to be ignored, leave it blank.\n";
+      }
+      if (!requiredPathnamesAreValidBool) {
+        std::cout <<
+        "Make sure that the following required pathnames are provided:\n"
+        " - sequence\n"
+        " - parameters\n"
+        " - traml\n";
+      }
+      std::cout << "Apply the fixes and reload the sequence file.\n";
+      getLineInput("Press Enter to go back to the Main menu.\n");
+      return false;
     }
+
+    return true;
+  }
+
+  bool requiredPathnamesAreValid(const std::vector<InputDataValidation::Validity>& validation)
+  {
+    const std::unordered_set<std::string> required {"sequence", "parameters", "traml"};
+    bool is_valid {true};
+    for (const InputDataValidation::Validity& v : validation) {
+      if (required.count(v.member_name) &&
+          v.validity != InputDataValidation::Validity::valid) {
+        is_valid = false;
+      }
+    }
+    return is_valid;
   }
 
   void clearNonExistantDefaultGeneratedFilenames(Filenames& f)
   {
-    clearNonExistantFilename(f.parameters_csv_i);
-    clearNonExistantFilename(f.traML_csv_i);
+    // clearNonExistantFilename(f.sequence_csv_i);   // The file must exist
+    // clearNonExistantFilename(f.parameters_csv_i); // The file must exist
+    // clearNonExistantFilename(f.traML_csv_i);      // The file must exist
     clearNonExistantFilename(f.featureFilterComponents_csv_i);
     clearNonExistantFilename(f.featureFilterComponentGroups_csv_i);
     clearNonExistantFilename(f.featureQCComponents_csv_i);
@@ -713,28 +750,32 @@ public:
     }
   }
 
-  void generatePathnamesTxt(const std::string& pathname, const Filenames& f, const std::vector<bool>& is_valid)
+  void generatePathnamesTxt(
+    const std::string& pathname,
+    const Filenames& f,
+    const std::vector<InputDataValidation::Validity>& is_valid
+  )
   {
     std::ofstream ofs(pathname);
     if (!ofs.is_open()) {
-      std::cout << "\n\nCannot open " << pathname << "\n";
-      std::exit(EXIT_FAILURE);
+      std::cout << "\n\nCan't open file: " << pathname << "\n";
+      return;
     }
-    std::vector<bool>::const_iterator it = is_valid.cbegin();
+    std::vector<InputDataValidation::Validity>::const_iterator it = is_valid.cbegin();
     ofs <<
-      "sequence="                 << getPathnameOrPlaceholder(f.sequence_csv_i, *it++) <<
-      "parameters="               << getPathnameOrPlaceholder(f.parameters_csv_i, *it++) <<
-      "traml="                    << getPathnameOrPlaceholder(f.traML_csv_i, *it++) <<
-      "feature_filter_c="         << getPathnameOrPlaceholder(f.featureFilterComponents_csv_i, *it++) <<
-      "feature_filter_c_groups="  << getPathnameOrPlaceholder(f.featureFilterComponentGroups_csv_i, *it++) <<
-      "feature_qc_c="             << getPathnameOrPlaceholder(f.featureQCComponents_csv_i, *it++) <<
-      "feature_qc_c_groups="      << getPathnameOrPlaceholder(f.featureQCComponentGroups_csv_i, *it++) <<
-      "quantitation_methods="     << getPathnameOrPlaceholder(f.quantitationMethods_csv_i, *it++) <<
-      "standards_concentrations=" << getPathnameOrPlaceholder(f.standardsConcentrations_csv_i, *it++) <<
-      "reference_data="           << getPathnameOrPlaceholder(f.referenceData_csv_i, *it++);
+      "sequence="            << getValidPathnameOrPlaceholder(f.sequence_csv_i, (it++)->validity) <<
+      "parameters="          << getValidPathnameOrPlaceholder(f.parameters_csv_i, (it++)->validity) <<
+      "traml="               << getValidPathnameOrPlaceholder(f.traML_csv_i, (it++)->validity) <<
+      "featureFilter="       << getValidPathnameOrPlaceholder(f.featureFilterComponents_csv_i, (it++)->validity) <<
+      "featureFilterGroups=" << getValidPathnameOrPlaceholder(f.featureFilterComponentGroups_csv_i, (it++)->validity) <<
+      "featureQC="           << getValidPathnameOrPlaceholder(f.featureQCComponents_csv_i, (it++)->validity) <<
+      "featureQCGroups="     << getValidPathnameOrPlaceholder(f.featureQCComponentGroups_csv_i, (it++)->validity) <<
+      "quantitationMethods=" << getValidPathnameOrPlaceholder(f.quantitationMethods_csv_i, (it++)->validity) <<
+      "standardsConcentrations=" << getValidPathnameOrPlaceholder(f.standardsConcentrations_csv_i, (it++)->validity) <<
+      "referenceData="       << getValidPathnameOrPlaceholder(f.referenceData_csv_i, (it++)->validity);
   }
 
-  std::string getPathnameOrPlaceholder(const std::string& pathname, const bool is_valid)
+  std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid)
   {
     const std::string placeholder = "";
     return (is_valid ? pathname : placeholder) + "\n";
@@ -746,6 +787,10 @@ public:
     const std::regex re("([a-zA-Z_]+)=([^\\s]*)");
     std::smatch match;
     std::string line;
+    if (!stream.is_open()) {
+      std::cout << "Can't open file: " << pathname << "\n";
+      return;
+    }
     while (std::getline(stream, line)) {
       const bool matched = std::regex_match(line, match, re);
       if (matched == false) {
@@ -756,30 +801,41 @@ public:
       }
       std::string label;
       std::string value;
-      if (match.size() == 3) { // the entire match is at index 0, and parenthesized sub-matches start from index 1
+      // The entire match is at index 0
+      // Parenthesized sub-matches start from index 1
+      if (match.size() == 3) {
         label = match[1].str();
         value = match[2].str();
         // std::cout << label << "=" << value << '\n';
       }
       if (label == "sequence") {
         f.sequence_csv_i = value;
+        if (value.empty()) {
+          std::cout << "Error!!! The sequence csv file cannot be empty.\n";
+        }
       } else if (label == "parameters") {
         f.parameters_csv_i = value;
+        if (value.empty()) {
+          std::cout << "Error!!! The parameters csv file cannot be empty.\n";
+        }
       } else if (label == "traml") {
         f.traML_csv_i = value;
-      } else if (label == "feature_filter_c") {
+        if (value.empty()) {
+          std::cout << "Error!!! The TraML file cannot be empty.\n";
+        }
+      } else if (label == "featureFilter") {
         f.featureFilterComponents_csv_i = value;
-      } else if (label == "feature_filter_c_groups") {
+      } else if (label == "featureFilterGroups") {
         f.featureFilterComponentGroups_csv_i = value;
-      } else if (label == "feature_qc_c") {
+      } else if (label == "featureQC") {
         f.featureQCComponents_csv_i = value;
-      } else if (label == "feature_qc_c_groups") {
+      } else if (label == "featureQCGroups") {
         f.featureQCComponentGroups_csv_i = value;
-      } else if (label == "quantitation_methods") {
+      } else if (label == "quantitationMethods") {
         f.quantitationMethods_csv_i = value;
-      } else if (label == "standards_concentrations") {
+      } else if (label == "standardsConcentrations") {
         f.standardsConcentrations_csv_i = value;
-      } else if (label == "reference_data") {
+      } else if (label == "referenceData") {
         f.referenceData_csv_i = value;
       } else {
         std::cout << "\n\nLabel is not valid: " << label << "\n";
@@ -1090,8 +1146,10 @@ public:
   //   } else {
   //     setSequencePathnameFromInput();
   //   }
-  //   buildStaticFilenames();
-  //   SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
+  //   const bool pathnamesAreCorrect = buildStaticFilenames();
+  //   if (pathnamesAreCorrect) {
+  //     SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
+  //   }
   // }
 
   CommandLine()                                    = default;

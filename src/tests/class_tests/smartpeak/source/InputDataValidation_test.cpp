@@ -26,11 +26,15 @@ BOOST_AUTO_TEST_CASE(fileExists)
 BOOST_AUTO_TEST_CASE(isValidFilename)
 {
   string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv");
-  BOOST_CHECK_EQUAL(InputDataValidation::isValidFilename(pathname, "some standards file"), true);  // success
+  InputDataValidation::Validity v;
+  v = InputDataValidation::isValidFilename(pathname, "some standards file");
+  BOOST_CHECK_EQUAL(v.validity, InputDataValidation::Validity::valid);  // success
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("this_does_not_exist.csv");
-  BOOST_CHECK_EQUAL(InputDataValidation::isValidFilename(pathname, "a file that does not exist"), false); // failure
+  v = InputDataValidation::isValidFilename(pathname, "a file that does not exist");
+  BOOST_CHECK_EQUAL(v.validity, InputDataValidation::Validity::invalid); // failure
   pathname.clear();
-  BOOST_CHECK_EQUAL(InputDataValidation::isValidFilename(pathname, "an empty pathname"), true);  // not provided
+  v = InputDataValidation::isValidFilename(pathname, "an empty pathname");
+  BOOST_CHECK_EQUAL(v.validity, InputDataValidation::Validity::not_provided);  // not provided
 }
 
 BOOST_AUTO_TEST_CASE(validateNamesInStructures)
