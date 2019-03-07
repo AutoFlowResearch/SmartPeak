@@ -13,7 +13,7 @@ install:
     - git submodule update --init --recursive
     - mkdir C:\projects\deps
     - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
-    - dir C:\projects\deps\xsd\lib
+    - dir C:\projects\deps\xsd\xerces-c-3.1.1
 before_build:
     - echo %CD%
     - mkdir foo
