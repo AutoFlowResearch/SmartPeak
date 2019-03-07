@@ -13,7 +13,7 @@ install:
     - git submodule update --init --recursive
     - mkdir C:\projects\deps
     - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
-    - dir C:\projects\deps
+    - dir C:\projects\deps\xsd
 before_build:
     - echo %CD%
     - mkdir foo
