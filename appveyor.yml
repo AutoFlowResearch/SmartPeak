@@ -22,7 +22,7 @@ before_build:
     - echo %CD%
     - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
     - ps: cd C:\projects\OpenMS-build
-    - cmake -DXERCESC_LIB_OPT:FILEPATH="C:\projects\deps\xsd\lib\vc-12.0\xerces-c_3.lib" -DXERCESC_INCLUDE_DIRS="C:\projects\deps\xsd\include\xercesc" -DBOOST_ROOT=C:\Libraries\boost_1_69_0 -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build
+    - cmake -DCMAKE_PREFIX_PATH="C:\projects\deps\xsd\lib\vc-12.0" -DXERCESC_INCLUDE_DIRS="C:\projects\deps\xsd\include\xercesc" -DBOOST_ROOT=C:\Libraries\boost_1_69_0 -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build
     # -DXercesC_LIBRARIES="C:\projects\deps\xsd\lib\vc-12.0"
     #- 
     #- ps: cd C:\projects\smartpeak2
