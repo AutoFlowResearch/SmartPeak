@@ -95,7 +95,7 @@ namespace SmartPeak
 
       // encapsulate in a packaged_task
       std::packaged_task<bool (InjectionHandler*,
-          std::vector<RawDataProcessor*>,
+          std::vector<RawDataProcessor*>*,
           Filenames*, bool
           )> task(SequenceProcessor::processSequence_);
 
@@ -105,13 +105,13 @@ namespace SmartPeak
         task_results.push_back(task.get_future());
         std::thread task_thread(std::move(task),
           &injection, 
-          std::ref(raw_data_processing_methods),
+          &raw_data_processing_methods,
           &filenames_inj,
           std::ref(verbose_I));
         task_thread.detach();
 
       // retrieve the results
-      if (thread_cnt == n_hard_threads - 1 || injection_cnt == process_sequence.size() - 1)
+      if (thread_cnt >= n_hard_threads - 1 || injection_cnt >= process_sequence.size() - 1)
       {
         for (auto& task_result : task_results)
         {
@@ -123,7 +123,7 @@ namespace SmartPeak
             }
             catch (std::exception& e)
             {
-              printf("Exception: %s", e.what());
+              std::cout << "Exception: " << e.what() << std::endl;;
             }
           }
         }
@@ -140,17 +140,17 @@ namespace SmartPeak
 
   bool SequenceProcessor::processSequence_(
     InjectionHandler* injection,
-    const std::vector<RawDataProcessor*>& raw_data_processing_methods_I,
+    const std::vector<RawDataProcessor*>* raw_data_processing_methods_I,
     const Filenames* filenames,
     const bool verbose_I){
 
     try {
     // process the samples
-      for (size_t i = 0; i < raw_data_processing_methods_I.size(); ++i) {
+      for (size_t i = 0; i < raw_data_processing_methods_I->size(); ++i) {
         if (verbose_I) {
-          std::cout << "\n[" << (i + 1) << "/" << raw_data_processing_methods_I.size() << "]" << std::endl;
+          std::cout << "\n[" << (i + 1) << "/" << raw_data_processing_methods_I->size() << "]" << std::endl;
         }
-        raw_data_processing_methods_I[i]->process(injection->getRawData(),
+        raw_data_processing_methods_I->at(i)->process(injection->getRawData(),
           injection->getRawData().getParameters(),
           *filenames,
           verbose_I);
@@ -158,7 +158,7 @@ namespace SmartPeak
       return true;
     }
     catch (std::exception& e) {
-      // TODO
+      std::cout << "Exception: " << e.what() << std::endl;;
       return false;
     }
   }

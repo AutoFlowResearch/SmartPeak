@@ -59,7 +59,7 @@ public:
 
     static bool processSequence_(
       InjectionHandler* injection,
-      const std::vector<RawDataProcessor*>& raw_data_processing_methods_I,
+      const std::vector<RawDataProcessor*>* raw_data_processing_methods_I,
       const Filenames* filenames,
       const bool verbose_I = false);
 
