@@ -1,7 +1,7 @@
 
 @echo on
 
-set install="C:\projects\OpenMS-build"
+set install="C:\projects\deps"
 
 REM xsd, xerces-c by download
 
