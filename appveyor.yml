@@ -10,6 +10,7 @@ install:
     - git submodule update --init --recursive
     - mkdir C:\projects\deps
     - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
+    - 7z x C:\projects\deps\seqan-src-1.4.0.tar.gz
     - dir C:\projects\deps\xsd\lib\vc-12.0
 before_build:
     - echo %CD%
