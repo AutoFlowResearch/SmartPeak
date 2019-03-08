@@ -11,9 +11,9 @@ install:
     - mkdir C:\projects\deps
     - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
     - 7z x C:\projects\deps\seqan-src-1.4.0.tar.gz
-    - 7z e seqan-src-1.4.0.tar -o"C:\projects\deps\"
+    - 7z e seqan-src-1.4.0.tar -o"C:\projects\deps\seqan" -y
     - dir .
-    - dir C:\projects\deps 
+    - dir C:\projects\deps\seqan 
 before_build:
     - echo %CD%
     - mkdir foo
