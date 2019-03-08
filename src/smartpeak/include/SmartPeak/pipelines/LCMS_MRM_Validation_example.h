@@ -31,7 +31,8 @@ void example_LCMS_MRM_Validation(
       dir_I + "/features/",
       dir_I + "/features/",
       injection.getMetaData().getSampleName(),
-      key
+      key,
+      static_filenames.referenceData_csv_i
     );
   }
 
@@ -58,7 +59,8 @@ void example_LCMS_MRM_Validation(
       "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
       "points_across_half_height", "logSN", "calculated_concentration",
       "QC_transition_message", "QC_transition_pass", "QC_transition_score",
-      "QC_transition_group_message", "QC_transition_group_score"
+      "QC_transition_group_message", "QC_transition_group_score",
+      "accuracy", "precision", "recall"
     },
     {MetaDataHandler::SampleType::Unknown}
   );

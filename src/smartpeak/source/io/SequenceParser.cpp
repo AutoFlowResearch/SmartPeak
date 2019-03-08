@@ -226,9 +226,16 @@ namespace SmartPeak
       if (sample_types.count(st) == 0)
         continue;
       const std::string& sample_name = mdh.getSampleName();
+<<<<<<< HEAD
 
       // feature_map_history_ is needed in order to export all "used_" = true and false features
       for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMapHistory()) {
+=======
+      const RawDataHandler& rawDataHandler = sampleHandler.getRawData();
+      std::cout << "rawDataHandler.getValidationMetrics() " << rawDataHandler.getValidationMetrics().at("accuracy") << std::endl;
+      for (const OpenMS::Feature& feature : rawDataHandler.getFeatureMap()) {
+      // for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
+>>>>>>> Validation workflow
         if (!feature.metaValueExists(s_PeptideRef) || feature.getMetaValue(s_PeptideRef).isEmpty()) {
           LOGV << "component_group_name is absent or empty. Skipping this feature";
           continue;
@@ -265,7 +272,11 @@ namespace SmartPeak
             "used_",
             subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
           );
+          row.emplace("accuracy", std::to_string(rawDataHandler.getValidationMetrics().at("accuracy")));
+          row.emplace("precision", std::to_string(rawDataHandler.getValidationMetrics().at("precision")));
+          row.emplace("recall", std::to_string(rawDataHandler.getValidationMetrics().at("recall")));
           for (const std::string& meta_value_name : meta_data) {
+<<<<<<< HEAD
             if (subordinate.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_message") {
 
               OpenMS::StringList messages = subordinate.getMetaValue(meta_value_name).toStringList();
@@ -290,6 +301,15 @@ namespace SmartPeak
                 row.emplace(meta_value_name, "");
               }
             }
+=======
+            // std::cout << " meta value name " << meta_value_name << std::endl;
+            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0)
+              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+              row.emplace(meta_value_name, std::to_string(datum.f_));
+            else
+              row.emplace(meta_value_name, "");
+>>>>>>> Validation workflow
           }
           list_dict.push_back(row);
         }
@@ -322,6 +342,8 @@ namespace SmartPeak
     for (const std::map<std::string,std::string>& m : list_dict) {
       std::vector<std::string> line;
       for (const std::string& h : headers) {
+        // std::cout << "Headerrr " << h << std::endl;
+        // std::cout << "wow " << m.at(h) << std::endl;
         line.push_back(m.at(h));
       }
       writer.writeDataInRow(line.cbegin(), line.cend());

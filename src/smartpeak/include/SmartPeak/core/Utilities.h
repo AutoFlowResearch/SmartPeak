@@ -371,6 +371,8 @@ public:
       const std::vector<T>& y_pred
     )
     {
+      std::cout << y_true.size() << std::endl;
+      std::cout << y_pred.size() << std::endl;
       if (y_true.empty() || y_pred.empty()) {
         throw std::invalid_argument("Actual and predicted values' vectors cannot be empty.");
       }

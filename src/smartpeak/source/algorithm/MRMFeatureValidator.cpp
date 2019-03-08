@@ -14,6 +14,9 @@ namespace SmartPeak
     const float Tr_window
   )
   {
+    std::cout << "features " << features.size() << std::endl;
+    std::cout << "reference data " << reference_data_v.size() << std::endl;
+    std::cout << "injection_name " << injection_name << std::endl;
     std::vector<int> y_true;
     std::vector<int> y_pred;
     output_validated.clear(true);
@@ -24,20 +27,24 @@ namespace SmartPeak
         continue;
       }
       const std::string& name = m.at("component_name").s_;
+      // std::cout << "FOUND A MATCH" << std::endl;
       reference_data[name] = m;
     }
 
     for (const OpenMS::Feature& feature : features) {
       std::vector<OpenMS::Feature> subordinates_tmp;
       for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
+        
         bool fc_pass = false;
         if (!subordinate.metaValueExists("native_id")) {
           throw "native_id info is missing.";
         }
         const std::string reference_data_key = subordinate.getMetaValue("native_id").toString();
+        // std::cout << "subordinate " << reference_data_key << std::endl;
         OpenMS::Feature subordinate_copy = subordinate;
 
         if (0 == reference_data.count(reference_data_key)) {
+          // std::cout << " reference data count os 0 " << std::endl;
           subordinate_copy.setMetaValue("validation", "ND");
           subordinates_tmp.push_back(subordinate_copy);
           continue;
@@ -84,6 +91,14 @@ namespace SmartPeak
       output_validated.push_back(feature_tmp);
     }
 
+<<<<<<< HEAD
     validation_metrics = Utilities::calculateValidationMetrics(y_true, y_pred);
+=======
+    if (y_true.size() == 0 || y_pred.size() == 0) {
+      std::cout << "NO DATA" << std::endl;
+      return;
+    }
+    validation_metrics = Utilities::calculateValidationMetrics(y_true, y_pred, verbose_I);
+>>>>>>> Validation workflow
   }
 }

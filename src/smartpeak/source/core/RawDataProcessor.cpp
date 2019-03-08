@@ -469,6 +469,7 @@ namespace SmartPeak
 
     OpenMS::FeatureMap mapped_features;
     std::map<std::string, float> validation_metrics; // keys: accuracy, recall, precision
+    std::cout << "Reference data size, raw data handler " << rawDataHandler_IO.getReferenceData().size() << std::endl;
 
     MRMFeatureValidator::validate_MRMFeatures(
       rawDataHandler_IO.getReferenceData(),
