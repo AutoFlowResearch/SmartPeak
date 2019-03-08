@@ -52,7 +52,7 @@ public:
 
   std::string                           pathnamesFilename_       = "pathnames.txt";
   std::string                           sequence_pathname_;
-  std::string                           main_dir_;
+  std::string                           main_dir_                = ".";
   std::string                           mzML_dir_;
   std::string                           features_in_dir_;
   std::string                           features_out_dir_;
@@ -405,9 +405,7 @@ public:
       "[2] Workflow wizard\n"
       "[3] Feature plot\n"
       "[4] Metric plot\n"
-      "[5] Feature summary\n"
-      "[6] Sequence summary\n"
-      "[7] Log\n"
+      "[5] Log\n"
       "[M] Main menu\n\n";
 
     std::string in;
@@ -424,26 +422,6 @@ public:
     else if ("4" == in) {
     }
     else if ("5" == in) {
-      const std::string pathname = main_dir_ + "/FeatureSummary.csv";
-      SequenceParser::writeDataTableFromMetaValue(
-        sequenceHandler_,
-        pathname,
-        featureSummaryMetaData_,
-        featureSummaryTypes_
-      );
-      std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
-    }
-    else if ("6" == in) {
-      const std::string pathname = main_dir_ + "/SequenceSummary.csv";
-      SequenceParser::writeDataMatrixFromMetaValue(
-        sequenceHandler_,
-        pathname,
-        sequenceSummaryMetaData_,
-        sequenceSummaryTypes_
-      );
-      std::cout << "SequenceSummary.csv file has been stored at: " << pathname << '\n';
-    }
-    else if ("7" == in) {
     }
     else if ("m" == in || "M" == in) {
       // empty
@@ -512,12 +490,62 @@ public:
       menuQuickInfo();
     }
     else if ("4" == in) {
+      menuReport();
     }
     else if ("m" == in || "M" == in) {
       // empty
     }
     else {
       goto menuActions_label;
+    }
+  }
+
+  void menuReport()
+  {
+    std::cout <<
+      "\n\n"
+      "Main > Actions > Report\n"
+      "[1] Feature summary\n"
+      "[2] Sequence summary\n"
+      "[M] Main menu\n\n";
+
+    std::string in;
+  menuReport_label:
+    in = getLineInput("> ", false);
+
+    if ("1" == in) {
+      const std::string pathname = main_dir_ + "/FeatureSummary.csv";
+      const bool data_was_written = SequenceParser::writeDataTableFromMetaValue(
+        sequenceHandler_,
+        pathname,
+        featureSummaryMetaData_,
+        featureSummaryTypes_
+      );
+      if (data_was_written) {
+        std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
+      } else {
+        std::cout << "An error occurred.\n";
+      }
+    }
+    else if ("2" == in) {
+      const std::string pathname = main_dir_ + "/SequenceSummary.csv";
+      const bool data_was_written = SequenceParser::writeDataMatrixFromMetaValue(
+        sequenceHandler_,
+        pathname,
+        sequenceSummaryMetaData_,
+        sequenceSummaryTypes_
+      );
+      if (data_was_written) {
+        std::cout << "SequenceSummary.csv file has been stored at: " << pathname << '\n';
+      } else {
+        std::cout << "An error occurred.\n";
+      }
+    }
+    else if ("m" == in || "M" == in) {
+      // empty
+    }
+    else {
+      goto menuReport_label;
     }
   }
 
