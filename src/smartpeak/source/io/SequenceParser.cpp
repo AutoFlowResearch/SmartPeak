@@ -226,16 +226,9 @@ namespace SmartPeak
       if (sample_types.count(st) == 0)
         continue;
       const std::string& sample_name = mdh.getSampleName();
-<<<<<<< HEAD
 
       // feature_map_history_ is needed in order to export all "used_" = true and false features
       for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMapHistory()) {
-=======
-      const RawDataHandler& rawDataHandler = sampleHandler.getRawData();
-      std::cout << "rawDataHandler.getValidationMetrics() " << rawDataHandler.getValidationMetrics().at("accuracy") << std::endl;
-      for (const OpenMS::Feature& feature : rawDataHandler.getFeatureMap()) {
-      // for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
->>>>>>> Validation workflow
         if (!feature.metaValueExists(s_PeptideRef) || feature.getMetaValue(s_PeptideRef).isEmpty()) {
           LOGV << "component_group_name is absent or empty. Skipping this feature";
           continue;
