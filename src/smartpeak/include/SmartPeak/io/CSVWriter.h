@@ -18,7 +18,8 @@ namespace SmartPeak
   class CSVWriter
   {
 public:
-    CSVWriter(const std::string& filename, std::string delm = ",");
+    CSVWriter(const std::string& filename, const std::string& delm = ",") :
+      filename_(filename), delimeter_(delm) {}
     CSVWriter()                            = default; ///< Default constructor
     ~CSVWriter()                           = default; ///< Default destructor
     CSVWriter(const CSVWriter&)            = default;
@@ -32,39 +33,46 @@ public:
     void setDelimeter(const std::string& delimeter); ///< delimeter setter
     std::string getDelimeter() const; ///< delimeter getter
 
-    void setLineCount(const int& line_count); ///< line_count setter
+    void setLineCount(const int line_count); ///< line_count setter
     int getLineCount() const; ///< line_count getter
- 
+
     /**
       @brief This Function accepts a range and appends all the elements in the range
         to the last row, seperated by delimeter (Default is comma)
 
       @param first Iterator to the first element
       @param last Iterator to the last element
-    */ 
+    */
     template<typename T>
-    void writeDataInRow(T first, T last)
+    int writeDataInRow(T first, T last)
     {
-      std::fstream file;
-      // Open the file in truncate mode if first line else in Append Mode
-      file.open(filename_, std::ios::out | (line_count_ ? std::ios::app : std::ios::trunc));
-    
-      // Iterate over the range and add each lement to file seperated by delimeter.
-      for (; first != last; )
-      {
-        file << *first;
-        if (++first != last)
-          file << delimeter_;
+      // Open the file in truncate mode if first line, else in append mode
+      std::ofstream ofs(filename_, line_count_ ? std::ios::app : std::ios::trunc);
+
+      if (!ofs.is_open()) {
+        std::cerr << "Cannot open file: " << filename_ << "\n";
+        return -1;
       }
-      file << "\n";
-      line_count_++;
-    
-      // Close the file
-      file.close();
+
+      int cnt {0};
+
+      if (first != last) {
+        ofs << *first++;
+        ++cnt;
+      }
+      while (first != last) {
+        ofs << delimeter_ << *first++;
+        ++cnt;
+      }
+
+      ofs << "\n";
+      ++line_count_;
+      return cnt;
     }
+
 private:
     std::string filename_;
     std::string delimeter_;
-    int line_count_;
+    int line_count_ = 0;
   };
 }
