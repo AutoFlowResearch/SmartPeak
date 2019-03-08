@@ -274,7 +274,7 @@ namespace SmartPeak
     }
   }
 
-  void SequenceParser::writeDataTableFromMetaValue(
+  bool SequenceParser::writeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data,
@@ -292,7 +292,11 @@ namespace SmartPeak
     makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data, sample_types);
 
     CSVWriter writer(filename, ",");
-    writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const int cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      return false;
+    }
 
     for (const std::map<std::string,std::string>& m : list_dict) {
       std::vector<std::string> line;
@@ -305,6 +309,8 @@ namespace SmartPeak
     if (verbose) {
       std::cout << "==== END   writeDataTableFromMetaValue()" << std::endl;
     }
+
+    return true;
   }
 
   void SequenceParser::makeDataMatrixFromMetaValue(
@@ -376,7 +382,7 @@ namespace SmartPeak
     data_out = std::move(data);
   }
 
-  void SequenceParser::writeDataMatrixFromMetaValue(
+  bool SequenceParser::writeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data,
@@ -398,7 +404,11 @@ namespace SmartPeak
     headers.insert(headers.end(), columns.begin(), columns.end());
 
     CSVWriter writer(filename, ",");
-    writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const int cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      return false;
+    }
 
     for (size_t i = 0; i < rows.size(); ++i) {
       std::vector<std::string> line;
@@ -415,5 +425,7 @@ namespace SmartPeak
     if (verbose) {
       std::cout << "==== END   writeDataMatrixFromMetaValue()" << std::endl;
     }
+
+    return true;
   }
 }
