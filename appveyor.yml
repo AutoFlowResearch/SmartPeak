@@ -12,7 +12,7 @@ install:
     - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
     - 7z x C:\projects\deps\seqan-src-1.4.0.zip -o"C:\projects\deps\seqan" -y
     - 7z x C:\projects\deps\libsvm.zip -o"C:\projects\deps\libsvm" -y
-    - dir C:\projects\deps\libsvm\libsvm-291
+    - dir C:\projects\deps\libsvm\libsvm-310
 before_build:
     - echo %CD%
     - mkdir foo
@@ -21,7 +21,7 @@ before_build:
     - echo %CD%
     - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
     - ps: cd C:\projects\OpenMS-build
-    - cmake -DCMAKE_PREFIX_PATH="C:\projects\deps\xsd\lib\vc-12.0" -DCMAKE_INCLUDE_PATH="C:\projects\deps\xsd\include\xercesc;C:\projects\deps\seqan\seqan-library-1.4.0\include;C:\projects\deps\libsvm\libsvm-291;C:\projects\deps\libsvm\libsvm-291\windows" -DCMAKE_LIB_PATH="C:\projects\deps\libsvm\libsvm-291\windows" -DXercesC_INCLUDE_DIRS="C:\projects\deps\xsd\include\xercesc;C:\projects\deps\seqan\seqan-library-1.4.0\include;C:\projects\deps\libsvm\libsvm-291" -DBOOST_ROOT=C:\Libraries\boost_1_69_0 -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build
+    - cmake -DCMAKE_PREFIX_PATH="C:\projects\deps\xsd\lib\vc-12.0" -DCMAKE_INCLUDE_PATH="C:\projects\deps\xsd\include\xercesc;C:\projects\deps\seqan\seqan-library-1.4.0\include;C:\projects\deps\libsvm\libsvm-310;C:\projects\deps\libsvm\libsvm-310\windows" -DCMAKE_LIB_PATH="C:\projects\deps\libsvm\libsvm-310\windows" -DXercesC_INCLUDE_DIRS="C:\projects\deps\xsd\include\xercesc;C:\projects\deps\seqan\seqan-library-1.4.0\include;C:\projects\deps\libsvm\libsvm-310" -DBOOST_ROOT=C:\Libraries\boost_1_69_0 -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build
     
     # -DXercesC_LIBRARIES="C:\projects\deps\xsd\lib\vc-12.0"
     #- 
