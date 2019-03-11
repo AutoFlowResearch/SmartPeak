@@ -20,12 +20,13 @@ before_build:
     - ps: cd foo
     - echo %CD%
     - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
+    - cd C:\projects\OpenMS-build
     - git submodule update --init contrib
     - mkdir contrib_win64_build
     - cd contrib_win64_build
     - cmake -DBUILD_TYPE=ALL -DNUMBER_OF_JOBS=4 -G "Visual Studio 15 2017 Win64" "c:\projects\OpenMS-build\contrib"
     - ps: cd C:\projects\OpenMS-build
-    - cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+    - cmake -D OPENMS_CONTRIB_LIBS="C:\projects\OpenMS-build\contrib_win64_build" -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
     # -DXercesC_LIBRARIES="C:\projects\deps\xsd\lib\vc-12.0"
     #- 
     #- ps: cd C:\projects\smartpeak2
