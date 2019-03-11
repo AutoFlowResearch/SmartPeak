@@ -101,19 +101,7 @@ public:
     "Please insert the sequence of methods to run.\n"
     "You can choose the same method multiple times.\n"
     "Separate chosen methods with a space.\n\n"
-    "[" + std::to_string(OPT_LOAD_RAW_DATA) + "]  Load raw data\n"
-    "[" + std::to_string(OPT_LOAD_FEATURES) + "]  Load features\n"
-    "[" + std::to_string(OPT_PICK_FEATURES) + "]  Pick features\n"
-    "[" + std::to_string(OPT_FILTER_FEATURES) + "]  Filter features\n"
-    "[" + std::to_string(OPT_SELECT_FEATURES) + "]  Select features\n"
-    "[" + std::to_string(OPT_VALIDATE_FEATURES) + "]  Validate features\n"
-    "[" + std::to_string(OPT_QUANTIFY_FEATURES) + "]  Quantify features\n"
-    "[" + std::to_string(OPT_CHECK_FEATURES) + "]  Check features\n"
-    "[" + std::to_string(OPT_STORE_FEATURES) + "]  Store features\n"
-    "[" + std::to_string(OPT_PLOT_FEATURES) + "] Plot features (not implemented)\n"
-    "[" + std::to_string(OPT_CALCULATE_CALIBRATION) + "] Calculate calibration\n"
-    "[" + std::to_string(OPT_STORE_QUANTITATION_METHODS) + "] Store quantitation methods\n"
-    "[" + std::to_string(OPT_LOAD_QUANTITATION_METHODS) + "] Load quantitation methods\n"
+    + commandsString() +
     "[M]  Main menu\n\n"
     "Presets:\n"
     "Unknowns: 1 3 4 4 5 7 8 9\n"
@@ -351,35 +339,7 @@ public:
     else if ("14" == in) {
     }
     else if ("15" == in) {
-      if (mzML_dir_.empty()) {
-        mzML_dir_ = main_dir_ + "/mzML";
-        std::cout << "\nPath for 'mzML':\t" << mzML_dir_ << '\n';
-        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
-        const std::string path_input = getLineInput("> ");
-        if (path_input.size()) {
-          mzML_dir_ = path_input;
-        }
-      }
-
-      if (features_in_dir_.empty()) {
-        features_in_dir_ = main_dir_ + "/features";
-        std::cout << "\nPath for 'INPUT features':\t" << features_in_dir_ << '\n';
-        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
-        const std::string path_input = getLineInput("> ");
-        if (path_input.size()) {
-          features_in_dir_ = path_input;
-        }
-      }
-
-      if (features_out_dir_.empty()) {
-        features_out_dir_ = main_dir_ + "/features";
-        std::cout << "\nPath for 'OUTPUT features':\t" << features_out_dir_ << '\n';
-        std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
-        const std::string path_input = getLineInput("> ");
-        if (path_input.size()) {
-          features_out_dir_ = path_input;
-        }
-      }
+      initializeAllDirs();
 
       const std::vector<Command> methods = getMethodsInput();
       if (methods.empty()) {
@@ -439,7 +399,8 @@ public:
       "[1] Run command\n"
       "[2] Run workflow\n"
       "[3] Quick info\n"
-      "[4] Report\n"
+      "[4] Check data integrity\n"
+      "[5] Report\n"
       "[M] Main menu\n\n";
 
     std::string in;
@@ -447,49 +408,35 @@ public:
     in = getLineInput("> ", false);
 
     if      ("1" == in) {
+      initializeAllDirs();
+
+      std::cout << commandsString();
+
+      const std::string input = getLineInput("> ");
+      try {
+        const int n = std::stoi(input);
+        Command cmd;
+        if (createCommand(n, cmd)) {
+          processCommands({cmd});
+        }
+      } catch (...) {
+        std::cout << "Invalid input: cannot convert to integer.\n";
+      }
     }
     else if ("2" == in) {
-      size_t i = 0;
-      while (i < commands_.size()) {
-        const Command::CommandType type = commands_[i].type;
-        size_t j = i + 1;
-        for (; j < commands_.size() && type == commands_[j].type; ++j) {
-          // empty body
-        }
-        const Command& cmd = commands_[i];
-        if (cmd.type == Command::RawDataMethod) {
-          std::vector<std::shared_ptr<RawDataProcessor>> raw_methods;
-          std::transform(commands_.begin() + i, commands_.begin() + j, std::back_inserter(raw_methods),
-            [](const Command& command){ return command.raw_data_method; });
-          SequenceProcessor::processSequence(
-            sequenceHandler_,
-            cmd.dynamic_filenames,
-            std::set<std::string>(),
-            raw_methods,
-            verbose_
-          );
-        } else if (cmd.type == Command::SequenceSegmentMethod) {
-          std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
-          std::transform(commands_.begin() + i, commands_.begin() + j, std::back_inserter(seq_seg_methods),
-            [](const Command& command){ return command.seq_seg_method; });
-          SequenceProcessor::processSequenceSegments(
-            sequenceHandler_,
-            cmd.dynamic_filenames,
-            std::set<std::string>(),
-            seq_seg_methods,
-            verbose_
-          );
-        } else {
-          std::cout << "\nSkipping a command: " << cmd.type << "\n";
-        }
-        i = j;
-      }
+      processCommands(commands_);
       std::cout << "\nWorkflow completed.\n";
     }
     else if ("3" == in) {
       menuQuickInfo();
     }
     else if ("4" == in) {
+      InputDataValidation::sampleNamesAreConsistent(sequenceHandler_);
+      InputDataValidation::componentNamesAreConsistent(sequenceHandler_);
+      InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler_);
+      InputDataValidation::heavyComponentsAreConsistent(sequenceHandler_);
+    }
+    else if ("5" == in) {
       menuReport();
     }
     else if ("m" == in || "M" == in) {
@@ -609,7 +556,8 @@ public:
       "Main > Help\n"
       "[1] About\n"
       "[2] Documentation\n"
-      "[3] Version\n"
+      "[3] Getting started\n"
+      "[4] Version\n"
       "[M] Main menu\n\n";
 
     std::string in;
@@ -617,14 +565,13 @@ public:
     in = getLineInput("> ", false);
 
     if      ("1" == in) {
-      std::cout << "SmartPeak2 about message\n";
     }
     else if ("2" == in) {
-      std::cout << "SmartPeak2 documentation message\n";
     }
     else if ("3" == in) {
-      // TODO: macro with commit revision? sha1sum of source file?
-      std::cout << "SmartPeak2 version message\n";
+      std::cout << gettingStartedString();
+    }
+    else if ("4" == in) {
     }
     else if ("m" == in || "M" == in) {
       // empty
@@ -860,40 +807,11 @@ public:
     std::istringstream iss {line};
 
     for (int n; iss >> n;) {
-      if (n < 1 || n > 13 || n == 10) { // TODO: update this if plotting is implemented
-        std::cout << "Skipping: " << n << '\n';
-        continue;
-      }
       Command cmd;
-      if (n >= 1 && n <= 10) {
-        cmd.setMethod(n_to_raw_data_method_.at(n));
-        for (const InjectionHandler& injection : sequenceHandler_.getSequence()) {
-          const std::string& key = injection.getMetaData().getInjectionName();
-          cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-            mzML_dir_,
-            features_in_dir_,
-            features_out_dir_,
-            injection.getMetaData().getSampleName(),
-            key
-          );
-        }
-      } else if (n >= 11 && n <= 13) {
-        cmd.setMethod(n_to_seq_seg_method_.at(n));
-        for (const SequenceSegmentHandler& sequence_segment : sequenceHandler_.getSequenceSegments()) {
-          const std::string& key = sequence_segment.getSequenceSegmentName();
-          cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-            mzML_dir_,
-            features_in_dir_,
-            features_out_dir_,
-            key,
-            key
-          );
-        }
-      } else {
-        std::cout << "\ninvalid option\n";
-        continue;
+      const bool created = createCommand(n, cmd);
+      if (created) {
+        methods.push_back(cmd);
       }
-      methods.push_back(cmd);
     }
 
     return methods;
@@ -1110,6 +1028,163 @@ public:
     return metadata;
   }
 
+  std::string gettingStartedString()
+  {
+    return
+    "Welcome to SmartPeak\n\n"
+
+    "Load an existing session from a sequence file\n"
+    "`File -> Import file -> Sequence` to load the sequence file\n"
+    "`Edit -> Workflow ->\"1 2\"` then `Actions->Run workflow` to load the raw data and associated features\n\n"
+
+    "Get quick information about the current application state\n"
+    "`Actions -> Quick Info`\n\n"
+
+    "Check the integrity of loaded data\n"
+    "`Actions -> Check data integrity`\n\n"
+
+    "Run a workflow\n"
+    "`Edit -> Workflow -> your_commands_here`\n"
+    "`Actions -> Run workflow`\n\n"
+
+    "Save workflow results\n"
+    "`Edit -> Workflow`, input `9` to select `Store features`\n"
+    "`Actions -> Run workflow`\n\n"
+
+    "Report workflow results\n"
+    "`Actions -> Report`\n\n"
+
+    "See this introductory tutorial again\n"
+    "Help -> Getting started`\n";
+  }
+
+  std::string commandsString()
+  {
+    return
+      "[" + std::to_string(OPT_LOAD_RAW_DATA) + "]  Load raw data\n"
+      "[" + std::to_string(OPT_LOAD_FEATURES) + "]  Load features\n"
+      "[" + std::to_string(OPT_PICK_FEATURES) + "]  Pick features\n"
+      "[" + std::to_string(OPT_FILTER_FEATURES) + "]  Filter features\n"
+      "[" + std::to_string(OPT_SELECT_FEATURES) + "]  Select features\n"
+      "[" + std::to_string(OPT_VALIDATE_FEATURES) + "]  Validate features\n"
+      "[" + std::to_string(OPT_QUANTIFY_FEATURES) + "]  Quantify features\n"
+      "[" + std::to_string(OPT_CHECK_FEATURES) + "]  Check features\n"
+      "[" + std::to_string(OPT_STORE_FEATURES) + "]  Store features\n"
+      "[" + std::to_string(OPT_PLOT_FEATURES) + "] Plot features (not implemented)\n"
+      "[" + std::to_string(OPT_CALCULATE_CALIBRATION) + "] Calculate calibration\n"
+      "[" + std::to_string(OPT_STORE_QUANTITATION_METHODS) + "] Store quantitation methods\n"
+      "[" + std::to_string(OPT_LOAD_QUANTITATION_METHODS) + "] Load quantitation methods\n";
+  }
+
+  void processCommands(const std::vector<Command>& commands)
+  {
+    size_t i = 0;
+    while (i < commands.size()) {
+      const Command::CommandType type = commands[i].type;
+      size_t j = i + 1;
+      for (; j < commands.size() && type == commands[j].type; ++j) {
+        // empty body
+      }
+      const Command& cmd = commands[i];
+      if (cmd.type == Command::RawDataMethod) {
+        std::vector<std::shared_ptr<RawDataProcessor>> raw_methods;
+        std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(raw_methods),
+          [](const Command& command){ return command.raw_data_method; });
+        SequenceProcessor::processSequence(
+          sequenceHandler_,
+          cmd.dynamic_filenames,
+          std::set<std::string>(),
+          raw_methods,
+          verbose_
+        );
+      } else if (cmd.type == Command::SequenceSegmentMethod) {
+        std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
+        std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(seq_seg_methods),
+          [](const Command& command){ return command.seq_seg_method; });
+        SequenceProcessor::processSequenceSegments(
+          sequenceHandler_,
+          cmd.dynamic_filenames,
+          std::set<std::string>(),
+          seq_seg_methods,
+          verbose_
+        );
+      } else {
+        std::cout << "\nSkipping a command: " << cmd.type << "\n";
+      }
+      i = j;
+    }
+  }
+
+  bool createCommand(const int n, Command& cmd)
+  {
+    if (n < 1 || n > 13 || n == 10) { // TODO: update this if plotting is implemented
+      std::cout << "Skipping: " << n << '\n';
+      return false;
+    }
+    if (n >= 1 && n <= 10) {
+      cmd.setMethod(n_to_raw_data_method_.at(n));
+      for (const InjectionHandler& injection : sequenceHandler_.getSequence()) {
+        const std::string& key = injection.getMetaData().getInjectionName();
+        cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+          mzML_dir_,
+          features_in_dir_,
+          features_out_dir_,
+          injection.getMetaData().getSampleName(),
+          key
+        );
+      }
+    } else if (n >= 11 && n <= 13) {
+      cmd.setMethod(n_to_seq_seg_method_.at(n));
+      for (const SequenceSegmentHandler& sequence_segment : sequenceHandler_.getSequenceSegments()) {
+        const std::string& key = sequence_segment.getSequenceSegmentName();
+        cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+          mzML_dir_,
+          features_in_dir_,
+          features_out_dir_,
+          key,
+          key
+        );
+      }
+    } else {
+      std::cout << "\ninvalid option\n";
+      return false;
+    }
+    return true;
+  }
+
+  void initializeAllDirs()
+  {
+    if (mzML_dir_.empty()) {
+      mzML_dir_ = main_dir_ + "/mzML";
+      std::cout << "\nPath for 'mzML':\t" << mzML_dir_ << '\n';
+      std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
+      const std::string path_input = getLineInput("> ");
+      if (path_input.size()) {
+        mzML_dir_ = path_input;
+      }
+    }
+
+    if (features_in_dir_.empty()) {
+      features_in_dir_ = main_dir_ + "/features";
+      std::cout << "\nPath for 'INPUT features':\t" << features_in_dir_ << '\n';
+      std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
+      const std::string path_input = getLineInput("> ");
+      if (path_input.size()) {
+        features_in_dir_ = path_input;
+      }
+    }
+
+    if (features_out_dir_.empty()) {
+      features_out_dir_ = main_dir_ + "/features";
+      std::cout << "\nPath for 'OUTPUT features':\t" << features_out_dir_ << '\n';
+      std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
+      const std::string path_input = getLineInput("> ");
+      if (path_input.size()) {
+        features_out_dir_ = path_input;
+      }
+    }
+  }
+
   // // Initializes the sequence structure
   // CommandLine(int argc, char **argv)
   // {
@@ -1139,6 +1214,7 @@ public:
   CommandLine& operator=(CommandLine&& other)      = delete;
 
   void runApp() {
+    std::cout << gettingStartedString();
     while (true) {
       menuMain();
     }
