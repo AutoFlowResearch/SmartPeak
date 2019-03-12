@@ -440,10 +440,7 @@ public:
       menuQuickInfo();
     }
     else if ("4" == in) {
-      InputDataValidation::sampleNamesAreConsistent(sequenceHandler_);
-      InputDataValidation::componentNamesAreConsistent(sequenceHandler_);
-      InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler_);
-      InputDataValidation::heavyComponentsAreConsistent(sequenceHandler_);
+      menuDataIntegrity();
     }
     else if ("5" == in) {
       menuReport();
@@ -453,6 +450,41 @@ public:
     }
     else {
       goto menuActions_label;
+    }
+  }
+
+  void menuDataIntegrity()
+  {
+    std::cout <<
+      "\n\n"
+      "Main > Actions > Check data integrity\n"
+      "[1] Sample names\n"
+      "[2] Component names\n"
+      "[3] Component groups names\n"
+      "[4] Heavy components\n"
+      "[M] Main menu\n\n";
+
+    std::string in;
+  menuDataIntegrity_label:
+    in = getLineInput("> ", false);
+
+    if      ("1" == in) {
+      InputDataValidation::sampleNamesAreConsistent(sequenceHandler_);
+    }
+    else if ("2" == in) {
+      InputDataValidation::componentNamesAreConsistent(sequenceHandler_);
+    }
+    else if ("3" == in) {
+      InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler_);
+    }
+    else if ("4" == in) {
+      InputDataValidation::heavyComponentsAreConsistent(sequenceHandler_);
+    }
+    else if ("m" == in || "M" == in) {
+      // empty
+    }
+    else {
+      goto menuDataIntegrity_label;
     }
   }
 
