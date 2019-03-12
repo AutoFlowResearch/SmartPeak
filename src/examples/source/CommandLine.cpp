@@ -502,6 +502,8 @@ public:
     in = getLineInput("> ", false);
 
     if ("1" == in) {
+      featureSummaryMetaData_ = getMetaDataInput("\nMain > Actions > Report > Feature summary\n");
+      featureSummaryTypes_    = getSampleTypesInput();
       const std::string pathname = main_dir_ + "/FeatureSummary.csv";
       const bool data_was_written = SequenceParser::writeDataTableFromMetaValue(
         sequenceHandler_,
@@ -516,6 +518,8 @@ public:
       }
     }
     else if ("2" == in) {
+      sequenceSummaryMetaData_ = getMetaDataInput("\nMain > Actions > Report > Sequence summary\n");
+      sequenceSummaryTypes_    = getSampleTypesInput();
       const std::string pathname = main_dir_ + "/SequenceSummary.csv";
       const bool data_was_written = SequenceParser::writeDataMatrixFromMetaValue(
         sequenceHandler_,
