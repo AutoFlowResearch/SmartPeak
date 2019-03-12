@@ -16,7 +16,7 @@ namespace SmartPeak
       ImGui::Text("By SmartPeak contributors.");
       ImGui::End();
     }
-    //if (show_sequence_progress) SequenceProgressWidget(&show_sequence_progress);
+    //if (show_sequence_) SequenceProgressWidget(&show_sequence_progress);
     //if (show_generic_table) TableWidget(&show_generic_table);
     //if (show_file_browser) FileBrowserWidget(&show_file_browser);
     //if (show_plot) PlotWidget(&show_plot);

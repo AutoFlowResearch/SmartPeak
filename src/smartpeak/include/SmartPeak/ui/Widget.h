@@ -15,7 +15,7 @@ namespace SmartPeak
     /**
       Interface to show the widget
     */
-    virtual void show() = 0;
+    virtual void show(bool* p_open) = 0;
 
     /**
       Helper method to filter a popup
@@ -31,30 +31,30 @@ namespace SmartPeak
   class GenericTableWidget : public Widget
   {
   public:
-    void show();
+    void show(bool* p_open);
   };
 
   class GenericPlotWidget : public Widget
   {
   public:
-    void show();
+    void show(bool* p_open);
   };
 
   class SequenceWidget : public Widget
   {
   public:
-    void show();
+    void show(bool* p_open);
   };
 
   class FileBrowserWidget : public Widget
   {
   public:
-    void show();
+    void show(bool* p_open);
   };
 
   class WorkflowWidget : public Widget
   {
   public:
-    void show();
+    void show(bool* p_open);
   };
 }
