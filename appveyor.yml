@@ -1,5 +1,8 @@
 version: '1.0.{build}'
 image: Visual Studio 2017
+environment:
+  BOOST_ROOT: C:\Libraries\boost_1_69_0
+  BOOT
 init:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - mkdir C:\projects\deps
@@ -15,9 +18,10 @@ install:
   - 7z x C:\projects\deps\contrib_build.tar.gz -o"C:\projects\deps" -y
   - 7z x C:\projects\deps\contrib_build.tar -o"C:\projects\deps\contrib" -y
   - dir C:\projects\deps\contrib
+  - dir C:\Libraries\boost_1_69_0
 before_build:
   - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
   - ps: cd C:\projects\OpenMS-build
-  - cmake -DBOOST_ROOT=C:\Libraries\boost_1_69_0 -DOPENMS_CONTRIB_LIBS="C:\projects\deps\contrib" -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+  - cmake -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0\boost" -DBOOST_ROOT=C:\Libraries\boost_1_69_0 -DOPENMS_CONTRIB_LIBS="C:\projects\deps\contrib" -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 build:
   project: $(APPVEYOR_BUILD_FOLDER)/$(APPVEYOR_PROJECT_NAME).sln
