@@ -5,6 +5,7 @@ environment:
   BOOSTROOT: C:\Libraries\boost_1_69_0
   BOOST_LIBRARYDIR: C:\Libraries\boost_1_69_0\lib64-msvc-14.1
   BOOST_INCLUDEDIR: C:\Libraries\boost_1_69_0
+  Boost_DEBUG: ENABLED
 init:
 # - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
