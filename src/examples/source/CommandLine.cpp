@@ -982,13 +982,14 @@ public:
       "[9]  QC transition pass\n"
       "[10] QC transition message\n"
       "[11] QC transition score\n"
-      "[12] QC transition group message\n"
-      "[13] QC transition group score\n"
-      "[14] Tailing factor\n"
-      "[15] Total width\n"
-      "[16] Width at 50% peak's height\n"
-      "[17] Retention time\n"
-      "[18] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17\n\n";
+      "[12] QC transition group pass\n"
+      "[13] QC transition group message\n"
+      "[14] QC transition group score\n"
+      "[15] Tailing factor\n"
+      "[16] Total width\n"
+      "[17] Width at 50% peak's height\n"
+      "[18] Retention time\n"
+      "[19] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18\n\n";
 
     std::string line;
 
@@ -1001,7 +1002,7 @@ public:
     std::vector<std::string> metadata;
 
     for (int n; iss >> n;) {
-      if (n < 1 || n > 18) {
+      if (n < 1 || n > 19) {
         std::cout << "Skipping: " << n << '\n';
         continue;
       }
@@ -1042,24 +1043,27 @@ public:
         metadata.push_back("QC_transition_score");
         break;
       case 12:
-        metadata.push_back("QC_transition_group_message");
+        metadata.push_back("QC_transition_group_pass");
         break;
       case 13:
-        metadata.push_back("QC_transition_group_score");
+        metadata.push_back("QC_transition_group_message");
         break;
       case 14:
-        metadata.push_back("tailing_factor");
+        metadata.push_back("QC_transition_group_score");
         break;
       case 15:
-        metadata.push_back("total_width");
+        metadata.push_back("tailing_factor");
         break;
       case 16:
-        metadata.push_back("width_at_50");
+        metadata.push_back("total_width");
         break;
       case 17:
-        metadata.push_back("RT");
+        metadata.push_back("width_at_50");
         break;
       case 18:
+        metadata.push_back("RT");
+        break;
+      case 19:
         metadata = {
           "peak_apex_int", "peak_area", "total_width", "width_at_50", "tailing_factor",
           "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
