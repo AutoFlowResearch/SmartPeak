@@ -8,7 +8,6 @@ platform:
 configuration:
   - Debug
 cache:
-  - xsd-4.0.msi -> appveyor.yml
   - C:\projects\deps
 install:
   - git submodule update --init --recursive
