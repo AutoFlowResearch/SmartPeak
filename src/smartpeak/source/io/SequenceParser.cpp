@@ -268,15 +268,10 @@ namespace SmartPeak
                  meta_value_name == "QC_transition_group_message")) {
 
               OpenMS::StringList messages = subordinate.getMetaValue(meta_value_name).toStringList();
-              std::string msg;
-              if (messages.size()) {
-                msg.append(messages[0]);
-              }
-              for (size_t i = 1; i < messages.size(); ++i) {
-                msg.append(delimiter);
-                msg.append(messages[i]);
-              }
-              row.emplace(meta_value_name, msg);
+              row.emplace(
+                meta_value_name,
+                Utilities::join(messages.begin(), messages.end(), delimiter)
+              );
             } else {
               Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
               if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
