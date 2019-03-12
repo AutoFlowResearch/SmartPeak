@@ -9,7 +9,7 @@ configuration:
   - Debug
 cache:
   - xsd-4.0.msi -> appveyor.yml
-  - C:\projects\deps\ -> appveyor.yml
+  - C:\projects\deps
 install:
   - git submodule update --init --recursive
   - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
