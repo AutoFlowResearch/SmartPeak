@@ -2,7 +2,6 @@ version: '1.0.{build}'
 image: Visual Studio 2017
 environment:
   BOOST_ROOT: C:\Libraries\boost_1_69_0
-  BOOT
 init:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - mkdir C:\projects\deps
