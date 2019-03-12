@@ -2,7 +2,9 @@ version: '1.0.{build}'
 image: Visual Studio 2017
 init:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-platform:
+  - mkdir C:\projects\deps
+
+  platform:
   - x64
 configuration:
   - Debug
@@ -10,6 +12,9 @@ cache:
     - xsd-4.0.msi -> appveyor.yml
 install:
     - git submodule update --init --recursive
+    - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
+    - 7z x C:\projects\deps\contrib_build.tar.gz -o"C:\projects\deps\contrib" -y
+    - dir C:\projects\deps\contrib
     - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
 before_build:
     - cd C:\projects\OpenMS-build
