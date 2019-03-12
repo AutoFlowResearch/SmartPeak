@@ -213,6 +213,8 @@ namespace SmartPeak
     }
     headers_out = headers;
 
+    const std::string delimiter {"_____"};
+
     list_dict.clear();
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
@@ -261,12 +263,29 @@ namespace SmartPeak
             subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
           );
           for (const std::string& meta_value_name : meta_data) {
-            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-            if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0)
-              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-              row.emplace(meta_value_name, std::to_string(datum.f_));
-            else
-              row.emplace(meta_value_name, "");
+            if (subordinate.metaValueExists(meta_value_name) &&
+                (meta_value_name == "QC_transition_message" ||
+                 meta_value_name == "QC_transition_group_message")) {
+
+              OpenMS::StringList messages = subordinate.getMetaValue(meta_value_name).toStringList();
+              std::string msg;
+              if (messages.size()) {
+                msg.append(messages[0]);
+              }
+              for (size_t i = 1; i < messages.size(); ++i) {
+                msg.append(delimiter);
+                msg.append(messages[i]);
+              }
+              row.emplace(meta_value_name, msg);
+            } else {
+              Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+              if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
+                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                row.emplace(meta_value_name, std::to_string(datum.f_));
+              } else {
+                row.emplace(meta_value_name, "");
+              }
+            }
           }
           list_dict.push_back(row);
         }
