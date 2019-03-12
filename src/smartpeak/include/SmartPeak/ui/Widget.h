@@ -1,7 +1,6 @@
 #pragma once
 
-#include "imgui.h"
-
+#include <imgui.h>
 #include <string>
 #include <vector>
 
@@ -16,7 +15,7 @@ namespace SmartPeak
     /**
       Interface to show the widget
     */
-    virtual void show() = 0
+    virtual void show() = 0;
 
     /**
       Helper method to filter a popup
@@ -26,7 +25,7 @@ namespace SmartPeak
       @param[in] colum Column of text items to filter
       @param[in] checked Vector of boolean values indicating if the column is filtered or not
     */
-    static void TableFilterPopup(const char* popuop_id, ImGuiTextFilter& filter, std::vector<std::string>& column, bool* checked);
+    static void tableFilterPopup(const char* popuop_id, ImGuiTextFilter& filter, std::vector<std::string>& column, bool* checked);
   };
 
   class GenericTableWidget : public Widget

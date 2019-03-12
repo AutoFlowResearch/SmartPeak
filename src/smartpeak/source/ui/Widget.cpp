@@ -2,7 +2,7 @@
 
 namespace SmartPeak
 {
-  void Widget::TableFilterPopup(const char* popuop_id, ImGuiTextFilter& filter, std::vector<std::string>& column, bool* checked) {
+  void Widget::tableFilterPopup(const char* popuop_id, ImGuiTextFilter& filter, std::vector<std::string>& column, bool* checked) {
 
     if (ImGui::BeginPopup(popuop_id))
     {
