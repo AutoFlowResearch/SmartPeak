@@ -2,6 +2,8 @@ version: '1.0.{build}'
 image: Visual Studio 2017
 environment:
   BOOST_ROOT: C:\Libraries\boost_1_69_0
+  BOOST_LIBRARYDIR: C:\Libraries\boost_1_69_0\lib64-msvc-14.1
+  BOOST_INCLUDEDIR: C:\Libraries\boost_1_69_0\boost
 init:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - mkdir C:\projects\deps
@@ -17,7 +19,7 @@ install:
   - 7z x C:\projects\deps\contrib_build.tar.gz -o"C:\projects\deps" -y
   - 7z x C:\projects\deps\contrib_build.tar -o"C:\projects\deps\contrib" -y
   - dir C:\projects\deps\contrib
-  - dir C:\Libraries\boost_1_69_0
+  - dir C:\Qt\5.12.1
 before_build:
   - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
   - ps: cd C:\projects\OpenMS-build
