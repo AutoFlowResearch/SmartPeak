@@ -150,9 +150,10 @@ public:
       "Main > File\n"
       "[1] New session\n"
       "[2] Load session\n"
-      "[3] Save session\n"
-      "[4] Import file\n"
-      "[5] Export file\n"
+      "[3] Load session from sequence\n"
+      "[4] Save session\n"
+      "[5] Import file\n"
+      "[6] Export file\n"
       "[M] Main menu\n"
       "[E] Exit\n\n";
 
@@ -165,11 +166,21 @@ public:
     else if ("2" == in) {
     }
     else if ("3" == in) {
+      setSequencePathnameFromInput();
+      const bool pathnamesAreCorrect = buildStaticFilenames();
+      if (pathnamesAreCorrect) {
+        sequenceHandler_.clear();
+        SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
+      } else {
+        std::cout << "Pathnames are not correct.\n";
+      }
     }
     else if ("4" == in) {
-      menuImportFile();
     }
     else if ("5" == in) {
+      menuImportFile();
+    }
+    else if ("6" == in) {
     }
     else if ("m" == in || "M" == in) {
       // empty
@@ -204,11 +215,9 @@ public:
 
     if      ("1" == in) {
       setSequencePathnameFromInput();
-      const bool pathnamesAreCorrect = buildStaticFilenames();
-      if (pathnamesAreCorrect) {
-        sequenceHandler_.clear();
-        SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
-      }
+      static_filenames_.sequence_csv_i = sequence_pathname_;
+      sequenceHandler_.clear();
+      SequenceParser::readSequenceFile(sequenceHandler_, static_filenames_.sequence_csv_i, ",", verbose_);
     }
     else if ("2" == in) {
       const std::string pathname = getPathnameFromInput();
@@ -1034,7 +1043,7 @@ public:
     "Welcome to SmartPeak\n\n"
 
     "Load an existing session from a sequence file\n"
-    "`File -> Import file -> Sequence` to load the sequence file\n"
+    "`File -> Load session from sequence`\n"
     "`Edit -> Workflow ->\"1 2\"` then `Actions->Run workflow` to load the raw data and associated features\n\n"
 
     "Get quick information about the current application state\n"
