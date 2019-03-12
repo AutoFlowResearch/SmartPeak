@@ -12,7 +12,8 @@ cache:
 install:
   - git submodule update --init --recursive
   - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
-  - 7z x C:\projects\deps\contrib_build.tar.gz -o"C:\projects\deps\contrib" -y
+  - 7z x C:\projects\deps\contrib_build.tar.gz -o"C:\projects\deps" -y
+  - 7z x C:\projects\deps\contrib_build.tar -o"C:\projects\deps\contrib" -y
   - dir C:\projects\deps\contrib
   - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
 before_build:
