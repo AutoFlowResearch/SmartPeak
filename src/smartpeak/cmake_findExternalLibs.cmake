@@ -25,6 +25,14 @@ endif()
 find_package(Eigen3 3.1.0 REQUIRED)
 
 #------------------------------------------------------------------------------
+# Find ImGUI
+#------------------------------------------------------------------------------
+find_package(ImGUI REQUIRED)
+if (IMGUI_FOUND)
+  message(STATUS "imgui_INCLUDE_DIR : ${IMGUI_INCLUDE_DIR}")
+endif (IMGUI_FOUND)
+
+#------------------------------------------------------------------------------
 # Find OpenMS
 #------------------------------------------------------------------------------
 find_package(OpenMS REQUIRED)

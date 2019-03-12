@@ -17,5 +17,5 @@ endforeach(i)
 set(SmartPeak_sources ${SmartPeak_sources} ${sources})
 
 ### source group definition
-source_group("Source Files\\ui FILES ${sources})
+source_group("Source Files\\ui" FILES ${sources})
 

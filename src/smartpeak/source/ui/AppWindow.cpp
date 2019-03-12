@@ -9,45 +9,45 @@ namespace SmartPeak
 
   void MainMenu::showMainMenuBar() {
     // Show the widgets
-    if (show_app_about) {
-      ImGui::Begin("About SmartPeak", &show_app_about, ImGuiWindowFlags_AlwaysAutoResize);
+    if (show_app_about_) {
+      ImGui::Begin("About SmartPeak", &show_app_about_, ImGuiWindowFlags_AlwaysAutoResize);
       ImGui::Text("SmartPeak %s", 1.0); //TODO: define version function
       ImGui::Separator();
       ImGui::Text("By SmartPeak contributors.");
       ImGui::End();
     }
-    if (show_sequence_progress) SequenceProgressWidget(&show_sequence_progress);
-    if (show_generic_table) TableWidget(&show_generic_table);
-    if (show_file_browser) FileBrowserWidget(&show_file_browser);
-    if (show_plot) PlotWidget(&show_plot);
-    if (show_workflow) WorkflowWidget(&show_workflow);
+    //if (show_sequence_progress) SequenceProgressWidget(&show_sequence_progress);
+    //if (show_generic_table) TableWidget(&show_generic_table);
+    //if (show_file_browser) FileBrowserWidget(&show_file_browser);
+    //if (show_plot) PlotWidget(&show_plot);
+    //if (show_workflow) WorkflowWidget(&show_workflow);
 
     // Show the main menu bar
     if (ImGui::BeginMainMenuBar())
     {
       if (ImGui::BeginMenu("File"))
       {
-        ShowMenuFile();
+        showMenuFile();
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Edit"))
       {
-        ShowMenuEdit();
+        showMenuEdit();
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("View"))
       {
-        ShowMenuView(show_sequence_progress);
+        showMenuView();
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Actions"))
       {
-        ShowMenuAction();
+        showMenuAction();
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Help"))
       {
-        ShowMenuHelp(show_app_about);
+        showMenuHelp();
         ImGui::EndMenu();
       }
       ImGui::EndMainMenuBar();
