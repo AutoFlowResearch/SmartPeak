@@ -58,6 +58,7 @@ namespace SmartPeak
           Utilities::castString(param.at("value"), param.at("type"), c);
           mzML_params.emplace(param.at("name"), c);
         }
+        // Deal with ChromeleonFile format
         if (mzML_params.count("format") && mzML_params.at("format").s_ == "ChromeleonFile") {
           const size_t pos = filenames.mzML_i.rfind(".");
           std::string txt_name = filenames.mzML_i;
@@ -67,6 +68,17 @@ namespace SmartPeak
           OpenMS::ChromeleonFile chfh;
           std::cout << "loadMSExperiment(): loading " << txt_name << std::endl;
           chfh.load(txt_name, chromatograms);
+        }
+        // Deal with .mzXML format
+        else if (mzML_params.count("format") && mzML_params.at("format").s_ == "XML") {
+          const size_t pos = filenames.mzML_i.rfind(".");
+          std::string txt_name = filenames.mzML_i;
+          if (pos != std::string::npos) {
+            txt_name.replace(txt_name.cbegin() + pos + 1, txt_name.cend(), "xml"); // replace extension
+          }
+          OpenMS::FileHandler fh;
+          std::cout << "loadMSExperiment(): loading " << txt_name << std::endl;
+          fh.loadExperiment(txt_name, chromatograms, OpenMS::FileTypes::MZXML);
         }
         else {
           OpenMS::FileHandler fh;
