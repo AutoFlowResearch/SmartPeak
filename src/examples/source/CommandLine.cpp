@@ -661,7 +661,7 @@ public:
 
     std::cout << "\n\n"
       "The following list of file was searched for:\n";
-    std::vector<InputDataValidation::Validity> is_valid(10);
+    std::vector<InputDataValidation::FilenameInfo> is_valid(10);
     is_valid[0] = InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence");
     is_valid[1] = InputDataValidation::isValidFilename(f.parameters_csv_i, "parameters");
     is_valid[2] = InputDataValidation::isValidFilename(f.traML_csv_i, "traml");
@@ -680,8 +680,8 @@ public:
     const bool otherPathnamesAreFine = std::all_of(
       is_valid.cbegin() + 3,
       is_valid.cend(),
-      [](const InputDataValidation::Validity& arg)
-        { return arg.validity != InputDataValidation::Validity::invalid; });
+      [](const InputDataValidation::FilenameInfo& arg)
+        { return arg.validity != InputDataValidation::FilenameInfo::invalid; });
 
     if (!requiredPathnamesAreValidBool || !otherPathnamesAreFine) {
       generatePathnamesTxt(pathnamesFilePath, f, is_valid);
@@ -706,13 +706,13 @@ public:
     return true;
   }
 
-  bool requiredPathnamesAreValid(const std::vector<InputDataValidation::Validity>& validation)
+  bool requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation)
   {
     const std::unordered_set<std::string> required {"sequence", "parameters", "traml"};
     bool is_valid {true};
-    for (const InputDataValidation::Validity& v : validation) {
+    for (const InputDataValidation::FilenameInfo& v : validation) {
       if (required.count(v.member_name) &&
-          v.validity != InputDataValidation::Validity::valid) {
+          v.validity != InputDataValidation::FilenameInfo::valid) {
         is_valid = false;
       }
     }
@@ -743,7 +743,7 @@ public:
   void generatePathnamesTxt(
     const std::string& pathname,
     const Filenames& f,
-    const std::vector<InputDataValidation::Validity>& is_valid
+    const std::vector<InputDataValidation::FilenameInfo>& is_valid
   )
   {
     std::ofstream ofs(pathname);
@@ -751,7 +751,7 @@ public:
       std::cout << "\n\nCan't open file: " << pathname << "\n";
       return;
     }
-    std::vector<InputDataValidation::Validity>::const_iterator it = is_valid.cbegin();
+    std::vector<InputDataValidation::FilenameInfo>::const_iterator it = is_valid.cbegin();
     ofs <<
       "sequence="            << getValidPathnameOrPlaceholder(f.sequence_csv_i, (it++)->validity) <<
       "parameters="          << getValidPathnameOrPlaceholder(f.parameters_csv_i, (it++)->validity) <<

@@ -18,14 +18,14 @@ public:
     InputDataValidation(InputDataValidation&&)                 = delete;
     InputDataValidation& operator=(InputDataValidation&&)      = delete;
 
-    struct Validity {
+    struct FilenameInfo {
       enum ValidityEnum {invalid, valid, not_provided} validity;
       std::string pathname;
       std::string member_name;
     };
 
     static bool fileExists(const std::string& filepath);
-    static Validity isValidFilename(const std::string& filename, const std::string& member_name);
+    static FilenameInfo isValidFilename(const std::string& filename, const std::string& member_name);
 
     static std::string getSequenceInfo(
       const SequenceHandler& sequenceHandler,
