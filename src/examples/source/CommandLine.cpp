@@ -646,9 +646,9 @@ public:
 
     if (InputDataValidation::fileExists(pathnamesFilePath)) {
       std::cout << "\n\n"
-        "The following file was found in the current working directory:\n" <<
-        pathnamesFilePath << "\n"
-        "Should the pathnames be used to search for the input files? [Y/n]\n";
+        "Pathnames file was found:\n" <<
+        " - " << pathnamesFilePath << "\n"
+        "Should its values be used to search for the input files? [Y/n]\n";
       const std::string in = getLineInput("> ");
       std::cout << '\n';
       if (in.empty() || in.front() == 'y') {
@@ -685,15 +685,12 @@ public:
 
     if (!requiredPathnamesAreValidBool || !otherPathnamesAreFine) {
       generatePathnamesTxt(pathnamesFilePath, f, is_valid);
-      std::cout << "\n\nERROR!!!\n";
-      if (!otherPathnamesAreFine) {
-        std::cout <<
-          "One or more pathnames searches resulted in \"FAILURE\"s.\n"
-          "A file has been generated for you to fix the pathnames:\n"
-          " - " << pathnamesFilePath << "\n"
-          "The incorrect information has been replaced with an empty value.\n"
-          "If a pathname is to be ignored, leave it blank.\n";
-      }
+      std::cout << "\n\nERROR!!!\n"
+        "One or more pathnames are not valid.\n"
+        "A file has been generated for you to fix the pathnames:\n"
+        " - " << pathnamesFilePath << "\n"
+        "The incorrect information has been replaced with an empty value.\n"
+        "If a pathname is to be ignored, leave it blank.\n";
       if (!requiredPathnamesAreValidBool) {
         std::cout <<
         "Make sure that the following required pathnames are provided:\n"
@@ -1104,7 +1101,7 @@ public:
     "`Actions -> Report`\n\n"
 
     "See this introductory tutorial again\n"
-    "Help -> Getting started`\n";
+    "`Help -> Getting started`\n";
   }
 
   std::string commandsString()
