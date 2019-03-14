@@ -130,7 +130,12 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
 
   vector<map<string,string>> data_out;
   vector<string> headers_out;
-  const vector<string> meta_data = {"peak_apex_int", "logSN"};
+  const vector<string> meta_data {
+    "peak_apex_int",
+    "logSN",
+    "QC_transition_message",
+    "QC_transition_group_message",
+  };
   const set<MetaDataHandler::SampleType> sample_types = {MetaDataHandler::SampleType::Unknown};
 
   SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types);
@@ -142,7 +147,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(data_out.at(0).at("component_name"), "23dpg.23dpg_1.Heavy");
   BOOST_CHECK_EQUAL(data_out.at(0).at("peak_apex_int"), std::to_string(235.0));
   BOOST_CHECK_EQUAL(data_out.at(0).at("logSN"), std::to_string(3.52866193485212));
-  BOOST_CHECK_EQUAL(headers_out.size(), 21);
+  BOOST_CHECK_EQUAL(headers_out.size(), 23);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
@@ -165,6 +170,8 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   // metadata
   BOOST_CHECK_EQUAL(headers_out[19], "peak_apex_int");
   BOOST_CHECK_EQUAL(headers_out[20], "logSN");
+  BOOST_CHECK_EQUAL(headers_out[21], "QC_transition_message");
+  BOOST_CHECK_EQUAL(headers_out[22], "QC_transition_group_message");
 
   // write sequence to output
   // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataTableFromMetaValue.csv");
