@@ -127,60 +127,63 @@ namespace SmartPeak
       throw std::invalid_argument("Delimiter \"" + delimiter + "\" is not supported.");
     }
 
-    MetaDataHandler t; // as in temporary
-    std::string t_date;
-    std::string t_sample_type;
-    size_t row_number = 1;
-    bool inj_numbers_equal_row_numbers = false;
-
     while (true) {
+      MetaDataHandler t; // as in temporary
+      std::string t_date;
+      std::string t_sample_type;
+      std::string t_rack_number;
+      std::string t_plate_number;
+      std::string t_pos_number;
+      std::string t_inj_number;
+      std::string t_dilution_factor;
+      std::string t_inj_volume;
       bool is_valid = false;
 
       if (delimiter == s_comma) {
         is_valid = in_comma.read_row(t.sample_name, t.sample_group_name,
           t.sequence_segment_name, t_sample_type, t.original_filename,
-          t.proc_method_name, t.rack_number, t.plate_number, t.pos_number,
-          t.inj_number, t.dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t.inj_volume, t.inj_volume_units, t.batch_name);
+          t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
+          t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
+          t_date, t_inj_volume, t.inj_volume_units, t.batch_name);
       } else if (delimiter == s_semicolon) {
         is_valid = in_semicolon.read_row(t.sample_name, t.sample_group_name,
           t.sequence_segment_name, t_sample_type, t.original_filename,
-          t.proc_method_name, t.rack_number, t.plate_number, t.pos_number,
-          t.inj_number, t.dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t.inj_volume, t.inj_volume_units, t.batch_name);
+          t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
+          t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
+          t_date, t_inj_volume, t.inj_volume_units, t.batch_name);
       } else if (delimiter == s_tab) {
         is_valid = in_tab.read_row(t.sample_name, t.sample_group_name,
           t.sequence_segment_name, t_sample_type, t.original_filename,
-          t.proc_method_name, t.rack_number, t.plate_number, t.pos_number,
-          t.inj_number, t.dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t.inj_volume, t.inj_volume_units, t.batch_name);
+          t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
+          t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
+          t_date, t_inj_volume, t.inj_volume_units, t.batch_name);
       }
 
       if (!is_valid)
         break;
 
-      t.sample_type = MetaDataHandler::stringToSampleType(t_sample_type);
-      std::tm& adt = t.acquisition_date_and_time;
-      std::stringstream iss(t_date, std::ios_base::in);
-      iss >> adt.tm_mday >> adt.tm_mon >> adt.tm_year >> adt.tm_hour >> adt.tm_min >> adt.tm_sec;
-
-      if (t.inj_number <= 0) {
-        t.inj_number = row_number;
-        inj_numbers_equal_row_numbers = true;
+      if (false == validateAndConvert(t_inj_number, t.inj_number)) {
+        std::cout << "Error: Empty cell in column " << s_inj_number << ". Skipping entire row.\n";
+        continue;
       }
 
+      if (t.inj_number <= 0) {
+        std::cout << "Error: Value '" << t.inj_number << "' is not valid for column '" << s_inj_number << "'. Skipping entire row.\n";
+        continue;
+      }
+
+      validateAndConvert(t_rack_number,     t.rack_number);
+      validateAndConvert(t_plate_number,    t.plate_number);
+      validateAndConvert(t_pos_number,      t.pos_number);
+      validateAndConvert(t_dilution_factor, t.dilution_factor);
+      validateAndConvert(t_inj_volume,      t.inj_volume);
+
+      t.sample_type = MetaDataHandler::stringToSampleType(t_sample_type);
+      std::tm& adt = t.acquisition_date_and_time;
+      std::istringstream iss(t_date);
+      iss >> adt.tm_mday >> adt.tm_mon >> adt.tm_year >> adt.tm_hour >> adt.tm_min >> adt.tm_sec;
+
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
-
-      t.clear();
-      t_date.clear();
-      t_sample_type.clear();
-      ++row_number;
-    }
-
-    // std::cout << InputDataValidation::getSequenceInfo(sequenceHandler, delimiter);
-
-    if (inj_numbers_equal_row_numbers) {
-      std::cout << "One or more inj_number values were not found. These have been replaced with their row numbers.\n";
     }
 
     if (verbose) {

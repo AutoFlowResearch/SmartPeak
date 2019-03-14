@@ -26,6 +26,28 @@ public:
       const bool verbose = false
     );
 
+    template<typename T>
+    static bool validateAndConvert(
+      const std::string& s,
+      T& output
+    )
+    {
+      if (Utilities::trimString(s).empty()) {
+        return false;
+      }
+
+      if (std::is_same<T, int>::value) {
+        output = std::stoi(s);
+      } else if (std::is_same<T, float>::value) {
+        output = std::stof(s);
+      } else {
+        std::cerr << "Error: SequenceParser::validateAndConvert. Case not handled.\n";
+        return false;
+      }
+
+      return true;
+    }
+
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
     static void makeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,

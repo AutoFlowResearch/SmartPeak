@@ -88,10 +88,11 @@ BOOST_AUTO_TEST_CASE(sampleNamesAreConsistent)
   BOOST_CHECK_EQUAL(result, true);
 
   filenames.sequence_csv_i = main_dir + "/sequence_missing.csv";
+  sequenceHandler.clear();
   SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
 
   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
-  BOOST_CHECK_EQUAL(result, false); // missing sample: 150516_CM3_Level900
+  BOOST_CHECK_EQUAL(result, false); // missing sample: fakeSample
 }
 
 BOOST_AUTO_TEST_CASE(componentNamesAreConsistent)
