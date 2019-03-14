@@ -93,6 +93,12 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
   BOOST_CHECK_EQUAL(injection5.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
+
+  sequenceHandler.clear();
+  Filenames filenames { generateTestFilenames() };
+  filenames.sequence_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv");
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false, false);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(processSequence)

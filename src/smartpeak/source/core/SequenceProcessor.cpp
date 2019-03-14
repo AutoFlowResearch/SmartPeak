@@ -22,6 +22,14 @@ namespace SmartPeak
     }
 
     SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
+    if (sequenceHandler_IO.getSequence().empty()) {
+      std::cout << "Empty sequence. Returning.\n"
+        "==== END   createSequence()" << std::endl;
+      return;
+    }
+    // TODO: Given that the raw data is shared between all injections, it could
+    // be beneficial to move it somewhere else (i.e. in SequenceHandler) and adapt
+    // the algorithms to the change
     RawDataHandler& rawDataHandler = sequenceHandler_IO.getSequence()[0].getRawData();
 
     // load rawDataHandler files (applies to the whole session)
