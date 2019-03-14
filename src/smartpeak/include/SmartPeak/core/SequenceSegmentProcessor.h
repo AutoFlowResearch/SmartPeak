@@ -12,9 +12,6 @@ namespace SmartPeak
   class SequenceSegmentProcessor
   {
   public:
-    SequenceSegmentProcessor() = default;
-    ~SequenceSegmentProcessor() = default;
-
     virtual int getID() const = 0;  ///< get the raw data processor class ID
     virtual std::string getName() const = 0;  ///< get the raw data processor class name
     virtual std::string getDescription() const = 0;  ///< get the raw data processor class description
@@ -52,7 +49,7 @@ namespace SmartPeak
   class CalculateCalibration : public SequenceSegmentProcessor
   {
   public:
-    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -78,7 +75,7 @@ namespace SmartPeak
   class LoadStandardsConcentrations : public SequenceSegmentProcessor
   {
   public:
-    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -104,7 +101,7 @@ namespace SmartPeak
   class LoadQuantitationMethods : public SequenceSegmentProcessor
   {
   public:
-    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -130,7 +127,7 @@ namespace SmartPeak
   class StoreQuantitationMethods : public SequenceSegmentProcessor
   {
   public:
-    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -156,7 +153,7 @@ namespace SmartPeak
   class PlotCalibrators : public SequenceSegmentProcessor
   {
   public:
-    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };

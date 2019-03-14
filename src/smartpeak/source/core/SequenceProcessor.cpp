@@ -26,13 +26,13 @@ namespace SmartPeak
 
     // load rawDataHandler files (applies to the whole session)
     LoadParameters loadParameters;
-    loadParameters.process(rawDataHandler, {}, filenames);
+    loadParameters.process(rawDataHandler, {}, filenames, verbose_I);
 
     LoadTransitions loadTransitions;
     loadTransitions.process(rawDataHandler, {}, filenames, verbose_I);
 
-    LoadFeatureFilters LoadFeatureFilters;
-    LoadFeatureFilters.process(rawDataHandler, {}, filenames, verbose_I);
+    LoadFeatureFilters loadFeatureFilters;
+    loadFeatureFilters.process(rawDataHandler, {}, filenames, verbose_I);
 
     LoadFeatureQCs loadFeatureQCs;
     loadFeatureQCs.process(rawDataHandler, {}, filenames, verbose_I);

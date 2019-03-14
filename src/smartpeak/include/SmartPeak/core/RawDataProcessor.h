@@ -21,9 +21,6 @@ namespace SmartPeak
   class RawDataProcessor
   {
   public:
-    RawDataProcessor() = default;
-    ~RawDataProcessor() = default;
-
     virtual int getID() const = 0;  ///< get the raw data processor class ID
     virtual std::string getName() const = 0;  ///< get the raw data processor class name
     virtual std::string getDescription() const = 0;  ///< get the raw data processor class description
@@ -44,7 +41,7 @@ namespace SmartPeak
   class LoadRawData : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -78,7 +75,7 @@ namespace SmartPeak
   class StoreRawData : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -102,7 +99,7 @@ namespace SmartPeak
   class LoadFeatures : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -126,7 +123,7 @@ namespace SmartPeak
   class StoreFeatures : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -150,7 +147,7 @@ namespace SmartPeak
   class PickFeatures : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -174,7 +171,7 @@ namespace SmartPeak
   class FilterFeatures : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -198,7 +195,7 @@ namespace SmartPeak
   class CheckFeatures : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -222,7 +219,7 @@ namespace SmartPeak
   class SelectFeatures : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -246,7 +243,7 @@ namespace SmartPeak
   class ValidateFeatures : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -270,7 +267,7 @@ namespace SmartPeak
   class QuantifyFeatures : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -294,7 +291,7 @@ namespace SmartPeak
   class PlotFeatures : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -318,7 +315,7 @@ namespace SmartPeak
   class LoadTransitions : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -342,7 +339,7 @@ namespace SmartPeak
   class LoadFeatureFilters : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -366,7 +363,7 @@ namespace SmartPeak
   class LoadFeatureQCs : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -390,7 +387,7 @@ namespace SmartPeak
   class LoadValidationData : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -414,7 +411,7 @@ namespace SmartPeak
   class LoadParameters : public RawDataProcessor
   {
   public:
-    using RawDataProcessor::RawDataProcessor;
+    // using RawDataProcessor::RawDataProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };

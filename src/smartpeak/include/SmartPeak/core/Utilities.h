@@ -439,5 +439,18 @@ public:
       const std::vector<std::map<std::string, std::string>>& params,
       const std::vector<std::map<std::string, std::string>>& score_weights
     );
+
+    template<typename Iterator>
+    static std::string join(Iterator first, Iterator last, const std::string& delimiter = "")
+    {
+      std::ostringstream oss;
+      if (first != last) {
+        oss << *first;
+        for (Iterator it = 1 + first; it != last; ++it) {
+          oss << delimiter << *it;
+        }
+      }
+      return oss.str();
+    }
   };
 }

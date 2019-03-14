@@ -213,6 +213,8 @@ namespace SmartPeak
     }
     headers_out = headers;
 
+    const std::string delimiter {"_____"};
+
     list_dict.clear();
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
@@ -261,12 +263,24 @@ namespace SmartPeak
             subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
           );
           for (const std::string& meta_value_name : meta_data) {
-            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-            if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0)
-              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-              row.emplace(meta_value_name, std::to_string(datum.f_));
-            else
-              row.emplace(meta_value_name, "");
+            if (subordinate.metaValueExists(meta_value_name) &&
+                (meta_value_name == "QC_transition_message" ||
+                 meta_value_name == "QC_transition_group_message")) {
+
+              OpenMS::StringList messages = subordinate.getMetaValue(meta_value_name).toStringList();
+              row.emplace(
+                meta_value_name,
+                Utilities::join(messages.begin(), messages.end(), delimiter)
+              );
+            } else {
+              Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+              if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
+                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                row.emplace(meta_value_name, std::to_string(datum.f_));
+              } else {
+                row.emplace(meta_value_name, "");
+              }
+            }
           }
           list_dict.push_back(row);
         }
@@ -274,7 +288,7 @@ namespace SmartPeak
     }
   }
 
-  void SequenceParser::writeDataTableFromMetaValue(
+  bool SequenceParser::writeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data,
@@ -292,7 +306,11 @@ namespace SmartPeak
     makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data, sample_types);
 
     CSVWriter writer(filename, ",");
-    writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const int cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      return false;
+    }
 
     for (const std::map<std::string,std::string>& m : list_dict) {
       std::vector<std::string> line;
@@ -305,6 +323,8 @@ namespace SmartPeak
     if (verbose) {
       std::cout << "==== END   writeDataTableFromMetaValue()" << std::endl;
     }
+
+    return true;
   }
 
   void SequenceParser::makeDataMatrixFromMetaValue(
@@ -376,7 +396,7 @@ namespace SmartPeak
     data_out = std::move(data);
   }
 
-  void SequenceParser::writeDataMatrixFromMetaValue(
+  bool SequenceParser::writeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data,
@@ -398,7 +418,11 @@ namespace SmartPeak
     headers.insert(headers.end(), columns.begin(), columns.end());
 
     CSVWriter writer(filename, ",");
-    writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const int cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      return false;
+    }
 
     for (size_t i = 0; i < rows.size(); ++i) {
       std::vector<std::string> line;
@@ -415,5 +439,7 @@ namespace SmartPeak
     if (verbose) {
       std::cout << "==== END   writeDataMatrixFromMetaValue()" << std::endl;
     }
+
+    return true;
   }
 }

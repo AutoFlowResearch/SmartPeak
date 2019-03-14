@@ -17,17 +17,21 @@ namespace SmartPeak
     return ifs.is_open();
   }
 
-  bool InputDataValidation::isValidFilename(const std::string& filename, const std::string& member_name)
+  InputDataValidation::FilenameInfo InputDataValidation::isValidFilename(const std::string& filename, const std::string& member_name)
   {
-    std::cout << "[" << member_name << "]:\t";
+    FilenameInfo v;
+    v.pathname = filename;
+    v.member_name = member_name;
+    std::cout << member_name << ":\n\t";
     if (filename.size()) {
       const bool is_valid = fileExists(filename);
-      std::cout << filename << ":\t" << (is_valid ? "SUCCESS" : "FAILURE") << '\n';
-      return is_valid;
+      std::cout << (is_valid ? "SUCCESS" : "FAILURE") << " <- " << filename << "\n";
+      v.validity = is_valid ? FilenameInfo::valid : FilenameInfo::invalid;
     } else {
-      std::cout << "\tNOT PROVIDED\n";
-      return true;
+      std::cout << "NOT PROVIDED\n";
+      v.validity = FilenameInfo::not_provided;
     }
+    return v;
   }
 
   std::string InputDataValidation::getSequenceInfo(

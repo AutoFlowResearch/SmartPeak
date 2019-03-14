@@ -35,7 +35,7 @@ public:
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
-    static void writeDataTableFromMetaValue(
+    static bool writeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
       const std::vector<std::string>& meta_data = {"calculated_concentration"},
@@ -81,7 +81,7 @@ public:
     );
 
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
-    static void writeDataMatrixFromMetaValue(
+    static bool writeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
       const std::vector<std::string>& meta_data = {"calculated_concentration"},
