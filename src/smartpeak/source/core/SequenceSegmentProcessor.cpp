@@ -230,23 +230,26 @@ namespace SmartPeak
     }
   }
 
-   void PlotCalibrators::process(
-     SequenceSegmentHandler& sequenceSegmentHandler_IO,
-     const SequenceHandler& sequenceHandler_I,
-     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-     const Filenames& filenames,
-     const bool verbose_I
-   ) const {
-     if (verbose_I)
-       std::cout << "Plotting calibrators." << std::endl;
+  void PlotCalibrators::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  ) const
+  {
+    if (verbose_I) {
+      std::cout << "Plotting calibrators." << std::endl;
+    }
 
-     if (params_I.at("SequenceSegmentPlotter").empty()) {
-       throw std::invalid_argument("Parameters or filename are empty.");
-     }
+    if (params_I.at("SequenceSegmentPlotter").empty()) {
+      std::cout << "PlotCalibrators: params_I is empty\n";
+      return;
+    }
 
-     //// TODO: Uncomment when SequenceSegmentPlotter is implemented
-     //SequenceSegmentPlotter sequenceSegmentPlotter;
-     //sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
-     //sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
-   }
+    //// TODO: Uncomment when SequenceSegmentPlotter is implemented
+    //SequenceSegmentPlotter sequenceSegmentPlotter;
+    //sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
+    //sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
+  }
 }
