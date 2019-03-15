@@ -198,7 +198,7 @@ namespace SmartPeak
     size_t cnt {0};
     for (const InjectionHandler& inj : getSequence()) {
       if (inj.getRawData().getExperiment().getChromatograms().size()) {
-        ++cnt; // TODO: or cnt += the size?
+        ++cnt;
       }
     }
     std::ostringstream oss;
