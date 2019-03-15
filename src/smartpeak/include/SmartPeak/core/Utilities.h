@@ -192,6 +192,7 @@ public:
         clear();
       }
 
+      // TODO: rename to deallocate() or similar
       void clear()
       {
         if (is_clear_)
@@ -214,6 +215,9 @@ public:
           case STRING_LIST:
             sl_.~vector();
             break;
+          default:
+            // nothing to deallocate
+            break;
         }
 
         is_clear_ = true;
@@ -232,6 +236,8 @@ public:
         STRING_LIST
       };
 
+      Type tag_;
+
       union {
         bool b_;
         float f_;
@@ -242,6 +248,8 @@ public:
         std::vector<int> il_;
         std::vector<std::string> sl_;
       };
+
+      CastValue::Type getTag() const { return tag_; }
 
       template<typename T>
       void setTagAndData(const CastValue::Type type, const T& data)
@@ -297,11 +305,7 @@ public:
         is_clear_ = false;
       }
 
-      Type tag_;
       bool is_clear_;
-
-    public:
-      CastValue::Type getTag() const { return tag_; }
     };
 
     /**
