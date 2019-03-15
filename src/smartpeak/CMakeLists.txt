@@ -38,7 +38,7 @@ include (${PROJECT_SOURCE_DIR}/includes.cmake)
 
 #------------------------------------------------------------------------------
 # all the dependency libraries are linked into libSmartPeak.so
-set(SMARTPEAK_DEP_LIBRARIES ${OpenMS_LIBRARIES})
+set(SMARTPEAK_DEP_LIBRARIES ${OpenMS_LIBRARIES} ${SDL2_LIBRARIES})
 
 # xerces requires linking against CoreFoundation&CoreServices
 if(APPLE)
@@ -63,6 +63,7 @@ smartpeak_add_library(TARGET_NAME  SmartPeak
                    INTERNAL_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR}/include
                                      ${CMAKE_CURRENT_BINARY_DIR}/include
                    EXTERNAL_INCLUDES ${OpenMS_INCLUDE_DIRECTORIES}
+									 ${SDL2_INCLUDE_DIRS}
                                      ${IMGUI_INCLUDE_DIR}
                                      ${EIGEN3_INCLUDE_DIR}
                    LINK_LIBRARIES ${APPLE_EXTRA_LIBS}
