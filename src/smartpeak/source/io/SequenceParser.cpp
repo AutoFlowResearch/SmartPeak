@@ -309,7 +309,7 @@ namespace SmartPeak
     makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data, sample_types);
 
     CSVWriter writer(filename, ",");
-    const int cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     if (cnt < headers.size()) {
       return false;
@@ -421,7 +421,7 @@ namespace SmartPeak
     headers.insert(headers.end(), columns.begin(), columns.end());
 
     CSVWriter writer(filename, ",");
-    const int cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     if (cnt < headers.size()) {
       return false;

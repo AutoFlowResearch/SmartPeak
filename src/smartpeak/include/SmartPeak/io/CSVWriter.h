@@ -44,7 +44,7 @@ public:
       @param last Iterator to the last element
     */
     template<typename T>
-    int writeDataInRow(T first, T last)
+    size_t writeDataInRow(T first, T last)
     {
       // Open the file in truncate mode if first line, else in append mode
       std::ofstream ofs(filename_, line_count_ ? std::ios::app : std::ios::trunc);
@@ -54,7 +54,7 @@ public:
         return -1;
       }
 
-      int cnt {0};
+      size_t cnt {0};
 
       if (first != last) {
         ofs << *first++;
