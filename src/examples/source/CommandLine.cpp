@@ -553,6 +553,11 @@ public:
       "[5] Feature filters\n"
       "[6] Feature QC\n"
       "[7] Parameters\n"
+      "[8] Raw data files\n"
+      "[9] Analyzed features\n"
+      "[10] Selected features\n"
+      "[11] Picked peaks\n"
+      "[12] Filtered/selected peaks\n"
       "[M] Main menu\n\n";
 
     std::string in;
@@ -585,6 +590,21 @@ public:
     else if ("7" == in) {
       std::cout << InputDataValidation::getParametersInfo(
         sequenceHandler_.getSequence().front().getRawData().getParameters()) << "\n";
+    }
+    else if ("8" == in) {
+      std::cout << sequenceHandler_.getRawDataFilesInfo() << "\n";
+    }
+    else if ("9" == in) {
+      std::cout << sequenceHandler_.getAnalyzedFeaturesInfo() << "\n";
+    }
+    else if ("10" == in) {
+      std::cout << sequenceHandler_.getSelectedFeaturesInfo() << "\n";
+    }
+    else if ("11" == in) {
+      std::cout << sequenceHandler_.getPickedPeaksInfo() << "\n";
+    }
+    else if ("12" == in) {
+      std::cout << sequenceHandler_.getFilteredSelectedPeaksInfo() << "\n";
     }
     else if ("m" == in || "M" == in) {
       // empty

@@ -335,7 +335,6 @@ namespace SmartPeak
   ) const {
     if (verbose_I) {
       std::cout << "==== START pickFeatures" << std::endl;
-      std::cout << "Experiment size: " << rawDataHandler_IO.getChromatogramMap().size() << std::endl;
     }
 
     if (params_I.find("MRMFeatureFinderScoring") != params_I.end() && params_I.at("MRMFeatureFinderScoring").empty()) {
