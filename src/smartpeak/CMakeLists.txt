@@ -64,7 +64,7 @@ smartpeak_add_library(TARGET_NAME  SmartPeak
                                      ${CMAKE_CURRENT_BINARY_DIR}/include
                    EXTERNAL_INCLUDES ${OpenMS_INCLUDE_DIRECTORIES}
 									 ${SDL2_INCLUDE_DIRS}
-                                     ${IMGUI_INCLUDE_DIR}
+                                     ${ImGui_INCLUDE_DIR}
                                      ${EIGEN3_INCLUDE_DIR}
                    LINK_LIBRARIES ${APPLE_EXTRA_LIBS}
                                   ${SMARTPEAK_DEP_LIBRARIES}
