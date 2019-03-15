@@ -27,7 +27,7 @@ namespace SmartPeak
         return "Double Blank";
       case SampleType::Solvent:
         return "Solvent";
-      case SampleType::Unrecognized:
+      default:
         return "Unrecognized";
     }
   }
@@ -46,8 +46,7 @@ namespace SmartPeak
       return SampleType::DoubleBlank;
     if (sample_type == "Solvent")
       return SampleType::Solvent;
-    if (sample_type == "Unrecognized")
-      return SampleType::Unrecognized;
+    return SampleType::Unrecognized;
   }
 
   void MetaDataHandler::setSampleName(const std::string& sample_name_I)
