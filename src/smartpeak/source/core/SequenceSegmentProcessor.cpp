@@ -240,8 +240,9 @@ namespace SmartPeak
      if (verbose_I)
        std::cout << "Plotting calibrators." << std::endl;
 
-     if (params_I.at("SequenceSegmentPlotter").empty());
+     if (params_I.at("SequenceSegmentPlotter").empty()) {
        throw std::invalid_argument("Parameters or filename are empty.");
+     }
 
      //// TODO: Uncomment when SequenceSegmentPlotter is implemented
      //SequenceSegmentPlotter sequenceSegmentPlotter;
