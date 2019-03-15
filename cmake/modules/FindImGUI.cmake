@@ -218,7 +218,7 @@ foreach(_component IN LISTS ImGui_FIND_COMPONENTS)
 
             add_library(ImGui::Examples INTERFACE IMPORTED)
             set_property(TARGET ImGui::Examples APPEND PROPERTY
-                INTERFACE_EXAMPLES "${ImGui_EXAMPLES}")
+                INTERFACE_SOURCES "${ImGui_EXAMPLES}")
 			# set_property(TARGET ImGui::Examples APPEND PROPERTY
 				# INTERFACE_INCLUDE_DIRECTORIES ${IMGUI_DIR}/examples)
             set_property(TARGET ImGui::Examples APPEND PROPERTY
