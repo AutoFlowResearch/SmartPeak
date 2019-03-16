@@ -85,12 +85,6 @@ namespace SmartPeak
           std::cout << "loadMSExperiment(): loading " << filenames.mzML_i << std::endl;
           fh.loadExperiment(filenames.mzML_i, chromatograms);
         }
-        if (mzML_params.count("zero_baseline") && mzML_params.at("zero_baseline").b_) {
-          std::vector<OpenMS::MSChromatogram>& chroms = chromatograms.getChromatograms();
-          for (OpenMS::MSChromatogram& ch : chroms) {
-            OpenMS::subtractMinimumIntensity(ch);
-          }
-        }
       }
       else {
         OpenMS::FileHandler fh;
@@ -134,27 +128,6 @@ namespace SmartPeak
       );
     }
     rawDataHandler_IO.setExperiment(chromatograms);
-
-    // # map transitions to the chromatograms
-    if (params_I.at("MRMMapping").size()) {
-      // # set up MRMMapping and
-      // # parse the MRMMapping params
-      OpenMS::MRMMapping mrmmapper;
-      OpenMS::Param parameters = mrmmapper.getParameters();
-      Utilities::updateParameters(
-        parameters,
-        params_I.at("MRMMapping")
-      );
-      mrmmapper.setParameters(parameters);
-      OpenMS::MSExperiment chromatogram_map;
-
-      mrmmapper.mapExperiment(
-        chromatograms,
-        rawDataHandler_IO.getTargetedExperiment(),
-        chromatogram_map
-      );
-      rawDataHandler_IO.setChromatogramMap(chromatogram_map);
-    }
 
     if (verbose_I) {
       std::cout << "==== END   loadMSExperiment" << std::endl;
@@ -942,6 +915,66 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "==== END   sanitizeRawDataProcessorParameters" << std::endl;
+    }
+  }
+
+  void ZeroChromatogramBaseline::process(RawDataHandler & rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames & filenames, const bool verbose_I) const
+  {
+    if (verbose_I) {
+      std::cout << "==== START ZeroChromatogramBaseline" << std::endl;
+    }
+    std::vector<OpenMS::MSChromatogram>& chroms = rawDataHandler_IO.getChromatogramMap().getChromatograms();
+    for (OpenMS::MSChromatogram& ch : chroms) {
+      OpenMS::subtractMinimumIntensity(ch);
+    }
+    if (verbose_I) {
+      std::cout << "==== END   ZeroChromatogramBaseline" << std::endl;
+    }
+  }
+
+  void MapChromatograms::process(RawDataHandler & rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames & filenames, const bool verbose_I) const
+  {
+    if (verbose_I) {
+      std::cout << "==== START MapChromatograms" << std::endl;
+    }
+
+    if (params_I.find("MRMMapping") != params_I.end() && params_I.at("MRMMapping").empty()) {
+      std::cout << "No parameters passed to MRMMapping. No transition mapping will be done." << std::endl;
+      return;
+    }
+
+    // Set up MRMMapping and parse the MRMMapping params
+    OpenMS::MRMMapping mrmmapper;
+    OpenMS::Param parameters = mrmmapper.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("MRMMapping"));
+    mrmmapper.setParameters(parameters);
+
+    OpenMS::MSExperiment chromatogram_map;
+    mrmmapper.mapExperiment(
+      rawDataHandler_IO.getExperiment(),
+      rawDataHandler_IO.getTargetedExperiment(),
+      chromatogram_map
+    );
+    rawDataHandler_IO.setChromatogramMap(chromatogram_map);
+    if (verbose_I) {
+      std::cout << "==== END   MapChromatograms" << std::endl;
+    }
+  }
+
+  void ExtractChromatogramWindows::process(RawDataHandler & rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames & filenames, const bool verbose_I) const
+  {
+    if (verbose_I) {
+      std::cout << "==== START ExtractChromatogramWindows" << std::endl;
+    }
+    for (const OpenMS::MRMFeatureQC::ComponentQCs& transition_filters : rawDataHandler_IO.getFeatureFilter().component_qcs) {
+      for (OpenMS::MSChromatogram& ch : rawDataHandler_IO.getChromatogramMap().getChromatograms()) {
+        if (transition_filters.component_name == ch.getNativeID()) {
+          OpenMS::removePeaks(ch, transition_filters.retention_time_l, transition_filters.retention_time_u);
+        }        
+      }
+    }
+    if (verbose_I) {
+      std::cout << "==== END   ExtractChromatogramWindows" << std::endl;
     }
   }
 }

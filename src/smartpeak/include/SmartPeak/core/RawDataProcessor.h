@@ -81,7 +81,7 @@ namespace SmartPeak
     std::string getName() const { return name_; };
     std::string getDescription() const { return description_; };
 
-    /** Run the openSWATH workflow for a single raw data file.
+    /** Store the processed raw data mzML file to disk.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
@@ -94,6 +94,78 @@ namespace SmartPeak
     int id_ = 2;
     std::string name_ = "STORE_RAW_DATA";
     std::string description_ = "Store the processed raw data mzML file to disk.";
+  };
+
+  class ZeroChromatogramBaseline : public RawDataProcessor
+  {
+  public:
+    // using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Normalize the lowest chromatogram intensity to zero FOR MAPPED CHROMATOGRAMS.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 1;
+    std::string name_ = "ZERO_CHROMATOGRAM_BASELINE";
+    std::string description_ = "Normalize the lowest chromatogram intensity to zero.";
+  };
+
+  class MapChromatograms : public RawDataProcessor
+  {
+  public:
+    // using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Map chromatograms to the loaded set of transitions.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 1;
+    std::string name_ = "MAP_CHROMATOGRAMS";
+    std::string description_ = "Map chromatograms to the loaded set of transitions.";
+  };
+
+  class ExtractChromatogramWindows : public RawDataProcessor
+  {
+  public:
+    // using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Extract out specified chromatogram windows FROM A MAPPED CHROMATOGRAM using the componentFeatureFilters
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+
+  protected:
+    int id_ = 1;
+    std::string name_ = "EXTRACT_CHROMATOGRAM_WINDOWS";
+    std::string description_ = "Extract out specified chromatogram windows using the componentFeatureFilters.";
   };
 
   class LoadFeatures : public RawDataProcessor
