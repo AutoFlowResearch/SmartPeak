@@ -2,7 +2,7 @@
 
 #include <SmartPeak/test_config.h>
 
-#include <SmartPeak/core/LCMS_MRM_Unknown_example.h>
+#include <SmartPeak/pipelines/LCMS_MRM_Unknown_example.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 

@@ -76,11 +76,14 @@ public:
     {8, std::shared_ptr<RawDataProcessor>(new CheckFeatures())},
     {9, std::shared_ptr<RawDataProcessor>(new StoreFeatures())},
     {10, std::shared_ptr<RawDataProcessor>(new PlotFeatures())},
+    {11, std::shared_ptr<RawDataProcessor>(new MapChromatograms())},
+    {12, std::shared_ptr<RawDataProcessor>(new ZeroChromatogramBaseline())},
+    {13, std::shared_ptr<RawDataProcessor>(new ExtractChromatogramWindows())},
   };
   const std::unordered_map<int, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
-    {11, std::shared_ptr<SequenceSegmentProcessor>(new CalculateCalibration())},
-    {12, std::shared_ptr<SequenceSegmentProcessor>(new StoreQuantitationMethods())},
-    {13, std::shared_ptr<SequenceSegmentProcessor>(new LoadQuantitationMethods())},
+    {14, std::shared_ptr<SequenceSegmentProcessor>(new CalculateCalibration())},
+    {15, std::shared_ptr<SequenceSegmentProcessor>(new StoreQuantitationMethods())},
+    {16, std::shared_ptr<SequenceSegmentProcessor>(new LoadQuantitationMethods())},
   };
   enum ProcOpt {
     OPT_LOAD_RAW_DATA = 1,
@@ -93,6 +96,9 @@ public:
     OPT_CHECK_FEATURES,
     OPT_STORE_FEATURES,
     OPT_PLOT_FEATURES,
+    OPT_MAP_CHROMATROGRAMS,
+    OPT_ZERO_CHROMATOGRAM_BASELINE,
+    OPT_EXTRACT_CHROMATOGRAM_WIDOWS,
     OPT_CALCULATE_CALIBRATION,
     OPT_STORE_QUANTITATION_METHODS,
     OPT_LOAD_QUANTITATION_METHODS,
@@ -104,9 +110,12 @@ public:
     + commandsString() +
     "[M]  Main menu\n\n"
     "Presets:\n"
-    "Unknowns: 1 3 4 4 5 7 8 9\n"
-    "Standards: 1 3 4 4 5 8 9 11 12 7 8 9\n"
-    "Validation: 1 3 4 5 6\n\n";
+    "LCMS MRM Unknowns: 1 11 3 7 8 5 9\n"
+    "LCMS MRM Standards: 1 11 3 4 4 5 14 15 7 8 9\n"
+    "HPLC UV Unknowns: 1 11 13 12 3 7 8 5 9\n"
+    "HPLC UV Standards: 1 11 13 12 3 8 5 14 15 7 9\n"
+    "GCMS SIM Unknowns: 1 11 13 3 7 8 5 9\n"
+    "LCMS MRM Validation: 1 11 3 4 5 6\n\n";
 
   void menuMain()
   {
@@ -1137,6 +1146,9 @@ public:
       "[" + std::to_string(OPT_CHECK_FEATURES) + "]  Check features\n"
       "[" + std::to_string(OPT_STORE_FEATURES) + "]  Store features\n"
       "[" + std::to_string(OPT_PLOT_FEATURES) + "] Plot features (not implemented)\n"
+      "[" + std::to_string(OPT_MAP_CHROMATROGRAMS) + "] Map transitions to the raw data\n"
+      "[" + std::to_string(OPT_ZERO_CHROMATOGRAM_BASELINE) + "] Zero the chromatogram baseline\n"
+      "[" + std::to_string(OPT_EXTRACT_CHROMATOGRAM_WIDOWS) + "] Extract chromatogram windows\n"
       "[" + std::to_string(OPT_CALCULATE_CALIBRATION) + "] Calculate calibration\n"
       "[" + std::to_string(OPT_STORE_QUANTITATION_METHODS) + "] Store quantitation methods\n"
       "[" + std::to_string(OPT_LOAD_QUANTITATION_METHODS) + "] Load quantitation methods\n";
@@ -1183,11 +1195,11 @@ public:
 
   bool createCommand(const int n, Command& cmd)
   {
-    if (n < 1 || n > 13 || n == 10) { // TODO: update this if plotting is implemented
+    if (n < 1 || n > 16 || n == 10) { // TODO: update this if plotting is implemented
       std::cout << "Skipping: " << n << '\n';
       return false;
     }
-    if (n >= 1 && n <= 10) {
+    if (n >= 1 && n <= 13) {
       cmd.setMethod(n_to_raw_data_method_.at(n));
       for (const InjectionHandler& injection : sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
@@ -1199,7 +1211,7 @@ public:
           key
         );
       }
-    } else if (n >= 11 && n <= 13) {
+    } else if (n >= 14 && n <= 16) {
       cmd.setMethod(n_to_seq_seg_method_.at(n));
       for (const SequenceSegmentHandler& sequence_segment : sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();

@@ -11,6 +11,7 @@ set(SmartPeak_sources_h  CACHE INTERNAL "This variable should hold all SmartPeak
 include(include/SmartPeak/core/sources.cmake)
 include(include/SmartPeak/algorithm/sources.cmake)
 include(include/SmartPeak/io/sources.cmake)
+include(include/SmartPeak/pipelines/sources.cmake)
 
 ## add configured config.h&Co to source group
 source_group("Header Files\\SmartPeak" FILES ${SmartPeak_configured_headers})
