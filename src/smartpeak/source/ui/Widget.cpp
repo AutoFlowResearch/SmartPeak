@@ -568,4 +568,12 @@ namespace SmartPeak
     }
     ImGui::End();
   }
+  void AboutWidget::show(bool * p_open)
+  {
+    ImGui::Begin("About SmartPeak", p_open, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Text("SmartPeak %s", 1.0); //TODO: define version function
+    ImGui::Separator();
+    ImGui::Text("By the hardworking SmartPeak developers.");
+    ImGui::End();
+  }
 }

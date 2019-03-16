@@ -28,6 +28,12 @@ namespace SmartPeak
     static void tableFilterPopup(const char* popuop_id, ImGuiTextFilter& filter, std::vector<std::string>& column, bool* checked);
   };
 
+  class AboutWidget : public Widget
+  {
+  public:
+    void show(bool* p_open);
+  };
+
   class GenericTableWidget : public Widget
   {
   public:

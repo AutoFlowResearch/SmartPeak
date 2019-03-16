@@ -1,4 +1,5 @@
 #include <SmartPeak/ui/AppWindow.h>
+#include <SmartPeak/ui/Widget.h>
 
 namespace SmartPeak
 {
@@ -9,13 +10,6 @@ namespace SmartPeak
 
   void MainMenu::showMainMenuBar() {
     // Show the widgets
-    if (show_app_about_) {
-      ImGui::Begin("About SmartPeak", &show_app_about_, ImGuiWindowFlags_AlwaysAutoResize);
-      ImGui::Text("SmartPeak %s", 1.0); //TODO: define version function
-      ImGui::Separator();
-      ImGui::Text("By SmartPeak contributors.");
-      ImGui::End();
-    }
     //if (show_sequence_) SequenceProgressWidget(&show_sequence_progress);
     //if (show_generic_table) TableWidget(&show_generic_table);
     //if (show_file_browser) FileBrowserWidget(&show_file_browser);
@@ -55,7 +49,7 @@ namespace SmartPeak
   }
 
   void MainMenu::showMenuFile() {
-    ImGui::MenuItem("Main menu", NULL, false, false);
+    ImGui::MenuItem("File", NULL, false, false);
     if (ImGui::MenuItem("New"))
     {
       //TODO: SQL light interface
@@ -97,7 +91,7 @@ namespace SmartPeak
   }
 
   void MainMenu::showMenuEdit() {
-    ImGui::MenuItem("Main menu", NULL, false, false);
+    ImGui::MenuItem("Edit", NULL, false, false);
     if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
     if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
     ImGui::Separator();
@@ -119,18 +113,18 @@ namespace SmartPeak
   }
 
   void MainMenu::showMenuView() {
-    ImGui::MenuItem("Main menu", NULL, false, false);
+    ImGui::MenuItem("View", NULL, false, false);
     ImGui::MenuItem("Sequence", NULL, &show_sequence_);
     if (ImGui::MenuItem("Sequence segments")) {}
     if (ImGui::MenuItem("Sample groups")) {}
     if (ImGui::MenuItem("Workflow wizard")) {}
-    if (ImGui::MenuItem("Review plots"))
+    if (ImGui::BeginMenu("Review plots"))
     {
       if (ImGui::MenuItem("Feature plot")) {}
       if (ImGui::MenuItem("Metric plot")) {}
       ImGui::EndMenu();
     }
-    if (ImGui::MenuItem("Reports"))
+    if (ImGui::BeginMenu("Reports"))
     {
       if (ImGui::MenuItem("Feature summary")) {}
       if (ImGui::MenuItem("Sequence summary")) {}
@@ -140,12 +134,12 @@ namespace SmartPeak
   }
 
   void MainMenu::showMenuAction() {
-    ImGui::MenuItem("Main menu", NULL, false, false);
+    ImGui::MenuItem("Action", NULL, false, false);
     if (ImGui::MenuItem("Run command")) {}
     if (ImGui::MenuItem("Run workflow")) {}
     if (ImGui::MenuItem("Sample groups")) {}
     if (ImGui::MenuItem("Workflow wizard")) {}
-    if (ImGui::MenuItem("Quick info"))
+    if (ImGui::BeginMenu("Quick info"))
     { // TODO: bug
       if (ImGui::MenuItem("Sequence")) {}
       if (ImGui::MenuItem("Transitions")) {}
@@ -158,7 +152,7 @@ namespace SmartPeak
       if (ImGui::MenuItem("Parameters")) {}
       ImGui::EndMenu();
     }
-    if (ImGui::MenuItem("Integrity checks"))
+    if (ImGui::BeginMenu("Integrity checks"))
     {  // TODO: bug
       if (ImGui::MenuItem("Sample consistency")) {}
       if (ImGui::MenuItem("Comp consistency")) {}
@@ -166,7 +160,7 @@ namespace SmartPeak
       if (ImGui::MenuItem("IS consistency")) {}
       ImGui::EndMenu();
     }
-    if (ImGui::MenuItem("Report"))
+    if (ImGui::BeginMenu("Report"))
     {  // TODO: bug
       if (ImGui::MenuItem("Feature summary")) {}
       if (ImGui::MenuItem("Sequence summary")) {}
@@ -176,8 +170,20 @@ namespace SmartPeak
 
   void MainMenu::showMenuHelp() {
     ImGui::MenuItem("Main menu", NULL, false, false);
-    ImGui::MenuItem("About", NULL, &show_app_about_);
+    if (ImGui::MenuItem("About")) {
+      ImGui::OpenPopup("about");
+    };
+    if (ImGui::BeginPopupModal("about", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+      AboutWidget aboutWidget;
+      bool show_about = true;
+      aboutWidget.show(&show_about);
+      ImGui::EndPopup();
+    }
+
     if (ImGui::MenuItem("Documentation")) {}
     if (ImGui::MenuItem("Version")) {}
+
+
   }
 }
