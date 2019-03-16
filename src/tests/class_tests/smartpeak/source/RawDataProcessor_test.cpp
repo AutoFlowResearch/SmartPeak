@@ -240,15 +240,15 @@ BOOST_AUTO_TEST_CASE(processorMapChromatograms)
 
   const vector<OpenMS::MSChromatogram>& chromatograms1 = rawDataHandler.getChromatogramMap().getChromatograms();
 
-  BOOST_CHECK_EQUAL(chromatograms1.size(), 0);
+  BOOST_CHECK_EQUAL(chromatograms1.size(), 324);
 
-  BOOST_CHECK_EQUAL(chromatograms1.front().getNativeID(), "");
-  BOOST_CHECK_CLOSE(chromatograms1.front().getPrecursor().getMZ(), 0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.front().getProduct().getMZ(), 0, 1e-3);
+  BOOST_CHECK_EQUAL(chromatograms1.front().getNativeID(), "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_CLOSE(chromatograms1.front().getPrecursor().getMZ(), 179, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front().getProduct().getMZ(), 136, 1e-3);
 
-  BOOST_CHECK_EQUAL(chromatograms1.back().getNativeID(), "");
-  BOOST_CHECK_CLOSE(chromatograms1.back().getPrecursor().getMZ(), 0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.back().getProduct().getMZ(), 0, 1e-3);
+  BOOST_CHECK_EQUAL(chromatograms1.back().getNativeID(), "nadph.nadph_2.Light");
+  BOOST_CHECK_CLOSE(chromatograms1.back().getPrecursor().getMZ(), 744, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back().getProduct().getMZ(), 79, 1e-3);
 }
 
 /**
@@ -299,16 +299,13 @@ BOOST_AUTO_TEST_CASE(processorZeroChromatogramBaseline)
   ZeroChromatogramBaseline zeroChromBase;
   zeroChromBase.process(rawDataHandler, params_I, filenames);
 
-  const vector<OpenMS::MSChromatogram>& chromatograms2 = rawDataHandler.getExperiment().getChromatograms();
-
+  const vector<OpenMS::MSChromatogram>& chromatograms2 = rawDataHandler.getChromatogramMap().getChromatograms();
   BOOST_CHECK_EQUAL(chromatograms2.size(), 2);
-
   BOOST_CHECK_CLOSE(chromatograms2[0][0].getIntensity(), 2.0, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms2[0][1].getIntensity(), 3.0, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms2[0][2].getIntensity(), 5.0, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms2[0][3].getIntensity(), 18.0, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms2[0][4].getIntensity(), 0.0, 1e-3);
-
   BOOST_CHECK_CLOSE(chromatograms2[1][0].getIntensity(), 11.0, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms2[1][1].getIntensity(), 12.0, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms2[1][2].getIntensity(), 6.0, 1e-3);
@@ -329,11 +326,9 @@ BOOST_AUTO_TEST_CASE(processorZeroChromatogramBaseline)
   rawDataHandler.setChromatogramMap(rawDataHandler.getExperiment()); // Avoiding the mapping step for testing purposes
   zeroChromBase.process(rawDataHandler, params_I, filenames);
 
-  const vector<OpenMS::MSChromatogram>& chromatograms4 = rawDataHandler.getExperiment().getChromatograms();
-
+  const vector<OpenMS::MSChromatogram>& chromatograms4 = rawDataHandler.getChromatogramMap().getChromatograms();
   BOOST_CHECK_EQUAL(chromatograms4.size(), 1);
   BOOST_CHECK_EQUAL(chromatograms4[0].size(), 3301);
-
   BOOST_CHECK_CLOSE(chromatograms4[0][0].getIntensity(), 1.004634, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms4[0][600].getIntensity(), 0.500819, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms4[0][1200].getIntensity(), 0.33794, 1e-3);
@@ -390,19 +385,19 @@ BOOST_AUTO_TEST_CASE(processorExtractChromatogramWindows)
 
   // Control
   const vector<OpenMS::MSChromatogram>& chromatograms1 = rawDataHandler.getChromatogramMap().getChromatograms();
-  BOOST_CHECK_EQUAL(chromatograms1.size(), 0);
-  BOOST_CHECK_CLOSE(chromatograms1.front()[0].getIntensity(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.front()[0].getMZ(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.front()[1].getIntensity(), 4.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.front()[1].getMZ(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.front()[2].getIntensity(), 6.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.front()[2].getMZ(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.back()[0].getIntensity(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.back()[0].getMZ(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.back()[1].getIntensity(), 4.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.back()[1].getMZ(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.back()[2].getIntensity(), 6.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms1.back()[2].getMZ(), 3.0, 1e-3);
+  BOOST_CHECK_EQUAL(chromatograms1.size(), 324);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[0].getIntensity(), 158.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[0].getMZ(), 38.621, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[1].getIntensity(), 211, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[1].getMZ(), 38.7209999, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[2].getIntensity(), 158, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[2].getMZ(), 38.82, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[0].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[0].getMZ(), 912.233, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[1].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[1].getMZ(), 913.1870, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[2].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[2].getMZ(), 914.139, 1e-3);
 
   // Test window extraction
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_extractChromWindowTest_1.csv");
@@ -414,19 +409,19 @@ BOOST_AUTO_TEST_CASE(processorExtractChromatogramWindows)
   extractChromWin.process(rawDataHandler, {}, filenames);
 
   const vector<OpenMS::MSChromatogram>& chromatograms2 = rawDataHandler.getChromatogramMap().getChromatograms();
-  BOOST_CHECK_EQUAL(chromatograms2.size(), 0);
-  BOOST_CHECK_CLOSE(chromatograms2.front()[0].getIntensity(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2.front()[0].getMZ(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2.front()[1].getIntensity(), 4.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2.front()[1].getMZ(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2.front()[2].getIntensity(), 6.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2.front()[2].getMZ(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2.back()[0].getIntensity(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2.back()[0].getMZ(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2.back()[1].getIntensity(), 4.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2.back()[1].getMZ(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2.back()[2].getIntensity(), 6.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2.back()[2].getMZ(), 3.0, 1e-3);
+  BOOST_CHECK_EQUAL(chromatograms2.size(), 324);
+  BOOST_CHECK_CLOSE(chromatograms2.front()[0].getIntensity(), 158.0, 1e-3); // No filtering; within the RT window
+  BOOST_CHECK_CLOSE(chromatograms2.front()[0].getMZ(), 38.621, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.front()[1].getIntensity(), 211, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.front()[1].getMZ(), 38.7209999, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.front()[2].getIntensity(), 158, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.front()[2].getMZ(), 38.82, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.back()[0].getIntensity(), 0.0, 1e-3); // Filtering; outside of the RT window
+  BOOST_CHECK_CLOSE(chromatograms2.back()[0].getMZ(), 951.20299, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.back()[1].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.back()[1].getMZ(), 952.31299, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.back()[2].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.back()[2].getMZ(), 953.40699, 1e-3);
 }
 
 /**
