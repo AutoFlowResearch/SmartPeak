@@ -32,7 +32,7 @@ namespace SmartPeak
     void showMenuHelp(); ///< Show the main menu Help options
 
   private:
-    bool show_sequence_ = false;  ///< Show the sequence widget
+    bool show_sequence_ = true;  ///< Show the sequence widget
     bool show_sequence_segments_ = false;  ///< Show the sequence segment widget
     bool show_sample_groups_ = false;  ///< Show the sample groups widget
     bool show_workflow_wizard_ = false;  ///< Show the workflow wizard widget
