@@ -24,7 +24,7 @@ void test_main_LCMS_MRM_Unknown()
 
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_test.featureXMLL");
+  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_test.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
 
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
