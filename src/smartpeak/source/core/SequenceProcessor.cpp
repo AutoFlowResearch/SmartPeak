@@ -141,9 +141,14 @@ namespace SmartPeak
         throw "no sequence segment processing methods given.\n";
       } 
 
+      const size_t n = sequence_segment_processing_methods_I.size();
+
       // process the sequence segment
-      for (const std::shared_ptr<SequenceSegmentProcessor> sequence_segment_processing_method : sequence_segment_processing_methods_I) {
-        sequence_segment_processing_method->process(
+      for (size_t i = 0; i < n; ++i) {
+        if (verbose_I) {
+          std::cout << "\n[" << (i + 1) << "/" << n << "]" << std::endl;
+        }
+        sequence_segment_processing_methods_I[i]->process(
           sequence_segment,
           sequenceHandler_IO,
           sequenceHandler_IO
