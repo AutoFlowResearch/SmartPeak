@@ -11,7 +11,6 @@ namespace SmartPeak
     window_flags |= ImGuiWindowFlags_NoCollapse;
     window_flags |= ImGuiWindowFlags_MenuBar;
     ImGui::SetNextWindowPos(ImVec2(0, 0));
-    static ImVec2 display_size = ImGui::GetIO().DisplaySize;
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
     static bool show_main_window = true;
     if (ImGui::Begin("Sequence list", &show_main_window, window_flags))
@@ -19,15 +18,9 @@ namespace SmartPeak
       // Main menu bar
       MainMenu main_menu;
       main_menu.showMainMenuBar();
-      
-      // left (icon pain, set w ~1/20 window size) e.g., injections, components
-      ImGui::BeginChild("Icon pane", ImVec2(50, 0), true);
-      ImGui::Text("TODO: icons");
-      ImGui::EndChild();
-      ImGui::SameLine();
 
-      // left (explorer pain, 1/5 w window size)
-      ImGui::BeginChild("Explorer pane", ImVec2(display_size.x*0.2, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
+      // left Top (explorer pain, 1/5 w window size)
+      ImGui::BeginChild("Explorer pane", ImVec2(ImGui::GetIO().DisplaySize.x*0.2, ImGui::GetIO().DisplaySize.y*0.75), true, ImGuiWindowFlags_HorizontalScrollbar);
       ImGui::Text("TODO: search and sort bar");
       ImGui::Text("TODO: list or tree");
       ImGui::EndChild();
@@ -35,15 +28,15 @@ namespace SmartPeak
 
       // right top (main pain 3/5 w 5/6 l window size)
       //ImGui::BeginChild("Main pane", ImVec2(0, 0), true);
-      ImGui::BeginChild("Main pane", ImVec2(0, display_size.y*0.8), true);
+      ImGui::BeginChild("Main pane", ImVec2(0, ImGui::GetIO().DisplaySize.y*0.75), true);
       ImGui::Text("TODO: main graphics");
       ImGui::EndChild();
+      ImGui::NewLine();
 
-      //// right bottom (log/output pain, 3/5 w 1/6 l window size)
-      //ImGui::SetNextWindowPos(ImVec2(display_size.x*0.2 + 50, display_size.y*0.8));
-      //ImGui::BeginChild("Info pane", ImVec2(0,0), true, ImGuiWindowFlags_HorizontalScrollbar);
-      //ImGui::Text("TODO: output and info");
-      //ImGui::EndChild();
+      // Bottom (log/output pain, 3/5 w 1/6 l window size)
+      ImGui::BeginChild("Info pane", ImVec2(0,0), true, ImGuiWindowFlags_HorizontalScrollbar);
+      ImGui::Text("TODO: output and info");
+      ImGui::EndChild();
     }
     ImGui::End();
   }
