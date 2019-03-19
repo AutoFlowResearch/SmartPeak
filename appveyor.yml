@@ -36,4 +36,4 @@ before_build:
   - cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH=C:\projects\OpenMS-build -DCMAKE_BUILD_TYPE=Debug C:\projects\smartpeak2
   - dir C:\projects\smartpeak2
 build:
-  project: C:\projects\smartpeak2\
+  project: C:\projects\smartpeak2\ 
