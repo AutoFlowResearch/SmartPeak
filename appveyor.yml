@@ -33,7 +33,7 @@ before_build:
 #  - msbuild C:\projects\OpenMS-build\src\openswathalgo\OpenSWATHAlgo.sln
 #  - msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln
 #  - msbuild C:\projects\OpenMS-build\OpenMS_host.sln
-  - cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH=C:\projects\OpenMS-build -DCMAKE_BUILD_TYPE=Debug C:\projects\smartpeak2
+  - cmake -DEIGEN3_INCLUDE_DIR="C:\projects\deps\contrib\include\eigen3" -G "Visual Studio 15 2017 Win64" -T host=x64 -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH=C:\projects\OpenMS-build -DCMAKE_BUILD_TYPE=Debug C:\projects\smartpeak2
   - dir C:\projects\smartpeak2
 build:
   project: C:\projects\smartpeak2\ 
