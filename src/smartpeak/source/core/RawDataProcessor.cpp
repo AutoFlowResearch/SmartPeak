@@ -949,13 +949,11 @@ namespace SmartPeak
     Utilities::updateParameters(parameters, params_I.at("MRMMapping"));
     mrmmapper.setParameters(parameters);
 
-    OpenMS::MSExperiment chromatogram_map;
     mrmmapper.mapExperiment(
       rawDataHandler_IO.getExperiment(),
       rawDataHandler_IO.getTargetedExperiment(),
-      chromatogram_map
+      rawDataHandler_IO.getChromatogramMap()
     );
-    rawDataHandler_IO.setChromatogramMap(chromatogram_map);
     if (verbose_I) {
       std::cout << "==== END   MapChromatograms" << std::endl;
     }

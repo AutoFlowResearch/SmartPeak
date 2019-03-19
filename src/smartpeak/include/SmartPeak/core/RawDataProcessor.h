@@ -115,7 +115,7 @@ namespace SmartPeak
     ) const;
 
   protected:
-    int id_ = 1;
+    int id_ = 17;
     std::string name_ = "ZERO_CHROMATOGRAM_BASELINE";
     std::string description_ = "Normalize the lowest chromatogram intensity to zero.";
   };
@@ -139,7 +139,7 @@ namespace SmartPeak
     ) const;
 
   protected:
-    int id_ = 1;
+    int id_ = 18;
     std::string name_ = "MAP_CHROMATOGRAMS";
     std::string description_ = "Map chromatograms to the loaded set of transitions.";
   };
@@ -163,7 +163,7 @@ namespace SmartPeak
     ) const;
 
   protected:
-    int id_ = 1;
+    int id_ = 19;
     std::string name_ = "EXTRACT_CHROMATOGRAM_WINDOWS";
     std::string description_ = "Extract out specified chromatogram windows using the componentFeatureFilters.";
   };

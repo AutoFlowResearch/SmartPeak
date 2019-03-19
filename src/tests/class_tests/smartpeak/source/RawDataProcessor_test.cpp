@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(gettersMapChromatograms)
 {
   MapChromatograms processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 1);  // TODO: update at some point
+  BOOST_CHECK_EQUAL(processor.getID(), 18);
   BOOST_CHECK_EQUAL(processor.getName(), "MAP_CHROMATOGRAMS");
 }
 
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE(gettersZeroChromatogramBaseline)
 {
   ZeroChromatogramBaseline processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 1);  // TODO: update at some point
+  BOOST_CHECK_EQUAL(processor.getID(), 17);
   BOOST_CHECK_EQUAL(processor.getName(), "ZERO_CHROMATOGRAM_BASELINE");
 }
 
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE(gettersExtractChromatogramWindows)
 {
   ExtractChromatogramWindows processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 1);  // TODO: update at some point
+  BOOST_CHECK_EQUAL(processor.getID(), 19);
   BOOST_CHECK_EQUAL(processor.getName(), "EXTRACT_CHROMATOGRAM_WINDOWS");
 }
 
