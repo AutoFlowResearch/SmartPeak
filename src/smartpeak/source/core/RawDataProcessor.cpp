@@ -333,6 +333,10 @@ namespace SmartPeak
     // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
     featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
 
+    if (verbose_I) {
+      std::cout << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename() << "\n";
+    }
+
     rawDataHandler_IO.setFeatureMap(featureMap);
     rawDataHandler_IO.updateFeatureMapHistory();
 
@@ -448,6 +452,10 @@ namespace SmartPeak
     }
 
     output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
+
+    if (verbose_I) {
+      std::cout << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename() << "\n";
+    }
 
     rawDataHandler_IO.setFeatureMap(output);
     rawDataHandler_IO.updateFeatureMapHistory();
