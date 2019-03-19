@@ -2,7 +2,7 @@
 
 #include <SmartPeak/test_config.h>
 
-#include <SmartPeak/core/LCMS_MRM_Unknown_example.h>
+#include <SmartPeak/pipelines/HPLC_UV_Unknown_example.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 
@@ -14,7 +14,7 @@ void test_main_HPLC_UV_Unknown()
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Unknowns");
   const Filenames static_filenames = Filenames::getDefaultStaticFilenames(main_dir);
 
-  example_LCMS_MRM_Unknowns(main_dir, static_filenames, ",", true);
+  example_HPLC_UV_Unknowns(main_dir, static_filenames, ",", true);
 
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;

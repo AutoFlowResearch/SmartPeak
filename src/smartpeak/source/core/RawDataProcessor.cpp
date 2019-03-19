@@ -85,12 +85,6 @@ namespace SmartPeak
           std::cout << "loadMSExperiment(): loading " << filenames.mzML_i << std::endl;
           fh.loadExperiment(filenames.mzML_i, chromatograms);
         }
-        if (mzML_params.count("zero_baseline") && mzML_params.at("zero_baseline").b_) {
-          std::vector<OpenMS::MSChromatogram>& chroms = chromatograms.getChromatograms();
-          for (OpenMS::MSChromatogram& ch : chroms) {
-            OpenMS::subtractMinimumIntensity(ch);
-          }
-        }
       }
       else {
         OpenMS::FileHandler fh;
@@ -135,27 +129,6 @@ namespace SmartPeak
     }
     rawDataHandler_IO.setExperiment(chromatograms);
 
-    // # map transitions to the chromatograms
-    if (params_I.at("MRMMapping").size()) {
-      // # set up MRMMapping and
-      // # parse the MRMMapping params
-      OpenMS::MRMMapping mrmmapper;
-      OpenMS::Param parameters = mrmmapper.getParameters();
-      Utilities::updateParameters(
-        parameters,
-        params_I.at("MRMMapping")
-      );
-      mrmmapper.setParameters(parameters);
-      OpenMS::MSExperiment chromatogram_map;
-
-      mrmmapper.mapExperiment(
-        chromatograms,
-        rawDataHandler_IO.getTargetedExperiment(),
-        chromatogram_map
-      );
-      rawDataHandler_IO.setChromatogramMap(chromatogram_map);
-    }
-
     if (verbose_I) {
       std::cout << "==== END   loadMSExperiment" << std::endl;
     }
@@ -172,14 +145,14 @@ namespace SmartPeak
     std::string filename;
     std::string samplename;
 
-    const std::string loaded_file_path = rawDataHandler_IO.getChromatogramMap().getLoadedFilePath();
+    const std::string loaded_file_path = rawDataHandler_IO.getExperiment().getLoadedFilePath();
 
     if (loaded_file_path.size()) {
       const std::string prefix{ "file://" };
       filename = !loaded_file_path.find(prefix) ? loaded_file_path.substr(prefix.size()) : loaded_file_path;
     }
 
-    OpenMS::DataValue dv_mzml_id = rawDataHandler_IO.getChromatogramMap().getMetaValue("mzml_id");
+    OpenMS::DataValue dv_mzml_id = rawDataHandler_IO.getExperiment().getMetaValue("mzml_id");
 
     if (!dv_mzml_id.isEmpty() && dv_mzml_id.toString().size()) {
       samplename = dv_mzml_id.toString();
@@ -191,7 +164,7 @@ namespace SmartPeak
       throw "no mzml_id found\n";
     }
 
-    const OpenMS::MSExperiment& chromatogram_map = rawDataHandler_IO.getChromatogramMap();
+    const OpenMS::MSExperiment& chromatograms = rawDataHandler_IO.getExperiment();
 
     MetaDataHandler& metaDataHandler = rawDataHandler_IO.getMetaData();
 
@@ -202,18 +175,18 @@ namespace SmartPeak
       metaDataHandler.setFilename(filename);
 
     if (metaDataHandler.proc_method_name.empty())
-      metaDataHandler.proc_method_name = chromatogram_map.getInstrument().getSoftware().getName();
+      metaDataHandler.proc_method_name = chromatograms.getInstrument().getSoftware().getName();
 
     if (metaDataHandler.instrument.empty())
-      metaDataHandler.instrument = chromatogram_map.getInstrument().getName();
+      metaDataHandler.instrument = chromatograms.getInstrument().getName();
 
-    if (metaDataHandler.operator_name.empty() && chromatogram_map.getContacts().size())
-      metaDataHandler.operator_name = chromatogram_map.getContacts()[0].getLastName() + " " + chromatogram_map.getContacts()[0].getFirstName();
+    if (metaDataHandler.operator_name.empty() && chromatograms.getContacts().size())
+      metaDataHandler.operator_name = chromatograms.getContacts()[0].getLastName() + " " + chromatograms.getContacts()[0].getFirstName();
 
     if (metaDataHandler.acquisition_date_and_time.tm_year == 0) {
       // some noise because OpenMS uses uint and the standard library uses int (for time structure's members)
       struct { OpenMS::UInt tm_mon, tm_mday, tm_year, tm_hour, tm_min, tm_sec; } dt_uint;
-      rawDataHandler_IO.getChromatogramMap().getDateTime().get(
+      rawDataHandler_IO.getExperiment().getDateTime().get(
         dt_uint.tm_mon,
         dt_uint.tm_mday,
         dt_uint.tm_year,
@@ -942,6 +915,64 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "==== END   sanitizeRawDataProcessorParameters" << std::endl;
+    }
+  }
+
+  void ZeroChromatogramBaseline::process(RawDataHandler & rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames & filenames, const bool verbose_I) const
+  {
+    if (verbose_I) {
+      std::cout << "==== START ZeroChromatogramBaseline" << std::endl;
+    }
+    std::vector<OpenMS::MSChromatogram>& chroms = rawDataHandler_IO.getChromatogramMap().getChromatograms();
+    for (OpenMS::MSChromatogram& ch : chroms) {
+      OpenMS::subtractMinimumIntensity(ch);
+    }
+    if (verbose_I) {
+      std::cout << "==== END   ZeroChromatogramBaseline" << std::endl;
+    }
+  }
+
+  void MapChromatograms::process(RawDataHandler & rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames & filenames, const bool verbose_I) const
+  {
+    if (verbose_I) {
+      std::cout << "==== START MapChromatograms" << std::endl;
+    }
+
+    if (params_I.find("MRMMapping") != params_I.end() && params_I.at("MRMMapping").empty()) {
+      std::cout << "No parameters passed to MRMMapping. No transition mapping will be done." << std::endl;
+      return;
+    }
+
+    // Set up MRMMapping and parse the MRMMapping params
+    OpenMS::MRMMapping mrmmapper;
+    OpenMS::Param parameters = mrmmapper.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("MRMMapping"));
+    mrmmapper.setParameters(parameters);
+
+    mrmmapper.mapExperiment(
+      rawDataHandler_IO.getExperiment(),
+      rawDataHandler_IO.getTargetedExperiment(),
+      rawDataHandler_IO.getChromatogramMap()
+    );
+    if (verbose_I) {
+      std::cout << "==== END   MapChromatograms" << std::endl;
+    }
+  }
+
+  void ExtractChromatogramWindows::process(RawDataHandler & rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames & filenames, const bool verbose_I) const
+  {
+    if (verbose_I) {
+      std::cout << "==== START ExtractChromatogramWindows" << std::endl;
+    }
+    for (const OpenMS::MRMFeatureQC::ComponentQCs& transition_filters : rawDataHandler_IO.getFeatureFilter().component_qcs) {
+      for (OpenMS::MSChromatogram& ch : rawDataHandler_IO.getChromatogramMap().getChromatograms()) {
+        if (transition_filters.component_name == ch.getNativeID()) {
+          OpenMS::removePeaks(ch, transition_filters.retention_time_l, transition_filters.retention_time_u);
+        }        
+      }
+    }
+    if (verbose_I) {
+      std::cout << "==== END   ExtractChromatogramWindows" << std::endl;
     }
   }
 }
