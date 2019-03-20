@@ -121,7 +121,7 @@ namespace SmartPeak
     }
     ImGui::End();
   }
-  void GenericPlotWidget::show(bool * p_open)
+  void GenericGraphicWidget::show(bool * p_open)
   {
     //TODO: add input for columns and tables (i.e., std::map)
     ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
@@ -221,7 +221,7 @@ namespace SmartPeak
     }
     ImGui::End();
   }
-  void SequenceWidget::show(bool * p_open)
+  void GenericTreeWidget::show(bool * p_open)
   {
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -573,7 +573,7 @@ namespace SmartPeak
     }
     ImGui::End();
   }
-  void AboutWidget::show(bool * p_open)
+  void GenericTextWidget::show(bool * p_open)
   {
     ImGui::Begin("About SmartPeak", p_open, ImGuiWindowFlags_AlwaysAutoResize);
     ImGui::Text("SmartPeak %s", 1.0); //TODO: define version function

@@ -5,13 +5,6 @@ namespace SmartPeak
 {
   void AppWindow::showApp() {
     // View: Explorer pane
-    static bool show_injections_search_ = false;
-    static bool show_samples_search_ = false;
-    static bool show_sequence_segments_search_ = false;
-    static bool show_sample_groups_search_ = false;
-    static bool show_components_search_ = false;
-    static bool show_component_groups_search_ = false;
-    static bool show_workflow_steps_search_ = false;
     static bool show_sequence_explorer_ = false;
     static bool show_transitions_explorer_ = false;
     static bool show_experiment_explorer_ = false;
@@ -54,13 +47,6 @@ namespace SmartPeak
       MainMenu main_menu;
       main_menu.showMainMenuBar(
         // View: Explorer pane
-        show_injections_search_,
-        show_samples_search_,
-        show_sequence_segments_search_,
-        show_sample_groups_search_,
-        show_components_search_,
-        show_component_groups_search_,
-        show_workflow_steps_search_,
         show_sequence_explorer_,
         show_transitions_explorer_,
         show_experiment_explorer_,
@@ -88,54 +74,86 @@ namespace SmartPeak
         // Help
         show_app_about_);
 
-      // left Top (explorer pain, 1/5 w window size)
-      ImGui::BeginChild("Explorer pane", ImVec2(ImGui::GetIO().DisplaySize.x*0.2, ImGui::GetIO().DisplaySize.y*0.75), true, ImGuiWindowFlags_HorizontalScrollbar);
-      ImGui::Text("TODO: search and sort bar");
-      ImGui::Text("TODO: list or tree");
-      ImGui::EndChild();
-      ImGui::SameLine();
+      // determine what windows will be shown
+      bool show_explorer_pane = false;
+      bool show_main_pane = true; // always shown
+      bool show_info_pane = false;
+      if (show_sequence_explorer_ ||
+        show_transitions_explorer_ ||
+        show_experiment_explorer_ ||
+        show_features_explorer_) show_explorer_pane = true;
+      if (show_output_ ||
+        show_info_ ||
+        show_log_) show_info_pane = true;
 
-      // right top (main pain 3/5 w 5/6 l window size)
-      //ImGui::BeginChild("Main pane", ImVec2(0, 0), true);
-      ImGui::BeginChild("Main pane", ImVec2(0, ImGui::GetIO().DisplaySize.y*0.75), true);
-      MainWindow mainWindow;
-      mainWindow.showMainWindow(show_sequence_table_,
-        show_transitions_table_,
-        show_workflow_table_,
-        show_parameters_table_,
-        show_quant_method_table_,
-        show_stds_concs_table_,
-        show_comp_filters_table_,
-        show_comp_group_filters_table_,
-        show_comp_qcs_table_,
-        show_comp_group_qcs_table_,
-        show_feature_plot_,
-        show_line_plot_,
-        show_heatmap_plot_,
-        show_feature_summary_table_,
-        show_sequence_summary_table_);
-      //ImGui::Text("TODO: main graphics");
-      ImGui::EndChild();
-      ImGui::NewLine();
+      // calculate the window sizes
+      ImVec2 explorer_pane_size, main_pane_size, info_pane_size;
+      if (show_explorer_pane && show_main_pane && show_info_pane) {
+        // All panes
+        explorer_pane_size = ImVec2(ImGui::GetIO().DisplaySize.x*0.2, ImGui::GetIO().DisplaySize.y*0.75);
+        main_pane_size = ImVec2(0, ImGui::GetIO().DisplaySize.y*0.75);
+        info_pane_size = ImVec2(0, 0);
+      } else if (show_explorer_pane && show_main_pane){
+        // No info pane
+        explorer_pane_size = ImVec2(ImGui::GetIO().DisplaySize.x*0.2, 0);
+        main_pane_size = ImVec2(0, 0);
+        info_pane_size = ImVec2(0, 0);
+      } else if (show_main_pane) {
+        // No explorer and info panes
+        explorer_pane_size = ImVec2(0, 0);
+        main_pane_size = ImVec2(0, 0);
+        info_pane_size = ImVec2(0, 0);
+      } else {
+        explorer_pane_size = ImVec2(0, 0);
+        main_pane_size = ImVec2(0, 0);
+        info_pane_size = ImVec2(0, 0);
+      }
 
-      // Bottom (log/output pain, 3/5 w 1/6 l window size)
-      ImGui::BeginChild("Info pane", ImVec2(0,0), true, ImGuiWindowFlags_HorizontalScrollbar);
-      InfoWindow infoWindow;
-      infoWindow.showInfoWindow(show_output_, show_info_, show_log_);
-      ImGui::EndChild();
+      // left Top
+      if (show_explorer_pane) {
+        ImGui::BeginChild("Explorer pane", ImVec2(ImGui::GetIO().DisplaySize.x*0.2, ImGui::GetIO().DisplaySize.y*0.75), false, ImGuiWindowFlags_HorizontalScrollbar);
+        ImGui::Text("TODO: search and sort bar");
+        ImGui::Text("TODO: list or tree");
+        ImGui::EndChild();
+        ImGui::SameLine();
+      }
+
+      // right top 
+      if (show_main_pane) {
+        ImGui::BeginChild("Main pane", ImVec2(0, ImGui::GetIO().DisplaySize.y*0.75), false);
+        MainWindow mainWindow;
+        mainWindow.showMainWindow(show_sequence_table_,
+          show_transitions_table_,
+          show_workflow_table_,
+          show_parameters_table_,
+          show_quant_method_table_,
+          show_stds_concs_table_,
+          show_comp_filters_table_,
+          show_comp_group_filters_table_,
+          show_comp_qcs_table_,
+          show_comp_group_qcs_table_,
+          show_feature_plot_,
+          show_line_plot_,
+          show_heatmap_plot_,
+          show_feature_summary_table_,
+          show_sequence_summary_table_);
+        ImGui::EndChild();
+        ImGui::NewLine();
+      }
+
+      // Bottom
+      if (show_info_pane) {
+        ImGui::BeginChild("Info pane", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+        InfoWindow infoWindow;
+        infoWindow.showInfoWindow(show_output_, show_info_, show_log_);
+        ImGui::EndChild();
+      }
     }
     ImGui::End();
   }
 
   void MainMenu::showMainMenuBar(
     // View: Explorer pane
-    bool& show_injections_search,
-    bool& show_samples_search,
-    bool& show_sequence_segments_search,
-    bool& show_sample_groups_search,
-    bool& show_components_search,
-    bool& show_component_groups_search,
-    bool& show_workflow_steps_search,
     bool& show_sequence_explorer,
     bool& show_transitions_explorer,
     bool& show_experiment_explorer,
@@ -188,13 +206,6 @@ namespace SmartPeak
       {
         showMenuView(
           // View: Explorer pane
-          show_injections_search,
-          show_samples_search,
-          show_sequence_segments_search,
-          show_sample_groups_search,
-          show_components_search,
-          show_component_groups_search,
-          show_workflow_steps_search,
           show_sequence_explorer,
           show_transitions_explorer,
           show_experiment_explorer,
@@ -332,25 +343,10 @@ namespace SmartPeak
     bool& show_log) {
     ImGui::MenuItem("Explorer window", NULL, false, false);
     // Explorer sub windows
-    if (ImGui::BeginMenu("Filter and Search"))
-    {
-      if (ImGui::MenuItem("Injections", NULL, &show_injections_search)) {}
-      if (ImGui::MenuItem("Samples", NULL, &show_samples_search)) {}
-      if (ImGui::MenuItem("Sequence segments", NULL, &show_sequence_segments_search)) {}
-      if (ImGui::MenuItem("Sample groups", NULL, &show_sample_groups_search)) {}
-      if (ImGui::MenuItem("Components", NULL, &show_components_search)) {}
-      if (ImGui::MenuItem("Component groups", NULL, &show_component_groups_search)) {}
-      if (ImGui::MenuItem("Workflow steps", NULL, &show_workflow_steps_search)) {}
-      ImGui::EndMenu();
-    }
-    if (ImGui::BeginMenu("Browse"))
-    {
-      if (ImGui::MenuItem("Sequence", NULL, &show_sequence_explorer)) {}
-      if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {}
-      if (ImGui::MenuItem("Experiment", NULL, &show_experiment_explorer)) {}
-      if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}  // including metadata?
-      ImGui::EndMenu();
-    }
+    if (ImGui::MenuItem("Sequence", NULL, &show_sequence_explorer)) {}
+    if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {}
+    if (ImGui::MenuItem("Experiment", NULL, &show_experiment_explorer)) {}
+    if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}  // including metadata?
     // Main pane tabs
     ImGui::Separator();  // Primary input
     ImGui::MenuItem("Main window", NULL, false, false);

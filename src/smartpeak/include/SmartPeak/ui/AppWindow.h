@@ -26,13 +26,6 @@ namespace SmartPeak
 
     void showMainMenuBar(
       // View: Explorer pane
-      bool& show_injections_search,
-      bool& show_samples_search,
-      bool& show_sequence_segments_search,
-      bool& show_sample_groups_search,
-      bool& show_components_search,
-      bool& show_component_groups_search,
-      bool& show_workflow_steps_search,
       bool& show_sequence_explorer,
       bool& show_transitions_explorer,
       bool& show_experiment_explorer,
@@ -66,13 +59,6 @@ namespace SmartPeak
 
     void showMenuView(
       // View: Explorer pane
-      bool& show_injections_search,
-      bool& show_samples_search,
-      bool& show_sequence_segments_search,
-      bool& show_sample_groups_search,
-      bool& show_components_search,
-      bool& show_component_groups_search,
-      bool& show_workflow_steps_search,
       bool& show_sequence_explorer,
       bool& show_transitions_explorer,
       bool& show_experiment_explorer,
