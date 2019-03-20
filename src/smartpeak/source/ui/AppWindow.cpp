@@ -4,6 +4,41 @@
 namespace SmartPeak
 {
   void AppWindow::showApp() {
+    // View: Explorer pane
+    static bool show_injections_search_ = false;
+    static bool show_samples_search_ = false;
+    static bool show_sequence_segments_search_ = false;
+    static bool show_sample_groups_search_ = false;
+    static bool show_components_search_ = false;
+    static bool show_component_groups_search_ = false;
+    static bool show_workflow_steps_search_ = false;
+    static bool show_sequence_explorer_ = false;
+    static bool show_transitions_explorer_ = false;
+    static bool show_experiment_explorer_ = false;
+    static bool show_features_explorer_ = false;
+    // View: Main pane
+    static bool show_sequence_table_ = true;
+    static bool show_transitions_table_ = false;
+    static bool show_workflow_table_ = false;
+    static bool show_parameters_table_ = false;
+    static bool show_quant_method_table_ = false;
+    static bool show_stds_concs_table_ = false;
+    static bool show_comp_filters_table_ = false;
+    static bool show_comp_group_filters_table_ = false;
+    static bool show_comp_qcs_table_ = false;
+    static bool show_comp_group_qcs_table_ = false;
+    static bool show_feature_plot_ = false;
+    static bool show_line_plot_ = false;
+    static bool show_heatmap_plot_ = false;
+    static bool show_feature_summary_table_ = false;
+    static bool show_sequence_summary_table_ = false;
+    // View: Info pane
+    static bool show_output_ = true;
+    static bool show_info_ = false;
+    static bool show_log_ = false;
+    // Help
+    static bool show_app_about_ = false;
+
     // Show the main window
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -85,7 +120,8 @@ namespace SmartPeak
 
       // Bottom (log/output pain, 3/5 w 1/6 l window size)
       ImGui::BeginChild("Info pane", ImVec2(0,0), true, ImGuiWindowFlags_HorizontalScrollbar);
-      ImGui::Text("TODO: output and info");
+      InfoWindow infoWindow;
+      infoWindow.showInfoWindow(show_output_, show_info_, show_log_);
       ImGui::EndChild();
     }
     ImGui::End();
@@ -410,6 +446,7 @@ namespace SmartPeak
 
 
   }
+
   void MainWindow::showMainWindow(
     bool& show_sequence_table,
     bool& show_transitions_table,
@@ -428,14 +465,70 @@ namespace SmartPeak
     bool& show_sequence_summary_table)
   {
     static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable;
-    if (ImGui::BeginTabBar("Main pane tab bar", tab_bar_flags))
+    if ((show_sequence_table ||
+      show_transitions_table ||
+      show_workflow_table ||
+      show_parameters_table ||
+      show_quant_method_table ||
+      show_stds_concs_table ||
+      show_comp_filters_table ||
+      show_comp_group_filters_table ||
+      show_comp_qcs_table ||
+      show_comp_group_qcs_table ||
+      show_feature_plot ||
+      show_line_plot ||
+      show_heatmap_plot ||
+      show_feature_summary_table ||
+      show_sequence_summary_table) && ImGui::BeginTabBar("Main pane tab bar", tab_bar_flags))
     {
       if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
       {
         ImGui::Text("TODO: sequence table");
         ImGui::EndTabItem();
       }
+      if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
+      {
+        ImGui::Text("TODO: transition table");
+        ImGui::EndTabItem();
+      }
+      if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
+      {
+        ImGui::Text("TODO: workflow table");
+        ImGui::EndTabItem();
+      }
+      // TODO...
       ImGui::EndTabBar();
     }
+  }
+
+  void InfoWindow::showInfoWindow(bool & show_output, bool & show_info, bool & show_log)
+  {
+    static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable;
+    if ((show_output ||
+      show_info ||
+      show_log) && ImGui::BeginTabBar("Info pane tab bar", tab_bar_flags))
+    {
+      if (show_output && ImGui::BeginTabItem("Output", &show_output))
+      {
+        ImGui::Text("TODO: output text");
+        ImGui::EndTabItem();
+      }
+      if (show_info && ImGui::BeginTabItem("Info", &show_info))
+      {
+        ImGui::Text("TODO: info text");
+        ImGui::EndTabItem();
+      }
+      if (show_log && ImGui::BeginTabItem("Log", &show_log))
+      {
+        ImGui::Text("TODO: log text");
+        ImGui::EndTabItem();
+      }
+      // TODO...
+      ImGui::EndTabBar();
+    }
+  }
+
+  void ExplorerWindow::showExplorerWindow(bool & show_injections_search, bool & show_samples_search, bool & show_sequence_segments_search, bool & show_sample_groups_search, bool & show_components_search, bool & show_component_groups_search, bool & show_workflow_steps_search, bool & show_sequence_explorer, bool & show_transitions_explorer, bool & show_experiment_explorer, bool & show_features_explorer)
+  {
   }
 }

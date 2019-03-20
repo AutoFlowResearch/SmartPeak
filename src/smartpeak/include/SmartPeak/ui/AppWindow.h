@@ -16,45 +16,6 @@ namespace SmartPeak
       Show the application screen
     */
     void showApp();
-
-  private:
-    // View: Explorer pane
-    bool show_injections_search_ = false;  ///< Show the sample groups widget
-    bool show_samples_search_ = false;  ///< Show the sample groups widget
-    bool show_sequence_segments_search_ = false;  ///< Show the sequence segment widget
-    bool show_sample_groups_search_ = false;  ///< Show the sample groups widget
-    bool show_components_search_ = false;  ///< Show the sample groups widget
-    bool show_component_groups_search_ = false;  ///< Show the sample groups widget
-    bool show_workflow_steps_search_ = false;  ///< Show the sample groups widget
-    bool show_sequence_explorer_ = false;  ///< Show the sequence widget
-    bool show_transitions_explorer_ = false;  ///< Show the sequence widget
-    bool show_experiment_explorer_ = false;  ///< Show the sequence widget
-    bool show_features_explorer_ = false;  ///< Show the sequence widget
-
-    // View: Main pane
-    bool show_sequence_table_ = true;  ///< Show the sequence widget
-    bool show_transitions_table_ = false;  ///< Show the sequence widget
-    bool show_workflow_table_ = false;  ///< Show the workflow wizard widget
-    bool show_parameters_table_ = false;  ///< Show the workflow wizard widget
-    bool show_quant_method_table_ = false;  ///< Show the workflow wizard widget
-    bool show_stds_concs_table_ = false;  ///< Show the workflow wizard widget
-    bool show_comp_filters_table_ = false;  ///< Show the workflow wizard widget
-    bool show_comp_group_filters_table_ = false;  ///< Show the workflow wizard widget
-    bool show_comp_qcs_table_ = false;  ///< Show the workflow wizard widget
-    bool show_comp_group_qcs_table_ = false;  ///< Show the workflow wizard widget
-    bool show_feature_plot_ = false;  ///< Show the feature plot widget
-    bool show_line_plot_ = false;  ///< Show the metric plot widget
-    bool show_heatmap_plot_ = false;  ///< Show the metric plot widget
-    bool show_feature_summary_table_ = false; ///< Show the feature summary widget
-    bool show_sequence_summary_table_ = false; ///< Show the sequence summary widget
-
-    // View: Info pane
-    bool show_output_ = false;   ///< Show the log widget
-    bool show_info_ = false;   ///< Show the log widget
-    bool show_log_ = false;   ///< Show the log widget
-
-    // Help
-    bool show_app_about_ = false;    ///< Show the about widget
   };
 
   class MainMenu
@@ -142,6 +103,26 @@ namespace SmartPeak
     void showMenuHelp(bool& show_app_about); ///< Show the main menu Help options
   };
 
+  class ExplorerWindow
+  {
+  public:
+    ExplorerWindow() = default;
+    ~ExplorerWindow() = default;
+
+    void showExplorerWindow(
+      bool& show_injections_search,
+      bool& show_samples_search,
+      bool& show_sequence_segments_search,
+      bool& show_sample_groups_search,
+      bool& show_components_search,
+      bool& show_component_groups_search,
+      bool& show_workflow_steps_search,
+      bool& show_sequence_explorer,
+      bool& show_transitions_explorer,
+      bool& show_experiment_explorer,
+      bool& show_features_explorer);
+  };
+
   class MainWindow
   {
   public:
@@ -164,5 +145,17 @@ namespace SmartPeak
       bool& show_heatmap_plot,
       bool& show_feature_summary_table,
       bool& show_sequence_summary_table);
+  };
+
+  class InfoWindow
+  {
+  public:
+    InfoWindow() = default;
+    ~InfoWindow() = default;
+
+    void showInfoWindow(
+      bool& show_output,
+      bool& show_info,
+      bool& show_log);
   };
 }
