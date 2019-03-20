@@ -4,9 +4,19 @@
 
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
+
+#include <iomanip>
+#include <ios>
 #include <iostream>
 #include <regex>
+#include <string>
 #include <unordered_set>
+
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
+
 #define maxFunc(a,b) (((a) > (b)) ? (a) : (b))
 
 namespace SmartPeak
@@ -452,5 +462,8 @@ public:
       }
       return oss.str();
     }
+
+    // To validate quantitation methods stored in examples' tests
+    static bool testStoredQuantitationMethods(const std::string& pathname);
   };
 }

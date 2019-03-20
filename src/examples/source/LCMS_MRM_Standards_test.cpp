@@ -74,6 +74,11 @@ cout << "getRT: " << f1->getRT() << endl;
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
+
+  // check quantitation methods
+  const string quant_methods_pathname {main_dir + "/features/segment1_quantitationMethods.csv"};
+  const bool is_ok = Utilities::testStoredQuantitationMethods(quant_methods_pathname);
+  assert(is_ok == true);
 }
 
 int main(int argc, char **argv)
