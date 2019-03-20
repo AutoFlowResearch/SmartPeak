@@ -19,46 +19,87 @@ void test_main_HPLC_UV_Standards()
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;
   Filenames filenames;
+
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_8_BatchName_1900-01-01_000000.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
-
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
+
+  rawDataHandler.clear();
 
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_test.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
-
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 
-cout << "fm1.size(): " << fm1.size() << endl;
-cout << "fm2.size(): " << fm2.size() << endl;
+  cout << "fm1.size(): " << fm1.size() << endl;
+  cout << "fm2.size(): " << fm2.size() << endl;
+
+  assert(fm1.size() == 18);
   assert(fm1.size() == fm2.size());
 
-cout << "fm1[0].getSubordinates().size(): " << fm1[0].getSubordinates().size() << endl;
-cout << "fm2[0].getSubordinates().size(): " << fm2[0].getSubordinates().size() << endl;
+  cout << "fm1[0].getSubordinates().size(): " << fm1[0].getSubordinates().size() << endl;
+  cout << "fm2[0].getSubordinates().size(): " << fm2[0].getSubordinates().size() << endl;
+
+  assert(fm1[0].getSubordinates().size() == 2);
   assert(fm1[0].getSubordinates().size() == fm2[0].getSubordinates().size());
   const OpenMS::Feature* f1 = &fm1[0].getSubordinates()[0];
   const OpenMS::Feature* f2 = &fm2[0].getSubordinates()[0];
-cout << "f1 0 0 native_id: " << f1->getMetaValue("native_id") << endl;
-cout << "f1 0 0 peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
-cout << "f1 0 0 getRT: " << f1->getRT() << endl;
-cout << "f2 0 0 native_id: " << f2->getMetaValue("native_id") << endl;
-cout << "f2 0 0 peak_apex_int: " << f2->getMetaValue("peak_apex_int") << endl;
-cout << "f2 0 0 getRT: " << f2->getRT() << endl;
+
+  cout << "f1 0 0 native_id: "     << f1->getMetaValue("native_id") << endl;
+  cout << "f1 0 0 peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
+  cout << "f1 0 0 getRT: "         << f1->getRT() << endl;
+  cout << "f2 0 0 native_id: "     << f2->getMetaValue("native_id") << endl;
+  cout << "f2 0 0 peak_apex_int: " << f2->getMetaValue("peak_apex_int") << endl;
+  cout << "f2 0 0 getRT: "         << f2->getRT() << endl;
+
+  assert(f1->getMetaValue("native_id") == "5-HTP");
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 32.407596803989946));
+  assert(Utilities::assert_close((double)f1->getRT(), 1.12343));
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
 
-cout << "fm1[6].getSubordinates().size(): " << fm1[6].getSubordinates().size() << endl;
+
+  cout << "fm1[6].getSubordinates().size(): " << fm1[6].getSubordinates().size() << endl;
+  cout << "fm2[6].getSubordinates().size(): " << fm2[6].getSubordinates().size() << endl;
+
   assert(fm1[6].getSubordinates().size() == 2);
   assert(fm1[6].getSubordinates().size() == fm2[6].getSubordinates().size());
   f1 = &fm1[6].getSubordinates()[0];
   f2 = &fm2[6].getSubordinates()[0];
-cout << "f1 6 0 native_id: " << f1->getMetaValue("native_id") << endl;
-cout << "f1 6 0 peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
-cout << "f1 6 0 getRT: " << f1->getRT() << endl;
-cout << "f2 6 0 native_id: " << f2->getMetaValue("native_id") << endl;
-cout << "f2 6 0 peak_apex_int: " << f2->getMetaValue("peak_apex_int") << endl;
-cout << "f2 6 0 getRT: " << f2->getRT() << endl;
+
+  cout << "f1 6 0 native_id: "     << f1->getMetaValue("native_id") << endl;
+  cout << "f1 6 0 peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
+  cout << "f1 6 0 getRT: "         << f1->getRT() << endl;
+  cout << "f2 6 0 native_id: "     << f2->getMetaValue("native_id") << endl;
+  cout << "f2 6 0 peak_apex_int: " << f2->getMetaValue("peak_apex_int") << endl;
+  cout << "f2 6 0 getRT: "         << f2->getRT() << endl;
+
+  assert(f1->getMetaValue("native_id") == "Acetylserotonin");
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 30.768488494563741));
+  assert(Utilities::assert_close((double)f1->getRT(), 5.07083));
+  assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
+  assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
+
+
+  cout << "fm1[17].getSubordinates().size(): " << fm1[17].getSubordinates().size() << endl;
+  cout << "fm2[17].getSubordinates().size(): " << fm2[17].getSubordinates().size() << endl;
+
+  assert(fm1[17].getSubordinates().size() == 2);
+  assert(fm1[17].getSubordinates().size() == fm2[17].getSubordinates().size());
+  f1 = &fm1[17].getSubordinates()[0];
+  f2 = &fm2[17].getSubordinates()[0];
+
+  cout << "f1 17 0 native_id: "     << f1->getMetaValue("native_id") << endl;
+  cout << "f1 17 0 peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
+  cout << "f1 17 0 getRT: "         << f1->getRT() << endl;
+  cout << "f2 17 0 native_id: "     << f2->getMetaValue("native_id") << endl;
+  cout << "f2 17 0 peak_apex_int: " << f2->getMetaValue("peak_apex_int") << endl;
+  cout << "f2 17 0 getRT: "         << f2->getRT() << endl;
+
+  assert(f1->getMetaValue("native_id") == "Tryptophan");
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 37.969307969562713));
+  assert(Utilities::assert_close((double)f1->getRT(), 3.43251));
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
