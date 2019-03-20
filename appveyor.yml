@@ -31,10 +31,10 @@ before_build:
   - cmake  -DCMAKE_PREFIX_PATH="C:\Qt\5.12.1\msvc2017_64\lib\cmake" -DBoost_DEBUG=TRUE -DCMAKE_GENERATOR_PLATFORM=x64 -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_ROOT="C:\Libraries\boost_1_69_0\boost" -DOPENMS_CONTRIB_LIBS="C:/projects/deps/contrib" -DBOOST_USE_STATIC=ON -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
   - dir C:\projects\OpenMS-build\src\openms
   - msbuild C:\projects\OpenMS-build\src\openswathalgo\OpenSWATHAlgo.sln
-  - msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln
-  - msbuild C:\projects\OpenMS-build\OpenMS_host.sln
+#  - msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln
+#  - msbuild C:\projects\OpenMS-build\OpenMS_host.sln
 #  - cmake -DEIGEN3_INCLUDE_DIR="C:\projects\deps\contrib\include\eigen3" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH=C:\projects\OpenMS-build -DCMAKE_BUILD_TYPE=Debug C:\projects\smartpeak2
 #  - dir C:\projects\smartpeak2 
 build:
   #project: C:\projects\smartpeak2\ 
-  project: C:\projects\OpenMS-build\OpenMS_host.sln
+  project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
