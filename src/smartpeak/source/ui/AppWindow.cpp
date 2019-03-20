@@ -17,7 +17,41 @@ namespace SmartPeak
     {
       // Main menu bar
       MainMenu main_menu;
-      main_menu.showMainMenuBar();
+      main_menu.showMainMenuBar(
+        // View: Explorer pane
+        show_injections_search_,
+        show_samples_search_,
+        show_sequence_segments_search_,
+        show_sample_groups_search_,
+        show_components_search_,
+        show_component_groups_search_,
+        show_workflow_steps_search_,
+        show_sequence_explorer_,
+        show_transitions_explorer_,
+        show_experiment_explorer_,
+        show_features_explorer_,
+        // View: Main pane
+        show_sequence_table_,
+        show_transitions_table_,
+        show_workflow_table_,
+        show_parameters_table_,
+        show_quant_method_table_,
+        show_stds_concs_table_,
+        show_comp_filters_table_,
+        show_comp_group_filters_table_,
+        show_comp_qcs_table_,
+        show_comp_group_qcs_table_,
+        show_feature_plot_,
+        show_line_plot_,
+        show_heatmap_plot_,
+        show_feature_summary_table_,
+        show_sequence_summary_table_,
+        // View: Info pane
+        show_output_,
+        show_info_,
+        show_log_,
+        // Help
+        show_app_about_);
 
       // left Top (explorer pain, 1/5 w window size)
       ImGui::BeginChild("Explorer pane", ImVec2(ImGui::GetIO().DisplaySize.x*0.2, ImGui::GetIO().DisplaySize.y*0.75), true, ImGuiWindowFlags_HorizontalScrollbar);
@@ -29,7 +63,23 @@ namespace SmartPeak
       // right top (main pain 3/5 w 5/6 l window size)
       //ImGui::BeginChild("Main pane", ImVec2(0, 0), true);
       ImGui::BeginChild("Main pane", ImVec2(0, ImGui::GetIO().DisplaySize.y*0.75), true);
-      ImGui::Text("TODO: main graphics");
+      MainWindow mainWindow;
+      mainWindow.showMainWindow(show_sequence_table_,
+        show_transitions_table_,
+        show_workflow_table_,
+        show_parameters_table_,
+        show_quant_method_table_,
+        show_stds_concs_table_,
+        show_comp_filters_table_,
+        show_comp_group_filters_table_,
+        show_comp_qcs_table_,
+        show_comp_group_qcs_table_,
+        show_feature_plot_,
+        show_line_plot_,
+        show_heatmap_plot_,
+        show_feature_summary_table_,
+        show_sequence_summary_table_);
+      //ImGui::Text("TODO: main graphics");
       ImGui::EndChild();
       ImGui::NewLine();
 
@@ -41,7 +91,41 @@ namespace SmartPeak
     ImGui::End();
   }
 
-  void MainMenu::showMainMenuBar() {
+  void MainMenu::showMainMenuBar(
+    // View: Explorer pane
+    bool& show_injections_search,
+    bool& show_samples_search,
+    bool& show_sequence_segments_search,
+    bool& show_sample_groups_search,
+    bool& show_components_search,
+    bool& show_component_groups_search,
+    bool& show_workflow_steps_search,
+    bool& show_sequence_explorer,
+    bool& show_transitions_explorer,
+    bool& show_experiment_explorer,
+    bool& show_features_explorer,
+    // View: Main pane
+    bool& show_sequence_table,
+    bool& show_transitions_table,
+    bool& show_workflow_table,
+    bool& show_parameters_table,
+    bool& show_quant_method_table,
+    bool& show_stds_concs_table,
+    bool& show_comp_filters_table,
+    bool& show_comp_group_filters_table,
+    bool& show_comp_qcs_table,
+    bool& show_comp_group_qcs_table,
+    bool& show_feature_plot,
+    bool& show_line_plot,
+    bool& show_heatmap_plot,
+    bool& show_feature_summary_table,
+    bool& show_sequence_summary_table,
+    // View: Info pane
+    bool& show_output,
+    bool& show_info,
+    bool& show_log,
+    // Help
+    bool& show_app_about) {
     // Show the widgets
     //SequenceWidget sequenceWidget;
     //if (show_sequence_) sequenceWidget.show(&show_sequence_);
@@ -66,7 +150,39 @@ namespace SmartPeak
       }
       if (ImGui::BeginMenu("View"))
       {
-        showMenuView();
+        showMenuView(
+          // View: Explorer pane
+          show_injections_search,
+          show_samples_search,
+          show_sequence_segments_search,
+          show_sample_groups_search,
+          show_components_search,
+          show_component_groups_search,
+          show_workflow_steps_search,
+          show_sequence_explorer,
+          show_transitions_explorer,
+          show_experiment_explorer,
+          show_features_explorer,
+          // View: Main pane
+          show_sequence_table,
+          show_transitions_table,
+          show_workflow_table,
+          show_parameters_table,
+          show_quant_method_table,
+          show_stds_concs_table,
+          show_comp_filters_table,
+          show_comp_group_filters_table,
+          show_comp_qcs_table,
+          show_comp_group_qcs_table,
+          show_feature_plot,
+          show_line_plot,
+          show_heatmap_plot,
+          show_feature_summary_table,
+          show_sequence_summary_table,
+          // View: Info pane
+          show_output,
+          show_info,
+          show_log);
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Actions"))
@@ -76,7 +192,7 @@ namespace SmartPeak
       }
       if (ImGui::BeginMenu("Help"))
       {
-        showMenuHelp();
+        showMenuHelp(show_app_about);
         ImGui::EndMenu();
       }
       ImGui::EndMenuBar();
@@ -85,49 +201,56 @@ namespace SmartPeak
   }
 
   void MainMenu::showMenuFile() {
-    ImGui::MenuItem("File", NULL, false, false);
-    if (ImGui::MenuItem("New"))
+    ImGui::MenuItem("Session", NULL, false, false);
+    if (ImGui::MenuItem("New Session"))
     {
       //TODO: SQL light interface
     }
-    if (ImGui::MenuItem("Open...", "Ctrl+O"))
+    if (ImGui::MenuItem("Load Session", "Ctrl+O"))
     {
       //TODO: open file browser modal
     }
-    if (ImGui::BeginMenu("Open Recent"))
-    {
-      //TODO: populate with recent
-      ImGui::MenuItem("fish_hat.c");
-      ImGui::MenuItem("fish_hat.inl");
-      ImGui::MenuItem("fish_hat.h");
-      ImGui::EndMenu();
-    }
-    if (ImGui::MenuItem("Save", "Ctrl+S"))
+    if (ImGui::MenuItem("Save Session", "Ctrl+S"))
     {
       //TODO
     }
-    if (ImGui::MenuItem("Save As.."))
+    if (ImGui::MenuItem("Save Session As..."))
     {
       //TODO: open save as File browser modal
     }
     ImGui::Separator();
-    if (ImGui::BeginMenu("Import ..."))
+    ImGui::MenuItem("Text file", NULL, false, false);
+    if (ImGui::BeginMenu("Import File"))
     {
-      //TODO
-      // sequence, parameters, and all other tables
+      if (ImGui::MenuItem("Sequence")) {}
+      if (ImGui::MenuItem("Transitions")) {}
+      if (ImGui::MenuItem("Parameters")) {}
+      if (ImGui::MenuItem("Quant Method")) {}
+      if (ImGui::MenuItem("Standards Conc")) {}
+      if (ImGui::MenuItem("Comp Filters")) {}
+      if (ImGui::MenuItem("Comp Group Filters")) {}
+      if (ImGui::MenuItem("Comp QCs")) {}
+      if (ImGui::MenuItem("Comp Group QCs")) {}
       ImGui::EndMenu();
     }
-    if (ImGui::BeginMenu("Export ..."))
+    if (ImGui::BeginMenu("Export File"))
     {
-      //TODO
-      // sequence, parameters, and all other tables
+      if (ImGui::MenuItem("Sequence")) {}
+      if (ImGui::MenuItem("Transitions")) {}
+      if (ImGui::MenuItem("Parameters")) {}
+      if (ImGui::MenuItem("Quant Method")) {}
+      if (ImGui::MenuItem("Standards Conc")) {}
+      if (ImGui::MenuItem("Comp Filters")) {}
+      if (ImGui::MenuItem("Comp Group Filters")) {}
+      if (ImGui::MenuItem("Comp QCs")) {}
+      if (ImGui::MenuItem("Comp Group QCs")) {}
       ImGui::EndMenu();
     }
+    ImGui::Separator();
     if (ImGui::MenuItem("Quit", "Alt+F4")) {}
   }
 
   void MainMenu::showMenuEdit() {
-    ImGui::MenuItem("Edit", NULL, false, false);
     if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
     if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
     ImGui::Separator();
@@ -135,46 +258,103 @@ namespace SmartPeak
     if (ImGui::MenuItem("Copy", "CTRL+C")) {}
     if (ImGui::MenuItem("Paste", "CTRL+V")) {}
     ImGui::Separator();
-    if (ImGui::MenuItem("Sequence")) {}
-    if (ImGui::MenuItem("Transitions")) {}
-    if (ImGui::MenuItem("Quant Method")) {}
-    if (ImGui::MenuItem("Standards Conc")) {}
-    if (ImGui::MenuItem("Comp Filters")) {}
-    if (ImGui::MenuItem("Comp Group Filters")) {}
-    if (ImGui::MenuItem("Comp QCs")) {}
-    if (ImGui::MenuItem("Comp Group QCs")) {}
-    if (ImGui::MenuItem("Parameters")) {}
-    ImGui::Separator();
     if (ImGui::MenuItem("Workflow")) {}
   }
 
-  void MainMenu::showMenuView() {
-    ImGui::MenuItem("View", NULL, false, false);
-    ImGui::MenuItem("Sequence", NULL, &show_sequence_);
-    if (ImGui::MenuItem("Sequence segments")) {}
-    if (ImGui::MenuItem("Sample groups")) {}
-    if (ImGui::MenuItem("Workflow wizard")) {}
+  void MainMenu::showMenuView(
+    // View: Explorer pane
+    bool& show_injections_search,
+    bool& show_samples_search,
+    bool& show_sequence_segments_search,
+    bool& show_sample_groups_search,
+    bool& show_components_search,
+    bool& show_component_groups_search,
+    bool& show_workflow_steps_search,
+    bool& show_sequence_explorer,
+    bool& show_transitions_explorer,
+    bool& show_experiment_explorer,
+    bool& show_features_explorer,
+    // View: Main pane
+    bool& show_sequence_table,
+    bool& show_transitions_table,
+    bool& show_workflow_table,
+    bool& show_parameters_table,
+    bool& show_quant_method_table,
+    bool& show_stds_concs_table,
+    bool& show_comp_filters_table,
+    bool& show_comp_group_filters_table,
+    bool& show_comp_qcs_table,
+    bool& show_comp_group_qcs_table,
+    bool& show_feature_plot,
+    bool& show_line_plot,
+    bool& show_heatmap_plot,
+    bool& show_feature_summary_table,
+    bool& show_sequence_summary_table,
+    // View: Info pane
+    bool& show_output,
+    bool& show_info,
+    bool& show_log) {
+    ImGui::MenuItem("Explorer window", NULL, false, false);
+    // Explorer sub windows
+    if (ImGui::BeginMenu("Filter and Search"))
+    {
+      if (ImGui::MenuItem("Injections", NULL, &show_injections_search)) {}
+      if (ImGui::MenuItem("Samples", NULL, &show_samples_search)) {}
+      if (ImGui::MenuItem("Sequence segments", NULL, &show_sequence_segments_search)) {}
+      if (ImGui::MenuItem("Sample groups", NULL, &show_sample_groups_search)) {}
+      if (ImGui::MenuItem("Components", NULL, &show_components_search)) {}
+      if (ImGui::MenuItem("Component groups", NULL, &show_component_groups_search)) {}
+      if (ImGui::MenuItem("Workflow steps", NULL, &show_workflow_steps_search)) {}
+      ImGui::EndMenu();
+    }
+    if (ImGui::BeginMenu("Browse"))
+    {
+      if (ImGui::MenuItem("Sequence", NULL, &show_sequence_explorer)) {}
+      if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {}
+      if (ImGui::MenuItem("Experiment", NULL, &show_experiment_explorer)) {}
+      if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}  // including metadata?
+      ImGui::EndMenu();
+    }
+    // Main pane tabs
+    ImGui::Separator();  // Primary input
+    ImGui::MenuItem("Main window", NULL, false, false);
+    if (ImGui::MenuItem("Sequence", NULL, &show_sequence_table)) {}
+    if (ImGui::MenuItem("Transitions", NULL, &show_transitions_table)) {}
+    if (ImGui::MenuItem("Workflow", NULL, &show_workflow_table)) {}
+    if (ImGui::BeginMenu("Workflow settings"))
+    {
+      if (ImGui::MenuItem("Parameters", NULL, &show_parameters_table)) {}
+      if (ImGui::MenuItem("Quant Method", NULL, &show_quant_method_table)) {}
+      if (ImGui::MenuItem("Standards Conc", NULL, &show_stds_concs_table)) {}
+      if (ImGui::MenuItem("Comp Filters", NULL, &show_comp_filters_table)) {}
+      if (ImGui::MenuItem("Comp Group Filters", NULL, &show_comp_group_filters_table)) {}
+      if (ImGui::MenuItem("Comp QCs", NULL, &show_comp_qcs_table)) {}
+      if (ImGui::MenuItem("Comp Group QCs", NULL, &show_comp_group_qcs_table)) {}
+      ImGui::EndMenu();
+    }
     if (ImGui::BeginMenu("Review plots"))
     {
-      if (ImGui::MenuItem("Feature plot")) {}
-      if (ImGui::MenuItem("Metric plot")) {}
+      if (ImGui::MenuItem("Features", NULL, &show_feature_plot)) {}
+      if (ImGui::MenuItem("Line plot", NULL, &show_line_plot)) {}
+      if (ImGui::MenuItem("Heatmap", NULL, &show_heatmap_plot)) {}
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Reports"))
     {
-      if (ImGui::MenuItem("Feature summary")) {}
-      if (ImGui::MenuItem("Sequence summary")) {}
+      if (ImGui::MenuItem("Feature summary", NULL, &show_feature_summary_table)) {}
+      if (ImGui::MenuItem("Sequence summary", NULL, &show_sequence_summary_table)) {}
       ImGui::EndMenu();
     }
-    if (ImGui::MenuItem("Log")) {}
+    // Info pane tabs
+    ImGui::MenuItem("Info window", NULL, false, false);
+    if (ImGui::MenuItem("Output", NULL, &show_output)) {}
+    if (ImGui::MenuItem("Info", NULL, &show_info)) {}
+    if (ImGui::MenuItem("Log", NULL, &show_log)) {}
   }
 
   void MainMenu::showMenuAction() {
-    ImGui::MenuItem("Action", NULL, false, false);
     if (ImGui::MenuItem("Run command")) {}
     if (ImGui::MenuItem("Run workflow")) {}
-    if (ImGui::MenuItem("Sample groups")) {}
-    if (ImGui::MenuItem("Workflow wizard")) {}
     if (ImGui::BeginMenu("Quick info"))
     { // TODO: bug
       if (ImGui::MenuItem("Sequence")) {}
@@ -186,6 +366,11 @@ namespace SmartPeak
       if (ImGui::MenuItem("Comp QCs")) {}
       if (ImGui::MenuItem("Comp Group QCs")) {}
       if (ImGui::MenuItem("Parameters")) {}
+      if (ImGui::MenuItem("Raw data files")) {}
+      if (ImGui::MenuItem("Analyzed features")) {}
+      if (ImGui::MenuItem("Selected features")) {}
+      if (ImGui::MenuItem("Picked peaks")) {}
+      if (ImGui::MenuItem("Filtered/selected peaks")) {}
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Integrity checks"))
@@ -204,8 +389,7 @@ namespace SmartPeak
     }
   }
 
-  void MainMenu::showMenuHelp() {
-    ImGui::MenuItem("Main menu", NULL, false, false);
+  void MainMenu::showMenuHelp(bool& show_app_about) {
     if (ImGui::MenuItem("About")) {
       ImGui::OpenPopup("about");
       if (ImGui::BeginPopupModal("about"))
@@ -225,5 +409,33 @@ namespace SmartPeak
     if (ImGui::MenuItem("Version")) {}
 
 
+  }
+  void MainWindow::showMainWindow(
+    bool& show_sequence_table,
+    bool& show_transitions_table,
+    bool& show_workflow_table,
+    bool& show_parameters_table,
+    bool& show_quant_method_table,
+    bool& show_stds_concs_table,
+    bool& show_comp_filters_table,
+    bool& show_comp_group_filters_table,
+    bool& show_comp_qcs_table,
+    bool& show_comp_group_qcs_table,
+    bool& show_feature_plot,
+    bool& show_line_plot,
+    bool& show_heatmap_plot,
+    bool& show_feature_summary_table,
+    bool& show_sequence_summary_table)
+  {
+    static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable;
+    if (ImGui::BeginTabBar("Main pane tab bar", tab_bar_flags))
+    {
+      if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
+      {
+        ImGui::Text("TODO: sequence table");
+        ImGui::EndTabItem();
+      }
+      ImGui::EndTabBar();
+    }
   }
 }
