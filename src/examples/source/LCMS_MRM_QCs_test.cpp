@@ -19,14 +19,15 @@ void test_main_LCMS_MRM_QCs()
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;
   Filenames filenames;
+
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1_1_BatchName_1900-01-01_000000.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
-
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
+
+  rawDataHandler.clear();
 
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_QCs/features/150601_0_BloodProject01_PLT_QC_Broth-1_test.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
-
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 
   assert(fm1.size() == fm2.size());
