@@ -23,7 +23,7 @@ install:
   - 7z x C:\projects\deps\contrib_build.tar.gz -o"C:\projects\deps" -y
   - 7z x C:\projects\deps\contrib_build.tar -o"C:\projects\deps\contrib" -y
   - dir C:\projects\deps\contrib
-  - dir C:\Qt\5.12.1\msvc2017_64
+  - dir C:\Qt\5.12.1
   - dir C:\Libraries\boost_1_69_0
 before_build:
 #  - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
