@@ -192,4 +192,93 @@ namespace SmartPeak
 
     return cast;
   }
+
+  std::string SequenceHandler::getRawDataFilesInfo() const
+  {
+    size_t cnt {0};
+    for (const InjectionHandler& inj : getSequence()) {
+      if (inj.getRawData().getExperiment().getChromatograms().size()) {
+        ++cnt;
+      }
+    }
+    std::ostringstream oss;
+    oss << "==== START getRawDataFilesInfo\n";
+    oss << "Number of raw data files: " << std::to_string(cnt) << "\n";
+    oss << "==== END   getRawDataFilesInfo\n";
+    return oss.str();
+  }
+
+  std::string SequenceHandler::getAnalyzedFeaturesInfo() const
+  {
+    std::map<std::string, size_t> inj_feats;
+    for (const InjectionHandler& inj : getSequence()) {
+      inj_feats.emplace(
+        inj.getMetaData().getInjectionName(),
+        inj.getRawData().getFeatureMapHistory().size()
+      );
+    }
+    std::ostringstream oss;
+    oss << "==== START getAnalyzedFeaturesInfo\n";
+    for (const std::pair<std::string, size_t>& p : inj_feats) {
+      oss << p.first << "\t" << p.second << "\n";
+    }
+    oss << "==== END   getAnalyzedFeaturesInfo\n";
+    return oss.str();
+  }
+
+  std::string SequenceHandler::getSelectedFeaturesInfo() const
+  {
+    std::map<std::string, size_t> inj_feats;
+    for (const InjectionHandler& inj : getSequence()) {
+      inj_feats.emplace(
+        inj.getMetaData().getInjectionName(),
+        inj.getRawData().getFeatureMap().size()
+      );
+    }
+    std::ostringstream oss;
+    oss << "==== START getSelectedFeaturesInfo\n";
+    for (const std::pair<std::string, size_t>& p : inj_feats) {
+      oss << p.first << "\t" << p.second << "\n";
+    }
+    oss << "==== END   getSelectedFeaturesInfo\n";
+    return oss.str();
+  }
+
+  std::string SequenceHandler::getPickedPeaksInfo() const
+  {
+    std::map<std::string, size_t> inj_feats;
+    for (const InjectionHandler& inj : getSequence()) {
+      size_t n_peaks {0};
+      for (const OpenMS::Feature& f : inj.getRawData().getFeatureMapHistory()) {
+        n_peaks += f.getSubordinates().size();
+      }
+      inj_feats.emplace(inj.getMetaData().getInjectionName(), n_peaks);
+    }
+    std::ostringstream oss;
+    oss << "==== START getPickedPeaksInfo\n";
+    for (const std::pair<std::string, size_t>& p : inj_feats) {
+      oss << p.first << "\t" << p.second << "\n";
+    }
+    oss << "==== END   getPickedPeaksInfo\n";
+    return oss.str();
+  }
+
+  std::string SequenceHandler::getFilteredSelectedPeaksInfo() const
+  {
+    std::map<std::string, size_t> inj_feats;
+    for (const InjectionHandler& inj : getSequence()) {
+      size_t n_peaks {0};
+      for (const OpenMS::Feature& f : inj.getRawData().getFeatureMap()) {
+        n_peaks += f.getSubordinates().size();
+      }
+      inj_feats.emplace(inj.getMetaData().getInjectionName(), n_peaks);
+    }
+    std::ostringstream oss;
+    oss << "==== START getFilteredSelectedPeaksInfo\n";
+    for (const std::pair<std::string, size_t>& p : inj_feats) {
+      oss << p.first << "\t" << p.second << "\n";
+    }
+    oss << "==== END   getFilteredSelectedPeaksInfo\n";
+    return oss.str();
+  }
 }

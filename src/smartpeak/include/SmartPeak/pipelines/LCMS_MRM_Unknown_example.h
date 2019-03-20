@@ -4,7 +4,7 @@
 
 using namespace SmartPeak;
 
-void example_LCMS_MRM_Validation(
+void example_LCMS_MRM_Unknowns(
   const std::string& dir_I,
   const Filenames& static_filenames,
   const std::string& delimiter_I = ",",
@@ -17,10 +17,14 @@ void example_LCMS_MRM_Validation(
 
   const std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
     std::shared_ptr<RawDataProcessor>(new LoadRawData()),
+    std::shared_ptr<RawDataProcessor>(new MapChromatograms()),
     std::shared_ptr<RawDataProcessor>(new PickFeatures()),
     std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
+    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
-    std::shared_ptr<RawDataProcessor>(new ValidateFeatures())
+    std::shared_ptr<RawDataProcessor>(new QuantifyFeatures()),
+    std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
+    std::shared_ptr<RawDataProcessor>(new StoreFeatures())
   };
 
   std::map<std::string, Filenames> dynamic_filenames;
@@ -40,7 +44,7 @@ void example_LCMS_MRM_Validation(
     dynamic_filenames,
     std::set<std::string>(),
     raw_data_processing_methods,
-    true
+    verbose_I
   );
 
   SequenceParser::writeDataMatrixFromMetaValue(

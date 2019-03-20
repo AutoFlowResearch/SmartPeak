@@ -42,6 +42,12 @@ public:
       const std::string& meta_value
     );
 
+    std::string getRawDataFilesInfo() const;
+    std::string getAnalyzedFeaturesInfo() const;
+    std::string getSelectedFeaturesInfo() const;
+    std::string getPickedPeaksInfo() const;
+    std::string getFilteredSelectedPeaksInfo() const;
+
 private:
     std::vector<InjectionHandler> sequence_;
     std::vector<SequenceSegmentHandler> sequence_segments_;

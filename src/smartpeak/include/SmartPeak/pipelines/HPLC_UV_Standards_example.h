@@ -4,7 +4,7 @@
 
 using namespace SmartPeak;
 
-void example_LCMS_MRM_Standards(
+void example_HPLC_UV_Standards(
   const std::string& dir_I,
   const Filenames& static_filenames,
   const std::string& delimiter_I = ",",
@@ -17,9 +17,11 @@ void example_LCMS_MRM_Standards(
 
   std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
     std::shared_ptr<RawDataProcessor>(new LoadRawData()),
+    std::shared_ptr<RawDataProcessor>(new MapChromatograms()),
+    std::shared_ptr<RawDataProcessor>(new ExtractChromatogramWindows()),
+    std::shared_ptr<RawDataProcessor>(new ZeroChromatogramBaseline()),
     std::shared_ptr<RawDataProcessor>(new PickFeatures()),
-    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
-    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
+    //std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
     std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
     std::shared_ptr<RawDataProcessor>(new StoreFeatures())
