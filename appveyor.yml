@@ -38,3 +38,10 @@ before_build:
 build:
   project: C:\projects\smartpeak2\SmartPeak_host.sln 
   #project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
+test_script:
+  - C:\projects\smartpeak2\bin\GCMS_SIM_Unknown_test
+  - C:\projects\smartpeak2\bin\HPLC_UV_Standards_test
+  - C:\projects\smartpeak2\bin\HPLC_UV_Unknown_test
+  - C:\projects\smartpeak2\bin\LCMS_MRM_QCs_test
+  - C:\projects\smartpeak2\bin\LCMS_MRM_Standards_test
+  - C:\projects\smartpeak2\bin\LCMS_MRM_Unknown_test
