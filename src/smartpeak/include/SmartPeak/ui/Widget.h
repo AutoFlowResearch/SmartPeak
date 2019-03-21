@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <string>
 #include <vector>
+#include <map>
 
 namespace SmartPeak
 {
@@ -31,6 +32,7 @@ namespace SmartPeak
       @param[in] checked Vector of boolean values indicating if the column is filtered or not
     */
     static void tableFilterPopup(const char* popuop_id, ImGuiTextFilter& filter, std::vector<std::string>& column, bool* checked);
+    static void tableFilterPopup(const char* popuop_id, ImGuiTextFilter& filter, std::vector<std::string>& column, bool* checked, std::map<std::string, std::vector<int>>& values_indices);
   };
 
   /**

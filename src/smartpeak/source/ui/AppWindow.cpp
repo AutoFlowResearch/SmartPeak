@@ -306,14 +306,16 @@ namespace SmartPeak
   }
 
   void MainMenu::showMenuEdit() {
+    ImGui::MenuItem("Session", NULL, false, false);
     if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
     if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
     ImGui::Separator();
-    if (ImGui::MenuItem("Cut", "CTRL+X")) {}
-    if (ImGui::MenuItem("Copy", "CTRL+C")) {}
-    if (ImGui::MenuItem("Paste", "CTRL+V")) {}
-    ImGui::Separator();
-    if (ImGui::MenuItem("Workflow")) {}
+    ImGui::MenuItem("Settings", NULL, false, false);
+    if (ImGui::MenuItem("Tables")) {} // TODO: modal of settings 
+    if (ImGui::MenuItem("Plots")) {} // TODO: modal of settings 
+    if (ImGui::MenuItem("Explorer")) {} // TODO: modal of settings 
+    if (ImGui::MenuItem("Search")) {} // TODO: modal of settings 
+    if (ImGui::MenuItem("Workflow")) {} // TODO: modal of settings 
   }
 
   void MainMenu::showMenuView(
@@ -483,17 +485,16 @@ namespace SmartPeak
         ImGui::Text("TODO: sequence table");
 
         // Dummy data for testing
-        const std::vector<std::string> headers = { "Name", "Path" };
-        const std::vector<std::string> column0 = { "One", "Two", "Three" };
-        const std::vector<std::string> column1 = { "/path/one",  "/path/two",  "/path/three" };
-        std::vector<std::vector<std::string>> columns;
-        columns.push_back(column0);
-        columns.push_back(column1);
-        static bool rows_checked[] = { true, true, true };
-        //static bool rows_checked[3];
-        //GenericTableWidget::makeCheckedRows(3, rows_checked);
+        std::vector<std::string> headers = { "sample_name", "sample_type", "component_name" }; // feature or sample columns to filter on
+        std::vector<std::string> sample_name_col = { "S1", "S1", "S2", "S2", "S3", "S3", "S4", "S4" };
+        std::vector<std::string> sample_type_col = { "A", "A", "A", "A", "B", "B", "B" ,"B" };
+        std::vector<std::string> component_name_col = { "C1", "C2", "C1", "C2", "C1", "C2", "C1", "C2" };
+        std::vector<std::vector<std::string>> columns = { sample_name_col, sample_type_col, component_name_col };
+        static bool rows_checked[] = { true, true, true, true, true, true, true, true };
 
         GenericTableWidget sequenceTable;
+        // TODO: get the headers, columns, and rows_checked
+        // NOTE: rows_checked must be statically declared before calling the GUI!
         sequenceTable.show(headers, columns, rows_checked);
         ImGui::EndTabItem();
       }
@@ -507,7 +508,68 @@ namespace SmartPeak
         ImGui::Text("TODO: workflow table");
         ImGui::EndTabItem();
       }
-      // TODO...
+      if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
+      {
+        ImGui::Text("TODO: parameters table");
+        ImGui::EndTabItem();
+      }
+      if (show_quant_method_table && ImGui::BeginTabItem("Quant Methods", &show_quant_method_table))
+      {
+        ImGui::Text("TODO: Quant methods table");
+        ImGui::EndTabItem();
+      }
+      if (show_stds_concs_table && ImGui::BeginTabItem("Stds Concs", &show_stds_concs_table))
+      {
+        ImGui::Text("TODO: Standards concentrations table");
+        ImGui::EndTabItem();
+      }
+      if (show_comp_filters_table && ImGui::BeginTabItem("Comp Filters", &show_comp_filters_table))
+      {
+        ImGui::Text("TODO: Component Filters table");
+        ImGui::EndTabItem();
+      }
+      if (show_comp_group_filters_table && ImGui::BeginTabItem("Comp Group Filters", &show_comp_group_filters_table))
+      {
+        ImGui::Text("TODO: Component group filters table");
+        ImGui::EndTabItem();
+      }
+      if (show_comp_qcs_table && ImGui::BeginTabItem("Comp QCs", &show_comp_qcs_table))
+      {
+        ImGui::Text("TODO: Component QCs table");
+        ImGui::EndTabItem();
+      }
+      if (show_comp_group_qcs_table && ImGui::BeginTabItem("Comp Group QCs", &show_comp_group_qcs_table))
+      {
+        ImGui::Text("TODO: Component group qcs table");
+        ImGui::EndTabItem();
+      }
+      if (show_feature_plot && ImGui::BeginTabItem("Feature plot", &show_feature_plot))
+      {
+        ImGui::Text("TODO: Feature plot");
+        GenericGraphicWidget featurePlot;
+        featurePlot.show();
+        ImGui::EndTabItem();
+      }
+      if (show_line_plot && ImGui::BeginTabItem("Line plot", &show_line_plot))
+      {
+        ImGui::Text("TODO: Line plot");
+        ImGui::EndTabItem();
+      }
+      if (show_heatmap_plot && ImGui::BeginTabItem("Heatmap", &show_heatmap_plot))
+      {
+        ImGui::Text("TODO: Heatmap");
+        ImGui::EndTabItem();
+      }
+      if (show_feature_summary_table && ImGui::BeginTabItem("FeatureSummary", &show_feature_summary_table))
+      {
+        ImGui::Text("TODO: FeatureSummary table");
+        ImGui::EndTabItem();
+      }
+      if (show_sequence_summary_table && ImGui::BeginTabItem("SequenceSummary", &show_sequence_summary_table))
+      {
+        ImGui::Text("TODO: SequenceSummary table");
+        ImGui::EndTabItem();
+      }
       ImGui::EndTabBar();
     }
   }
