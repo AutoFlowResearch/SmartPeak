@@ -367,19 +367,11 @@ namespace SmartPeak
       if (ImGui::MenuItem("Comp Group QCs", NULL, &show_comp_group_qcs_table)) {}
       ImGui::EndMenu();
     }
-    if (ImGui::BeginMenu("Review plots"))
-    {
-      if (ImGui::MenuItem("Features", NULL, &show_feature_plot)) {}
-      if (ImGui::MenuItem("Line plot", NULL, &show_line_plot)) {}
-      if (ImGui::MenuItem("Heatmap", NULL, &show_heatmap_plot)) {}
-      ImGui::EndMenu();
-    }
-    if (ImGui::BeginMenu("Reports"))
-    {
-      if (ImGui::MenuItem("Feature summary", NULL, &show_feature_summary_table)) {}
-      if (ImGui::MenuItem("Sequence summary", NULL, &show_sequence_summary_table)) {}
-      ImGui::EndMenu();
-    }
+    if (ImGui::MenuItem("Features", NULL, &show_feature_plot)) {}
+    if (ImGui::MenuItem("Metric plot", NULL, &show_line_plot)) {}
+    if (ImGui::MenuItem("Heatmap", NULL, &show_heatmap_plot)) {}
+    if (ImGui::MenuItem("Features table", NULL, &show_feature_summary_table)) {}
+    if (ImGui::MenuItem("Features pivot table", NULL, &show_sequence_summary_table)) {}
     // Info pane tabs
     ImGui::MenuItem("Info window", NULL, false, false);
     if (ImGui::MenuItem("Output", NULL, &show_output)) {}

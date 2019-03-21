@@ -9,6 +9,9 @@ namespace SmartPeak
 {
   /**
     @brief Abstract base class for all panes, windows, and widgets
+
+    TODO: potential refactors
+    - Add unit tests for `makeCheckedRows`
   */
   class Widget
   {
@@ -24,15 +27,58 @@ namespace SmartPeak
     virtual void show() {};
 
     /**
-      Helper method to filter a popup
+      Method to make a filter and search popup
 
       @param[in] popup_id Sequence handler
       @param[in] filter Text filters
       @param[in] colum Column of text items to filter
-      @param[in] checked Vector of boolean values indicating if the column is filtered or not
+      @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
+      @param[in] values_indices Map containing unique row entries and their duplicate indices
     */
-    static void tableFilterPopup(const char* popuop_id, ImGuiTextFilter& filter, std::vector<std::string>& column, bool* checked);
-    static void tableFilterPopup(const char* popuop_id, ImGuiTextFilter& filter, std::vector<std::string>& column, bool* checked, std::map<std::string, std::vector<int>>& values_indices);
+    static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const std::vector<std::string>& column, bool* checked, 
+      const std::vector<std::pair<std::string, std::vector<int>>>& values_indices);
+
+    /**
+      Method to make a sort button
+
+      @param[in] button_id button ID
+      @param[in] headers Table headers
+      @param[in, out] columns Table columns
+      @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
+      @param[in, out] columns_indices A vector of maps containing unique row entries and their duplicate indices
+      @param[in] sort_asc Whether to sort in ascending order or descending order
+    */
+    static void SortButton(const char* button_id, const std::vector<std::string>& headers, 
+      std::vector<std::vector<std::string>>& columns,
+      const int& n_col,
+      bool* checked,
+      std::vector<std::vector<std::pair<std::string, std::vector<int>>>>& columns_indices,
+      bool sort_asc = true);
+
+    /**
+      Helper method to make the filters and value_indices of needed for `FilterPopup`
+
+      @param[in] headers Table headers
+      @param[in] columns Table columns
+      @param[out] columns_indices A vector of maps containing unique row entries and their duplicate indices
+      @param[out] filter Vector of ImGuiTextFilters
+    */
+    static void makeFilters(const std::vector<std::string>& headers,
+      const std::vector<std::vector<std::string>>& columns, 
+      std::vector<std::vector<std::pair<std::string, std::vector<int>>>>& columns_indices,
+      std::vector<ImGuiTextFilter>& filter);
+
+    /*
+      @brief Helper method to create the checked_rows param
+
+      @example
+      static bool checked_rows[n_rows];
+      makeCheckedRows(n_rows, checked_rows);
+
+      @param[in] n_rows The number of rows
+      @param[in,out] checked_rows What rows are checked/filtered
+    */
+    static void makeCheckedRows(const int& n_rows, bool* checked_rows);
   };
 
   /**
@@ -50,7 +96,6 @@ namespace SmartPeak
     TODO: potential refactors
     - Extract out methods for making the headers and columns
     - Extract out method for maing the filters (unit testable)
-    - Add unit tests for `makeCheckedRows`
   */
   class GenericTableWidget : public Widget
   {
@@ -65,18 +110,6 @@ namespace SmartPeak
     void show(const std::vector<std::string>& headers,
       std::vector<std::vector<std::string>>& columns,
     bool* checked_rows);
-
-    /*
-    @brief Helper method to create the checked_rows param
-
-    @example
-    static bool checked_rows[n_rows];
-    makeCheckedRows(n_rows, checked_rows);
-
-    @param[in] n_rows The number of rows
-    @param[in,out] checked_rows What rows are checked/filtered
-    */
-    static void makeCheckedRows(const int& n_rows, bool* checked_rows);
   };
 
   /**
