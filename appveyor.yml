@@ -38,7 +38,7 @@ before_build:
 build:
   project: C:\projects\smartpeak2\SmartPeak_host.sln 
   #project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
-test_script:
+test_script: 
   - dir C:\projects\smartpeak2\bin\Debug\
   - C:\projects\smartpeak2\bin\Debug\GCMS_SIM_Unknown_test.exe
   - C:\projects\smartpeak2\bin\Debug\HPLC_UV_Standards_test.exe
