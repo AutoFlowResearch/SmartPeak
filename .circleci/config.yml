@@ -27,7 +27,25 @@ jobs:
       - run:
           command: |
             ctest -j4
-
+      - run:
+          command: |
+            /root/SmartPeak2/bin/GCMS_SIM_Unknown_test
+      - run:
+          command: |
+            /root/SmartPeak2/bin/HPLC_UV_Standards_test
+      - run:
+          command: |
+            /root/SmartPeak2/bin/HPLC_UV_Unknown_test
+      - run:
+          command: |
+            /root/SmartPeak2/bin/LCMS_MRM_QCs_test
+      - run:
+          command: |
+            /root/SmartPeak2/bin/LCMS_MRM_Standards_test
+      - run:
+          command: |
+            /root/SmartPeak2/bin/LCMS_MRM_Unknown_test
+  
 workflows:
   version: 2
   build-deploy:
