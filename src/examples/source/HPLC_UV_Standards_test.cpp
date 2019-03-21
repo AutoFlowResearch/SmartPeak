@@ -110,7 +110,7 @@ void test_main_HPLC_UV_Standards()
   assert(is_ok == true);
 }
 
-int main(int argc, char **argv)
+int main()
 {
   test_main_HPLC_UV_Standards();
   return 0;

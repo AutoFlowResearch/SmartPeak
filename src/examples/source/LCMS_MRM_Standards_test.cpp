@@ -81,7 +81,7 @@ cout << "getRT: " << f1->getRT() << endl;
   assert(is_ok == true);
 }
 
-int main(int argc, char **argv)
+int main()
 {
   test_main_LCMS_MRM_Standards();
   return 0;

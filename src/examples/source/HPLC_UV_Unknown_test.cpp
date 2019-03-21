@@ -104,7 +104,7 @@ void test_main_HPLC_UV_Unknown()
   // cout << "END ENTIRE OUTPUT FOR DEBUGGING" << endl;
 }
 
-int main(int argc, char **argv)
+int main()
 {
   test_main_HPLC_UV_Unknown();
   return 0;

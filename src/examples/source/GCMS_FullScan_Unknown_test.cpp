@@ -89,7 +89,7 @@ cout << "50 0 getRT: " << f1->getRT() << endl;
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
 }
 
-int main(int argc, char **argv)
+int main()
 {
   test_main_GCMS_FullScan_Unknown();
   return 0;
