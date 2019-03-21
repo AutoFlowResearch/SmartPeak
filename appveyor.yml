@@ -39,7 +39,7 @@ build:
   project: C:\projects\smartpeak2\SmartPeak_host.sln 
   #project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
 test_script:
-  - C:\projects\smartpeak2\bin\Debug\GCMS_SIM_Unknown_test
+  #- C:\projects\smartpeak2\bin\Debug\GCMS_SIM_Unknown_test
   - C:\projects\smartpeak2\bin\Debug\HPLC_UV_Standards_test
   - C:\projects\smartpeak2\bin\Debug\HPLC_UV_Unknown_test
   - C:\projects\smartpeak2\bin\Debug\LCMS_MRM_QCs_test
