@@ -268,7 +268,7 @@ namespace SmartPeak
       } else if (cast.getTag() == CastValue::FLOAT_LIST) {
         cast.fl_.push_back(std::strtof(it->str().c_str(), NULL));
       } else if (cast.getTag() == CastValue::INT_LIST) {
-        cast.il_.push_back(std::strtol(it->str().c_str(), NULL, 10));
+        cast.il_.push_back(std::stoi(it->str()));
       } else if (cast.getTag() == CastValue::STRING_LIST) {
         cast.sl_.push_back((*it)[1].str());
       } else {
@@ -312,12 +312,17 @@ namespace SmartPeak
 
     const std::unordered_set<char> characters(whitespaces.cbegin(), whitespaces.cend());
 
-    int l, r;
+    size_t l, r;
 
-    for (l = 0; static_cast<size_t>(l) < s.size() && characters.count(s[l]); ++l)
+    for (l = 0; l < s.size() && characters.count(s[l]); ++l)
       ;
 
-    for (r = s.size() - 1; r >= l && characters.count(s[r]); --r)
+    if (l == s.size()) {
+      return std::string();
+    }
+
+    // reaching here implies that s contains at least one non-whitespace character
+    for (r = s.size() - 1; r > l && characters.count(s[r]); --r)
       ;
 
     return s.substr(l, r - l + 1);
