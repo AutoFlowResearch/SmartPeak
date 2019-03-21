@@ -574,7 +574,7 @@ public:
     in = getLineInput("> ", false);
 
     if      ("1" == in) {
-      std::cout << InputDataValidation::getSequenceInfo(sequenceHandler_, ",") << "\n";
+      std::cout << InputDataValidation::getSequenceInfo(sequenceHandler_) << "\n";
     }
     else if ("2" == in) {
       std::cout << InputDataValidation::getTraMLInfo(
@@ -1334,7 +1334,8 @@ public:
   }
 };
 
-int main(int argc, char **argv)
+// int main(int argc, char **argv)
+int main()
 {
   // CommandLine cli(argc, argv);
   CommandLine cli;

@@ -35,8 +35,7 @@ namespace SmartPeak
   }
 
   std::string InputDataValidation::getSequenceInfo(
-    const SequenceHandler& sequenceHandler,
-    const std::string& delimiter
+    const SequenceHandler& sequenceHandler
   )
   {
     std::ostringstream oss;
