@@ -134,13 +134,15 @@ namespace SmartPeak
         ImGui::NextColumn();
         for (int j = 0; j < headers.size(); ++j)
         {
-          //ImGui::Selectable(columns[j][i].c_str(), false);
-          //ImGui::Text(columns[j][i].c_str());
-          char buf[512];
-          sprintf(buf, columns[j][i].c_str());
-          ImGui::InputText("", buf, IM_ARRAYSIZE(buf));
+          ImGui::Text(columns[j][i].c_str());
+
+          // Testing random fixes to get input text to work
+          //char buf[512];
+          //sprintf(buf, columns[j][i].c_str());
+          //ImGui::InputText("", buf, IM_ARRAYSIZE(buf));
           //if (ImGui::IsItemHovered() || ImGui::IsItemFocused())
           //  ImGui::SetMouseCursor(1); 
+
           ImGui::NextColumn();
         }
       }
