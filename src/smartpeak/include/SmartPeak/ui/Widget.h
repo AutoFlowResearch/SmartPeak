@@ -17,8 +17,10 @@ namespace SmartPeak
 
     /**
       Interface to show the widget
+
+      NOTE: free to override in inherited implmementations
     */
-    virtual void show(bool* p_open) = 0;
+    virtual void show() {};
 
     /**
       Helper method to filter a popup
@@ -37,16 +39,42 @@ namespace SmartPeak
   class GenericTextWidget : public Widget
   {
   public:
-    void show(bool* p_open);
+    void show(const std::vector<std::string>& text_lines);
   };
 
   /**
     @brief Base class for all tables
+
+    TODO: potential refactors
+    - Extract out methods for making the headers and columns
+    - Extract out method for maing the filters (unit testable)
+    - Add unit tests for `makeCheckedRows`
   */
   class GenericTableWidget : public Widget
   {
   public:
-    void show(bool* p_open);
+    /*
+    @brief Show the table
+
+    @param[in] headers Column header names
+    @param[in,out] columns Columns where the inner vector<string> are individual columns [TODO: refactor to use other types besides strings]
+    @param[in,out] checked_rows What rows are checked/filtered
+    */
+    void show(const std::vector<std::string>& headers,
+      std::vector<std::vector<std::string>>& columns,
+    bool* checked_rows);
+
+    /*
+    @brief Helper method to create the checked_rows param
+
+    @example
+    static bool checked_rows[n_rows];
+    makeCheckedRows(n_rows, checked_rows);
+
+    @param[in] n_rows The number of rows
+    @param[in,out] checked_rows What rows are checked/filtered
+    */
+    static void makeCheckedRows(const int& n_rows, bool* checked_rows);
   };
 
   /**
@@ -55,7 +83,7 @@ namespace SmartPeak
   class GenericGraphicWidget : public Widget
   {
   public:
-    void show(bool* p_open);
+    void show();
   };
 
   /**
@@ -64,7 +92,7 @@ namespace SmartPeak
   class GenericTreeWidget : public Widget
   {
   public:
-    void show(bool* p_open);
+    void show();
   };
   
   /**
@@ -74,7 +102,7 @@ namespace SmartPeak
   class FileBrowserWidget : public Widget
   {
   public:
-    void show(bool* p_open);
+    void show();
   };
 
   /**
@@ -83,6 +111,6 @@ namespace SmartPeak
   class WorkflowWidget : public GenericGraphicWidget
   {
   public:
-    void show(bool* p_open);
+    void show();
   };
 }

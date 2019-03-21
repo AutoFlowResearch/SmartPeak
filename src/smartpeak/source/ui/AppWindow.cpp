@@ -4,6 +4,14 @@
 namespace SmartPeak
 {
   void AppWindow::showApp() {
+    // View: Search pane
+    static bool show_injections_search = false;
+    static bool show_samples_search = false;
+    static bool show_sequence_segments_search = false;
+    static bool show_sample_groups_search = false;
+    static bool show_components_search = false;
+    static bool show_component_groups_search = false;
+    static bool show_workflow_steps_search = false;
     // View: Explorer pane
     static bool show_sequence_explorer_ = false;
     static bool show_transitions_explorer_ = false;
@@ -310,13 +318,6 @@ namespace SmartPeak
 
   void MainMenu::showMenuView(
     // View: Explorer pane
-    bool& show_injections_search,
-    bool& show_samples_search,
-    bool& show_sequence_segments_search,
-    bool& show_sample_groups_search,
-    bool& show_components_search,
-    bool& show_component_groups_search,
-    bool& show_workflow_steps_search,
     bool& show_sequence_explorer,
     bool& show_transitions_explorer,
     bool& show_experiment_explorer,
@@ -480,6 +481,20 @@ namespace SmartPeak
       if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
       {
         ImGui::Text("TODO: sequence table");
+
+        // Dummy data for testing
+        const std::vector<std::string> headers = { "Name", "Path" };
+        const std::vector<std::string> column0 = { "One", "Two", "Three" };
+        const std::vector<std::string> column1 = { "/path/one",  "/path/two",  "/path/three" };
+        std::vector<std::vector<std::string>> columns;
+        columns.push_back(column0);
+        columns.push_back(column1);
+        static bool rows_checked[] = { true, true, true };
+        //static bool rows_checked[3];
+        //GenericTableWidget::makeCheckedRows(3, rows_checked);
+
+        GenericTableWidget sequenceTable;
+        sequenceTable.show(headers, columns, rows_checked);
         ImGui::EndTabItem();
       }
       if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
