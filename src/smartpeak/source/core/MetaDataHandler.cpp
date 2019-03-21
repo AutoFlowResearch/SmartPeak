@@ -211,7 +211,7 @@ namespace SmartPeak
 
 #ifdef _WIN32
   // https://stackoverflow.com/questions/321849/strptime-equivalent-on-windows
-  char* strptime(const char* s, const char* f, struct tm* tm) {
+  char* strptime(const char* s, const char* f, std::tm* tm) {
     // Isn't the C++ standard lib nice? std::get_time is defined such that its
     // format parameters are the exact same as strptime. Of course, we have to
     // create a string stream first, and imbue it with the current C locale, and
@@ -233,7 +233,7 @@ namespace SmartPeak
     const std::string& format
   )
   {
-    struct tm tm = { 0, 0, 0, 1, 0, 0, 0, 0, 0 };
+    std::tm tm = { 0, 0, 0, 1, 0, 0, 0, 0, 0 };
     if (strptime(acquisition_datetime.data(), format.data(), &tm) == NULL) {
       throw "Could not convert string to date time object.";
     }
