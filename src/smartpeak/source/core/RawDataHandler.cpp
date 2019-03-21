@@ -343,7 +343,7 @@ namespace SmartPeak
     // Case 2: "Remove" filtered/non-selected features and "Add" new features via "used_" and "timestamp_" feature metadata attributes
     else {
       std::vector<OpenMS::Feature> new_features;
-      std::set<OpenMS::UInt> unique_ids_feat_history, unique_ids_feat_select; // Get all feature IDs
+      std::set<OpenMS::UInt64> unique_ids_feat_history, unique_ids_feat_select; // Get all feature IDs
       for (const OpenMS::Feature& feature_copy : feature_map_history_) {
         unique_ids_feat_history.insert(feature_copy.getUniqueId());
       }
