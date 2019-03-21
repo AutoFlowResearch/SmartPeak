@@ -40,7 +40,7 @@ build:
   #project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
 test_script:
   - dir C:\projects\smartpeak2\bin\Debug\
-  - ps: mpiexec -n 2 C:\projects\smartpeak2\bin\Debug\GCMS_SIM_Unknown_test.exe
+  - "\"%MSMPI_BIN%\\mpiexec.exe\" -n 2 C:\projects\smartpeak2\bin\Debug\GCMS_SIM_Unknown_test.exe
   - ps: C:\projects\smartpeak2\bin\Debug\GCMS_SIM_Unknown_test.exe
   - ps: C:\projects\smartpeak2\bin\Debug\HPLC_UV_Standards_test.exe
   - ps: C:\projects\smartpeak2\bin\Debug\HPLC_UV_Unknown_test.exe
