@@ -10,6 +10,8 @@ init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - mkdir C:\projects\deps
+  - PATH=%PATH%;C:\projects\OpenMS-build\bin\Debug;C:\Qt\5.12.1\msvc2017_64\bin;C:\Libraries\boost_1_69_0\lib64-msvc-14.1
+
 platform:
   - x64
 configuration:
