@@ -87,7 +87,6 @@ int main(int argc, char **argv)
 
     // 1. Show the window
     {
-      // ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiCond_FirstUseEver); // Normally user code doesn't need/want to call this because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
       SmartPeak::AppWindow appWindow;
       appWindow.showApp();
     }

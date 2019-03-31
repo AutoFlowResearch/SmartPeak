@@ -156,8 +156,8 @@ namespace SmartPeak
         infoWindow.showInfoWindow(show_output_, show_info_, show_log_);
         ImGui::EndChild();
       }
+      ImGui::End();
     }
-    ImGui::End();
   }
 
   void MainMenu::showMainMenuBar(
@@ -264,6 +264,26 @@ namespace SmartPeak
     if (ImGui::MenuItem("Load Session", "Ctrl+O"))
     {
       //TODO: open file browser modal
+      ImGui::OpenPopup("Delete?");
+    }
+    if (ImGui::BeginPopupModal("Delete?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+      ImGui::Text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
+      ImGui::Separator();
+
+      //static int dummy_i = 0;
+      //ImGui::Combo("Combo", &dummy_i, "Delete\0Delete harder\0");
+
+      static bool dont_ask_me_next_time = false;
+      ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+      ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
+      ImGui::PopStyleVar();
+
+      if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+      ImGui::SetItemDefaultFocus();
+      ImGui::SameLine();
+      if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+      ImGui::EndPopup();
     }
     if (ImGui::MenuItem("Save Session", "Ctrl+S"))
     {
@@ -301,8 +321,9 @@ namespace SmartPeak
       if (ImGui::MenuItem("Comp Group QCs")) {}
       ImGui::EndMenu();
     }
-    ImGui::Separator();
-    if (ImGui::MenuItem("Quit", "Alt+F4")) {}
+    // TODO
+    //ImGui::Separator();
+    //if (ImGui::MenuItem("Quit", "Alt+F4")) {}
   }
 
   void MainMenu::showMenuEdit() {

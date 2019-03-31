@@ -56,7 +56,7 @@ namespace SmartPeak
       bool sort_asc = true);
 
     /**
-      Helper method to make the filters and value_indices of needed for `FilterPopup`
+      Helper method to make the filters and value_indices needed for `FilterPopup`
 
       @param[in] headers Table headers
       @param[in] columns Table columns
