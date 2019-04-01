@@ -162,6 +162,8 @@ function(smartpeak_add_library)
   # copy dll to test/doc bin folder on MSVC systems
   copy_dll_to_extern_bin(${smartpeak_add_library_TARGET_NAME})
 
+  target_link_libraries(SmartPeak plog::plog)
+
   #------------------------------------------------------------------------------
   # Status message for configure output
   message(STATUS "Adding library ${smartpeak_add_library_TARGET_NAME} - SUCCESS")

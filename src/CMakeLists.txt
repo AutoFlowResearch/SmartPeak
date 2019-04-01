@@ -21,3 +21,6 @@ option (BUILD_EXAMPLES "Whether or not build the examples" ON)
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
+
+# 3rd party code (i.e. plog)
+add_subdirectory(3rd_party)
