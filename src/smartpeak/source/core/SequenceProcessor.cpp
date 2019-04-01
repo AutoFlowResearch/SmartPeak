@@ -6,6 +6,7 @@
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/SequenceParser.h>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -21,10 +22,15 @@ namespace SmartPeak
       std::cout << "==== START createSequence()" << std::endl;
     }
 
+    LOGD << "START createSequence";
+
     SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
     if (sequenceHandler_IO.getSequence().empty()) {
       std::cout << "Empty sequence. Returning.\n"
         "==== END   createSequence()" << std::endl;
+
+      LOGE << "Empty sequence. Returning";
+      LOGD << "END createSequence";
       return;
     }
     // TODO: Given that the raw data is shared between all injections, it could
@@ -64,6 +70,8 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "==== END   createSequence()" << std::endl;
     }
+
+    LOGD << "END createSequence";
   }
 
   void SequenceProcessor::processSequence(
@@ -101,6 +109,7 @@ namespace SmartPeak
         if (verbose_I) {
           std::cout << "\n[" << (i + 1) << "/" << n << "]" << std::endl;
         }
+        LOGI << "\n[" << (i + 1) << "/" << n << "]";
         raw_data_processing_methods_I[i]->process(injection.getRawData(), 
           injection.getRawData().getParameters(), 
           filenames.at(injection.getMetaData().getInjectionName()), 
@@ -148,6 +157,7 @@ namespace SmartPeak
         if (verbose_I) {
           std::cout << "\n[" << (i + 1) << "/" << n << "]" << std::endl;
         }
+        LOGI << "\n[" << (i + 1) << "/" << n << "]";
         sequence_segment_processing_methods_I[i]->process(
           sequence_segment,
           sequenceHandler_IO,

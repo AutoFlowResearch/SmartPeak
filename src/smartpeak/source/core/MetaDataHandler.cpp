@@ -2,6 +2,7 @@
 
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <iostream>
+#include <plog/Log.h>
 
 // required for strptime on Windows
 #ifdef _WIN32
@@ -132,46 +133,55 @@ namespace SmartPeak
 
     if (meta_data.getSampleName().empty()) {
       std::cerr << "SequenceFile Error: sample_name must be specified." << std::endl;
+      LOGE << "sample_name must be specified";
       is_valid = false;
     }
 
     if (meta_data.getSampleGroupName().empty()) {
       std::cerr << "SequenceFile Error: sample_group_name must be specified." << std::endl;
+      LOGE << "sample_group_name must be specified";
       is_valid = false;
     }
 
     if (meta_data.getSequenceSegmentName().empty()) {
       std::cerr << "SequenceFile Error: sequence_segment_name must be specified." << std::endl;
+      LOGE << "sequence_segment_name must be specified";
       is_valid = false;
     }
 
     if (meta_data.getFilename().empty()) {
       std::cerr << "SequenceFile Error: original_filename must be specified." << std::endl;
+      LOGE << "original_filename must be specified";
       is_valid = false;
     }
 
     if (meta_data.getSampleType() == SampleType::Unrecognized) {
       std::cerr << "SequenceFile Error: sample type could not be recognized." << std::endl;
+      LOGE << "sample type could not be recognized";
       is_valid = false;
     }
 
     if (meta_data.acq_method_name.empty()) {
       std::cerr << "SequenceFile Error: acq_method_name must be specified." << std::endl;
+      LOGE << "acq_method_name must be specified";
       is_valid = false;
     }
 
     if (meta_data.inj_volume <= 0.0) {
       std::cerr << "SequenceFile Error: no value for inj_volume." << std::endl;
+      LOGE << "no value for inj_volume";
       is_valid = false;
     }
 
     if (meta_data.inj_volume_units.empty()) {
       std::cerr << "SequenceFile Error: inj_volume_units must be specified." << std::endl;
+      LOGE << "inj_volume_units must be specified";
       is_valid = false;
     }
 
     if (meta_data.batch_name.empty()) {
       std::cerr << "SequenceFile Error: batch_name must be specified." << std::endl;
+      LOGE << "batch_name must be specified";
       is_valid = false;
     }
 
