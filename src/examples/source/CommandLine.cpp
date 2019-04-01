@@ -10,6 +10,8 @@
 #include <iostream>
 #include <regex>
 #include <unordered_map>
+#include <plog/Log.h>
+#include <plog/Appenders/ConsoleAppender.h>
 
 #ifdef _WIN32
   // https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/getcwd-wgetcwd
@@ -1295,6 +1297,10 @@ public:
   CommandLine& operator=(CommandLine&& other)      = delete;
 
   void runApp() {
+    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender("smartpeak_log_multi.csv", 0, 0);
+    static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
+    plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender);
+    // plog::init(plog::debug, "smartpeak_log.csv");
     std::cout << gettingStartedString();
     while (true) {
       menuMain();

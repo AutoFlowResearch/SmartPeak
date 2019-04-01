@@ -8,6 +8,7 @@
 #include <fstream>
 #include <string>
 #include <unordered_map>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -22,15 +23,18 @@ namespace SmartPeak
     FilenameInfo v;
     v.pathname = filename;
     v.member_name = member_name;
-    std::cout << member_name << ":\n\t";
+    std::ostringstream msg;
+    msg << member_name << ":\n\t";
     if (filename.size()) {
       const bool is_valid = fileExists(filename);
-      std::cout << (is_valid ? "SUCCESS" : "FAILURE") << " <- " << filename << "\n";
+      msg << (is_valid ? "SUCCESS" : "FAILURE") << " <- " << filename << "\n";
       v.validity = is_valid ? FilenameInfo::valid : FilenameInfo::invalid;
     } else {
-      std::cout << "NOT PROVIDED\n";
+      msg << "NOT PROVIDED\n";
       v.validity = FilenameInfo::not_provided;
     }
+    std::cout << msg.str();
+    LOGI << msg.str();
     return v;
   }
 
@@ -218,6 +222,7 @@ namespace SmartPeak
   )
   {
     std::cout << "==== START sampleNamesAreConsistent\n";
+    LOGD << "START sampleNamesAreConsistent";
 
     const std::vector<InjectionHandler>& samples = sequenceHandler.getSequence();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
@@ -237,6 +242,7 @@ namespace SmartPeak
     const bool check_passed = validateNamesInStructures(names1, names2, "SEQUENCE", "STANDARDS", false);
 
     std::cout << "==== END   sampleNamesAreConsistent" << std::endl;
+    LOGD << "END sampleNamesAreConsistent";
     return check_passed;
   }
 
@@ -245,6 +251,7 @@ namespace SmartPeak
   )
   {
     std::cout << "==== START componentNamesAreConsistent\n";
+    LOGD << "START componentNamesAreConsistent";
 
     const RawDataHandler& rawDataHandler = sequenceHandler.getSequence().front().getRawData();
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
@@ -290,6 +297,7 @@ namespace SmartPeak
     check_passed.at(3) = validateNamesInStructures(names1, names5, "TRAML", "STANDARDS", false);
 
     std::cout << "==== END   componentNamesAreConsistent" << std::endl;
+    LOGD << "END componentNamesAreConsistent";
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
@@ -299,6 +307,7 @@ namespace SmartPeak
   )
   {
     std::cout << "==== START componentNameGroupsAreConsistent\n";
+    LOGD << "START componentNameGroupsAreConsistent";
 
     const RawDataHandler& rawDataHandler = sequenceHandler.getSequence().front().getRawData();
     const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
@@ -328,6 +337,7 @@ namespace SmartPeak
     check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
 
     std::cout << "==== END   componentNameGroupsAreConsistent" << std::endl;
+    LOGD << "END componentNameGroupsAreConsistent";
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
   }
@@ -337,6 +347,7 @@ namespace SmartPeak
   )
   {
     std::cout << "==== START heavyComponentsAreConsistent\n";
+    LOGD << "START heavyComponentsAreConsistent";
 
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
       sequenceHandler.getSequenceSegments().front().getQuantitationMethods();
@@ -357,6 +368,7 @@ namespace SmartPeak
     const bool check_passed = validateNamesInStructures(names1, names2, "QUANTITATIONMETHODS", "STANDARDS", false);
 
     std::cout << "==== END   heavyComponentsAreConsistent" << std::endl;
+    LOGD << "END heavyComponentsAreConsistent";
     return check_passed;
   }
 
@@ -370,13 +382,17 @@ namespace SmartPeak
   {
     const std::set<std::string> missing1 = findMissingNames(names1, names2);
     if (missing1.size()) {
-      std::cout << logMissingNames(missing1, structure_ref1, structure_ref2);
+      const std::string msg = logMissingNames(missing1, structure_ref1, structure_ref2);
+      std::cout << msg;
+      LOGI << msg;
     }
     std::set<std::string> missing2;
     if (check_both_directions) {
       missing2 = findMissingNames(names2, names1);
       if (missing2.size()) {
-        std::cout << logMissingNames(missing2, structure_ref2, structure_ref1);
+        const std::string msg = logMissingNames(missing2, structure_ref2, structure_ref1);
+        std::cout << msg;
+        LOGI << msg;
       }
     }
     return missing1.empty() && missing2.empty();

@@ -25,6 +25,7 @@
 #define CSV_IO_NO_THREAD
 #endif
 #include <SmartPeak/io/csv.h>
+#include <plog/Log.h>
 
 // feature selection
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
@@ -46,7 +47,7 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "==== START loadMSExperiment" << std::endl;
     }
-
+    LOGD << "START loadMSExperiment";
     // # load chromatograms
     OpenMS::MSExperiment chromatograms;
     if (filenames.mzML_i.size()) {
@@ -67,6 +68,7 @@ namespace SmartPeak
           }
           OpenMS::ChromeleonFile chfh;
           std::cout << "loadMSExperiment(): loading " << txt_name << std::endl;
+          LOGI << "Loading: " << txt_name;
           chfh.load(txt_name, chromatograms);
         }
         // Deal with .mzXML format
@@ -78,17 +80,20 @@ namespace SmartPeak
           }
           OpenMS::FileHandler fh;
           std::cout << "loadMSExperiment(): loading " << txt_name << std::endl;
+          LOGI << "Loading: " << txt_name;
           fh.loadExperiment(txt_name, chromatograms, OpenMS::FileTypes::MZXML);
         }
         else {
           OpenMS::FileHandler fh;
           std::cout << "loadMSExperiment(): loading " << filenames.mzML_i << std::endl;
+          LOGI << "Loading: " << filenames.mzML_i;
           fh.loadExperiment(filenames.mzML_i, chromatograms);
         }
       }
       else {
         OpenMS::FileHandler fh;
         std::cout << "loadMSExperiment(): loading " << filenames.mzML_i << std::endl;
+        LOGI << "Loading: " << filenames.mzML_i;
         fh.loadExperiment(filenames.mzML_i, chromatograms);
       }
     }
@@ -132,6 +137,7 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "==== END   loadMSExperiment" << std::endl;
     }
+    LOGD << "END loadMSExperiment";
   }
 
   void LoadRawData::extractMetaData(
@@ -141,6 +147,7 @@ namespace SmartPeak
   {
     if (verbose_I)
       std::cout << "Extracting metadata" << std::endl;
+    LOGD << "START extractMetaData";
 
     std::string filename;
     std::string samplename;
@@ -202,6 +209,7 @@ namespace SmartPeak
       dt_int.tm_min = dt_uint.tm_min;
       dt_int.tm_sec = dt_uint.tm_sec;
     }
+    LOGD << "END extractMetaData";
   }
 
   void StoreRawData::process(
@@ -214,9 +222,14 @@ namespace SmartPeak
       std::cout << "==== START storeMzML"
         << "\nstoreMzML(): storing " << filenames.mzML_i << std::endl;
     }
+    LOGD << "START storeMzML";
+
+    LOGI << "Storing: " << filenames.mzML_i;
 
     if (filenames.mzML_i.empty()) {
       std::cout << "storeMzML(): filename is empty\n";
+      LOGE << "Filename is empty";
+      LOGD << "END storeMzML";
       return;
     }
 
@@ -226,11 +239,13 @@ namespace SmartPeak
     }
     catch (const std::exception& e) {
       std::cerr << "storeMzML(): " << e.what() << std::endl;
+      LOGE << e.what();
     }
 
     if (verbose_I) {
       std::cout << "==== END   storeMzML" << std::endl;
     }
+    LOGD << "END storeMzML";
   }
 
   void LoadFeatures::process(
@@ -240,17 +255,23 @@ namespace SmartPeak
     const bool verbose_I
   ) const {
     if (verbose_I) {
-      std::cout << "==== START loadFeatureMap"
-        << "\nloadFeatureMap(): loading " << filenames.featureXML_i << std::endl;
+      std::cout << "==== START LoadFeatures"
+        << "\nLoadFeatures(): loading " << filenames.featureXML_i << std::endl;
     }
+    LOGD << "START LoadFeatures";
+    LOGI << "Loading: " << filenames.featureXML_i;
 
     if (filenames.featureXML_i.empty()) {
-      std::cout << "loadFeatureMap(): filename is empty\n";
+      std::cout << "LoadFeatures(): filename is empty\n";
+      LOGE << "Filename is empty";
+      LOGD << "END LoadFeatures";
       return;
     }
 
     if (!InputDataValidation::fileExists(filenames.featureXML_i)) {
-      std::cout << "loadFeatureMap(): file not found\n";
+      std::cout << "LoadFeatures(): file not found\n";
+      LOGE << "File not found";
+      LOGD << "END LoadFeatures";
       return;
     }
 
@@ -260,14 +281,17 @@ namespace SmartPeak
       rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
-      std::cerr << "loadFeatureMap(): " << e.what() << std::endl;
+      std::cerr << "LoadFeatures(): " << e.what() << std::endl;
+      LOGE << e.what();
       rawDataHandler_IO.getFeatureMap().clear();
-      std::cerr << "loadFeatureMap(): feature map clear" << std::endl;
+      std::cerr << "LoadFeatures(): feature map clear" << std::endl;
+      LOGE << "feature map clear";
     }
 
     if (verbose_I) {
-      std::cout << "==== END   loadFeatureMap" << std::endl;
+      std::cout << "==== END   LoadFeatures" << std::endl;
     }
+    LOGD << "END LoadFeatures";
   }
 
   void StoreFeatures::process(
@@ -280,9 +304,13 @@ namespace SmartPeak
       std::cout << "==== START storeFeatureMap"
         << "\nstoreFeatureMap(): storing " << filenames.featureXML_o << std::endl;
     }
+    LOGD << "START storeFeatureMap";
+    LOGI << "Storing: " << filenames.featureXML_o;
 
     if (filenames.featureXML_o.empty()) {
       std::cout << "storeFeatureMap(): filename is empty\n";
+      LOGE << "Filename is empty";
+      LOGD << "END storeFeatureMap";
       return;
     }
 
@@ -293,11 +321,13 @@ namespace SmartPeak
     }
     catch (const std::exception& e) {
       std::cerr << "storeFeatureMap(): " << e.what() << std::endl;
+      LOGE << e.what();
     }
 
     if (verbose_I) {
       std::cout << "==== END   storeFeatureMap" << std::endl;
     }
+    LOGD << "END storeFeatureMap";
   }
 
   void PickFeatures::process(
@@ -309,9 +339,12 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "==== START pickFeatures" << std::endl;
     }
+    LOGD << "START pickFeatures";
 
     if (params_I.find("MRMFeatureFinderScoring") != params_I.end() && params_I.at("MRMFeatureFinderScoring").empty()) {
       std::cout << "No parameters passed to PickFeatures. Not picking." << std::endl;
+      LOGE << "No parameters passed to PickFeatures. Not picking";
+      LOGD << "END pickFeatures";
       return;
     }
 
@@ -336,6 +369,7 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename() << "\n";
     }
+    LOGD << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename();
 
     rawDataHandler_IO.setFeatureMap(featureMap);
     rawDataHandler_IO.updateFeatureMapHistory();
@@ -344,6 +378,8 @@ namespace SmartPeak
       std::cout << "pickFeatures: output size: " << featureMap.size() << std::endl;
       std::cout << "==== END   pickFeatures" << std::endl;
     }
+    LOGI << "Feature Picker output size: " << featureMap.size();
+    LOGD << "END pickFeatures";
   }
 
   void FilterFeatures::process(
@@ -356,9 +392,13 @@ namespace SmartPeak
       std::cout << "==== START filterFeatures" << std::endl;
       std::cout << "filterFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
     }
+    LOGD << "START filterFeatures";
+    LOGI << "Feature Filter input size: " << rawDataHandler_IO.getFeatureMap().size();
 
     if (params_I.find("MRMFeatureFilter.filter_MRMFeatures") != params_I.end() && params_I.at("MRMFeatureFilter.filter_MRMFeatures").empty()) {
       std::cout << "No parameters passed to filterFeatures. Not filtering." << std::endl;
+      LOGE << "No parameters passed to filterFeatures. Not filtering";
+      LOGD << "END filterFeatures";
       return;
     }
 
@@ -381,6 +421,8 @@ namespace SmartPeak
       std::cout << "filterFeatures: output size: " << featureMap.size() << std::endl;
       std::cout << "==== END   filterFeatures" << std::endl;
     }
+    LOGI << "Feature Filter output size: " << featureMap.size();
+    LOGD << "END filterFeatures";
   }
 
   void CheckFeatures::process(
@@ -393,9 +435,13 @@ namespace SmartPeak
       std::cout << "==== START checkFeatures" << std::endl;
       std::cout << "checkFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
     }
+    LOGD << "START checkFeatures";
+    LOGI << "Feature Checker input size: " << rawDataHandler_IO.getFeatureMap().size();
 
     if (params_I.find("MRMFeatureFilter.filter_MRMFeatures.qc") != params_I.end() && params_I.at("MRMFeatureFilter.filter_MRMFeatures.qc").empty()) {
       std::cout << "No parameters passed to checkFeatures. Not checking." << std::endl;
+      LOGE << "No parameters passed to checkFeatures. Not checking";
+      LOGD << "END checkFeatures";
       return;
     }
 
@@ -418,6 +464,8 @@ namespace SmartPeak
       std::cout << "checkFeatures: output size: " << featureMap.size() << std::endl;
       std::cout << "==== END   checkFeatures" << std::endl;
     }
+    LOGI << "Feature Checker output size: " << featureMap.size();
+    LOGD << "END checkFeatures";
   }
 
   void SelectFeatures::process(
@@ -430,10 +478,14 @@ namespace SmartPeak
       std::cout << "==== START selectFeatures" << std::endl;
       std::cout << "selectFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
     }
+    LOGD << "START selectFeatures";
+    LOGI << "selectFeatures input size: " << rawDataHandler_IO.getFeatureMap().size();
 
     if (params_I.find("MRMFeatureSelector.schedule_MRMFeatures_qmip") != params_I.end() &&
       params_I.find("MRMFeatureSelector.schedule_MRMFeatures_score") != params_I.end()) {
       std::cout << "No parameters passed to selectFeatures. Not selecting." << std::endl;
+      LOGE << "No parameters passed to selectFeatures. Not selecting";
+      LOGD << "END selectFeatures";
       return;
     }
 
@@ -448,6 +500,9 @@ namespace SmartPeak
         Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
     } else {
+      LOGE << "Both arguments 'select params' and 'schedule params' are empty";
+      LOGD << "END selectFeatures";
+      // TODO: replace throw with return?
       throw std::invalid_argument("Both arguments 'select params' and 'schedule params' are empty.");
     }
 
@@ -455,6 +510,7 @@ namespace SmartPeak
 
     if (verbose_I) {
       std::cout << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename() << "\n";
+      LOGV << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename();
     }
 
     rawDataHandler_IO.setFeatureMap(output);
@@ -464,6 +520,8 @@ namespace SmartPeak
       std::cout << "selectFeatures: output size: " << output.size() << std::endl;
       std::cout << "==== END   selectFeatures" << std::endl;
     }
+    LOGI << "selectFeatures output size: " << output.size();
+    LOGD << "END selectFeatures";
   }
 
   void ValidateFeatures::process(
@@ -475,9 +533,12 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "==== START validateFeatures" << std::endl;
     }
+    LOGD << "START validateFeatures";
 
     if (params_I.find("MRMFeatureValidator.validate_MRMFeatures") != params_I.end() && params_I.at("MRMFeatureValidator.validate_MRMFeatures").empty()) {
       std::cout << "No parameters passed to validateFeatures. Not validating." << std::endl;
+      LOGE << "No parameters passed to validateFeatures. Not validating";
+      LOGD << "END validateFeatures";
       return;
     }
 
@@ -500,6 +561,7 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "==== END   validateFeatures" << std::endl;
     }
+    LOGD << "END validateFeatures";
   }
 
   void PlotFeatures::process(
@@ -510,6 +572,7 @@ namespace SmartPeak
   ) const {
     if (verbose_I)
       std::cout << "Plotting peaks with features (NOT IMPLEMENTED)" << std::endl;
+    LOGD << "START PlotFeatures";
 
     // TODO: Uncomment once FeaturePlotter is ready
 
@@ -524,6 +587,7 @@ namespace SmartPeak
     //   rawDataHandler_IO.getChromatogramMap(),
     //   rawDataHandler_IO.getFeatureMap()
     // );
+    LOGD << "END PlotFeatures";
   }
 
   void QuantifyFeatures::process(
@@ -536,6 +600,8 @@ namespace SmartPeak
       std::cout << "==== START quantifyComponents" << std::endl;
       std::cout << "Processing # quantitation methods: " << rawDataHandler_IO.getQuantitationMethods().size() << std::endl;
     }
+    LOGD << "START quantifyComponents";
+    LOGI << "Processing # quantitation methods: " << rawDataHandler_IO.getQuantitationMethods().size();
 
     try {
       OpenMS::AbsoluteQuantitation aq;
@@ -544,11 +610,13 @@ namespace SmartPeak
       rawDataHandler_IO.updateFeatureMapHistory();
     } catch (const std::exception& e) {
       std::cerr << "quantifyComponents(): " << e.what() << std::endl;
+      LOGE << e.what();
     }
 
     if (verbose_I) {
       std::cout << "==== END   quantifyComponents" << std::endl;
     }
+    LOGD << "END quantifyComponents";
   }
   
   void LoadTransitions::process(
@@ -563,14 +631,21 @@ namespace SmartPeak
       std::cout << "==== START loadTraML"
         << "\nloadTraML(): loading " << filenames.traML_csv_i << "; format: " << format << std::endl;
     }
+    LOGD << "START loadTraML";
+    LOGI << "Loading " << filenames.traML_csv_i;
+    LOGI << "Format: " << format;
 
     if (filenames.traML_csv_i.empty()) {
       std::cout << "loadTraML(): filename is empty\n";
+      LOGE << "Filename is empty";
+      LOGD << "END loadTraML";
       return;
     }
 
     if (!InputDataValidation::fileExists(filenames.traML_csv_i)) {
       std::cout << "loadTraML(): file not found\n";
+      LOGE << "File not found";
+      LOGD << "END loadTraML";
       return;
     }
 
@@ -594,19 +669,21 @@ namespace SmartPeak
       }
       else {
         std::cerr << "loadTraML(): format must either be \"csv\" or \"traML\".\n";
+        LOGE << "Format must either be 'csv' or 'traML'";
       }
     }
     catch (const std::exception& e) {
       std::cerr << "loadTraML(): " << e.what() << std::endl;
+      LOGE << e.what();
       rawDataHandler_IO.getTargetedExperiment().clear(true);
       std::cerr << "loadTraML(): targeted experiment clear" << std::endl;
+      LOGI << "targeted experiment clear";
     }
-
-    // std::cout << InputDataValidation::getTraMLInfo(rawDataHandler_IO);
 
     if (verbose_I) {
       std::cout << "==== END   loadTraML" << std::endl;
     }
+    LOGD << "END loadTraML";
   }
 
   void LoadFeatureFilters::process(
@@ -620,21 +697,30 @@ namespace SmartPeak
         << "\nloadFeatureFilter(): loading " << filenames.featureFilterComponents_csv_i << " and "
         << filenames.featureFilterComponentGroups_csv_i << std::endl;
     }
+    LOGD << "START loadFeatureFilter";
+    LOGI << "Loading: " << filenames.featureFilterComponents_csv_i << " and " <<
+      filenames.featureFilterComponentGroups_csv_i;
 
     if (filenames.featureFilterComponents_csv_i.empty() && filenames.featureFilterComponentGroups_csv_i.empty()) {
       std::cout << "loadFeatureFilter(): filenames are both empty\n";
+      LOGE << "Filenames are both empty";
+      LOGD << "END loadFeatureFilter";
       return;
     }
 
     if (filenames.featureFilterComponents_csv_i.size() &&
       !InputDataValidation::fileExists(filenames.featureFilterComponents_csv_i)) {
       std::cout << "loadFeatureFilter(): file not found (" << filenames.featureFilterComponents_csv_i << ")\n";
+      LOGE << "File not found: " << filenames.featureFilterComponents_csv_i;
+      LOGD << "END loadFeatureFilter";
       return;
     }
 
     if (filenames.featureFilterComponentGroups_csv_i.size() &&
       !InputDataValidation::fileExists(filenames.featureFilterComponentGroups_csv_i)) {
       std::cout << "loadFeatureFilter(): file not found (" << filenames.featureFilterComponentGroups_csv_i << ")\n";
+      LOGE << "File not found: " << filenames.featureFilterComponentGroups_csv_i;
+      LOGD << "END loadFeatureFilter";
       return;
     }
 
@@ -649,17 +735,18 @@ namespace SmartPeak
     }
     catch (const std::exception& e) {
       std::cerr << "loadFeatureFilter(): " << e.what() << std::endl;
+      LOGE << e.what();
       rawDataHandler_IO.getFeatureFilter().component_qcs.clear();
       rawDataHandler_IO.getFeatureFilter().component_group_qcs.clear();
       rawDataHandler_IO.getFeatureFilter().component_group_pair_qcs.clear();
       std::cerr << "loadFeatureFilter(): feature filter clear" << std::endl;
+      LOGI << "feature filter clear";
     }
-
-    // std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler_IO, true);
 
     if (verbose_I) {
       std::cout << "==== END   loadFeatureFilter" << std::endl;
     }
+    LOGD << "END loadFeatureFilter";
   }
 
   void LoadFeatureQCs::process(
@@ -673,21 +760,30 @@ namespace SmartPeak
         << "\nloadFeatureQC(): loading " << filenames.featureQCComponents_csv_i << " and "
         << filenames.featureQCComponentGroups_csv_i << std::endl;
     }
+    LOGD << "START loadFeatureQC";
+    LOGI << "Loading: " << filenames.featureQCComponents_csv_i << " and " <<
+      filenames.featureQCComponentGroups_csv_i;
 
     if (filenames.featureQCComponents_csv_i.empty() && filenames.featureQCComponentGroups_csv_i.empty()) {
       std::cout << "loadFeatureQC(): filenames are both empty\n";
+      LOGE << "Filenames are both empty";
+      LOGD << "END loadFeatureQC";
       return;
     }
 
     if (filenames.featureQCComponents_csv_i.size() &&
       !InputDataValidation::fileExists(filenames.featureQCComponents_csv_i)) {
       std::cout << "loadFeatureQC(): file not found (" << filenames.featureQCComponents_csv_i << ")\n";
+      LOGE << "File not found: " << filenames.featureQCComponents_csv_i;
+      LOGD << "END loadFeatureQC";
       return;
     }
 
     if (filenames.featureQCComponentGroups_csv_i.size() &&
       !InputDataValidation::fileExists(filenames.featureQCComponentGroups_csv_i)) {
       std::cout << "loadFeatureQC(): file not found (" << filenames.featureQCComponentGroups_csv_i << ")\n";
+      LOGE << "File not found: " << filenames.featureQCComponentGroups_csv_i;
+      LOGD << "END loadFeatureQC";
       return;
     }
 
@@ -702,17 +798,18 @@ namespace SmartPeak
     }
     catch (const std::exception& e) {
       std::cerr << "loadFeatureQC(): " << e.what() << std::endl;
+      LOGE << e.what();
       rawDataHandler_IO.getFeatureQC().component_qcs.clear();
       rawDataHandler_IO.getFeatureQC().component_group_qcs.clear();
       rawDataHandler_IO.getFeatureQC().component_group_pair_qcs.clear();
       std::cerr << "loadFeatureQC(): feature qc clear" << std::endl;
+      LOGI << "Feature qc clear";
     }
-
-    // std::cout << InputDataValidation::getComponentsAndGroupsInfo(rawDataHandler_IO, false);
 
     if (verbose_I) {
       std::cout << "==== END   loadFeatureQC" << std::endl;
     }
+    LOGD << "END loadFeatureQC";
   }
 
   void LoadValidationData::process(
@@ -725,14 +822,20 @@ namespace SmartPeak
       std::cout << "==== START loadValidationData"
         << "\nloadValidationData(): loading " << filenames.referenceData_csv_i << std::endl;
     }
+    LOGD << "START loadValidationData";
+    LOGI << "Loading: " << filenames.referenceData_csv_i;
 
     if (filenames.referenceData_csv_i.empty()) {
       std::cout << "loadValidationData(): filename is empty\n";
+      LOGE << "Filename is empty";
+      LOGD << "END loadValidationData";
       return;
     }
 
     if (!InputDataValidation::fileExists(filenames.referenceData_csv_i)) {
       std::cout << "loadValidationData(): file not found\n";
+      LOGE << "File not found";
+      LOGD << "END loadValidationData";
       return;
     }
 
@@ -851,6 +954,7 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "==== END   loadValidationData" << std::endl;
     }
+    LOGD << "END loadValidationData";
   }
 
   void LoadParameters::process(
@@ -863,14 +967,20 @@ namespace SmartPeak
       std::cout << "==== START readRawDataProcessingParameters"
         << "\nreadRawDataProcessingParameters(): loading " << filenames.parameters_csv_i << std::endl;
     }
+    LOGD << "START readRawDataProcessingParameters";
+    LOGI << "Loading: " << filenames.parameters_csv_i;
 
     if (filenames.parameters_csv_i.empty()) {
       std::cout << "readRawDataProcessingParameters(): filename is empty\n";
+      LOGE << "Filename is empty";
+      LOGD << "END readRawDataProcessingParameters";
       return;
     }
 
     if (!InputDataValidation::fileExists(filenames.parameters_csv_i)) {
       std::cout << "readRawDataProcessingParameters(): file not found\n";
+      LOGE << "File not found";
+      LOGD << "END readRawDataProcessingParameters";
       return;
     }
 
@@ -880,11 +990,13 @@ namespace SmartPeak
     }
     catch (const std::exception& e) {
       std::cerr << "readRawDataProcessingParameters(): " << e.what() << std::endl;
+      LOGE << e.what();
     }
 
     if (verbose_I) {
       std::cout << "==== END   readRawDataProcessingParameters" << std::endl;
     }
+    LOGD << "END readRawDataProcessingParameters";
   }
 
   void LoadParameters::sanitizeParameters(
@@ -894,6 +1006,7 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "==== START sanitizeRawDataProcessorParameters" << std::endl;
     }
+    LOGD << "START sanitizeRawDataProcessorParameters";
 
     // # check for workflow parameters integrity
     const std::vector<std::string> required_parameters = {
@@ -924,30 +1037,48 @@ namespace SmartPeak
     if (verbose_I) {
       std::cout << "==== END   sanitizeRawDataProcessorParameters" << std::endl;
     }
+    LOGD << "END sanitizeRawDataProcessorParameters";
   }
 
-  void ZeroChromatogramBaseline::process(RawDataHandler & rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames & filenames, const bool verbose_I) const
+  void ZeroChromatogramBaseline::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames & filenames,
+    const bool verbose_I
+  ) const
   {
     if (verbose_I) {
       std::cout << "==== START ZeroChromatogramBaseline" << std::endl;
     }
+    LOGD << "START ZeroChromatogramBaseline";
+
     std::vector<OpenMS::MSChromatogram>& chroms = rawDataHandler_IO.getChromatogramMap().getChromatograms();
     for (OpenMS::MSChromatogram& ch : chroms) {
       OpenMS::subtractMinimumIntensity(ch);
     }
+
     if (verbose_I) {
       std::cout << "==== END   ZeroChromatogramBaseline" << std::endl;
     }
+    LOGD << "END ZeroChromatogramBaseline";
   }
 
-  void MapChromatograms::process(RawDataHandler & rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames & filenames, const bool verbose_I) const
+  void MapChromatograms::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  ) const
   {
     if (verbose_I) {
       std::cout << "==== START MapChromatograms" << std::endl;
     }
+    LOGD << "START MapChromatograms";
 
     if (params_I.find("MRMMapping") != params_I.end() && params_I.at("MRMMapping").empty()) {
       std::cout << "No parameters passed to MRMMapping. No transition mapping will be done." << std::endl;
+      LOGE << "No parameters passed to MRMMapping. No transition mapping will be done";
+      LOGD << "END MapChromatograms";
       return;
     }
 
@@ -962,16 +1093,25 @@ namespace SmartPeak
       rawDataHandler_IO.getTargetedExperiment(),
       rawDataHandler_IO.getChromatogramMap()
     );
+
     if (verbose_I) {
       std::cout << "==== END   MapChromatograms" << std::endl;
     }
+    LOGD << "END MapChromatograms";
   }
 
-  void ExtractChromatogramWindows::process(RawDataHandler & rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames & filenames, const bool verbose_I) const
+  void ExtractChromatogramWindows::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  ) const
   {
     if (verbose_I) {
       std::cout << "==== START ExtractChromatogramWindows" << std::endl;
     }
+    LOGD << "START ExtractChromatogramWindows";
+
     for (const OpenMS::MRMFeatureQC::ComponentQCs& transition_filters : rawDataHandler_IO.getFeatureFilter().component_qcs) {
       for (OpenMS::MSChromatogram& ch : rawDataHandler_IO.getChromatogramMap().getChromatograms()) {
         if (transition_filters.component_name == ch.getNativeID()) {
@@ -979,8 +1119,10 @@ namespace SmartPeak
         }        
       }
     }
+
     if (verbose_I) {
       std::cout << "==== END   ExtractChromatogramWindows" << std::endl;
     }
+    LOGD << "END ExtractChromatogramWindows";
   }
 }
