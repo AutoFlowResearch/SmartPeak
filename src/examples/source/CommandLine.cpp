@@ -176,6 +176,9 @@ public:
     }
     else if ("3" == in) {
       setSequencePathnameFromInput();
+      mzML_dir_.clear();
+      features_in_dir_.clear();
+      features_out_dir_.clear();
       const bool pathnamesAreCorrect = buildStaticFilenames();
       if (pathnamesAreCorrect) {
         sequenceHandler_.clear();
