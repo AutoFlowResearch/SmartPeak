@@ -176,6 +176,9 @@ public:
     }
     else if ("3" == in) {
       setSequencePathnameFromInput();
+      mzML_dir_.clear();
+      features_in_dir_.clear();
+      features_out_dir_.clear();
       const bool pathnamesAreCorrect = buildStaticFilenames();
       if (pathnamesAreCorrect) {
         sequenceHandler_.clear();
@@ -574,7 +577,7 @@ public:
     in = getLineInput("> ", false);
 
     if      ("1" == in) {
-      std::cout << InputDataValidation::getSequenceInfo(sequenceHandler_, ",") << "\n";
+      std::cout << InputDataValidation::getSequenceInfo(sequenceHandler_) << "\n";
     }
     else if ("2" == in) {
       std::cout << InputDataValidation::getTraMLInfo(
@@ -1334,7 +1337,8 @@ public:
   }
 };
 
-int main(int argc, char **argv)
+// int main(int argc, char **argv)
+int main()
 {
   // CommandLine cli(argc, argv);
   CommandLine cli;

@@ -268,7 +268,7 @@ namespace SmartPeak
       } else if (cast.getTag() == CastValue::FLOAT_LIST) {
         cast.fl_.push_back(std::strtof(it->str().c_str(), NULL));
       } else if (cast.getTag() == CastValue::INT_LIST) {
-        cast.il_.push_back(std::strtol(it->str().c_str(), NULL, 10));
+        cast.il_.push_back(std::stoi(it->str()));
       } else if (cast.getTag() == CastValue::STRING_LIST) {
         cast.sl_.push_back((*it)[1].str());
       } else {
@@ -312,12 +312,17 @@ namespace SmartPeak
 
     const std::unordered_set<char> characters(whitespaces.cbegin(), whitespaces.cend());
 
-    int l, r;
+    size_t l, r;
 
-    for (l = 0; static_cast<size_t>(l) < s.size() && characters.count(s[l]); ++l)
+    for (l = 0; l < s.size() && characters.count(s[l]); ++l)
       ;
 
-    for (r = s.size() - 1; r >= l && characters.count(s[r]); --r)
+    if (l == s.size()) {
+      return std::string();
+    }
+
+    // reaching here implies that s contains at least one non-whitespace character
+    for (r = s.size() - 1; r > l && characters.count(s[r]); --r)
       ;
 
     return s.substr(l, r - l + 1);
@@ -416,5 +421,53 @@ namespace SmartPeak
     }
 
     return v;
+  }
+
+  bool Utilities::testStoredQuantitationMethods(const std::string& pathname)
+  {
+    io::CSVReader<
+      4,
+      io::trim_chars<' ', '\t'>,
+      io::no_quote_escape<','>, // io::no_quote_escape<','>, // io::double_quote_escape<',', '\"'>,
+      io::no_comment // io::single_line_comment<'#'>
+    > in(pathname);
+    const std::string s_is_name {"IS_name"};
+    const std::string s_component_name {"component_name"};
+    const std::string s_transformation_model_param_slope {"transformation_model_param_slope"};
+    const std::string s_transformation_model_param_intercept {"transformation_model_param_intercept"};
+
+    in.read_header(
+      io::ignore_extra_column,
+      s_is_name,
+      s_component_name,
+      s_transformation_model_param_slope,
+      s_transformation_model_param_intercept
+    );
+
+    std::string is_name;
+    std::string component_name;
+    double slope;
+    double intercept;
+    bool is_ok {false};
+
+    std::cout <<
+      "IS_name                       \t"
+      "component_name                \t"
+      "slope                         \t"
+      "intercept                     \n";
+
+    while (!is_ok && in.read_row(is_name, component_name, slope, intercept)) {
+      std::cout <<
+        std::setw(30) << std::left << is_name << "\t" <<
+        std::setw(30) << std::left << component_name << "\t" <<
+        std::setw(30) << slope << "\t" <<
+        std::setw(30) << intercept << std::endl;
+      if (slope != 1.0 || intercept != 0.0) {
+        std::cout << "is_ok!!!\n";
+        is_ok = true;
+      }
+    }
+
+    return is_ok;
   }
 }

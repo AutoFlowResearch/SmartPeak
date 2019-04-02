@@ -12,6 +12,13 @@ namespace SmartPeak
   class SequenceSegmentProcessor
   {
   public:
+    SequenceSegmentProcessor()                                           = default;
+    virtual ~SequenceSegmentProcessor()                                  = default;
+    SequenceSegmentProcessor(const SequenceSegmentProcessor&)            = delete;
+    SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor&) = delete;
+    SequenceSegmentProcessor(SequenceSegmentProcessor&&)                 = delete;
+    SequenceSegmentProcessor& operator=(SequenceSegmentProcessor&&)      = delete;
+
     virtual int getID() const = 0;  ///< get the raw data processor class ID
     virtual std::string getName() const = 0;  ///< get the raw data processor class name
     virtual std::string getDescription() const = 0;  ///< get the raw data processor class description

@@ -19,14 +19,15 @@ void test_main_GCMS_SIM_Unknown()
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;
   Filenames filenames;
+
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_SIM_Unknowns/features/GCMS_SIM_1_BatchName_1900-01-01_000000.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
-
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
+
+  rawDataHandler.clear();
 
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_SIM_Unknowns/features/GCMS_SIM_test.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
-
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 
 cout << "fm1 size: " << fm1.size() << endl;
@@ -65,7 +66,7 @@ cout << "15 0 getRT: " << f1->getRT() << endl;
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
 }
 
-int main(int argc, char **argv)
+int main()
 {
   test_main_GCMS_SIM_Unknown();
   return 0;
