@@ -35,7 +35,6 @@ namespace SmartPeak
       std::cerr << type << " type not supported." << std::endl;
       LOGW << "Type not supported: " << type;
       cast.setTagAndData(CastValue::UNKNOWN, value);
-      throw std::invalid_argument("type is invalid");
     }
   }
 
