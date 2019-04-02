@@ -98,6 +98,7 @@ namespace SmartPeak
         if (meta_data_I.getSequenceSegmentName() == sequenceSegmentHandler.getSequenceSegmentName()) {
           absQuantMethods_ptr = sequenceSegmentHandler.getQuantitationMethodsShared();
           found_seq_seg = true;
+          sequenceSegmentHandler.getSampleIndices().push_back(sequence_.size()); // index = the size of the sequence
           break;
         }
       }
