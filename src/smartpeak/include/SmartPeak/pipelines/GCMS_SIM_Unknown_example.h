@@ -7,13 +7,12 @@ using namespace SmartPeak;
 void example_GCMS_SIM_Unknowns(
   const std::string& dir_I,
   const Filenames& static_filenames,
-  const std::string& delimiter_I = ",",
-  const bool verbose_I = false
+  const std::string& delimiter_I = ","
 )
 {
   SequenceHandler sequenceHandler;
 
-  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true, true);
+  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true);
 
   const std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
     std::shared_ptr<RawDataProcessor>(new LoadRawData()),
@@ -44,8 +43,7 @@ void example_GCMS_SIM_Unknowns(
     sequenceHandler,
     dynamic_filenames,
     std::set<std::string>(),
-    raw_data_processing_methods,
-    verbose_I
+    raw_data_processing_methods
   );
 
   SequenceParser::writeDataMatrixFromMetaValue(
