@@ -16,6 +16,7 @@
 #define CSV_IO_NO_THREAD
 #endif
 #include <SmartPeak/io/csv.h>
+#include <plog/Log.h>
 
 #define maxFunc(a,b) (((a) > (b)) ? (a) : (b))
 
@@ -367,15 +368,14 @@ public:
     template<typename T>
     static std::map<std::string, float> calculateValidationMetrics(
       const std::vector<T>& y_true,
-      const std::vector<T>& y_pred,
-      const bool verbose_I = false
+      const std::vector<T>& y_pred
     )
     {
       if (y_true.empty() || y_pred.empty()) {
         throw std::invalid_argument("Actual and predicted values' vectors cannot be empty.");
       }
 
-      const std::array<size_t, 4> conf = computeConfusionMatrix(y_true, y_pred, verbose_I);
+      const std::array<size_t, 4> conf = computeConfusionMatrix(y_true, y_pred);
       const size_t TP = conf[0];
       const size_t FP = conf[1];
       const size_t FN = conf[2];
@@ -394,8 +394,7 @@ public:
     template<typename T>
     static std::array<size_t, 4> computeConfusionMatrix(
       const std::vector<T>& y_true,
-      const std::vector<T>& y_pred,
-      const bool verbose_I = false
+      const std::vector<T>& y_pred
     )
     {
       if (y_true.size() != y_pred.size())
@@ -425,8 +424,7 @@ public:
         }
       }
 
-      if (verbose_I)
-        std::cout << "Confusion matrix: [TP, FP, FN, TN] = [" << TP << ", " << FP << ", " << FN << ", " << TN << "]" << std::endl;
+      LOGD << "Confusion matrix: [TP, FP, FN, TN] = [" << TP << ", " << FP << ", " << FN << ", " << TN << "]";
 
       return conf;
     }

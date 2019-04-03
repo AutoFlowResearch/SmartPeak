@@ -3,6 +3,7 @@
 #pragma once
 
 #include <SmartPeak/core/SequenceHandler.h>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -22,8 +23,7 @@ public:
     static void readSequenceFile(
       SequenceHandler& sequenceHandler,
       const std::string& pathname,
-      const std::string& delimiter,
-      const bool verbose = false
+      const std::string& delimiter
     );
 
     template<typename T>
@@ -41,7 +41,7 @@ public:
       } else if (std::is_same<T, float>::value) {
         output = std::stof(s);
       } else {
-        std::cerr << "Error: SequenceParser::validateAndConvert. Case not handled.\n";
+        LOGE << "Case not handled";
         return false;
       }
 
@@ -61,8 +61,7 @@ public:
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
       const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown}),
-      const bool verbose = false
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
     struct Row
@@ -107,8 +106,7 @@ public:
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
       const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown}),
-      const bool verbose = false
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
   };
 }
