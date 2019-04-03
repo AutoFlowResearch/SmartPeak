@@ -7,13 +7,12 @@ using namespace SmartPeak;
 void example_HPLC_UV_Standards(
   const std::string& dir_I,
   const Filenames& static_filenames,
-  const std::string& delimiter_I = ",",
-  const bool verbose_I = false
+  const std::string& delimiter_I = ","
 )
 {
   SequenceHandler sequenceHandler;
 
-  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true, true);
+  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true);
 
   std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
     std::shared_ptr<RawDataProcessor>(new LoadRawData()),
@@ -43,8 +42,7 @@ void example_HPLC_UV_Standards(
     sequenceHandler,
     dynamic_filenames1,
     std::set<std::string>(),
-    raw_data_processing_methods,
-    true
+    raw_data_processing_methods
   );
 
   const std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods = {
@@ -68,8 +66,7 @@ void example_HPLC_UV_Standards(
     sequenceHandler,
     dynamic_filenames2,
     std::set<std::string>(),
-    sequence_segment_processing_methods,
-    true
+    sequence_segment_processing_methods
   );
 
   raw_data_processing_methods = {
@@ -94,8 +91,7 @@ void example_HPLC_UV_Standards(
     sequenceHandler,
     dynamic_filenames3,
     std::set<std::string>(),
-    raw_data_processing_methods,
-    true
+    raw_data_processing_methods
   );
 
   SequenceParser::writeDataMatrixFromMetaValue(
