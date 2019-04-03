@@ -32,7 +32,6 @@ namespace SmartPeak
     } else if (lowercase_type == "string") {
       cast = value;
     } else {
-      std::cerr << type << " type not supported." << std::endl;
       LOGW << "Type not supported: " << type;
       cast.setTagAndData(CastValue::UNKNOWN, value);
     }
@@ -46,7 +45,6 @@ namespace SmartPeak
     for (const std::map<std::string,std::string>& param : parameters_I) {
       const std::string& name = param.at("name");
       if (!Param_IO.exists(name)) {
-        std::cout << "Utilities::updateParameters(): parameter \"" << name << "\" not found." << std::endl;
         LOGW << "Parameter not found: " << name;
         continue;
       }
@@ -256,7 +254,6 @@ namespace SmartPeak
         cast = trimmed;
       }
     } catch (const std::exception& e) {
-      std::cerr << "parseString(): " << e.what() << std::endl;
       LOGE << e.what();
     }
   }
