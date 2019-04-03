@@ -31,7 +31,6 @@ public:
       @param[out] output_validated Validated features
       @param[out] validation_metrics Validation metrics
       @param[in] Tr_window Retention time difference threshold
-      @param[in] verbose_I Verbosity
     */
     static void validate_MRMFeatures(
       const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data_v,
@@ -39,8 +38,7 @@ public:
       const std::string& injection_name,
       OpenMS::FeatureMap& output_validated,
       std::map<std::string, float>& validation_metrics,
-      const float Tr_window = 1.0,
-      const bool verbose_I = false
+      const float Tr_window = 1.0
     );
   };
 }

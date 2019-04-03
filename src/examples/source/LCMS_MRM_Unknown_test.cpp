@@ -2,7 +2,7 @@
 
 #include <SmartPeak/test_config.h>
 
-#include <SmartPeak/core/LCMS_MRM_Unknown_example.h>
+#include <SmartPeak/pipelines/LCMS_MRM_Unknown_example.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
 
@@ -19,14 +19,15 @@ void test_main_LCMS_MRM_Unknown()
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;
   Filenames filenames;
+
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_1_BatchName_1900-01-01_000000.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
-
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_test.featureXMLL");
-  loadFeatures.process(rawDataHandler, {}, filenames);
+  rawDataHandler.clear();
 
+  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_test.featureXML");
+  loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 
 cout << "fm1 size: " << fm1.size() << endl;
@@ -75,7 +76,7 @@ cout << "50 0 getRT: " << f1->getRT() << endl;
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
 }
 
-int main(int argc, char **argv)
+int main()
 {
   test_main_LCMS_MRM_Unknown();
   return 0;

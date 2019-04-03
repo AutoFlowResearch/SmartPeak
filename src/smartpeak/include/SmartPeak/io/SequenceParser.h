@@ -3,6 +3,7 @@
 #pragma once
 
 #include <SmartPeak/core/SequenceHandler.h>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -22,9 +23,30 @@ public:
     static void readSequenceFile(
       SequenceHandler& sequenceHandler,
       const std::string& pathname,
-      const std::string& delimiter,
-      const bool verbose = false
+      const std::string& delimiter
     );
+
+    template<typename T>
+    static bool validateAndConvert(
+      const std::string& s,
+      T& output
+    )
+    {
+      if (Utilities::trimString(s).empty()) {
+        return false;
+      }
+
+      if (std::is_same<T, int>::value) {
+        output = std::stoi(s);
+      } else if (std::is_same<T, float>::value) {
+        output = std::stof(s);
+      } else {
+        LOGE << "Case not handled";
+        return false;
+      }
+
+      return true;
+    }
 
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
     static void makeDataTableFromMetaValue(
@@ -35,12 +57,11 @@ public:
       const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
-    static void writeDataTableFromMetaValue(
+    static bool writeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
       const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown}),
-      const bool verbose = false
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
 
     struct Row
@@ -81,12 +102,11 @@ public:
     );
 
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
-    static void writeDataMatrixFromMetaValue(
+    static bool writeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
       const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown}),
-      const bool verbose = false
+      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
     );
   };
 }

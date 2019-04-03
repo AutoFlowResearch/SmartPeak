@@ -4,9 +4,20 @@
 
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
+
+#include <iomanip>
+#include <ios>
 #include <iostream>
 #include <regex>
+#include <string>
 #include <unordered_set>
+
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
+#include <plog/Log.h>
+
 #define maxFunc(a,b) (((a) > (b)) ? (a) : (b))
 
 namespace SmartPeak
@@ -182,6 +193,7 @@ public:
         clear();
       }
 
+      // TODO: rename to deallocate() or similar
       void clear()
       {
         if (is_clear_)
@@ -204,6 +216,9 @@ public:
           case STRING_LIST:
             sl_.~vector();
             break;
+          default:
+            // nothing to deallocate
+            break;
         }
 
         is_clear_ = true;
@@ -222,6 +237,8 @@ public:
         STRING_LIST
       };
 
+      Type tag_;
+
       union {
         bool b_;
         float f_;
@@ -232,6 +249,8 @@ public:
         std::vector<int> il_;
         std::vector<std::string> sl_;
       };
+
+      CastValue::Type getTag() const { return tag_; }
 
       template<typename T>
       void setTagAndData(const CastValue::Type type, const T& data)
@@ -287,11 +306,7 @@ public:
         is_clear_ = false;
       }
 
-      Type tag_;
       bool is_clear_;
-
-    public:
-      CastValue::Type getTag() const { return tag_; }
     };
 
     /**
@@ -353,15 +368,14 @@ public:
     template<typename T>
     static std::map<std::string, float> calculateValidationMetrics(
       const std::vector<T>& y_true,
-      const std::vector<T>& y_pred,
-      const bool verbose_I = false
+      const std::vector<T>& y_pred
     )
     {
       if (y_true.empty() || y_pred.empty()) {
         throw std::invalid_argument("Actual and predicted values' vectors cannot be empty.");
       }
 
-      const std::array<size_t, 4> conf = computeConfusionMatrix(y_true, y_pred, verbose_I);
+      const std::array<size_t, 4> conf = computeConfusionMatrix(y_true, y_pred);
       const size_t TP = conf[0];
       const size_t FP = conf[1];
       const size_t FN = conf[2];
@@ -380,8 +394,7 @@ public:
     template<typename T>
     static std::array<size_t, 4> computeConfusionMatrix(
       const std::vector<T>& y_true,
-      const std::vector<T>& y_pred,
-      const bool verbose_I = false
+      const std::vector<T>& y_pred
     )
     {
       if (y_true.size() != y_pred.size())
@@ -411,8 +424,7 @@ public:
         }
       }
 
-      if (verbose_I)
-        std::cout << "Confusion matrix: [TP, FP, FN, TN] = [" << TP << ", " << FP << ", " << FN << ", " << TN << "]" << std::endl;
+      LOGD << "Confusion matrix: [TP, FP, FN, TN] = [" << TP << ", " << FP << ", " << FN << ", " << TN << "]";
 
       return conf;
     }
@@ -439,5 +451,21 @@ public:
       const std::vector<std::map<std::string, std::string>>& params,
       const std::vector<std::map<std::string, std::string>>& score_weights
     );
+
+    template<typename Iterator>
+    static std::string join(Iterator first, Iterator last, const std::string& delimiter = "")
+    {
+      std::ostringstream oss;
+      if (first != last) {
+        oss << *first;
+        for (Iterator it = 1 + first; it != last; ++it) {
+          oss << delimiter << *it;
+        }
+      }
+      return oss.str();
+    }
+
+    // To validate quantitation methods stored in examples' tests
+    static bool testStoredQuantitationMethods(const std::string& pathname);
   };
 }

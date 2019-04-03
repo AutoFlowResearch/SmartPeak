@@ -10,27 +10,30 @@
 #include <SmartPeak/io/InputDataValidation.h>
 #include <ctime>
 
+#include <plog/Log.h>
+
 namespace SmartPeak
 {
   void SequenceParser::readSequenceFile(
     SequenceHandler& sequenceHandler,
     const std::string& pathname,
-    const std::string& delimiter,
-    const bool verbose
+    const std::string& delimiter
   )
   {
-    if (verbose) {
-      std::cout << "==== START readSequenceFile()"
-        << "\nreadSequenceFile(): loading " << pathname << std::endl;
-    }
+    LOGD << "START readSequenceFile";
+    LOGD << "Delimiter: " << delimiter;
+
+    LOGI << "Loading: " << pathname;
 
     if (pathname.empty()) {
-      std::cout << "readSequenceFile(): pathname is empty\n";
+      LOGE << "Pathname is empty";
+      LOGD << "END readSequenceFile";
       return;
     }
 
     if (!InputDataValidation::fileExists(pathname)) {
-      std::cout << "readSequenceFile(): file not found\n";
+      LOGE << "File not found";
+      LOGD << "END readSequenceFile";
       return;
     }
 
@@ -127,65 +130,66 @@ namespace SmartPeak
       throw std::invalid_argument("Delimiter \"" + delimiter + "\" is not supported.");
     }
 
-    MetaDataHandler t; // as in temporary
-    std::string t_date;
-    std::string t_sample_type;
-    size_t row_number = 1;
-    bool inj_numbers_equal_row_numbers = false;
-
     while (true) {
+      MetaDataHandler t; // as in temporary
+      std::string t_date;
+      std::string t_sample_type;
+      std::string t_rack_number;
+      std::string t_plate_number;
+      std::string t_pos_number;
+      std::string t_inj_number;
+      std::string t_dilution_factor;
+      std::string t_inj_volume;
       bool is_valid = false;
 
       if (delimiter == s_comma) {
         is_valid = in_comma.read_row(t.sample_name, t.sample_group_name,
           t.sequence_segment_name, t_sample_type, t.original_filename,
-          t.proc_method_name, t.rack_number, t.plate_number, t.pos_number,
-          t.inj_number, t.dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t.inj_volume, t.inj_volume_units, t.batch_name);
+          t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
+          t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
+          t_date, t_inj_volume, t.inj_volume_units, t.batch_name);
       } else if (delimiter == s_semicolon) {
         is_valid = in_semicolon.read_row(t.sample_name, t.sample_group_name,
           t.sequence_segment_name, t_sample_type, t.original_filename,
-          t.proc_method_name, t.rack_number, t.plate_number, t.pos_number,
-          t.inj_number, t.dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t.inj_volume, t.inj_volume_units, t.batch_name);
+          t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
+          t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
+          t_date, t_inj_volume, t.inj_volume_units, t.batch_name);
       } else if (delimiter == s_tab) {
         is_valid = in_tab.read_row(t.sample_name, t.sample_group_name,
           t.sequence_segment_name, t_sample_type, t.original_filename,
-          t.proc_method_name, t.rack_number, t.plate_number, t.pos_number,
-          t.inj_number, t.dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t.inj_volume, t.inj_volume_units, t.batch_name);
+          t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
+          t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
+          t_date, t_inj_volume, t.inj_volume_units, t.batch_name);
       }
 
       if (!is_valid)
         break;
 
-      t.sample_type = MetaDataHandler::stringToSampleType(t_sample_type);
-      std::tm& adt = t.acquisition_date_and_time;
-      std::stringstream iss(t_date, std::ios_base::in);
-      iss >> adt.tm_mday >> adt.tm_mon >> adt.tm_year >> adt.tm_hour >> adt.tm_min >> adt.tm_sec;
-
-      if (t.inj_number <= 0) {
-        t.inj_number = row_number;
-        inj_numbers_equal_row_numbers = true;
+      if (false == validateAndConvert(t_inj_number, t.inj_number)) {
+        LOGW << "Warning: Empty cell in column '" << s_inj_number << "'. Skipping entire row";
+        continue;
       }
 
+      if (t.inj_number <= 0) {
+        LOGW << "Warning: Value '" << t.inj_number << "' is not valid for column '" << s_inj_number << "'. Skipping entire row";
+        continue;
+      }
+
+      validateAndConvert(t_rack_number,     t.rack_number);
+      validateAndConvert(t_plate_number,    t.plate_number);
+      validateAndConvert(t_pos_number,      t.pos_number);
+      validateAndConvert(t_dilution_factor, t.dilution_factor);
+      validateAndConvert(t_inj_volume,      t.inj_volume);
+
+      t.sample_type = MetaDataHandler::stringToSampleType(t_sample_type);
+      std::tm& adt = t.acquisition_date_and_time;
+      std::istringstream iss(t_date);
+      iss >> adt.tm_mday >> adt.tm_mon >> adt.tm_year >> adt.tm_hour >> adt.tm_min >> adt.tm_sec;
+
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
-
-      t.clear();
-      t_date.clear();
-      t_sample_type.clear();
-      ++row_number;
     }
 
-    // std::cout << InputDataValidation::getSequenceInfo(sequenceHandler, delimiter);
-
-    if (inj_numbers_equal_row_numbers) {
-      std::cout << "One or more inj_number values were not found. These have been replaced with their row numbers.\n";
-    }
-
-    if (verbose) {
-      std::cout << "==== END   readSequenceFile()" << std::endl;
-    }
+    LOGD << "END readSequenceFile";
   }
 
   void SequenceParser::makeDataTableFromMetaValue(
@@ -213,6 +217,8 @@ namespace SmartPeak
     }
     headers_out = headers;
 
+    const std::string delimiter {"_____"};
+
     list_dict.clear();
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
@@ -224,8 +230,7 @@ namespace SmartPeak
       // feature_map_history_ is needed in order to export all "used_" = true and false features
       for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMapHistory()) {
         if (!feature.metaValueExists(s_PeptideRef) || feature.getMetaValue(s_PeptideRef).isEmpty()) {
-          // std::cout << "component_group_name is absent or empty. Skipping this feature." << std::endl;
-          // TODO: Log it, instead
+          LOGV << "component_group_name is absent or empty. Skipping this feature";
           continue;
         }
         const std::string component_group_name = feature.getMetaValue(s_PeptideRef);
@@ -237,7 +242,7 @@ namespace SmartPeak
           if (!subordinate.metaValueExists(s_native_id) ||
               subordinate.getMetaValue(s_native_id).isEmpty() ||
               subordinate.getMetaValue(s_native_id).toString().empty()) {
-            std::cout << "component_name is absent or empty. Skipping this subordinate." << std::endl;
+            LOGV << "component_group_name is absent or empty. Skipping this subordinate";
             continue;
           }
           const std::string component_name = subordinate.getMetaValue(s_native_id);
@@ -261,12 +266,24 @@ namespace SmartPeak
             subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
           );
           for (const std::string& meta_value_name : meta_data) {
-            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-            if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0)
-              // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-              row.emplace(meta_value_name, std::to_string(datum.f_));
-            else
-              row.emplace(meta_value_name, "");
+            if (subordinate.metaValueExists(meta_value_name) &&
+                (meta_value_name == "QC_transition_message" ||
+                 meta_value_name == "QC_transition_group_message")) {
+
+              OpenMS::StringList messages = subordinate.getMetaValue(meta_value_name).toStringList();
+              row.emplace(
+                meta_value_name,
+                Utilities::join(messages.begin(), messages.end(), delimiter)
+              );
+            } else {
+              Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+              if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
+                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                row.emplace(meta_value_name, std::to_string(datum.f_));
+              } else {
+                row.emplace(meta_value_name, "");
+              }
+            }
           }
           list_dict.push_back(row);
         }
@@ -274,25 +291,27 @@ namespace SmartPeak
     }
   }
 
-  void SequenceParser::writeDataTableFromMetaValue(
+  bool SequenceParser::writeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types,
-    const bool verbose
+    const std::set<MetaDataHandler::SampleType>& sample_types
   )
   {
-    if (verbose) {
-      std::cout << "==== START writeDataTableFromMetaValue()"
-        << "\nwriteDataTableFromMetaValue(): storing " << filename << std::endl;
-    }
+    LOGD << "START writeDataTableFromMetaValue";
+    LOGI << "Storing: " << filename;
 
     std::vector<std::map<std::string,std::string>> list_dict;
     std::vector<std::string> headers;
     makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data, sample_types);
 
     CSVWriter writer(filename, ",");
-    writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      LOGD << "END writeDataTableFromMetaValue";
+      return false;
+    }
 
     for (const std::map<std::string,std::string>& m : list_dict) {
       std::vector<std::string> line;
@@ -302,9 +321,8 @@ namespace SmartPeak
       writer.writeDataInRow(line.cbegin(), line.cend());
     }
 
-    if (verbose) {
-      std::cout << "==== END   writeDataTableFromMetaValue()" << std::endl;
-    }
+    LOGD << "END writeDataTableFromMetaValue";
+    return true;
   }
 
   void SequenceParser::makeDataMatrixFromMetaValue(
@@ -376,18 +394,16 @@ namespace SmartPeak
     data_out = std::move(data);
   }
 
-  void SequenceParser::writeDataMatrixFromMetaValue(
+  bool SequenceParser::writeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types,
-    const bool verbose
+    const std::set<MetaDataHandler::SampleType>& sample_types
   )
   {
-    if (verbose) {
-      std::cout << "==== START writeDataMatrixFromMetaValue()"
-        << "\nwriteDataMatrixFromMetaValue(): storing " << filename << std::endl;
-    }
+    LOGD << "START writeDataMatrixFromMetaValue";
+
+    LOGI << "Storing: " << filename;
 
     std::vector<std::vector<float>> data;
     std::vector<std::string> columns;
@@ -398,7 +414,12 @@ namespace SmartPeak
     headers.insert(headers.end(), columns.begin(), columns.end());
 
     CSVWriter writer(filename, ",");
-    writer.writeDataInRow(headers.cbegin(), headers.cend());
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      LOGD << "END writeDataMatrixFromMetaValue";
+      return false;
+    }
 
     for (size_t i = 0; i < rows.size(); ++i) {
       std::vector<std::string> line;
@@ -412,8 +433,7 @@ namespace SmartPeak
       writer.writeDataInRow(line.cbegin(), line.cend());
     }
 
-    if (verbose) {
-      std::cout << "==== END   writeDataMatrixFromMetaValue()" << std::endl;
-    }
+    LOGD << "END writeDataMatrixFromMetaValue";
+    return true;
   }
 }

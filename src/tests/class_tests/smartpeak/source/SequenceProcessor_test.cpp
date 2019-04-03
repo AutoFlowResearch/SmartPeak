@@ -14,7 +14,7 @@ Filenames generateTestFilenames()
 {
   const std::string dir = SMARTPEAK_GET_TEST_DATA_PATH("");
   Filenames filenames;
-  filenames.sequence_csv_i                     = dir + "SequenceParser_sequence_1.csv";
+  filenames.sequence_csv_i                     = dir + "SequenceProcessor_sequence.csv";
   filenames.parameters_csv_i                   = dir + "RawDataProcessor_params_1_core.csv";
   filenames.traML_csv_i                        = dir + "OpenMSFile_traML_1.csv";
   filenames.featureFilterComponents_csv_i      = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_SUITE(sequenceprocessor)
 BOOST_AUTO_TEST_CASE(createSequence)
 {
   SequenceHandler sequenceHandler;
-  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", true, false);
+  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
 
   // Test initialization of the sequence
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
@@ -93,12 +93,18 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
   BOOST_CHECK_EQUAL(injection5.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
+
+  sequenceHandler.clear();
+  Filenames filenames { generateTestFilenames() };
+  filenames.sequence_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv");
+  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(processSequence)
 {
   SequenceHandler sequenceHandler;
-  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", true, false);
+  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
   const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::shared_ptr<RawDataProcessor>(new LoadRawData()) };
   const RawDataHandler& rawDataHandler0 = sequenceHandler.getSequence()[0].getRawData();
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
@@ -124,7 +130,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
 BOOST_AUTO_TEST_CASE(processSequenceSegments)
 {
   SequenceHandler sequenceHandler;
-  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", true, false);
+  SequenceProcessor::createSequence(sequenceHandler, generateTestFilenames(), ",", false);
   const vector<std::shared_ptr<SequenceSegmentProcessor>> raw_data_processing_methods =
     { std::shared_ptr<SequenceSegmentProcessor>(new CalculateCalibration()) };
 

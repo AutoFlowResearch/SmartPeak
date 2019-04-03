@@ -92,28 +92,7 @@ BOOST_AUTO_TEST_CASE(processorLoadRawData)
   BOOST_CHECK_CLOSE(chromatograms1[1][3].getIntensity(), -8.0, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms1[1][4].getIntensity(), 1.0, 1e-3);
 
-  // TEST CASE 2:  mzML with baseline correction
-  params_I.at("mzML")[0].at("value") = "true";
-  rawDataHandler.clear();
-  processor.process(rawDataHandler, params_I, filenames);
-
-  const vector<OpenMS::MSChromatogram>& chromatograms2 = rawDataHandler.getExperiment().getChromatograms();
-
-  BOOST_CHECK_EQUAL(chromatograms2.size(), 2);
-
-  BOOST_CHECK_CLOSE(chromatograms2[0][0].getIntensity(), 2.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2[0][1].getIntensity(), 3.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2[0][2].getIntensity(), 5.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2[0][3].getIntensity(), 18.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2[0][4].getIntensity(), 0.0, 1e-3);
-
-  BOOST_CHECK_CLOSE(chromatograms2[1][0].getIntensity(), 11.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2[1][1].getIntensity(), 12.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2[1][2].getIntensity(), 6.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2[1][3].getIntensity(), 0.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms2[1][4].getIntensity(), 9.0, 1e-3);
-
-  // TEST CASE 3:  Chromeleon file format
+  // TEST CASE 2:  Chromeleon file format
   params_I.at("mzML")[0].at("value") = "false";
   params_I.at("mzML").push_back(
     {
@@ -137,23 +116,6 @@ BOOST_AUTO_TEST_CASE(processorLoadRawData)
   BOOST_CHECK_CLOSE(chromatograms3[0][1800].getIntensity(), -0.232843, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms3[0][2400].getIntensity(), -0.223644, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms3[0][3300].getIntensity(), 0.126958, 1e-3);
-
-  // TEST CASE 3:  Chromeleon file format with baseline correction
-  params_I.at("mzML")[0].at("value") = "true";
-  rawDataHandler.clear();
-  processor.process(rawDataHandler, params_I, filenames);
-
-  const vector<OpenMS::MSChromatogram>& chromatograms4 = rawDataHandler.getExperiment().getChromatograms();
-
-  BOOST_CHECK_EQUAL(chromatograms4.size(), 1);
-  BOOST_CHECK_EQUAL(chromatograms4[0].size(), 3301);
-
-  BOOST_CHECK_CLOSE(chromatograms4[0][0].getIntensity(), 1.004634, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][600].getIntensity(), 0.500819, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][1200].getIntensity(), 0.33794, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][1800].getIntensity(), 0.771791, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][2400].getIntensity(), 0.78099, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][3300].getIntensity(), 1.131592, 1e-3);
 }
 
 BOOST_AUTO_TEST_CASE(extractMetaData)
@@ -227,6 +189,239 @@ BOOST_AUTO_TEST_CASE(gettersStoreRawData)
 BOOST_AUTO_TEST_CASE(processStoreRawData)
 {
   // no tests, it wraps OpenMS store function
+}
+
+/**
+  MapChromatograms Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorMapChromatograms)
+{
+  MapChromatograms* ptrMapChromatograms = nullptr;
+  MapChromatograms* nullPointerMapChromatograms = nullptr;
+  BOOST_CHECK_EQUAL(ptrMapChromatograms, nullPointerMapChromatograms);
+}
+
+BOOST_AUTO_TEST_CASE(destructorMapChromatograms)
+{
+  MapChromatograms* ptrMapChromatograms = nullptr;
+  ptrMapChromatograms = new MapChromatograms();
+  delete ptrMapChromatograms;
+}
+
+BOOST_AUTO_TEST_CASE(gettersMapChromatograms)
+{
+  MapChromatograms processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 18);
+  BOOST_CHECK_EQUAL(processor.getName(), "MAP_CHROMATOGRAMS");
+}
+
+BOOST_AUTO_TEST_CASE(processorMapChromatograms)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  // Test map chromatograms
+  MapChromatograms mapChroms;
+  mapChroms.process(rawDataHandler, params_1, filenames);
+
+  const vector<OpenMS::MSChromatogram>& chromatograms1 = rawDataHandler.getChromatogramMap().getChromatograms();
+
+  BOOST_CHECK_EQUAL(chromatograms1.size(), 324);
+
+  BOOST_CHECK_EQUAL(chromatograms1.front().getNativeID(), "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_CLOSE(chromatograms1.front().getPrecursor().getMZ(), 179, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front().getProduct().getMZ(), 136, 1e-3);
+
+  BOOST_CHECK_EQUAL(chromatograms1.back().getNativeID(), "nadph.nadph_2.Light");
+  BOOST_CHECK_CLOSE(chromatograms1.back().getPrecursor().getMZ(), 744, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back().getProduct().getMZ(), 79, 1e-3);
+}
+
+/**
+  ZeroChromatogramBaseline Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorZeroChromatogramBaseline)
+{
+  ZeroChromatogramBaseline* ptrZeroChromatogramBaseline = nullptr;
+  ZeroChromatogramBaseline* nullPointerZeroChromatogramBaseline = nullptr;
+  BOOST_CHECK_EQUAL(ptrZeroChromatogramBaseline, nullPointerZeroChromatogramBaseline);
+}
+
+BOOST_AUTO_TEST_CASE(destructorZeroChromatogramBaseline)
+{
+  ZeroChromatogramBaseline* ptrZeroChromatogramBaseline = nullptr;
+  ptrZeroChromatogramBaseline = new ZeroChromatogramBaseline();
+  delete ptrZeroChromatogramBaseline;
+}
+
+BOOST_AUTO_TEST_CASE(gettersZeroChromatogramBaseline)
+{
+  ZeroChromatogramBaseline processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 17);
+  BOOST_CHECK_EQUAL(processor.getName(), "ZERO_CHROMATOGRAM_BASELINE");
+}
+
+BOOST_AUTO_TEST_CASE(processorZeroChromatogramBaseline)
+{
+  // TEST CASE 1:  mzML with baseline correction
+  RawDataHandler rawDataHandler;
+  std::map<std::string, std::string> params_tmp = { // Must be initialized step by step due to Compiler Error C2665 on Windows...
+    {"name", "zero_baseline"},
+    {"type", "bool"},
+    {"value", "true"}
+  };
+  std::vector<std::map<std::string, std::string>> mzML_params;
+  mzML_params.push_back(params_tmp);
+  std::map<std::string, std::vector<std::map<std::string, std::string>>> params_I;
+  params_I.emplace("mzML", mzML_params);
+  params_I.emplace("ChromatogramExtractor", std::vector<std::map<std::string, std::string>>());
+
+  Filenames filenames;
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_baseline_correction.mzML");
+  LoadRawData processor;
+  processor.process(rawDataHandler, params_I, filenames);
+  rawDataHandler.setChromatogramMap(rawDataHandler.getExperiment()); // Avoiding the mapping step for testing purposes
+  ZeroChromatogramBaseline zeroChromBase;
+  zeroChromBase.process(rawDataHandler, params_I, filenames);
+
+  const vector<OpenMS::MSChromatogram>& chromatograms2 = rawDataHandler.getChromatogramMap().getChromatograms();
+  BOOST_CHECK_EQUAL(chromatograms2.size(), 2);
+  BOOST_CHECK_CLOSE(chromatograms2[0][0].getIntensity(), 2.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][1].getIntensity(), 3.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][2].getIntensity(), 5.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][3].getIntensity(), 18.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[0][4].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][0].getIntensity(), 11.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][1].getIntensity(), 12.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][2].getIntensity(), 6.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][3].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2[1][4].getIntensity(), 9.0, 1e-3);
+
+  // TEST CASE 2:  Chromeleon file format with baseline correction
+  params_I.at("mzML").push_back(
+    {
+      {"name", "format"},
+      {"type", "string"},
+      {"value", "ChromeleonFile"}
+    }
+  );
+  rawDataHandler.clear();
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_ChromeleonFile_10ug.txt");
+  processor.process(rawDataHandler, params_I, filenames);
+  rawDataHandler.setChromatogramMap(rawDataHandler.getExperiment()); // Avoiding the mapping step for testing purposes
+  zeroChromBase.process(rawDataHandler, params_I, filenames);
+
+  const vector<OpenMS::MSChromatogram>& chromatograms4 = rawDataHandler.getChromatogramMap().getChromatograms();
+  BOOST_CHECK_EQUAL(chromatograms4.size(), 1);
+  BOOST_CHECK_EQUAL(chromatograms4[0].size(), 3301);
+  BOOST_CHECK_CLOSE(chromatograms4[0][0].getIntensity(), 1.004634, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][600].getIntensity(), 0.500819, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][1200].getIntensity(), 0.33794, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][1800].getIntensity(), 0.771791, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][2400].getIntensity(), 0.78099, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][3300].getIntensity(), 1.131592, 1e-3);
+}
+
+/**
+  ExtractChromatogramWindows Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorExtractChromatogramWindows)
+{
+  ExtractChromatogramWindows* ptrExtractChromatogramWindows = nullptr;
+  ExtractChromatogramWindows* nullPointerExtractChromatogramWindows = nullptr;
+  BOOST_CHECK_EQUAL(ptrExtractChromatogramWindows, nullPointerExtractChromatogramWindows);
+}
+
+BOOST_AUTO_TEST_CASE(destructorExtractChromatogramWindows)
+{
+  ExtractChromatogramWindows* ptrExtractChromatogramWindows = nullptr;
+  ptrExtractChromatogramWindows = new ExtractChromatogramWindows();
+  delete ptrExtractChromatogramWindows;
+}
+
+BOOST_AUTO_TEST_CASE(gettersExtractChromatogramWindows)
+{
+  ExtractChromatogramWindows processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 19);
+  BOOST_CHECK_EQUAL(processor.getName(), "EXTRACT_CHROMATOGRAM_WINDOWS");
+}
+
+BOOST_AUTO_TEST_CASE(processorExtractChromatogramWindows)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  MapChromatograms mapChroms;
+  mapChroms.process(rawDataHandler, params_1, filenames);
+
+  // Control
+  const vector<OpenMS::MSChromatogram>& chromatograms1 = rawDataHandler.getChromatogramMap().getChromatograms();
+  BOOST_CHECK_EQUAL(chromatograms1.size(), 324);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[0].getIntensity(), 158.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[0].getMZ(), 38.621, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[1].getIntensity(), 211, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[1].getMZ(), 38.7209999, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[2].getIntensity(), 158, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.front()[2].getMZ(), 38.82, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[0].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[0].getMZ(), 912.233, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[1].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[1].getMZ(), 913.1870, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[2].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms1.back()[2].getMZ(), 914.139, 1e-3);
+
+  // Test window extraction
+  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_extractChromWindowTest_1.csv");
+  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  LoadFeatureFilters loadFeatureFilters;
+  loadFeatureFilters.process(rawDataHandler, {}, filenames);
+
+  ExtractChromatogramWindows extractChromWin;
+  extractChromWin.process(rawDataHandler, {}, filenames);
+
+  const vector<OpenMS::MSChromatogram>& chromatograms2 = rawDataHandler.getChromatogramMap().getChromatograms();
+  BOOST_CHECK_EQUAL(chromatograms2.size(), 324);
+  BOOST_CHECK_CLOSE(chromatograms2.front()[0].getIntensity(), 158.0, 1e-3); // No filtering; within the RT window
+  BOOST_CHECK_CLOSE(chromatograms2.front()[0].getMZ(), 38.621, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.front()[1].getIntensity(), 211, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.front()[1].getMZ(), 38.7209999, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.front()[2].getIntensity(), 158, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.front()[2].getMZ(), 38.82, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.back()[0].getIntensity(), 0.0, 1e-3); // Filtering; outside of the RT window
+  BOOST_CHECK_CLOSE(chromatograms2.back()[0].getMZ(), 951.20299, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.back()[1].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.back()[1].getMZ(), 952.31299, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.back()[2].getIntensity(), 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms2.back()[2].getMZ(), 953.40699, 1e-3);
 }
 
 /**
@@ -619,6 +814,9 @@ BOOST_AUTO_TEST_CASE(pickFeatures)
   loadRawData.process(rawDataHandler,params_1, filenames);
   loadRawData.extractMetaData(rawDataHandler);
 
+  MapChromatograms mapChroms;
+  mapChroms.process(rawDataHandler, params_1, filenames);
+
   // Test pick features
   PickFeatures pickFeatures;
   pickFeatures.process(rawDataHandler, params_1, filenames);
@@ -694,6 +892,9 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler,params_1, filenames);
   loadRawData.extractMetaData(rawDataHandler);
+
+  MapChromatograms mapChroms;
+  mapChroms.process(rawDataHandler, params_1, filenames);
 
   filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_1_core_RawDataProcessor.featureXML");
   LoadFeatures loadFeatures;
@@ -783,6 +984,9 @@ BOOST_AUTO_TEST_CASE(selectFeatures)
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler,params_1, filenames);
   loadRawData.extractMetaData(rawDataHandler);
+
+  MapChromatograms mapChroms;
+  mapChroms.process(rawDataHandler, params_1, filenames);
 
   filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_2_core_RawDataProcessor.featureXML");
   LoadFeatures loadFeatures;
@@ -875,7 +1079,7 @@ BOOST_AUTO_TEST_CASE(validateFeatures)
 
   // Test validate features
   ValidateFeatures validateFeatures;
-  validateFeatures.process(rawDataHandler, params_1, filenames, true);
+  validateFeatures.process(rawDataHandler, params_1, filenames);
 
   const std::map<std::string, float>& validation_metrics = rawDataHandler.getValidationMetrics();
   // Confusion matrix: [TP, FP, FN, TN] = [0, 155, 0, 0]
@@ -1080,6 +1284,9 @@ BOOST_AUTO_TEST_CASE(process)
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params_1, filenames);
   loadRawData.extractMetaData(rawDataHandler);
+
+  MapChromatograms mapChroms;
+  mapChroms.process(rawDataHandler, params_1, filenames);
 
   // Test integrated workflow: pickFeatures, filterFeatures, SelectFeatures, quantifyFeatures, and checkFeatures
   PickFeatures pickFeatures;

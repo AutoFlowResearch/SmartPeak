@@ -12,8 +12,12 @@ namespace SmartPeak
   class SequenceSegmentProcessor
   {
   public:
-    SequenceSegmentProcessor() = default;
-    ~SequenceSegmentProcessor() = default;
+    SequenceSegmentProcessor()                                           = default;
+    virtual ~SequenceSegmentProcessor()                                  = default;
+    SequenceSegmentProcessor(const SequenceSegmentProcessor&)            = delete;
+    SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor&) = delete;
+    SequenceSegmentProcessor(SequenceSegmentProcessor&&)                 = delete;
+    SequenceSegmentProcessor& operator=(SequenceSegmentProcessor&&)      = delete;
 
     virtual int getID() const = 0;  ///< get the raw data processor class ID
     virtual std::string getName() const = 0;  ///< get the raw data processor class name
@@ -30,8 +34,8 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false) const = 0;
+      const Filenames& filenames
+    ) const = 0;
 
     /**
       Return all injection indices that belong to a given sample type.
@@ -52,7 +56,7 @@ namespace SmartPeak
   class CalculateCalibration : public SequenceSegmentProcessor
   {
   public:
-    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -65,8 +69,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
+      const Filenames& filenames
     ) const;
 
   protected:
@@ -78,7 +81,7 @@ namespace SmartPeak
   class LoadStandardsConcentrations : public SequenceSegmentProcessor
   {
   public:
-    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -91,8 +94,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
+      const Filenames& filenames
     ) const;
 
   protected:
@@ -104,7 +106,7 @@ namespace SmartPeak
   class LoadQuantitationMethods : public SequenceSegmentProcessor
   {
   public:
-    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -117,8 +119,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
+      const Filenames& filenames
     ) const;
 
   protected:
@@ -130,7 +131,7 @@ namespace SmartPeak
   class StoreQuantitationMethods : public SequenceSegmentProcessor
   {
   public:
-    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -143,8 +144,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
+      const Filenames& filenames
     ) const;
 
   protected:
@@ -156,7 +156,7 @@ namespace SmartPeak
   class PlotCalibrators : public SequenceSegmentProcessor
   {
   public:
-    using SequenceSegmentProcessor::SequenceSegmentProcessor;
+    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
 
     int getID() const { return id_; };
     std::string getName() const { return name_; };
@@ -171,8 +171,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
+      const Filenames& filenames
     ) const;
 
   protected:

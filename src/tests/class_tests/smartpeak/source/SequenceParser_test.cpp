@@ -18,9 +18,9 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   string pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1.csv");
   SequenceHandler sequenceHandler;
   SequenceParser::readSequenceFile(sequenceHandler, pathname, ",");
-  vector<InjectionHandler>& sequence1 = sequenceHandler.getSequence();
-  BOOST_CHECK_EQUAL(sequence1.size(), 6);
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
+  const vector<InjectionHandler>& sequence1 = sequenceHandler.getSequence();
+  BOOST_CHECK_EQUAL(sequence1.size(), 4);
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc2_1x");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSequenceSegmentName(), "Group01");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
@@ -29,69 +29,69 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_CLOSE(sequence1[0].getMetaData().inj_volume, 10.0, 1e-3);
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_volume_units, "uL");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_number, 1);
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().acq_method_name, "LCMS");
-  BOOST_CHECK_CLOSE(sequence1[5].getMetaData().inj_volume, 10.0, 1e-3);
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().inj_volume_units, "uL");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().inj_number, 6);
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_number, 2);
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSequenceSegmentName(), "Group01");
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().acq_method_name, "LCMS");
+  BOOST_CHECK_CLOSE(sequence1[3].getMetaData().inj_volume, 10.0, 1e-3);
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().inj_volume_units, "uL");
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().batch_name, "FluxTest");
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().inj_number, 5);
 
   sequenceHandler.clear();
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_semicolon.csv");
   SequenceParser::readSequenceFile(sequenceHandler, pathname, ";");
-  vector<InjectionHandler>& sequence2 = sequenceHandler.getSequence();
-  BOOST_CHECK_EQUAL(sequence2.size(), 6);
+  const vector<InjectionHandler>& sequence2 = sequenceHandler.getSequence();
+  BOOST_CHECK_EQUAL(sequence2.size(), 5);
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSequenceSegmentName(), "Group01");
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().acq_method_name, "LCMS");
-  BOOST_CHECK_CLOSE(sequence1[0].getMetaData().inj_volume, 10.0, 1e-3);
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_volume_units, "uL");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_number, 1);
-  BOOST_CHECK_EQUAL(sequence2[5].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(sequence2[5].getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sequence2[5].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence2[5].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
-  BOOST_CHECK_EQUAL(sequence2[5].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().acq_method_name, "LCMS");
-  BOOST_CHECK_CLOSE(sequence1[5].getMetaData().inj_volume, 10.0, 1e-3);
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().inj_volume_units, "uL");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().inj_number, 6);
+  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().acq_method_name, "LCMS");
+  BOOST_CHECK_CLOSE(sequence2[0].getMetaData().inj_volume, 10.0, 1e-3);
+  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().inj_volume_units, "uL");
+  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().batch_name, "FluxTest");
+  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().inj_number, 1);
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSequenceSegmentName(), "Group01");
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().acq_method_name, "LCMS");
+  BOOST_CHECK_CLOSE(sequence2[4].getMetaData().inj_volume, 10.0, 1e-3);
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().inj_volume_units, "uL");
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().batch_name, "FluxTest");
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().inj_number, 5);
 
   sequenceHandler.clear();
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_tab.csv");
   SequenceParser::readSequenceFile(sequenceHandler, pathname, "\t");
-  vector<InjectionHandler>& sequence3 = sequenceHandler.getSequence();
-  BOOST_CHECK_EQUAL(sequence3.size(), 6);
+  const vector<InjectionHandler>& sequence3 = sequenceHandler.getSequence();
+  BOOST_CHECK_EQUAL(sequence3.size(), 5);
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSequenceSegmentName(), "Group01");
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().acq_method_name, "LCMS");
-  BOOST_CHECK_CLOSE(sequence1[0].getMetaData().inj_volume, 10.0, 1e-3);
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_volume_units, "uL");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_number, 1);
-  BOOST_CHECK_EQUAL(sequence3[5].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(sequence3[5].getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sequence3[5].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence3[5].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
-  BOOST_CHECK_EQUAL(sequence3[5].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().acq_method_name, "LCMS");
-  BOOST_CHECK_CLOSE(sequence1[5].getMetaData().inj_volume, 10.0, 1e-3);
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().inj_volume_units, "uL");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence1[5].getMetaData().inj_number, 6);
+  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().acq_method_name, "LCMS");
+  BOOST_CHECK_CLOSE(sequence3[0].getMetaData().inj_volume, 10.0, 1e-3);
+  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().inj_volume_units, "uL");
+  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().batch_name, "FluxTest");
+  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().inj_number, 1);
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSequenceSegmentName(), "Group01");
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().acq_method_name, "LCMS");
+  BOOST_CHECK_CLOSE(sequence3[4].getMetaData().inj_volume, 10.0, 1e-3);
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().inj_volume_units, "uL");
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().batch_name, "FluxTest");
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().inj_number, 5);
 }
 
 BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
@@ -130,7 +130,12 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
 
   vector<map<string,string>> data_out;
   vector<string> headers_out;
-  const vector<string> meta_data = {"peak_apex_int", "logSN"};
+  const vector<string> meta_data {
+    "peak_apex_int",
+    "logSN",
+    "QC_transition_message",
+    "QC_transition_group_message",
+  };
   const set<MetaDataHandler::SampleType> sample_types = {MetaDataHandler::SampleType::Unknown};
 
   SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types);
@@ -142,7 +147,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(data_out.at(0).at("component_name"), "23dpg.23dpg_1.Heavy");
   BOOST_CHECK_EQUAL(data_out.at(0).at("peak_apex_int"), std::to_string(235.0));
   BOOST_CHECK_EQUAL(data_out.at(0).at("logSN"), std::to_string(3.52866193485212));
-  BOOST_CHECK_EQUAL(headers_out.size(), 21);
+  BOOST_CHECK_EQUAL(headers_out.size(), 23);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
@@ -165,6 +170,8 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   // metadata
   BOOST_CHECK_EQUAL(headers_out[19], "peak_apex_int");
   BOOST_CHECK_EQUAL(headers_out[20], "logSN");
+  BOOST_CHECK_EQUAL(headers_out[21], "QC_transition_message");
+  BOOST_CHECK_EQUAL(headers_out[22], "QC_transition_group_message");
 
   // write sequence to output
   // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataTableFromMetaValue.csv");

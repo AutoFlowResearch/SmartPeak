@@ -4,23 +4,27 @@
 
 using namespace SmartPeak;
 
-void example_LCMS_MRM_Validation(
+void example_GCMS_SIM_Unknowns(
   const std::string& dir_I,
   const Filenames& static_filenames,
-  const std::string& delimiter_I = ",",
-  const bool verbose_I = false
+  const std::string& delimiter_I = ","
 )
 {
   SequenceHandler sequenceHandler;
 
-  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true, true);
+  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true);
 
   const std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
     std::shared_ptr<RawDataProcessor>(new LoadRawData()),
+    std::shared_ptr<RawDataProcessor>(new MapChromatograms()),
+    std::shared_ptr<RawDataProcessor>(new ExtractChromatogramWindows()),
     std::shared_ptr<RawDataProcessor>(new PickFeatures()),
     std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
+    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
-    std::shared_ptr<RawDataProcessor>(new ValidateFeatures())
+    std::shared_ptr<RawDataProcessor>(new QuantifyFeatures()),
+    std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
+    std::shared_ptr<RawDataProcessor>(new StoreFeatures())
   };
 
   std::map<std::string, Filenames> dynamic_filenames;
@@ -39,8 +43,7 @@ void example_LCMS_MRM_Validation(
     sequenceHandler,
     dynamic_filenames,
     std::set<std::string>(),
-    raw_data_processing_methods,
-    true
+    raw_data_processing_methods
   );
 
   SequenceParser::writeDataMatrixFromMetaValue(

@@ -5,9 +5,6 @@ set(directory include/SmartPeak/core)
 set(sources_list_h
 	Filenames.h
 	Helloworld.h
-	LCMS_MRM_Standards_example.h
-	LCMS_MRM_Unknown_example.h
-	LCMS_MRM_Validation_example.h
 	MetaDataHandler.h
 	RawDataHandler.h
 	RawDataProcessor.h
