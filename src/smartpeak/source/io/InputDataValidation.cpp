@@ -33,7 +33,6 @@ namespace SmartPeak
       msg << "NOT PROVIDED\n";
       v.validity = FilenameInfo::not_provided;
     }
-    std::cout << msg.str();
     LOGI << msg.str();
     return v;
   }
@@ -221,7 +220,6 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler
   )
   {
-    std::cout << "==== START sampleNamesAreConsistent\n";
     LOGD << "START sampleNamesAreConsistent";
 
     const std::vector<InjectionHandler>& samples = sequenceHandler.getSequence();
@@ -241,7 +239,6 @@ namespace SmartPeak
 
     const bool check_passed = validateNamesInStructures(names1, names2, "SEQUENCE", "STANDARDS", false);
 
-    std::cout << "==== END   sampleNamesAreConsistent" << std::endl;
     LOGD << "END sampleNamesAreConsistent";
     return check_passed;
   }
@@ -250,7 +247,6 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler
   )
   {
-    std::cout << "==== START componentNamesAreConsistent\n";
     LOGD << "START componentNamesAreConsistent";
 
     const RawDataHandler& rawDataHandler = sequenceHandler.getSequence().front().getRawData();
@@ -296,7 +292,6 @@ namespace SmartPeak
     check_passed.at(2) = validateNamesInStructures(names1, names4, "TRAML", "QUANTITATIONMETHODS", false);
     check_passed.at(3) = validateNamesInStructures(names1, names5, "TRAML", "STANDARDS", false);
 
-    std::cout << "==== END   componentNamesAreConsistent" << std::endl;
     LOGD << "END componentNamesAreConsistent";
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
@@ -306,7 +301,6 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler
   )
   {
-    std::cout << "==== START componentNameGroupsAreConsistent\n";
     LOGD << "START componentNameGroupsAreConsistent";
 
     const RawDataHandler& rawDataHandler = sequenceHandler.getSequence().front().getRawData();
@@ -336,7 +330,6 @@ namespace SmartPeak
     check_passed.at(0) = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
     check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
 
-    std::cout << "==== END   componentNameGroupsAreConsistent" << std::endl;
     LOGD << "END componentNameGroupsAreConsistent";
 
     return std::all_of(check_passed.cbegin(), check_passed.cend(), [](const bool has_passed){ return has_passed; });
@@ -346,7 +339,6 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler
   )
   {
-    std::cout << "==== START heavyComponentsAreConsistent\n";
     LOGD << "START heavyComponentsAreConsistent";
 
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods =
@@ -367,7 +359,6 @@ namespace SmartPeak
 
     const bool check_passed = validateNamesInStructures(names1, names2, "QUANTITATIONMETHODS", "STANDARDS", false);
 
-    std::cout << "==== END   heavyComponentsAreConsistent" << std::endl;
     LOGD << "END heavyComponentsAreConsistent";
     return check_passed;
   }
@@ -382,17 +373,13 @@ namespace SmartPeak
   {
     const std::set<std::string> missing1 = findMissingNames(names1, names2);
     if (missing1.size()) {
-      const std::string msg = logMissingNames(missing1, structure_ref1, structure_ref2);
-      std::cout << msg;
-      LOGI << msg;
+      LOGI << logMissingNames(missing1, structure_ref1, structure_ref2);
     }
     std::set<std::string> missing2;
     if (check_both_directions) {
       missing2 = findMissingNames(names2, names1);
       if (missing2.size()) {
-        const std::string msg = logMissingNames(missing2, structure_ref2, structure_ref1);
-        std::cout << msg;
-        LOGI << msg;
+        LOGI << logMissingNames(missing2, structure_ref2, structure_ref1);
       }
     }
     return missing1.empty() && missing2.empty();
