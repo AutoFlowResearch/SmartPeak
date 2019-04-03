@@ -40,11 +40,12 @@ before_build:
 build:
   project: C:\projects\smartpeak2\SmartPeak_host.sln 
   #project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
-test_script:
-  - dir C:\projects\smartpeak2\bin\Debug\
-  - ps: C:\projects\smartpeak2\bin\Debug\GCMS_SIM_Unknown_test.exe
-  - ps: C:\projects\smartpeak2\bin\Debug\HPLC_UV_Standards_test.exe
-  - ps: C:\projects\smartpeak2\bin\Debug\HPLC_UV_Unknown_test.exe
-  - ps: C:\projects\smartpeak2\bin\Debug\LCMS_MRM_QCs_test.exe
-  - ps: C:\projects\smartpeak2\bin\Debug\LCMS_MRM_Standards_test.exe
-  - ps: C:\projects\smartpeak2\bin\Debug\LCMS_MRM_Unknown_test.exe
+
+#test_script:
+#  - dir C:\projects\smartpeak2\bin\Debug\
+#  - ps: C:\projects\smartpeak2\bin\Debug\GCMS_SIM_Unknown_test.exe
+#  - ps: C:\projects\smartpeak2\bin\Debug\HPLC_UV_Standards_test.exe
+#  - ps: C:\projects\smartpeak2\bin\Debug\HPLC_UV_Unknown_test.exe
+#  - ps: C:\projects\smartpeak2\bin\Debug\LCMS_MRM_QCs_test.exe
+#  - ps: C:\projects\smartpeak2\bin\Debug\LCMS_MRM_Standards_test.exe
+#  - ps: C:\projects\smartpeak2\bin\Debug\LCMS_MRM_Unknown_test.exe
