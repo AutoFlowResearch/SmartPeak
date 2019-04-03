@@ -1294,10 +1294,16 @@ public:
   CommandLine& operator=(CommandLine&& other)      = delete;
 
   void runApp() {
-    static plog::RollingFileAppender<plog::CsvFormatter> fileAppender("smartpeak_log_multi.csv", 0, 0);
+    // Add .csv appender: 32 MiB per file, max. 100 log files
+    static plog::RollingFileAppender<plog::CsvFormatter>
+      fileAppender("smartpeak_log.csv", 1024 * 1024 * 32, 100);
+
+    // Add console appender, instead of only the file one
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
+
+    // Init logger with two appenders
     plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender);
-    // plog::init(plog::debug, "smartpeak_log.csv");
+
     std::cout << gettingStartedString();
     while (true) {
       menuMain();
