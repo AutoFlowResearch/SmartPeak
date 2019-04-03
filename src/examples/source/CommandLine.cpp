@@ -58,7 +58,6 @@ public:
   std::string                           mzML_dir_;
   std::string                           features_in_dir_;
   std::string                           features_out_dir_;
-  bool                                  verbose_                 = true;
   std::set<MetaDataHandler::SampleType> sequenceSummaryTypes_;
   std::set<MetaDataHandler::SampleType> featureSummaryTypes_;
   std::vector<std::string>              sequenceSummaryMetaData_;
@@ -184,7 +183,7 @@ public:
       const bool pathnamesAreCorrect = buildStaticFilenames();
       if (pathnamesAreCorrect) {
         sequenceHandler_.clear();
-        SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
+        SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true);
       } else {
         std::cout << "Pathnames are not correct.\n";
       }
@@ -231,20 +230,20 @@ public:
       setSequencePathnameFromInput();
       static_filenames_.sequence_csv_i = sequence_pathname_;
       sequenceHandler_.clear();
-      SequenceParser::readSequenceFile(sequenceHandler_, static_filenames_.sequence_csv_i, ",", verbose_);
+      SequenceParser::readSequenceFile(sequenceHandler_, static_filenames_.sequence_csv_i, ",");
     }
     else if ("2" == in) {
       const std::string pathname = getPathnameFromInput();
       static_filenames_.traML_csv_i = pathname;
       LoadTransitions loadTransitions;
-      loadTransitions.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+      loadTransitions.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_);
     }
     else if ("3" == in) {
       const std::string pathname = getPathnameFromInput();
       static_filenames_.quantitationMethods_csv_i = pathname;
       for (SequenceSegmentHandler& sequenceSegmentHandler : sequenceHandler_.getSequenceSegments()) {
         LoadQuantitationMethods loadQuantitationMethods;
-        loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, static_filenames_, verbose_);
+        loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, static_filenames_);
       }
     }
     else if ("4" == in) {
@@ -252,7 +251,7 @@ public:
       static_filenames_.standardsConcentrations_csv_i = pathname;
       for (SequenceSegmentHandler& sequenceSegmentHandler : sequenceHandler_.getSequenceSegments()) {
         LoadStandardsConcentrations loadStandardsConcentrations;
-        loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, static_filenames_, verbose_);
+        loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, static_filenames_);
       }
     }
     else if ("5" == in) {
@@ -261,7 +260,7 @@ public:
       LoadFeatureFilters loadFeatureFilters;
       const std::string backup = static_filenames_.featureFilterComponentGroups_csv_i;
       static_filenames_.featureFilterComponentGroups_csv_i.clear();
-      loadFeatureFilters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+      loadFeatureFilters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_);
       static_filenames_.featureFilterComponentGroups_csv_i = backup;
     }
     else if ("6" == in) {
@@ -270,7 +269,7 @@ public:
       LoadFeatureFilters loadFeatureFilters;
       const std::string backup = static_filenames_.featureFilterComponents_csv_i;
       static_filenames_.featureFilterComponents_csv_i.clear();
-      loadFeatureFilters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+      loadFeatureFilters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_);
       static_filenames_.featureFilterComponents_csv_i = backup;
     }
     else if ("7" == in) {
@@ -279,7 +278,7 @@ public:
       LoadFeatureQCs loadFeatureQCs;
       const std::string backup = static_filenames_.featureQCComponentGroups_csv_i;
       static_filenames_.featureQCComponentGroups_csv_i.clear();
-      loadFeatureQCs.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+      loadFeatureQCs.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_);
       static_filenames_.featureQCComponentGroups_csv_i = backup;
     }
     else if ("8" == in) {
@@ -288,14 +287,14 @@ public:
       LoadFeatureQCs loadFeatureQCs;
       const std::string backup = static_filenames_.featureQCComponents_csv_i;
       static_filenames_.featureQCComponents_csv_i.clear();
-      loadFeatureQCs.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+      loadFeatureQCs.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_);
       static_filenames_.featureQCComponents_csv_i = backup;
     }
     else if ("9" == in) {
       const std::string pathname = getPathnameFromInput();
       static_filenames_.parameters_csv_i = pathname;
       LoadParameters loadParameters;
-      loadParameters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_, verbose_);
+      loadParameters.process(sequenceHandler_.getSequence()[0].getRawData(), {}, static_filenames_);
     }
     else if ("m" == in || "M" == in) {
       // empty
@@ -1177,8 +1176,7 @@ public:
           sequenceHandler_,
           cmd.dynamic_filenames,
           std::set<std::string>(),
-          raw_methods,
-          verbose_
+          raw_methods
         );
       } else if (cmd.type == Command::SequenceSegmentMethod) {
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
@@ -1188,8 +1186,7 @@ public:
           sequenceHandler_,
           cmd.dynamic_filenames,
           std::set<std::string>(),
-          seq_seg_methods,
-          verbose_
+          seq_seg_methods
         );
       } else {
         std::cout << "\nSkipping a command: " << cmd.type << "\n";
@@ -1285,7 +1282,7 @@ public:
   //   }
   //   const bool pathnamesAreCorrect = buildStaticFilenames();
   //   if (pathnamesAreCorrect) {
-  //     SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true, verbose_);
+  //     SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true);
   //   }
   // }
 
