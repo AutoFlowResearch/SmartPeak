@@ -266,16 +266,22 @@ namespace SmartPeak
             subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
           );
           for (const std::string& meta_value_name : meta_data) {
-            if (subordinate.metaValueExists(meta_value_name) &&
-                (meta_value_name == "QC_transition_message" ||
-                 meta_value_name == "QC_transition_group_message")) {
+            if (subordinate.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_message") {
 
               OpenMS::StringList messages = subordinate.getMetaValue(meta_value_name).toStringList();
               row.emplace(
                 meta_value_name,
                 Utilities::join(messages.begin(), messages.end(), delimiter)
               );
-            } else {
+            }
+            else if (feature.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_group_message") {
+              OpenMS::StringList messages = feature.getMetaValue(meta_value_name).toStringList();
+              row.emplace(
+                meta_value_name,
+                Utilities::join(messages.begin(), messages.end(), delimiter)
+              );
+            }
+            else {
               Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
               if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
                 // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
