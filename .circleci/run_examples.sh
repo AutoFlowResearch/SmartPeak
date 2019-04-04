@@ -19,20 +19,15 @@ run_example()
 # Assumption: SmartPeak2 build folder
 cd ~/SmartPeak2_build/bin || return 1
 
-# for filename in *_test; do
-#     [ -e "$filename" ] || continue
-#     run_example "$filename"
-# done
+{
+  (run_example GCMS_SIM_Unknown_test)&
+  (run_example HPLC_UV_Standards_test)&
+  (run_example HPLC_UV_Unknown_test)&
+  (run_example LCMS_MRM_QCs_test)&
+  (run_example LCMS_MRM_Standards_test)&
+  (run_example LCMS_MRM_Unknown_test)&
+} |
+tee examples_log.txt
 
-run_example GCMS_FullScan_Unknown_test &
-run_example LCMS_MRM_Standards_test &
-run_example GCMS_SIM_Unknown_test &
-run_example HPLC_UV_Standards_test &
-run_example HPLC_UV_Unknown_test &
-# sleep 55
-run_example LCMS_MRM_Unknown_test &
-# sleep 20
-run_example LCMS_MRM_QCs_test &
-
-wait
-echo "Done"
+# When adding a new example, update the comparison n==NUMBER_OF_EXAMPLES
+grep -c "PASS" examples_log.txt | ( read n && (( n==6 )) )
