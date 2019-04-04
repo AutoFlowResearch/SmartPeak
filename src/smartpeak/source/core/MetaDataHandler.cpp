@@ -2,6 +2,7 @@
 
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <iostream>
+#include <plog/Log.h>
 
 // required for strptime on Windows
 #ifdef _WIN32
@@ -27,7 +28,7 @@ namespace SmartPeak
         return "Double Blank";
       case SampleType::Solvent:
         return "Solvent";
-      case SampleType::Unrecognized:
+      default:
         return "Unrecognized";
     }
   }
@@ -46,8 +47,7 @@ namespace SmartPeak
       return SampleType::DoubleBlank;
     if (sample_type == "Solvent")
       return SampleType::Solvent;
-    if (sample_type == "Unrecognized")
-      return SampleType::Unrecognized;
+    return SampleType::Unrecognized;
   }
 
   void MetaDataHandler::setSampleName(const std::string& sample_name_I)
@@ -132,47 +132,47 @@ namespace SmartPeak
     bool is_valid { true };
 
     if (meta_data.getSampleName().empty()) {
-      std::cerr << "SequenceFile Error: sample_name must be specified." << std::endl;
+      LOGE << "sample_name must be specified";
       is_valid = false;
     }
 
     if (meta_data.getSampleGroupName().empty()) {
-      std::cerr << "SequenceFile Error: sample_group_name must be specified." << std::endl;
+      LOGE << "sample_group_name must be specified";
       is_valid = false;
     }
 
     if (meta_data.getSequenceSegmentName().empty()) {
-      std::cerr << "SequenceFile Error: sequence_segment_name must be specified." << std::endl;
+      LOGE << "sequence_segment_name must be specified";
       is_valid = false;
     }
 
     if (meta_data.getFilename().empty()) {
-      std::cerr << "SequenceFile Error: original_filename must be specified." << std::endl;
+      LOGE << "original_filename must be specified";
       is_valid = false;
     }
 
     if (meta_data.getSampleType() == SampleType::Unrecognized) {
-      std::cerr << "SequenceFile Error: sample type could not be recognized." << std::endl;
+      LOGE << "sample type could not be recognized";
       is_valid = false;
     }
 
     if (meta_data.acq_method_name.empty()) {
-      std::cerr << "SequenceFile Error: acq_method_name must be specified." << std::endl;
+      LOGE << "acq_method_name must be specified";
       is_valid = false;
     }
 
     if (meta_data.inj_volume <= 0.0) {
-      std::cerr << "SequenceFile Error: no value for inj_volume." << std::endl;
+      LOGE << "no value for inj_volume";
       is_valid = false;
     }
 
     if (meta_data.inj_volume_units.empty()) {
-      std::cerr << "SequenceFile Error: inj_volume_units must be specified." << std::endl;
+      LOGE << "inj_volume_units must be specified";
       is_valid = false;
     }
 
     if (meta_data.batch_name.empty()) {
-      std::cerr << "SequenceFile Error: batch_name must be specified." << std::endl;
+      LOGE << "batch_name must be specified";
       is_valid = false;
     }
 
@@ -212,7 +212,7 @@ namespace SmartPeak
 
 #ifdef _WIN32
   // https://stackoverflow.com/questions/321849/strptime-equivalent-on-windows
-  char* strptime(const char* s, const char* f, struct tm* tm) {
+  char* strptime(const char* s, const char* f, std::tm* tm) {
     // Isn't the C++ standard lib nice? std::get_time is defined such that its
     // format parameters are the exact same as strptime. Of course, we have to
     // create a string stream first, and imbue it with the current C locale, and
@@ -234,7 +234,7 @@ namespace SmartPeak
     const std::string& format
   )
   {
-    struct tm tm = { 0, 0, 0, 1, 0, 0, 0, 0, 0 };
+    std::tm tm = { 0, 0, 0, 1, 0, 0, 0, 0, 0 };
     if (strptime(acquisition_datetime.data(), format.data(), &tm) == NULL) {
       throw "Could not convert string to date time object.";
     }

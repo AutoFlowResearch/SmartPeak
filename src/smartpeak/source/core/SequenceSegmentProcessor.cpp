@@ -9,6 +9,7 @@
 #include <SmartPeak/io/InputDataValidation.h>
 #include <OpenMS/FORMAT/AbsoluteQuantitationStandardsFile.h>
 #include <OpenMS/FORMAT/AbsoluteQuantitationMethodFile.h>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -31,12 +32,10 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-    const Filenames& filenames,
-    const bool verbose_I
-  ) const {
-    if (verbose_I) {
-      std::cout << "==== START optimizeCalibrationCurves" << std::endl;
-    }
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START optimizeCalibrationCurves";
 
     std::vector<size_t> standards_indices;
 
@@ -50,7 +49,8 @@ namespace SmartPeak
 
     // check if there are any standards to calculate the calibrators from
     if (standards_indices.empty()) {
-      std::cout << "standards_indices argument is empty. Returning." << std::endl;
+      LOGE << "standards_indices argument is empty. Returning";
+      LOGD << "END optimizeCalibrationCurves";
       return;
     }
 
@@ -60,7 +60,8 @@ namespace SmartPeak
     }
 
     if (params_I.at("AbsoluteQuantitation").empty()) {
-      std::cout << "AbsoluteQuantitation_params_I argument is empty. Returning." << std::endl;
+      LOGE << "Parameters not found for AbsoluteQuantitation. Returning";
+      LOGD << "END optimizeCalibrationCurves";
       return;
     }
 
@@ -112,30 +113,28 @@ namespace SmartPeak
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
 
-    if (verbose_I) {
-      std::cout << "==== END   optimizeCalibrationCurves" << std::endl;
-    }
+    LOGD << "END optimizeCalibrationCurves";
   }
 
   void LoadStandardsConcentrations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-    const Filenames& filenames,
-    const bool verbose_I
-  ) const {
-    if (verbose_I) {
-      std::cout << "==== START loadStandardsConcentrations"
-        << "\nloadStandardsConcentrations(): loading " << filenames.standardsConcentrations_csv_i << std::endl;
-    }
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START loadStandardsConcentrations";
+    LOGI << "Loading: " << filenames.standardsConcentrations_csv_i;
 
     if (filenames.standardsConcentrations_csv_i.empty()) {
-      std::cout << "loadStandardsConcentrations(): filename is empty\n";
+      LOGE << "Filename is empty";
+      LOGD << "END loadStandardsConcentrations";
       return;
     }
 
     if (!InputDataValidation::fileExists(filenames.standardsConcentrations_csv_i)) {
-      std::cout << "loadStandardsConcentrations(): file not found\n";
+      LOGE << "File not found";
+      LOGD << "END loadStandardsConcentrations";
       return;
     }
 
@@ -144,38 +143,33 @@ namespace SmartPeak
       AQSf.load(filenames.standardsConcentrations_csv_i, sequenceSegmentHandler_IO.getStandardsConcentrations());
     }
     catch (const std::exception& e) {
-      std::cerr << "loadStandardsConcentrations(): " << e.what() << std::endl;
+      LOGE << e.what();
       sequenceSegmentHandler_IO.getStandardsConcentrations().clear();
-      std::cerr << "loadStandardsConcentrations(): standards concentrations clear" << std::endl;
+      LOGI << "Standards concentrations clear";
     }
 
-    // std::cout << InputDataValidation::getStandardsConcentrationsInfo(sequenceSegmentHandler_IO);
-
-    if (verbose_I) {
-      std::cout << "==== END   loadStandardsConcentrations" << std::endl;
-    }
+    LOGD << "END loadStandardsConcentrations";
   }
 
   void LoadQuantitationMethods::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-    const Filenames& filenames,
-    const bool verbose_I
+    const Filenames& filenames
   ) const
   {
-    if (verbose_I) {
-      std::cout << "==== START loadQuantitationMethods"
-        << "\nloadQuantitationMethods(): loading " << filenames.quantitationMethods_csv_i << std::endl;
-    }
+    LOGD << "START loadQuantitationMethods";
+    LOGI << "Loading: " << filenames.quantitationMethods_csv_i;
 
     if (filenames.quantitationMethods_csv_i.empty()) {
-      std::cout << "loadQuantitationMethods(): filename is empty\n";
+      LOGE << "Filename is empty";
+      LOGD << "END loadQuantitationMethods";
       return;
     }
 
     if (!InputDataValidation::fileExists(filenames.quantitationMethods_csv_i)) {
-      std::cout << "loadQuantitationMethods(): file not found\n";
+      LOGE << "File not found";
+      LOGD << "END loadQuantitationMethods";
       return;
     }
 
@@ -184,33 +178,27 @@ namespace SmartPeak
       AQMf.load(filenames.quantitationMethods_csv_i, sequenceSegmentHandler_IO.getQuantitationMethods());
     }
     catch (const std::exception& e) {
-      std::cerr << "loadQuantitationMethods(): " << e.what() << std::endl;
+      LOGE << e.what();
       sequenceSegmentHandler_IO.getQuantitationMethods().clear();
-      std::cerr << "loadQuantitationMethods(): quantitation methods clear" << std::endl;
+      LOGI << "quantitation methods clear";
     }
 
-    // std::cout << InputDataValidation::getQuantitationMethodsInfo(sequenceSegmentHandler_IO);
-
-    if (verbose_I) {
-      std::cout << "==== END   loadQuantitationMethods" << std::endl;
-    }
+    LOGD << "END loadQuantitationMethods";
   }
 
   void StoreQuantitationMethods::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-    const Filenames& filenames,
-    const bool verbose_I
+    const Filenames& filenames
   ) const
   {
-    if (verbose_I) {
-      std::cout << "==== START storeQuantitationMethods"
-        << "\nstoreQuantitationMethods(): storing " << filenames.quantitationMethods_csv_o << std::endl;
-    }
+    LOGD << "START storeQuantitationMethods";
+    LOGI << "Storing: " << filenames.quantitationMethods_csv_o;
 
     if (filenames.quantitationMethods_csv_o.empty()) {
-      std::cout << "storeQuantitationMethods(): filename is empty\n";
+      LOGE << "Filename is empty";
+      LOGD << "END storeQuantitationMethods";
       return;
     }
 
@@ -222,30 +210,32 @@ namespace SmartPeak
       );
     }
     catch (const std::exception& e) {
-      std::cerr << "storeQuantitationMethods(): " << e.what() << std::endl;
+      LOGE << e.what();
     }
 
-    if (verbose_I) {
-      std::cout << "==== END   storeQuantitationMethods" << std::endl;
-    }
+    LOGD << "END storeQuantitationMethods";
   }
 
-   void PlotCalibrators::process(
-     SequenceSegmentHandler& sequenceSegmentHandler_IO,
-     const SequenceHandler& sequenceHandler_I,
-     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-     const Filenames& filenames,
-     const bool verbose_I
-   ) const {
-     if (verbose_I)
-       std::cout << "Plotting calibrators." << std::endl;
+  void PlotCalibrators::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START PlotCalibrators";
 
-     if (params_I.at("SequenceSegmentPlotter").empty());
-       throw std::invalid_argument("Parameters or filename are empty.");
+    if (params_I.count("SequenceSegmentPlotter") &&
+        params_I.at("SequenceSegmentPlotter").empty()) {
+      LOGE << "No parameters for SequenceSegmentPlotter";
+      LOGD << "END PlotCalibrators";
+      return;
+    }
 
-     //// TODO: Uncomment when SequenceSegmentPlotter is implemented
-     //SequenceSegmentPlotter sequenceSegmentPlotter;
-     //sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
-     //sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
-   }
+    //// TODO: Uncomment when SequenceSegmentPlotter is implemented
+    //SequenceSegmentPlotter sequenceSegmentPlotter;
+    //sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
+    //sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
+    LOGD << "END PlotCalibrators";
+  }
 }

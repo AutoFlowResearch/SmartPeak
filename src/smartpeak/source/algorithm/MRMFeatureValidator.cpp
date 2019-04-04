@@ -11,8 +11,7 @@ namespace SmartPeak
     const std::string& injection_name,
     OpenMS::FeatureMap& output_validated,
     std::map<std::string, float>& validation_metrics,
-    const float Tr_window,
-    const bool verbose_I
+    const float Tr_window
   )
   {
     std::vector<int> y_true;
@@ -85,6 +84,6 @@ namespace SmartPeak
       output_validated.push_back(feature_tmp);
     }
 
-    validation_metrics = Utilities::calculateValidationMetrics(y_true, y_pred, verbose_I);
+    validation_metrics = Utilities::calculateValidationMetrics(y_true, y_pred);
   }
 }
