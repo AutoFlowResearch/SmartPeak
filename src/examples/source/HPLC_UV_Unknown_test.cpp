@@ -5,8 +5,6 @@
 #include <SmartPeak/pipelines/HPLC_UV_Unknown_example.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
-#include <plog/Log.h>
-#include <plog/Appenders/ConsoleAppender.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -108,15 +106,6 @@ void test_main_HPLC_UV_Unknown()
 
 int main()
 {
-  // Add .csv appender: 32 MiB per file, max. 100 log files
-  static plog::RollingFileAppender<plog::CsvFormatter>
-    fileAppender("smartpeak_log.csv", 1024 * 1024 * 32, 100);
-
-  // Add console appender, instead of only the file one
-  static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
-
-  // Init logger with two appenders
-  plog::init(plog::info, &fileAppender).addAppender(&consoleAppender);
   test_main_HPLC_UV_Unknown();
   return 0;
 }
