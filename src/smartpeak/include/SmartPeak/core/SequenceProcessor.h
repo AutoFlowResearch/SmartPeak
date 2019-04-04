@@ -29,14 +29,12 @@ public:
       @param[in] filenames Pathnames to load
       @param[in] delimiter String delimiter of the imported file
       @param[in] checkConsistency Check consistency of data contained in files
-      @param[in] verbose_I Verbosity
     */
     static void createSequence(
       SequenceHandler& sequenceHandler_IO,
       const Filenames& filenames,
       const std::string& delimiter = ",",
-      const bool checkConsistency = true,
-      const bool verbose_I = false
+      const bool checkConsistency = true
     );
 
     /**
@@ -46,15 +44,13 @@ public:
       @param[in] filenames Mapping from injection names to pathnames
       @param[in] injection_names Injections to select from the sequence
       @param[in] raw_data_processing_methods_I Events to process
-      @param[in] verbose_I Verbosity
     */
     static void processSequence(
       SequenceHandler& sequenceHandler_IO,
       const std::map<std::string, Filenames>& filenames,
       const std::set<std::string>& injection_names = {},
       const std::vector<std::shared_ptr<RawDataProcessor>>&
-        raw_data_processing_methods_I = {},
-      const bool verbose_I = false
+        raw_data_processing_methods_I = {}
     );
 
     /**
@@ -64,15 +60,13 @@ public:
       @param[in] filenames Mapping from sequence groups names to pathnames
       @param[in] sequence_segment_names Sequence groups to select from the sequence
       @param[in] sequence_segment_processing_methods_I Events to process
-      @param[in] verbose_I Verbosity
     */
     static void processSequenceSegments(
       SequenceHandler& sequenceHandler_IO,
       const std::map<std::string, Filenames>& filenames,
       const std::set<std::string>& sequence_segment_names = {},
       const std::vector<std::shared_ptr<SequenceSegmentProcessor>>&
-        sequence_segment_processing_methods_I = {},
-      const bool verbose_I = false
+        sequence_segment_processing_methods_I = {}
     );
   };
 }

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -50,7 +51,7 @@ public:
       std::ofstream ofs(filename_, line_count_ ? std::ios::app : std::ios::trunc);
 
       if (!ofs.is_open()) {
-        std::cerr << "Cannot open file: " << filename_ << "\n";
+        LOGE << "Cannot open file: " << filename_;
         return -1;
       }
 

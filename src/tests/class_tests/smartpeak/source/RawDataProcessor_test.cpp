@@ -1079,7 +1079,7 @@ BOOST_AUTO_TEST_CASE(validateFeatures)
 
   // Test validate features
   ValidateFeatures validateFeatures;
-  validateFeatures.process(rawDataHandler, params_1, filenames, true);
+  validateFeatures.process(rawDataHandler, params_1, filenames);
 
   const std::map<std::string, float>& validation_metrics = rawDataHandler.getValidationMetrics();
   // Confusion matrix: [TP, FP, FN, TN] = [0, 155, 0, 0]

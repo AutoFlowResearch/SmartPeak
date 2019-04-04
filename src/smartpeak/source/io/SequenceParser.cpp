@@ -10,27 +10,30 @@
 #include <SmartPeak/io/InputDataValidation.h>
 #include <ctime>
 
+#include <plog/Log.h>
+
 namespace SmartPeak
 {
   void SequenceParser::readSequenceFile(
     SequenceHandler& sequenceHandler,
     const std::string& pathname,
-    const std::string& delimiter,
-    const bool verbose
+    const std::string& delimiter
   )
   {
-    if (verbose) {
-      std::cout << "==== START readSequenceFile()"
-        << "\nreadSequenceFile(): loading " << pathname << std::endl;
-    }
+    LOGD << "START readSequenceFile";
+    LOGD << "Delimiter: " << delimiter;
+
+    LOGI << "Loading: " << pathname;
 
     if (pathname.empty()) {
-      std::cout << "readSequenceFile(): pathname is empty\n";
+      LOGE << "Pathname is empty";
+      LOGD << "END readSequenceFile";
       return;
     }
 
     if (!InputDataValidation::fileExists(pathname)) {
-      std::cout << "readSequenceFile(): file not found\n";
+      LOGE << "File not found";
+      LOGD << "END readSequenceFile";
       return;
     }
 
@@ -163,12 +166,12 @@ namespace SmartPeak
         break;
 
       if (false == validateAndConvert(t_inj_number, t.inj_number)) {
-        std::cout << "Error: Empty cell in column " << s_inj_number << ". Skipping entire row.\n";
+        LOGW << "Warning: Empty cell in column '" << s_inj_number << "'. Skipping entire row";
         continue;
       }
 
       if (t.inj_number <= 0) {
-        std::cout << "Error: Value '" << t.inj_number << "' is not valid for column '" << s_inj_number << "'. Skipping entire row.\n";
+        LOGW << "Warning: Value '" << t.inj_number << "' is not valid for column '" << s_inj_number << "'. Skipping entire row";
         continue;
       }
 
@@ -186,9 +189,7 @@ namespace SmartPeak
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
     }
 
-    if (verbose) {
-      std::cout << "==== END   readSequenceFile()" << std::endl;
-    }
+    LOGD << "END readSequenceFile";
   }
 
   void SequenceParser::makeDataTableFromMetaValue(
@@ -229,8 +230,7 @@ namespace SmartPeak
       // feature_map_history_ is needed in order to export all "used_" = true and false features
       for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMapHistory()) {
         if (!feature.metaValueExists(s_PeptideRef) || feature.getMetaValue(s_PeptideRef).isEmpty()) {
-          // std::cout << "component_group_name is absent or empty. Skipping this feature." << std::endl;
-          // TODO: Log it, instead
+          LOGV << "component_group_name is absent or empty. Skipping this feature";
           continue;
         }
         const std::string component_group_name = feature.getMetaValue(s_PeptideRef);
@@ -242,7 +242,7 @@ namespace SmartPeak
           if (!subordinate.metaValueExists(s_native_id) ||
               subordinate.getMetaValue(s_native_id).isEmpty() ||
               subordinate.getMetaValue(s_native_id).toString().empty()) {
-            std::cout << "component_name is absent or empty. Skipping this subordinate." << std::endl;
+            LOGV << "component_group_name is absent or empty. Skipping this subordinate";
             continue;
           }
           const std::string component_name = subordinate.getMetaValue(s_native_id);
@@ -295,14 +295,11 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types,
-    const bool verbose
+    const std::set<MetaDataHandler::SampleType>& sample_types
   )
   {
-    if (verbose) {
-      std::cout << "==== START writeDataTableFromMetaValue()"
-        << "\nwriteDataTableFromMetaValue(): storing " << filename << std::endl;
-    }
+    LOGD << "START writeDataTableFromMetaValue";
+    LOGI << "Storing: " << filename;
 
     std::vector<std::map<std::string,std::string>> list_dict;
     std::vector<std::string> headers;
@@ -312,6 +309,7 @@ namespace SmartPeak
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     if (cnt < headers.size()) {
+      LOGD << "END writeDataTableFromMetaValue";
       return false;
     }
 
@@ -323,10 +321,7 @@ namespace SmartPeak
       writer.writeDataInRow(line.cbegin(), line.cend());
     }
 
-    if (verbose) {
-      std::cout << "==== END   writeDataTableFromMetaValue()" << std::endl;
-    }
-
+    LOGD << "END writeDataTableFromMetaValue";
     return true;
   }
 
@@ -403,14 +398,12 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
     const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types,
-    const bool verbose
+    const std::set<MetaDataHandler::SampleType>& sample_types
   )
   {
-    if (verbose) {
-      std::cout << "==== START writeDataMatrixFromMetaValue()"
-        << "\nwriteDataMatrixFromMetaValue(): storing " << filename << std::endl;
-    }
+    LOGD << "START writeDataMatrixFromMetaValue";
+
+    LOGI << "Storing: " << filename;
 
     std::vector<std::vector<float>> data;
     std::vector<std::string> columns;
@@ -424,6 +417,7 @@ namespace SmartPeak
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     if (cnt < headers.size()) {
+      LOGD << "END writeDataMatrixFromMetaValue";
       return false;
     }
 
@@ -439,10 +433,7 @@ namespace SmartPeak
       writer.writeDataInRow(line.cbegin(), line.cend());
     }
 
-    if (verbose) {
-      std::cout << "==== END   writeDataMatrixFromMetaValue()" << std::endl;
-    }
-
+    LOGD << "END writeDataMatrixFromMetaValue";
     return true;
   }
 }
