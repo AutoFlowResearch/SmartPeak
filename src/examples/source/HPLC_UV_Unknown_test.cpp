@@ -44,9 +44,9 @@ void test_main_HPLC_UV_Unknown()
   const OpenMS::Feature* f1 = &fm1[0].getSubordinates()[0];
   const OpenMS::Feature* f2 = &fm2[0].getSubordinates()[0];
 
-  cout << "native_id: " << f1->getMetaValue("native_id") << endl;
+  cout << "native_id: "     << f1->getMetaValue("native_id") << endl;
   cout << "peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
-  cout << "getRT: " << f1->getRT() << endl;
+  cout << "getRT: "         << f1->getRT() << endl;
 
   assert(f1->getMetaValue("native_id") == "5-HTP");
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 2.830286591566697));
@@ -63,9 +63,9 @@ void test_main_HPLC_UV_Unknown()
   f1 = &fm1[6].getSubordinates()[0];
   f2 = &fm2[6].getSubordinates()[0];
 
-  cout << "native_id: " << f1->getMetaValue("native_id") << endl;
+  cout << "native_id: "     << f1->getMetaValue("native_id") << endl;
   cout << "peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
-  cout << "getRT: " << f1->getRT() << endl;
+  cout << "getRT: "         << f1->getRT() << endl;
 
   assert(f1->getMetaValue("native_id") == "Acetylserotonin");
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 2.646960722065395));
@@ -82,9 +82,9 @@ void test_main_HPLC_UV_Unknown()
   f1 = &fm1[26].getSubordinates()[0];
   f2 = &fm2[26].getSubordinates()[0];
 
-  cout << "native_id: " << f1->getMetaValue("native_id") << endl;
+  cout << "native_id: "     << f1->getMetaValue("native_id") << endl;
   cout << "peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
-  cout << "getRT: " << f1->getRT() << endl;
+  cout << "getRT: "         << f1->getRT() << endl;
 
   assert(f1->getMetaValue("native_id") == "Tryptophan");
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 2.076895443935449));
