@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   meta_data3.setFilename("file3");
   meta_data3.setSampleName("sample3");
   meta_data3.setSampleGroupName("sample");
-  meta_data3.setSequenceSegmentName("sequence_segment3");
+  meta_data3.setSequenceSegmentName("sequence_segment2");
   meta_data3.setSampleType(MetaDataHandler::SampleType::Unknown);
   meta_data3.acq_method_name = "6";
   meta_data3.inj_volume = 7.0;
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureQC().component_qcs.size(), 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getQuantitationMethods().size(), 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSequenceSegmentName(), "sequence_segment3");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSequenceSegmentName(), "sequence_segment2");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSampleGroupName(), "sample");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMap().metaValueExists("foo3"), true);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMap().getMetaValue("foo3"), "bar3");
@@ -112,12 +112,9 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSampleIndices()[0], 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSequenceSegmentName(), "sequence_segment2");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getQuantitationMethods().size(), 0);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices().size(), 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices().size(), 2);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices()[0], 1);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[2].getSequenceSegmentName(), "sequence_segment3");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[2].getQuantitationMethods().size(), 0);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[2].getSampleIndices().size(), 1);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[2].getSampleIndices()[0], 2);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices()[1], 2);
 
   // Test non-shared resources
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
@@ -162,7 +159,6 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getQuantitationMethods().size(), 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getQuantitationMethods().size(), 0);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[2].getQuantitationMethods().size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(getMetaValue)
