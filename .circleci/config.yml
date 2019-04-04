@@ -36,6 +36,9 @@ jobs:
           command: |
             cd ~/SmartPeak2_build || exit 1
             ctest -j4
+      - run:
+          command: |
+            ~/SmartPeak2/.circleci/run_examples.sh
 
 workflows:
   version: 2
