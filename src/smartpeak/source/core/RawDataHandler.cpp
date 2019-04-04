@@ -380,6 +380,8 @@ namespace SmartPeak
           }
 
           // Matching feature
+          OpenMS::Feature feature_tmp = feature_select; // Make a temporary feature based on the selected feature that will be later swapped for the feature in the history
+          bool update_feature = false;
           std::vector<OpenMS::Feature> new_subordinates;
           // get the unique subordinate names (and not unique ids!)
           std::set<std::string> unique_ids_sub_history, unique_ids_sub_select;
@@ -397,24 +399,30 @@ namespace SmartPeak
             new_subordinate.setMetaValue("timestamp_", timestamp);
             // add the new subordinate to the list; we will add them to the feature subordinate list at the end
             new_subordinates.push_back(new_subordinate);
+            update_feature = true;
           }
 
           for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
-            if (0 == unique_ids_sub_select.count(subordinate_copy.getMetaValue("native_id"))) { // Removed subordinate
+            if (unique_ids_sub_select.count(subordinate_copy.getMetaValue("native_id")) == 0) { // Removed subordinate
               subordinate_copy.setMetaValue("used_", "false");
               subordinate_copy.setMetaValue("timestamp_", timestamp);
+              update_feature = true;
               continue; // move on to the next subordinate from the history
-            }
+            } 
             for (const OpenMS::Feature& subordinate_select : feature_select.getSubordinates()) {
               if (subordinate_select.getUniqueId() == subordinate_copy.getUniqueId() &&
-                  subordinate_select.getMetaValue("native_id") ==
-                    subordinate_copy.getMetaValue("native_id")) { // Matching subordinate
+                  subordinate_select.getMetaValue("native_id") == subordinate_copy.getMetaValue("native_id")) { // Matching subordinate
                 subordinate_copy = subordinate_select; // copy over changed meta values from the current feature map subordinate
                 subordinate_copy.setMetaValue("used_", "true");
                 subordinate_copy.setMetaValue("timestamp_", timestamp);
+                update_feature = true;
                 break; // break the loop and move on to the next subordinate from the history
               }
             }
+          }
+          if (update_feature) { // copy over the updated subordinates and change the feature to the updated version
+            feature_tmp.setSubordinates(feature_copy.getSubordinates());
+            feature_copy = feature_tmp;
           }
           if (new_subordinates.size()) { // append new subordinates to the existing subordinates list
             for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {

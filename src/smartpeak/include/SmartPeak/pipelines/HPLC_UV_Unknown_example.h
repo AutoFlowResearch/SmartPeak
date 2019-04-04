@@ -20,11 +20,11 @@ void example_HPLC_UV_Unknowns(
     std::shared_ptr<RawDataProcessor>(new ExtractChromatogramWindows()),
     std::shared_ptr<RawDataProcessor>(new ZeroChromatogramBaseline()),
     std::shared_ptr<RawDataProcessor>(new PickFeatures()),
+    std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
     std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
     std::shared_ptr<RawDataProcessor>(new QuantifyFeatures()),
-    std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
     std::shared_ptr<RawDataProcessor>(new StoreFeatures())
   };
 
