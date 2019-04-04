@@ -3,6 +3,7 @@
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/Utilities.h>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -98,6 +99,7 @@ namespace SmartPeak
         if (meta_data_I.getSequenceSegmentName() == sequenceSegmentHandler.getSequenceSegmentName()) {
           absQuantMethods_ptr = sequenceSegmentHandler.getQuantitationMethodsShared();
           found_seq_seg = true;
+          sequenceSegmentHandler.getSampleIndices().push_back(sequence_.size()); // index = the size of the sequence
           break;
         }
       }
@@ -185,8 +187,7 @@ namespace SmartPeak
     } else if (subordinate.metaValueExists(meta_value) && !subordinate.getMetaValue(meta_value).isEmpty()) {
       cast = static_cast<float>(subordinate.getMetaValue(meta_value));
     } else {
-      // throw std::invalid_argument("meta_value \"" + meta_value + "\" not found.");
-      // std::cout << "meta_value \"" + meta_value + "\" not found.\n"; // Log?
+      LOGV << "meta_value not found: " << meta_value;
       cast = "";
     }
 

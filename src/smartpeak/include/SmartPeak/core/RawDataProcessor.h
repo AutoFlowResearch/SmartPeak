@@ -21,6 +21,8 @@ namespace SmartPeak
   class RawDataProcessor
   {
   public:
+    virtual ~RawDataProcessor() = default;
+
     virtual int getID() const = 0;  ///< get the raw data processor class ID
     virtual std::string getName() const = 0;  ///< get the raw data processor class name
     virtual std::string getDescription() const = 0;  ///< get the raw data processor class description
@@ -34,8 +36,8 @@ namespace SmartPeak
     virtual void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false) const = 0;
+      const Filenames& filenames
+    ) const = 0;
   };
 
   class LoadRawData : public RawDataProcessor
@@ -55,15 +57,13 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
     /** Extracts metadata from the chromatogram.
     */
     static void extractMetaData(
-      RawDataHandler& rawDataHandler_IO,
-      const bool verbose_I = false
+      RawDataHandler& rawDataHandler_IO
     );
 
   protected:
@@ -86,9 +86,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 2;
@@ -110,9 +109,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 17;
@@ -134,9 +132,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 18;
@@ -158,9 +155,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 19;
@@ -182,9 +178,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    )  const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 3;
@@ -206,9 +201,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 4;
@@ -230,9 +224,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 5;
@@ -254,9 +247,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 6;
@@ -278,9 +270,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 7;
@@ -302,9 +293,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 8;
@@ -326,9 +316,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 9;
@@ -350,9 +339,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 10;
@@ -374,9 +362,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 11;
@@ -398,9 +385,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 12;
@@ -422,9 +408,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 13;
@@ -446,9 +431,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 14;
@@ -470,9 +454,8 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
 
   protected:
     int id_ = 15;
@@ -494,12 +477,10 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
-    ) const;
+      const Filenames& filenames
+    ) const override;
     static void sanitizeParameters(
-      std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const bool verbose_I = false
+      std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I
     );
 
   protected:
