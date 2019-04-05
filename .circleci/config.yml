@@ -30,7 +30,7 @@ jobs:
           command: |
             mkdir ~/SmartPeak2_build
             cd ~/SmartPeak2_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/plog/include -DImGui_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/imgui -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/imgui -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
             make -j4
       - run:
           command: |
