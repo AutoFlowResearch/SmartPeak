@@ -19,14 +19,15 @@ void test_main_LCMS_MRM_Standards()
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;
   Filenames filenames;
+
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Standards/features/150516_CM1_Level1_1_BatchName_1900-01-01_000000.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
-
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
+
+  rawDataHandler.clear();
 
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Standards/features/150516_CM1_Level1_test.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
-
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 
 cout << "fm1 size: " << fm1.size() << endl;
@@ -73,9 +74,14 @@ cout << "getRT: " << f1->getRT() << endl;
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
+
+  // check quantitation methods
+  const string quant_methods_pathname {main_dir + "/features/segment1_quantitationMethods.csv"};
+  const bool is_ok = Utilities::testStoredQuantitationMethods(quant_methods_pathname);
+  assert(is_ok == true);
 }
 
-int main(int argc, char **argv)
+int main()
 {
   test_main_LCMS_MRM_Standards();
   return 0;

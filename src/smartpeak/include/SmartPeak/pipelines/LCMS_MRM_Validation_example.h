@@ -7,13 +7,12 @@ using namespace SmartPeak;
 void example_LCMS_MRM_Validation(
   const std::string& dir_I,
   const Filenames& static_filenames,
-  const std::string& delimiter_I = ",",
-  const bool verbose_I = false
+  const std::string& delimiter_I = ","
 )
 {
   SequenceHandler sequenceHandler;
 
-  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true, true);
+  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true);
 
   const std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
     std::shared_ptr<RawDataProcessor>(new LoadRawData()),

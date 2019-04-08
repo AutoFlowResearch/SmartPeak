@@ -6,6 +6,7 @@
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/SequenceParser.h>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -13,18 +14,15 @@ namespace SmartPeak
     SequenceHandler& sequenceHandler_IO,
     const Filenames& filenames,
     const std::string& delimiter,
-    const bool checkConsistency,
-    const bool verbose_I
+    const bool checkConsistency
   )
   {
-    if (verbose_I) {
-      std::cout << "==== START createSequence()" << std::endl;
-    }
+    LOGD << "START createSequence";
 
     SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
     if (sequenceHandler_IO.getSequence().empty()) {
-      std::cout << "Empty sequence. Returning.\n"
-        "==== END   createSequence()" << std::endl;
+      LOGE << "Empty sequence. Returning";
+      LOGD << "END createSequence";
       return;
     }
     // TODO: Given that the raw data is shared between all injections, it could
@@ -34,24 +32,24 @@ namespace SmartPeak
 
     // load rawDataHandler files (applies to the whole session)
     LoadParameters loadParameters;
-    loadParameters.process(rawDataHandler, {}, filenames, verbose_I);
+    loadParameters.process(rawDataHandler, {}, filenames);
 
     LoadTransitions loadTransitions;
-    loadTransitions.process(rawDataHandler, {}, filenames, verbose_I);
+    loadTransitions.process(rawDataHandler, {}, filenames);
 
     LoadFeatureFilters loadFeatureFilters;
-    loadFeatureFilters.process(rawDataHandler, {}, filenames, verbose_I);
+    loadFeatureFilters.process(rawDataHandler, {}, filenames);
 
     LoadFeatureQCs loadFeatureQCs;
-    loadFeatureQCs.process(rawDataHandler, {}, filenames, verbose_I);
+    loadFeatureQCs.process(rawDataHandler, {}, filenames);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
 
     // load sequenceSegmentHandler files
     for (SequenceSegmentHandler& sequenceSegmentHandler: sequenceHandler_IO.getSequenceSegments()) {
       LoadQuantitationMethods loadQuantitationMethods;
-      loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames, verbose_I);
+      loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       LoadStandardsConcentrations loadStandardsConcentrations;
-      loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames, verbose_I);
+      loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
     }
 
     if (checkConsistency) {
@@ -61,17 +59,14 @@ namespace SmartPeak
       InputDataValidation::heavyComponentsAreConsistent(sequenceHandler_IO);
     }
 
-    if (verbose_I) {
-      std::cout << "==== END   createSequence()" << std::endl;
-    }
+    LOGD << "END createSequence";
   }
 
   void SequenceProcessor::processSequence(
     SequenceHandler& sequenceHandler_IO,
     const std::map<std::string, Filenames>& filenames,
     const std::set<std::string>& injection_names,
-    const std::vector<std::shared_ptr<RawDataProcessor>>& raw_data_processing_methods_I,
-    const bool verbose_I
+    const std::vector<std::shared_ptr<RawDataProcessor>>& raw_data_processing_methods_I
   )
   {
     std::vector<InjectionHandler> process_sequence = sequenceHandler_IO.getSamplesInSequence(injection_names);
@@ -85,7 +80,7 @@ namespace SmartPeak
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
-    // [OPTIMIZATION: add-in parallel execution here using 
+    // [OPTIMIZATION: add-in parallel execution here using
     //  `std::vector<std::future>>`, `std::packaged_task`, `std::thread`, and thread count/retrieval pattern]
     for (InjectionHandler& injection : process_sequence) {
 
@@ -98,13 +93,10 @@ namespace SmartPeak
 
       // process the samples
       for (size_t i = 0; i < n; ++i) {
-        if (verbose_I) {
-          std::cout << "\n[" << (i + 1) << "/" << n << "]" << std::endl;
-        }
-        raw_data_processing_methods_I[i]->process(injection.getRawData(), 
-          injection.getRawData().getParameters(), 
-          filenames.at(injection.getMetaData().getInjectionName()), 
-          verbose_I);
+        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sequence";
+        raw_data_processing_methods_I[i]->process(injection.getRawData(),
+          injection.getRawData().getParameters(),
+          filenames.at(injection.getMetaData().getInjectionName()));
       }
     }
   }
@@ -113,8 +105,7 @@ namespace SmartPeak
     SequenceHandler& sequenceHandler_IO,
     const std::map<std::string, Filenames>& filenames,
     const std::set<std::string>& sequence_segment_names,
-    const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& sequence_segment_processing_methods_I,
-    const bool verbose_I
+    const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& sequence_segment_processing_methods_I
   )
   {
     std::vector<SequenceSegmentHandler> sequence_segments;
@@ -139,15 +130,13 @@ namespace SmartPeak
       // handle user-desired sequence_segment_processing_methods
       if (!sequence_segment_processing_methods_I.size()) {
         throw "no sequence segment processing methods given.\n";
-      } 
+      }
 
       const size_t n = sequence_segment_processing_methods_I.size();
 
       // process the sequence segment
       for (size_t i = 0; i < n; ++i) {
-        if (verbose_I) {
-          std::cout << "\n[" << (i + 1) << "/" << n << "]" << std::endl;
-        }
+        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sequence segments";
         sequence_segment_processing_methods_I[i]->process(
           sequence_segment,
           sequenceHandler_IO,
@@ -156,8 +145,7 @@ namespace SmartPeak
             .at(sequence_segment.getSampleIndices().front())
             .getRawData()
             .getParameters(), // assumption: all parameters are the same for each sample in the sequence segment!
-          filenames.at(sequence_segment.getSequenceSegmentName()),
-          verbose_I
+          filenames.at(sequence_segment.getSequenceSegmentName())
         );
       }
     }

@@ -12,6 +12,13 @@ namespace SmartPeak
   class SequenceSegmentProcessor
   {
   public:
+    SequenceSegmentProcessor()                                           = default;
+    virtual ~SequenceSegmentProcessor()                                  = default;
+    SequenceSegmentProcessor(const SequenceSegmentProcessor&)            = delete;
+    SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor&) = delete;
+    SequenceSegmentProcessor(SequenceSegmentProcessor&&)                 = delete;
+    SequenceSegmentProcessor& operator=(SequenceSegmentProcessor&&)      = delete;
+
     virtual int getID() const = 0;  ///< get the raw data processor class ID
     virtual std::string getName() const = 0;  ///< get the raw data processor class name
     virtual std::string getDescription() const = 0;  ///< get the raw data processor class description
@@ -27,8 +34,8 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false) const = 0;
+      const Filenames& filenames
+    ) const = 0;
 
     /**
       Return all injection indices that belong to a given sample type.
@@ -62,8 +69,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
+      const Filenames& filenames
     ) const;
 
   protected:
@@ -88,8 +94,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
+      const Filenames& filenames
     ) const;
 
   protected:
@@ -114,8 +119,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
+      const Filenames& filenames
     ) const;
 
   protected:
@@ -140,8 +144,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
+      const Filenames& filenames
     ) const;
 
   protected:
@@ -168,8 +171,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
+      const Filenames& filenames
     ) const;
 
   protected:

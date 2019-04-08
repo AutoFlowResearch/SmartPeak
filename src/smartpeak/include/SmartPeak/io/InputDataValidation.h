@@ -28,8 +28,7 @@ public:
     static FilenameInfo isValidFilename(const std::string& filename, const std::string& member_name);
 
     static std::string getSequenceInfo(
-      const SequenceHandler& sequenceHandler,
-      const std::string& delimiter
+      const SequenceHandler& sequenceHandler
     );
 
     static std::string getParametersInfo(

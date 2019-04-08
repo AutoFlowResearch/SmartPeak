@@ -16,10 +16,13 @@ option (USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
 
 if (USE_SUPERBUILD)
   project ("SuperBuild" NONE)
-  include(external/eigen.cmake)
+  include(external/plog.cmake)
   include(external/imgui.cmake)
-  include(external/boost.cmake)
-  include(external/openms.cmake)
+  if (MSVC)
+    include(external/eigen.cmake)
+    include(external/boost.cmake)
+    include(external/openms.cmake)
+  endif()
   return() # stop processing this file further
 else()
   project ("SmartPeak_host")
@@ -33,6 +36,7 @@ SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 # Set C++ version
 SET(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CXX_EXTENSIONS OFF)
 
 #------------------------------------------------------------------------------
 ## CMake sanity check: sometimes CMAKE_SIZEOF_VOID_P just vanishes when
@@ -148,12 +152,12 @@ endif()
 # Force build type into the cache (needs to be set beforehand)
 set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 
-if (CMAKE_BUILD_TYPE EQUAL Debug)
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpedantic -Wconversion -g")
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
-elseif (CMAKE_BUILD_TYPE EQUAL Release)
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall")
+elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -Wpedantic -Wconversion")
 endif()
 
 # Windows/Linux specific issues
@@ -161,7 +165,7 @@ if (WIN32)
   add_compile_definitions(NOMINMAX)
 else()
   # prevent error position independent code error with QT on Linux
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  add_compile_options(-fPIC)
 endif()
 
 #------------------------------------------------------------------------------
