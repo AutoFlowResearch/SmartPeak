@@ -76,10 +76,21 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
+# OpenGL
+#------------------------------------------------------------------------------
+find_package(OpenGL REQUIRED)
+include_directories(${OpenGL_INCLUDE_DIRS})
+
+#------------------------------------------------------------------------------
 # ImGUI
 #------------------------------------------------------------------------------
 find_package(ImGUI COMPONENTS Sources Examples REQUIRED)
 include_directories(${ImGui_INCLUDE_DIR})
+if (ImGui_Examples_FOUND)
+  message(STATUS "ImGui_Examples_FOUND has been set and found")
+else()
+  message(STATUS "imgui has not been found")
+endif()
 
 #------------------------------------------------------------------------------
 # disable optimization for examples for gcc like compilers
