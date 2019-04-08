@@ -36,7 +36,7 @@ namespace SmartPeak
       @param[in] values_indices Map containing unique row entries and their duplicate indices
     */
     static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const std::vector<std::string>& column, bool* checked, 
-      const std::vector<std::pair<std::string, std::vector<int>>>& values_indices);
+      const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices);
 
     /**
       Method to make a sort button
@@ -50,9 +50,9 @@ namespace SmartPeak
     */
     static void SortButton(const char* button_id, const std::vector<std::string>& headers, 
       std::vector<std::vector<std::string>>& columns,
-      const int& n_col,
+      const int n_col,
       bool* checked,
-      std::vector<std::vector<std::pair<std::string, std::vector<int>>>>& columns_indices,
+      std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
       bool sort_asc = true);
 
     /**
@@ -65,7 +65,7 @@ namespace SmartPeak
     */
     static void makeFilters(const std::vector<std::string>& headers,
       const std::vector<std::vector<std::string>>& columns, 
-      std::vector<std::vector<std::pair<std::string, std::vector<int>>>>& columns_indices,
+      std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
       std::vector<ImGuiTextFilter>& filter);
 
     /*
@@ -78,7 +78,7 @@ namespace SmartPeak
       @param[in] n_rows The number of rows
       @param[in,out] checked_rows What rows are checked/filtered
     */
-    static void makeCheckedRows(const int& n_rows, bool* checked_rows);
+    static void makeCheckedRows(const size_t n_rows, bool* checked_rows);
   };
 
   /**

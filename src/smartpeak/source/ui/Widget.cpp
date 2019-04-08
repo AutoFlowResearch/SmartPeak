@@ -3,75 +3,96 @@
 
 namespace SmartPeak
 {
-  void Widget::FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const std::vector<std::string>& column, bool* checked,
-    const std::vector<std::pair<std::string, std::vector<int>>>& values_indices) {
-
-    if (ImGui::BeginPopup(popuop_id))
-    {
-      //// Sorting
-      //if (ImGui::Button("Asc"))
-      //{
-      //  // TODO: will need to rethink how this function is called to implement sorting on the entire table
-      //  //std::sort(std::begin(column), std::end(column), [](std::string a, std::string b) {return a > b; });
-      //  //std::sort(std::begin(values_indices), std::end(values_indices), [](std::pair<std::string, std::vector<int>> a, std::pair<std::string, std::vector<int>> b) {return a.first > b.first; });
-      //}
-      //ImGui::SameLine();
-      //if (ImGui::Button("Desc"))
-      //{
-      //  // TODO: will need to rethink how this function is called to implement sorting on the entire table
-      //  //std::sort(std::begin(column), std::end(column), [](std::string a, std::string b) {return a < b; });
-      //  //std::sort(std::begin(values_indices), std::end(values_indices), [](std::pair<std::string, std::vector<int>> a, std::pair<std::string, std::vector<int>> b) {return a.first < b.first; });
-      //}
-      //ImGui::Separator();
-
-      // Filtering and selecting
-      filter.Draw();
-      
-      if (ImGui::Button("check all"))
-        for (const auto& indexes: values_indices)
-          for (const int& i: indexes.second) 
-            checked[i] = true;
-      ImGui::SameLine();
-      if (ImGui::Button("uncheck all"))
-        for (const auto& indexes : values_indices)
-          for (const int& i : indexes.second)
-            checked[i] = false;
-      for (const auto& indexes : values_indices)
-        if (filter.PassFilter(indexes.first.c_str()))
-          ImGui::Checkbox(indexes.first.c_str(), &checked[indexes.second.front()]);
-
-      // Update checked rows not explicitly shown
-      for (const auto& indexes : values_indices)
-        for (const int& i : indexes.second)
-          checked[i] = checked[indexes.second.front()];
-
-      // NOTE: Appears to apply the filter immediately so this is not needed
-      // // Apply filters
-      // ImGui::Separator();
-      // if (ImGui::Button("Accept"))
-      // {
-      //   //TODO: apply filter and exit
-      // }
-      // ImGui::SameLine();
-      // if (ImGui::Button("Cancel"))
-      // {
-      //   //TODO: exit without applying filter
-      // }
-
-      ImGui::EndPopup();
-    }
-  }
-  void Widget::makeFilters(const std::vector<std::string>& headers,
-    const std::vector<std::vector<std::string>>& columns,
-    std::vector<std::vector<std::pair<std::string, std::vector<int>>>>& columns_indices,
-    std::vector<ImGuiTextFilter>& filter)
+  void Widget::FilterPopup(
+    const char* popuop_id,
+    ImGuiTextFilter& filter,
+    const std::vector<std::string>& column,
+    bool* checked,
+    const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices
+  )
   {
-    for (int col = 0; col < headers.size(); ++col)
+    if (false == ImGui::BeginPopup(popuop_id))
+      return;
+
+    //// Sorting
+    //if (ImGui::Button("Asc"))
+    //{
+    //  // TODO: will need to rethink how this function is called to implement sorting on the entire table
+    //  //std::sort(std::begin(column), std::end(column), [](std::string a, std::string b) {return a > b; });
+    //  //std::sort(std::begin(values_indices), std::end(values_indices), [](std::pair<std::string, std::vector<int>> a, std::pair<std::string, std::vector<int>> b) {return a.first > b.first; });
+    //}
+    //ImGui::SameLine();
+    //if (ImGui::Button("Desc"))
+    //{
+    //  // TODO: will need to rethink how this function is called to implement sorting on the entire table
+    //  //std::sort(std::begin(column), std::end(column), [](std::string a, std::string b) {return a < b; });
+    //  //std::sort(std::begin(values_indices), std::end(values_indices), [](std::pair<std::string, std::vector<int>> a, std::pair<std::string, std::vector<int>> b) {return a.first < b.first; });
+    //}
+    //ImGui::Separator();
+
+    // Filtering and selecting
+    filter.Draw();
+
+    if (ImGui::Button("check all")) {
+      for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
+        for (const size_t i: indexes.second) {
+          checked[i] = true;
+        }
+      }
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("uncheck all")) {
+      for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
+        for (const size_t i : indexes.second) {
+          checked[i] = false;
+        }
+      }
+    }
+
+    for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
+      if (filter.PassFilter(indexes.first.c_str())) {
+        ImGui::Checkbox(indexes.first.c_str(), &checked[indexes.second.front()]);
+      }
+    }
+
+    // Update checked rows not explicitly shown
+    for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
+      for (const size_t i : indexes.second) {
+        checked[i] = checked[indexes.second.front()];
+      }
+    }
+
+    // NOTE: Appears to apply the filter immediately so this is not needed
+    // // Apply filters
+    // ImGui::Separator();
+    // if (ImGui::Button("Accept"))
+    // {
+    //   //TODO: apply filter and exit
+    // }
+    // ImGui::SameLine();
+    // if (ImGui::Button("Cancel"))
+    // {
+    //   //TODO: exit without applying filter
+    // }
+
+    ImGui::EndPopup();
+  }
+
+  void Widget::makeFilters(
+    const std::vector<std::string>& headers,
+    const std::vector<std::vector<std::string>>& columns,
+    std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
+    std::vector<ImGuiTextFilter>& filter
+  )
+  {
+    for (size_t col = 0; col < headers.size(); ++col)
     {
       // Extract out unique columns and replicate indices
-      std::map<std::string, std::vector<int>> value_indices;
-      for (int row = 0; row < columns[col].size(); ++row) {
-        std::vector<int> index = { row };
+      std::map<std::string, std::vector<size_t>> value_indices;
+      for (size_t row = 0; row < columns[col].size(); ++row) {
+        std::vector<size_t> index = { row };
         auto found = value_indices.emplace(columns[col][row], index);
         if (!found.second) {
           value_indices.at(columns[col][row]).push_back(row);
@@ -79,8 +100,12 @@ namespace SmartPeak
       }
 
       // Copy into a vector of pairs (used for downstream sorting)
-      std::vector<std::pair<std::string, std::vector<int>>> value_indices_v;
-      std::copy(value_indices.begin(), value_indices.end(), std::back_inserter<std::vector<std::pair<std::string, std::vector<int>>>>(value_indices_v));
+      std::vector<std::pair<std::string, std::vector<size_t>>> value_indices_v;
+      std::copy(
+        value_indices.begin(),
+        value_indices.end(),
+        std::back_inserter(value_indices_v)
+      );
       columns_indices.push_back(value_indices_v);
 
       // Initialize the filters
@@ -88,7 +113,7 @@ namespace SmartPeak
       filter.push_back(filter0);
     }
   }
-  void Widget::makeCheckedRows(const int & n_rows, bool * checked_rows)
+  void Widget::makeCheckedRows(const size_t n_rows, bool * checked_rows)
   {
     for (size_t i = 0; i < n_rows; ++i)
       checked_rows[i] = true;
@@ -102,46 +127,50 @@ namespace SmartPeak
 
     // row filters
     static std::vector<ImGuiTextFilter> filter;
-    std::vector<std::vector<std::pair<std::string, std::vector<int>>>> columns_indices;
+    std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>> columns_indices;
     this->makeFilters(headers, columns, columns_indices, filter);
 
     // headers
-    ImGui::Columns(headers.size() + 1, columns[0][0].data(), true);
+    ImGui::Columns(static_cast<int>(headers.size() + 1), columns[0][0].data(), true);
     ImGui::Separator();
     ImGui::Text("Index");
     ImGui::NextColumn();
-    for (int col = 0; col < headers.size(); ++col)
+    for (size_t col = 0; col < headers.size(); ++col)
     {
-      if (ImGui::Button(headers[col].c_str()))
-        ImGui::OpenPopup(&static_cast<char>(col));
-      this->FilterPopup(&static_cast<char>(col), filter[col], columns[col], checked_rows, columns_indices[col]);
+      char s[128];
+      if (ImGui::Button(headers[col].c_str())) {
+        sprintf(s, "%lu", col);
+        ImGui::OpenPopup(s);
+      }
+      sprintf(s, "%lu", col);
+      this->FilterPopup(s, filter[col], columns[col], checked_rows, columns_indices[col]);
       ImGui::NextColumn();
     }
 
     // body
     ImGui::Separator();
-    static int selected = -1;
-    for (int i = 0; i < columns[0].size(); ++i)
+    static size_t selected = -1;
+    for (size_t i = 0; i < columns[0].size(); ++i)
     {
       bool pass_all_columns = checked_rows[i];
       if (pass_all_columns)
       {
         char label[32];
-        sprintf(label, "%d", i);
+        sprintf(label, "%lu", i);
         if (ImGui::Selectable(label, selected == i, ImGuiSelectableFlags_SpanAllColumns))
           selected = i;
-        bool hovered = ImGui::IsItemHovered();
+        // bool hovered = ImGui::IsItemHovered();
         ImGui::NextColumn();
-        for (int j = 0; j < headers.size(); ++j)
+        for (size_t j = 0; j < headers.size(); ++j)
         {
-          ImGui::Text(columns[j][i].c_str());
+          ImGui::Text("%s", columns[j][i].c_str());
 
           // Testing random fixes to get input text to work
           //char buf[512];
           //sprintf(buf, columns[j][i].c_str());
           //ImGui::InputText("", buf, IM_ARRAYSIZE(buf));
           //if (ImGui::IsItemHovered() || ImGui::IsItemFocused())
-          //  ImGui::SetMouseCursor(1); 
+          //  ImGui::SetMouseCursor(1);
 
           ImGui::NextColumn();
         }
@@ -149,7 +178,7 @@ namespace SmartPeak
     }
     // ImGui::EndChild();
   }
-  
+
   void GenericGraphicWidget::show()
   {
     // Dummy data
@@ -162,15 +191,19 @@ namespace SmartPeak
 
     // row filters
     static std::vector<ImGuiTextFilter> filter;
-    std::vector<std::vector<std::pair<std::string, std::vector<int>>>> columns_indices;
+    std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>> columns_indices;
     this->makeFilters(headers, columns, columns_indices, filter);
 
     // Search and filtering options for the plot
-    for (int col = 0; col < headers.size(); ++col)
+    for (size_t col = 0; col < headers.size(); ++col)
     {
-      if (ImGui::Button(headers[col].c_str()))
-        ImGui::OpenPopup(&static_cast<char>(col));
-      this->FilterPopup(&static_cast<char>(col), filter[col], columns[col], checked_rows, columns_indices[col]);
+      char s[128];
+      if (ImGui::Button(headers[col].c_str())) {
+        sprintf(s, "%lu", col);
+        ImGui::OpenPopup(s);
+      }
+      sprintf(s, "%lu", col);
+      this->FilterPopup(s, filter[col], columns[col], checked_rows, columns_indices[col]);
       ImGui::SameLine();
     }
     ImGui::NewLine();
@@ -300,7 +333,7 @@ namespace SmartPeak
     ImGui::NextColumn();
     for (int col = 0; col < IM_ARRAYSIZE(headers); ++col)
     {
-      ImGui::Text(headers[col]);
+      ImGui::Text("%s", headers[col]);
       ImGui::NextColumn();
     }
     // Body
@@ -321,13 +354,13 @@ namespace SmartPeak
         sprintf(label, "%d", i);
         if (ImGui::Selectable(label, selected_file == i, ImGuiSelectableFlags_SpanAllColumns))
           selected_file = i;
-        bool hovered = ImGui::IsItemHovered();
+        // bool hovered = ImGui::IsItemHovered();
         if (ImGui::IsItemClicked()) // update the selected file
           sprintf(buffilename, "%s", columns[i][0]);
         ImGui::NextColumn();
         for (int j = 0; j < IM_ARRAYSIZE(headers); ++j)
         {
-          ImGui::Text(columns[i][j]);
+          ImGui::Text("%s", columns[i][j]);
           ImGui::NextColumn();
         }
       }
@@ -339,7 +372,7 @@ namespace SmartPeak
     // Filtering and selecting
     ImGui::Separator();
     ImGui::Text("File Name:");
-    // 
+    //
     ImGui::SameLine();
     ImGui::InputText("", buffilename, 256);
     ImGui::SameLine();
@@ -383,7 +416,7 @@ namespace SmartPeak
       {
         if (sample_filter.PassFilter(sample_ps[i]))
         {
-          ImGui::Text(sample_ps[i]);
+          ImGui::Text("%s", sample_ps[i]);
           if (ImGui::IsItemClicked())
           {
             //TODO:  add table row
@@ -404,7 +437,7 @@ namespace SmartPeak
       {
         if (sequence_segment_filter.PassFilter(sequence_segment_ps[i]))
         {
-          ImGui::Text(sequence_segment_ps[i]);
+          ImGui::Text("%s", sequence_segment_ps[i]);
           if (ImGui::IsItemClicked())
           {
             //TODO:  add table row
@@ -425,7 +458,7 @@ namespace SmartPeak
       {
         if (sample_group_filter.PassFilter(sample_group_ps[i]))
         {
-          ImGui::Text(sample_group_ps[i]);
+          ImGui::Text("%s", sample_group_ps[i]);
           if (ImGui::IsItemClicked())
           {
             //TODO:  add table row
@@ -436,7 +469,7 @@ namespace SmartPeak
     }
     ImGui::EndGroup();
 
-    // Middle: 
+    // Middle:
     // Table Filters
     static std::vector<ImGuiTextFilter> filter;
     static ImGuiTextFilter filter0, filter1, filter2, filter3;
@@ -471,20 +504,20 @@ namespace SmartPeak
     // Body
     // TODO: 3 columns with order, process step, checkmark (enabled, disabled)
     ImGui::Separator();
-    static int selected = -1;
-    for (int i = 0; i < columns[0].size(); ++i)
+    static size_t selected = -1;
+    for (size_t i = 0; i < columns[0].size(); ++i)
     {
       if (checked_rows[i])
       {
         char label[32];
-        sprintf(label, "%d", i);
+        sprintf(label, "%lu", i);
         if (ImGui::Selectable(label, selected == i, ImGuiSelectableFlags_SpanAllColumns))
           selected = i;
-        bool hovered = ImGui::IsItemHovered();
+        // bool hovered = ImGui::IsItemHovered();
         ImGui::NextColumn();
         for (int j = 0; j < IM_ARRAYSIZE(headers); ++j)
         {
-          ImGui::Text(columns[j][i].c_str());
+          ImGui::Text("%s", columns[j][i].c_str());
           // TODO: tooltip description of each processing step
           ImGui::NextColumn();
         }
@@ -517,7 +550,7 @@ namespace SmartPeak
   void GenericTextWidget::show(const std::vector<std::string>& text_lines)
   {
     for (const std::string& line : text_lines) {
-      ImGui::Text(line.data());
+      ImGui::Text("%s", line.c_str());
     }
   }
 }
