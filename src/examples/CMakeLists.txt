@@ -72,10 +72,13 @@ endif()
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
+find_package(OpenGL REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
+
 #------------------------------------------------------------------------------
 # ImGUI
 #------------------------------------------------------------------------------
-find_package(ImGui REQUIRED Sources Examples)
+find_package(ImGUI COMPONENTS Sources Examples REQUIRED)
 include_directories(${ImGui_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
@@ -101,7 +104,7 @@ add_dependencies(INTERACTIVE_EXAMPLES ${interactive_executables_list})
 foreach(_examples ${EXAMPLE_executables})
   add_executable(${_examples} source/${_examples})
   # TODO: only link SDL2 and ImGUI libraries with the GUI 
-  target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples)
+  target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples)
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
   # see https://sourceforge.net/apps/trac/open-ms/ticket/280 for details)
   if (OPENMP_FOUND AND NOT MSVC AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
