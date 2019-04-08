@@ -37,9 +37,9 @@
 #
 #   This file is part of Magnum.
 #
-#   Copyright © 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019
-#             Vladimír Vondruš <mosra@centrum.cz>
-#   Copyright © 2018 Jonathan Hale <squareys@googlemail.com>
+#   Copyright ï¿½ 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019
+#             Vladimï¿½r Vondruï¿½ <mosra@centrum.cz>
+#   Copyright ï¿½ 2018 Jonathan Hale <squareys@googlemail.com>
 #
 #   Permission is hereby granted, free of charge, to any person obtaining a
 #   copy of this software and associated documentation files (the "Software"),
@@ -126,7 +126,7 @@ macro(_imgui_setup_source_file source_var)
 endmacro()
 
 # Find components
-foreach(_component IN LISTS ImGui_FIND_COMPONENTS)
+foreach(_component IN LISTS ImGUI_FIND_COMPONENTS)
     if(_component STREQUAL "Sources")
         if(NOT TARGET ImGui::Sources)
             set(ImGui_Sources_FOUND TRUE)
@@ -193,16 +193,16 @@ foreach(_component IN LISTS ImGui_FIND_COMPONENTS)
                 # Disable the find root path here, it overrides the
                 # CMAKE_FIND_ROOT_PATH_MODE_INCLUDE setting potentially set in
                 # toolchains.
-                find_file(ImGui_${_file}_EXAMPLE NAMES ${_file}.h
-                    HINTS ${IMGUI_DIR}/examples NO_CMAKE_FIND_ROOT_PATH)
-                list(APPEND ImGui_EXAMPLES ${ImGui_${_file}_EXAMPLE})
+                # find_file(ImGui_${_file}_EXAMPLE NAMES ${_file}.h
+                #     HINTS ${IMGUI_DIR}/examples NO_CMAKE_FIND_ROOT_PATH)
+                # list(APPEND ImGui_EXAMPLES ${ImGui_${_file}_EXAMPLE})
 
-                if(NOT ImGui_${_file}_EXAMPLE)
-                    set(ImGui_Examples_FOUND FALSE)
-                    break()
-                endif()
+                # if(NOT ImGui_${_file}_EXAMPLE)
+                #     set(ImGui_Examples_FOUND FALSE)
+                #     break()
+                # endif()
 
-                _imgui_setup_source_file(ImGui_${_file}_EXAMPLE)
+                # _imgui_setup_source_file(ImGui_${_file}_EXAMPLE)
 				
                 find_file(ImGui_${_file}_EXAMPLE NAMES ${_file}.cpp
                     HINTS ${IMGUI_DIR}/examples NO_CMAKE_FIND_ROOT_PATH)
