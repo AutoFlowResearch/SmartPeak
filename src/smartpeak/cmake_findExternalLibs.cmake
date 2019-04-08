@@ -34,7 +34,7 @@ find_package(SDL2 REQUIRED)
 #------------------------------------------------------------------------------
 find_package(ImGUI REQUIRED)
 if (IMGUI_FOUND)
-  message(STATUS "imgui_INCLUDE_DIR : ${ImGui_INCLUDE_DIR}")
+  message(STATUS "ImGui_INCLUDE_DIR : ${ImGui_INCLUDE_DIR}")
 endif (IMGUI_FOUND)
 
 #------------------------------------------------------------------------------
