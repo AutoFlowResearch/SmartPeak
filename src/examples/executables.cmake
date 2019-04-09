@@ -1,5 +1,4 @@
 set(pipeline_executables_list
-  CommandLine
   GCMS_FullScan_Unknown_test
   GCMS_SIM_Unknown_test
   HPLC_UV_Standards_test
@@ -9,7 +8,13 @@ set(pipeline_executables_list
   LCMS_MRM_Unknown_test
 )
 
+set(interactive_executables_list
+  CommandLine
+  GUI
+)
+
 ### collect example executables
 set(EXAMPLE_executables
   ${pipeline_executables_list}
+  ${interactive_executables_list}
 )

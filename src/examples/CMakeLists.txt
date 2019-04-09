@@ -67,6 +67,32 @@ if (NOT Qt5Core_FOUND)
 endif()
 
 #------------------------------------------------------------------------------
+# ImGUI SDL and OpenGL dependencies
+#------------------------------------------------------------------------------
+find_package(SDL2 REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
+
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIR})
+
+#------------------------------------------------------------------------------
+# OpenGL
+#------------------------------------------------------------------------------
+find_package(OpenGL REQUIRED)
+include_directories(${OpenGL_INCLUDE_DIRS})
+
+#------------------------------------------------------------------------------
+# ImGUI
+#------------------------------------------------------------------------------
+find_package(ImGUI COMPONENTS Sources Examples REQUIRED)
+include_directories(${ImGui_INCLUDE_DIR})
+if (ImGui_Examples_FOUND)
+  message(STATUS "ImGui_Examples_FOUND has been set and found")
+else()
+  message(STATUS "imgui has not been found")
+endif()
+
+#------------------------------------------------------------------------------
 # disable optimization for examples for gcc like compilers
 if (CMAKE_COMPILER_IS_INTELCXX OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG)
   set(_TMP_CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
@@ -79,11 +105,17 @@ endif()
 add_custom_target(PIPELINE_EXAMPLES)
 add_dependencies(PIPELINE_EXAMPLES ${pipeline_executables_list})
 
+# interactive examples
+# TODO: these will need to be moved into the CPack script for user installation
+add_custom_target(INTERACTIVE_EXAMPLES) 
+add_dependencies(INTERACTIVE_EXAMPLES ${interactive_executables_list})
+
 #------------------------------------------------------------------------------
 # Add the actual examples
 foreach(_examples ${EXAMPLE_executables})
   add_executable(${_examples} source/${_examples})
-  target_link_libraries(${_examples} ${SmartPeak_LIBRARIES} OpenMS)
+  # TODO: only link SDL2 and ImGUI libraries with the GUI 
+  target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples)
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
   # see https://sourceforge.net/apps/trac/open-ms/ticket/280 for details)
   if (OPENMP_FOUND AND NOT MSVC AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
