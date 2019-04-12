@@ -1,5 +1,6 @@
 #include <SmartPeak/ui/AppWindow.h>
 #include <SmartPeak/ui/Widget.h>
+#include <imgui.h>
 
 namespace SmartPeak
 {
@@ -40,27 +41,153 @@ namespace SmartPeak
     // Help
     static bool show_app_about_ = false;
 
+    static bool show_file_picker_ = false;
+
+    if (show_file_picker_)
+    {
+      ImGui::OpenPopup("modal_file_picker");
+    }
+
+    // File picker modal
+    if (ImGui::BeginPopupModal("modal_file_picker", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+      {
+        // ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.5f);
+
+        // ImGui::BeginChild("Folders", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 130));
+        ImGui::BeginChild("Folders", ImVec2(170, 300));
+
+        for (int n = 0; n < 50; ++n)
+          ImGui::Text("Folder n. %d", n);
+        ImGui::EndChild();
+      }
+
+      ImGui::SameLine();
+
+      {
+        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.5f);
+        // ImGui::BeginChild("Folder's content", ImVec2(ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 210)));
+        ImGui::BeginChild("Folder's content", ImVec2(ImVec2(600, 300)));
+        ImGui::Text("Content of the selected (not yet) folder");
+        ImGui::EndChild();
+        ImGui::PopStyleVar();
+      }
+
+      if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+        show_file_picker_ = false;
+        ImGui::CloseCurrentPopup();
+      }
+
+      ImGui::SameLine();
+      if (ImGui::Button("Open", ImVec2(120, 0))) {
+        show_file_picker_ = false;
+        ImGui::CloseCurrentPopup();
+      }
+
+      ImGui::EndPopup();
+    }
+
     // Show the main window
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
-    window_flags |= ImGuiWindowFlags_NoResize;
-    window_flags |= ImGuiWindowFlags_NoCollapse;
+    // TODO: eventually uncomment following lines
+    // window_flags |= ImGuiWindowFlags_NoResize;
+    // window_flags |= ImGuiWindowFlags_NoCollapse;
     window_flags |= ImGuiWindowFlags_MenuBar;
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
     static bool show_main_window = true;
-    if (ImGui::Begin("Sequence list", &show_main_window, window_flags))
+    if (!ImGui::Begin("Sequence list", &show_main_window, window_flags))
     {
-      // Main menu bar
-      MainMenu main_menu;
-      main_menu.showMainMenuBar(
-        // View: Explorer pane
-        show_sequence_explorer_,
-        show_transitions_explorer_,
-        show_experiment_explorer_,
-        show_features_explorer_,
-        // View: Main pane
-        show_sequence_table_,
+      // Early out if the window is collapsed, as an optimization.
+      ImGui::End();
+      return;
+    }
+    // Main menu bar
+    showMainMenuBar(
+      // View: Explorer pane
+      show_sequence_explorer_,
+      show_transitions_explorer_,
+      show_experiment_explorer_,
+      show_features_explorer_,
+      // View: Main pane
+      show_sequence_table_,
+      show_transitions_table_,
+      show_workflow_table_,
+      show_parameters_table_,
+      show_quant_method_table_,
+      show_stds_concs_table_,
+      show_comp_filters_table_,
+      show_comp_group_filters_table_,
+      show_comp_qcs_table_,
+      show_comp_group_qcs_table_,
+      show_feature_plot_,
+      show_line_plot_,
+      show_heatmap_plot_,
+      show_feature_summary_table_,
+      show_sequence_summary_table_,
+      // View: Info pane
+      show_output_,
+      show_info_,
+      show_log_,
+      // Help
+      show_app_about_,
+      show_file_picker_
+    );
+
+    // determine what windows will be shown
+    bool show_explorer_pane = false;
+    bool show_main_pane = true; // always shown
+    bool show_info_pane = false;
+    if (show_sequence_explorer_ ||
+        show_transitions_explorer_ ||
+        show_experiment_explorer_ ||
+        show_features_explorer_)
+    {
+      show_explorer_pane = true;
+    }
+
+    if (show_output_ || show_info_ || show_log_)
+    {
+      show_info_pane = true;
+    }
+
+    // // calculate the window sizes
+    // ImVec2 explorer_pane_size, main_pane_size, info_pane_size;
+    // if (show_explorer_pane && show_main_pane && show_info_pane) {
+    //   // All panes
+    //   explorer_pane_size = ImVec2(ImGui::GetIO().DisplaySize.x*0.2, ImGui::GetIO().DisplaySize.y*0.75);
+    //   main_pane_size = ImVec2(0, ImGui::GetIO().DisplaySize.y*0.75);
+    //   info_pane_size = ImVec2(0, 0);
+    // } else if (show_explorer_pane && show_main_pane){
+    //   // No info pane
+    //   explorer_pane_size = ImVec2(ImGui::GetIO().DisplaySize.x*0.2, 0);
+    //   main_pane_size = ImVec2(0, 0);
+    //   info_pane_size = ImVec2(0, 0);
+    // } else if (show_main_pane) {
+    //   // No explorer and info panes
+    //   explorer_pane_size = ImVec2(0, 0);
+    //   main_pane_size = ImVec2(0, 0);
+    //   info_pane_size = ImVec2(0, 0);
+    // } else {
+    //   explorer_pane_size = ImVec2(0, 0);
+    //   main_pane_size = ImVec2(0, 0);
+    //   info_pane_size = ImVec2(0, 0);
+    // }
+
+    // left Top
+    if (show_explorer_pane) {
+      ImGui::BeginChild("Explorer pane", ImVec2(ImGui::GetIO().DisplaySize.x*0.2, ImGui::GetIO().DisplaySize.y*0.75), false, ImGuiWindowFlags_HorizontalScrollbar);
+      ImGui::Text("TODO: search and sort bar");
+      ImGui::Text("TODO: list or tree");
+      ImGui::EndChild();
+      ImGui::SameLine();
+    }
+
+    // right top 
+    if (show_main_pane) {
+      ImGui::BeginChild("Main pane", ImVec2(0, ImGui::GetIO().DisplaySize.y*0.75), false);
+      showMainWindow(show_sequence_table_,
         show_transitions_table_,
         show_workflow_table_,
         show_parameters_table_,
@@ -74,93 +201,22 @@ namespace SmartPeak
         show_line_plot_,
         show_heatmap_plot_,
         show_feature_summary_table_,
-        show_sequence_summary_table_,
-        // View: Info pane
-        show_output_,
-        show_info_,
-        show_log_,
-        // Help
-        show_app_about_);
-
-      // determine what windows will be shown
-      bool show_explorer_pane = false;
-      bool show_main_pane = true; // always shown
-      bool show_info_pane = false;
-      if (show_sequence_explorer_ ||
-        show_transitions_explorer_ ||
-        show_experiment_explorer_ ||
-        show_features_explorer_) show_explorer_pane = true;
-      if (show_output_ ||
-        show_info_ ||
-        show_log_) show_info_pane = true;
-
-      // calculate the window sizes
-      ImVec2 explorer_pane_size, main_pane_size, info_pane_size;
-      if (show_explorer_pane && show_main_pane && show_info_pane) {
-        // All panes
-        explorer_pane_size = ImVec2(ImGui::GetIO().DisplaySize.x*0.2, ImGui::GetIO().DisplaySize.y*0.75);
-        main_pane_size = ImVec2(0, ImGui::GetIO().DisplaySize.y*0.75);
-        info_pane_size = ImVec2(0, 0);
-      } else if (show_explorer_pane && show_main_pane){
-        // No info pane
-        explorer_pane_size = ImVec2(ImGui::GetIO().DisplaySize.x*0.2, 0);
-        main_pane_size = ImVec2(0, 0);
-        info_pane_size = ImVec2(0, 0);
-      } else if (show_main_pane) {
-        // No explorer and info panes
-        explorer_pane_size = ImVec2(0, 0);
-        main_pane_size = ImVec2(0, 0);
-        info_pane_size = ImVec2(0, 0);
-      } else {
-        explorer_pane_size = ImVec2(0, 0);
-        main_pane_size = ImVec2(0, 0);
-        info_pane_size = ImVec2(0, 0);
-      }
-
-      // left Top
-      if (show_explorer_pane) {
-        ImGui::BeginChild("Explorer pane", ImVec2(ImGui::GetIO().DisplaySize.x*0.2, ImGui::GetIO().DisplaySize.y*0.75), false, ImGuiWindowFlags_HorizontalScrollbar);
-        ImGui::Text("TODO: search and sort bar");
-        ImGui::Text("TODO: list or tree");
-        ImGui::EndChild();
-        ImGui::SameLine();
-      }
-
-      // right top 
-      if (show_main_pane) {
-        ImGui::BeginChild("Main pane", ImVec2(0, ImGui::GetIO().DisplaySize.y*0.75), false);
-        MainWindow mainWindow;
-        mainWindow.showMainWindow(show_sequence_table_,
-          show_transitions_table_,
-          show_workflow_table_,
-          show_parameters_table_,
-          show_quant_method_table_,
-          show_stds_concs_table_,
-          show_comp_filters_table_,
-          show_comp_group_filters_table_,
-          show_comp_qcs_table_,
-          show_comp_group_qcs_table_,
-          show_feature_plot_,
-          show_line_plot_,
-          show_heatmap_plot_,
-          show_feature_summary_table_,
-          show_sequence_summary_table_);
-        ImGui::EndChild();
-        ImGui::NewLine();
-      }
-
-      // Bottom
-      if (show_info_pane) {
-        ImGui::BeginChild("Info pane", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-        InfoWindow infoWindow;
-        infoWindow.showInfoWindow(show_output_, show_info_, show_log_);
-        ImGui::EndChild();
-      }
-      ImGui::End();
+        show_sequence_summary_table_
+      );
+      ImGui::EndChild();
+      ImGui::NewLine();
     }
+
+    // Bottom
+    if (show_info_pane) {
+      ImGui::BeginChild("Info pane", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
+      showInfoWindow(show_output_, show_info_, show_log_);
+      ImGui::EndChild();
+    }
+    ImGui::End();
   }
 
-  void MainMenu::showMainMenuBar(
+  void AppWindow::showMainMenuBar(
     // View: Explorer pane
     bool& show_sequence_explorer,
     bool& show_transitions_explorer,
@@ -187,7 +243,10 @@ namespace SmartPeak
     bool& show_info,
     bool& show_log,
     // Help
-    bool& show_app_about) {
+    bool& show_app_about,
+    bool& show_file_picker
+  )
+  {
     // Show the widgets
     //SequenceWidget sequenceWidget;
     //if (show_sequence_) sequenceWidget.show(&show_sequence_);
@@ -202,7 +261,7 @@ namespace SmartPeak
     {
       if (ImGui::BeginMenu("File"))
       {
-        showMenuFile();
+        showMenuFile(show_file_picker);
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Edit"))
@@ -255,36 +314,24 @@ namespace SmartPeak
     }
   }
 
-  void MainMenu::showMenuFile() {
+  void AppWindow::showMenuFile(bool& show_file_picker)
+  {
     ImGui::MenuItem("Session", NULL, false, false);
     if (ImGui::MenuItem("New Session"))
     {
       //TODO: SQL light interface
     }
+
     if (ImGui::MenuItem("Load Session", "Ctrl+O"))
     {
       //TODO: open file browser modal
-      ImGui::OpenPopup("Delete?");
+      // ImGui::OpenPopup("Delete?");
     }
-    if (ImGui::BeginPopupModal("Delete?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-      ImGui::Text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
-      ImGui::Separator();
 
-      //static int dummy_i = 0;
-      //ImGui::Combo("Combo", &dummy_i, "Delete\0Delete harder\0");
-
-      static bool dont_ask_me_next_time = false;
-      ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-      ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
-      ImGui::PopStyleVar();
-
-      if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-      ImGui::SetItemDefaultFocus();
-      ImGui::SameLine();
-      if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-      ImGui::EndPopup();
+    if (ImGui::MenuItem("Load session from sequence")) {
+      show_file_picker = !show_file_picker;
     }
+
     if (ImGui::MenuItem("Save Session", "Ctrl+S"))
     {
       //TODO
@@ -326,7 +373,7 @@ namespace SmartPeak
     //if (ImGui::MenuItem("Quit", "Alt+F4")) {}
   }
 
-  void MainMenu::showMenuEdit() {
+  void AppWindow::showMenuEdit() {
     ImGui::MenuItem("Session", NULL, false, false);
     if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
     if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
@@ -339,7 +386,7 @@ namespace SmartPeak
     if (ImGui::MenuItem("Workflow")) {} // TODO: modal of settings 
   }
 
-  void MainMenu::showMenuView(
+  void AppWindow::showMenuView(
     // View: Explorer pane
     bool& show_sequence_explorer,
     bool& show_transitions_explorer,
@@ -400,7 +447,7 @@ namespace SmartPeak
     if (ImGui::MenuItem("Log", NULL, &show_log)) {}
   }
 
-  void MainMenu::showMenuAction() {
+  void AppWindow::showMenuAction() {
     if (ImGui::MenuItem("Run command")) {}
     if (ImGui::MenuItem("Run workflow")) {}
     if (ImGui::BeginMenu("Quick info"))
@@ -437,7 +484,7 @@ namespace SmartPeak
     }
   }
 
-  void MainMenu::showMenuHelp(bool& show_app_about) {
+  void AppWindow::showMenuHelp(bool& show_app_about) {
     if (ImGui::MenuItem("About")) {
       ImGui::OpenPopup("about");
       if (ImGui::BeginPopupModal("about"))
@@ -446,7 +493,7 @@ namespace SmartPeak
         //bool show_about = true;
         //aboutWidget.show(&show_about);
         ImGui::Text("About SmartPeak");
-        ImGui::Text("SmartPeak %s", 1.0); //TODO: define version function
+        ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
         ImGui::Separator();
         ImGui::Text("By the hardworking SmartPeak developers.");
         ImGui::EndPopup();
@@ -459,7 +506,7 @@ namespace SmartPeak
 
   }
 
-  void MainWindow::showMainWindow(
+  void AppWindow::showMainWindow(
     bool& show_sequence_table,
     bool& show_transitions_table,
     bool& show_workflow_table,
@@ -587,7 +634,11 @@ namespace SmartPeak
     }
   }
 
-  void InfoWindow::showInfoWindow(bool & show_output, bool & show_info, bool & show_log)
+  void AppWindow::showInfoWindow(
+    bool & show_output,
+    bool & show_info,
+    bool & show_log
+  )
   {
     static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable;
     if ((show_output ||
@@ -614,7 +665,19 @@ namespace SmartPeak
     }
   }
 
-  void ExplorerWindow::showExplorerWindow(bool & show_injections_search, bool & show_samples_search, bool & show_sequence_segments_search, bool & show_sample_groups_search, bool & show_components_search, bool & show_component_groups_search, bool & show_workflow_steps_search, bool & show_sequence_explorer, bool & show_transitions_explorer, bool & show_experiment_explorer, bool & show_features_explorer)
+  void AppWindow::showExplorerWindow(
+    bool & show_injections_search,
+    bool & show_samples_search,
+    bool & show_sequence_segments_search,
+    bool & show_sample_groups_search,
+    bool & show_components_search,
+    bool & show_component_groups_search,
+    bool & show_workflow_steps_search,
+    bool & show_sequence_explorer,
+    bool & show_transitions_explorer,
+    bool & show_experiment_explorer,
+    bool & show_features_explorer
+  )
   {
   }
 }
