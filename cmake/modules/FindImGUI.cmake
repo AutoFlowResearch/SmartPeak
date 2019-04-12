@@ -37,9 +37,9 @@
 #
 #   This file is part of Magnum.
 #
-#   Copyright � 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019
-#             Vladim�r Vondru� <mosra@centrum.cz>
-#   Copyright � 2018 Jonathan Hale <squareys@googlemail.com>
+#   Copyright 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019
+#             Vladimir Vondrus <mosra@centrum.cz>
+#   Copyright 2018 Jonathan Hale <squareys@googlemail.com>
 #
 #   Permission is hereby granted, free of charge, to any person obtaining a
 #   copy of this software and associated documentation files (the "Software"),
@@ -194,12 +194,12 @@ foreach(_component IN LISTS ImGUI_FIND_COMPONENTS)
                 # CMAKE_FIND_ROOT_PATH_MODE_INCLUDE setting potentially set in
                 # toolchains.
                 # find_file(ImGui_${_file}_EXAMPLE NAMES ${_file}.h
-                #     HINTS ${IMGUI_DIR}/examples NO_CMAKE_FIND_ROOT_PATH)
+                    # HINTS ${IMGUI_DIR}/examples NO_CMAKE_FIND_ROOT_PATH)
                 # list(APPEND ImGui_EXAMPLES ${ImGui_${_file}_EXAMPLE})
 
                 # if(NOT ImGui_${_file}_EXAMPLE)
-                #     set(ImGui_Examples_FOUND FALSE)
-                #     break()
+                    # set(ImGui_Examples_FOUND FALSE)
+                    # break()
                 # endif()
 
                 # _imgui_setup_source_file(ImGui_${_file}_EXAMPLE)
