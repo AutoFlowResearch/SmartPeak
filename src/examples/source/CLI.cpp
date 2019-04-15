@@ -1,4 +1,4 @@
-#include <SmartPeak/CommandLine.h>
+#include "CommandLine.h"
 
 int main()
 {
