@@ -1,6 +1,8 @@
 #include <SmartPeak/ui/AppWindow.h>
 #include <SmartPeak/ui/Widget.h>
 #include <imgui.h>
+#include <dirent.h>
+#include <algorithm>
 
 namespace SmartPeak
 {
@@ -42,6 +44,11 @@ namespace SmartPeak
     static bool show_app_about_ = false;
 
     static bool show_file_picker_ = false;
+    static std::vector<std::string> folders;
+    static std::vector<std::string> selected_folder;
+    static char pathname[1024] = "/home/pasdom/.";
+    static char pathname_selected[1024];
+
 
     if (show_file_picker_)
     {
@@ -51,36 +58,108 @@ namespace SmartPeak
     // File picker modal
     if (ImGui::BeginPopupModal("modal_file_picker", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
+      static int selected = 0;
+      static const std::string* selected_content = &selected_folder[0];
       {
-        // ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.5f);
+        ImGui::BeginChild("Folders", ImVec2(170, 300), true);
 
-        // ImGui::BeginChild("Folders", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 130));
-        ImGui::BeginChild("Folders", ImVec2(170, 300));
+        for (int i = 0; i < folders.size(); ++i)
+        {
+          if (ImGui::Selectable(folders[i].c_str(), selected == i, ImGuiSelectableFlags_AllowDoubleClick))
+          {
+            selected = i;
+            if (ImGui::IsMouseDoubleClicked(0))
+            {
+              sprintf(pathname, "%s/%s", pathname, folders[selected].c_str());
+              getPathnameContent(pathname, folders, true);
+              selected = 0;
+            }
+            else {
+              sprintf(pathname_selected, "%s/%s", pathname, folders[selected].c_str());
+              getPathnameContent(pathname_selected, selected_folder, false);
+              if (selected_folder.size() >= 2 && selected_folder[1] == "..")
+              {
+                selected_folder.erase(selected_folder.begin() + 1);
+              }
+              selected_content = &selected_folder[i];
+            }
+          }
+        }
 
-        for (int n = 0; n < 50; ++n)
-          ImGui::Text("Folder n. %d", n);
         ImGui::EndChild();
       }
 
       ImGui::SameLine();
 
       {
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.5f);
+        static ImGuiTextFilter filter;
         // ImGui::BeginChild("Folder's content", ImVec2(ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 210)));
-        ImGui::BeginChild("Folder's content", ImVec2(ImVec2(600, 300)));
-        ImGui::Text("Content of the selected (not yet) folder");
+        ImGui::BeginChild("Folder's content", ImVec2(600, 300), true, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::SameLine();
+        filter.Draw("Filter filename (inc,-exc)");
+        ImGui::SameLine();
+
+        {
+          // // Using the _simplified_ one-liner Combo() api here
+          // // See "Combo" section for examples of how to use the more complete BeginCombo()/EndCombo() api.
+          // const char* items[] = { "All", "csv", "featureXML", "mzML" };
+          // static int item_current = 0;
+          // ImGui::Combo("combo", &item_current, items, IM_ARRAYSIZE(items));
+          // ImGui::SameLine(); HelpMarker("Filter files by their extension");
+
+          // General BeginCombo() API, you have full control over your selection data and display type.
+          // (your selection data could be an index, a pointer to the object, an id for the object, a flag stored in the object itself, etc.)
+          static const char* items[] = { "All", "csv", "featureXML", "mzML" };
+          static const char* item_current = items[0]; // Here our selection is a single pointer stored outside the object.
+          if (ImGui::BeginCombo("combo 1", item_current, ImGuiWindowFlags_AlwaysAutoResize)) // The second parameter is the label previewed before opening the combo.
+          {
+            for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+            {
+              bool is_selected = item_current == items[n];
+              if (ImGui::Selectable(items[n], is_selected))
+                item_current = items[n];
+              if (is_selected)
+                ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
+            }
+            ImGui::EndCombo();
+          }
+        }
+
+        // const char* lines[] = { "aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world" };
+        // for (int i = 0; i < IM_ARRAYSIZE(lines); ++i)
+        //   if (filter.PassFilter(lines[i]))
+        //     ImGui::Text("%s", lines[i]);
+        {
+          for (int i = 0; i < selected_folder.size(); ++i)
+          {
+            if (filter.PassFilter(selected_folder[i].c_str()))
+            {
+              const bool is_selected = selected_content == &selected_folder[i];
+              if (ImGui::Selectable(selected_folder[i].c_str(), is_selected))
+              {
+                selected_content = &selected_folder[i];
+              }
+              if (is_selected)
+              {
+                ImGui::SetItemDefaultFocus();
+              }
+            }
+          }
+        }
+
         ImGui::EndChild();
-        ImGui::PopStyleVar();
       }
 
       if (ImGui::Button("Cancel", ImVec2(120, 0))) {
         show_file_picker_ = false;
+        selected = -1;
         ImGui::CloseCurrentPopup();
       }
 
       ImGui::SameLine();
       if (ImGui::Button("Open", ImVec2(120, 0))) {
         show_file_picker_ = false;
+        selected = -1;
         ImGui::CloseCurrentPopup();
       }
 
@@ -132,7 +211,9 @@ namespace SmartPeak
       show_log_,
       // Help
       show_app_about_,
-      show_file_picker_
+      show_file_picker_,
+      pathname,
+      folders
     );
 
     // determine what windows will be shown
@@ -244,7 +325,9 @@ namespace SmartPeak
     bool& show_log,
     // Help
     bool& show_app_about,
-    bool& show_file_picker
+    bool& show_file_picker,
+    char const * const pathname,
+    std::vector<std::string>& folders
   )
   {
     // Show the widgets
@@ -261,7 +344,7 @@ namespace SmartPeak
     {
       if (ImGui::BeginMenu("File"))
       {
-        showMenuFile(show_file_picker);
+        showMenuFile(show_file_picker, pathname, folders);
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Edit"))
@@ -314,7 +397,11 @@ namespace SmartPeak
     }
   }
 
-  void AppWindow::showMenuFile(bool& show_file_picker)
+  void AppWindow::showMenuFile(
+    bool& show_file_picker,
+    char const * const pathname,
+    std::vector<std::string>& folders
+  )
   {
     ImGui::MenuItem("Session", NULL, false, false);
     if (ImGui::MenuItem("New Session"))
@@ -329,7 +416,8 @@ namespace SmartPeak
     }
 
     if (ImGui::MenuItem("Load session from sequence")) {
-      show_file_picker = !show_file_picker;
+      getPathnameContent(pathname, folders, true);
+      show_file_picker = true;
     }
 
     if (ImGui::MenuItem("Save Session", "Ctrl+S"))
@@ -679,5 +767,51 @@ namespace SmartPeak
     bool & show_features_explorer
   )
   {
+  }
+
+  // copied from imgui_demo.cpp
+  // Helper to display a little (?) mark which shows a tooltip when hovered.
+  void AppWindow::HelpMarker(const char* desc)
+  {
+      ImGui::TextDisabled("(?)");
+      if (ImGui::IsItemHovered())
+      {
+          ImGui::BeginTooltip();
+          ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+          ImGui::TextUnformatted(desc);
+          ImGui::PopTextWrapPos();
+          ImGui::EndTooltip();
+      }
+  }
+
+  void AppWindow::getPathnameContent(
+    char const * const pathname,
+    std::vector<std::string>& content,
+    const bool only_directories
+  )
+  {
+    printf("getPathnameContent(): %s\n", pathname);
+    content.clear();
+    DIR *dir;
+    struct dirent *ent;
+    if (dir = opendir(pathname)) {
+      while (ent = readdir(dir)) {
+        if (!only_directories || ent->d_type == DT_DIR) {
+          content.push_back(ent->d_name);
+        }
+      }
+      printf("size of content: %lu\n", content.size());
+      std::sort(content.begin(), content.end(), [](const std::string& a, const std::string& b){
+        std::string a_lowercase, b_lowercase;
+        a_lowercase.resize(a.size());
+        b_lowercase.resize(b.size());
+        std::transform(a.begin(), a.end(), a_lowercase.begin(), ::tolower);
+        std::transform(b.begin(), b.end(), b_lowercase.begin(), ::tolower);
+        return a_lowercase.compare(b_lowercase) < 0;
+      });
+      closedir(dir);
+    } else {
+      perror("");
+    }
   }
 }
