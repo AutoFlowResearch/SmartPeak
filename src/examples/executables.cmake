@@ -10,7 +10,6 @@ set(pipeline_executables_list
 
 set(interactive_executables_list
   CLI
-  CommandLine
   GUI
 )
 
