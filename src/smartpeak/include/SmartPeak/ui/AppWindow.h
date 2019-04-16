@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 namespace SmartPeak
 {
   class AppWindow
@@ -38,10 +41,16 @@ namespace SmartPeak
       bool& show_log,
       // Help
       bool& show_app_about,
-      bool& show_file_picker
+      bool& show_file_picker,
+      char const * const pathname,
+      std::vector<std::string>& folders
     );
 
-    static void showMenuFile(bool& show_file_picker); ///< Show the main menu File options
+    static void showMenuFile(
+      bool& show_file_picker,
+      char const * const pathname,
+      std::vector<std::string>& folders
+    ); ///< Show the main menu File options
 
     static void showMenuEdit(); ///< Show the main menu Edit options
 
@@ -113,6 +122,14 @@ namespace SmartPeak
       bool& show_output,
       bool& show_info,
       bool& show_log
+    );
+
+    static void HelpMarker(const char* desc);
+
+    static void getPathnameContent(
+      char const * const pathname,
+      std::vector<std::string>& content,
+      const bool only_directories
     );
   };
 }
