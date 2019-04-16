@@ -52,7 +52,7 @@ public:
     std::map<std::string, Filenames> dynamic_filenames;
   };
 
-  std::string                           pathnamesFilename_       = "pathnames.txt";
+  const std::string                     pathnamesFilename_       = "pathnames.txt";
   std::string                           sequence_pathname_;
   std::string                           main_dir_                = ".";
   std::string                           mzML_dir_;
@@ -361,8 +361,6 @@ public:
     else if ("14" == in) {
     }
     else if ("15" == in) {
-      initializeAllDirs();
-
       const std::vector<Command> methods = getMethodsInput();
       if (methods.empty()) {
         std::cout << "\nPipeline not modified.\n";
@@ -446,6 +444,7 @@ public:
       }
     }
     else if ("2" == in) {
+      initializeAllDirs();
       processCommands(commands_);
       std::cout << "\nWorkflow completed.\n";
     }
@@ -675,7 +674,7 @@ public:
     clearNonExistantDefaultGeneratedFilenames(f);
     f.sequence_csv_i = sequence_pathname_;
 
-    const std::string pathnamesFilePath = main_dir_ + "/" + std::string(pathnamesFilename_);
+    const std::string pathnamesFilePath = main_dir_ + "/" + pathnamesFilename_;
 
     if (InputDataValidation::fileExists(pathnamesFilePath)) {
       std::cout << "\n\n"
