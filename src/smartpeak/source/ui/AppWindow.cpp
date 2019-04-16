@@ -44,11 +44,8 @@ namespace SmartPeak
     static bool show_app_about_ = false;
 
     static bool show_file_picker_ = false;
-    static std::vector<std::string> folders;
-    static std::vector<std::string> selected_folder;
-    static char pathname[1024] = "/home/pasdom/.";
-    static char pathname_selected[1024];
-
+    static std::string pathname = { "/home" };
+    static std::vector<std::string> pathname_content;
 
     if (show_file_picker_)
     {
@@ -56,93 +53,81 @@ namespace SmartPeak
     }
 
     // File picker modal
-    if (ImGui::BeginPopupModal("modal_file_picker", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    if (ImGui::BeginPopupModal("modal_file_picker"))
+    // if (ImGui::BeginPopupModal("modal_file_picker", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
-      static int selected = 0;
-      static const std::string* selected_content = &selected_folder[0];
-      {
-        ImGui::BeginChild("Folders", ImVec2(170, 300), true);
+      static int selected = -1;
 
-        for (int i = 0; i < folders.size(); ++i)
+      if (ImGui::Button("Up"))
+      {
+        pathname = getParentPathname(pathname);
+        getPathnameContent(pathname, pathname_content, false);
+        selected = -1;
+      }
+      ImGui::SameLine();
+      ImGui::Text("Path: %s", pathname.c_str());
+
+      static ImGuiTextFilter filter;
+      filter.Draw("Filter filename (inc,-exc)");
+
+      // File type filter
+      {
+        static const char* items[] = { "All", "csv", "featureXML", "mzML" };
+        static const char* item_current = items[0];
+        if (ImGui::BeginCombo("File type", item_current)) // The second parameter is the label previewed before opening the combo.
         {
-          if (ImGui::Selectable(folders[i].c_str(), selected == i, ImGuiSelectableFlags_AllowDoubleClick))
+          for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+          {
+            bool is_selected = item_current == items[n];
+            if (ImGui::Selectable(items[n], is_selected))
+              item_current = items[n];
+            if (is_selected)
+              ImGui::SetItemDefaultFocus();
+          }
+          ImGui::EndCombo();
+        }
+      }
+
+      // {
+      //   for (int i = 0; i < selected_folder.size(); ++i)
+      //   {
+      //     if (filter.PassFilter(selected_folder[i].c_str()))
+      //     {
+      //       const bool is_selected = selected_content == &selected_folder[i];
+      //       if (ImGui::Selectable(selected_folder[i].c_str(), is_selected))
+      //       {
+      //         selected_content = &selected_folder[i];
+      //       }
+      //       if (is_selected)
+      //       {
+      //         ImGui::SetItemDefaultFocus();
+      //       }
+      //     }
+      //   }
+      // }
+
+      // Folder content / Navigation
+      {
+        ImGui::BeginChild("Content", ImVec2(600, 300), true);
+
+        for (int i = 0; i < pathname_content.size(); ++i)
+        {
+          if (!filter.PassFilter(pathname_content[i].c_str()))
+          {
+            continue; // continue if it does not pass the filter
+          }
+          if (ImGui::Selectable(pathname_content[i].c_str(), selected == i, ImGuiSelectableFlags_AllowDoubleClick))
           {
             selected = i;
             if (ImGui::IsMouseDoubleClicked(0))
             {
-              sprintf(pathname, "%s/%s", pathname, folders[selected].c_str());
-              getPathnameContent(pathname, folders, true);
-              selected = 0;
-            }
-            else {
-              sprintf(pathname_selected, "%s/%s", pathname, folders[selected].c_str());
-              getPathnameContent(pathname_selected, selected_folder, false);
-              if (selected_folder.size() >= 2 && selected_folder[1] == "..")
+              if (pathname != "/") // do not insert "/" if pathname == root dir, i.e. avoid "//home"
               {
-                selected_folder.erase(selected_folder.begin() + 1);
+                pathname.append("/");
               }
-              selected_content = &selected_folder[i];
-            }
-          }
-        }
-
-        ImGui::EndChild();
-      }
-
-      ImGui::SameLine();
-
-      {
-        static ImGuiTextFilter filter;
-        // ImGui::BeginChild("Folder's content", ImVec2(ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 210)));
-        ImGui::BeginChild("Folder's content", ImVec2(600, 300), true, ImGuiWindowFlags_AlwaysAutoResize);
-        ImGui::SameLine();
-        filter.Draw("Filter filename (inc,-exc)");
-        ImGui::SameLine();
-
-        {
-          // // Using the _simplified_ one-liner Combo() api here
-          // // See "Combo" section for examples of how to use the more complete BeginCombo()/EndCombo() api.
-          // const char* items[] = { "All", "csv", "featureXML", "mzML" };
-          // static int item_current = 0;
-          // ImGui::Combo("combo", &item_current, items, IM_ARRAYSIZE(items));
-          // ImGui::SameLine(); HelpMarker("Filter files by their extension");
-
-          // General BeginCombo() API, you have full control over your selection data and display type.
-          // (your selection data could be an index, a pointer to the object, an id for the object, a flag stored in the object itself, etc.)
-          static const char* items[] = { "All", "csv", "featureXML", "mzML" };
-          static const char* item_current = items[0]; // Here our selection is a single pointer stored outside the object.
-          if (ImGui::BeginCombo("combo 1", item_current, ImGuiWindowFlags_AlwaysAutoResize)) // The second parameter is the label previewed before opening the combo.
-          {
-            for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-            {
-              bool is_selected = item_current == items[n];
-              if (ImGui::Selectable(items[n], is_selected))
-                item_current = items[n];
-              if (is_selected)
-                ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
-            }
-            ImGui::EndCombo();
-          }
-        }
-
-        // const char* lines[] = { "aaa1.c", "bbb1.c", "ccc1.c", "aaa2.cpp", "bbb2.cpp", "ccc2.cpp", "abc.h", "hello, world" };
-        // for (int i = 0; i < IM_ARRAYSIZE(lines); ++i)
-        //   if (filter.PassFilter(lines[i]))
-        //     ImGui::Text("%s", lines[i]);
-        {
-          for (int i = 0; i < selected_folder.size(); ++i)
-          {
-            if (filter.PassFilter(selected_folder[i].c_str()))
-            {
-              const bool is_selected = selected_content == &selected_folder[i];
-              if (ImGui::Selectable(selected_folder[i].c_str(), is_selected))
-              {
-                selected_content = &selected_folder[i];
-              }
-              if (is_selected)
-              {
-                ImGui::SetItemDefaultFocus();
-              }
+              pathname.append(pathname_content[selected]);
+              getPathnameContent(pathname, pathname_content, false);
+              selected = -1;
             }
           }
         }
@@ -213,7 +198,7 @@ namespace SmartPeak
       show_app_about_,
       show_file_picker_,
       pathname,
-      folders
+      pathname_content
     );
 
     // determine what windows will be shown
@@ -326,8 +311,8 @@ namespace SmartPeak
     // Help
     bool& show_app_about,
     bool& show_file_picker,
-    char const * const pathname,
-    std::vector<std::string>& folders
+    const std::string& pathname,
+    std::vector<std::string>& pathname_content
   )
   {
     // Show the widgets
@@ -344,7 +329,7 @@ namespace SmartPeak
     {
       if (ImGui::BeginMenu("File"))
       {
-        showMenuFile(show_file_picker, pathname, folders);
+        showMenuFile(show_file_picker, pathname, pathname_content);
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Edit"))
@@ -399,8 +384,8 @@ namespace SmartPeak
 
   void AppWindow::showMenuFile(
     bool& show_file_picker,
-    char const * const pathname,
-    std::vector<std::string>& folders
+    const std::string& pathname,
+    std::vector<std::string>& pathname_content
   )
   {
     ImGui::MenuItem("Session", NULL, false, false);
@@ -416,7 +401,7 @@ namespace SmartPeak
     }
 
     if (ImGui::MenuItem("Load session from sequence")) {
-      getPathnameContent(pathname, folders, true);
+      getPathnameContent(pathname, pathname_content, false);
       show_file_picker = true;
     }
 
@@ -785,17 +770,20 @@ namespace SmartPeak
   }
 
   void AppWindow::getPathnameContent(
-    char const * const pathname,
+    const std::string& pathname,
     std::vector<std::string>& content,
     const bool only_directories
   )
   {
-    printf("getPathnameContent(): %s\n", pathname);
+    printf("getPathnameContent(): %s\n", pathname.c_str());
     content.clear();
     DIR *dir;
     struct dirent *ent;
-    if (dir = opendir(pathname)) {
+    if (dir = opendir(pathname.c_str())) {
       while (ent = readdir(dir)) {
+        if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) {
+          continue;
+        }
         if (!only_directories || ent->d_type == DT_DIR) {
           content.push_back(ent->d_name);
         }
@@ -813,5 +801,20 @@ namespace SmartPeak
     } else {
       perror("");
     }
+  }
+
+  std::string AppWindow::getParentPathname(const std::string& pathname)
+  {
+    std::string parent;
+    const size_t pos = pathname.find_last_of("/");
+    if (pos != std::string::npos)
+    {
+      parent = pathname.substr(0, pos);
+      if (parent.empty())
+      {
+        parent = "/";
+      }
+    }
+    return parent;
   }
 }
