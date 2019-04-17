@@ -66,6 +66,7 @@ int main()
 
   // Main loop
   bool done = false;
+  SmartPeak::AppWindow appWindow;
   while (!done)
   {
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -87,7 +88,6 @@ int main()
 
     // 1. Show the window
     {
-      SmartPeak::AppWindow appWindow;
       appWindow.showApp();
     }
 
