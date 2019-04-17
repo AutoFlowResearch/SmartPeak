@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <dirent.h>
 #include <algorithm>
+#include <SmartPeak/core/Utilities.h>
 
 namespace SmartPeak
 {
@@ -98,7 +99,7 @@ namespace SmartPeak
           }
 
           if (selected_extension > 0 &&
-              !endsWith(pathname_content[i], "." + std::string(extensions[selected_extension]), false))
+              !Utilities::endsWith(pathname_content[i], "." + std::string(extensions[selected_extension]), false))
           {
             continue; // continue if the file type is not desired
           }
@@ -830,26 +831,5 @@ namespace SmartPeak
       }
     }
     return parent;
-  }
-
-  bool AppWindow::endsWith(
-    std::string str,
-    std::string suffix,
-    const bool case_sensitive
-  )
-  {
-    if (str.size() < suffix.size())
-      return false;
-
-    if (!case_sensitive)
-    {
-      std::transform(str.begin(), str.end(), str.begin(), ::tolower);
-      std::transform(suffix.begin(), suffix.end(), suffix.begin(), ::tolower);
-    }
-
-    if (str.rfind(suffix) == str.size() - suffix.size())
-      return true;
-
-    return false;
   }
 }

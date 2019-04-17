@@ -365,4 +365,39 @@ BOOST_AUTO_TEST_CASE(extractSelectorParameters)
   BOOST_CHECK_EQUAL(p->score_weights.at("peak_apices_sum") == OpenMS::MRMFeatureSelector::LambdaScore::INVERSE_LOG10, true);
 }
 
+BOOST_AUTO_TEST_CASE(endsWith)
+{
+  const vector<string> names { "1.csv", "2.featureXML", "3.CSV", "4.FeatureXML", "5.another" };
+
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "csv"), true); // default argument case
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "csv", true), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "CSV", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "Csv", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "CSV", false), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "Csv", false), true);
+
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "featureXML"), true); // default argument case
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "featureXML", true), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "FEATUREXML", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "FeatureXML", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "FEATUREXML", false), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "FeatureXML", false), true);
+
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "csv"), false); // default argument case
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "csv", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "CSV", true), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "Csv", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "CSV", false), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "Csv", false), true);
+
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "featureXML"), false); // default argument case
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "featureXML", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "FEATUREXML", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "FeatureXML", true), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "FEATUREXML", false), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "FeatureXML", false), true);
+
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[4], "does_not_end_with_this", false), false);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

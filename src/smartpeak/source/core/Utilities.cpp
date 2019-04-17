@@ -470,4 +470,25 @@ namespace SmartPeak
 
     return is_ok;
   }
+
+  bool Utilities::endsWith(
+    std::string str,
+    std::string suffix,
+    const bool case_sensitive
+  )
+  {
+    if (str.size() < suffix.size())
+      return false;
+
+    if (!case_sensitive)
+    {
+      std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+      std::transform(suffix.begin(), suffix.end(), suffix.begin(), ::tolower);
+    }
+
+    if (str.rfind(suffix) == str.size() - suffix.size())
+      return true;
+
+    return false;
+  }
 }

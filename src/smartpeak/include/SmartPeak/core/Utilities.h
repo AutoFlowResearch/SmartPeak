@@ -467,5 +467,11 @@ public:
 
     // To validate quantitation methods stored in examples' tests
     static bool testStoredQuantitationMethods(const std::string& pathname);
+
+    static bool endsWith(
+      std::string str,
+      std::string suffix,
+      const bool case_sensitive = true
+    );
   };
 }
