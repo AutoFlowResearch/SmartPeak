@@ -88,23 +88,7 @@ namespace SmartPeak
         }
       }
 
-      // {
-      //   for (int i = 0; i < selected_folder.size(); ++i)
-      //   {
-      //     if (filter.PassFilter(selected_folder[i].c_str()))
-      //     {
-      //       const bool is_selected = selected_content == &selected_folder[i];
-      //       if (ImGui::Selectable(selected_folder[i].c_str(), is_selected))
-      //       {
-      //         selected_content = &selected_folder[i];
-      //       }
-      //       if (is_selected)
-      //       {
-      //         ImGui::SetItemDefaultFocus();
-      //       }
-      //     }
-      //   }
-      // }
+      static char filename[256] = "";
 
       // Folder content / Navigation
       {
@@ -119,6 +103,7 @@ namespace SmartPeak
           if (ImGui::Selectable(pathname_content[i].c_str(), selected == i, ImGuiSelectableFlags_AllowDoubleClick))
           {
             selected = i;
+            sprintf(filename, "%s", pathname_content[selected].c_str());
             if (ImGui::IsMouseDoubleClicked(0))
             {
               if (pathname != "/") // do not insert "/" if pathname == root dir, i.e. avoid "//home"
@@ -135,14 +120,20 @@ namespace SmartPeak
         ImGui::EndChild();
       }
 
-      if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+      ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.7f);
+      ImGui::InputTextWithHint("", "File name", filename, IM_ARRAYSIZE(filename));
+
+      ImGui::SameLine();
+      ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.5f);
+      if (ImGui::Button("Open")) {
         show_file_picker_ = false;
         selected = -1;
         ImGui::CloseCurrentPopup();
       }
 
       ImGui::SameLine();
-      if (ImGui::Button("Open", ImVec2(120, 0))) {
+      ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
+      if (ImGui::Button("Cancel")) {
         show_file_picker_ = false;
         selected = -1;
         ImGui::CloseCurrentPopup();
@@ -790,6 +781,7 @@ namespace SmartPeak
       }
       printf("size of content: %lu\n", content.size());
       std::sort(content.begin(), content.end(), [](const std::string& a, const std::string& b){
+        // case-insensitive comparison
         std::string a_lowercase, b_lowercase;
         a_lowercase.resize(a.size());
         b_lowercase.resize(b.size());
@@ -812,7 +804,7 @@ namespace SmartPeak
       parent = pathname.substr(0, pos);
       if (parent.empty())
       {
-        parent = "/";
+        parent = "/"; // TODO: does this work on other OSs?
       }
     }
     return parent;
