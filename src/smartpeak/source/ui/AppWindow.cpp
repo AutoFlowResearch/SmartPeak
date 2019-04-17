@@ -71,21 +71,10 @@ namespace SmartPeak
       filter.Draw("Filter filename (inc,-exc)");
 
       // File type filter
+      static int selected_extension = 0; // If the selection isn't within 0..count, Combo won't display a preview
       {
-        static const char* items[] = { "All", "csv", "featureXML", "mzML" };
-        static const char* item_current = items[0];
-        if (ImGui::BeginCombo("File type", item_current)) // The second parameter is the label previewed before opening the combo.
-        {
-          for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-          {
-            bool is_selected = item_current == items[n];
-            if (ImGui::Selectable(items[n], is_selected))
-              item_current = items[n];
-            if (is_selected)
-              ImGui::SetItemDefaultFocus();
-          }
-          ImGui::EndCombo();
-        }
+        static const char* extensions[] = { "All", "csv", "featureXML", "mzML" };
+        ImGui::Combo("File type", &selected_extension, extensions, IM_ARRAYSIZE(extensions));
       }
 
       static char filename[256] = "";
@@ -113,6 +102,7 @@ namespace SmartPeak
               pathname.append(pathname_content[selected]);
               getPathnameContent(pathname, pathname_content, false);
               selected = -1;
+              filename[0] = '\0';
             }
           }
         }
