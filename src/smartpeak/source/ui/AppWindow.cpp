@@ -46,6 +46,7 @@ namespace SmartPeak
     static bool show_file_picker_ = false;
     static std::string pathname = { "/home" };
     static std::vector<std::string> pathname_content;
+    static std::string selected_pathname;
 
     if (show_file_picker_)
     {
@@ -72,10 +73,8 @@ namespace SmartPeak
 
       // File type filter
       static int selected_extension = 0; // If the selection isn't within 0..count, Combo won't display a preview
-      {
-        static const char* extensions[] = { "All", "csv", "featureXML", "mzML" };
-        ImGui::Combo("File type", &selected_extension, extensions, IM_ARRAYSIZE(extensions));
-      }
+      static const char* extensions[] = { "All", "csv", "featureXML", "mzML" };
+      ImGui::Combo("File type", &selected_extension, extensions, IM_ARRAYSIZE(extensions));
 
       static char filename[256] = "";
 
@@ -88,6 +87,11 @@ namespace SmartPeak
           if (!filter.PassFilter(pathname_content[i].c_str()))
           {
             continue; // continue if it does not pass the filter
+          }
+          if (selected_extension > 0 &&
+              !endsWith(pathname_content[i], "." + std::string(extensions[selected_extension])))
+          {
+            continue;
           }
           if (ImGui::Selectable(pathname_content[i].c_str(), selected == i, ImGuiSelectableFlags_AllowDoubleClick))
           {
@@ -116,6 +120,7 @@ namespace SmartPeak
       ImGui::SameLine();
       ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.5f);
       if (ImGui::Button("Open")) {
+        selected_pathname = pathname_content[selected];
         show_file_picker_ = false;
         selected = -1;
         ImGui::CloseCurrentPopup();
@@ -124,6 +129,7 @@ namespace SmartPeak
       ImGui::SameLine();
       ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
       if (ImGui::Button("Cancel")) {
+        selected_pathname.clear();
         show_file_picker_ = false;
         selected = -1;
         ImGui::CloseCurrentPopup();
@@ -798,5 +804,16 @@ namespace SmartPeak
       }
     }
     return parent;
+  }
+
+  bool AppWindow::endsWith(const std::string& str, const std::string& suffix)
+  {
+    if (str.size() < suffix.size())
+      return false;
+
+    if (str.rfind(suffix) == str.size() - suffix.size())
+      return true;
+
+    return false;
   }
 }

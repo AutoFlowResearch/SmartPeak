@@ -133,5 +133,8 @@ namespace SmartPeak
     );
 
     static std::string getParentPathname(const std::string& pathname);
+
+    // TODO: move it to class Utilities
+    static bool endsWith(const std::string& str, const std::string& suffix);
   };
 }
