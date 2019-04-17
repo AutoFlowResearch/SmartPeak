@@ -46,7 +46,7 @@ namespace SmartPeak
     static bool show_file_picker_ = false;
     static std::string pathname = { "/home" };
     static std::vector<std::string> pathname_content;
-    static std::string selected_pathname;
+    static std::string selected_pathname; // TODO: reset when modal is opened?
 
     if (show_file_picker_)
     {
@@ -80,7 +80,15 @@ namespace SmartPeak
 
       // Folder content / Navigation
       {
-        ImGui::BeginChild("Content", ImVec2(600, 300), true);
+        ImGui::BeginChild("Content", ImVec2(600, 300));
+        // Start of Columns - content_columns
+        ImGui::Columns(4, "content_columns");
+        ImGui::Separator();
+        ImGui::Text("Name"); ImGui::NextColumn();
+        ImGui::Text("Size"); ImGui::NextColumn();
+        ImGui::Text("Type"); ImGui::NextColumn();
+        ImGui::Text("Date Modified"); ImGui::NextColumn();
+        ImGui::Separator();
 
         for (int i = 0; i < pathname_content.size(); ++i)
         {
@@ -88,12 +96,16 @@ namespace SmartPeak
           {
             continue; // continue if it does not pass the filter
           }
+
           if (selected_extension > 0 &&
               !endsWith(pathname_content[i], "." + std::string(extensions[selected_extension])))
           {
-            continue;
+            continue; // continue if the file type is not desired
           }
-          if (ImGui::Selectable(pathname_content[i].c_str(), selected == i, ImGuiSelectableFlags_AllowDoubleClick))
+
+          const ImGuiWindowFlags flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick;
+
+          if (ImGui::Selectable(pathname_content[i].c_str(), selected == i, flags))
           {
             selected = i;
             sprintf(filename, "%s", pathname_content[selected].c_str());
@@ -109,10 +121,17 @@ namespace SmartPeak
               filename[0] = '\0';
             }
           }
-        }
 
+          ImGui::NextColumn();
+          ImGui::Text("%s", pathname_content[i].c_str()); ImGui::NextColumn();
+          ImGui::Text("%s", pathname_content[i].c_str()); ImGui::NextColumn();
+          ImGui::Text("%s", pathname_content[i].c_str()); ImGui::NextColumn();
+        }
+        ImGui::Columns(1);
+        // End of Columns - content_columns
         ImGui::EndChild();
       }
+      ImGui::Separator();
 
       ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.7f);
       ImGui::InputTextWithHint("", "File name", filename, IM_ARRAYSIZE(filename));
@@ -120,7 +139,15 @@ namespace SmartPeak
       ImGui::SameLine();
       ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.5f);
       if (ImGui::Button("Open")) {
-        selected_pathname = pathname_content[selected];
+        if (selected >= 0)
+        {
+          selected_pathname = pathname + "/" + pathname_content[selected];
+        }
+        else
+        {
+          selected_pathname = pathname;
+        }
+        printf("Open: %s\n", selected_pathname.c_str());
         show_file_picker_ = false;
         selected = -1;
         ImGui::CloseCurrentPopup();
@@ -775,7 +802,6 @@ namespace SmartPeak
           content.push_back(ent->d_name);
         }
       }
-      printf("size of content: %lu\n", content.size());
       std::sort(content.begin(), content.end(), [](const std::string& a, const std::string& b){
         // case-insensitive comparison
         std::string a_lowercase, b_lowercase;
