@@ -11,7 +11,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-int main()
+int main(int argc, char **argv)
 {
   // Setup SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
