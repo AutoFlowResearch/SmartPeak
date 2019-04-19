@@ -76,8 +76,6 @@ include_directories(${SDL2_INCLUDE_DIRS})
 # OpenGL
 #------------------------------------------------------------------------------
 find_package(OpenGL REQUIRED)
-# TODO: which one is necessary?
-include_directories(${OpenGL_INCLUDE_DIRS})
 include_directories(${OPENGL_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
