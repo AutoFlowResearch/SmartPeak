@@ -1,9 +1,14 @@
 #include <SmartPeak/ui/AppWindow.h>
 #include <SmartPeak/ui/Widget.h>
 #include <imgui.h>
-#include <dirent.h>
 #include <algorithm>
 #include <SmartPeak/core/Utilities.h>
+
+#ifdef _WIN32
+  #include "dirent.h"
+#else
+  #include <dirent.h>
+#endif
 
 namespace SmartPeak
 {
