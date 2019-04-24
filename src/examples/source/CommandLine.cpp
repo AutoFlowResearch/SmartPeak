@@ -361,6 +361,7 @@ public:
     else if ("14" == in) {
     }
     else if ("15" == in) {
+      initializeAllDirs();
       const std::vector<Command> methods = getMethodsInput();
       if (methods.empty()) {
         std::cout << "\nPipeline not modified.\n";
