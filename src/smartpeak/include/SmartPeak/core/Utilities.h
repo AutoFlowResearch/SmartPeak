@@ -39,6 +39,8 @@ public:
       CastValue(const std::string& s) : tag_(STRING), s_(s), is_clear_(false) {}
       CastValue(const char *s) : tag_(STRING), s_(s), is_clear_(false) {}
       CastValue(const float f) : tag_(FLOAT), f_(f), is_clear_(true) {}
+      CastValue(const int i) : tag_(INT), i_(i), is_clear_(true) {}
+      CastValue(const long int li) : tag_(LONG_INT), li_(li), is_clear_(true) {}
 
       CastValue(const CastValue& other) : tag_(UNINITIALIZED), b_(false), is_clear_(true)
       {
@@ -68,6 +70,9 @@ public:
             break;
           case INT:
             setTagAndData(other.tag_, other.i_);
+            break;
+          case LONG_INT:
+            setTagAndData(other.tag_, other.li_);
             break;
           case BOOL_LIST:
             setTagAndData(other.tag_, other.bl_);
@@ -107,6 +112,9 @@ public:
             break;
           case INT:
             i_ = other.i_;
+            break;
+          case LONG_INT:
+            li_ = other.li_;
             break;
           case BOOL_LIST:
             new (&bl_) std::vector<bool>(std::move(other.bl_));
@@ -149,6 +157,12 @@ public:
       CastValue& operator=(const int data)
       {
         setTagAndData(INT, data);
+        return *this;
+      }
+
+      CastValue& operator=(const long int data)
+      {
+        setTagAndData(LONG_INT, data);
         return *this;
       }
 
@@ -230,6 +244,7 @@ public:
         BOOL,
         FLOAT,
         INT,
+        LONG_INT,
         STRING,
         BOOL_LIST,
         FLOAT_LIST,
@@ -243,6 +258,7 @@ public:
         bool b_;
         float f_;
         int i_;
+        long int li_;
         std::string s_;
         std::vector<bool> bl_;
         std::vector<float> fl_;
@@ -274,6 +290,11 @@ public:
       void setData(const int data)
       {
         i_ = data;
+      }
+
+      void setData(const long int data)
+      {
+        li_ = data;
       }
 
       void setData(const std::string& data)
