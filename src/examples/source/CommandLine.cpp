@@ -4,8 +4,10 @@
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <algorithm>
+#include <chrono>
 #include <cctype>
 #include <cstdlib>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <regex>
@@ -1295,9 +1297,13 @@ public:
   CommandLine& operator=(CommandLine&& other)      = delete;
 
   void runApp() {
+    const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    char filename[128];
+    strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
+
     // Add .csv appender: 32 MiB per file, max. 100 log files
     static plog::RollingFileAppender<plog::CsvFormatter>
-      fileAppender("smartpeak_log.csv", 1024 * 1024 * 32, 100);
+      fileAppender(filename, 1024 * 1024 * 32, 100);
 
     // Add console appender, instead of only the file one
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
