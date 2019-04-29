@@ -202,6 +202,41 @@ public:
         return *this;
       }
 
+      bool is_less_than(const CastValue& other, const bool case_sensitive = true)
+      {
+        if (tag_ != other.tag_) {
+          LOGE << "CastValue: Comparing data of different types";
+          return true;
+        }
+
+        switch (tag_) {
+        case STRING:
+          {
+            if (!case_sensitive) {
+              std::string a_lowercase, b_lowercase;
+              a_lowercase.resize(s_.size());
+              b_lowercase.resize(other.s_.size());
+              std::transform(s_.begin(), s_.end(), a_lowercase.begin(), ::tolower);
+              std::transform(other.s_.begin(), other.s_.end(), b_lowercase.begin(), ::tolower);
+              return a_lowercase.compare(b_lowercase) < 0;
+            }
+            return s_.compare(other.s_) < 0;
+          }
+        case UNINITIALIZED:
+        case BOOL:
+          return b_ < other.b_;
+        case FLOAT:
+          return f_ < other.f_;
+        case INT:
+          return i_ < other.i_;
+        case LONG_INT:
+          return li_ < other.li_;
+        default:
+          LOGE << "Tag type cannot be compared";
+          return true;
+        }
+      }
+
       ~CastValue()
       {
         clear();
@@ -495,4 +530,30 @@ public:
       const bool case_sensitive = true
     );
   };
+
+  static std::ostream& operator<<(std::ostream& os, const Utilities::CastValue& cv)
+  {
+    switch (cv.tag_) {
+      case cv.UNKNOWN:
+      case cv.STRING:
+        os << cv.s_;
+        break;
+      case cv.UNINITIALIZED:
+      case cv.BOOL:
+        os << cv.b_;
+        break;
+      case cv.FLOAT:
+        os << cv.f_;
+        break;
+      case cv.INT:
+        os << cv.i_;
+        break;
+      case cv.LONG_INT:
+        os << cv.li_;
+        break;
+      default:
+        throw "Tag type not managed in operator<<. Implement it.";
+    }
+    return os;
+  }
 }
