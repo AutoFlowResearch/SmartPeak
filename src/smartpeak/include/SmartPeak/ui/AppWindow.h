@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SmartPeak/core/Table.h>
 #include <string>
 #include <vector>
 
@@ -43,13 +44,13 @@ namespace SmartPeak
       bool& show_app_about,
       bool& show_file_picker,
       const std::string& pathname,
-      std::vector<std::string>& folders
+      Table& folders
     );
 
     static void showMenuFile(
       bool& show_file_picker,
       const std::string& pathname,
-      std::vector<std::string>& folders
+      Table& folders
     ); ///< Show the main menu File options
 
     static void showMenuEdit(); ///< Show the main menu Edit options
@@ -128,7 +129,7 @@ namespace SmartPeak
 
     static void getPathnameContent(
       const std::string& pathname,
-      std::vector<std::string>& content,
+      Table& content,
       const bool only_directories
     );
 

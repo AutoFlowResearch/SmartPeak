@@ -3,11 +3,18 @@
 #include <imgui.h>
 #include <algorithm>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/Table.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #ifdef _WIN32
   #include "dirent.h"
+  auto mystat = &_stat;
 #else
   #include <dirent.h>
+  #include <unistd.h>
+  auto mystat = &stat;
 #endif
 
 namespace SmartPeak
@@ -51,7 +58,7 @@ namespace SmartPeak
 
     static bool show_file_picker_ = false;
     static std::string pathname = { "/home" };
-    static std::vector<std::string> pathname_content;
+    static Table pathname_content;
     static std::string selected_pathname; // TODO: reset when modal is opened?
 
     if (show_file_picker_)
@@ -98,30 +105,30 @@ namespace SmartPeak
 
         for (int i = 0; i < pathname_content.size(); ++i)
         {
-          if (!filter.PassFilter(pathname_content[i].c_str()))
+          if (!filter.PassFilter(pathname_content.get(i, "Name").s_.c_str()))
           {
             continue; // continue if it does not pass the filter
           }
 
           if (selected_extension > 0 &&
-              !Utilities::endsWith(pathname_content[i], "." + std::string(extensions[selected_extension]), false))
+              !Utilities::endsWith(pathname_content.get(i, "Name").s_, "." + std::string(extensions[selected_extension]), false))
           {
             continue; // continue if the file type is not desired
           }
 
           const ImGuiWindowFlags flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick;
 
-          if (ImGui::Selectable(pathname_content[i].c_str(), selected == i, flags))
+          if (ImGui::Selectable(pathname_content.get(i, "Name").s_.c_str(), selected == i, flags))
           {
             selected = i;
-            sprintf(filename, "%s", pathname_content[selected].c_str());
+            sprintf(filename, "%s", pathname_content.get(selected, "Name").s_.c_str());
             if (ImGui::IsMouseDoubleClicked(0))
             {
               if (pathname != "/") // do not insert "/" if pathname == root dir, i.e. avoid "//home"
               {
                 pathname.append("/");
               }
-              pathname.append(pathname_content[selected]);
+              pathname.append(pathname_content.get(selected, "Name").s_);
               getPathnameContent(pathname, pathname_content, false);
               selected = -1;
               filename[0] = '\0';
@@ -129,9 +136,9 @@ namespace SmartPeak
           }
 
           ImGui::NextColumn();
-          ImGui::Text("%s", pathname_content[i].c_str()); ImGui::NextColumn();
-          ImGui::Text("%s", pathname_content[i].c_str()); ImGui::NextColumn();
-          ImGui::Text("%s", pathname_content[i].c_str()); ImGui::NextColumn();
+          ImGui::Text("%d", pathname_content.get(i, "Size").i_); ImGui::NextColumn();
+          ImGui::Text("%s", pathname_content.get(i, "Type").s_.c_str()); ImGui::NextColumn();
+          ImGui::Text("%s", pathname_content.get(i, "Date Modified").s_.c_str()); ImGui::NextColumn();
         }
         ImGui::Columns(1);
         // End of Columns - content_columns
@@ -147,7 +154,7 @@ namespace SmartPeak
       if (ImGui::Button("Open")) {
         if (selected >= 0)
         {
-          selected_pathname = pathname + "/" + pathname_content[selected];
+          selected_pathname = pathname + "/" + pathname_content.get(selected, "Name").s_;
         }
         else
         {
@@ -332,7 +339,7 @@ namespace SmartPeak
     bool& show_app_about,
     bool& show_file_picker,
     const std::string& pathname,
-    std::vector<std::string>& pathname_content
+    Table& pathname_content
   )
   {
     // Show the widgets
@@ -405,7 +412,7 @@ namespace SmartPeak
   void AppWindow::showMenuFile(
     bool& show_file_picker,
     const std::string& pathname,
-    std::vector<std::string>& pathname_content
+    Table& pathname_content
   )
   {
     ImGui::MenuItem("Session", NULL, false, false);
@@ -791,12 +798,22 @@ namespace SmartPeak
 
   void AppWindow::getPathnameContent(
     const std::string& pathname,
-    std::vector<std::string>& content,
+    Table& content,
     const bool only_directories
   )
   {
     printf("getPathnameContent(): %s\n", pathname.c_str());
     content.clear();
+    content.addColumn("Name");
+    content.addColumn("Size");
+    content.addColumn("Type");
+    content.addColumn("Date Modified");
+
+    Column& names = content.get("Name");
+    Column& sizes = content.get("Size");
+    Column& types = content.get("Type");
+    Column& dates = content.get("Date Modified");
+
     DIR *dir;
     struct dirent *ent;
     if (dir = opendir(pathname.c_str())) {
@@ -804,20 +821,37 @@ namespace SmartPeak
         if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) {
           continue;
         }
-        if (!only_directories || ent->d_type == DT_DIR) {
-          content.push_back(ent->d_name);
+        if (only_directories && ent->d_type != DT_DIR) {
+          continue;
         }
+        const std::string d_name = std::string(ent->d_name);
+        names.push_back(d_name);
+        struct stat info;
+        const std::string full_name = pathname + "/" + d_name;
+        mystat(full_name.c_str(), &info);
+        if (ent->d_type == DT_DIR) {
+          DIR *dir_subfolder;
+          struct dirent *ent_subfolder;
+          int n_items {-2}; // removes "." and ".." from the count
+          if (dir_subfolder = opendir(full_name.c_str())) {
+            while (ent_subfolder = readdir(dir_subfolder)) {
+              ++n_items;
+            }
+            closedir(dir_subfolder);
+          }
+          sizes.push_back(n_items);
+          types.push_back("Directory");
+        } else {
+          sizes.push_back(info.st_size);
+          const std::string::size_type pos = d_name.rfind(".");
+          types.push_back(pos == std::string::npos ? "Unknown" : d_name.substr(pos));
+        }
+        char buff[128];
+        strftime(buff, sizeof buff, "%A %c", localtime(&(info.st_mtime)));
+        dates.push_back(std::string(buff));
       }
-      std::sort(content.begin(), content.end(), [](const std::string& a, const std::string& b){
-        // case-insensitive comparison
-        std::string a_lowercase, b_lowercase;
-        a_lowercase.resize(a.size());
-        b_lowercase.resize(b.size());
-        std::transform(a.begin(), a.end(), a_lowercase.begin(), ::tolower);
-        std::transform(b.begin(), b.end(), b_lowercase.begin(), ::tolower);
-        return a_lowercase.compare(b_lowercase) < 0;
-      });
       closedir(dir);
+      content.sort("Name");
     } else {
       perror("");
     }
