@@ -14,6 +14,7 @@ set(sources_list
 	SequenceProcessor.cpp
 	SequenceSegmentHandler.cpp
 	SequenceSegmentProcessor.cpp
+	Table.cpp
 	Utilities.cpp
 )
 
