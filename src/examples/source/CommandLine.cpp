@@ -4,8 +4,10 @@
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <algorithm>
+#include <chrono>
 #include <cctype>
 #include <cstdlib>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <regex>
@@ -52,7 +54,7 @@ public:
     std::map<std::string, Filenames> dynamic_filenames;
   };
 
-  std::string                           pathnamesFilename_       = "pathnames.txt";
+  const std::string                     pathnamesFilename_       = "pathnames.txt";
   std::string                           sequence_pathname_;
   std::string                           main_dir_                = ".";
   std::string                           mzML_dir_;
@@ -362,7 +364,6 @@ public:
     }
     else if ("15" == in) {
       initializeAllDirs();
-
       const std::vector<Command> methods = getMethodsInput();
       if (methods.empty()) {
         std::cout << "\nPipeline not modified.\n";
@@ -446,6 +447,7 @@ public:
       }
     }
     else if ("2" == in) {
+      initializeAllDirs();
       processCommands(commands_);
       std::cout << "\nWorkflow completed.\n";
     }
@@ -675,7 +677,7 @@ public:
     clearNonExistantDefaultGeneratedFilenames(f);
     f.sequence_csv_i = sequence_pathname_;
 
-    const std::string pathnamesFilePath = main_dir_ + "/" + std::string(pathnamesFilename_);
+    const std::string pathnamesFilePath = main_dir_ + "/" + pathnamesFilename_;
 
     if (InputDataValidation::fileExists(pathnamesFilePath)) {
       std::cout << "\n\n"
@@ -1295,9 +1297,13 @@ public:
   CommandLine& operator=(CommandLine&& other)      = delete;
 
   void runApp() {
+    const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    char filename[128];
+    strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
+
     // Add .csv appender: 32 MiB per file, max. 100 log files
     static plog::RollingFileAppender<plog::CsvFormatter>
-      fileAppender("smartpeak_log.csv", 1024 * 1024 * 32, 100);
+      fileAppender(filename, 1024 * 1024 * 32, 100);
 
     // Add console appender, instead of only the file one
     static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
