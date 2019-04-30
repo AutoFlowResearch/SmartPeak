@@ -1,16 +1,16 @@
 #pragma once
 
-#include <SmartPeak/core/Utilities.h>
 #include <string>
 #include <vector>
-#include <iostream>
+// #include <iostream>
+#include <SmartPeak/core/CastValue.h>
 
 namespace SmartPeak
 {
 
   class Column {
     std::vector<size_t>* indices = nullptr; // TODO: try using references? it'd be hard to create copies of columns in different tables
-    std::vector<Utilities::CastValue> rows;
+    std::vector<CastValue> rows;
   public:
     Column(std::vector<size_t>* indices, const std::string& header) :
       indices(indices), header(header) {}
@@ -28,15 +28,15 @@ namespace SmartPeak
       rows.insert(rows.cbegin() + n, std::forward<T>(value));
       if (indices->size() < rows.size()) {
         indices->insert(indices->cbegin() + n, n);
-        printf("inserting index %lu\n", n);
+        // printf("inserting index %lu\n", n);
       }
-      std::cout << "inserting value " << value << std::endl;
+      // std::cout << "inserting value " << value << std::endl;
     }
 
     void setIndices(std::vector<size_t>& indices);
 
-    Utilities::CastValue& get(const size_t i);
-    const Utilities::CastValue& get(const size_t i) const;
+    CastValue& get(const size_t i);
+    const CastValue& get(const size_t i) const;
 
     size_t size() const;
 
@@ -49,11 +49,11 @@ namespace SmartPeak
   public:
     std::vector<std::string> getHeaders() const;
 
-    Utilities::CastValue& get(const size_t i, const size_t j);
-    const Utilities::CastValue& get(const size_t i, const size_t j) const;
+    CastValue& get(const size_t i, const size_t j);
+    const CastValue& get(const size_t i, const size_t j) const;
 
-    Utilities::CastValue& get(const size_t i, const std::string& header);
-    const Utilities::CastValue& get(const size_t i, const std::string& header) const;
+    CastValue& get(const size_t i, const std::string& header);
+    const CastValue& get(const size_t i, const std::string& header) const;
 
     Column& get(const size_t j);
     const Column& get(const size_t j) const;

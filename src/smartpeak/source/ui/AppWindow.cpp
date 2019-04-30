@@ -2,20 +2,8 @@
 #include <SmartPeak/ui/Widget.h>
 #include <imgui.h>
 #include <algorithm>
-#include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/Table.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#ifdef _WIN32
-  #include "dirent.h"
-  auto mystat = &_stat;
-#else
-  #include <dirent.h>
-  #include <unistd.h>
-  auto mystat = &stat;
-#endif
+#include <SmartPeak/ui/FilePicker.h>
 
 namespace SmartPeak
 {
@@ -57,125 +45,11 @@ namespace SmartPeak
     static bool show_app_about_ = false;
 
     static bool show_file_picker_ = false;
-    static std::string pathname = { "/home" };
-    static Table pathname_content;
-    static std::string selected_pathname; // TODO: reset when modal is opened?
+    static FilePicker file_picker(show_file_picker_);
 
     if (show_file_picker_)
     {
-      ImGui::OpenPopup("modal_file_picker");
-    }
-
-    // File picker modal
-    if (ImGui::BeginPopupModal("modal_file_picker"))
-    // if (ImGui::BeginPopupModal("modal_file_picker", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-      static int selected = -1;
-
-      if (ImGui::Button("Up"))
-      {
-        pathname = getParentPathname(pathname);
-        getPathnameContent(pathname, pathname_content, false);
-        selected = -1;
-      }
-      ImGui::SameLine();
-      ImGui::Text("Path: %s", pathname.c_str());
-
-      static ImGuiTextFilter filter;
-      filter.Draw("Filter filename (inc,-exc)");
-
-      // File type filter
-      static int selected_extension = 0; // If the selection isn't within 0..count, Combo won't display a preview
-      static const char* extensions[] = { "All", "csv", "featureXML", "mzML" };
-      ImGui::Combo("File type", &selected_extension, extensions, IM_ARRAYSIZE(extensions));
-
-      static char filename[256] = "";
-
-      // Folder content / Navigation
-      {
-        ImGui::BeginChild("Content", ImVec2(600, 300));
-        // Start of Columns - content_columns
-        ImGui::Columns(4, "content_columns");
-        ImGui::Separator();
-        ImGui::Text("Name"); ImGui::NextColumn();
-        ImGui::Text("Size"); ImGui::NextColumn();
-        ImGui::Text("Type"); ImGui::NextColumn();
-        ImGui::Text("Date Modified"); ImGui::NextColumn();
-        ImGui::Separator();
-
-        for (int i = 0; i < pathname_content.size(); ++i)
-        {
-          if (!filter.PassFilter(pathname_content.get(i, "Name").s_.c_str()))
-          {
-            continue; // continue if it does not pass the filter
-          }
-
-          if (selected_extension > 0 &&
-              !Utilities::endsWith(pathname_content.get(i, "Name").s_, "." + std::string(extensions[selected_extension]), false))
-          {
-            continue; // continue if the file type is not desired
-          }
-
-          const ImGuiWindowFlags flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick;
-
-          if (ImGui::Selectable(pathname_content.get(i, "Name").s_.c_str(), selected == i, flags))
-          {
-            selected = i;
-            sprintf(filename, "%s", pathname_content.get(selected, "Name").s_.c_str());
-            if (ImGui::IsMouseDoubleClicked(0))
-            {
-              if (pathname != "/") // do not insert "/" if pathname == root dir, i.e. avoid "//home"
-              {
-                pathname.append("/");
-              }
-              pathname.append(pathname_content.get(selected, "Name").s_);
-              getPathnameContent(pathname, pathname_content, false);
-              selected = -1;
-              filename[0] = '\0';
-            }
-          }
-
-          ImGui::NextColumn();
-          ImGui::Text("%d", pathname_content.get(i, "Size").i_); ImGui::NextColumn();
-          ImGui::Text("%s", pathname_content.get(i, "Type").s_.c_str()); ImGui::NextColumn();
-          ImGui::Text("%s", pathname_content.get(i, "Date Modified").s_.c_str()); ImGui::NextColumn();
-        }
-        ImGui::Columns(1);
-        // End of Columns - content_columns
-        ImGui::EndChild();
-      }
-      ImGui::Separator();
-
-      ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.7f);
-      ImGui::InputTextWithHint("", "File name", filename, IM_ARRAYSIZE(filename));
-
-      ImGui::SameLine();
-      ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.5f);
-      if (ImGui::Button("Open")) {
-        if (selected >= 0)
-        {
-          selected_pathname = pathname + "/" + pathname_content.get(selected, "Name").s_;
-        }
-        else
-        {
-          selected_pathname = pathname;
-        }
-        printf("Open: %s\n", selected_pathname.c_str());
-        show_file_picker_ = false;
-        selected = -1;
-        ImGui::CloseCurrentPopup();
-      }
-
-      ImGui::SameLine();
-      ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
-      if (ImGui::Button("Cancel")) {
-        selected_pathname.clear();
-        show_file_picker_ = false;
-        selected = -1;
-        ImGui::CloseCurrentPopup();
-      }
-
-      ImGui::EndPopup();
+      file_picker.draw();
     }
 
     // Show the main window
@@ -223,9 +97,7 @@ namespace SmartPeak
       show_log_,
       // Help
       show_app_about_,
-      show_file_picker_,
-      pathname,
-      pathname_content
+      show_file_picker_
     );
 
     // determine what windows will be shown
@@ -337,9 +209,7 @@ namespace SmartPeak
     bool& show_log,
     // Help
     bool& show_app_about,
-    bool& show_file_picker,
-    const std::string& pathname,
-    Table& pathname_content
+    bool& show_file_picker
   )
   {
     // Show the widgets
@@ -356,7 +226,7 @@ namespace SmartPeak
     {
       if (ImGui::BeginMenu("File"))
       {
-        showMenuFile(show_file_picker, pathname, pathname_content);
+        showMenuFile(show_file_picker);
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Edit"))
@@ -410,9 +280,7 @@ namespace SmartPeak
   }
 
   void AppWindow::showMenuFile(
-    bool& show_file_picker,
-    const std::string& pathname,
-    Table& pathname_content
+    bool& show_file_picker
   )
   {
     ImGui::MenuItem("Session", NULL, false, false);
@@ -428,7 +296,6 @@ namespace SmartPeak
     }
 
     if (ImGui::MenuItem("Load session from sequence")) {
-      getPathnameContent(pathname, pathname_content, false);
       show_file_picker = true;
     }
 
@@ -794,81 +661,5 @@ namespace SmartPeak
           ImGui::PopTextWrapPos();
           ImGui::EndTooltip();
       }
-  }
-
-  void AppWindow::getPathnameContent(
-    const std::string& pathname,
-    Table& content,
-    const bool only_directories
-  )
-  {
-    printf("getPathnameContent(): %s\n", pathname.c_str());
-    content.clear();
-    content.addColumn("Name");
-    content.addColumn("Size");
-    content.addColumn("Type");
-    content.addColumn("Date Modified");
-
-    Column& names = content.get("Name");
-    Column& sizes = content.get("Size");
-    Column& types = content.get("Type");
-    Column& dates = content.get("Date Modified");
-
-    DIR *dir;
-    struct dirent *ent;
-    if (dir = opendir(pathname.c_str())) {
-      while (ent = readdir(dir)) {
-        if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) {
-          continue;
-        }
-        if (only_directories && ent->d_type != DT_DIR) {
-          continue;
-        }
-        const std::string d_name = std::string(ent->d_name);
-        names.push_back(d_name);
-        struct stat info;
-        const std::string full_name = pathname + "/" + d_name;
-        mystat(full_name.c_str(), &info);
-        if (ent->d_type == DT_DIR) {
-          DIR *dir_subfolder;
-          struct dirent *ent_subfolder;
-          int n_items {-2}; // removes "." and ".." from the count
-          if (dir_subfolder = opendir(full_name.c_str())) {
-            while (ent_subfolder = readdir(dir_subfolder)) {
-              ++n_items;
-            }
-            closedir(dir_subfolder);
-          }
-          sizes.push_back(n_items);
-          types.push_back("Directory");
-        } else {
-          sizes.push_back(info.st_size);
-          const std::string::size_type pos = d_name.rfind(".");
-          types.push_back(pos == std::string::npos ? "Unknown" : d_name.substr(pos));
-        }
-        char buff[128];
-        strftime(buff, sizeof buff, "%A %c", localtime(&(info.st_mtime)));
-        dates.push_back(std::string(buff));
-      }
-      closedir(dir);
-      content.sort("Name");
-    } else {
-      perror("");
-    }
-  }
-
-  std::string AppWindow::getParentPathname(const std::string& pathname)
-  {
-    std::string parent;
-    const size_t pos = pathname.find_last_of("/");
-    if (pos != std::string::npos)
-    {
-      parent = pathname.substr(0, pos);
-      if (parent.empty())
-      {
-        parent = "/"; // TODO: does this work on other OSs?
-      }
-    }
-    return parent;
   }
 }

@@ -1,11 +1,25 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/Table.h>
+#include <SmartPeak/core/CastValue.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <iostream>
 #include <regex>
 #include <unordered_set>
 #include <plog/Log.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#ifdef _WIN32
+  #include "dirent.h"
+  auto mystat = &_stat;
+#else
+  #include <dirent.h>
+  #include <unistd.h>
+  auto mystat = &stat;
+#endif
 
 namespace SmartPeak
 {
@@ -490,5 +504,83 @@ namespace SmartPeak
       return true;
 
     return false;
+  }
+
+  void Utilities::getPathnameContent(
+    const std::string& pathname,
+    Table& content,
+    const bool only_directories
+  )
+  {
+    printf("getPathnameContent(): %s\n", pathname.c_str());
+    content.clear();
+    content.addColumn("Name");
+    content.addColumn("Size");
+    content.addColumn("Type");
+    content.addColumn("Date Modified");
+
+    Column& names = content.get("Name");
+    Column& sizes = content.get("Size");
+    Column& types = content.get("Type");
+    Column& dates = content.get("Date Modified");
+
+    DIR *dir;
+    struct dirent *ent;
+    if (dir = opendir(pathname.c_str())) {
+      while (ent = readdir(dir)) {
+        if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) {
+          continue;
+        }
+        if (only_directories && ent->d_type != DT_DIR) {
+          continue;
+        }
+        const std::string d_name = std::string(ent->d_name);
+        names.push_back(d_name);
+        struct stat info;
+        const std::string full_name = pathname + "/" + d_name;
+        mystat(full_name.c_str(), &info);
+        if (ent->d_type == DT_DIR) {
+          DIR *dir_subfolder;
+          struct dirent *ent_subfolder;
+          int n_items {-2}; // removes "." and ".." from the count
+          if (dir_subfolder = opendir(full_name.c_str())) {
+            while (ent_subfolder = readdir(dir_subfolder)) {
+              ++n_items;
+            }
+            closedir(dir_subfolder);
+          } else { // i.e. permission denied
+            n_items = 0;
+          }
+          sizes.push_back(n_items);
+          types.push_back("Directory");
+        } else {
+          sizes.push_back(info.st_size);
+          const std::string::size_type pos = d_name.rfind(".");
+          types.push_back(pos == std::string::npos ? "Unknown" : d_name.substr(pos));
+        }
+        char buff[128];
+        strftime(buff, sizeof buff, "%Y/%m/%d %H:%M:%S", localtime(&(info.st_mtime)));
+        dates.push_back(std::string(buff));
+      }
+      closedir(dir);
+      content.sort("Name");
+    } else {
+      perror("");
+    }
+  }
+
+  std::string Utilities::getParentPathname(const std::string& pathname)
+  {
+    std::string parent;
+    const size_t pos = pathname.find_last_of("/");
+    if (pos != std::string::npos)
+    {
+      parent = pathname.substr(0, pos);
+      if (parent.empty())
+      {
+        parent = "/"; // TODO: does this work on other OSs?
+      }
+    }
+    return parent;
   }
 }

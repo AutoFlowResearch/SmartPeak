@@ -50,9 +50,9 @@ namespace SmartPeak
     if (filenames.mzML_i.size()) {
       if (params_I.at("mzML").size()) {
         // # convert parameters
-        std::map<std::string, Utilities::CastValue> mzML_params;
+        std::map<std::string, CastValue> mzML_params;
         for (const std::map<std::string, std::string>& param : params_I.at("mzML")) {
-          Utilities::CastValue c;
+          CastValue c;
           Utilities::castString(param.at("value"), param.at("type"), c);
           mzML_params.emplace(param.at("name"), c);
         }
@@ -94,9 +94,9 @@ namespace SmartPeak
     OpenMS::TargetedExperiment& targeted_exp = rawDataHandler_IO.getTargetedExperiment();
     if (params_I.at("ChromatogramExtractor").size()) {
       // # convert parameters
-      std::map<std::string, Utilities::CastValue> chromatogramExtractor_params;
+      std::map<std::string, CastValue> chromatogramExtractor_params;
       for (const std::map<std::string, std::string>& param : params_I.at("ChromatogramExtractor")) {
-        Utilities::CastValue c;
+        CastValue c;
         Utilities::castString(param.at("value"), param.at("type"), c);
         chromatogramExtractor_params.emplace(param.at("name"), c);
       }
@@ -762,7 +762,7 @@ namespace SmartPeak
     float height;
     float area;
 
-    std::vector<std::map<std::string, Utilities::CastValue>> reference_data;
+    std::vector<std::map<std::string, CastValue>> reference_data;
 
     while (in.read_row(
       sample_index,
@@ -786,7 +786,7 @@ namespace SmartPeak
       std::transform(used.begin(), used.end(), used.begin(), ::tolower);
       if (used == "false")
         continue;
-      std::map<std::string, Utilities::CastValue> m;
+      std::map<std::string, CastValue> m;
       m.emplace(s_sample_index, sample_index);
       m.emplace(s_original_filename, original_filename);
       m.emplace(s_sample_name, sample_name);

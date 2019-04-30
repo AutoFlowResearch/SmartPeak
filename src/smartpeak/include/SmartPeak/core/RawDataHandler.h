@@ -10,7 +10,7 @@
 #include <OpenMS/KERNEL/MSExperiment.h>
 
 #include <SmartPeak/core/MetaDataHandler.h>
-#include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/CastValue.h>
 
 #include <map>
 #include <vector>
@@ -47,11 +47,11 @@ public:
     const OpenMS::TargetedExperiment& getTargetedExperiment() const;
     std::shared_ptr<OpenMS::TargetedExperiment>& getTargetedExperimentShared();
 
-    void setReferenceData(const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data);
-    void setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>& reference_data);
-    std::vector<std::map<std::string, Utilities::CastValue>>& getReferenceData();
-    const std::vector<std::map<std::string, Utilities::CastValue>>& getReferenceData() const;
-    std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>& getReferenceDataShared();
+    void setReferenceData(const std::vector<std::map<std::string, CastValue>>& reference_data);
+    void setReferenceData(std::shared_ptr<std::vector<std::map<std::string, CastValue>>>& reference_data);
+    std::vector<std::map<std::string, CastValue>>& getReferenceData();
+    const std::vector<std::map<std::string, CastValue>>& getReferenceData() const;
+    std::shared_ptr<std::vector<std::map<std::string, CastValue>>>& getReferenceDataShared();
 
     void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods);
     void setQuantitationMethods(std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& quantitation_methods);
@@ -123,7 +123,7 @@ private:
     // input (reused between RawDataHandlers)
     std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>> parameters_ = nullptr;  ///< algorithm parameters; shared between all raw data handlers in the sequence
     std::shared_ptr<OpenMS::TargetedExperiment> targeted_exp_ = nullptr;  ///< transitions for the SRM experiments; shared between all raw data handlers in the sequence
-    std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>> reference_data_ = nullptr;  ///< Reference data to compare algorithm accuracy; shared between all raw data handlers in the sequence
+    std::shared_ptr<std::vector<std::map<std::string, CastValue>>> reference_data_ = nullptr;  ///< Reference data to compare algorithm accuracy; shared between all raw data handlers in the sequence
     std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> quantitation_methods_ = nullptr;  ///< Transition quantitation methods; shared between all raw data handlers in the sequence segment
     std::shared_ptr<OpenMS::MRMFeatureQC> feature_filter_ = nullptr;  ///< Feature Filters; shared between all raw data handlers in the sequence
     std::shared_ptr<OpenMS::MRMFeatureQC> feature_qc_ = nullptr;  ///< Feature QCs; shared between all raw data handlers in the sequence

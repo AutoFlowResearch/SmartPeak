@@ -42,15 +42,11 @@ namespace SmartPeak
       bool& show_log,
       // Help
       bool& show_app_about,
-      bool& show_file_picker,
-      const std::string& pathname,
-      Table& folders
+      bool& show_file_picker
     );
 
     static void showMenuFile(
-      bool& show_file_picker,
-      const std::string& pathname,
-      Table& folders
+      bool& show_file_picker
     ); ///< Show the main menu File options
 
     static void showMenuEdit(); ///< Show the main menu Edit options
@@ -126,13 +122,5 @@ namespace SmartPeak
     );
 
     static void HelpMarker(const char* desc);
-
-    static void getPathnameContent(
-      const std::string& pathname,
-      Table& content,
-      const bool only_directories
-    );
-
-    static std::string getParentPathname(const std::string& pathname);
   };
 }

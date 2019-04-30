@@ -12,14 +12,14 @@ namespace SmartPeak
     Column::indices = &indices;
   }
 
-  Utilities::CastValue& Column::get(const size_t i)
+  CastValue& Column::get(const size_t i)
   {
     if (!indices)
       throw "Table: indices ptr is null\n";
     return rows[(*indices)[i]];
   }
 
-  const Utilities::CastValue& Column::get(const size_t i) const
+  const CastValue& Column::get(const size_t i) const
   {
     if (!indices)
       throw "Table: indices ptr is null\n";
@@ -61,22 +61,22 @@ namespace SmartPeak
   //   return names;
   // }
 
-  Utilities::CastValue& Table::get(const size_t r, const size_t c)
+  CastValue& Table::get(const size_t r, const size_t c)
   {
     return get(c).get(r);
   }
 
-  const Utilities::CastValue& Table::get(const size_t r, const size_t c) const
+  const CastValue& Table::get(const size_t r, const size_t c) const
   {
     return get(c).get(r);
   }
 
-  Utilities::CastValue& Table::get(const size_t r, const std::string& header)
+  CastValue& Table::get(const size_t r, const std::string& header)
   {
     return get(header).get(r);
   }
 
-  const Utilities::CastValue& Table::get(const size_t r, const std::string& header) const
+  const CastValue& Table::get(const size_t r, const std::string& header) const
   {
     return get(header).get(r);
   }

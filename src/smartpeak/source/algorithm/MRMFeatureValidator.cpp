@@ -6,7 +6,7 @@
 namespace SmartPeak
 {
   void MRMFeatureValidator::validate_MRMFeatures(
-    const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data_v,
+    const std::vector<std::map<std::string, CastValue>>& reference_data_v,
     const OpenMS::FeatureMap& features,
     const std::string& injection_name,
     OpenMS::FeatureMap& output_validated,
@@ -18,8 +18,8 @@ namespace SmartPeak
     std::vector<int> y_pred;
     output_validated.clear(true);
 
-    std::map<std::string, std::map<std::string, Utilities::CastValue>> reference_data;
-    for (const std::map<std::string, Utilities::CastValue>& m : reference_data_v) {
+    std::map<std::string, std::map<std::string, CastValue>> reference_data;
+    for (const std::map<std::string, CastValue>& m : reference_data_v) {
       if (m.at("injection_name").s_ != injection_name) {
         continue;
       }

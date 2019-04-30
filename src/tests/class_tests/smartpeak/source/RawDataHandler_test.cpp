@@ -291,10 +291,10 @@ BOOST_AUTO_TEST_CASE(set_get_ChromatogramMap)
 BOOST_AUTO_TEST_CASE(set_get_ReferenceData)
 {
   RawDataHandler rawDataHandler;
-  std::vector<std::map<std::string, Utilities::CastValue>> data;
-  Utilities::CastValue c("bar");
+  std::vector<std::map<std::string, CastValue>> data;
+  CastValue c("bar");
 
-  map<string, Utilities::CastValue> m /*= {{"foo", c}}*/;
+  map<string, CastValue> m /*= {{"foo", c}}*/;
   m.emplace("foo", c);
   c = "bar2";
   m.emplace("foo2", c);
@@ -302,7 +302,7 @@ BOOST_AUTO_TEST_CASE(set_get_ReferenceData)
 
   rawDataHandler.setReferenceData(data);
 
-  const std::vector<std::map<std::string, Utilities::CastValue>>& data2 = rawDataHandler.getReferenceData();
+  const std::vector<std::map<std::string, CastValue>>& data2 = rawDataHandler.getReferenceData();
 
   BOOST_CHECK_EQUAL(data2.size(), 1);
   BOOST_CHECK_EQUAL(data2[0].count("foo"), 1);
@@ -314,7 +314,7 @@ BOOST_AUTO_TEST_CASE(set_get_ReferenceData)
 
   rawDataHandler.getReferenceData().push_back({{"foo3", c}});
 
-  const std::vector<std::map<std::string, Utilities::CastValue>>& data3 = rawDataHandler.getReferenceData();
+  const std::vector<std::map<std::string, CastValue>>& data3 = rawDataHandler.getReferenceData();
 
   BOOST_CHECK_EQUAL(data3.size(), 2);
   BOOST_CHECK_EQUAL(data3[0].count("foo"), 1);

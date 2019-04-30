@@ -688,7 +688,7 @@ BOOST_AUTO_TEST_CASE(processLoadValidationData)
 
   LoadValidationData loadValidationData;
   loadValidationData.process(rawDataHandler, {}, filenames);
-  const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
+  const std::vector<std::map<std::string, CastValue>>& ref_data = rawDataHandler.getReferenceData();
 
   BOOST_CHECK_EQUAL(ref_data.size(), 179);
   BOOST_CHECK_EQUAL(ref_data[0].at("component_name").s_, "23dpg.23dpg_1.Heavy");
