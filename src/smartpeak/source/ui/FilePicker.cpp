@@ -45,7 +45,7 @@ namespace SmartPeak
     ImGui::Text("Date Modified"); ImGui::NextColumn();
     ImGui::Separator();
 
-    for (int i = 0; i < pathname_content_.size(); ++i)
+    for (int i = 0; static_cast<size_t>(i) < pathname_content_.size(); ++i)
     {
       if (!filter.PassFilter(pathname_content_.get(i, "Name").s_.c_str()))
       {
