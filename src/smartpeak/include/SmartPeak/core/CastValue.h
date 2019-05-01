@@ -12,19 +12,45 @@ namespace SmartPeak
   class CastValue
   {
   public:
-    CastValue() : tag_(UNINITIALIZED), b_(false), is_clear_(true) {}
-    CastValue(const std::string& s) : tag_(STRING), s_(s), is_clear_(false) {}
-    CastValue(const char *s) : tag_(STRING), s_(s), is_clear_(false) {}
-    CastValue(const float f) : tag_(FLOAT), f_(f), is_clear_(true) {}
-    CastValue(const int i) : tag_(INT), i_(i), is_clear_(true) {}
-    CastValue(const long int li) : tag_(LONG_INT), li_(li), is_clear_(true) {}
+    enum Type {
+      UNINITIALIZED,
+      UNKNOWN,
+      BOOL,
+      FLOAT,
+      INT,
+      LONG_INT,
+      STRING,
+      BOOL_LIST,
+      FLOAT_LIST,
+      INT_LIST,
+      STRING_LIST
+    };
 
-    CastValue(const CastValue& other) : tag_(UNINITIALIZED), b_(false), is_clear_(true)
+    union {
+      bool b_;
+      float f_;
+      int i_;
+      long int li_;
+      std::string s_;
+      std::vector<bool> bl_;
+      std::vector<float> fl_;
+      std::vector<int> il_;
+      std::vector<std::string> sl_;
+    };
+
+    CastValue() : b_(false), tag_(UNINITIALIZED), is_clear_(true) {}
+    CastValue(const std::string& s) : s_(s), tag_(STRING), is_clear_(false) {}
+    CastValue(const char *s) : s_(s), tag_(STRING), is_clear_(false) {}
+    CastValue(const float f) : f_(f), tag_(FLOAT), is_clear_(true) {}
+    CastValue(const int i) : i_(i), tag_(INT), is_clear_(true) {}
+    CastValue(const long int li) : li_(li), tag_(LONG_INT), is_clear_(true) {}
+
+    CastValue(const CastValue& other) : b_(false), tag_(UNINITIALIZED), is_clear_(true)
     {
       *this = other;
     }
 
-    CastValue(CastValue&& other) : tag_(UNINITIALIZED), b_(false), is_clear_(true)
+    CastValue(CastValue&& other) : b_(false), tag_(UNINITIALIZED), is_clear_(true)
     {
       *this = std::move(other);
     }
@@ -51,32 +77,6 @@ namespace SmartPeak
     void clear();
 
     bool is_less_than(const CastValue& other, const bool case_sensitive = true);
-
-    enum Type {
-      UNINITIALIZED,
-      UNKNOWN,
-      BOOL,
-      FLOAT,
-      INT,
-      LONG_INT,
-      STRING,
-      BOOL_LIST,
-      FLOAT_LIST,
-      INT_LIST,
-      STRING_LIST
-    };
-
-    union {
-      bool b_;
-      float f_;
-      int i_;
-      long int li_;
-      std::string s_;
-      std::vector<bool> bl_;
-      std::vector<float> fl_;
-      std::vector<int> il_;
-      std::vector<std::string> sl_;
-    };
 
     CastValue::Type getTag() const;
 
