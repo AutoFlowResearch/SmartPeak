@@ -17,7 +17,7 @@ namespace SmartPeak
   {
   public:
     Widget() = default;
-    ~Widget() = default;
+    virtual ~Widget() = default;
 
     /**
       Interface to show the widget
