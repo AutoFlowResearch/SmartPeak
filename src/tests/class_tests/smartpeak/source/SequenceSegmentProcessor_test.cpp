@@ -348,6 +348,8 @@ BOOST_AUTO_TEST_CASE(processCalculateCalibration)
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 200.0, 1e-6);
 
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs_rdh = sequenceHandler.getSequence()[0].getRawData().getQuantitationMethods();
+  BOOST_CHECK_EQUAL(AQMs_rdh.size(), 3);
+
   BOOST_CHECK_EQUAL(AQMs_rdh[0].getComponentName(), "amp.amp_1.Light");
   BOOST_CHECK_EQUAL(AQMs_rdh[0].getISName(), "amp.amp_1.Heavy");
   BOOST_CHECK_EQUAL(AQMs_rdh[0].getFeatureName(), "peak_apex_int");
