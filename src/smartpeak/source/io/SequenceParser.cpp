@@ -37,7 +37,6 @@ namespace SmartPeak
       return;
     }
 
-    sequenceHandler.clear(); // start with an empty sequence handler
     const std::string s_sample_name {"sample_name"};
     const std::string s_sample_group_name {"sample_group_name"};
     const std::string s_sequence_segment_name {"sequence_segment_name"};
