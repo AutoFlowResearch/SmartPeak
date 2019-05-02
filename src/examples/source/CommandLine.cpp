@@ -122,7 +122,7 @@ public:
 
   void menuMain()
   {
-    std::cout <<
+    LOGN <<
       "\n\n"
       "Main\n"
       "[1] File\n"
@@ -157,7 +157,7 @@ public:
 
   void menuFile()
   {
-    std::cout <<
+    LOGN <<
       "\n\n"
       "Main > File\n"
       "[1] New session\n"
@@ -182,12 +182,14 @@ public:
       mzML_dir_.clear();
       features_in_dir_.clear();
       features_out_dir_.clear();
+      LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
       const bool pathnamesAreCorrect = buildStaticFilenames();
       if (pathnamesAreCorrect) {
         sequenceHandler_.clear();
         SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true);
       } else {
-        std::cout << "Pathnames are not correct.\n";
+        LOGE << "Provided and/or inferred pathnames are not correct."
+          "The sequence has not been modified. Check file: " << pathnamesFilename_;
       }
     }
     else if ("4" == in) {
@@ -210,7 +212,7 @@ public:
 
   void menuImportFile()
   {
-    std::cout <<
+    LOGN <<
       "\n\n"
       "Main > File > Import file\n"
       "[1] Sequence\n"
@@ -232,6 +234,7 @@ public:
       setSequencePathnameFromInput();
       static_filenames_.sequence_csv_i = sequence_pathname_;
       sequenceHandler_.clear();
+      LOGI << "Sequence handler has been cleared";
       SequenceParser::readSequenceFile(sequenceHandler_, static_filenames_.sequence_csv_i, ",");
     }
     else if ("2" == in) {
@@ -308,7 +311,7 @@ public:
 
   void menuEdit()
   {
-    std::cout <<
+    LOGN <<
       "\n\n"
       "Main > Edit\n"
       "[1]  Undo\n"
@@ -363,10 +366,10 @@ public:
     else if ("14" == in) {
     }
     else if ("15" == in) {
-      initializeAllDirs();
+      initializeDataDirs();
       const std::vector<Command> methods = getMethodsInput();
       if (methods.empty()) {
-        std::cout << "\nPipeline not modified.\n";
+        LOGW << "\n\nPipeline not modified";
       } else {
         commands_ = methods;
       }
@@ -381,7 +384,7 @@ public:
 
   void menuView()
   {
-    std::cout <<
+    LOGN <<
       "\n\n"
       "Main > View\n"
       "[1] Sequence status\n"
@@ -398,7 +401,7 @@ public:
     if      ("1" == in) {
     }
     else if ("2" == in) {
-      std::cout << getPipelineString();
+      LOGN << "\n\n" << getPipelineString();
     }
     else if ("3" == in) {
     }
@@ -416,7 +419,7 @@ public:
 
   void menuActions()
   {
-    std::cout <<
+    LOGN <<
       "\n\n"
       "Main > Actions\n"
       "[1] Run command\n"
@@ -431,9 +434,9 @@ public:
     in = getLineInput("> ", false);
 
     if      ("1" == in) {
-      initializeAllDirs();
+      initializeDataDirs();
 
-      std::cout << commandsString();
+      LOGN << "\n\n" << commandsString();
 
       const std::string input = getLineInput("> ");
       try {
@@ -443,13 +446,13 @@ public:
           processCommands({cmd});
         }
       } catch (...) {
-        std::cout << "Invalid input: cannot convert to integer.\n";
+        LOGE << "\n\nInvalid input: cannot convert to integer.\n";
       }
     }
     else if ("2" == in) {
-      initializeAllDirs();
+      initializeDataDirs();
       processCommands(commands_);
-      std::cout << "\nWorkflow completed.\n";
+      LOGN << "\n\nWorkflow completed.\n";
     }
     else if ("3" == in) {
       menuQuickInfo();
@@ -470,7 +473,7 @@ public:
 
   void menuDataIntegrity()
   {
-    std::cout <<
+    LOGN <<
       "\n\n"
       "Main > Actions > Check data integrity\n"
       "[1] Sample names\n"
@@ -505,7 +508,7 @@ public:
 
   void menuReport()
   {
-    std::cout <<
+    LOGN <<
       "\n\n"
       "Main > Actions > Report\n"
       "[1] Feature summary\n"
@@ -527,9 +530,9 @@ public:
         featureSummaryTypes_
       );
       if (data_was_written) {
-        std::cout << "FeatureSummary.csv file has been stored at: " << pathname << '\n';
+        LOGN << "\n\nFeatureSummary.csv file has been stored at: " << pathname << '\n';
       } else {
-        std::cout << "An error occurred.\n";
+        LOGE << "\n\nError during write. FeatureSummary.csv content is invalid.\n";
       }
     }
     else if ("2" == in) {
@@ -543,9 +546,9 @@ public:
         sequenceSummaryTypes_
       );
       if (data_was_written) {
-        std::cout << "SequenceSummary.csv file has been stored at: " << pathname << '\n';
+        LOGN << "\n\nSequenceSummary.csv file has been stored at: " << pathname << '\n';
       } else {
-        std::cout << "An error occurred.\n";
+        LOGE << "\n\nError during write. FeatureSummary.csv content is invalid.\n";
       }
     }
     else if ("m" == in || "M" == in) {
@@ -558,7 +561,7 @@ public:
 
   void menuQuickInfo()
   {
-    std::cout <<
+    LOGN <<
       "\n\n"
       "Main > Actions > Quick Info\n"
       "[1] Sequence\n"
@@ -580,46 +583,46 @@ public:
     in = getLineInput("> ", false);
 
     if      ("1" == in) {
-      std::cout << InputDataValidation::getSequenceInfo(sequenceHandler_) << "\n";
+      LOGN << "\n\n" << InputDataValidation::getSequenceInfo(sequenceHandler_) << "\n";
     }
     else if ("2" == in) {
-      std::cout << InputDataValidation::getTraMLInfo(
+      LOGN << "\n\n" << InputDataValidation::getTraMLInfo(
         sequenceHandler_.getSequence().front().getRawData()) << "\n";
     }
     else if ("3" == in) {
-      std::cout << InputDataValidation::getQuantitationMethodsInfo(
+      LOGN << "\n\n" << InputDataValidation::getQuantitationMethodsInfo(
         sequenceHandler_.getSequenceSegments().front()) << "\n";
     }
     else if ("4" == in) {
-      std::cout << InputDataValidation::getStandardsConcentrationsInfo(
+      LOGN << "\n\n" << InputDataValidation::getStandardsConcentrationsInfo(
         sequenceHandler_.getSequenceSegments().front()) << "\n";
     }
     else if ("5" == in) {
-      std::cout << InputDataValidation::getComponentsAndGroupsInfo(
+      LOGN << "\n\n" << InputDataValidation::getComponentsAndGroupsInfo(
         sequenceHandler_.getSequence().front().getRawData(), true) << "\n";
     }
     else if ("6" == in) {
-      std::cout << InputDataValidation::getComponentsAndGroupsInfo(
+      LOGN << "\n\n" << InputDataValidation::getComponentsAndGroupsInfo(
         sequenceHandler_.getSequence().front().getRawData(), false) << "\n";
     }
     else if ("7" == in) {
-      std::cout << InputDataValidation::getParametersInfo(
+      LOGN << "\n\n" << InputDataValidation::getParametersInfo(
         sequenceHandler_.getSequence().front().getRawData().getParameters()) << "\n";
     }
     else if ("8" == in) {
-      std::cout << sequenceHandler_.getRawDataFilesInfo() << "\n";
+      LOGN << "\n\n" << sequenceHandler_.getRawDataFilesInfo() << "\n";
     }
     else if ("9" == in) {
-      std::cout << sequenceHandler_.getAnalyzedFeaturesInfo() << "\n";
+      LOGN << "\n\n" << sequenceHandler_.getAnalyzedFeaturesInfo() << "\n";
     }
     else if ("10" == in) {
-      std::cout << sequenceHandler_.getSelectedFeaturesInfo() << "\n";
+      LOGN << "\n\n" << sequenceHandler_.getSelectedFeaturesInfo() << "\n";
     }
     else if ("11" == in) {
-      std::cout << sequenceHandler_.getPickedPeaksInfo() << "\n";
+      LOGN << "\n\n" << sequenceHandler_.getPickedPeaksInfo() << "\n";
     }
     else if ("12" == in) {
-      std::cout << sequenceHandler_.getFilteredSelectedPeaksInfo() << "\n";
+      LOGN << "\n\n" << sequenceHandler_.getFilteredSelectedPeaksInfo() << "\n";
     }
     else if ("m" == in || "M" == in) {
       // empty
@@ -631,7 +634,7 @@ public:
 
   void menuHelp()
   {
-    std::cout <<
+    LOGN <<
       "\n\n"
       "Main > Help\n"
       "[1] About\n"
@@ -649,7 +652,7 @@ public:
     else if ("2" == in) {
     }
     else if ("3" == in) {
-      std::cout << gettingStartedString();
+      LOGN << "\n\n" << gettingStartedString();
     }
     else if ("4" == in) {
     }
@@ -664,7 +667,7 @@ public:
   void exitSmartPeak()
   {
     const std::string in = getLineInput("\nExit SmartPeak? [y/N]\n> ");
-    if (std::tolower(in.front()) == 'y') {
+    if (in.size() && std::tolower(in.front()) == 'y') {
       std::exit(EXIT_SUCCESS);
     }
   }
@@ -680,21 +683,20 @@ public:
     const std::string pathnamesFilePath = main_dir_ + "/" + pathnamesFilename_;
 
     if (InputDataValidation::fileExists(pathnamesFilePath)) {
-      std::cout << "\n\n"
+      LOGN << "\n\n"
         "Pathnames file was found:\n" <<
         " - " << pathnamesFilePath << "\n"
         "Should its values be used to search for the input files? [Y/n]\n";
       const std::string in = getLineInput("> ");
-      std::cout << '\n';
       if (in.empty() || in.front() == 'y') {
-        std::cout << "Values in " << pathnamesFilePath << ": USED\n";
+        LOGN << "\n\nValues in " << pathnamesFilePath << ": USED\n";
         updateFilenames(f, pathnamesFilePath);
       } else {
-        std::cout << "Values in " << pathnamesFilePath << ": IGNORED\n";
+        LOGN << "\n\nValues in " << pathnamesFilePath << ": IGNORED\n";
       }
     }
 
-    std::cout << "\n\n"
+    LOGN << "\n\n"
       "The following list of file was searched for:\n";
     std::vector<InputDataValidation::FilenameInfo> is_valid(10);
     is_valid[0] = InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence");
@@ -720,20 +722,20 @@ public:
 
     if (!requiredPathnamesAreValidBool || !otherPathnamesAreFine) {
       generatePathnamesTxt(pathnamesFilePath, f, is_valid);
-      std::cout << "\n\nERROR!!!\n"
+      LOGF << "\n\nERROR!!!\n"
         "One or more pathnames are not valid.\n"
         "A file has been generated for you to fix the pathnames:\n"
         " - " << pathnamesFilePath << "\n"
         "The incorrect information has been replaced with an empty value.\n"
         "If a pathname is to be ignored, leave it blank.\n";
       if (!requiredPathnamesAreValidBool) {
-        std::cout <<
+        LOGF << "\n\n"
         "Make sure that the following required pathnames are provided:\n"
         " - sequence\n"
         " - parameters\n"
         " - traml\n";
       }
-      std::cout << "Apply the fixes and reload the sequence file.\n";
+      LOGN << "Apply the fixes and reload the sequence file.\n";
       getLineInput("Press Enter to go back to the Main menu.\n");
       return false;
     }
@@ -783,7 +785,7 @@ public:
   {
     std::ofstream ofs(pathname);
     if (!ofs.is_open()) {
-      std::cout << "\n\nCan't open file: " << pathname << "\n";
+      LOGF << "\n\nCan't open file: " << pathname << "\n";
       return;
     }
     std::vector<InputDataValidation::FilenameInfo>::const_iterator it = is_valid.cbegin();
@@ -813,13 +815,13 @@ public:
     std::smatch match;
     std::string line;
     if (!stream.is_open()) {
-      std::cout << "Can't open file: " << pathname << "\n";
+      LOGF << "Can't open file: " << pathname << "\n";
       return;
     }
     while (std::getline(stream, line)) {
       const bool matched = std::regex_match(line, match, re);
       if (matched == false) {
-        std::cout << "\n\n"
+        LOGF << "\n\n"
           "Regex did not match with the line: " << line << "\n"
           "Please make sure that the format is correct.\n";
         std::exit(EXIT_FAILURE);
@@ -831,22 +833,22 @@ public:
       if (match.size() == 3) {
         label = match[1].str();
         value = match[2].str();
-        // std::cout << label << "=" << value << '\n';
+        // LOGD << label << "=" << value << '\n';
       }
       if (label == "sequence") {
         f.sequence_csv_i = value;
         if (value.empty()) {
-          std::cout << "Error!!! The sequence csv file cannot be empty.\n";
+          LOGE << "\n\nError!!! The sequence csv file cannot be empty.\n";
         }
       } else if (label == "parameters") {
         f.parameters_csv_i = value;
         if (value.empty()) {
-          std::cout << "Error!!! The parameters csv file cannot be empty.\n";
+          LOGE << "\n\nError!!! The parameters csv file cannot be empty.\n";
         }
       } else if (label == "traml") {
         f.traML_csv_i = value;
         if (value.empty()) {
-          std::cout << "Error!!! The TraML file cannot be empty.\n";
+          LOGE << "\n\nError!!! The TraML file cannot be empty.\n";
         }
       } else if (label == "featureFilter") {
         f.featureFilterComponents_csv_i = value;
@@ -863,7 +865,7 @@ public:
       } else if (label == "referenceData") {
         f.referenceData_csv_i = value;
       } else {
-        std::cout << "\n\nLabel is not valid: " << label << "\n";
+        LOGE << "\n\nLabel is not valid: " << label << "\n";
         std::exit(EXIT_FAILURE);
       }
     }
@@ -873,7 +875,7 @@ public:
   {
     std::vector<Command> methods;
 
-    std::cout << main_menu_;
+    LOGN << main_menu_;
 
     const std::string line = getLineInput("> ", false);
 
@@ -896,23 +898,24 @@ public:
 
   void setSequencePathnameFromInput()
   {
-    std::cout << "\n\nSet the sequence file pathname.\n";
+    LOGN << "\n\nSet the sequence file pathname.\n";
     if (sequence_pathname_.size()) {
-      std::cout << "Current: " << sequence_pathname_ << "\n\n";
+      LOGN << "\n\nCurrent: " << sequence_pathname_ << "\n\n";
     } else {
-      std::cout <<
+      LOGN << "\n\n"
         "Example:\n"
         // "> /home/user/data/some_sequence_file.csv\n\n"
         "> /home/pasdom/SmartPeak2/src/examples/data/HPLC_UV_Standards/sequence.csv\n\n";
     }
-    std::cout << "Enter the absolute pathname:\n";
+    LOGN << "\n\nEnter the absolute pathname:\n";
     while (true) {
       sequence_pathname_ = getLineInput("> ", false);
       if (InputDataValidation::fileExists(sequence_pathname_)) {
         break;
       }
-      std::cout << "The file does not exist. Try again.\n";
+      LOGE << "\n\nThe file does not exist. Try again.\n";
     }
+    LOGI << "\n\nSequence pathname set to: " << sequence_pathname_;
   }
 
   std::string getLineInput(const std::string& message = "", const bool canBeEmpty = true)
@@ -925,27 +928,29 @@ public:
       std::getline(std::cin, line);
       line = Utilities::trimString(line);
     } while (!canBeEmpty && line.empty());
+    LOGD << "Input line: " << line;
     return line;
   }
 
   std::string getPathnameFromInput()
   {
     std::string pathname;
-    std::cout << "Pathname: ";
+    LOGN << "Pathname: ";
     while (true) {
       pathname = getLineInput("> ", false);
       if (InputDataValidation::fileExists(pathname)) {
         break;
       }
-      std::cout << "The file does not exist. Try again.\n";
+      LOGE << "\n\nThe pathname is not correct. Try again.\n";
     }
+    LOGD << "Pathname being returned: " << pathname;
     return pathname;
   }
 
   std::set<MetaDataHandler::SampleType> getSampleTypesInput()
   {
-    std::cout <<
-      "\nPlease select the sample types. Insert the indexes separated by a space:\n"
+    LOGN << "\n\n"
+      "Please select the sample types. Insert the indexes separated by a space:\n"
       "[1] Unknown\n"
       "[2] Standard\n"
       "[3] QC\n"
@@ -969,7 +974,7 @@ public:
 
     for (int n; iss >> n;) {
       if (n < 1 || n > 6) {
-        std::cout << "Skipping: " << n << '\n';
+        LOGW << "Skipping: " << n << '\n';
         continue;
       }
       switch (n) {
@@ -1001,7 +1006,7 @@ public:
     const std::string& title
   )
   {
-    std::cout << title <<
+    LOGN << "\n\n" << title <<
       "Please select the metadata. Insert the indexes separated by a space:\n"
       "[1]  Asymmetry factor\n"
       "[2]  Baseline delta/height\n"
@@ -1035,7 +1040,7 @@ public:
 
     for (int n; iss >> n;) {
       if (n < 1 || n > 19) {
-        std::cout << "Skipping: " << n << '\n';
+        LOGW << "Skipping: " << n << '\n';
         continue;
       }
       switch (n) {
@@ -1192,7 +1197,7 @@ public:
           seq_seg_methods
         );
       } else {
-        std::cout << "\nSkipping a command: " << cmd.type << "\n";
+        LOGW << "Skipping a command: " << cmd.type << "\n";
       }
       i = j;
     }
@@ -1201,7 +1206,7 @@ public:
   bool createCommand(const int n, Command& cmd)
   {
     if (n < 1 || n > 16 || n == 10) { // TODO: update this if plotting is implemented
-      std::cout << "Skipping: " << n << '\n';
+      LOGW << "\n\nSkipping: " << n;
       return false;
     }
     if (n >= 1 && n <= 13) {
@@ -1229,18 +1234,18 @@ public:
         );
       }
     } else {
-      std::cout << "\ninvalid option\n";
+      LOGE << "\nNo command for selection number " << n;
       return false;
     }
     return true;
   }
 
-  void initializeAllDirs()
+  void initializeDataDirs()
   {
     if (mzML_dir_.empty()) {
       mzML_dir_ = main_dir_ + "/mzML";
-      std::cout << "\nPath for 'mzML':\t" << mzML_dir_ << '\n';
-      std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
+      LOGN << "\n\nPath for 'mzML':\t" << mzML_dir_;
+      LOGN << "\n\nEnter an absolute pathname to change it, or press Enter to confirm.\n";
       const std::string path_input = getLineInput("> ");
       if (path_input.size()) {
         mzML_dir_ = path_input;
@@ -1249,8 +1254,8 @@ public:
 
     if (features_in_dir_.empty()) {
       features_in_dir_ = main_dir_ + "/features";
-      std::cout << "\nPath for 'INPUT features':\t" << features_in_dir_ << '\n';
-      std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
+      LOGN << "\n\nPath for 'INPUT features':\t" << features_in_dir_;
+      LOGN << "\n\nEnter an absolute pathname to change it, or press Enter to confirm.\n";
       const std::string path_input = getLineInput("> ");
       if (path_input.size()) {
         features_in_dir_ = path_input;
@@ -1259,8 +1264,8 @@ public:
 
     if (features_out_dir_.empty()) {
       features_out_dir_ = main_dir_ + "/features";
-      std::cout << "\nPath for 'OUTPUT features':\t" << features_out_dir_ << '\n';
-      std::cout << "Enter an absolute pathname to change it, or press Enter to confirm.\n";
+      LOGN << "\n\nPath for 'OUTPUT features':\t" << features_out_dir_;
+      LOGN << "\n\nEnter an absolute pathname to change it, or press Enter to confirm.\n";
       const std::string path_input = getLineInput("> ");
       if (path_input.size()) {
         features_out_dir_ = path_input;
@@ -1311,7 +1316,7 @@ public:
     // Init logger with two appenders
     plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender);
 
-    std::cout << gettingStartedString();
+    LOGN << "\n\n" << gettingStartedString();
     while (true) {
       menuMain();
     }
