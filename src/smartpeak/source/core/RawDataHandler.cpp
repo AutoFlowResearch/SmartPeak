@@ -413,7 +413,8 @@ namespace SmartPeak
               if (subordinate_select.getUniqueId() == subordinate_copy.getUniqueId() &&
                   subordinate_select.getMetaValue("native_id") == subordinate_copy.getMetaValue("native_id")) { // Matching subordinate
                 subordinate_copy = subordinate_select; // copy over changed meta values from the current feature map subordinate
-                subordinate_copy.setMetaValue("used_", "true");
+                if (!subordinate_copy.metaValueExists("used_"))  // overwrite "used_" only if it does not exist
+                  subordinate_copy.setMetaValue("used_", "true");
                 subordinate_copy.setMetaValue("timestamp_", timestamp);
                 update_feature = true;
                 break; // break the loop and move on to the next subordinate from the history
