@@ -11,7 +11,8 @@ using namespace std;
 
 void make_featuresAndStandardsConcentrations(
   SequenceHandler& sequenceHandler_IO,
-  vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& runs
+  vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& runs,
+  std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& absQuantMethods_ptr
 )
 {
   // ser-L.ser-L_1.Light
@@ -143,6 +144,7 @@ void make_featuresAndStandardsConcentrations(
 
     RawDataHandler rawDataHandler;
     rawDataHandler.setFeatureMap(feature_map);
+    rawDataHandler.setQuantitationMethods(absQuantMethods_ptr);
     sequenceHandler_IO.getSequence().at(i).setRawData(rawDataHandler);
   }
 }
@@ -295,10 +297,11 @@ BOOST_AUTO_TEST_CASE(processCalculateCalibration)
   SequenceSegmentHandler sequenceSegmentHandler;
 
   sequenceSegmentHandler.setQuantitationMethods(quant_methods);
+  std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> absQuantMethods_ptr = sequenceSegmentHandler.getQuantitationMethodsShared();
 
   vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> runs;
   SequenceHandler sequenceHandler;
-  make_featuresAndStandardsConcentrations(sequenceHandler, runs);
+  make_featuresAndStandardsConcentrations(sequenceHandler, runs, absQuantMethods_ptr);
   sequenceSegmentHandler.setStandardsConcentrations(runs);
 
   vector<size_t> indices(sequenceHandler.getSequence().size());
@@ -343,6 +346,39 @@ BOOST_AUTO_TEST_CASE(processCalculateCalibration)
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getCorrelationCoefficient()), 0.9993200722867581, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getLLOQ()), 0.04, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 200.0, 1e-6);
+
+  const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs_rdh = sequenceHandler.getSequence()[0].getRawData().getQuantitationMethods();
+  BOOST_CHECK_EQUAL(AQMs_rdh.size(), 3);
+
+  BOOST_CHECK_EQUAL(AQMs_rdh[0].getComponentName(), "amp.amp_1.Light");
+  BOOST_CHECK_EQUAL(AQMs_rdh[0].getISName(), "amp.amp_1.Heavy");
+  BOOST_CHECK_EQUAL(AQMs_rdh[0].getFeatureName(), "peak_apex_int");
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[0].getTransformationModelParams().getValue("slope")), 0.957996830126945, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[0].getTransformationModelParams().getValue("intercept")), -1.0475433871941753, 1e-6);
+  BOOST_CHECK_EQUAL(AQMs_rdh[0].getNPoints(), 11);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[0].getCorrelationCoefficient()), 0.9991692616730385, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[0].getLLOQ()), 0.02, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[0].getULOQ()), 40.0, 1e-6);
+
+  BOOST_CHECK_EQUAL(AQMs_rdh[1].getComponentName(), "atp.atp_1.Light");
+  BOOST_CHECK_EQUAL(AQMs_rdh[1].getISName(), "atp.atp_1.Heavy");
+  BOOST_CHECK_EQUAL(AQMs_rdh[1].getFeatureName(), "peak_apex_int");
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[1].getTransformationModelParams().getValue("slope")), 0.6230408240794582, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[1].getTransformationModelParams().getValue("intercept")), 0.36130172586029285, 1e-6);
+  BOOST_CHECK_EQUAL(AQMs_rdh[1].getNPoints(), 6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[1].getCorrelationCoefficient()), 0.9982084021849695, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[1].getLLOQ()), 0.02, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[1].getULOQ()), 40.0, 1e-6);
+
+  BOOST_CHECK_EQUAL(AQMs_rdh[2].getComponentName(), "ser-L.ser-L_1.Light");
+  BOOST_CHECK_EQUAL(AQMs_rdh[2].getISName(), "ser-L.ser-L_1.Heavy");
+  BOOST_CHECK_EQUAL(AQMs_rdh[2].getFeatureName(), "peak_apex_int");
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[2].getTransformationModelParams().getValue("slope")), 0.9011392589148208, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[2].getTransformationModelParams().getValue("intercept")), 1.8701850759567624, 1e-6);
+  BOOST_CHECK_EQUAL(AQMs_rdh[2].getNPoints(), 11);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[2].getCorrelationCoefficient()), 0.9993200722867581, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[2].getLLOQ()), 0.04, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[2].getULOQ()), 200.0, 1e-6);
 }
 
 /**
