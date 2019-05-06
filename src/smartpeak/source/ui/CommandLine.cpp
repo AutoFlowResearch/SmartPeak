@@ -60,12 +60,8 @@ namespace SmartPeak
     LOGN <<
       "\n\n"
       "Main > File\n"
-      "[1] New session\n"
-      "[2] Load session\n"
-      "[3] Load session from sequence\n"
-      "[4] Save session\n"
-      "[5] Import file\n"
-      "[6] Export file\n"
+      "[1] Load session from sequence\n"
+      "[2] Import file\n"
       "[M] Main menu\n"
       "[E] Exit\n\n";
 
@@ -73,11 +69,7 @@ namespace SmartPeak
   menuFile_label:
     in = getLineInput("> ", false);
 
-    if      ("1" == in) {
-    }
-    else if ("2" == in) {
-    }
-    else if ("3" == in) {
+    if ("1" == in) {
       setSequencePathnameFromInput();
       mzML_dir_.clear();
       features_in_dir_.clear();
@@ -92,12 +84,8 @@ namespace SmartPeak
           "The sequence has not been modified. Check file: " << pathnamesFilename_;
       }
     }
-    else if ("4" == in) {
-    }
-    else if ("5" == in) {
+    else if ("2" == in) {
       menuImportFile();
-    }
-    else if ("6" == in) {
     }
     else if ("m" == in || "M" == in) {
       // empty
@@ -214,58 +202,14 @@ namespace SmartPeak
     LOGN <<
       "\n\n"
       "Main > Edit\n"
-      "[1]  Undo\n"
-      "[2]  Redo\n"
-      "[3]  Cut\n"
-      "[4]  Copy\n"
-      "[5]  Paste\n"
-      "    ------------------------\n"
-      "[6]  Sequence\n"
-      "[7]  TraML\n"
-      "[8]  Quantitation methods\n"
-      "[9]  Standards concentrations\n"
-      "[10] Component filters\n"
-      "[11] Component group filters\n"
-      "[12] Component QCs\n"
-      "[13] Component group QCs\n"
-      "[14] Parameters\n"
-      "    ------------------------\n"
-      "[15] Workflow\n"
+      "[1] Workflow\n"
       "[M] Main menu\n\n";
 
     std::string in;
   menuEdit_label:
     in = getLineInput("> ", false);
 
-    if      ("1" == in) {
-    }
-    else if ("2" == in) {
-    }
-    else if ("3" == in) {
-    }
-    else if ("4" == in) {
-    }
-    else if ("5" == in) {
-    }
-    else if ("6" == in) {
-    }
-    else if ("7" == in) {
-    }
-    else if ("8" == in) {
-    }
-    else if ("9" == in) {
-    }
-    else if ("10" == in) {
-    }
-    else if ("11" == in) {
-    }
-    else if ("12" == in) {
-    }
-    else if ("13" == in) {
-    }
-    else if ("14" == in) {
-    }
-    else if ("15" == in) {
+    if ("1" == in) {
       initializeDataDirs();
       const std::vector<CommandLine::Command> methods = getMethodsInput();
       if (methods.empty()) {
@@ -287,27 +231,15 @@ namespace SmartPeak
     LOGN <<
       "\n\n"
       "Main > View\n"
-      "[1] Sequence status\n"
-      "[2] Workflow wizard\n"
-      "[3] Feature plot\n"
-      "[4] Metric plot\n"
-      "[5] Log\n"
+      "[1] Workflow wizard\n"
       "[M] Main menu\n\n";
 
     std::string in;
   menuView_label:
     in = getLineInput("> ", false);
 
-    if      ("1" == in) {
-    }
-    else if ("2" == in) {
+    if ("1" == in) {
       LOGN << "\n\n" << getPipelineString();
-    }
-    else if ("3" == in) {
-    }
-    else if ("4" == in) {
-    }
-    else if ("5" == in) {
     }
     else if ("m" == in || "M" == in) {
       // empty
@@ -537,24 +469,15 @@ namespace SmartPeak
     LOGN <<
       "\n\n"
       "Main > Help\n"
-      "[1] About\n"
-      "[2] Documentation\n"
-      "[3] Getting started\n"
-      "[4] Version\n"
+      "[1] Getting started\n"
       "[M] Main menu\n\n";
 
     std::string in;
   menuHelp_label:
     in = getLineInput("> ", false);
 
-    if      ("1" == in) {
-    }
-    else if ("2" == in) {
-    }
-    else if ("3" == in) {
+    if ("1" == in) {
       LOGN << "\n\n" << gettingStartedString();
-    }
-    else if ("4" == in) {
     }
     else if ("m" == in || "M" == in) {
       // empty
