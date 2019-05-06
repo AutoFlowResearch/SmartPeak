@@ -1,10 +1,10 @@
-#include <SmartPeak/ui/CommandLine.h>
+#include <SmartPeak/ui/AppManager.h>
 
 using namespace SmartPeak;
 
 int main()
 {
-  CommandLine cli;
+  AppManager cli;
   cli.runApp();
   return 0;
 }

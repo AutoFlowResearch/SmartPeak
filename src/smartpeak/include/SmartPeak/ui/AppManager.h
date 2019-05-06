@@ -8,7 +8,7 @@
 
 namespace SmartPeak
 {
-  class CommandLine final {
+  class AppManager final {
   public:
     class Command {
     public:
@@ -163,12 +163,12 @@ namespace SmartPeak
 
     void initializeDataDirs();
 
-    CommandLine()                                    = default;
-    ~CommandLine()                                   = default;
-    CommandLine(const CommandLine& other)            = delete;
-    CommandLine& operator=(const CommandLine& other) = delete;
-    CommandLine(CommandLine&& other)                 = delete;
-    CommandLine& operator=(CommandLine&& other)      = delete;
+    AppManager()                                   = default;
+    ~AppManager()                                  = default;
+    AppManager(const AppManager& other)            = delete;
+    AppManager& operator=(const AppManager& other) = delete;
+    AppManager(AppManager&& other)                 = delete;
+    AppManager& operator=(AppManager&& other)      = delete;
 
     void runApp();
 
