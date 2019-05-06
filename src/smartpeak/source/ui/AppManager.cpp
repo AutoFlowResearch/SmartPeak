@@ -1,4 +1,4 @@
-#include <SmartPeak/ui/CommandLine.h>
+#include <SmartPeak/ui/AppManager.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
@@ -20,7 +20,7 @@
 
 namespace SmartPeak
 {
-  void CommandLine::menuMain()
+  void AppManager::menuMain()
   {
     LOGN <<
       "\n\n"
@@ -55,7 +55,7 @@ namespace SmartPeak
     }
   }
 
-  void CommandLine::menuFile()
+  void AppManager::menuFile()
   {
     LOGN <<
       "\n\n"
@@ -98,7 +98,7 @@ namespace SmartPeak
     }
   }
 
-  void CommandLine::menuImportFile()
+  void AppManager::menuImportFile()
   {
     LOGN <<
       "\n\n"
@@ -197,7 +197,7 @@ namespace SmartPeak
     }
   }
 
-  void CommandLine::menuEdit()
+  void AppManager::menuEdit()
   {
     LOGN <<
       "\n\n"
@@ -211,7 +211,7 @@ namespace SmartPeak
 
     if ("1" == in) {
       initializeDataDirs();
-      const std::vector<CommandLine::Command> methods = getMethodsInput();
+      const std::vector<AppManager::Command> methods = getMethodsInput();
       if (methods.empty()) {
         LOGW << "\n\nPipeline not modified";
       } else {
@@ -226,7 +226,7 @@ namespace SmartPeak
     }
   }
 
-  void CommandLine::menuView()
+  void AppManager::menuView()
   {
     LOGN <<
       "\n\n"
@@ -249,7 +249,7 @@ namespace SmartPeak
     }
   }
 
-  void CommandLine::menuActions()
+  void AppManager::menuActions()
   {
     LOGN <<
       "\n\n"
@@ -273,7 +273,7 @@ namespace SmartPeak
       const std::string input = getLineInput("> ");
       try {
         const int n = std::stoi(input);
-        CommandLine::Command cmd;
+        AppManager::Command cmd;
         if (createCommand(n, cmd)) {
           processCommands({cmd});
         }
@@ -303,7 +303,7 @@ namespace SmartPeak
     }
   }
 
-  void CommandLine::menuDataIntegrity()
+  void AppManager::menuDataIntegrity()
   {
     LOGN <<
       "\n\n"
@@ -338,7 +338,7 @@ namespace SmartPeak
     }
   }
 
-  void CommandLine::menuReport()
+  void AppManager::menuReport()
   {
     LOGN <<
       "\n\n"
@@ -391,7 +391,7 @@ namespace SmartPeak
     }
   }
 
-  void CommandLine::menuQuickInfo()
+  void AppManager::menuQuickInfo()
   {
     LOGN <<
       "\n\n"
@@ -464,7 +464,7 @@ namespace SmartPeak
     }
   }
 
-  void CommandLine::menuHelp()
+  void AppManager::menuHelp()
   {
     LOGN <<
       "\n\n"
@@ -487,7 +487,7 @@ namespace SmartPeak
     }
   }
 
-  void CommandLine::exitSmartPeak()
+  void AppManager::exitSmartPeak()
   {
     const std::string in = getLineInput("\nExit SmartPeak? [y/N]\n> ");
     if (in.size() && std::tolower(in.front()) == 'y') {
@@ -495,7 +495,7 @@ namespace SmartPeak
     }
   }
 
-  bool CommandLine::buildStaticFilenames()
+  bool AppManager::buildStaticFilenames()
   {
     Filenames& f = static_filenames_;
     main_dir_ = sequence_pathname_.substr(0, sequence_pathname_.find_last_of('/'));
@@ -566,7 +566,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool CommandLine::requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation)
+  bool AppManager::requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation)
   {
     const std::unordered_set<std::string> required {"sequence", "parameters", "traml"};
     bool is_valid {true};
@@ -579,7 +579,7 @@ namespace SmartPeak
     return is_valid;
   }
 
-  void CommandLine::clearNonExistantDefaultGeneratedFilenames(Filenames& f)
+  void AppManager::clearNonExistantDefaultGeneratedFilenames(Filenames& f)
   {
     // clearNonExistantFilename(f.sequence_csv_i);   // The file must exist
     // clearNonExistantFilename(f.parameters_csv_i); // The file must exist
@@ -593,14 +593,14 @@ namespace SmartPeak
     clearNonExistantFilename(f.referenceData_csv_i);
   }
 
-  void CommandLine::clearNonExistantFilename(std::string& filename)
+  void AppManager::clearNonExistantFilename(std::string& filename)
   {
     if (InputDataValidation::fileExists(filename) == false) {
       filename.clear();
     }
   }
 
-  void CommandLine::generatePathnamesTxt(
+  void AppManager::generatePathnamesTxt(
     const std::string& pathname,
     const Filenames& f,
     const std::vector<InputDataValidation::FilenameInfo>& is_valid
@@ -625,13 +625,13 @@ namespace SmartPeak
       "referenceData="       << getValidPathnameOrPlaceholder(f.referenceData_csv_i, (it++)->validity);
   }
 
-  std::string CommandLine::getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid)
+  std::string AppManager::getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid)
   {
     const std::string placeholder = "";
     return (is_valid ? pathname : placeholder) + "\n";
   }
 
-  void CommandLine::updateFilenames(Filenames& f, const std::string& pathname)
+  void AppManager::updateFilenames(Filenames& f, const std::string& pathname)
   {
     std::ifstream stream(pathname);
     const std::regex re("([a-zA-Z_]+)=([^\\s]*)");
@@ -694,9 +694,9 @@ namespace SmartPeak
     }
   }
 
-  std::vector<CommandLine::Command> CommandLine::getMethodsInput()
+  std::vector<AppManager::Command> AppManager::getMethodsInput()
   {
-    std::vector<CommandLine::Command> methods;
+    std::vector<AppManager::Command> methods;
 
     LOGN << main_menu_;
 
@@ -709,7 +709,7 @@ namespace SmartPeak
     std::istringstream iss {line};
 
     for (int n; iss >> n;) {
-      CommandLine::Command cmd;
+      AppManager::Command cmd;
       const bool created = createCommand(n, cmd);
       if (created) {
         methods.push_back(cmd);
@@ -719,7 +719,7 @@ namespace SmartPeak
     return methods;
   }
 
-  void CommandLine::setSequencePathnameFromInput()
+  void AppManager::setSequencePathnameFromInput()
   {
     LOGN << "\n\nSet the sequence file pathname.\n";
     if (sequence_pathname_.size()) {
@@ -741,7 +741,7 @@ namespace SmartPeak
     LOGI << "\n\nSequence pathname set to: " << sequence_pathname_;
   }
 
-  std::string CommandLine::getLineInput(const std::string& message, const bool canBeEmpty)
+  std::string AppManager::getLineInput(const std::string& message, const bool canBeEmpty)
   {
     std::string line;
     do {
@@ -755,7 +755,7 @@ namespace SmartPeak
     return line;
   }
 
-  std::string CommandLine::getPathnameFromInput()
+  std::string AppManager::getPathnameFromInput()
   {
     std::string pathname;
     LOGN << "Pathname: ";
@@ -770,7 +770,7 @@ namespace SmartPeak
     return pathname;
   }
 
-  std::set<MetaDataHandler::SampleType> CommandLine::getSampleTypesInput()
+  std::set<MetaDataHandler::SampleType> AppManager::getSampleTypesInput()
   {
     LOGN << "\n\n"
       "Please select the sample types. Insert the indexes separated by a space:\n"
@@ -825,7 +825,7 @@ namespace SmartPeak
     return sample_types;
   }
 
-  std::vector<std::string> CommandLine::getMetaDataInput(
+  std::vector<std::string> AppManager::getMetaDataInput(
     const std::string& title
   )
   {
@@ -938,7 +938,7 @@ namespace SmartPeak
     return metadata;
   }
 
-  std::string CommandLine::gettingStartedString()
+  std::string AppManager::gettingStartedString()
   {
     return
     "Welcome to SmartPeak\n\n"
@@ -968,7 +968,7 @@ namespace SmartPeak
     "`Help -> Getting started`\n";
   }
 
-  std::string CommandLine::commandsString()
+  std::string AppManager::commandsString()
   {
     return
       "[" + std::to_string(OPT_LOAD_RAW_DATA) + "]  Load raw data\n"
@@ -989,30 +989,30 @@ namespace SmartPeak
       "[" + std::to_string(OPT_LOAD_QUANTITATION_METHODS) + "] Load quantitation methods\n";
   }
 
-  void CommandLine::processCommands(const std::vector<CommandLine::Command>& commands)
+  void AppManager::processCommands(const std::vector<AppManager::Command>& commands)
   {
     size_t i = 0;
     while (i < commands.size()) {
-      const CommandLine::Command::CommandType type = commands[i].type;
+      const AppManager::Command::CommandType type = commands[i].type;
       size_t j = i + 1;
       for (; j < commands.size() && type == commands[j].type; ++j) {
         // empty body
       }
-      const CommandLine::Command& cmd = commands[i];
-      if (cmd.type == CommandLine::Command::RawDataMethod) {
+      const AppManager::Command& cmd = commands[i];
+      if (cmd.type == AppManager::Command::RawDataMethod) {
         std::vector<std::shared_ptr<RawDataProcessor>> raw_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(raw_methods),
-          [](const CommandLine::Command& command){ return command.raw_data_method; });
+          [](const AppManager::Command& command){ return command.raw_data_method; });
         SequenceProcessor::processSequence(
           sequenceHandler_,
           cmd.dynamic_filenames,
           std::set<std::string>(),
           raw_methods
         );
-      } else if (cmd.type == CommandLine::Command::SequenceSegmentMethod) {
+      } else if (cmd.type == AppManager::Command::SequenceSegmentMethod) {
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(seq_seg_methods),
-          [](const CommandLine::Command& command){ return command.seq_seg_method; });
+          [](const AppManager::Command& command){ return command.seq_seg_method; });
         SequenceProcessor::processSequenceSegments(
           sequenceHandler_,
           cmd.dynamic_filenames,
@@ -1026,7 +1026,7 @@ namespace SmartPeak
     }
   }
 
-  bool CommandLine::createCommand(const int n, CommandLine::Command& cmd)
+  bool AppManager::createCommand(const int n, AppManager::Command& cmd)
   {
     if (n < 1 || n > 16 || n == 10) { // TODO: update this if plotting is implemented
       LOGW << "\n\nSkipping: " << n;
@@ -1063,7 +1063,7 @@ namespace SmartPeak
     return true;
   }
 
-  void CommandLine::initializeDataDirs()
+  void AppManager::initializeDataDirs()
   {
     if (mzML_dir_.empty()) {
       mzML_dir_ = main_dir_ + "/mzML";
@@ -1107,7 +1107,7 @@ namespace SmartPeak
 // #endif
 
   // // Initializes the sequence structure
-  // CommandLine(int argc, char **argv)
+  // AppManager(int argc, char **argv)
   // {
   //   // Three ways of setting `sequence_pathname_`
   //   if (argc == 2 && InputDataValidation::fileExists(argv[1])) { // sequence.csv abs. path passed as argument
@@ -1127,7 +1127,7 @@ namespace SmartPeak
   //   }
   // }
 
-  void CommandLine::runApp() {
+  void AppManager::runApp() {
     const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     char filename[128];
     strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
@@ -1179,11 +1179,11 @@ namespace SmartPeak
 
   // Returns a string representation of the workflow steps
   // i.e. 1 2 3 4 5 5 18
-  std::string CommandLine::getPipelineString()
+  std::string AppManager::getPipelineString()
   {
     std::string s;
-    for (const CommandLine::Command& cmd : commands_) {
-      if (cmd.type == CommandLine::Command::RawDataMethod) {
+    for (const AppManager::Command& cmd : commands_) {
+      if (cmd.type == AppManager::Command::RawDataMethod) {
         const std::unordered_map<int, std::shared_ptr<RawDataProcessor>>::const_iterator
         it = std::find_if(
           n_to_raw_data_method_.cbegin(),
@@ -1192,7 +1192,7 @@ namespace SmartPeak
             { return p.second == cmd.raw_data_method; }
         );
         s.append(std::to_string(it->first));
-      } else if (cmd.type == CommandLine::Command::SequenceSegmentMethod) {
+      } else if (cmd.type == AppManager::Command::SequenceSegmentMethod) {
         const std::unordered_map<int, std::shared_ptr<SequenceSegmentProcessor>>::const_iterator
         it = std::find_if(
           n_to_seq_seg_method_.cbegin(),
