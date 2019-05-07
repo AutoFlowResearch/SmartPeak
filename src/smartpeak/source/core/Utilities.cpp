@@ -4,6 +4,7 @@
 #include <SmartPeak/core/Table.h>
 #include <SmartPeak/core/CastValue.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
+#include <algorithm>
 #include <iostream>
 #include <regex>
 #include <unordered_set>
@@ -564,18 +565,58 @@ namespace SmartPeak
     }
   }
 
-  std::string Utilities::getParentPathname(const std::string& pathname)
+  std::string Utilities::getParentPathname(std::string pathname)
   {
     std::string parent;
-    const size_t pos = pathname.find_last_of("/");
-    if (pos != std::string::npos)
-    {
-      parent = pathname.substr(0, pos);
-      if (parent.empty())
-      {
-        parent = "/"; // TODO: does this work on other OSs?
+    std::string suffix;
+
+    std::replace(pathname.begin(), pathname.end(), '\\', '/');
+
+    // Remove consecutive duplicates of character '/', because it might break the algorithm.
+    // It helps with pathnames of the form "/home/user//some////folder"
+    std::string::iterator it = std::unique(
+      pathname.begin(),
+      pathname.end(),
+      [](const char a, const char b) { return a == b && a == '/'; }
+    );
+    pathname.erase(it, pathname.end());
+
+    // Extract suffix, and update pathname
+    // Example: it could be "C:/" on Windows, and "/" on Linux
+    // suffix stays empty if the pathname is relative
+    if (pathname.size() && pathname[0] == '/') { // Linux
+      suffix = "/";
+      pathname = pathname.substr(1);
+    } else if (pathname.size() >= 2 && pathname[1] == ':') { // Windows
+      if (pathname.size() == 2) {
+        suffix = pathname + "/";
+        pathname.clear();
+      } else {
+        suffix = pathname.substr(0, 3);
+        pathname = pathname.substr(3);
       }
     }
+
+    // If present, remove slash at the end
+    if (pathname.size() && pathname.back() == '/')
+      pathname.pop_back();
+
+    // Extract parent pathname
+    const size_t pos = pathname.find_last_of("/");
+    if (pos != std::string::npos) {
+      pathname = pathname.substr(0, pos);
+    }
+
+    parent = suffix + pathname;
+
+    if (parent.empty()) {
+#ifdef _WIN32
+      parent = "C:/";
+#else
+      parent = "/";
+#endif
+    }
+
     return parent;
   }
 }

@@ -205,6 +205,6 @@ public:
       const bool only_directories
     );
 
-    static std::string getParentPathname(const std::string& pathname);
+    static std::string getParentPathname(std::string pathname);
   };
 }
