@@ -73,6 +73,12 @@ namespace SmartPeak
     CastValue& operator=(const std::vector<int>& data);
     CastValue& operator=(const std::vector<std::string>& data);
 
+    operator std::string() const
+    {
+      std::ostringstream oss(*this);
+      return oss.str();
+    }
+
     // TODO: rename to deallocate() or similar
     void clear();
 
