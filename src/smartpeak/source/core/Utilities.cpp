@@ -512,7 +512,7 @@ namespace SmartPeak
     const bool only_directories
   )
   {
-    printf("getPathnameContent(): %s\n", pathname.c_str());
+    // printf("getPathnameContent(): %s\n", pathname.c_str());
     content.clear();
     const size_t names_idx = content.addColumn("Name");
     const size_t sizes_idx = content.addColumn("Size");

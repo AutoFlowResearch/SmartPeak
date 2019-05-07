@@ -1,5 +1,7 @@
 // TODO: Add copyright
 
+#include <SmartPeak/test_config.h>
+
 #define BOOST_TEST_MODULE Utilities test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/Utilities.h>
@@ -378,6 +380,40 @@ BOOST_AUTO_TEST_CASE(endsWith)
   BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "FeatureXML", false), true);
 
   BOOST_CHECK_EQUAL(Utilities::endsWith(names[4], "does_not_end_with_this", false), false);
+}
+
+BOOST_AUTO_TEST_CASE(getPathnameContent)
+{
+  const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
+  Table c; // content
+
+  Utilities::getPathnameContent(pathname, c, false);
+
+  BOOST_CHECK_EQUAL(c.size(), 38); // number of items in the pathname
+
+  BOOST_CHECK_EQUAL(c.get(0, "Name").s_, "170808_Jonathan_yeast_Sacc1_1x.featureXML");
+  BOOST_CHECK_EQUAL(c.get(0, "Size").i_, 761937); // file size
+  BOOST_CHECK_EQUAL(c.get(0, "Type").s_, ".featureXML");
+  BOOST_CHECK_EQUAL(c.get(0, "Date Modified").s_, "2018/09/25 10:51:23");
+
+  BOOST_CHECK_EQUAL(c.get(37, "Name").s_, "workflow_csv_files");
+  BOOST_CHECK_EQUAL(c.get(37, "Size").i_, 12); // number of items within the folder
+  BOOST_CHECK_EQUAL(c.get(37, "Type").s_, "Directory");
+  BOOST_CHECK_EQUAL(c.get(37, "Date Modified").s_, "2019/04/03 14:38:47");
+
+  Utilities::getPathnameContent(pathname, c, true); // directories only, no files
+
+  BOOST_CHECK_EQUAL(c.size(), 2);
+
+  BOOST_CHECK_EQUAL(c.get(0, "Name").s_, "mzML");
+  BOOST_CHECK_EQUAL(c.get(0, "Size").i_, 6);
+  BOOST_CHECK_EQUAL(c.get(0, "Type").s_, "Directory");
+  BOOST_CHECK_EQUAL(c.get(0, "Date Modified").s_, "2018/10/01 12:48:35");
+
+  BOOST_CHECK_EQUAL(c.get(1, "Name").s_, "workflow_csv_files");
+  BOOST_CHECK_EQUAL(c.get(1, "Size").i_, 12); // number of items within the folder
+  BOOST_CHECK_EQUAL(c.get(1, "Type").s_, "Directory");
+  BOOST_CHECK_EQUAL(c.get(1, "Date Modified").s_, "2019/04/03 14:38:47");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
