@@ -514,15 +514,10 @@ namespace SmartPeak
   {
     printf("getPathnameContent(): %s\n", pathname.c_str());
     content.clear();
-    content.addColumn("Name");
-    content.addColumn("Size");
-    content.addColumn("Type");
-    content.addColumn("Date Modified");
-
-    Column& names = content.get("Name");
-    Column& sizes = content.get("Size");
-    Column& types = content.get("Type");
-    Column& dates = content.get("Date Modified");
+    const size_t names_idx = content.addColumn("Name");
+    const size_t sizes_idx = content.addColumn("Size");
+    const size_t types_idx = content.addColumn("Type");
+    const size_t dates_idx = content.addColumn("Date Modified");
 
     DIR *dir;
     struct dirent *ent;
@@ -535,7 +530,7 @@ namespace SmartPeak
           continue;
         }
         const std::string d_name = std::string(ent->d_name);
-        names.push_back(d_name);
+        content.push(names_idx, d_name);
         struct stat info;
         const std::string full_name = pathname + "/" + d_name;
         mystat(full_name.c_str(), &info);
@@ -551,16 +546,16 @@ namespace SmartPeak
           } else { // i.e. permission denied
             n_items = 0;
           }
-          sizes.push_back(n_items);
-          types.push_back("Directory");
+          content.push(sizes_idx, n_items);
+          content.push(types_idx, "Directory");
         } else {
-          sizes.push_back(info.st_size);
+          content.push(sizes_idx, info.st_size);
           const std::string::size_type pos = d_name.rfind(".");
-          types.push_back(pos == std::string::npos ? "Unknown" : d_name.substr(pos));
+          content.push(types_idx, pos == std::string::npos ? "Unknown" : d_name.substr(pos));
         }
         char buff[128];
         strftime(buff, sizeof buff, "%Y/%m/%d %H:%M:%S", localtime(&(info.st_mtime)));
-        dates.push_back(std::string(buff));
+        content.push(dates_idx, std::string(buff));
       }
       closedir(dir);
       content.sort("Name");

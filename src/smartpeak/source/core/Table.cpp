@@ -2,143 +2,71 @@
 
 namespace SmartPeak
 {
-  size_t Column::size() const
-  {
-    return rows.size();
-  }
-
-  void Column::setIndices(std::vector<size_t>& indices)
-  {
-    Column::indices = &indices;
-  }
-
-  CastValue& Column::get(const size_t i)
-  {
-    if (!indices)
-      throw "Table: indices ptr is null\n";
-    return rows[(*indices)[i]];
-  }
-
-  const CastValue& Column::get(const size_t i) const
-  {
-    if (!indices)
-      throw "Table: indices ptr is null\n";
-    return rows.at((*indices)[i]);
-  }
-
-  void Column::sort(const bool asc, const bool case_sensitive)
-  {
-    if (rows.size() != indices->size())
-      throw "can't sort: rows and indices have different sizes";
-
-    std::sort(
-      indices->begin(),
-      indices->end(),
-      [this, asc, case_sensitive](const size_t l, const size_t r)
-      {
-        const bool b = rows[l].is_less_than(rows[r], case_sensitive);
-        return asc ? b : !b;
-      }
-    );
-  }
-
   std::vector<std::string> Table::getHeaders() const
   {
-    std::vector<std::string> names;
-    for (const Column& c : columns) {
-      names.push_back(c.header);
-    }
-    return names;
+    return headers_;
   }
-
-  // NOTE: if columns is a map instead of a vector
-  // std::vector<std::string> Table::getHeaders() const
-  // {
-  //   std::vector<std::string> names;
-  //   for (const std::pair<size_t, Column>& p : columns) {
-  //     names.push_back(p.second.header);
-  //   }
-  //   return names;
-  // }
 
   CastValue& Table::get(const size_t r, const size_t c)
   {
-    return get(c).get(r);
+    return get(c)[indices_.at(r)];
   }
 
   const CastValue& Table::get(const size_t r, const size_t c) const
   {
-    return get(c).get(r);
+    return get(c).at(indices_.at(r));
   }
 
   CastValue& Table::get(const size_t r, const std::string& header)
   {
-    return get(header).get(r);
+    return get(r, findIndex(header));
   }
 
   const CastValue& Table::get(const size_t r, const std::string& header) const
   {
-    return get(header).get(r);
+    return get(r, findIndex(header));
   }
 
   Column& Table::get(const size_t c)
   {
-    return columns[c];
+    return columns_[c];
   }
 
   const Column& Table::get(const size_t c) const
   {
-    return columns.at(c);
+    return columns_.at(c);
   }
 
   Column& Table::get(const std::string& header)
   {
-    std::vector<Column>::iterator it = std::find_if(
-      columns.begin(),
-      columns.end(),
-      [&header](Column& c){
-        return c.header == header;
-      }
-    );
-
-    if (it == columns.end())
-      throw "Table: column not found: " + header + "\n";
-    
-    return *it;
+    return get(findIndex(header));
   }
 
   const Column& Table::get(const std::string& header) const
   {
-    std::vector<Column>::const_iterator it = std::find_if(
-      columns.cbegin(),
-      columns.cend(),
-      [&header](const Column& c){
-        return c.header == header;
-      }
-    );
-
-    if (it == columns.cend())
-      throw "Table: column not found: " + header + "\n";
-    
-    return *it;
+    return get(findIndex(header));
   }
 
   size_t Table::size() const
   {
-    if (columns.empty())
+    if (columns_.empty())
       return 0;
-    return columns[0].size();
+    return columns_[0].size();
   }
 
   void Table::clear()
   {
-    indices.clear();
-    columns.clear();
+    headers_.clear();
+    indices_.clear();
+    columns_.clear();
   }
 
-  Column& Table::addColumn(const std::string& column_header)
+  size_t Table::addColumn(const std::string& column_header)
   {
-    return *columns.emplace(columns.cend(), &indices, column_header);
+    headers_.push_back(column_header);
+    const size_t i = findIndex(column_header);
+    columns_.insert(columns_.cbegin() + i, Column());
+    return i;
   }
 
   void Table::sort(
@@ -147,7 +75,20 @@ namespace SmartPeak
     const bool case_sensitive
   )
   {
-    get(column_idx).sort(asc, case_sensitive);
+    Column& c = get(column_idx);
+
+    if (c.size() != indices_.size())
+      throw "can't sort: rows and indices have different sizes";
+
+    std::sort(
+      indices_.begin(),
+      indices_.end(),
+      [&c, asc, case_sensitive](const size_t l, const size_t r)
+      {
+        const bool b = c[l].is_less_than(c[r], case_sensitive);
+        return asc ? b : !b;
+      }
+    );
   }
 
   void Table::sort(
@@ -156,6 +97,20 @@ namespace SmartPeak
     const bool case_sensitive
   )
   {
-    get(column_header).sort(asc, case_sensitive);
+    sort(findIndex(column_header), asc, case_sensitive);
+  }
+
+  size_t Table::findIndex(const std::string& header) const
+  {
+    const long int i = std::distance(
+      headers_.begin(),
+      std::find(headers_.begin(), headers_.end(), header)
+    );
+
+    if (i < 0 || static_cast<size_t>(i) >= headers_.size()) {
+      throw std::out_of_range("Table: header/column not found");
+    }
+
+    return static_cast<size_t>(i);
   }
 }
