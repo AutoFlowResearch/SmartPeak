@@ -75,7 +75,8 @@ namespace SmartPeak
 
     operator std::string() const
     {
-      std::ostringstream oss(*this);
+      std::ostringstream oss;
+      oss << *this;
       return oss.str();
     }
 
