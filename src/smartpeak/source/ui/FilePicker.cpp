@@ -1,6 +1,7 @@
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/Utilities.h>
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace SmartPeak
 {
@@ -24,6 +25,31 @@ namespace SmartPeak
     }
     ImGui::SameLine();
     ImGui::Text("Path: %s", current_pathname_.c_str());
+
+    static char new_pathname[4096];
+    if (ImGui::Button("Change dir"))
+    {
+      ImGui::OpenPopup("Change directory");
+      std::strncpy(new_pathname, current_pathname_.c_str(), 4096);
+    }
+
+    if (ImGui::BeginPopupModal("Change directory", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+      ImGui::InputText("Pathname", new_pathname, 4096);
+      if (ImGui::Button("Set") || ImGui::IsKeyPressedMap(ImGuiKey_Enter))
+      {
+        current_pathname_.assign(new_pathname);
+        Utilities::getPathnameContent(current_pathname_, pathname_content_, false);
+        selected_entry = -1;
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::SameLine();
+      if (ImGui::Button("Cancel"))
+      {
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
 
     static ImGuiTextFilter filter;
     filter.Draw("Filter filename (inc,-exc)");
