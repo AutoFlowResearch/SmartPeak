@@ -174,7 +174,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(headers_out[22], "QC_transition_group_message");
 
   // write sequence to output
-  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataTableFromMetaValue.csv");
+  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataTableFromMetaValue.csv");
   // SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
 }
 
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   BOOST_CHECK_CLOSE(data_out.back().back(), 1.57220089, 1e-3);
 
   // write sequence to output
-  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataMatrixFromMetaValue.csv");
+  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataMatrixFromMetaValue.csv");
   // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
 }
 

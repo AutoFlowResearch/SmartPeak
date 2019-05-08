@@ -49,6 +49,3 @@ src/examples/data/LCMS_MRM_Unknowns/features/
 src/examples/data/LCMS_MRM_QCs/features/
 src/examples/data/GCMS_SIM_Unknowns/features/
 src/examples/data/GCMS_FullScan_Unknowns/
-src/tests/class_tests/smartpeak/data/SequenceParser_writeDataMatrixFromMetaValue.csv
-src/tests/class_tests/smartpeak/data/SequenceParser_writeDataTableFromMetaValue.csv
-src/tests/class_tests/smartpeak/data/CSVWriterTest.csv
