@@ -35,7 +35,9 @@ jobs:
       - run:
           command: |
             cd ~/SmartPeak2_build || exit 1
+            ls -l ~/SmartPeak2/src/tests/class_tests/smartpeak/data
             ctest -V
+            ls -l ~/SmartPeak2/src/tests/class_tests/smartpeak/data
       - run:
           command: |
             ~/SmartPeak2/.circleci/run_examples.sh
