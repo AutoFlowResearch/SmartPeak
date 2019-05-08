@@ -522,8 +522,8 @@ namespace SmartPeak
 
     DIR *dir;
     struct dirent *ent;
-    if (dir = opendir(pathname.c_str())) {
-      while (ent = readdir(dir)) {
+    if ((dir = opendir(pathname.c_str()))) {
+      while ((ent = readdir(dir))) {
         if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) {
           continue;
         }
@@ -539,8 +539,8 @@ namespace SmartPeak
           DIR *dir_subfolder;
           struct dirent *ent_subfolder;
           int n_items {-2}; // removes "." and ".." from the count
-          if (dir_subfolder = opendir(full_name.c_str())) {
-            while (ent_subfolder = readdir(dir_subfolder)) {
+          if ((dir_subfolder = opendir(full_name.c_str()))) {
+            while ((ent_subfolder = readdir(dir_subfolder))) {
               ++n_items;
             }
             closedir(dir_subfolder);
