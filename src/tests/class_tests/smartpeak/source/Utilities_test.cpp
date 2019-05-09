@@ -418,13 +418,9 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
 
 BOOST_AUTO_TEST_CASE(getParentPathname)
 {
-#ifdef _WIN32
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname(""), "C:/");
-#else
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname(""), "/");
-#endif
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname(""), "");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D://///"), "D:/");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:"), "D:/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:"), "D:");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs"), "E:/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E://home///user//docs"), "E:/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs and a space"), "E:/home/user");
@@ -434,6 +430,46 @@ BOOST_AUTO_TEST_CASE(getParentPathname)
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("//home///user//docs"), "/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs and a space"), "/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs/"), "/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home"), "/");
+}
+
+BOOST_AUTO_TEST_CASE(isRootPathname)
+{
+  BOOST_CHECK_EQUAL(Utilities::isRootPathname("C:"), true);
+  BOOST_CHECK_EQUAL(Utilities::isRootPathname("D:\\"), true);
+  BOOST_CHECK_EQUAL(Utilities::isRootPathname("E:/"), true);
+  BOOST_CHECK_EQUAL(Utilities::isRootPathname("/"), true);
+  BOOST_CHECK_EQUAL(Utilities::isRootPathname("D://///"), false);
+  BOOST_CHECK_EQUAL(Utilities::isRootPathname("E:/home/user/docs"), false);
+  BOOST_CHECK_EQUAL(Utilities::isRootPathname("E:/home/user/docs/"), false);
+  BOOST_CHECK_EQUAL(Utilities::isRootPathname("/////"), false);
+  BOOST_CHECK_EQUAL(Utilities::isRootPathname("/home/user/docs"), false);
+  BOOST_CHECK_EQUAL(Utilities::isRootPathname("/home"), false);
+}
+
+BOOST_AUTO_TEST_CASE(cleanupPathname)
+{
+  std::string s;
+
+  s = "/home/user/data";
+  Utilities::cleanupPathname(s);
+  BOOST_CHECK_EQUAL(s, "/home/user/data");
+
+  s = "/////home///user//data/";
+  Utilities::cleanupPathname(s);
+  BOOST_CHECK_EQUAL(s, "/home/user/data");
+
+  s = "/home/\\user/data\\/";
+  Utilities::cleanupPathname(s);
+  BOOST_CHECK_EQUAL(s, "/home/user/data");
+
+  s = "C:\\Users\\user";
+  Utilities::cleanupPathname(s);
+  BOOST_CHECK_EQUAL(s, "C:/Users/user");
+
+  s = "C:\\\\\\Users\\user////";
+  Utilities::cleanupPathname(s);
+  BOOST_CHECK_EQUAL(s, "C:/Users/user");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

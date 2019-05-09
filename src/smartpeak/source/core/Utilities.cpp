@@ -564,11 +564,46 @@ namespace SmartPeak
     }
   }
 
-  std::string Utilities::getParentPathname(std::string pathname)
+  std::string Utilities::getParentPathname(const std::string& pathname)
   {
-    std::string parent;
-    std::string suffix;
+    std::string parent(pathname);
 
+    cleanupPathname(parent);
+
+    if (isRootPathname(parent))
+      return parent;
+
+    // Erase from last slash up to end of string
+    const size_t pos = parent.find_last_of("/");
+    if (pos != std::string::npos) {
+      parent.erase(parent.cbegin() + pos, parent.cend());
+    }
+
+    // After erase, a pathname like "/home" would become ""
+    if (parent.empty() && pathname.size())
+      parent.append("/");
+
+    return parent;
+  }
+
+  bool Utilities::isRootPathname(const std::string& pathname)
+  {
+    if (pathname.empty())
+      return false;
+
+    if (pathname == "/")
+      return true;
+
+    // C:/ and C: do not have the same meaning on Windows. Ignoring this detail.
+    // https://docs.microsoft.com/en-us/windows/desktop/fileio/naming-a-file#fully-qualified-vs-relative-paths
+    // Also ignoring UNC paths
+    if (pathname.size() <= 3 && pathname[1] == ':')
+      return true;
+  }
+
+  void Utilities::cleanupPathname(std::string& pathname)
+  {
+    // Replace all backslashes with slashes. Windows supports both.
     std::replace(pathname.begin(), pathname.end(), '\\', '/');
 
     // Remove consecutive duplicates of character '/', because it might break the algorithm.
@@ -580,42 +615,10 @@ namespace SmartPeak
     );
     pathname.erase(it, pathname.end());
 
-    // Extract suffix, and update pathname
-    // Example: it could be "C:/" on Windows, and "/" on Linux
-    // suffix stays empty if the pathname is relative
-    if (pathname.size() && pathname[0] == '/') { // Linux
-      suffix = "/";
-      pathname = pathname.substr(1);
-    } else if (pathname.size() >= 2 && pathname[1] == ':') { // Windows
-      if (pathname.size() == 2) {
-        suffix = pathname + "/";
-        pathname.clear();
-      } else {
-        suffix = pathname.substr(0, 3);
-        pathname = pathname.substr(3);
-      }
-    }
-
-    // If present, remove slash at the end
-    if (pathname.size() && pathname.back() == '/')
+    if (pathname.size() &&
+        pathname.back() == '/' &&
+        false == isRootPathname(pathname)) {
       pathname.pop_back();
-
-    // Extract parent pathname
-    const size_t pos = pathname.find_last_of("/");
-    if (pos != std::string::npos) {
-      pathname = pathname.substr(0, pos);
     }
-
-    parent = suffix + pathname;
-
-    if (parent.empty()) {
-#ifdef _WIN32
-      parent = "C:/";
-#else
-      parent = "/";
-#endif
-    }
-
-    return parent;
   }
 }
