@@ -16,7 +16,6 @@
 #include <unordered_map>
 #include <vector>
 #include <plog/Log.h>
-#include <plog/Appenders/ConsoleAppender.h>
 
 namespace SmartPeak
 {
@@ -1127,7 +1126,8 @@ namespace SmartPeak
   //   }
   // }
 
-  void AppManager::runApp() {
+  void AppManager::initFileLogger()
+  {
     const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     char filename[128];
     strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
@@ -1136,45 +1136,7 @@ namespace SmartPeak
     static plog::RollingFileAppender<plog::CsvFormatter>
       fileAppender(filename, 1024 * 1024 * 32, 100);
 
-    // Inspired by plog::TxtFormatter
-    class ConsoleFormatter
-    {
-    public:
-      static plog::util::nstring header()
-      {
-        return plog::util::nstring();
-      }
-
-      static plog::util::nstring format(const plog::Record& record)
-      {
-        if (record.getSeverity() > plog::info) {
-          return "";
-        }
-
-        std::tm t;
-        (plog::util::localtime_s)(&t, &record.getTime().time);
-
-        plog::util::nostringstream ss;
-        ss << t.tm_year + 1900 << "-" << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_mon + 1 << PLOG_NSTR("-") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_mday << PLOG_NSTR(" ");
-        ss << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_hour << PLOG_NSTR(":") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_min << PLOG_NSTR(":") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_sec << PLOG_NSTR(" ");
-        // ss << std::setfill(PLOG_NSTR(' ')) << std::setw(5) << std::left << severityToString(record.getSeverity()) << PLOG_NSTR(" ");
-        // ss << PLOG_NSTR("[") << record.getTid() << PLOG_NSTR("] ");
-        ss << record.getMessage() << PLOG_NSTR("\n");
-
-        return ss.str();
-      }
-    };
-
-    // Add console appender, instead of only the file one
-    static plog::ConsoleAppender<ConsoleFormatter> consoleAppender;
-
-    // Init logger with two appenders
-    plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender);
-
-    LOGN << "\n\n" << gettingStartedString();
-    while (true) {
-      menuMain();
-    }
+    plog::init(plog::debug, &fileAppender);
   }
 
   // Returns a string representation of the workflow steps

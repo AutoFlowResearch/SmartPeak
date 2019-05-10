@@ -172,7 +172,7 @@ namespace SmartPeak
     AppManager(AppManager&& other)                 = delete;
     AppManager& operator=(AppManager&& other)      = delete;
 
-    void runApp();
+    void initFileLogger();
 
     std::string getPipelineString();
   };
