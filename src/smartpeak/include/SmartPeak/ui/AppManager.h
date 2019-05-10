@@ -1,3 +1,5 @@
+#pragma once
+
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
