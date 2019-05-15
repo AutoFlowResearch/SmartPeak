@@ -1,3 +1,4 @@
+#include <SmartPeak/ui/AppManager.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
@@ -11,117 +12,16 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 
-#ifdef _WIN32
-  // https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/getcwd-wgetcwd
-  #include <direct.h>
-  auto mygetcwd = &_getcwd;
-#else
-  // http://pubs.opengroup.org/onlinepubs/9699919799/functions/getcwd.html
-  #include <unistd.h>
-  auto mygetcwd = &getcwd;
-#endif
-
-using namespace SmartPeak;
-
-class CommandLine final {
-public:
-  class Command {
-  public:
-    enum CommandType {
-      RawDataMethod,
-      SequenceSegmentMethod,
-    } type;
-
-    void setMethod(const std::shared_ptr<RawDataProcessor> method)
-    {
-      type = RawDataMethod;
-      raw_data_method = method;
-    }
-
-    void setMethod(const std::shared_ptr<SequenceSegmentProcessor> method)
-    {
-      type = SequenceSegmentMethod;
-      seq_seg_method = method;
-    }
-
-    std::shared_ptr<RawDataProcessor> raw_data_method;
-    std::shared_ptr<SequenceSegmentProcessor> seq_seg_method;
-
-    std::map<std::string, Filenames> dynamic_filenames;
-  };
-
-  const std::string                     pathnamesFilename_       = "pathnames.txt";
-  std::string                           sequence_pathname_;
-  std::string                           main_dir_                = ".";
-  std::string                           mzML_dir_;
-  std::string                           features_in_dir_;
-  std::string                           features_out_dir_;
-  std::set<MetaDataHandler::SampleType> sequenceSummaryTypes_;
-  std::set<MetaDataHandler::SampleType> featureSummaryTypes_;
-  std::vector<std::string>              sequenceSummaryMetaData_;
-  std::vector<std::string>              featureSummaryMetaData_;
-  std::vector<Command>                  commands_;
-  Filenames                             static_filenames_;
-  SequenceHandler                       sequenceHandler_;
-
-  const std::unordered_map<int, std::shared_ptr<RawDataProcessor>> n_to_raw_data_method_ {
-    {1, std::shared_ptr<RawDataProcessor>(new LoadRawData())},
-    {2, std::shared_ptr<RawDataProcessor>(new LoadFeatures())},
-    {3, std::shared_ptr<RawDataProcessor>(new PickFeatures())},
-    {4, std::shared_ptr<RawDataProcessor>(new FilterFeatures())},
-    {5, std::shared_ptr<RawDataProcessor>(new SelectFeatures())},
-    {6, std::shared_ptr<RawDataProcessor>(new ValidateFeatures())},
-    {7, std::shared_ptr<RawDataProcessor>(new QuantifyFeatures())},
-    {8, std::shared_ptr<RawDataProcessor>(new CheckFeatures())},
-    {9, std::shared_ptr<RawDataProcessor>(new StoreFeatures())},
-    {10, std::shared_ptr<RawDataProcessor>(new PlotFeatures())},
-    {11, std::shared_ptr<RawDataProcessor>(new MapChromatograms())},
-    {12, std::shared_ptr<RawDataProcessor>(new ZeroChromatogramBaseline())},
-    {13, std::shared_ptr<RawDataProcessor>(new ExtractChromatogramWindows())},
-  };
-  const std::unordered_map<int, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
-    {14, std::shared_ptr<SequenceSegmentProcessor>(new CalculateCalibration())},
-    {15, std::shared_ptr<SequenceSegmentProcessor>(new StoreQuantitationMethods())},
-    {16, std::shared_ptr<SequenceSegmentProcessor>(new LoadQuantitationMethods())},
-  };
-  enum ProcOpt {
-    OPT_LOAD_RAW_DATA = 1,
-    OPT_LOAD_FEATURES,
-    OPT_PICK_FEATURES,
-    OPT_FILTER_FEATURES,
-    OPT_SELECT_FEATURES,
-    OPT_VALIDATE_FEATURES,
-    OPT_QUANTIFY_FEATURES,
-    OPT_CHECK_FEATURES,
-    OPT_STORE_FEATURES,
-    OPT_PLOT_FEATURES,
-    OPT_MAP_CHROMATROGRAMS,
-    OPT_ZERO_CHROMATOGRAM_BASELINE,
-    OPT_EXTRACT_CHROMATOGRAM_WIDOWS,
-    OPT_CALCULATE_CALIBRATION,
-    OPT_STORE_QUANTITATION_METHODS,
-    OPT_LOAD_QUANTITATION_METHODS,
-  };
-  const std::string main_menu_ = "\n\n"
-    "Please insert the sequence of methods to run.\n"
-    "You can choose the same method multiple times.\n"
-    "Separate chosen methods with a space.\n\n"
-    + commandsString() +
-    "[M]  Main menu\n\n"
-    "Presets:\n"
-    "LCMS MRM Unknowns: 1 11 3 7 8 5 9\n"
-    "LCMS MRM Standards: 1 11 3 4 4 5 14 15 7 8 9\n"
-    "HPLC UV Unknowns: 1 11 13 12 3 7 8 5 9\n"
-    "HPLC UV Standards: 1 11 13 12 3 8 5 14 15 7 9\n"
-    "GCMS SIM Unknowns: 1 11 13 3 7 8 5 9\n"
-    "LCMS MRM Validation: 1 11 3 4 5 6\n\n";
-
-  void menuMain()
+namespace SmartPeak
+{
+  void AppManager::menuMain()
   {
     LOGN <<
       "\n\n"
@@ -156,17 +56,13 @@ public:
     }
   }
 
-  void menuFile()
+  void AppManager::menuFile()
   {
     LOGN <<
       "\n\n"
       "Main > File\n"
-      "[1] New session\n"
-      "[2] Load session\n"
-      "[3] Load session from sequence\n"
-      "[4] Save session\n"
-      "[5] Import file\n"
-      "[6] Export file\n"
+      "[1] Load session from sequence\n"
+      "[2] Import file\n"
       "[M] Main menu\n"
       "[E] Exit\n\n";
 
@@ -174,11 +70,7 @@ public:
   menuFile_label:
     in = getLineInput("> ", false);
 
-    if      ("1" == in) {
-    }
-    else if ("2" == in) {
-    }
-    else if ("3" == in) {
+    if ("1" == in) {
       setSequencePathnameFromInput();
       mzML_dir_.clear();
       features_in_dir_.clear();
@@ -193,12 +85,8 @@ public:
           "The sequence has not been modified. Check file: " << pathnamesFilename_;
       }
     }
-    else if ("4" == in) {
-    }
-    else if ("5" == in) {
+    else if ("2" == in) {
       menuImportFile();
-    }
-    else if ("6" == in) {
     }
     else if ("m" == in || "M" == in) {
       // empty
@@ -211,7 +99,7 @@ public:
     }
   }
 
-  void menuImportFile()
+  void AppManager::menuImportFile()
   {
     LOGN <<
       "\n\n"
@@ -310,65 +198,21 @@ public:
     }
   }
 
-  void menuEdit()
+  void AppManager::menuEdit()
   {
     LOGN <<
       "\n\n"
       "Main > Edit\n"
-      "[1]  Undo\n"
-      "[2]  Redo\n"
-      "[3]  Cut\n"
-      "[4]  Copy\n"
-      "[5]  Paste\n"
-      "    ------------------------\n"
-      "[6]  Sequence\n"
-      "[7]  TraML\n"
-      "[8]  Quantitation methods\n"
-      "[9]  Standards concentrations\n"
-      "[10] Component filters\n"
-      "[11] Component group filters\n"
-      "[12] Component QCs\n"
-      "[13] Component group QCs\n"
-      "[14] Parameters\n"
-      "    ------------------------\n"
-      "[15] Workflow\n"
+      "[1] Workflow\n"
       "[M] Main menu\n\n";
 
     std::string in;
   menuEdit_label:
     in = getLineInput("> ", false);
 
-    if      ("1" == in) {
-    }
-    else if ("2" == in) {
-    }
-    else if ("3" == in) {
-    }
-    else if ("4" == in) {
-    }
-    else if ("5" == in) {
-    }
-    else if ("6" == in) {
-    }
-    else if ("7" == in) {
-    }
-    else if ("8" == in) {
-    }
-    else if ("9" == in) {
-    }
-    else if ("10" == in) {
-    }
-    else if ("11" == in) {
-    }
-    else if ("12" == in) {
-    }
-    else if ("13" == in) {
-    }
-    else if ("14" == in) {
-    }
-    else if ("15" == in) {
+    if ("1" == in) {
       initializeDataDirs();
-      const std::vector<Command> methods = getMethodsInput();
+      const std::vector<AppManager::Command> methods = getMethodsInput();
       if (methods.empty()) {
         LOGW << "\n\nPipeline not modified";
       } else {
@@ -383,32 +227,20 @@ public:
     }
   }
 
-  void menuView()
+  void AppManager::menuView()
   {
     LOGN <<
       "\n\n"
       "Main > View\n"
-      "[1] Sequence status\n"
-      "[2] Workflow wizard\n"
-      "[3] Feature plot\n"
-      "[4] Metric plot\n"
-      "[5] Log\n"
+      "[1] Workflow wizard\n"
       "[M] Main menu\n\n";
 
     std::string in;
   menuView_label:
     in = getLineInput("> ", false);
 
-    if      ("1" == in) {
-    }
-    else if ("2" == in) {
+    if ("1" == in) {
       LOGN << "\n\n" << getPipelineString();
-    }
-    else if ("3" == in) {
-    }
-    else if ("4" == in) {
-    }
-    else if ("5" == in) {
     }
     else if ("m" == in || "M" == in) {
       // empty
@@ -418,7 +250,7 @@ public:
     }
   }
 
-  void menuActions()
+  void AppManager::menuActions()
   {
     LOGN <<
       "\n\n"
@@ -442,7 +274,7 @@ public:
       const std::string input = getLineInput("> ");
       try {
         const int n = std::stoi(input);
-        Command cmd;
+        AppManager::Command cmd;
         if (createCommand(n, cmd)) {
           processCommands({cmd});
         }
@@ -472,7 +304,7 @@ public:
     }
   }
 
-  void menuDataIntegrity()
+  void AppManager::menuDataIntegrity()
   {
     LOGN <<
       "\n\n"
@@ -507,7 +339,7 @@ public:
     }
   }
 
-  void menuReport()
+  void AppManager::menuReport()
   {
     LOGN <<
       "\n\n"
@@ -560,7 +392,7 @@ public:
     }
   }
 
-  void menuQuickInfo()
+  void AppManager::menuQuickInfo()
   {
     LOGN <<
       "\n\n"
@@ -633,29 +465,20 @@ public:
     }
   }
 
-  void menuHelp()
+  void AppManager::menuHelp()
   {
     LOGN <<
       "\n\n"
       "Main > Help\n"
-      "[1] About\n"
-      "[2] Documentation\n"
-      "[3] Getting started\n"
-      "[4] Version\n"
+      "[1] Getting started\n"
       "[M] Main menu\n\n";
 
     std::string in;
   menuHelp_label:
     in = getLineInput("> ", false);
 
-    if      ("1" == in) {
-    }
-    else if ("2" == in) {
-    }
-    else if ("3" == in) {
+    if ("1" == in) {
       LOGN << "\n\n" << gettingStartedString();
-    }
-    else if ("4" == in) {
     }
     else if ("m" == in || "M" == in) {
       // empty
@@ -665,7 +488,7 @@ public:
     }
   }
 
-  void exitSmartPeak()
+  void AppManager::exitSmartPeak()
   {
     const std::string in = getLineInput("\nExit SmartPeak? [y/N]\n> ");
     if (in.size() && std::tolower(in.front()) == 'y') {
@@ -673,7 +496,7 @@ public:
     }
   }
 
-  bool buildStaticFilenames()
+  bool AppManager::buildStaticFilenames()
   {
     Filenames& f = static_filenames_;
     main_dir_ = sequence_pathname_.substr(0, sequence_pathname_.find_last_of('/'));
@@ -744,7 +567,7 @@ public:
     return true;
   }
 
-  bool requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation)
+  bool AppManager::requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation)
   {
     const std::unordered_set<std::string> required {"sequence", "parameters", "traml"};
     bool is_valid {true};
@@ -757,7 +580,7 @@ public:
     return is_valid;
   }
 
-  void clearNonExistantDefaultGeneratedFilenames(Filenames& f)
+  void AppManager::clearNonExistantDefaultGeneratedFilenames(Filenames& f)
   {
     // clearNonExistantFilename(f.sequence_csv_i);   // The file must exist
     // clearNonExistantFilename(f.parameters_csv_i); // The file must exist
@@ -771,14 +594,14 @@ public:
     clearNonExistantFilename(f.referenceData_csv_i);
   }
 
-  void clearNonExistantFilename(std::string& filename)
+  void AppManager::clearNonExistantFilename(std::string& filename)
   {
     if (InputDataValidation::fileExists(filename) == false) {
       filename.clear();
     }
   }
 
-  void generatePathnamesTxt(
+  void AppManager::generatePathnamesTxt(
     const std::string& pathname,
     const Filenames& f,
     const std::vector<InputDataValidation::FilenameInfo>& is_valid
@@ -803,13 +626,13 @@ public:
       "referenceData="       << getValidPathnameOrPlaceholder(f.referenceData_csv_i, (it++)->validity);
   }
 
-  std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid)
+  std::string AppManager::getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid)
   {
     const std::string placeholder = "";
     return (is_valid ? pathname : placeholder) + "\n";
   }
 
-  void updateFilenames(Filenames& f, const std::string& pathname)
+  void AppManager::updateFilenames(Filenames& f, const std::string& pathname)
   {
     std::ifstream stream(pathname);
     const std::regex re("([a-zA-Z_]+)=([^\\s]*)");
@@ -872,9 +695,9 @@ public:
     }
   }
 
-  std::vector<Command> getMethodsInput()
+  std::vector<AppManager::Command> AppManager::getMethodsInput()
   {
-    std::vector<Command> methods;
+    std::vector<AppManager::Command> methods;
 
     LOGN << main_menu_;
 
@@ -887,7 +710,7 @@ public:
     std::istringstream iss {line};
 
     for (int n; iss >> n;) {
-      Command cmd;
+      AppManager::Command cmd;
       const bool created = createCommand(n, cmd);
       if (created) {
         methods.push_back(cmd);
@@ -897,7 +720,7 @@ public:
     return methods;
   }
 
-  void setSequencePathnameFromInput()
+  void AppManager::setSequencePathnameFromInput()
   {
     LOGN << "\n\nSet the sequence file pathname.\n";
     if (sequence_pathname_.size()) {
@@ -919,7 +742,7 @@ public:
     LOGI << "\n\nSequence pathname set to: " << sequence_pathname_;
   }
 
-  std::string getLineInput(const std::string& message = "", const bool canBeEmpty = true)
+  std::string AppManager::getLineInput(const std::string& message, const bool canBeEmpty)
   {
     std::string line;
     do {
@@ -933,7 +756,7 @@ public:
     return line;
   }
 
-  std::string getPathnameFromInput()
+  std::string AppManager::getPathnameFromInput()
   {
     std::string pathname;
     LOGN << "Pathname: ";
@@ -948,7 +771,7 @@ public:
     return pathname;
   }
 
-  std::set<MetaDataHandler::SampleType> getSampleTypesInput()
+  std::set<MetaDataHandler::SampleType> AppManager::getSampleTypesInput()
   {
     LOGN << "\n\n"
       "Please select the sample types. Insert the indexes separated by a space:\n"
@@ -1003,7 +826,7 @@ public:
     return sample_types;
   }
 
-  std::vector<std::string> getMetaDataInput(
+  std::vector<std::string> AppManager::getMetaDataInput(
     const std::string& title
   )
   {
@@ -1116,7 +939,7 @@ public:
     return metadata;
   }
 
-  std::string gettingStartedString()
+  std::string AppManager::gettingStartedString()
   {
     return
     "Welcome to SmartPeak\n\n"
@@ -1146,7 +969,7 @@ public:
     "`Help -> Getting started`\n";
   }
 
-  std::string commandsString()
+  std::string AppManager::commandsString()
   {
     return
       "[" + std::to_string(OPT_LOAD_RAW_DATA) + "]  Load raw data\n"
@@ -1167,30 +990,30 @@ public:
       "[" + std::to_string(OPT_LOAD_QUANTITATION_METHODS) + "] Load quantitation methods\n";
   }
 
-  void processCommands(const std::vector<Command>& commands)
+  void AppManager::processCommands(const std::vector<AppManager::Command>& commands)
   {
     size_t i = 0;
     while (i < commands.size()) {
-      const Command::CommandType type = commands[i].type;
+      const AppManager::Command::CommandType type = commands[i].type;
       size_t j = i + 1;
       for (; j < commands.size() && type == commands[j].type; ++j) {
         // empty body
       }
-      const Command& cmd = commands[i];
-      if (cmd.type == Command::RawDataMethod) {
+      const AppManager::Command& cmd = commands[i];
+      if (cmd.type == AppManager::Command::RawDataMethod) {
         std::vector<std::shared_ptr<RawDataProcessor>> raw_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(raw_methods),
-          [](const Command& command){ return command.raw_data_method; });
+          [](const AppManager::Command& command){ return command.raw_data_method; });
         SequenceProcessor::processSequence(
           sequenceHandler_,
           cmd.dynamic_filenames,
           std::set<std::string>(),
           raw_methods
         );
-      } else if (cmd.type == Command::SequenceSegmentMethod) {
+      } else if (cmd.type == AppManager::Command::SequenceSegmentMethod) {
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(seq_seg_methods),
-          [](const Command& command){ return command.seq_seg_method; });
+          [](const AppManager::Command& command){ return command.seq_seg_method; });
         SequenceProcessor::processSequenceSegments(
           sequenceHandler_,
           cmd.dynamic_filenames,
@@ -1204,7 +1027,7 @@ public:
     }
   }
 
-  bool createCommand(const int n, Command& cmd)
+  bool AppManager::createCommand(const int n, AppManager::Command& cmd)
   {
     if (n < 1 || n > 16 || n == 10) { // TODO: update this if plotting is implemented
       LOGW << "\n\nSkipping: " << n;
@@ -1241,7 +1064,7 @@ public:
     return true;
   }
 
-  void initializeDataDirs()
+  void AppManager::initializeDataDirs()
   {
     if (mzML_dir_.empty()) {
       mzML_dir_ = main_dir_ + "/mzML";
@@ -1274,8 +1097,18 @@ public:
     }
   }
 
+// #ifdef _WIN32
+//   // https://docs.microsoft.com/en-us/cpp/c-runtime-library/reference/getcwd-wgetcwd
+//   #include <direct.h>
+//   auto mygetcwd = &_getcwd;
+// #else
+//   // http://pubs.opengroup.org/onlinepubs/9699919799/functions/getcwd.html
+//   #include <unistd.h>
+//   auto mygetcwd = &getcwd;
+// #endif
+
   // // Initializes the sequence structure
-  // CommandLine(int argc, char **argv)
+  // AppManager(int argc, char **argv)
   // {
   //   // Three ways of setting `sequence_pathname_`
   //   if (argc == 2 && InputDataValidation::fileExists(argv[1])) { // sequence.csv abs. path passed as argument
@@ -1295,14 +1128,7 @@ public:
   //   }
   // }
 
-  CommandLine()                                    = default;
-  ~CommandLine()                                   = default;
-  CommandLine(const CommandLine& other)            = delete;
-  CommandLine& operator=(const CommandLine& other) = delete;
-  CommandLine(CommandLine&& other)                 = delete;
-  CommandLine& operator=(CommandLine&& other)      = delete;
-
-  void runApp() {
+  void AppManager::runApp() {
     const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     char filename[128];
     strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
@@ -1322,15 +1148,19 @@ public:
 
       static plog::util::nstring format(const plog::Record& record)
       {
+        if (record.getSeverity() > plog::info) {
+          return "";
+        }
+
         std::tm t;
         (plog::util::localtime_s)(&t, &record.getTime().time);
 
         plog::util::nostringstream ss;
         ss << t.tm_year + 1900 << "-" << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_mon + 1 << PLOG_NSTR("-") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_mday << PLOG_NSTR(" ");
         ss << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_hour << PLOG_NSTR(":") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_min << PLOG_NSTR(":") << std::setfill(PLOG_NSTR('0')) << std::setw(2) << t.tm_sec << PLOG_NSTR(" ");
-        ss << std::setfill(PLOG_NSTR(' ')) << std::setw(5) << std::left << severityToString(record.getSeverity()) << PLOG_NSTR(" ");
+        // ss << std::setfill(PLOG_NSTR(' ')) << std::setw(5) << std::left << severityToString(record.getSeverity()) << PLOG_NSTR(" ");
         // ss << PLOG_NSTR("[") << record.getTid() << PLOG_NSTR("] ");
-        ss << PLOG_NSTR("\n") << record.getMessage() << PLOG_NSTR("\n");
+        ss << record.getMessage() << PLOG_NSTR("\n");
 
         return ss.str();
       }
@@ -1350,11 +1180,11 @@ public:
 
   // Returns a string representation of the workflow steps
   // i.e. 1 2 3 4 5 5 18
-  std::string getPipelineString()
+  std::string AppManager::getPipelineString()
   {
     std::string s;
-    for (const Command& cmd : commands_) {
-      if (cmd.type == Command::RawDataMethod) {
+    for (const AppManager::Command& cmd : commands_) {
+      if (cmd.type == AppManager::Command::RawDataMethod) {
         const std::unordered_map<int, std::shared_ptr<RawDataProcessor>>::const_iterator
         it = std::find_if(
           n_to_raw_data_method_.cbegin(),
@@ -1363,7 +1193,7 @@ public:
             { return p.second == cmd.raw_data_method; }
         );
         s.append(std::to_string(it->first));
-      } else if (cmd.type == Command::SequenceSegmentMethod) {
+      } else if (cmd.type == AppManager::Command::SequenceSegmentMethod) {
         const std::unordered_map<int, std::shared_ptr<SequenceSegmentProcessor>>::const_iterator
         it = std::find_if(
           n_to_seq_seg_method_.cbegin(),
@@ -1382,14 +1212,4 @@ public:
     }
     return s;
   }
-};
-
-// int main(int argc, char **argv)
-int main()
-{
-  // CommandLine cli(argc, argv);
-  CommandLine cli;
-  cli.runApp();
-  return 0;
 }
-
