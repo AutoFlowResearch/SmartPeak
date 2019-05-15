@@ -15,7 +15,6 @@ set(sources_list_h
 	SequenceProcessor.h
 	SequenceSegmentHandler.h
 	SequenceSegmentProcessor.h
-	Table.h
 	Utilities.h
 )
 

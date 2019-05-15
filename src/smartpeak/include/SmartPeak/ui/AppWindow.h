@@ -1,6 +1,5 @@
 #pragma once
 
-#include <SmartPeak/core/Table.h>
 #include <string>
 #include <vector>
 

@@ -12,6 +12,7 @@
 #include <iostream>
 #include <regex>
 #include <unordered_map>
+#include <unordered_set>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 

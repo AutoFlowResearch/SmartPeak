@@ -19,8 +19,11 @@ namespace SmartPeak
 
     if (ImGui::Button("Up"))
     {
-      current_pathname_ = Utilities::getParentPathname(current_pathname_);
-      Utilities::getPathnameContent(current_pathname_, pathname_content_, false);
+      const std::string parent = Utilities::getParentPathname(current_pathname_);
+      if (parent.size()) {
+        current_pathname_ = parent;
+      }
+      pathname_content_ = Utilities::getPathnameContent(current_pathname_);
       selected_entry = -1;
     }
     ImGui::SameLine();
@@ -39,7 +42,7 @@ namespace SmartPeak
       if (ImGui::Button("Set") || ImGui::IsKeyPressedMap(ImGuiKey_Enter))
       {
         current_pathname_.assign(new_pathname);
-        Utilities::getPathnameContent(current_pathname_, pathname_content_, false);
+        pathname_content_ = Utilities::getPathnameContent(current_pathname_);
         selected_entry = -1;
         ImGui::CloseCurrentPopup();
       }
@@ -71,33 +74,33 @@ namespace SmartPeak
     ImGui::Text("Date Modified"); ImGui::NextColumn();
     ImGui::Separator();
 
-    for (int i = 0; static_cast<size_t>(i) < pathname_content_.size(); ++i)
+    for (int i = 0; static_cast<size_t>(i) < pathname_content_[0].size(); ++i)
     {
-      if (!filter.PassFilter(pathname_content_.get(i, "Name").s_.c_str()))
+      if (!filter.PassFilter(pathname_content_[0][i].c_str()))
       {
         continue; // continue if it does not pass the filter
       }
 
       if (selected_extension > 0 &&
-          !Utilities::endsWith(pathname_content_.get(i, "Name").s_, "." + std::string(extensions[selected_extension]), false))
+          !Utilities::endsWith(pathname_content_[0][i], "." + std::string(extensions[selected_extension]), false))
       {
         continue; // continue if the file type is not desired
       }
 
       const ImGuiWindowFlags flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick;
 
-      if (ImGui::Selectable(pathname_content_.get(i, "Name").s_.c_str(), selected_entry == i, flags))
+      if (ImGui::Selectable(pathname_content_[0][i].c_str(), selected_entry == i, flags))
       {
         selected_entry = i;
-        sprintf(selected_filename, "%s", pathname_content_.get(selected_entry, "Name").s_.c_str());
-        if (ImGui::IsMouseDoubleClicked(0) && pathname_content_.get(selected_entry, "Type").s_ == "Directory") // TODO: error prone to rely on strings
+        sprintf(selected_filename, "%s", pathname_content_[0][selected_entry].c_str());
+        if (ImGui::IsMouseDoubleClicked(0) && pathname_content_[2][selected_entry] == "Directory") // TODO: error prone to rely on strings
         {
           if (current_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
           {
             current_pathname_.append("/");
           }
-          current_pathname_.append(pathname_content_.get(selected_entry, "Name").s_);
-          Utilities::getPathnameContent(current_pathname_, pathname_content_, false);
+          current_pathname_.append(pathname_content_[0][selected_entry]);
+          pathname_content_ = Utilities::getPathnameContent(current_pathname_);
           selected_entry = -1;
           selected_filename[0] = '\0';
           break; // IMPORTANT: because the following lines in the loop assume accessing old/previous pathname_content_'s data
@@ -105,9 +108,9 @@ namespace SmartPeak
       }
 
       ImGui::NextColumn();
-      ImGui::Text("%d", pathname_content_.get(i, "Size").i_); ImGui::NextColumn();
-      ImGui::Text("%s", pathname_content_.get(i, "Type").s_.c_str()); ImGui::NextColumn();
-      ImGui::Text("%s", pathname_content_.get(i, "Date Modified").s_.c_str()); ImGui::NextColumn();
+      ImGui::Text("%s", pathname_content_[1][i].c_str()); ImGui::NextColumn();
+      ImGui::Text("%s", pathname_content_[2][i].c_str()); ImGui::NextColumn();
+      ImGui::Text("%s", pathname_content_[3][i].c_str()); ImGui::NextColumn();
     }
     ImGui::Columns(1);
     // End of Columns - content_columns
@@ -129,7 +132,7 @@ namespace SmartPeak
         {
           picked_pathname_.append("/");
         }
-        picked_pathname_ .append(pathname_content_.get(selected_entry, "Name").s_);
+        picked_pathname_.append(pathname_content_[0][selected_entry]);
       }
       printf("Open: %s\n", picked_pathname_.c_str());
       show_file_picker_ = false;

@@ -2,7 +2,6 @@
 #include <SmartPeak/ui/Widget.h>
 #include <imgui.h>
 #include <algorithm>
-#include <SmartPeak/core/Table.h>
 #include <SmartPeak/ui/FilePicker.h>
 
 namespace SmartPeak
