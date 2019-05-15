@@ -13,6 +13,7 @@ namespace SmartPeak
     std::array<std::vector<std::string>, 4> pathname_content_;
     std::string current_pathname_ = fs::current_path().root_path().string();
     std::string picked_pathname_;
+    std::string title_ = "Pick a pathname";
     bool&       show_file_picker_;
 
   public:
@@ -22,7 +23,10 @@ namespace SmartPeak
       pathname_content_ = Utilities::getPathnameContent(current_pathname_);
     }
 
-    void draw(const char* title = "Pick a pathname");
+    void draw();
+
     std::string getPickedPathname() const;
+
+    void setTitle(const std::string& title);
   };
 }

@@ -5,13 +5,12 @@
 
 namespace SmartPeak
 {
-  void FilePicker::draw(const char* title)
+  void FilePicker::draw()
   {
-    ImGui::OpenPopup(title);
+    ImGui::OpenPopup(title_.c_str());
 
     // File picker modal
-    // if (!ImGui::BeginPopupModal(title)) {
-    if (!ImGui::BeginPopupModal(title, NULL, ImGuiWindowFlags_NoResize)) {
+    if (!ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_NoResize)) {
       return;
     }
 
@@ -156,5 +155,10 @@ namespace SmartPeak
   std::string FilePicker::getPickedPathname() const
   {
     return picked_pathname_;
+  }
+
+  void FilePicker::setTitle(const std::string& title)
+  {
+    title_ = title;
   }
 }
