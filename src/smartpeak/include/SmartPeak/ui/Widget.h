@@ -24,7 +24,7 @@ namespace SmartPeak
 
       NOTE: free to override in inherited implmementations
     */
-    virtual void draw() {};
+    virtual void draw() = 0;
 
     /**
       Method to make a filter and search popup
@@ -87,7 +87,7 @@ namespace SmartPeak
   class GenericTextWidget : public Widget
   {
   public:
-    void draw();
+    void draw() override;
     std::vector<std::string> text_lines;
   };
 
@@ -108,7 +108,7 @@ namespace SmartPeak
     @param[in,out] columns Columns where the inner vector<string> are individual columns [TODO: refactor to use other types besides strings]
     @param[in,out] checked_rows What rows are checked/filtered
     */
-    void draw();
+    void draw() override;
     std::vector<std::string> headers;
     std::vector<std::vector<std::string>> columns;
     bool* checked_rows;
@@ -120,7 +120,7 @@ namespace SmartPeak
   class GenericGraphicWidget : public Widget
   {
   public:
-    void draw();
+    void draw() override;
   };
 
   /**
@@ -129,7 +129,7 @@ namespace SmartPeak
   class GenericTreeWidget : public Widget
   {
   public:
-    void draw();
+    void draw() override;
   };
 
   /**
@@ -138,6 +138,6 @@ namespace SmartPeak
   class WorkflowWidget : public GenericGraphicWidget
   {
   public:
-    void draw();
+    void draw() override;
   };
 }
