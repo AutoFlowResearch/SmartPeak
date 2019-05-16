@@ -71,18 +71,7 @@ namespace SmartPeak
 
     if ("1" == in) {
       setSequencePathnameFromInput();
-      mzML_dir_.clear();
-      features_in_dir_.clear();
-      features_out_dir_.clear();
-      LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
-      const bool pathnamesAreCorrect = buildStaticFilenames();
-      if (pathnamesAreCorrect) {
-        sequenceHandler_.clear();
-        SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true);
-      } else {
-        LOGE << "Provided and/or inferred pathnames are not correct."
-          "The sequence has not been modified. Check file: " << pathnamesFilename_;
-      }
+      loadSessionFromSequence();
     }
     else if ("2" == in) {
       menuImportFile();
@@ -1173,5 +1162,21 @@ namespace SmartPeak
       s.pop_back();
     }
     return s;
+  }
+
+  void AppManager::loadSessionFromSequence()
+  {
+    mzML_dir_.clear();
+    features_in_dir_.clear();
+    features_out_dir_.clear();
+    LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
+    const bool pathnamesAreCorrect = buildStaticFilenames();
+    if (pathnamesAreCorrect) {
+      sequenceHandler_.clear();
+      SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true);
+    } else {
+      LOGE << "Provided and/or inferred pathnames are not correct."
+        "The sequence has not been modified. Check file: " << pathnamesFilename_;
+    }
   }
 }

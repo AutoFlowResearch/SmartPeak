@@ -44,12 +44,10 @@ namespace SmartPeak
     // Help
     static bool show_app_about_ = false;
 
-    static bool show_file_picker_ = false;
-    static FilePicker file_picker(show_file_picker_);
 
-    if (show_file_picker_)
+    if (file_picker_.show_file_picker_)
     {
-      file_picker.draw();
+      file_picker_.draw();
     }
 
     // Show the main window
@@ -96,8 +94,7 @@ namespace SmartPeak
       show_info_,
       show_log_,
       // Help
-      show_app_about_,
-      show_file_picker_
+      show_app_about_
     );
 
     // determine what windows will be shown
@@ -208,8 +205,7 @@ namespace SmartPeak
     bool& show_info,
     bool& show_log,
     // Help
-    bool& show_app_about,
-    bool& show_file_picker
+    bool& show_app_about
   )
   {
     // Show the widgets
@@ -225,7 +221,7 @@ namespace SmartPeak
     {
       if (ImGui::BeginMenu("File"))
       {
-        showMenuFile(show_file_picker);
+        showMenuFile();
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Edit"))
@@ -278,9 +274,7 @@ namespace SmartPeak
     }
   }
 
-  void AppWindow::showMenuFile(
-    bool& show_file_picker
-  )
+  void AppWindow::showMenuFile()
   {
     ImGui::MenuItem("Session", NULL, false, false);
     if (ImGui::MenuItem("New Session"))
@@ -295,7 +289,12 @@ namespace SmartPeak
     }
 
     if (ImGui::MenuItem("Load session from sequence")) {
-      show_file_picker = true;
+      file_picker_.subscribe(fpo_);
+      file_picker_.setMessage("load_session_from_sequence");
+      file_picker_.is_valid = [this](){
+        return InputDataValidation::fileExists(file_picker_.getPickedPathname());
+      };
+      file_picker_.show_file_picker_ = true;
     }
 
     if (ImGui::MenuItem("Save Session", "Ctrl+S"))
@@ -308,6 +307,7 @@ namespace SmartPeak
     }
     ImGui::Separator();
     ImGui::MenuItem("Text file", NULL, false, false);
+
     if (ImGui::BeginMenu("Import File"))
     {
       if (ImGui::MenuItem("Sequence")) {}

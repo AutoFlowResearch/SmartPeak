@@ -175,5 +175,7 @@ namespace SmartPeak
     void initFileLogger();
 
     std::string getPipelineString();
+
+    void loadSessionFromSequence();
   };
 }

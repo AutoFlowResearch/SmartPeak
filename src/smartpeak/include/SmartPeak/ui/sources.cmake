@@ -6,6 +6,7 @@ set(sources_list_h
 	AppManager.h
 	AppWindow.h
 	FilePicker.h
+	Observer.h
 	Widget.h
 )
 

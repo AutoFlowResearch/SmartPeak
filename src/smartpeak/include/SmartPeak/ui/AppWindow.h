@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SmartPeak/ui/AppManager.h>
+#include <SmartPeak/ui/FilePicker.h>
 #include <string>
 #include <vector>
 
@@ -7,13 +9,21 @@ namespace SmartPeak
 {
   class AppWindow
   {
+    FilePicker         file_picker_;
+    FilePickerObserver fpo_;
   public:
+    AppManager         am_;
+
+    AppWindow() {
+      fpo_.am_ = &am_;
+    }
+
     /**
       Show the application screen
     */
-    static void showApp();
+    void showApp();
 
-    static void showMainMenuBar(
+    void showMainMenuBar(
       // View: Explorer pane
       bool& show_sequence_explorer,
       bool& show_transitions_explorer,
@@ -40,13 +50,10 @@ namespace SmartPeak
       bool& show_info,
       bool& show_log,
       // Help
-      bool& show_app_about,
-      bool& show_file_picker
+      bool& show_app_about
     );
 
-    static void showMenuFile(
-      bool& show_file_picker
-    ); ///< Show the main menu File options
+    void showMenuFile(); ///< Show the main menu File options
 
     static void showMenuEdit(); ///< Show the main menu Edit options
 

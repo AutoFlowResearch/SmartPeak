@@ -2,6 +2,7 @@
 #include <SmartPeak/core/Utilities.h>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -133,10 +134,18 @@ namespace SmartPeak
         }
         picked_pathname_.append(pathname_content_[0][selected_entry]);
       }
-      printf("Open: %s\n", picked_pathname_.c_str());
-      show_file_picker_ = false;
-      selected_entry = -1;
-      ImGui::CloseCurrentPopup();
+      if (is_valid()) {
+        LOGI << "Open: " << picked_pathname_;
+        notify(*this, message_); // notifies observers
+        show_file_picker_ = false;
+        selected_entry = -1;
+        ImGui::CloseCurrentPopup();
+      }
+      else
+      {
+        LOGE << "Validity check failed. Won't open picked pathname. Clearing it.";
+        picked_pathname_.clear();
+      }
     }
 
     ImGui::SameLine();
@@ -160,5 +169,10 @@ namespace SmartPeak
   void FilePicker::setTitle(const std::string& title)
   {
     title_ = title;
+  }
+
+  void FilePicker::setMessage(const std::string& message)
+  {
+    message_ = message;
   }
 }

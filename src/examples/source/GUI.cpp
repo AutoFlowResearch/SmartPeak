@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <plog/Appenders/ConsoleAppender.h>
 
 int main(int argc, char **argv) 
   // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
@@ -68,6 +69,9 @@ int main(int argc, char **argv)
   // Main loop
   bool done = false;
   SmartPeak::AppWindow appWindow;
+  appWindow.am_.initFileLogger(); // Enable file logging
+  static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
+  plog::get()->addAppender(&consoleAppender); // Enable console logging
   while (!done)
   {
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -88,9 +92,7 @@ int main(int argc, char **argv)
     ImGui::NewFrame();
 
     // 1. Show the window
-    {
-      appWindow.showApp();
-    }
+    appWindow.showApp();
 
     // Rendering
     ImGui::Render();
