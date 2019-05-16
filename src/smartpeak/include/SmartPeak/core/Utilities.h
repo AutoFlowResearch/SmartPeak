@@ -2,17 +2,12 @@
 
 #pragma once
 
-#include <SmartPeak/core/Table.h>
 #include <SmartPeak/core/CastValue.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 
-#include <iomanip>
-#include <ios>
-#include <iostream>
 #include <regex>
 #include <string>
-#include <unordered_set>
 
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
@@ -199,14 +194,30 @@ public:
       const bool case_sensitive = true
     );
 
-    static void getPathnameContent(
+    static std::array<std::vector<std::string>, 4> getPathnameContent(
       const std::string& pathname,
-      Table& content,
-      const bool only_directories
+      const bool asc = true
     );
 
     static std::string getParentPathname(const std::string& pathname);
-    static bool isRootPathname(const std::string& pathname);
-    static void cleanupPathname(std::string& pathname);
+
+    template<typename T>
+    static void applyPermutation(
+      const std::vector<size_t>& indices,
+      std::vector<T>& v
+    )
+    {
+      if (indices.size() != v.size()) {
+        throw std::invalid_argument("applyPermutation: arguments' sizes do not match");
+      }
+      const std::vector<T> cp(v); // a copy of v
+      for (size_t i = 0; i < v.size(); ++i) {
+        v[i] = cp[indices[i]];
+      }
+    }
+
+    static bool is_less_than_icase(const std::string& a, const std::string& b);
+
+    static size_t directorySize(const std::string& pathname);
   };
 }

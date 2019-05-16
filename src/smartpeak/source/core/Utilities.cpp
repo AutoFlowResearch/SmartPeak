@@ -1,25 +1,17 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/core/Table.h>
 #include <SmartPeak/core/CastValue.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <algorithm>
 #include <iostream>
+#include <numeric>
 #include <regex>
 #include <unordered_set>
 #include <plog/Log.h>
+#include <boost/filesystem.hpp>
 
-#ifdef _WIN32
-  #include "dirent.h"
-  auto mystat = &_stat;
-#else
-  #include <dirent.h>
-  #include <unistd.h>
-  #include <sys/types.h>
-  #include <sys/stat.h>
-  auto mystat = &stat;
-#endif
+namespace fs = boost::filesystem;
 
 namespace SmartPeak
 {
@@ -506,119 +498,110 @@ namespace SmartPeak
     return false;
   }
 
-  void Utilities::getPathnameContent(
+  std::array<std::vector<std::string>, 4> Utilities::getPathnameContent(
     const std::string& pathname,
-    Table& content,
-    const bool only_directories
+    const bool asc
   )
   {
-    // printf("getPathnameContent(): %s\n", pathname.c_str());
-    content.clear();
-    const size_t names_idx = content.addColumn("Name");
-    const size_t sizes_idx = content.addColumn("Size");
-    const size_t types_idx = content.addColumn("Type");
-    const size_t dates_idx = content.addColumn("Date Modified");
+    std::array<std::vector<std::string>, 4> content;
+    boost::system::error_code ec;
 
-    DIR *dir;
-    struct dirent *ent;
-    if ((dir = opendir(pathname.c_str()))) {
-      while ((ent = readdir(dir))) {
-        if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, "..")) {
-          continue;
-        }
-        if (only_directories && ent->d_type != DT_DIR) {
-          continue;
-        }
-        const std::string d_name = std::string(ent->d_name);
-        content.push(names_idx, d_name);
-        struct stat info;
-        const std::string full_name = pathname + "/" + d_name;
-        mystat(full_name.c_str(), &info);
-        if (ent->d_type == DT_DIR) {
-          DIR *dir_subfolder;
-          struct dirent *ent_subfolder;
-          int n_items {-2}; // removes "." and ".." from the count
-          if ((dir_subfolder = opendir(full_name.c_str()))) {
-            while ((ent_subfolder = readdir(dir_subfolder))) {
-              ++n_items;
-            }
-            closedir(dir_subfolder);
-          } else { // i.e. permission denied
-            n_items = 0;
-          }
-          content.push(sizes_idx, n_items);
-          content.push(types_idx, "Directory");
-        } else {
-          content.push(sizes_idx, info.st_size);
-          const std::string::size_type pos = d_name.rfind(".");
-          content.push(types_idx, pos == std::string::npos ? "Unknown" : d_name.substr(pos));
-        }
-        char buff[128];
-        strftime(buff, sizeof buff, "%Y/%m/%d %H:%M:%S", localtime(&(info.st_mtime)));
-        content.push(dates_idx, std::string(buff));
-      }
-      closedir(dir);
-      content.sort("Name");
-    } else {
-      perror("");
+    fs::directory_iterator it = fs::directory_iterator(fs::path(pathname), ec);
+    if (ec.value()) {
+      return content;
     }
+    const fs::path p(pathname);
+    fs::directory_iterator it_end = fs::directory_iterator();
+
+    for ( ; it != it_end; it++) {
+      const fs::directory_entry& entry = *it;
+
+      if (!exists(entry.path())) { // protects from e.g. "dangling" symbolic links
+        LOGD << "Path does not exist. Skipping: " << entry.path();
+        continue;
+      }
+
+      const std::string filename(entry.path().filename().string());
+      if (filename == "." || filename == "..") {
+        continue;
+      }
+
+      size_t filesize = fs::is_directory(entry)
+        ? directorySize(entry.path().string())
+        : fs::file_size(entry, ec);
+      if (ec.value()) {
+        filesize = 0;
+        ec.clear();
+      }
+
+      const std::string filetype = fs::is_directory(entry) ? "Directory" : entry.path().extension().string();
+
+      char buff[128];
+      const std::time_t t(fs::last_write_time(entry));
+      std::strftime(buff, sizeof buff, "%Y-%m-%d %H:%M:%S", std::localtime(&t)); // ISO 8601 date format
+
+      content[0].push_back(filename);
+      content[1].push_back(std::to_string(filesize));
+      content[2].push_back(filetype);
+      content[3].push_back(std::string(buff));
+    }
+
+    std::vector<size_t> indices(content[0].size());
+    std::iota(indices.begin(), indices.end(), 0);
+    const std::vector<std::string>& names = content[0];
+    std::sort(
+      indices.begin(),
+      indices.end(),
+      [&names, asc](const size_t l, const size_t r)
+      {
+        const bool b = is_less_than_icase(names[l], names[r]);
+        return asc ? b : !b;
+      }
+    );
+    applyPermutation(indices, content[0]);
+    applyPermutation(indices, content[1]);
+    applyPermutation(indices, content[2]);
+    applyPermutation(indices, content[3]);
+    return content;
   }
 
   std::string Utilities::getParentPathname(const std::string& pathname)
   {
-    std::string parent(pathname);
-
-    cleanupPathname(parent);
-
-    if (isRootPathname(parent))
-      return parent;
-
-    // Erase from last slash up to end of string
-    const size_t pos = parent.find_last_of("/");
-    if (pos != std::string::npos) {
-      parent.erase(parent.cbegin() + pos, parent.cend());
-    }
-
-    // After erase, a pathname like "/home" would become ""
-    if (parent.empty() && pathname.size())
-      parent.append("/");
-
-    return parent;
+    const fs::path p(pathname);
+    const fs::directory_entry entry(p);
+    return entry.path().parent_path().string();
   }
 
-  bool Utilities::isRootPathname(const std::string& pathname)
+  bool Utilities::is_less_than_icase(const std::string& a, const std::string& b)
   {
-    if (pathname.empty())
-      return false;
-
-    if (pathname == "/")
-      return true;
-
-    // C:/ and C: do not have the same meaning on Windows. Ignoring this detail.
-    // https://docs.microsoft.com/en-us/windows/desktop/fileio/naming-a-file#fully-qualified-vs-relative-paths
-    // Also ignoring UNC paths
-    if (pathname.size() <= 3 && pathname[1] == ':')
-      return true;
+    std::string a_lowercase, b_lowercase;
+    a_lowercase.resize(a.size());
+    b_lowercase.resize(b.size());
+    std::transform(a.begin(), a.end(), a_lowercase.begin(), ::tolower);
+    std::transform(b.begin(), b.end(), b_lowercase.begin(), ::tolower);
+    return a_lowercase.compare(b_lowercase) < 0;
   }
 
-  void Utilities::cleanupPathname(std::string& pathname)
+  size_t Utilities::directorySize(const std::string& pathname)
   {
-    // Replace all backslashes with slashes. Windows supports both.
-    std::replace(pathname.begin(), pathname.end(), '\\', '/');
+    size_t n { 0 };
+    boost::system::error_code ec;
 
-    // Remove consecutive duplicates of character '/', because it might break the algorithm.
-    // It helps with pathnames of the form "/home/user//some////folder"
-    std::string::iterator it = std::unique(
-      pathname.begin(),
-      pathname.end(),
-      [](const char a, const char b) { return a == b && a == '/'; }
-    );
-    pathname.erase(it, pathname.end());
-
-    if (pathname.size() &&
-        pathname.back() == '/' &&
-        false == isRootPathname(pathname)) {
-      pathname.pop_back();
+    fs::directory_iterator it = fs::directory_iterator(fs::path(pathname), ec);
+    if (ec.value()) {
+      // std::cout << pathname << "\tec.value(): " << ec.value() << std::endl;
+      return 0;
     }
+    fs::directory_iterator it_end = fs::directory_iterator();
+
+    for ( ; it != it_end; it++) {
+      const fs::path& filename { it->path().filename() };
+      if (filename == fs::path(".") || filename == fs::path("..")) {
+        continue;
+      }
+      ++n;
+    }
+
+    return n;
   }
 }

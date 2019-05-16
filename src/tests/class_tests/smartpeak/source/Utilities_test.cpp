@@ -385,91 +385,89 @@ BOOST_AUTO_TEST_CASE(endsWith)
 BOOST_AUTO_TEST_CASE(getPathnameContent)
 {
   const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
-  Table c; // content
+  const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname);
 
-  Utilities::getPathnameContent(pathname, c, false);
+  // number of items in the pathname, taking .gitignore into account
+  BOOST_CHECK_EQUAL(c[0].size(), 35);
+  BOOST_CHECK_EQUAL(c[1].size(), 35);
+  BOOST_CHECK_EQUAL(c[2].size(), 35);
+  BOOST_CHECK_EQUAL(c[3].size(), 35);
 
-  BOOST_CHECK_EQUAL(c.size(), 35); // number of items in the pathname, taking .gitignore into account
+  BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x.featureXML");
+  BOOST_CHECK_EQUAL(c[1][0], "761937"); // file size
+  BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
 
-  BOOST_CHECK_EQUAL(c.get(0, "Name").s_, "170808_Jonathan_yeast_Sacc1_1x.featureXML");
-  BOOST_CHECK_EQUAL(c.get(0, "Size").i_, 761937); // file size
-  BOOST_CHECK_EQUAL(c.get(0, "Type").s_, ".featureXML");
-  // BOOST_CHECK_EQUAL(c.get(0, "Date Modified").s_, "2018/09/25 10:51:23");
-
-  BOOST_CHECK_EQUAL(c.get(34, "Name").s_, "workflow_csv_files");
-  BOOST_CHECK_EQUAL(c.get(34, "Size").i_, 12); // number of items within the folder
-  BOOST_CHECK_EQUAL(c.get(34, "Type").s_, "Directory");
-  // BOOST_CHECK_EQUAL(c.get(34, "Date Modified").s_, "2019/04/03 14:38:47");
-
-  Utilities::getPathnameContent(pathname, c, true); // directories only, no files
-
-  BOOST_CHECK_EQUAL(c.size(), 3);
-
-  BOOST_CHECK_EQUAL(c.get(0, "Name").s_, "mzML");
-  BOOST_CHECK_EQUAL(c.get(0, "Size").i_, 6);
-  BOOST_CHECK_EQUAL(c.get(0, "Type").s_, "Directory");
-  // BOOST_CHECK_EQUAL(c.get(0, "Date Modified").s_, "2018/10/01 12:48:35");
-
-  BOOST_CHECK_EQUAL(c.get(2, "Name").s_, "workflow_csv_files");
-  BOOST_CHECK_EQUAL(c.get(2, "Size").i_, 12); // number of items within the folder
-  BOOST_CHECK_EQUAL(c.get(2, "Type").s_, "Directory");
-  // BOOST_CHECK_EQUAL(c.get(2, "Date Modified").s_, "2019/04/03 14:38:47");
+  BOOST_CHECK_EQUAL(c[0][34], "workflow_csv_files");
+  BOOST_CHECK_EQUAL(c[1][34], "12"); // number of items within the folder
+  BOOST_CHECK_EQUAL(c[2][34], "Directory");
 }
 
 BOOST_AUTO_TEST_CASE(getParentPathname)
 {
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname(""), "");
+#ifdef _WIN32
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D://///"), "D:/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:\\"), "D:\\");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:"), "D:");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs"), "E:/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E://home///user//docs"), "E:/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs and a space"), "E:/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs/"), "E:/home/user");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/////"), "/");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs"), "/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("//home///user//docs"), "/home/user");
+#else
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname(""), "");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs and a space"), "/home/user");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs/"), "/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs/"), "/home/user/docs");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs"), "/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home"), "/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/file.txt"), "/home");
+#endif
 }
 
-BOOST_AUTO_TEST_CASE(isRootPathname)
+BOOST_AUTO_TEST_CASE(applyPermutation)
 {
-  BOOST_CHECK_EQUAL(Utilities::isRootPathname("C:"), true);
-  BOOST_CHECK_EQUAL(Utilities::isRootPathname("D:\\"), true);
-  BOOST_CHECK_EQUAL(Utilities::isRootPathname("E:/"), true);
-  BOOST_CHECK_EQUAL(Utilities::isRootPathname("/"), true);
-  BOOST_CHECK_EQUAL(Utilities::isRootPathname("D://///"), false);
-  BOOST_CHECK_EQUAL(Utilities::isRootPathname("E:/home/user/docs"), false);
-  BOOST_CHECK_EQUAL(Utilities::isRootPathname("E:/home/user/docs/"), false);
-  BOOST_CHECK_EQUAL(Utilities::isRootPathname("/////"), false);
-  BOOST_CHECK_EQUAL(Utilities::isRootPathname("/home/user/docs"), false);
-  BOOST_CHECK_EQUAL(Utilities::isRootPathname("/home"), false);
+  const std::vector<size_t> indices { 1, 0, 3, 2, 5, 4 };
+
+  std::vector<std::string> v { "second", "first", "4th", "3rd", "6th", "5th" };
+  Utilities::applyPermutation(indices, v);
+  BOOST_CHECK_EQUAL(v[0], "first");
+  BOOST_CHECK_EQUAL(v[1], "second");
+  BOOST_CHECK_EQUAL(v[2], "3rd");
+  BOOST_CHECK_EQUAL(v[3], "4th");
+  BOOST_CHECK_EQUAL(v[4], "5th");
+  BOOST_CHECK_EQUAL(v[5], "6th");
+
+  std::vector<int> w { 11, 22, 33, 44, 55, 66 };
+  Utilities::applyPermutation(indices, w);
+  BOOST_CHECK_EQUAL(w[0], 22);
+  BOOST_CHECK_EQUAL(w[1], 11);
+  BOOST_CHECK_EQUAL(w[2], 44);
+  BOOST_CHECK_EQUAL(w[3], 33);
+  BOOST_CHECK_EQUAL(w[4], 66);
+  BOOST_CHECK_EQUAL(w[5], 55);
+
+  std::vector<float> t;
+  Utilities::applyPermutation({}, t); // should not throw
 }
 
-BOOST_AUTO_TEST_CASE(cleanupPathname)
+BOOST_AUTO_TEST_CASE(is_less_than_icase)
 {
-  std::string s;
+  auto& f = Utilities::is_less_than_icase;
+  BOOST_CHECK_EQUAL(f("abc", "abc"), false);
+  BOOST_CHECK_EQUAL(f("abc", "ABC"), false);
+  BOOST_CHECK_EQUAL(f("ABC", "abc"), false);
+  BOOST_CHECK_EQUAL(f("home", "z"), true);
+  BOOST_CHECK_EQUAL(f("proc", "dev"), false);
+  BOOST_CHECK_EQUAL(f("dev", "proc"), true);
+  BOOST_CHECK_EQUAL(f("boot", "grub"), true);
+}
 
-  s = "/home/user/data";
-  Utilities::cleanupPathname(s);
-  BOOST_CHECK_EQUAL(s, "/home/user/data");
-
-  s = "/////home///user//data/";
-  Utilities::cleanupPathname(s);
-  BOOST_CHECK_EQUAL(s, "/home/user/data");
-
-  s = "/home/\\user/data\\/";
-  Utilities::cleanupPathname(s);
-  BOOST_CHECK_EQUAL(s, "/home/user/data");
-
-  s = "C:\\Users\\user";
-  Utilities::cleanupPathname(s);
-  BOOST_CHECK_EQUAL(s, "C:/Users/user");
-
-  s = "C:\\\\\\Users\\user////";
-  Utilities::cleanupPathname(s);
-  BOOST_CHECK_EQUAL(s, "C:/Users/user");
+BOOST_AUTO_TEST_CASE(directorySize)
+{
+  const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
+  auto& f = Utilities::directorySize;
+  BOOST_CHECK_EQUAL(f(path), 35);
+  BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 12);
+  BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
