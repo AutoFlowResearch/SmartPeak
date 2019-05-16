@@ -87,7 +87,8 @@ namespace SmartPeak
   class GenericTextWidget : public Widget
   {
   public:
-    void show(const std::vector<std::string>& text_lines);
+    void show();
+    std::vector<std::string> text_lines;
   };
 
   /**
@@ -107,9 +108,10 @@ namespace SmartPeak
     @param[in,out] columns Columns where the inner vector<string> are individual columns [TODO: refactor to use other types besides strings]
     @param[in,out] checked_rows What rows are checked/filtered
     */
-    void show(const std::vector<std::string>& headers,
-      std::vector<std::vector<std::string>>& columns,
-    bool* checked_rows);
+    void show();
+    std::vector<std::string> headers;
+    std::vector<std::vector<std::string>> columns;
+    bool* checked_rows;
   };
 
   /**
@@ -125,16 +127,6 @@ namespace SmartPeak
     @brief Base class for all tree layouts
   */
   class GenericTreeWidget : public Widget
-  {
-  public:
-    void show();
-  };
-  
-  /**
-    @brief Base class used for all file browsing used in
-       loading and storing files
-  */
-  class FileBrowserWidget : public Widget
   {
   public:
     void show();

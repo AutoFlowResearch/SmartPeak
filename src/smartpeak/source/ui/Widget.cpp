@@ -119,10 +119,10 @@ namespace SmartPeak
       checked_rows[i] = true;
   }
 
-  void GenericTableWidget::show(const std::vector<std::string>& headers,
-    std::vector<std::vector<std::string>>& columns,
-    bool* checked_rows)
+  void GenericTableWidget::show()
   {
+    if (headers.empty())
+      return;
     // ImGui::BeginChild("##ScrollingRegion", ImVec2(0, ImGui::GetFontSize() * 20), false, ImGuiWindowFlags_HorizontalScrollbar);
 
     // row filters
@@ -273,132 +273,6 @@ namespace SmartPeak
     // TODO: add selected samples to workflow widget
   }
 
-  void FileBrowserWidget::show()
-  {
-    typedef char element[256];
-
-    // starting variables
-    static char buffilename[256] = "";
-    static char bufdirname[256] = "path/to/current/dir";  // TODO: update with current user directory
-
-    // top: up level, current directory string, refresh icon, search
-    // ImGui::BeginChild("Top");
-    if (ImGui::Button("Up"))
-    {
-      // TODO: move up one directory
-      // TODO: update the list of
-    }
-    ImGui::SameLine();
-    ImGui::InputText("", bufdirname, 256);
-    ImGui::SameLine();
-    if (ImGui::Button("Refresh"))
-    {
-      // Refresh right panel and list of files
-    }
-    ImGui::SameLine();
-    static ImGuiTextFilter filter;
-    filter.Draw();
-    // ImGui::EndChild();
-    ImGui::Separator();
-
-    // left: current directory folders (recursive tree)
-    // TODO: develop recursive directory logic
-    static int selected_dir = 0;
-    ImGui::BeginChild("Directories", ImVec2(120, -ImGui::GetFrameHeightWithSpacing()), true);
-    element current_dirs[] = { "dir 1", "dir 2", "dir 3", "dir 4" };
-    static int n_current_dirs = 4;
-    for (int i = 0; i < n_current_dirs; ++i)
-    {
-      char label[64];
-      sprintf(label, "dir %d", i);
-      if (ImGui::Selectable(label, selected_dir == i))
-        selected_dir = i;
-      if (ImGui::IsItemClicked())
-      {
-        // TODO retrieve the path of the system folder...
-        sprintf(bufdirname, "%s", current_dirs[i]);  // update the directory name
-        // TODO update the table based on what is in the current directory
-      }
-    }
-    ImGui::EndChild();
-    ImGui::SameLine();
-
-    // right: files/folders in highlighted directory
-    ImGui::BeginChild("Current Directory", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), true);
-    // headers
-    const char* headers[] = { "Name", "Date Modified", "Type", "Size" };
-    ImGui::Columns(IM_ARRAYSIZE(headers) + 1, "mycolumns", true); // with border
-    ImGui::Separator();
-    ImGui::Text("index");
-    ImGui::NextColumn();
-    for (int col = 0; col < IM_ARRAYSIZE(headers); ++col)
-    {
-      ImGui::Text("%s", headers[col]);
-      ImGui::NextColumn();
-    }
-    // Body
-    ImGui::Separator();
-    // // typedef (todo: change to std::vector/map)
-    typedef element row[4];
-    row columns[] = { // NOTE: this table can be all char or std::string
-      {"file1", "04/15/2018 2:00 PM", ".csv", "1MB"},
-      {"file2", "04/15/2018 2:00 PM", ".txt", "2MB"},
-      {"file3", "04/15/2018 2:00 PM", ".mzML", "3MB"},
-    };
-    static int selected_file = -1;
-    for (int i = 0; i < IM_ARRAYSIZE(columns); ++i)
-    {
-      if (filter.PassFilter(columns[i][0]))
-      {
-        char label[32];
-        sprintf(label, "%d", i);
-        if (ImGui::Selectable(label, selected_file == i, ImGuiSelectableFlags_SpanAllColumns))
-          selected_file = i;
-        // bool hovered = ImGui::IsItemHovered();
-        if (ImGui::IsItemClicked()) // update the selected file
-          sprintf(buffilename, "%s", columns[i][0]);
-        ImGui::NextColumn();
-        for (int j = 0; j < IM_ARRAYSIZE(headers); ++j)
-        {
-          ImGui::Text("%s", columns[i][j]);
-          ImGui::NextColumn();
-        }
-      }
-    }
-    ImGui::EndChild();
-
-    // bottom: selected filename, filetypes, open/cancel
-    ImGui::BeginGroup();
-    // Filtering and selecting
-    ImGui::Separator();
-    ImGui::Text("File Name:");
-    //
-    ImGui::SameLine();
-    ImGui::InputText("", buffilename, 256);
-    ImGui::SameLine();
-    const char* file_types[] = { ".csv", ".txt", ".mzML", "." };
-    if (ImGui::BeginMenu("File Type"))
-    {
-      for (int i = 0; i < IM_ARRAYSIZE(file_types); ++i)
-      {
-        ImGui::MenuItem(file_types[i]);
-      }
-      // ImGui::SameLine(); //TODO: display selected filetype
-      // ImGui::Text(file_types[i]);
-      ImGui::EndMenu();
-    }
-    if (ImGui::Button("Accept"))
-    {
-      // TODO read in the file
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Cancel"))
-    {
-      // TODO close the modal
-    }
-    ImGui::EndGroup();
-  }
-
   void WorkflowWidget::show()
   {
     // Top
@@ -547,7 +421,7 @@ namespace SmartPeak
     ImGui::EndGroup();
   }
 
-  void GenericTextWidget::show(const std::vector<std::string>& text_lines)
+  void GenericTextWidget::show()
   {
     for (const std::string& line : text_lines) {
       ImGui::Text("%s", line.c_str());

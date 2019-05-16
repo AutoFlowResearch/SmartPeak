@@ -6,7 +6,8 @@
 
 namespace SmartPeak
 {
-  void AppWindow::showApp() {
+  void AppWindow::showApp()
+  {
     // View: Search pane
     static bool show_injections_search = false;
     static bool show_samples_search = false;
@@ -215,7 +216,6 @@ namespace SmartPeak
     //SequenceWidget sequenceWidget;
     //if (show_sequence_) sequenceWidget.show(&show_sequence_);
     //if (show_generic_table) TableWidget(&show_generic_table);
-    //if (show_file_browser) FileBrowserWidget(&show_file_browser);
     //if (show_plot) PlotWidget(&show_plot);
     //if (show_workflow) WorkflowWidget(&show_workflow);
 
@@ -521,7 +521,11 @@ namespace SmartPeak
         GenericTableWidget sequenceTable;
         // TODO: get the headers, columns, and rows_checked
         // NOTE: rows_checked must be statically declared before calling the GUI!
-        sequenceTable.show(headers, columns, rows_checked);
+        // TODO: following lines of code keep copying data. it is slow.
+        sequenceTable.headers = headers;
+        sequenceTable.columns = columns;
+        sequenceTable.checked_rows = rows_checked;
+        sequenceTable.show();
         ImGui::EndTabItem();
       }
       if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
