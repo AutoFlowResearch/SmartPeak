@@ -214,7 +214,7 @@ namespace SmartPeak
   {
     // Show the widgets
     //SequenceWidget sequenceWidget;
-    //if (show_sequence_) sequenceWidget.show(&show_sequence_);
+    //if (show_sequence_) sequenceWidget.draw(&show_sequence_);
     //if (show_generic_table) TableWidget(&show_generic_table);
     //if (show_plot) PlotWidget(&show_plot);
     //if (show_workflow) WorkflowWidget(&show_workflow);
@@ -457,7 +457,7 @@ namespace SmartPeak
       {
         //AboutWidget aboutWidget;
         //bool show_about = true;
-        //aboutWidget.show(&show_about);
+        //aboutWidget.draw(&show_about);
         ImGui::Text("About SmartPeak");
         ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
         ImGui::Separator();
@@ -525,7 +525,7 @@ namespace SmartPeak
         sequenceTable.headers = headers;
         sequenceTable.columns = columns;
         sequenceTable.checked_rows = rows_checked;
-        sequenceTable.show();
+        sequenceTable.draw();
         ImGui::EndTabItem();
       }
       if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
@@ -577,7 +577,7 @@ namespace SmartPeak
       {
         ImGui::Text("TODO: Feature plot");
         GenericGraphicWidget featurePlot;
-        featurePlot.show();
+        featurePlot.draw();
         ImGui::EndTabItem();
       }
       if (show_line_plot && ImGui::BeginTabItem("Line plot", &show_line_plot))

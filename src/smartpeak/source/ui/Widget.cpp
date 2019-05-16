@@ -119,7 +119,7 @@ namespace SmartPeak
       checked_rows[i] = true;
   }
 
-  void GenericTableWidget::show()
+  void GenericTableWidget::draw()
   {
     if (headers.empty())
       return;
@@ -179,7 +179,7 @@ namespace SmartPeak
     // ImGui::EndChild();
   }
 
-  void GenericGraphicWidget::show()
+  void GenericGraphicWidget::draw()
   {
     // Dummy data
     std::vector<std::string> headers = { "sample_name", "sample_type", "component_name" }; // feature or sample columns to filter on
@@ -213,7 +213,7 @@ namespace SmartPeak
     ImGui::TextWrapped("TODO: scatter plots for each feature (red, selected; green, not selected)");
   }
 
-  void GenericTreeWidget::show()
+  void GenericTreeWidget::draw()
   {
     // left
 
@@ -273,7 +273,7 @@ namespace SmartPeak
     // TODO: add selected samples to workflow widget
   }
 
-  void WorkflowWidget::show()
+  void WorkflowWidget::draw()
   {
     // Top
     ImGui::BeginGroup();
@@ -421,7 +421,7 @@ namespace SmartPeak
     ImGui::EndGroup();
   }
 
-  void GenericTextWidget::show()
+  void GenericTextWidget::draw()
   {
     for (const std::string& line : text_lines) {
       ImGui::Text("%s", line.c_str());
