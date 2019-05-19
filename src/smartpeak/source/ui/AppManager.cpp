@@ -1149,7 +1149,7 @@ namespace SmartPeak
       static plog::util::nstring format(const plog::Record& record)
       {
         if (record.getSeverity() > plog::info) {
-          return "";
+          return plog::util::nstring();
         }
 
         std::tm t;
