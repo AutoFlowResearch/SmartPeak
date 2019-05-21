@@ -1,26 +1,29 @@
 // TODO: Add copyright
 
-#include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/SequenceSegmentHandler.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <plog/Log.h>
+#include <map>
+#include <memory> // shared_ptr
+#include <set>
+#include <string>
+#include <vector>
 
 namespace SmartPeak
 {
-  void SequenceProcessor::createSequence(
-    SequenceHandler& sequenceHandler_IO,
-    const Filenames& filenames,
-    const std::string& delimiter,
-    const bool checkConsistency
-  )
+  void CreateSequence::process() const
   {
     LOGD << "START createSequence";
 
-    SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
-    if (sequenceHandler_IO.getSequence().empty()) {
+    SequenceParser::readSequenceFile(*sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
+    if (sequenceHandler_IO->getSequence().empty()) {
       LOGE << "Empty sequence. Returning";
       LOGD << "END createSequence";
       return;
@@ -28,7 +31,7 @@ namespace SmartPeak
     // TODO: Given that the raw data is shared between all injections, it could
     // be beneficial to move it somewhere else (i.e. in SequenceHandler) and adapt
     // the algorithms to the change
-    RawDataHandler& rawDataHandler = sequenceHandler_IO.getSequence()[0].getRawData();
+    RawDataHandler& rawDataHandler = sequenceHandler_IO->getSequence()[0].getRawData();
 
     // load rawDataHandler files (applies to the whole session)
     LoadParameters loadParameters;
@@ -45,7 +48,7 @@ namespace SmartPeak
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
 
     // load sequenceSegmentHandler files
-    for (SequenceSegmentHandler& sequenceSegmentHandler: sequenceHandler_IO.getSequenceSegments()) {
+    for (SequenceSegmentHandler& sequenceSegmentHandler: sequenceHandler_IO->getSequenceSegments()) {
       LoadQuantitationMethods loadQuantitationMethods;
       loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       LoadStandardsConcentrations loadStandardsConcentrations;
@@ -53,27 +56,22 @@ namespace SmartPeak
     }
 
     if (checkConsistency) {
-      InputDataValidation::sampleNamesAreConsistent(sequenceHandler_IO);
-      InputDataValidation::componentNamesAreConsistent(sequenceHandler_IO);
-      InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler_IO);
-      InputDataValidation::heavyComponentsAreConsistent(sequenceHandler_IO);
+      InputDataValidation::sampleNamesAreConsistent(*sequenceHandler_IO);
+      InputDataValidation::componentNamesAreConsistent(*sequenceHandler_IO);
+      InputDataValidation::componentNameGroupsAreConsistent(*sequenceHandler_IO);
+      InputDataValidation::heavyComponentsAreConsistent(*sequenceHandler_IO);
     }
 
     LOGD << "END createSequence";
   }
 
-  void SequenceProcessor::processSequence(
-    SequenceHandler& sequenceHandler_IO,
-    const std::map<std::string, Filenames>& filenames,
-    const std::set<std::string>& injection_names,
-    const std::vector<std::shared_ptr<RawDataProcessor>>& raw_data_processing_methods_I
-  )
+  void ProcessSequence::process() const
   {
-    std::vector<InjectionHandler> process_sequence = sequenceHandler_IO.getSamplesInSequence(injection_names);
+    std::vector<InjectionHandler> process_sequence = sequenceHandler_IO->getSamplesInSequence(injection_names);
 
     // handle user-desired samples
     if (injection_names.empty()) {
-      process_sequence = sequenceHandler_IO.getSequence();
+      process_sequence = sequenceHandler_IO->getSequence();
     }
 
     if (filenames.size() != process_sequence.size()) {
@@ -94,26 +92,23 @@ namespace SmartPeak
       // process the samples
       for (size_t i = 0; i < n; ++i) {
         LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sequence";
-        raw_data_processing_methods_I[i]->process(injection.getRawData(),
+        raw_data_processing_methods_I[i]->process(
+          injection.getRawData(),
           injection.getRawData().getParameters(),
-          filenames.at(injection.getMetaData().getInjectionName()));
+          filenames.at(injection.getMetaData().getInjectionName())
+        );
       }
     }
   }
 
-  void SequenceProcessor::processSequenceSegments(
-    SequenceHandler& sequenceHandler_IO,
-    const std::map<std::string, Filenames>& filenames,
-    const std::set<std::string>& sequence_segment_names,
-    const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& sequence_segment_processing_methods_I
-  )
+  void ProcessSequenceSegments::process() const
   {
     std::vector<SequenceSegmentHandler> sequence_segments;
 
     if (sequence_segment_names.empty()) { // select all
-      sequence_segments = sequenceHandler_IO.getSequenceSegments();
+      sequence_segments = sequenceHandler_IO->getSequenceSegments();
     } else { // select those with specific sequence segment names
-      for (SequenceSegmentHandler& s : sequenceHandler_IO.getSequenceSegments()) {
+      for (SequenceSegmentHandler& s : sequenceHandler_IO->getSequenceSegments()) {
         if (sequence_segment_names.count(s.getSequenceSegmentName())) {
           sequence_segments.push_back(s);
         }
@@ -139,8 +134,8 @@ namespace SmartPeak
         LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sequence segments";
         sequence_segment_processing_methods_I[i]->process(
           sequence_segment,
-          sequenceHandler_IO,
-          sequenceHandler_IO
+          *sequenceHandler_IO,
+          (*sequenceHandler_IO)
             .getSequence()
             .at(sequence_segment.getSampleIndices().front())
             .getRawData()
@@ -150,6 +145,6 @@ namespace SmartPeak
       }
     }
 
-    sequenceHandler_IO.setSequenceSegments(sequence_segments);
+    sequenceHandler_IO->setSequenceSegments(sequence_segments);
   }
 }

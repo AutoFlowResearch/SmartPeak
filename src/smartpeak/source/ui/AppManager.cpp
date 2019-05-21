@@ -79,7 +79,11 @@ namespace SmartPeak
       const bool pathnamesAreCorrect = buildStaticFilenames();
       if (pathnamesAreCorrect) {
         sequenceHandler_.clear();
-        SequenceProcessor::createSequence(sequenceHandler_, static_filenames_, ",", true);
+        CreateSequence cs(sequenceHandler_);
+        cs.filenames          = static_filenames_;
+        cs.delimiter          = ",";
+        cs.checkConsistency   = true;
+        cs.process();
       } else {
         LOGE << "Provided and/or inferred pathnames are not correct."
           "The sequence has not been modified. Check file: " << pathnamesFilename_;
@@ -1004,22 +1008,18 @@ namespace SmartPeak
         std::vector<std::shared_ptr<RawDataProcessor>> raw_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(raw_methods),
           [](const AppManager::Command& command){ return command.raw_data_method; });
-        SequenceProcessor::processSequence(
-          sequenceHandler_,
-          cmd.dynamic_filenames,
-          std::set<std::string>(),
-          raw_methods
-        );
+        ProcessSequence ps(sequenceHandler_);
+        ps.filenames                     = cmd.dynamic_filenames;
+        ps.raw_data_processing_methods_I = raw_methods;
+        ps.process();
       } else if (cmd.type == AppManager::Command::SequenceSegmentMethod) {
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(seq_seg_methods),
           [](const AppManager::Command& command){ return command.seq_seg_method; });
-        SequenceProcessor::processSequenceSegments(
-          sequenceHandler_,
-          cmd.dynamic_filenames,
-          std::set<std::string>(),
-          seq_seg_methods
-        );
+        ProcessSequenceSegments pss(sequenceHandler_);
+        pss.filenames                             = cmd.dynamic_filenames;
+        pss.sequence_segment_processing_methods_I = seq_seg_methods;
+        pss.process();
       } else {
         LOGW << "Skipping a command: " << cmd.type << "\n";
       }

@@ -12,7 +12,11 @@ void example_HPLC_UV_Standards(
 {
   SequenceHandler sequenceHandler;
 
-  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true);
+  CreateSequence cs(sequenceHandler);
+  cs.filenames        = static_filenames;
+  cs.delimiter        = delimiter_I;
+  cs.checkConsistency = true;
+  cs.process();
 
   std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
     std::shared_ptr<RawDataProcessor>(new LoadRawData()),
@@ -38,12 +42,10 @@ void example_HPLC_UV_Standards(
     );
   }
 
-  SequenceProcessor::processSequence(
-    sequenceHandler,
-    dynamic_filenames1,
-    std::set<std::string>(),
-    raw_data_processing_methods
-  );
+  ProcessSequence ps(sequenceHandler);
+  ps.filenames                     = dynamic_filenames1;
+  ps.raw_data_processing_methods_I = raw_data_processing_methods;
+  ps.process();
 
   const std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods = {
     std::shared_ptr<SequenceSegmentProcessor>(new CalculateCalibration()),
@@ -62,12 +64,10 @@ void example_HPLC_UV_Standards(
     );
   }
 
-  SequenceProcessor::processSequenceSegments(
-    sequenceHandler,
-    dynamic_filenames2,
-    std::set<std::string>(),
-    sequence_segment_processing_methods
-  );
+  ProcessSequenceSegments pss(sequenceHandler);
+  pss.filenames                             = dynamic_filenames2;
+  pss.sequence_segment_processing_methods_I = sequence_segment_processing_methods;
+  pss.process();
 
   raw_data_processing_methods = {
     std::shared_ptr<RawDataProcessor>(new QuantifyFeatures()),
@@ -87,12 +87,9 @@ void example_HPLC_UV_Standards(
     );
   }
 
-  SequenceProcessor::processSequence(
-    sequenceHandler,
-    dynamic_filenames3,
-    std::set<std::string>(),
-    raw_data_processing_methods
-  );
+  ps.filenames                     = dynamic_filenames3;
+  ps.raw_data_processing_methods_I = raw_data_processing_methods;
+  ps.process();
 
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,

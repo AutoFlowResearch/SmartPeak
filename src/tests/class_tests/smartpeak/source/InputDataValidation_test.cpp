@@ -80,7 +80,12 @@ BOOST_AUTO_TEST_CASE(sampleNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
-  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+
+  CreateSequence cs(sequenceHandler);
+  cs.filenames          = filenames;
+  cs.delimiter          = ",";
+  cs.checkConsistency   = false;
+  cs.process();
 
   bool result;
 
@@ -89,7 +94,9 @@ BOOST_AUTO_TEST_CASE(sampleNamesAreConsistent)
 
   filenames.sequence_csv_i = main_dir + "/sequence_missing.csv";
   sequenceHandler.clear();
-  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+
+  cs.filenames = filenames;
+  cs.process();
 
   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
   BOOST_CHECK_EQUAL(result, false); // missing sample: fakeSample
@@ -99,7 +106,12 @@ BOOST_AUTO_TEST_CASE(componentNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
-  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+
+  CreateSequence cs(sequenceHandler);
+  cs.filenames          = filenames;
+  cs.delimiter          = ",";
+  cs.checkConsistency   = false;
+  cs.process();
 
   bool result;
 
@@ -120,7 +132,12 @@ BOOST_AUTO_TEST_CASE(componentNameGroupsAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
-  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+
+  CreateSequence cs(sequenceHandler);
+  cs.filenames          = filenames;
+  cs.delimiter          = ",";
+  cs.checkConsistency   = false;
+  cs.process();
 
   bool result;
 
@@ -141,7 +158,12 @@ BOOST_AUTO_TEST_CASE(heavyComponentsAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
-  SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
+
+  CreateSequence cs(sequenceHandler);
+  cs.filenames          = filenames;
+  cs.delimiter          = ",";
+  cs.checkConsistency   = false;
+  cs.process();
 
   bool result;
 
