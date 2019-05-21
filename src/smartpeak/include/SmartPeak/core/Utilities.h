@@ -240,17 +240,17 @@ public:
 
       @throws std::invalid_argument Sizes of indices and v differ
 
-      @param[in] indices The vector of indices that decides the permutation
-      @param[in,out] v The vector of elements to be permuted
+      @param[in] indices The vector of indices that decides the sorting
+      @param[in,out] v The vector of elements to be sorted
     */
     template<typename T>
-    static void applyPermutation(
+    static void sortPairs(
       const std::vector<size_t>& indices,
       std::vector<T>& v
     )
     {
       if (indices.size() != v.size()) {
-        throw std::invalid_argument("applyPermutation: arguments' sizes do not match");
+        throw std::invalid_argument("sortPairs: arguments' sizes do not match");
       }
       const std::vector<T> cp(v); // a copy of v
       for (size_t i = 0; i < v.size(); ++i) {

@@ -558,10 +558,10 @@ namespace SmartPeak
         return asc ? b : !b;
       }
     );
-    applyPermutation(indices, content[0]);
-    applyPermutation(indices, content[1]);
-    applyPermutation(indices, content[2]);
-    applyPermutation(indices, content[3]);
+    sortPairs(indices, content[0]);
+    sortPairs(indices, content[1]);
+    sortPairs(indices, content[2]);
+    sortPairs(indices, content[3]);
     return content;
   }
 

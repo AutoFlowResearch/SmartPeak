@@ -423,12 +423,12 @@ BOOST_AUTO_TEST_CASE(getParentPathname)
 #endif
 }
 
-BOOST_AUTO_TEST_CASE(applyPermutation)
+BOOST_AUTO_TEST_CASE(sortPairs)
 {
   const std::vector<size_t> indices { 1, 0, 3, 2, 5, 4 };
 
   std::vector<std::string> v { "second", "first", "4th", "3rd", "6th", "5th" };
-  Utilities::applyPermutation(indices, v);
+  Utilities::sortPairs(indices, v);
   BOOST_CHECK_EQUAL(v[0], "first");
   BOOST_CHECK_EQUAL(v[1], "second");
   BOOST_CHECK_EQUAL(v[2], "3rd");
@@ -437,7 +437,7 @@ BOOST_AUTO_TEST_CASE(applyPermutation)
   BOOST_CHECK_EQUAL(v[5], "6th");
 
   std::vector<int> w { 11, 22, 33, 44, 55, 66 };
-  Utilities::applyPermutation(indices, w);
+  Utilities::sortPairs(indices, w);
   BOOST_CHECK_EQUAL(w[0], 22);
   BOOST_CHECK_EQUAL(w[1], 11);
   BOOST_CHECK_EQUAL(w[2], 44);
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE(applyPermutation)
   BOOST_CHECK_EQUAL(w[5], 55);
 
   std::vector<float> t;
-  Utilities::applyPermutation({}, t); // should not throw
+  Utilities::sortPairs({}, t); // should not throw
 }
 
 BOOST_AUTO_TEST_CASE(is_less_than_icase)
