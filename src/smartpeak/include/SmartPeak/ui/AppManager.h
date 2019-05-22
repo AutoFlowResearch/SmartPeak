@@ -87,19 +87,8 @@ namespace SmartPeak
       OPT_STORE_QUANTITATION_METHODS,
       OPT_LOAD_QUANTITATION_METHODS,
     };
-    const std::string main_menu_ = "\n\n"
-      "Please insert the sequence of methods to run.\n"
-      "You can choose the same method multiple times.\n"
-      "Separate chosen methods with a space.\n\n"
-      + commandsString() +
-      "[M]  Main menu\n\n"
-      "Presets:\n"
-      "LCMS MRM Unknowns: 1 11 3 7 8 5 9\n"
-      "LCMS MRM Standards: 1 11 3 8 5 14 15 7 9\n"
-      "HPLC UV Unknowns: 1 11 13 12 3 7 8 5 9\n"
-      "HPLC UV Standards: 1 11 13 12 3 8 5 14 15 7 9\n"
-      "GCMS SIM Unknowns: 1 11 13 12 3 7 8 5 9\n"
-      "GCMS Full Scan Unknowns: 1 11 13 12 3 8 5 14 15 7 9\n";
+
+    std::string mainMenuString();
 
     void menuMain();
 
