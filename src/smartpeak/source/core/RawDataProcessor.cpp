@@ -432,7 +432,6 @@ namespace SmartPeak
   void SelectFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-<<<<<<< HEAD
     const Filenames& filenames
   ) const
   {
@@ -450,23 +449,6 @@ namespace SmartPeak
     if (qmip_params_passed_but_empty || score_params_passed_but_empty) {
       LOGE << "Parameters missing for selectFeatures. Not selecting";
       LOGD << "END selectFeatures";
-=======
-    const Filenames& filenames,
-    const bool verbose_I
-  ) const {
-    if (verbose_I) {
-      std::cout << "==== START selectFeatures" << std::endl;
-      std::cout << "selectFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
-    }
-    std::cout << "params_I.size() " << params_I.size() << std::endl;
-    for (auto const& pair: params_I) {
-        std::cout << pair.first << " " << pair.second.size() << std::endl;
-    }
-
-    if (params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip").size() &&
-      params_I.find("MRMFeatureSelector.schedule_MRMFeatures_score") != params_I.end()) {
-      std::cout << "No parameters passed to selectFeatures. Not selecting." << std::endl;
->>>>>>> validation experiments runs
       return;
     }
 

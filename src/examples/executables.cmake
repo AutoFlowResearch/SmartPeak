@@ -9,6 +9,11 @@ set(pipeline_executables_list
   Validation_test
 )
 
+set(interactive_executables_list
+  CLI
+  GUI
+)
+
 ### collect example executables
 set(EXAMPLE_executables
   ${pipeline_executables_list}
