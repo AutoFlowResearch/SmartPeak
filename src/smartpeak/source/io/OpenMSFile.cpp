@@ -502,7 +502,7 @@ namespace SmartPeak
       "MRMFeatureFinderScoring",
       "MRMFeatureFilter.filter_MRMFeatures",
       "MRMFeatureSelector.select_MRMFeatures_qmip",
-      "MRMFeatureSelector.schedule_MRMFeatures_qmip",
+      // "MRMFeatureSelector.schedule_MRMFeatures_qmip",
       "MRMFeatureSelector.select_MRMFeatures_score",
       "ReferenceDataMethods.getAndProcess_referenceData_samples",
       "MRMFeatureValidator.validate_MRMFeatures",

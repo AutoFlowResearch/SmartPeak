@@ -19,7 +19,6 @@ void example_LCMS_MRM_Standards(
     std::shared_ptr<RawDataProcessor>(new MapChromatograms()),
     std::shared_ptr<RawDataProcessor>(new PickFeatures()),
     std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
-    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
     std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
     std::shared_ptr<RawDataProcessor>(new StoreFeatures())

@@ -123,7 +123,7 @@ namespace SmartPeak
       //rdh.setFeatureFilter(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
       //rdh.setFeatureQC(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
       //rdh.setTargetedExperiment(std::shared_ptr<OpenMS::TargetedExperiment>(new OpenMS::TargetedExperiment()));
-      //rdh.setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>(new std::vector<std::map<std::string, Utilities::CastValue>>()));
+      // rdh.setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>(new std::vector<std::map<std::string, Utilities::CastValue>>()));
 
       // initialize the sequence segment
       SequenceSegmentHandler sequenceSegmentHandler;

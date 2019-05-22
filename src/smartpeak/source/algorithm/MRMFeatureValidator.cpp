@@ -23,6 +23,7 @@ namespace SmartPeak
 
     std::map<std::string, std::map<std::string, Utilities::CastValue>> reference_data;
     for (const std::map<std::string, Utilities::CastValue>& m : reference_data_v) {
+      // std::cout << m.at("injection_name").s_ << std::endl;
       if (m.at("injection_name").s_ != injection_name) {
         continue;
       }
@@ -34,7 +35,11 @@ namespace SmartPeak
     for (const OpenMS::Feature& feature : features) {
       std::vector<OpenMS::Feature> subordinates_tmp;
       for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
-        
+        if (subordinate.metaValueExists("used_")) {
+          const std::string used = subordinate.getMetaValue("used_").toString();
+            if (used.empty() || used[0] == 'f' || used[0] == 'F')
+              continue;
+        }
         bool fc_pass = false;
         if (!subordinate.metaValueExists("native_id")) {
           throw "native_id info is missing.";
@@ -51,7 +56,7 @@ namespace SmartPeak
         }
 
         // extract and format rt information
-        const float reference_rt = reference_data[reference_data_key]["retention_time"].f_;
+        const float reference_rt = reference_data[reference_data_key]["retention_time"].f_*60;
 
         if (0.0 == reference_rt) {
           continue;
@@ -60,7 +65,7 @@ namespace SmartPeak
         const float feature_leftWidth = static_cast<float>(feature.getMetaValue("leftWidth"));
         const float feature_rightWidth = static_cast<float>(feature.getMetaValue("rightWidth"));
         // validate the retention time
-        if (std::fabs(reference_rt - feature_rt) < Tr_window ||
+        if (std::fabs(reference_rt - feature_rt) < Tr_window*60 ||
             (reference_rt > feature_leftWidth &&
              reference_rt < feature_rightWidth)) {
           fc_pass = true;

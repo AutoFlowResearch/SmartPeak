@@ -265,9 +265,6 @@ namespace SmartPeak
             "used_",
             subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
           );
-          row.emplace("accuracy", std::to_string(rawDataHandler.getValidationMetrics().at("accuracy")));
-          row.emplace("precision", std::to_string(rawDataHandler.getValidationMetrics().at("precision")));
-          row.emplace("recall", std::to_string(rawDataHandler.getValidationMetrics().at("recall")));
           for (const std::string& meta_value_name : meta_data) {
 <<<<<<< HEAD
             if (subordinate.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_message") {
@@ -335,8 +332,6 @@ namespace SmartPeak
     for (const std::map<std::string,std::string>& m : list_dict) {
       std::vector<std::string> line;
       for (const std::string& h : headers) {
-        // std::cout << "Headerrr " << h << std::endl;
-        // std::cout << "wow " << m.at(h) << std::endl;
         line.push_back(m.at(h));
       }
       writer.writeDataInRow(line.cbegin(), line.cend());
@@ -361,6 +356,7 @@ namespace SmartPeak
 
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
+      std::map<std::string, float> validation_metrics = sampleHandler.getRawData().getValidationMetrics();
       const MetaDataHandler::SampleType st = mdh.getSampleType();
       if (sample_types.count(st) == 0) {
         continue;
@@ -383,7 +379,12 @@ namespace SmartPeak
               subordinate.getMetaValue(s_native_id).toString(),
               meta_value_name
             );
-            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            Utilities::CastValue datum;
+            if (meta_value_name == "accuracy" || meta_value_name == "n_features") {
+              datum = validation_metrics[meta_value_name];
+            } else {
+              datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            }
             if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
               columns.insert(sample_name);

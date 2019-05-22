@@ -488,4 +488,32 @@ namespace SmartPeak
     std::string name_ = "LOAD_PARAMETERS";
     std::string description_ = "Load the data processing parameters from file.";
   };
+
+  class MetaLoad : public RawDataProcessor
+  {
+  public:
+    using RawDataProcessor::RawDataProcessor;
+
+    int getID() const { return id_; };
+    std::string getName() const { return name_; };
+    std::string getDescription() const { return description_; };
+
+    /** Load the data processing parameters from file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames,
+      const bool verbose_I = false
+    ) const;
+    static void sanitizeParameters(
+      std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const bool verbose_I = false
+    );
+
+  protected:
+    int id_ = 16;
+    std::string name_ = "LOAD_PARAMETERS";
+    std::string description_ = "Load the data processing parameters from file.";
+  };
 }

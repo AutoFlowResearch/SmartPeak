@@ -47,6 +47,10 @@ namespace SmartPeak
     LOGD << "START loadMSExperiment";
     // # load chromatograms
     OpenMS::MSExperiment chromatograms;
+    for (auto elem : params_I)
+    {
+      std::cout << elem.first << "\n";
+    }
     if (filenames.mzML_i.size()) {
       if (params_I.at("mzML").size()) {
         // # convert parameters
@@ -301,14 +305,18 @@ namespace SmartPeak
       return;
     }
 
-    OpenMS::MRMFeatureFinderScoring featureFinder;
-    OpenMS::Param parameters = featureFinder.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFinderScoring"));
-    featureFinder.setParameters(parameters);
+    // try {
+      OpenMS::MRMFeatureFinderScoring featureFinder;
+      OpenMS::Param parameters = featureFinder.getParameters();
+      Utilities::updateParameters(parameters, params_I.at("MRMFeatureFinderScoring"));
+      featureFinder.setParameters(parameters);
 
-    OpenMS::FeatureMap featureMap;
+      OpenMS::FeatureMap featureMap;
 
+<<<<<<< HEAD
     try {
+=======
+>>>>>>> validation experiments runs
       featureFinder.pickExperiment(
         rawDataHandler_IO.getChromatogramMap(),
         featureMap,
@@ -316,14 +324,18 @@ namespace SmartPeak
         rawDataHandler_IO.getTransformationDescription(),
         rawDataHandler_IO.getSWATH()
       );
+<<<<<<< HEAD
     }
     catch (const std::exception& e) {
       LOGE << e.what();
     }
+=======
+>>>>>>> validation experiments runs
 
-    // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
-    featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
+      // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
+      featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
 
+<<<<<<< HEAD
     LOGD << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename();
 
     rawDataHandler_IO.setFeatureMap(featureMap);
@@ -331,6 +343,22 @@ namespace SmartPeak
 
     LOGI << "Feature Picker output size: " << featureMap.size();
     LOGD << "END pickFeatures";
+=======
+      rawDataHandler_IO.setFeatureMap(featureMap);
+      rawDataHandler_IO.updateFeatureMapHistory();
+
+        std::cout << "pickFeatures: output size: " << featureMap.size() << std::endl;
+        std::cout << "==== END   pickFeatures" << std::endl;
+
+      if (verbose_I) {
+        std::cout << "pickFeatures: output size: " << featureMap.size() << std::endl;
+        std::cout << "==== END   pickFeatures" << std::endl;
+      }
+    
+    // } catch (const std::exception &) {
+    //   std::cout << "CAUGHT AN EXCEPTION" << std::endl;
+    // }
+>>>>>>> validation experiments runs
   }
 
   void FilterFeatures::process(
@@ -404,6 +432,7 @@ namespace SmartPeak
   void SelectFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+<<<<<<< HEAD
     const Filenames& filenames
   ) const
   {
@@ -421,6 +450,23 @@ namespace SmartPeak
     if (qmip_params_passed_but_empty || score_params_passed_but_empty) {
       LOGE << "Parameters missing for selectFeatures. Not selecting";
       LOGD << "END selectFeatures";
+=======
+    const Filenames& filenames,
+    const bool verbose_I
+  ) const {
+    if (verbose_I) {
+      std::cout << "==== START selectFeatures" << std::endl;
+      std::cout << "selectFeatures: input size: " << rawDataHandler_IO.getFeatureMap().size() << std::endl;
+    }
+    std::cout << "params_I.size() " << params_I.size() << std::endl;
+    for (auto const& pair: params_I) {
+        std::cout << pair.first << " " << pair.second.size() << std::endl;
+    }
+
+    if (params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip").size() &&
+      params_I.find("MRMFeatureSelector.schedule_MRMFeatures_score") != params_I.end()) {
+      std::cout << "No parameters passed to selectFeatures. Not selecting." << std::endl;
+>>>>>>> validation experiments runs
       return;
     }
 
@@ -768,7 +814,7 @@ namespace SmartPeak
     float height;
     float area;
 
-    std::vector<std::map<std::string, Utilities::CastValue>> reference_data;
+    std::vector<std::map<std::string, Utilities::CastValue>>& reference_data = rawDataHandler_IO.getReferenceData();
 
     while (in.read_row(
       sample_index,
@@ -953,5 +999,44 @@ namespace SmartPeak
     }
 
     LOGD << "END ExtractChromatogramWindows";
+  }
+
+  void MetaLoad::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames,
+    const bool verbose_I
+  ) const {
+    if (InputDataValidation::fileExists(filenames.featureXML_i)) {
+      std::cout << "MetaLoad(): found feature file\n";
+
+      LoadFeatures loadFeatures;
+      loadFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+
+      ValidateFeatures validateFeatures;
+      validateFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+    } else {
+      std::cout << "MetaLoad(): feature file not found\n";
+      LoadRawData loadRawData;
+      loadRawData.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+
+      try {   
+        PickFeatures pickFeatures;
+        pickFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+// TODO: filter for LP
+        FilterFeatures filterFeatures;
+        filterFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+
+        SelectFeatures selectFeatures;
+        selectFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+
+        ValidateFeatures validateFeatures;
+        validateFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+
+        StoreFeatures storeFeatures;
+        storeFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+      } catch (const std::exception& e) 
+      { std::cout << 'SKIPPING' << std::endl; }
+    }
   }
 }
