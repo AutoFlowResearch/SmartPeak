@@ -18,18 +18,17 @@
 
 namespace SmartPeak
 {
-  class RawDataProcessor
+  struct RawDataProcessor
   {
-  public:
     virtual ~RawDataProcessor() = default;
 
-    virtual int getID() const = 0;  ///< get the raw data processor class ID
-    virtual std::string getName() const = 0;  ///< get the raw data processor class name
-    virtual std::string getDescription() const = 0;  ///< get the raw data processor class description
+    virtual int getID() const = 0; /// get the raw data processor struct ID
+    virtual std::string getName() const = 0; /// get the raw data processor struct name
+    virtual std::string getDescription() const = 0; /// get the raw data processor struct description
 
     /** Interface to all raw data processing methods.
 
-      @param[in,out] rawDataHandler_IO Raw data file class
+      @param[in,out] rawDataHandler_IO Raw data file struct
       @param[in] params_I Dictionary of parameter names, values, descriptions, and tags
       @param[in] filenames Info about where data should be read from or written to
     */
@@ -40,14 +39,11 @@ namespace SmartPeak
     ) const = 0;
   };
 
-  class LoadRawData : public RawDataProcessor
+  struct LoadRawData : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 1; }
+    std::string getName() const override { return "LOAD_RAW_DATA"; }
+    std::string getDescription() const override { return "Read in raw data mzML file from disk."; }
 
     /** Read in raw data mzML file from disk.
 
@@ -62,24 +58,14 @@ namespace SmartPeak
 
     /** Extracts metadata from the chromatogram.
     */
-    static void extractMetaData(
-      RawDataHandler& rawDataHandler_IO
-    );
-
-  protected:
-    int id_ = 1;
-    std::string name_ = "LOAD_RAW_DATA";
-    std::string description_ = "Read in raw data mzML file from disk.";
+    static void extractMetaData(RawDataHandler& rawDataHandler_IO);
   };
 
-  class StoreRawData : public RawDataProcessor
+  struct StoreRawData : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_RAW_DATA"; }
+    std::string getDescription() const override { return "Store the processed raw data mzML file to disk."; }
 
     /** Store the processed raw data mzML file to disk.
     */
@@ -88,21 +74,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 2;
-    std::string name_ = "STORE_RAW_DATA";
-    std::string description_ = "Store the processed raw data mzML file to disk.";
   };
 
-  class ZeroChromatogramBaseline : public RawDataProcessor
+  struct ZeroChromatogramBaseline : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 12; }
+    std::string getName() const override { return "ZERO_CHROMATOGRAM_BASELINE"; }
+    std::string getDescription() const override { return "Normalize the lowest chromatogram intensity to zero."; }
 
     /** Normalize the lowest chromatogram intensity to zero FOR MAPPED CHROMATOGRAMS.
     */
@@ -111,21 +89,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 17;
-    std::string name_ = "ZERO_CHROMATOGRAM_BASELINE";
-    std::string description_ = "Normalize the lowest chromatogram intensity to zero.";
   };
 
-  class MapChromatograms : public RawDataProcessor
+  struct MapChromatograms : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 11; }
+    std::string getName() const override { return "MAP_CHROMATOGRAMS"; }
+    std::string getDescription() const override { return "Map chromatograms to the loaded set of transitions."; }
 
     /** Map chromatograms to the loaded set of transitions.
     */
@@ -134,21 +104,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 18;
-    std::string name_ = "MAP_CHROMATOGRAMS";
-    std::string description_ = "Map chromatograms to the loaded set of transitions.";
   };
 
-  class ExtractChromatogramWindows : public RawDataProcessor
+  struct ExtractChromatogramWindows : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 13; }
+    std::string getName() const override { return "EXTRACT_CHROMATOGRAM_WINDOWS"; }
+    std::string getDescription() const override { return "Extract out specified chromatogram windows using the componentFeatureFilters."; }
 
     /** Extract out specified chromatogram windows FROM A MAPPED CHROMATOGRAM using the componentFeatureFilters
     */
@@ -157,21 +119,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 19;
-    std::string name_ = "EXTRACT_CHROMATOGRAM_WINDOWS";
-    std::string description_ = "Extract out specified chromatogram windows using the componentFeatureFilters.";
   };
 
-  class LoadFeatures : public RawDataProcessor
+  struct LoadFeatures : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 2; }
+    std::string getName() const override { return "LOAD_FEATURES"; }
+    std::string getDescription() const override { return "Read in the features from disk."; }
 
     /** Read in the features from disk.
     */
@@ -180,21 +134,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 3;
-    std::string name_ = "LOAD_FEATURES";
-    std::string description_ = "Read in the features from disk.";
   };
 
-  class StoreFeatures : public RawDataProcessor
+  struct StoreFeatures : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 9; }
+    std::string getName() const override { return "STORE_FEATURES"; }
+    std::string getDescription() const override { return "Write the features to disk."; }
 
     /** Write the features to disk.
     */
@@ -203,21 +149,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 4;
-    std::string name_ = "STORE_FEATURES";
-    std::string description_ = "Write the features to disk.";
   };
 
-  class PickFeatures : public RawDataProcessor
+  struct PickFeatures : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 3; }
+    std::string getName() const override { return "PICK_FEATURES"; }
+    std::string getDescription() const override { return "Run the peak picking algorithm."; }
 
     /** Run the openSWATH pick peaking and scoring workflow for a single raw data file.
     */
@@ -226,21 +164,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 5;
-    std::string name_ = "PICK_FEATURES";
-    std::string description_ = "Run the peak picking algorithm.";
   };
 
-  class FilterFeatures : public RawDataProcessor
+  struct FilterFeatures : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 4; }
+    std::string getName() const override { return "FILTER_FEATURES"; }
+    std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
 
     /** Filter features that do not pass the filter QCs.
     */
@@ -249,21 +179,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 6;
-    std::string name_ = "FILTER_FEATURES";
-    std::string description_ = "Filter transitions and transitions groups based on a user defined criteria.";
   };
 
-  class CheckFeatures : public RawDataProcessor
+  struct CheckFeatures : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 8; }
+    std::string getName() const override { return "CHECK_FEATURES"; }
+    std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
 
     /** Flag features that do not pass the filter QCs.
     */
@@ -272,21 +194,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 7;
-    std::string name_ = "CHECK_FEATURES";
-    std::string description_ = "Flag and score transitions and transition groups based on a user defined criteria.";
   };
 
-  class SelectFeatures : public RawDataProcessor
+  struct SelectFeatures : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 5; }
+    std::string getName() const override { return "SELECT_FEATURES"; }
+    std::string getDescription() const override { return "Run the peak selection/alignment algorithm."; }
 
     /** Select features using the MRMFeatureSelection algorithm.
     */
@@ -295,21 +209,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 8;
-    std::string name_ = "SELECT_FEATURES";
-    std::string description_ = "Run the peak selection/alignment algorithm.";
   };
 
-  class ValidateFeatures : public RawDataProcessor
+  struct ValidateFeatures : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 6; }
+    std::string getName() const override { return "VALIDATE_FEATURES"; }
+    std::string getDescription() const override { return "Compare selected features to a reference data set."; }
 
     /** Validate the selected peaks against reference data.
     */
@@ -318,21 +224,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 9;
-    std::string name_ = "VALIDATE_FEATURES";
-    std::string description_ = "Compare selected features to a reference data set.";
   };
 
-  class QuantifyFeatures : public RawDataProcessor
+  struct QuantifyFeatures : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 7; }
+    std::string getName() const override { return "QUANTIFY_FEATURES"; }
+    std::string getDescription() const override { return "Apply a calibration model defined in quantitationMethods to each transition."; }
 
     /** Quantify all unknown samples based on the quantitationMethod.
     */
@@ -341,21 +239,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 10;
-    std::string name_ = "QUANTIFY_FEATURES";
-    std::string description_ = "Apply a calibration model defined in quantitationMethods to each transition.";
   };
 
-  class PlotFeatures : public RawDataProcessor
+  struct PlotFeatures : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return 10; }
+    std::string getName() const override { return "PLOT_FEATURES"; }
+    std::string getDescription() const override { return "Plot the raw chromatogram with selected peaks overlaid."; }
 
     /** Validate the selected peaks against reference data.
     */
@@ -364,21 +254,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 11;
-    std::string name_ = "PLOT_FEATURES";
-    std::string description_ = "Plot the raw chromatogram with selected peaks overlaid.";
   };
 
-  class LoadTransitions : public RawDataProcessor
+  struct LoadTransitions : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_TRANSITIONS"; }
+    std::string getDescription() const override { return "Load the transitions for the SRM experiments from the TraML file."; }
 
     /** Load the transitions from the TraML file.
     */
@@ -387,21 +269,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 12;
-    std::string name_ = "LOAD_TRANSITIONS";
-    std::string description_ = "Load the transitions for the SRM experiments from the TraML file.";
   };
 
-  class LoadFeatureFilters : public RawDataProcessor
+  struct LoadFeatureFilters : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
+    std::string getDescription() const override { return "Load the component and component group transition filters from file."; }
 
     /** Load the component and component group transition filters from file.
     */
@@ -410,21 +284,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 13;
-    std::string name_ = "LOAD_FEATURE_FILTERS";
-    std::string description_ = "Load the component and component group transition filters from file.";
   };
 
-  class LoadFeatureQCs : public RawDataProcessor
+  struct LoadFeatureQCs : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_FEATURE_QCS"; }
+    std::string getDescription() const override { return "Load the component and component group transition QC specifications from file."; }
 
     /** Load the component and component group transition QCs from file.
     */
@@ -433,21 +299,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 14;
-    std::string name_ = "LOAD_FEATURE_QCS";
-    std::string description_ = "Load the component and component group transition QC specifications from file.";
   };
 
-  class LoadValidationData : public RawDataProcessor
+  struct LoadValidationData : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_VALIDATION_DATA"; }
+    std::string getDescription() const override { return "Load the validation data from file."; }
 
     /** Load the validation data from file.
     */
@@ -456,21 +314,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
-
-  protected:
-    int id_ = 15;
-    std::string name_ = "LOAD_VALIDATION_DATA";
-    std::string description_ = "Load the validation data from file.";
   };
 
-  class LoadParameters : public RawDataProcessor
+  struct LoadParameters : public RawDataProcessor
   {
-  public:
-    // using RawDataProcessor::RawDataProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_PARAMETERS"; }
+    std::string getDescription() const override { return "Load the data processing parameters from file."; }
 
     /** Load the data processing parameters from file.
     */
@@ -482,10 +332,5 @@ namespace SmartPeak
     static void sanitizeParameters(
       std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I
     );
-
-  protected:
-    int id_ = 16;
-    std::string name_ = "LOAD_PARAMETERS";
-    std::string description_ = "Load the data processing parameters from file.";
   };
 }
