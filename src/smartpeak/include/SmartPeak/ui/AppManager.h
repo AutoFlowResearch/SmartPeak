@@ -173,5 +173,11 @@ namespace SmartPeak
     void runApp();
 
     std::string getPipelineString();
+
+    void initializeDataDir(
+      const std::string& label,
+      std::string& data_dir_member,
+      const std::string& default_dir
+    );
   };
 }

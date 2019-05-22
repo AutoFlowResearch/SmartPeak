@@ -1066,35 +1066,9 @@ namespace SmartPeak
 
   void AppManager::initializeDataDirs()
   {
-    if (mzML_dir_.empty()) {
-      mzML_dir_ = main_dir_ + "/mzML";
-      LOGN << "\n\nPath for 'mzML':\t" << mzML_dir_;
-      LOGN << "\n\nEnter an absolute pathname to change it, or press Enter to confirm.\n";
-      const std::string path_input = getLineInput("> ");
-      if (path_input.size()) {
-        mzML_dir_ = path_input;
-      }
-    }
-
-    if (features_in_dir_.empty()) {
-      features_in_dir_ = main_dir_ + "/features";
-      LOGN << "\n\nPath for 'INPUT features':\t" << features_in_dir_;
-      LOGN << "\n\nEnter an absolute pathname to change it, or press Enter to confirm.\n";
-      const std::string path_input = getLineInput("> ");
-      if (path_input.size()) {
-        features_in_dir_ = path_input;
-      }
-    }
-
-    if (features_out_dir_.empty()) {
-      features_out_dir_ = main_dir_ + "/features";
-      LOGN << "\n\nPath for 'OUTPUT features':\t" << features_out_dir_;
-      LOGN << "\n\nEnter an absolute pathname to change it, or press Enter to confirm.\n";
-      const std::string path_input = getLineInput("> ");
-      if (path_input.size()) {
-        features_out_dir_ = path_input;
-      }
-    }
+    initializeDataDir("mzML", mzML_dir_, "mzML");
+    initializeDataDir("INPUT features", features_in_dir_, "features");
+    initializeDataDir("OUTPUT features", features_out_dir_, "features");
   }
 
 // #ifdef _WIN32
@@ -1211,5 +1185,23 @@ namespace SmartPeak
       s.pop_back();
     }
     return s;
+  }
+
+  void AppManager::initializeDataDir(
+    const std::string& label,
+    std::string& data_dir_member,
+    const std::string& default_dir
+  )
+  {
+    if (data_dir_member.size()) {
+      return;
+    }
+    data_dir_member = main_dir_ + "/" + default_dir;
+    LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member;
+    LOGN << "\n\nEnter an absolute pathname to change it, or press Enter to confirm.\n";
+    const std::string path_input = getLineInput("> ");
+    if (path_input.size()) {
+      data_dir_member = path_input;
+    }
   }
 }
