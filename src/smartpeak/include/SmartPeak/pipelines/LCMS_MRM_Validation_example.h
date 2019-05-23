@@ -11,8 +11,11 @@ void example_LCMS_MRM_Validation(
 )
 {
   SequenceHandler sequenceHandler;
+  std::cout << "HERE" << std::endl;
 
   SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true);
+
+  std::cout << "after creat esequence" << std::endl;
 
   const std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
     // std::shared_ptr<RawDataProcessor>(new LoadRawData()),
@@ -44,8 +47,7 @@ void example_LCMS_MRM_Validation(
     sequenceHandler,
     dynamic_filenames,
     std::set<std::string>(),
-    raw_data_processing_methods,
-    true
+    raw_data_processing_methods
   );
 
   SequenceParser::writeDataMatrixFromMetaValue(

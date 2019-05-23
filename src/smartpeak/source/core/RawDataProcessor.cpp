@@ -313,10 +313,7 @@ namespace SmartPeak
 
       OpenMS::FeatureMap featureMap;
 
-<<<<<<< HEAD
     try {
-=======
->>>>>>> validation experiments runs
       featureFinder.pickExperiment(
         rawDataHandler_IO.getChromatogramMap(),
         featureMap,
@@ -324,18 +321,14 @@ namespace SmartPeak
         rawDataHandler_IO.getTransformationDescription(),
         rawDataHandler_IO.getSWATH()
       );
-<<<<<<< HEAD
     }
     catch (const std::exception& e) {
       LOGE << e.what();
     }
-=======
->>>>>>> validation experiments runs
 
       // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
       featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
 
-<<<<<<< HEAD
     LOGD << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename();
 
     rawDataHandler_IO.setFeatureMap(featureMap);
@@ -343,22 +336,6 @@ namespace SmartPeak
 
     LOGI << "Feature Picker output size: " << featureMap.size();
     LOGD << "END pickFeatures";
-=======
-      rawDataHandler_IO.setFeatureMap(featureMap);
-      rawDataHandler_IO.updateFeatureMapHistory();
-
-        std::cout << "pickFeatures: output size: " << featureMap.size() << std::endl;
-        std::cout << "==== END   pickFeatures" << std::endl;
-
-      if (verbose_I) {
-        std::cout << "pickFeatures: output size: " << featureMap.size() << std::endl;
-        std::cout << "==== END   pickFeatures" << std::endl;
-      }
-    
-    // } catch (const std::exception &) {
-    //   std::cout << "CAUGHT AN EXCEPTION" << std::endl;
-    // }
->>>>>>> validation experiments runs
   }
 
   void FilterFeatures::process(
@@ -797,6 +774,7 @@ namespace SmartPeak
     float area;
 
     std::vector<std::map<std::string, Utilities::CastValue>>& reference_data = rawDataHandler_IO.getReferenceData();
+    LOGD << "Got reference data";
 
     while (in.read_row(
       sample_index,
@@ -842,10 +820,13 @@ namespace SmartPeak
       mdh.sample_name = sample_name;
       mdh.inj_number = sample_index;
       mdh.batch_name = experiment_id;
-      mdh.setAcquisitionDateAndTimeFromString(acquisition_date_and_time, "%m-%d-%Y %H:%M");
+      // NOTE: temporary, for compatibility with sample files
+      // mdh.setAcquisitionDateAndTimeFromString(acquisition_date_and_time, "%m-%d-%Y %H:%M");
       m.emplace("injection_name", mdh.getInjectionName());
       reference_data.push_back(std::move(m));
     }
+
+    LOGD << "Finished reading reference data";
 
     rawDataHandler_IO.setReferenceData(reference_data);
 
@@ -986,39 +967,35 @@ namespace SmartPeak
   void MetaLoad::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-    const Filenames& filenames,
-    const bool verbose_I
+    const Filenames& filenames
   ) const {
     if (InputDataValidation::fileExists(filenames.featureXML_i)) {
-      std::cout << "MetaLoad(): found feature file\n";
+      LOGD <<  "MetaLoad(): found feature file\n";
 
       LoadFeatures loadFeatures;
-      loadFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+      loadFeatures.process(rawDataHandler_IO, params_I, filenames);
 
       ValidateFeatures validateFeatures;
-      validateFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+      validateFeatures.process(rawDataHandler_IO, params_I, filenames);
     } else {
-      std::cout << "MetaLoad(): feature file not found\n";
+      LOGD << "MetaLoad(): feature file not found\n";
       LoadRawData loadRawData;
-      loadRawData.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+      loadRawData.process(rawDataHandler_IO, params_I, filenames);
+ 
+      PickFeatures pickFeatures;
+      pickFeatures.process(rawDataHandler_IO, params_I, filenames);
 
-      try {   
-        PickFeatures pickFeatures;
-        pickFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
-// TODO: filter for LP
-        FilterFeatures filterFeatures;
-        filterFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+      FilterFeatures filterFeatures;
+      filterFeatures.process(rawDataHandler_IO, params_I, filenames);
 
-        SelectFeatures selectFeatures;
-        selectFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+      SelectFeatures selectFeatures;
+      selectFeatures.process(rawDataHandler_IO, params_I, filenames);
 
-        ValidateFeatures validateFeatures;
-        validateFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
+      ValidateFeatures validateFeatures;
+      validateFeatures.process(rawDataHandler_IO, params_I, filenames);
 
-        StoreFeatures storeFeatures;
-        storeFeatures.process(rawDataHandler_IO, params_I, filenames, verbose_I);
-      } catch (const std::exception& e) 
-      { std::cout << 'SKIPPING' << std::endl; }
+      StoreFeatures storeFeatures;
+      storeFeatures.process(rawDataHandler_IO, params_I, filenames);
     }
   }
 }

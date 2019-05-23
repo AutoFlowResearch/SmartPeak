@@ -17,7 +17,9 @@ namespace SmartPeak
     const bool checkConsistency
   )
   {
+    std::cout << "START createSequence 111" << std::endl;
     LOGD << "START createSequence";
+    std::cout << "START createSequence" << std::endl;
 
     SequenceParser::readSequenceFile(sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
     if (sequenceHandler_IO.getSequence().empty()) {
@@ -45,7 +47,7 @@ namespace SmartPeak
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
 
     LoadValidationData loadValidationData;
-    loadValidationData.process(rawDataHandler, {}, filenames, verbose_I);
+    loadValidationData.process(rawDataHandler, {}, filenames);
 
   const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
 

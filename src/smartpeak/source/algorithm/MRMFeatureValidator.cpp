@@ -96,14 +96,6 @@ namespace SmartPeak
       output_validated.push_back(feature_tmp);
     }
 
-<<<<<<< HEAD
     validation_metrics = Utilities::calculateValidationMetrics(y_true, y_pred);
-=======
-    if (y_true.size() == 0 || y_pred.size() == 0) {
-      std::cout << "NO DATA" << std::endl;
-      return;
-    }
-    validation_metrics = Utilities::calculateValidationMetrics(y_true, y_pred, verbose_I);
->>>>>>> Validation workflow
   }
 }

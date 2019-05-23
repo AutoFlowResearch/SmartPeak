@@ -2,8 +2,11 @@
 
 #include <SmartPeak/test_config.h>
 
-#include <SmartPeak/core/LCMS_MRM_Validation_example.h>
+#include <SmartPeak/pipelines/LCMS_MRM_Validation_example.h>
 #include <SmartPeak/core/Filenames.h>
+
+#include <plog/Log.h>
+#include <plog/Appenders/ConsoleAppender.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -18,11 +21,13 @@ void test_main_Validation(std::string dirpath, std::string sequence_csv_i, std::
 
   std::cout << static_filenames.quantitationMethods_csv_i  << std::endl;
   std::cout << static_filenames.referenceData_csv_i  << std::endl;
-  example_LCMS_MRM_Validation(main_dir, static_filenames, ",", true);
+  example_LCMS_MRM_Validation(main_dir, static_filenames, ",");
 }
 
 int main(int argc, char **argv)
 {
+  static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
+  plog::init(plog::debug, &consoleAppender);
   test_main_Validation(argv[1], argv[2], argv[3], argv[4]);
   return 0;
 }

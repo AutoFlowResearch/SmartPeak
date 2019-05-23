@@ -503,12 +503,10 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames,
-      const bool verbose_I = false
+      const Filenames& filenames
     ) const;
     static void sanitizeParameters(
-      std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const bool verbose_I = false
+      std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I
     );
 
   protected:
