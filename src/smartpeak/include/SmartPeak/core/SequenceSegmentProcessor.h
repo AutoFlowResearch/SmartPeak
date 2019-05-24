@@ -11,6 +11,12 @@ namespace SmartPeak
 {
   struct SequenceSegmentProcessor
   {
+    // C.67: A polymorphic class should suppress copying
+    SequenceSegmentProcessor(const SequenceSegmentProcessor& other) = delete;
+    SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor& other) = delete;
+
+    // C.35: A base class destructor should be either public and virtual, or protected and nonvirtual
+    // C.127: A class with a virtual function should have a virtual or protected destructor
     virtual ~SequenceSegmentProcessor() = default;
 
     virtual int getID() const = 0; /// get the raw data processor struct ID
@@ -46,9 +52,16 @@ namespace SmartPeak
       const MetaDataHandler::SampleType sampleType,
       std::vector<size_t>& sampleIndices
     );
+
+  protected:
+    // Forced to write this, because the other user-defined constructors inhibit
+    // the implicit definition of a default constructor
+    // Even though this class is pure abstract and hence can't be instantiated,
+    // derived classes will call the base's constructor
+    SequenceSegmentProcessor() = default;
   };
 
-  struct CalculateCalibration : public SequenceSegmentProcessor
+  struct CalculateCalibration : SequenceSegmentProcessor
   {
     int getID() const { return 14; }
     std::string getName() const { return "CALCULATE_CALIBRATION"; }
@@ -65,7 +78,7 @@ namespace SmartPeak
     ) const;
   };
 
-  struct LoadStandardsConcentrations : public SequenceSegmentProcessor
+  struct LoadStandardsConcentrations : SequenceSegmentProcessor
   {
     int getID() const { return -1; }
     std::string getName() const { return "LOAD_STANDARDS_CONCENTRATIONS"; }
@@ -82,7 +95,7 @@ namespace SmartPeak
     ) const;
   };
 
-  struct LoadQuantitationMethods : public SequenceSegmentProcessor
+  struct LoadQuantitationMethods : SequenceSegmentProcessor
   {
     int getID() const { return 16; }
     std::string getName() const { return "LOAD_QUANTITATION_METHODS"; }
@@ -99,7 +112,7 @@ namespace SmartPeak
     ) const;
   };
 
-  struct StoreQuantitationMethods : public SequenceSegmentProcessor
+  struct StoreQuantitationMethods : SequenceSegmentProcessor
   {
     int getID() const { return 15; }
     std::string getName() const { return "STORE_QUANTITATION_METHODS"; }
@@ -116,7 +129,7 @@ namespace SmartPeak
     ) const;
   };
 
-  struct PlotCalibrators : public SequenceSegmentProcessor
+  struct PlotCalibrators : SequenceSegmentProcessor
   {
     int getID() const { return -1; }
     std::string getName() const { return "PLOT_CALIBRATORS"; }

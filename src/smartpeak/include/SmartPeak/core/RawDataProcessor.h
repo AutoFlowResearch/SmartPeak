@@ -20,6 +20,12 @@ namespace SmartPeak
 {
   struct RawDataProcessor
   {
+    // C.67: A polymorphic class should suppress copying
+    RawDataProcessor(const RawDataProcessor& other) = delete;
+    RawDataProcessor& operator=(const RawDataProcessor& other) = delete;
+
+    // C.35: A base class destructor should be either public and virtual, or protected and nonvirtual
+    // C.127: A class with a virtual function should have a virtual or protected destructor
     virtual ~RawDataProcessor() = default;
 
     virtual int getID() const = 0; /// get the raw data processor struct ID
@@ -37,9 +43,16 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const = 0;
+
+  protected:
+    // Forced to write this, because the other user-defined constructors inhibit
+    // the implicit definition of a default constructor
+    // Even though this class is pure abstract and hence can't be instantiated,
+    // derived classes will call the base's constructor
+    RawDataProcessor() = default;
   };
 
-  struct LoadRawData : public RawDataProcessor
+  struct LoadRawData : RawDataProcessor
   {
     int getID() const override { return 1; }
     std::string getName() const override { return "LOAD_RAW_DATA"; }
@@ -61,7 +74,7 @@ namespace SmartPeak
     static void extractMetaData(RawDataHandler& rawDataHandler_IO);
   };
 
-  struct StoreRawData : public RawDataProcessor
+  struct StoreRawData : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "STORE_RAW_DATA"; }
@@ -76,7 +89,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct ZeroChromatogramBaseline : public RawDataProcessor
+  struct ZeroChromatogramBaseline : RawDataProcessor
   {
     int getID() const override { return 12; }
     std::string getName() const override { return "ZERO_CHROMATOGRAM_BASELINE"; }
@@ -91,7 +104,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct MapChromatograms : public RawDataProcessor
+  struct MapChromatograms : RawDataProcessor
   {
     int getID() const override { return 11; }
     std::string getName() const override { return "MAP_CHROMATOGRAMS"; }
@@ -106,7 +119,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct ExtractChromatogramWindows : public RawDataProcessor
+  struct ExtractChromatogramWindows : RawDataProcessor
   {
     int getID() const override { return 13; }
     std::string getName() const override { return "EXTRACT_CHROMATOGRAM_WINDOWS"; }
@@ -121,7 +134,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatures : public RawDataProcessor
+  struct LoadFeatures : RawDataProcessor
   {
     int getID() const override { return 2; }
     std::string getName() const override { return "LOAD_FEATURES"; }
@@ -136,7 +149,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct StoreFeatures : public RawDataProcessor
+  struct StoreFeatures : RawDataProcessor
   {
     int getID() const override { return 9; }
     std::string getName() const override { return "STORE_FEATURES"; }
@@ -151,7 +164,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct PickFeatures : public RawDataProcessor
+  struct PickFeatures : RawDataProcessor
   {
     int getID() const override { return 3; }
     std::string getName() const override { return "PICK_FEATURES"; }
@@ -166,7 +179,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct FilterFeatures : public RawDataProcessor
+  struct FilterFeatures : RawDataProcessor
   {
     int getID() const override { return 4; }
     std::string getName() const override { return "FILTER_FEATURES"; }
@@ -181,7 +194,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct CheckFeatures : public RawDataProcessor
+  struct CheckFeatures : RawDataProcessor
   {
     int getID() const override { return 8; }
     std::string getName() const override { return "CHECK_FEATURES"; }
@@ -196,7 +209,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct SelectFeatures : public RawDataProcessor
+  struct SelectFeatures : RawDataProcessor
   {
     int getID() const override { return 5; }
     std::string getName() const override { return "SELECT_FEATURES"; }
@@ -211,7 +224,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct ValidateFeatures : public RawDataProcessor
+  struct ValidateFeatures : RawDataProcessor
   {
     int getID() const override { return 6; }
     std::string getName() const override { return "VALIDATE_FEATURES"; }
@@ -226,7 +239,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct QuantifyFeatures : public RawDataProcessor
+  struct QuantifyFeatures : RawDataProcessor
   {
     int getID() const override { return 7; }
     std::string getName() const override { return "QUANTIFY_FEATURES"; }
@@ -241,7 +254,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct PlotFeatures : public RawDataProcessor
+  struct PlotFeatures : RawDataProcessor
   {
     int getID() const override { return 10; }
     std::string getName() const override { return "PLOT_FEATURES"; }
@@ -256,7 +269,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadTransitions : public RawDataProcessor
+  struct LoadTransitions : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_TRANSITIONS"; }
@@ -271,7 +284,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureFilters : public RawDataProcessor
+  struct LoadFeatureFilters : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
@@ -286,7 +299,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureQCs : public RawDataProcessor
+  struct LoadFeatureQCs : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_QCS"; }
@@ -301,7 +314,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadValidationData : public RawDataProcessor
+  struct LoadValidationData : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_VALIDATION_DATA"; }
@@ -316,7 +329,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadParameters : public RawDataProcessor
+  struct LoadParameters : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_PARAMETERS"; }
