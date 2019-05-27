@@ -47,7 +47,7 @@ namespace SmartPeak
   protected:
     // Forced to write this, because the other user-defined constructors inhibit
     // the implicit definition of a default constructor
-    // Even though this class is pure abstract and hence can't be instantiated,
+    // Even though this class is abstract and hence can't be instantiated,
     // derived classes will call the base's constructor
     RawDataProcessor() = default;
   };
