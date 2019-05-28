@@ -20,11 +20,13 @@
 
 namespace SmartPeak
 {
-  bool AppStateProcessor::buildStaticFilenames()
+  bool BuildStaticFilenames::operator()()
   {
     Filenames& f = state_.static_filenames_;
     state_.main_dir_ = state_.sequence_pathname_.substr(0, state_.sequence_pathname_.find_last_of('/'));
     f = Filenames::getDefaultStaticFilenames(state_.main_dir_);
+    ClearNonExistantDefaultGeneratedFilenames
+      clearNonExistantDefaultGeneratedFilenames(state_);
     clearNonExistantDefaultGeneratedFilenames(f);
     f.sequence_csv_i = state_.sequence_pathname_;
 
@@ -50,6 +52,7 @@ namespace SmartPeak
         " - " << pathnamesFilePath << "\n"
         "Its values will be used.\n";
       LOGN << "\n\nValues in " << pathnamesFilePath << ": USED\n";
+      UpdateFilenames updateFilenames(state_);
       updateFilenames(f, pathnamesFilePath);
     }
 
@@ -69,6 +72,7 @@ namespace SmartPeak
 
     std::cout << "\n\n";
 
+    RequiredPathnamesAreValid requiredPathnamesAreValid(state_);
     const bool requiredPathnamesAreValidBool = requiredPathnamesAreValid(is_valid);
 
     const bool otherPathnamesAreFine = std::all_of(
@@ -78,6 +82,7 @@ namespace SmartPeak
         { return arg.validity != InputDataValidation::FilenameInfo::invalid; });
 
     if (!requiredPathnamesAreValidBool || !otherPathnamesAreFine) {
+      GeneratePathnamesTxt generatePathnamesTxt(state_);
       generatePathnamesTxt(pathnamesFilePath, f, is_valid);
       LOGF << "\n\nERROR!!!\n"
         "One or more pathnames are not valid.\n"
@@ -100,7 +105,9 @@ namespace SmartPeak
     return true;
   }
 
-  bool AppStateProcessor::requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation)
+  bool RequiredPathnamesAreValid::operator()(
+    const std::vector<InputDataValidation::FilenameInfo>& validation
+  )
   {
     const std::unordered_set<std::string> required {"sequence", "parameters", "traml"};
     bool is_valid {true};
@@ -113,8 +120,9 @@ namespace SmartPeak
     return is_valid;
   }
 
-  void AppStateProcessor::clearNonExistantDefaultGeneratedFilenames(Filenames& f)
+  void ClearNonExistantDefaultGeneratedFilenames::operator()(Filenames& f)
   {
+    ClearNonExistantFilename clearNonExistantFilename(state_);
     // clearNonExistantFilename(f.sequence_csv_i);   // The file must exist
     // clearNonExistantFilename(f.parameters_csv_i); // The file must exist
     // clearNonExistantFilename(f.traML_csv_i);      // The file must exist
@@ -127,14 +135,14 @@ namespace SmartPeak
     clearNonExistantFilename(f.referenceData_csv_i);
   }
 
-  void AppStateProcessor::clearNonExistantFilename(std::string& filename)
+  void ClearNonExistantFilename::operator()(std::string& filename)
   {
     if (InputDataValidation::fileExists(filename) == false) {
       filename.clear();
     }
   }
 
-  void AppStateProcessor::generatePathnamesTxt(
+  void GeneratePathnamesTxt::operator()(
     const std::string& pathname,
     const Filenames& f,
     const std::vector<InputDataValidation::FilenameInfo>& is_valid
@@ -146,6 +154,7 @@ namespace SmartPeak
       return;
     }
     std::vector<InputDataValidation::FilenameInfo>::const_iterator it = is_valid.cbegin();
+    GetValidPathnameOrPlaceholder getValidPathnameOrPlaceholder(state_);
     ofs <<
       "sequence="            << getValidPathnameOrPlaceholder(f.sequence_csv_i, (it++)->validity) <<
       "parameters="          << getValidPathnameOrPlaceholder(f.parameters_csv_i, (it++)->validity) <<
@@ -159,13 +168,13 @@ namespace SmartPeak
       "referenceData="       << getValidPathnameOrPlaceholder(f.referenceData_csv_i, (it++)->validity);
   }
 
-  std::string AppStateProcessor::getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid)
+  std::string GetValidPathnameOrPlaceholder::operator()(const std::string& pathname, const bool is_valid)
   {
     const std::string placeholder = "";
     return (is_valid ? pathname : placeholder) + "\n";
   }
 
-  void AppStateProcessor::updateFilenames(Filenames& f, const std::string& pathname)
+  void UpdateFilenames::operator()(Filenames& f, const std::string& pathname)
   {
     std::ifstream stream(pathname);
     const std::regex re("([a-zA-Z_]+)=([^\\s]*)");
@@ -228,7 +237,7 @@ namespace SmartPeak
     }
   }
 
-  void AppStateProcessor::processCommands(const std::vector<AppState::Command>& commands)
+  void ProcessCommands::operator()(const std::vector<AppState::Command>& commands)
   {
     size_t i = 0;
     while (i < commands.size()) {
@@ -261,7 +270,7 @@ namespace SmartPeak
     }
   }
 
-  bool AppStateProcessor::createCommand(const int n, AppState::Command& cmd)
+  bool CreateCommand::operator()(const int n, AppState::Command& cmd)
   {
     if (n < 1 || n > 16 || n == 10) { // TODO: update this if plotting is implemented
       LOGW << "\n\nSkipping: " << n;
