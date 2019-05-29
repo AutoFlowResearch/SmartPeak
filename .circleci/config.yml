@@ -13,8 +13,7 @@ jobs:
       - run: |
           apt-get update
       - run: >
-          apt-get install --no-install-recommends -y
-          git cmake qt5-default libboost-dev libeigen3-dev
+          apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev
           libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev
           libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
           libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
