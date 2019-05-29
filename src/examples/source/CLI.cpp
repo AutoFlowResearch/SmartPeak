@@ -11,6 +11,7 @@
 using namespace SmartPeak;
 
 AppState state;
+AppStateProcessor processor(state);
 
 std::string getLineInput(const std::string& message, const bool canBeEmpty = true);
 
@@ -150,8 +151,7 @@ std::vector<AppState::Command> getMethodsInput()
 
   for (int n; iss >> n;) {
     AppState::Command cmd;
-    CreateCommand createCommand(state);
-    const bool created = createCommand(n, cmd);
+    const bool created = processor.createCommand(n, cmd);
     if (created) {
       methods.push_back(cmd);
     }
@@ -420,8 +420,7 @@ menuFile_label:
     state.features_in_dir_.clear();
     state.features_out_dir_.clear();
     LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
-    BuildStaticFilenames buildStaticFilenames(state);
-    const bool pathnamesAreCorrect = buildStaticFilenames();
+    const bool pathnamesAreCorrect = processor.buildStaticFilenames();
     if (pathnamesAreCorrect) {
       state.sequenceHandler_.clear();
       CreateSequence cs(state.sequenceHandler_);
@@ -624,10 +623,8 @@ menuActions_label:
     try {
       const int n = std::stoi(input);
       AppState::Command cmd;
-      CreateCommand createCommand(state);
-      if (createCommand(n, cmd)) {
-        ProcessCommands processCommands(state);
-        processCommands({cmd});
+      if (processor.createCommand(n, cmd)) {
+        processor.processCommands({cmd});
       }
     } catch (...) {
       LOGE << "\n\nInvalid input: cannot convert to integer.\n";
@@ -635,8 +632,7 @@ menuActions_label:
   }
   else if ("2" == in) {
     initializeDataDirs();
-    ProcessCommands processCommands(state);
-    processCommands(state.commands_);
+    processor.processCommands(state.commands_);
     LOGN << "\n\nWorkflow completed.\n";
   }
   else if ("3" == in) {
@@ -910,6 +906,9 @@ void initializeDataDir(
 
 int main()
 {
+  AppState state;
+  AppStateProcessor processor(state);
+
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   char filename[128];
   strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
