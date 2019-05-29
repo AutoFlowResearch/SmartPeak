@@ -1,10 +1,14 @@
 #pragma once
 
+#include <SmartPeak/ui/FilePicker.h>
+
 namespace SmartPeak
 {
   class AppWindow
   {
   public:
+    FilePicker file_picker_;
+
     /**
       Show the application screen
     */
@@ -37,13 +41,10 @@ namespace SmartPeak
       bool& show_info,
       bool& show_log,
       // Help
-      bool& show_app_about,
-      bool& show_file_picker
+      bool& show_app_about
     );
 
-    void showMenuFile(
-      bool& show_file_picker
-    ); ///< Show the main menu File options
+    void showMenuFile(); ///< Show the main menu File options
 
     void showMenuEdit(); ///< Show the main menu Edit options
 
