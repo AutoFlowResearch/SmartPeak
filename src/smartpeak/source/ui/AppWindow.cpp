@@ -2,6 +2,7 @@
 #include <SmartPeak/ui/Widget.h>
 #include <imgui.h>
 #include <algorithm>
+#include <SmartPeak/ui/FilePicker.h>
 
 namespace SmartPeak
 {
@@ -43,9 +44,12 @@ namespace SmartPeak
     // Help
     static bool show_app_about_ = false;
 
-    if (file_picker_.show_file_picker_)
+    static bool show_file_picker_ = false;
+    static FilePicker file_picker(show_file_picker_);
+
+    if (show_file_picker_)
     {
-      file_picker_.draw();
+      file_picker.draw();
     }
 
     // Show the main window
@@ -92,7 +96,8 @@ namespace SmartPeak
       show_info_,
       show_log_,
       // Help
-      show_app_about_
+      show_app_about_,
+      show_file_picker_
     );
 
     // determine what windows will be shown
@@ -203,7 +208,8 @@ namespace SmartPeak
     bool& show_info,
     bool& show_log,
     // Help
-    bool& show_app_about
+    bool& show_app_about,
+    bool& show_file_picker
   )
   {
     // Show the widgets
@@ -219,7 +225,7 @@ namespace SmartPeak
     {
       if (ImGui::BeginMenu("File"))
       {
-        showMenuFile();
+        showMenuFile(show_file_picker);
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Edit"))
@@ -272,7 +278,9 @@ namespace SmartPeak
     }
   }
 
-  void AppWindow::showMenuFile()
+  void AppWindow::showMenuFile(
+    bool& show_file_picker
+  )
   {
     ImGui::MenuItem("Session", NULL, false, false);
     if (ImGui::MenuItem("New Session"))
@@ -287,7 +295,7 @@ namespace SmartPeak
     }
 
     if (ImGui::MenuItem("Load session from sequence")) {
-      file_picker_.show_file_picker_ = true;
+      show_file_picker = true;
     }
 
     if (ImGui::MenuItem("Save Session", "Ctrl+S"))

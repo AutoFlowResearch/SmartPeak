@@ -1,6 +1,5 @@
 #pragma once
 
-#include <SmartPeak/ui/FilePicker.h>
 #include <string>
 #include <vector>
 
@@ -9,14 +8,12 @@ namespace SmartPeak
   class AppWindow
   {
   public:
-    FilePicker file_picker_;
-
     /**
       Show the application screen
     */
-    void showApp();
+    static void showApp();
 
-    void showMainMenuBar(
+    static void showMainMenuBar(
       // View: Explorer pane
       bool& show_sequence_explorer,
       bool& show_transitions_explorer,
@@ -43,14 +40,17 @@ namespace SmartPeak
       bool& show_info,
       bool& show_log,
       // Help
-      bool& show_app_about
+      bool& show_app_about,
+      bool& show_file_picker
     );
 
-    void showMenuFile(); ///< Show the main menu File options
+    static void showMenuFile(
+      bool& show_file_picker
+    ); ///< Show the main menu File options
 
-    void showMenuEdit(); ///< Show the main menu Edit options
+    static void showMenuEdit(); ///< Show the main menu Edit options
 
-    void showMenuView(
+    static void showMenuView(
       // View: Explorer pane
       bool& show_sequence_explorer,
       bool& show_transitions_explorer,
@@ -78,11 +78,11 @@ namespace SmartPeak
       bool& show_log
     ); ///< Show the main menu View options
 
-    void showMenuAction(); ///< Show the main menu Action options
+    static void showMenuAction(); ///< Show the main menu Action options
 
-    void showMenuHelp(bool& show_app_about); ///< Show the main menu Help options
+    static void showMenuHelp(bool& show_app_about); ///< Show the main menu Help options
 
-    void showExplorerWindow(
+    static void showExplorerWindow(
       bool& show_injections_search,
       bool& show_samples_search,
       bool& show_sequence_segments_search,
@@ -96,7 +96,7 @@ namespace SmartPeak
       bool& show_features_explorer
     );
 
-    void showMainWindow(
+    static void showMainWindow(
       bool& show_sequence_table,
       bool& show_transitions_table,
       bool& show_workflow_table,
@@ -114,12 +114,12 @@ namespace SmartPeak
       bool& show_sequence_summary_table
     );
 
-    void showInfoWindow(
+    static void showInfoWindow(
       bool& show_output,
       bool& show_info,
       bool& show_log
     );
 
-    void HelpMarker(const char* desc);
+    static void HelpMarker(const char* desc);
   };
 }

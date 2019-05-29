@@ -14,18 +14,13 @@ namespace SmartPeak
     std::array<std::vector<std::string>, 4> pathname_content_;
     std::string current_pathname_ = fs::current_path().root_path().string();
     std::string picked_pathname_;
-    std::string title_            = "Pick a pathname";
+    std::string title_ = "Pick a pathname";
+    bool&       show_file_picker_;
 
   public:
-    bool        show_file_picker_ = false;
+    FilePicker() = delete;
 
-    FilePicker()
-    {
-      pathname_content_ = Utilities::getPathnameContent(current_pathname_);
-    }
-
-    FilePicker(bool show_file_picker) : show_file_picker_(show_file_picker)
-    {
+    FilePicker(bool& show_file_picker) : show_file_picker_(show_file_picker) {
       pathname_content_ = Utilities::getPathnameContent(current_pathname_);
     }
 
