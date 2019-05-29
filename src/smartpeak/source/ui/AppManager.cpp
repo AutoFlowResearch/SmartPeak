@@ -849,7 +849,8 @@ namespace SmartPeak
       "[16] Total width\n"
       "[17] Width at 50% peak's height\n"
       "[18] Retention time\n"
-      "[19] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18\n\n";
+      "[19] Integration start and end\n"
+      "[20] Preset (all): 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19\n\n";
 
     std::string line;
 
@@ -924,13 +925,17 @@ namespace SmartPeak
         metadata.push_back("RT");
         break;
       case 19:
+        metadata.push_back("leftWidth");
+        metadata.push_back("rightWidth");
+        break;
+      case 20:
         metadata = {
           "peak_apex_int", "peak_area", "total_width", "width_at_50", "tailing_factor",
           "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
           "points_across_half_height", "logSN", "calculated_concentration",
           "QC_transition_message", "QC_transition_pass", "QC_transition_score",
           "QC_transition_group_message", "QC_transition_group_pass",
-          "QC_transition_group_score", "RT"
+          "QC_transition_group_score", "RT", "leftWidth", "rightWidth"
         };
         break;
       }
