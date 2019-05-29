@@ -1,8 +1,10 @@
 #pragma once
+
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/ui/Widget.h>
 #include <array>
 #include <string>
+#include <vector>
 #include <boost/filesystem.hpp>
 
 namespace fs = boost::filesystem;

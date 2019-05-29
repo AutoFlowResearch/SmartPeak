@@ -1,8 +1,8 @@
 #include <SmartPeak/ui/AppWindow.h>
-#include <SmartPeak/ui/Widget.h>
-#include <imgui.h>
-#include <algorithm>
 #include <SmartPeak/ui/FilePicker.h>
+#include <string>
+#include <vector>
+#include <imgui.h>
 
 namespace SmartPeak
 {

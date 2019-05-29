@@ -1,8 +1,5 @@
 #pragma once
 
-#include <string>
-#include <vector>
-
 namespace SmartPeak
 {
   class AppWindow
@@ -11,9 +8,9 @@ namespace SmartPeak
     /**
       Show the application screen
     */
-    static void showApp();
+    void showApp();
 
-    static void showMainMenuBar(
+    void showMainMenuBar(
       // View: Explorer pane
       bool& show_sequence_explorer,
       bool& show_transitions_explorer,
@@ -44,13 +41,13 @@ namespace SmartPeak
       bool& show_file_picker
     );
 
-    static void showMenuFile(
+    void showMenuFile(
       bool& show_file_picker
     ); ///< Show the main menu File options
 
-    static void showMenuEdit(); ///< Show the main menu Edit options
+    void showMenuEdit(); ///< Show the main menu Edit options
 
-    static void showMenuView(
+    void showMenuView(
       // View: Explorer pane
       bool& show_sequence_explorer,
       bool& show_transitions_explorer,
@@ -78,11 +75,11 @@ namespace SmartPeak
       bool& show_log
     ); ///< Show the main menu View options
 
-    static void showMenuAction(); ///< Show the main menu Action options
+    void showMenuAction(); ///< Show the main menu Action options
 
-    static void showMenuHelp(bool& show_app_about); ///< Show the main menu Help options
+    void showMenuHelp(bool& show_app_about); ///< Show the main menu Help options
 
-    static void showExplorerWindow(
+    void showExplorerWindow(
       bool& show_injections_search,
       bool& show_samples_search,
       bool& show_sequence_segments_search,
@@ -96,7 +93,7 @@ namespace SmartPeak
       bool& show_features_explorer
     );
 
-    static void showMainWindow(
+    void showMainWindow(
       bool& show_sequence_table,
       bool& show_transitions_table,
       bool& show_workflow_table,
@@ -114,12 +111,12 @@ namespace SmartPeak
       bool& show_sequence_summary_table
     );
 
-    static void showInfoWindow(
+    void showInfoWindow(
       bool& show_output,
       bool& show_info,
       bool& show_log
     );
 
-    static void HelpMarker(const char* desc);
+    void HelpMarker(const char* desc);
   };
 }
