@@ -306,4 +306,26 @@ namespace SmartPeak
     }
     return true;
   }
+
+  void LoadSessionFromSequence::operator()(const char* const pathname)
+  {
+    state_.sequence_pathname_ = std::string(pathname);
+    state_.mzML_dir_.clear();
+    state_.features_in_dir_.clear();
+    state_.features_out_dir_.clear();
+    LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
+    BuildStaticFilenames buildStaticFilenames(state_);
+    const bool pathnamesAreCorrect = buildStaticFilenames();
+    if (pathnamesAreCorrect) {
+      state_.sequenceHandler_.clear();
+      CreateSequence cs(state_.sequenceHandler_);
+      cs.filenames        = state_.static_filenames_;
+      cs.delimiter        = ",";
+      cs.checkConsistency = true;
+      cs.process();
+    } else {
+      LOGE << "Provided and/or inferred pathnames are not correct."
+        "The sequence has not been modified. Check file: " << state_.pathnamesFilename_;
+    }
+  };
 }

@@ -1,13 +1,18 @@
 #pragma once
 
+#include <SmartPeak/core/AppState.h>
+#include <SmartPeak/core/AppStateProcessor.h>
 #include <SmartPeak/ui/FilePicker.h>
 
 namespace SmartPeak
 {
-  class AppWindow
-  {
+  class AppWindow {
   public:
     FilePicker file_picker_;
+    AppState& state_;
+
+    AppWindow() = delete;
+    AppWindow(AppState& state) : state_(state) {}
 
     /**
       Show the application screen

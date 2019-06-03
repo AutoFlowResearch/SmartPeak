@@ -31,6 +31,7 @@ namespace SmartPeak
     virtual void operator()(Filenames& f, const std::string& pathname) {}
     virtual void operator()(const std::vector<AppState::Command>& commands) {}
     virtual bool operator()(const int n, AppState::Command& cmd) {}
+    virtual void operator()(const char* const pathname) {}
 
     AppState& state_;
 
@@ -90,5 +91,10 @@ namespace SmartPeak
   struct CreateCommand : AppStateProcessor {
     CreateCommand(AppState& state) : AppStateProcessor(state) {}
     bool operator()(const int n, AppState::Command& cmd) override;
+  };
+
+  struct LoadSessionFromSequence : AppStateProcessor {
+    LoadSessionFromSequence(AppState& state) : AppStateProcessor(state) {}
+    void operator()(const char* const pathname) override;
   };
 }

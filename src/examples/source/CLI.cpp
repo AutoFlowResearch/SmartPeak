@@ -1,4 +1,3 @@
-// #include <SmartPeak/ui/AppManager.h>
 #include <SmartPeak/core/AppState.h>
 #include <SmartPeak/core/AppStateProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
@@ -416,23 +415,8 @@ menuFile_label:
 
   if ("1" == in) {
     setSequencePathnameFromInput();
-    state.mzML_dir_.clear();
-    state.features_in_dir_.clear();
-    state.features_out_dir_.clear();
-    LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
-    BuildStaticFilenames buildStaticFilenames(state);
-    const bool pathnamesAreCorrect = buildStaticFilenames();
-    if (pathnamesAreCorrect) {
-      state.sequenceHandler_.clear();
-      CreateSequence cs(state.sequenceHandler_);
-      cs.filenames        = state.static_filenames_;
-      cs.delimiter        = ",";
-      cs.checkConsistency = true;
-      cs.process();
-    } else {
-      LOGE << "Provided and/or inferred pathnames are not correct."
-        "The sequence has not been modified. Check file: " << state.pathnamesFilename_;
-    }
+    LoadSessionFromSequence processor(state);
+    processor(state.sequence_pathname_.c_str());
   }
   else if ("2" == in) {
     menuImportFile();

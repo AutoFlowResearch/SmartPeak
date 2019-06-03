@@ -10,10 +10,29 @@
 #include <stdio.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <plog/Log.h>
+#include <plog/Appenders/ConsoleAppender.h>
+#include <chrono>
 
 int main(int argc, char **argv) 
   // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
+  const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+  char filename[128];
+  strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
+
+  // Add .csv appender: 32 MiB per file, max. 100 log files
+  static plog::RollingFileAppender<plog::CsvFormatter>
+    fileAppender(filename, 1024 * 1024 * 32, 100);
+
+  // Add console appender, instead of only the file one
+  static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
+
+  // Init logger with two appenders
+  plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender);
+
+  LOGN << "Log file at: " << filename;
+
   // Setup SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
   {
@@ -67,7 +86,8 @@ int main(int argc, char **argv)
 
   // Main loop
   bool done = false;
-  SmartPeak::AppWindow appWindow;
+  SmartPeak::AppState state;
+  SmartPeak::AppWindow appWindow(state);
   while (!done)
   {
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.

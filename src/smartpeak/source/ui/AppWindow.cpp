@@ -287,6 +287,8 @@ namespace SmartPeak
     }
 
     if (ImGui::MenuItem("Load session from sequence")) {
+      static LoadSessionFromSequence processor(state_);
+      file_picker_.setProcessor(processor);
       file_picker_.show_file_picker_ = true;
     }
 
