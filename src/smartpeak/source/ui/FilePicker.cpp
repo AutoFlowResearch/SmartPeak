@@ -1,7 +1,9 @@
+#include <SmartPeak/core/AppStateProcessor.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/Utilities.h>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
@@ -133,7 +135,9 @@ namespace SmartPeak
         }
         picked_pathname_.append(pathname_content_[0][selected_entry]);
       }
-      printf("Open: %s\n", picked_pathname_.c_str());
+      LOGI << "Picked pathname: " << picked_pathname_;
+      runProcessor();
+      clearProcessor();
       show_file_picker_ = false;
       selected_entry = -1;
       ImGui::CloseCurrentPopup();
@@ -160,5 +164,25 @@ namespace SmartPeak
   void FilePicker::setTitle(const std::string& title)
   {
     title_ = title;
+  }
+
+  void FilePicker::setProcessor(AppStateProcessor& processor)
+  {
+    LOGD << "Setting processor: " << (&processor);
+    processor_ = &processor;
+  }
+
+  void FilePicker::runProcessor()
+  {
+    LOGD << "Running processor (ptr): " << processor_;
+    if (!processor_)
+      return;
+    (*processor_)(picked_pathname_.c_str());
+  }
+
+  void FilePicker::clearProcessor()
+  {
+    LOGD << "Clearing processor";
+    processor_ = nullptr;
   }
 }

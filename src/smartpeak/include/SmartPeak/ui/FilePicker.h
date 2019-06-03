@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SmartPeak/core/AppStateProcessor.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/ui/Widget.h>
 #include <array>
@@ -16,7 +17,8 @@ namespace SmartPeak
     std::array<std::vector<std::string>, 4> pathname_content_;
     std::string current_pathname_ = fs::current_path().root_path().string();
     std::string picked_pathname_;
-    std::string title_ = "Pick a pathname";
+    std::string title_            = "Pick a pathname";
+    AppStateProcessor* processor_ = nullptr;
 
   public:
     bool        show_file_picker_ = false;
@@ -31,5 +33,11 @@ namespace SmartPeak
     std::string getPickedPathname() const;
 
     void setTitle(const std::string& title);
+
+    void setProcessor(AppStateProcessor& processor);
+
+    void runProcessor();
+
+    void clearProcessor();
   };
 }
