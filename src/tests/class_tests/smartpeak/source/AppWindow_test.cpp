@@ -13,14 +13,14 @@ BOOST_AUTO_TEST_CASE(constructor)
 {
   AppWindow* ptr = nullptr;
   AppWindow* nullPointer = nullptr;
-  ptr = new AppWindow();
+  // ptr = new AppWindow();
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
 BOOST_AUTO_TEST_CASE(destructor) 
 {
   AppWindow* ptr = nullptr;
-  ptr = new AppWindow();
+  // ptr = new AppWindow();
   delete ptr;
 }
 
