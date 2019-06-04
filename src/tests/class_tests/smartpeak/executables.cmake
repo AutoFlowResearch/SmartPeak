@@ -26,7 +26,7 @@ set(algorithm_executables_list
 )
 
 set(ui_executables_list
-	# AppWindow_test
+	AppWindow_test
 )
 
 ### collect test executables

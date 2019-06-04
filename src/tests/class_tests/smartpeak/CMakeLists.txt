@@ -99,9 +99,9 @@ add_dependencies(IO_TEST ${io_executables_list})
 add_custom_target(ALGORITHM_TEST)
 add_dependencies(ALGORITHM_TEST ${algorithm_executables_list})
 
-# ui
-# add_custom_target(UI_TEST)
-# add_dependencies(UI_TEST ${ui_executables_list})
+# algorithm
+add_custom_target(UI_TEST)
+add_dependencies(UI_TEST ${ui_executables_list})
 
 #------------------------------------------------------------------------------
 # Add the actual tests
