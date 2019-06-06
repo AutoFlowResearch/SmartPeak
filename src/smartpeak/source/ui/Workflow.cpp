@@ -102,10 +102,28 @@ namespace SmartPeak
       ImGui::Text("No steps set. Please select a preset and/or add a single method step.");
 
     for (int i = 0; static_cast<size_t>(i) < commands_.size(); ) {
-      ImGui::PushItemWidth(100.0f);
-      ImGui::Text("[%2d] %s", i + 1, commands_.at(i).getName().c_str());
+      ImGui::PushID(i + 1); // avoid hashing an id := 0, not sure it's necessary
+      ImGui::Text("[%02d] %s", i + 1, commands_.at(i).getName().c_str());
+      // if (ImGui::BeginDragDropSource())
+      if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) // forced to use this flag unless I use Button instead of Text
+      {
+        ImGui::SetDragDropPayload("DND_STEP", &i, sizeof(int));
+        ImGui::Text("Moving %s", commands_.at(i).getName().c_str());
+        ImGui::EndDragDropSource();
+      }
+      if (ImGui::BeginDragDropTarget())
+      {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_STEP"))
+        {
+          IM_ASSERT(payload->DataSize == sizeof(int));
+          int source_n = *(const int*)payload->Data;
+          AppState::Command tmp = commands_.at(source_n);
+          commands_.erase(commands_.cbegin() + source_n);
+          commands_.insert(commands_.cbegin() + i, tmp);
+        }
+        ImGui::EndDragDropTarget();
+      }
       ImGui::SameLine();
-      ImGui::PushID(i);
       if (ImGui::SmallButton("x")) {
         commands_.erase(commands_.cbegin() + i);
       } else {
