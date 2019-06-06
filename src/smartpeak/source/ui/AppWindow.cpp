@@ -48,6 +48,11 @@ namespace SmartPeak
       file_picker_.draw();
     }
 
+    if (workflow_.draw_)
+    {
+      workflow_.draw();
+    }
+
     // Show the main window
     ImGuiWindowFlags window_flags = 0;
     window_flags |= ImGuiWindowFlags_NoTitleBar;
@@ -343,7 +348,10 @@ namespace SmartPeak
     if (ImGui::MenuItem("Plots")) {} // TODO: modal of settings 
     if (ImGui::MenuItem("Explorer")) {} // TODO: modal of settings 
     if (ImGui::MenuItem("Search")) {} // TODO: modal of settings 
-    if (ImGui::MenuItem("Workflow")) {} // TODO: modal of settings 
+    if (ImGui::MenuItem("Workflow"))
+    {
+      workflow_.draw_ = true;
+    }
   }
 
   void AppWindow::showMenuView(
