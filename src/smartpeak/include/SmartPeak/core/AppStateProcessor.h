@@ -18,8 +18,8 @@ namespace SmartPeak
     virtual ~AppStateProcessor() = default;
 
     // Each of the derived classes implement one of the following virtual methods
-    virtual bool operator()() {}
-    virtual bool operator()(const std::vector<InputDataValidation::FilenameInfo>& validation) {}
+    virtual bool operator()() { return false; }
+    virtual bool operator()(const std::vector<InputDataValidation::FilenameInfo>& validation) { return false; }
     virtual void operator()(Filenames& f) {}
     virtual void operator()(std::string& filename) {}
     virtual void operator()(
@@ -27,11 +27,12 @@ namespace SmartPeak
       const Filenames& f,
       const std::vector<InputDataValidation::FilenameInfo>& is_valid
     ) {}
-    virtual std::string operator()(const std::string& pathname, const bool is_valid) {}
+    virtual std::string operator()(const std::string& pathname, const bool is_valid) { return std::string(); }
     virtual void operator()(Filenames& f, const std::string& pathname) {}
     virtual void operator()(const std::vector<AppState::Command>& commands) {}
-    virtual bool operator()(const int n, AppState::Command& cmd) {}
+    virtual bool operator()(const int n, AppState::Command& cmd) { return false; }
     virtual void operator()(const char* const pathname) {}
+    virtual std::vector<AppState::Command> operator()(const std::string& ids) { return std::vector<AppState::Command>(); }
 
     AppState& state_;
 
@@ -96,5 +97,10 @@ namespace SmartPeak
   struct LoadSessionFromSequence : AppStateProcessor {
     LoadSessionFromSequence(AppState& state) : AppStateProcessor(state) {}
     void operator()(const char* const pathname) override;
+  };
+
+  struct BuildCommandsFromIds : AppStateProcessor {
+    BuildCommandsFromIds(AppState& state) : AppStateProcessor(state) {}
+    std::vector<AppState::Command> operator()(const std::string& ids) override;
   };
 }
