@@ -863,7 +863,7 @@ namespace SmartPeak
     std::vector<std::string> metadata;
 
     for (int n; iss >> n;) {
-      if (n < 1 || n > 19) {
+      if (n < 1 || n > 20) {
         LOGW << "Skipping: " << n << '\n';
         continue;
       }
