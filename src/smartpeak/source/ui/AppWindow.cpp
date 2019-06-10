@@ -48,6 +48,11 @@ namespace SmartPeak
       file_picker_.draw();
     }
 
+    if (report_.draw_)
+    {
+      report_.draw();
+    }
+
     if (workflow_.draw_)
     {
       workflow_.draw();
@@ -350,6 +355,7 @@ namespace SmartPeak
     if (ImGui::MenuItem("Search")) {} // TODO: modal of settings 
     if (ImGui::MenuItem("Workflow"))
     {
+      initializeDataDirs(state_);
       workflow_.draw_ = true;
     }
   }
@@ -416,8 +422,18 @@ namespace SmartPeak
   }
 
   void AppWindow::showMenuAction() {
-    if (ImGui::MenuItem("Run command")) {}
-    if (ImGui::MenuItem("Run workflow")) {}
+    if (ImGui::MenuItem("Run command"))
+    {
+      initializeDataDirs(state_);
+      // do the rest
+    }
+    if (ImGui::MenuItem("Run workflow"))
+    {
+      initializeDataDirs(state_);
+      ProcessCommands processCommands(state_);
+      processCommands(state_.commands_);
+      LOGN << "\n\nWorkflow completed.\n";
+    }
     if (ImGui::BeginMenu("Quick info"))
     { // TODO: bug
       if (ImGui::MenuItem("Sequence")) {}
@@ -444,11 +460,9 @@ namespace SmartPeak
       if (ImGui::MenuItem("IS consistency")) {}
       ImGui::EndMenu();
     }
-    if (ImGui::BeginMenu("Report"))
-    {  // TODO: bug
-      if (ImGui::MenuItem("Feature summary")) {}
-      if (ImGui::MenuItem("Sequence summary")) {}
-      ImGui::EndMenu();
+    if (ImGui::MenuItem("Report"))
+    {
+      report_.draw_ = true;
     }
   }
 
@@ -666,5 +680,26 @@ namespace SmartPeak
       ImGui::PopTextWrapPos();
       ImGui::EndTooltip();
     }
+  }
+
+  void AppWindow::initializeDataDirs(AppState& state)
+  {
+    initializeDataDir(state, "mzML", state.mzML_dir_, "mzML");
+    initializeDataDir(state, "INPUT features", state.features_in_dir_, "features");
+    initializeDataDir(state, "OUTPUT features", state.features_out_dir_, "features");
+  }
+
+  void AppWindow::initializeDataDir(
+    AppState& state,
+    const std::string& label,
+    std::string& data_dir_member,
+    const std::string& default_dir
+  )
+  {
+    if (data_dir_member.size()) {
+      return;
+    }
+    data_dir_member = state.main_dir_ + "/" + default_dir;
+    LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member;
   }
 }
