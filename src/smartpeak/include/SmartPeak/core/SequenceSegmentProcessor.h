@@ -4,6 +4,7 @@
 
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
+#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
 
@@ -49,7 +50,7 @@ namespace SmartPeak
     static void getSampleIndicesBySampleType(
       const SequenceSegmentHandler& sequenceSegmentHandler,
       const SequenceHandler& sequenceHandler,
-      const MetaDataHandler::SampleType sampleType,
+      const SampleType sampleType,
       std::vector<size_t>& sampleIndices
     );
 

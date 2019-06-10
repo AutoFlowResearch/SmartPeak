@@ -8,11 +8,13 @@ set(sources_list_h
 	CastValue.h
 	Filenames.h
 	Helloworld.h
+	Metadata.h
 	MetaDataHandler.h
 	RawDataHandler.h
 	RawDataProcessor.h
 	SampleGroupHandler.h
 	InjectionHandler.h
+	SampleType.h
 	SequenceHandler.h
 	SequenceProcessor.h
 	SequenceSegmentHandler.h

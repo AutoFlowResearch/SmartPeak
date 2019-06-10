@@ -1,3 +1,5 @@
+#include <SmartPeak/core/Metadata.h>
+#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/io/SequenceParser.h>
@@ -50,20 +52,30 @@ void example_LCMS_MRM_Unknowns(
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,
     static_filenames.sequenceSummary_csv_o,
-    {"calculated_concentration"},
-    {MetaDataHandler::SampleType::Unknown}
+    {Metadata::calculated_concentration},
+    {SampleType::Unknown}
   );
 
   SequenceParser::writeDataTableFromMetaValue(
     sequenceHandler,
     static_filenames.featureSummary_csv_o,
     {
-      "peak_apex_int", "total_width", "width_at_50", "tailing_factor",
-      "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
-      "points_across_half_height", "logSN", "calculated_concentration",
-      "QC_transition_message", "QC_transition_pass", "QC_transition_score",
-      "QC_transition_group_message", "QC_transition_group_score"
+      Metadata::peak_apex_intensity,
+      Metadata::total_width,
+      Metadata::width_at_50_peak_height,
+      Metadata::tailing_factor,
+      Metadata::asymmetry_factor,
+      Metadata::baseline_delta_to_height,
+      Metadata::points_across_baseline,
+      Metadata::points_across_half_height,
+      Metadata::log_signal_to_noise,
+      Metadata::calculated_concentration,
+      Metadata::qc_transition_message,
+      Metadata::qc_transition_pass,
+      Metadata::qc_transition_score,
+      Metadata::qc_transition_group_message,
+      Metadata::qc_transition_group_score
     },
-    {MetaDataHandler::SampleType::Unknown}
+    {SampleType::Unknown}
   );
 }

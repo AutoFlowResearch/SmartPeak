@@ -2,29 +2,14 @@
 
 #pragma once
 
+#include <SmartPeak/core/SampleType.h>
+
 #include <string>
 #include <ctime>
 
-namespace SmartPeak
-{
-
-  class MetaDataHandler
-  {
+namespace SmartPeak {
+  class MetaDataHandler {
 public:
-    enum SampleType
-    {
-      Unknown = 1,
-      Standard,
-      QC,
-      Blank,
-      DoubleBlank,
-      Solvent,
-      Unrecognized
-    };
-
-    static std::string SampleTypeToString(const SampleType sample_type);
-    static SampleType stringToSampleType(const std::string& sample_type);
-
     /*
     * TODO:
     * All properties are now public.

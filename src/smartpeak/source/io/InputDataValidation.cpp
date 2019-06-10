@@ -2,6 +2,7 @@
 
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/io/FileReader.h>
 #include <SmartPeak/io/SequenceParser.h>
@@ -49,7 +50,7 @@ namespace SmartPeak
 
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& sample_meta_data = sampleHandler.getMetaData();
-      oss << sample_meta_data.getInjectionName() << "\t" << MetaDataHandler::SampleTypeToString(sample_meta_data.sample_type) << "\n";
+      oss << sample_meta_data.getInjectionName() << "\t" << sampleTypeToString.at(sample_meta_data.sample_type) << "\n";
     }
 
     oss << "==== END   getSequenceInfo\n";
