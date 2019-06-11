@@ -21,8 +21,6 @@ namespace SmartPeak
       return;
     }
 
-    ImGui::BeginChild("Content", ImVec2(600, 400));
-
     if (ImGui::BeginCombo("Presets", NULL))
     {
       AppState::Command cmd;
@@ -98,14 +96,17 @@ namespace SmartPeak
     ImGui::Text("Steps");
     ImGui::Separator();
 
+    ImGui::BeginChild("Workflow Steps", ImVec2(600, 300));
+
     if (commands_.empty())
       ImGui::Text("No steps set. Please select a preset and/or add a single method step.");
 
     for (int i = 0; static_cast<size_t>(i) < commands_.size(); ) {
       ImGui::PushID(i + 1); // avoid hashing an id := 0, not sure it's necessary
-      ImGui::Text("[%02d] %s", i + 1, commands_.at(i).getName().c_str());
-      // if (ImGui::BeginDragDropSource())
-      if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) // forced to use this flag unless I use Button instead of Text
+      char step_label[256];
+      sprintf(step_label, "[%02d] %s", i + 1, commands_.at(i).getName().c_str());
+      ImGui::Button(step_label);
+      if (ImGui::BeginDragDropSource())
       {
         ImGui::SetDragDropPayload("DND_STEP", &i, sizeof(int));
         ImGui::Text("Moving %s", commands_.at(i).getName().c_str());
@@ -124,7 +125,7 @@ namespace SmartPeak
         ImGui::EndDragDropTarget();
       }
       ImGui::SameLine();
-      if (ImGui::SmallButton("x")) {
+      if (ImGui::Button("x")) {
         commands_.erase(commands_.cbegin() + i);
       } else {
         ++i;
