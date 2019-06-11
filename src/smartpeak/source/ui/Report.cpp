@@ -69,8 +69,6 @@ namespace SmartPeak
       } else {
         LOGE << "Error during write. FeatureSummary.csv content is invalid.";
       }
-      draw_ = false;
-      ImGui::CloseCurrentPopup();
     }
 
     if (ImGui::Button("Create SequenceSummary.csv"))
@@ -88,14 +86,12 @@ namespace SmartPeak
       } else {
         LOGE << "Error during write. SequenceSummary.csv content is invalid.";
       }
-      draw_ = false;
-      ImGui::CloseCurrentPopup();
     }
 
     ImGui::SameLine();
-    if (ImGui::Button("Cancel"))
+    if (ImGui::Button("Close"))
     {
-      LOGI << "No report created.";
+      LOGI << "Report window is closed.";
       draw_ = false;
       ImGui::CloseCurrentPopup();
     }
