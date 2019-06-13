@@ -69,18 +69,25 @@ namespace SmartPeak
 
     if (ImGui::Button("Create FeatureSummary.csv"))
     {
-      initializeMetadataAndSampleTypes();
-      const std::string pathname = state_->main_dir_ + "/FeatureSummary.csv";
-      const bool data_was_written = SequenceParser::writeDataTableFromMetaValue(
-        state_->sequenceHandler_,
-        pathname,
-        summaryMetaData_,
-        summarySampleTypes_
-      );
-      if (data_was_written) {
-        LOGN << "FeatureSummary.csv file has been stored at: " << pathname;
-      } else {
-        LOGE << "Error during write. FeatureSummary.csv content is invalid.";
+      const bool checkboxes_check = initializeMetadataAndSampleTypes();
+      if (checkboxes_check)
+      {
+        const std::string pathname = state_->main_dir_ + "/FeatureSummary.csv";
+        const bool data_was_written = SequenceParser::writeDataTableFromMetaValue(
+          state_->sequenceHandler_,
+          pathname,
+          summaryMetaData_,
+          summarySampleTypes_
+        );
+        if (data_was_written) {
+          LOGN << "FeatureSummary.csv file has been stored at: " << pathname;
+        } else {
+          LOGE << "Error during write. FeatureSummary.csv content is invalid.";
+        }
+      }
+      else
+      {
+        LOGE << "Select at least one Sample Type and at least one Metadata";
       }
     }
 
@@ -88,18 +95,25 @@ namespace SmartPeak
 
     if (ImGui::Button("Create SequenceSummary.csv"))
     {
-      initializeMetadataAndSampleTypes();
-      const std::string pathname = state_->main_dir_ + "/SequenceSummary.csv";
-      const bool data_was_written = SequenceParser::writeDataMatrixFromMetaValue(
-        state_->sequenceHandler_,
-        pathname,
-        summaryMetaData_,
-        summarySampleTypes_
-      );
-      if (data_was_written) {
-        LOGN << "SequenceSummary.csv file has been stored at: " << pathname;
-      } else {
-        LOGE << "Error during write. SequenceSummary.csv content is invalid.";
+      const bool checkboxes_check = initializeMetadataAndSampleTypes();
+      if (checkboxes_check)
+      {
+        const std::string pathname = state_->main_dir_ + "/SequenceSummary.csv";
+        const bool data_was_written = SequenceParser::writeDataMatrixFromMetaValue(
+          state_->sequenceHandler_,
+          pathname,
+          summaryMetaData_,
+          summarySampleTypes_
+        );
+        if (data_was_written) {
+          LOGN << "SequenceSummary.csv file has been stored at: " << pathname;
+        } else {
+          LOGE << "Error during write. SequenceSummary.csv content is invalid.";
+        }
+      }
+      else
+      {
+        LOGE << "Select at least one Sample Type and at least one Metadata";
       }
     }
 
@@ -120,7 +134,7 @@ namespace SmartPeak
     state_ = &state;
   }
 
-  void Report::initializeMetadataAndSampleTypes()
+  bool Report::initializeMetadataAndSampleTypes()
   {
     summarySampleTypes_.clear();
     summaryMetaData_.clear();
@@ -138,5 +152,7 @@ namespace SmartPeak
         summaryMetaData_.push_back(p.first);
       }
     }
+
+    return summarySampleTypes_.size() && summaryMetaData_.size();
   }
 }
