@@ -30,6 +30,11 @@ namespace SmartPeak
         seq_seg_method = method;
       }
 
+      int getID() const
+      {
+        return type == RawDataMethod ? raw_data_method->getID() : seq_seg_method->getID();
+      }
+
       std::string getName() const
       {
         return type == RawDataMethod ? raw_data_method->getName() : seq_seg_method->getName();
