@@ -14,23 +14,9 @@ namespace SmartPeak {
     Unrecognized
   };
 
-  static const std::map<SampleType, std::string> sampleTypeToString {
-    { SampleType::Unknown,      "Unknown"      },
-    { SampleType::Standard,     "Standard"     },
-    { SampleType::QC,           "QC"           },
-    { SampleType::Blank,        "Blank"        },
-    { SampleType::DoubleBlank,  "Double Blank" },
-    { SampleType::Solvent,      "Solvent"      },
-    { SampleType::Unrecognized, "Unrecognized" }
-  };
+  extern const std::map<SampleType, std::string> sampleTypeToString;
 
-  static const std::map<std::string, SampleType> stringToSampleType {
-    { "Unknown",      SampleType::Unknown      },
-    { "Standard",     SampleType::Standard     },
-    { "QC",           SampleType::QC           },
-    { "Blank",        SampleType::Blank        },
-    { "Double Blank", SampleType::DoubleBlank  },
-    { "Solvent",      SampleType::Solvent      },
-    { "Unrecognized", SampleType::Unrecognized }
-  };
+  extern const std::map<std::string, SampleType> stringToSampleType;
+
+  constexpr size_t SampleTypeSize { 7 };
 }

@@ -13,11 +13,11 @@ namespace SmartPeak
 {
   class Report final : public Widget
   {
-    std::array<bool, 7>   st_checks_; // TODO: find a way to not forget about these magic numbers
-    std::array<bool, 20>  md_checks_;
-    std::set<SampleType>  summarySampleTypes_;
-    std::vector<FeatureMetadata> summaryMetaData_;
-    AppState*             state_ = nullptr;
+    std::array<bool, SampleTypeSize>      st_checks_;
+    std::array<bool, FeatureMetadataSize> md_checks_;
+    std::set<SampleType>                  summarySampleTypes_;
+    std::vector<FeatureMetadata>          summaryMetaData_;
+    AppState*                             state_ = nullptr;
 
     void initializeMetadataAndSampleTypes();
 
