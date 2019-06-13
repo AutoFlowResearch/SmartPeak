@@ -26,9 +26,13 @@ namespace SmartPeak
 
     ImGui::BeginChild("ReportContent", ImVec2(600, 400));
 
+    ImGui::Text("Select the information to export in the reports.");
+
     {
-      ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
-      ImGui::BeginChild("SampleTypesChild", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 400), true);
+      ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 2.0f);
+      ImGui::BeginChild("SampleTypesChild", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 380), true);
+      ImGui::Text("Sample types");
+      ImGui::Separator();
       size_t i = 0;
       for (const std::pair<SampleType, std::string>& p : sampleTypeToString)
       {
@@ -39,8 +43,10 @@ namespace SmartPeak
     }
     ImGui::SameLine();
     {
-      ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
-      ImGui::BeginChild("MetadataChild", ImVec2(0, 400), true);
+      ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 2.0f);
+      ImGui::BeginChild("MetadataChild", ImVec2(0, 380), true);
+      ImGui::Text("Metadata");
+      ImGui::Separator();
       size_t i = 0;
       for (const std::pair<FeatureMetadata, std::string>& p : metadataToString)
       {
@@ -70,6 +76,8 @@ namespace SmartPeak
         LOGE << "Error during write. FeatureSummary.csv content is invalid.";
       }
     }
+
+    ImGui::SameLine();
 
     if (ImGui::Button("Create SequenceSummary.csv"))
     {
