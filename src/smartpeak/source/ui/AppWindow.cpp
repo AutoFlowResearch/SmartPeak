@@ -431,6 +431,7 @@ namespace SmartPeak
     {
       initializeDataDirs(state_);
       ProcessCommands processCommands(state_);
+      // TODO: IO operation -> use another thread
       processCommands(state_.commands_);
       LOGN << "\n\nWorkflow completed.\n";
     }

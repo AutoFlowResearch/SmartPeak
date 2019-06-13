@@ -73,6 +73,7 @@ namespace SmartPeak
       if (checkboxes_check)
       {
         const std::string pathname = state_->main_dir_ + "/FeatureSummary.csv";
+        // TODO: IO operation -> use another thread
         const bool data_was_written = SequenceParser::writeDataTableFromMetaValue(
           state_->sequenceHandler_,
           pathname,
@@ -99,6 +100,7 @@ namespace SmartPeak
       if (checkboxes_check)
       {
         const std::string pathname = state_->main_dir_ + "/SequenceSummary.csv";
+        // TODO: IO operation -> use another thread
         const bool data_was_written = SequenceParser::writeDataMatrixFromMetaValue(
           state_->sequenceHandler_,
           pathname,
