@@ -20,7 +20,7 @@ namespace SmartPeak
     std::vector<FeatureMetadata> summaryMetaData_;
     AppState*             state_ = nullptr;
 
-    void initializeMetadataAndSamleTypes();
+    void initializeMetadataAndSampleTypes();
 
   public:
     bool draw_ = false;

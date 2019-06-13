@@ -62,7 +62,7 @@ namespace SmartPeak
 
     if (ImGui::Button("Create FeatureSummary.csv"))
     {
-      initializeMetadataAndSamleTypes();
+      initializeMetadataAndSampleTypes();
       const std::string pathname = state_->main_dir_ + "/FeatureSummary.csv";
       const bool data_was_written = SequenceParser::writeDataTableFromMetaValue(
         state_->sequenceHandler_,
@@ -81,7 +81,7 @@ namespace SmartPeak
 
     if (ImGui::Button("Create SequenceSummary.csv"))
     {
-      initializeMetadataAndSamleTypes();
+      initializeMetadataAndSampleTypes();
       const std::string pathname = state_->main_dir_ + "/SequenceSummary.csv";
       const bool data_was_written = SequenceParser::writeDataMatrixFromMetaValue(
         state_->sequenceHandler_,
@@ -113,7 +113,7 @@ namespace SmartPeak
     state_ = &state;
   }
 
-  void Report::initializeMetadataAndSamleTypes()
+  void Report::initializeMetadataAndSampleTypes()
   {
     summarySampleTypes_.clear();
     summaryMetaData_.clear();
