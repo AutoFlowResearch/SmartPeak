@@ -1,6 +1,6 @@
 #include <SmartPeak/core/AppState.h>
 #include <SmartPeak/core/AppStateProcessor.h>
-#include <SmartPeak/core/Metadata.h>
+#include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Utilities.h>
@@ -23,7 +23,7 @@ std::string getPathnameFromInput();
 
 std::set<SampleType> getSampleTypesInput();
 
-std::vector<Metadata> getMetaDataInput(
+std::vector<FeatureMetadata> getMetaDataInput(
   const std::string& title
 );
 
@@ -245,7 +245,7 @@ std::set<SampleType> getSampleTypesInput()
   return sample_types;
 }
 
-std::vector<Metadata> getMetaDataInput(
+std::vector<FeatureMetadata> getMetaDataInput(
   const std::string& title
 )
 {
@@ -279,7 +279,7 @@ std::vector<Metadata> getMetaDataInput(
 
   std::istringstream iss;
   iss.str(line);
-  std::vector<Metadata> metadata;
+  std::vector<FeatureMetadata> metadata;
 
   for (int n; iss >> n;) {
     if (n < 1 || n > 19) {
@@ -288,81 +288,81 @@ std::vector<Metadata> getMetaDataInput(
     }
     switch (n) {
     case 1:
-      metadata.push_back(Metadata::asymmetry_factor);
+      metadata.push_back(FeatureMetadata::asymmetry_factor);
       break;
     case 2:
-      metadata.push_back(Metadata::baseline_delta_to_height);
+      metadata.push_back(FeatureMetadata::baseline_delta_to_height);
       break;
     case 3:
-      metadata.push_back(Metadata::calculated_concentration);
+      metadata.push_back(FeatureMetadata::calculated_concentration);
       break;
     case 4:
-      metadata.push_back(Metadata::log_signal_to_noise);
+      metadata.push_back(FeatureMetadata::log_signal_to_noise);
       break;
     case 5:
-      metadata.push_back(Metadata::peak_apex_intensity);
+      metadata.push_back(FeatureMetadata::peak_apex_intensity);
       break;
     case 6:
-      metadata.push_back(Metadata::peak_area); // "intensity" attribute of a subordinate feature
+      metadata.push_back(FeatureMetadata::peak_area); // "intensity" attribute of a subordinate feature
       // NOTE: there is also an "intensity" attribute at the feature level
       // which is the sum of all subordinate feature "intensities"
       break;
     case 7:
-      metadata.push_back(Metadata::points_across_baseline);
+      metadata.push_back(FeatureMetadata::points_across_baseline);
       break;
     case 8:
-      metadata.push_back(Metadata::points_across_half_height);
+      metadata.push_back(FeatureMetadata::points_across_half_height);
       break;
     case 9:
-      metadata.push_back(Metadata::qc_transition_pass);
+      metadata.push_back(FeatureMetadata::qc_transition_pass);
       break;
     case 10:
-      metadata.push_back(Metadata::qc_transition_message);
+      metadata.push_back(FeatureMetadata::qc_transition_message);
       break;
     case 11:
-      metadata.push_back(Metadata::qc_transition_score);
+      metadata.push_back(FeatureMetadata::qc_transition_score);
       break;
     case 12:
-      metadata.push_back(Metadata::qc_transition_group_pass);
+      metadata.push_back(FeatureMetadata::qc_transition_group_pass);
       break;
     case 13:
-      metadata.push_back(Metadata::qc_transition_group_message);
+      metadata.push_back(FeatureMetadata::qc_transition_group_message);
       break;
     case 14:
-      metadata.push_back(Metadata::qc_transition_group_score);
+      metadata.push_back(FeatureMetadata::qc_transition_group_score);
       break;
     case 15:
-      metadata.push_back(Metadata::tailing_factor);
+      metadata.push_back(FeatureMetadata::tailing_factor);
       break;
     case 16:
-      metadata.push_back(Metadata::total_width);
+      metadata.push_back(FeatureMetadata::total_width);
       break;
     case 17:
-      metadata.push_back(Metadata::width_at_50_peak_height);
+      metadata.push_back(FeatureMetadata::width_at_50_peak_height);
       break;
     case 18:
-      metadata.push_back(Metadata::retention_time);
+      metadata.push_back(FeatureMetadata::retention_time);
       break;
     case 19:
       metadata = {
-        Metadata::asymmetry_factor,
-        Metadata::baseline_delta_to_height,
-        Metadata::calculated_concentration,
-        Metadata::log_signal_to_noise,
-        Metadata::peak_apex_intensity,
-        Metadata::peak_area,
-        Metadata::points_across_baseline,
-        Metadata::points_across_half_height,
-        Metadata::qc_transition_pass,
-        Metadata::qc_transition_message,
-        Metadata::qc_transition_score,
-        Metadata::qc_transition_group_pass,
-        Metadata::qc_transition_group_message,
-        Metadata::qc_transition_group_score,
-        Metadata::tailing_factor,
-        Metadata::total_width,
-        Metadata::width_at_50_peak_height,
-        Metadata::retention_time
+        FeatureMetadata::asymmetry_factor,
+        FeatureMetadata::baseline_delta_to_height,
+        FeatureMetadata::calculated_concentration,
+        FeatureMetadata::log_signal_to_noise,
+        FeatureMetadata::peak_apex_intensity,
+        FeatureMetadata::peak_area,
+        FeatureMetadata::points_across_baseline,
+        FeatureMetadata::points_across_half_height,
+        FeatureMetadata::qc_transition_pass,
+        FeatureMetadata::qc_transition_message,
+        FeatureMetadata::qc_transition_score,
+        FeatureMetadata::qc_transition_group_pass,
+        FeatureMetadata::qc_transition_group_message,
+        FeatureMetadata::qc_transition_group_score,
+        FeatureMetadata::tailing_factor,
+        FeatureMetadata::total_width,
+        FeatureMetadata::width_at_50_peak_height,
+        FeatureMetadata::retention_time
       };
       break;
     }
@@ -695,7 +695,7 @@ menuReport_label:
   in = getLineInput("> ", false);
 
   if ("1" == in) {
-    const std::vector<Metadata> summaryMetaData = getMetaDataInput("\nMain > Actions > Report > Feature summary\n");
+    const std::vector<FeatureMetadata> summaryMetaData = getMetaDataInput("\nMain > Actions > Report > Feature summary\n");
     const std::set<SampleType> summarySampleTypes = getSampleTypesInput();
     const std::string pathname = state.main_dir_ + "/FeatureSummary.csv";
     const bool data_was_written = SequenceParser::writeDataTableFromMetaValue(
@@ -711,7 +711,7 @@ menuReport_label:
     }
   }
   else if ("2" == in) {
-    const std::vector<Metadata> summaryMetaData = getMetaDataInput("\nMain > Actions > Report > Sequence summary\n");
+    const std::vector<FeatureMetadata> summaryMetaData = getMetaDataInput("\nMain > Actions > Report > Sequence summary\n");
     const std::set<SampleType> summarySampleTypes = getSampleTypesInput();
     const std::string pathname = state.main_dir_ + "/SequenceSummary.csv";
     const bool data_was_written = SequenceParser::writeDataMatrixFromMetaValue(

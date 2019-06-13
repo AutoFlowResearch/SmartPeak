@@ -2,7 +2,7 @@
 
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/core/AppState.h>
-#include <SmartPeak/core/Metadata.h>
+#include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <algorithm>
 #include <array>
@@ -17,7 +17,7 @@ namespace SmartPeak
     std::array<bool, 7>   st_checks_; // TODO: find a way to not forget about these magic numbers
     std::array<bool, 20>  md_checks_;
     std::set<SampleType>  summarySampleTypes_;
-    std::vector<Metadata> summaryMetaData_;
+    std::vector<FeatureMetadata> summaryMetaData_;
     AppState*             state_ = nullptr;
 
     void initializeMetadataAndSamleTypes();

@@ -1,4 +1,4 @@
-#include <SmartPeak/core/Metadata.h>
+#include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
@@ -95,7 +95,7 @@ void example_LCMS_MRM_Standards(
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,
     static_filenames.sequenceSummary_csv_o,
-    {Metadata::calculated_concentration},
+    {FeatureMetadata::calculated_concentration},
     {SampleType::Standard}
   );
 
@@ -103,21 +103,21 @@ void example_LCMS_MRM_Standards(
     sequenceHandler,
     static_filenames.featureSummary_csv_o,
     {
-      Metadata::peak_apex_intensity,
-      Metadata::total_width,
-      Metadata::width_at_50_peak_height,
-      Metadata::tailing_factor,
-      Metadata::asymmetry_factor,
-      Metadata::baseline_delta_to_height,
-      Metadata::points_across_baseline,
-      Metadata::points_across_half_height,
-      Metadata::log_signal_to_noise,
-      Metadata::calculated_concentration,
-      Metadata::qc_transition_message,
-      Metadata::qc_transition_pass,
-      Metadata::qc_transition_score,
-      Metadata::qc_transition_group_message,
-      Metadata::qc_transition_group_score
+      FeatureMetadata::peak_apex_intensity,
+      FeatureMetadata::total_width,
+      FeatureMetadata::width_at_50_peak_height,
+      FeatureMetadata::tailing_factor,
+      FeatureMetadata::asymmetry_factor,
+      FeatureMetadata::baseline_delta_to_height,
+      FeatureMetadata::points_across_baseline,
+      FeatureMetadata::points_across_half_height,
+      FeatureMetadata::log_signal_to_noise,
+      FeatureMetadata::calculated_concentration,
+      FeatureMetadata::qc_transition_message,
+      FeatureMetadata::qc_transition_pass,
+      FeatureMetadata::qc_transition_score,
+      FeatureMetadata::qc_transition_group_message,
+      FeatureMetadata::qc_transition_group_score
     },
     {SampleType::Standard}
   );

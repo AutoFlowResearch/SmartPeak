@@ -8,7 +8,7 @@ set(sources_list_h
 	CastValue.h
 	Filenames.h
 	Helloworld.h
-	Metadata.h
+	FeatureMetadata.h
 	MetaDataHandler.h
 	RawDataHandler.h
 	RawDataProcessor.h

@@ -1,6 +1,6 @@
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/core/AppStateProcessor.h>
-#include <SmartPeak/core/Metadata.h>
+#include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <imgui.h>
@@ -42,7 +42,7 @@ namespace SmartPeak
       ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 3.0f);
       ImGui::BeginChild("MetadataChild", ImVec2(0, 400), true);
       size_t i = 0;
-      for (const std::pair<Metadata, std::string>& p : metadataToString)
+      for (const std::pair<FeatureMetadata, std::string>& p : metadataToString)
       {
         ImGui::Checkbox(p.second.c_str(), &md_checks_.at(i++));
       }
@@ -118,7 +118,7 @@ namespace SmartPeak
     }
 
     i = 0;
-    for (const std::pair<Metadata, std::string>& p : metadataToString) {
+    for (const std::pair<FeatureMetadata, std::string>& p : metadataToString) {
       if (md_checks_.at(i++)) {
         summaryMetaData_.push_back(p.first);
       }

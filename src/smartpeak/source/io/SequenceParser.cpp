@@ -1,7 +1,7 @@
 // TODO: Add copyright
 
 #include <SmartPeak/io/SequenceParser.h>
-#include <SmartPeak/core/Metadata.h>
+#include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #ifndef CSV_IO_NO_THREAD
@@ -307,7 +307,7 @@ namespace SmartPeak
   bool SequenceParser::writeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
-    const std::vector<Metadata>& meta_data,
+    const std::vector<FeatureMetadata>& meta_data,
     const std::set<SampleType>& sample_types
   )
   {
@@ -317,7 +317,7 @@ namespace SmartPeak
     std::vector<std::map<std::string,std::string>> list_dict;
     std::vector<std::string> headers;
     std::vector<std::string> meta_data_strings;
-    for (const Metadata& m : meta_data) {
+    for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
     }
     makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data_strings, sample_types);
@@ -414,7 +414,7 @@ namespace SmartPeak
   bool SequenceParser::writeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
-    const std::vector<Metadata>& meta_data,
+    const std::vector<FeatureMetadata>& meta_data,
     const std::set<SampleType>& sample_types
   )
   {
@@ -426,7 +426,7 @@ namespace SmartPeak
     std::vector<std::string> columns;
     std::vector<Row> rows;
     std::vector<std::string> meta_data_strings;
-    for (const Metadata& m : meta_data) {
+    for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
     }
     makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_strings, sample_types);

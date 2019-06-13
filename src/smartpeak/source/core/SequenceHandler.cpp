@@ -68,7 +68,7 @@ namespace SmartPeak
   )
   {
     if (!MetaDataHandler::validateMetaData(meta_data_I))
-      throw std::invalid_argument("Metadata argument is not valid.");
+      throw std::invalid_argument("FeatureMetadata argument is not valid.");
     std::shared_ptr<MetaDataHandler> meta_data_ptr(new MetaDataHandler(meta_data_I));
 
     // initialize the raw data

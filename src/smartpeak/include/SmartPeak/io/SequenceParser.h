@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <SmartPeak/core/Metadata.h>
+#include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/Utilities.h>
@@ -63,7 +63,7 @@ public:
     static bool writeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::vector<Metadata>& meta_data = {Metadata::calculated_concentration},
+      const std::vector<FeatureMetadata>& meta_data = {FeatureMetadata::calculated_concentration},
       const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
     );
 
@@ -108,7 +108,7 @@ public:
     static bool writeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::vector<Metadata>& meta_data = {Metadata::calculated_concentration},
+      const std::vector<FeatureMetadata>& meta_data = {FeatureMetadata::calculated_concentration},
       const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
     );
   };
