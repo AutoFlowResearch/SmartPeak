@@ -4,7 +4,6 @@
 #include <SmartPeak/core/AppState.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
-#include <algorithm>
 #include <array>
 #include <set>
 #include <string>
@@ -25,11 +24,7 @@ namespace SmartPeak
   public:
     bool draw_ = false;
 
-    Report()
-    {
-      std::fill(st_checks_.begin(), st_checks_.end(), false);
-      std::fill(md_checks_.begin(), md_checks_.end(), true);
-    }
+    Report();
 
     void draw() override;
 

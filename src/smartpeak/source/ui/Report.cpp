@@ -3,12 +3,19 @@
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/io/SequenceParser.h>
+#include <algorithm>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
 {
+  Report::Report()
+  {
+    std::fill(st_checks_.begin(), st_checks_.end(), false);
+    std::fill(md_checks_.begin(), md_checks_.end(), false);
+  }
+
   void Report::draw()
   {
     ImGui::OpenPopup("Report dialog");
