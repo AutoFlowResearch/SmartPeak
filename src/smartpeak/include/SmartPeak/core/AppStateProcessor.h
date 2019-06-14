@@ -18,17 +18,6 @@ namespace SmartPeak
     virtual ~AppStateProcessor() = default;
 
     // Each of the derived classes implement one of the following virtual methods
-    virtual bool operator()() {}
-    virtual bool operator()(const std::vector<InputDataValidation::FilenameInfo>& validation) {}
-    virtual void operator()(Filenames& f) {}
-    virtual void operator()(std::string& filename) {}
-    virtual void operator()(
-      const std::string& pathname,
-      const Filenames& f,
-      const std::vector<InputDataValidation::FilenameInfo>& is_valid
-    ) {}
-    virtual std::string operator()(const std::string& pathname, const bool is_valid) {}
-    virtual void operator()(Filenames& f, const std::string& pathname) {}
     virtual void operator()(const std::vector<AppState::Command>& commands) {}
     virtual bool operator()(const int n, AppState::Command& cmd) {}
     virtual void operator()(const char* const pathname) {}
@@ -44,45 +33,6 @@ namespace SmartPeak
     AppStateProcessor(AppState& state) : state_(state) {}
   };
 
-  struct BuildStaticFilenames : AppStateProcessor {
-    BuildStaticFilenames(AppState& state) : AppStateProcessor(state) {}
-    bool operator()() override;
-  };
-
-  struct RequiredPathnamesAreValid : AppStateProcessor {
-    RequiredPathnamesAreValid(AppState& state) : AppStateProcessor(state) {}
-    bool operator()(const std::vector<InputDataValidation::FilenameInfo>& validation) override;
-  };
-
-  struct ClearNonExistantDefaultGeneratedFilenames : AppStateProcessor {
-    ClearNonExistantDefaultGeneratedFilenames(AppState& state) : AppStateProcessor(state) {}
-    void operator()(Filenames& f) override;
-  };
-
-  struct ClearNonExistantFilename : AppStateProcessor {
-    ClearNonExistantFilename(AppState& state) : AppStateProcessor(state) {}
-    void operator()(std::string& filename) override;
-  };
-
-  struct GeneratePathnamesTxt : AppStateProcessor {
-    GeneratePathnamesTxt(AppState& state) : AppStateProcessor(state) {}
-    void operator()(
-      const std::string& pathname,
-      const Filenames& f,
-      const std::vector<InputDataValidation::FilenameInfo>& is_valid
-    ) override;
-  };
-
-  struct GetValidPathnameOrPlaceholder : AppStateProcessor {
-    GetValidPathnameOrPlaceholder(AppState& state) : AppStateProcessor(state) {}
-    std::string operator()(const std::string& pathname, const bool is_valid) override;
-  };
-
-  struct UpdateFilenames : AppStateProcessor {
-    UpdateFilenames(AppState& state) : AppStateProcessor(state) {}
-    void operator()(Filenames& f, const std::string& pathname) override;
-  };
-
   struct ProcessCommands : AppStateProcessor {
     ProcessCommands(AppState& state) : AppStateProcessor(state) {}
     void operator()(const std::vector<AppState::Command>& commands) override;
@@ -96,5 +46,17 @@ namespace SmartPeak
   struct LoadSessionFromSequence : AppStateProcessor {
     LoadSessionFromSequence(AppState& state) : AppStateProcessor(state) {}
     void operator()(const char* const pathname) override;
+  private:
+    bool buildStaticFilenames();
+    void updateFilenames(Filenames& f, const std::string& pathname);
+    bool requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation);
+    void clearNonExistantDefaultGeneratedFilenames(Filenames& f);
+    void clearNonExistantFilename(std::string& filename);
+    void generatePathnamesTxt(
+      const std::string& pathname,
+      const Filenames& f,
+      const std::vector<InputDataValidation::FilenameInfo>& is_valid
+    );
+    std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
   };
 }
