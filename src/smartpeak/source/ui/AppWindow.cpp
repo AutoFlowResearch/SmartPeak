@@ -607,14 +607,14 @@ namespace SmartPeak
         ImGui::Text("TODO: Heatmap");
         ImGui::EndTabItem();
       }
-      if (show_feature_summary_table && ImGui::BeginTabItem("FeatureSummary", &show_feature_summary_table))
+      if (show_feature_summary_table && ImGui::BeginTabItem("FeatureDB", &show_feature_summary_table))
       {
-        ImGui::Text("TODO: FeatureSummary table");
+        ImGui::Text("TODO: FeatureDB table");
         ImGui::EndTabItem();
       }
-      if (show_sequence_summary_table && ImGui::BeginTabItem("SequenceSummary", &show_sequence_summary_table))
+      if (show_sequence_summary_table && ImGui::BeginTabItem("PivotTable", &show_sequence_summary_table))
       {
-        ImGui::Text("TODO: SequenceSummary table");
+        ImGui::Text("TODO: PivotTable table");
         ImGui::EndTabItem();
       }
       ImGui::EndTabBar();

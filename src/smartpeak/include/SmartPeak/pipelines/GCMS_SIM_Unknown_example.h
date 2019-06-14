@@ -52,14 +52,14 @@ void example_GCMS_SIM_Unknowns(
 
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,
-    static_filenames.sequenceSummary_csv_o,
+    static_filenames.pivotTable_csv_o,
     {FeatureMetadata::calculated_concentration},
     {SampleType::Unknown}
   );
 
   SequenceParser::writeDataTableFromMetaValue(
     sequenceHandler,
-    static_filenames.featureSummary_csv_o,
+    static_filenames.featureDB_csv_o,
     {
       FeatureMetadata::peak_apex_intensity,
       FeatureMetadata::total_width,

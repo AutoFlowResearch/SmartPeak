@@ -67,12 +67,12 @@ namespace SmartPeak
 
     ImGui::Separator();
 
-    if (ImGui::Button("Create FeatureSummary.csv"))
+    if (ImGui::Button("Create FeatureDB.csv"))
     {
       const bool checkboxes_check = initializeMetadataAndSampleTypes();
       if (checkboxes_check)
       {
-        const std::string pathname = state_->main_dir_ + "/FeatureSummary.csv";
+        const std::string pathname = state_->main_dir_ + "/FeatureDB.csv";
         // TODO: IO operation -> use another thread
         const bool data_was_written = SequenceParser::writeDataTableFromMetaValue(
           state_->sequenceHandler_,
@@ -81,9 +81,9 @@ namespace SmartPeak
           summarySampleTypes_
         );
         if (data_was_written) {
-          LOGN << "FeatureSummary.csv file has been stored at: " << pathname;
+          LOGN << "FeatureDB.csv file has been stored at: " << pathname;
         } else {
-          LOGE << "Error during write. FeatureSummary.csv content is invalid.";
+          LOGE << "Error during write. FeatureDB.csv content is invalid.";
         }
       }
       else
@@ -94,12 +94,12 @@ namespace SmartPeak
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Create SequenceSummary.csv"))
+    if (ImGui::Button("Create PivotTable.csv"))
     {
       const bool checkboxes_check = initializeMetadataAndSampleTypes();
       if (checkboxes_check)
       {
-        const std::string pathname = state_->main_dir_ + "/SequenceSummary.csv";
+        const std::string pathname = state_->main_dir_ + "/PivotTable.csv";
         // TODO: IO operation -> use another thread
         const bool data_was_written = SequenceParser::writeDataMatrixFromMetaValue(
           state_->sequenceHandler_,
@@ -108,9 +108,9 @@ namespace SmartPeak
           summarySampleTypes_
         );
         if (data_was_written) {
-          LOGN << "SequenceSummary.csv file has been stored at: " << pathname;
+          LOGN << "PivotTable.csv file has been stored at: " << pathname;
         } else {
-          LOGE << "Error during write. SequenceSummary.csv content is invalid.";
+          LOGE << "Error during write. PivotTable.csv content is invalid.";
         }
       }
       else

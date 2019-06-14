@@ -697,7 +697,7 @@ menuReport_label:
   if ("1" == in) {
     const std::vector<FeatureMetadata> summaryMetaData = getMetaDataInput("\nMain > Actions > Report > Feature summary\n");
     const std::set<SampleType> summarySampleTypes = getSampleTypesInput();
-    const std::string pathname = state.main_dir_ + "/FeatureSummary.csv";
+    const std::string pathname = state.main_dir_ + "/FeatureDB.csv";
     const bool data_was_written = SequenceParser::writeDataTableFromMetaValue(
       state.sequenceHandler_,
       pathname,
@@ -705,15 +705,15 @@ menuReport_label:
       summarySampleTypes
     );
     if (data_was_written) {
-      LOGN << "\n\nFeatureSummary.csv file has been stored at: " << pathname << '\n';
+      LOGN << "\n\nFeatureDB.csv file has been stored at: " << pathname << '\n';
     } else {
-      LOGE << "\n\nError during write. FeatureSummary.csv content is invalid.\n";
+      LOGE << "\n\nError during write. FeatureDB.csv content is invalid.\n";
     }
   }
   else if ("2" == in) {
     const std::vector<FeatureMetadata> summaryMetaData = getMetaDataInput("\nMain > Actions > Report > Sequence summary\n");
     const std::set<SampleType> summarySampleTypes = getSampleTypesInput();
-    const std::string pathname = state.main_dir_ + "/SequenceSummary.csv";
+    const std::string pathname = state.main_dir_ + "/PivotTable.csv";
     const bool data_was_written = SequenceParser::writeDataMatrixFromMetaValue(
       state.sequenceHandler_,
       pathname,
@@ -721,9 +721,9 @@ menuReport_label:
       summarySampleTypes
     );
     if (data_was_written) {
-      LOGN << "\n\nSequenceSummary.csv file has been stored at: " << pathname << '\n';
+      LOGN << "\n\nPivotTable.csv file has been stored at: " << pathname << '\n';
     } else {
-      LOGE << "\n\nError during write. FeatureSummary.csv content is invalid.\n";
+      LOGE << "\n\nError during write. FeatureDB.csv content is invalid.\n";
     }
   }
   else if ("m" == in || "M" == in) {
