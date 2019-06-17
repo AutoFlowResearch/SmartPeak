@@ -407,14 +407,15 @@ BOOST_AUTO_TEST_CASE(getParentPathname)
 #ifdef _WIN32
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D://///"), "D:/");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:\\"), "D:\\");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:"), "D:");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:"), "");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs"), "E:/home/user");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E://home///user//docs"), "E:/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E://home///user//docs"), "E://home///user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs and a space"), "E:/home/user");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs/"), "E:/home/user");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("//home///user//docs"), "/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs/"), "E:/home/user/docs");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("//home///user//docs"), "//home///user");
 #else
   BOOST_CHECK_EQUAL(Utilities::getParentPathname(""), "");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/"), "");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs and a space"), "/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs/"), "/home/user/docs");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs"), "/home/user");
