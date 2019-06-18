@@ -410,7 +410,8 @@ BOOST_AUTO_TEST_CASE(getParentPathname)
 {
 #ifdef _WIN32
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D://///"), "D:/");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:\\"), "D:\\");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:\\"), "D:");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:/"), "D:/");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:"), "");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs"), "E:/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E://home///user//docs"), "E://home///user");
