@@ -34,15 +34,18 @@ run_example()
 
 cd $1 || return 1
 
+echo "build directory: $1"
+echo "unix binaries: $command_prefix"
+
 {
   (run_example GCMS_SIM_Unknown_test)&
   (run_example HPLC_UV_Standards_test)&
   (run_example HPLC_UV_Unknown_test)&
   (run_example LCMS_MRM_QCs_test)&
-  (run_example LCMS_MRM_Standards_test)&
+#  (run_example LCMS_MRM_Standards_test)&
   (run_example LCMS_MRM_Unknown_test)&
 } |
 ${command_prefix}tee examples_log.txt
 
 # When adding a new example, update the comparison n==NUMBER_OF_EXAMPLES
-${command_prefix}grep -c "PASS" examples_log.txt | ( read n && (( n==6 )) )
+${command_prefix}grep -c "PASS" examples_log.txt | ( read n && (( n==5 )) )
