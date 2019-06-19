@@ -28,13 +28,15 @@ install:
   - dir C:\Qt\5.12
   - dir C:\Libraries\boost_1_69_0
 before_build:
-#  - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
-#  - ps: cd C:\projects\OpenMS-build
-#  - cmake  -DCMAKE_PREFIX_PATH="C:\Qt\5.12\msvc2017_64\lib\cmake" -DBoost_DEBUG=TRUE -DCMAKE_GENERATOR_PLATFORM=x64 -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_ROOT="C:\Libraries\boost_1_69_0\boost" -DOPENMS_CONTRIB_LIBS="C:/projects/deps/contrib" -DBOOST_USE_STATIC=ON -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
-#  - dir C:\projects\OpenMS-build\src\openms
-#  - msbuild C:\projects\OpenMS-build\src\openswathalgo\OpenSWATHAlgo.sln
-#  - msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln
-#  - msbuild C:\projects\OpenMS-build\OpenMS_host.sln
+  if (![System.IO.File]::Exists("C:\projects\OpenMS-build")) {
+    - git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS-build
+    - cd C:\projects\OpenMS-build
+    - cmake -DCMAKE_PREFIX_PATH="C:\Qt\5.12\msvc2017_64\lib\cmake" -DBoost_DEBUG=TRUE -DCMAKE_GENERATOR_PLATFORM=x64 -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_ROOT="C:\Libraries\boost_1_69_0\boost" -DOPENMS_CONTRIB_LIBS="C:/projects/deps/contrib" -DBOOST_USE_STATIC=ON -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+    - dir C:\projects\OpenMS-build\src\openms
+    - msbuild C:\projects\OpenMS-build\src\openswathalgo\OpenSWATHAlgo.sln
+    - msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln
+    - msbuild C:\projects\OpenMS-build\OpenMS_host.sln
+  }
   - cmake -DCMAKE_PREFIX_PATH="C:\projects\OpenMS-build;C:\Qt\5.12\msvc2017_64\lib\cmake" -G "Visual Studio 15 2017 Win64" -T host=x64 -DEIGEN3_INCLUDE_DIR="C:\projects\deps\contrib\include\eigen3" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_BUILD_TYPE=Release C:\projects\smartpeak2
   - dir C:\projects\smartpeak2  
 build:
