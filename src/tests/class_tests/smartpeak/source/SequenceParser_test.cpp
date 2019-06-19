@@ -135,6 +135,8 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
     "logSN",
     "QC_transition_message",
     "QC_transition_group_message",
+    "leftWidth",
+    "rightWidth",
   };
   const set<MetaDataHandler::SampleType> sample_types = {MetaDataHandler::SampleType::Unknown};
 
@@ -147,7 +149,9 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(data_out.at(0).at("component_name"), "23dpg.23dpg_1.Heavy");
   BOOST_CHECK_EQUAL(data_out.at(0).at("peak_apex_int"), std::to_string(235.0));
   BOOST_CHECK_EQUAL(data_out.at(0).at("logSN"), std::to_string(3.52866193485212));
-  BOOST_CHECK_EQUAL(headers_out.size(), 23);
+  BOOST_CHECK_EQUAL(data_out.at(0).at("leftWidth"), std::to_string(15.605367));
+  BOOST_CHECK_EQUAL(data_out.at(0).at("rightWidth"), std::to_string(15.836817));
+  BOOST_CHECK_EQUAL(headers_out.size(), 25);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
@@ -172,10 +176,12 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(headers_out[20], "logSN");
   BOOST_CHECK_EQUAL(headers_out[21], "QC_transition_message");
   BOOST_CHECK_EQUAL(headers_out[22], "QC_transition_group_message");
+  BOOST_CHECK_EQUAL(headers_out[23], "leftWidth");
+  BOOST_CHECK_EQUAL(headers_out[24], "rightWidth");
 
   // write sequence to output
-  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataTableFromMetaValue.csv");
-  // SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
+  const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataTableFromMetaValue.csv");
+  SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
 }
 
 BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
@@ -216,21 +222,25 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   std::vector<std::string> columns_out;
   std::vector<SequenceParser::Row> rows_out;
 
-  const vector<string> meta_data = {"calculated_concentration"};
+  const vector<string> meta_data = {
+    "calculated_concentration",
+    "leftWidth",
+    "rightWidth"
+  };
   const set<MetaDataHandler::SampleType> sample_types = {MetaDataHandler::SampleType::Unknown};
 
   SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types);
 
   BOOST_CHECK_EQUAL(columns_out.size(), 6);
   BOOST_CHECK_EQUAL(columns_out[0], "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(rows_out.size(), 28);
-  BOOST_CHECK_EQUAL(rows_out[0].component_group_name, "accoa");
-  BOOST_CHECK_CLOSE(data_out.front().front(), 1.28478575, 1e-3);
-  BOOST_CHECK_CLOSE(data_out.back().back(), 1.57220089, 1e-3);
+  BOOST_CHECK_EQUAL(rows_out.size(), 636);
+  BOOST_CHECK_EQUAL(rows_out[0].component_group_name, "23dpg");
+  BOOST_CHECK_CLOSE(data_out.front().front(), 15.6053667, 1e-3);
+  BOOST_CHECK_CLOSE(data_out.back().back(), 1.66744995, 1e-3);
 
   // write sequence to output
-  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_writeDataMatrixFromMetaValue.csv");
-  // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
+  const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataMatrixFromMetaValue.csv");
+  SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

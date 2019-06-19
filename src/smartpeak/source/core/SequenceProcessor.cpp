@@ -93,7 +93,7 @@ namespace SmartPeak
 
       // process the samples
       for (size_t i = 0; i < n; ++i) {
-        LOGI << "\n[" << (i + 1) << "/" << n << "] steps in processing sequence";
+        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sequence";
         raw_data_processing_methods_I[i]->process(injection.getRawData(),
           injection.getRawData().getParameters(),
           filenames.at(injection.getMetaData().getInjectionName()));
@@ -136,7 +136,7 @@ namespace SmartPeak
 
       // process the sequence segment
       for (size_t i = 0; i < n; ++i) {
-        LOGI << "\n[" << (i + 1) << "/" << n << "] steps in processing sequence segments";
+        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sequence segments";
         sequence_segment_processing_methods_I[i]->process(
           sequence_segment,
           sequenceHandler_IO,

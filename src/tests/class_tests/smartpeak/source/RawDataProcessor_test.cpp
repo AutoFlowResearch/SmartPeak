@@ -1236,6 +1236,7 @@ BOOST_AUTO_TEST_CASE(checkFeatures)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& sub = rawDataHandler.getFeatureMap()[0].getSubordinates()[1];
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getMetaValue("QC_transition_group_pass").toString(), "1");
   BOOST_CHECK_EQUAL(sub.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
   BOOST_CHECK_EQUAL(sub.getMetaValue("QC_transition_pass").toString(), "1");
 
@@ -1243,6 +1244,7 @@ BOOST_AUTO_TEST_CASE(checkFeatures)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& hsub = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[1];
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("QC_transition_group_pass").toString(), "1");
   BOOST_CHECK_EQUAL(hsub.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
   BOOST_CHECK_EQUAL(hsub.getMetaValue("QC_transition_pass").toString(), "1");
   BOOST_CHECK(hsub.getMetaValue("used_").toBool());

@@ -308,13 +308,18 @@ namespace SmartPeak
 
     OpenMS::FeatureMap featureMap;
 
-    featureFinder.pickExperiment(
-      rawDataHandler_IO.getChromatogramMap(),
-      featureMap,
-      rawDataHandler_IO.getTargetedExperiment(),
-      rawDataHandler_IO.getTransformationDescription(),
-      rawDataHandler_IO.getSWATH()
-    );
+    try {
+      featureFinder.pickExperiment(
+        rawDataHandler_IO.getChromatogramMap(),
+        featureMap,
+        rawDataHandler_IO.getTargetedExperiment(),
+        rawDataHandler_IO.getTransformationDescription(),
+        rawDataHandler_IO.getSWATH()
+      );
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
 
     // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
     featureMap.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
@@ -384,17 +389,15 @@ namespace SmartPeak
     Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeatures.qc"));
     featureFilter.setParameters(parameters);
 
-    OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
-
     featureFilter.FilterFeatureMap(
-      featureMap,
+      rawDataHandler_IO.getFeatureMap(),
       rawDataHandler_IO.getFeatureQC(),
       rawDataHandler_IO.getTargetedExperiment()
     );
 
     rawDataHandler_IO.updateFeatureMapHistory();
 
-    LOGI << "Feature Checker output size: " << featureMap.size();
+    LOGI << "Feature Checker output size: " << rawDataHandler_IO.getFeatureMap().size();
     LOGD << "END checkFeatures";
   }
 
