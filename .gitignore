@@ -40,8 +40,8 @@ build*/
 
 cmake-build-debug/
 
-src/examples/data/*/FeatureSummary.csv
-src/examples/data/*/SequenceSummary.csv
+src/examples/data/*/FeatureDB.csv
+src/examples/data/*/PivotTable.csv
 src/examples/data/HPLC_UV_Standards/features/
 src/examples/data/HPLC_UV_Unknowns/features/
 src/examples/data/LCMS_MRM_Standards/features/
@@ -49,6 +49,3 @@ src/examples/data/LCMS_MRM_Unknowns/features/
 src/examples/data/LCMS_MRM_QCs/features/
 src/examples/data/GCMS_SIM_Unknowns/features/
 src/examples/data/GCMS_FullScan_Unknowns/
-src/tests/class_tests/smartpeak/data/SequenceParser_writeDataMatrixFromMetaValue.csv
-src/tests/class_tests/smartpeak/data/SequenceParser_writeDataTableFromMetaValue.csv
-src/tests/class_tests/smartpeak/data/CSVWriterTest.csv

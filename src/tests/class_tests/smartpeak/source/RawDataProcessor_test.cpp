@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE(gettersStoreRawData)
 {
   StoreRawData processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 2);
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "STORE_RAW_DATA");
 }
 
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(gettersMapChromatograms)
 {
   MapChromatograms processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 18);
+  BOOST_CHECK_EQUAL(processor.getID(), 11);
   BOOST_CHECK_EQUAL(processor.getName(), "MAP_CHROMATOGRAMS");
 }
 
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE(gettersZeroChromatogramBaseline)
 {
   ZeroChromatogramBaseline processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 17);
+  BOOST_CHECK_EQUAL(processor.getID(), 12);
   BOOST_CHECK_EQUAL(processor.getName(), "ZERO_CHROMATOGRAM_BASELINE");
 }
 
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE(gettersExtractChromatogramWindows)
 {
   ExtractChromatogramWindows processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 19);
+  BOOST_CHECK_EQUAL(processor.getID(), 13);
   BOOST_CHECK_EQUAL(processor.getName(), "EXTRACT_CHROMATOGRAM_WINDOWS");
 }
 
@@ -445,7 +445,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadFeatures)
 {
   LoadFeatures processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 3);
+  BOOST_CHECK_EQUAL(processor.getID(), 2);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURES");
 }
 
@@ -511,7 +511,7 @@ BOOST_AUTO_TEST_CASE(gettersStoreFeatures)
 {
   StoreFeatures processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 4);
+  BOOST_CHECK_EQUAL(processor.getID(), 9);
   BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURES");
 }
 
@@ -541,7 +541,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadTransitions)
 {
   LoadTransitions processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 12);
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_TRANSITIONS");
 }
 
@@ -590,7 +590,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadFeatureFilters)
 {
   LoadFeatureFilters processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 13);
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_FILTERS");
 }
 
@@ -633,7 +633,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadFeatureQCs)
 {
   LoadFeatureQCs processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 14);
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_QCS");
 }
 
@@ -676,7 +676,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadValidationData)
 {
   LoadValidationData processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 15);
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_VALIDATION_DATA");
 }
 
@@ -688,7 +688,7 @@ BOOST_AUTO_TEST_CASE(processLoadValidationData)
 
   LoadValidationData loadValidationData;
   loadValidationData.process(rawDataHandler, {}, filenames);
-  const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
+  const std::vector<std::map<std::string, CastValue>>& ref_data = rawDataHandler.getReferenceData();
 
   BOOST_CHECK_EQUAL(ref_data.size(), 179);
   BOOST_CHECK_EQUAL(ref_data[0].at("component_name").s_, "23dpg.23dpg_1.Heavy");
@@ -723,7 +723,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadParameters)
 {
   LoadParameters processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 16);
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_PARAMETERS");
 }
 
@@ -792,7 +792,7 @@ BOOST_AUTO_TEST_CASE(gettersPickFeatures)
 {
   PickFeatures processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 5);
+  BOOST_CHECK_EQUAL(processor.getID(), 3);
   BOOST_CHECK_EQUAL(processor.getName(), "PICK_FEATURES");
 }
 
@@ -871,7 +871,7 @@ BOOST_AUTO_TEST_CASE(gettersFilterFeatures)
 {
   FilterFeatures processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 6);
+  BOOST_CHECK_EQUAL(processor.getID(), 4);
   BOOST_CHECK_EQUAL(processor.getName(), "FILTER_FEATURES");
 }
 
@@ -963,7 +963,7 @@ BOOST_AUTO_TEST_CASE(gettersSelectFeatures)
 {
   SelectFeatures processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 8);
+  BOOST_CHECK_EQUAL(processor.getID(), 5);
   BOOST_CHECK_EQUAL(processor.getName(), "SELECT_FEATURES");
 }
 
@@ -1050,7 +1050,7 @@ BOOST_AUTO_TEST_CASE(gettersValidateFeatures)
 {
   ValidateFeatures processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 9);
+  BOOST_CHECK_EQUAL(processor.getID(), 6);
   BOOST_CHECK_EQUAL(processor.getName(), "VALIDATE_FEATURES");
 }
 
@@ -1108,7 +1108,7 @@ BOOST_AUTO_TEST_CASE(gettersPlotFeatures)
 {
   PlotFeatures processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 11);
+  BOOST_CHECK_EQUAL(processor.getID(), 10);
   BOOST_CHECK_EQUAL(processor.getName(), "PLOT_FEATURES");
 }
 
@@ -1138,7 +1138,7 @@ BOOST_AUTO_TEST_CASE(gettersQuantifyFeatures)
 {
   QuantifyFeatures processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 10);
+  BOOST_CHECK_EQUAL(processor.getID(), 7);
   BOOST_CHECK_EQUAL(processor.getName(), "QUANTIFY_FEATURES");
 }
 
@@ -1202,7 +1202,7 @@ BOOST_AUTO_TEST_CASE(gettersCheckFeatures)
 {
   CheckFeatures processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 7);
+  BOOST_CHECK_EQUAL(processor.getID(), 8);
   BOOST_CHECK_EQUAL(processor.getName(), "CHECK_FEATURES");
 }
 

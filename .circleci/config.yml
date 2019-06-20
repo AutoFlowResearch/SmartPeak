@@ -12,11 +12,14 @@ jobs:
       - checkout
       - run: |
           apt-get update
-      - run: | 
-          apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
+      - run: >
+          apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev
+          libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev
+          libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
+          libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
       - run: |
           cd ~ &&
-          git clone --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git &&
+          git clone --branch chore/replace_boost_regex --depth 1 https://github.com/biosustain/OpenMS.git &&
           cd OpenMS &&
           cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
           make -j4 OpenMS
@@ -35,7 +38,9 @@ jobs:
       - run:
           command: |
             cd ~/SmartPeak2_build || exit 1
-            ctest -j4
+            ls -l ~/SmartPeak2/src/tests/class_tests/smartpeak/data
+            ctest -V
+            ls -l ~/SmartPeak2/src/tests/class_tests/smartpeak/data
       - run:
           command: |
             ~/SmartPeak2/.circleci/run_examples.sh

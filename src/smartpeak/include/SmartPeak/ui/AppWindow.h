@@ -1,16 +1,34 @@
 #pragma once
 
+#include <SmartPeak/core/AppState.h>
+#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/ui/FilePicker.h>
+#include <SmartPeak/ui/Report.h>
+#include <SmartPeak/ui/Workflow.h>
+
 namespace SmartPeak
 {
-  class AppWindow
-  {
+  class AppWindow {
   public:
+    // widgets
+    FilePicker file_picker_;
+    Report     report_;
+    Workflow   workflow_;
+    // app state
+    AppState&  state_;
+
+    AppWindow() = delete;
+    AppWindow(AppState& state) : state_(state) {
+      report_.setState(state_);
+      workflow_.setState(state_);
+    }
+
     /**
       Show the application screen
     */
-    static void showApp();
+    void showApp();
 
-    static void showMainMenuBar(
+    void showMainMenuBar(
       // View: Explorer pane
       bool& show_sequence_explorer,
       bool& show_transitions_explorer,
@@ -37,15 +55,14 @@ namespace SmartPeak
       bool& show_info,
       bool& show_log,
       // Help
-      bool& show_app_about,
-      bool& show_file_picker
+      bool& show_app_about
     );
 
-    static void showMenuFile(bool& show_file_picker); ///< Show the main menu File options
+    void showMenuFile(); ///< Show the main menu File options
 
-    static void showMenuEdit(); ///< Show the main menu Edit options
+    void showMenuEdit(); ///< Show the main menu Edit options
 
-    static void showMenuView(
+    void showMenuView(
       // View: Explorer pane
       bool& show_sequence_explorer,
       bool& show_transitions_explorer,
@@ -73,11 +90,11 @@ namespace SmartPeak
       bool& show_log
     ); ///< Show the main menu View options
 
-    static void showMenuAction(); ///< Show the main menu Action options
+    void showMenuAction(); ///< Show the main menu Action options
 
-    static void showMenuHelp(bool& show_app_about); ///< Show the main menu Help options
+    void showMenuHelp(bool& show_app_about); ///< Show the main menu Help options
 
-    static void showExplorerWindow(
+    void showExplorerWindow(
       bool& show_injections_search,
       bool& show_samples_search,
       bool& show_sequence_segments_search,
@@ -91,7 +108,7 @@ namespace SmartPeak
       bool& show_features_explorer
     );
 
-    static void showMainWindow(
+    void showMainWindow(
       bool& show_sequence_table,
       bool& show_transitions_table,
       bool& show_workflow_table,
@@ -109,10 +126,21 @@ namespace SmartPeak
       bool& show_sequence_summary_table
     );
 
-    static void showInfoWindow(
+    void showInfoWindow(
       bool& show_output,
       bool& show_info,
       bool& show_log
+    );
+
+    void HelpMarker(const char* desc);
+
+    void initializeDataDirs(AppState& state);
+
+    void initializeDataDir(
+      AppState& state,
+      const std::string& label,
+      std::string& data_dir_member,
+      const std::string& default_dir
     );
   };
 }

@@ -1,7 +1,9 @@
 // TODO: Add copyright
 
-#include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/io/SequenceParser.h>
+#include <SmartPeak/core/FeatureMetadata.h>
+#include <SmartPeak/core/SampleType.h>
+#include <SmartPeak/core/SequenceHandler.h>
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
 #endif
@@ -181,7 +183,12 @@ namespace SmartPeak
       validateAndConvert(t_dilution_factor, t.dilution_factor);
       validateAndConvert(t_inj_volume,      t.inj_volume);
 
-      t.sample_type = MetaDataHandler::stringToSampleType(t_sample_type);
+      if (stringToSampleType.count(t_sample_type)) {
+        t.sample_type = stringToSampleType.at(t_sample_type);
+      } else {
+        t.sample_type = SampleType::Unrecognized;
+      }
+
       std::tm& adt = t.acquisition_date_and_time;
       std::istringstream iss(t_date);
       iss >> adt.tm_mday >> adt.tm_mon >> adt.tm_year >> adt.tm_hour >> adt.tm_min >> adt.tm_sec;
@@ -197,7 +204,7 @@ namespace SmartPeak
     std::vector<std::map<std::string,std::string>>& list_dict,
     std::vector<std::string>& headers_out,
     const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types // TODO: can overload with a vector of strings
+    const std::set<SampleType>& sample_types
   )
   {
     std::vector<std::string> headers = {
@@ -222,7 +229,7 @@ namespace SmartPeak
     list_dict.clear();
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
-      const MetaDataHandler::SampleType st = mdh.getSampleType();
+      const SampleType st = mdh.getSampleType();
       if (sample_types.count(st) == 0)
         continue;
       const std::string& sample_name = mdh.getSampleName();
@@ -236,7 +243,7 @@ namespace SmartPeak
         const std::string component_group_name = feature.getMetaValue(s_PeptideRef);
         for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
           std::map<std::string,std::string> row;
-          row.emplace("sample_type", MetaDataHandler::SampleTypeToString(st));
+          row.emplace("sample_type", sampleTypeToString.at(st));
           row.emplace("sample_name", sample_name);
           row.emplace("component_group_name", component_group_name);
           if (!subordinate.metaValueExists(s_native_id) ||
@@ -282,8 +289,8 @@ namespace SmartPeak
               );
             }
             else {
-              Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-              if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
+              CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+              if (datum.getTag() == CastValue::FLOAT && datum.f_ != 0.0) {
                 // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
                 row.emplace(meta_value_name, std::to_string(datum.f_));
               } else {
@@ -300,8 +307,8 @@ namespace SmartPeak
   bool SequenceParser::writeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
-    const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types
+    const std::vector<FeatureMetadata>& meta_data,
+    const std::set<SampleType>& sample_types
   )
   {
     LOGD << "START writeDataTableFromMetaValue";
@@ -309,7 +316,11 @@ namespace SmartPeak
 
     std::vector<std::map<std::string,std::string>> list_dict;
     std::vector<std::string> headers;
-    makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data, sample_types);
+    std::vector<std::string> meta_data_strings;
+    for (const FeatureMetadata& m : meta_data) {
+      meta_data_strings.push_back(metadataToString.at(m));
+    }
+    makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data_strings, sample_types);
 
     CSVWriter writer(filename, ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
@@ -337,7 +348,7 @@ namespace SmartPeak
     std::vector<std::string>& columns_out,
     std::vector<Row>& rows_out,
     const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types
+    const std::set<SampleType>& sample_types
   )
   {
     std::set<std::string> columns;
@@ -346,7 +357,7 @@ namespace SmartPeak
 
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
-      const MetaDataHandler::SampleType st = mdh.getSampleType();
+      const SampleType st = mdh.getSampleType();
       if (sample_types.count(st) == 0) {
         continue;
       }
@@ -368,8 +379,8 @@ namespace SmartPeak
               subordinate.getMetaValue(s_native_id).toString(),
               meta_value_name
             );
-            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-            if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
+            CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            if (datum.getTag() == CastValue::FLOAT && datum.f_ != 0.0) {
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
@@ -403,8 +414,8 @@ namespace SmartPeak
   bool SequenceParser::writeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
-    const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types
+    const std::vector<FeatureMetadata>& meta_data,
+    const std::set<SampleType>& sample_types
   )
   {
     LOGD << "START writeDataMatrixFromMetaValue";
@@ -414,7 +425,11 @@ namespace SmartPeak
     std::vector<std::vector<float>> data;
     std::vector<std::string> columns;
     std::vector<Row> rows;
-    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data, sample_types);
+    std::vector<std::string> meta_data_strings;
+    for (const FeatureMetadata& m : meta_data) {
+      meta_data_strings.push_back(metadataToString.at(m));
+    }
+    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_strings, sample_types);
 
     std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
     headers.insert(headers.end(), columns.begin(), columns.end());

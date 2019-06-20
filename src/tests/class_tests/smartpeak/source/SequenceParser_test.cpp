@@ -7,6 +7,7 @@
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/SampleType.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -23,7 +24,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc2_1x");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleType() == SampleType::Unknown, true);
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().acq_method_name, "LCMS");
   BOOST_CHECK_CLOSE(sequence1[0].getMetaData().inj_volume, 10.0, 1e-3);
@@ -33,7 +34,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleType() == SampleType::Unknown, true);
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().acq_method_name, "LCMS");
   BOOST_CHECK_CLOSE(sequence1[3].getMetaData().inj_volume, 10.0, 1e-3);
@@ -49,7 +50,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleType() == SampleType::Unknown, true);
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().acq_method_name, "LCMS");
   BOOST_CHECK_CLOSE(sequence2[0].getMetaData().inj_volume, 10.0, 1e-3);
@@ -59,7 +60,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleType() == SampleType::Unknown, true);
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().acq_method_name, "LCMS");
   BOOST_CHECK_CLOSE(sequence2[4].getMetaData().inj_volume, 10.0, 1e-3);
@@ -75,7 +76,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleType() == SampleType::Unknown, true);
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().acq_method_name, "LCMS");
   BOOST_CHECK_CLOSE(sequence3[0].getMetaData().inj_volume, 10.0, 1e-3);
@@ -85,7 +86,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleType(), MetaDataHandler::SampleType::Unknown);
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleType() == SampleType::Unknown, true);
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().acq_method_name, "LCMS");
   BOOST_CHECK_CLOSE(sequence3[4].getMetaData().inj_volume, 10.0, 1e-3);
@@ -111,7 +112,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
     MetaDataHandler metaDataHandler;
     metaDataHandler.setSampleName(sample_name);
     metaDataHandler.setFilename(sample_name + ".mzML");
-    metaDataHandler.setSampleType(MetaDataHandler::SampleType::Unknown);
+    metaDataHandler.setSampleType(SampleType::Unknown);
     metaDataHandler.setSampleGroupName("sample_group");
     metaDataHandler.setSequenceSegmentName("sequence_segment");
     metaDataHandler.acq_method_name = "6";
@@ -138,7 +139,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
     "leftWidth",
     "rightWidth",
   };
-  const set<MetaDataHandler::SampleType> sample_types = {MetaDataHandler::SampleType::Unknown};
+  const set<SampleType> sample_types = {SampleType::Unknown};
 
   SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types);
 
@@ -180,8 +181,8 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(headers_out[24], "rightWidth");
 
   // write sequence to output
-  const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataTableFromMetaValue.csv");
-  SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
+  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataTableFromMetaValue.csv");
+  // SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
 }
 
 BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
@@ -201,7 +202,7 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
     MetaDataHandler metaDataHandler;
     metaDataHandler.setSampleName(sample_name);
     metaDataHandler.setFilename(sample_name + ".mzML");
-    metaDataHandler.setSampleType(MetaDataHandler::SampleType::Unknown);
+    metaDataHandler.setSampleType(SampleType::Unknown);
     metaDataHandler.setSampleGroupName("sample_group");
     metaDataHandler.setSequenceSegmentName("sequence_segment");
     metaDataHandler.acq_method_name = "6";
@@ -227,7 +228,8 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
     "leftWidth",
     "rightWidth"
   };
-  const set<MetaDataHandler::SampleType> sample_types = {MetaDataHandler::SampleType::Unknown};
+  // const vector<string> meta_data = {"calculated_concentration"};
+  const set<SampleType> sample_types = {SampleType::Unknown};
 
   SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types);
 
@@ -239,8 +241,8 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   BOOST_CHECK_CLOSE(data_out.back().back(), 1.66744995, 1e-3);
 
   // write sequence to output
-  const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataMatrixFromMetaValue.csv");
-  SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
+  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataMatrixFromMetaValue.csv");
+  // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

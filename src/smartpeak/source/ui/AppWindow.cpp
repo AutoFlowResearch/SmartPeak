@@ -1,10 +1,14 @@
 #include <SmartPeak/ui/AppWindow.h>
-#include <SmartPeak/ui/Widget.h>
+#include <string>
+#include <vector>
 #include <imgui.h>
+#include <algorithm>
+#include <SmartPeak/ui/FilePicker.h>
 
 namespace SmartPeak
 {
-  void AppWindow::showApp() {
+  void AppWindow::showApp()
+  {
     // View: Search pane
     static bool show_injections_search = false;
     static bool show_samples_search = false;
@@ -41,50 +45,19 @@ namespace SmartPeak
     // Help
     static bool show_app_about_ = false;
 
-    static bool show_file_picker_ = false;
-
-    if (show_file_picker_)
+    if (file_picker_.show_file_picker_)
     {
-      ImGui::OpenPopup("modal_file_picker");
+      file_picker_.draw();
     }
 
-    // File picker modal
-    if (ImGui::BeginPopupModal("modal_file_picker", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    if (report_.draw_)
     {
-      {
-        // ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.5f);
+      report_.draw();
+    }
 
-        // ImGui::BeginChild("Folders", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 130));
-        ImGui::BeginChild("Folders", ImVec2(170, 300));
-
-        for (int n = 0; n < 50; ++n)
-          ImGui::Text("Folder n. %d", n);
-        ImGui::EndChild();
-      }
-
-      ImGui::SameLine();
-
-      {
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.5f);
-        // ImGui::BeginChild("Folder's content", ImVec2(ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 210)));
-        ImGui::BeginChild("Folder's content", ImVec2(ImVec2(600, 300)));
-        ImGui::Text("Content of the selected (not yet) folder");
-        ImGui::EndChild();
-        ImGui::PopStyleVar();
-      }
-
-      if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-        show_file_picker_ = false;
-        ImGui::CloseCurrentPopup();
-      }
-
-      ImGui::SameLine();
-      if (ImGui::Button("Open", ImVec2(120, 0))) {
-        show_file_picker_ = false;
-        ImGui::CloseCurrentPopup();
-      }
-
-      ImGui::EndPopup();
+    if (workflow_.draw_)
+    {
+      workflow_.draw();
     }
 
     // Show the main window
@@ -131,8 +104,7 @@ namespace SmartPeak
       show_info_,
       show_log_,
       // Help
-      show_app_about_,
-      show_file_picker_
+      show_app_about_
     );
 
     // determine what windows will be shown
@@ -243,15 +215,13 @@ namespace SmartPeak
     bool& show_info,
     bool& show_log,
     // Help
-    bool& show_app_about,
-    bool& show_file_picker
+    bool& show_app_about
   )
   {
     // Show the widgets
     //SequenceWidget sequenceWidget;
-    //if (show_sequence_) sequenceWidget.show(&show_sequence_);
+    //if (show_sequence_) sequenceWidget.draw(&show_sequence_);
     //if (show_generic_table) TableWidget(&show_generic_table);
-    //if (show_file_browser) FileBrowserWidget(&show_file_browser);
     //if (show_plot) PlotWidget(&show_plot);
     //if (show_workflow) WorkflowWidget(&show_workflow);
 
@@ -261,7 +231,7 @@ namespace SmartPeak
     {
       if (ImGui::BeginMenu("File"))
       {
-        showMenuFile(show_file_picker);
+        showMenuFile();
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Edit"))
@@ -314,7 +284,7 @@ namespace SmartPeak
     }
   }
 
-  void AppWindow::showMenuFile(bool& show_file_picker)
+  void AppWindow::showMenuFile()
   {
     ImGui::MenuItem("Session", NULL, false, false);
     if (ImGui::MenuItem("New Session"))
@@ -329,7 +299,9 @@ namespace SmartPeak
     }
 
     if (ImGui::MenuItem("Load session from sequence")) {
-      show_file_picker = !show_file_picker;
+      static LoadSessionFromSequence processor(state_);
+      file_picker_.setProcessor(processor);
+      file_picker_.show_file_picker_ = true;
     }
 
     if (ImGui::MenuItem("Save Session", "Ctrl+S"))
@@ -383,7 +355,11 @@ namespace SmartPeak
     if (ImGui::MenuItem("Plots")) {} // TODO: modal of settings 
     if (ImGui::MenuItem("Explorer")) {} // TODO: modal of settings 
     if (ImGui::MenuItem("Search")) {} // TODO: modal of settings 
-    if (ImGui::MenuItem("Workflow")) {} // TODO: modal of settings 
+    if (ImGui::MenuItem("Workflow"))
+    {
+      initializeDataDirs(state_);
+      workflow_.draw_ = true;
+    }
   }
 
   void AppWindow::showMenuView(
@@ -448,8 +424,19 @@ namespace SmartPeak
   }
 
   void AppWindow::showMenuAction() {
-    if (ImGui::MenuItem("Run command")) {}
-    if (ImGui::MenuItem("Run workflow")) {}
+    if (ImGui::MenuItem("Run command"))
+    {
+      initializeDataDirs(state_);
+      // do the rest
+    }
+    if (ImGui::MenuItem("Run workflow"))
+    {
+      initializeDataDirs(state_);
+      ProcessCommands processCommands(state_);
+      // TODO: IO operation -> use another thread
+      processCommands(state_.commands_);
+      LOGN << "\n\nWorkflow completed.\n";
+    }
     if (ImGui::BeginMenu("Quick info"))
     { // TODO: bug
       if (ImGui::MenuItem("Sequence")) {}
@@ -476,11 +463,9 @@ namespace SmartPeak
       if (ImGui::MenuItem("IS consistency")) {}
       ImGui::EndMenu();
     }
-    if (ImGui::BeginMenu("Report"))
-    {  // TODO: bug
-      if (ImGui::MenuItem("Feature summary")) {}
-      if (ImGui::MenuItem("Sequence summary")) {}
-      ImGui::EndMenu();
+    if (ImGui::MenuItem("Report"))
+    {
+      report_.draw_ = true;
     }
   }
 
@@ -491,7 +476,7 @@ namespace SmartPeak
       {
         //AboutWidget aboutWidget;
         //bool show_about = true;
-        //aboutWidget.show(&show_about);
+        //aboutWidget.draw(&show_about);
         ImGui::Text("About SmartPeak");
         ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
         ImGui::Separator();
@@ -555,7 +540,11 @@ namespace SmartPeak
         GenericTableWidget sequenceTable;
         // TODO: get the headers, columns, and rows_checked
         // NOTE: rows_checked must be statically declared before calling the GUI!
-        sequenceTable.show(headers, columns, rows_checked);
+        // TODO: following lines of code keep copying data. it is slow.
+        sequenceTable.headers = headers;
+        sequenceTable.columns = columns;
+        sequenceTable.checked_rows = rows_checked;
+        sequenceTable.draw();
         ImGui::EndTabItem();
       }
       if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
@@ -607,7 +596,7 @@ namespace SmartPeak
       {
         ImGui::Text("TODO: Feature plot");
         GenericGraphicWidget featurePlot;
-        featurePlot.show();
+        featurePlot.draw();
         ImGui::EndTabItem();
       }
       if (show_line_plot && ImGui::BeginTabItem("Line plot", &show_line_plot))
@@ -620,14 +609,14 @@ namespace SmartPeak
         ImGui::Text("TODO: Heatmap");
         ImGui::EndTabItem();
       }
-      if (show_feature_summary_table && ImGui::BeginTabItem("FeatureSummary", &show_feature_summary_table))
+      if (show_feature_summary_table && ImGui::BeginTabItem("FeatureDB", &show_feature_summary_table))
       {
-        ImGui::Text("TODO: FeatureSummary table");
+        ImGui::Text("TODO: FeatureDB table");
         ImGui::EndTabItem();
       }
-      if (show_sequence_summary_table && ImGui::BeginTabItem("SequenceSummary", &show_sequence_summary_table))
+      if (show_sequence_summary_table && ImGui::BeginTabItem("PivotTable", &show_sequence_summary_table))
       {
-        ImGui::Text("TODO: SequenceSummary table");
+        ImGui::Text("TODO: PivotTable table");
         ImGui::EndTabItem();
       }
       ImGui::EndTabBar();
@@ -679,5 +668,41 @@ namespace SmartPeak
     bool & show_features_explorer
   )
   {
+  }
+
+  // copied from imgui_demo.cpp
+  // Helper to display a little (?) mark which shows a tooltip when hovered.
+  void AppWindow::HelpMarker(const char* desc)
+  {
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered())
+    {
+      ImGui::BeginTooltip();
+      ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+      ImGui::TextUnformatted(desc);
+      ImGui::PopTextWrapPos();
+      ImGui::EndTooltip();
+    }
+  }
+
+  void AppWindow::initializeDataDirs(AppState& state)
+  {
+    initializeDataDir(state, "mzML", state.mzML_dir_, "mzML");
+    initializeDataDir(state, "INPUT features", state.features_in_dir_, "features");
+    initializeDataDir(state, "OUTPUT features", state.features_out_dir_, "features");
+  }
+
+  void AppWindow::initializeDataDir(
+    AppState& state,
+    const std::string& label,
+    std::string& data_dir_member,
+    const std::string& default_dir
+  )
+  {
+    if (data_dir_member.size()) {
+      return;
+    }
+    data_dir_member = state.main_dir_ + "/" + default_dir;
+    LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member;
   }
 }

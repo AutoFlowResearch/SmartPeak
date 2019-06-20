@@ -1,8 +1,8 @@
 // TODO: Add copyright
 
+#include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SequenceHandler.h>
-#include <SmartPeak/core/Utilities.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
@@ -68,7 +68,7 @@ namespace SmartPeak
   )
   {
     if (!MetaDataHandler::validateMetaData(meta_data_I))
-      throw std::invalid_argument("Metadata argument is not valid.");
+      throw std::invalid_argument("FeatureMetadata argument is not valid.");
     std::shared_ptr<MetaDataHandler> meta_data_ptr(new MetaDataHandler(meta_data_I));
 
     // initialize the raw data
@@ -123,7 +123,7 @@ namespace SmartPeak
       //rdh.setFeatureFilter(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
       //rdh.setFeatureQC(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
       //rdh.setTargetedExperiment(std::shared_ptr<OpenMS::TargetedExperiment>(new OpenMS::TargetedExperiment()));
-      //rdh.setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>(new std::vector<std::map<std::string, Utilities::CastValue>>()));
+      //rdh.setReferenceData(std::shared_ptr<std::vector<std::map<std::string, CastValue>>>(new std::vector<std::map<std::string, CastValue>>()));
 
       // initialize the sequence segment
       SequenceSegmentHandler sequenceSegmentHandler;
@@ -168,13 +168,13 @@ namespace SmartPeak
     return samples;
   }
 
-  Utilities::CastValue SequenceHandler::getMetaValue(
+  CastValue SequenceHandler::getMetaValue(
     const OpenMS::Feature& feature,
     const OpenMS::Feature& subordinate,
     const std::string& meta_value
   )
   {
-    Utilities::CastValue cast;
+    CastValue cast;
 
     if (meta_value == "RT") {
       cast = static_cast<float>(feature.getRT());

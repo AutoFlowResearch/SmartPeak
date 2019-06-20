@@ -3,9 +3,11 @@ set(directory include/SmartPeak/ui)
 
 ### list all header files of the directory here
 set(sources_list_h
-	AppManager.h
-	Widget.h
 	AppWindow.h
+	FilePicker.h
+	Report.h
+	Widget.h
+	Workflow.h
 )
 
 ### add path to the filenames

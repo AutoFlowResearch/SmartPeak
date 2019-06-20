@@ -3,13 +3,18 @@ set(directory include/SmartPeak/core)
 
 ### list all header files of the directory here
 set(sources_list_h
+	AppState.h
+	AppStateProcessor.h
+	CastValue.h
 	Filenames.h
 	Helloworld.h
+	FeatureMetadata.h
 	MetaDataHandler.h
 	RawDataHandler.h
 	RawDataProcessor.h
 	SampleGroupHandler.h
 	InjectionHandler.h
+	SampleType.h
 	SequenceHandler.h
 	SequenceProcessor.h
 	SequenceSegmentHandler.h

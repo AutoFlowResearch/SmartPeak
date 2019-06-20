@@ -43,6 +43,21 @@ endif (IMGUI_FOUND)
 find_package(Plog REQUIRED)
 
 #------------------------------------------------------------------------------
+# Find BOOST
+#------------------------------------------------------------------------------
+find_boost(filesystem)
+
+if(Boost_FOUND)
+  message(STATUS "Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}" )
+  set(CF_OPENMS_BOOST_VERSION_MAJOR ${Boost_MAJOR_VERSION})
+	set(CF_OPENMS_BOOST_VERSION_MINOR ${Boost_MINOR_VERSION})
+  set(CF_OPENMS_BOOST_VERSION_SUBMINOR ${Boost_SUBMINOR_VERSION})
+	set(CF_OPENMS_BOOST_VERSION ${Boost_VERSION})
+else()
+  message(FATAL_ERROR "Boost or one of its components not found!")
+endif()
+
+#------------------------------------------------------------------------------
 # Find OpenMS
 #------------------------------------------------------------------------------
 find_package(OpenMS REQUIRED)

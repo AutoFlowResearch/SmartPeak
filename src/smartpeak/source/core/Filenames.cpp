@@ -20,8 +20,8 @@ namespace SmartPeak
     static_filenames.quantitationMethods_csv_i = dir + "/quantitationMethods.csv";
     static_filenames.standardsConcentrations_csv_i = dir + "/standardsConcentrations.csv";
     static_filenames.referenceData_csv_i = dir + "/referenceData.csv";
-    static_filenames.sequenceSummary_csv_o = dir + "/SequenceSummary.csv";
-    static_filenames.featureSummary_csv_o = dir + "/FeatureSummary.csv";
+    static_filenames.pivotTable_csv_o = dir + "/PivotTable.csv";
+    static_filenames.featureDB_csv_o = dir + "/FeatureDB.csv";
     return static_filenames;
   }
 
@@ -67,7 +67,7 @@ namespace SmartPeak
     features_pdf_o.clear();
     quantitationMethods_csv_o.clear();
     componentsToConcentrations_csv_o.clear();
-    sequenceSummary_csv_o.clear();
-    featureSummary_csv_o.clear();
+    pivotTable_csv_o.clear();
+    featureDB_csv_o.clear();
   }
 }
