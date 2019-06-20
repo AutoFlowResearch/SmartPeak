@@ -1,0 +1,8 @@
+# Ignore everything in this directory
+*
+
+# Except this file
+!.gitignore
+
+# The folder is intended for output data coming from the tests.
+# Git cannot track empty folders, therefore this file exists to bypass the issue.

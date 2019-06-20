@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 namespace SmartPeak
 {
   class AppWindow
@@ -41,7 +44,9 @@ namespace SmartPeak
       bool& show_file_picker
     );
 
-    static void showMenuFile(bool& show_file_picker); ///< Show the main menu File options
+    static void showMenuFile(
+      bool& show_file_picker
+    ); ///< Show the main menu File options
 
     static void showMenuEdit(); ///< Show the main menu Edit options
 
@@ -114,5 +119,7 @@ namespace SmartPeak
       bool& show_info,
       bool& show_log
     );
+
+    static void HelpMarker(const char* desc);
   };
 }

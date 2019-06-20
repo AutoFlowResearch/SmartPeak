@@ -6,7 +6,7 @@
 #include <SmartPeak/core/SampleGroupHandler.h>
 #include <SmartPeak/core/InjectionHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
-#include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/CastValue.h>
 
 namespace SmartPeak
 {
@@ -36,7 +36,7 @@ public:
       const std::set<std::string>& injection_names
     ) const;
 
-    static Utilities::CastValue getMetaValue(
+    static CastValue getMetaValue(
       const OpenMS::Feature& feature,
       const OpenMS::Feature& subordinate,
       const std::string& meta_value

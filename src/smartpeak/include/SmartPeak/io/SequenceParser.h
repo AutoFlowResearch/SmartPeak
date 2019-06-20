@@ -3,6 +3,7 @@
 #pragma once
 
 #include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/core/Utilities.h>
 #include <plog/Log.h>
 
 namespace SmartPeak

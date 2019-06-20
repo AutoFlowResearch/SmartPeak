@@ -282,8 +282,8 @@ namespace SmartPeak
               );
             }
             else {
-              Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-              if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
+              CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+              if (datum.getTag() == CastValue::FLOAT && datum.f_ != 0.0) {
                 // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
                 row.emplace(meta_value_name, std::to_string(datum.f_));
               } else {
@@ -368,8 +368,8 @@ namespace SmartPeak
               subordinate.getMetaValue(s_native_id).toString(),
               meta_value_name
             );
-            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-            if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
+            CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            if (datum.getTag() == CastValue::FLOAT && datum.f_ != 0.0) {
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
               columns.insert(sample_name);
               rows.insert(row_tuple_name);

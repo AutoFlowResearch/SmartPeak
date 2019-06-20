@@ -1,10 +1,13 @@
 #include <SmartPeak/ui/AppWindow.h>
 #include <SmartPeak/ui/Widget.h>
 #include <imgui.h>
+#include <algorithm>
+#include <SmartPeak/ui/FilePicker.h>
 
 namespace SmartPeak
 {
-  void AppWindow::showApp() {
+  void AppWindow::showApp()
+  {
     // View: Search pane
     static bool show_injections_search = false;
     static bool show_samples_search = false;
@@ -42,49 +45,11 @@ namespace SmartPeak
     static bool show_app_about_ = false;
 
     static bool show_file_picker_ = false;
+    static FilePicker file_picker(show_file_picker_);
 
     if (show_file_picker_)
     {
-      ImGui::OpenPopup("modal_file_picker");
-    }
-
-    // File picker modal
-    if (ImGui::BeginPopupModal("modal_file_picker", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-      {
-        // ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.5f);
-
-        // ImGui::BeginChild("Folders", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 130));
-        ImGui::BeginChild("Folders", ImVec2(170, 300));
-
-        for (int n = 0; n < 50; ++n)
-          ImGui::Text("Folder n. %d", n);
-        ImGui::EndChild();
-      }
-
-      ImGui::SameLine();
-
-      {
-        ImGui::PushStyleVar(ImGuiStyleVar_ChildRounding, 1.5f);
-        // ImGui::BeginChild("Folder's content", ImVec2(ImVec2(ImGui::GetWindowContentRegionWidth() * 0.5f, 210)));
-        ImGui::BeginChild("Folder's content", ImVec2(ImVec2(600, 300)));
-        ImGui::Text("Content of the selected (not yet) folder");
-        ImGui::EndChild();
-        ImGui::PopStyleVar();
-      }
-
-      if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-        show_file_picker_ = false;
-        ImGui::CloseCurrentPopup();
-      }
-
-      ImGui::SameLine();
-      if (ImGui::Button("Open", ImVec2(120, 0))) {
-        show_file_picker_ = false;
-        ImGui::CloseCurrentPopup();
-      }
-
-      ImGui::EndPopup();
+      file_picker.draw();
     }
 
     // Show the main window
@@ -249,9 +214,8 @@ namespace SmartPeak
   {
     // Show the widgets
     //SequenceWidget sequenceWidget;
-    //if (show_sequence_) sequenceWidget.show(&show_sequence_);
+    //if (show_sequence_) sequenceWidget.draw(&show_sequence_);
     //if (show_generic_table) TableWidget(&show_generic_table);
-    //if (show_file_browser) FileBrowserWidget(&show_file_browser);
     //if (show_plot) PlotWidget(&show_plot);
     //if (show_workflow) WorkflowWidget(&show_workflow);
 
@@ -314,7 +278,9 @@ namespace SmartPeak
     }
   }
 
-  void AppWindow::showMenuFile(bool& show_file_picker)
+  void AppWindow::showMenuFile(
+    bool& show_file_picker
+  )
   {
     ImGui::MenuItem("Session", NULL, false, false);
     if (ImGui::MenuItem("New Session"))
@@ -329,7 +295,7 @@ namespace SmartPeak
     }
 
     if (ImGui::MenuItem("Load session from sequence")) {
-      show_file_picker = !show_file_picker;
+      show_file_picker = true;
     }
 
     if (ImGui::MenuItem("Save Session", "Ctrl+S"))
@@ -491,7 +457,7 @@ namespace SmartPeak
       {
         //AboutWidget aboutWidget;
         //bool show_about = true;
-        //aboutWidget.show(&show_about);
+        //aboutWidget.draw(&show_about);
         ImGui::Text("About SmartPeak");
         ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
         ImGui::Separator();
@@ -555,7 +521,11 @@ namespace SmartPeak
         GenericTableWidget sequenceTable;
         // TODO: get the headers, columns, and rows_checked
         // NOTE: rows_checked must be statically declared before calling the GUI!
-        sequenceTable.show(headers, columns, rows_checked);
+        // TODO: following lines of code keep copying data. it is slow.
+        sequenceTable.headers = headers;
+        sequenceTable.columns = columns;
+        sequenceTable.checked_rows = rows_checked;
+        sequenceTable.draw();
         ImGui::EndTabItem();
       }
       if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
@@ -607,7 +577,7 @@ namespace SmartPeak
       {
         ImGui::Text("TODO: Feature plot");
         GenericGraphicWidget featurePlot;
-        featurePlot.show();
+        featurePlot.draw();
         ImGui::EndTabItem();
       }
       if (show_line_plot && ImGui::BeginTabItem("Line plot", &show_line_plot))
@@ -679,5 +649,20 @@ namespace SmartPeak
     bool & show_features_explorer
   )
   {
+  }
+
+  // copied from imgui_demo.cpp
+  // Helper to display a little (?) mark which shows a tooltip when hovered.
+  void AppWindow::HelpMarker(const char* desc)
+  {
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered())
+    {
+      ImGui::BeginTooltip();
+      ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+      ImGui::TextUnformatted(desc);
+      ImGui::PopTextWrapPos();
+      ImGui::EndTooltip();
+    }
   }
 }

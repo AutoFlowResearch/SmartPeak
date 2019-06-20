@@ -4,8 +4,9 @@ set(directory source/ui)
 ### list all filenames of the directory here
 set(sources_list
 	AppManager.cpp
-	Widget.cpp
 	AppWindow.cpp
+	FilePicker.cpp
+	Widget.cpp
 )
 
 ### add path to the filenames
