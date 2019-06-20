@@ -5,6 +5,7 @@ set(directory include/SmartPeak/ui)
 set(sources_list_h
 	AppWindow.h
 	FilePicker.h
+	Report.h
 	Widget.h
 	Workflow.h
 )

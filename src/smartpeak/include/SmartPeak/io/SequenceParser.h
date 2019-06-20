@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <SmartPeak/core/FeatureMetadata.h>
+#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/Utilities.h>
 #include <plog/Log.h>
@@ -55,14 +57,14 @@ public:
       std::vector<std::map<std::string,std::string>>& list_dict,
       std::vector<std::string>& headers_out,
       const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
+      const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
     );
 
     static bool writeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
+      const std::vector<FeatureMetadata>& meta_data = {FeatureMetadata::calculated_concentration},
+      const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
     );
 
     struct Row
@@ -99,15 +101,15 @@ public:
       std::vector<std::string>& columns_out,
       std::vector<Row>& rows_out,
       const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
+      const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
     );
 
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
     static bool writeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
+      const std::vector<FeatureMetadata>& meta_data = {FeatureMetadata::calculated_concentration},
+      const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
     );
   };
 }

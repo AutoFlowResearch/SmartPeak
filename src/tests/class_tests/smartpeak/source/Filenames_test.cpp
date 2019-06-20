@@ -31,8 +31,8 @@ BOOST_AUTO_TEST_CASE(getDefaultStaticFilenames)
   BOOST_CHECK_EQUAL(filenames.features_pdf_o, "");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.sequenceSummary_csv_o, "/home/user/SequenceSummary.csv");
-  BOOST_CHECK_EQUAL(filenames.featureSummary_csv_o, "/home/user/FeatureSummary.csv");
+  BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "/home/user/PivotTable.csv");
+  BOOST_CHECK_EQUAL(filenames.featureDB_csv_o, "/home/user/FeatureDB.csv");
 }
 
 BOOST_AUTO_TEST_CASE(getDefaultDynamicFilenames)
@@ -60,8 +60,8 @@ BOOST_AUTO_TEST_CASE(getDefaultDynamicFilenames)
   BOOST_CHECK_EQUAL(filenames.features_pdf_o, "/home/user/featuresOut/injOut");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "/home/user/featuresOut/injOut_quantitationMethods.csv");
   BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "/home/user/featuresOut/injOut_componentsToConcentrations.csv");
-  BOOST_CHECK_EQUAL(filenames.sequenceSummary_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureSummary_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureDB_csv_o, "");
 }
 
 BOOST_AUTO_TEST_CASE(clear1)
@@ -85,8 +85,8 @@ BOOST_AUTO_TEST_CASE(clear1)
   BOOST_CHECK_EQUAL(filenames.features_pdf_o, "");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.sequenceSummary_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureSummary_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureDB_csv_o, "");
 }
 
 BOOST_AUTO_TEST_CASE(clear2)
@@ -115,8 +115,8 @@ BOOST_AUTO_TEST_CASE(clear2)
   BOOST_CHECK_EQUAL(filenames.features_pdf_o, "");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.sequenceSummary_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureSummary_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureDB_csv_o, "");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

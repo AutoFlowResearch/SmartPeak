@@ -3,18 +3,23 @@
 #include <SmartPeak/core/AppState.h>
 #include <SmartPeak/core/AppStateProcessor.h>
 #include <SmartPeak/ui/FilePicker.h>
+#include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
 
 namespace SmartPeak
 {
   class AppWindow {
   public:
+    // widgets
     FilePicker file_picker_;
-    Workflow workflow_;
-    AppState& state_;
+    Report     report_;
+    Workflow   workflow_;
+    // app state
+    AppState&  state_;
 
     AppWindow() = delete;
     AppWindow(AppState& state) : state_(state) {
+      report_.setState(state_);
       workflow_.setState(state_);
     }
 
@@ -128,5 +133,14 @@ namespace SmartPeak
     );
 
     void HelpMarker(const char* desc);
+
+    void initializeDataDirs(AppState& state);
+
+    void initializeDataDir(
+      AppState& state,
+      const std::string& label,
+      std::string& data_dir_member,
+      const std::string& default_dir
+    );
   };
 }

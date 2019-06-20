@@ -2,6 +2,7 @@
 
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <map>
@@ -52,10 +53,6 @@ namespace SmartPeak
     std::string                           mzML_dir_;
     std::string                           features_in_dir_;
     std::string                           features_out_dir_;
-    std::set<MetaDataHandler::SampleType> sequenceSummaryTypes_;
-    std::set<MetaDataHandler::SampleType> featureSummaryTypes_;
-    std::vector<std::string>              sequenceSummaryMetaData_;
-    std::vector<std::string>              featureSummaryMetaData_;
     std::vector<Command>                  commands_;
     Filenames                             static_filenames_;
     SequenceHandler                       sequenceHandler_;

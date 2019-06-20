@@ -1,3 +1,5 @@
+#include <SmartPeak/core/FeatureMetadata.h>
+#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/io/SequenceParser.h>
@@ -51,21 +53,31 @@ void example_HPLC_UV_Unknowns(
 
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,
-    static_filenames.sequenceSummary_csv_o,
-    {"calculated_concentration"},
-    {MetaDataHandler::SampleType::Unknown}
+    static_filenames.pivotTable_csv_o,
+    {FeatureMetadata::calculated_concentration},
+    {SampleType::Unknown}
   );
 
   SequenceParser::writeDataTableFromMetaValue(
     sequenceHandler,
-    static_filenames.featureSummary_csv_o,
+    static_filenames.featureDB_csv_o,
     {
-      "peak_apex_int", "total_width", "width_at_50", "tailing_factor",
-      "asymmetry_factor", "baseline_delta_2_height", "points_across_baseline",
-      "points_across_half_height", "logSN", "calculated_concentration",
-      "QC_transition_message", "QC_transition_pass", "QC_transition_score",
-      "QC_transition_group_message", "QC_transition_group_score"
+      FeatureMetadata::peak_apex_intensity,
+      FeatureMetadata::total_width,
+      FeatureMetadata::width_at_50_peak_height,
+      FeatureMetadata::tailing_factor,
+      FeatureMetadata::asymmetry_factor,
+      FeatureMetadata::baseline_delta_to_height,
+      FeatureMetadata::points_across_baseline,
+      FeatureMetadata::points_across_half_height,
+      FeatureMetadata::log_signal_to_noise,
+      FeatureMetadata::calculated_concentration,
+      FeatureMetadata::qc_transition_message,
+      FeatureMetadata::qc_transition_pass,
+      FeatureMetadata::qc_transition_score,
+      FeatureMetadata::qc_transition_group_message,
+      FeatureMetadata::qc_transition_group_score
     },
-    {MetaDataHandler::SampleType::Unknown}
+    {SampleType::Unknown}
   );
 }

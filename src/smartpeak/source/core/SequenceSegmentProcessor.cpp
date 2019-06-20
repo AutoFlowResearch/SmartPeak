@@ -3,6 +3,7 @@
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
+#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/Utilities.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
@@ -17,7 +18,7 @@ namespace SmartPeak
   void SequenceSegmentProcessor::getSampleIndicesBySampleType(
     const SequenceSegmentHandler& sequenceSegmentHandler,
     const SequenceHandler& sequenceHandler,
-    const MetaDataHandler::SampleType sampleType,
+    const SampleType sampleType,
     std::vector<size_t>& sampleIndices
   )
   {
@@ -44,7 +45,7 @@ namespace SmartPeak
     this->getSampleIndicesBySampleType(
       sequenceSegmentHandler_IO,
       sequenceHandler_I,
-      MetaDataHandler::SampleType::Standard,
+      SampleType::Standard,
       standards_indices
     );
 
