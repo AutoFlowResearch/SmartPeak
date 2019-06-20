@@ -6,6 +6,7 @@ set(sources_list
 	AppWindow.cpp
 	FilePicker.cpp
 	Widget.cpp
+	Workflow.cpp
 )
 
 ### add path to the filenames

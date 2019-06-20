@@ -321,5 +321,23 @@ namespace SmartPeak
       LOGE << "Provided and/or inferred pathnames are not correct."
         "The sequence has not been modified. Check file: " << state_.pathnamesFilename_;
     }
-  };
+  }
+
+  std::vector<AppState::Command> BuildCommandsFromIds::operator()(const std::string& ids)
+  {
+    std::vector<AppState::Command> commands;
+
+    std::istringstream iss {ids};
+
+    for (int n; iss >> n;) {
+      AppState::Command cmd;
+      CreateCommand createCommand(state_);
+      const bool created = createCommand(n, cmd);
+      if (created) {
+        commands.push_back(cmd);
+      }
+    }
+
+    return commands;
+  }
 }

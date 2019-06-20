@@ -145,16 +145,8 @@ std::vector<AppState::Command> getMethodsInput()
     return {};
   }
 
-  std::istringstream iss {line};
-
-  for (int n; iss >> n;) {
-    AppState::Command cmd;
-    CreateCommand createCommand(state);
-    const bool created = createCommand(n, cmd);
-    if (created) {
-      methods.push_back(cmd);
-    }
-  }
+  BuildCommandsFromIds buildCommandsFromIds(state);
+  methods = buildCommandsFromIds(line);
 
   return methods;
 }
@@ -839,7 +831,7 @@ std::string getPipelineString()
   std::string s;
   for (const AppState::Command& cmd : state.commands_) {
     if (cmd.type == AppState::Command::RawDataMethod) {
-      const std::unordered_map<int, std::shared_ptr<RawDataProcessor>>::const_iterator
+      const std::map<int, std::shared_ptr<RawDataProcessor>>::const_iterator
       it = std::find_if(
         state.n_to_raw_data_method_.cbegin(),
         state.n_to_raw_data_method_.cend(),
@@ -848,7 +840,7 @@ std::string getPipelineString()
       );
       s.append(std::to_string(it->first));
     } else if (cmd.type == AppState::Command::SequenceSegmentMethod) {
-      const std::unordered_map<int, std::shared_ptr<SequenceSegmentProcessor>>::const_iterator
+      const std::map<int, std::shared_ptr<SequenceSegmentProcessor>>::const_iterator
       it = std::find_if(
         state.n_to_seq_seg_method_.cbegin(),
         state.n_to_seq_seg_method_.cend(),

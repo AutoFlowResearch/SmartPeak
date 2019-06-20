@@ -21,6 +21,7 @@ namespace SmartPeak
     virtual void operator()(const std::vector<AppState::Command>& commands) {}
     virtual bool operator()(const int n, AppState::Command& cmd) {}
     virtual void operator()(const char* const pathname) {}
+    virtual std::vector<AppState::Command> operator()(const std::string& ids) {}
 
     AppState& state_;
 
@@ -58,5 +59,10 @@ namespace SmartPeak
       const std::vector<InputDataValidation::FilenameInfo>& is_valid
     );
     std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
+  };
+
+  struct BuildCommandsFromIds : AppStateProcessor {
+    BuildCommandsFromIds(AppState& state) : AppStateProcessor(state) {}
+    std::vector<AppState::Command> operator()(const std::string& ids) override;
   };
 }

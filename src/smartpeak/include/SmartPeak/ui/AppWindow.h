@@ -3,16 +3,20 @@
 #include <SmartPeak/core/AppState.h>
 #include <SmartPeak/core/AppStateProcessor.h>
 #include <SmartPeak/ui/FilePicker.h>
+#include <SmartPeak/ui/Workflow.h>
 
 namespace SmartPeak
 {
   class AppWindow {
   public:
     FilePicker file_picker_;
+    Workflow workflow_;
     AppState& state_;
 
     AppWindow() = delete;
-    AppWindow(AppState& state) : state_(state) {}
+    AppWindow(AppState& state) : state_(state) {
+      workflow_.setState(state_);
+    }
 
     /**
       Show the application screen

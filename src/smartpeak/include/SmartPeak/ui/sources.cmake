@@ -6,6 +6,7 @@ set(sources_list_h
 	AppWindow.h
 	FilePicker.h
 	Widget.h
+	Workflow.h
 )
 
 ### add path to the filenames

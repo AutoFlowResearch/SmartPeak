@@ -4,8 +4,8 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
+#include <map>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 namespace SmartPeak
@@ -30,6 +30,16 @@ namespace SmartPeak
         seq_seg_method = method;
       }
 
+      int getID() const
+      {
+        return type == RawDataMethod ? raw_data_method->getID() : seq_seg_method->getID();
+      }
+
+      std::string getName() const
+      {
+        return type == RawDataMethod ? raw_data_method->getName() : seq_seg_method->getName();
+      }
+
       std::shared_ptr<RawDataProcessor> raw_data_method;
       std::shared_ptr<SequenceSegmentProcessor> seq_seg_method;
 
@@ -50,7 +60,7 @@ namespace SmartPeak
     Filenames                             static_filenames_;
     SequenceHandler                       sequenceHandler_;
 
-    const std::unordered_map<int, std::shared_ptr<RawDataProcessor>> n_to_raw_data_method_ {
+    const std::map<int, std::shared_ptr<RawDataProcessor>> n_to_raw_data_method_ {
       {1, std::shared_ptr<RawDataProcessor>(new LoadRawData())},
       {2, std::shared_ptr<RawDataProcessor>(new LoadFeatures())},
       {3, std::shared_ptr<RawDataProcessor>(new PickFeatures())},
@@ -65,7 +75,7 @@ namespace SmartPeak
       {12, std::shared_ptr<RawDataProcessor>(new ZeroChromatogramBaseline())},
       {13, std::shared_ptr<RawDataProcessor>(new ExtractChromatogramWindows())},
     };
-    const std::unordered_map<int, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
+    const std::map<int, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
       {14, std::shared_ptr<SequenceSegmentProcessor>(new CalculateCalibration())},
       {15, std::shared_ptr<SequenceSegmentProcessor>(new StoreQuantitationMethods())},
       {16, std::shared_ptr<SequenceSegmentProcessor>(new LoadQuantitationMethods())},
