@@ -9,21 +9,22 @@
 
 namespace SmartPeak
 {
-  class SequenceSegmentProcessor
+  struct SequenceSegmentProcessor
   {
-  public:
-    SequenceSegmentProcessor()                                           = default;
-    virtual ~SequenceSegmentProcessor()                                  = default;
-    SequenceSegmentProcessor(const SequenceSegmentProcessor&)            = delete;
-    SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor&) = delete;
-    SequenceSegmentProcessor(SequenceSegmentProcessor&&)                 = delete;
-    SequenceSegmentProcessor& operator=(SequenceSegmentProcessor&&)      = delete;
+    // C.67: A polymorphic class should suppress copying
+    SequenceSegmentProcessor(const SequenceSegmentProcessor& other) = delete;
+    SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor& other) = delete;
 
-    virtual int getID() const = 0;  ///< get the raw data processor class ID
-    virtual std::string getName() const = 0;  ///< get the raw data processor class name
-    virtual std::string getDescription() const = 0;  ///< get the raw data processor class description
+    // C.35: A base class destructor should be either public and virtual, or protected and nonvirtual
+    // C.127: A class with a virtual function should have a virtual or protected destructor
+    virtual ~SequenceSegmentProcessor() = default;
 
-    /** Interface to all  sequence segment processing methods.
+    virtual int getID() const = 0; /// get the raw data processor struct ID
+    virtual std::string getName() const = 0; /// get the raw data processor struct name
+    virtual std::string getDescription() const = 0; /// get the raw data processor struct description
+
+    /**
+      Interface to all  sequence segment processing methods.
 
       @param[in,out] sequenceSegmentHandler_IO Sequence segment handler
       @param[in] sequenceHandler_I Sequence handler
@@ -51,16 +52,20 @@ namespace SmartPeak
       const MetaDataHandler::SampleType sampleType,
       std::vector<size_t>& sampleIndices
     );
+
+  protected:
+    // Forced to write this, because the other user-defined constructors inhibit
+    // the implicit definition of a default constructor
+    // Even though this class is abstract and hence can't be instantiated,
+    // derived classes will call the base's constructor
+    SequenceSegmentProcessor() = default;
   };
 
-  class CalculateCalibration : public SequenceSegmentProcessor
+  struct CalculateCalibration : SequenceSegmentProcessor
   {
-  public:
-    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const { return 14; }
+    std::string getName() const { return "CALCULATE_CALIBRATION"; }
+    std::string getDescription() const { return "Determine the optimal relationship between known sample concentration and measured intensity."; }
 
     /**
       Optimize the calibration curve for all components.
@@ -71,21 +76,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const;
-
-  protected:
-    int id_ = 1;
-    std::string name_ = "CALCULATE_CALIBRATION";
-    std::string description_ = "Determine the optimal relationship between known sample concentration and measured intensity.";
   };
 
-  class LoadStandardsConcentrations : public SequenceSegmentProcessor
+  struct LoadStandardsConcentrations : SequenceSegmentProcessor
   {
-  public:
-    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const { return -1; }
+    std::string getName() const { return "LOAD_STANDARDS_CONCENTRATIONS"; }
+    std::string getDescription() const { return "Load the standards concentrations file that gives the relationship between injection, component, and known concentration from disk."; }
 
     /**
       Load the standards concentration file.
@@ -96,21 +93,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const;
-
-  protected:
-    int id_ = 2;
-    std::string name_ = "LOAD_STANDARDS_CONCENTRATIONS";
-    std::string description_ = "Load the standards concentrations file that gives the relationship between injection, component, and known concentration from disk.";
   };
 
-  class LoadQuantitationMethods : public SequenceSegmentProcessor
+  struct LoadQuantitationMethods : SequenceSegmentProcessor
   {
-  public:
-    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const { return 16; }
+    std::string getName() const { return "LOAD_QUANTITATION_METHODS"; }
+    std::string getDescription() const { return "Load each transitions calibration model defined in quantitationMethods from disk."; }
 
     /**
       Load the quantitation methods file.
@@ -121,21 +110,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const;
-
-  protected:
-    int id_ = 3;
-    std::string name_ = "LOAD_QUANTITATION_METHODS";
-    std::string description_ = "Load each transitions calibration model defined in quantitationMethods from disk.";
   };
 
-  class StoreQuantitationMethods : public SequenceSegmentProcessor
+  struct StoreQuantitationMethods : SequenceSegmentProcessor
   {
-  public:
-    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const { return 15; }
+    std::string getName() const { return "STORE_QUANTITATION_METHODS"; }
+    std::string getDescription() const { return "Write each transitions calibration model to disk for later use."; }
 
     /**
       Write the quantitation methods to disk.
@@ -146,21 +127,13 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const;
-
-  protected:
-    int id_ = 4;
-    std::string name_ = "STORE_QUANTITATION_METHODS";
-    std::string description_ = "Write each transitions calibration model to disk for later use.";
   };
 
-  class PlotCalibrators : public SequenceSegmentProcessor
+  struct PlotCalibrators : SequenceSegmentProcessor
   {
-  public:
-    // using SequenceSegmentProcessor::SequenceSegmentProcessor;
-
-    int getID() const { return id_; };
-    std::string getName() const { return name_; };
-    std::string getDescription() const { return description_; };
+    int getID() const { return -1; }
+    std::string getName() const { return "PLOT_CALIBRATORS"; }
+    std::string getDescription() const { return "Plot the calibration points for each component where the x-axis is concentration ratio and the y-axis is intensity ratio."; }
 
     /**
       Plot the calibration points for each component.
@@ -173,10 +146,5 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const;
-
-  protected:
-    int id_ = 5;
-    std::string name_ = "PLOT_CALIBRATORS";
-    std::string description_ = "Plot the calibration points for each component where the x-axis is concentration ratio and the y-axis is intensity ratio.";
   };
 }

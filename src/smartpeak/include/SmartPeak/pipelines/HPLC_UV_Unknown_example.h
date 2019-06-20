@@ -12,7 +12,11 @@ void example_HPLC_UV_Unknowns(
 {
   SequenceHandler sequenceHandler;
 
-  SequenceProcessor::createSequence(sequenceHandler, static_filenames, delimiter_I, true);
+  CreateSequence cs(sequenceHandler);
+  cs.filenames        = static_filenames;
+  cs.delimiter        = delimiter_I;
+  cs.checkConsistency = true;
+  cs.process();
 
   const std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
     std::shared_ptr<RawDataProcessor>(new LoadRawData()),
@@ -40,12 +44,10 @@ void example_HPLC_UV_Unknowns(
     );
   }
 
-  SequenceProcessor::processSequence(
-    sequenceHandler,
-    dynamic_filenames,
-    std::set<std::string>(),
-    raw_data_processing_methods
-  );
+  ProcessSequence ps(sequenceHandler);
+  ps.filenames                     = dynamic_filenames;
+  ps.raw_data_processing_methods_I = raw_data_processing_methods;
+  ps.process();
 
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,

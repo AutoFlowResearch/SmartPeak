@@ -26,7 +26,6 @@ set(algorithm_executables_list
 )
 
 set(ui_executables_list
-	AppManager_test
 	AppWindow_test
 )
 

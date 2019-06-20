@@ -1,3 +1,5 @@
+#pragma once
+
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
@@ -8,8 +10,7 @@
 
 namespace SmartPeak
 {
-  class AppManager final {
-  public:
+  struct AppState final {
     class Command {
     public:
       enum CommandType {
@@ -87,91 +88,5 @@ namespace SmartPeak
       OPT_STORE_QUANTITATION_METHODS,
       OPT_LOAD_QUANTITATION_METHODS,
     };
-    const std::string main_menu_ = "\n\n"
-      "Please insert the sequence of methods to run.\n"
-      "You can choose the same method multiple times.\n"
-      "Separate chosen methods with a space.\n\n"
-      + commandsString() +
-      "[M]  Main menu\n\n"
-      "Presets:\n"
-      "LCMS MRM Unknowns: 1 11 3 7 8 5 9\n"
-      "LCMS MRM Standards: 1 11 3 8 5 14 15 7 9\n"
-      "HPLC UV Unknowns: 1 11 13 12 3 7 8 5 9\n"
-      "HPLC UV Standards: 1 11 13 12 3 8 5 14 15 7 9\n"
-      "GCMS SIM Unknowns: 1 11 13 12 3 7 8 5 9\n"
-      "GCMS Full Scan Unknowns: 1 11 13 12 3 8 5 14 15 7 9\n";
-
-    void menuMain();
-
-    void menuFile();
-
-    void menuImportFile();
-
-    void menuEdit();
-
-    void menuView();
-
-    void menuActions();
-
-    void menuDataIntegrity();
-
-    void menuReport();
-
-    void menuQuickInfo();
-
-    void menuHelp();
-
-    void exitSmartPeak();
-
-    bool buildStaticFilenames();
-
-    bool requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation);
-
-    void clearNonExistantDefaultGeneratedFilenames(Filenames& f);
-
-    void clearNonExistantFilename(std::string& filename);
-
-    void generatePathnamesTxt(
-      const std::string& pathname,
-      const Filenames& f,
-      const std::vector<InputDataValidation::FilenameInfo>& is_valid
-    );
-
-    std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
-
-    void updateFilenames(Filenames& f, const std::string& pathname);
-
-    std::vector<Command> getMethodsInput();
-
-    void setSequencePathnameFromInput();
-
-    std::string getLineInput(const std::string& message = "", const bool canBeEmpty = true);
-
-    std::string getPathnameFromInput();
-
-    std::set<MetaDataHandler::SampleType> getSampleTypesInput();
-
-    std::vector<std::string> getMetaDataInput(const std::string& title);
-
-    std::string gettingStartedString();
-
-    std::string commandsString();
-
-    void processCommands(const std::vector<Command>& commands);
-
-    bool createCommand(const int n, Command& cmd);
-
-    void initializeDataDirs();
-
-    AppManager()                                   = default;
-    ~AppManager()                                  = default;
-    AppManager(const AppManager& other)            = delete;
-    AppManager& operator=(const AppManager& other) = delete;
-    AppManager(AppManager&& other)                 = delete;
-    AppManager& operator=(AppManager&& other)      = delete;
-
-    void runApp();
-
-    std::string getPipelineString();
   };
 }
