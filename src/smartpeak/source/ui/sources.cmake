@@ -5,6 +5,7 @@ set(directory source/ui)
 set(sources_list
 	AppWindow.cpp
 	FilePicker.cpp
+	GuiAppender.cpp
 	Report.cpp
 	Widget.cpp
 	Workflow.cpp
