@@ -158,7 +158,7 @@ namespace SmartPeak
 
     // right top 
     if (show_main_pane) {
-      ImGui::BeginChild("Main pane", ImVec2(0, ImGui::GetIO().DisplaySize.y*0.75), false);
+      ImGui::BeginChild("Main pane", ImVec2(0, ImGui::GetIO().DisplaySize.y*0.4), false);
       showMainWindow(show_sequence_table_,
         show_transitions_table_,
         show_workflow_table_,
@@ -636,7 +636,24 @@ namespace SmartPeak
     {
       if (show_output && ImGui::BeginTabItem("Output", &show_output))
       {
-        ImGui::Text("TODO: output text");
+        static bool scroll_down = true;
+        ImGui::Checkbox("Scroll down", &scroll_down);
+        ImGui::Separator();
+        ImGuiWindowFlags flags = 0;
+        if (scroll_down)
+        {
+          flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+        }
+        ImGui::BeginChild("Output child", ImVec2(0,0), false, flags);
+        for (const plog::util::nstring& s : appender_.getMessageList())
+        {
+          ImGui::Text(s.c_str());
+        }
+        if (scroll_down)
+        {
+          ImGui::SetScrollY(ImGui::GetScrollMaxY());
+        }
+        ImGui::EndChild();
         ImGui::EndTabItem();
       }
       if (show_info && ImGui::BeginTabItem("Info", &show_info))
