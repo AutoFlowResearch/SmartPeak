@@ -4,6 +4,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/ui/AppWindow.h>
 #include <SmartPeak/core/AppState.h>
+#include <SmartPeak/ui/GuiAppender.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -15,7 +16,8 @@ BOOST_AUTO_TEST_CASE(constructor)
   AppWindow* ptr = nullptr;
   AppWindow* nullPointer = nullptr;
   AppState state;
-  ptr = new AppWindow(state);
+  GuiAppender guiAppender;
+  ptr = new AppWindow(state, guiAppender);
   BOOST_CHECK_NE(ptr, nullPointer);
 }
 
@@ -23,7 +25,8 @@ BOOST_AUTO_TEST_CASE(destructor)
 {
   AppWindow* ptr = nullptr;
   AppState state;
-  ptr = new AppWindow(state);
+  GuiAppender guiAppender;
+  ptr = new AppWindow(state, guiAppender);
   delete ptr;
 }
 

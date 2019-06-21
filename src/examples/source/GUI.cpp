@@ -13,6 +13,7 @@
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <chrono>
+#include <SmartPeak/ui/GuiAppender.h>
 
 int main(int argc, char **argv) 
   // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
@@ -28,8 +29,13 @@ int main(int argc, char **argv)
   // Add console appender, instead of only the file one
   static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
 
-  // Init logger with two appenders
-  plog::init(plog::debug, &fileAppender).addAppender(&consoleAppender);
+  static SmartPeak::GuiAppender guiAppender;
+
+  // Init logger with all the appenders
+  // TODO: remove or comment out ConsoleAppender. Not necessary in a GUI
+  plog::init(plog::debug, &fileAppender)
+    .addAppender(&consoleAppender)
+    .addAppender(&guiAppender);
 
   LOGN << "Log file at: " << filename;
 
@@ -87,7 +93,7 @@ int main(int argc, char **argv)
   // Main loop
   bool done = false;
   SmartPeak::AppState state;
-  SmartPeak::AppWindow appWindow(state);
+  SmartPeak::AppWindow appWindow(state, guiAppender);
   while (!done)
   {
     // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.

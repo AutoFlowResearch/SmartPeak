@@ -5,6 +5,7 @@
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
+#include <SmartPeak/ui/GuiAppender.h>
 
 namespace SmartPeak
 {
@@ -16,9 +17,13 @@ namespace SmartPeak
     Workflow   workflow_;
     // app state
     AppState&  state_;
+    // log appender
+    GuiAppender& appender_;
 
     AppWindow() = delete;
-    AppWindow(AppState& state) : state_(state) {
+    AppWindow(AppState& state, GuiAppender& appender)
+      : state_(state), appender_(appender)
+    {
       report_.setState(state_);
       workflow_.setState(state_);
     }
