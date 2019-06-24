@@ -38,10 +38,6 @@ namespace SmartPeak
     static bool show_heatmap_plot_ = false;
     static bool show_feature_summary_table_ = false;
     static bool show_sequence_summary_table_ = false;
-    // View: Info pane
-    static bool show_output_ = false;
-    static bool show_info_ = false;
-    static bool show_log_ = true;
     // Help
     static bool show_app_about_ = false;
 
@@ -99,10 +95,6 @@ namespace SmartPeak
       show_heatmap_plot_,
       show_feature_summary_table_,
       show_sequence_summary_table_,
-      // View: Info pane
-      show_output_,
-      show_info_,
-      show_log_,
       // Help
       show_app_about_
     );
@@ -182,7 +174,7 @@ namespace SmartPeak
     // Bottom
     if (show_info_pane) {
       ImGui::BeginChild("Info pane", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-      showInfoWindow(show_output_, show_info_, show_log_);
+      showInfoWindow();
       ImGui::EndChild();
     }
     ImGui::End();
@@ -210,10 +202,6 @@ namespace SmartPeak
     bool& show_heatmap_plot,
     bool& show_feature_summary_table,
     bool& show_sequence_summary_table,
-    // View: Info pane
-    bool& show_output,
-    bool& show_info,
-    bool& show_log,
     // Help
     bool& show_app_about
   )
@@ -262,11 +250,7 @@ namespace SmartPeak
           show_line_plot,
           show_heatmap_plot,
           show_feature_summary_table,
-          show_sequence_summary_table,
-          // View: Info pane
-          show_output,
-          show_info,
-          show_log);
+          show_sequence_summary_table);
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Actions"))
@@ -383,11 +367,9 @@ namespace SmartPeak
     bool& show_line_plot,
     bool& show_heatmap_plot,
     bool& show_feature_summary_table,
-    bool& show_sequence_summary_table,
-    // View: Info pane
-    bool& show_output,
-    bool& show_info,
-    bool& show_log) {
+    bool& show_sequence_summary_table
+  )
+  {
     ImGui::MenuItem("Explorer window", NULL, false, false);
     // Explorer sub windows
     if (ImGui::MenuItem("Sequence", NULL, &show_sequence_explorer)) {}
@@ -418,9 +400,9 @@ namespace SmartPeak
     if (ImGui::MenuItem("Features pivot table", NULL, &show_sequence_summary_table)) {}
     // Info pane tabs
     ImGui::MenuItem("Info window", NULL, false, false);
-    if (ImGui::MenuItem("Output", NULL, &show_output)) {}
-    if (ImGui::MenuItem("Info", NULL, &show_info)) {}
-    if (ImGui::MenuItem("Log", NULL, &show_log)) {}
+    if (ImGui::MenuItem("Output", NULL, &show_output_)) {}
+    if (ImGui::MenuItem("Info", NULL, &show_info_)) {}
+    if (ImGui::MenuItem("Log", NULL, &show_log_)) {}
   }
 
   void AppWindow::showMenuAction() {
@@ -439,20 +421,60 @@ namespace SmartPeak
     }
     if (ImGui::BeginMenu("Quick info"))
     { // TODO: bug
-      if (ImGui::MenuItem("Sequence")) {}
-      if (ImGui::MenuItem("Transitions")) {}
-      if (ImGui::MenuItem("Quant Method")) {}
-      if (ImGui::MenuItem("Standards Conc")) {}
-      if (ImGui::MenuItem("Comp Filters")) {}
-      if (ImGui::MenuItem("Comp Group Filters")) {}
-      if (ImGui::MenuItem("Comp QCs")) {}
-      if (ImGui::MenuItem("Comp Group QCs")) {}
-      if (ImGui::MenuItem("Parameters")) {}
-      if (ImGui::MenuItem("Raw data files")) {}
-      if (ImGui::MenuItem("Analyzed features")) {}
-      if (ImGui::MenuItem("Selected features")) {}
-      if (ImGui::MenuItem("Picked peaks")) {}
-      if (ImGui::MenuItem("Filtered/selected peaks")) {}
+      if (ImGui::MenuItem("Sequence")) {
+        quickInfoText_ = InputDataValidation::getSequenceInfo(state_.sequenceHandler_);
+      }
+      if (ImGui::MenuItem("Transitions")) {
+        quickInfoText_.clear();
+        if (state_.sequenceHandler_.getSequence().size()) {
+          quickInfoText_ = InputDataValidation::getTraMLInfo(state_.sequenceHandler_.getSequence().front().getRawData());
+        }
+      }
+      if (ImGui::MenuItem("Quant Method")) {
+        quickInfoText_.clear();
+        if (state_.sequenceHandler_.getSequenceSegments().size()) {
+          quickInfoText_ = InputDataValidation::getQuantitationMethodsInfo(state_.sequenceHandler_.getSequenceSegments().front());
+        }
+      }
+      if (ImGui::MenuItem("Standards Conc")) {
+        quickInfoText_.clear();
+        if (state_.sequenceHandler_.getSequenceSegments().size()) {
+          quickInfoText_ = InputDataValidation::getStandardsConcentrationsInfo(state_.sequenceHandler_.getSequenceSegments().front());
+        }
+      }
+      if (ImGui::MenuItem("Comp (Group) Filters")) {
+        quickInfoText_.clear();
+        if (state_.sequenceHandler_.getSequence().size()) {
+          quickInfoText_ = InputDataValidation::getComponentsAndGroupsInfo(state_.sequenceHandler_.getSequence().front().getRawData(), true);
+        }
+      }
+      if (ImGui::MenuItem("Comp (Group) QCs")) {
+        quickInfoText_.clear();
+        if (state_.sequenceHandler_.getSequence().size()) {
+          quickInfoText_ = InputDataValidation::getComponentsAndGroupsInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
+        }
+      }
+      if (ImGui::MenuItem("Parameters")) {
+        quickInfoText_.clear();
+        if (state_.sequenceHandler_.getSequence().size()) {
+          quickInfoText_ = InputDataValidation::getParametersInfo(state_.sequenceHandler_.getSequence().front().getRawData().getParameters());
+        }
+      }
+      if (ImGui::MenuItem("Raw data files")) {
+        quickInfoText_ = state_.sequenceHandler_.getRawDataFilesInfo();
+      }
+      if (ImGui::MenuItem("Analyzed features")) {
+        quickInfoText_ = state_.sequenceHandler_.getAnalyzedFeaturesInfo();
+      }
+      if (ImGui::MenuItem("Selected features")) {
+        quickInfoText_ = state_.sequenceHandler_.getSelectedFeaturesInfo();
+      }
+      if (ImGui::MenuItem("Picked peaks")) {
+        quickInfoText_ = state_.sequenceHandler_.getPickedPeaksInfo();
+      }
+      if (ImGui::MenuItem("Filtered/selected peaks")) {
+        quickInfoText_ = state_.sequenceHandler_.getFilteredSelectedPeaksInfo();
+      }
       ImGui::EndMenu();
     }
     if (ImGui::BeginMenu("Integrity checks"))
@@ -623,28 +645,25 @@ namespace SmartPeak
     }
   }
 
-  void AppWindow::showInfoWindow(
-    bool & show_output,
-    bool & show_info,
-    bool & show_log
-  )
+  void AppWindow::showInfoWindow()
   {
     static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable;
-    if ((show_output ||
-      show_info ||
-      show_log) && ImGui::BeginTabBar("Info pane tab bar", tab_bar_flags))
+    if ((show_output_ || show_info_ || show_log_) &&
+        ImGui::BeginTabBar("Info pane tab bar", tab_bar_flags))
     {
-      if (show_output && ImGui::BeginTabItem("Output", &show_output))
+      if (show_output_ && ImGui::BeginTabItem("Output", &show_output_))
       {
         ImGui::Text("TODO: not implemented yet");
         ImGui::EndTabItem();
       }
-      if (show_info && ImGui::BeginTabItem("Info", &show_info))
+      if (show_info_ && ImGui::BeginTabItem("Info", &show_info_))
       {
-        ImGui::Text("TODO: info text");
+        ImGui::BeginChild("Info child");
+        ImGui::TextWrapped("%s", quickInfoText_.c_str());
+        ImGui::EndChild();
         ImGui::EndTabItem();
       }
-      if (show_log && ImGui::BeginTabItem("Log", &show_log))
+      if (show_log_ && ImGui::BeginTabItem("Log", &show_log_))
       {
         const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
         static int selected_severity = 5;
@@ -656,7 +675,7 @@ namespace SmartPeak
         }
 
         ImGui::Separator();
-        ImGui::BeginChild("Log child", ImVec2(0,0));
+        ImGui::BeginChild("Log child");
         for (const plog::util::nstring& s : appender_.getMessageList(severity))
         {
           ImGui::Text("%s", s.c_str());

@@ -55,10 +55,6 @@ namespace SmartPeak
       bool& show_heatmap_plot,
       bool& show_feature_summary_table,
       bool& show_sequence_summary_table,
-      // View: Info pane
-      bool& show_output,
-      bool& show_info,
-      bool& show_log,
       // Help
       bool& show_app_about
     );
@@ -88,11 +84,7 @@ namespace SmartPeak
       bool& show_line_plot,
       bool& show_heatmap_plot,
       bool& show_feature_summary_table,
-      bool& show_sequence_summary_table,
-      // View: Info pane
-      bool& show_output,
-      bool& show_info,
-      bool& show_log
+      bool& show_sequence_summary_table
     ); ///< Show the main menu View options
 
     void showMenuAction(); ///< Show the main menu Action options
@@ -131,11 +123,7 @@ namespace SmartPeak
       bool& show_sequence_summary_table
     );
 
-    void showInfoWindow(
-      bool& show_output,
-      bool& show_info,
-      bool& show_log
-    );
+    void showInfoWindow();
 
     void HelpMarker(const char* desc);
 
@@ -147,5 +135,12 @@ namespace SmartPeak
       std::string& data_dir_member,
       const std::string& default_dir
     );
+
+  private:
+    std::string quickInfoText_;
+    // View: Info pane
+    bool show_output_ = false;
+    bool show_info_   = true;
+    bool show_log_    = true;
   };
 }
