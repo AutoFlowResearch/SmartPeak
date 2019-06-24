@@ -111,7 +111,7 @@ namespace SmartPeak
       show_explorer_pane = true;
     }
 
-    if (show_output_ || show_info_ || show_log_)
+    if (show_info_ || show_log_)
     {
       show_info_pane = true;
     }
@@ -400,7 +400,6 @@ namespace SmartPeak
     if (ImGui::MenuItem("Features pivot table", NULL, &show_sequence_summary_table)) {}
     // Info pane tabs
     ImGui::MenuItem("Info window", NULL, false, false);
-    if (ImGui::MenuItem("Output", NULL, &show_output_)) {}
     if (ImGui::MenuItem("Info", NULL, &show_info_)) {}
     if (ImGui::MenuItem("Log", NULL, &show_log_)) {}
   }
@@ -648,14 +647,9 @@ namespace SmartPeak
   void AppWindow::showInfoWindow()
   {
     static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable;
-    if ((show_output_ || show_info_ || show_log_) &&
+    if ((show_info_ || show_log_) &&
         ImGui::BeginTabBar("Info pane tab bar", tab_bar_flags))
     {
-      if (show_output_ && ImGui::BeginTabItem("Output", &show_output_))
-      {
-        ImGui::Text("TODO: not implemented yet");
-        ImGui::EndTabItem();
-      }
       if (show_info_ && ImGui::BeginTabItem("Info", &show_info_))
       {
         ImGui::BeginChild("Info child");

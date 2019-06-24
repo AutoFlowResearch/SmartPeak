@@ -139,7 +139,6 @@ namespace SmartPeak
   private:
     std::string quickInfoText_;
     // View: Info pane
-    bool show_output_ = false;
     bool show_info_   = true;
     bool show_log_    = true;
   };
