@@ -39,9 +39,9 @@ namespace SmartPeak
     static bool show_feature_summary_table_ = false;
     static bool show_sequence_summary_table_ = false;
     // View: Info pane
-    static bool show_output_ = true;
+    static bool show_output_ = false;
     static bool show_info_ = false;
-    static bool show_log_ = false;
+    static bool show_log_ = true;
     // Help
     static bool show_app_about_ = false;
 
@@ -149,7 +149,7 @@ namespace SmartPeak
 
     // left Top
     if (show_explorer_pane) {
-      ImGui::BeginChild("Explorer pane", ImVec2(ImGui::GetIO().DisplaySize.x*0.2, ImGui::GetIO().DisplaySize.y*0.75), false, ImGuiWindowFlags_HorizontalScrollbar);
+      ImGui::BeginChild("Explorer pane", ImVec2(ImGui::GetIO().DisplaySize.x * 0.2f, ImGui::GetIO().DisplaySize.y * 0.75f), false, ImGuiWindowFlags_HorizontalScrollbar);
       ImGui::Text("TODO: search and sort bar");
       ImGui::Text("TODO: list or tree");
       ImGui::EndChild();
@@ -158,7 +158,7 @@ namespace SmartPeak
 
     // right top 
     if (show_main_pane) {
-      ImGui::BeginChild("Main pane", ImVec2(0, ImGui::GetIO().DisplaySize.y*0.4), false);
+      ImGui::BeginChild("Main pane", ImVec2(0, ImGui::GetIO().DisplaySize.y * 0.4f), false);
       showMainWindow(show_sequence_table_,
         show_transitions_table_,
         show_workflow_table_,
@@ -636,24 +636,7 @@ namespace SmartPeak
     {
       if (show_output && ImGui::BeginTabItem("Output", &show_output))
       {
-        static bool scroll_down = true;
-        ImGui::Checkbox("Scroll down", &scroll_down);
-        ImGui::Separator();
-        ImGuiWindowFlags flags = 0;
-        if (scroll_down)
-        {
-          flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
-        }
-        ImGui::BeginChild("Output child", ImVec2(0,0), false, flags);
-        for (const plog::util::nstring& s : appender_.getMessageList())
-        {
-          ImGui::Text(s.c_str());
-        }
-        if (scroll_down)
-        {
-          ImGui::SetScrollY(ImGui::GetScrollMaxY());
-        }
-        ImGui::EndChild();
+        ImGui::Text("TODO: not implemented yet");
         ImGui::EndTabItem();
       }
       if (show_info && ImGui::BeginTabItem("Info", &show_info))
@@ -663,7 +646,34 @@ namespace SmartPeak
       }
       if (show_log && ImGui::BeginTabItem("Log", &show_log))
       {
-        ImGui::Text("TODO: log text");
+        static bool scroll_down = true;
+        ImGui::Checkbox("Scroll down", &scroll_down);
+        ImGui::SameLine();
+        const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
+        static int selected_severity = 5;
+        static plog::Severity severity = plog::Severity::debug;
+
+        if (ImGui::Combo("Level", &selected_severity, items, IM_ARRAYSIZE(items)))
+        {
+          severity = plog::severityFromString(items[selected_severity]);
+        }
+
+        ImGui::Separator();
+        ImGuiWindowFlags flags = 0;
+        if (scroll_down)
+        {
+          flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+        }
+        ImGui::BeginChild("Log child", ImVec2(0,0), false, flags);
+        for (const plog::util::nstring& s : appender_.getMessageList(severity))
+        {
+          ImGui::Text("%s", s.c_str());
+        }
+        if (scroll_down)
+        {
+          ImGui::SetScrollY(ImGui::GetScrollMaxY());
+        }
+        ImGui::EndChild();
         ImGui::EndTabItem();
       }
       // TODO...
