@@ -646,9 +646,6 @@ namespace SmartPeak
       }
       if (show_log && ImGui::BeginTabItem("Log", &show_log))
       {
-        static bool scroll_down = true;
-        ImGui::Checkbox("Scroll down", &scroll_down);
-        ImGui::SameLine();
         const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
         static int selected_severity = 5;
         static plog::Severity severity = plog::Severity::debug;
@@ -659,19 +656,10 @@ namespace SmartPeak
         }
 
         ImGui::Separator();
-        ImGuiWindowFlags flags = 0;
-        if (scroll_down)
-        {
-          flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
-        }
-        ImGui::BeginChild("Log child", ImVec2(0,0), false, flags);
+        ImGui::BeginChild("Log child", ImVec2(0,0));
         for (const plog::util::nstring& s : appender_.getMessageList(severity))
         {
           ImGui::Text("%s", s.c_str());
-        }
-        if (scroll_down)
-        {
-          ImGui::SetScrollY(ImGui::GetScrollMaxY());
         }
         ImGui::EndChild();
         ImGui::EndTabItem();
