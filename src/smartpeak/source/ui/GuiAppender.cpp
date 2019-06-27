@@ -16,7 +16,7 @@ namespace SmartPeak
   {
     std::vector<plog::util::nstring> filtered;
     std::lock_guard<std::mutex> g(messages_mutex);
-    for (const GARecord& p : messages) {
+    for (const GuiAppenderRecord& p : messages) {
       if (p.first <= severity) {
         filtered.push_back(p.second);
       }

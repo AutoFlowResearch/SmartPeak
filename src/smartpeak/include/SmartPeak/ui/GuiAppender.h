@@ -14,8 +14,8 @@ namespace SmartPeak
     std::vector<plog::util::nstring> getMessageList(plog::Severity severity) const;
 
   private:
-    typedef std::pair<plog::Severity, plog::util::nstring> GARecord; // GuiAppenderRecord
-    std::vector<GARecord> messages;
+    typedef std::pair<plog::Severity, plog::util::nstring> GuiAppenderRecord;
+    std::vector<GuiAppenderRecord> messages;
     mutable std::mutex messages_mutex;
   };
 }
