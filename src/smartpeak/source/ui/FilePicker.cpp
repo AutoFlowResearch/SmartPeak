@@ -102,6 +102,7 @@ namespace SmartPeak
           }
           current_pathname_.append(pathname_content_[0][selected_entry]);
           pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+          filter.Clear();
           selected_entry = -1;
           selected_filename[0] = '\0';
           break; // IMPORTANT: because the following lines in the loop assume accessing old/previous pathname_content_'s data
