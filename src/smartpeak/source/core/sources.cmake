@@ -18,7 +18,9 @@ set(sources_list
 	SequenceProcessor.cpp
 	SequenceSegmentHandler.cpp
 	SequenceSegmentProcessor.cpp
+	SharedProcessors.cpp
 	Utilities.cpp
+	WorkflowManager.cpp
 )
 
 ### add path to the filenames

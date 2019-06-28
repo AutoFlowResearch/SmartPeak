@@ -34,10 +34,16 @@ namespace SmartPeak
     AppStateProcessor(AppState& state) : state_(state) {}
   };
 
-  struct ProcessCommands : AppStateProcessor {
-    ProcessCommands(AppState& state) : AppStateProcessor(state) {}
-    void operator()(const std::vector<AppState::Command>& commands) override;
-  };
+  namespace AppStateProcessors {
+    // Passing a copy of "commands" because "state" is passed by reference, and
+    // its "commands" (currently part of the "state" object) could not possibly
+    // be passed as const reference.
+    // I prefer not to pass "commands" by non-const reference because it would
+    // tell the reader/developer "this is an input/output variable".
+    // Since this function is called once every N minutes, the cost of the copy
+    // can be ignored.
+    void processCommands(AppState& state, std::vector<AppState::Command> commands);
+  }
 
   struct CreateCommand : AppStateProcessor {
     CreateCommand(AppState& state) : AppStateProcessor(state) {}

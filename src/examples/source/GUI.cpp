@@ -18,6 +18,7 @@
 int main(int argc, char **argv) 
   // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
+  // TODO: try moving the log code into AppWindow
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   char filename[128];
   strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
@@ -92,7 +93,7 @@ int main(int argc, char **argv)
 
   // Main loop
   bool done = false;
-  SmartPeak::AppState state;
+  SmartPeak::AppState state; // TODO: try moving the state into AppWindow, avoiding passing the argument "state" and "guiAppender"
   SmartPeak::AppWindow appWindow(state, guiAppender);
   while (!done)
   {
