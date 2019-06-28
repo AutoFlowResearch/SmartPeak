@@ -616,8 +616,7 @@ menuActions_label:
       AppState::Command cmd;
       CreateCommand createCommand(state);
       if (createCommand(n, cmd)) {
-        ProcessCommands processCommands(state);
-        processCommands({cmd});
+        AppStateProcessors::processCommands(state, {cmd});
       }
     } catch (...) {
       LOGE << "\n\nInvalid input: cannot convert to integer.\n";
@@ -625,8 +624,7 @@ menuActions_label:
   }
   else if ("2" == in) {
     initializeDataDirs();
-    ProcessCommands processCommands(state);
-    processCommands(state.commands_);
+    AppStateProcessors::processCommands(state, state.commands_);
     LOGN << "\n\nWorkflow completed.\n";
   }
   else if ("3" == in) {

@@ -2,10 +2,13 @@
 
 #include <SmartPeak/core/AppState.h>
 #include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
 #include <SmartPeak/ui/GuiAppender.h>
+#include <string>
+#include <vector>
 
 namespace SmartPeak
 {
@@ -17,6 +20,7 @@ namespace SmartPeak
     Workflow   workflow_;
     // app state
     AppState&  state_;
+    WorkflowManager manager_;
     // log appender
     GuiAppender& appender_;
 

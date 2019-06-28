@@ -412,11 +412,15 @@ namespace SmartPeak
     }
     if (ImGui::MenuItem("Run workflow"))
     {
-      initializeDataDirs(state_);
-      ProcessCommands processCommands(state_);
-      // TODO: IO operation -> use another thread
-      processCommands(state_.commands_);
-      LOGN << "\n\nWorkflow completed.\n";
+      if (state_.commands_.size()) // ensures that workflow's steps have been set
+      {
+        initializeDataDirs(state_);
+        manager_.addWorkflow(state_);
+      }
+      else
+      {
+        LOGE << "Workflow cannot start. Please set the workflow's steps.";
+      }
     }
     if (ImGui::BeginMenu("Quick info"))
     { // TODO: bug
@@ -575,7 +579,12 @@ namespace SmartPeak
       }
       if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
       {
-        ImGui::Text("TODO: workflow table");
+        const std::vector<char>& statuses = manager_.getWorkflowsStatus();
+        const size_t statuses_size = statuses.size(); // So one does not depend on compiler optimizations flags
+        for (int i = 0; static_cast<size_t>(i) < statuses_size; ++i)
+        {
+          ImGui::Text("Workflow %d: %s", i, statuses.at(i) ? "done" : "running...");
+        }
         ImGui::EndTabItem();
       }
       if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))

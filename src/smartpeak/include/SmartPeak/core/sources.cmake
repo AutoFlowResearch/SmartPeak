@@ -20,6 +20,7 @@ set(sources_list_h
 	SequenceSegmentHandler.h
 	SequenceSegmentProcessor.h
 	Utilities.h
+	WorkflowManager.h
 )
 
 ### add path to the filenames
