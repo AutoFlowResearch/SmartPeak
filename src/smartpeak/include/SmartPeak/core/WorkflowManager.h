@@ -22,6 +22,6 @@ namespace SmartPeak {
 
     std::vector<AppState> states_;
     std::vector<char> done_;
-    mutable std::mutex mutex_;
+    std::mutex mutex_;
   };
 }
