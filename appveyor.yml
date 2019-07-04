@@ -65,7 +65,7 @@ before_build:
 build:
   parallel: true
   verbosity: detailed
-  project: C:\projects\SmartPeak2\SmartPeak2_host.sln
+  project: C:\projects\SmartPeak2-build\SmartPeak_host.sln
   #project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
 
 #test_script:
