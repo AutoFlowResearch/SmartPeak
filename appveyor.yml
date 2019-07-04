@@ -41,15 +41,15 @@ install:
   - dir C:\Libraries\boost_1_65_1
 before_build:
   - git clone --depth=1 --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS
-  # - ps: |
-  #     if (-not ("C:\projects\OpenMS-build" | Test-Path)) {
-  #       mkdir C:\projects\OpenMS-build
-  #       cd C:\projects\OpenMS-build
-  #       cmake -DCMAKE_PREFIX_PATH="C:\Qt\5.12\msvc2017_64\lib\cmake" -DBoost_DEBUG=TRUE -DCMAKE_GENERATOR_PLATFORM=x64 -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_65_1\lib64-msvc-14.1" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_65_1" -DBOOST_ROOT="C:\Libraries\boost_1_65_1\boost" -DOPENMS_CONTRIB_LIBS="C:/projects/deps/contrib" -DBOOST_USE_STATIC=ON -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON C:\projects\OpenMS
-  #       dir C:\projects\OpenMS-build\src\openms
-  #       msbuild C:\projects\OpenMS-build\src\openswathalgo\OpenSWATHAlgo.sln -maxcpucount
-  #       msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln -maxcpucount
-  #     }
+  - ps: |
+      if (-not ("C:\projects\OpenMS-build" | Test-Path)) {
+        mkdir C:\projects\OpenMS-build
+        cd C:\projects\OpenMS-build
+        cmake -DCMAKE_PREFIX_PATH="C:\Qt\5.12\msvc2017_64\lib\cmake" -DBoost_DEBUG=TRUE -DCMAKE_GENERATOR_PLATFORM=x64 -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_65_1\lib64-msvc-14.1" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_65_1" -DBOOST_ROOT="C:\Libraries\boost_1_65_1\boost" -DOPENMS_CONTRIB_LIBS="C:/projects/deps/contrib" -DBOOST_USE_STATIC=ON -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON C:\projects\OpenMS
+        dir C:\projects\OpenMS-build\src\openms
+        msbuild C:\projects\OpenMS-build\src\openswathalgo\OpenSWATHAlgo.sln -maxcpucount
+        msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln -maxcpucount
+      }
   - dir C:\projects\OpenMS-build\lib
   - dir C:\projects\OpenMS-build\lib\Debug
   - dir C:\projects\SmartPeak2
