@@ -1,5 +1,7 @@
 version: '1.0.{build}'
 image: Visual Studio 2017
+force_https_clone: true
+clone_depth: 1
 environment:
   APPVEYOR_RDP_PASSWORD: z1x2c3V4
   BOOSTROOT: C:\Libraries\boost_1_69_0
@@ -38,13 +40,28 @@ before_build:
         msbuild C:\projects\OpenMS-build\src\openswathalgo\OpenSWATHAlgo.sln -maxcpucount
         msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln -maxcpucount
       }
+  - dir C:\projects\SmartPeak2
+  - cd C:\projects
+  - git clone -n https://github.com/SergiusTheBest/plog.git
+  - cd plog
+  - git checkout 5f69a631086bf038e2c0feee4319a485c34fa863
+  - cd C:\projects
+  - git clone -n https://github.com/ocornut/imgui.git
+  - cd imgui
+  - git checkout ebe79bbed00a13fd4455f04131b63d49c28ebd5d
+  - cd C:\projects
+  - curl -fsS -o SDL2-2.0.9.zip https://www.libsdl.org/release/SDL2-2.0.9.zip
+  - dir C:\projects\deps
+  - 7z x SDL2-2.0.9.zip -o"C:\projects\deps" -y
+  - dir C:\projects\deps
   - mkdir C:\projects\SmartPeak2-build
   - cd C:\projects\SmartPeak2-build
-  - dir C:\projects\SmartPeak2
-  - cmake -DCMAKE_PREFIX_PATH="C:\projects\OpenMS-build;C:\Qt\5.12\msvc2017_64\lib\cmake" -G "Visual Studio 15 2017 Win64" -T host=x64 -DEIGEN3_INCLUDE_DIR="C:\projects\deps\contrib\include\eigen3" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_BUILD_TYPE=Debug C:\projects\SmartPeak2
+  - cmake -DCMAKE_PREFIX_PATH="C:\projects\OpenMS-build;C:\Qt\5.12\msvc2017_64\lib\cmake;C:\projects\deps\SDL2-2.0.9" -G "Visual Studio 15 2017 Win64" -T host=x64 -DEIGEN3_INCLUDE_DIR="C:\projects\deps\contrib\include\eigen3" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DPLOG_INCLUDE_DIR="C:/projects/plog/include" -DIMGUI_DIR="C:/projects/imgui" -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_BUILD_TYPE=Debug C:\projects\SmartPeak2
   - dir C:\projects\SmartPeak2-build
 build:
-  project: C:\projects\smartpeak2\SmartPeak_host.sln 
+  parallel: true
+  verbosity: detailed
+  project: C:\projects\SmartPeak2\SmartPeak_host.sln
   #project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
 
 #test_script:
