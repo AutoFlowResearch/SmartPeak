@@ -23,12 +23,14 @@ cache:
 #  - C:\projects\deps
   - C:\projects\OpenMS-build
 artifacts:
-  - path: C:\projects\OpenMS-build\lib
-    name: libOpenMS.dll
-  - path: C:\projects\OpenMS-build\lib
-    name: libOpenSwathAlgo.dll
-  - path: C:\projects\OpenMS-build\lib
-    name: libSuperHirn.dll
+  - path: C:\projects\OpenMS-build\lib\Debug
+    name: OpenMSd.exp
+  - path: C:\projects\OpenMS-build\lib\Debug
+    name: OpenMSd.lib
+  - path: C:\projects\OpenMS-build\lib\Debug
+    name: OpenSwathAlgod.exp
+  - path: C:\projects\OpenMS-build\lib\Debug
+    name: OpenSwathAlgod.lib
 install:
   - git submodule update --init --recursive
   - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
