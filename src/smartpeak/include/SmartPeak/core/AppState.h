@@ -1,15 +1,17 @@
+#pragma once
+
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
+#include <map>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 namespace SmartPeak
 {
-  class AppManager final {
-  public:
+  struct AppState final {
     class Command {
     public:
       enum CommandType {
@@ -29,6 +31,16 @@ namespace SmartPeak
         seq_seg_method = method;
       }
 
+      int getID() const
+      {
+        return type == RawDataMethod ? raw_data_method->getID() : seq_seg_method->getID();
+      }
+
+      std::string getName() const
+      {
+        return type == RawDataMethod ? raw_data_method->getName() : seq_seg_method->getName();
+      }
+
       std::shared_ptr<RawDataProcessor> raw_data_method;
       std::shared_ptr<SequenceSegmentProcessor> seq_seg_method;
 
@@ -41,15 +53,11 @@ namespace SmartPeak
     std::string                           mzML_dir_;
     std::string                           features_in_dir_;
     std::string                           features_out_dir_;
-    std::set<MetaDataHandler::SampleType> sequenceSummaryTypes_;
-    std::set<MetaDataHandler::SampleType> featureSummaryTypes_;
-    std::vector<std::string>              sequenceSummaryMetaData_;
-    std::vector<std::string>              featureSummaryMetaData_;
     std::vector<Command>                  commands_;
     Filenames                             static_filenames_;
     SequenceHandler                       sequenceHandler_;
 
-    const std::unordered_map<int, std::shared_ptr<RawDataProcessor>> n_to_raw_data_method_ {
+    const std::map<int, std::shared_ptr<RawDataProcessor>> n_to_raw_data_method_ {
       {1, std::shared_ptr<RawDataProcessor>(new LoadRawData())},
       {2, std::shared_ptr<RawDataProcessor>(new LoadFeatures())},
       {3, std::shared_ptr<RawDataProcessor>(new PickFeatures())},
@@ -64,7 +72,7 @@ namespace SmartPeak
       {12, std::shared_ptr<RawDataProcessor>(new ZeroChromatogramBaseline())},
       {13, std::shared_ptr<RawDataProcessor>(new ExtractChromatogramWindows())},
     };
-    const std::unordered_map<int, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
+    const std::map<int, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
       {14, std::shared_ptr<SequenceSegmentProcessor>(new CalculateCalibration())},
       {15, std::shared_ptr<SequenceSegmentProcessor>(new StoreQuantitationMethods())},
       {16, std::shared_ptr<SequenceSegmentProcessor>(new LoadQuantitationMethods())},
@@ -87,91 +95,5 @@ namespace SmartPeak
       OPT_STORE_QUANTITATION_METHODS,
       OPT_LOAD_QUANTITATION_METHODS,
     };
-    const std::string main_menu_ = "\n\n"
-      "Please insert the sequence of methods to run.\n"
-      "You can choose the same method multiple times.\n"
-      "Separate chosen methods with a space.\n\n"
-      + commandsString() +
-      "[M]  Main menu\n\n"
-      "Presets:\n"
-      "LCMS MRM Unknowns: 1 11 3 7 8 5 9\n"
-      "LCMS MRM Standards: 1 11 3 8 5 14 15 7 9\n"
-      "HPLC UV Unknowns: 1 11 13 12 3 7 8 5 9\n"
-      "HPLC UV Standards: 1 11 13 12 3 8 5 14 15 7 9\n"
-      "GCMS SIM Unknowns: 1 11 13 12 3 7 8 5 9\n"
-      "GCMS Full Scan Unknowns: 1 11 13 12 3 8 5 14 15 7 9\n";
-
-    void menuMain();
-
-    void menuFile();
-
-    void menuImportFile();
-
-    void menuEdit();
-
-    void menuView();
-
-    void menuActions();
-
-    void menuDataIntegrity();
-
-    void menuReport();
-
-    void menuQuickInfo();
-
-    void menuHelp();
-
-    void exitSmartPeak();
-
-    bool buildStaticFilenames();
-
-    bool requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation);
-
-    void clearNonExistantDefaultGeneratedFilenames(Filenames& f);
-
-    void clearNonExistantFilename(std::string& filename);
-
-    void generatePathnamesTxt(
-      const std::string& pathname,
-      const Filenames& f,
-      const std::vector<InputDataValidation::FilenameInfo>& is_valid
-    );
-
-    std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
-
-    void updateFilenames(Filenames& f, const std::string& pathname);
-
-    std::vector<Command> getMethodsInput();
-
-    void setSequencePathnameFromInput();
-
-    std::string getLineInput(const std::string& message = "", const bool canBeEmpty = true);
-
-    std::string getPathnameFromInput();
-
-    std::set<MetaDataHandler::SampleType> getSampleTypesInput();
-
-    std::vector<std::string> getMetaDataInput(const std::string& title);
-
-    std::string gettingStartedString();
-
-    std::string commandsString();
-
-    void processCommands(const std::vector<Command>& commands);
-
-    bool createCommand(const int n, Command& cmd);
-
-    void initializeDataDirs();
-
-    AppManager()                                   = default;
-    ~AppManager()                                  = default;
-    AppManager(const AppManager& other)            = delete;
-    AppManager& operator=(const AppManager& other) = delete;
-    AppManager(AppManager&& other)                 = delete;
-    AppManager& operator=(AppManager&& other)      = delete;
-
-    void runApp();
-
-    std::string getPipelineString();
   };
 }

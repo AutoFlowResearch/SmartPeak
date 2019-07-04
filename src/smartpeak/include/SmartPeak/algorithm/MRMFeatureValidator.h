@@ -2,7 +2,7 @@
 
 #pragma once
 #include <OpenMS/KERNEL/FeatureMap.h>
-#include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/CastValue.h>
 
 namespace SmartPeak
 {
@@ -33,7 +33,7 @@ public:
       @param[in] Tr_window Retention time difference threshold
     */
     static void validate_MRMFeatures(
-      const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data_v,
+      const std::vector<std::map<std::string, CastValue>>& reference_data_v,
       const OpenMS::FeatureMap& features,
       const std::string& injection_name,
       OpenMS::FeatureMap& output_validated,

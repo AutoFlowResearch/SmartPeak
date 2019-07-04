@@ -26,8 +26,8 @@ public:
     std::string features_pdf_o;
     std::string quantitationMethods_csv_o;
     std::string componentsToConcentrations_csv_o;
-    std::string sequenceSummary_csv_o;
-    std::string featureSummary_csv_o;
+    std::string pivotTable_csv_o;
+    std::string featureDB_csv_o;
 
     static Filenames getDefaultStaticFilenames(
       const std::string& dir

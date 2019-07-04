@@ -1,5 +1,8 @@
 set(core_executables_list
+	AppStateProcessor_test
+	CastValue_test
 	Filenames_test
+	GuiAppender_test
 	Helloworld_test
 	MetaDataHandler_test
 	RawDataHandler_test
@@ -25,9 +28,7 @@ set(algorithm_executables_list
 )
 
 set(ui_executables_list
-	AppManager_test
 	AppWindow_test
-	Widget_test
 )
 
 ### collect test executables

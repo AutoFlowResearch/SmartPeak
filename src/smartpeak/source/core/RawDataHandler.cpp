@@ -10,7 +10,7 @@ namespace SmartPeak
     meta_data_(new MetaDataHandler()),
     parameters_(new std::map<std::string, std::vector<std::map<std::string, std::string>>>()),
     targeted_exp_(new OpenMS::TargetedExperiment()),
-    reference_data_(new std::vector<std::map<std::string, Utilities::CastValue>>()),
+    reference_data_(new std::vector<std::map<std::string, CastValue>>()),
     quantitation_methods_(new std::vector<OpenMS::AbsoluteQuantitationMethod>()),
     feature_filter_(new OpenMS::MRMFeatureQC()),
     feature_qc_(new OpenMS::MRMFeatureQC())
@@ -108,27 +108,27 @@ namespace SmartPeak
     return targeted_exp_;
   }
 
-  void RawDataHandler::setReferenceData(const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data)
+  void RawDataHandler::setReferenceData(const std::vector<std::map<std::string, CastValue>>& reference_data)
   {
-    reference_data_.reset(new std::vector<std::map<std::string, Utilities::CastValue>>(reference_data));
+    reference_data_.reset(new std::vector<std::map<std::string, CastValue>>(reference_data));
   }
 
-  void RawDataHandler::setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>& reference_data)
+  void RawDataHandler::setReferenceData(std::shared_ptr<std::vector<std::map<std::string, CastValue>>>& reference_data)
   {
     reference_data_ = reference_data;
   }
 
-  std::vector<std::map<std::string, Utilities::CastValue>>& RawDataHandler::getReferenceData()
+  std::vector<std::map<std::string, CastValue>>& RawDataHandler::getReferenceData()
   {
     return *(reference_data_.get());
   }
 
-  const std::vector<std::map<std::string, Utilities::CastValue>>& RawDataHandler::getReferenceData() const
+  const std::vector<std::map<std::string, CastValue>>& RawDataHandler::getReferenceData() const
   {
     return *(reference_data_.get());
   }
 
-  std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>& RawDataHandler::getReferenceDataShared()
+  std::shared_ptr<std::vector<std::map<std::string, CastValue>>>& RawDataHandler::getReferenceDataShared()
   {
     return reference_data_;
   }

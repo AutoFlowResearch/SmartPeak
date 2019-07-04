@@ -3,6 +3,9 @@ set(directory source/core)
 
 ### list all filenames of the directory here
 set(sources_list
+	AppStateProcessor.cpp
+	CastValue.cpp
+	FeatureMetadata.cpp
 	Filenames.cpp
 	Helloworld.cpp
 	MetaDataHandler.cpp
@@ -10,6 +13,7 @@ set(sources_list
 	RawDataProcessor.cpp
 	SampleGroupHandler.cpp
 	InjectionHandler.cpp
+	SampleType.cpp
 	SequenceHandler.cpp
 	SequenceProcessor.cpp
 	SequenceSegmentHandler.cpp

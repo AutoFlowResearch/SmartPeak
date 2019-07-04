@@ -1,5 +1,7 @@
 // TODO: Add copyright
 
+#include <SmartPeak/test_config.h>
+
 #define BOOST_TEST_MODULE Utilities test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/Utilities.h>
@@ -9,46 +11,26 @@ using namespace std;
 
 BOOST_AUTO_TEST_SUITE(utilities)
 
-BOOST_AUTO_TEST_CASE(castValue_constructor_copyConstructor)
-{
-  Utilities::CastValue c;
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::UNINITIALIZED);
-  BOOST_CHECK_EQUAL(c.b_, false);
-
-  c = 7;
-
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::INT);
-  BOOST_CHECK_EQUAL(c.i_, 7);
-
-  Utilities::CastValue c2 = c;
-  BOOST_CHECK_EQUAL(c2.getTag(), Utilities::CastValue::INT);
-  BOOST_CHECK_EQUAL(c2.i_, 7);
-
-  Utilities::CastValue c3(c);
-  BOOST_CHECK_EQUAL(c3.getTag(), Utilities::CastValue::INT);
-  BOOST_CHECK_EQUAL(c3.i_, 7);
-}
-
 BOOST_AUTO_TEST_CASE(castString)
 {
-  Utilities::CastValue c;
+  CastValue c;
   Utilities::castString(string("19"), string("iNT"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::INT);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::INT);
   BOOST_CHECK_EQUAL(c.i_, 19);
   Utilities::castString(string("tRuE"), string("bOOl"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::BOOL);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::BOOL);
   BOOST_CHECK_EQUAL(c.b_, true);
   Utilities::castString(string("False"), string("STRing"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::BOOL);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::BOOL);
   BOOST_CHECK_EQUAL(c.b_, false);
   Utilities::castString(string("hello"), string("stRIng"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::STRING);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::STRING);
   BOOST_CHECK_EQUAL(c.s_, "hello");
   Utilities::castString(string("world"), string("String"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::STRING);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::STRING);
   BOOST_CHECK_EQUAL(c.s_, "world");
   Utilities::castString(string("35.35"), string("float"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::FLOAT);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::FLOAT);
   BOOST_CHECK_CLOSE(c.f_, (float)35.35, 1e-6);
 }
 
@@ -168,52 +150,52 @@ BOOST_AUTO_TEST_CASE(updateParameters)
 
 BOOST_AUTO_TEST_CASE(parseString)
 {
-  Utilities::CastValue c;
+  CastValue c;
 
   Utilities::parseString("", c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::STRING);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::STRING);
   BOOST_CHECK_EQUAL(c.s_, "");
 
   Utilities::parseString(" foo ", c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::STRING);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::STRING);
   BOOST_CHECK_EQUAL(c.s_, "foo");
 
   Utilities::parseString("   34  ", c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::INT);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::INT);
   BOOST_CHECK_EQUAL(c.i_, 34);
 
   Utilities::parseString(" 7.7  ", c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::FLOAT);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::FLOAT);
   BOOST_CHECK_CLOSE(c.f_, (float)7.7, 1e-6);
 
   Utilities::parseString("  false", c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::BOOL);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::BOOL);
   BOOST_CHECK_EQUAL(c.b_, false);
 
   Utilities::parseString("true   ", c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::BOOL);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::BOOL);
   BOOST_CHECK_EQUAL(c.b_, true);
 
   Utilities::parseString("[ 1,   2,    3 ]", c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::INT_LIST);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::INT_LIST);
   BOOST_CHECK_EQUAL(c.il_[0], 1);
   BOOST_CHECK_EQUAL(c.il_[1], 2);
   BOOST_CHECK_EQUAL(c.il_[2], 3);
 
   Utilities::parseString("[   1 ,  2.2  ,     3.3]", c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::FLOAT_LIST);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::FLOAT_LIST);
   BOOST_CHECK_CLOSE(c.fl_[0], (float)1, 1e-6);
   BOOST_CHECK_CLOSE(c.fl_[1], (float)2.2, 1e-6);
   BOOST_CHECK_CLOSE(c.fl_[2], (float)3.3, 1e-6);
 
   Utilities::parseString("[   false ,  false  ,     true]", c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::BOOL_LIST);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::BOOL_LIST);
   BOOST_CHECK_EQUAL(c.bl_[0], false);
   BOOST_CHECK_EQUAL(c.bl_[1], false);
   BOOST_CHECK_EQUAL(c.bl_[2], true);
 
   Utilities::parseString("[   \"first string\" ,  \"second string\"  ,     \"third string\"]", c);
-  BOOST_CHECK_EQUAL(c.getTag(), Utilities::CastValue::STRING_LIST);
+  BOOST_CHECK_EQUAL(c.getTag(), CastValue::STRING_LIST);
   BOOST_CHECK_EQUAL(c.sl_[0], "first string");
   BOOST_CHECK_EQUAL(c.sl_[1], "second string");
   BOOST_CHECK_EQUAL(c.sl_[2], "third string");
@@ -223,7 +205,7 @@ BOOST_AUTO_TEST_CASE(parseList)
 {
   const string floats = "[1.1,-2.1,+3.1,4]";
   std::regex re_float_number("[+-]?\\d+(?:\\.\\d+)?"); // copied from .cpp implementation
-  Utilities::CastValue c;
+  CastValue c;
   c = std::vector<float>();
   Utilities::parseList(floats, re_float_number, c);
   BOOST_CHECK_CLOSE(c.fl_[0], (float)1.1, 1e-6);
@@ -363,6 +345,135 @@ BOOST_AUTO_TEST_CASE(extractSelectorParameters)
   BOOST_CHECK_EQUAL(p->score_weights.size(), 2);
   BOOST_CHECK_EQUAL(p->score_weights.at("var_log_sn_score") == OpenMS::MRMFeatureSelector::LambdaScore::INVERSE, true);
   BOOST_CHECK_EQUAL(p->score_weights.at("peak_apices_sum") == OpenMS::MRMFeatureSelector::LambdaScore::INVERSE_LOG10, true);
+}
+
+BOOST_AUTO_TEST_CASE(endsWith)
+{
+  const vector<string> names { "1.csv", "2.featureXML", "3.CSV", "4.FeatureXML", "5.another" };
+
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "csv"), true); // default argument case
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "csv", true), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "CSV", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "Csv", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "CSV", false), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[0], "Csv", false), true);
+
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "featureXML"), true); // default argument case
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "featureXML", true), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "FEATUREXML", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "FeatureXML", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "FEATUREXML", false), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[1], "FeatureXML", false), true);
+
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "csv"), false); // default argument case
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "csv", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "CSV", true), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "Csv", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "CSV", false), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[2], "Csv", false), true);
+
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "featureXML"), false); // default argument case
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "featureXML", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "FEATUREXML", true), false);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "FeatureXML", true), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "FEATUREXML", false), true);
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[3], "FeatureXML", false), true);
+
+  BOOST_CHECK_EQUAL(Utilities::endsWith(names[4], "does_not_end_with_this", false), false);
+}
+
+BOOST_AUTO_TEST_CASE(getPathnameContent)
+{
+  const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
+  const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname);
+
+  // number of items in the pathname, taking .gitignore into account
+  BOOST_CHECK_EQUAL(c[0].size(), 35);
+  BOOST_CHECK_EQUAL(c[1].size(), 35);
+  BOOST_CHECK_EQUAL(c[2].size(), 35);
+  BOOST_CHECK_EQUAL(c[3].size(), 35);
+
+  BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x.featureXML");
+#ifdef _WIN32
+  BOOST_CHECK_EQUAL(c[1][0], "774620"); // file size
+#else
+  BOOST_CHECK_EQUAL(c[1][0], "761937"); // file size
+#endif
+  BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
+
+  BOOST_CHECK_EQUAL(c[0][34], "workflow_csv_files");
+  BOOST_CHECK_EQUAL(c[1][34], "12"); // number of items within the folder
+  BOOST_CHECK_EQUAL(c[2][34], "Directory");
+}
+
+BOOST_AUTO_TEST_CASE(getParentPathname)
+{
+#ifdef _WIN32
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D://///"), "D:/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:\\"), "D:");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:/"), "D:/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:"), "");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs"), "E:/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E://home///user//docs"), "E://home///user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs and a space"), "E:/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs/"), "E:/home/user/docs");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("//home///user//docs"), "//home///user");
+#else
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname(""), "");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/"), "");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs and a space"), "/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs/"), "/home/user/docs");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs"), "/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home"), "/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/file.txt"), "/home");
+#endif
+}
+
+BOOST_AUTO_TEST_CASE(sortPairs)
+{
+  const std::vector<size_t> indices { 1, 0, 3, 2, 5, 4 };
+
+  std::vector<std::string> v { "second", "first", "4th", "3rd", "6th", "5th" };
+  Utilities::sortPairs(indices, v);
+  BOOST_CHECK_EQUAL(v[0], "first");
+  BOOST_CHECK_EQUAL(v[1], "second");
+  BOOST_CHECK_EQUAL(v[2], "3rd");
+  BOOST_CHECK_EQUAL(v[3], "4th");
+  BOOST_CHECK_EQUAL(v[4], "5th");
+  BOOST_CHECK_EQUAL(v[5], "6th");
+
+  std::vector<int> w { 11, 22, 33, 44, 55, 66 };
+  Utilities::sortPairs(indices, w);
+  BOOST_CHECK_EQUAL(w[0], 22);
+  BOOST_CHECK_EQUAL(w[1], 11);
+  BOOST_CHECK_EQUAL(w[2], 44);
+  BOOST_CHECK_EQUAL(w[3], 33);
+  BOOST_CHECK_EQUAL(w[4], 66);
+  BOOST_CHECK_EQUAL(w[5], 55);
+
+  std::vector<float> t;
+  Utilities::sortPairs({}, t); // should not throw
+}
+
+BOOST_AUTO_TEST_CASE(is_less_than_icase)
+{
+  auto& f = Utilities::is_less_than_icase;
+  BOOST_CHECK_EQUAL(f("abc", "abc"), false);
+  BOOST_CHECK_EQUAL(f("abc", "ABC"), false);
+  BOOST_CHECK_EQUAL(f("ABC", "abc"), false);
+  BOOST_CHECK_EQUAL(f("home", "z"), true);
+  BOOST_CHECK_EQUAL(f("proc", "dev"), false);
+  BOOST_CHECK_EQUAL(f("dev", "proc"), true);
+  BOOST_CHECK_EQUAL(f("boot", "grub"), true);
+}
+
+BOOST_AUTO_TEST_CASE(directorySize)
+{
+  const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
+  auto& f = Utilities::directorySize;
+  BOOST_CHECK_EQUAL(f(path), 35);
+  BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 12);
+  BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

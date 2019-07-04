@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(gettersAndSetters)
 
 BOOST_AUTO_TEST_CASE(writeDataInRow)
 {
-  const std::string filename = SMARTPEAK_GET_TEST_DATA_PATH("CSVWriterTest.csv");
+  const std::string filename = SMARTPEAK_GET_TEST_DATA_PATH("output/CSVWriterTest.csv");
   std::vector<std::string> headers, line;
   CSVWriter csvwriter(filename);
 
