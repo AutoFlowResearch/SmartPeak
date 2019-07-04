@@ -49,6 +49,7 @@ before_build:
   #       msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln -maxcpucount
   #     }
   - dir C:\projects\OpenMS-build\lib
+  - dir C:\projects\OpenMS-build\lib\Debug
   - dir C:\projects\SmartPeak2
   - cd C:\projects
   - git clone -n https://github.com/SergiusTheBest/plog.git
