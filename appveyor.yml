@@ -51,9 +51,9 @@ before_build:
   - cd imgui
   - git checkout ebe79bbed00a13fd4455f04131b63d49c28ebd5d
   - cd C:\projects
-  - curl -fsS -o SDL2-2.0.9.zip https://www.libsdl.org/release/SDL2-2.0.9.zip
+  - curl -fsS -o SDL2-devel-2.0.9-VC.zip https://www.libsdl.org/release/SDL2-devel-2.0.9-VC.zip
   - dir C:\projects\deps
-  - 7z x SDL2-2.0.9.zip -o"C:\projects\deps" -y
+  - 7z x SDL2-devel-2.0.9-VC.zip -o"C:\projects\deps" -y
   - dir C:\projects\deps
   - mkdir C:\projects\SmartPeak2-build
   - cd C:\projects\SmartPeak2-build
