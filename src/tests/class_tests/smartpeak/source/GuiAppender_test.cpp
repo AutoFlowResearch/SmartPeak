@@ -48,19 +48,19 @@ BOOST_AUTO_TEST_CASE(thread_safety)
 
   BOOST_CHECK_EQUAL(log.size(), 30); // ensure the correct number of entries
 
-  auto endsWith = [](const plog::util::nchar* pattern)
-  {
-    return [pattern](const plog::util::nstring& s)
-    {
-      const std::string::size_type n = s.rfind(pattern);
-      return n != std::string::npos;
-    };
-  };
+  // auto endsWith = [](const plog::util::nchar* pattern)
+  // {
+  //   return [pattern](const plog::util::nstring& s)
+  //   {
+  //     const std::string::size_type n = s.rfind(pattern);
+  //     return n != std::string::npos;
+  //   };
+  // };
 
-  int my_count_if = [endsWith](const std::vector<plog::util::nstring>& v, const plog::util::nchar* pattern)
-  {
-    return std::count_if(v.cbegin(), v.cend(), endsWith(pattern));
-  };
+  // int my_count_if = [endsWith](const std::vector<plog::util::nstring>& v, const plog::util::nchar* pattern)
+  // {
+  //   return std::count_if(v.cbegin(), v.cend(), endsWith(pattern));
+  // };
 
   // ensure that entries end with the expected pattern, for the correct number of times
   // since we have three threads appending the same vector elements, we expect the same
