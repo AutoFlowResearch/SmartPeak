@@ -21,7 +21,8 @@ cache:
   - C:\projects\OpenMS-build
 install:
   - git submodule update --init --recursive
-  - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
+  - pushd util\install-dep-windows\ && install-dependencies-win.bat
+  - popd
   - 7z x C:\projects\deps\contrib_build.tar.gz -o"C:\projects\deps" -y
   - 7z x C:\projects\deps\contrib_build.tar -o"C:\projects\deps\contrib" -y
   - dir C:\projects\deps\contrib
@@ -38,8 +39,12 @@ before_build:
   - msbuild C:\projects\OpenMS-build\src\openswathalgo\OpenSWATHAlgo.sln -maxcpucount
   - msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln -maxcpucount
 #  }
-  - cmake -DCMAKE_PREFIX_PATH="C:\projects\OpenMS-build;C:\Qt\5.12\msvc2017_64\lib\cmake" -G "Visual Studio 15 2017 Win64" -T host=x64 -DEIGEN3_INCLUDE_DIR="C:\projects\deps\contrib\include\eigen3" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_BUILD_TYPE=Release C:\projects\smartpeak2
-  - dir C:\projects\smartpeak2  
+  - popd
+  - mkdir C:\projects\SmartPeak2-build
+  - pushd C:\projects\SmartPeak2-build
+  - dir C:\projects\SmartPeak2
+  - cmake -DCMAKE_PREFIX_PATH="C:\projects\OpenMS-build;C:\Qt\5.12\msvc2017_64\lib\cmake" -G "Visual Studio 15 2017 Win64" -T host=x64 -DEIGEN3_INCLUDE_DIR="C:\projects\deps\contrib\include\eigen3" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_BUILD_TYPE=Debug C:\projects\SmartPeak2
+  - dir C:\projects\SmartPeak2-build
 build:
   project: C:\projects\smartpeak2\SmartPeak_host.sln 
   #project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
