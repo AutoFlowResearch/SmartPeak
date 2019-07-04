@@ -34,7 +34,7 @@ install:
   - dir C:\Libraries\boost_1_69_0
 before_build:
   - ps: |
-      if(![System.IO.File]::Exists("C:\projects\OpenMS-build")) {
+      if (-not ("C:\projects\OpenMS-build" | Test-Path)) {
         git clone --depth=1 --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS
         mkdir C:\projects\OpenMS-build
         cd C:\projects\OpenMS-build
