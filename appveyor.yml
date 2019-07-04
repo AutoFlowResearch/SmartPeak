@@ -21,8 +21,7 @@ cache:
   - C:\projects\OpenMS-build
 install:
   - git submodule update --init --recursive
-  - pushd util\install-dep-windows\ && install-dependencies-win.bat
-  - popd
+  - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
   - 7z x C:\projects\deps\contrib_build.tar.gz -o"C:\projects\deps" -y
   - 7z x C:\projects\deps\contrib_build.tar -o"C:\projects\deps\contrib" -y
   - dir C:\projects\deps\contrib
@@ -33,15 +32,14 @@ before_build:
 #  {
   - git clone --depth=1 --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS
   - mkdir C:\projects\OpenMS-build
-  - pushd C:\projects\OpenMS-build
+  - cd C:\projects\OpenMS-build
   - cmake -DCMAKE_PREFIX_PATH="C:\Qt\5.12\msvc2017_64\lib\cmake" -DBoost_DEBUG=TRUE -DCMAKE_GENERATOR_PLATFORM=x64 -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_ROOT="C:\Libraries\boost_1_69_0\boost" -DOPENMS_CONTRIB_LIBS="C:/projects/deps/contrib" -DBOOST_USE_STATIC=ON -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF C:\projects\OpenMS-build -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON C:\projects\OpenMS
   - dir C:\projects\OpenMS-build\src\openms
   - msbuild C:\projects\OpenMS-build\src\openswathalgo\OpenSWATHAlgo.sln -maxcpucount
   - msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln -maxcpucount
 #  }
-  - popd
   - mkdir C:\projects\SmartPeak2-build
-  - pushd C:\projects\SmartPeak2-build
+  - cd C:\projects\SmartPeak2-build
   - dir C:\projects\SmartPeak2
   - cmake -DCMAKE_PREFIX_PATH="C:\projects\OpenMS-build;C:\Qt\5.12\msvc2017_64\lib\cmake" -G "Visual Studio 15 2017 Win64" -T host=x64 -DEIGEN3_INCLUDE_DIR="C:\projects\deps\contrib\include\eigen3" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_69_0" -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_69_0\lib64-msvc-14.1" -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_BUILD_TYPE=Debug C:\projects\SmartPeak2
   - dir C:\projects\SmartPeak2-build
