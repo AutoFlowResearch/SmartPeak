@@ -8,6 +8,7 @@
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <chrono>
+#include <cctype>
 
 using namespace SmartPeak;
 
