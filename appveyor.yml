@@ -70,7 +70,7 @@ before_build:
   - dir C:\projects\SmartPeak2
 build:
   parallel: true
-  verbosity: normal
+  verbosity: minimal
   project: C:\projects\SmartPeak2-build\SmartPeak_host.sln
   #project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
 
