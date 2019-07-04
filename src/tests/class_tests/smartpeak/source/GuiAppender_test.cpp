@@ -43,15 +43,12 @@ BOOST_AUTO_TEST_CASE(thread_safety)
   t2.join();
   t3.join();
   std::cout << "threads joined.\n";
-  for (const plog::util::nstring& s : appender.getMessageList(plog::Severity::verbose)) {
-    std::cout << s << std::endl;
-  }
 
   const std::vector<plog::util::nstring> log = appender.getMessageList(plog::Severity::verbose);
 
   BOOST_CHECK_EQUAL(log.size(), 30); // ensure the correct number of entries
 
-  auto endsWith = [](const char* pattern)
+  auto endsWith = [](const plog::util::nchar* pattern)
   {
     return [pattern](const plog::util::nstring& s)
     {
