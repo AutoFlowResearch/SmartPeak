@@ -24,6 +24,11 @@ cache:
   - C:\projects\OpenMS-build
 artifacts:
   - path: C:\projects\OpenMS-build\lib
+    name: libOpenMS.dll
+  - path: C:\projects\OpenMS-build\lib
+    name: libOpenSwathAlgo.dll
+  - path: C:\projects\OpenMS-build\lib
+    name: libSuperHirn.dll
 install:
   - git submodule update --init --recursive
   - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
@@ -43,6 +48,7 @@ before_build:
   #       msbuild C:\projects\OpenMS-build\src\openswathalgo\OpenSWATHAlgo.sln -maxcpucount
   #       msbuild C:\projects\OpenMS-build\src\openms\OpenMS.sln -maxcpucount
   #     }
+  - dir C:\projects\OpenMS-build\lib
   - dir C:\projects\SmartPeak2
   - cd C:\projects
   - git clone -n https://github.com/SergiusTheBest/plog.git
