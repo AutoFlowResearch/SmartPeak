@@ -23,15 +23,21 @@ cache:
 #  - C:\projects\deps
   - C:\projects\OpenMS-build
 # artifacts can only be found in the same dir of the build (i.e. C:\projects\SmartPeak) or subdirs
-# artifacts:
-#   - path: ..\OpenMS-build\lib\Debug
-#     name: OpenMSd.exp
-#   - path: ..\OpenMS-build\lib\Debug
-#     name: OpenMSd.lib
-#   - path: ..\OpenMS-build\lib\Debug
-#     name: OpenSwathAlgod.exp
-#   - path: ..\OpenMS-build\lib\Debug
-#     name: OpenSwathAlgod.lib
+artifacts:
+  - path: build\bin\Debug
+    name: CLI.exe
+  - path: build\bin\Debug
+    name: GUI.exe
+  - path: build\bin\Debug
+    name: HPLC_UV_Standards_test.exe
+  # - path: ..\OpenMS-build\lib\Debug
+  #   name: OpenMSd.exp
+  # - path: ..\OpenMS-build\lib\Debug
+  #   name: OpenMSd.lib
+  # - path: ..\OpenMS-build\lib\Debug
+  #   name: OpenSwathAlgod.exp
+  # - path: ..\OpenMS-build\lib\Debug
+  #   name: OpenSwathAlgod.lib
 install:
   - git submodule update --init --recursive
   - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
@@ -68,24 +74,24 @@ before_build:
   - dir C:\projects\deps
   - 7z x SDL2-devel-2.0.9-VC.zip -o"C:\projects\deps" -y
   - dir C:\projects\deps
-  - mkdir C:\projects\SmartPeak2-build
-  - cd C:\projects\SmartPeak2-build
+  - mkdir C:\projects\SmartPeak2\build
+  - cd C:\projects\SmartPeak2\build
   - cmake -DCMAKE_PREFIX_PATH="C:\projects\OpenMS-build;C:\Qt\5.12\msvc2017_64\lib\cmake;C:\projects\deps\SDL2-2.0.9" -G "Visual Studio 15 2017 Win64" -T host=x64 -DEIGEN3_INCLUDE_DIR="C:\projects\deps\contrib\include\eigen3" -DBOOST_INCLUDEDIR="C:\Libraries\boost_1_67_0" -DBOOST_LIBRARYDIR="C:\Libraries\boost_1_67_0\lib64-msvc-14.1" -DPLOG_INCLUDE_DIR="C:/projects/plog/include" -DIMGUI_DIR="C:/projects/imgui" -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=ON -DCMAKE_BUILD_TYPE=Debug C:\projects\SmartPeak2
-  - dir C:\projects\SmartPeak2-build
+  - dir C:\projects\SmartPeak2\build
   - dir C:\projects\SmartPeak2
 build:
   parallel: true
   verbosity: minimal
-  project: C:\projects\SmartPeak2-build\SmartPeak_host.sln
+  project: C:\projects\SmartPeak2\build\SmartPeak_host.sln
   #project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
 
 test_script:
-  - dir C:\projects\SmartPeak2-build\bin\Debug\
-  - cd C:\projects\SmartPeak2-build
+  - dir C:\projects\SmartPeak2\build\bin\Debug\
+  - cd C:\projects\SmartPeak2\build
   - ctest -V
-  - ps: C:\projects\SmartPeak2-build\bin\Debug\GCMS_SIM_Unknown_test.exe
-  - ps: C:\projects\SmartPeak2-build\bin\Debug\HPLC_UV_Standards_test.exe
-  - ps: C:\projects\SmartPeak2-build\bin\Debug\HPLC_UV_Unknown_test.exe
-  - ps: C:\projects\SmartPeak2-build\bin\Debug\LCMS_MRM_QCs_test.exe
-  - ps: C:\projects\SmartPeak2-build\bin\Debug\LCMS_MRM_Standards_test.exe
-  - ps: C:\projects\SmartPeak2-build\bin\Debug\LCMS_MRM_Unknown_test.exe
+  - ps: C:\projects\SmartPeak2\build\bin\Debug\GCMS_SIM_Unknown_test.exe
+  - ps: C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Standards_test.exe
+  - ps: C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Unknown_test.exe
+  - ps: C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_QCs_test.exe
+  - ps: C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_Standards_test.exe
+  - ps: C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_Unknown_test.exe
