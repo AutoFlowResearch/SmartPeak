@@ -36,6 +36,7 @@ install:
   - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
   - 7z x C:\projects\deps\contrib_build.tar.gz -o"C:\projects\deps" -y
   - 7z x C:\projects\deps\contrib_build.tar -o"C:\projects\deps\contrib" -y
+  - rmdir /Q/S C:/projects/deps/contrib/include/boost
   - dir C:\projects\deps\contrib
   - dir C:\Qt\5.12
   - dir C:\Libraries\boost_1_65_1
