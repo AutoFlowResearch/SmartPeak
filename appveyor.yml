@@ -22,15 +22,16 @@ configuration:
 cache:
 #  - C:\projects\deps
   - C:\projects\OpenMS-build
-artifacts:
-  - path: ..\OpenMS-build\lib\Debug
-    name: OpenMSd.exp
-  - path: ..\OpenMS-build\lib\Debug
-    name: OpenMSd.lib
-  - path: ..\OpenMS-build\lib\Debug
-    name: OpenSwathAlgod.exp
-  - path: ..\OpenMS-build\lib\Debug
-    name: OpenSwathAlgod.lib
+# artifacts can only be found in the same dir of the build (i.e. C:\projects\SmartPeak) or subdirs
+# artifacts:
+#   - path: ..\OpenMS-build\lib\Debug
+#     name: OpenMSd.exp
+#   - path: ..\OpenMS-build\lib\Debug
+#     name: OpenMSd.lib
+#   - path: ..\OpenMS-build\lib\Debug
+#     name: OpenSwathAlgod.exp
+#   - path: ..\OpenMS-build\lib\Debug
+#     name: OpenSwathAlgod.lib
 install:
   - git submodule update --init --recursive
   - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
