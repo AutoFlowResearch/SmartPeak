@@ -80,10 +80,12 @@ build:
   #project: C:\projects\OpenMS-build\src\openms\OpenMS.sln
 
 test_script:
- - dir C:\projects\SmartPeak2-build\bin\Debug\
- - ps: C:\projects\SmartPeak2-build\bin\Debug\GCMS_SIM_Unknown_test.exe
- - ps: C:\projects\SmartPeak2-build\bin\Debug\HPLC_UV_Standards_test.exe
- - ps: C:\projects\SmartPeak2-build\bin\Debug\HPLC_UV_Unknown_test.exe
- - ps: C:\projects\SmartPeak2-build\bin\Debug\LCMS_MRM_QCs_test.exe
- - ps: C:\projects\SmartPeak2-build\bin\Debug\LCMS_MRM_Standards_test.exe
- - ps: C:\projects\SmartPeak2-build\bin\Debug\LCMS_MRM_Unknown_test.exe
+  - dir C:\projects\SmartPeak2-build\bin\Debug\
+  - cd C:\projects\SmartPeak2-build
+  - ctest -V
+  - ps: C:\projects\SmartPeak2-build\bin\Debug\GCMS_SIM_Unknown_test.exe
+  - ps: C:\projects\SmartPeak2-build\bin\Debug\HPLC_UV_Standards_test.exe
+  - ps: C:\projects\SmartPeak2-build\bin\Debug\HPLC_UV_Unknown_test.exe
+  - ps: C:\projects\SmartPeak2-build\bin\Debug\LCMS_MRM_QCs_test.exe
+  - ps: C:\projects\SmartPeak2-build\bin\Debug\LCMS_MRM_Standards_test.exe
+  - ps: C:\projects\SmartPeak2-build\bin\Debug\LCMS_MRM_Unknown_test.exe
