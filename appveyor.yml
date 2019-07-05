@@ -23,13 +23,13 @@ cache:
 #  - C:\projects\deps
   - C:\projects\OpenMS-build
 artifacts:
-  - path: C:\projects\OpenMS-build\lib\Debug
+  - path: ..\OpenMS-build\lib\Debug
     name: OpenMSd.exp
-  - path: C:\projects\OpenMS-build\lib\Debug
+  - path: ..\OpenMS-build\lib\Debug
     name: OpenMSd.lib
-  - path: C:\projects\OpenMS-build\lib\Debug
+  - path: ..\OpenMS-build\lib\Debug
     name: OpenSwathAlgod.exp
-  - path: C:\projects\OpenMS-build\lib\Debug
+  - path: ..\OpenMS-build\lib\Debug
     name: OpenSwathAlgod.lib
 install:
   - git submodule update --init --recursive
