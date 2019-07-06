@@ -88,10 +88,10 @@ build:
 test_script:
   - dir C:\projects\SmartPeak2\build\bin\Debug\
   - cd C:\projects\SmartPeak2\build
-  - ps: ctest -C "Debug" -V
-  - ps: C:\projects\SmartPeak2\build\bin\Debug\GCMS_SIM_Unknown_test.exe
+  # - ps: ctest -C "Debug" -V
+  # - ps: C:\projects\SmartPeak2\build\bin\Debug\GCMS_SIM_Unknown_test.exe
   - ps: C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Standards_test.exe
-  - ps: C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Unknown_test.exe
-  - ps: C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_QCs_test.exe
-  - ps: C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_Standards_test.exe
-  - ps: C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_Unknown_test.exe
+  # - ps: C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Unknown_test.exe
+  # - ps: C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_QCs_test.exe
+  # - ps: C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_Standards_test.exe
+  # - ps: C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_Unknown_test.exe
