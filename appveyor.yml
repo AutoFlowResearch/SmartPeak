@@ -88,6 +88,7 @@ build:
 test_script:
   - dir C:\projects\SmartPeak2\build\bin\Debug\
   - cd C:\projects\SmartPeak2\build
+  - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\GCMS_SIM_Unknown_test.exe
   - ctest -C "Debug" -V
   - C:\projects\SmartPeak2\build\bin\Debug\GCMS_SIM_Unknown_test.exe
   - C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Standards_test.exe
