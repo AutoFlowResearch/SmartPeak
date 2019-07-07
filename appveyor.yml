@@ -21,7 +21,7 @@ configuration:
   - Debug
 cache:
 #  - C:\projects\deps
-  - C:\projects\OpenMS-build
+  - C:\projects\OpenMS-build\lib\Debug
 # artifacts can only be found in the same dir of the build (i.e. C:\projects\SmartPeak) or subdirs
 artifacts:
   - path: build\bin\Debug
@@ -47,6 +47,8 @@ install:
   - dir C:\projects\deps\contrib
   - dir C:\Qt\5.12
   - dir C:\Libraries\boost_1_67_0
+  - dir C:\Windows\System32
+  - dir C:\Windows\SysWOW64
 before_build:
   - git clone --depth=1 --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS
   - ps: |
@@ -88,7 +90,9 @@ build:
 test_script:
   - dir C:\projects\SmartPeak2\build\bin\Debug\
   - cd C:\projects\SmartPeak2\build
-  - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\GCMS_SIM_Unknown_test.exe
+  - dumpbin /all /rawdata:none C:\projects\SmartPeak2\build\bin\Debug\CLI.exe
+  - dumpbin /all /rawdata:none C:\projects\SmartPeak2\build\bin\Debug\GUI.exe
+  - dumpbin /all /rawdata:none C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Standards_test.exe
   - ctest -C "Debug" -V
   - C:\projects\SmartPeak2\build\bin\Debug\GCMS_SIM_Unknown_test.exe
   - C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Standards_test.exe
