@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+if [ $# -eq 0 ]
+then
+    echo "Error: please provide the path to the binaries"
+    echo "Example: ./run_example.sh ~/SmartPeak2_build/bin"
+    exit 1
+fi
+
 run_example()
 {
     filename=$1
@@ -16,8 +23,7 @@ run_example()
     return $RET_VALUE
 }
 
-# Assumption: SmartPeak2 build folder
-cd ~/SmartPeak2_build/bin || return 1
+cd $1 || return 1
 
 {
   (run_example GCMS_SIM_Unknown_test)&
