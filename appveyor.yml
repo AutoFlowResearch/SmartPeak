@@ -89,6 +89,7 @@ build:
 
 test_script:
   - robocopy C:\projects\deps\SDL2-2.0.9\lib\x64 C:\projects\SmartPeak2\build\bin\Debug & exit 0
+  - robocopy C:\projects\OpenMS-build\lib\Debug C:\projects\SmartPeak2\build\bin\Debug & exit 0
   - dir C:\projects\SmartPeak2\build\bin\Debug\
   - cd C:\projects\SmartPeak2\build
   - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\CLI.exe
