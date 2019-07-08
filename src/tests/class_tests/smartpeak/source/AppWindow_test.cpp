@@ -19,14 +19,6 @@ BOOST_AUTO_TEST_CASE(constructor)
   GuiAppender guiAppender;
   ptr = new AppWindow(state, guiAppender);
   BOOST_CHECK_NE(ptr, nullPointer);
-}
-
-BOOST_AUTO_TEST_CASE(destructor) 
-{
-  AppWindow* ptr = nullptr;
-  AppState state;
-  GuiAppender guiAppender;
-  ptr = new AppWindow(state, guiAppender);
   delete ptr;
 }
 
