@@ -111,8 +111,12 @@ add_dependencies(INTERACTIVE_EXAMPLES ${interactive_executables_list})
 # Add the actual examples
 foreach(_examples ${EXAMPLE_executables})
   add_executable(${_examples} source/${_examples})
-  # TODO: only link SDL2 and ImGUI libraries with the GUI 
-  target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples)
+  # message(STATUS "${_examples}")
+  if(NOT ${_examples} STREQUAL "GUI")
+    target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
+  else()
+    target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples)
+  endif()
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
   # see https://sourceforge.net/apps/trac/open-ms/ticket/280 for details)
   if (OPENMP_FOUND AND NOT MSVC AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
