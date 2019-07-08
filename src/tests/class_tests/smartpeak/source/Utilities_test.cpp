@@ -394,11 +394,11 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
   BOOST_CHECK_EQUAL(c[3].size(), 35);
 
   BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x.featureXML");
-#ifdef _WIN32
-  BOOST_CHECK_EQUAL(c[1][0], "774620"); // file size
-#else
+// #ifdef _WIN32
+//   BOOST_CHECK_EQUAL(c[1][0], "774620"); // file size
+// #else
   BOOST_CHECK_EQUAL(c[1][0], "761937"); // file size
-#endif
+// #endif
   BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
 
   BOOST_CHECK_EQUAL(c[0][34], "workflow_csv_files");
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_CASE(getParentPathname)
 #ifdef _WIN32
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D://///"), "D:/");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:\\"), "D:");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:/"), "D:/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:/"), "D:");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:"), "");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs"), "E:/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E://home///user//docs"), "E://home///user");
