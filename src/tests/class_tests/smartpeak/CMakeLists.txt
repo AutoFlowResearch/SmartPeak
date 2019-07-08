@@ -130,7 +130,12 @@ add_dependencies(UI_TEST ${ui_executables_list})
 # Add the actual tests
 foreach(_class_test ${TEST_executables})
   add_executable(${_class_test} source/${_class_test})
-  target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} ${Boost_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples)
+  # message(STATUS "${_class_test}")
+  if(NOT (${_class_test} STREQUAL "GuiAppender_test" OR ${_class_test} STREQUAL "AppWindow_test"))
+    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} ${Boost_LIBRARIES} OpenMS)
+  else()
+    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} ${Boost_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples)
+  endif()
   add_test(${_class_test} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_class_test})
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
   # see https://sourceforge.net/apps/trac/open-ms/ticket/280 for details)
