@@ -95,7 +95,7 @@ test_script:
   - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\CLI.exe
   - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\GUI.exe
   - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Standards_test.exe
-  - ctest -C "Debug" -V
+  - ctest -j 4 -C "Debug" -V
   - C:\projects\SmartPeak2\build\bin\Debug\GCMS_SIM_Unknown_test.exe
   - C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Standards_test.exe
   - C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Unknown_test.exe
