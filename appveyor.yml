@@ -26,19 +26,7 @@ cache:
 # artifacts can only be found in the same dir of the build (i.e. C:\projects\SmartPeak) or subdirs
 artifacts:
   - path: build\bin\Debug
-    name: CLI.exe
-  - path: build\bin\Debug
-    name: GUI.exe
-  - path: build\bin\Debug
-    name: HPLC_UV_Standards_test.exe
-  # - path: ..\OpenMS-build\lib\Debug
-  #   name: OpenMSd.exp
-  # - path: ..\OpenMS-build\lib\Debug
-  #   name: OpenMSd.lib
-  # - path: ..\OpenMS-build\lib\Debug
-  #   name: OpenSwathAlgod.exp
-  # - path: ..\OpenMS-build\lib\Debug
-  #   name: OpenSwathAlgod.lib
+    name: executables_and_examples_output
 install:
   - git submodule update --init --recursive
   - pushd util\install-dep-windows\ && install-dependencies-win.bat & popd
@@ -96,5 +84,5 @@ test_script:
   - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\CLI.exe
   - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\GUI.exe
   - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Standards_test.exe
-  - C:\projects\SmartPeak2\.circleci\run_examples.sh C:\projects\SmartPeak2\build\bin\Debug\
+  - C:\projects\SmartPeak2\.circleci\run_examples.sh C:\projects\SmartPeak2\build\bin\Debug C:\cygwin64\bin\
   - ctest -j 4 -C "Debug" -V
