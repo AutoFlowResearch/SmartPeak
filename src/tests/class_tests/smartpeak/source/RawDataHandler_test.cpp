@@ -15,12 +15,6 @@ BOOST_AUTO_TEST_CASE(constructor)
   RawDataHandler* nullPointer = nullptr;
   ptr = new RawDataHandler();
   BOOST_CHECK_NE(ptr, nullPointer);
-}
-
-BOOST_AUTO_TEST_CASE(destructor)
-{
-  RawDataHandler* ptr = nullptr;
-  ptr = new RawDataHandler();
   delete ptr;
 }
 

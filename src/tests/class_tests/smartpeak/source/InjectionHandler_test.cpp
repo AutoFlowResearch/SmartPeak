@@ -16,12 +16,6 @@ BOOST_AUTO_TEST_CASE(constructor)
   InjectionHandler* nullPointer = nullptr;
   ptr = new InjectionHandler();
   BOOST_CHECK_NE(ptr, nullPointer);
-}
-
-BOOST_AUTO_TEST_CASE(destructor)
-{
-  InjectionHandler* ptr = nullptr;
-  ptr = new InjectionHandler();
   delete ptr;
 }
 

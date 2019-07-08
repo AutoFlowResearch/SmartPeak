@@ -15,12 +15,6 @@ BOOST_AUTO_TEST_CASE(constructor)
   SequenceSegmentHandler* nullPointer = nullptr;
   ptr = new SequenceSegmentHandler();
   BOOST_CHECK_NE(ptr, nullPointer);
-}
-
-BOOST_AUTO_TEST_CASE(destructor)
-{
-  SequenceSegmentHandler* ptr = nullptr;
-  ptr = new SequenceSegmentHandler();
   delete ptr;
 }
 

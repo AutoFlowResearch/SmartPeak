@@ -16,12 +16,6 @@ BOOST_AUTO_TEST_CASE(constructor)
   SequenceHandler* nullPointer = nullptr;
   ptr = new SequenceHandler();
   BOOST_CHECK_NE(ptr, nullPointer);
-}
-
-BOOST_AUTO_TEST_CASE(destructor)
-{
-  SequenceHandler* ptr = nullptr;
-  ptr = new SequenceHandler();
   delete ptr;
 }
 
