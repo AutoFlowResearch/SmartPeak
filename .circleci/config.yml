@@ -43,7 +43,7 @@ jobs:
             ls -l ~/SmartPeak2/src/tests/class_tests/smartpeak/data
       - run:
           command: |
-            ~/SmartPeak2/.circleci/run_examples.sh
+            ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
 
 workflows:
   version: 2
