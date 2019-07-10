@@ -39,7 +39,7 @@ namespace SmartPeak
       cast = value;
     } else {
       LOGW << "Type not supported: " << type;
-      cast.setTagAndData(CastValue::UNKNOWN, value);
+      cast.setTagAndData(CastValue::Type::UNKNOWN, value);
     }
   }
 
@@ -123,7 +123,7 @@ namespace SmartPeak
               break;
             }
           default:
-            c.setTagAndData(CastValue::UNKNOWN, Param_IO.getValue(name).toString());
+            c.setTagAndData(CastValue::Type::UNKNOWN, Param_IO.getValue(name).toString());
         }
       }
 
@@ -152,19 +152,19 @@ namespace SmartPeak
       }
       // update the params
       switch (c.getTag()) {
-        case CastValue::BOOL:
+        case CastValue::Type::BOOL:
           Param_IO.setValue(name, c.b_ ? "true" : "false", description, tags);
           break;
-        case CastValue::FLOAT:
+        case CastValue::Type::FLOAT:
           Param_IO.setValue(name, static_cast<double>(c.f_), description, tags);
           break;
-        case CastValue::INT:
+        case CastValue::Type::INT:
           Param_IO.setValue(name, c.i_, description, tags);
           break;
-        case CastValue::STRING:
+        case CastValue::Type::STRING:
           Param_IO.setValue(name, c.s_, description, tags);
           break;
-        case CastValue::FLOAT_LIST:
+        case CastValue::Type::FLOAT_LIST:
           {
             std::vector<double> dl;
             for (const float f : c.fl_) {
@@ -173,7 +173,7 @@ namespace SmartPeak
             Param_IO.setValue(name, dl, description, tags);
             break;
           }
-        case CastValue::INT_LIST:
+        case CastValue::Type::INT_LIST:
           {
             std::vector<int> il;
             for (const int i : c.il_) {
@@ -182,7 +182,7 @@ namespace SmartPeak
             Param_IO.setValue(name, il, description, tags);
             break;
           }
-        case CastValue::STRING_LIST:
+        case CastValue::Type::STRING_LIST:
           {
             OpenMS::StringList sl;
             for (const std::string& s : c.sl_) {
@@ -191,7 +191,7 @@ namespace SmartPeak
             Param_IO.setValue(name, sl, description, tags);
             break;
           }
-        case CastValue::BOOL_LIST:
+        case CastValue::Type::BOOL_LIST:
           {
             OpenMS::StringList sl;
             for (const bool b : c.bl_) {
@@ -200,7 +200,7 @@ namespace SmartPeak
             Param_IO.setValue(name, sl, description, tags);
             break;
           }
-        case CastValue::UNKNOWN:
+        case CastValue::Type::UNKNOWN:
           Param_IO.setValue(name, c.s_, description, tags);
           break;
         default:
@@ -269,13 +269,13 @@ namespace SmartPeak
     std::sregex_iterator matches_begin = std::sregex_iterator(line.begin(), line.end(), re);
     std::sregex_iterator matches_end = std::sregex_iterator();
     for (std::sregex_iterator it = matches_begin; it != matches_end; ++it) {
-      if (cast.getTag() == CastValue::BOOL_LIST) {
+      if (cast.getTag() == CastValue::Type::BOOL_LIST) {
         cast.bl_.push_back(it->str()[0] == 't' || it->str()[0] == 'T');
-      } else if (cast.getTag() == CastValue::FLOAT_LIST) {
+      } else if (cast.getTag() == CastValue::Type::FLOAT_LIST) {
         cast.fl_.push_back(std::strtof(it->str().c_str(), NULL));
-      } else if (cast.getTag() == CastValue::INT_LIST) {
+      } else if (cast.getTag() == CastValue::Type::INT_LIST) {
         cast.il_.push_back(std::stoi(it->str()));
-      } else if (cast.getTag() == CastValue::STRING_LIST) {
+      } else if (cast.getTag() == CastValue::Type::STRING_LIST) {
         cast.sl_.push_back((*it)[1].str());
       } else {
         throw std::invalid_argument("unexcepted tag type");

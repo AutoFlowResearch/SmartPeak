@@ -175,23 +175,23 @@ BOOST_AUTO_TEST_CASE(getMetaValue)
   CastValue result;
 
   result = SequenceHandler::getMetaValue(feature, subordinate, "RT");
-  BOOST_CHECK_EQUAL(result.getTag(), CastValue::Type::FLOAT);
+  BOOST_CHECK_EQUAL(result.getTag() == CastValue::Type::FLOAT, true);
   BOOST_CHECK_CLOSE(result.f_, 16.0, 1e-6);
 
   result = SequenceHandler::getMetaValue(feature, subordinate, "intensity");
-  BOOST_CHECK_EQUAL(result.getTag(), CastValue::Type::FLOAT);
+  BOOST_CHECK_EQUAL(result.getTag() == CastValue::Type::FLOAT, true);
   BOOST_CHECK_CLOSE(result.f_, 1.0e4, 1e-6);
 
   result = SequenceHandler::getMetaValue(feature, subordinate, "peak_area");
-  BOOST_CHECK_EQUAL(result.getTag(), CastValue::Type::FLOAT);
+  BOOST_CHECK_EQUAL(result.getTag() == CastValue::Type::FLOAT, true);
   BOOST_CHECK_CLOSE(result.f_, 1.0e2, 1e-6);
 
   result = SequenceHandler::getMetaValue(feature, subordinate, "calculated_concentration");
-  BOOST_CHECK_EQUAL(result.getTag(), CastValue::Type::FLOAT);
+  BOOST_CHECK_EQUAL(result.getTag() == CastValue::Type::FLOAT, true);
   BOOST_CHECK_CLOSE(result.f_, 10.0, 1e-6);
 
   result = SequenceHandler::getMetaValue(feature, subordinate, "absent_meta_value");
-  BOOST_CHECK_EQUAL(result.getTag(), CastValue::Type::STRING);
+  BOOST_CHECK_EQUAL(result.getTag() == CastValue::Type::STRING, true);
   BOOST_CHECK_EQUAL(result.s_, "");
 }
 
