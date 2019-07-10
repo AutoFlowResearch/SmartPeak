@@ -86,5 +86,5 @@ test_script:
   - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\CLI.exe
   - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\GUI.exe
   - dumpbin /dependents C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Standards_test.exe
-  - ctest -j 4 -C "Debug" -V
+  - ctest -j 2 -C "Debug" -V
   - C:\projects\SmartPeak2\.circleci\run_examples.sh C:\projects\SmartPeak2\build\bin\Debug C:\cygwin64\bin\
