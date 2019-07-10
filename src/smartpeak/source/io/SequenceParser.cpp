@@ -357,6 +357,7 @@ namespace SmartPeak
 
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
+      std::map<std::string, float> validation_metrics = sampleHandler.getRawData().getValidationMetrics();
       const SampleType st = mdh.getSampleType();
       if (sample_types.count(st) == 0) {
         continue;

@@ -49,7 +49,7 @@ namespace SmartPeak
     LoadValidationData loadValidationData;
     loadValidationData.process(rawDataHandler, {}, filenames);
 
-    const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
+    const std::vector<std::map<std::string, CastValue>>& ref_data = rawDataHandler.getReferenceData();
     // load sequenceSegmentHandler files
     for (SequenceSegmentHandler& sequenceSegmentHandler: sequenceHandler_IO->getSequenceSegments()) {
       LoadQuantitationMethods loadQuantitationMethods;
