@@ -30,7 +30,8 @@ namespace SmartPeak
     const std::string& features_input_path,
     const std::string& output_path,
     const std::string& input_inj_name,
-    const std::string& output_inj_name
+    const std::string& output_inj_name,
+    const std::string& referenceData_csv_i
   )
   {
     Filenames dynamic_filenames;
@@ -44,6 +45,7 @@ namespace SmartPeak
     dynamic_filenames.features_pdf_o                   = prefix;
     dynamic_filenames.quantitationMethods_csv_o        = prefix + "_quantitationMethods.csv";
     dynamic_filenames.componentsToConcentrations_csv_o = prefix + "_componentsToConcentrations.csv";
+    dynamic_filenames.referenceData_csv_i = referenceData_csv_i;
 
     return dynamic_filenames;
   }

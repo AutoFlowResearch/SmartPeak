@@ -46,7 +46,10 @@ namespace SmartPeak
     LoadFeatureQCs loadFeatureQCs;
     loadFeatureQCs.process(rawDataHandler, {}, filenames);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
+    LoadValidationData loadValidationData;
+    loadValidationData.process(rawDataHandler, {}, filenames);
 
+    const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
     // load sequenceSegmentHandler files
     for (SequenceSegmentHandler& sequenceSegmentHandler: sequenceHandler_IO->getSequenceSegments()) {
       LoadQuantitationMethods loadQuantitationMethods;

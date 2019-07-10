@@ -379,7 +379,12 @@ namespace SmartPeak
               subordinate.getMetaValue(s_native_id).toString(),
               meta_value_name
             );
-            CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            CastValue datum;
+            if (meta_value_name == "accuracy" || meta_value_name == "n_features") {
+              datum = validation_metrics[meta_value_name];
+            } else {
+              datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            }
             if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
               columns.insert(sample_name);
