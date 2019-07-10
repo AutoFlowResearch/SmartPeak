@@ -9,33 +9,33 @@ namespace SmartPeak
     if (this == &other)
       return *this;
     switch (other.tag_) {
-      case UNKNOWN:
-      case STRING:
+      case Type::UNKNOWN:
+      case Type::STRING:
         setTagAndData(other.tag_, other.s_);
         break;
-      case UNINITIALIZED:
-      case BOOL:
+      case Type::UNINITIALIZED:
+      case Type::BOOL:
         setTagAndData(other.tag_, other.b_);
         break;
-      case FLOAT:
+      case Type::FLOAT:
         setTagAndData(other.tag_, other.f_);
         break;
-      case INT:
+      case Type::INT:
         setTagAndData(other.tag_, other.i_);
         break;
-      case LONG_INT:
+      case Type::LONG_INT:
         setTagAndData(other.tag_, other.li_);
         break;
-      case BOOL_LIST:
+      case Type::BOOL_LIST:
         setTagAndData(other.tag_, other.bl_);
         break;
-      case FLOAT_LIST:
+      case Type::FLOAT_LIST:
         setTagAndData(other.tag_, other.fl_);
         break;
-      case INT_LIST:
+      case Type::INT_LIST:
         setTagAndData(other.tag_, other.il_);
         break;
-      case STRING_LIST:
+      case Type::STRING_LIST:
         setTagAndData(other.tag_, other.sl_);
         break;
       default:
@@ -50,37 +50,37 @@ namespace SmartPeak
       return *this;
     clear();
     switch (other.tag_) {
-      case UNKNOWN:
-      case STRING:
+      case Type::UNKNOWN:
+      case Type::STRING:
         new (&s_) std::string(std::move(other.s_));
         is_clear_ = false;
         break;
-      case UNINITIALIZED:
-      case BOOL:
+      case Type::UNINITIALIZED:
+      case Type::BOOL:
         b_ = other.b_;
         break;
-      case FLOAT:
+      case Type::FLOAT:
         f_ = other.f_;
         break;
-      case INT:
+      case Type::INT:
         i_ = other.i_;
         break;
-      case LONG_INT:
+      case Type::LONG_INT:
         li_ = other.li_;
         break;
-      case BOOL_LIST:
+      case Type::BOOL_LIST:
         new (&bl_) std::vector<bool>(std::move(other.bl_));
         is_clear_ = false;
         break;
-      case FLOAT_LIST:
+      case Type::FLOAT_LIST:
         new (&fl_) std::vector<float>(std::move(other.fl_));
         is_clear_ = false;
         break;
-      case INT_LIST:
+      case Type::INT_LIST:
         new (&il_) std::vector<int>(std::move(other.il_));
         is_clear_ = false;
         break;
-      case STRING_LIST:
+      case Type::STRING_LIST:
         new (&sl_) std::vector<std::string>(std::move(other.sl_));
         is_clear_ = false;
         break;
@@ -88,7 +88,7 @@ namespace SmartPeak
         throw "Tag type not managed in move assignment operator. Implement it.";
     }
     tag_ = other.tag_;
-    other.tag_ = UNINITIALIZED;
+    other.tag_ = Type::UNINITIALIZED;
     other.is_clear_ = true;
     other.b_ = false;
     return *this;
@@ -96,61 +96,61 @@ namespace SmartPeak
 
   CastValue& CastValue::operator=(const bool data)
   {
-    setTagAndData(BOOL, data);
+    setTagAndData(Type::BOOL, data);
     return *this;
   }
 
   CastValue& CastValue::operator=(const float data)
   {
-    setTagAndData(FLOAT, data);
+    setTagAndData(Type::FLOAT, data);
     return *this;
   }
 
   CastValue& CastValue::operator=(const int data)
   {
-    setTagAndData(INT, data);
+    setTagAndData(Type::INT, data);
     return *this;
   }
 
   CastValue& CastValue::operator=(const long int data)
   {
-    setTagAndData(LONG_INT, data);
+    setTagAndData(Type::LONG_INT, data);
     return *this;
   }
 
   CastValue& CastValue::operator=(const char *data)
   {
-    setTagAndData(STRING, std::move(std::string(data)));
+    setTagAndData(Type::STRING, std::move(std::string(data)));
     return *this;
   }
 
   CastValue& CastValue::operator=(const std::string& data)
   {
-    setTagAndData(STRING, data);
+    setTagAndData(Type::STRING, data);
     return *this;
   }
 
   CastValue& CastValue::operator=(const std::vector<bool>& data)
   {
-    setTagAndData(BOOL_LIST, data);
+    setTagAndData(Type::BOOL_LIST, data);
     return *this;
   }
 
   CastValue& CastValue::operator=(const std::vector<float>& data)
   {
-    setTagAndData(FLOAT_LIST, data);
+    setTagAndData(Type::FLOAT_LIST, data);
     return *this;
   }
 
   CastValue& CastValue::operator=(const std::vector<int>& data)
   {
-    setTagAndData(INT_LIST, data);
+    setTagAndData(Type::INT_LIST, data);
     return *this;
   }
 
   CastValue& CastValue::operator=(const std::vector<std::string>& data)
   {
-    setTagAndData(STRING_LIST, data);
+    setTagAndData(Type::STRING_LIST, data);
     return *this;
   }
 
@@ -162,7 +162,7 @@ namespace SmartPeak
     }
 
     switch (tag_) {
-    case STRING:
+    case Type::STRING:
       {
         if (!case_sensitive) {
           std::string a_lowercase, b_lowercase;
@@ -174,14 +174,14 @@ namespace SmartPeak
         }
         return s_.compare(other.s_) < 0;
       }
-    case UNINITIALIZED:
-    case BOOL:
+    case Type::UNINITIALIZED:
+    case Type::BOOL:
       return b_ < other.b_;
-    case FLOAT:
+    case Type::FLOAT:
       return f_ < other.f_;
-    case INT:
+    case Type::INT:
       return i_ < other.i_;
-    case LONG_INT:
+    case Type::LONG_INT:
       return li_ < other.li_;
     default:
       LOGE << "Tag type cannot be compared";
@@ -195,20 +195,20 @@ namespace SmartPeak
       return;
 
     switch (tag_) {
-      case UNKNOWN:
-      case STRING:
+      case Type::UNKNOWN:
+      case Type::STRING:
         s_.~basic_string();
         break;
-      case BOOL_LIST:
+      case Type::BOOL_LIST:
         bl_.~vector();
         break;
-      case FLOAT_LIST:
+      case Type::FLOAT_LIST:
         fl_.~vector();
         break;
-      case INT_LIST:
+      case Type::INT_LIST:
         il_.~vector();
         break;
-      case STRING_LIST:
+      case Type::STRING_LIST:
         sl_.~vector();
         break;
       default:
