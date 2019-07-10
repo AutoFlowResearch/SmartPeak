@@ -49,7 +49,7 @@ namespace SmartPeak
         }
 
         // extract and format rt information
-        const float reference_rt = reference_data[reference_data_key]["retention_time"].f_*60;
+        const float reference_rt = reference_data[reference_data_key]["retention_time"].f_;
 
         if (0.0 == reference_rt) {
           continue;
@@ -58,7 +58,7 @@ namespace SmartPeak
         const float feature_leftWidth = static_cast<float>(feature.getMetaValue("leftWidth"));
         const float feature_rightWidth = static_cast<float>(feature.getMetaValue("rightWidth"));
         // validate the retention time
-        if (std::fabs(reference_rt - feature_rt) < Tr_window*60 ||
+        if (std::fabs(reference_rt - feature_rt) < Tr_window ||
             (reference_rt > feature_leftWidth &&
              reference_rt < feature_rightWidth)) {
           fc_pass = true;
