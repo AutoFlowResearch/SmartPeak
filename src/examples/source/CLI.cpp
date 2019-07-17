@@ -92,7 +92,9 @@ std::string mainMenuString =
   "HPLC UV Unknowns: 1 11 13 12 3 7 8 5 9\n"
   "HPLC UV Standards: 1 11 13 12 3 8 5 14 15 7 9\n"
   "GCMS SIM Unknowns: 1 11 13 12 3 7 8 5 9\n"
-  "GCMS Full Scan Unknowns: 1 11 13 12 3 8 5 14 15 7 9\n";
+  "GCMS Full Scan Unknowns: 1 11 13 12 3 8 5 14 15 7 9\n"
+  "LCMS MRM Validation - QMIP: 1 11 13 3 4 4 5 6 9\n"
+  "LCMS MRM Validation - LP: 1 11 3 5 6 9\n";
 
 std::string gettingStartedString =
   "Welcome to SmartPeak\n\n"
