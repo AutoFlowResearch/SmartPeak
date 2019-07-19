@@ -388,7 +388,7 @@ namespace SmartPeak
             );
             CastValue datum;
             if (meta_value_name == "accuracy" || meta_value_name == "n_features") {
-              datum = validation_metrics[meta_value_name];
+              datum = validation_metrics.at(meta_value_name);
             } else {
               datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
             }

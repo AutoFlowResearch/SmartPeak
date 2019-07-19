@@ -38,8 +38,7 @@ public:
       const std::string& features_input_path,
       const std::string& output_path,
       const std::string& input_inj_name,
-      const std::string& output_inj_name,
-      const std::string& referenceData_csv_i=""
+      const std::string& output_inj_name
     );
 
     void clear();
