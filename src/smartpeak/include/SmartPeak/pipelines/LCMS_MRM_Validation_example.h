@@ -37,8 +37,7 @@ void example_LCMS_MRM_Validation(
       dir_I + "/features/",
       dir_I + "/features/",
       injection.getMetaData().getSampleName(),
-      key,
-      static_filenames.referenceData_csv_i
+      key
     );
   }
 
