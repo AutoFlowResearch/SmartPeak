@@ -303,6 +303,7 @@ namespace SmartPeak
       if (ImGui::MenuItem("Sequence")) {}
       if (ImGui::MenuItem("Transitions")) {}
       if (ImGui::MenuItem("Parameters")) {}
+      if (ImGui::MenuItem("Reference data")) {}
       if (ImGui::MenuItem("Quant Method")) {}
       if (ImGui::MenuItem("Standards Conc")) {}
       if (ImGui::MenuItem("Comp Filters")) {}

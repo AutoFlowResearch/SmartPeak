@@ -448,12 +448,13 @@ void menuImportFile()
     "[1] Sequence\n"
     "[2] TraML\n"
     "[3] Quantitation methods\n"
-    "[4] Standards concentrations\n"
-    "[5] Component filters\n"
-    "[6] Component group filters\n"
-    "[7] Component QCs\n"
-    "[8] Component group QCs\n"
-    "[9] Parameters\n"
+    "[4] Reference data\n"
+    "[5] Standards concentrations\n"
+    "[6] Component filters\n"
+    "[7] Component group filters\n"
+    "[8] Component QCs\n"
+    "[9] Component group QCs\n"
+    "[10] Parameters\n"
     "[M] Main menu\n\n";
 
   std::string in;
@@ -483,13 +484,19 @@ menuImportFile_label:
   }
   else if ("4" == in) {
     const std::string pathname = getPathnameFromInput();
+    state.static_filenames_.referenceData_csv_i = pathname;
+    LoadValidationData loadValidationData;
+    loadValidationData.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
+  }
+  else if ("5" == in) {
+    const std::string pathname = getPathnameFromInput();
     state.static_filenames_.standardsConcentrations_csv_i = pathname;
     for (SequenceSegmentHandler& sequenceSegmentHandler : state.sequenceHandler_.getSequenceSegments()) {
       LoadStandardsConcentrations loadStandardsConcentrations;
       loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, state.static_filenames_);
     }
   }
-  else if ("5" == in) {
+  else if ("6" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureFilterComponents_csv_i = pathname;
     LoadFeatureFilters loadFeatureFilters;
@@ -498,7 +505,7 @@ menuImportFile_label:
     loadFeatureFilters.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
     state.static_filenames_.featureFilterComponentGroups_csv_i = backup;
   }
-  else if ("6" == in) {
+  else if ("7" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureFilterComponentGroups_csv_i = pathname;
     LoadFeatureFilters loadFeatureFilters;
@@ -507,7 +514,7 @@ menuImportFile_label:
     loadFeatureFilters.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
     state.static_filenames_.featureFilterComponents_csv_i = backup;
   }
-  else if ("7" == in) {
+  else if ("8" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureQCComponents_csv_i = pathname;
     LoadFeatureQCs loadFeatureQCs;
@@ -516,7 +523,7 @@ menuImportFile_label:
     loadFeatureQCs.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
     state.static_filenames_.featureQCComponentGroups_csv_i = backup;
   }
-  else if ("8" == in) {
+  else if ("9" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureQCComponentGroups_csv_i = pathname;
     LoadFeatureQCs loadFeatureQCs;
@@ -525,7 +532,7 @@ menuImportFile_label:
     loadFeatureQCs.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
     state.static_filenames_.featureQCComponents_csv_i = backup;
   }
-  else if ("9" == in) {
+  else if ("10" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.parameters_csv_i = pathname;
     LoadParameters loadParameters;
