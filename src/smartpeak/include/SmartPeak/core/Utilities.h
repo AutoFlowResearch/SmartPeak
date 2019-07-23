@@ -108,6 +108,7 @@ public:
         {"accuracy", accuracy},
         {"recall", recall},
         {"precision", precision},
+        {"n_features", y_true.size()},
       };
     }
 

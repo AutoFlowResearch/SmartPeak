@@ -14,6 +14,13 @@
 
 #include <plog/Log.h>
 
+// required for strptime on Windows
+#ifdef _WIN32
+#include <time.h>
+#include <iomanip>
+#include <sstream>
+#endif
+
 namespace SmartPeak
 {
   void SequenceParser::readSequenceFile(
@@ -190,8 +197,7 @@ namespace SmartPeak
       }
 
       std::tm& adt = t.acquisition_date_and_time;
-      std::istringstream iss(t_date);
-      iss >> adt.tm_mday >> adt.tm_mon >> adt.tm_year >> adt.tm_hour >> adt.tm_min >> adt.tm_sec;
+      strptime(t_date.c_str(), "%m-%d-%Y %H:%M", &adt);
 
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
     }
@@ -357,6 +363,7 @@ namespace SmartPeak
 
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
+      std::map<std::string, float> validation_metrics = sampleHandler.getRawData().getValidationMetrics();
       const SampleType st = mdh.getSampleType();
       if (sample_types.count(st) == 0) {
         continue;
@@ -379,7 +386,12 @@ namespace SmartPeak
               subordinate.getMetaValue(s_native_id).toString(),
               meta_value_name
             );
-            CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            CastValue datum;
+            if (meta_value_name == "accuracy" || meta_value_name == "n_features") {
+              datum = validation_metrics.at(meta_value_name);
+            } else {
+              datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            }
             if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
               columns.insert(sample_name);

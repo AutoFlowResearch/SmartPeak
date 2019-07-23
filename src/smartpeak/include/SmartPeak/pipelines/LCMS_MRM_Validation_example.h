@@ -49,7 +49,7 @@ void example_LCMS_MRM_Validation(
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,
     static_filenames.pivotTable_csv_o,
-    {FeatureMetadata::calculated_concentration},
+    {FeatureMetadata::accuracy, FeatureMetadata::n_features},
     {SampleType::Unknown}
   );
 

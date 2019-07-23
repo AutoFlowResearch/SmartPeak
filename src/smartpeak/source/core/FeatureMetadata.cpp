@@ -23,6 +23,8 @@ namespace SmartPeak {
     { FeatureMetadata::width_at_50_peak_height,     "width_at_50"                 },
     { FeatureMetadata::retention_time,              "RT"                          },
     { FeatureMetadata::integration_left_boundary,   "leftWidth"                   },
-    { FeatureMetadata::integration_right_boundary,  "rightWidth"                  }
+    { FeatureMetadata::integration_right_boundary,  "rightWidth"                  },
+    { FeatureMetadata::accuracy,                    "accuracy"                    },
+    { FeatureMetadata::n_features,                  "n_features"                  }
   };
 }

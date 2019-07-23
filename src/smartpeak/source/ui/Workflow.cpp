@@ -31,7 +31,9 @@ namespace SmartPeak
         "HPLC UV Unknowns",
         "HPLC UV Standards",
         "GCMS SIM Unknowns",
-        "GCMS Full Scan Unknowns"
+        "GCMS Full Scan Unknowns",
+        "LCMS MRM Validation - QMIP",
+        "LCMS MRM Validation - LP"
       };
       for (const char* s : presets)
       {
@@ -51,6 +53,10 @@ namespace SmartPeak
             ids = "1 11 13 12 3 7 8 5 9";
           if (std::string(s) == "GCMS Full Scan Unknowns")
             ids = "1 11 13 12 3 8 5 14 15 7 9";
+          if (std::string(s) == "LCMS MRM Validation - LP")
+            ids = "1 11 13 3 4 4 5 6 9";
+          if (std::string(s) == "LCMS MRM Validation - QMIP")
+            ids = "1 11 3 5 6 9";
           commands_ = buildCommandsFromIds(ids);
           LOGI << "Local workflow has been replaced";
         }
