@@ -1,0 +1,1 @@
+curl -i -X DELETE -H 'Authorization: Bearer v2.mspgd928ui127bxhtqrq' https://ci.appveyor.com/api/projects/dmccloskey/smartpeak2/buildcache
