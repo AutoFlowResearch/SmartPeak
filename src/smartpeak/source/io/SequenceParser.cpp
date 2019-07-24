@@ -14,13 +14,6 @@
 
 #include <plog/Log.h>
 
-// required for strptime on Windows
-#ifdef _WIN32
-#include <time.h>
-#include <iomanip>
-#include <sstream>
-#endif
-
 namespace SmartPeak
 {
   void SequenceParser::readSequenceFile(
@@ -197,7 +190,8 @@ namespace SmartPeak
       }
 
       std::tm& adt = t.acquisition_date_and_time;
-      strptime(t_date.c_str(), "%m-%d-%Y %H:%M", &adt);
+      std::istringstream iss(t_date);
+      iss >> adt.tm_mon >> adt.tm_mday >> adt.tm_year >> adt.tm_hour >> adt.tm_min;
 
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
     }
