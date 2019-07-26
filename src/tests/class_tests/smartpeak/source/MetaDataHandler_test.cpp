@@ -16,12 +16,6 @@ BOOST_AUTO_TEST_CASE(constructor)
   MetaDataHandler* nullPointer = nullptr;
   ptr = new MetaDataHandler();
   BOOST_CHECK_NE(ptr, nullPointer);
-}
-
-BOOST_AUTO_TEST_CASE(destructor)
-{
-  MetaDataHandler* ptr = nullptr;
-  ptr = new MetaDataHandler();
   delete ptr;
 }
 

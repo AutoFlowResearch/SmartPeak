@@ -24,11 +24,13 @@ namespace SmartPeak {
     width_at_50_peak_height,
     retention_time,
     integration_left_boundary,
-    integration_right_boundary
+    integration_right_boundary,
+    accuracy,
+    n_features
   };
 
   // Returns the string representation that a FeatureMetadata would have in OpenMS
   extern const std::map<FeatureMetadata, std::string> metadataToString;
 
-  constexpr size_t FeatureMetadataSize { 20 };
+  constexpr size_t FeatureMetadataSize { 22 };
 }

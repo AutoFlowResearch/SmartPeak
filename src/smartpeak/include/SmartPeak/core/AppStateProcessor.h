@@ -19,9 +19,9 @@ namespace SmartPeak
 
     // Each of the derived classes implement one of the following virtual methods
     virtual void operator()(const std::vector<AppState::Command>& commands) {}
-    virtual bool operator()(const int n, AppState::Command& cmd) {}
+    virtual bool operator()(const int n, AppState::Command& cmd) { return false; }
     virtual void operator()(const char* const pathname) {}
-    virtual std::vector<AppState::Command> operator()(const std::string& ids) {}
+    virtual std::vector<AppState::Command> operator()(const std::string& ids) { return std::vector<AppState::Command>(); }
 
     AppState& state_;
 

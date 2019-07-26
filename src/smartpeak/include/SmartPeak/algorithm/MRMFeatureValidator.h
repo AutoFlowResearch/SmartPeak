@@ -19,6 +19,9 @@ public:
 
     /**
       Map reference data to FeatureMap.
+      Please note that in order to align the retention times properly the units
+      should match in the featureMap, reference data and the Tr_window parameter.
+      The default units for OpenMS are seconds.
 
       @note Potential code optimizations:
       - identify True Negatives and False Negatives (can be problematic due to
@@ -30,7 +33,7 @@ public:
       @param[in] injection_name Injection name
       @param[out] output_validated Validated features
       @param[out] validation_metrics Validation metrics
-      @param[in] Tr_window Retention time difference threshold
+      @param[in] Tr_window Retention time difference threshold (in seconds)
     */
     static void validate_MRMFeatures(
       const std::vector<std::map<std::string, CastValue>>& reference_data_v,

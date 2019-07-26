@@ -134,6 +134,8 @@ BOOST_AUTO_TEST_CASE(processSequence)
     );
   }
 
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), dynamic_filenames.size());
+
   ProcessSequence ps(sequenceHandler);
   ps.filenames                     = dynamic_filenames;
   ps.raw_data_processing_methods_I = raw_data_processing_methods;

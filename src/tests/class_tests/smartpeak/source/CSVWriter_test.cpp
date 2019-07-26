@@ -22,10 +22,6 @@ BOOST_AUTO_TEST_CASE(constructor)
 {
   ptr = new CSVWriter();
   BOOST_CHECK_NE(ptr, nullPointer);
-}
-
-BOOST_AUTO_TEST_CASE(destructor)
-{
   delete ptr;
 }
 

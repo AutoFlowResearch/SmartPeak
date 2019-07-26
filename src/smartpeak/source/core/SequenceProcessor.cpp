@@ -46,6 +46,8 @@ namespace SmartPeak
     LoadFeatureQCs loadFeatureQCs;
     loadFeatureQCs.process(rawDataHandler, {}, filenames);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
+    LoadValidationData loadValidationData;
+    loadValidationData.process(rawDataHandler, {}, filenames);
 
     // load sequenceSegmentHandler files
     for (SequenceSegmentHandler& sequenceSegmentHandler: sequenceHandler_IO->getSequenceSegments()) {

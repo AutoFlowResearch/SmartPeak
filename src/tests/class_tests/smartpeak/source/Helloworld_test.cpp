@@ -15,12 +15,6 @@ BOOST_AUTO_TEST_CASE(constructor)
   Helloworld* nullPointer = nullptr;
   ptr = new Helloworld();
   BOOST_CHECK_NE(ptr, nullPointer);
-}
-
-BOOST_AUTO_TEST_CASE(destructor) 
-{
-  Helloworld* ptr = nullptr;
-  ptr = new Helloworld();
   delete ptr;
 }
 

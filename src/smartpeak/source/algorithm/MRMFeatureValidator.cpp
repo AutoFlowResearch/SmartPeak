@@ -30,6 +30,11 @@ namespace SmartPeak
     for (const OpenMS::Feature& feature : features) {
       std::vector<OpenMS::Feature> subordinates_tmp;
       for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
+	      if (subordinate.metaValueExists("used_")) {
+          const std::string used = subordinate.getMetaValue("used_").toString();
+            if (used.empty() || used[0] == 'f' || used[0] == 'F')
+              continue;
+        }
         bool fc_pass = false;
         if (!subordinate.metaValueExists("native_id")) {
           throw "native_id info is missing.";

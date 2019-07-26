@@ -12,7 +12,7 @@ namespace SmartPeak
   class CastValue
   {
   public:
-    enum Type {
+    enum class Type {
       UNINITIALIZED,
       UNKNOWN,
       BOOL,
@@ -38,19 +38,19 @@ namespace SmartPeak
       std::vector<std::string> sl_;
     };
 
-    CastValue() : b_(false), tag_(UNINITIALIZED), is_clear_(true) {}
-    CastValue(const std::string& s) : s_(s), tag_(STRING), is_clear_(false) {}
-    CastValue(const char *s) : s_(s), tag_(STRING), is_clear_(false) {}
-    CastValue(const float f) : f_(f), tag_(FLOAT), is_clear_(true) {}
-    CastValue(const int i) : i_(i), tag_(INT), is_clear_(true) {}
-    CastValue(const long int li) : li_(li), tag_(LONG_INT), is_clear_(true) {}
+    CastValue() : b_(false), tag_(Type::UNINITIALIZED), is_clear_(true) {}
+    CastValue(const std::string& s) : s_(s), tag_(Type::STRING), is_clear_(false) {}
+    CastValue(const char *s) : s_(s), tag_(Type::STRING), is_clear_(false) {}
+    CastValue(const float f) : f_(f), tag_(Type::FLOAT), is_clear_(true) {}
+    CastValue(const int i) : i_(i), tag_(Type::INT), is_clear_(true) {}
+    CastValue(const long int li) : li_(li), tag_(Type::LONG_INT), is_clear_(true) {}
 
-    CastValue(const CastValue& other) : b_(false), tag_(UNINITIALIZED), is_clear_(true)
+    CastValue(const CastValue& other) : b_(false), tag_(Type::UNINITIALIZED), is_clear_(true)
     {
       *this = other;
     }
 
-    CastValue(CastValue&& other) : b_(false), tag_(UNINITIALIZED), is_clear_(true)
+    CastValue(CastValue&& other) : b_(false), tag_(Type::UNINITIALIZED), is_clear_(true)
     {
       *this = std::move(other);
     }
@@ -97,22 +97,23 @@ namespace SmartPeak
 
     friend std::ostream& operator<<(std::ostream& os, const CastValue& cv)
     {
-      switch (cv.getTag()) {
-        case cv.UNKNOWN:
-        case cv.STRING:
+      const CastValue::Type tag = cv.getTag();
+      switch (tag) {
+        case CastValue::Type::UNKNOWN:
+        case CastValue::Type::STRING:
           os << cv.s_;
           break;
-        case cv.UNINITIALIZED:
-        case cv.BOOL:
+        case CastValue::Type::UNINITIALIZED:
+        case CastValue::Type::BOOL:
           os << cv.b_;
           break;
-        case cv.FLOAT:
+        case CastValue::Type::FLOAT:
           os << cv.f_;
           break;
-        case cv.INT:
+        case CastValue::Type::INT:
           os << cv.i_;
           break;
-        case cv.LONG_INT:
+        case CastValue::Type::LONG_INT:
           os << cv.li_;
           break;
         default:

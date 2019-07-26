@@ -15,22 +15,22 @@ BOOST_AUTO_TEST_CASE(castString)
 {
   CastValue c;
   Utilities::castString(string("19"), string("iNT"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::INT);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::INT, true);
   BOOST_CHECK_EQUAL(c.i_, 19);
   Utilities::castString(string("tRuE"), string("bOOl"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::BOOL);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::BOOL, true);
   BOOST_CHECK_EQUAL(c.b_, true);
   Utilities::castString(string("False"), string("STRing"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::BOOL);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::BOOL, true);
   BOOST_CHECK_EQUAL(c.b_, false);
   Utilities::castString(string("hello"), string("stRIng"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::STRING);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::STRING, true);
   BOOST_CHECK_EQUAL(c.s_, "hello");
   Utilities::castString(string("world"), string("String"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::STRING);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::STRING, true);
   BOOST_CHECK_EQUAL(c.s_, "world");
   Utilities::castString(string("35.35"), string("float"), c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::FLOAT);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::FLOAT, true);
   BOOST_CHECK_CLOSE(c.f_, (float)35.35, 1e-6);
 }
 
@@ -153,49 +153,49 @@ BOOST_AUTO_TEST_CASE(parseString)
   CastValue c;
 
   Utilities::parseString("", c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::STRING);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::STRING, true);
   BOOST_CHECK_EQUAL(c.s_, "");
 
   Utilities::parseString(" foo ", c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::STRING);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::STRING, true);
   BOOST_CHECK_EQUAL(c.s_, "foo");
 
   Utilities::parseString("   34  ", c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::INT);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::INT, true);
   BOOST_CHECK_EQUAL(c.i_, 34);
 
   Utilities::parseString(" 7.7  ", c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::FLOAT);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::FLOAT, true);
   BOOST_CHECK_CLOSE(c.f_, (float)7.7, 1e-6);
 
   Utilities::parseString("  false", c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::BOOL);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::BOOL, true);
   BOOST_CHECK_EQUAL(c.b_, false);
 
   Utilities::parseString("true   ", c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::BOOL);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::BOOL, true);
   BOOST_CHECK_EQUAL(c.b_, true);
 
   Utilities::parseString("[ 1,   2,    3 ]", c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::INT_LIST);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::INT_LIST, true);
   BOOST_CHECK_EQUAL(c.il_[0], 1);
   BOOST_CHECK_EQUAL(c.il_[1], 2);
   BOOST_CHECK_EQUAL(c.il_[2], 3);
 
   Utilities::parseString("[   1 ,  2.2  ,     3.3]", c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::FLOAT_LIST);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::FLOAT_LIST, true);
   BOOST_CHECK_CLOSE(c.fl_[0], (float)1, 1e-6);
   BOOST_CHECK_CLOSE(c.fl_[1], (float)2.2, 1e-6);
   BOOST_CHECK_CLOSE(c.fl_[2], (float)3.3, 1e-6);
 
   Utilities::parseString("[   false ,  false  ,     true]", c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::BOOL_LIST);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::BOOL_LIST, true);
   BOOST_CHECK_EQUAL(c.bl_[0], false);
   BOOST_CHECK_EQUAL(c.bl_[1], false);
   BOOST_CHECK_EQUAL(c.bl_[2], true);
 
   Utilities::parseString("[   \"first string\" ,  \"second string\"  ,     \"third string\"]", c);
-  BOOST_CHECK_EQUAL(c.getTag(), CastValue::STRING_LIST);
+  BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::STRING_LIST, true);
   BOOST_CHECK_EQUAL(c.sl_[0], "first string");
   BOOST_CHECK_EQUAL(c.sl_[1], "second string");
   BOOST_CHECK_EQUAL(c.sl_[2], "third string");
@@ -394,11 +394,11 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
   BOOST_CHECK_EQUAL(c[3].size(), 35);
 
   BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x.featureXML");
-#ifdef _WIN32
-  BOOST_CHECK_EQUAL(c[1][0], "774620"); // file size
-#else
+// #ifdef _WIN32
+//   BOOST_CHECK_EQUAL(c[1][0], "774620"); // file size
+// #else
   BOOST_CHECK_EQUAL(c[1][0], "761937"); // file size
-#endif
+// #endif
   BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
 
   BOOST_CHECK_EQUAL(c[0][34], "workflow_csv_files");
@@ -411,7 +411,7 @@ BOOST_AUTO_TEST_CASE(getParentPathname)
 #ifdef _WIN32
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D://///"), "D:/");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:\\"), "D:");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:/"), "D:/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:/"), "D:");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:"), "");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs"), "E:/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPathname("E://home///user//docs"), "E://home///user");

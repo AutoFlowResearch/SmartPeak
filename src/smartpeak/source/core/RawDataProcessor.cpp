@@ -767,7 +767,7 @@ namespace SmartPeak
     float height;
     float area;
 
-    std::vector<std::map<std::string, CastValue>> reference_data;
+    std::vector<std::map<std::string, CastValue>>& reference_data = rawDataHandler_IO.getReferenceData();
 
     while (in.read_row(
       sample_index,
