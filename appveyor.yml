@@ -7,12 +7,14 @@ environment:
   APPVEYOR_SAVE_CACHE_ON_ERROR: true
   BOOST_TEST_DETECT_MEMORY_LEAK: 0
   CLCACHE_DIR: C:\projects\clcache
+  CLCACHE_HARDLINK: 1
+  CLCACHE_SERVER: 1
 
 # scripts that are called at very beginning, before repo cloning
 init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - PATH=C:\Python37-x64;C:\Python37-x64\Scripts;C:\projects\clcache\install;C:\projects\OpenMS-build\bin\Debug;C:\Qt\5.12.2\msvc2017_64\bin;C:\projects\deps\SDL2-2.0.9\lib\x64;%PATH%
+  - PATH=C:\Python37-x64;C:\Python37-x64\Scripts;C:\projects\clcache\install\bin;C:\projects\OpenMS-build\bin\Debug;C:\Qt\5.12.2\msvc2017_64\bin;C:\projects\deps\SDL2-2.0.9\lib\x64;%PATH%
   - set PYTHONPATH=C:\projects\clcache\install
   - cmake --version
   - pip3 --version
@@ -33,6 +35,9 @@ artifacts:
 
 before_build:
   - if not exist "C:\projects\clcache\install" mkdir C:\projects\clcache\install & pip3 install --target=C:\projects\clcache\install clcache
+  - ps: $Clcacheserver = Start-Process clcache-server -PassThru
+  - ps: fsutil behavior set disablelastaccess 0 # Enable Access time feature on Windows (for clcache)
+  - clcache -M 2147483648 & clcache -s
   - if not exist "C:\projects\deps" call "C:\projects\SmartPeak2\ci\prepare_deps.bat"
   - if not exist "C:\projects\OpenMS" git clone --depth=1 --branch chore/replace_boost_regex https://github.com/biosustain/OpenMS.git C:\projects\OpenMS
   - if not exist "C:\projects\OpenMS-build" call "C:\projects\SmartPeak2\ci\build_openms.bat"
@@ -40,9 +45,14 @@ before_build:
 
 build_script:
   - cd C:\projects\SmartPeak2\build
-  - msbuild SmartPeak_host.sln /verbosity:normal /maxcpucount /p:CLToolExe=clcache.exe /p:CLToolPath=C:\projects\clcache\install\bin
+  - msbuild SmartPeak_host.sln /verbosity:normal /maxcpucount /p:TrackFileAccess=false /p:CLToolExe=clcache.exe /p:CLToolPath=C:\projects\clcache\install\bin
+
+after_build:
+  - ps: fsutil behavior set disablelastaccess 1 # Disable Access time feature on Windows (better performance)
+  - ps: Stop-Process -Id $Clcacheserver.Id
+  - clcache -s & clcache -z
 
 test_script:
   - cd C:\projects\SmartPeak2\build
-  - ctest -C "Debug" -V
+  - ctest -C "Debug" -V -j2
   - C:\projects\SmartPeak2\.circleci\run_examples.sh C:\projects\SmartPeak2\build\bin\Debug C:\cygwin64\bin\
