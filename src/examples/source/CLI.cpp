@@ -3,6 +3,7 @@
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <plog/Log.h>
@@ -62,42 +63,19 @@ void initializeDataDir(
   const std::string& default_dir
 );
 
-std::string commandsString =
-  "[" + std::to_string(AppState::OPT_LOAD_RAW_DATA) + "]  Load raw data\n"
-  "[" + std::to_string(AppState::OPT_LOAD_FEATURES) + "]  Load features\n"
-  "[" + std::to_string(AppState::OPT_PICK_FEATURES) + "]  Pick features\n"
-  "[" + std::to_string(AppState::OPT_FILTER_FEATURES) + "]  Filter features\n"
-  "[" + std::to_string(AppState::OPT_SELECT_FEATURES) + "]  Select features\n"
-  "[" + std::to_string(AppState::OPT_VALIDATE_FEATURES) + "]  Validate features\n"
-  "[" + std::to_string(AppState::OPT_QUANTIFY_FEATURES) + "]  Quantify features\n"
-  "[" + std::to_string(AppState::OPT_CHECK_FEATURES) + "]  Check features\n"
-  "[" + std::to_string(AppState::OPT_STORE_FEATURES) + "]  Store features\n"
-  "[" + std::to_string(AppState::OPT_PLOT_FEATURES) + "] Plot features (not implemented)\n"
-  "[" + std::to_string(AppState::OPT_MAP_CHROMATROGRAMS) + "] Map transitions to the raw data\n"
-  "[" + std::to_string(AppState::OPT_ZERO_CHROMATOGRAM_BASELINE) + "] Zero the chromatogram baseline\n"
-  "[" + std::to_string(AppState::OPT_EXTRACT_CHROMATOGRAM_WIDOWS) + "] Extract chromatogram windows\n"
-  "[" + std::to_string(AppState::OPT_CALCULATE_CALIBRATION) + "] Calculate calibration\n"
-  "[" + std::to_string(AppState::OPT_STORE_QUANTITATION_METHODS) + "] Store quantitation methods\n"
-  "[" + std::to_string(AppState::OPT_LOAD_QUANTITATION_METHODS) + "] Load quantitation methods\n";
+std::string getCommandsString()
+{
+  std::string s;
+  for (const auto& p : n_to_raw_data_method_) {
+    s.append("[" + std::to_string(p.first) + "] " + p.second->getName() + "\n");
+  }
+  for (const auto& p : n_to_seq_seg_method_) {
+    s.append("[" + std::to_string(p.first) + "] " + p.second->getName() + "\n");
+  }
+  return s;
+}
 
-std::string mainMenuString =
-  "\n"
-  "Please insert the sequence of methods to run.\n"
-  "You can choose the same method multiple times.\n"
-  "Separate chosen methods with a space.\n\n"
-  + commandsString +
-  "[M]  Main menu\n\n"
-  "Presets:\n"
-  "LCMS MRM Unknowns: 1 11 3 7 8 5 9\n"
-  "LCMS MRM Standards: 1 11 3 8 5 14 15 7 9\n"
-  "HPLC UV Unknowns: 1 11 13 12 3 7 8 5 9\n"
-  "HPLC UV Standards: 1 11 13 12 3 8 5 14 15 7 9\n"
-  "GCMS SIM Unknowns: 1 11 13 12 3 7 8 5 9\n"
-  "GCMS Full Scan Unknowns: 1 11 13 12 3 8 5 14 15 7 9\n"
-  "LCMS MRM Validation - LP: 1 11 13 3 4 4 5 6 9\n"
-  "LCMS MRM Validation - QMIP: 1 11 3 5 6 9\n";
-
-std::string gettingStartedString =
+const std::string gettingStartedString =
   "Welcome to SmartPeak\n\n"
 
   "Load an existing session from a sequence file\n"
@@ -142,7 +120,21 @@ std::vector<AppState::Command> getMethodsInput()
 {
   std::vector<AppState::Command> methods;
 
-  LOGN << mainMenuString;
+  LOGN << "\n"
+    "Please insert the sequence of methods to run.\n"
+    "You can choose the same method multiple times.\n"
+    "Separate chosen methods with a space.\n\n"
+    + getCommandsString() +
+    "[M] Main menu\n\n"
+    "Presets:\n"
+    "LCMS MRM Unknowns: 1 11 3 7 8 5 9\n"
+    "LCMS MRM Standards: 1 11 3 8 5 14 15 7 9\n"
+    "HPLC UV Unknowns: 1 11 13 12 3 7 8 5 9\n"
+    "HPLC UV Standards: 1 11 13 12 3 8 5 14 15 7 9\n"
+    "GCMS SIM Unknowns: 1 11 13 12 3 7 8 5 9\n"
+    "GCMS Full Scan Unknowns: 1 11 13 12 3 8 5 14 15 7 9\n"
+    "LCMS MRM Validation - LP: 1 11 13 3 4 4 5 6 9\n"
+    "LCMS MRM Validation - QMIP: 1 11 3 5 6 9\n";
 
   const std::string line = getLineInput("> ", false);
 
@@ -618,7 +610,7 @@ menuActions_label:
   if      ("1" == in) {
     initializeDataDirs();
 
-    LOGN << "\n\n" << commandsString;
+    LOGN << "\n\n" << getCommandsString();
 
     const std::string input = getLineInput("> ");
     try {
@@ -855,8 +847,8 @@ std::string getPipelineString()
     if (cmd.type == AppState::Command::RawDataMethod) {
       const std::map<int, std::shared_ptr<RawDataProcessor>>::const_iterator
       it = std::find_if(
-        state.n_to_raw_data_method_.cbegin(),
-        state.n_to_raw_data_method_.cend(),
+        n_to_raw_data_method_.cbegin(),
+        n_to_raw_data_method_.cend(),
         [&cmd](const std::pair<int, std::shared_ptr<RawDataProcessor>>& p)
           { return p.second == cmd.raw_data_method; }
       );
@@ -864,8 +856,8 @@ std::string getPipelineString()
     } else if (cmd.type == AppState::Command::SequenceSegmentMethod) {
       const std::map<int, std::shared_ptr<SequenceSegmentProcessor>>::const_iterator
       it = std::find_if(
-        state.n_to_seq_seg_method_.cbegin(),
-        state.n_to_seq_seg_method_.cend(),
+        n_to_seq_seg_method_.cbegin(),
+        n_to_seq_seg_method_.cend(),
         [&cmd](const std::pair<int, std::shared_ptr<SequenceSegmentProcessor>>& p)
           { return p.second == cmd.seq_seg_method; }
       );

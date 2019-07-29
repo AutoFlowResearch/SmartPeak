@@ -10,7 +10,7 @@ namespace SmartPeak {
     /**
     * Append the passed state in a vector and run a list of commands on it
     */
-    void addWorkflow(AppState state);
+    void addWorkflow(AppState& source_state);
 
     const std::vector<char>& getWorkflowsStatus() const;
 
@@ -18,10 +18,9 @@ namespace SmartPeak {
     /**
     * Spawn a new thread that runs the workflow, and wait for it to finish
     */
-    static void run_and_join(AppState& state, char& done);
+    static void run_and_join(AppState& state, char& done, AppState& source_state);
 
     std::vector<AppState> states_;
     std::vector<char> done_;
-    std::mutex mutex_;
   };
 }

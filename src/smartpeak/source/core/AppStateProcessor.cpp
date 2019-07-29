@@ -17,6 +17,7 @@
 #include <vector>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
+#include <SmartPeak/core/SharedProcessors.h>
 
 namespace SmartPeak
 {
@@ -274,7 +275,7 @@ namespace SmartPeak
       return false;
     }
     if (n >= 1 && n <= 13) {
-      cmd.setMethod(state_.n_to_raw_data_method_.at(n));
+      cmd.setMethod(n_to_raw_data_method_.at(n));
       for (const InjectionHandler& injection : state_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
         cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
@@ -286,7 +287,7 @@ namespace SmartPeak
         );
       }
     } else if (n >= 14 && n <= 16) {
-      cmd.setMethod(state_.n_to_seq_seg_method_.at(n));
+      cmd.setMethod(n_to_seq_seg_method_.at(n));
       for (const SequenceSegmentHandler& sequence_segment : state_.sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();
         cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(

@@ -43,7 +43,7 @@ namespace SmartPeak
     // Since this function is called once every N minutes, the cost of the copy
     // can be ignored.
     void processCommands(AppState& state, std::vector<AppState::Command> commands);
-  };
+  }
 
   struct CreateCommand : AppStateProcessor {
     CreateCommand(AppState& state) : AppStateProcessor(state) {}
