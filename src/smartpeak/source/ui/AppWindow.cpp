@@ -41,6 +41,8 @@ namespace SmartPeak
     // Help
     static bool show_app_about_ = false;
 
+    workflow_is_done_ = manager_.isWorkflowDone();
+
     if (file_picker_.show_file_picker_)
     {
       file_picker_.draw();
@@ -271,34 +273,33 @@ namespace SmartPeak
   void AppWindow::showMenuFile()
   {
     ImGui::MenuItem("Session", NULL, false, false);
-    if (ImGui::MenuItem("New Session"))
+    if (ImGui::MenuItem("New Session", NULL, false, false))
     {
       //TODO: SQL light interface
     }
-
-    if (ImGui::MenuItem("Load Session", "Ctrl+O"))
+    if (ImGui::MenuItem("Load Session", "Ctrl+O", false, false))
     {
       //TODO: open file browser modal
       // ImGui::OpenPopup("Delete?");
     }
 
-    if (ImGui::MenuItem("Load session from sequence")) {
+    if (ImGui::MenuItem("Load session from sequence", NULL, false, workflow_is_done_)) {
       static LoadSessionFromSequence processor(state_);
       file_picker_.setProcessor(processor);
       file_picker_.show_file_picker_ = true;
     }
 
-    if (ImGui::MenuItem("Save Session", "Ctrl+S"))
+    if (ImGui::MenuItem("Save Session", "Ctrl+S", false, false))
     {
       //TODO
     }
-    if (ImGui::MenuItem("Save Session As..."))
+    if (ImGui::MenuItem("Save Session As...", NULL, false, false))
     {
       //TODO: open save as File browser modal
     }
     ImGui::Separator();
     ImGui::MenuItem("Text file", NULL, false, false);
-    if (ImGui::BeginMenu("Import File"))
+    if (ImGui::BeginMenu("Import File", false))
     {
       if (ImGui::MenuItem("Sequence")) {}
       if (ImGui::MenuItem("Transitions")) {}
@@ -312,7 +313,7 @@ namespace SmartPeak
       if (ImGui::MenuItem("Comp Group QCs")) {}
       ImGui::EndMenu();
     }
-    if (ImGui::BeginMenu("Export File"))
+    if (ImGui::BeginMenu("Export File", false))
     {
       if (ImGui::MenuItem("Sequence")) {}
       if (ImGui::MenuItem("Transitions")) {}
@@ -332,15 +333,15 @@ namespace SmartPeak
 
   void AppWindow::showMenuEdit() {
     ImGui::MenuItem("Session", NULL, false, false);
-    if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+    if (ImGui::MenuItem("Undo", "CTRL+Z", false, false)) {}
     if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
     ImGui::Separator();
     ImGui::MenuItem("Settings", NULL, false, false);
-    if (ImGui::MenuItem("Tables")) {} // TODO: modal of settings 
-    if (ImGui::MenuItem("Plots")) {} // TODO: modal of settings 
-    if (ImGui::MenuItem("Explorer")) {} // TODO: modal of settings 
-    if (ImGui::MenuItem("Search")) {} // TODO: modal of settings 
-    if (ImGui::MenuItem("Workflow"))
+    if (ImGui::MenuItem("Tables", NULL, false, false)) {} // TODO: modal of settings 
+    if (ImGui::MenuItem("Plots", NULL, false, false)) {} // TODO: modal of settings 
+    if (ImGui::MenuItem("Explorer", NULL, false, false)) {} // TODO: modal of settings 
+    if (ImGui::MenuItem("Search", NULL, false, false)) {} // TODO: modal of settings 
+    if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_))
     {
       initializeDataDirs(state_);
       workflow_.draw_ = true;
@@ -406,12 +407,12 @@ namespace SmartPeak
   }
 
   void AppWindow::showMenuAction() {
-    if (ImGui::MenuItem("Run command"))
+    if (ImGui::MenuItem("Run command", NULL, false, workflow_is_done_))
     {
       initializeDataDirs(state_);
       // do the rest
     }
-    if (ImGui::MenuItem("Run workflow"))
+    if (ImGui::MenuItem("Run workflow", NULL, false, workflow_is_done_))
     {
       if (state_.commands_.size()) // ensures that workflow's steps have been set
       {
@@ -580,8 +581,7 @@ namespace SmartPeak
       }
       if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
       {
-        const bool done = manager_.isWorkflowDone();
-        ImGui::Text("Workflow status: %s", done ? "done" : "running...");
+        ImGui::Text("Workflow status: %s", workflow_is_done_ ? "done" : "running...");
         ImGui::EndTabItem();
       }
       if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))

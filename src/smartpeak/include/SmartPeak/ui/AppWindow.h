@@ -145,5 +145,6 @@ namespace SmartPeak
     // View: Info pane
     bool show_info_   = true;
     bool show_log_    = true;
+    bool workflow_is_done_ = true;
   };
 }
