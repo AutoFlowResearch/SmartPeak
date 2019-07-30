@@ -25,6 +25,7 @@ set(io_executables_list
 
 set(algorithm_executables_list
 	MRMFeatureValidator_test
+	FIADataProcessor_test
 )
 
 set(ui_executables_list
