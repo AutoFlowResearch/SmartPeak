@@ -146,5 +146,6 @@ namespace SmartPeak
     bool show_info_   = true;
     bool show_log_    = true;
     bool workflow_is_done_ = true;
+    bool file_loading_is_done_ = true;
   };
 }

@@ -42,6 +42,7 @@ namespace SmartPeak
     static bool show_app_about_ = false;
 
     workflow_is_done_ = manager_.isWorkflowDone();
+    file_loading_is_done_ = file_picker_.fileLoadingIsDone();
 
     if (file_picker_.show_file_picker_)
     {
@@ -283,7 +284,7 @@ namespace SmartPeak
       // ImGui::OpenPopup("Delete?");
     }
 
-    if (ImGui::MenuItem("Load session from sequence", NULL, false, workflow_is_done_)) {
+    if (ImGui::MenuItem("Load session from sequence", NULL, false, workflow_is_done_ && file_loading_is_done_)) {
       static LoadSessionFromSequence processor(state_);
       file_picker_.setProcessor(processor);
       file_picker_.show_file_picker_ = true;
@@ -407,12 +408,12 @@ namespace SmartPeak
   }
 
   void AppWindow::showMenuAction() {
-    if (ImGui::MenuItem("Run command", NULL, false, workflow_is_done_))
+    if (ImGui::MenuItem("Run command", NULL, false, workflow_is_done_ && file_loading_is_done_))
     {
       initializeDataDirs(state_);
       // do the rest
     }
-    if (ImGui::MenuItem("Run workflow", NULL, false, workflow_is_done_))
+    if (ImGui::MenuItem("Run workflow", NULL, false, workflow_is_done_ && file_loading_is_done_))
     {
       if (state_.commands_.size()) // ensures that workflow's steps have been set
       {

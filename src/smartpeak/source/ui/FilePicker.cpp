@@ -1,6 +1,7 @@
 #include <SmartPeak/core/AppStateProcessor.h> // TODO: maybe forward declaration could do it
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/Utilities.h>
+#include <thread>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <plog/Log.h>
@@ -178,12 +179,31 @@ namespace SmartPeak
     LOGD << "Running processor (ptr): " << processor_;
     if (!processor_)
       return;
-    (*processor_)(picked_pathname_.c_str());
+    loading_is_done_ = false;
+    run_and_join(processor_, picked_pathname_, loading_is_done_);
   }
 
   void FilePicker::clearProcessor()
   {
     LOGD << "Clearing processor";
     processor_ = nullptr;
+  }
+
+  void FilePicker::run_and_join(
+    AppStateProcessor* processor,
+    const std::string& pathname,
+    bool& loading_is_done
+  )
+  {
+    std::thread t([processor](const char* pathname){ (*processor)(pathname); }, pathname.c_str());
+    LOGN << "File is being loaded...";
+    t.join();
+    loading_is_done = true;
+    LOGN << "File has been loaded.";
+  }
+
+  bool FilePicker::fileLoadingIsDone()
+  {
+    return loading_is_done_;
   }
 }
