@@ -580,12 +580,8 @@ namespace SmartPeak
       }
       if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
       {
-        const std::vector<char>& statuses = manager_.getWorkflowsStatus();
-        const size_t statuses_size = statuses.size(); // So one does not depend on compiler optimizations flags
-        for (int i = 0; static_cast<size_t>(i) < statuses_size; ++i)
-        {
-          ImGui::Text("Workflow %d: %s", i, statuses.at(i) ? "done" : "running...");
-        }
+        const bool done = manager_.isWorkflowDone();
+        ImGui::Text("Workflow status: %s", done ? "done" : "running...");
         ImGui::EndTabItem();
       }
       if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))

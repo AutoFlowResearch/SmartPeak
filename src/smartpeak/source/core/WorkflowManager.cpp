@@ -13,23 +13,23 @@ namespace SmartPeak {
   void WorkflowManager::addWorkflow(AppState& source_state)
   {
     // do not run workflows concurrently
-    if (std::any_of(done_.begin(), done_.end(), [](bool b){ return b == false; })) {
+    if (!done_) {
       return;
     }
-    states_.push_back(source_state);
-    done_.emplace_back(0); // to be regarded as "false"
-    std::thread t(run_and_join, std::ref(states_.back()), std::ref(done_.back()), std::ref(source_state));
+    state_ = source_state;
+    done_ = false;
+    std::thread t(run_and_join, std::ref(state_), std::ref(done_), std::ref(source_state));
     LOGD << "Created thread (to be detached): " << t.get_id();
     t.detach();
     LOGD << "Thread has been detached";
   }
 
-  const std::vector<char>& WorkflowManager::getWorkflowsStatus() const
+  bool WorkflowManager::isWorkflowDone() const
   {
     return done_;
   }
 
-  void WorkflowManager::run_and_join(AppState& state, char& done, AppState& source_state)
+  void WorkflowManager::run_and_join(AppState& state, bool& done, AppState& source_state)
   {
     // run the workflow on a separate thread t
     std::thread t(
@@ -42,8 +42,8 @@ namespace SmartPeak {
     t.join();
     LOGD << "Thread has been joined";
     // update the status for this workflow, to be used in the gui
-    done = 1;
     source_state = std::move(state);
+    done = true;
     LOGI << "State updated with workflow's results";
   }
 }

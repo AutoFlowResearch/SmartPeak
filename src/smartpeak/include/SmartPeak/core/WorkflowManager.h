@@ -12,15 +12,15 @@ namespace SmartPeak {
     */
     void addWorkflow(AppState& source_state);
 
-    const std::vector<char>& getWorkflowsStatus() const;
+    bool isWorkflowDone() const;
 
   private:
     /**
     * Spawn a new thread that runs the workflow, and wait for it to finish
     */
-    static void run_and_join(AppState& state, char& done, AppState& source_state);
+    static void run_and_join(AppState& state, bool& done, AppState& source_state);
 
-    std::vector<AppState> states_;
-    std::vector<char> done_;
+    AppState state_;
+    bool done_ = true;
   };
 }
