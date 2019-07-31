@@ -3,7 +3,6 @@ set(directory source/ui)
 
 ### list all filenames of the directory here
 set(sources_list
-	AppWindow.cpp
 	FilePicker.cpp
 	GuiAppender.cpp
 	Report.cpp
