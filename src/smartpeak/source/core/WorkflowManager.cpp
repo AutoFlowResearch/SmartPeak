@@ -1,15 +1,9 @@
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/AppState.h>
 #include <SmartPeak/core/AppStateProcessor.h>
-#include <algorithm>
-#include <mutex>
 #include <thread>
-#include <vector>
 
 namespace SmartPeak {
-  /**
-  * Append the passed state in a vector and run a list of commands on it
-  */
   void WorkflowManager::addWorkflow(AppState& source_state)
   {
     // do not run workflows concurrently
