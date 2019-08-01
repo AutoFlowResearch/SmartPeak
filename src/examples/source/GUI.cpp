@@ -38,17 +38,22 @@ int main(int argc, char **argv)
   // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
   std::string quickInfoText_;
-  // View: Info pane
-  bool show_info_   = true;
-  bool show_log_    = true;
+  bool show_top_window_ = false;
+  bool show_bottom_window_ = false;
+
+  // View: Bottom window
+  bool show_info_ = true;
+  bool show_log_ = true;
+  bool show_about_ = false;
 
   // View: Explorer pane
   bool show_sequence_explorer = false;
   bool show_transitions_explorer = false;
   bool show_experiment_explorer = false;
   bool show_features_explorer = false;
-  // View: Main pane
-  bool show_sequence_table = true;
+
+  // View: Top window
+  bool show_sequence_table = false;
   bool show_transitions_table = false;
   bool show_workflow_table = false;
   bool show_parameters_table = false;
@@ -78,11 +83,11 @@ int main(int argc, char **argv)
   strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
 
   // Add .csv appender: 32 MiB per file, max. 100 log files
-  static plog::RollingFileAppender<plog::CsvFormatter>
+  plog::RollingFileAppender<plog::CsvFormatter>
     fileAppender(filename, 1024 * 1024 * 32, 100);
 
   // Add console appender, instead of only the file one
-  static plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
+  plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
 
   // Init logger with all the appenders
   plog::init(plog::debug, &fileAppender)
@@ -125,31 +130,12 @@ int main(int argc, char **argv)
   ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
   ImGui_ImplOpenGL2_Init();
 
-  // Load Fonts
-  // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-  // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-  // - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-  // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-  // - Read 'misc/fonts/README.txt' for more instructions and details.
-  // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-  //io.Fonts->AddFontDefault();
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
-  //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-  //IM_ASSERT(font != NULL);
-
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   // Main loop
   bool done = false;
   while (!done)
   {
-    // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-    // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
-    // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
-    // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -163,8 +149,19 @@ int main(int argc, char **argv)
     ImGui_ImplSDL2_NewFrame(window);
     ImGui::NewFrame();
 
-    // 1. Show the window
 {
+  if (show_about_)
+  {
+    if (ImGui::Begin("begin_about", &show_about_))
+    {
+      ImGui::Text("About SmartPeak");
+      ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
+      ImGui::Separator();
+      ImGui::Text("By the hardworking SmartPeak developers.");
+    }
+    ImGui::End();
+  }
+
   if (file_picker_.show_file_picker_)
   {
     file_picker_.draw();
@@ -180,33 +177,7 @@ int main(int argc, char **argv)
     workflow_.draw();
   }
 
-  // Show the main window
-  ImGuiWindowFlags window_flags = 0;
-  window_flags |= ImGuiWindowFlags_NoTitleBar;
-  // TODO: eventually uncomment following lines
-  // window_flags |= ImGuiWindowFlags_NoResize;
-  // window_flags |= ImGuiWindowFlags_NoCollapse;
-  window_flags |= ImGuiWindowFlags_MenuBar;
-  ImGui::SetNextWindowPos(ImVec2(0, 0));
-  ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
-  static bool show_main_window = true;
-  if (!ImGui::Begin("Sequence list", &show_main_window, window_flags))
-  {
-    // Early out if the window is collapsed, as an optimization.
-    ImGui::End();
-  }
-  else
-  {
-    // Show the widgets
-    //SequenceWidget sequenceWidget;
-    //if (show_sequence_) sequenceWidget.draw(&show_sequence_);
-    //if (show_generic_table) TableWidget(&show_generic_table);
-    //if (show_plot) PlotWidget(&show_plot);
-    //if (show_workflow) WorkflowWidget(&show_workflow);
-
-    // Show the main menu bar
-    if (ImGui::BeginMenuBar())
-    // if (ImGui::BeginMainMenuBar())
+    if (ImGui::BeginMainMenuBar())
     {
       if (ImGui::BeginMenu("File"))
       {
@@ -291,13 +262,11 @@ int main(int argc, char **argv)
       if (ImGui::BeginMenu("View"))
       {
         ImGui::MenuItem("Explorer window", NULL, false, false);
-        // Explorer sub windows
         if (ImGui::MenuItem("Sequence", NULL, &show_sequence_explorer)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {}
         if (ImGui::MenuItem("Experiment", NULL, &show_experiment_explorer)) {}
         if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}  // including metadata?
-        // Main pane tabs
-        ImGui::Separator();  // Primary input
+        ImGui::Separator(); // Primary input
         ImGui::MenuItem("Main window", NULL, false, false);
         if (ImGui::MenuItem("Sequence", NULL, &show_sequence_table)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_table)) {}
@@ -318,7 +287,6 @@ int main(int argc, char **argv)
         if (ImGui::MenuItem("Heatmap", NULL, &show_heatmap_plot)) {}
         if (ImGui::MenuItem("Features table", NULL, &show_feature_summary_table)) {}
         if (ImGui::MenuItem("Features pivot table", NULL, &show_sequence_summary_table)) {}
-        // Info pane tabs
         ImGui::MenuItem("Info window", NULL, false, false);
         if (ImGui::MenuItem("Info", NULL, &show_info_)) {}
         if (ImGui::MenuItem("Log", NULL, &show_log_)) {}
@@ -413,204 +381,30 @@ int main(int argc, char **argv)
       }
       if (ImGui::BeginMenu("Help"))
       {
-        if (ImGui::MenuItem("About")) {
-          ImGui::OpenPopup("about");
-        }
-        if (ImGui::BeginPopupModal("about"))
-        {
-          //AboutWidget aboutWidget;
-          //bool show_about = true;
-          //aboutWidget.draw(&show_about);
-          ImGui::Text("About SmartPeak");
-          ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
-          ImGui::Separator();
-          ImGui::Text("By the hardworking SmartPeak developers.");
-          ImGui::EndPopup();
-        }
+        ImGui::MenuItem("About", NULL, &show_about_);
         if (ImGui::MenuItem("Documentation")) {}
         if (ImGui::MenuItem("Version")) {}
         ImGui::EndMenu();
       }
-      ImGui::EndMenuBar();
-      //ImGui::EndMainMenuBar();
+      ImGui::EndMainMenuBar();
     }
-  }
 
-  // determine what windows will be shown
-  bool show_explorer_pane = false;
-  bool show_main_pane = true; // always shown
-  bool show_info_pane = false;
-  if (show_sequence_explorer ||
-      show_transitions_explorer ||
-      show_experiment_explorer ||
-      show_features_explorer)
-  {
-    show_explorer_pane = true;
-  }
-  if (show_info_ || show_log_)
-  {
-    show_info_pane = true;
-  }
+  show_bottom_window_ = show_info_ || show_log_;
 
-
-  // // calculate the window sizes
-  // ImVec2 explorer_pane_size, main_pane_size, info_pane_size;
-  // if (show_explorer_pane && show_main_pane && show_info_pane) {
-  //   // All panes
-  //   explorer_pane_size = ImVec2(ImGui::GetIO().DisplaySize.x*0.2, ImGui::GetIO().DisplaySize.y*0.75);
-  //   main_pane_size = ImVec2(0, ImGui::GetIO().DisplaySize.y*0.75);
-  //   info_pane_size = ImVec2(0, 0);
-  // } else if (show_explorer_pane && show_main_pane){
-  //   // No info pane
-  //   explorer_pane_size = ImVec2(ImGui::GetIO().DisplaySize.x*0.2, 0);
-  //   main_pane_size = ImVec2(0, 0);
-  //   info_pane_size = ImVec2(0, 0);
-  // } else if (show_main_pane) {
-  //   // No explorer and info panes
-  //   explorer_pane_size = ImVec2(0, 0);
-  //   main_pane_size = ImVec2(0, 0);
-  //   info_pane_size = ImVec2(0, 0);
-  // } else {
-  //   explorer_pane_size = ImVec2(0, 0);
-  //   main_pane_size = ImVec2(0, 0);
-  //   info_pane_size = ImVec2(0, 0);
-  // }
-
-  // left Top
-  if (show_explorer_pane) {
-    ImGui::BeginChild("Explorer pane", ImVec2(ImGui::GetIO().DisplaySize.x * 0.2f, ImGui::GetIO().DisplaySize.y * 0.75f), false, ImGuiWindowFlags_HorizontalScrollbar);
-    ImGui::Text("TODO: search and sort bar");
-    ImGui::Text("TODO: list or tree");
-    ImGui::EndChild();
-    ImGui::SameLine();
-  }
-
-  // right top
-  if (show_main_pane) {
-    ImGui::BeginChild("Main pane", ImVec2(0, ImGui::GetIO().DisplaySize.y * 0.4f), false);
-    static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable;
-    if ((show_sequence_table ||
-      show_transitions_table ||
-      show_workflow_table ||
-      show_parameters_table ||
-      show_quant_method_table ||
-      show_stds_concs_table ||
-      show_comp_filters_table ||
-      show_comp_group_filters_table ||
-      show_comp_qcs_table ||
-      show_comp_group_qcs_table ||
-      show_feature_plot ||
-      show_line_plot ||
-      show_heatmap_plot ||
-      show_feature_summary_table ||
-      show_sequence_summary_table) && ImGui::BeginTabBar("Main pane tab bar", tab_bar_flags))
-    {
-      if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
-      {
-        ImGui::Text("TODO: sequence table");
-
-        // Dummy data for testing
-        std::vector<std::string> headers = { "sample_name", "sample_type", "component_name" }; // feature or sample columns to filter on
-        std::vector<std::string> sample_name_col = { "S1", "S1", "S2", "S2", "S3", "S3", "S4", "S4" };
-        std::vector<std::string> sample_type_col = { "A", "A", "A", "A", "B", "B", "B" ,"B" };
-        std::vector<std::string> component_name_col = { "C1", "C2", "C1", "C2", "C1", "C2", "C1", "C2" };
-        std::vector<std::vector<std::string>> columns = { sample_name_col, sample_type_col, component_name_col };
-        static bool rows_checked[] = { true, true, true, true, true, true, true, true };
-
-        GenericTableWidget sequenceTable;
-        // TODO: get the headers, columns, and rows_checked
-        // NOTE: rows_checked must be statically declared before calling the GUI!
-        // TODO: following lines of code keep copying data. it is slow.
-        sequenceTable.headers = headers;
-        sequenceTable.columns = columns;
-        sequenceTable.checked_rows = rows_checked;
-        sequenceTable.draw();
-        ImGui::EndTabItem();
-      }
-      if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
-      {
-        ImGui::Text("TODO: transition table");
-        ImGui::EndTabItem();
-      }
-      if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
-      {
-        ImGui::Text("TODO: workflow table");
-        ImGui::EndTabItem();
-      }
-      if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
-      {
-        ImGui::Text("TODO: parameters table");
-        ImGui::EndTabItem();
-      }
-      if (show_quant_method_table && ImGui::BeginTabItem("Quant Methods", &show_quant_method_table))
-      {
-        ImGui::Text("TODO: Quant methods table");
-        ImGui::EndTabItem();
-      }
-      if (show_stds_concs_table && ImGui::BeginTabItem("Stds Concs", &show_stds_concs_table))
-      {
-        ImGui::Text("TODO: Standards concentrations table");
-        ImGui::EndTabItem();
-      }
-      if (show_comp_filters_table && ImGui::BeginTabItem("Comp Filters", &show_comp_filters_table))
-      {
-        ImGui::Text("TODO: Component Filters table");
-        ImGui::EndTabItem();
-      }
-      if (show_comp_group_filters_table && ImGui::BeginTabItem("Comp Group Filters", &show_comp_group_filters_table))
-      {
-        ImGui::Text("TODO: Component group filters table");
-        ImGui::EndTabItem();
-      }
-      if (show_comp_qcs_table && ImGui::BeginTabItem("Comp QCs", &show_comp_qcs_table))
-      {
-        ImGui::Text("TODO: Component QCs table");
-        ImGui::EndTabItem();
-      }
-      if (show_comp_group_qcs_table && ImGui::BeginTabItem("Comp Group QCs", &show_comp_group_qcs_table))
-      {
-        ImGui::Text("TODO: Component group qcs table");
-        ImGui::EndTabItem();
-      }
-      if (show_feature_plot && ImGui::BeginTabItem("Feature plot", &show_feature_plot))
-      {
-        ImGui::Text("TODO: Feature plot");
-        GenericGraphicWidget featurePlot;
-        featurePlot.draw();
-        ImGui::EndTabItem();
-      }
-      if (show_line_plot && ImGui::BeginTabItem("Line plot", &show_line_plot))
-      {
-        ImGui::Text("TODO: Line plot");
-        ImGui::EndTabItem();
-      }
-      if (show_heatmap_plot && ImGui::BeginTabItem("Heatmap", &show_heatmap_plot))
-      {
-        ImGui::Text("TODO: Heatmap");
-        ImGui::EndTabItem();
-      }
-      if (show_feature_summary_table && ImGui::BeginTabItem("FeatureDB", &show_feature_summary_table))
-      {
-        ImGui::Text("TODO: FeatureDB table");
-        ImGui::EndTabItem();
-      }
-      if (show_sequence_summary_table && ImGui::BeginTabItem("PivotTable", &show_sequence_summary_table))
-      {
-        ImGui::Text("TODO: PivotTable table");
-        ImGui::EndTabItem();
-      }
-      ImGui::EndTabBar();
-    }
-    ImGui::EndChild();
-    ImGui::NewLine();
-  }
-
-  // Bottom
-  if (show_info_pane) {
-    ImGui::BeginChild("Info pane", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
-    static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_Reorderable;
-    if ((show_info_ || show_log_) &&
-        ImGui::BeginTabBar("Info pane tab bar", tab_bar_flags))
+  // Bottom window
+  if (show_bottom_window_) {
+    const float bottom_window_y_pos = show_top_window_ ? 400 : 18;
+    ImGui::SetNextWindowPos(ImVec2(0, bottom_window_y_pos));
+    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y - bottom_window_y_pos));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+    const ImGuiWindowFlags bottom_window_flags =
+      ImGuiWindowFlags_NoTitleBar |
+      ImGuiWindowFlags_NoResize |
+      ImGuiWindowFlags_NoMove |
+      ImGuiWindowFlags_NoCollapse |
+      ImGuiWindowFlags_NoFocusOnAppearing;
+    ImGui::Begin("Bottom window", NULL, bottom_window_flags);
+    if (ImGui::BeginTabBar("Bottom window tab bar", ImGuiTabBarFlags_Reorderable))
     {
       if (show_info_ && ImGui::BeginTabItem("Info", &show_info_))
       {
@@ -639,12 +433,11 @@ int main(int argc, char **argv)
         ImGui::EndChild();
         ImGui::EndTabItem();
       }
-      // TODO...
       ImGui::EndTabBar();
     }
-    ImGui::EndChild();
+    ImGui::End();
+    ImGui::PopStyleVar();
   }
-  ImGui::End();
 }
 
     // Rendering
