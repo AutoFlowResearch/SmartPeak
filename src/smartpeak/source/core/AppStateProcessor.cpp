@@ -343,4 +343,19 @@ namespace SmartPeak
 
     return commands;
   }
+
+  void SetRawDataPathname::operator()(const char* const pathname)
+  {
+    state_.mzML_dir_ = pathname;
+  }
+
+  void SetInputFeaturesPathname::operator()(const char* const pathname)
+  {
+    state_.features_in_dir_ = pathname;
+  }
+
+  void SetOutputFeaturesPathname::operator()(const char* const pathname)
+  {
+    state_.features_out_dir_ = pathname;
+  }
 }

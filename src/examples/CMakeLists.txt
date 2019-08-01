@@ -81,7 +81,7 @@ include_directories(${OPENGL_INCLUDE_DIR})
 #------------------------------------------------------------------------------
 # ImGUI
 #------------------------------------------------------------------------------
-find_package(ImGUI COMPONENTS Sources Examples REQUIRED)
+find_package(ImGUI COMPONENTS Sources Examples SourcesMiscCpp REQUIRED)
 include_directories(${ImGui_INCLUDE_DIR})
 if (ImGui_Examples_FOUND)
   message(STATUS "ImGui_Examples_FOUND has been set and found")
@@ -107,7 +107,7 @@ foreach(_examples ${EXAMPLE_executables})
   if(NOT ${_examples} STREQUAL "GUI")
     target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
   else()
-    target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples)
+    target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
   endif()
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
   # see https://sourceforge.net/apps/trac/open-ms/ticket/280 for details)

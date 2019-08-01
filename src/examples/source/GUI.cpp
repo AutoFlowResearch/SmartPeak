@@ -20,6 +20,7 @@
 #include <imgui.h>
 #include <examples/imgui_impl_sdl.h>
 #include <examples/imgui_impl_opengl2.h>
+#include <misc/cpp/imgui_stdlib.h>
 
 using namespace SmartPeak;
 
@@ -44,7 +45,7 @@ int main(int argc, char **argv)
   // View: Bottom window
   bool show_info_ = true;
   bool show_log_ = true;
-  bool show_about_ = false;
+  bool popup_about_ = false;
 
   // View: Explorer pane
   bool show_sequence_explorer = false;
@@ -68,6 +69,8 @@ int main(int argc, char **argv)
   bool show_heatmap_plot = false;
   bool show_feature_summary_table = false;
   bool show_sequence_summary_table = false;
+
+  bool popup_run_workflow_ = false;
 
   AppState state_;
   GuiAppender appender_;
@@ -150,16 +153,93 @@ int main(int argc, char **argv)
     ImGui::NewFrame();
 
     { // keeping this block to easily collapse/expand the bulk of the loop
-    if (show_about_)
+
+    if (popup_run_workflow_)
     {
-      if (ImGui::Begin("begin_about", &show_about_))
+      ImGui::OpenPopup("Run workflow modal");
+      popup_run_workflow_ = false;
+    }
+
+    if (ImGui::BeginPopupModal("Run workflow modal", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+      ImGui::Text("mzML folder");
+      ImGui::PushID(1);
+      ImGui::InputTextWithHint("", state_.mzML_dir_.c_str(), &state_.mzML_dir_);
+      ImGui::PopID();
+      ImGui::SameLine();
+      ImGui::PushID(11);
+      if (ImGui::Button("Select"))
       {
-        ImGui::Text("About SmartPeak");
-        ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
-        ImGui::Separator();
-        ImGui::Text("By the hardworking SmartPeak developers.");
+        static SetRawDataPathname processor(state_);
+        file_picker_.setProcessor(processor);
+        file_picker_.show_file_picker_ = true;
       }
-      ImGui::End();
+      ImGui::PopID();
+
+      ImGui::Text("Input features folder");
+      ImGui::PushID(2);
+      ImGui::InputTextWithHint("", state_.features_in_dir_.c_str(), &state_.features_in_dir_);
+      ImGui::PopID();
+      ImGui::SameLine();
+      ImGui::PushID(22);
+      if (ImGui::Button("Select"))
+      {
+        static SetInputFeaturesPathname processor(state_);
+        file_picker_.setProcessor(processor);
+        file_picker_.show_file_picker_ = true;
+      }
+      ImGui::PopID();
+
+      ImGui::Text("Output features folder");
+      ImGui::PushID(3);
+      ImGui::InputTextWithHint("", state_.features_out_dir_.c_str(), &state_.features_out_dir_);
+      ImGui::PopID();
+      ImGui::SameLine();
+      ImGui::PushID(33);
+      if (ImGui::Button("Select"))
+      {
+        static SetOutputFeaturesPathname processor(state_);
+        file_picker_.setProcessor(processor);
+        file_picker_.show_file_picker_ = true;
+      }
+      ImGui::PopID();
+
+      ImGui::Separator();
+
+      if (ImGui::Button("Run workflow"))
+      {
+        ProcessCommands processCommands(state_);
+        processCommands(state_.commands_);
+        ImGui::CloseCurrentPopup();
+      }
+
+      ImGui::SameLine();
+      if (ImGui::Button("Close"))
+      {
+        ImGui::CloseCurrentPopup();
+      }
+
+      ImGui::EndPopup();
+    }
+
+    if (popup_about_)
+    {
+      ImGui::OpenPopup("About modal");
+      popup_about_ = false;
+    }
+
+    if (ImGui::BeginPopupModal("About modal", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+      ImGui::Text("About SmartPeak");
+      ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
+      ImGui::Separator();
+      ImGui::Text("By the hardworking SmartPeak developers.");
+      ImGui::Separator();
+      if (ImGui::Button("Close"))
+      {
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
     }
 
     if (file_picker_.show_file_picker_)
@@ -302,10 +382,7 @@ int main(int argc, char **argv)
         if (ImGui::MenuItem("Run workflow"))
         {
           initializeDataDirs(state_);
-          ProcessCommands processCommands(state_);
-          // TODO: IO operation -> use another thread
-          processCommands(state_.commands_);
-          LOGN << "\n\nWorkflow completed.\n";
+          popup_run_workflow_ = true;
         }
         if (ImGui::BeginMenu("Quick info"))
         { // TODO: bug
@@ -381,7 +458,7 @@ int main(int argc, char **argv)
       }
       if (ImGui::BeginMenu("Help"))
       {
-        ImGui::MenuItem("About", NULL, &show_about_);
+        ImGui::MenuItem("About", NULL, &popup_about_);
         if (ImGui::MenuItem("Documentation")) {}
         if (ImGui::MenuItem("Version")) {}
         ImGui::EndMenu();
