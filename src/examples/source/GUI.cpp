@@ -149,33 +149,33 @@ int main(int argc, char **argv)
     ImGui_ImplSDL2_NewFrame(window);
     ImGui::NewFrame();
 
-{
-  if (show_about_)
-  {
-    if (ImGui::Begin("begin_about", &show_about_))
+    { // keeping this block to easily collapse/expand the bulk of the loop
+    if (show_about_)
     {
-      ImGui::Text("About SmartPeak");
-      ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
-      ImGui::Separator();
-      ImGui::Text("By the hardworking SmartPeak developers.");
+      if (ImGui::Begin("begin_about", &show_about_))
+      {
+        ImGui::Text("About SmartPeak");
+        ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
+        ImGui::Separator();
+        ImGui::Text("By the hardworking SmartPeak developers.");
+      }
+      ImGui::End();
     }
-    ImGui::End();
-  }
 
-  if (file_picker_.show_file_picker_)
-  {
-    file_picker_.draw();
-  }
+    if (file_picker_.show_file_picker_)
+    {
+      file_picker_.draw();
+    }
 
-  if (report_.draw_)
-  {
-    report_.draw();
-  }
+    if (report_.draw_)
+    {
+      report_.draw();
+    }
 
-  if (workflow_.draw_)
-  {
-    workflow_.draw();
-  }
+    if (workflow_.draw_)
+    {
+      workflow_.draw();
+    }
 
     if (ImGui::BeginMainMenuBar())
     {
@@ -389,56 +389,57 @@ int main(int argc, char **argv)
       ImGui::EndMainMenuBar();
     }
 
-  show_bottom_window_ = show_info_ || show_log_;
+    show_bottom_window_ = show_info_ || show_log_;
 
-  // Bottom window
-  if (show_bottom_window_) {
-    const float bottom_window_y_pos = show_top_window_ ? 400 : 18;
-    ImGui::SetNextWindowPos(ImVec2(0, bottom_window_y_pos));
-    ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y - bottom_window_y_pos));
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
-    const ImGuiWindowFlags bottom_window_flags =
-      ImGuiWindowFlags_NoTitleBar |
-      ImGuiWindowFlags_NoResize |
-      ImGuiWindowFlags_NoMove |
-      ImGuiWindowFlags_NoCollapse |
-      ImGuiWindowFlags_NoFocusOnAppearing;
-    ImGui::Begin("Bottom window", NULL, bottom_window_flags);
-    if (ImGui::BeginTabBar("Bottom window tab bar", ImGuiTabBarFlags_Reorderable))
+    // Bottom window
+    if (show_bottom_window_)
     {
-      if (show_info_ && ImGui::BeginTabItem("Info", &show_info_))
+      const float bottom_window_y_pos = show_top_window_ ? 400 : 18;
+      ImGui::SetNextWindowPos(ImVec2(0, bottom_window_y_pos));
+      ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y - bottom_window_y_pos));
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+      const ImGuiWindowFlags bottom_window_flags =
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoFocusOnAppearing;
+      ImGui::Begin("Bottom window", NULL, bottom_window_flags);
+      if (ImGui::BeginTabBar("Bottom window tab bar", ImGuiTabBarFlags_Reorderable))
       {
-        ImGui::BeginChild("Info child");
-        ImGui::TextWrapped("%s", quickInfoText_.c_str());
-        ImGui::EndChild();
-        ImGui::EndTabItem();
-      }
-      if (show_log_ && ImGui::BeginTabItem("Log", &show_log_))
-      {
-        const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
-        static int selected_severity = 5;
-        static plog::Severity severity = plog::Severity::debug;
-
-        if (ImGui::Combo("Level", &selected_severity, items, IM_ARRAYSIZE(items)))
+        if (show_info_ && ImGui::BeginTabItem("Info", &show_info_))
         {
-          severity = plog::severityFromString(items[selected_severity]);
+          ImGui::BeginChild("Info child");
+          ImGui::TextWrapped("%s", quickInfoText_.c_str());
+          ImGui::EndChild();
+          ImGui::EndTabItem();
         }
-
-        ImGui::Separator();
-        ImGui::BeginChild("Log child");
-        for (const plog::util::nstring& s : appender_.getMessageList(severity))
+        if (show_log_ && ImGui::BeginTabItem("Log", &show_log_))
         {
-          ImGui::Text("%s", s.c_str());
+          const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
+          static int selected_severity = 5;
+          static plog::Severity severity = plog::Severity::debug;
+
+          if (ImGui::Combo("Level", &selected_severity, items, IM_ARRAYSIZE(items)))
+          {
+            severity = plog::severityFromString(items[selected_severity]);
+          }
+
+          ImGui::Separator();
+          ImGui::BeginChild("Log child");
+          for (const plog::util::nstring& s : appender_.getMessageList(severity))
+          {
+            ImGui::Text("%s", s.c_str());
+          }
+          ImGui::EndChild();
+          ImGui::EndTabItem();
         }
-        ImGui::EndChild();
-        ImGui::EndTabItem();
+        ImGui::EndTabBar();
       }
-      ImGui::EndTabBar();
+      ImGui::End();
+      ImGui::PopStyleVar();
     }
-    ImGui::End();
-    ImGui::PopStyleVar();
-  }
-}
+    }
 
     // Rendering
     ImGui::Render();
