@@ -65,4 +65,19 @@ namespace SmartPeak
     BuildCommandsFromIds(AppState& state) : AppStateProcessor(state) {}
     std::vector<AppState::Command> operator()(const std::string& ids) override;
   };
+
+  struct SetRawDataPathname : AppStateProcessor {
+    SetRawDataPathname(AppState& state) : AppStateProcessor(state) {}
+    void operator()(const char* const pathname) override;
+  };
+
+  struct SetInputFeaturesPathname : AppStateProcessor {
+    SetInputFeaturesPathname(AppState& state) : AppStateProcessor(state) {}
+    void operator()(const char* const pathname) override;
+  };
+
+  struct SetOutputFeaturesPathname : AppStateProcessor {
+    SetOutputFeaturesPathname(AppState& state) : AppStateProcessor(state) {}
+    void operator()(const char* const pathname) override;
+  };
 }
