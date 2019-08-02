@@ -15,6 +15,7 @@
 #include <SmartPeak/ui/Workflow.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
+#include <boost/filesystem.hpp>
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <imgui.h>
@@ -23,6 +24,7 @@
 #include <misc/cpp/imgui_stdlib.h>
 
 using namespace SmartPeak;
+namespace fs = boost::filesystem;
 
 void HelpMarker(const char* desc);
 
@@ -71,6 +73,7 @@ int main(int argc, char **argv)
   bool show_sequence_summary_table = false;
 
   bool popup_run_workflow_ = false;
+  bool popup_file_picker_ = false;
 
   AppState state_;
   GuiAppender appender_;
@@ -154,6 +157,14 @@ int main(int argc, char **argv)
 
     { // keeping this block to easily collapse/expand the bulk of the loop
 
+    if (popup_file_picker_)
+    {
+      ImGui::OpenPopup("Pick a pathname");
+      popup_file_picker_ = false;
+    }
+
+    file_picker_.draw();
+
     if (popup_run_workflow_)
     {
       ImGui::OpenPopup("Run workflow modal");
@@ -172,7 +183,7 @@ int main(int argc, char **argv)
       {
         static SetRawDataPathname processor(state_);
         file_picker_.setProcessor(processor);
-        file_picker_.show_file_picker_ = true;
+        popup_file_picker_ = true;
       }
       ImGui::PopID();
 
@@ -186,7 +197,7 @@ int main(int argc, char **argv)
       {
         static SetInputFeaturesPathname processor(state_);
         file_picker_.setProcessor(processor);
-        file_picker_.show_file_picker_ = true;
+        popup_file_picker_ = true;
       }
       ImGui::PopID();
 
@@ -200,14 +211,37 @@ int main(int argc, char **argv)
       {
         static SetOutputFeaturesPathname processor(state_);
         file_picker_.setProcessor(processor);
-        file_picker_.show_file_picker_ = true;
+        popup_file_picker_ = true;
       }
       ImGui::PopID();
+
+      if (popup_file_picker_)
+      {
+        ImGui::OpenPopup("Pick a pathname");
+        popup_file_picker_ = false;
+      }
+
+      file_picker_.draw();
 
       ImGui::Separator();
 
       if (ImGui::Button("Run workflow"))
       {
+        for (const std::string& pathname : {state_.mzML_dir_, state_.features_in_dir_, state_.features_out_dir_}) {
+          fs::create_directories(fs::path(pathname));
+        }
+        for (AppState::Command& cmd : state_.commands_)
+        {
+          for (std::pair<const std::string, Filenames>& p : cmd.dynamic_filenames)
+          {
+            Filenames::updateDefaultDynamicFilenames(
+              state_.mzML_dir_,
+              state_.features_in_dir_,
+              state_.features_out_dir_,
+              p.second
+            );
+          }
+        }
         ProcessCommands processCommands(state_);
         processCommands(state_.commands_);
         ImGui::CloseCurrentPopup();
@@ -242,11 +276,6 @@ int main(int argc, char **argv)
       ImGui::EndPopup();
     }
 
-    if (file_picker_.show_file_picker_)
-    {
-      file_picker_.draw();
-    }
-
     if (report_.draw_)
     {
       report_.draw();
@@ -276,7 +305,7 @@ int main(int argc, char **argv)
         if (ImGui::MenuItem("Load session from sequence")) {
           static LoadSessionFromSequence processor(state_);
           file_picker_.setProcessor(processor);
-          file_picker_.show_file_picker_ = true;
+          popup_file_picker_ = true;
         }
 
         if (ImGui::MenuItem("Save Session", "Ctrl+S"))

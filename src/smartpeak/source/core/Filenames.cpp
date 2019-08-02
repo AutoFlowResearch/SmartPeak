@@ -2,6 +2,7 @@
 
 #include <SmartPeak/core/Filenames.h>
 #include <string>
+#include <boost/filesystem.hpp>
 
 namespace SmartPeak
 {
@@ -45,7 +46,41 @@ namespace SmartPeak
     dynamic_filenames.quantitationMethods_csv_o        = prefix + "_quantitationMethods.csv";
     dynamic_filenames.componentsToConcentrations_csv_o = prefix + "_componentsToConcentrations.csv";
 
+    dynamic_filenames.mzml_input_path = mzml_input_path;
+    dynamic_filenames.features_input_path = features_input_path;
+    dynamic_filenames.output_path = output_path;
+
     return dynamic_filenames;
+  }
+
+  void Filenames::updateDefaultDynamicFilenames(
+    const std::string& mzml_input_path,
+    const std::string& features_input_path,
+    const std::string& output_path,
+    Filenames& filenames
+  )
+  {
+    namespace fs = boost::filesystem;
+
+    filenames.mzML_i = fs::path(mzml_input_path)
+      .append(fs::path(filenames.mzML_i).filename().c_str())
+      .string();
+
+    filenames.featureXML_i = fs::path(features_input_path)
+      .append(fs::path(filenames.featureXML_i).filename().c_str())
+      .string();
+
+    const fs::path prefix { output_path };
+
+    filenames.featureXML_o = fs::path(prefix).append(fs::path(filenames.featureXML_o).filename().c_str()).string();
+
+    filenames.feature_csv_o = fs::path(prefix).append(fs::path(filenames.feature_csv_o).filename().c_str()).string();
+
+    filenames.features_pdf_o = fs::path(prefix).append(fs::path(filenames.features_pdf_o).filename().c_str()).string();
+
+    filenames.quantitationMethods_csv_o = fs::path(prefix).append(fs::path(filenames.quantitationMethods_csv_o).filename().c_str()).string();
+
+    filenames.componentsToConcentrations_csv_o = fs::path(prefix).append(fs::path(filenames.componentsToConcentrations_csv_o).filename().c_str()).string();
   }
 
   void Filenames::clear()

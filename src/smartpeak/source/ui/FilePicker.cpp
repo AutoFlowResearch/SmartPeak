@@ -1,4 +1,4 @@
-#include <SmartPeak/core/AppStateProcessor.h> // TODO: maybe forward declaration could do it
+#include <SmartPeak/core/AppStateProcessor.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/Utilities.h>
 #include <future>
@@ -10,10 +10,7 @@ namespace SmartPeak
 {
   void FilePicker::draw()
   {
-    ImGui::OpenPopup(title_.c_str());
-
-    // File picker modal
-    if (!ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_NoResize)) {
+    if (!ImGui::BeginPopupModal("Pick a pathname", NULL, ImGuiWindowFlags_NoResize)) {
       return;
     }
 
@@ -123,6 +120,7 @@ namespace SmartPeak
 
     ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.9f);
     ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    ImGui::PopItemWidth();
 
     ImGui::SameLine();
     ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.5f);
@@ -140,20 +138,20 @@ namespace SmartPeak
       LOGI << "Picked pathname: " << picked_pathname_;
       runProcessor();
       clearProcessor();
-      show_file_picker_ = false;
       selected_entry = -1;
       ImGui::CloseCurrentPopup();
     }
+    ImGui::PopItemWidth();
 
     ImGui::SameLine();
     ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth());
     if (ImGui::Button("Cancel"))
     {
       picked_pathname_.clear();
-      show_file_picker_ = false;
       selected_entry = -1;
       ImGui::CloseCurrentPopup();
     }
+    ImGui::PopItemWidth();
 
     ImGui::EndPopup();
   }
@@ -161,11 +159,6 @@ namespace SmartPeak
   std::string FilePicker::getPickedPathname() const
   {
     return picked_pathname_;
-  }
-
-  void FilePicker::setTitle(const std::string& title)
-  {
-    title_ = title;
   }
 
   void FilePicker::setProcessor(AppStateProcessor& processor)

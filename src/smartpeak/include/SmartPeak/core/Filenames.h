@@ -28,6 +28,11 @@ public:
     std::string componentsToConcentrations_csv_o;
     std::string pivotTable_csv_o;
     std::string featureDB_csv_o;
+    // TODO: do not hardcode entire pathnames (all those above this line)
+    // Instead, construct them when needed, using the strings below
+    std::string mzml_input_path;
+    std::string features_input_path;
+    std::string output_path;
 
     static Filenames getDefaultStaticFilenames(
       const std::string& dir
@@ -39,6 +44,13 @@ public:
       const std::string& output_path,
       const std::string& input_inj_name,
       const std::string& output_inj_name
+    );
+
+    static void updateDefaultDynamicFilenames(
+      const std::string& mzml_input_path,
+      const std::string& features_input_path,
+      const std::string& output_path,
+      Filenames& filenames
     );
 
     void clear();
