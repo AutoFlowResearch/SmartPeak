@@ -41,21 +41,22 @@ namespace SmartPeak
         {
           BuildCommandsFromIds buildCommandsFromIds(*state_);
           std::string ids;
-          if (std::string(s) == "LCMS MRM Unknowns")
+          const std::string s_string { s };
+          if (s_string == "LCMS MRM Unknowns")
             ids = "1 11 3 7 8 5 9";
-          if (std::string(s) == "LCMS MRM Standards")
+          else if (s_string == "LCMS MRM Standards")
             ids = "1 11 3 8 5 14 15 7 9";
-          if (std::string(s) == "HPLC UV Unknowns")
+          else if (s_string == "HPLC UV Unknowns")
             ids = "1 11 13 12 3 7 8 5 9";
-          if (std::string(s) == "HPLC UV Standards")
+          else if (s_string == "HPLC UV Standards")
             ids = "1 11 13 12 3 8 5 14 15 7 9";
-          if (std::string(s) == "GCMS SIM Unknowns")
+          else if (s_string == "GCMS SIM Unknowns")
             ids = "1 11 13 12 3 7 8 5 9";
-          if (std::string(s) == "GCMS Full Scan Unknowns")
+          else if (s_string == "GCMS Full Scan Unknowns")
             ids = "1 11 13 12 3 8 5 14 15 7 9";
-          if (std::string(s) == "LCMS MRM Validation - LP")
+          else if (s_string == "LCMS MRM Validation - LP")
             ids = "1 11 13 3 4 4 5 6 9";
-          if (std::string(s) == "LCMS MRM Validation - QMIP")
+          else if (s_string == "LCMS MRM Validation - QMIP")
             ids = "1 11 3 5 6 9";
           commands_ = buildCommandsFromIds(ids);
           LOGI << "Local workflow has been replaced";
