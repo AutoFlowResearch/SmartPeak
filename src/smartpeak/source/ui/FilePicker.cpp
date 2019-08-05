@@ -1,7 +1,7 @@
 #include <SmartPeak/core/AppStateProcessor.h> // TODO: maybe forward declaration could do it
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/Utilities.h>
-#include <thread>
+#include <future>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <plog/Log.h>
@@ -195,9 +195,21 @@ namespace SmartPeak
     bool& loading_is_done
   )
   {
-    std::thread t([processor](const char* pathname){ (*processor)(pathname); }, pathname.c_str());
+    std::future<void> f = std::async(
+      std::launch::async,
+      [processor](const char* pathname){ (*processor)(pathname); },
+      pathname.c_str()
+    );
+
     LOGN << "File is being loaded...";
-    t.join();
+    f.wait();
+
+    try {
+      f.get(); // checking for exception
+    } catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
     loading_is_done = true;
     LOGN << "File has been loaded.";
   }

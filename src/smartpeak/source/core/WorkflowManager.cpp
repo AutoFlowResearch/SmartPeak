@@ -2,6 +2,7 @@
 #include <SmartPeak/core/AppState.h>
 #include <SmartPeak/core/AppStateProcessor.h>
 #include <thread>
+#include <future>
 
 namespace SmartPeak {
   void WorkflowManager::addWorkflow(AppState& source_state)
@@ -25,16 +26,24 @@ namespace SmartPeak {
 
   void WorkflowManager::run_and_join(AppState& state, bool& done, AppState& source_state)
   {
-    // run the workflow on a separate thread t
-    std::thread t(
+    // run workflow asynchronously
+    std::future<void> f = std::async(
+      std::launch::async,
       AppStateProcessors::processCommands,
       std::ref(state),
       state.commands_
     );
-    // join the workflow's associated thread object t
-    LOGD << "Joining thread: " << t.get_id();
-    t.join();
-    LOGD << "Thread has been joined";
+
+    LOGD << "Waiting on async operation...";
+    f.wait();
+    LOGD << "Async operation completed";
+
+    try {
+      f.get(); // checking for exception
+    } catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
     // update the status for this workflow, to be used in the gui
     source_state = std::move(state);
     done = true;

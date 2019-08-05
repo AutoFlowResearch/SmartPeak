@@ -169,7 +169,15 @@ namespace SmartPeak
       std::cref(sample_types)
     );
     LOGN << data_writer_label << " file is being stored...";
-    const bool data_was_written = future.get();
+
+    bool data_was_written = false;
+
+    try {
+      data_was_written = future.get();
+    } catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
     if (data_was_written) {
       LOGN << data_writer_label << " file has been stored at: " << pathname;
     } else {
