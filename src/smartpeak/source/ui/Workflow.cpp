@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <plog/Log.h>
+#include <SmartPeak/core/SharedProcessors.h>
 
 namespace SmartPeak
 {
@@ -69,7 +70,7 @@ namespace SmartPeak
     {
       AppState::Command cmd;
       CreateCommand createCommand(*state_);
-      for (const std::pair<int, std::shared_ptr<RawDataProcessor>>& p : state_->n_to_raw_data_method_)
+      for (const std::pair<int, std::shared_ptr<RawDataProcessor>>& p : n_to_raw_data_method_)
       {
         if (ImGui::Selectable(p.second->getName().c_str()))
         {
@@ -86,7 +87,7 @@ namespace SmartPeak
     {
       AppState::Command cmd;
       CreateCommand createCommand(*state_);
-      for (const std::pair<int, std::shared_ptr<SequenceSegmentProcessor>>& p : state_->n_to_seq_seg_method_)
+      for (const std::pair<int, std::shared_ptr<SequenceSegmentProcessor>>& p : n_to_seq_seg_method_)
       {
         if (ImGui::Selectable(p.second->getName().c_str()))
         {

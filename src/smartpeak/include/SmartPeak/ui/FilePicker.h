@@ -18,6 +18,13 @@ namespace SmartPeak
     std::string current_pathname_ = ".";
     std::string picked_pathname_;
     AppStateProcessor* processor_ = nullptr;
+    bool loading_is_done_ = true;
+
+    void run_and_join(
+      AppStateProcessor* processor,
+      const std::string& pathname,
+      bool& loading_is_done
+    );
 
   public:
     FilePicker()
@@ -35,5 +42,7 @@ namespace SmartPeak
     void runProcessor();
 
     void clearProcessor();
+
+    bool fileLoadingIsDone();
   };
 }

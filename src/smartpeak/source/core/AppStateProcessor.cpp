@@ -17,6 +17,7 @@
 #include <vector>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
+#include <SmartPeak/core/SharedProcessors.h>
 
 namespace SmartPeak
 {
@@ -232,7 +233,8 @@ namespace SmartPeak
     }
   }
 
-  void ProcessCommands::operator()(const std::vector<AppState::Command>& commands)
+  namespace AppStateProcessors {
+  void processCommands(AppState& state, std::vector<AppState::Command> commands)
   {
     size_t i = 0;
     while (i < commands.size()) {
@@ -246,7 +248,7 @@ namespace SmartPeak
         std::vector<std::shared_ptr<RawDataProcessor>> raw_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(raw_methods),
           [](const AppState::Command& command){ return command.raw_data_method; });
-        ProcessSequence ps(state_.sequenceHandler_);
+        ProcessSequence ps(state.sequenceHandler_);
         ps.filenames                     = cmd.dynamic_filenames;
         ps.raw_data_processing_methods_I = raw_methods;
         ps.process();
@@ -254,7 +256,7 @@ namespace SmartPeak
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(seq_seg_methods),
           [](const AppState::Command& command){ return command.seq_seg_method; });
-        ProcessSequenceSegments pss(state_.sequenceHandler_);
+        ProcessSequenceSegments pss(state.sequenceHandler_);
         pss.filenames                             = cmd.dynamic_filenames;
         pss.sequence_segment_processing_methods_I = seq_seg_methods;
         pss.process();
@@ -264,6 +266,7 @@ namespace SmartPeak
       i = j;
     }
   }
+  }
 
   bool CreateCommand::operator()(const int n, AppState::Command& cmd)
   {
@@ -272,7 +275,7 @@ namespace SmartPeak
       return false;
     }
     if (n >= 1 && n <= 13) {
-      cmd.setMethod(state_.n_to_raw_data_method_.at(n));
+      cmd.setMethod(n_to_raw_data_method_.at(n));
       for (const InjectionHandler& injection : state_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
         cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
@@ -284,7 +287,7 @@ namespace SmartPeak
         );
       }
     } else if (n >= 14 && n <= 16) {
-      cmd.setMethod(state_.n_to_seq_seg_method_.at(n));
+      cmd.setMethod(n_to_seq_seg_method_.at(n));
       for (const SequenceSegmentHandler& sequence_segment : state_.sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();
         cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(

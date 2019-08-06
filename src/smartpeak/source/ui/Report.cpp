@@ -4,6 +4,7 @@
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <algorithm>
+#include <future>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <plog/Log.h>
@@ -73,18 +74,14 @@ namespace SmartPeak
       if (checkboxes_check)
       {
         const std::string pathname = state_->main_dir_ + "/FeatureDB.csv";
-        // TODO: IO operation -> use another thread
-        const bool data_was_written = SequenceParser::writeDataTableFromMetaValue(
+        run_and_join(
+          SequenceParser::writeDataTableFromMetaValue,
+          "FeatureDB.csv",
           state_->sequenceHandler_,
           pathname,
           summaryMetaData_,
           summarySampleTypes_
         );
-        if (data_was_written) {
-          LOGN << "FeatureDB.csv file has been stored at: " << pathname;
-        } else {
-          LOGE << "Error during write. FeatureDB.csv content is invalid.";
-        }
       }
       else
       {
@@ -100,18 +97,14 @@ namespace SmartPeak
       if (checkboxes_check)
       {
         const std::string pathname = state_->main_dir_ + "/PivotTable.csv";
-        // TODO: IO operation -> use another thread
-        const bool data_was_written = SequenceParser::writeDataMatrixFromMetaValue(
+        run_and_join(
+          SequenceParser::writeDataMatrixFromMetaValue,
+          "PivotTable.csv",
           state_->sequenceHandler_,
           pathname,
           summaryMetaData_,
           summarySampleTypes_
         );
-        if (data_was_written) {
-          LOGN << "PivotTable.csv file has been stored at: " << pathname;
-        } else {
-          LOGE << "Error during write. PivotTable.csv content is invalid.";
-        }
       }
       else
       {
@@ -156,5 +149,39 @@ namespace SmartPeak
     }
 
     return summarySampleTypes_.size() && summaryMetaData_.size();
+  }
+
+  void Report::run_and_join(
+    bool (*data_writer)(const SequenceHandler&, const std::string&, const std::vector<FeatureMetadata>&, const std::set<SampleType>&),
+    const std::string& data_writer_label,
+    const SequenceHandler sequence,
+    const std::string& pathname,
+    const std::vector<FeatureMetadata>& meta_data,
+    const std::set<SampleType>& sample_types
+  )
+  {
+    std::future<bool> future = std::async(
+      std::launch::async,
+      data_writer,
+      std::ref(sequence),
+      std::cref(pathname),
+      std::cref(meta_data),
+      std::cref(sample_types)
+    );
+    LOGN << data_writer_label << " file is being stored...";
+
+    bool data_was_written = false;
+
+    try {
+      data_was_written = future.get();
+    } catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    if (data_was_written) {
+      LOGN << data_writer_label << " file has been stored at: " << pathname;
+    } else {
+      LOGE << "Error during write. " << data_writer_label << " content is invalid.";
+    }
   }
 }

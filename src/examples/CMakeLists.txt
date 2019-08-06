@@ -90,14 +90,6 @@ else()
 endif()
 
 #------------------------------------------------------------------------------
-# disable optimization for examples for gcc like compilers
-if (CMAKE_COMPILER_IS_INTELCXX OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG)
-  set(_TMP_CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-  set(CMAKE_CXX_FLAGS_RELEASE "-O0")
-endif()
-
-#------------------------------------------------------------------------------
-
 # pipeline examples
 add_custom_target(PIPELINE_EXAMPLES)
 add_dependencies(PIPELINE_EXAMPLES ${pipeline_executables_list})
