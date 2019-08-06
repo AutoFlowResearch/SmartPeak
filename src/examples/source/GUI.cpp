@@ -63,7 +63,7 @@ int main(int argc, char **argv)
   // View: Top window
   bool show_sequence_table = false;
   bool show_transitions_table = false;
-  bool show_workflow_table = false;
+  bool show_workflow_table = true;
   bool show_parameters_table = false;
   bool show_quant_method_table = false;
   bool show_stds_concs_table = false;
@@ -143,6 +143,10 @@ int main(int argc, char **argv)
   ImGui_ImplOpenGL2_Init();
 
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+  const float main_menu_bar_y_size = 18.0f;
+  float y_avail;
+  float y_avail_half;
+  float top_window_y_size;
 
   // Main loop
   bool done = false;
@@ -162,10 +166,8 @@ int main(int argc, char **argv)
     ImGui::NewFrame();
 
     { // keeping this block to easily collapse/expand the bulk of the loop
-    static const float main_menu_bar_y_size = 18.0f;
-    static const float y_avail = io.DisplaySize.y - main_menu_bar_y_size;
-    static const float y_avail_half = y_avail / 2;
-    static float top_window_y_size = y_avail;
+    y_avail = io.DisplaySize.y - main_menu_bar_y_size;
+    y_avail_half = y_avail / 2;
 
     workflow_is_done_ = manager_.isWorkflowDone();
     file_loading_is_done_ = file_picker_.fileLoadingIsDone();
