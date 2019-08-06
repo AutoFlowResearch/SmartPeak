@@ -13,6 +13,7 @@
 #include <SmartPeak/ui/GuiAppender.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
+#include <SmartPeak/core/WorkflowManager.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <boost/filesystem.hpp>
@@ -43,6 +44,10 @@ int main(int argc, char **argv)
   std::string quickInfoText_;
   bool show_top_window_ = false;
   bool show_bottom_window_ = false;
+
+  // to disable buttons
+  bool workflow_is_done_ = true;
+  bool file_loading_is_done_ = true;
 
   // View: Bottom window
   bool show_info_ = true;
@@ -76,6 +81,7 @@ int main(int argc, char **argv)
   bool popup_file_picker_ = false;
 
   AppState state_;
+  WorkflowManager manager_;
   GuiAppender appender_;
 
   // widgets
@@ -156,6 +162,13 @@ int main(int argc, char **argv)
     ImGui::NewFrame();
 
     { // keeping this block to easily collapse/expand the bulk of the loop
+    static const float main_menu_bar_y_size = 18.0f;
+    static const float y_avail = io.DisplaySize.y - main_menu_bar_y_size;
+    static const float y_avail_half = y_avail / 2;
+    static float top_window_y_size = y_avail;
+
+    workflow_is_done_ = manager_.isWorkflowDone();
+    file_loading_is_done_ = file_picker_.fileLoadingIsDone();
 
     if (popup_file_picker_)
     {
@@ -242,8 +255,7 @@ int main(int argc, char **argv)
             );
           }
         }
-        ProcessCommands processCommands(state_);
-        processCommands(state_.commands_);
+        manager_.addWorkflow(state_);
         ImGui::CloseCurrentPopup();
       }
 
@@ -291,34 +303,34 @@ int main(int argc, char **argv)
       if (ImGui::BeginMenu("File"))
       {
         ImGui::MenuItem("Session", NULL, false, false);
-        if (ImGui::MenuItem("New Session"))
+        if (ImGui::MenuItem("New Session", NULL, false, false))
         {
           //TODO: SQL light interface
         }
 
-        if (ImGui::MenuItem("Load Session", "Ctrl+O"))
+        if (ImGui::MenuItem("Load Session", NULL, false, false))
         {
           //TODO: open file browser modal
           // ImGui::OpenPopup("Delete?");
         }
 
-        if (ImGui::MenuItem("Load session from sequence")) {
+        if (ImGui::MenuItem("Load session from sequence", NULL, false, workflow_is_done_ && file_loading_is_done_)) {
           static LoadSessionFromSequence processor(state_);
           file_picker_.setProcessor(processor);
           popup_file_picker_ = true;
         }
 
-        if (ImGui::MenuItem("Save Session", "Ctrl+S"))
+        if (ImGui::MenuItem("Save Session", NULL, false, false))
         {
           //TODO
         }
-        if (ImGui::MenuItem("Save Session As..."))
+        if (ImGui::MenuItem("Save Session As...", NULL, false, false))
         {
           //TODO: open save as File browser modal
         }
         ImGui::Separator();
         ImGui::MenuItem("Text file", NULL, false, false);
-        if (ImGui::BeginMenu("Import File"))
+        if (ImGui::BeginMenu("Import File", false))
         {
           if (ImGui::MenuItem("Sequence")) {}
           if (ImGui::MenuItem("Transitions")) {}
@@ -353,15 +365,15 @@ int main(int argc, char **argv)
       if (ImGui::BeginMenu("Edit"))
       {
         ImGui::MenuItem("Session", NULL, false, false);
-        if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
-        if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+        if (ImGui::MenuItem("Undo", "CTRL+Z", false, false)) {}
+        if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {} // Disabled item
         ImGui::Separator();
         ImGui::MenuItem("Settings", NULL, false, false);
-        if (ImGui::MenuItem("Tables")) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Plots")) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Explorer")) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Search")) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Workflow"))
+        if (ImGui::MenuItem("Tables", NULL, false, false)) {} // TODO: modal of settings
+        if (ImGui::MenuItem("Plots", NULL, false, false)) {} // TODO: modal of settings
+        if (ImGui::MenuItem("Explorer", NULL, false, false)) {} // TODO: modal of settings
+        if (ImGui::MenuItem("Search", NULL, false, false)) {} // TODO: modal of settings
+        if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_))
         {
           initializeDataDirs(state_);
           workflow_.draw_ = true;
@@ -403,13 +415,17 @@ int main(int argc, char **argv)
       }
       if (ImGui::BeginMenu("Actions"))
       {
-        if (ImGui::MenuItem("Run command"))
+        if (ImGui::MenuItem("Run command", NULL, false, workflow_is_done_ && file_loading_is_done_))
         {
           initializeDataDirs(state_);
           // do the rest
         }
         if (ImGui::MenuItem("Run workflow"))
         {
+          if (state_.commands_.empty())
+          {
+            LOGW << "Workflow has no steps to run. Please set the workflow's steps.";
+          }
           initializeDataDirs(state_);
           popup_run_workflow_ = true;
         }
@@ -495,14 +511,42 @@ int main(int argc, char **argv)
       ImGui::EndMainMenuBar();
     }
 
+    show_top_window_ = show_workflow_table;
     show_bottom_window_ = show_info_ || show_log_;
+
+    // Top window
+    if (show_top_window_)
+    {
+      top_window_y_size = show_bottom_window_ ? y_avail_half : y_avail;
+      ImGui::SetNextWindowPos(ImVec2(0, main_menu_bar_y_size));
+      ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, top_window_y_size));
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+      const ImGuiWindowFlags top_window_flags =
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoFocusOnAppearing;
+      ImGui::Begin("Top window", NULL, top_window_flags);
+      if (ImGui::BeginTabBar("Top window tab bar", ImGuiTabBarFlags_Reorderable))
+      {
+        if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
+        {
+          ImGui::Text("Workflow status: %s", workflow_is_done_ ? "done" : "running...");
+          ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+      }
+      ImGui::End();
+      ImGui::PopStyleVar();
+    }
 
     // Bottom window
     if (show_bottom_window_)
     {
-      const float bottom_window_y_pos = show_top_window_ ? 400 : 18;
+      const float bottom_window_y_pos = main_menu_bar_y_size + (show_top_window_ ? top_window_y_size : 0);
       ImGui::SetNextWindowPos(ImVec2(0, bottom_window_y_pos));
-      ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y - bottom_window_y_pos));
+      ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, show_top_window_ ? y_avail_half : y_avail));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags bottom_window_flags =
         ImGuiWindowFlags_NoTitleBar |
