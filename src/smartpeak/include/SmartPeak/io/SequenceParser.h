@@ -111,5 +111,11 @@ public:
       const std::vector<FeatureMetadata>& meta_data = {FeatureMetadata::calculated_concentration},
       const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
     );
+
+    /**
+      If the argument `headers` contains the string "calculated_concentration" but
+      misses the string "concentration_units", the latter is added
+    */
+    static void ensure_concentration_units_presence(std::vector<std::string>& headers);
   };
 }

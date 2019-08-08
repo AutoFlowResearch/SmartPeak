@@ -324,11 +324,7 @@ namespace SmartPeak
     for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
     }
-    if (meta_data_strings.count("calculated_concentration") &&
-        !meta_data_strings.count("concentration_units"))
-    {
-      meta_data_strings.push_back("concentration_units");
-    }
+    ensure_concentration_units_presence(meta_data_strings);
     makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data_strings, sample_types);
 
     CSVWriter writer(filename, ",");
@@ -471,5 +467,16 @@ namespace SmartPeak
 
     LOGD << "END writeDataMatrixFromMetaValue";
     return true;
+  }
+
+  void SequenceParser::ensure_concentration_units_presence(std::vector<std::string>& headers)
+  {
+    std::vector<std::string>::iterator conc_it = std::find(headers.begin(), headers.end(), "calculated_concentration");
+    std::vector<std::string>::iterator units_it = std::find(headers.begin(), headers.end(), "concentration_units");
+    std::vector<std::string>::iterator end_it = headers.end();
+
+    if (conc_it != end_it && units_it == end_it) {
+      headers.emplace(conc_it + 1, std::string("concentration_units"));
+    }
   }
 }

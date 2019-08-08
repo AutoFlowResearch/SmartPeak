@@ -245,4 +245,28 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
 }
 
+BOOST_AUTO_TEST_CASE(ensure_concentration_units_presence_test)
+{
+  std::vector<std::string> headers;
+
+  SequenceParser::ensure_concentration_units_presence(headers);
+  BOOST_CHECK_EQUAL(headers.size(), 0);
+
+  headers.push_back("some header");
+  SequenceParser::ensure_concentration_units_presence(headers);
+  BOOST_CHECK_EQUAL(headers.size(), 1);
+
+  headers.push_back("calculated_concentration");
+  BOOST_CHECK_EQUAL(headers.size(), 2);
+  SequenceParser::ensure_concentration_units_presence(headers);
+  BOOST_CHECK_EQUAL(headers.size(), 3);
+  BOOST_CHECK_EQUAL(headers.at(2), "concentration_units");
+
+  headers = { "calculated_concentration", "some header" };
+  BOOST_CHECK_EQUAL(headers.size(), 2);
+  SequenceParser::ensure_concentration_units_presence(headers);
+  BOOST_CHECK_EQUAL(headers.size(), 3);
+  BOOST_CHECK_EQUAL(headers.at(1), "concentration_units");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
