@@ -324,6 +324,11 @@ namespace SmartPeak
     for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
     }
+    if (meta_data_strings.count("calculated_concentration") &&
+        !meta_data_strings.count("concentration_units"))
+    {
+      meta_data_strings.push_back("concentration_units");
+    }
     makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data_strings, sample_types);
 
     CSVWriter writer(filename, ",");
