@@ -73,6 +73,10 @@ namespace SmartPeak
 
   void ProcessSequence::process() const
   {
+    if (raw_data_processing_methods_I.empty()) {
+      throw "no raw data processing methods given.\n";
+    }
+
     std::vector<InjectionHandler> injections = injection_names.empty()
       ? sequenceHandler_IO->getSequence()
       : sequenceHandler_IO->getSamplesInSequence(injection_names);
