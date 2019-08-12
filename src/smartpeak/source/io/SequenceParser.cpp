@@ -277,8 +277,14 @@ namespace SmartPeak
             subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
           );
           for (const std::string& meta_value_name : meta_data) {
-            if (subordinate.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_message") {
-
+            if (meta_value_name == "calculated_concentration" &&
+                (!subordinate.metaValueExists(meta_value_name) || subordinate.getMetaValue(meta_value_name).toString().empty())) {
+              row.emplace(meta_value_name, "ND"); // write ND if it does not exist or if it is an empty string
+            }
+            else if (subordinate.metaValueExists(meta_value_name) && meta_value_name == "concentration_units") {
+              row.emplace(meta_value_name, subordinate.getMetaValue(meta_value_name).toString());
+            }
+            else if (subordinate.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_message") {
               OpenMS::StringList messages = subordinate.getMetaValue(meta_value_name).toStringList();
               row.emplace(
                 meta_value_name,
