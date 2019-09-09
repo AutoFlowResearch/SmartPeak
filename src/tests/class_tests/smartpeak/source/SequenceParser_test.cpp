@@ -131,13 +131,13 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
 
   vector<map<string,string>> data_out;
   vector<string> headers_out;
-  const vector<string> meta_data {
-    "peak_apex_int",
-    "logSN",
-    "QC_transition_message",
-    "QC_transition_group_message",
-    "leftWidth",
-    "rightWidth",
+  const std::vector<FeatureMetadata> meta_data {
+    FeatureMetadata::peak_apex_intensity,
+    FeatureMetadata::log_signal_to_noise,
+    FeatureMetadata::qc_transition_message,
+    FeatureMetadata::qc_transition_group_message,
+    FeatureMetadata::integration_left_boundary,
+    FeatureMetadata::integration_right_boundary
   };
   const set<SampleType> sample_types = {SampleType::Unknown};
 
@@ -223,12 +223,11 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   std::vector<std::string> columns_out;
   std::vector<SequenceParser::Row> rows_out;
 
-  const vector<string> meta_data = {
-    "calculated_concentration",
-    "leftWidth",
-    "rightWidth"
+  const vector<FeatureMetadata> meta_data = {
+    FeatureMetadata::calculated_concentration,
+    FeatureMetadata::integration_left_boundary,
+    FeatureMetadata::integration_right_boundary
   };
-  // const vector<string> meta_data = {"calculated_concentration"};
   const set<SampleType> sample_types = {SampleType::Unknown};
 
   SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types);
@@ -247,26 +246,29 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
 
 BOOST_AUTO_TEST_CASE(ensure_concentration_units_presence_test)
 {
-  std::vector<std::string> headers;
+  std::vector<FeatureMetadata> headers;
 
   SequenceParser::ensure_concentration_units_presence(headers);
   BOOST_CHECK_EQUAL(headers.size(), 0);
 
-  headers.push_back("some header");
+  headers.push_back(FeatureMetadata::log_signal_to_noise);
   SequenceParser::ensure_concentration_units_presence(headers);
   BOOST_CHECK_EQUAL(headers.size(), 1);
 
-  headers.push_back("calculated_concentration");
+  headers.push_back(FeatureMetadata::calculated_concentration);
   BOOST_CHECK_EQUAL(headers.size(), 2);
   SequenceParser::ensure_concentration_units_presence(headers);
   BOOST_CHECK_EQUAL(headers.size(), 3);
-  BOOST_CHECK_EQUAL(headers.at(2), "concentration_units");
+  BOOST_CHECK_EQUAL(headers.at(2) == FeatureMetadata::concentration_units, true);
 
-  headers = { "calculated_concentration", "some header" };
+  headers = {
+    FeatureMetadata::calculated_concentration,
+    FeatureMetadata::points_across_half_height
+  };
   BOOST_CHECK_EQUAL(headers.size(), 2);
   SequenceParser::ensure_concentration_units_presence(headers);
   BOOST_CHECK_EQUAL(headers.size(), 3);
-  BOOST_CHECK_EQUAL(headers.at(1), "concentration_units");
+  BOOST_CHECK_EQUAL(headers.at(1) == FeatureMetadata::concentration_units, true);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

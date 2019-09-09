@@ -207,7 +207,7 @@ namespace SmartPeak
     const SequenceHandler& sequenceHandler,
     std::vector<std::map<std::string,std::string>>& list_dict,
     std::vector<std::string>& headers_out,
-    const std::vector<std::string>& meta_data,
+    const std::vector<FeatureMetadata>& meta_data,
     const std::set<SampleType>& sample_types
   )
   {
@@ -217,7 +217,12 @@ namespace SmartPeak
       "inj_volume_units", "operator_name", "acq_method_name", "proc_method_name",
       "original_filename", "acquisition_date_and_time", "injection_name", "used_"
     };
-    headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
+    std::vector<FeatureMetadata>::const_iterator it = meta_data.cbegin();
+    std::vector<std::string> meta_data_strings(meta_data.size());
+    for (std::string& s : meta_data_strings) {
+      s = metadataToString.at(*it++);
+    }
+    headers.insert(headers.end(), meta_data_strings.begin(), meta_data_strings.end());
     for (size_t i = 0; i < headers.size() - 1; ++i) { // checking headers are unique, stable (maintaining the same positions)
       for (size_t j = i + 1; j < headers.size(); ) {
         if (headers[i] == headers[j])
@@ -276,7 +281,7 @@ namespace SmartPeak
             "used_",
             subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
           );
-          for (const std::string& meta_value_name : meta_data) {
+          for (const std::string& meta_value_name : meta_data_strings) {
             if (meta_value_name == "calculated_concentration" &&
                 (!subordinate.metaValueExists(meta_value_name) || subordinate.getMetaValue(meta_value_name).toString().empty())) {
               row.emplace(meta_value_name, "ND"); // write ND if it does not exist or if it is an empty string
@@ -326,12 +331,9 @@ namespace SmartPeak
 
     std::vector<std::map<std::string,std::string>> list_dict;
     std::vector<std::string> headers;
-    std::vector<std::string> meta_data_strings;
-    for (const FeatureMetadata& m : meta_data) {
-      meta_data_strings.push_back(metadataToString.at(m));
-    }
-    ensure_concentration_units_presence(meta_data_strings);
-    makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data_strings, sample_types);
+    std::vector<FeatureMetadata> meta_data_modifiable = meta_data;
+    ensure_concentration_units_presence(meta_data_modifiable);
+    makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data_modifiable, sample_types);
 
     CSVWriter writer(filename, ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
@@ -358,7 +360,7 @@ namespace SmartPeak
     std::vector<std::vector<float>>& data_out,
     std::vector<std::string>& columns_out,
     std::vector<Row>& rows_out,
-    const std::vector<std::string>& meta_data,
+    const std::vector<FeatureMetadata>& meta_data,
     const std::set<SampleType>& sample_types
   )
   {
@@ -375,7 +377,12 @@ namespace SmartPeak
       }
       const std::string& sample_name = mdh.getSampleName();
       data_dict.insert({sample_name, std::map<Row,float,Row_less>()});
-      for (const std::string& meta_value_name : meta_data) {
+      std::vector<FeatureMetadata>::const_iterator it = meta_data.cbegin();
+      std::vector<std::string> meta_data_strings(meta_data.size());
+      for (std::string& s : meta_data_strings) {
+        s = metadataToString.at(*it++);
+      }
+      for (const std::string& meta_value_name : meta_data_strings) {
 
         // feature_map_history is not needed here as we are only interested in the current/"used" features
         for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
@@ -442,11 +449,7 @@ namespace SmartPeak
     std::vector<std::vector<float>> data;
     std::vector<std::string> columns;
     std::vector<Row> rows;
-    std::vector<std::string> meta_data_strings;
-    for (const FeatureMetadata& m : meta_data) {
-      meta_data_strings.push_back(metadataToString.at(m));
-    }
-    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_strings, sample_types);
+    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data, sample_types);
 
     std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
     headers.insert(headers.end(), columns.begin(), columns.end());
@@ -475,14 +478,14 @@ namespace SmartPeak
     return true;
   }
 
-  void SequenceParser::ensure_concentration_units_presence(std::vector<std::string>& headers)
+  void SequenceParser::ensure_concentration_units_presence(std::vector<FeatureMetadata>& headers)
   {
-    std::vector<std::string>::iterator conc_it = std::find(headers.begin(), headers.end(), "calculated_concentration");
-    std::vector<std::string>::iterator units_it = std::find(headers.begin(), headers.end(), "concentration_units");
-    std::vector<std::string>::iterator end_it = headers.end();
+    std::vector<FeatureMetadata>::iterator conc_it = std::find(headers.begin(), headers.end(), FeatureMetadata::calculated_concentration);
+    std::vector<FeatureMetadata>::iterator units_it = std::find(headers.begin(), headers.end(), FeatureMetadata::concentration_units);
+    std::vector<FeatureMetadata>::iterator end_it = headers.end();
 
     if (conc_it != end_it && units_it == end_it) {
-      headers.emplace(conc_it + 1, std::string("concentration_units"));
+      headers.emplace(conc_it + 1, FeatureMetadata::concentration_units);
     }
   }
 }

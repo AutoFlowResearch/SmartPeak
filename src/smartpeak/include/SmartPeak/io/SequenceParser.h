@@ -56,7 +56,7 @@ public:
       const SequenceHandler& sequenceHandler,
       std::vector<std::map<std::string,std::string>>& list_dict,
       std::vector<std::string>& headers_out,
-      const std::vector<std::string>& meta_data = {"calculated_concentration"},
+      const std::vector<FeatureMetadata>& meta_data = {FeatureMetadata::calculated_concentration},
       const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
     );
 
@@ -100,7 +100,7 @@ public:
       std::vector<std::vector<float>>& data_out,
       std::vector<std::string>& columns_out,
       std::vector<Row>& rows_out,
-      const std::vector<std::string>& meta_data = {"calculated_concentration"},
+      const std::vector<FeatureMetadata>& meta_data = {FeatureMetadata::calculated_concentration},
       const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
     );
 
@@ -113,9 +113,9 @@ public:
     );
 
     /**
-      If the argument `headers` contains the string "calculated_concentration" but
-      misses the string "concentration_units", the latter is added
+      If argument `headers` contains `calculated_concentration`, it ensures that
+      it is followed by `concentration_units`.
     */
-    static void ensure_concentration_units_presence(std::vector<std::string>& headers);
+    static void ensure_concentration_units_presence(std::vector<FeatureMetadata>& headers);
   };
 }
