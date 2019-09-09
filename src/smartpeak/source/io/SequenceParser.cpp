@@ -215,7 +215,8 @@ namespace SmartPeak
       "sample_name", "sample_type", "component_group_name", "component_name", "batch_name",
       "rack_number", "plate_number", "pos_number", "inj_number", "dilution_factor", "inj_volume",
       "inj_volume_units", "operator_name", "acq_method_name", "proc_method_name",
-      "original_filename", "acquisition_date_and_time", "injection_name", "used_"
+      "original_filename", "acquisition_date_and_time", "injection_name", "used_",
+      "quantifying_transition"
     };
     std::vector<FeatureMetadata>::const_iterator it = meta_data.cbegin();
     std::vector<std::string> meta_data_strings(meta_data.size());
@@ -242,6 +243,8 @@ namespace SmartPeak
       if (sample_types.count(st) == 0)
         continue;
       const std::string& sample_name = mdh.getSampleName();
+      const std::vector<OpenMS::ReactionMonitoringTransition>& transitions =
+        sampleHandler.getRawData().getTargetedExperiment().getTransitions();
 
       // feature_map_history_ is needed in order to export all "used_" = true and false features
       for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMapHistory()) {
@@ -281,6 +284,17 @@ namespace SmartPeak
             "used_",
             subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
           );
+          const std::vector<OpenMS::ReactionMonitoringTransition>::const_iterator it =
+            std::find_if(
+              transitions.cbegin(),
+              transitions.cend(),
+              [&component_name](const OpenMS::ReactionMonitoringTransition& t){
+                return t.getName() == component_name;
+              });
+          const std::string is_quantifying_transition =
+            it != transitions.cend() && it->isQuantifyingTransition()
+              ? "1" : "0";
+          row.emplace("quantifying_transition", is_quantifying_transition);
           for (const std::string& meta_value_name : meta_data_strings) {
             if (meta_value_name == "calculated_concentration" &&
                 (!subordinate.metaValueExists(meta_value_name) || subordinate.getMetaValue(meta_value_name).toString().empty())) {
