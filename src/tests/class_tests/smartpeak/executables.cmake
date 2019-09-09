@@ -1,6 +1,7 @@
 set(core_executables_list
 	AppStateProcessor_test
 	CastValue_test
+	FeatureMetadata_test
 	Filenames_test
 	GuiAppender_test
 	Helloworld_test
