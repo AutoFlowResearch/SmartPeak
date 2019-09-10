@@ -297,7 +297,9 @@ namespace SmartPeak
           row.emplace("quantifying_transition", is_quantifying_transition);
           for (const std::string& meta_value_name : meta_data_strings) {
             if (meta_value_name == "calculated_concentration" &&
-                (!subordinate.metaValueExists(meta_value_name) || subordinate.getMetaValue(meta_value_name).toString().empty())) {
+                (!subordinate.metaValueExists(meta_value_name) ||
+                 subordinate.getMetaValue(meta_value_name).toString().empty() ||
+                 subordinate.getMetaValue(meta_value_name).toString() == "inf")) {
               row.emplace(meta_value_name, "ND"); // write ND if it does not exist or if it is an empty string
             }
             else if (subordinate.metaValueExists(meta_value_name) && meta_value_name == "concentration_units") {
