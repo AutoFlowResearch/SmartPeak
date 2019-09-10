@@ -10,10 +10,14 @@
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <plog/Log.h>
+#include <atomic>
+#include <future>
+#include <list>
 #include <map>
 #include <memory> // shared_ptr
 #include <set>
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace SmartPeak
@@ -69,38 +73,25 @@ namespace SmartPeak
 
   void ProcessSequence::process() const
   {
-    std::vector<InjectionHandler> process_sequence = sequenceHandler_IO->getSamplesInSequence(injection_names);
-
-    // handle user-desired samples
-    if (injection_names.empty()) {
-      process_sequence = sequenceHandler_IO->getSequence();
+    if (raw_data_processing_methods_I.empty()) {
+      throw "no raw data processing methods given.\n";
     }
 
-    if (filenames.size() != process_sequence.size()) {
+    std::vector<InjectionHandler> injections = injection_names.empty()
+      ? sequenceHandler_IO->getSequence()
+      : sequenceHandler_IO->getSamplesInSequence(injection_names);
+
+    if (filenames.size() != injections.size()) {
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
-    // [OPTIMIZATION: add-in parallel execution here using
-    //  `std::vector<std::future>>`, `std::packaged_task`, `std::thread`, and thread count/retrieval pattern]
-    for (InjectionHandler& injection : process_sequence) {
+    SequenceProcessorMultithread manager(
+      injections,
+      filenames,
+      raw_data_processing_methods_I
+    );
 
-      // handle user-desired raw_data_processing_methods
-      if (raw_data_processing_methods_I.size() == 0) {
-        throw "no raw data processing methods given.\n";
-      }
-
-      const size_t n = raw_data_processing_methods_I.size();
-
-      // process the samples
-      for (size_t i = 0; i < n; ++i) {
-        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sequence";
-        raw_data_processing_methods_I[i]->process(
-          injection.getRawData(),
-          injection.getRawData().getParameters(),
-          filenames.at(injection.getMetaData().getInjectionName())
-        );
-      }
-    }
+    manager.spawn_workers();
   }
 
   void ProcessSequenceSegments::process() const
@@ -148,5 +139,68 @@ namespace SmartPeak
     }
 
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
+  }
+
+  void SequenceProcessorMultithread::spawn_workers()
+  {
+    const unsigned int n_threads = std::thread::hardware_concurrency(); // might return 0
+    const size_t n_workers = n_threads ? n_threads : 1;
+    LOGD << "Number of workers: " << n_workers;
+    std::list<std::future<void>> futures;
+    LOGD << "Spawning workers...";
+    for (size_t i = 0; i < n_workers; ++i) {
+      futures.emplace_back(std::async(std::launch::async, &SequenceProcessorMultithread::run_injection_processing, this));
+    }
+    LOGD << "Waiting for workers...";
+    for (std::future<void>& f : futures) {
+      f.wait();
+    }
+    LOGD << "Workers are done";
+  }
+
+  void SequenceProcessorMultithread::run_injection_processing()
+  {
+    while (true) {
+      const size_t i = i_.fetch_add(1);
+      if (i >= injections_.size()) {
+        break;
+      }
+      InjectionHandler& injection { injections_[i] };
+      std::future<void> f = std::async(
+        std::launch::async,
+        processInjection,
+        std::ref(injection),
+        std::cref(filenames_.at(injection.getMetaData().getInjectionName())),
+        std::cref(methods_)
+      );
+      LOGD << "Injenction [" << i << "]: waiting...";
+      f.wait();
+      LOGD << "Injenction [" << i << "]: done";
+      try {
+        f.get(); // check for exceptions
+      } catch (const std::exception& e) {
+        LOGE << "Injenction [" << i << "]: " << e.what();
+      }
+    }
+    LOGD << "Worker is done";
+  }
+
+  void processInjection(
+    InjectionHandler& injection,
+    const Filenames& filenames,
+    const std::vector<std::shared_ptr<RawDataProcessor>>& methods
+  )
+  {
+    size_t i_step { 1 };
+    const size_t n_steps { methods.size() };
+    const std::string inj_name { injection.getMetaData().getInjectionName() };
+    for (const std::shared_ptr<RawDataProcessor>& p : methods) {
+      LOGI << "[" << (i_step++) << "/" << n_steps << "] method on injection: " << inj_name;
+      p->process(
+        injection.getRawData(),
+        injection.getRawData().getParameters(),
+        filenames
+      );
+    }
   }
 }
