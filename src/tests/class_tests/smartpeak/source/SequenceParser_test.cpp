@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(data_out.at(0).at("logSN"), std::to_string(3.52866193485212));
   BOOST_CHECK_EQUAL(data_out.at(0).at("leftWidth"), std::to_string(15.605367));
   BOOST_CHECK_EQUAL(data_out.at(0).at("rightWidth"), std::to_string(15.836817));
-  BOOST_CHECK_EQUAL(headers_out.size(), 27);
+  BOOST_CHECK_EQUAL(headers_out.size(), 28);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
@@ -174,14 +174,15 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(headers_out[17], "injection_name");
   BOOST_CHECK_EQUAL(headers_out[18], "used_");
   BOOST_CHECK_EQUAL(headers_out[19], "quantifying_transition");
+  BOOST_CHECK_EQUAL(headers_out[20], "LabelType");
   // metadata
-  BOOST_CHECK_EQUAL(headers_out[20], "peak_apex_int");
-  BOOST_CHECK_EQUAL(headers_out[21], "calculated_concentration");
-  BOOST_CHECK_EQUAL(headers_out[22], "logSN");
-  BOOST_CHECK_EQUAL(headers_out[23], "QC_transition_message");
-  BOOST_CHECK_EQUAL(headers_out[24], "QC_transition_group_message");
-  BOOST_CHECK_EQUAL(headers_out[25], "leftWidth");
-  BOOST_CHECK_EQUAL(headers_out[26], "rightWidth");
+  BOOST_CHECK_EQUAL(headers_out[21], "peak_apex_int");
+  BOOST_CHECK_EQUAL(headers_out[22], "calculated_concentration");
+  BOOST_CHECK_EQUAL(headers_out[23], "logSN");
+  BOOST_CHECK_EQUAL(headers_out[24], "QC_transition_message");
+  BOOST_CHECK_EQUAL(headers_out[25], "QC_transition_group_message");
+  BOOST_CHECK_EQUAL(headers_out[26], "leftWidth");
+  BOOST_CHECK_EQUAL(headers_out[27], "rightWidth");
 
   for (const map<string, string>& m : data_out) {
     BOOST_CHECK_NE(m.at("calculated_concentration"), "inf");
