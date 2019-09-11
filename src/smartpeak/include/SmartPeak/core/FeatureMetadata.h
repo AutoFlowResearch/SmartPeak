@@ -4,10 +4,15 @@
 #include <string>
 
 namespace SmartPeak {
+  // IMPORTANT:
+  // When adding or removing an element to FeatureMetadata:
+  // - update FeatureMetadataSize
+  // - update metadataToString in FeatureMetadata.cpp
   enum class FeatureMetadata {
     asymmetry_factor = 1,
     baseline_delta_to_height,
     calculated_concentration,
+    concentration_units,
     log_signal_to_noise,
     peak_apex_intensity,
     peak_area,
@@ -32,5 +37,5 @@ namespace SmartPeak {
   // Returns the string representation that a FeatureMetadata would have in OpenMS
   extern const std::map<FeatureMetadata, std::string> metadataToString;
 
-  constexpr size_t FeatureMetadataSize { 22 };
+  constexpr size_t FeatureMetadataSize { 23 };
 }

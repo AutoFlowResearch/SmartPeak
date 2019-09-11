@@ -7,6 +7,7 @@ namespace SmartPeak {
     { FeatureMetadata::asymmetry_factor,            "asymmetry_factor"            },
     { FeatureMetadata::baseline_delta_to_height,    "baseline_delta_2_height"     },
     { FeatureMetadata::calculated_concentration,    "calculated_concentration"    },
+    { FeatureMetadata::concentration_units,         "concentration_units"         },
     { FeatureMetadata::log_signal_to_noise,         "logSN"                       },
     { FeatureMetadata::peak_apex_intensity,         "peak_apex_int"               },
     { FeatureMetadata::peak_area,                   "peak_area"                   },

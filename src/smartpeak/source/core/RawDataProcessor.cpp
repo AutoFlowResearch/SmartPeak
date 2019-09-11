@@ -36,6 +36,8 @@
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>  // feature picker
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h> // feature quantification
 
+#include <unordered_set>
+
 namespace SmartPeak
 {
   void LoadRawData::process(
@@ -554,6 +556,26 @@ namespace SmartPeak
       return;
     }
 
+    auto remove_whitespaces_from_transitions =
+    [](OpenMS::TargetedExperiment& targeted_experiment)
+    {
+      auto remove_whitespaces_from_string = [](std::string& str)
+      {
+        const std::unordered_set<char> whitespaces { ' ', '\f', '\n', '\r', '\t', '\v' };
+        str.erase(
+          std::remove_if(str.begin(), str.end(), [&whitespaces](char ch){ return whitespaces.count(ch); }),
+          str.end()
+        );
+      };
+      std::vector<OpenMS::ReactionMonitoringTransition> transitions { targeted_experiment.getTransitions() };
+      for (auto& t : transitions) {
+        std::string name { t.getName() }; // this is the transition_name in traML.csv files
+        remove_whitespaces_from_string(name);
+        t.setName(name);
+      }
+      targeted_experiment.setTransitions(transitions);
+    };
+
     try {
       // must use "PeptideSequence"
       if (format == "csv") {
@@ -565,12 +587,14 @@ namespace SmartPeak
           OpenMS::FileTypes::TRAML,
           rawDataHandler_IO.getTargetedExperiment()
         );
+        remove_whitespaces_from_transitions(rawDataHandler_IO.getTargetedExperiment());
       }
       else if (format == "traML") {
         // Transitions are appended to the existing experiment in OpenMS
         rawDataHandler_IO.getTargetedExperiment().clear(true);
         OpenMS::TraMLFile tramlfile;
         tramlfile.load(filenames.traML_csv_i, rawDataHandler_IO.getTargetedExperiment());
+        remove_whitespaces_from_transitions(rawDataHandler_IO.getTargetedExperiment());
       }
       else {
         LOGE << "Format must either be 'csv' or 'traML'";
