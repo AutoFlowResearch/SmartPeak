@@ -270,11 +270,11 @@ namespace SmartPeak
 
   bool CreateCommand::operator()(const int n, AppState::Command& cmd)
   {
-    if (n < 1 || n > 16 || n == 10) { // TODO: update this if plotting is implemented
+    if (n < 1 || n > 17 || n == 10) { // TODO: update this if plotting is implemented
       LOGW << "\n\nSkipping: " << n;
       return false;
     }
-    if (n >= 1 && n <= 13) {
+    if (n >= 1 && n <= 14) {
       cmd.setMethod(n_to_raw_data_method_.at(n));
       for (const InjectionHandler& injection : state_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
@@ -286,7 +286,7 @@ namespace SmartPeak
           key
         );
       }
-    } else if (n >= 14 && n <= 16) {
+    } else if (n >= 15 && n <= 17) {
       cmd.setMethod(n_to_seq_seg_method_.at(n));
       for (const SequenceSegmentHandler& sequence_segment : state_.sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();

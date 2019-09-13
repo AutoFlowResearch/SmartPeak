@@ -349,7 +349,7 @@ namespace SmartPeak
 
   struct EMGProcessor : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    int getID() const override { return 14; }
     std::string getName() const override { return "EMG_PROCESSOR"; }
     std::string getDescription() const override { return "Reconstruct a peak from available data points."; }
 

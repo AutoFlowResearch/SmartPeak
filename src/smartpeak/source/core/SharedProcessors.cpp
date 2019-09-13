@@ -20,10 +20,11 @@ namespace SmartPeak {
     {11, std::make_shared<MapChromatograms>()},
     {12, std::make_shared<ZeroChromatogramBaseline>()},
     {13, std::make_shared<ExtractChromatogramWindows>()},
+    {14, std::make_shared<EMGProcessor>()},
   };
   const std::map<int, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
-    {14, std::make_shared<CalculateCalibration>()},
-    {15, std::make_shared<StoreQuantitationMethods>()},
-    {16, std::make_shared<LoadQuantitationMethods>()},
+    {15, std::make_shared<CalculateCalibration>()},
+    {16, std::make_shared<StoreQuantitationMethods>()},
+    {17, std::make_shared<LoadQuantitationMethods>()},
   };
 }
