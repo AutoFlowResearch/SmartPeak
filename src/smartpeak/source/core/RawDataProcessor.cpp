@@ -30,11 +30,16 @@
 // feature selection
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMBatchFeatureSelector.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/PeakIntegrator.h>
 
 #include <SmartPeak/algorithm/MRMFeatureValidator.h>  // feature validaiton
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>  // feature filter/QC
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>  // feature picker
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h> // feature quantification
+#include <OpenMS/MATH/MISC/EmgGradientDescent.h>
+
+#include <algorithm>
+#include <exception>
 
 namespace SmartPeak
 {
@@ -952,5 +957,138 @@ namespace SmartPeak
     }
 
     LOGD << "END ExtractChromatogramWindows";
+  }
+
+  void EMGProcessor::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START EMGProcessor";
+
+    OpenMS::EmgGradientDescent emg;
+
+    if (params_I.count("EmgGradientDescent") && params_I.at("EmgGradientDescent").size()) {
+      OpenMS::Param parameters = emg.getParameters();
+      Utilities::updateParameters(parameters, params_I.at("EmgGradientDescent"));
+      parameters.setValue("print_debug", 2);
+      emg.setParameters(parameters);
+    }
+
+    // TODO: Remove these lines after testing/debugging is done
+    OpenMS::Param parameters = emg.getParameters();
+    parameters.setValue("print_debug", 1);
+    emg.setParameters(parameters);
+
+    OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
+
+    const std::vector<OpenMS::MSChromatogram>& chromatograms {
+      rawDataHandler_IO.getChromatogramMap().getChromatograms() };
+
+    auto getChromatogramByName = [&chromatograms](const OpenMS::String& name) -> const OpenMS::MSChromatogram&
+    {
+      const std::vector<OpenMS::MSChromatogram>::const_iterator it =
+        std::find_if(chromatograms.cbegin(), chromatograms.cend(), [&name](const OpenMS::MSChromatogram& chrom){
+          return name == chrom.getNativeID();
+        });
+      if (it == chromatograms.cend()) {
+        throw std::string("Can't find a chromatogram with NativeID == ") + name;
+      }
+      return *it;
+    };
+
+    try {
+      using namespace OpenMS;
+      for (Feature& feature : featureMap) {
+        const double left { feature.getMetaValue("leftWidth") };
+        const double right { feature.getMetaValue("rightWidth") };
+        // std::cout << "left: " << left << "\n";
+        // std::cout << "right: " << right << "\n";
+        std::vector<Feature>& subordinates { feature.getSubordinates() };
+        // std::cout << "n. subordinates: " << subordinates.size() << "\n";
+        for (Feature& subfeature : subordinates) {
+          const String name = subfeature.getMetaValue("native_id");
+          // std::cout << "subordinate name: " << name << "\n";
+          const MSChromatogram& chromatogram = getChromatogramByName(name);
+          // std::cout << "chromatogram found!\n";
+          std::vector<double> x;
+          std::vector<double> y;
+          extractPointsIntoVectors(chromatogram, left, right, x, y);
+          // std::cout << "extracted n. points: " << x.size() << "\n";
+
+          if (x.size() < 3) {
+            std::cout << "Less than 2 points. Skipping: " << name << "\n\n";
+            continue;
+          }
+
+          // EMG parameter estimation with gradient descent
+          double h, mu, sigma, tau;
+          emg.estimateEmgParameters(x, y, h, mu, sigma, tau);
+
+          // Estimate the intensities for each point
+          std::vector<double> out_xs;
+          std::vector<double> out_ys;
+          emg.applyEstimatedParameters(x, h, mu, sigma, tau, out_xs, out_ys);
+
+          // integrate area and estimate background, update the subfeature
+
+          // std::cout << "emg n. points: " << out_xs.size() << "\n";
+          MSChromatogram emg_chrom;
+          for (size_t i = 0; i < out_xs.size(); ++i) {
+            emg_chrom.push_back(ChromatogramPeak(out_xs[i], out_ys[i]));
+            // std::cout << out_xs[i] << "\t" << out_ys[i] << "\n";
+          }
+
+          PeakIntegrator pi;
+          emg_chrom.updateRanges();
+          const double emg_chrom_left { emg_chrom.getMin()[0] };
+          const double emg_chrom_right { emg_chrom.getMax()[0] };
+          PeakIntegrator::PeakArea pa = pi.integratePeak(emg_chrom, emg_chrom_left, emg_chrom_right);
+          PeakIntegrator::PeakBackground pb = pi.estimateBackground(emg_chrom, emg_chrom_left, emg_chrom_right, pa.apex_pos);
+          double peak_integral { pa.area - pb.area };
+          double peak_apex_int { pa.height - pb.height };
+          if (peak_integral < 0) { peak_integral = 0; }
+          if (peak_apex_int < 0) { peak_apex_int = 0; }
+
+          // std::cout << "Intensity: " << subfeature.getIntensity() << "\t" << peak_integral << "\n";
+          // std::cout << "peak_apex_position: " << subfeature.getMetaValue("peak_apex_position") << "\t" << pa.apex_pos << "\n";
+          // std::cout << "peak_apex_int: " << subfeature.getMetaValue("peak_apex_int") << "\t" << peak_apex_int << "\n";
+          // std::cout << "area_background_level: " << subfeature.getMetaValue("area_background_level") << "\t" << pb.area << "\n";
+          // std::cout << "noise_background_level: " << subfeature.getMetaValue("noise_background_level") << "\t" << pb.height << "\n\n";
+
+          subfeature.setIntensity(peak_integral);
+          subfeature.setMetaValue("peak_apex_position", pa.apex_pos);
+          subfeature.setMetaValue("peak_apex_int", peak_apex_int);
+          subfeature.setMetaValue("area_background_level", pb.area);
+          subfeature.setMetaValue("noise_background_level", pb.height);
+        }
+      }
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    LOGD << "END EMGProcessor";
+  }
+
+  void EMGProcessor::extractPointsIntoVectors(
+    const OpenMS::MSChromatogram& chromatogram,
+    const double left,
+    const double right,
+    std::vector<double>& x,
+    std::vector<double>& y
+  ) const
+  {
+    x.clear();
+    y.clear();
+    OpenMS::MSChromatogram::ConstIterator it = chromatogram.PosBegin(left);
+    const OpenMS::MSChromatogram::ConstIterator end = chromatogram.PosEnd(right);
+    // std::cout << "empty range: " << (it == end) << "\n";
+    for (; it != end; ++it) {
+      x.push_back(it->getPos());
+      y.push_back(it->getIntensity());
+      // std::cout << x.back() << "\t" << y.back() << "\n";
+    }
   }
 }
