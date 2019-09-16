@@ -999,18 +999,17 @@ namespace SmartPeak
     };
 
     try {
-      using namespace OpenMS;
-      for (Feature& feature : featureMap) {
+      for (OpenMS::Feature& feature : featureMap) {
         const double left { feature.getMetaValue("leftWidth") };
         const double right { feature.getMetaValue("rightWidth") };
         // std::cout << "left: " << left << "\n";
         // std::cout << "right: " << right << "\n";
-        std::vector<Feature>& subordinates { feature.getSubordinates() };
+        std::vector<OpenMS::Feature>& subordinates { feature.getSubordinates() };
         // std::cout << "n. subordinates: " << subordinates.size() << "\n";
-        for (Feature& subfeature : subordinates) {
-          const String name = subfeature.getMetaValue("native_id");
+        for (OpenMS::Feature& subfeature : subordinates) {
+          const OpenMS::String name = subfeature.getMetaValue("native_id");
           // std::cout << "subordinate name: " << name << "\n";
-          const MSChromatogram& chromatogram = getChromatogramByName(name);
+          const OpenMS::MSChromatogram& chromatogram = getChromatogramByName(name);
           // std::cout << "chromatogram found!\n";
           std::vector<double> x;
           std::vector<double> y;
@@ -1034,18 +1033,18 @@ namespace SmartPeak
           // integrate area and estimate background, update the subfeature
 
           // std::cout << "emg n. points: " << out_xs.size() << "\n";
-          MSChromatogram emg_chrom;
+          OpenMS::MSChromatogram emg_chrom;
           for (size_t i = 0; i < out_xs.size(); ++i) {
-            emg_chrom.push_back(ChromatogramPeak(out_xs[i], out_ys[i]));
+            emg_chrom.push_back(OpenMS::ChromatogramPeak(out_xs[i], out_ys[i]));
             // std::cout << out_xs[i] << "\t" << out_ys[i] << "\n";
           }
 
-          PeakIntegrator pi;
+          OpenMS::PeakIntegrator pi;
           emg_chrom.updateRanges();
           const double emg_chrom_left { emg_chrom.getMin()[0] };
           const double emg_chrom_right { emg_chrom.getMax()[0] };
-          PeakIntegrator::PeakArea pa = pi.integratePeak(emg_chrom, emg_chrom_left, emg_chrom_right);
-          PeakIntegrator::PeakBackground pb = pi.estimateBackground(emg_chrom, emg_chrom_left, emg_chrom_right, pa.apex_pos);
+          OpenMS::PeakIntegrator::PeakArea pa = pi.integratePeak(emg_chrom, emg_chrom_left, emg_chrom_right);
+          OpenMS::PeakIntegrator::PeakBackground pb = pi.estimateBackground(emg_chrom, emg_chrom_left, emg_chrom_right, pa.apex_pos);
           double peak_integral { pa.area - pb.area };
           double peak_apex_int { pa.height - pb.height };
           if (peak_integral < 0) { peak_integral = 0; }
