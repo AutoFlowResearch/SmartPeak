@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(gettersCalculateCalibration)
 {
   CalculateCalibration processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 14);
+  BOOST_CHECK_EQUAL(processor.getID(), 15);
   BOOST_CHECK_EQUAL(processor.getName(), "CALCULATE_CALIBRATION");
 }
 
@@ -494,7 +494,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadQuantitationMethods)
 {
   LoadQuantitationMethods processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 16);
+  BOOST_CHECK_EQUAL(processor.getID(), 17);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_QUANTITATION_METHODS");
 }
 
@@ -561,7 +561,7 @@ BOOST_AUTO_TEST_CASE(gettersStoreQuantitationMethods)
 {
   StoreQuantitationMethods processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 15);
+  BOOST_CHECK_EQUAL(processor.getID(), 16);
   BOOST_CHECK_EQUAL(processor.getName(), "STORE_QUANTITATION_METHODS");
 }
 

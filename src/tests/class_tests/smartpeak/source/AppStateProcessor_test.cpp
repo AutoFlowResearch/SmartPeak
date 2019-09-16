@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(buildcommandsfromids)
   BOOST_CHECK_EQUAL(methods.at(0).getID(), 1);
   BOOST_CHECK_EQUAL(methods.at(1).getID(), 2);
 
-  methods = buildCommandsFromIds(std::string("1 17 16")); // "17" and higher don't exist
+  methods = buildCommandsFromIds(std::string("1 18 16")); // "18" and higher don't exist
   BOOST_CHECK_EQUAL(methods.size(), 2);
   BOOST_CHECK_EQUAL(methods.at(0).getID(), 1);
   BOOST_CHECK_EQUAL(methods.at(1).getID(), 16);
