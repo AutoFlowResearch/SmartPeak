@@ -52,18 +52,18 @@ after_build:
   - ps: Stop-Process -Id $Clcacheserver.Id
   - clcache -s & clcache -z
 
-# test_script:
-#   - cd C:\projects\SmartPeak2\build
-#   - ctest -C "Debug" -V -j2
-#   - cd bin\Debug
-#   - echo %time%
-#   - C:\projects\SmartPeak2\build\bin\Debug\GCMS_SIM_Unknown_test > GCMS_SIM_Unknown_test.txt 2>&1
-#   - echo %time%
-#   - C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Standards_test > HPLC_UV_Standards_test.txt 2>&1
-#   - echo %time%
-#   - C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Unknown_test > HPLC_UV_Unknown_test.txt 2>&1
-#   - echo %time%
-#   - C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_QCs_test > LCMS_MRM_QCs_test.txt 2>&1
-#   - echo %time%
-#   - C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_Unknown_test > LCMS_MRM_Unknown_test.txt 2>&1
-#   - echo %time%
+test_script:
+  - cd C:\projects\SmartPeak2\build
+  - ctest -C "Debug" -V -j2
+  - cd bin\Debug
+  - echo %time%
+  - C:\projects\SmartPeak2\build\bin\Debug\GCMS_SIM_Unknown_test > GCMS_SIM_Unknown_test.txt 2>&1
+  - echo %time%
+  - C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Standards_test > HPLC_UV_Standards_test.txt 2>&1
+  - echo %time%
+  - C:\projects\SmartPeak2\build\bin\Debug\HPLC_UV_Unknown_test > HPLC_UV_Unknown_test.txt 2>&1
+  - echo %time%
+  - C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_QCs_test > LCMS_MRM_QCs_test.txt 2>&1
+  - echo %time%
+  - C:\projects\SmartPeak2\build\bin\Debug\LCMS_MRM_Unknown_test > LCMS_MRM_Unknown_test.txt 2>&1
+  - echo %time%
