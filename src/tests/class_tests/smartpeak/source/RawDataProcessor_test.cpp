@@ -1389,6 +1389,9 @@ BOOST_AUTO_TEST_CASE(emg_processor)
   OpenMS::FeatureMap& m = rawDataHandler.getFeatureMap();
   m.erase(m.begin() + 1, m.end());
 
+  BOOST_CHECK_EQUAL(m.size(), 1);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 1);
+
   EMGProcessor emg;
   emg.process(rawDataHandler, params_1, filenames);
 
