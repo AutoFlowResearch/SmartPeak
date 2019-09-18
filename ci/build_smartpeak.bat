@@ -1,6 +1,6 @@
 call "C:/Program Files (x86)/Microsoft Visual Studio/2017/BuildTools/VC/Auxiliary/Build/vcvars64.bat"
 mkdir build & cd build
-cmake -DCMAKE_PREFIX_PATH="C:/OpenMS/build;C:/Qt/5.12.2/msvc2017_64/lib/cmake;C:/SDL2-2.0.9" ^
+cmake -DCMAKE_PREFIX_PATH="C:/OpenMS/build;C:/Qt/5.12/msvc2017_64/lib/cmake;C:/SDL2-2.0.9" ^
   -G "Visual Studio 15 2017 Win64" ^
   -T host=x64 ^
   -DUSE_SUPERBUILD=OFF ^
