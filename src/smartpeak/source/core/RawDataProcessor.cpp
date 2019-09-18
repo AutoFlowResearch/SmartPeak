@@ -972,13 +972,12 @@ namespace SmartPeak
     if (params_I.count("EmgGradientDescent") && params_I.at("EmgGradientDescent").size()) {
       OpenMS::Param parameters = emg.getParameters();
       Utilities::updateParameters(parameters, params_I.at("EmgGradientDescent"));
-      parameters.setValue("print_debug", 2);
       emg.setParameters(parameters);
     }
 
     // TODO: Remove these lines after testing/debugging is done
     OpenMS::Param parameters = emg.getParameters();
-    parameters.setValue("print_debug", 1);
+    parameters.setValue("print_debug", 2);
     emg.setParameters(parameters);
 
     OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
