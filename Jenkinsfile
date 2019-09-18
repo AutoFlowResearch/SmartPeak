@@ -2,7 +2,7 @@
 pipeline {
     agent any
     environment {
-        PATH = "$PATH;C:\\OpenMS\\build\\bin\\Debug;C:\\Qt\\5.12.2\\msvc2017_64\\bin;C:\\SDL2-2.0.9\\lib\\x64"
+        PATH = "$PATH;C:\\OpenMS\\build\\bin\\Debug;C:\\Qt\\5.12\\msvc2017_64\\bin;C:\\SDL2-2.0.9\\lib\\x64"
         BOOST_TEST_DETECT_MEMORY_LEAK=0
     }
     stages {
