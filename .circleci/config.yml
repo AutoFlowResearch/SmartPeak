@@ -19,7 +19,7 @@ jobs:
           libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
       - run: |
           cd ~ &&
-          git clone --branch develop --depth 1 https://github.com/biosustain/OpenMS.git &&
+          git clone --branch fix_debug_severity_emg --depth 1 https://github.com/biosustain/OpenMS.git &&
           cd OpenMS &&
           cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
           make -j4 OpenMS
