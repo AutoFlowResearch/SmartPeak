@@ -999,21 +999,22 @@ namespace SmartPeak
 
     try {
       for (OpenMS::Feature& feature : featureMap) {
+        std::cout << "NEW FEATURE\n";
         const double left { feature.getMetaValue("leftWidth") };
         const double right { feature.getMetaValue("rightWidth") };
-        // std::cout << "left: " << left << "\n";
-        // std::cout << "right: " << right << "\n";
+        std::cout << "Boundaries: [" << left << ", " << right << "]\n";
         std::vector<OpenMS::Feature>& subordinates { feature.getSubordinates() };
-        // std::cout << "n. subordinates: " << subordinates.size() << "\n";
+        std::cout << "n. subordinates: " << subordinates.size() << "\n";
         for (OpenMS::Feature& subfeature : subordinates) {
+          std::cout << "NEW SUBFEATURE\n";
           const OpenMS::String name = subfeature.getMetaValue("native_id");
-          // std::cout << "subordinate name: " << name << "\n";
+          std::cout << "Subordinate name: " << name << "\n";
           const OpenMS::MSChromatogram& chromatogram = getChromatogramByName(name);
-          // std::cout << "chromatogram found!\n";
+          std::cout << "Chromatogram found!\n";
           std::vector<double> x;
           std::vector<double> y;
           extractPointsIntoVectors(chromatogram, left, right, x, y);
-          // std::cout << "extracted n. points: " << x.size() << "\n";
+          std::cout << "Extracted n. points: " << x.size() << "\n";
 
           if (x.size() < 3) {
             std::cout << "Less than 2 points. Skipping: " << name << "\n\n";
@@ -1031,7 +1032,7 @@ namespace SmartPeak
 
           // integrate area and estimate background, update the subfeature
 
-          // std::cout << "emg n. points: " << out_xs.size() << "\n";
+          std::cout << "emg peak # points: " << out_xs.size() << "\n";
           OpenMS::MSChromatogram emg_chrom;
           for (size_t i = 0; i < out_xs.size(); ++i) {
             emg_chrom.push_back(OpenMS::ChromatogramPeak(out_xs[i], out_ys[i]));
@@ -1039,21 +1040,26 @@ namespace SmartPeak
           }
 
           OpenMS::PeakIntegrator pi;
+          std::cout << "Updating ranges...\n";
           emg_chrom.updateRanges();
+          std::cout << "Ranges updated.\n";
           const double emg_chrom_left { emg_chrom.getMin()[0] };
           const double emg_chrom_right { emg_chrom.getMax()[0] };
+          std::cout << "Positions calculated.\n";
           OpenMS::PeakIntegrator::PeakArea pa = pi.integratePeak(emg_chrom, emg_chrom_left, emg_chrom_right);
+          std::cout << "Area calculated.\n";
           OpenMS::PeakIntegrator::PeakBackground pb = pi.estimateBackground(emg_chrom, emg_chrom_left, emg_chrom_right, pa.apex_pos);
+          std::cout << "Background calculated.\n";
           double peak_integral { pa.area - pb.area };
           double peak_apex_int { pa.height - pb.height };
           if (peak_integral < 0) { peak_integral = 0; }
           if (peak_apex_int < 0) { peak_apex_int = 0; }
 
-          // std::cout << "Intensity: " << subfeature.getIntensity() << "\t" << peak_integral << "\n";
-          // std::cout << "peak_apex_position: " << subfeature.getMetaValue("peak_apex_position") << "\t" << pa.apex_pos << "\n";
-          // std::cout << "peak_apex_int: " << subfeature.getMetaValue("peak_apex_int") << "\t" << peak_apex_int << "\n";
-          // std::cout << "area_background_level: " << subfeature.getMetaValue("area_background_level") << "\t" << pb.area << "\n";
-          // std::cout << "noise_background_level: " << subfeature.getMetaValue("noise_background_level") << "\t" << pb.height << "\n\n";
+          std::cout << "Intensity: " << subfeature.getIntensity() << "\t" << peak_integral << "\n";
+          std::cout << "peak_apex_position: " << subfeature.getMetaValue("peak_apex_position") << "\t" << pa.apex_pos << "\n";
+          std::cout << "peak_apex_int: " << subfeature.getMetaValue("peak_apex_int") << "\t" << peak_apex_int << "\n";
+          std::cout << "area_background_level: " << subfeature.getMetaValue("area_background_level") << "\t" << pb.area << "\n";
+          std::cout << "noise_background_level: " << subfeature.getMetaValue("noise_background_level") << "\t" << pb.height << "\n\n";
 
           subfeature.setIntensity(peak_integral);
           subfeature.setMetaValue("peak_apex_position", pa.apex_pos);
@@ -1064,6 +1070,7 @@ namespace SmartPeak
       }
     }
     catch (const std::exception& e) {
+      std::cout << "I catched the exception (in SmartPeak)!\n";
       LOGE << e.what();
     }
 
@@ -1082,7 +1089,7 @@ namespace SmartPeak
     y.clear();
     OpenMS::MSChromatogram::ConstIterator it = chromatogram.PosBegin(left);
     const OpenMS::MSChromatogram::ConstIterator end = chromatogram.PosEnd(right);
-    // std::cout << "empty range: " << (it == end) << "\n";
+    std::cout << "empty range: " << (it == end) << "\n";
     for (; it != end; ++it) {
       x.push_back(it->getPos());
       y.push_back(it->getIntensity());
