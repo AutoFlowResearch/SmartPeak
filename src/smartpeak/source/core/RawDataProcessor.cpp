@@ -977,7 +977,8 @@ namespace SmartPeak
 
     // TODO: Remove these lines after testing/debugging is done
     OpenMS::Param parameters = emg.getParameters();
-    parameters.setValue("print_debug", 2);
+    parameters.setValue("print_debug", 1);
+    parameters.setValue("max_gd_iter", 10000u);
     emg.setParameters(parameters);
 
     OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
