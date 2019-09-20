@@ -1023,11 +1023,13 @@ namespace SmartPeak
 
           // EMG parameter estimation with gradient descent
           double h, mu, sigma, tau;
+          std::cout << "Estimating EMG parameters...\n";
           emg.estimateEmgParameters(x, y, h, mu, sigma, tau);
 
           // Estimate the intensities for each point
           std::vector<double> out_xs;
           std::vector<double> out_ys;
+          std::cout << "Applying estimated parameters...\n";
           emg.applyEstimatedParameters(x, h, mu, sigma, tau, out_xs, out_ys);
 
           // integrate area and estimate background, update the subfeature
