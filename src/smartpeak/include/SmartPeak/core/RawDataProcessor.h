@@ -265,6 +265,32 @@ namespace SmartPeak
     ) const override;
   };
 
+  struct MetaLoadQMIP : RawDataProcessor
+  {
+    int getID() const { return 17; };
+    std::string getName() const { return "METALOAD_QMIP"; };
+    std::string getDescription() const { return "METALOAD_QMIP"; };
+
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct MetaLoadLP : RawDataProcessor
+  {
+    int getID() const { return 18; };
+    std::string getName() const { return "METALOAD_LP"; };
+    std::string getDescription() const { return "METALOAD_LP"; };
+
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
   struct LoadTransitions : RawDataProcessor
   {
     int getID() const override { return -1; }

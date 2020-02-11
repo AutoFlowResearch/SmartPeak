@@ -21,10 +21,15 @@ namespace SmartPeak
     std::map<std::string, std::map<std::string, CastValue>> reference_data;
     for (const std::map<std::string, CastValue>& m : reference_data_v) {
       if (m.at("injection_name").s_ != injection_name) {
+        // std::cout << "injection_name != injection_name " << std::endl;
+        // std::cout << m.at("injection_name").s_ << std::endl;
+        // std::cout << injection_name << std::endl;
         continue;
       }
       const std::string& name = m.at("component_name").s_;
       reference_data[name] = m;
+      // std::cout << "name " << name << std::endl;
+      // std::cout << "m " << m << std::endl;
     }
 
     for (const OpenMS::Feature& feature : features) {
@@ -40,9 +45,11 @@ namespace SmartPeak
           throw "native_id info is missing.";
         }
         const std::string reference_data_key = subordinate.getMetaValue("native_id").toString();
+        // std::cout << "reference_data_key " << reference_data_key << std::endl;
         OpenMS::Feature subordinate_copy = subordinate;
 
         if (0 == reference_data.count(reference_data_key)) {
+          // std::cout << "not in reference data " << reference_data_key << std::endl;
           subordinate_copy.setMetaValue("validation", "ND");
           subordinates_tmp.push_back(subordinate_copy);
           continue;
@@ -58,6 +65,10 @@ namespace SmartPeak
         const float feature_leftWidth = static_cast<float>(feature.getMetaValue("leftWidth"));
         const float feature_rightWidth = static_cast<float>(feature.getMetaValue("rightWidth"));
         // validate the retention time
+        // std::cout << reference_rt << " " << feature_rt << std::endl;
+        // std::cout << "Tr_window " << Tr_window << std::endl;
+        // std::cout << "feature_leftWidth " << feature_leftWidth << std::endl;
+        // std::cout << "feature_rightWidth " << feature_rightWidth << std::endl;
         if (std::fabs(reference_rt - feature_rt) < Tr_window ||
             (reference_rt > feature_leftWidth &&
              reference_rt < feature_rightWidth)) {

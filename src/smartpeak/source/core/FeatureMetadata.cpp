@@ -25,6 +25,7 @@ namespace SmartPeak {
     { FeatureMetadata::integration_left_boundary,   "leftWidth"                   },
     { FeatureMetadata::integration_right_boundary,  "rightWidth"                  },
     { FeatureMetadata::accuracy,                    "accuracy"                    },
-    { FeatureMetadata::n_features,                  "n_features"                  }
+    { FeatureMetadata::n_features,                  "n_features"                  },
+    { FeatureMetadata::validation,                  "validation"                  }
   };
 }

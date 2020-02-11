@@ -92,7 +92,13 @@ public:
     )
     {
       if (y_true.empty() || y_pred.empty()) {
-        throw std::invalid_argument("Actual and predicted values' vectors cannot be empty.");
+        LOGD << "Actual size " << y_true.size() << ", predicted size " << y_pred.size();
+        return {
+          {"accuracy", 0},
+          {"recall", 0},
+          {"precision", 0},
+          {"n_features", 0},
+        };
       }
 
       const std::array<size_t, 4> conf = computeConfusionMatrix(y_true, y_pred);

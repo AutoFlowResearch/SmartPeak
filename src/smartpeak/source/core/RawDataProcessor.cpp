@@ -19,6 +19,11 @@
 #include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
 #include <SmartPeak/io/InputDataValidation.h> // check filenames and headers
 
+#include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/DataAccessHelper.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/SimpleOpenMSSpectraAccessFactory.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/MRMFeatureAccessOpenMS.h>
+
+
 // load validation data and parameters
 #include <SmartPeak/io/FileReader.h>
 #ifndef CSV_IO_NO_THREAD
@@ -53,7 +58,9 @@ namespace SmartPeak
     // # load chromatograms
     OpenMS::MSExperiment chromatograms;
     if (filenames.mzML_i.size()) {
+      LOGI << "before";
       if (params_I.at("mzML").size()) {
+        LOGI << "after";
         // # convert parameters
         std::map<std::string, CastValue> mzML_params;
         for (const std::map<std::string, std::string>& param : params_I.at("mzML")) {
@@ -313,6 +320,26 @@ namespace SmartPeak
 
     OpenMS::FeatureMap featureMap;
 
+    // OpenMS::MSExperiment exp1 = rawDataHandler_IO.getChromatogramMap();
+    // boost::shared_ptr<OpenMS::PeakMap > sh_chromatograms = boost::make_shared<OpenMS::PeakMap >(exp1);
+    // OpenSwath::SpectrumAccessPtr chromatogram_ptr = OpenMS::SimpleOpenMSSpectraFactory::getSpectrumAccessOpenMSPtr(sh_chromatograms);
+
+    // OpenMS::Size nr_chromatograms = chromatogram_ptr->getNrChromatograms();
+    // for (OpenMS::Size i = 0; i < chromatogram_ptr->getNrChromatograms(); i++)
+    // {
+    //   std::cout << chromatogram_ptr->getChromatogramNativeID(i) << std::endl;
+    // }
+
+    // OpenMS::TargetedExperiment transition_exp = rawDataHandler_IO.getTargetedExperiment();
+
+    // for (OpenMS::Size i = 0; i < transition_exp.getTransitions().size(); i++)
+    // {
+    //   // get the current transition and try to find the corresponding chromatogram
+    //   std::cout << "Transition " << transition_exp.getTransitions()[i].getNativeID() << std::endl;
+    //   // if (chromatogram_map.find(transition->getNativeID()) == chromatogram_map.end())
+    //   // {}
+    // }
+
     try {
       featureFinder.pickExperiment(
         rawDataHandler_IO.getChromatogramMap(),
@@ -323,7 +350,31 @@ namespace SmartPeak
       );
     }
     catch (const std::exception& e) {
+
       LOGE << e.what();
+      throw e;
+      // std::cout << "Filenames dir" << filenames.dir << std::endl;
+      // Filenames filenames2 = Filenames::getDefaultStaticFilenames(filenames.dir);
+      // std::string dir_backup = "/Users/svegal/Documents/validation_experiments/mzML_calibrators_QMIP/traML_backup.csv";
+      // std::string dir_traml = "/Users/svegal/Documents/validation_experiments/mzML_calibrators_QMIP/traML.csv";
+      // std::size_t is_backup = filenames2.traML_csv_i == dir_backup;
+      // if (is_backup) {
+      //   filenames2.setTraML(dir_traml);
+      // } else {
+      //   filenames2.setTraML(dir_backup);
+      // }
+      // LoadTransitions loadTransitions;
+      // loadTransitions.process(rawDataHandler_IO, params_I, filenames2);
+      // MapChromatograms mapChromatograms;
+      // mapChromatograms.process(rawDataHandler_IO, params_I, filenames2);
+
+      // featureFinder.pickExperiment(
+      //   rawDataHandler_IO.getChromatogramMap(),
+      //   featureMap,
+      //   rawDataHandler_IO.getTargetedExperiment(),
+      //   rawDataHandler_IO.getTransformationDescription(),
+      //   rawDataHandler_IO.getSWATH()
+      // );
     }
 
     // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
@@ -360,6 +411,10 @@ namespace SmartPeak
     featureFilter.setParameters(parameters);
 
     OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
+
+    std::cout << "Feature map size " << featureMap.size() << std::endl;
+    // std::cout << "Feature Filter size " << rawDataHandler_IO.getFeatureFilter() << std::endl;
+    std::cout << "Targeted experiment size " << rawDataHandler_IO.getTargetedExperiment().getTransitions().size() << std::endl;
 
     featureFilter.FilterFeatureMap(
       featureMap,
@@ -431,11 +486,11 @@ namespace SmartPeak
 
     OpenMS::FeatureMap output;
 
-    if (params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip").size()) {
+    if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_qmip")) {
       std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
         Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"), params_I.at("MRMFeatureSelector.select_MRMFeatures_qmip"));
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
-    } else if (params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score").size()) {
+    } else if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_score")) {
       std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
         Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
@@ -626,9 +681,11 @@ namespace SmartPeak
       if (filenames.featureFilterComponents_csv_i.size()) { // because we don't know if either of the two names is empty
         featureQCFile.load(filenames.featureFilterComponents_csv_i, rawDataHandler_IO.getFeatureFilter(), false);
       }
+      std::cout << "After filter components" << std::endl;
       if (filenames.featureFilterComponentGroups_csv_i.size()) {
         featureQCFile.load(filenames.featureFilterComponentGroups_csv_i, rawDataHandler_IO.getFeatureFilter(), true);
       }
+      std::cout << "After filter groups" << std::endl;
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -945,7 +1002,7 @@ namespace SmartPeak
       "MRMFeatureFinderScoring",
       "MRMFeatureFilter.filter_MRMFeatures",
       "MRMFeatureSelector.select_MRMFeatures_qmip",
-      "MRMFeatureSelector.schedule_MRMFeatures_qmip",
+      // "MRMFeatureSelector.schedule_MRMFeatures_qmip",
       "MRMFeatureSelector.select_MRMFeatures_score",
       "ReferenceDataMethods.getAndProcess_referenceData_samples",
       "MRMFeatureValidator.validate_MRMFeatures",
@@ -1010,6 +1067,115 @@ namespace SmartPeak
     );
 
     LOGD << "END MapChromatograms";
+  }
+
+  void MetaLoadLP::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const {
+    if (InputDataValidation::fileExists(filenames.featureXML_i)) {
+      LOGD <<  "MetaLoad(): found feature file for LP\n";
+
+       LoadFeatures loadFeatures;
+      loadFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+      // QuantifyFeatures quantifyFeatures;
+      // quantifyFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+       ValidateFeatures validateFeatures;
+      validateFeatures.process(rawDataHandler_IO, params_I, filenames);
+    } else {
+      LOGD << "MetaLoad(): feature file not found for LP\n";
+      LoadRawData loadRawData;
+      loadRawData.process(rawDataHandler_IO, params_I, filenames);
+
+      MapChromatograms mapChromatograms;
+      mapChromatograms.process(rawDataHandler_IO, params_I, filenames);
+
+      ExtractChromatogramWindows extractChromatogramWindows;
+      extractChromatogramWindows.process(rawDataHandler_IO, params_I, filenames);
+
+      try {
+       PickFeatures pickFeatures;
+       pickFeatures.process(rawDataHandler_IO, params_I, filenames);
+      }
+      catch (const std::exception& e) {
+        LOGE << e.what();
+        return;
+      }
+
+       FilterFeatures filterFeatures;
+      filterFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+       FilterFeatures filterFeatures2;
+      filterFeatures2.process(rawDataHandler_IO, params_I, filenames);
+
+       SelectFeatures selectFeatures;
+      selectFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+      // QuantifyFeatures quantifyFeatures;
+      // quantifyFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+       ValidateFeatures validateFeatures;
+      validateFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+       StoreFeatures storeFeatures;
+      storeFeatures.process(rawDataHandler_IO, params_I, filenames);
+    }
+  }
+
+  void MetaLoadQMIP::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const {
+    if (InputDataValidation::fileExists(filenames.featureXML_i)) {
+      LOGD <<  "MetaLoad(): found feature file for QMIP\n";
+
+      LoadFeatures loadFeatures;
+      loadFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+      // QuantifyFeatures quantifyFeatures;
+      // quantifyFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+      ValidateFeatures validateFeatures;
+      validateFeatures.process(rawDataHandler_IO, params_I, filenames);
+    } else {
+      LOGD << "MetaLoad(): feature file not found for QMIP\n";
+      LoadRawData loadRawData;
+      loadRawData.process(rawDataHandler_IO, params_I, filenames);
+
+      MapChromatograms mapChromatograms;
+      mapChromatograms.process(rawDataHandler_IO, params_I, filenames);
+
+      try {
+       PickFeatures pickFeatures;
+       pickFeatures.process(rawDataHandler_IO, params_I, filenames);
+      }
+      catch (const std::exception& e) {
+        LOGE << e.what();
+        return;
+      }
+      
+       FilterFeatures filterFeatures;
+      filterFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+       FilterFeatures filterFeatures2;
+      filterFeatures2.process(rawDataHandler_IO, params_I, filenames);
+
+       SelectFeatures selectFeatures;
+      selectFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+      // QuantifyFeatures quantifyFeatures;
+      // quantifyFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+       ValidateFeatures validateFeatures;
+      validateFeatures.process(rawDataHandler_IO, params_I, filenames);
+
+       StoreFeatures storeFeatures;
+      storeFeatures.process(rawDataHandler_IO, params_I, filenames);
+    }
   }
 
   void ExtractChromatogramWindows::process(

@@ -9,6 +9,7 @@ namespace SmartPeak
   class Filenames
   {
 public:
+    std::string dir;
     std::string sequence_csv_i;
     std::string parameters_csv_i;
     std::string traML_csv_i;
@@ -56,6 +57,10 @@ public:
 
     static Filenames getDefaultStaticFilenames(
       const std::string& dir
+    );
+
+    void setTraML(
+      const std::string& name
     );
 
     static Filenames getDefaultDynamicFilenames(
