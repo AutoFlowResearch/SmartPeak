@@ -190,18 +190,9 @@ namespace SmartPeak
       }
 
       std::tm& adt = t.acquisition_date_and_time;
-<<<<<<< HEAD
-      std::istringstream iss(t_date);
-      iss >> adt.tm_mon >> adt.tm_mday >> adt.tm_year >> adt.tm_hour >> adt.tm_min;
-      if (adt.tm_mday < 1 || adt.tm_mday > 31) {
-        LOGD << "Invalid value for std::tm::tm_mday: " << adt.tm_mday << ". Setting to 1.";
-        adt.tm_mday = 1;
-      }
-=======
       strptime(t_date.c_str(), "%m-%d-%Y %H:%M", &adt);
       // std::istringstream iss(t_date);
       // iss >> adt.tm_mon >> adt.tm_mday >> adt.tm_year >> adt.tm_hour >> adt.tm_min;
->>>>>>> feat: initial
 
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
     }

@@ -42,7 +42,6 @@ namespace SmartPeak
     LOGD << "START optimizeCalibrationCurves";
 
     std::vector<size_t> standards_indices;
-
     // get all standards
     this->getSampleIndicesBySampleType(
       sequenceSegmentHandler_IO,
@@ -51,23 +50,27 @@ namespace SmartPeak
       standards_indices
     );
 
+
     // check if there are any standards to calculate the calibrators from
     if (standards_indices.empty()) {
       LOGE << "standards_indices argument is empty. Returning";
       LOGD << "END optimizeCalibrationCurves";
       return;
     }
+    std::cout << "Before" << std::endl;
 
     std::vector<OpenMS::FeatureMap> standards_featureMaps;
     for (const size_t index : standards_indices) {
       standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
     }
+    std::cout << "After" << std::endl;
 
     if (params_I.at("AbsoluteQuantitation").empty()) {
       LOGE << "Parameters not found for AbsoluteQuantitation. Returning";
       LOGD << "END optimizeCalibrationCurves";
       return;
     }
+    std::cout << "71" << std::endl;
 
     // add in the method parameters
     OpenMS::AbsoluteQuantitation absoluteQuantitation;
@@ -76,13 +79,16 @@ namespace SmartPeak
     absoluteQuantitation.setParameters(parameters);
 
     absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
+    std::cout << "80" << std::endl;
 
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
-
+    std::cout << "83" << std::endl;
     for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods()) {
       // map standards to features
       OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
+
+      std::cout << row.getComponentName() << std::endl;
 
       absoluteQuantitationStandards.getComponentFeatureConcentrations(
         sequenceSegmentHandler_IO.getStandardsConcentrations(),
@@ -90,7 +96,6 @@ namespace SmartPeak
         row.getComponentName(),
         feature_concentrations
       );
-
       // remove features with an actual concentration of 0.0 or less
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_pruned;
       for (const OpenMS::AbsoluteQuantitationStandards::featureConcentration& feature : feature_concentrations) {
@@ -98,25 +103,32 @@ namespace SmartPeak
           feature_concentrations_pruned.push_back(feature);
         }
       }
+      std::cout << "102" << std::endl;
 
       // remove components without any points
-      if (feature_concentrations_pruned.empty())
+      if (feature_concentrations_pruned.empty()) {
+        std::cout << "106" << std::endl;
         continue;
+      }
+
 
       // find the optimal calibration curve for each component
       absoluteQuantitation.optimizeSingleCalibrationCurve(
         row.getComponentName(),
         feature_concentrations_pruned
       );
-
+      std::cout << "113" << std::endl;
       components_to_concentrations.erase(row.getComponentName());
       components_to_concentrations.insert({row.getComponentName(), feature_concentrations_pruned});
     }
-
+    std::cout << "117" << std::endl;
     // store results
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
+    std::cout << "120" << std::endl;
+
     sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
     //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
+    std::cout << "124" << std::endl;
 
     LOGD << "END optimizeCalibrationCurves";
   }
