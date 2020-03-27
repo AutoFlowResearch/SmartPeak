@@ -89,16 +89,30 @@ namespace SmartPeak
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations;
 
       std::cout << row.getComponentName() << std::endl;
+      for (auto s : sequenceSegmentHandler_IO.getStandardsConcentrations()) {
+        if (row.getComponentName() == s.component_name) {
+          std::cout << s.sample_name << std::endl;
+          std::cout << s.component_name << std::endl;
+          std::cout << s.actual_concentration << std::endl;
+        }
+      }
+      std::cout << standards_featureMaps.size() << std::endl;
 
+      std::cout << "feature_concentrations.size " << feature_concentrations.size() << std::endl;
+      
       absoluteQuantitationStandards.getComponentFeatureConcentrations(
         sequenceSegmentHandler_IO.getStandardsConcentrations(),
         standards_featureMaps,
         row.getComponentName(),
         feature_concentrations
       );
+      std::cout << "feature_concentrations.size after " << feature_concentrations.size() << std::endl;
       // remove features with an actual concentration of 0.0 or less
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_pruned;
       for (const OpenMS::AbsoluteQuantitationStandards::featureConcentration& feature : feature_concentrations) {
+        std::cout << feature.actual_concentration << std::endl;
+        // std::cout << feature.sample_name << std::endl;
+        // std::cout << feature.component_name << std::endl;
         if (feature.actual_concentration > 0.0) {
           feature_concentrations_pruned.push_back(feature);
         }

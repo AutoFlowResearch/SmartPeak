@@ -267,6 +267,8 @@ namespace SmartPeak
   {
     size_t cnt {0};
     for (const InjectionHandler& inj : getSequence()) {
+      std::cout << "inj.getMetaData().getInjectionName() " << inj.getMetaData().getInjectionName() << std::endl;
+      std::cout << "inj.getRawData().getExperiment() " << inj.getRawData().getExperiment() << std::endl;
       if (inj.getRawData().getExperiment().getChromatograms().size()) {
         ++cnt;
       }

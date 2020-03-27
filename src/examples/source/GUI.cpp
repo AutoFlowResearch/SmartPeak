@@ -257,7 +257,9 @@ int main(int argc, char **argv)
             );
           }
         }
+        std::cout << " before manager_.addWorkflow(state_) " << std::endl;
         manager_.addWorkflow(state_);
+        std::cout << " after manager_.addWorkflow(state_) " << std::endl;
         ImGui::CloseCurrentPopup();
       }
 

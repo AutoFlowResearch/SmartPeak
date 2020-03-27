@@ -123,7 +123,8 @@ namespace SmartPeak
         }
       }
     }
-
+    std::cout << "filenames.size() " << filenames.size() << std::endl;
+    std::cout << "sequence_segments.size() " << sequence_segments.size() << std::endl;
     if (filenames.size() != sequence_segments.size()) {
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
@@ -160,7 +161,8 @@ namespace SmartPeak
   void SequenceProcessorMultithread::spawn_workers()
   {
     const unsigned int n_threads = std::thread::hardware_concurrency(); // might return 0
-    const size_t n_workers = n_threads ? n_threads : 1;
+    // const size_t n_workers = n_threads ? n_threads : 1;
+    const size_t n_workers = 1;
     LOGD << "Number of workers: " << n_workers;
     std::list<std::future<void>> futures;
     LOGD << "Spawning workers...";
@@ -210,6 +212,7 @@ namespace SmartPeak
     size_t i_step { 1 };
     const size_t n_steps { methods.size() };
     const std::string inj_name { injection.getMetaData().getInjectionName() };
+    std::cout << "inj_name " << inj_name << std::endl;
     for (const std::shared_ptr<RawDataProcessor>& p : methods) {
       LOGI << "[" << (i_step++) << "/" << n_steps << "] method on injection: " << inj_name;
       p->process(

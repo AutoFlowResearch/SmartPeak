@@ -5,6 +5,11 @@
 #define BOOST_TEST_MODULE FileReader test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/FileReader.h>
+#include <OpenMS/FORMAT/FileHandler.h>
+#include <OpenMS/FORMAT/MzMLFile.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/ChromatogramExtractor.h>
+#include <OpenMS/ANALYSIS/TARGETED/MRMMapping.h>
+#include <OpenMS/KERNEL/SpectrumHelper.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -92,6 +97,13 @@ BOOST_AUTO_TEST_CASE(parseopenmsparams)
   BOOST_CHECK_EQUAL(parameters[func3][0]["type"], "bool");
   BOOST_CHECK_EQUAL(parameters[func3][0]["value"], "FALSE");
   BOOST_CHECK_EQUAL(parameters[func3][0]["description"], "");
+
+  OpenMS::FileHandler fh;
+  OpenMS::MSExperiment chromatograms;
+  string filename = "/Users/svegal/Documents/validation_experiments/RapidRIP_QMIP/mzML/170330_CalibrationCurves_CM3-170330_CM1_Level12.mzML";
+  std::cout << "Loading: " << filename << std::endl;
+  fh.loadExperiment(filename, chromatograms);
+  std::cout << "size: " << chromatograms.getChromatograms().size() << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

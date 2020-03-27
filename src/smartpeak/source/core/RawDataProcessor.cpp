@@ -59,6 +59,7 @@ namespace SmartPeak
     OpenMS::MSExperiment chromatograms;
     if (filenames.mzML_i.size()) {
       LOGI << "before";
+      std::cout << "params_I.at(mzML).size() " << params_I.at("mzML").size() << std::endl;
       if (params_I.at("mzML").size()) {
         LOGI << "after";
         // # convert parameters
@@ -100,8 +101,11 @@ namespace SmartPeak
         OpenMS::FileHandler fh;
         LOGI << "Loading: " << filenames.mzML_i;
         fh.loadExperiment(filenames.mzML_i, chromatograms);
+        LOGI << "LOADED FINE " << filenames.mzML_i;
       }
     }
+
+    LOGI << " AFTER LOADED FINE ";
 
     OpenMS::TargetedExperiment& targeted_exp = rawDataHandler_IO.getTargetedExperiment();
     if (params_I.at("ChromatogramExtractor").size()) {
@@ -245,23 +249,33 @@ namespace SmartPeak
   {
     LOGD << "START LoadFeatures";
     LOGI << "Loading: " << filenames.featureXML_i;
+    LOGI << filenames.featureXML_i.size();
 
     if (filenames.featureXML_i.empty()) {
       LOGE << "Filename is empty";
       LOGD << "END LoadFeatures";
       return;
     }
+    LOGI << "HERE1";
 
     if (!InputDataValidation::fileExists(filenames.featureXML_i)) {
       LOGE << "File not found";
       LOGD << "END LoadFeatures";
       return;
     }
+    LOGI << "HERE2";
 
     try {
+      LOGI << "HERE3";
       OpenMS::FeatureXMLFile featurexml;
+      LOGI << "HERE4";
+      LOGI << filenames.featureXML_i;
+      LOGI << "rawDataHandler_IO.getFeatureMap().size() " << rawDataHandler_IO.getFeatureMap().size();
       featurexml.load(filenames.featureXML_i, rawDataHandler_IO.getFeatureMap());
+      LOGI << "rawDataHandler_IO.getFeatureMap().size() " << rawDataHandler_IO.getFeatureMap().size();
+      LOGI << "HERE5";
       rawDataHandler_IO.updateFeatureMapHistory();
+      LOGI << "HERE6";
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -579,6 +593,7 @@ namespace SmartPeak
     LOGI << "Processing # quantitation methods: " << rawDataHandler_IO.getQuantitationMethods().size();
 
     try {
+      LOGI << "rawDataHandler_IO.getFeatureMap().size() " << rawDataHandler_IO.getFeatureMap().size();
       OpenMS::AbsoluteQuantitation aq;
       aq.setQuantMethods(rawDataHandler_IO.getQuantitationMethods());
       aq.quantifyComponents(rawDataHandler_IO.getFeatureMap());
