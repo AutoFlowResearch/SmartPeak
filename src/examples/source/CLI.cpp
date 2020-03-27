@@ -128,11 +128,11 @@ std::vector<AppState::Command> getMethodsInput()
     "[M] Main menu\n\n"
     "Presets:\n"
     "LCMS MRM Unknowns: 1 11 3 7 8 5 9\n"
-    "LCMS MRM Standards: 1 11 3 8 5 14 15 7 9\n"
+    "LCMS MRM Standards: 1 11 3 8 5 15 16 7 9\n"
     "HPLC UV Unknowns: 1 11 13 12 3 7 8 5 9\n"
-    "HPLC UV Standards: 1 11 13 12 3 8 5 14 15 7 9\n"
+    "HPLC UV Standards: 1 11 13 12 3 8 5 15 16 7 9\n"
     "GCMS SIM Unknowns: 1 11 13 12 3 7 8 5 9\n"
-    "GCMS Full Scan Unknowns: 1 11 13 12 3 8 5 14 15 7 9\n"
+    "GCMS Full Scan Unknowns: 1 11 13 12 3 8 5 15 16 7 9\n"
     "LCMS MRM Validation - LP: 1 11 13 3 4 4 5 6 9\n"
     "LCMS MRM Validation - QMIP: 1 11 3 5 6 9\n";
 

@@ -346,4 +346,28 @@ namespace SmartPeak
       std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I
     );
   };
+
+  struct EMGProcessor : RawDataProcessor
+  {
+    int getID() const override { return 14; }
+    std::string getName() const override { return "EMG_PROCESSOR"; }
+    std::string getDescription() const override { return "Reconstruct a peak from available data points."; }
+
+    /** Apply the EMG peak reconstruction technique to the data points.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+
+  private:
+    void extractPointsIntoVectors(
+      const OpenMS::MSChromatogram& chromatogram,
+      const double left,
+      const double right,
+      std::vector<double>& x,
+      std::vector<double>& y
+    ) const;
+  };
 }

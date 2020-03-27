@@ -46,15 +46,15 @@ namespace SmartPeak
           if (s_string == "LCMS MRM Unknowns")
             ids = "1 11 3 7 8 5 9";
           else if (s_string == "LCMS MRM Standards")
-            ids = "1 11 3 8 5 14 15 7 9";
+            ids = "1 11 3 8 5 15 16 7 9";
           else if (s_string == "HPLC UV Unknowns")
             ids = "1 11 13 12 3 7 8 5 9";
           else if (s_string == "HPLC UV Standards")
-            ids = "1 11 13 12 3 8 5 14 15 7 9";
+            ids = "1 11 13 12 3 8 5 15 16 7 9";
           else if (s_string == "GCMS SIM Unknowns")
             ids = "1 11 13 12 3 7 8 5 9";
           else if (s_string == "GCMS Full Scan Unknowns")
-            ids = "1 11 13 12 3 8 5 14 15 7 9";
+            ids = "1 11 13 12 3 8 5 15 16 7 9";
           else if (s_string == "LCMS MRM Validation - LP")
             ids = "1 11 13 3 4 4 5 6 9";
           else if (s_string == "LCMS MRM Validation - QMIP")

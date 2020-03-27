@@ -1348,4 +1348,64 @@ BOOST_AUTO_TEST_CASE(process)
   BOOST_CHECK(!hsubordinate2.getMetaValue("used_").toBool());
 }
 
+BOOST_AUTO_TEST_CASE(emg_processor)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler,params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  MapChromatograms mapChroms;
+  mapChroms.process(rawDataHandler, params_1, filenames);
+
+  // Test pick features
+  PickFeatures pickFeatures;
+  pickFeatures.process(rawDataHandler, params_1, filenames);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 481);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
+
+  const OpenMS::Feature sub1 { rawDataHandler.getFeatureMap()[0].getSubordinates()[0] };
+  BOOST_CHECK_CLOSE(static_cast<double>(sub1.getIntensity()), 922154.75, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(sub1.getMetaValue("peak_apex_position")), 953.40699999999993, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(sub1.getMetaValue("peak_apex_int")), 266403.0, 1e-6);
+  BOOST_CHECK_EQUAL(sub1.metaValueExists("area_background_level") == false, 1);
+  BOOST_CHECK_EQUAL(sub1.metaValueExists("noise_background_level") == false, 1);
+  // BOOST_CHECK_CLOSE(static_cast<double>(sub1.getMetaValue("area_background_level")), 0.0, 1e-6);
+  // BOOST_CHECK_CLOSE(static_cast<double>(sub1.getMetaValue("noise_background_level")), 0.0, 1e-6);
+
+  // reduce the number of features for test purposes
+  OpenMS::FeatureMap& m = rawDataHandler.getFeatureMap();
+  m.erase(m.begin() + 1, m.end());
+
+  BOOST_CHECK_EQUAL(m.size(), 1);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 1);
+
+  EMGProcessor emg;
+  emg.process(rawDataHandler, params_1, filenames);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 1);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
+
+  const OpenMS::Feature sub2 { rawDataHandler.getFeatureMap()[0].getSubordinates()[0] };
+  BOOST_CHECK_CLOSE(static_cast<double>(sub2.getIntensity()), 758053.375, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("peak_apex_position")), 953.40699999999993, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("peak_apex_int")), 202893.72550713021, 1e-6);
+  BOOST_CHECK_EQUAL(sub2.metaValueExists("area_background_level") == false, 0);
+  BOOST_CHECK_EQUAL(sub2.metaValueExists("noise_background_level") == false, 0);
+  BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("area_background_level")), 0.0083339133585532514, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("noise_background_level")), 0.00012474754841647006, 1e-6);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

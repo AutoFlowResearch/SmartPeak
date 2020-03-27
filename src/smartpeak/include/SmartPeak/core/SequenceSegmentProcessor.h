@@ -64,7 +64,7 @@ namespace SmartPeak
 
   struct CalculateCalibration : SequenceSegmentProcessor
   {
-    int getID() const { return 14; }
+    int getID() const { return 15; }
     std::string getName() const { return "CALCULATE_CALIBRATION"; }
     std::string getDescription() const { return "Determine the optimal relationship between known sample concentration and measured intensity."; }
 
@@ -98,7 +98,7 @@ namespace SmartPeak
 
   struct LoadQuantitationMethods : SequenceSegmentProcessor
   {
-    int getID() const { return 16; }
+    int getID() const { return 17; }
     std::string getName() const { return "LOAD_QUANTITATION_METHODS"; }
     std::string getDescription() const { return "Load each transitions calibration model defined in quantitationMethods from disk."; }
 
@@ -115,7 +115,7 @@ namespace SmartPeak
 
   struct StoreQuantitationMethods : SequenceSegmentProcessor
   {
-    int getID() const { return 15; }
+    int getID() const { return 16; }
     std::string getName() const { return "STORE_QUANTITATION_METHODS"; }
     std::string getDescription() const { return "Write each transitions calibration model to disk for later use."; }
 
