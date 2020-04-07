@@ -19,6 +19,6 @@ cpack_add_component(applications
                 )
 cpack_add_component(doc
                 DISPLAY_NAME "Documentation"
-                DESCRIPTION "Class and tool documentation. With tutorials."
+                DESCRIPTION "Class documentation with tutorials."
                 INSTALL_TYPES recommended full
                 )

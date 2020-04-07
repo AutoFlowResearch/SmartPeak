@@ -1,0 +1,573 @@
+############################################
+## see README before running this script! ##
+############################################
+## useful resources:
+# http://abarinoff-dev.blogspot.com/2010/04/passing-parameters-and-retrieving.html
+# http://nsis.sourceforge.net/UAC_plug-in
+# http://nsis.sourceforge.net/Inetc_plug-in
+#
+## using the UAC-plugin the installer is run in elevated mode by default (inner instance). If you want to
+## do some user specific action (e.g. Start-Menu entries) you need to use the UAC's wrappers and calls
+
+###################
+### CPACK config ##
+###################
+Name "@CPACK_PACKAGE_NAME@"
+BrandingText "@CPACK_PACKAGE_FILE_NAME@"
+OutFile "@CPACK_TOPLEVEL_DIRECTORY@/@CPACK_OUTPUT_FILE_NAME@"
+SetCompressor /SOLID lzma
+!define INST_DIR "@CPACK_TEMPORARY_DIRECTORY@"
+## Long version has to have 4 levels...
+!define VERSION_LONG "@CPACK_PACKAGE_VERSION@.0"
+
+##################
+###   config   ###
+##################
+### let Cfg_Settings.nsh.in be configured by CMake. Then include:
+!include ..\..\..\Cfg_Settings.nsh
+### NSISRESOURCES now consists of the cmake/Windows directory of the source tree.
+!addplugindir ${NSISRESOURCES}\Plugins\x86-unicode
+
+# set to "0" for deployment!!! use "1" to build the executable fast (for script debugging) 
+!define DEBUG_BUILD 0
+# set to "0" for deployment!!! use "1" to skip packaging of *.html files (takes ages)
+!define DEBUG_SKIP_DOCU 0
+
+##################
+###   SCRIPT   ###
+##################
+
+# which extensions to connect to GUI
+!macro SmartPeakGUIExtensions _action
+  !insertmacro ${_action} ".mzData" "GUI"
+  !insertmacro ${_action} ".mzXML" "GUI"
+  !insertmacro ${_action} ".mzML" "GUI"
+  !insertmacro ${_action} ".idXML" "GUI"
+  !insertmacro ${_action} ".featureXML" "GUI"
+  !insertmacro ${_action} ".consensusXML" "GUI"
+!macroend
+
+# Defines
+!define REGKEY "SOFTWARE\$(^Name)"
+!define PRODUCT_UNINST_ROOT HKLM
+!define PRODUCT_UNINST_KEY ${REGKEY}
+!define COMPANY "SmartPeak Developer Team"
+!define URL https://www.SmartPeak.de
+!define APPNAME "SmartPeak"
+
+## UAC plugin requires us to use normal user privileges
+##, it will launch an admin process within the user process automatically
+RequestExecutionLevel user    /* RequestExecutionLevel REQUIRED! */
+
+# Included files
+
+# MUI2 somehow crashes with NSIS3.0 release/stable. Switched to MuiEx (belongs to UltraMui) that seems better supported and has legacy option.
+!include MUI2.nsh
+#!include MUIEx.nsh
+!include Sections.nsh
+!include Library.nsh
+!include FileFunc.nsh
+!include ${NSISRESOURCES}\UAC.nsh
+!include ${NSISRESOURCES}\IncludeScript_Misc.nsh
+!define FOLDERLIST_EXE ${NSISRESOURCES}\FolderList.exe
+!include ${NSISRESOURCES}\IncludeScript_FileLogging.nsh
+!include ${NSISRESOURCES}\EnvVarUpdate.nsh
+!include x64.nsh
+!include ${NSISRESOURCES}\LogicLib.nsh
+!include ${NSISRESOURCES}\AdvUninstLog2.nsh
+
+# For uninstalllog
+!insertmacro UNATTENDED_UNINSTALL
+
+
+# Reserved Files
+#!insertmacro MUI_RESERVEFILE_LANGDLL
+# Modify the next line to adapt to the plugin for other NSIS versions (currently 3.0 release)
+# e.g. NSIS 2.x does not have the subfolders x86-unicode or x86-ansi, so remove them.
+#ReserveFile "${NSISDIR}\Plugins\x86-unicode\advsplash.dll"
+
+;--------------------------------
+;Interface Configuration
+
+!define MUI_HEADERIMAGE
+!define MUI_HEADERIMAGE_BITMAP "${NSISRESOURCES}\images\header.bmp" ; optional
+!define MUI_HEADERIMAGE_UNBITMAP "${NSISRESOURCES}\images\header-uninstall.bmp" ; optional
+!define MUI_HEADERIMAGE_RIGHT
+!define MUI_ABORTWARNING
+!define MUI_WELCOMEFINISHPAGE_BITMAP "${NSISRESOURCES}\images\wizard.bmp" ; optional
+!define MUI_UNWELCOMEFINISHPAGE_BITMAP "${NSISRESOURCES}\images\wizard-uninstall.bmp" ; optional
+
+!insertmacro RefreshShellIcons
+!insertmacro un.RefreshShellIcons
+!insertmacro DirState
+!insertmacro GetFileName
+
+# Variables
+Var StartMenuGroup
+
+# MUI defines
+#!define MUI_ICON SmartPeak.ico
+
+
+!define MUI_FINISHPAGE_NOAUTOCLOSE
+!define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
+!define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
+!define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER "SmartPeak"
+!define MUI_LICENSEPAGE_RADIOBUTTONS
+!define MUI_FINISHPAGE_SHOWREADME $INSTDIR\ReleaseNotes.txt
+!define MUI_UNFINISHPAGE_NOAUTOCLOSE
+!define MUI_LANGDLL_REGISTRY_ROOT HKLM
+!define MUI_LANGDLL_REGISTRY_KEY ${REGKEY}
+!define MUI_LANGDLL_REGISTRY_VALUENAME InstallerLanguage
+
+# Installer pages
+!insertmacro MUI_PAGE_WELCOME
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW licpageshow
+!insertmacro MUI_PAGE_LICENSE ${SMARTPEAKDIRSRC}\License.txt
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_STARTMENU Application $StartMenuGroup
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+#!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+
+# Installer languages
+!insertmacro MUI_LANGUAGE German
+!insertmacro MUI_LANGUAGE English
+!insertmacro MUI_LANGUAGE French
+
+# Installer Language Strings
+LangString ^UninstallLink ${LANG_GERMAN} "Uninstall $(^Name)"
+LangString ^UninstallLink ${LANG_ENGLISH} "Uninstall $(^Name)"
+LangString ^UninstallLink ${LANG_FRENCH} "Uninstall $(^Name)"
+
+# Custom MUI Function to set font of license display page
+# to a mono spaced one.
+# from http://stackoverflow.com/questions/8424172/nsis-display-license-with-a-monospace-font
+Function licpageshow
+FindWindow $0 "#32770" "" $HWNDPARENT
+CreateFont $1 "Consolas" "8"
+GetDlgItem $0 $0 1000
+SendMessage $0 ${WM_SETFONT} $1 1
+FunctionEnd
+
+
+# predefined installation modes
+InstType "Recommended"  #1
+InstType "Minimum"      #2
+InstType "Full"         #3
+
+# Installer attributes
+!if ${PLATFORM} == 32
+	InstallDir "$PROGRAMFILES32\SmartPeak-${VERSION}"
+!else
+	InstallDir "$PROGRAMFILES64\SmartPeak-${VERSION}"
+!endif
+
+CRCCheck on
+ShowInstDetails hide
+VIProductVersion ${VERSION_LONG}
+VIAddVersionKey /LANG=${LANG_GERMAN} ProductName "SmartPeak"
+VIAddVersionKey /LANG=${LANG_GERMAN} ProductVersion "${VERSION}"
+VIAddVersionKey /LANG=${LANG_GERMAN} CompanyName "${COMPANY}"
+VIAddVersionKey /LANG=${LANG_GERMAN} CompanyWebsite "${URL}"
+VIAddVersionKey /LANG=${LANG_GERMAN} FileVersion "${VERSION}"
+VIAddVersionKey /LANG=${LANG_GERMAN} FileDescription ""
+VIAddVersionKey /LANG=${LANG_GERMAN} LegalCopyright ""
+InstallDirRegKey HKLM "${REGKEY}" Path
+ShowUninstDetails hide
+
+; HKLM (all users) vs HKCU (current user) defines
+!define env_hklm 'HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"'
+!define env_hkcu 'HKCU "Environment"'
+
+!macro CREATE_SMGROUP_SHORTCUT NAME PATH
+    Push "${NAME}"
+    Push "${PATH}"
+    Call CreateSMGroupShortcut
+!macroend
+
+Function CreateSMGroupShortcut
+    Exch $R0 ;PATH
+    Exch
+    Exch $R1 ;NAME
+    Push $R2
+    StrCpy $R2 $StartMenuGroup 1
+    StrCmp $R2 ">" no_smgroup
+    SetOutPath $SMPROGRAMS\$StartMenuGroup
+    StrCpy $OUTDIR "$INSTDIR"       # execute link target in $OUTDIR
+    
+    CreateDirectory "$SMPROGRAMS\${APPNAME}"
+    CreateShortcut "$SMPROGRAMS\${APPNAME}\$R1.lnk" $R0
+
+no_smgroup:
+    Pop $R2
+    Pop $R1
+    Pop $R0
+FunctionEnd
+
+
+# Installer sections
+Section "SmartPeak Library" SEC_Lib
+    SectionIn 1 2 3 RO
+# we need to install add dll´s together with the binaries 
+# to ensure the dynamic linking uses the correct dll´s
+# (putting dll´s in another path makes it prone to 
+# invalid PATH settings)
+    SetOutPath $INSTDIR\bin
+    SetOverwrite on
+
+    # open log file    
+    !insertmacro UNINSTALL.LOG_OPEN_INSTALL
+
+    # install files
+	#File "${SMARTPEAKBINDIR}\*.dll"
+	File "${SMARTPEAKBINDIR}\*.lib"
+    #File /r "${SMARTPEAKBINDIR}\plugins\*.*"
+    SetOutPath $INSTDIR\share\SmartPeak
+    SetOverwrite on
+    
+    # icon for *files* associated with SmartPeak
+    File "${NSISRESOURCES}\SmartPeak.ico"
+    
+    !insertmacro UNINSTALL.LOG_CLOSE_INSTALL
+SectionEnd
+
+#Section "SmartPeak" SEC_SmartPeak
+#    SectionIn 1 2 3 RO
+#    #open log file    
+#    !insertmacro UNINSTALL.LOG_OPEN_INSTALL
+
+#    SetOutPath $INSTDIR\bin
+#    SetOverwrite on
+    
+#    !if ${DEBUG_BUILD} == 0
+#        File /x "SmartPeak_GUI.exe" "${SMARTPEAKBINDIR}\*.exe"
+#    !endif
+
+#    !insertmacro UNINSTALL.LOG_CLOSE_INSTALL
+#SectionEnd
+
+
+#Section "Documentation" SEC_Doc
+#    SectionIn 1 3
+#    #open log file    
+#    !insertmacro UNINSTALL.LOG_OPEN_INSTALL
+
+#    SetOverwrite on
+    
+#	## html docu
+#    !if ${DEBUG_SKIP_DOCU} == 0
+#      SetOutPath $INSTDIR\share\doc\html
+#      File /r "${SMARTPEAKDOCDIR}\html\*.*"
+#      SetOutPath $INSTDIR\share\doc
+#      File "${SMARTPEAKDOCDIR}\SmartPeak_tutorial.pdf"
+#    !endif    
+
+#    !insertmacro UNINSTALL.LOG_CLOSE_INSTALL
+#SectionEnd
+
+Section "-License" SEC_License
+    SectionIn 1 2 3
+    #open log file    
+    !insertmacro UNINSTALL.LOG_OPEN_INSTALL
+
+    SetOutPath $INSTDIR
+    SetOverwrite on
+
+    File  "${NSISRESOURCES}\ReleaseNotes.txt"
+
+    !insertmacro UNINSTALL.LOG_CLOSE_INSTALL
+SectionEnd
+
+Function CreateShortcuts
+    !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+    
+		## warning: create shortcuts only AFTER installing files, OR renew SetOutPath
+		## otherwise all files will be installed to the default install directory
+    #!insertmacro CREATE_SMGROUP_SHORTCUT "SmartPeak Documentation (html)" $INSTDIR\doc\html\index.html
+    #!insertmacro CREATE_SMGROUP_SHORTCUT "SmartPeak Tutorial (pdf)" $INSTDIR\doc\SmartPeak_tutorial.pdf
+
+    #!insertmacro CREATE_SMGROUP_SHORTCUT SmartPeak_GUI $INSTDIR\bin\SmartPeak_GUI.exe
+    #!insertmacro CREATE_SMGROUP_SHORTCUT "SmartPeak Homepage" http://www.SmartPeak.com/
+
+    SetOutPath $SMPROGRAMS\${APPNAME}
+    CreateShortcut "$SMPROGRAMS\${APPNAME}\$(^UninstallLink).lnk" $INSTDIR\uninstall.exe
+    !insertmacro MUI_STARTMENU_WRITE_END
+    
+FunctionEnd
+
+
+Section "-Create_StartMenu" SEC_StartMenuCreate
+  GetFunctionAddress $0 CreateShortcuts
+  UAC::ExecCodeSegment $0
+SectionEnd
+
+Section "-PathInst" SEC_PathRegister
+    SectionIn 1 2 3
+    # no logging required, as we do not install files in this section
+    ## HINT: do not forget to also add/modify the un.EnvVarUpdate in the uninstall section!
+    
+    # SmartPeak binary path
+    ${EnvVarUpdate} $0 "PATH" "A" "HKLM" "$INSTDIR\bin"
+    IfErrors 0 +2
+      MessageBox MB_OK "Unable to add '$INSTDIR\bin' to PATH environment. Add manually if required. See 'details' for details."
+
+    #create SMARTPEAK_DATA_PATH environment variable (for shared xml files etc)
+    ; set variable
+    WriteRegExpandStr ${env_hklm} "SMARTPEAK_DATA_PATH" "$INSTDIR\share\SmartPeak"
+    ; make sure windows knows about the change
+    SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+
+SectionEnd
+
+SectionGroup "Register File Extensions" SEC_RegisterExt
+    # no logging required, as we do not install files in this section
+
+    # windows registry info: http://support.microsoft.com/kb/256986
+    !insertmacro SmartPeakGUIExtensions RegisterExtensionSection
+    
+    Section "-RegFileRefreshInternal" SEC_RegFileRefreshInternal
+        SectionIn 1 2 3
+        ${RefreshShellIcons}
+    SectionEnd
+        
+SectionGroupEnd
+
+Section "-hidden VSRuntime"
+    # this requires admin privileges!
+    SetOutPath $TEMP
+    SetOverwrite on
+
+    File "${VS_REDISTRIBUTABLE_PATH}\${VS_REDISTRIBUTABLE_EXE}"
+    ClearErrors
+    ExecWait '$TEMP\${VS_REDISTRIBUTABLE_EXE} /install /passive /norestart' $0
+    StrCmp $0 0 vs_install_success
+    StrCmp $0 1638 vs_install_success
+    MessageBox MB_OK|MB_ICONEXCLAMATION "The installation of the Visual Studio redistributable package '${VS_REDISTRIBUTABLE_EXE}' failed! SmartPeak will not work unless this package is installed! The package is located at '$TEMP\${VS_REDISTRIBUTABLE_EXE}'. Try to execute it as administrator - there will likely be an error which you can blame Microsoft for. If you cannot fix it contact the SmartPeak developers!"
+		
+    ## reasons why the install might fail:
+    ## see doc\doxygen\install\install-win-bin.doxygen --> FAQ
+    
+	vs_install_success:
+		
+SectionEnd
+
+Section -post SEC0008
+    WriteRegStr HKLM "${REGKEY}" Path $INSTDIR
+    WriteRegStr HKLM "${REGKEY}" "UninstallString" "$INSTDIR\uninstall.exe"
+    SetOutPath $INSTDIR
+    WriteUninstaller $INSTDIR\uninstall.exe
+    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayName "$(^Name)"
+    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayVersion "${VERSION}"
+    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" Publisher "SmartPeak Developer Team"
+    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" URLInfoAbout "${URL}"
+    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" DisplayIcon $INSTDIR\uninstall.exe
+    WriteRegStr HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" UninstallString $INSTDIR\uninstall.exe
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoModify 1
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)" NoRepair 1
+SectionEnd
+
+# Installer functions
+; Attempt to give the UAC plug-in a user process and an admin process.
+Function .onInit
+
+  ## UAC init:
+  ## copied from http://nsis.sourceforge.net/UAC_plug-in
+
+  UAC_Elevate:
+      UAC::RunElevated 
+      StrCmp 1223 $0 UAC_ElevationAborted ; UAC dialog aborted by user?
+      StrCmp 0 $0 0 UAC_Err ; Error?
+      StrCmp 1 $1 0 UAC_Success ;Are we the real deal or just the wrapper?
+      Quit
+
+  UAC_Err:
+      MessageBox mb_iconstop "Unable to elevate, error $0"
+      Abort
+
+  UAC_ElevationAborted:
+      # elevation was aborted, run as normal?
+      MessageBox mb_iconstop "This installer requires administrative rights, aborting!"
+      Abort
+
+  UAC_Success:
+      StrCmp 1 $3 +4 ;Admin?
+      StrCmp 3 $1 0 UAC_ElevationAborted ;Try again?
+      MessageBox mb_iconstop "This installer requires administrative rights, try again"
+      goto UAC_Elevate
+
+  ## now our own code:
+  
+  !insertmacro UNINSTALL.LOG_PREPARE_INSTALL
+
+  # show splash screen
+  InitPluginsDir
+  Push $R1
+  File /oname=$PLUGINSDIR\spltmp.bmp "${NSISRESOURCES}\images\SmartPeak_splash.bmp"
+  advsplash::show 1000 600 400 -1 $PLUGINSDIR\spltmp
+  Pop $R1
+  Pop $R1
+
+	## deny starting of x64 installer on an x86 system (will not run)
+	!if ${PLATFORM} == 64
+		${If} ${RunningX64}
+		${else}
+		  MessageBox mb_iconstop "You are running a 32bit operating system. The executables of this setup are 64bit, and thus cannot be run after installation. Use a 64bit OS, or use the 32bit setup of SmartPeak."
+		  Abort
+		${EndIf}
+	!endif
+	
+	
+  # check for previous versions
+  #on install we did:     WriteRegStr HKLM "${REGKEY}" "Path" "$INSTDIR"
+  ReadRegStr $R0  HKLM "${REGKEY}" "Path"
+  StrCmp $R0 "" virgin_install
+  
+  ## store, if the old-installer is present ($R8 should be empty then)
+  ReadRegStr $R8  HKLM "${REGKEY}" "UninstallString"    
+
+  MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION \
+    "SmartPeak has already been installed. $\nThe old version will be removed automatically. \
+     Please close all SmartPeak applications before continuing!" \
+    IDCANCEL  quit_installer
+
+  ;Run the uninstaller
+  ClearErrors
+  ExecWait '$R0\uninstall.exe _?=$R0';; Do not execute the copy of uninstaller (ExecWait won´t work)
+  Delete "$R0\uninstall.exe"          # delete installer manually
+  
+  push $R9
+  ${DirState} "$R0" $R9
+  StrCmp $R9 1 0 virgin_install
+  pop $R9
+  
+  # look for the very first (and buggy) version of the installer
+  StrCmp $R8 "" 0 new_installer    
+      # we found the old installer:
+      ## delete the licenses, share other stuff
+      RmDir /REBOOTOK "$R0\GUI"
+      RmDir /REBOOTOK /r "$R0\share"
+      Delete /REBOOTOK "$R0\*.txt"
+      ## correct Path settings (they were not properly reset)
+      ${EnvVarUpdate} $0 "PATH" "R" "HKLM" "$R0\lib"
+      ; delete variable
+      DeleteRegValue ${env_hklm} "SMARTPEAK_DATA_PATH"
+      ; make sure windows knows about the change
+      SendMessage ${HWND_BROADCAST} ${WM_WININICHANGE} 0 "STR:Environment" /TIMEOUT=5000
+      #${EnvVarUpdate} $0 "SMARTPEAK_DATA_PATH" "R" "HKLM" "$R0\lib"
+  
+  new_installer:
+
+  ## check that all *.dll´s and *.exe files are gone (userfiles are ok)! otherwise force reboot
+  !insertmacro REBOOT_ON_INCOMPLETE_DELETION $R0
+ 
+virgin_install:
+  
+  !insertmacro MUI_LANGDLL_DISPLAY
+
+  return
+  
+quit_installer:
+  quit
+  
+FunctionEnd
+
+Function .OnInstFailed
+   UAC::Unload ;Must call unload!
+FunctionEnd
+ 
+Function .OnInstSuccess
+   !insertmacro UNINSTALL.LOG_UPDATE_INSTALL
+   UAC::Unload ;Must call unload!
+FunctionEnd
+
+# set the component descriptions after the Sections have been defined!
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+!insertmacro MUI_DESCRIPTION_TEXT ${SEC_Lib} "The core libraries of SmartPeak"
+#!insertmacro MUI_DESCRIPTION_TEXT ${SEC_Doc} "Documentation/Tutorials for SmartPeak and the SmartPeak library itself."
+!insertmacro MUI_DESCRIPTION_TEXT ${SEC_RegisterExt} "Register certain file types (e.g. '.mzML') with SmartPeak_GUI.exe"
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
+################
+## UNINSTALL ###
+################
+
+# Uninstaller sections
+
+Section "Uninstall"
+    ReadRegStr $INSTDIR HKLM "${REGKEY}" Path
+    !insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuGroup
+    !insertmacro MUI_UNGETLANGUAGE
+
+    ## undo changes to PATH 
+    
+    # SmartPeak binary path
+    ${un.EnvVarUpdate} $0 "PATH" "R" "HKLM" "$INSTDIR\bin"
+
+    ## remove SMARTPEAK_DATA_PATH
+    ${un.EnvVarUpdate} $0 "SMARTPEAK_DATA_PATH" "R" "HKLM" "$INSTDIR\share\SmartPeak"
+
+    # remove extension-links to SmartPeak_GUI
+    !insertmacro SmartPeakGUIExtensions UnRegisterExtensionSection
+    ${un.RefreshShellIcons}
+
+    ## delete all installed files
+	!insertmacro UNINSTALL.NEW_UNINSTALL
+
+    # remove directories which are now empty
+    Push "\"
+    Call un.RemoveEmptyDirs
+	
+    ## clean up the registry
+    DeleteRegKey HKLM "SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\$(^Name)"
+    # delete /Software/SmartPeak (with all its content)
+    DeleteRegKey HKLM "${REGKEY}"
+	
+    RmDir /REBOOTOK $INSTDIR
+
+    ## delete start menu entries (via user process to find the correct $SMPROGRAMS directory)
+    GetFunctionAddress $0 un.clearStartMenu
+    UAC::ExecCodeSegment $0
+
+SectionEnd
+
+Function un.clearStartMenu
+   # delete Startmenu-Entry
+   RmDir /r /REBOOTOK $SMPROGRAMS\${APPNAME}
+FunctionEnd
+
+# UnInstaller functions
+; Attempt to give the UAC plug-in a user process and an admin process.
+Function un.onInit
+
+## UAC init:
+## copied from http://nsis.sourceforge.net/UAC_plug-in
+
+UAC_Elevate:
+    UAC::RunElevated 
+    StrCmp 1223 $0 UAC_ElevationAborted ; UAC dialog aborted by user?
+    StrCmp 0 $0 0 UAC_Err ; Error?
+    StrCmp 1 $1 0 UAC_Success ;Are we the real deal or just the wrapper?
+    Quit
+ 
+UAC_Err:
+    MessageBox mb_iconstop "Unable to elevate, error $0"
+    Abort
+ 
+UAC_ElevationAborted:
+    # elevation was aborted, run as normal?
+    MessageBox mb_iconstop "This installer requires administrative rights, aborting!"
+    Abort
+ 
+UAC_Success:
+    StrCmp 1 $3 +4 ;Admin?
+    StrCmp 3 $1 0 UAC_ElevationAborted ;Try again?
+    MessageBox mb_iconstop "This installer requires administrative rights, try again"
+    goto UAC_Elevate 
+
+FunctionEnd
+
+
