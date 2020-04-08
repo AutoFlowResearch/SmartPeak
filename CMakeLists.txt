@@ -77,9 +77,9 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Windows")
 #------------------------------------------------------------------------------
 # SmartPeak Version Information
 #------------------------------------------------------------------------------
-set (smartPeak_VERSION_MAJOR 1)
-set (smartPeak_VERSION_MINOR 0)
-set (smartPeak_VERSION_PATCH 0)
+set (SMARTPEAK_PACKAGE_VERSION_MAJOR 1)
+set (SMARTPEAK_PACKAGE_VERSION_MINOR 0)
+set (SMARTPEAK_PACKAGE_VERSION_PATCH 0)
 
 #------------------------------------------------------------------------------
 # retrieve detailed informations on the working copy (git)

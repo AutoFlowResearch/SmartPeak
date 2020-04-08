@@ -22,3 +22,10 @@ cpack_add_component(doc
                 DESCRIPTION "Class documentation with tutorials."
                 INSTALL_TYPES recommended full
                 )
+
+install(CODE "
+ include(BundleUtilities)
+ GET_BUNDLE_ALL_EXECUTABLES(${CMAKE_RUNTIME_OUTPUT_DIRECTORY} EXECS)
+ SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} C:/Users/domccl/GitHub/OpenMS/openms-build/bin/debug ${BOOST_LIBRARYDIR} C:/Users/domccl/GitHub/SDL/lib)
+ fixup_bundle(\"\${EXECS}\" \"\" \"\${DIRS}\")
+ " COMPONENT applications)

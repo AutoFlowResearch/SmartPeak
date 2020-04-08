@@ -41,22 +41,14 @@ endif()
 #        DESTINATION SmartPeak-${CPACK_PACKAGE_VERSION}/${PACKAGE_LIB_DIR}/
 #        COMPONENT library)
 
-## Careful: the configured file needs to lie exactly in the Build directory so that it is found by the NSIS_template
-#configure_file(${PROJECT_SOURCE_DIR}/cmake/Windows/Cfg_Settings.nsh.in ${PROJECT_BINARY_DIR}/Cfg_Settings.nsh.in.conf @ONLY)
-#install(CODE "
-#	set (PACKAGING_DIR \${CMAKE_INSTALL_PREFIX})
-#	configure_file(${PROJECT_BINARY_DIR}/Cfg_Settings.nsh.in.conf ${PROJECT_BINARY_DIR}/Cfg_Settings.nsh)
-#	")
-
 set(CPACK_GENERATOR NSIS)
 ## Remove the next three lines if you use the NSIS autogeneration feature at some point!
 ## For now it makes sure everything is merged into the usual folders bin/share/include
 set(CPACK_COMPONENT_ALL_IN_ONE 1)
 set(CPACK_COMPONENTS_ALL_GROUPS_IN_ONE_PACKAGE 1)
 set(CPACK_MONOLITHIC_INSTALL 1)
-##
 
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${SMARTPEAK_PACKAGE_VERSION_FULLSTRING}-Win${PLATFORM}")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${SMARTPEAK_PACKAGE_VERSION_MAJOR}.${SMARTPEAK_PACKAGE_VERSION_MINOR}.${SMARTPEAK_PACKAGE_VERSION_PATCH}-Win${PLATFORM}")
 #set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/cmake/Windows/SmartPeak.ico")
 
 ## Create own target because you cannot "depend" on the internal target 'package'
@@ -82,11 +74,11 @@ endif()
 
 # set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/cmake/Windows/SmartPeak.ico")
 # set(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/cmake/Windows/SmartPeak.ico")
-# set(CPACK_NSIS_HELP_LINK "https://www.openms.de/getting-started")
-# set(CPACK_NSIS_URL_INFO_ABOUT "https://www.openms.de")
-# set(CPACK_NSIS_CONTACT "open-ms-general@lists.sourceforge.net")
+# set(CPACK_NSIS_HELP_LINK "https://www.SmartPeak.com/getting-started")
+# set(CPACK_NSIS_URL_INFO_ABOUT "https://www.SmartPeak.com")
+# set(CPACK_NSIS_CONTACT "smartpeak-general@lists.sourceforge.net")
 # set(CPACK_NSIS_MENU_LINKS
-#     "https://www.openms.de" "SmartPeak Web Site")
+#     "https://www.SmartPeak.com" "SmartPeak Web Site")
 
 
 
