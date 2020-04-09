@@ -22,10 +22,14 @@ cpack_add_component(doc
                 DESCRIPTION "Class documentation with tutorials."
                 INSTALL_TYPES recommended full
                 )
-
 install(CODE "
+ include(InstallRequiredSystemLibraries)
  include(BundleUtilities)
- GET_BUNDLE_ALL_EXECUTABLES(${CMAKE_RUNTIME_OUTPUT_DIRECTORY} EXECS)
- SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} C:/Users/domccl/GitHub/OpenMS/openms-build/bin/debug ${BOOST_LIBRARYDIR} C:/Users/domccl/GitHub/SDL/lib)
- fixup_bundle(\"\${EXECS}\" \"\" \"\${DIRS}\")
- " COMPONENT applications)
+ # GET_BUNDLE_ALL_EXECUTABLES(${CMAKE_RUNTIME_OUTPUT_DIRECTORY} EXECS)
+ # SET(EXECS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/GUI.exe)
+ SET(DEST \"\${CMAKE_INSTALL_PREFIX}/bin/GUI.exe\")
+ SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} C:/Users/domccl/GitHub/OpenMS/openms-build/bin/Release ${BOOST_LIBRARYDIR} C:/Users/domccl/GitHub/SDL/lib/x64)
+ fixup_bundle(\"\${DEST}\" \"\" \"\${DIRS}\")
+ # copy_and_fixup_bundle(\"\${EXECS}\" \"\${DEST}\" \"\" \"\${DIRS}\")
+ " 
+ COMPONENT Runtime)

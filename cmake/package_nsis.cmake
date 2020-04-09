@@ -33,13 +33,12 @@ if (NOT VC_REDIST_PATH)
 	endif()
 endif()
 
-##TODO try following instead once CMake generates NSIS commands for us. Installs dll instead of redist though. Thirdparties?
-# ########################################################### System runtime libraries
-#set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
-#include(InstallRequiredSystemLibraries)
-#install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-#        DESTINATION SmartPeak-${CPACK_PACKAGE_VERSION}/${PACKAGE_LIB_DIR}/
-#        COMPONENT library)
+## System runtime libraries for users that do not have the needed VC libraries installed
+set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+include(InstallRequiredSystemLibraries)
+install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+       DESTINATION bin
+       COMPONENT library)
 
 set(CPACK_GENERATOR NSIS)
 ## Remove the next three lines if you use the NSIS autogeneration feature at some point!

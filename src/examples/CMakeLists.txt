@@ -123,6 +123,7 @@ foreach(_examples ${EXAMPLE_executables})
     target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
   else()
     target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+	install_tool(${_examples}) # Required by CPack for bundling (see install_macros.cmake and package_general.cmake)
   endif()
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
   # see https://sourceforge.net/apps/trac/open-ms/ticket/280 for details)

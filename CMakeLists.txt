@@ -283,13 +283,7 @@ if(NOT "${PACKAGE_TYPE}" STREQUAL "none")
   elseif("${PACKAGE_TYPE}" STREQUAL "deb") # .. debs
     include(cmake/package_deb.cmake)
   elseif("${PACKAGE_TYPE}" STREQUAL "nsis") # .. Windows nsis
-    # For now we use the old NSIS script AS IS
-    # i.e. although CMake runs make install etc. NSIS
-    # will use everything from the usual build folder like before.
-    # TODO automate more and let CMake generate install commands
-    # in the script. Unfortunately we have a lot of specific code in the script.
     include(cmake/package_nsis.cmake)
   endif()
   include(CPack)
-  include(cmake/package_components.cmake)
 endif()
