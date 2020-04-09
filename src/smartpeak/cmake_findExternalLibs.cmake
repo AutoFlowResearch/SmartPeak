@@ -71,9 +71,6 @@ if (OpenMS_FOUND)
     set(_message "${_message}Please use the latest version from the OpenMS release!")
     message(FATAL_ERROR ${_message})
   endif()
-  ## include directories for OpenMS headers (and contrib)
-  #       OpenMS_GUI -> ${OpenMS_GUI_INCLUDE_DIRECTORIES}
-  #include_directories(${OpenMS_INCLUDE_DIRECTORIES})
 
   ## append precompiler macros and compiler flags specific to OpenMS
   ## Warning: this could be harmful to your project. Check this if problems occur.
