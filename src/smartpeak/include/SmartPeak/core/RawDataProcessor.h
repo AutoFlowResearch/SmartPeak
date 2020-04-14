@@ -20,12 +20,8 @@ namespace SmartPeak
 {
   struct RawDataProcessor
   {
-    // C.67: A polymorphic class should suppress copying
     RawDataProcessor(const RawDataProcessor& other) = delete;
     RawDataProcessor& operator=(const RawDataProcessor& other) = delete;
-
-    // C.35: A base class destructor should be either public and virtual, or protected and nonvirtual
-    // C.127: A class with a virtual function should have a virtual or protected destructor
     virtual ~RawDataProcessor() = default;
 
     virtual int getID() const = 0; /// get the raw data processor struct ID
@@ -306,6 +302,36 @@ namespace SmartPeak
     std::string getDescription() const override { return "Load the component and component group transition QC specifications from file."; }
 
     /** Load the component and component group transition QCs from file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureFilters : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
+    std::string getDescription() const override { return "Store the component and component group transition filters from file."; }
+
+    /** Store the component and component group transition filters from file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureQCs : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_QCS"; }
+    std::string getDescription() const override { return "Store the component and component group transition QC specifications from file."; }
+
+    /** Store the component and component group transition QCs from file.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,

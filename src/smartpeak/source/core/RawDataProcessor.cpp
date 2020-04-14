@@ -692,6 +692,74 @@ namespace SmartPeak
     LOGD << "END loadFeatureQC";
   }
 
+  void StoreFeatureFilters::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START storeFeatureFilter";
+    LOGI << "Storing: " << filenames.featureFilterComponents_csv_i << " and " <<
+      filenames.featureFilterComponentGroups_csv_i;
+
+    if (filenames.featureFilterComponents_csv_i.empty() &&
+      filenames.featureFilterComponentGroups_csv_i.empty()) {
+      LOGE << "Filenames are both empty";
+      LOGD << "END storeFeatureFilter";
+      return;
+    }
+
+    try {
+      OpenMS::MRMFeatureQCFile featureQCFile;
+      if (filenames.featureFilterComponents_csv_i.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.featureFilterComponents_csv_i, rawDataHandler_IO.getFeatureFilter(), false);
+      }
+      if (filenames.featureFilterComponentGroups_csv_i.size()) {
+        featureQCFile.store(filenames.featureFilterComponentGroups_csv_i, rawDataHandler_IO.getFeatureFilter(), true);
+      }
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+      LOGI << "feature filter store exception";
+    }
+
+    LOGD << "END storeFeatureFilter";
+  }
+
+  void StoreFeatureQCs::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START storeFeatureQC";
+    LOGI << "Loading: " << filenames.featureQCComponents_csv_i << " and " <<
+      filenames.featureQCComponentGroups_csv_i;
+
+    if (filenames.featureQCComponents_csv_i.empty() &&
+      filenames.featureQCComponentGroups_csv_i.empty()) {
+      LOGE << "Filenames are both empty";
+      LOGD << "END storeFeatureQC";
+      return;
+    }
+
+    try {
+      OpenMS::MRMFeatureQCFile featureQCFile;
+      if (filenames.featureQCComponents_csv_i.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.featureQCComponents_csv_i, rawDataHandler_IO.getFeatureQC(), false);
+      }
+      if (filenames.featureQCComponentGroups_csv_i.size()) {
+        featureQCFile.store(filenames.featureQCComponentGroups_csv_i, rawDataHandler_IO.getFeatureQC(), true);
+      }
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+      LOGI << "Feature qc store exception";
+    }
+
+    LOGD << "END storeFeatureQC";
+  }
+
   void LoadValidationData::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
