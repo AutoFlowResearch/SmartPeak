@@ -12,12 +12,8 @@ namespace SmartPeak
 {
   struct SequenceSegmentProcessor
   {
-    // C.67: A polymorphic class should suppress copying
     SequenceSegmentProcessor(const SequenceSegmentProcessor& other) = delete;
     SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor& other) = delete;
-
-    // C.35: A base class destructor should be either public and virtual, or protected and nonvirtual
-    // C.127: A class with a virtual function should have a virtual or protected destructor
     virtual ~SequenceSegmentProcessor() = default;
 
     virtual int getID() const = 0; /// get the raw data processor struct ID
@@ -140,6 +136,78 @@ namespace SmartPeak
       Plot the calibration points for each component.
 
       NOTE: Not yet implemented
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const;
+  };
+
+  struct EstimateFeatureFilterValues : SequenceSegmentProcessor
+  {
+    int getID() const { return -1; }
+    std::string getName() const { return "ESTIMATE_FEATURE_FILTER_DEFAULTS"; }
+    std::string getDescription() const { return "Estimate default FeatureQC parameter values from Standard and QC samples."; }
+
+    /**
+      @brief Estimate default FeatureQC parameter values from Standard and QC samples.
+        The Standard samples should span the LLOQ and ULOQ. The `setComponentsToConcentrations`
+        will be used to guide which Standard samples.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const;
+  };
+
+  struct TransferLOQToFeatureFilters : SequenceSegmentProcessor
+  {
+    int getID() const { return -1; }
+    std::string getName() const { return "TRANSFER_LOQ_TO_FEATURE_FILTERS"; }
+    std::string getDescription() const { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
+
+    /**
+      Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const;
+  };
+
+  struct EstimateComponentRSDs : SequenceSegmentProcessor
+  {
+    int getID() const { return -1; }
+    std::string getName() const { return "ESTIMATE_COMPONENT_RSDS"; }
+    std::string getDescription() const { return "Estimate the %RSD for component and component group feature filter attributes from pooled QC samples."; }
+
+    /**
+      Estimate the %RSD for component and component group feature filter attributes from pooled QC samples
+
+      NOTE: estimation from replicate Unknown samples is not yet implemented
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const;
+  };
+
+  struct EstimateComponentBackgroundInterferences : SequenceSegmentProcessor
+  {
+    int getID() const { return -1; }
+    std::string getName() const { return "ESTIMATE_COMPONENT_BACKGROUND_INTERFERENCES"; }
+    std::string getDescription() const { return "Plot the calibration points for each component where the x-axis is concentration ratio and the y-axis is intensity ratio."; }
+
+    /**
+      Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,

@@ -7,6 +7,7 @@
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/Utilities.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>  // feature filter/QC
 #include <OpenMS/METADATA/AbsoluteQuantitationStandards.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <OpenMS/FORMAT/AbsoluteQuantitationStandardsFile.h>
@@ -240,5 +241,75 @@ namespace SmartPeak
     //sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
     //sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
     LOGD << "END PlotCalibrators";
+  }
+
+  void EstimateFeatureFilterValues::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START estimateFeatureFilterValues";
+
+    std::vector<size_t> standards_indices, qcs_indices;
+
+    // get all standards
+    this->getSampleIndicesBySampleType(
+      sequenceSegmentHandler_IO,
+      sequenceHandler_I,
+      SampleType::Standard,
+      standards_indices
+    );
+
+    // get all QCs
+    this->getSampleIndicesBySampleType(
+      sequenceSegmentHandler_IO,
+      sequenceHandler_I,
+      SampleType::QC,
+      qcs_indices
+    );
+
+    // check if there are any standards or QCs to estimate the feature filter parameters from
+    if (standards_indices.empty() && qcs_indices.empty()) {
+      LOGE << "standards_indices and/or qcs_indices argument is empty. Returning";
+      LOGD << "END estimateFeatureFilterValues";
+      return;
+    }
+
+    // OPTIMIZATION: it would be prefered to only use those standards that are part of the optimized calibration curve for each component
+    std::vector<OpenMS::FeatureMap> standards_featureMaps;
+    for (const size_t index : standards_indices) {
+      standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+    }
+    for (const size_t index : qcs_indices) {
+      standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+    }
+
+    if (params_I.at("MRMFeatureFilter.filter_MRMFeatures").empty()) {
+      LOGE << "No parameters passed to filterFeatures. Not filtering";
+      LOGD << "END estimateFeatureFilterValues";
+      return;
+    }
+
+    // add in the method parameters
+    OpenMS::MRMFeatureFilter featureFilter;
+    OpenMS::Param parameters = featureFilter.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeatures"));
+    featureFilter.setParameters(parameters);
+
+    featureFilter.EstimateDefaultMRMFeatureQCValues(
+      standards_featureMaps,
+      sequenceSegmentHandler_IO.getFeatureFilter(),
+      sequenceSegmentHandler_IO.getTargetedExperiment(),
+      true
+    );
+
+    // store results
+    sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
+    sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
+    //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
+
+    LOGD << "END estimateFeatureFilterValues";
   }
 }
