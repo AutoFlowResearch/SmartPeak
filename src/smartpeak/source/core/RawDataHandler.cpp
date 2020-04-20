@@ -311,8 +311,8 @@ namespace SmartPeak
     if (parameters_!=nullptr) parameters_->clear();
     if (targeted_exp_!=nullptr) targeted_exp_->clear(true);
     if (quantitation_methods_ != nullptr) quantitation_methods_->clear();
-    if (feature_filter_ != nullptr) feature_filter_ = std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC());
-    if (feature_qc_ != nullptr) feature_qc_ = std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC());
+    if (feature_filter_ != nullptr) feature_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_qc_ != nullptr) feature_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
   }
 
   void RawDataHandler::updateFeatureMapHistory()

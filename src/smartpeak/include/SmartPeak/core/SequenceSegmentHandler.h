@@ -4,6 +4,7 @@
 
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
 #include <OpenMS/METADATA/AbsoluteQuantitationStandards.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureQC.h>
 
 namespace SmartPeak
 {
@@ -32,6 +33,18 @@ public:
     const std::vector<OpenMS::AbsoluteQuantitationMethod>& getQuantitationMethods() const;
     std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& getQuantitationMethodsShared();
 
+    void setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter);
+    void setFeatureFilter(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_filter);
+    OpenMS::MRMFeatureQC& getFeatureFilter();
+    const OpenMS::MRMFeatureQC& getFeatureFilter() const;
+    std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureFilterShared();
+
+    void setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc);
+    void setFeatureQC(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_qc);
+    OpenMS::MRMFeatureQC& getFeatureQC();
+    const OpenMS::MRMFeatureQC& getFeatureQC() const;
+    std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureQCShared();
+
     void setComponentsToConcentrations(
       const std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations
     );
@@ -46,7 +59,9 @@ private:
     std::string sequence_segment_name_;
     std::vector<size_t> sample_indices_;  ///< The indices of each injection; this could be replaced with `std::shared_ptr<InjectionHandler>` to save the map lookup
     std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration> standards_concentrations_;
-    std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> quantitation_methods_ = nullptr;  ///< Transition quantitation methods; shared between all raw data handlers in the sequence segment
+    std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> quantitation_methods_ = nullptr;  ///< Transition quantitation methods; shared between all raw data handlers in the sequence segment    
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_filter_ = nullptr;  ///< Feature Filters; shared between all raw data handlers in the sequence segment
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_qc_ = nullptr;  ///< Feature QCs; shared between all raw data handlers in the sequence segment
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations_;
   };
 }

@@ -15,6 +15,8 @@ namespace SmartPeak
     sample_indices_.clear();
     standards_concentrations_.clear();
     if (quantitation_methods_!=nullptr) quantitation_methods_->clear();
+    if (feature_filter_ != nullptr) feature_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_qc_ != nullptr) feature_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     components_to_concentrations_.clear();
   }
 
@@ -86,6 +88,56 @@ namespace SmartPeak
   std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& SequenceSegmentHandler::getQuantitationMethodsShared()
   {
     return quantitation_methods_;
+  }
+
+  void SequenceSegmentHandler::setFeatureFilter(const OpenMS::MRMFeatureQC& feature_filter)
+  {
+    feature_filter_.reset(new OpenMS::MRMFeatureQC(feature_filter));
+  }
+
+  void SequenceSegmentHandler::setFeatureFilter(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_filter)
+  {
+    feature_filter_ = feature_filter;
+  }
+
+  OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureFilter()
+  {
+    return *(feature_filter_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureFilter() const
+  {
+    return *(feature_filter_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& SequenceSegmentHandler::getFeatureFilterShared()
+  {
+    return feature_filter_;
+  }
+
+  void SequenceSegmentHandler::setFeatureQC(const OpenMS::MRMFeatureQC& feature_qc)
+  {
+    feature_qc_.reset(new OpenMS::MRMFeatureQC(feature_qc));
+  }
+
+  void SequenceSegmentHandler::setFeatureQC(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_qc)
+  {
+    feature_qc_ = feature_qc;
+  }
+
+  OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureQC()
+  {
+    return *(feature_qc_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureQC() const
+  {
+    return *(feature_qc_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& SequenceSegmentHandler::getFeatureQCShared()
+  {
+    return feature_qc_;
   }
 
   void SequenceSegmentHandler::setComponentsToConcentrations(

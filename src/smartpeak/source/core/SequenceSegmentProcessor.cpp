@@ -301,13 +301,11 @@ namespace SmartPeak
     featureFilter.EstimateDefaultMRMFeatureQCValues(
       standards_featureMaps,
       sequenceSegmentHandler_IO.getFeatureFilter(),
-      sequenceSegmentHandler_IO.getTargetedExperiment(),
+      sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment(), // Targeted experiment used by all injections in the sequence
       true
     );
 
     // store results
-    sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
-    sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
     //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
 
     LOGD << "END estimateFeatureFilterValues";
