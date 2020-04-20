@@ -44,10 +44,10 @@ namespace SmartPeak
     LoadTransitions loadTransitions;
     loadTransitions.process(rawDataHandler, {}, filenames);
 
-    LoadFeatureFilters loadFeatureFilters;
+    LoadFeatureFiltersRDP loadFeatureFilters;
     loadFeatureFilters.process(rawDataHandler, {}, filenames);
 
-    LoadFeatureQCs loadFeatureQCs;
+    LoadFeatureQCsRDP loadFeatureQCs;
     loadFeatureQCs.process(rawDataHandler, {}, filenames);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
     LoadValidationData loadValidationData;

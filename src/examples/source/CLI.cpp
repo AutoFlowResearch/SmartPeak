@@ -492,7 +492,7 @@ menuImportFile_label:
   else if ("6" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureFilterComponents_csv_i = pathname;
-    LoadFeatureFilters loadFeatureFilters;
+    LoadFeatureFiltersRDP loadFeatureFilters;
     const std::string backup = state.static_filenames_.featureFilterComponentGroups_csv_i;
     state.static_filenames_.featureFilterComponentGroups_csv_i.clear();
     loadFeatureFilters.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
@@ -501,7 +501,7 @@ menuImportFile_label:
   else if ("7" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureFilterComponentGroups_csv_i = pathname;
-    LoadFeatureFilters loadFeatureFilters;
+    LoadFeatureFiltersRDP loadFeatureFilters;
     const std::string backup = state.static_filenames_.featureFilterComponents_csv_i;
     state.static_filenames_.featureFilterComponents_csv_i.clear();
     loadFeatureFilters.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
@@ -510,7 +510,7 @@ menuImportFile_label:
   else if ("8" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureQCComponents_csv_i = pathname;
-    LoadFeatureQCs loadFeatureQCs;
+    LoadFeatureQCsRDP loadFeatureQCs;
     const std::string backup = state.static_filenames_.featureQCComponentGroups_csv_i;
     state.static_filenames_.featureQCComponentGroups_csv_i.clear();
     loadFeatureQCs.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
@@ -519,7 +519,7 @@ menuImportFile_label:
   else if ("9" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureQCComponentGroups_csv_i = pathname;
-    LoadFeatureQCs loadFeatureQCs;
+    LoadFeatureQCsRDP loadFeatureQCs;
     const std::string backup = state.static_filenames_.featureQCComponents_csv_i;
     state.static_filenames_.featureQCComponents_csv_i.clear();
     loadFeatureQCs.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);

@@ -590,7 +590,7 @@ namespace SmartPeak
     LOGD << "END loadTraML";
   }
 
-  void LoadFeatureFilters::process(
+  void LoadFeatureFiltersRDP::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
@@ -641,7 +641,7 @@ namespace SmartPeak
     LOGD << "END loadFeatureFilter";
   }
 
-  void LoadFeatureQCs::process(
+  void LoadFeatureQCsRDP::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
@@ -692,7 +692,7 @@ namespace SmartPeak
     LOGD << "END loadFeatureQC";
   }
 
-  void StoreFeatureFilters::process(
+  void StoreFeatureFiltersRDP::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
@@ -726,7 +726,7 @@ namespace SmartPeak
     LOGD << "END storeFeatureFilter";
   }
 
-  void StoreFeatureQCs::process(
+  void StoreFeatureQCsRDP::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames

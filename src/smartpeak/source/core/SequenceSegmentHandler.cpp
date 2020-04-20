@@ -5,7 +5,9 @@
 namespace SmartPeak
 {
   SequenceSegmentHandler::SequenceSegmentHandler():
-    quantitation_methods_(new std::vector<OpenMS::AbsoluteQuantitationMethod>())
+    quantitation_methods_(new std::vector<OpenMS::AbsoluteQuantitationMethod>()),
+    feature_filter_(new OpenMS::MRMFeatureQC()),
+    feature_qc_(new OpenMS::MRMFeatureQC())
   {
   }
 

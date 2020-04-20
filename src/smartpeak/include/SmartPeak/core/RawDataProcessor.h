@@ -280,7 +280,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureFilters : RawDataProcessor
+  struct LoadFeatureFiltersRDP : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
@@ -295,7 +295,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureQCs : RawDataProcessor
+  struct LoadFeatureQCsRDP : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_QCS"; }
@@ -310,7 +310,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct StoreFeatureFilters : RawDataProcessor
+  struct StoreFeatureFiltersRDP : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
@@ -325,7 +325,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct StoreFeatureQCs : RawDataProcessor
+  struct StoreFeatureQCsRDP : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "STORE_FEATURE_QCS"; }

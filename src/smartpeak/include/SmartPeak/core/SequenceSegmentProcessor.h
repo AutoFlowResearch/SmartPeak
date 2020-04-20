@@ -72,7 +72,7 @@ namespace SmartPeak
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
-    ) const;
+    ) const override;
   };
 
   struct LoadStandardsConcentrations : SequenceSegmentProcessor
@@ -89,7 +89,7 @@ namespace SmartPeak
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
-    ) const;
+    ) const override;
   };
 
   struct LoadQuantitationMethods : SequenceSegmentProcessor
@@ -106,7 +106,7 @@ namespace SmartPeak
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
-    ) const;
+    ) const override;
   };
 
   struct StoreQuantitationMethods : SequenceSegmentProcessor
@@ -123,7 +123,71 @@ namespace SmartPeak
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
-    ) const;
+    ) const override;
+  };
+
+  struct LoadFeatureFilters : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
+    std::string getDescription() const override { return "Load the component and component group transition filters from file."; }
+
+    /** Load the component and component group transition filters from file.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct LoadFeatureQCs : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_FEATURE_QCS"; }
+    std::string getDescription() const override { return "Load the component and component group transition QC specifications from file."; }
+
+    /** Load the component and component group transition QCs from file.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureFilters : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
+    std::string getDescription() const override { return "Store the component and component group transition filters from file."; }
+
+    /** Store the component and component group transition filters from file.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureQCs : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_QCS"; }
+    std::string getDescription() const override { return "Store the component and component group transition QC specifications from file."; }
+
+    /** Store the component and component group transition QCs from file.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
   };
 
   struct PlotCalibrators : SequenceSegmentProcessor
@@ -142,7 +206,7 @@ namespace SmartPeak
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
-    ) const;
+    ) const override;
   };
 
   struct EstimateFeatureFilterValues : SequenceSegmentProcessor
@@ -161,7 +225,7 @@ namespace SmartPeak
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
-    ) const;
+    ) const override;
   };
 
   struct TransferLOQToFeatureFilters : SequenceSegmentProcessor
@@ -178,7 +242,7 @@ namespace SmartPeak
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
-    ) const;
+    ) const override;
   };
 
   struct EstimateComponentRSDs : SequenceSegmentProcessor
@@ -197,7 +261,7 @@ namespace SmartPeak
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
-    ) const;
+    ) const override;
   };
 
   struct EstimateComponentBackgroundInterferences : SequenceSegmentProcessor
@@ -214,6 +278,6 @@ namespace SmartPeak
       const SequenceHandler& sequenceHandler_I,
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
-    ) const;
+    ) const override;
   };
 }

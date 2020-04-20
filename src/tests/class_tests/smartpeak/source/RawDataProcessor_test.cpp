@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(processorExtractChromatogramWindows)
   // Test window extraction
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_extractChromWindowTest_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  LoadFeatureFilters loadFeatureFilters;
+  LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, {}, filenames);
 
   ExtractChromatogramWindows extractChromWin;
@@ -570,25 +570,25 @@ BOOST_AUTO_TEST_CASE(processLoadTransitions)
 }
 
 /**
-  LoadFeatureFilters Tests
+  LoadFeatureFiltersRDP Tests
 */
 BOOST_AUTO_TEST_CASE(constructorLoadFeatureFilters)
 {
-  LoadFeatureFilters* ptrLoadFeatureFilters = nullptr;
-  LoadFeatureFilters* nullPointerLoadFeatureFilters = nullptr;
+  LoadFeatureFiltersRDP* ptrLoadFeatureFilters = nullptr;
+  LoadFeatureFiltersRDP* nullPointerLoadFeatureFilters = nullptr;
   BOOST_CHECK_EQUAL(ptrLoadFeatureFilters, nullPointerLoadFeatureFilters);
 }
 
 BOOST_AUTO_TEST_CASE(destructorLoadFeatureFilters)
 {
-  LoadFeatureFilters* ptrLoadFeatureFilters = nullptr;
-  ptrLoadFeatureFilters = new LoadFeatureFilters();
+  LoadFeatureFiltersRDP* ptrLoadFeatureFilters = nullptr;
+  ptrLoadFeatureFilters = new LoadFeatureFiltersRDP();
   delete ptrLoadFeatureFilters;
 }
 
 BOOST_AUTO_TEST_CASE(gettersLoadFeatureFilters)
 {
-  LoadFeatureFilters processor;
+  LoadFeatureFiltersRDP processor;
 
   BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_FILTERS");
@@ -602,7 +602,7 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureFilters)
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
 
-  LoadFeatureFilters loadFeatureFilters;
+  LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureFilter();
 
@@ -613,25 +613,25 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureFilters)
 }
 
 /**
-  LoadFeatureQCs Tests
+  LoadFeatureQCsRDP Tests
 */
 BOOST_AUTO_TEST_CASE(constructorLoadFeatureQCs)
 {
-  LoadFeatureQCs* ptrLoadFeatureQCs = nullptr;
-  LoadFeatureQCs* nullPointerLoadFeatureQCs = nullptr;
+  LoadFeatureQCsRDP* ptrLoadFeatureQCs = nullptr;
+  LoadFeatureQCsRDP* nullPointerLoadFeatureQCs = nullptr;
   BOOST_CHECK_EQUAL(ptrLoadFeatureQCs, nullPointerLoadFeatureQCs);
 }
 
 BOOST_AUTO_TEST_CASE(destructorLoadFeatureQCs)
 {
-  LoadFeatureQCs* ptrLoadFeatureQCs = nullptr;
-  ptrLoadFeatureQCs = new LoadFeatureQCs();
+  LoadFeatureQCsRDP* ptrLoadFeatureQCs = nullptr;
+  ptrLoadFeatureQCs = new LoadFeatureQCsRDP();
   delete ptrLoadFeatureQCs;
 }
 
 BOOST_AUTO_TEST_CASE(gettersLoadFeatureQCs)
 {
-  LoadFeatureQCs processor;
+  LoadFeatureQCsRDP processor;
 
   BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_QCS");
@@ -645,7 +645,7 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureQCs)
   filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
 
-  LoadFeatureQCs loadFeatureQCs;
+  LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureQC();
 
@@ -656,25 +656,25 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureQCs)
 }
 
 /**
-  StoreFeatureFilters Tests
+  StoreFeatureFiltersRDP Tests
 */
 BOOST_AUTO_TEST_CASE(constructorStoreFeatureFilters)
 {
-  StoreFeatureFilters* ptrStoreFeatureFilters = nullptr;
-  StoreFeatureFilters* nullPointerStoreFeatureFilters = nullptr;
+  StoreFeatureFiltersRDP* ptrStoreFeatureFilters = nullptr;
+  StoreFeatureFiltersRDP* nullPointerStoreFeatureFilters = nullptr;
   BOOST_CHECK_EQUAL(ptrStoreFeatureFilters, nullPointerStoreFeatureFilters);
 }
 
 BOOST_AUTO_TEST_CASE(destructorStoreFeatureFilters)
 {
-  StoreFeatureFilters* ptrStoreFeatureFilters = nullptr;
-  ptrStoreFeatureFilters = new StoreFeatureFilters();
+  StoreFeatureFiltersRDP* ptrStoreFeatureFilters = nullptr;
+  ptrStoreFeatureFilters = new StoreFeatureFiltersRDP();
   delete ptrStoreFeatureFilters;
 }
 
 BOOST_AUTO_TEST_CASE(gettersStoreFeatureFilters)
 {
-  StoreFeatureFilters processor;
+  StoreFeatureFiltersRDP processor;
 
   BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_FILTERS");
@@ -687,11 +687,11 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureFilters)
   Filenames filenames;
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  LoadFeatureFilters loadFeatureFilters;
+  LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, {}, filenames);
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
-  StoreFeatureFilters storeFeatureFilters;
+  StoreFeatureFiltersRDP storeFeatureFilters;
   storeFeatureFilters.process(rawDataHandler, {}, filenames);
   loadFeatureFilters.process(rawDataHandler_test, {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureFilter();
@@ -708,25 +708,25 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureFilters)
 }
 
 /**
-  StoreFeatureQCs Tests
+  StoreFeatureQCsRDP Tests
 */
 BOOST_AUTO_TEST_CASE(constructorStoreFeatureQCs)
 {
-  StoreFeatureQCs* ptrStoreFeatureQCs = nullptr;
-  StoreFeatureQCs* nullPointerStoreFeatureQCs = nullptr;
+  StoreFeatureQCsRDP* ptrStoreFeatureQCs = nullptr;
+  StoreFeatureQCsRDP* nullPointerStoreFeatureQCs = nullptr;
   BOOST_CHECK_EQUAL(ptrStoreFeatureQCs, nullPointerStoreFeatureQCs);
 }
 
 BOOST_AUTO_TEST_CASE(destructorStoreFeatureQCs)
 {
-  StoreFeatureQCs* ptrStoreFeatureQCs = nullptr;
-  ptrStoreFeatureQCs = new StoreFeatureQCs();
+  StoreFeatureQCsRDP* ptrStoreFeatureQCs = nullptr;
+  ptrStoreFeatureQCs = new StoreFeatureQCsRDP();
   delete ptrStoreFeatureQCs;
 }
 
 BOOST_AUTO_TEST_CASE(gettersStoreFeatureQCs)
 {
-  StoreFeatureQCs processor;
+  StoreFeatureQCsRDP processor;
 
   BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_QCS");
@@ -739,11 +739,11 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureQCs)
   Filenames filenames;
   filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  LoadFeatureQCs loadFeatureQCs;
+  LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, {}, filenames);
   filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
   filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
-  StoreFeatureQCs storeFeatureQCs;
+  StoreFeatureQCsRDP storeFeatureQCs;
   storeFeatureQCs.process(rawDataHandler, {}, filenames);
   loadFeatureQCs.process(rawDataHandler_test, {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureQC();
@@ -1006,7 +1006,7 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
 
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  LoadFeatureFilters loadFeatureFilters;
+  LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
 
   // Test feature filter
@@ -1329,7 +1329,7 @@ BOOST_AUTO_TEST_CASE(checkFeatures)
 
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  LoadFeatureQCs loadFeatureQCs;
+  LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
   // Test check features
@@ -1369,7 +1369,7 @@ BOOST_AUTO_TEST_CASE(process)
 
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  LoadFeatureFilters loadFeatureFilters;
+  LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
 
   filenames.quantitationMethods_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv");
@@ -1378,7 +1378,7 @@ BOOST_AUTO_TEST_CASE(process)
   loadQuantitationMethods.process(sequenceSegmentHandler_IO, SequenceHandler(), {}, filenames);
   rawDataHandler.setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
 
-  LoadFeatureQCs loadFeatureQCs;
+  LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
