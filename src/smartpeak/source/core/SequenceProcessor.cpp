@@ -40,18 +40,15 @@ namespace SmartPeak
     // load rawDataHandler files (applies to the whole session)
     LoadParameters loadParameters;
     loadParameters.process(rawDataHandler, {}, filenames);
-
     LoadTransitions loadTransitions;
     loadTransitions.process(rawDataHandler, {}, filenames);
-
-    LoadFeatureFiltersRDP loadFeatureFilters;
-    loadFeatureFilters.process(rawDataHandler, {}, filenames);
-
-    LoadFeatureQCsRDP loadFeatureQCs;
-    loadFeatureQCs.process(rawDataHandler, {}, filenames);
-    // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
+    //LoadFeatureFiltersRDP loadFeatureFilters; // Ownership of FeatureFilter/QC changed from RawDataHandler to SequenceSegmentHandler
+    //loadFeatureFilters.process(rawDataHandler, {}, filenames);
+    //LoadFeatureQCsRDP loadFeatureQCs;
+    //loadFeatureQCs.process(rawDataHandler, {}, filenames);
     LoadValidationData loadValidationData;
     loadValidationData.process(rawDataHandler, {}, filenames);
+    // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
 
     // load sequenceSegmentHandler files
     for (SequenceSegmentHandler& sequenceSegmentHandler: sequenceHandler_IO->getSequenceSegments()) {
@@ -59,6 +56,10 @@ namespace SmartPeak
       loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       LoadStandardsConcentrations loadStandardsConcentrations;
       loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      LoadFeatureFilters loadFeatureFilters;
+      loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      LoadFeatureQCs loadFeatureQCs;
+      loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
     }
 
     if (checkConsistency) {

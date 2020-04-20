@@ -103,10 +103,14 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
 
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSequenceSegmentName(), "sequence_segment1");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureFilter().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs.size(), 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSampleIndices().size(), 1);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getSampleIndices()[0], 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSequenceSegmentName(), "sequence_segment2");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getQuantitationMethods().size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getFeatureFilter().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getFeatureQC().component_qcs.size(), 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices().size(), 2);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices()[0], 1);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices()[1], 2);
@@ -135,16 +139,16 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
-  injection0.getRawData().getFeatureFilter().component_qcs.resize(1);
-  injection0.getRawData().getFeatureFilter().component_qcs[0].component_name = "arg-L.arg-L_1.Heavy";
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  injection0.getRawData().getFeatureQC().component_qcs.resize(1);
-  injection0.getRawData().getFeatureQC().component_qcs[0].component_name = "arg-L.arg-L_1.Light";
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
+  //injection0.getRawData().getFeatureFilter().component_qcs.resize(1); // Ownership of FeatureFilter/QC changed from RawDataHandler to SequenceSegmentHandler
+  //injection0.getRawData().getFeatureFilter().component_qcs[0].component_name = "arg-L.arg-L_1.Heavy";
+  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  //injection0.getRawData().getFeatureQC().component_qcs.resize(1);
+  //injection0.getRawData().getFeatureQC().component_qcs[0].component_name = "arg-L.arg-L_1.Light";
+  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
+  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
+  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
 
   // Test shared resources across sequence segment handlers
   sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().resize(1);
@@ -154,6 +158,20 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getQuantitationMethods().size(), 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getQuantitationMethods().size(), 0);
+  sequenceHandler.getSequenceSegments()[0].getFeatureFilter().component_qcs.resize(1);
+  sequenceHandler.getSequenceSegments()[0].getFeatureFilter().component_qcs[0].component_name = "arg-L.arg-L_1.Heavy";
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureFilter().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureFilter().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getFeatureFilter().component_qcs.size(), 0);
+  sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs.resize(1);
+  sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs[0].component_name = "arg-L.arg-L_1.Light";
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureQC().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureQC().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getFeatureQC().component_qcs.size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(getMetaValue)

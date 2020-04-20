@@ -69,7 +69,7 @@ namespace SmartPeak
   {
     if (!MetaDataHandler::validateMetaData(meta_data_I))
       throw std::invalid_argument("FeatureMetadata argument is not valid.");
-    std::shared_ptr<MetaDataHandler> meta_data_ptr(new MetaDataHandler(meta_data_I));
+    auto meta_data_ptr = std::make_shared<MetaDataHandler>(MetaDataHandler(meta_data_I));
 
     // initialize the raw data
     RawDataHandler rdh;
@@ -82,10 +82,13 @@ namespace SmartPeak
     if (sequence_.size()) {
       auto parameters_ptr = sequence_.begin()->getRawDataShared()->getParametersShared();
       rdh.setParameters(parameters_ptr);
-      auto feature_filters_ptr = sequence_.begin()->getRawDataShared()->getFeatureFilterShared();
-      rdh.setFeatureFilter(feature_filters_ptr);
-      auto feature_qc_ptr = sequence_.begin()->getRawDataShared()->getFeatureQCShared();
-      rdh.setFeatureQC(feature_qc_ptr);
+
+      /// ownership was changed from the RawDataHandler to the SequenceSegmentHandler
+      //auto feature_filters_ptr = sequence_.begin()->getRawDataShared()->getFeatureFilterShared();
+      //rdh.setFeatureFilter(feature_filters_ptr);
+      //auto feature_qc_ptr = sequence_.begin()->getRawDataShared()->getFeatureQCShared();
+      //rdh.setFeatureQC(feature_qc_ptr);
+
       auto transitions_ptr = sequence_.begin()->getRawDataShared()->getTargetedExperimentShared();
       rdh.setTargetedExperiment(transitions_ptr);
       auto reference_data_ptr = sequence_.begin()->getRawDataShared()->getReferenceDataShared();
@@ -93,11 +96,15 @@ namespace SmartPeak
       // look up the sequence segment, 
       // add the sample index to the sequence segment list of injection indices
       // and copy over the quantitation method
-      std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> absQuantMethods_ptr(new std::vector<OpenMS::AbsoluteQuantitationMethod>());
+      auto absQuantMethods_ptr = std::make_shared<std::vector<OpenMS::AbsoluteQuantitationMethod>>(std::vector<OpenMS::AbsoluteQuantitationMethod>());
+      auto feature_filters_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_qc_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
       bool found_seq_seg = false;
       for (SequenceSegmentHandler& sequenceSegmentHandler : sequence_segments_) {
         if (meta_data_I.getSequenceSegmentName() == sequenceSegmentHandler.getSequenceSegmentName()) {
           absQuantMethods_ptr = sequenceSegmentHandler.getQuantitationMethodsShared();
+          feature_filters_ptr = sequenceSegmentHandler.getFeatureFilterShared();
+          feature_qc_ptr = sequenceSegmentHandler.getFeatureQCShared();
           found_seq_seg = true;
           sequenceSegmentHandler.getSampleIndices().push_back(sequence_.size()); // index = the size of the sequence
           break;
@@ -105,16 +112,22 @@ namespace SmartPeak
       }
       if (found_seq_seg) {
         rdh.setQuantitationMethods(absQuantMethods_ptr);
+        rdh.setFeatureFilter(feature_filters_ptr);
+        rdh.setFeatureQC(feature_qc_ptr);
       }
       else {  // New sequence segment
         // initialize the sequence segment
         SequenceSegmentHandler sequenceSegmentHandler;
         sequenceSegmentHandler.setSampleIndices({ sequence_.size() }); // index = the size of the sequence
         sequenceSegmentHandler.setQuantitationMethods(absQuantMethods_ptr);
+        sequenceSegmentHandler.setFeatureFilter(feature_filters_ptr);
+        sequenceSegmentHandler.setFeatureQC(feature_qc_ptr);
         sequenceSegmentHandler.setSequenceSegmentName(meta_data_I.getSequenceSegmentName());
         sequence_segments_.push_back(sequenceSegmentHandler);
 
         rdh.setQuantitationMethods(absQuantMethods_ptr);
+        rdh.setFeatureFilter(feature_filters_ptr);
+        rdh.setFeatureQC(feature_qc_ptr);
       }
     }
     else {
@@ -127,13 +140,19 @@ namespace SmartPeak
 
       // initialize the sequence segment
       SequenceSegmentHandler sequenceSegmentHandler;
-      std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> absQuantMethods_ptr(new std::vector<OpenMS::AbsoluteQuantitationMethod>());
+      auto absQuantMethods_ptr = std::make_shared<std::vector<OpenMS::AbsoluteQuantitationMethod>>(std::vector<OpenMS::AbsoluteQuantitationMethod>());
+      auto feature_filters_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_qc_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
       sequenceSegmentHandler.setSampleIndices({ 0 }); // first index of the sequence
       sequenceSegmentHandler.setQuantitationMethods(absQuantMethods_ptr);
+      sequenceSegmentHandler.setFeatureFilter(feature_filters_ptr);
+      sequenceSegmentHandler.setFeatureQC(feature_qc_ptr);
       sequenceSegmentHandler.setSequenceSegmentName(meta_data_I.getSequenceSegmentName());
       sequence_segments_.push_back(sequenceSegmentHandler);
 
       rdh.setQuantitationMethods(absQuantMethods_ptr);
+      rdh.setFeatureFilter(feature_filters_ptr);
+      rdh.setFeatureQC(feature_qc_ptr);
     }
 
     // intialize the meta data
