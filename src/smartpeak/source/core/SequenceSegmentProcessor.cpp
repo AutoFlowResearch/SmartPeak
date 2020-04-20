@@ -461,18 +461,7 @@ namespace SmartPeak
       standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
     }
 
-    if (params_I.at("MRMFeatureFilter.filter_MRMFeatures").empty()) {
-      LOGE << "No parameters passed to filterFeatures. Not filtering";
-      LOGD << "END estimateFeatureFilterValues";
-      return;
-    }
-
-    // add in the method parameters
     OpenMS::MRMFeatureFilter featureFilter;
-    OpenMS::Param parameters = featureFilter.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeatures"));
-    featureFilter.setParameters(parameters);
-
     featureFilter.EstimateDefaultMRMFeatureQCValues(
       standards_featureMaps,
       sequenceSegmentHandler_IO.getFeatureFilter(),
@@ -480,9 +469,111 @@ namespace SmartPeak
       true
     );
 
-    // store results
-    //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
-
     LOGD << "END estimateFeatureFilterValues";
+  }
+
+  void TransferLOQToFeatureFilters::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START TransferLOQToFeatureFilters";
+
+    // check if there are any quantitation methods
+    if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
+      LOGE << "quantitation methods is empty. Returning";
+      LOGD << "END TransferLOQToFeatureFilters";
+      return;
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    featureFilter.TransferLLOQAndULOQToCalculatedConcentrationBounds(
+      sequenceSegmentHandler_IO.getQuantitationMethods(),
+      sequenceSegmentHandler_IO.getFeatureFilter()
+    );
+
+    LOGD << "END TransferLOQToFeatureFilters";
+  }
+
+  void EstimateComponentRSDs::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START EstimateComponentRSDs";
+
+    // get all QCs
+    std::vector<size_t> qcs_indices;
+    this->getSampleIndicesBySampleType(
+      sequenceSegmentHandler_IO,
+      sequenceHandler_I,
+      SampleType::QC,
+      qcs_indices
+    );
+
+    // check if there are any standards or QCs to estimate the feature filter parameters from
+    if (qcs_indices.empty()) {
+      LOGE << "qcs_indices argument is empty. Returning";
+      LOGD << "END EstimateComponentRSDs";
+      return;
+    }
+
+    std::vector<OpenMS::FeatureMap> qcs_featureMaps;
+    for (const size_t index : qcs_indices) {
+      qcs_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    featureFilter.EstimatePercRSD(
+      qcs_featureMaps, 
+      sequenceSegmentHandler_IO.getFeatureFilter(), // TODO change to getComponentRSDs
+      sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment() // Targeted experiment used by all injections in the sequence
+    );
+
+    LOGD << "END EstimateComponentRSDs";
+  }
+
+  void EstimateComponentBackgroundInterferences::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START EstimateComponentBackgroundInterferences";
+
+    // get all Blanks
+    std::vector<size_t> blanks_indices;
+    this->getSampleIndicesBySampleType(
+      sequenceSegmentHandler_IO,
+      sequenceHandler_I,
+      SampleType::Blank,
+      blanks_indices
+    );
+
+    // check if there are any Blanks to estimate the background interference from
+    if (blanks_indices.empty()) {
+      LOGE << "blanks_indices argument is empty. Returning";
+      LOGD << "END EstimateComponentBackgroundInterferences";
+      return;
+    }
+
+    std::vector<OpenMS::FeatureMap> blanks_featureMaps;
+    for (const size_t index : blanks_indices) {
+      blanks_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    featureFilter.EstimateBackgroundInterferences(
+      blanks_featureMaps,
+      sequenceSegmentHandler_IO.getFeatureFilter(), // TODO change to getBackgroundInterferences
+      sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment() // Targeted experiment used by all injections in the sequence
+    );
+
+    LOGD << "END EstimateComponentBackgroundInterferences";
   }
 }

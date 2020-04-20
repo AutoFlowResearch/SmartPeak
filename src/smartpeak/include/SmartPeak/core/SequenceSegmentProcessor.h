@@ -268,7 +268,7 @@ namespace SmartPeak
   {
     int getID() const { return -1; }
     std::string getName() const { return "ESTIMATE_COMPONENT_BACKGROUND_INTERFERENCES"; }
-    std::string getDescription() const { return "Plot the calibration points for each component where the x-axis is concentration ratio and the y-axis is intensity ratio."; }
+    std::string getDescription() const { return "Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples."; }
 
     /**
       Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples
