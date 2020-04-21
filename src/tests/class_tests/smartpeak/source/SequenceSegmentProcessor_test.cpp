@@ -761,6 +761,386 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureQCs)
 }
 
 /**
+  LoadFeatureRSDFilters Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadFeatureRSDFilters)
+{
+  LoadFeatureRSDFilters* ptrLoadFeatureRSDFilters = nullptr;
+  LoadFeatureRSDFilters* nullPointerLoadFeatureRSDFilters = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadFeatureRSDFilters, nullPointerLoadFeatureRSDFilters);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadFeatureRSDFilters)
+{
+  LoadFeatureRSDFilters* ptrLoadFeatureRSDFilters = nullptr;
+  ptrLoadFeatureRSDFilters = new LoadFeatureRSDFilters();
+  delete ptrLoadFeatureRSDFilters;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadFeatureRSDFilters)
+{
+  LoadFeatureRSDFilters processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_RSD_FILTERS");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadFeatureRSDFilters)
+{
+  SequenceSegmentHandler ssh;
+
+  Filenames filenames;
+  filenames.featureRSDFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureRSDFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+
+  LoadFeatureRSDFilters loadFeatureRSDFilters;
+  loadFeatureRSDFilters.process(ssh, SequenceHandler(), {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDFilter();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+}
+
+/**
+  LoadFeatureRSDQCs Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadFeatureRSDQCs)
+{
+  LoadFeatureRSDQCs* ptrLoadFeatureRSDQCs = nullptr;
+  LoadFeatureRSDQCs* nullPointerLoadFeatureRSDQCs = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadFeatureRSDQCs, nullPointerLoadFeatureRSDQCs);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadFeatureRSDQCs)
+{
+  LoadFeatureRSDQCs* ptrLoadFeatureRSDQCs = nullptr;
+  ptrLoadFeatureRSDQCs = new LoadFeatureRSDQCs();
+  delete ptrLoadFeatureRSDQCs;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadFeatureRSDQCs)
+{
+  LoadFeatureRSDQCs processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_RSD_QCS");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadFeatureRSDQCs)
+{
+  SequenceSegmentHandler ssh;
+
+  Filenames filenames;
+  filenames.featureRSDQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureRSDQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+
+  LoadFeatureRSDQCs loadFeatureRSDQCs;
+  loadFeatureRSDQCs.process(ssh, SequenceHandler(), {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDQC();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+}
+
+/**
+  StoreFeatureRSDFilters Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorStoreFeatureRSDFilters)
+{
+  StoreFeatureRSDFilters* ptrStoreFeatureRSDFilters = nullptr;
+  StoreFeatureRSDFilters* nullPointerStoreFeatureRSDFilters = nullptr;
+  BOOST_CHECK_EQUAL(ptrStoreFeatureRSDFilters, nullPointerStoreFeatureRSDFilters);
+}
+
+BOOST_AUTO_TEST_CASE(destructorStoreFeatureRSDFilters)
+{
+  StoreFeatureRSDFilters* ptrStoreFeatureRSDFilters = nullptr;
+  ptrStoreFeatureRSDFilters = new StoreFeatureRSDFilters();
+  delete ptrStoreFeatureRSDFilters;
+}
+
+BOOST_AUTO_TEST_CASE(gettersStoreFeatureRSDFilters)
+{
+  StoreFeatureRSDFilters processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_RSD_FILTERS");
+}
+
+BOOST_AUTO_TEST_CASE(processStoreFeatureRSDFilters)
+{
+  SequenceSegmentHandler ssh, ssh_test;
+
+  Filenames filenames;
+  filenames.featureRSDFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureRSDFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  LoadFeatureRSDFilters loadFeatureRSDFilters;
+  loadFeatureRSDFilters.process(ssh, SequenceHandler(), {}, filenames);
+  filenames.featureRSDFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
+  filenames.featureRSDFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
+  StoreFeatureRSDFilters storeFeatureRSDFilters;
+  storeFeatureRSDFilters.process(ssh, SequenceHandler(), {}, filenames);
+  loadFeatureRSDFilters.process(ssh_test, SequenceHandler(), {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDFilter();
+  const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureRSDFilter();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+  }
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+  }
+}
+
+/**
+  StoreFeatureRSDQCs Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorStoreFeatureRSDQCs)
+{
+  StoreFeatureRSDQCs* ptrStoreFeatureRSDQCs = nullptr;
+  StoreFeatureRSDQCs* nullPointerStoreFeatureRSDQCs = nullptr;
+  BOOST_CHECK_EQUAL(ptrStoreFeatureRSDQCs, nullPointerStoreFeatureRSDQCs);
+}
+
+BOOST_AUTO_TEST_CASE(destructorStoreFeatureRSDQCs)
+{
+  StoreFeatureRSDQCs* ptrStoreFeatureRSDQCs = nullptr;
+  ptrStoreFeatureRSDQCs = new StoreFeatureRSDQCs();
+  delete ptrStoreFeatureRSDQCs;
+}
+
+BOOST_AUTO_TEST_CASE(gettersStoreFeatureRSDQCs)
+{
+  StoreFeatureRSDQCs processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_RSD_QCS");
+}
+
+BOOST_AUTO_TEST_CASE(processStoreFeatureRSDQCs)
+{
+  SequenceSegmentHandler ssh, ssh_test;
+
+  Filenames filenames;
+  filenames.featureRSDQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureRSDQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  LoadFeatureRSDQCs loadFeatureRSDQCs;
+  loadFeatureRSDQCs.process(ssh, SequenceHandler(), {}, filenames);
+  filenames.featureRSDQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
+  filenames.featureRSDQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
+  StoreFeatureRSDQCs storeFeatureRSDQCs;
+  storeFeatureRSDQCs.process(ssh, SequenceHandler(), {}, filenames);
+  loadFeatureRSDQCs.process(ssh_test, SequenceHandler(), {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDQC();
+  const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureRSDQC();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+  }
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+  }
+}
+
+/**
+  LoadFeatureBackgroundFilters Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadFeatureBackgroundFilters)
+{
+  LoadFeatureBackgroundFilters* ptrLoadFeatureBackgroundFilters = nullptr;
+  LoadFeatureBackgroundFilters* nullPointerLoadFeatureBackgroundFilters = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadFeatureBackgroundFilters, nullPointerLoadFeatureBackgroundFilters);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadFeatureBackgroundFilters)
+{
+  LoadFeatureBackgroundFilters* ptrLoadFeatureBackgroundFilters = nullptr;
+  ptrLoadFeatureBackgroundFilters = new LoadFeatureBackgroundFilters();
+  delete ptrLoadFeatureBackgroundFilters;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadFeatureBackgroundFilters)
+{
+  LoadFeatureBackgroundFilters processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_BACKGROUND_FILTERS");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadFeatureBackgroundFilters)
+{
+  SequenceSegmentHandler ssh;
+
+  Filenames filenames;
+  filenames.featureBackgroundFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureBackgroundFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+
+  LoadFeatureBackgroundFilters loadFeatureBackgroundFilters;
+  loadFeatureBackgroundFilters.process(ssh, SequenceHandler(), {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundFilter();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+}
+
+/**
+  LoadFeatureBackgroundQCs Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadFeatureBackgroundQCs)
+{
+  LoadFeatureBackgroundQCs* ptrLoadFeatureBackgroundQCs = nullptr;
+  LoadFeatureBackgroundQCs* nullPointerLoadFeatureBackgroundQCs = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadFeatureBackgroundQCs, nullPointerLoadFeatureBackgroundQCs);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadFeatureBackgroundQCs)
+{
+  LoadFeatureBackgroundQCs* ptrLoadFeatureBackgroundQCs = nullptr;
+  ptrLoadFeatureBackgroundQCs = new LoadFeatureBackgroundQCs();
+  delete ptrLoadFeatureBackgroundQCs;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadFeatureBackgroundQCs)
+{
+  LoadFeatureBackgroundQCs processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_BACKGROUND_QCS");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadFeatureBackgroundQCs)
+{
+  SequenceSegmentHandler ssh;
+
+  Filenames filenames;
+  filenames.featureBackgroundQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureBackgroundQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+
+  LoadFeatureBackgroundQCs loadFeatureBackgroundQCs;
+  loadFeatureBackgroundQCs.process(ssh, SequenceHandler(), {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundQC();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+}
+
+/**
+  StoreFeatureBackgroundFilters Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorStoreFeatureBackgroundFilters)
+{
+  StoreFeatureBackgroundFilters* ptrStoreFeatureBackgroundFilters = nullptr;
+  StoreFeatureBackgroundFilters* nullPointerStoreFeatureBackgroundFilters = nullptr;
+  BOOST_CHECK_EQUAL(ptrStoreFeatureBackgroundFilters, nullPointerStoreFeatureBackgroundFilters);
+}
+
+BOOST_AUTO_TEST_CASE(destructorStoreFeatureBackgroundFilters)
+{
+  StoreFeatureBackgroundFilters* ptrStoreFeatureBackgroundFilters = nullptr;
+  ptrStoreFeatureBackgroundFilters = new StoreFeatureBackgroundFilters();
+  delete ptrStoreFeatureBackgroundFilters;
+}
+
+BOOST_AUTO_TEST_CASE(gettersStoreFeatureBackgroundFilters)
+{
+  StoreFeatureBackgroundFilters processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_BACKGROUND_FILTERS");
+}
+
+BOOST_AUTO_TEST_CASE(processStoreFeatureBackgroundFilters)
+{
+  SequenceSegmentHandler ssh, ssh_test;
+
+  Filenames filenames;
+  filenames.featureBackgroundFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureBackgroundFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  LoadFeatureBackgroundFilters loadFeatureBackgroundFilters;
+  loadFeatureBackgroundFilters.process(ssh, SequenceHandler(), {}, filenames);
+  filenames.featureBackgroundFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
+  filenames.featureBackgroundFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
+  StoreFeatureBackgroundFilters storeFeatureBackgroundFilters;
+  storeFeatureBackgroundFilters.process(ssh, SequenceHandler(), {}, filenames);
+  loadFeatureBackgroundFilters.process(ssh_test, SequenceHandler(), {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundFilter();
+  const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureBackgroundFilter();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+  }
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+  }
+}
+
+/**
+  StoreFeatureBackgroundQCs Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorStoreFeatureBackgroundQCs)
+{
+  StoreFeatureBackgroundQCs* ptrStoreFeatureBackgroundQCs = nullptr;
+  StoreFeatureBackgroundQCs* nullPointerStoreFeatureBackgroundQCs = nullptr;
+  BOOST_CHECK_EQUAL(ptrStoreFeatureBackgroundQCs, nullPointerStoreFeatureBackgroundQCs);
+}
+
+BOOST_AUTO_TEST_CASE(destructorStoreFeatureBackgroundQCs)
+{
+  StoreFeatureBackgroundQCs* ptrStoreFeatureBackgroundQCs = nullptr;
+  ptrStoreFeatureBackgroundQCs = new StoreFeatureBackgroundQCs();
+  delete ptrStoreFeatureBackgroundQCs;
+}
+
+BOOST_AUTO_TEST_CASE(gettersStoreFeatureBackgroundQCs)
+{
+  StoreFeatureBackgroundQCs processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_BACKGROUND_QCS");
+}
+
+BOOST_AUTO_TEST_CASE(processStoreFeatureBackgroundQCs)
+{
+  SequenceSegmentHandler ssh, ssh_test;
+
+  Filenames filenames;
+  filenames.featureBackgroundQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureBackgroundQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  LoadFeatureBackgroundQCs loadFeatureBackgroundQCs;
+  loadFeatureBackgroundQCs.process(ssh, SequenceHandler(), {}, filenames);
+  filenames.featureBackgroundQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
+  filenames.featureBackgroundQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
+  StoreFeatureBackgroundQCs storeFeatureBackgroundQCs;
+  storeFeatureBackgroundQCs.process(ssh, SequenceHandler(), {}, filenames);
+  loadFeatureBackgroundQCs.process(ssh_test, SequenceHandler(), {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundQC();
+  const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureBackgroundQC();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+  }
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+  }
+}
+
+/**
   EstimateFeatureFilterValues Tests
 */
 BOOST_AUTO_TEST_CASE(constructorEstimateFeatureFilterValues)
