@@ -1167,4 +1167,140 @@ namespace SmartPeak
       // std::cout << x.back() << "\t" << y.back() << "\n";
     }
   }
+
+  void FilterFeaturesRSDs::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START filterFeaturesRSDs";
+    LOGI << "Feature Filter input size: " << rawDataHandler_IO.getFeatureMap().size();
+
+    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesRSDs") &&
+      params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs").empty()) {
+      LOGE << "No parameters passed to filterFeatures. Not filtering";
+      LOGD << "END filterFeaturesRSDs";
+      return;
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    OpenMS::Param parameters = featureFilter.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs"));
+    featureFilter.setParameters(parameters);
+
+    OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
+
+    featureFilter.FilterFeatureMapPercRSD(
+      featureMap,
+      rawDataHandler_IO.getFeatureFilter(),
+      rawDataHandler_IO.getFeatureRSDEstimations()
+    );
+
+    rawDataHandler_IO.updateFeatureMapHistory();
+
+    LOGI << "Feature Filter output size: " << featureMap.size();
+    LOGD << "END filterFeaturesRSDs";
+  }
+
+  void CheckFeaturesRSDs::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START checkFeaturesRSDs";
+    LOGI << "Feature Checker input size: " << rawDataHandler_IO.getFeatureMap().size();
+
+    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc") &&
+      params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc").empty()) {
+      LOGE << "No parameters passed to checkFeatures. Not checking";
+      LOGD << "END checkFeaturesRSDs";
+      return;
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    OpenMS::Param parameters = featureFilter.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc"));
+    featureFilter.setParameters(parameters);
+
+    featureFilter.FilterFeatureMapPercRSD(
+      rawDataHandler_IO.getFeatureMap(),
+      rawDataHandler_IO.getFeatureQC(),
+      rawDataHandler_IO.getFeatureRSDEstimations()
+    );
+
+    rawDataHandler_IO.updateFeatureMapHistory();
+
+    LOGI << "Feature Checker output size: " << rawDataHandler_IO.getFeatureMap().size();
+    LOGD << "END checkFeaturesRSDs";
+  }
+
+  void FilterFeaturesBackgroundInterferences::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START filterFeaturesBackgroundInterferences";
+    LOGI << "Feature Filter input size: " << rawDataHandler_IO.getFeatureMap().size();
+
+    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences") &&
+      params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences").empty()) {
+      LOGE << "No parameters passed to filterFeatures. Not filtering";
+      LOGD << "END filterFeaturesBackgroundInterferences";
+      return;
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    OpenMS::Param parameters = featureFilter.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences"));
+    featureFilter.setParameters(parameters);
+
+    OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
+
+    featureFilter.FilterFeatureMapBackgroundInterference(
+      featureMap,
+      rawDataHandler_IO.getFeatureFilter(),
+      rawDataHandler_IO.getFeatureBackgroundEstimations()
+    );
+
+    rawDataHandler_IO.updateFeatureMapHistory();
+
+    LOGI << "Feature Filter output size: " << featureMap.size();
+    LOGD << "END filterFeaturesBackgroundInterferences";
+  }
+
+  void CheckFeaturesBackgroundInterferences::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START checkFeaturesBackgroundInterferences";
+    LOGI << "Feature Checker input size: " << rawDataHandler_IO.getFeatureMap().size();
+
+    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc") &&
+      params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc").empty()) {
+      LOGE << "No parameters passed to checkFeatures. Not checking";
+      LOGD << "END checkFeaturesBackgroundInterferences";
+      return;
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    OpenMS::Param parameters = featureFilter.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc"));
+    featureFilter.setParameters(parameters);
+
+    featureFilter.FilterFeatureMapBackgroundInterference(
+      rawDataHandler_IO.getFeatureMap(),
+      rawDataHandler_IO.getFeatureQC(),
+      rawDataHandler_IO.getFeatureBackgroundEstimations()
+    );
+
+    rawDataHandler_IO.updateFeatureMapHistory();
+
+    LOGI << "Feature Checker output size: " << rawDataHandler_IO.getFeatureMap().size();
+    LOGD << "END checkFeaturesBackgroundInterferences";
+  }
 }

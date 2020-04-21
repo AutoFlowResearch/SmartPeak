@@ -396,4 +396,64 @@ namespace SmartPeak
       std::vector<double>& y
     ) const;
   };
+
+  struct FilterFeaturesRSDs : RawDataProcessor
+  {
+    int getID() const override { return 4; }
+    std::string getName() const override { return "FILTER_FEATURES_RSDS"; }
+    std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
+
+    /** Filter features that do not pass the filter QCs.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct CheckFeaturesRSDs : RawDataProcessor
+  {
+    int getID() const override { return 8; }
+    std::string getName() const override { return "CHECK_FEATURES_RSDS"; }
+    std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
+
+    /** Flag features that do not pass the filter QCs.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct FilterFeaturesBackgroundInterferences : RawDataProcessor
+  {
+    int getID() const override { return 4; }
+    std::string getName() const override { return "FILTER_FEATURES_BACKGROUND_INTERFERENCES"; }
+    std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
+
+    /** Filter features that do not pass the filter QCs.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct CheckFeaturesBackgroundInterferences : RawDataProcessor
+  {
+    int getID() const override { return 8; }
+    std::string getName() const override { return "CHECK_FEATURES_BACKGROUND_INTERFERENCES"; }
+    std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
+
+    /** Flag features that do not pass the filter QCs.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
 }
