@@ -130,9 +130,9 @@ namespace SmartPeak
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
-    std::string getDescription() const override { return "Load the component and component group transition filters from file."; }
+    std::string getDescription() const override { return "Load the component and component group filters from file."; }
 
-    /** Load the component and component group transition filters from file.
+    /** Load the component and component group filters from file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
@@ -146,9 +146,9 @@ namespace SmartPeak
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_QCS"; }
-    std::string getDescription() const override { return "Load the component and component group transition QC specifications from file."; }
+    std::string getDescription() const override { return "Load the component and component group QCs from file."; }
 
-    /** Load the component and component group transition QCs from file.
+    /** Load the component and component group QCs from file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
@@ -162,9 +162,9 @@ namespace SmartPeak
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
-    std::string getDescription() const override { return "Store the component and component group transition filters from file."; }
+    std::string getDescription() const override { return "Store the component and component group filters to disk."; }
 
-    /** Store the component and component group transition filters from file.
+    /** Store the component and component group filters to disk.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
@@ -178,9 +178,137 @@ namespace SmartPeak
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "STORE_FEATURE_QCS"; }
-    std::string getDescription() const override { return "Store the component and component group transition QC specifications from file."; }
+    std::string getDescription() const override { return "Store the component and component group QCs to disk."; }
 
-    /** Store the component and component group transition QCs from file.
+    /** Store the component and component group QCs to disk.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct LoadFeatureRSDFilters : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_FEATURE_RSD_FILTERS"; }
+    std::string getDescription() const override { return "Load the component and component group percent RSD filters from file."; }
+
+    /** Load the component and component group percent RSD filters from file.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct LoadFeatureRSDQCs : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_FEATURE_RSD_QCS"; }
+    std::string getDescription() const override { return "Load the component and component group percent RSD QCs from file."; }
+
+    /** Load the component and component group percent RSD QCs from file.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureRSDFilters : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_RSD_FILTERS"; }
+    std::string getDescription() const override { return "Store the component and component group percent RSD filters to disk."; }
+
+    /** Store the component and component group percent RSD filters to disk.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureRSDQCs : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_RSD_QCS"; }
+    std::string getDescription() const override { return "Store the component and component group percent RSD QCs to disk."; }
+
+    /** Store the component and component group percent RSD QCs to disk.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct LoadFeatureBackgroundFilters : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_FILTERS"; }
+    std::string getDescription() const override { return "Load the component and component group percent Background Interference filters from file."; }
+
+    /** Load the component and component group percent Background Interference filters from file.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct LoadFeatureBackgroundQCs : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_QCS"; }
+    std::string getDescription() const override { return "Load the component and component group percent Background Interference QCs from file."; }
+
+    /** Load the component and component group percent Background Interference QCs from file.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureBackgroundFilters : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_BACKGROUND_FILTERS"; }
+    std::string getDescription() const override { return "Store the component and component group percent Background Interference filters to disk."; }
+
+    /** Store the component and component group percent Background Interference filters to disk.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureBackgroundQCs : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_BACKGROUND_QCS"; }
+    std::string getDescription() const override { return "Store the component and component group percent Background Interference QCs to disk."; }
+
+    /** Store the component and component group percent Background Interference QCs to disk.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
