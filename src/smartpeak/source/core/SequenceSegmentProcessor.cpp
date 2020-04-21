@@ -497,14 +497,14 @@ namespace SmartPeak
     LOGD << "END TransferLOQToFeatureFilters";
   }
 
-  void EstimateComponentRSDs::process(
+  void EstimateFeatureRSDs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
   ) const
   {
-    LOGD << "START EstimateComponentRSDs";
+    LOGD << "START EstimateFeatureRSDs";
 
     // get all QCs
     std::vector<size_t> qcs_indices;
@@ -518,7 +518,7 @@ namespace SmartPeak
     // check if there are any standards or QCs to estimate the feature filter parameters from
     if (qcs_indices.empty()) {
       LOGE << "qcs_indices argument is empty. Returning";
-      LOGD << "END EstimateComponentRSDs";
+      LOGD << "END EstimateFeatureRSDs";
       return;
     }
 
@@ -534,17 +534,17 @@ namespace SmartPeak
       sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment() // Targeted experiment used by all injections in the sequence
     );
 
-    LOGD << "END EstimateComponentRSDs";
+    LOGD << "END EstimateFeatureRSDs";
   }
 
-  void EstimateComponentBackgroundInterferences::process(
+  void EstimateFeatureBackgroundInterferences::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
   ) const
   {
-    LOGD << "START EstimateComponentBackgroundInterferences";
+    LOGD << "START EstimateFeatureBackgroundInterferences";
 
     // get all Blanks
     std::vector<size_t> blanks_indices;
@@ -558,7 +558,7 @@ namespace SmartPeak
     // check if there are any Blanks to estimate the background interference from
     if (blanks_indices.empty()) {
       LOGE << "blanks_indices argument is empty. Returning";
-      LOGD << "END EstimateComponentBackgroundInterferences";
+      LOGD << "END EstimateFeatureBackgroundInterferences";
       return;
     }
 
@@ -574,6 +574,6 @@ namespace SmartPeak
       sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment() // Targeted experiment used by all injections in the sequence
     );
 
-    LOGD << "END EstimateComponentBackgroundInterferences";
+    LOGD << "END EstimateFeatureBackgroundInterferences";
   }
 }

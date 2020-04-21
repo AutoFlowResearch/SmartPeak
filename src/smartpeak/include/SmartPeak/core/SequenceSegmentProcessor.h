@@ -245,10 +245,10 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct EstimateComponentRSDs : SequenceSegmentProcessor
+  struct EstimateFeatureRSDs : SequenceSegmentProcessor
   {
     int getID() const { return -1; }
-    std::string getName() const { return "ESTIMATE_COMPONENT_RSDS"; }
+    std::string getName() const { return "ESTIMATE_FEATURE_RSDS"; }
     std::string getDescription() const { return "Estimate the %RSD for component and component group feature filter attributes from pooled QC samples."; }
 
     /**
@@ -264,10 +264,10 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct EstimateComponentBackgroundInterferences : SequenceSegmentProcessor
+  struct EstimateFeatureBackgroundInterferences : SequenceSegmentProcessor
   {
     int getID() const { return -1; }
-    std::string getName() const { return "ESTIMATE_COMPONENT_BACKGROUND_INTERFERENCES"; }
+    std::string getName() const { return "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES"; }
     std::string getDescription() const { return "Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples."; }
 
     /**

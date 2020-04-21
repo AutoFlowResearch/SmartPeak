@@ -5,8 +5,8 @@
 namespace SmartPeak
 {
   InjectionHandler::InjectionHandler():
-    meta_data_(new MetaDataHandler()),
-    raw_data_(new RawDataHandler())
+    meta_data_(std::make_shared<MetaDataHandler>(MetaDataHandler())),
+    raw_data_(std::make_shared<RawDataHandler>(RawDataHandler()))
   {
   }
 

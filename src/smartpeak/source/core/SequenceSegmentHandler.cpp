@@ -5,9 +5,15 @@
 namespace SmartPeak
 {
   SequenceSegmentHandler::SequenceSegmentHandler():
-    quantitation_methods_(new std::vector<OpenMS::AbsoluteQuantitationMethod>()),
-    feature_filter_(new OpenMS::MRMFeatureQC()),
-    feature_qc_(new OpenMS::MRMFeatureQC())
+    quantitation_methods_(std::make_shared<std::vector<OpenMS::AbsoluteQuantitationMethod>>(std::vector<OpenMS::AbsoluteQuantitationMethod>())),
+    feature_filter_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_qc_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_rsd_filter_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_rsd_qc_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_background_filter_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_background_qc_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_rsd_estimations_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_background_estimations_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC()))
   {
   }
 
@@ -19,6 +25,12 @@ namespace SmartPeak
     if (quantitation_methods_!=nullptr) quantitation_methods_->clear();
     if (feature_filter_ != nullptr) feature_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     if (feature_qc_ != nullptr) feature_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_rsd_filter_ != nullptr) feature_rsd_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_rsd_qc_ != nullptr) feature_rsd_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_background_filter_ != nullptr) feature_background_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_background_qc_ != nullptr) feature_background_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_rsd_estimations_ != nullptr) feature_rsd_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_background_estimations_ != nullptr) feature_background_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     components_to_concentrations_.clear();
   }
 
@@ -140,6 +152,156 @@ namespace SmartPeak
   std::shared_ptr<OpenMS::MRMFeatureQC>& SequenceSegmentHandler::getFeatureQCShared()
   {
     return feature_qc_;
+  }
+
+  void SequenceSegmentHandler::setFeatureRSDFilter(const OpenMS::MRMFeatureQC& feature_rsd_filter)
+  {
+    feature_rsd_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_rsd_filter));
+  }
+
+  void SequenceSegmentHandler::setFeatureRSDFilter(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_rsd_filter)
+  {
+    feature_rsd_filter_ = feature_rsd_filter;
+  }
+
+  OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureRSDFilter()
+  {
+    return *(feature_rsd_filter_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureRSDFilter() const
+  {
+    return *(feature_rsd_filter_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& SequenceSegmentHandler::getFeatureRSDFilterShared()
+  {
+    return feature_rsd_filter_;
+  }
+
+  void SequenceSegmentHandler::setFeatureRSDQC(const OpenMS::MRMFeatureQC& feature_rsd_qc)
+  {
+    feature_rsd_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_rsd_qc));
+  }
+
+  void SequenceSegmentHandler::setFeatureRSDQC(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_rsd_qc)
+  {
+    feature_rsd_qc_ = feature_rsd_qc;
+  }
+
+  OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureRSDQC()
+  {
+    return *(feature_rsd_qc_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureRSDQC() const
+  {
+    return *(feature_rsd_qc_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& SequenceSegmentHandler::getFeatureRSDQCShared()
+  {
+    return feature_rsd_qc_;
+  }
+
+  void SequenceSegmentHandler::setFeatureBackgroundFilter(const OpenMS::MRMFeatureQC& feature_background_filter)
+  {
+    feature_background_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_background_filter));
+  }
+
+  void SequenceSegmentHandler::setFeatureBackgroundFilter(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_background_filter)
+  {
+    feature_background_filter_ = feature_background_filter;
+  }
+
+  OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureBackgroundFilter()
+  {
+    return *(feature_background_filter_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureBackgroundFilter() const
+  {
+    return *(feature_background_filter_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& SequenceSegmentHandler::getFeatureBackgroundFilterShared()
+  {
+    return feature_background_filter_;
+  }
+
+  void SequenceSegmentHandler::setFeatureBackgroundQC(const OpenMS::MRMFeatureQC& feature_background_qc)
+  {
+    feature_background_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_background_qc));
+  }
+
+  void SequenceSegmentHandler::setFeatureBackgroundQC(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_background_qc)
+  {
+    feature_background_qc_ = feature_background_qc;
+  }
+
+  OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureBackgroundQC()
+  {
+    return *(feature_background_qc_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureBackgroundQC() const
+  {
+    return *(feature_background_qc_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& SequenceSegmentHandler::getFeatureBackgroundQCShared()
+  {
+    return feature_background_qc_;
+  }
+
+  void SequenceSegmentHandler::setFeatureRSDEstimations(const OpenMS::MRMFeatureQC& feature_rsd_estimations)
+  {
+    feature_rsd_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_rsd_estimations));
+  }
+
+  void SequenceSegmentHandler::setFeatureRSDEstimations(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_rsd_estimations)
+  {
+    feature_rsd_estimations_ = feature_rsd_estimations;
+  }
+
+  OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureRSDEstimations()
+  {
+    return *(feature_rsd_estimations_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureRSDEstimations() const
+  {
+    return *(feature_rsd_estimations_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& SequenceSegmentHandler::getFeatureRSDEstimationsShared()
+  {
+    return feature_rsd_estimations_;
+  }
+
+  void SequenceSegmentHandler::setFeatureBackgroundEstimations(const OpenMS::MRMFeatureQC& feature_background_estimations)
+  {
+    feature_background_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_background_estimations));
+  }
+
+  void SequenceSegmentHandler::setFeatureBackgroundEstimations(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_background_estimations)
+  {
+    feature_background_estimations_ = feature_background_estimations;
+  }
+
+  OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureBackgroundEstimations()
+  {
+    return *(feature_background_estimations_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& SequenceSegmentHandler::getFeatureBackgroundEstimations() const
+  {
+    return *(feature_background_estimations_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& SequenceSegmentHandler::getFeatureBackgroundEstimationsShared()
+  {
+    return feature_background_estimations_;
   }
 
   void SequenceSegmentHandler::setComponentsToConcentrations(

@@ -7,13 +7,13 @@
 namespace SmartPeak
 {
   RawDataHandler::RawDataHandler() :
-    meta_data_(new MetaDataHandler()),
-    parameters_(new std::map<std::string, std::vector<std::map<std::string, std::string>>>()),
-    targeted_exp_(new OpenMS::TargetedExperiment()),
-    reference_data_(new std::vector<std::map<std::string, CastValue>>()),
-    quantitation_methods_(new std::vector<OpenMS::AbsoluteQuantitationMethod>()),
-    feature_filter_(new OpenMS::MRMFeatureQC()),
-    feature_qc_(new OpenMS::MRMFeatureQC())
+    meta_data_(std::make_shared<MetaDataHandler>(MetaDataHandler())),
+    parameters_(std::make_shared<std::map<std::string, std::vector<std::map<std::string, std::string>>>>(std::map<std::string, std::vector<std::map<std::string, std::string>>>())),
+    targeted_exp_(std::make_shared<OpenMS::TargetedExperiment>(OpenMS::TargetedExperiment())),
+    reference_data_(std::make_shared<std::vector<std::map<std::string, CastValue>>>(std::vector<std::map<std::string, CastValue>>())),
+    quantitation_methods_(std::make_shared<std::vector<OpenMS::AbsoluteQuantitationMethod>>(std::vector<OpenMS::AbsoluteQuantitationMethod>())),
+    feature_filter_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_qc_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC()))
   {
   }
 
