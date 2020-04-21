@@ -21,6 +21,14 @@ Filenames generateTestFilenames()
   filenames.featureFilterComponentGroups_csv_i = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
   filenames.featureQCComponents_csv_i          = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
   filenames.featureQCComponentGroups_csv_i     = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
+  filenames.featureRSDFilterComponents_csv_i = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
+  filenames.featureRSDFilterComponentGroups_csv_i = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
+  filenames.featureRSDQCComponents_csv_i = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
+  filenames.featureRSDQCComponentGroups_csv_i = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
+  filenames.featureBackgroundFilterComponents_csv_i = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
+  filenames.featureBackgroundFilterComponentGroups_csv_i = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
+  filenames.featureBackgroundQCComponents_csv_i = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
+  filenames.featureBackgroundQCComponentGroups_csv_i = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
   filenames.quantitationMethods_csv_i          = dir + "OpenMSFile_quantitationMethods_1.csv";
   filenames.standardsConcentrations_csv_i      = dir + "OpenMSFile_standardsConcentrations_1.csv";
   return filenames;
@@ -51,6 +59,14 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureQC().component_qcs.size(), 324);
   BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDFilter().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDQC().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundFilter().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundQC().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods().size(), 107);
   BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
   InjectionHandler& injection5 = sequenceHandler.getSequence()[5];
@@ -65,6 +81,14 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureQC().component_qcs.size(), 324);
   BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDFilter().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDQC().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundFilter().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundQC().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_EQUAL(injection5.getRawData().getQuantitationMethods().size(), 107);
   BOOST_CHECK_EQUAL(injection5.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 1);
@@ -74,6 +98,14 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs.size(), 324);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDFilter().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDQC().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundFilter().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundQC().component_qcs.size(), 324);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
 
   // Test non-shared resources
   injection0.getMetaData().setSampleName("modified");
@@ -103,6 +135,22 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-modified");
   BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-modified");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-modified");
+  injection0.getRawData().getFeatureRSDFilter().component_qcs[0].component_name = "trp-L.trp-L_1.Heavy-mod";
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDFilter().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-mod");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDFilter().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-mod");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDFilter().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-mod");
+  injection0.getRawData().getFeatureRSDQC().component_qcs[0].component_name = "trp-L.trp-L_1.Heavy-modified";
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDQC().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-modified");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDQC().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-modified");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDQC().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-modified");
+  injection0.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name = "ala-L.ala-L_1.Heavy-mod";
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-mod");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-mod");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundFilter().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-mod");
+  injection0.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name = "ala-L.ala-L_1.Heavy-modified";
+  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-modified");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-modified");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundQC().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-modified");
 
   sequenceHandler.clear();
   Filenames filenames { generateTestFilenames() };

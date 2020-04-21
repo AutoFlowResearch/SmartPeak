@@ -60,6 +60,14 @@ namespace SmartPeak
       loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       LoadFeatureQCs loadFeatureQCs;
       loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      LoadFeatureRSDFilters loadFeatureRSDFilters;
+      loadFeatureRSDFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      LoadFeatureRSDQCs loadFeatureRSDQCs;
+      loadFeatureRSDQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      LoadFeatureBackgroundFilters loadFeatureBackgroundFilters;
+      loadFeatureBackgroundFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      LoadFeatureBackgroundQCs loadFeatureBackgroundQCs;
+      loadFeatureBackgroundQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
     }
 
     if (checkConsistency) {
