@@ -13,7 +13,13 @@ namespace SmartPeak
     reference_data_(std::make_shared<std::vector<std::map<std::string, CastValue>>>(std::vector<std::map<std::string, CastValue>>())),
     quantitation_methods_(std::make_shared<std::vector<OpenMS::AbsoluteQuantitationMethod>>(std::vector<OpenMS::AbsoluteQuantitationMethod>())),
     feature_filter_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
-    feature_qc_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC()))
+    feature_qc_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_rsd_filter_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_rsd_qc_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_background_filter_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_background_qc_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_rsd_estimations_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC())),
+    feature_background_estimations_(std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC()))
   {
   }
 
@@ -208,6 +214,156 @@ namespace SmartPeak
     return feature_qc_;
   }
 
+  void RawDataHandler::setFeatureRSDFilter(const OpenMS::MRMFeatureQC& feature_rsd_filter)
+  {
+    feature_rsd_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_rsd_filter));
+  }
+
+  void RawDataHandler::setFeatureRSDFilter(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_rsd_filter)
+  {
+    feature_rsd_filter_ = feature_rsd_filter;
+  }
+
+  OpenMS::MRMFeatureQC& RawDataHandler::getFeatureRSDFilter()
+  {
+    return *(feature_rsd_filter_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& RawDataHandler::getFeatureRSDFilter() const
+  {
+    return *(feature_rsd_filter_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& RawDataHandler::getFeatureRSDFilterShared()
+  {
+    return feature_rsd_filter_;
+  }
+
+  void RawDataHandler::setFeatureRSDQC(const OpenMS::MRMFeatureQC& feature_rsd_qc)
+  {
+    feature_rsd_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_rsd_qc));
+  }
+
+  void RawDataHandler::setFeatureRSDQC(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_rsd_qc)
+  {
+    feature_rsd_qc_ = feature_rsd_qc;
+  }
+
+  OpenMS::MRMFeatureQC& RawDataHandler::getFeatureRSDQC()
+  {
+    return *(feature_rsd_qc_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& RawDataHandler::getFeatureRSDQC() const
+  {
+    return *(feature_rsd_qc_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& RawDataHandler::getFeatureRSDQCShared()
+  {
+    return feature_rsd_qc_;
+  }
+
+  void RawDataHandler::setFeatureBackgroundFilter(const OpenMS::MRMFeatureQC& feature_background_filter)
+  {
+    feature_background_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_background_filter));
+  }
+
+  void RawDataHandler::setFeatureBackgroundFilter(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_background_filter)
+  {
+    feature_background_filter_ = feature_background_filter;
+  }
+
+  OpenMS::MRMFeatureQC& RawDataHandler::getFeatureBackgroundFilter()
+  {
+    return *(feature_background_filter_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& RawDataHandler::getFeatureBackgroundFilter() const
+  {
+    return *(feature_background_filter_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& RawDataHandler::getFeatureBackgroundFilterShared()
+  {
+    return feature_background_filter_;
+  }
+
+  void RawDataHandler::setFeatureBackgroundQC(const OpenMS::MRMFeatureQC& feature_background_qc)
+  {
+    feature_background_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_background_qc));
+  }
+
+  void RawDataHandler::setFeatureBackgroundQC(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_background_qc)
+  {
+    feature_background_qc_ = feature_background_qc;
+  }
+
+  OpenMS::MRMFeatureQC& RawDataHandler::getFeatureBackgroundQC()
+  {
+    return *(feature_background_qc_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& RawDataHandler::getFeatureBackgroundQC() const
+  {
+    return *(feature_background_qc_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& RawDataHandler::getFeatureBackgroundQCShared()
+  {
+    return feature_background_qc_;
+  }
+
+  void RawDataHandler::setFeatureRSDEstimations(const OpenMS::MRMFeatureQC& feature_rsd_estimations)
+  {
+    feature_rsd_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_rsd_estimations));
+  }
+
+  void RawDataHandler::setFeatureRSDEstimations(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_rsd_estimations)
+  {
+    feature_rsd_estimations_ = feature_rsd_estimations;
+  }
+
+  OpenMS::MRMFeatureQC& RawDataHandler::getFeatureRSDEstimations()
+  {
+    return *(feature_rsd_estimations_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& RawDataHandler::getFeatureRSDEstimations() const
+  {
+    return *(feature_rsd_estimations_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& RawDataHandler::getFeatureRSDEstimationsShared()
+  {
+    return feature_rsd_estimations_;
+  }
+
+  void RawDataHandler::setFeatureBackgroundEstimations(const OpenMS::MRMFeatureQC& feature_background_estimations)
+  {
+    feature_background_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC(feature_background_estimations));
+  }
+
+  void RawDataHandler::setFeatureBackgroundEstimations(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_background_estimations)
+  {
+    feature_background_estimations_ = feature_background_estimations;
+  }
+
+  OpenMS::MRMFeatureQC& RawDataHandler::getFeatureBackgroundEstimations()
+  {
+    return *(feature_background_estimations_.get());
+  }
+
+  const OpenMS::MRMFeatureQC& RawDataHandler::getFeatureBackgroundEstimations() const
+  {
+    return *(feature_background_estimations_.get());
+  }
+
+  std::shared_ptr<OpenMS::MRMFeatureQC>& RawDataHandler::getFeatureBackgroundEstimationsShared()
+  {
+    return feature_background_estimations_;
+  }
+
   void RawDataHandler::setFeatureMapHistory(const OpenMS::FeatureMap& feature_map_history)
   {
     feature_map_history_ = feature_map_history;
@@ -313,6 +469,12 @@ namespace SmartPeak
     if (quantitation_methods_ != nullptr) quantitation_methods_->clear();
     if (feature_filter_ != nullptr) feature_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     if (feature_qc_ != nullptr) feature_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_rsd_filter_ != nullptr) feature_rsd_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_rsd_qc_ != nullptr) feature_rsd_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_background_filter_ != nullptr) feature_background_filter_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_background_qc_ != nullptr) feature_background_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_rsd_estimations_ != nullptr) feature_rsd_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+    if (feature_background_estimations_ != nullptr) feature_background_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
   }
 
   void RawDataHandler::updateFeatureMapHistory()

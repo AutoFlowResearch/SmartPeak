@@ -238,6 +238,204 @@ BOOST_AUTO_TEST_CASE(set_get_FeatureQC)
   BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].retention_time_l, rt_low);
 }
 
+BOOST_AUTO_TEST_CASE(set_get_FeatureRSDFilter)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::MRMFeatureQC::ComponentQCs qc;
+  const string name{ "foo" };
+  qc.component_name = name;
+
+  OpenMS::MRMFeatureQC fqc1;
+  fqc1.component_qcs.push_back(qc);
+
+  rawDataHandler.setFeatureRSDFilter(fqc1);
+
+  const OpenMS::MRMFeatureQC& fqc2 = rawDataHandler.getFeatureRSDFilter(); // testing const getter
+  BOOST_CHECK_EQUAL(fqc2.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2.component_qcs[0].component_name, name);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc2shared = rawDataHandler.getFeatureRSDFilterShared(); // testing shared_ptr getter
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs[0].component_name, name);
+
+  const double rt_low{ 4.0 };
+  rawDataHandler.getFeatureRSDFilter().component_qcs[0].retention_time_l = rt_low; // testing non-const getter
+
+  const OpenMS::MRMFeatureQC& fqc3 = rawDataHandler.getFeatureRSDFilter();
+  BOOST_CHECK_EQUAL(fqc3.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc3shared = rawDataHandler.getFeatureRSDFilterShared();
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].retention_time_l, rt_low);
+}
+
+BOOST_AUTO_TEST_CASE(set_get_FeatureRSDQC)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::MRMFeatureQC::ComponentQCs qc;
+  const string name{ "foo" };
+  qc.component_name = name;
+
+  OpenMS::MRMFeatureQC fqc1;
+  fqc1.component_qcs.push_back(qc);
+
+  rawDataHandler.setFeatureRSDQC(fqc1);
+
+  const OpenMS::MRMFeatureQC& fqc2 = rawDataHandler.getFeatureRSDQC(); // testing const getter
+  BOOST_CHECK_EQUAL(fqc2.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2.component_qcs[0].component_name, name);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc2shared = rawDataHandler.getFeatureRSDQCShared(); // testing shared_ptr getter
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs[0].component_name, name);
+
+  const double rt_low{ 4.0 };
+  rawDataHandler.getFeatureRSDQC().component_qcs[0].retention_time_l = rt_low; // testing non-const getter
+
+  const OpenMS::MRMFeatureQC& fqc3 = rawDataHandler.getFeatureRSDQC();
+  BOOST_CHECK_EQUAL(fqc3.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc3shared = rawDataHandler.getFeatureRSDQCShared();
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].retention_time_l, rt_low);
+}
+
+BOOST_AUTO_TEST_CASE(set_get_FeatureBackgroundFilter)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::MRMFeatureQC::ComponentQCs qc;
+  const string name{ "foo" };
+  qc.component_name = name;
+
+  OpenMS::MRMFeatureQC fqc1;
+  fqc1.component_qcs.push_back(qc);
+
+  rawDataHandler.setFeatureBackgroundFilter(fqc1);
+
+  const OpenMS::MRMFeatureQC& fqc2 = rawDataHandler.getFeatureBackgroundFilter(); // testing const getter
+  BOOST_CHECK_EQUAL(fqc2.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2.component_qcs[0].component_name, name);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc2shared = rawDataHandler.getFeatureBackgroundFilterShared(); // testing shared_ptr getter
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs[0].component_name, name);
+
+  const double rt_low{ 4.0 };
+  rawDataHandler.getFeatureBackgroundFilter().component_qcs[0].retention_time_l = rt_low; // testing non-const getter
+
+  const OpenMS::MRMFeatureQC& fqc3 = rawDataHandler.getFeatureBackgroundFilter();
+  BOOST_CHECK_EQUAL(fqc3.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc3shared = rawDataHandler.getFeatureBackgroundFilterShared();
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].retention_time_l, rt_low);
+}
+
+BOOST_AUTO_TEST_CASE(set_get_FeatureBackgroundQC)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::MRMFeatureQC::ComponentQCs qc;
+  const string name{ "foo" };
+  qc.component_name = name;
+
+  OpenMS::MRMFeatureQC fqc1;
+  fqc1.component_qcs.push_back(qc);
+
+  rawDataHandler.setFeatureBackgroundQC(fqc1);
+
+  const OpenMS::MRMFeatureQC& fqc2 = rawDataHandler.getFeatureBackgroundQC(); // testing const getter
+  BOOST_CHECK_EQUAL(fqc2.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2.component_qcs[0].component_name, name);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc2shared = rawDataHandler.getFeatureBackgroundQCShared(); // testing shared_ptr getter
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs[0].component_name, name);
+
+  const double rt_low{ 4.0 };
+  rawDataHandler.getFeatureBackgroundQC().component_qcs[0].retention_time_l = rt_low; // testing non-const getter
+
+  const OpenMS::MRMFeatureQC& fqc3 = rawDataHandler.getFeatureBackgroundQC();
+  BOOST_CHECK_EQUAL(fqc3.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc3shared = rawDataHandler.getFeatureBackgroundQCShared();
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].retention_time_l, rt_low);
+}
+
+BOOST_AUTO_TEST_CASE(set_get_FeatureRSDEstimations)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::MRMFeatureQC::ComponentQCs qc;
+  const string name{ "foo" };
+  qc.component_name = name;
+
+  OpenMS::MRMFeatureQC fqc1;
+  fqc1.component_qcs.push_back(qc);
+
+  rawDataHandler.setFeatureRSDEstimations(fqc1);
+
+  const OpenMS::MRMFeatureQC& fqc2 = rawDataHandler.getFeatureRSDEstimations(); // testing const getter
+  BOOST_CHECK_EQUAL(fqc2.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2.component_qcs[0].component_name, name);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc2shared = rawDataHandler.getFeatureRSDEstimationsShared(); // testing shared_ptr getter
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs[0].component_name, name);
+
+  const double rt_low{ 4.0 };
+  rawDataHandler.getFeatureRSDEstimations().component_qcs[0].retention_time_l = rt_low; // testing non-const getter
+
+  const OpenMS::MRMFeatureQC& fqc3 = rawDataHandler.getFeatureRSDEstimations();
+  BOOST_CHECK_EQUAL(fqc3.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc3shared = rawDataHandler.getFeatureRSDEstimationsShared();
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].retention_time_l, rt_low);
+}
+
+BOOST_AUTO_TEST_CASE(set_get_FeatureBackgroundEstimations)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::MRMFeatureQC::ComponentQCs qc;
+  const string name{ "foo" };
+  qc.component_name = name;
+
+  OpenMS::MRMFeatureQC fqc1;
+  fqc1.component_qcs.push_back(qc);
+
+  rawDataHandler.setFeatureBackgroundEstimations(fqc1);
+
+  const OpenMS::MRMFeatureQC& fqc2 = rawDataHandler.getFeatureBackgroundEstimations(); // testing const getter
+  BOOST_CHECK_EQUAL(fqc2.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2.component_qcs[0].component_name, name);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc2shared = rawDataHandler.getFeatureBackgroundEstimationsShared(); // testing shared_ptr getter
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc2shared->component_qcs[0].component_name, name);
+
+  const double rt_low{ 4.0 };
+  rawDataHandler.getFeatureBackgroundEstimations().component_qcs[0].retention_time_l = rt_low; // testing non-const getter
+
+  const OpenMS::MRMFeatureQC& fqc3 = rawDataHandler.getFeatureBackgroundEstimations();
+  BOOST_CHECK_EQUAL(fqc3.component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3.component_qcs[0].retention_time_l, rt_low);
+  std::shared_ptr<OpenMS::MRMFeatureQC>& fqc3shared = rawDataHandler.getFeatureBackgroundEstimationsShared();
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs.size(), 1);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].component_name, name);
+  BOOST_CHECK_EQUAL(fqc3shared->component_qcs[0].retention_time_l, rt_low);
+}
+
 BOOST_AUTO_TEST_CASE(set_get_Experiment)
 {
   RawDataHandler rawDataHandler;
@@ -341,8 +539,13 @@ BOOST_AUTO_TEST_CASE(clear)
   OpenMS::MRMFeatureQC fqc1;
   fqc1.component_qcs.push_back(qc);
   rawDataHandler.setFeatureFilter(fqc1);
-
   rawDataHandler.setFeatureQC(fqc1);
+  rawDataHandler.setFeatureRSDFilter(fqc1);
+  rawDataHandler.setFeatureRSDQC(fqc1);
+  rawDataHandler.setFeatureBackgroundFilter(fqc1);
+  rawDataHandler.setFeatureBackgroundQC(fqc1);
+  rawDataHandler.setFeatureRSDEstimations(fqc1);
+  rawDataHandler.setFeatureBackgroundEstimations(fqc1);
 
   rawDataHandler.setFeatureMapHistory(f1);
 
@@ -362,6 +565,13 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().getMetaValue("name"), "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getExperiment().getMetaValue("name"), "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getChromatogramMap().getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureQC().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDFilter().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDQC().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundFilter().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundQC().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDEstimations().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundEstimations().component_qcs.front().component_name, "foo");
 
   rawDataHandler.clear();
 
@@ -373,6 +583,12 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 0);
   BOOST_CHECK_EQUAL(rawDataHandler.getExperiment().size(), 0);
   BOOST_CHECK_EQUAL(rawDataHandler.getChromatogramMap().size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDFilter().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDQC().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundFilter().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundQC().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDEstimations().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundEstimations().component_qcs.size(), 0);
 }
 
 BOOST_AUTO_TEST_CASE(updateFeatureMapHistory)
