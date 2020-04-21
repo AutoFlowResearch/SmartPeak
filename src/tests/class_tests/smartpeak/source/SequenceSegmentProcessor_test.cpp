@@ -760,4 +760,184 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureQCs)
   }
 }
 
+/**
+  EstimateFeatureFilterValues Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorEstimateFeatureFilterValues)
+{
+  EstimateFeatureFilterValues* ptrEstimateFeatureFilterValues = nullptr;
+  EstimateFeatureFilterValues* nullPointerEstimateFeatureFilterValues = nullptr;
+  BOOST_CHECK_EQUAL(ptrEstimateFeatureFilterValues, nullPointerEstimateFeatureFilterValues);
+}
+
+BOOST_AUTO_TEST_CASE(destructorEstimateFeatureFilterValues)
+{
+  EstimateFeatureFilterValues* ptrEstimateFeatureFilterValues = nullptr;
+  ptrEstimateFeatureFilterValues = new EstimateFeatureFilterValues();
+  delete ptrEstimateFeatureFilterValues;
+}
+
+BOOST_AUTO_TEST_CASE(gettersEstimateFeatureFilterValues)
+{
+  EstimateFeatureFilterValues processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "ESTIMATE_FEATURE_FILTER_VALUES");
+}
+
+BOOST_AUTO_TEST_CASE(processEstimateFeatureFilterValues)
+{
+  // TODO: Implementation EstimateFeatureFilterValues tests
+}
+/**
+  EstimateFeatureQCValues Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorEstimateFeatureQCValues)
+{
+  EstimateFeatureQCValues* ptrEstimateFeatureQCValues = nullptr;
+  EstimateFeatureQCValues* nullPointerEstimateFeatureQCValues = nullptr;
+  BOOST_CHECK_EQUAL(ptrEstimateFeatureQCValues, nullPointerEstimateFeatureQCValues);
+}
+
+BOOST_AUTO_TEST_CASE(destructorEstimateFeatureQCValues)
+{
+  EstimateFeatureQCValues* ptrEstimateFeatureQCValues = nullptr;
+  ptrEstimateFeatureQCValues = new EstimateFeatureQCValues();
+  delete ptrEstimateFeatureQCValues;
+}
+
+BOOST_AUTO_TEST_CASE(gettersEstimateFeatureQCValues)
+{
+  EstimateFeatureQCValues processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "ESTIMATE_FEATURE_QC_VALUES");
+}
+
+BOOST_AUTO_TEST_CASE(processEstimateFeatureQCValues)
+{
+  // TODO: Implementation EstimateFeatureQCValues tests
+}
+
+/**
+  TransferLOQToFeatureFilters Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorTransferLOQToFeatureFilters)
+{
+  TransferLOQToFeatureFilters* ptrTransferLOQToFeatureFilters = nullptr;
+  TransferLOQToFeatureFilters* nullPointerTransferLOQToFeatureFilters = nullptr;
+  BOOST_CHECK_EQUAL(ptrTransferLOQToFeatureFilters, nullPointerTransferLOQToFeatureFilters);
+}
+
+BOOST_AUTO_TEST_CASE(destructorTransferLOQToFeatureFilters)
+{
+  TransferLOQToFeatureFilters* ptrTransferLOQToFeatureFilters = nullptr;
+  ptrTransferLOQToFeatureFilters = new TransferLOQToFeatureFilters();
+  delete ptrTransferLOQToFeatureFilters;
+}
+
+BOOST_AUTO_TEST_CASE(gettersTransferLOQToFeatureFilters)
+{
+  TransferLOQToFeatureFilters processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "TRANSFER_LOQ_TO_FEATURE_FILTERS");
+}
+
+BOOST_AUTO_TEST_CASE(processTransferLOQToFeatureFilters)
+{
+  // TODO: Implementation TransferLOQToFeatureFilters tests
+}
+
+/**
+  TransferLOQToFeatureQCs Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorTransferLOQToFeatureQCs)
+{
+  TransferLOQToFeatureQCs* ptrTransferLOQToFeatureQCs = nullptr;
+  TransferLOQToFeatureQCs* nullPointerTransferLOQToFeatureQCs = nullptr;
+  BOOST_CHECK_EQUAL(ptrTransferLOQToFeatureQCs, nullPointerTransferLOQToFeatureQCs);
+}
+
+BOOST_AUTO_TEST_CASE(destructorTransferLOQToFeatureQCs)
+{
+  TransferLOQToFeatureQCs* ptrTransferLOQToFeatureQCs = nullptr;
+  ptrTransferLOQToFeatureQCs = new TransferLOQToFeatureQCs();
+  delete ptrTransferLOQToFeatureQCs;
+}
+
+BOOST_AUTO_TEST_CASE(gettersTransferLOQToFeatureQCs)
+{
+  TransferLOQToFeatureQCs processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "TRANSFER_LOQ_TO_FEATURE_QCS");
+}
+
+BOOST_AUTO_TEST_CASE(processTransferLOQToFeatureQCs)
+{
+  // TODO: Implementation TransferLOQToFeatureQCs tests
+}
+
+/**
+  EstimateFeatureRSDs Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorEstimateFeatureRSDs)
+{
+  EstimateFeatureRSDs* ptrEstimateFeatureRSDs = nullptr;
+  EstimateFeatureRSDs* nullPointerEstimateFeatureRSDs = nullptr;
+  BOOST_CHECK_EQUAL(ptrEstimateFeatureRSDs, nullPointerEstimateFeatureRSDs);
+}
+
+BOOST_AUTO_TEST_CASE(destructorEstimateFeatureRSDs)
+{
+  EstimateFeatureRSDs* ptrEstimateFeatureRSDs = nullptr;
+  ptrEstimateFeatureRSDs = new EstimateFeatureRSDs();
+  delete ptrEstimateFeatureRSDs;
+}
+
+BOOST_AUTO_TEST_CASE(gettersEstimateFeatureRSDs)
+{
+  EstimateFeatureRSDs processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "ESTIMATE_FEATURE_RSDS");
+}
+
+BOOST_AUTO_TEST_CASE(processEstimateFeatureRSDs)
+{
+  // TODO: Implementation EstimateFeatureRSDs tests
+}
+
+
+/**
+  EstimateFeatureBackgroundInterferences Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorEstimateFeatureBackgroundInterferences)
+{
+  EstimateFeatureBackgroundInterferences* ptrEstimateFeatureBackgroundInterferences = nullptr;
+  EstimateFeatureBackgroundInterferences* nullPointerEstimateFeatureBackgroundInterferences = nullptr;
+  BOOST_CHECK_EQUAL(ptrEstimateFeatureBackgroundInterferences, nullPointerEstimateFeatureBackgroundInterferences);
+}
+
+BOOST_AUTO_TEST_CASE(destructorEstimateFeatureBackgroundInterferences)
+{
+  EstimateFeatureBackgroundInterferences* ptrEstimateFeatureBackgroundInterferences = nullptr;
+  ptrEstimateFeatureBackgroundInterferences = new EstimateFeatureBackgroundInterferences();
+  delete ptrEstimateFeatureBackgroundInterferences;
+}
+
+BOOST_AUTO_TEST_CASE(gettersEstimateFeatureBackgroundInterferences)
+{
+  EstimateFeatureBackgroundInterferences processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES");
+}
+
+BOOST_AUTO_TEST_CASE(processEstimateFeatureBackgroundInterferences)
+{
+  // TODO: Implementation EstimateFeatureBackgroundInterferences tests
+}
+
 BOOST_AUTO_TEST_SUITE_END()

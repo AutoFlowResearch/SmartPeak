@@ -472,6 +472,60 @@ namespace SmartPeak
     LOGD << "END estimateFeatureFilterValues";
   }
 
+  void EstimateFeatureQCValues::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START estimateFeatureQCValues";
+
+    std::vector<size_t> standards_indices, qcs_indices;
+
+    // get all standards
+    this->getSampleIndicesBySampleType(
+      sequenceSegmentHandler_IO,
+      sequenceHandler_I,
+      SampleType::Standard,
+      standards_indices
+    );
+
+    // get all QCs
+    this->getSampleIndicesBySampleType(
+      sequenceSegmentHandler_IO,
+      sequenceHandler_I,
+      SampleType::QC,
+      qcs_indices
+    );
+
+    // check if there are any standards or QCs to estimate the feature filter parameters from
+    if (standards_indices.empty() && qcs_indices.empty()) {
+      LOGE << "standards_indices and/or qcs_indices argument is empty. Returning";
+      LOGD << "END estimateFeatureQCValues";
+      return;
+    }
+
+    // OPTIMIZATION: it would be prefered to only use those standards that are part of the optimized calibration curve for each component
+    std::vector<OpenMS::FeatureMap> standards_featureMaps;
+    for (const size_t index : standards_indices) {
+      standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+    }
+    for (const size_t index : qcs_indices) {
+      standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    featureFilter.EstimateDefaultMRMFeatureQCValues(
+      standards_featureMaps,
+      sequenceSegmentHandler_IO.getFeatureFilter(),
+      sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment(), // Targeted experiment used by all injections in the sequence
+      true
+    );
+
+    LOGD << "END estimateFeatureQCValues";
+  }
+
   void TransferLOQToFeatureFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
@@ -497,6 +551,30 @@ namespace SmartPeak
     LOGD << "END TransferLOQToFeatureFilters";
   }
 
+  void TransferLOQToFeatureQCs::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START TransferLOQToFeatureQCs";
+
+    // check if there are any quantitation methods
+    if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
+      LOGE << "quantitation methods is empty. Returning";
+      LOGD << "END TransferLOQToFeatureQCs";
+      return;
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    featureFilter.TransferLLOQAndULOQToCalculatedConcentrationBounds(
+      sequenceSegmentHandler_IO.getQuantitationMethods(),
+      sequenceSegmentHandler_IO.getFeatureQC()
+    );
+
+    LOGD << "END TransferLOQToFeatureQCs";
+  }
   void EstimateFeatureRSDs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
@@ -530,7 +608,7 @@ namespace SmartPeak
     OpenMS::MRMFeatureFilter featureFilter;
     featureFilter.EstimatePercRSD(
       qcs_featureMaps, 
-      sequenceSegmentHandler_IO.getFeatureFilter(), // TODO change to getComponentRSDs
+      sequenceSegmentHandler_IO.getFeatureRSDEstimations(),
       sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment() // Targeted experiment used by all injections in the sequence
     );
 
@@ -570,7 +648,7 @@ namespace SmartPeak
     OpenMS::MRMFeatureFilter featureFilter;
     featureFilter.EstimateBackgroundInterferences(
       blanks_featureMaps,
-      sequenceSegmentHandler_IO.getFeatureFilter(), // TODO change to getBackgroundInterferences
+      sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(),
       sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment() // Targeted experiment used by all injections in the sequence
     );
 

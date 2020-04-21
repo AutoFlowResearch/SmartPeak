@@ -212,8 +212,27 @@ namespace SmartPeak
   struct EstimateFeatureFilterValues : SequenceSegmentProcessor
   {
     int getID() const { return -1; }
-    std::string getName() const { return "ESTIMATE_FEATURE_FILTER_DEFAULTS"; }
-    std::string getDescription() const { return "Estimate default FeatureQC parameter values from Standard and QC samples."; }
+    std::string getName() const { return "ESTIMATE_FEATURE_FILTER_VALUES"; }
+    std::string getDescription() const { return "Estimate default FeatureQC parameter values for the feature filters from Standard and QC samples."; }
+
+    /**
+      @brief Estimate default FeatureQC parameter values from Standard and QC samples.
+        The Standard samples should span the LLOQ and ULOQ. The `setComponentsToConcentrations`
+        will be used to guide which Standard samples.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct EstimateFeatureQCValues : SequenceSegmentProcessor
+  {
+    int getID() const { return -1; }
+    std::string getName() const { return "ESTIMATE_FEATURE_QC_VALUES"; }
+    std::string getDescription() const { return "Estimate default FeatureQC parameter values for the feature QCs from Standard and QC samples."; }
 
     /**
       @brief Estimate default FeatureQC parameter values from Standard and QC samples.
@@ -236,6 +255,23 @@ namespace SmartPeak
 
     /**
       Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct TransferLOQToFeatureQCs : SequenceSegmentProcessor
+  {
+    int getID() const { return -1; }
+    std::string getName() const { return "TRANSFER_LOQ_TO_FEATURE_QCS"; }
+    std::string getDescription() const { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
+
+    /**
+      Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature QCs
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
