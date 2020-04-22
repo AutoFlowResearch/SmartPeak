@@ -52,9 +52,9 @@ after_build:
   - ps: Stop-Process -Id $Clcacheserver.Id
   - clcache -s & clcache -z
 
-# test_script:
-#   - cd C:\projects\SmartPeak2\build
-#   - ctest -C "Debug" -V -j2
+test_script:
+  - cd C:\projects\SmartPeak2\build
+  - ctest -C "Debug" -V -j2
 #   - cd bin\Debug
 #   - echo %time%
 #   - C:\projects\SmartPeak2\build\bin\Debug\GCMS_SIM_Unknown_test > GCMS_SIM_Unknown_test.txt 2>&1
