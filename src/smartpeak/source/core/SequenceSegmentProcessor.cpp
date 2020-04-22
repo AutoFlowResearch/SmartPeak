@@ -866,7 +866,7 @@ namespace SmartPeak
     OpenMS::MRMFeatureFilter featureFilter;
     featureFilter.EstimateDefaultMRMFeatureQCValues(
       standards_featureMaps,
-      sequenceSegmentHandler_IO.getFeatureFilter(),
+      sequenceSegmentHandler_IO.getFeatureQC(),
       sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment(), // Targeted experiment used by all injections in the sequence
       true
     );
@@ -993,7 +993,11 @@ namespace SmartPeak
       blanks_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
     }
 
+    // Initialize with a zero filter
     OpenMS::MRMFeatureFilter featureFilter;
+    featureFilter.zeroFilterValues(sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(), sequenceSegmentHandler_IO.getFeatureBackgroundEstimations());
+
+    // Then estimate the background interferences
     featureFilter.EstimateBackgroundInterferences(
       blanks_featureMaps,
       sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(),
