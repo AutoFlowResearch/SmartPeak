@@ -1907,7 +1907,85 @@ BOOST_AUTO_TEST_CASE(gettersTransferLOQToFeatureFilters)
 
 BOOST_AUTO_TEST_CASE(processTransferLOQToFeatureFilters)
 {
-  // TODO: Implementation TransferLOQToFeatureFilters tests
+  // Make the test sequence
+  SequenceHandler sequenceHandler;
+  addStandardsFeatures(sequenceHandler);
+
+  // Make the template FeatureQC
+  OpenMS::MRMFeatureQC feature_filter_template;
+  feature_filter_template.component_group_qcs.resize(3);
+  feature_filter_template.component_group_qcs.at(0).component_group_name = "ser-L";
+  feature_filter_template.component_group_qcs.at(1).component_group_name = "amp";
+  feature_filter_template.component_group_qcs.at(2).component_group_name = "atp";
+  feature_filter_template.component_qcs.resize(6);
+  feature_filter_template.component_qcs.at(0).component_name = "ser-L.ser-L_1.Light";
+  feature_filter_template.component_qcs.at(0).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  feature_filter_template.component_qcs.at(1).component_name = "ser-L.ser-L_1.Heavy";
+  feature_filter_template.component_qcs.at(1).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  feature_filter_template.component_qcs.at(2).component_name = "amp.amp_1.Light";
+  feature_filter_template.component_qcs.at(2).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  feature_filter_template.component_qcs.at(3).component_name = "amp.amp_1.Heavy";
+  feature_filter_template.component_qcs.at(3).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  feature_filter_template.component_qcs.at(4).component_name = "atp.atp_1.Light";
+  feature_filter_template.component_qcs.at(4).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  feature_filter_template.component_qcs.at(5).component_name = "atp.atp_1.Heavy";
+  feature_filter_template.component_qcs.at(5).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  sequenceHandler.getSequenceSegments().front().setFeatureFilter(feature_filter_template);
+
+  // Make the QuantitationMethods
+  vector<OpenMS::AbsoluteQuantitationMethod> quant_methods;
+  OpenMS::AbsoluteQuantitationMethod aqm;
+  aqm.setComponentName("ser-L.ser-L_1.Light");
+  aqm.setISName("ser-L.ser-L_1.Heavy");
+  aqm.setLLOQ(100);
+  aqm.setULOQ(1e4);
+  quant_methods.push_back(aqm);
+  aqm.setComponentName("amp.amp_1.Light");
+  aqm.setISName("amp.amp_1.Heavy");
+  aqm.setLLOQ(10);
+  aqm.setULOQ(1e5);
+  quant_methods.push_back(aqm);
+  aqm.setComponentName("atp.atp_1.Light");
+  aqm.setISName("atp.atp_1.Heavy");
+  aqm.setLLOQ(1);
+  aqm.setULOQ(1e6);
+  quant_methods.push_back(aqm);
+  sequenceHandler.getSequenceSegments().front().setQuantitationMethods(quant_methods);
+
+  // Make other constructs
+  const map<string, vector<map<string, string>>> params;
+  Filenames filenames;
+
+  // Process
+  TransferLOQToFeatureFilters processor;
+  processor.process(sequenceHandler.getSequenceSegments().front(), sequenceHandler, params, filenames);
+
+  // Test for the expected values
+  const OpenMS::MRMFeatureQC& feature_filters = sequenceHandler.getSequenceSegments().front().getFeatureFilter();
+  // Ser-L
+  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").first, 100, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").second, 1e4, 1e-4);
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
+  // Amp
+  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").first, 10, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").second, 1e5, 1e-4);
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
+  // Atp
+  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").first, 1, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").second, 1e6, 1e-4);
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
 }
 
 /**
@@ -1937,7 +2015,85 @@ BOOST_AUTO_TEST_CASE(gettersTransferLOQToFeatureQCs)
 
 BOOST_AUTO_TEST_CASE(processTransferLOQToFeatureQCs)
 {
-  // TODO: Implementation TransferLOQToFeatureQCs tests
+  // Make the test sequence
+  SequenceHandler sequenceHandler;
+  addStandardsFeatures(sequenceHandler);
+
+  // Make the template FeatureQC
+  OpenMS::MRMFeatureQC feature_filter_template;
+  feature_filter_template.component_group_qcs.resize(3);
+  feature_filter_template.component_group_qcs.at(0).component_group_name = "ser-L";
+  feature_filter_template.component_group_qcs.at(1).component_group_name = "amp";
+  feature_filter_template.component_group_qcs.at(2).component_group_name = "atp";
+  feature_filter_template.component_qcs.resize(6);
+  feature_filter_template.component_qcs.at(0).component_name = "ser-L.ser-L_1.Light";
+  feature_filter_template.component_qcs.at(0).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  feature_filter_template.component_qcs.at(1).component_name = "ser-L.ser-L_1.Heavy";
+  feature_filter_template.component_qcs.at(1).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  feature_filter_template.component_qcs.at(2).component_name = "amp.amp_1.Light";
+  feature_filter_template.component_qcs.at(2).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  feature_filter_template.component_qcs.at(3).component_name = "amp.amp_1.Heavy";
+  feature_filter_template.component_qcs.at(3).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  feature_filter_template.component_qcs.at(4).component_name = "atp.atp_1.Light";
+  feature_filter_template.component_qcs.at(4).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  feature_filter_template.component_qcs.at(5).component_name = "atp.atp_1.Heavy";
+  feature_filter_template.component_qcs.at(5).meta_value_qc.emplace("calculated_concentration", std::make_pair(0.0, 5000.0));
+  sequenceHandler.getSequenceSegments().front().setFeatureQC(feature_filter_template);
+
+  // Make the QuantitationMethods
+  vector<OpenMS::AbsoluteQuantitationMethod> quant_methods;
+  OpenMS::AbsoluteQuantitationMethod aqm;
+  aqm.setComponentName("ser-L.ser-L_1.Light");
+  aqm.setISName("ser-L.ser-L_1.Heavy");
+  aqm.setLLOQ(100);
+  aqm.setULOQ(1e4);
+  quant_methods.push_back(aqm);
+  aqm.setComponentName("amp.amp_1.Light");
+  aqm.setISName("amp.amp_1.Heavy");
+  aqm.setLLOQ(10);
+  aqm.setULOQ(1e5);
+  quant_methods.push_back(aqm);
+  aqm.setComponentName("atp.atp_1.Light");
+  aqm.setISName("atp.atp_1.Heavy");
+  aqm.setLLOQ(1);
+  aqm.setULOQ(1e6);
+  quant_methods.push_back(aqm);
+  sequenceHandler.getSequenceSegments().front().setQuantitationMethods(quant_methods);
+
+  // Make other constructs
+  const map<string, vector<map<string, string>>> params;
+  Filenames filenames;
+
+  // Process
+  TransferLOQToFeatureQCs processor;
+  processor.process(sequenceHandler.getSequenceSegments().front(), sequenceHandler, params, filenames);
+
+  // Test for the expected values
+  const OpenMS::MRMFeatureQC& feature_filters = sequenceHandler.getSequenceSegments().front().getFeatureQC();
+  // Ser-L
+  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").first, 100, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").second, 1e4, 1e-4);
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
+  // Amp
+  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").first, 10, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").second, 1e5, 1e-4);
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
+  // Atp
+  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").first, 1, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").second, 1e6, 1e-4);
+  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
 }
 
 /**
