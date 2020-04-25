@@ -1197,7 +1197,7 @@ namespace SmartPeak
 
     featureFilter.FilterFeatureMapPercRSD(
       featureMap,
-      rawDataHandler_IO.getFeatureFilter(),
+      rawDataHandler_IO.getFeatureRSDFilter(),
       rawDataHandler_IO.getFeatureRSDEstimations()
     );
 
@@ -1230,7 +1230,7 @@ namespace SmartPeak
 
     featureFilter.FilterFeatureMapPercRSD(
       rawDataHandler_IO.getFeatureMap(),
-      rawDataHandler_IO.getFeatureQC(),
+      rawDataHandler_IO.getFeatureRSDQC(),
       rawDataHandler_IO.getFeatureRSDEstimations()
     );
 
@@ -1265,7 +1265,7 @@ namespace SmartPeak
 
     featureFilter.FilterFeatureMapBackgroundInterference(
       featureMap,
-      rawDataHandler_IO.getFeatureFilter(),
+      rawDataHandler_IO.getFeatureBackgroundFilter(),
       rawDataHandler_IO.getFeatureBackgroundEstimations()
     );
 
@@ -1298,7 +1298,7 @@ namespace SmartPeak
 
     featureFilter.FilterFeatureMapBackgroundInterference(
       rawDataHandler_IO.getFeatureMap(),
-      rawDataHandler_IO.getFeatureQC(),
+      rawDataHandler_IO.getFeatureBackgroundQC(),
       rawDataHandler_IO.getFeatureBackgroundEstimations()
     );
 

@@ -1597,10 +1597,11 @@ BOOST_AUTO_TEST_CASE(checkFeaturesBackgroundInterferences)
   filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv");
   LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
-  rawDataHandler.setFeatureBackgroundQC(rawDataHandler.getFeatureQC()); // copy over the feature filter
 
   // Make the feature background estimates
   OpenMS::MRMFeatureQC feature_background_estimations = rawDataHandler.getFeatureQC();
+  feature_background_estimations.component_qcs.at(293).intensity_u = 30; // "23dpg.23dpg_1.Light"
+  rawDataHandler.setFeatureBackgroundQC(feature_background_estimations); // copy over the feature filter
   feature_background_estimations.component_qcs.at(293).intensity_u = 1e12; // "23dpg.23dpg_1.Light"
   rawDataHandler.setFeatureBackgroundEstimations(feature_background_estimations);
 
