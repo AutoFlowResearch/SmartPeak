@@ -125,8 +125,8 @@ BOOST_AUTO_TEST_CASE(extractMetaData)
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
-  BOOST_CHECK_EQUAL(params_1.size(), 14);
-  BOOST_CHECK_EQUAL(params_2.size(), 15);
+  BOOST_CHECK_EQUAL(params_1.size(), 18);
+  BOOST_CHECK_EQUAL(params_2.size(), 19);
   RawDataHandler rawDataHandler;
 
   // Pre-requisites: load the transitions and raw data
@@ -833,7 +833,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadParameters)
 
 BOOST_AUTO_TEST_CASE(processLoadParameters)
 {
-  // no tests, it calls FileReader::parseOpenMSParams and OpenMSFile::sanitizeRawDataProcessorParameters
+  // no tests, it calls FileReader::parseOpenMSParams and LoadParameters::sanitizeRawDataProcessorParameters
 }
 
 BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
@@ -853,7 +853,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
 
   LoadParameters loadParameters;
   loadParameters.sanitizeParameters(params);
-  BOOST_CHECK_EQUAL(params.size(), 14);
+  BOOST_CHECK_EQUAL(params.size(), 18);
   BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("AbsoluteQuantitation"), 1);
@@ -873,6 +873,10 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem2"), "value2");
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[1].at("map2_elem1"), "value3");
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeatures.qc").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesRSDs").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc").size(), 0);
 }
 
 /**
@@ -1043,7 +1047,7 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getMetaValue("peak_apex_int")), 0.0, 1e-6);
   BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 1067.5447296543123, 1e-6);
-  BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
+  BOOST_CHECK(!hsubordinate2.getMetaValue("used_").toBool());
 }
 
 /**
@@ -1130,7 +1134,7 @@ BOOST_AUTO_TEST_CASE(selectFeatures)
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getMetaValue("peak_apex_int")), 49333.0, 1e-6);
   BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 46.652168337345103, 1e-6);
-  BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
+  BOOST_CHECK(hsubordinate2.getMetaValue("used_").toBool());
 }
 
 /**
@@ -1404,29 +1408,36 @@ BOOST_AUTO_TEST_CASE(filterFeaturesRSDs)
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv");
+  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv");
   LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
+  rawDataHandler.setFeatureRSDFilter(rawDataHandler.getFeatureFilter()); // copy over the feature filter
+
+  // Make the feature RSD estimates
+  OpenMS::MRMFeatureQC feature_rsd_estimations = rawDataHandler.getFeatureFilter();
+  feature_rsd_estimations.component_group_qcs.at(115).retention_time_u = 40; // accoa
+  feature_rsd_estimations.component_qcs.at(292).meta_value_qc.at("peak_apex_int").second = 40; // "23dpg.23dpg_1.Heavy"
+  rawDataHandler.setFeatureRSDEstimations(feature_rsd_estimations);
 
   // Test feature filter
   FilterFeaturesRSDs filterFeatures;
   filterFeatures.process(rawDataHandler, params_1, filenames);
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 329); // Test feature_map_
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 478); // Test feature_map
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 2);
 
   const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getMetaValue("peak_apex_int")), 266403.0, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getMetaValue("peak_apex_int")), 262509, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getRT()), 953.66569377291205, 1e-6);
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[50].getSubordinates().size(), 2);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[50].getSubordinates().size(), 3);
 
   const OpenMS::Feature& subordinate2 = rawDataHandler.getFeatureMap()[50].getSubordinates()[0];
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 49333.0, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 46.652168337345103, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 640, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "acon-C.acon-C_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 842.11033066606501, 1e-6);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 481); // Test feature_map_history_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
@@ -1435,7 +1446,7 @@ BOOST_AUTO_TEST_CASE(filterFeaturesRSDs)
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate1.getMetaValue("peak_apex_int")), 266403.0, 1e-6);
   BOOST_CHECK_EQUAL(hsubordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate1.getRT()), 953.665693772912, 1e-6);
-  BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
+  BOOST_CHECK(!hsubordinate1.getMetaValue("used_").toBool());
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[50].getSubordinates().size(), 2);
 
@@ -1443,7 +1454,7 @@ BOOST_AUTO_TEST_CASE(filterFeaturesRSDs)
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getMetaValue("peak_apex_int")), 0.0, 1e-6);
   BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 1067.5447296543123, 1e-6);
-  BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
+  BOOST_CHECK(!hsubordinate2.getMetaValue("used_").toBool());
 }
 
 /**
@@ -1496,16 +1507,18 @@ BOOST_AUTO_TEST_CASE(filterFeaturesBackgroundInterferences)
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv");
+  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv");
   LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
+  rawDataHandler.setFeatureBackgroundFilter(rawDataHandler.getFeatureFilter()); // copy over the feature filter
+  rawDataHandler.setFeatureBackgroundEstimations(rawDataHandler.getFeatureFilter());
 
   // Test feature filter
   FilterFeaturesBackgroundInterferences filterFeatures;
   filterFeatures.process(rawDataHandler, params_1, filenames);
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 329); // Test feature_map_
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 479); // Test feature_map_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
@@ -1513,12 +1526,12 @@ BOOST_AUTO_TEST_CASE(filterFeaturesBackgroundInterferences)
   BOOST_CHECK_EQUAL(subordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getRT()), 953.66569377291205, 1e-6);
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[50].getSubordinates().size(), 2);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[50].getSubordinates().size(), 1);
 
   const OpenMS::Feature& subordinate2 = rawDataHandler.getFeatureMap()[50].getSubordinates()[0];
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 49333.0, 1e-6);
-  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 46.652168337345103, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 3842, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Light");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 1067.54472965431, 1e-6);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 481); // Test feature_map_history_
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
@@ -1535,7 +1548,7 @@ BOOST_AUTO_TEST_CASE(filterFeaturesBackgroundInterferences)
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getMetaValue("peak_apex_int")), 0.0, 1e-6);
   BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 1067.5447296543123, 1e-6);
-  BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
+  BOOST_CHECK(!hsubordinate2.getMetaValue("used_").toBool());
 }
 
 /**
@@ -1580,10 +1593,16 @@ BOOST_AUTO_TEST_CASE(checkFeaturesBackgroundInterferences)
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv");
+  filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv");
   LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
+  rawDataHandler.setFeatureBackgroundQC(rawDataHandler.getFeatureQC()); // copy over the feature filter
+
+  // Make the feature background estimates
+  OpenMS::MRMFeatureQC feature_background_estimations = rawDataHandler.getFeatureQC();
+  feature_background_estimations.component_qcs.at(293).intensity_u = 1e12; // "23dpg.23dpg_1.Light"
+  rawDataHandler.setFeatureBackgroundEstimations(feature_background_estimations);
 
   // Test check features
   CheckFeaturesBackgroundInterferences checkFeatures;
@@ -1593,17 +1612,17 @@ BOOST_AUTO_TEST_CASE(checkFeaturesBackgroundInterferences)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& sub = rawDataHandler.getFeatureMap()[0].getSubordinates()[1];
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getMetaValue("QC_transition_group_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getMetaValue("QC_transition_group_%BackgroundInterference_pass").toString(), "1");
   BOOST_CHECK_EQUAL(sub.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(sub.getMetaValue("QC_transition_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(sub.getMetaValue("QC_transition_%BackgroundInterference_pass").toString(), "0");
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 98);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& hsub = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[1];
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("QC_transition_group_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("QC_transition_group_%BackgroundInterference_pass").toString(), "1");
   BOOST_CHECK_EQUAL(hsub.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(hsub.getMetaValue("QC_transition_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(hsub.getMetaValue("QC_transition_%BackgroundInterference_pass").toString(), "0");
   BOOST_CHECK(hsub.getMetaValue("used_").toBool());
 }
 
@@ -1649,10 +1668,16 @@ BOOST_AUTO_TEST_CASE(checkFeaturesRSDs)
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv");
+  filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv");
   LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
+  rawDataHandler.setFeatureRSDQC(rawDataHandler.getFeatureQC()); // copy over the feature filter
+
+  // Make the feature RSD estimates
+  OpenMS::MRMFeatureQC feature_rsd_estimations = rawDataHandler.getFeatureQC();
+  feature_rsd_estimations.component_qcs.at(293).meta_value_qc.at("peak_apex_int").second = 40; // "23dpg.23dpg_1.Heavy"
+  rawDataHandler.setFeatureRSDEstimations(feature_rsd_estimations);
 
   // Test check features
   CheckFeaturesRSDs checkFeatures;
@@ -1662,17 +1687,17 @@ BOOST_AUTO_TEST_CASE(checkFeaturesRSDs)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& sub = rawDataHandler.getFeatureMap()[0].getSubordinates()[1];
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getMetaValue("QC_transition_group_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getMetaValue("QC_transition_group_%RSD_pass").toString(), "1");
   BOOST_CHECK_EQUAL(sub.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(sub.getMetaValue("QC_transition_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(sub.getMetaValue("QC_transition_%RSD_pass").toString(), "0");
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 98);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
 
   const OpenMS::Feature& hsub = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[1];
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("QC_transition_group_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("QC_transition_group_%RSD_pass").toString(), "1");
   BOOST_CHECK_EQUAL(hsub.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(hsub.getMetaValue("QC_transition_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(hsub.getMetaValue("QC_transition_%RSD_pass").toString(), "0");
   BOOST_CHECK(hsub.getMetaValue("used_").toBool());
 }
 

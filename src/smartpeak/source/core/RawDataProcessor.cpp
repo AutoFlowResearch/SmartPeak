@@ -950,6 +950,10 @@ namespace SmartPeak
       "ReferenceDataMethods.getAndProcess_referenceData_samples",
       "MRMFeatureValidator.validate_MRMFeatures",
       "MRMFeatureFilter.filter_MRMFeatures.qc",
+      "MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences",
+      "MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc",
+      "MRMFeatureFilter.filter_MRMFeaturesRSDs",
+      "MRMFeatureFilter.filter_MRMFeaturesRSDs.qc"
     };
     for (const std::string& parameter : required_parameters) {
       if (!params_I.count(parameter)) {
