@@ -21,10 +21,20 @@ namespace SmartPeak {
     {12, std::make_shared<ZeroChromatogramBaseline>()},
     {13, std::make_shared<ExtractChromatogramWindows>()},
     {14, std::make_shared<EMGProcessor>()},
+    {4, std::make_shared<FilterFeaturesRSDs>()},
+    {8, std::make_shared<CheckFeaturesRSDs>()},
+    {4, std::make_shared<FilterFeaturesBackgroundInterferences>()},
+    {8, std::make_shared<CheckFeaturesBackgroundInterferences>()}
   };
   const std::map<int, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
     {15, std::make_shared<CalculateCalibration>()},
     {16, std::make_shared<StoreQuantitationMethods>()},
     {17, std::make_shared<LoadQuantitationMethods>()},
+    {15, std::make_shared<EstimateFeatureFilterValues>()},
+    {15, std::make_shared<EstimateFeatureQCValues>()},
+    {15, std::make_shared<TransferLOQToFeatureFilters>()},
+    {15, std::make_shared<TransferLOQToFeatureQCs>()},
+    {15, std::make_shared<EstimateFeatureRSDs>()},
+    {15, std::make_shared<EstimateFeatureBackgroundInterferences>()}
   };
 }

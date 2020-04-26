@@ -344,6 +344,14 @@ int main(int argc, char **argv)
           if (ImGui::MenuItem("Comp Group Filters")) {}
           if (ImGui::MenuItem("Comp QCs")) {}
           if (ImGui::MenuItem("Comp Group QCs")) {}
+          if (ImGui::MenuItem("Comp %RSD Filters")) {}
+          if (ImGui::MenuItem("Comp Group %RSD Filters")) {}
+          if (ImGui::MenuItem("Comp %RSD QCs")) {}
+          if (ImGui::MenuItem("Comp Group %RSD QCs")) {}
+          if (ImGui::MenuItem("Comp %Background Filters")) {}
+          if (ImGui::MenuItem("Comp Group %Background Filters")) {}
+          if (ImGui::MenuItem("Comp %Background QCs")) {}
+          if (ImGui::MenuItem("Comp Group %Background QCs")) {}
           ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Export File"))
@@ -357,6 +365,14 @@ int main(int argc, char **argv)
           if (ImGui::MenuItem("Comp Group Filters")) {}
           if (ImGui::MenuItem("Comp QCs")) {}
           if (ImGui::MenuItem("Comp Group QCs")) {}
+          if (ImGui::MenuItem("Comp %RSD Filters")) {}
+          if (ImGui::MenuItem("Comp Group %RSD Filters")) {}
+          if (ImGui::MenuItem("Comp %RSD QCs")) {}
+          if (ImGui::MenuItem("Comp Group %RSD QCs")) {}
+          if (ImGui::MenuItem("Comp %Background Filters")) {}
+          if (ImGui::MenuItem("Comp Group %Background Filters")) {}
+          if (ImGui::MenuItem("Comp %Background QCs")) {}
+          if (ImGui::MenuItem("Comp Group %Background QCs")) {}
           ImGui::EndMenu();
         }
         // TODO
@@ -464,6 +480,30 @@ int main(int argc, char **argv)
             quickInfoText_.clear();
             if (state_.sequenceHandler_.getSequence().size()) {
               quickInfoText_ = InputDataValidation::getFeatureFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
+            }
+          }
+          if (ImGui::MenuItem("Comp (Group) %RSD Filters")) {
+            quickInfoText_.clear();
+            if (state_.sequenceHandler_.getSequence().size()) {
+              quickInfoText_ = InputDataValidation::getFeatureRSDFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), true);
+            }
+          }
+          if (ImGui::MenuItem("Comp (Group) %RSD QCs")) {
+            quickInfoText_.clear();
+            if (state_.sequenceHandler_.getSequence().size()) {
+              quickInfoText_ = InputDataValidation::getFeatureRSDFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
+            }
+          }
+          if (ImGui::MenuItem("Comp (Group) %Background Filters")) {
+            quickInfoText_.clear();
+            if (state_.sequenceHandler_.getSequence().size()) {
+              quickInfoText_ = InputDataValidation::getFeatureBackgroundFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), true);
+            }
+          }
+          if (ImGui::MenuItem("Comp (Group) %Background QCs")) {
+            quickInfoText_.clear();
+            if (state_.sequenceHandler_.getSequence().size()) {
+              quickInfoText_ = InputDataValidation::getFeatureBackgroundFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
             }
           }
           if (ImGui::MenuItem("Parameters")) {
