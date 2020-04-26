@@ -19,7 +19,7 @@ namespace SmartPeak
 
     // Each of the derived classes implement one of the following virtual methods
     virtual void operator()(const std::vector<AppState::Command>& commands) {}
-    virtual bool operator()(const int n, AppState::Command& cmd) { return false; }
+    virtual bool operator()(const std::string& name, AppState::Command& cmd) { return false; }
     virtual void operator()(const char* const pathname) {}
     virtual std::vector<AppState::Command> operator()(const std::string& ids) { return std::vector<AppState::Command>(); }
 
@@ -47,7 +47,7 @@ namespace SmartPeak
 
   struct CreateCommand : AppStateProcessor {
     CreateCommand(AppState& state) : AppStateProcessor(state) {}
-    bool operator()(const int n, AppState::Command& cmd) override;
+    bool operator()(const std::string& name, AppState::Command& cmd) override;
   };
 
   struct LoadSessionFromSequence : AppStateProcessor {
@@ -67,9 +67,9 @@ namespace SmartPeak
     std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
   };
 
-  struct BuildCommandsFromIds : AppStateProcessor {
-    BuildCommandsFromIds(AppState& state) : AppStateProcessor(state) {}
-    std::vector<AppState::Command> operator()(const std::string& ids) override;
+  struct BuildCommandsFromNames : AppStateProcessor {
+    BuildCommandsFromNames(AppState& state) : AppStateProcessor(state) {}
+    std::vector<AppState::Command> operator()(const std::string& names) override;
   };
 
   struct SetRawDataPathname : AppStateProcessor {

@@ -14,32 +14,27 @@ BOOST_AUTO_TEST_SUITE(appstateprocessor)
 BOOST_AUTO_TEST_CASE(buildcommandsfromids)
 {
   AppState state;
-  BuildCommandsFromIds buildCommandsFromIds(state);
+  BuildCommandsFromNames buildCommandsFromNames(state);
   std::vector<AppState::Command> methods;
 
-  methods = buildCommandsFromIds(std::string(""));
+  methods = buildCommandsFromNames(std::string(""));
   BOOST_CHECK_EQUAL(methods.size(), 0);
 
-  methods = buildCommandsFromIds(std::string("     "));
+  methods = buildCommandsFromNames(std::string("     "));
   BOOST_CHECK_EQUAL(methods.size(), 0);
 
-  methods = buildCommandsFromIds(std::string("1 2 3"));
+  methods = buildCommandsFromNames(std::string("LOAD_RAW_DATA LOAD_FEATURES PICK_FEATURES"));
   BOOST_CHECK_EQUAL(methods.size(), 3);
-  BOOST_CHECK_EQUAL(methods.at(0).getID(), 1);
-  BOOST_CHECK_EQUAL(methods.at(1).getID(), 2);
-  BOOST_CHECK_EQUAL(methods.at(2).getID(), 3);
+  BOOST_CHECK_EQUAL(methods.at(0).getName(), "LOAD_RAW_DATA");
+  BOOST_CHECK_EQUAL(methods.at(1).getName(), "LOAD_FEATURES");
+  BOOST_CHECK_EQUAL(methods.at(2).getName(), "PICK_FEATURES");
 
-  methods = buildCommandsFromIds(std::string("1 10 2")); // no plotting processor yet, "10" skips
+  methods = buildCommandsFromNames(std::string("LOAD_RAW_DATA PLOT_FEATURES LOAD_FEATURES")); // no plotting processor yet
   BOOST_CHECK_EQUAL(methods.size(), 2);
-  BOOST_CHECK_EQUAL(methods.at(0).getID(), 1);
-  BOOST_CHECK_EQUAL(methods.at(1).getID(), 2);
+  BOOST_CHECK_EQUAL(methods.at(0).getName(), "LOAD_RAW_DATA");
+  BOOST_CHECK_EQUAL(methods.at(1).getName(), "LOAD_FEATURES");
 
-  methods = buildCommandsFromIds(std::string("1 18 16")); // "18" and higher don't exist
-  BOOST_CHECK_EQUAL(methods.size(), 2);
-  BOOST_CHECK_EQUAL(methods.at(0).getID(), 1);
-  BOOST_CHECK_EQUAL(methods.at(1).getID(), 16);
-
-  methods = buildCommandsFromIds(std::string("55 87"));
+  methods = buildCommandsFromNames(std::string("55 87"));
   BOOST_CHECK_EQUAL(methods.size(), 0);
 }
 

@@ -1031,13 +1031,13 @@ namespace SmartPeak
     LOGD << "END ExtractChromatogramWindows";
   }
 
-  void EMGProcessor::process(
+  void FitFeaturesEMG::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
   ) const
   {
-    LOGD << "START EMGProcessor";
+    LOGD << "START FitFeaturesEMG";
 
     OpenMS::EmgGradientDescent emg;
 
@@ -1149,10 +1149,10 @@ namespace SmartPeak
       LOGE << e.what();
     }
 
-    LOGD << "END EMGProcessor";
+    LOGD << "END FitFeaturesEMG";
   }
 
-  void EMGProcessor::extractPointsIntoVectors(
+  void FitFeaturesEMG::extractPointsIntoVectors(
     const OpenMS::MSChromatogram& chromatogram,
     const double left,
     const double right,

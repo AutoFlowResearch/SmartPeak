@@ -373,10 +373,10 @@ namespace SmartPeak
     );
   };
 
-  struct EMGProcessor : RawDataProcessor
+  struct FitFeaturesEMG : RawDataProcessor
   {
     int getID() const override { return 14; }
-    std::string getName() const override { return "EMG_PROCESSOR"; }
+    std::string getName() const override { return "FIT_FEATURES_EMG"; }
     std::string getDescription() const override { return "Reconstruct a peak from available data points."; }
 
     /** Apply the EMG peak reconstruction technique to the data points.

@@ -142,7 +142,7 @@ std::vector<AppState::Command> getMethodsInput()
     return {};
   }
 
-  BuildCommandsFromIds buildCommandsFromIds(state);
+  BuildCommandsFromNames buildCommandsFromIds(state);
   methods = buildCommandsFromIds(line);
 
   return methods;

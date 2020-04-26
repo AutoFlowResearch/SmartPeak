@@ -40,25 +40,25 @@ namespace SmartPeak
       {
         if (ImGui::Selectable(s))
         {
-          BuildCommandsFromIds buildCommandsFromIds(*state_);
+          BuildCommandsFromNames buildCommandsFromIds(*state_);
           std::string ids;
           const std::string s_string { s };
           if (s_string == "LCMS MRM Unknowns")
-            ids = "1 11 3 7 8 5 9";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_FEATURES QUANTIFY_FEATURES CHECK_FEATURES STORE_FEATURES STORE_FEATURES";
           else if (s_string == "LCMS MRM Standards")
-            ids = "1 11 3 8 5 15 16 7 9";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_FEATURES CHECK_FEATURES STORE_FEATURES CALCULATE_CALIBRATION STORE_QUANTITATION_METHODS QUANTIFY_FEATURES STORE_FEATURES";
           else if (s_string == "HPLC UV Unknowns")
-            ids = "1 11 13 12 3 7 8 5 9";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES QUANTIFY_FEATURES CHECK_FEATURES STORE_FEATURES STORE_FEATURES";
           else if (s_string == "HPLC UV Standards")
-            ids = "1 11 13 12 3 8 5 15 16 7 9";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES CHECK_FEATURES STORE_FEATURES CALCULATE_CALIBRATION STORE_QUANTITATION_METHODS QUANTIFY_FEATURES STORE_FEATURES";
           else if (s_string == "GCMS SIM Unknowns")
-            ids = "1 11 13 12 3 7 8 5 9";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES QUANTIFY_FEATURES CHECK_FEATURES STORE_FEATURES STORE_FEATURES";
           else if (s_string == "GCMS Full Scan Unknowns")
-            ids = "1 11 13 12 3 8 5 15 16 7 9";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES CHECK_FEATURES STORE_FEATURES CALCULATE_CALIBRATION STORE_QUANTITATION_METHODS QUANTIFY_FEATURES STORE_FEATURES";
           else if (s_string == "LCMS MRM Validation - LP")
-            ids = "1 11 13 3 4 4 5 6 9";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS PICK_FEATURES FILTER_FEATURES FILTER_FEATURES STORE_FEATURES VALIDATE_FEATURES STORE_FEATURES";
           else if (s_string == "LCMS MRM Validation - QMIP")
-            ids = "1 11 3 5 6 9";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_FEATURES STORE_FEATURES VALIDATE_FEATURES STORE_FEATURES";
           commands_ = buildCommandsFromIds(ids);
           LOGI << "Local workflow has been replaced";
         }
@@ -70,11 +70,11 @@ namespace SmartPeak
     {
       AppState::Command cmd;
       CreateCommand createCommand(*state_);
-      for (const std::pair<int, std::shared_ptr<RawDataProcessor>>& p : n_to_raw_data_method_)
+      for (const auto& p : n_to_raw_data_method_)
       {
         if (ImGui::Selectable(p.second->getName().c_str()))
         {
-          const bool created = createCommand(p.second->getID(), cmd);
+          const bool created = createCommand(p.second->getName(), cmd);
           if (created) {
             commands_.push_back(cmd);
           }
@@ -87,11 +87,11 @@ namespace SmartPeak
     {
       AppState::Command cmd;
       CreateCommand createCommand(*state_);
-      for (const std::pair<int, std::shared_ptr<SequenceSegmentProcessor>>& p : n_to_seq_seg_method_)
+      for (const auto& p : n_to_seq_seg_method_)
       {
         if (ImGui::Selectable(p.second->getName().c_str()))
         {
-          const bool created = createCommand(p.second->getID(), cmd);
+          const bool created = createCommand(p.second->getName(), cmd);
           if (created) {
             commands_.push_back(cmd);
           }

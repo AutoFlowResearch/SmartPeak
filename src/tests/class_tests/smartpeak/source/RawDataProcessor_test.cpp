@@ -1844,7 +1844,7 @@ BOOST_AUTO_TEST_CASE(emg_processor)
   BOOST_CHECK_EQUAL(m.size(), 1);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 1);
 
-  EMGProcessor emg;
+  FitFeaturesEMG emg;
   emg.process(rawDataHandler, params_1, filenames);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 1);
