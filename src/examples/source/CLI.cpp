@@ -773,11 +773,11 @@ menuQuickInfo_label:
       state.sequenceHandler_.getSequenceSegments().front()) << "\n";
   }
   else if ("5" == in) {
-    LOGN << "\n\n" << InputDataValidation::getComponentsAndGroupsInfo(
+    LOGN << "\n\n" << InputDataValidation::getFeatureFiltersInfo(
       state.sequenceHandler_.getSequence().front().getRawData(), true) << "\n";
   }
   else if ("6" == in) {
-    LOGN << "\n\n" << InputDataValidation::getComponentsAndGroupsInfo(
+    LOGN << "\n\n" << InputDataValidation::getFeatureFiltersInfo(
       state.sequenceHandler_.getSequence().front().getRawData(), false) << "\n";
   }
   else if ("7" == in) {

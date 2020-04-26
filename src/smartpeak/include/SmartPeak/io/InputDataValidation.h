@@ -39,7 +39,17 @@ public:
       const RawDataHandler& rawDataHandler
     );
 
-    static std::string getComponentsAndGroupsInfo(
+    static std::string getFeatureFiltersInfo(
+      const RawDataHandler& rawDataHandler,
+      const bool is_feature_filter // else is feature qc
+    );
+
+    static std::string getFeatureRSDFiltersInfo(
+      const RawDataHandler& rawDataHandler,
+      const bool is_feature_filter // else is feature qc
+    );
+
+    static std::string getFeatureBackgroundFiltersInfo(
       const RawDataHandler& rawDataHandler,
       const bool is_feature_filter // else is feature qc
     );

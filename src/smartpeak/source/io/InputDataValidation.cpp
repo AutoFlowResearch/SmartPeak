@@ -114,7 +114,7 @@ namespace SmartPeak
     return oss.str();
   }
 
-  std::string InputDataValidation::getComponentsAndGroupsInfo(
+  std::string InputDataValidation::getFeatureFiltersInfo(
     const RawDataHandler& rawDataHandler,
     const bool is_feature_filter // else is feature qc
   )
@@ -124,7 +124,7 @@ namespace SmartPeak
       : rawDataHandler.getFeatureQC();
 
     std::ostringstream oss;
-    oss << "==== START getComponentsAndGroupsInfo " <<
+    oss << "==== START getFeatureFiltersInfo " <<
       (is_feature_filter ? "(FeatureFilter)" : "(FeatureQC)") << "\n" <<
       "Number of ComponentQCs: " << featureQC.component_qcs.size() << "\n" <<
       "Number of ComponentGroupQCs: " << featureQC.component_group_qcs.size() << "\n";
@@ -147,8 +147,72 @@ namespace SmartPeak
         << "\tn. of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
     }
 
-    oss << "==== END   getComponentsAndGroupsInfo " <<
+    oss << "==== END   getFeatureFiltersInfo " <<
       (is_feature_filter ? "(FeatureFilter)" : "(FeatureQC)") << "\n";
+    return oss.str();
+  }
+
+  std::string InputDataValidation::getFeatureRSDFiltersInfo(const RawDataHandler & rawDataHandler, const bool is_feature_filter)
+  {
+    const OpenMS::MRMFeatureQC& featureQC = is_feature_filter
+      ? rawDataHandler.getFeatureRSDFilter()
+      : rawDataHandler.getFeatureRSDQC();
+
+    std::ostringstream oss;
+    oss << "==== START getFeatureRSDFiltersInfo " <<
+      (is_feature_filter ? "(FeatureRSDFilter)" : "(FeatureRSDQC)") << "\n" <<
+      "Number of ComponentQCs: " << featureQC.component_qcs.size() << "\n" <<
+      "Number of ComponentGroupQCs: " << featureQC.component_group_qcs.size() << "\n";
+
+    oss << "Listing ComponentQCs' information:\n";
+    for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureQC.component_qcs) {
+      oss << qc.component_name
+        << "\tRT[" << qc.retention_time_l << ", " << qc.retention_time_u << "]"
+        << "\tINT[" << qc.intensity_l << ", " << qc.intensity_u << "]"
+        << "\tOQ[" << qc.overall_quality_l << ", " << qc.overall_quality_u << "]"
+        << "\tn. of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
+    }
+
+    oss << "Listing ComponentGroupQCs' information:\n";
+    for (const OpenMS::MRMFeatureQC::ComponentGroupQCs& qc : featureQC.component_group_qcs) {
+      oss << qc.component_group_name
+        << "\tRT[" << qc.retention_time_l << ", " << qc.retention_time_u << "]"
+        << "\tINT[" << qc.intensity_l << ", " << qc.intensity_u << "]"
+        << "\tOQ[" << qc.overall_quality_l << ", " << qc.overall_quality_u << "]"
+        << "\tn. of metavalues pairs: " << qc.meta_value_qc.size() << '\n';
+    }
+
+    oss << "==== END   getFeatureFiltersInfo " <<
+      (is_feature_filter ? "(FeatureRSDFilter)" : "(FeatureRSDQC)") << "\n";
+    return oss.str();
+  }
+
+  std::string InputDataValidation::getFeatureBackgroundFiltersInfo(const RawDataHandler & rawDataHandler, const bool is_feature_filter)
+  {
+    const OpenMS::MRMFeatureQC& featureQC = is_feature_filter
+      ? rawDataHandler.getFeatureBackgroundFilter()
+      : rawDataHandler.getFeatureBackgroundQC();
+
+    std::ostringstream oss;
+    oss << "==== START getFeatureBackgroundFiltersInfo " <<
+      (is_feature_filter ? "(FeatureBackgroundFilter)" : "(FeatureBackgroundQC)") << "\n" <<
+      "Number of ComponentQCs: " << featureQC.component_qcs.size() << "\n" <<
+      "Number of ComponentGroupQCs: " << featureQC.component_group_qcs.size() << "\n";
+
+    oss << "Listing ComponentQCs' information:\n";
+    for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureQC.component_qcs) {
+      oss << qc.component_name
+        << "\tINT[" << qc.intensity_l << ", " << qc.intensity_u << "]\n";
+    }
+
+    oss << "Listing ComponentGroupQCs' information:\n";
+    for (const OpenMS::MRMFeatureQC::ComponentGroupQCs& qc : featureQC.component_group_qcs) {
+      oss << qc.component_group_name
+        << "\tINT[" << qc.intensity_l << ", " << qc.intensity_u << "]\n";
+    }
+
+    oss << "==== END   getFeatureFiltersInfo " <<
+      (is_feature_filter ? "(FeatureBackgroundFilter)" : "(FeatureBackgroundQC)") << "\n";
     return oss.str();
   }
 
@@ -259,12 +323,20 @@ namespace SmartPeak
       sequenceHandler.getSequenceSegments().front().getQuantitationMethods();
     const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& standards =
       sequenceHandler.getSequenceSegments().front().getStandardsConcentrations();
+    const OpenMS::MRMFeatureQC& featureRSDFilter = rawDataHandler.getFeatureRSDFilter();
+    const OpenMS::MRMFeatureQC& featureRSDQC = rawDataHandler.getFeatureRSDQC();
+    const OpenMS::MRMFeatureQC& featureBackgroundFilter = rawDataHandler.getFeatureBackgroundFilter();
+    const OpenMS::MRMFeatureQC& featureBackgroundQC = rawDataHandler.getFeatureBackgroundQC();
 
     std::set<std::string> names1;
     std::set<std::string> names2;
     std::set<std::string> names3;
     std::set<std::string> names4;
     std::set<std::string> names5;
+    std::set<std::string> names6;
+    std::set<std::string> names7;
+    std::set<std::string> names8;
+    std::set<std::string> names9;
 
     for (const OpenMS::ReactionMonitoringTransition& transition : transitions) {
       names1.insert(transition.getName());
@@ -286,12 +358,32 @@ namespace SmartPeak
       names5.insert(run.component_name);
     }
 
-    std::vector<bool> check_passed(4);
+    for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureRSDFilter.component_qcs) {
+      names6.insert(qc.component_name);
+    }
+
+    for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureRSDQC.component_qcs) {
+      names7.insert(qc.component_name);
+    }
+
+    for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureBackgroundFilter.component_qcs) {
+      names8.insert(qc.component_name);
+    }
+
+    for (const OpenMS::MRMFeatureQC::ComponentQCs& qc : featureBackgroundQC.component_qcs) {
+      names9.insert(qc.component_name);
+    }
+
+    std::vector<bool> check_passed(8);
 
     check_passed.at(0) = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
     check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
     check_passed.at(2) = validateNamesInStructures(names1, names4, "TRAML", "QUANTITATIONMETHODS", false);
     check_passed.at(3) = validateNamesInStructures(names1, names5, "TRAML", "STANDARDS", false);
+    check_passed.at(4) = validateNamesInStructures(names1, names6, "TRAML", "FEATURE_RSD_FILTER", false);
+    check_passed.at(5) = validateNamesInStructures(names1, names7, "TRAML", "FEATURE_RSD_QC", false);
+    check_passed.at(6) = validateNamesInStructures(names1, names8, "TRAML", "FEATURE_BACKGROUND_FILTER", false);
+    check_passed.at(7) = validateNamesInStructures(names1, names9, "TRAML", "FEATURE_BACKGROUND_QC", false);
 
     LOGD << "END componentNamesAreConsistent";
 
@@ -309,10 +401,18 @@ namespace SmartPeak
       rawDataHandler.getTargetedExperiment().getTransitions();
     const OpenMS::MRMFeatureQC& featureFilter = rawDataHandler.getFeatureFilter();
     const OpenMS::MRMFeatureQC& featureQC = rawDataHandler.getFeatureQC();
+    const OpenMS::MRMFeatureQC& featureRSDFilter = rawDataHandler.getFeatureRSDFilter();
+    const OpenMS::MRMFeatureQC& featureRSDQC = rawDataHandler.getFeatureRSDQC();
+    const OpenMS::MRMFeatureQC& featureBackgroundFilter = rawDataHandler.getFeatureBackgroundFilter();
+    const OpenMS::MRMFeatureQC& featureBackgroundQC = rawDataHandler.getFeatureBackgroundQC();
 
     std::set<std::string> names1;
     std::set<std::string> names2;
     std::set<std::string> names3;
+    std::set<std::string> names4;
+    std::set<std::string> names5;
+    std::set<std::string> names6;
+    std::set<std::string> names7;
 
     for (const OpenMS::ReactionMonitoringTransition& transition : transitions) {
       names1.insert(transition.getPeptideRef());
@@ -326,10 +426,30 @@ namespace SmartPeak
       names3.insert(qc.component_group_name);
     }
 
-    std::vector<bool> check_passed(2);
+    for (const OpenMS::MRMFeatureQC::ComponentGroupQCs& qc : featureRSDFilter.component_group_qcs) {
+      names4.insert(qc.component_group_name);
+    }
+
+    for (const OpenMS::MRMFeatureQC::ComponentGroupQCs& qc : featureRSDQC.component_group_qcs) {
+      names5.insert(qc.component_group_name);
+    }
+
+    for (const OpenMS::MRMFeatureQC::ComponentGroupQCs& qc : featureBackgroundFilter.component_group_qcs) {
+      names6.insert(qc.component_group_name);
+    }
+
+    for (const OpenMS::MRMFeatureQC::ComponentGroupQCs& qc : featureBackgroundQC.component_group_qcs) {
+      names7.insert(qc.component_group_name);
+    }
+
+    std::vector<bool> check_passed(6);
 
     check_passed.at(0) = validateNamesInStructures(names1, names2, "TRAML", "FEATUREFILTER", false);
     check_passed.at(1) = validateNamesInStructures(names1, names3, "TRAML", "FEATUREQC", false);
+    check_passed.at(2) = validateNamesInStructures(names1, names2, "TRAML", "FEATURE_RSD_FILTER", false);
+    check_passed.at(3) = validateNamesInStructures(names1, names3, "TRAML", "FEATURE_RSD_QC", false);
+    check_passed.at(4) = validateNamesInStructures(names1, names2, "TRAML", "FEATURE_BACKGROUND_FILTER", false);
+    check_passed.at(5) = validateNamesInStructures(names1, names3, "TRAML", "FEATURE_BACKGROUND_QC", false);
 
     LOGD << "END componentNameGroupsAreConsistent";
 

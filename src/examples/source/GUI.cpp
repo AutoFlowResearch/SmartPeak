@@ -457,13 +457,13 @@ int main(int argc, char **argv)
           if (ImGui::MenuItem("Comp (Group) Filters")) {
             quickInfoText_.clear();
             if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getComponentsAndGroupsInfo(state_.sequenceHandler_.getSequence().front().getRawData(), true);
+              quickInfoText_ = InputDataValidation::getFeatureFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), true);
             }
           }
           if (ImGui::MenuItem("Comp (Group) QCs")) {
             quickInfoText_.clear();
             if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getComponentsAndGroupsInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
+              quickInfoText_ = InputDataValidation::getFeatureFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
             }
           }
           if (ImGui::MenuItem("Parameters")) {
