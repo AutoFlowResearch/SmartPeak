@@ -43,12 +43,8 @@ namespace SmartPeak
     LoadTransitions loadTransitions;
     loadTransitions.process(rawDataHandler, {}, filenames);
 
-    std::cout << "Before Loading Feature Filters!" << std::endl;
-
     LoadFeatureFilters loadFeatureFilters;
     loadFeatureFilters.process(rawDataHandler, {}, filenames);
-
-    std::cout << "Loaded Feature Filters!" << std::endl;
 
     LoadFeatureQCs loadFeatureQCs;
     loadFeatureQCs.process(rawDataHandler, {}, filenames);
@@ -123,8 +119,6 @@ namespace SmartPeak
         }
       }
     }
-    std::cout << "filenames.size() " << filenames.size() << std::endl;
-    std::cout << "sequence_segments.size() " << sequence_segments.size() << std::endl;
     if (filenames.size() != sequence_segments.size()) {
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
@@ -212,7 +206,6 @@ namespace SmartPeak
     size_t i_step { 1 };
     const size_t n_steps { methods.size() };
     const std::string inj_name { injection.getMetaData().getInjectionName() };
-    std::cout << "inj_name " << inj_name << std::endl;
     for (const std::shared_ptr<RawDataProcessor>& p : methods) {
       LOGI << "[" << (i_step++) << "/" << n_steps << "] method on injection: " << inj_name;
       p->process(

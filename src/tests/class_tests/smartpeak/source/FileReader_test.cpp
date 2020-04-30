@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(parseopenmsparams)
   const string func3 {"func3"};
 
   BOOST_CHECK_EQUAL(parameters[func3].size(), 1);
-
+  
   BOOST_CHECK_EQUAL(parameters[func3][0].count("name"), 1);
   BOOST_CHECK_EQUAL(parameters[func3][0].count("type"), 1);
   BOOST_CHECK_EQUAL(parameters[func3][0].count("value"), 1);
@@ -97,13 +97,6 @@ BOOST_AUTO_TEST_CASE(parseopenmsparams)
   BOOST_CHECK_EQUAL(parameters[func3][0]["type"], "bool");
   BOOST_CHECK_EQUAL(parameters[func3][0]["value"], "FALSE");
   BOOST_CHECK_EQUAL(parameters[func3][0]["description"], "");
-
-  OpenMS::FileHandler fh;
-  OpenMS::MSExperiment chromatograms;
-  string filename = "/Users/svegal/Documents/validation_experiments/RapidRIP_QMIP/mzML/170330_CalibrationCurves_CM3-170330_CM1_Level12.mzML";
-  std::cout << "Loading: " << filename << std::endl;
-  fh.loadExperiment(filename, chromatograms);
-  std::cout << "size: " << chromatograms.getChromatograms().size() << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

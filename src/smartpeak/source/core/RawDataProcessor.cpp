@@ -58,10 +58,7 @@ namespace SmartPeak
     // # load chromatograms
     OpenMS::MSExperiment chromatograms;
     if (filenames.mzML_i.size()) {
-      LOGI << "before";
-      std::cout << "params_I.at(mzML).size() " << params_I.at("mzML").size() << std::endl;
       if (params_I.at("mzML").size()) {
-        LOGI << "after";
         // # convert parameters
         std::map<std::string, CastValue> mzML_params;
         for (const std::map<std::string, std::string>& param : params_I.at("mzML")) {
@@ -256,26 +253,20 @@ namespace SmartPeak
       LOGD << "END LoadFeatures";
       return;
     }
-    LOGI << "HERE1";
 
     if (!InputDataValidation::fileExists(filenames.featureXML_i)) {
       LOGE << "File not found";
       LOGD << "END LoadFeatures";
       return;
     }
-    LOGI << "HERE2";
 
     try {
-      LOGI << "HERE3";
       OpenMS::FeatureXMLFile featurexml;
-      LOGI << "HERE4";
       LOGI << filenames.featureXML_i;
       LOGI << "rawDataHandler_IO.getFeatureMap().size() " << rawDataHandler_IO.getFeatureMap().size();
       featurexml.load(filenames.featureXML_i, rawDataHandler_IO.getFeatureMap());
       LOGI << "rawDataHandler_IO.getFeatureMap().size() " << rawDataHandler_IO.getFeatureMap().size();
-      LOGI << "HERE5";
       rawDataHandler_IO.updateFeatureMapHistory();
-      LOGI << "HERE6";
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -334,26 +325,6 @@ namespace SmartPeak
 
     OpenMS::FeatureMap featureMap;
 
-    // OpenMS::MSExperiment exp1 = rawDataHandler_IO.getChromatogramMap();
-    // boost::shared_ptr<OpenMS::PeakMap > sh_chromatograms = boost::make_shared<OpenMS::PeakMap >(exp1);
-    // OpenSwath::SpectrumAccessPtr chromatogram_ptr = OpenMS::SimpleOpenMSSpectraFactory::getSpectrumAccessOpenMSPtr(sh_chromatograms);
-
-    // OpenMS::Size nr_chromatograms = chromatogram_ptr->getNrChromatograms();
-    // for (OpenMS::Size i = 0; i < chromatogram_ptr->getNrChromatograms(); i++)
-    // {
-    //   std::cout << chromatogram_ptr->getChromatogramNativeID(i) << std::endl;
-    // }
-
-    // OpenMS::TargetedExperiment transition_exp = rawDataHandler_IO.getTargetedExperiment();
-
-    // for (OpenMS::Size i = 0; i < transition_exp.getTransitions().size(); i++)
-    // {
-    //   // get the current transition and try to find the corresponding chromatogram
-    //   std::cout << "Transition " << transition_exp.getTransitions()[i].getNativeID() << std::endl;
-    //   // if (chromatogram_map.find(transition->getNativeID()) == chromatogram_map.end())
-    //   // {}
-    // }
-
     try {
       featureFinder.pickExperiment(
         rawDataHandler_IO.getChromatogramMap(),
@@ -367,28 +338,6 @@ namespace SmartPeak
 
       LOGE << e.what();
       throw e;
-      // std::cout << "Filenames dir" << filenames.dir << std::endl;
-      // Filenames filenames2 = Filenames::getDefaultStaticFilenames(filenames.dir);
-      // std::string dir_backup = "/Users/svegal/Documents/validation_experiments/mzML_calibrators_QMIP/traML_backup.csv";
-      // std::string dir_traml = "/Users/svegal/Documents/validation_experiments/mzML_calibrators_QMIP/traML.csv";
-      // std::size_t is_backup = filenames2.traML_csv_i == dir_backup;
-      // if (is_backup) {
-      //   filenames2.setTraML(dir_traml);
-      // } else {
-      //   filenames2.setTraML(dir_backup);
-      // }
-      // LoadTransitions loadTransitions;
-      // loadTransitions.process(rawDataHandler_IO, params_I, filenames2);
-      // MapChromatograms mapChromatograms;
-      // mapChromatograms.process(rawDataHandler_IO, params_I, filenames2);
-
-      // featureFinder.pickExperiment(
-      //   rawDataHandler_IO.getChromatogramMap(),
-      //   featureMap,
-      //   rawDataHandler_IO.getTargetedExperiment(),
-      //   rawDataHandler_IO.getTransformationDescription(),
-      //   rawDataHandler_IO.getSWATH()
-      // );
     }
 
     // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
@@ -425,10 +374,6 @@ namespace SmartPeak
     featureFilter.setParameters(parameters);
 
     OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
-
-    std::cout << "Feature map size " << featureMap.size() << std::endl;
-    // std::cout << "Feature Filter size " << rawDataHandler_IO.getFeatureFilter() << std::endl;
-    std::cout << "Targeted experiment size " << rawDataHandler_IO.getTargetedExperiment().getTransitions().size() << std::endl;
 
     featureFilter.FilterFeatureMap(
       featureMap,
@@ -696,11 +641,9 @@ namespace SmartPeak
       if (filenames.featureFilterComponents_csv_i.size()) { // because we don't know if either of the two names is empty
         featureQCFile.load(filenames.featureFilterComponents_csv_i, rawDataHandler_IO.getFeatureFilter(), false);
       }
-      std::cout << "After filter components" << std::endl;
       if (filenames.featureFilterComponentGroups_csv_i.size()) {
         featureQCFile.load(filenames.featureFilterComponentGroups_csv_i, rawDataHandler_IO.getFeatureFilter(), true);
       }
-      std::cout << "After filter groups" << std::endl;
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -1185,6 +1128,9 @@ namespace SmartPeak
       // QuantifyFeatures quantifyFeatures;
       // quantifyFeatures.process(rawDataHandler_IO, params_I, filenames);
 
+      EMGProcessor emgProcessor;
+      emgProcessor.process(rawDataHandler_IO, params_I, filenames);
+
        ValidateFeatures validateFeatures;
       validateFeatures.process(rawDataHandler_IO, params_I, filenames);
 
@@ -1289,11 +1235,16 @@ namespace SmartPeak
           // integrate area and estimate background, update the subfeature
 
           std::cout << "emg peak # points: " << out_xs.size() << "\n";
+          OpenMS::ConvexHull2D::PointArrayType hull_points(out_xs.size());
           OpenMS::MSChromatogram emg_chrom;
           for (size_t i = 0; i < out_xs.size(); ++i) {
             emg_chrom.push_back(OpenMS::ChromatogramPeak(out_xs[i], out_ys[i]));
-            // std::cout << out_xs[i] << "\t" << out_ys[i] << "\n";
+            hull_points[i][0] = out_xs[i];
+            hull_points[i][1] = out_ys[i];
           }
+          OpenMS::ConvexHull2D hull;
+          hull.addPoints(hull_points);
+          subfeature.getConvexHulls().push_back(hull);
 
           OpenMS::PeakIntegrator pi;
           std::cout << "Updating ranges...\n";
@@ -1324,6 +1275,7 @@ namespace SmartPeak
           subfeature.setMetaValue("noise_background_level", pb.height);
         }
       }
+      rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
       std::cout << "I catched the exception (in SmartPeak)!\n";
@@ -1349,7 +1301,6 @@ namespace SmartPeak
     for (; it != end; ++it) {
       x.push_back(it->getPos());
       y.push_back(it->getIntensity());
-      // std::cout << x.back() << "\t" << y.back() << "\n";
     }
   }
 

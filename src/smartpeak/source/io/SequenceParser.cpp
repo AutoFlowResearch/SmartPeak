@@ -360,8 +360,6 @@ namespace SmartPeak
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
       std::map<std::string, float> validation_metrics = sampleHandler.getRawData().getValidationMetrics();
       const SampleType st = mdh.getSampleType();
-      // std::cout << "Sample name " << mdh.getSampleName() << std::endl;
-      // std::cout << "Sample type " << mdh.getSampleType() << std::endl;
       if (sample_types.count(st) == 0) {
         continue;
       }
@@ -373,13 +371,10 @@ namespace SmartPeak
         // feature_map_history is not needed here as we are only interested in the current/"used" features
         for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
           const std::string component_group_name = feature.getMetaValue(s_PeptideRef).toString();
-          // if (meta_value_name == "validation") std::cout << "component_group_name " << component_group_name << std::endl;
           for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
-            // if (meta_value_name == "validation") std::cout << "subordinate.getMetaValue(s_native_id).toString() " << subordinate.getMetaValue(s_native_id).toString() << std::endl;
             if (subordinate.metaValueExists("used_")) {
               const std::string used = subordinate.getMetaValue("used_").toString();
                 if (used.empty() || used[0] == 'f' || used[0] == 'F')
-                  // if (meta_value_name == "validation") std::cout << "continue" << std::endl;
                   continue;
             }
             const Row row_tuple_name(

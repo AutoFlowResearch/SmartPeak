@@ -267,7 +267,7 @@ namespace SmartPeak
 
   struct MetaLoadQMIP : RawDataProcessor
   {
-    int getID() const { return 17; };
+    int getID() const { return 18; };
     std::string getName() const { return "METALOAD_QMIP"; };
     std::string getDescription() const { return "METALOAD_QMIP"; };
 
@@ -280,7 +280,7 @@ namespace SmartPeak
 
   struct MetaLoadLP : RawDataProcessor
   {
-    int getID() const { return 18; };
+    int getID() const { return 19; };
     std::string getName() const { return "METALOAD_LP"; };
     std::string getDescription() const { return "METALOAD_LP"; };
 
