@@ -1027,80 +1027,20 @@ namespace SmartPeak
     LOGD << "END MapChromatograms";
   }
 
-  void MetaLoadLP::process(
+  void LoadFeaturesIfExists::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
   ) const {
+    LOGD << "START LoadFeaturesIfExists";
     if (InputDataValidation::fileExists(filenames.featureXML_i)) {
-      LOGD <<  "MetaLoad(): found feature file for LP\n";
-
-       LoadFeatures loadFeatures;
-      loadFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-      // QuantifyFeatures quantifyFeatures;
-      // quantifyFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-       ValidateFeatures validateFeatures;
-      validateFeatures.process(rawDataHandler_IO, params_I, filenames);
-    } else {
-      LOGD << "MetaLoad(): feature file not found for LP\n";
-      LoadRawData loadRawData;
-      loadRawData.process(rawDataHandler_IO, params_I, filenames);
-
-      MapChromatograms mapChromatograms;
-      mapChromatograms.process(rawDataHandler_IO, params_I, filenames);
-
-      ExtractChromatogramWindows extractChromatogramWindows;
-      extractChromatogramWindows.process(rawDataHandler_IO, params_I, filenames);
-
-      try {
-       PickFeatures pickFeatures;
-       pickFeatures.process(rawDataHandler_IO, params_I, filenames);
-      }
-      catch (const std::exception& e) {
-        LOGE << e.what();
-        return;
-      }
-
-       FilterFeatures filterFeatures;
-      filterFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-       FilterFeatures filterFeatures2;
-      filterFeatures2.process(rawDataHandler_IO, params_I, filenames);
-
-       SelectFeatures selectFeatures;
-      selectFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-      // QuantifyFeatures quantifyFeatures;
-      // quantifyFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-       ValidateFeatures validateFeatures;
-      validateFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-       StoreFeatures storeFeatures;
-      storeFeatures.process(rawDataHandler_IO, params_I, filenames);
-    }
-  }
-
-  void MetaLoadQMIP::process(
-    RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-    const Filenames& filenames
-  ) const {
-    if (InputDataValidation::fileExists(filenames.featureXML_i)) {
-      LOGD <<  "MetaLoad(): found feature file for QMIP\n";
+      LOGD <<  "LoadFeaturesIfExists: found feature file for QMIP\n";
 
       LoadFeatures loadFeatures;
       loadFeatures.process(rawDataHandler_IO, params_I, filenames);
 
-      // QuantifyFeatures quantifyFeatures;
-      // quantifyFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-      ValidateFeatures validateFeatures;
-      validateFeatures.process(rawDataHandler_IO, params_I, filenames);
     } else {
-      LOGD << "MetaLoad(): feature file not found for QMIP\n";
+      LOGD << "LoadFeaturesIfExists: feature file not found for QMIP\n";
       LoadRawData loadRawData;
       loadRawData.process(rawDataHandler_IO, params_I, filenames);
 
@@ -1124,19 +1064,8 @@ namespace SmartPeak
 
        SelectFeatures selectFeatures;
       selectFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-      // QuantifyFeatures quantifyFeatures;
-      // quantifyFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-      EMGProcessor emgProcessor;
-      emgProcessor.process(rawDataHandler_IO, params_I, filenames);
-
-       ValidateFeatures validateFeatures;
-      validateFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-       StoreFeatures storeFeatures;
-      storeFeatures.process(rawDataHandler_IO, params_I, filenames);
     }
+    LOGD << "END LoadFeaturesIfExists";
   }
 
   void ExtractChromatogramWindows::process(

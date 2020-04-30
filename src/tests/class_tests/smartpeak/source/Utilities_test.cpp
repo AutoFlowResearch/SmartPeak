@@ -471,8 +471,13 @@ BOOST_AUTO_TEST_CASE(directorySize)
 {
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto& f = Utilities::directorySize;
+<<<<<<< HEAD
   BOOST_CHECK_EQUAL(f(path), 39);
   BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 20);
+=======
+  BOOST_CHECK_EQUAL(f(path), 36);
+  BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 12);
+>>>>>>> fix: tests, AppStateProcessor
   BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
 }
 
