@@ -216,6 +216,5 @@ namespace SmartPeak
     }
     std::string acquisition_datetime(time_repr);
     return acquisition_datetime;
-    // return "1900-01-01_000000"; // for old runs
   }
 }

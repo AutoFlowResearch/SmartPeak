@@ -98,11 +98,8 @@ namespace SmartPeak
         OpenMS::FileHandler fh;
         LOGI << "Loading: " << filenames.mzML_i;
         fh.loadExperiment(filenames.mzML_i, chromatograms);
-        LOGI << "LOADED FINE " << filenames.mzML_i;
       }
     }
-
-    LOGI << " AFTER LOADED FINE ";
 
     OpenMS::TargetedExperiment& targeted_exp = rawDataHandler_IO.getTargetedExperiment();
     if (params_I.at("ChromatogramExtractor").size()) {
@@ -246,7 +243,6 @@ namespace SmartPeak
   {
     LOGD << "START LoadFeatures";
     LOGI << "Loading: " << filenames.featureXML_i;
-    LOGI << filenames.featureXML_i.size();
 
     if (filenames.featureXML_i.empty()) {
       LOGE << "Filename is empty";
@@ -262,16 +258,12 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureXMLFile featurexml;
-      LOGI << filenames.featureXML_i;
-      LOGI << "rawDataHandler_IO.getFeatureMap().size() " << rawDataHandler_IO.getFeatureMap().size();
       featurexml.load(filenames.featureXML_i, rawDataHandler_IO.getFeatureMap());
-      LOGI << "rawDataHandler_IO.getFeatureMap().size() " << rawDataHandler_IO.getFeatureMap().size();
       rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
       LOGE << e.what();
       rawDataHandler_IO.getFeatureMap().clear();
-      LOGE << "feature map clear";
     }
 
     LOGD << "END LoadFeatures";

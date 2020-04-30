@@ -1,5 +1,5 @@
 // TODO: Add copyright
-
+#include <stdio.h>
 #include <SmartPeak/test_config.h>
 
 #define BOOST_TEST_MODULE RawDataProcessor test suite
@@ -1978,7 +1978,7 @@ BOOST_AUTO_TEST_CASE(emg_processor)
   BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("area_background_level")), static_cast<double>(sub3.getMetaValue("area_background_level")), 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("noise_background_level")), static_cast<double>(sub3.getMetaValue("noise_background_level")), 1e-6);
 
-
+  std::remove(SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.featureXML"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
