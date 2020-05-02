@@ -39,7 +39,7 @@ before_build:
   - ps: fsutil behavior set disablelastaccess 0 # Enable Access time feature on Windows (for clcache)
   - clcache -M 2147483648 & clcache -s
   - if not exist "C:\projects\deps" call "C:\projects\SmartPeak2\ci\prepare_deps.bat"
-  - if not exist "C:\projects\OpenMS" git clone --depth=1 --branch develop https://github.com/biosustain/OpenMS.git C:\projects\OpenMS
+  - if not exist "C:\projects\OpenMS" git clone --depth=1 --branch develop https://github.com/OpenMS/OpenMS.git C:\projects\OpenMS
   - if not exist "C:\projects\OpenMS-build" call "C:\projects\SmartPeak2\ci\build_openms.bat"
   - if not exist "C:\projects\SmartPeak2\build" call "C:\projects\SmartPeak2\ci\cmake_smartpeak.bat"
 
