@@ -1,5 +1,4 @@
 // TODO: Add copyright
-#include <stdio.h>
 #include <SmartPeak/test_config.h>
 
 #define BOOST_TEST_MODULE RawDataProcessor test suite

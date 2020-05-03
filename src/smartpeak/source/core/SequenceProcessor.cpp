@@ -155,8 +155,7 @@ namespace SmartPeak
   void SequenceProcessorMultithread::spawn_workers()
   {
     const unsigned int n_threads = std::thread::hardware_concurrency(); // might return 0
-    // const size_t n_workers = n_threads ? n_threads : 1;
-    const size_t n_workers = 1;
+    const size_t n_workers = n_threads ? n_threads : 1;
     LOGD << "Number of workers: " << n_workers;
     std::list<std::future<void>> futures;
     LOGD << "Spawning workers...";

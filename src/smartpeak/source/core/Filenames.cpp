@@ -11,7 +11,6 @@ namespace SmartPeak
   )
   {
     Filenames static_filenames;
-    static_filenames.dir = dir;
     static_filenames.sequence_csv_i = dir + "/sequence.csv";
     static_filenames.parameters_csv_i = dir + "/parameters.csv";
     static_filenames.traML_csv_i = dir + "/traML.csv";
@@ -33,13 +32,6 @@ namespace SmartPeak
     static_filenames.pivotTable_csv_o = dir + "/PivotTable.csv";
     static_filenames.featureDB_csv_o = dir + "/FeatureDB.csv";
     return static_filenames;
-  }
-
-  void Filenames::setTraML(
-    const std::string& name
-  )
-  {
-    traML_csv_i = dir + name;
   }
 
   Filenames Filenames::getDefaultDynamicFilenames(
@@ -126,7 +118,6 @@ namespace SmartPeak
 
   void Filenames::clear()
   {
-    dir.clear();
     sequence_csv_i.clear();
     parameters_csv_i.clear();
     traML_csv_i.clear();

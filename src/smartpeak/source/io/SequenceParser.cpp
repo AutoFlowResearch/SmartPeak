@@ -190,9 +190,8 @@ namespace SmartPeak
       }
 
       std::tm& adt = t.acquisition_date_and_time;
-      strptime(t_date.c_str(), "%m-%d-%Y %H:%M", &adt);
-      // std::istringstream iss(t_date);
-      // iss >> adt.tm_mon >> adt.tm_mday >> adt.tm_year >> adt.tm_hour >> adt.tm_min;
+      std::istringstream iss(t_date);
+      iss >> adt.tm_mon >> adt.tm_mday >> adt.tm_year >> adt.tm_hour >> adt.tm_min;
 
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
     }
@@ -366,8 +365,6 @@ namespace SmartPeak
       const std::string& sample_name = mdh.getSampleName();
       data_dict.insert({sample_name, std::map<Row,float,Row_less>()});
       for (const std::string& meta_value_name : meta_data) {
-        
-
         // feature_map_history is not needed here as we are only interested in the current/"used" features
         for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
           const std::string component_group_name = feature.getMetaValue(s_PeptideRef).toString();

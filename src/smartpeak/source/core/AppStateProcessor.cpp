@@ -270,6 +270,7 @@ namespace SmartPeak
 
   bool CreateCommand::operator()(const std::string& names, AppState::Command& cmd)
   {
+<<<<<<< HEAD
     // Enumerate the valid command keys
     std::vector<std::string> valid_commands_raw_data_processor;
     for (const auto& it: n_to_raw_data_method_) { valid_commands_raw_data_processor.push_back(it.first); }
@@ -279,6 +280,14 @@ namespace SmartPeak
     // Run the command depending on whether it is a raw data processor method or sequence segment processor method
     if (std::count(valid_commands_raw_data_processor.begin(), valid_commands_raw_data_processor.end(), names)) {
       cmd.setMethod(n_to_raw_data_method_.at(names));
+=======
+    if (n < 1 || n > 17 || n == 10) { // TODO: update this if plotting is implemented
+      LOGW << "\n\nSkipping: " << n;
+      return false;
+    }
+    if ((n >= 1 && n <= 14) || n == 17) {
+      cmd.setMethod(n_to_raw_data_method_.at(n));
+>>>>>>> fix: remove unnecessary patches
       for (const InjectionHandler& injection : state_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
         cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(

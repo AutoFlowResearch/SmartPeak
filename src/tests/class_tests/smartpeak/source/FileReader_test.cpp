@@ -5,11 +5,6 @@
 #define BOOST_TEST_MODULE FileReader test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/FileReader.h>
-#include <OpenMS/FORMAT/FileHandler.h>
-#include <OpenMS/FORMAT/MzMLFile.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/ChromatogramExtractor.h>
-#include <OpenMS/ANALYSIS/TARGETED/MRMMapping.h>
-#include <OpenMS/KERNEL/SpectrumHelper.h>
 
 using namespace SmartPeak;
 using namespace std;

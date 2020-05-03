@@ -19,11 +19,6 @@
 #include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
 #include <SmartPeak/io/InputDataValidation.h> // check filenames and headers
 
-#include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/DataAccessHelper.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/SimpleOpenMSSpectraAccessFactory.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/MRMFeatureAccessOpenMS.h>
-
-
 // load validation data and parameters
 #include <SmartPeak/io/FileReader.h>
 #ifndef CSV_IO_NO_THREAD
@@ -327,9 +322,7 @@ namespace SmartPeak
       );
     }
     catch (const std::exception& e) {
-
       LOGE << e.what();
-      throw e;
     }
 
     // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
@@ -530,7 +523,6 @@ namespace SmartPeak
     LOGI << "Processing # quantitation methods: " << rawDataHandler_IO.getQuantitationMethods().size();
 
     try {
-      LOGI << "rawDataHandler_IO.getFeatureMap().size() " << rawDataHandler_IO.getFeatureMap().size();
       OpenMS::AbsoluteQuantitation aq;
       aq.setQuantMethods(rawDataHandler_IO.getQuantitationMethods());
       aq.quantifyComponents(rawDataHandler_IO.getFeatureMap());
@@ -1017,47 +1009,6 @@ namespace SmartPeak
     );
 
     LOGD << "END MapChromatograms";
-  }
-
-  void LoadFeaturesIfExists::process(
-    RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-    const Filenames& filenames
-  ) const {
-    LOGD << "START LoadFeaturesIfExists";
-    if (InputDataValidation::fileExists(filenames.featureXML_i)) {
-      LOGD <<  "LoadFeaturesIfExists: found feature file for QMIP\n";
-
-      LoadFeatures loadFeatures;
-      loadFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-    } else {
-      LOGD << "LoadFeaturesIfExists: feature file not found for QMIP\n";
-      LoadRawData loadRawData;
-      loadRawData.process(rawDataHandler_IO, params_I, filenames);
-
-      MapChromatograms mapChromatograms;
-      mapChromatograms.process(rawDataHandler_IO, params_I, filenames);
-
-      try {
-       PickFeatures pickFeatures;
-       pickFeatures.process(rawDataHandler_IO, params_I, filenames);
-      }
-      catch (const std::exception& e) {
-        LOGE << e.what();
-        return;
-      }
-      
-       FilterFeatures filterFeatures;
-      filterFeatures.process(rawDataHandler_IO, params_I, filenames);
-
-       FilterFeatures filterFeatures2;
-      filterFeatures2.process(rawDataHandler_IO, params_I, filenames);
-
-       SelectFeatures selectFeatures;
-      selectFeatures.process(rawDataHandler_IO, params_I, filenames);
-    }
-    LOGD << "END LoadFeaturesIfExists";
   }
 
   void ExtractChromatogramWindows::process(

@@ -265,21 +265,6 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeaturesIfExists : RawDataProcessor
-  {
-    int getID() const { return 18; };
-    std::string getName() const { return "LOAD_FEATURE_IF_EXISTS"; };
-    std::string getDescription() const { 
-      return "Load the feature file if exists, otherwise perform LOAD_RAW_DATA, MAP_CHROMATOGRAMS, PICK_FEATURES, FILTER_FEATURES, FILTER_FEATURES, SELECT_FEATURES"; 
-    };
-
-    void process(
-      RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames
-    ) const override;
-  };
-
   struct LoadTransitions : RawDataProcessor
   {
     int getID() const override { return -1; }
