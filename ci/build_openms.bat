@@ -1,4 +1,5 @@
 REM Used in AppVeyor
+cd C:\projects\OpenMS
 git submodule update --init THIRDPARTY
 mkdir C:\projects\OpenMS-build
 cd C:\projects\OpenMS-build

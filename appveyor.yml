@@ -24,8 +24,8 @@ configuration: Debug
 
 cache:
   - C:\projects\deps
-  #- C:\projects\OpenMS
-  #- C:\projects\OpenMS-build
+  - C:\projects\OpenMS
+  - C:\projects\OpenMS-build
   - C:\projects\clcache
 
 # artifacts can only be found in the repo dir (i.e. C:\projects\SmartPeak2) or subdirs
@@ -45,7 +45,10 @@ before_build:
 
 build_script:
   - cd C:\projects\SmartPeak2\build
-  - msbuild SmartPeak_host.sln /verbosity:normal /maxcpucount /p:TrackFileAccess=false /p:CLToolExe=clcache.exe /p:CLToolPath=C:\projects\clcache\install\bin
+  - #msbuild SmartPeak_host.sln /verbosity:normal /maxcpucount /p:TrackFileAccess=false /p:CLToolExe=clcache.exe /p:CLToolPath=C:\projects\clcache\install\bin
+  - msbuild src\smartpeak\SmartPeak.sln /verbosity:normal /maxcpucount /p:TrackFileAccess=false /p:CLToolExe=clcache.exe /p:CLToolPath=C:\projects\clcache\install\bin
+  - msbuild src\tests\class_tests\SmartPeak_class_tests.sln /verbosity:normal /maxcpucount /p:TrackFileAccess=false /p:CLToolExe=clcache.exe /p:CLToolPath=C:\projects\clcache\install\bin
+  - msbuild src\examples\SmartPeak_class_examples_smartpeak.sln /verbosity:normal /maxcpucount /p:TrackFileAccess=false /p:CLToolExe=clcache.exe /p:CLToolPath=C:\projects\clcache\install\bin
 
 after_build:
   - ps: fsutil behavior set disablelastaccess 1 # Disable Access time feature on Windows (better performance)
