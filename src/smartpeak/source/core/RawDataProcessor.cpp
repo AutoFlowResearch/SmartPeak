@@ -259,6 +259,7 @@ namespace SmartPeak
     catch (const std::exception& e) {
       LOGE << e.what();
       rawDataHandler_IO.getFeatureMap().clear();
+      LOGE << "feature map clear";
     }
 
     LOGD << "END LoadFeatures";
