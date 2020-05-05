@@ -8,6 +8,8 @@ jobs:
 
     working_directory: ~/SmartPeak2
 
+    resource_class: large
+
     steps:
       - checkout
       - run: |
