@@ -142,7 +142,7 @@ std::vector<AppState::Command> getMethodsInput()
     return {};
   }
 
-  BuildCommandsFromIds buildCommandsFromIds(state);
+  BuildCommandsFromNames buildCommandsFromIds(state);
   methods = buildCommandsFromIds(line);
 
   return methods;
@@ -492,7 +492,7 @@ menuImportFile_label:
   else if ("6" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureFilterComponents_csv_i = pathname;
-    LoadFeatureFilters loadFeatureFilters;
+    LoadFeatureFiltersRDP loadFeatureFilters;
     const std::string backup = state.static_filenames_.featureFilterComponentGroups_csv_i;
     state.static_filenames_.featureFilterComponentGroups_csv_i.clear();
     loadFeatureFilters.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
@@ -501,7 +501,7 @@ menuImportFile_label:
   else if ("7" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureFilterComponentGroups_csv_i = pathname;
-    LoadFeatureFilters loadFeatureFilters;
+    LoadFeatureFiltersRDP loadFeatureFilters;
     const std::string backup = state.static_filenames_.featureFilterComponents_csv_i;
     state.static_filenames_.featureFilterComponents_csv_i.clear();
     loadFeatureFilters.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
@@ -510,7 +510,7 @@ menuImportFile_label:
   else if ("8" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureQCComponents_csv_i = pathname;
-    LoadFeatureQCs loadFeatureQCs;
+    LoadFeatureQCsRDP loadFeatureQCs;
     const std::string backup = state.static_filenames_.featureQCComponentGroups_csv_i;
     state.static_filenames_.featureQCComponentGroups_csv_i.clear();
     loadFeatureQCs.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
@@ -519,7 +519,7 @@ menuImportFile_label:
   else if ("9" == in) {
     const std::string pathname = getPathnameFromInput();
     state.static_filenames_.featureQCComponentGroups_csv_i = pathname;
-    LoadFeatureQCs loadFeatureQCs;
+    LoadFeatureQCsRDP loadFeatureQCs;
     const std::string backup = state.static_filenames_.featureQCComponents_csv_i;
     state.static_filenames_.featureQCComponents_csv_i.clear();
     loadFeatureQCs.process(state.sequenceHandler_.getSequence()[0].getRawData(), {}, state.static_filenames_);
@@ -773,11 +773,11 @@ menuQuickInfo_label:
       state.sequenceHandler_.getSequenceSegments().front()) << "\n";
   }
   else if ("5" == in) {
-    LOGN << "\n\n" << InputDataValidation::getComponentsAndGroupsInfo(
+    LOGN << "\n\n" << InputDataValidation::getFeatureFiltersInfo(
       state.sequenceHandler_.getSequence().front().getRawData(), true) << "\n";
   }
   else if ("6" == in) {
-    LOGN << "\n\n" << InputDataValidation::getComponentsAndGroupsInfo(
+    LOGN << "\n\n" << InputDataValidation::getFeatureFiltersInfo(
       state.sequenceHandler_.getSequence().front().getRawData(), false) << "\n";
   }
   else if ("7" == in) {

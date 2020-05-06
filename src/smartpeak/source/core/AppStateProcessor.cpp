@@ -268,14 +268,17 @@ namespace SmartPeak
   }
   }
 
-  bool CreateCommand::operator()(const int n, AppState::Command& cmd)
+  bool CreateCommand::operator()(const std::string& names, AppState::Command& cmd)
   {
-    if (n < 1 || n > 17 || n == 10) { // TODO: update this if plotting is implemented
-      LOGW << "\n\nSkipping: " << n;
-      return false;
-    }
-    if (n >= 1 && n <= 14) {
-      cmd.setMethod(n_to_raw_data_method_.at(n));
+    // Enumerate the valid command keys
+    std::vector<std::string> valid_commands_raw_data_processor;
+    for (const auto& it: n_to_raw_data_method_) { valid_commands_raw_data_processor.push_back(it.first); }
+    std::vector<std::string> valid_commands_sequence_segment_processor;
+    for (const auto& it: n_to_seq_seg_method_) { valid_commands_sequence_segment_processor.push_back(it.first); }
+
+    // Run the command depending on whether it is a raw data processor method or sequence segment processor method
+    if (std::count(valid_commands_raw_data_processor.begin(), valid_commands_raw_data_processor.end(), names)) {
+      cmd.setMethod(n_to_raw_data_method_.at(names));
       for (const InjectionHandler& injection : state_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
         cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
@@ -286,8 +289,8 @@ namespace SmartPeak
           key
         );
       }
-    } else if (n >= 15 && n <= 17) {
-      cmd.setMethod(n_to_seq_seg_method_.at(n));
+    } else if (std::count(valid_commands_sequence_segment_processor.begin(), valid_commands_sequence_segment_processor.end(), names)) {
+      cmd.setMethod(n_to_seq_seg_method_.at(names));
       for (const SequenceSegmentHandler& sequence_segment : state_.sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();
         cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
@@ -299,7 +302,7 @@ namespace SmartPeak
         );
       }
     } else {
-      LOGE << "\nNo command for selection number " << n;
+      LOGE << "\nNo command for selection name " << names;
       return false;
     }
     return true;
@@ -326,13 +329,13 @@ namespace SmartPeak
     }
   }
 
-  std::vector<AppState::Command> BuildCommandsFromIds::operator()(const std::string& ids)
+  std::vector<AppState::Command> BuildCommandsFromNames::operator()(const std::string& names)
   {
     std::vector<AppState::Command> commands;
 
-    std::istringstream iss {ids};
+    std::istringstream iss {names};
 
-    for (int n; iss >> n;) {
+    for (std::string n; iss >> n;) {
       AppState::Command cmd;
       CreateCommand createCommand(state_);
       const bool created = createCommand(n, cmd);

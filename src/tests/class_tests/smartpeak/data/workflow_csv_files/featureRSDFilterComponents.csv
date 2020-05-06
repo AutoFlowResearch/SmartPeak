@@ -1,0 +1,11 @@
+component_name,metaValue_peak_apex_int_l,metaValue_peak_apex_int_u,metaValue_logSN_l,metaValue_logSN_u
+arg-L.arg-L_1.Heavy,100,1.00E+12,0.5,1.00E+12
+arg-L.arg-L_1.Light,100,1.00E+12,0.5,1.00E+12
+orn.orn_1.Heavy,100,1.00E+12,0.5,1.00E+12
+orn.orn_1.Light,100,1.00E+12,0.5,1.00E+12
+asn-L.asn-L_1.Heavy,100,1.00E+12,0.5,1.00E+12
+asn-L.asn-L_1.Light,100,1.00E+12,0.5,1.00E+12
+asn-L.asn-L_2.Light,100,1.00E+12,0.5,1.00E+12
+ser-L.ser-L_1.Heavy,100,1.00E+12,0.5,1.00E+12
+ser-L.ser-L_1.Light,100,1.00E+12,0.5,1.00E+12
+ser-L.ser-L_2.Light,100,1.00E+12,0.5,1.00E+12

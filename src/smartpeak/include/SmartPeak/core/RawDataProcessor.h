@@ -20,12 +20,8 @@ namespace SmartPeak
 {
   struct RawDataProcessor
   {
-    // C.67: A polymorphic class should suppress copying
     RawDataProcessor(const RawDataProcessor& other) = delete;
     RawDataProcessor& operator=(const RawDataProcessor& other) = delete;
-
-    // C.35: A base class destructor should be either public and virtual, or protected and nonvirtual
-    // C.127: A class with a virtual function should have a virtual or protected destructor
     virtual ~RawDataProcessor() = default;
 
     virtual int getID() const = 0; /// get the raw data processor struct ID
@@ -284,7 +280,7 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureFilters : RawDataProcessor
+  struct LoadFeatureFiltersRDP : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
@@ -299,13 +295,43 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureQCs : RawDataProcessor
+  struct LoadFeatureQCsRDP : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_QCS"; }
     std::string getDescription() const override { return "Load the component and component group transition QC specifications from file."; }
 
     /** Load the component and component group transition QCs from file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureFiltersRDP : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
+    std::string getDescription() const override { return "Store the component and component group transition filters from file."; }
+
+    /** Store the component and component group transition filters from file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureQCsRDP : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_QCS"; }
+    std::string getDescription() const override { return "Store the component and component group transition QC specifications from file."; }
+
+    /** Store the component and component group transition QCs from file.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
@@ -347,10 +373,10 @@ namespace SmartPeak
     );
   };
 
-  struct EMGProcessor : RawDataProcessor
+  struct FitFeaturesEMG : RawDataProcessor
   {
     int getID() const override { return 14; }
-    std::string getName() const override { return "EMG_PROCESSOR"; }
+    std::string getName() const override { return "FIT_FEATURES_EMG"; }
     std::string getDescription() const override { return "Reconstruct a peak from available data points."; }
 
     /** Apply the EMG peak reconstruction technique to the data points.
@@ -369,5 +395,65 @@ namespace SmartPeak
       std::vector<double>& x,
       std::vector<double>& y
     ) const;
+  };
+
+  struct FilterFeaturesRSDs : RawDataProcessor
+  {
+    int getID() const override { return 4; }
+    std::string getName() const override { return "FILTER_FEATURES_RSDS"; }
+    std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
+
+    /** Filter features that do not pass the filter QCs.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct CheckFeaturesRSDs : RawDataProcessor
+  {
+    int getID() const override { return 8; }
+    std::string getName() const override { return "CHECK_FEATURES_RSDS"; }
+    std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
+
+    /** Flag features that do not pass the filter QCs.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct FilterFeaturesBackgroundInterferences : RawDataProcessor
+  {
+    int getID() const override { return 4; }
+    std::string getName() const override { return "FILTER_FEATURES_BACKGROUND_INTERFERENCES"; }
+    std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
+
+    /** Filter features that do not pass the filter QCs.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct CheckFeaturesBackgroundInterferences : RawDataProcessor
+  {
+    int getID() const override { return 8; }
+    std::string getName() const override { return "CHECK_FEATURES_BACKGROUND_INTERFERENCES"; }
+    std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
+
+    /** Flag features that do not pass the filter QCs.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
   };
 }

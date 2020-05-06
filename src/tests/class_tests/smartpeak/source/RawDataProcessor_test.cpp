@@ -125,8 +125,8 @@ BOOST_AUTO_TEST_CASE(extractMetaData)
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
-  BOOST_CHECK_EQUAL(params_1.size(), 14);
-  BOOST_CHECK_EQUAL(params_2.size(), 15);
+  BOOST_CHECK_EQUAL(params_1.size(), 18);
+  BOOST_CHECK_EQUAL(params_2.size(), 19);
   RawDataHandler rawDataHandler;
 
   // Pre-requisites: load the transitions and raw data
@@ -402,7 +402,7 @@ BOOST_AUTO_TEST_CASE(processorExtractChromatogramWindows)
   // Test window extraction
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_extractChromWindowTest_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  LoadFeatureFilters loadFeatureFilters;
+  LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, {}, filenames);
 
   ExtractChromatogramWindows extractChromWin;
@@ -570,25 +570,25 @@ BOOST_AUTO_TEST_CASE(processLoadTransitions)
 }
 
 /**
-  LoadFeatureFilters Tests
+  LoadFeatureFiltersRDP Tests
 */
 BOOST_AUTO_TEST_CASE(constructorLoadFeatureFilters)
 {
-  LoadFeatureFilters* ptrLoadFeatureFilters = nullptr;
-  LoadFeatureFilters* nullPointerLoadFeatureFilters = nullptr;
+  LoadFeatureFiltersRDP* ptrLoadFeatureFilters = nullptr;
+  LoadFeatureFiltersRDP* nullPointerLoadFeatureFilters = nullptr;
   BOOST_CHECK_EQUAL(ptrLoadFeatureFilters, nullPointerLoadFeatureFilters);
 }
 
 BOOST_AUTO_TEST_CASE(destructorLoadFeatureFilters)
 {
-  LoadFeatureFilters* ptrLoadFeatureFilters = nullptr;
-  ptrLoadFeatureFilters = new LoadFeatureFilters();
+  LoadFeatureFiltersRDP* ptrLoadFeatureFilters = nullptr;
+  ptrLoadFeatureFilters = new LoadFeatureFiltersRDP();
   delete ptrLoadFeatureFilters;
 }
 
 BOOST_AUTO_TEST_CASE(gettersLoadFeatureFilters)
 {
-  LoadFeatureFilters processor;
+  LoadFeatureFiltersRDP processor;
 
   BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_FILTERS");
@@ -602,7 +602,7 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureFilters)
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
 
-  LoadFeatureFilters loadFeatureFilters;
+  LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureFilter();
 
@@ -613,25 +613,25 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureFilters)
 }
 
 /**
-  LoadFeatureQCs Tests
+  LoadFeatureQCsRDP Tests
 */
 BOOST_AUTO_TEST_CASE(constructorLoadFeatureQCs)
 {
-  LoadFeatureQCs* ptrLoadFeatureQCs = nullptr;
-  LoadFeatureQCs* nullPointerLoadFeatureQCs = nullptr;
+  LoadFeatureQCsRDP* ptrLoadFeatureQCs = nullptr;
+  LoadFeatureQCsRDP* nullPointerLoadFeatureQCs = nullptr;
   BOOST_CHECK_EQUAL(ptrLoadFeatureQCs, nullPointerLoadFeatureQCs);
 }
 
 BOOST_AUTO_TEST_CASE(destructorLoadFeatureQCs)
 {
-  LoadFeatureQCs* ptrLoadFeatureQCs = nullptr;
-  ptrLoadFeatureQCs = new LoadFeatureQCs();
+  LoadFeatureQCsRDP* ptrLoadFeatureQCs = nullptr;
+  ptrLoadFeatureQCs = new LoadFeatureQCsRDP();
   delete ptrLoadFeatureQCs;
 }
 
 BOOST_AUTO_TEST_CASE(gettersLoadFeatureQCs)
 {
-  LoadFeatureQCs processor;
+  LoadFeatureQCsRDP processor;
 
   BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_QCS");
@@ -645,7 +645,7 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureQCs)
   filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
 
-  LoadFeatureQCs loadFeatureQCs;
+  LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureQC();
 
@@ -653,6 +653,110 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureQCs)
   BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
   BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+}
+
+/**
+  StoreFeatureFiltersRDP Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorStoreFeatureFilters)
+{
+  StoreFeatureFiltersRDP* ptrStoreFeatureFilters = nullptr;
+  StoreFeatureFiltersRDP* nullPointerStoreFeatureFilters = nullptr;
+  BOOST_CHECK_EQUAL(ptrStoreFeatureFilters, nullPointerStoreFeatureFilters);
+}
+
+BOOST_AUTO_TEST_CASE(destructorStoreFeatureFilters)
+{
+  StoreFeatureFiltersRDP* ptrStoreFeatureFilters = nullptr;
+  ptrStoreFeatureFilters = new StoreFeatureFiltersRDP();
+  delete ptrStoreFeatureFilters;
+}
+
+BOOST_AUTO_TEST_CASE(gettersStoreFeatureFilters)
+{
+  StoreFeatureFiltersRDP processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_FILTERS");
+}
+
+BOOST_AUTO_TEST_CASE(processStoreFeatureFilters)
+{
+  RawDataHandler rawDataHandler, rawDataHandler_test;
+
+  Filenames filenames;
+  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  LoadFeatureFiltersRDP loadFeatureFilters;
+  loadFeatureFilters.process(rawDataHandler, {}, filenames);
+  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
+  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
+  StoreFeatureFiltersRDP storeFeatureFilters;
+  storeFeatureFilters.process(rawDataHandler, {}, filenames);
+  loadFeatureFilters.process(rawDataHandler_test, {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureFilter();
+  const OpenMS::MRMFeatureQC& fQC_test = rawDataHandler_test.getFeatureFilter();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+  }
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+  }
+}
+
+/**
+  StoreFeatureQCsRDP Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorStoreFeatureQCs)
+{
+  StoreFeatureQCsRDP* ptrStoreFeatureQCs = nullptr;
+  StoreFeatureQCsRDP* nullPointerStoreFeatureQCs = nullptr;
+  BOOST_CHECK_EQUAL(ptrStoreFeatureQCs, nullPointerStoreFeatureQCs);
+}
+
+BOOST_AUTO_TEST_CASE(destructorStoreFeatureQCs)
+{
+  StoreFeatureQCsRDP* ptrStoreFeatureQCs = nullptr;
+  ptrStoreFeatureQCs = new StoreFeatureQCsRDP();
+  delete ptrStoreFeatureQCs;
+}
+
+BOOST_AUTO_TEST_CASE(gettersStoreFeatureQCs)
+{
+  StoreFeatureQCsRDP processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_QCS");
+}
+
+BOOST_AUTO_TEST_CASE(processStoreFeatureQCs)
+{
+  RawDataHandler rawDataHandler, rawDataHandler_test;
+
+  Filenames filenames;
+  filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  LoadFeatureQCsRDP loadFeatureQCs;
+  loadFeatureQCs.process(rawDataHandler, {}, filenames);
+  filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
+  filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
+  StoreFeatureQCsRDP storeFeatureQCs;
+  storeFeatureQCs.process(rawDataHandler, {}, filenames);
+  loadFeatureQCs.process(rawDataHandler_test, {}, filenames);
+  const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureQC();
+  const OpenMS::MRMFeatureQC& fQC_test = rawDataHandler_test.getFeatureQC();
+
+  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+  }
+  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
+    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+  }
 }
 
 /**
@@ -729,7 +833,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadParameters)
 
 BOOST_AUTO_TEST_CASE(processLoadParameters)
 {
-  // no tests, it calls FileReader::parseOpenMSParams and OpenMSFile::sanitizeRawDataProcessorParameters
+  // no tests, it calls FileReader::parseOpenMSParams and LoadParameters::sanitizeRawDataProcessorParameters
 }
 
 BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
@@ -749,7 +853,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
 
   LoadParameters loadParameters;
   loadParameters.sanitizeParameters(params);
-  BOOST_CHECK_EQUAL(params.size(), 14);
+  BOOST_CHECK_EQUAL(params.size(), 18);
   BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("AbsoluteQuantitation"), 1);
@@ -769,6 +873,10 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem2"), "value2");
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[1].at("map2_elem1"), "value3");
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeatures.qc").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesRSDs").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc").size(), 0);
 }
 
 /**
@@ -902,7 +1010,7 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
 
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  LoadFeatureFilters loadFeatureFilters;
+  LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
 
   // Test feature filter
@@ -939,7 +1047,7 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getMetaValue("peak_apex_int")), 0.0, 1e-6);
   BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 1067.5447296543123, 1e-6);
-  BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
+  BOOST_CHECK(!hsubordinate2.getMetaValue("used_").toBool());
 }
 
 /**
@@ -1026,7 +1134,7 @@ BOOST_AUTO_TEST_CASE(selectFeatures)
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getMetaValue("peak_apex_int")), 49333.0, 1e-6);
   BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 46.652168337345103, 1e-6);
-  BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
+  BOOST_CHECK(hsubordinate2.getMetaValue("used_").toBool());
 }
 
 /**
@@ -1225,7 +1333,7 @@ BOOST_AUTO_TEST_CASE(checkFeatures)
 
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  LoadFeatureQCs loadFeatureQCs;
+  LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
   // Test check features
@@ -1250,6 +1358,350 @@ BOOST_AUTO_TEST_CASE(checkFeatures)
   BOOST_CHECK(hsub.getMetaValue("used_").toBool());
 }
 
+/**
+  FilterFeaturesRSDs Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorFilterFeaturesRSDs)
+{
+  FilterFeaturesRSDs* ptrFilterFeaturesRSDs = nullptr;
+  FilterFeaturesRSDs* nullPointerFilterFeaturesRSDs = nullptr;
+  BOOST_CHECK_EQUAL(ptrFilterFeaturesRSDs, nullPointerFilterFeaturesRSDs);
+}
+
+BOOST_AUTO_TEST_CASE(destructorFilterFeaturesRSDs)
+{
+  FilterFeaturesRSDs* ptrFilterFeaturesRSDs = nullptr;
+  ptrFilterFeaturesRSDs = new FilterFeaturesRSDs();
+  delete ptrFilterFeaturesRSDs;
+}
+
+BOOST_AUTO_TEST_CASE(gettersFilterFeaturesRSDs)
+{
+  FilterFeaturesRSDs processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 4);
+  BOOST_CHECK_EQUAL(processor.getName(), "FILTER_FEATURES_RSDS");
+}
+
+BOOST_AUTO_TEST_CASE(filterFeaturesRSDs)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  MapChromatograms mapChroms;
+  mapChroms.process(rawDataHandler, params_1, filenames);
+
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_1_core_RawDataProcessor.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv");
+  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv");
+  LoadFeatureFiltersRDP loadFeatureFilters;
+  loadFeatureFilters.process(rawDataHandler, params_1, filenames);
+  rawDataHandler.setFeatureRSDFilter(rawDataHandler.getFeatureFilter()); // copy over the feature filter
+
+  // Make the feature RSD estimates
+  OpenMS::MRMFeatureQC feature_rsd_estimations = rawDataHandler.getFeatureFilter();
+  feature_rsd_estimations.component_group_qcs.at(115).retention_time_u = 40; // accoa
+  feature_rsd_estimations.component_qcs.at(292).meta_value_qc.at("peak_apex_int").second = 40; // "23dpg.23dpg_1.Heavy"
+  rawDataHandler.setFeatureRSDEstimations(feature_rsd_estimations);
+
+  // Test feature filter
+  FilterFeaturesRSDs filterFeatures;
+  filterFeatures.process(rawDataHandler, params_1, filenames);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 478); // Test feature_map
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 2);
+
+  const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getMetaValue("peak_apex_int")), 262509, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getRT()), 953.66569377291205, 1e-6);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[50].getSubordinates().size(), 3);
+
+  const OpenMS::Feature& subordinate2 = rawDataHandler.getFeatureMap()[50].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 640, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "acon-C.acon-C_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 842.11033066606501, 1e-6);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 481); // Test feature_map_history_
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
+
+  const OpenMS::Feature& hsubordinate1 = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate1.getMetaValue("peak_apex_int")), 266403.0, 1e-6);
+  BOOST_CHECK_EQUAL(hsubordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate1.getRT()), 953.665693772912, 1e-6);
+  BOOST_CHECK(!hsubordinate1.getMetaValue("used_").toBool());
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[50].getSubordinates().size(), 2);
+
+  const OpenMS::Feature& hsubordinate2 = rawDataHandler.getFeatureMapHistory()[50].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getMetaValue("peak_apex_int")), 0.0, 1e-6);
+  BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 1067.5447296543123, 1e-6);
+  BOOST_CHECK(!hsubordinate2.getMetaValue("used_").toBool());
+}
+
+/**
+  FilterFeaturesBackgroundInterferences Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorFilterFeaturesBackgroundInterferences)
+{
+  FilterFeaturesBackgroundInterferences* ptrFilterFeaturesBackgroundInterferences = nullptr;
+  FilterFeaturesBackgroundInterferences* nullPointerFilterFeaturesBackgroundInterferences = nullptr;
+  BOOST_CHECK_EQUAL(ptrFilterFeaturesBackgroundInterferences, nullPointerFilterFeaturesBackgroundInterferences);
+}
+
+BOOST_AUTO_TEST_CASE(destructorFilterFeaturesBackgroundInterferences)
+{
+  FilterFeaturesBackgroundInterferences* ptrFilterFeaturesBackgroundInterferences = nullptr;
+  ptrFilterFeaturesBackgroundInterferences = new FilterFeaturesBackgroundInterferences();
+  delete ptrFilterFeaturesBackgroundInterferences;
+}
+
+BOOST_AUTO_TEST_CASE(gettersFilterFeaturesBackgroundInterferences)
+{
+  FilterFeaturesBackgroundInterferences processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 4);
+  BOOST_CHECK_EQUAL(processor.getName(), "FILTER_FEATURES_BACKGROUND_INTERFERENCES");
+}
+
+BOOST_AUTO_TEST_CASE(filterFeaturesBackgroundInterferences)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  MapChromatograms mapChroms;
+  mapChroms.process(rawDataHandler, params_1, filenames);
+
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_1_core_RawDataProcessor.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+  filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv");
+  filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv");
+  LoadFeatureFiltersRDP loadFeatureFilters;
+  loadFeatureFilters.process(rawDataHandler, params_1, filenames);
+  rawDataHandler.setFeatureBackgroundFilter(rawDataHandler.getFeatureFilter()); // copy over the feature filter
+  rawDataHandler.setFeatureBackgroundEstimations(rawDataHandler.getFeatureFilter());
+
+  // Test feature filter
+  FilterFeaturesBackgroundInterferences filterFeatures;
+  filterFeatures.process(rawDataHandler, params_1, filenames);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 479); // Test feature_map_
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
+
+  const OpenMS::Feature& subordinate1 = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getMetaValue("peak_apex_int")), 266403.0, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate1.getRT()), 953.66569377291205, 1e-6);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[50].getSubordinates().size(), 1);
+
+  const OpenMS::Feature& subordinate2 = rawDataHandler.getFeatureMap()[50].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getMetaValue("peak_apex_int")), 3842, 1e-6);
+  BOOST_CHECK_EQUAL(subordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Light");
+  BOOST_CHECK_CLOSE(static_cast<double>(subordinate2.getRT()), 1067.54472965431, 1e-6);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 481); // Test feature_map_history_
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
+
+  const OpenMS::Feature& hsubordinate1 = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate1.getMetaValue("peak_apex_int")), 266403.0, 1e-6);
+  BOOST_CHECK_EQUAL(hsubordinate1.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate1.getRT()), 953.665693772912, 1e-6);
+  BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[50].getSubordinates().size(), 2);
+
+  const OpenMS::Feature& hsubordinate2 = rawDataHandler.getFeatureMapHistory()[50].getSubordinates()[0];
+  BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getMetaValue("peak_apex_int")), 0.0, 1e-6);
+  BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 1067.5447296543123, 1e-6);
+  BOOST_CHECK(!hsubordinate2.getMetaValue("used_").toBool());
+}
+
+/**
+  CheckFeaturesBackgroundInterferences Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorCheckFeaturesBackgroundInterferences)
+{
+  CheckFeaturesBackgroundInterferences* ptrCheckFeaturesBackgroundInterferences = nullptr;
+  CheckFeaturesBackgroundInterferences* nullPointerCheckFeaturesBackgroundInterferences = nullptr;
+  BOOST_CHECK_EQUAL(ptrCheckFeaturesBackgroundInterferences, nullPointerCheckFeaturesBackgroundInterferences);
+}
+
+BOOST_AUTO_TEST_CASE(destructorCheckFeaturesBackgroundInterferences)
+{
+  CheckFeaturesBackgroundInterferences* ptrCheckFeaturesBackgroundInterferences = nullptr;
+  ptrCheckFeaturesBackgroundInterferences = new CheckFeaturesBackgroundInterferences();
+  delete ptrCheckFeaturesBackgroundInterferences;
+}
+
+BOOST_AUTO_TEST_CASE(gettersCheckFeaturesBackgroundInterferences)
+{
+  CheckFeaturesBackgroundInterferences processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 8);
+  BOOST_CHECK_EQUAL(processor.getName(), "CHECK_FEATURES_BACKGROUND_INTERFERENCES");
+}
+
+BOOST_AUTO_TEST_CASE(checkFeaturesBackgroundInterferences)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_3_core_RawDataProcessor.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+  filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv");
+  filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv");
+  LoadFeatureQCsRDP loadFeatureQCs;
+  loadFeatureQCs.process(rawDataHandler, params_1, filenames);
+
+  // Make the feature background estimates
+  OpenMS::MRMFeatureQC feature_background_estimations = rawDataHandler.getFeatureQC();
+  feature_background_estimations.component_qcs.at(293).intensity_u = 30; // "23dpg.23dpg_1.Light"
+  rawDataHandler.setFeatureBackgroundQC(feature_background_estimations); // copy over the feature filter
+  feature_background_estimations.component_qcs.at(293).intensity_u = 1e12; // "23dpg.23dpg_1.Light"
+  rawDataHandler.setFeatureBackgroundEstimations(feature_background_estimations);
+
+  // Test check features
+  CheckFeaturesBackgroundInterferences checkFeatures;
+  checkFeatures.process(rawDataHandler, params_1, filenames);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 98);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
+
+  const OpenMS::Feature& sub = rawDataHandler.getFeatureMap()[0].getSubordinates()[1];
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getMetaValue("QC_transition_group_%BackgroundInterference_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(sub.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(sub.getMetaValue("QC_transition_%BackgroundInterference_pass").toString(), "0");
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 98);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
+
+  const OpenMS::Feature& hsub = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[1];
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("QC_transition_group_%BackgroundInterference_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(hsub.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(hsub.getMetaValue("QC_transition_%BackgroundInterference_pass").toString(), "0");
+  BOOST_CHECK(hsub.getMetaValue("used_").toBool());
+}
+
+/**
+  CheckFeaturesRSDs Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorCheckFeaturesRSDs)
+{
+  CheckFeaturesRSDs* ptrCheckFeaturesRSDs = nullptr;
+  CheckFeaturesRSDs* nullPointerCheckFeaturesRSDs = nullptr;
+  BOOST_CHECK_EQUAL(ptrCheckFeaturesRSDs, nullPointerCheckFeaturesRSDs);
+}
+
+BOOST_AUTO_TEST_CASE(destructorCheckFeaturesRSDs)
+{
+  CheckFeaturesRSDs* ptrCheckFeaturesRSDs = nullptr;
+  ptrCheckFeaturesRSDs = new CheckFeaturesRSDs();
+  delete ptrCheckFeaturesRSDs;
+}
+
+BOOST_AUTO_TEST_CASE(gettersCheckFeaturesRSDs)
+{
+  CheckFeaturesRSDs processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), 8);
+  BOOST_CHECK_EQUAL(processor.getName(), "CHECK_FEATURES_RSDS");
+}
+
+BOOST_AUTO_TEST_CASE(checkFeaturesRSDs)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_test_3_core_RawDataProcessor.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+  filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv");
+  filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv");
+  LoadFeatureQCsRDP loadFeatureQCs;
+  loadFeatureQCs.process(rawDataHandler, params_1, filenames);
+  rawDataHandler.setFeatureRSDQC(rawDataHandler.getFeatureQC()); // copy over the feature filter
+
+  // Make the feature RSD estimates
+  OpenMS::MRMFeatureQC feature_rsd_estimations = rawDataHandler.getFeatureQC();
+  feature_rsd_estimations.component_qcs.at(293).meta_value_qc.at("peak_apex_int").second = 40; // "23dpg.23dpg_1.Heavy"
+  rawDataHandler.setFeatureRSDEstimations(feature_rsd_estimations);
+
+  // Test check features
+  CheckFeaturesRSDs checkFeatures;
+  checkFeatures.process(rawDataHandler, params_1, filenames);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 98);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 3);
+
+  const OpenMS::Feature& sub = rawDataHandler.getFeatureMap()[0].getSubordinates()[1];
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap()[0].getMetaValue("QC_transition_group_%RSD_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(sub.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(sub.getMetaValue("QC_transition_%RSD_pass").toString(), "0");
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 98);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getSubordinates().size(), 3);
+
+  const OpenMS::Feature& hsub = rawDataHandler.getFeatureMapHistory()[0].getSubordinates()[1];
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory()[0].getMetaValue("QC_transition_group_%RSD_pass").toString(), "1");
+  BOOST_CHECK_EQUAL(hsub.getMetaValue("native_id").toString(), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(hsub.getMetaValue("QC_transition_%RSD_pass").toString(), "0");
+  BOOST_CHECK(hsub.getMetaValue("used_").toBool());
+}
+
 BOOST_AUTO_TEST_CASE(process)
 {
   // Pre-requisites: load the parameters and associated raw data
@@ -1265,7 +1717,7 @@ BOOST_AUTO_TEST_CASE(process)
 
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  LoadFeatureFilters loadFeatureFilters;
+  LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
 
   filenames.quantitationMethods_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv");
@@ -1274,7 +1726,7 @@ BOOST_AUTO_TEST_CASE(process)
   loadQuantitationMethods.process(sequenceSegmentHandler_IO, SequenceHandler(), {}, filenames);
   rawDataHandler.setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
 
-  LoadFeatureQCs loadFeatureQCs;
+  LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
@@ -1392,7 +1844,7 @@ BOOST_AUTO_TEST_CASE(emg_processor)
   BOOST_CHECK_EQUAL(m.size(), 1);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 1);
 
-  EMGProcessor emg;
+  FitFeaturesEMG emg;
   emg.process(rawDataHandler, params_1, filenames);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 1);
