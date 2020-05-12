@@ -124,13 +124,8 @@ BOOST_AUTO_TEST_CASE(extractMetaData)
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
-<<<<<<< HEAD
   BOOST_CHECK_EQUAL(params_1.size(), 18);
   BOOST_CHECK_EQUAL(params_2.size(), 19);
-=======
-  BOOST_CHECK_EQUAL(params_1.size(), 14);
-  BOOST_CHECK_EQUAL(params_2.size(), 15);
->>>>>>> fix: tests, AppStateProcessor
   RawDataHandler rawDataHandler;
 
   // Pre-requisites: load the transitions and raw data
@@ -406,11 +401,7 @@ BOOST_AUTO_TEST_CASE(processorExtractChromatogramWindows)
   // Test window extraction
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_extractChromWindowTest_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-<<<<<<< HEAD
   LoadFeatureFiltersRDP loadFeatureFilters;
-=======
-  LoadFeatureFilters loadFeatureFilters;
->>>>>>> fix: tests, AppStateProcessor
   loadFeatureFilters.process(rawDataHandler, {}, filenames);
 
   ExtractChromatogramWindows extractChromWin;
@@ -578,43 +569,25 @@ BOOST_AUTO_TEST_CASE(processLoadTransitions)
 }
 
 /**
-<<<<<<< HEAD
   LoadFeatureFiltersRDP Tests
 */
 BOOST_AUTO_TEST_CASE(constructorLoadFeatureFilters)
 {
   LoadFeatureFiltersRDP* ptrLoadFeatureFilters = nullptr;
   LoadFeatureFiltersRDP* nullPointerLoadFeatureFilters = nullptr;
-=======
-  LoadFeatureFilters Tests
-*/
-BOOST_AUTO_TEST_CASE(constructorLoadFeatureFilters)
-{
-  LoadFeatureFilters* ptrLoadFeatureFilters = nullptr;
-  LoadFeatureFilters* nullPointerLoadFeatureFilters = nullptr;
->>>>>>> fix: tests, AppStateProcessor
   BOOST_CHECK_EQUAL(ptrLoadFeatureFilters, nullPointerLoadFeatureFilters);
 }
 
 BOOST_AUTO_TEST_CASE(destructorLoadFeatureFilters)
 {
-<<<<<<< HEAD
   LoadFeatureFiltersRDP* ptrLoadFeatureFilters = nullptr;
   ptrLoadFeatureFilters = new LoadFeatureFiltersRDP();
-=======
-  LoadFeatureFilters* ptrLoadFeatureFilters = nullptr;
-  ptrLoadFeatureFilters = new LoadFeatureFilters();
->>>>>>> fix: tests, AppStateProcessor
   delete ptrLoadFeatureFilters;
 }
 
 BOOST_AUTO_TEST_CASE(gettersLoadFeatureFilters)
 {
-<<<<<<< HEAD
   LoadFeatureFiltersRDP processor;
-=======
-  LoadFeatureFilters processor;
->>>>>>> fix: tests, AppStateProcessor
 
   BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_FILTERS");
@@ -628,11 +601,7 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureFilters)
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
 
-<<<<<<< HEAD
   LoadFeatureFiltersRDP loadFeatureFilters;
-=======
-  LoadFeatureFilters loadFeatureFilters;
->>>>>>> fix: tests, AppStateProcessor
   loadFeatureFilters.process(rawDataHandler, {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureFilter();
 
@@ -643,43 +612,25 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureFilters)
 }
 
 /**
-<<<<<<< HEAD
   LoadFeatureQCsRDP Tests
 */
 BOOST_AUTO_TEST_CASE(constructorLoadFeatureQCs)
 {
   LoadFeatureQCsRDP* ptrLoadFeatureQCs = nullptr;
   LoadFeatureQCsRDP* nullPointerLoadFeatureQCs = nullptr;
-=======
-  LoadFeatureQCs Tests
-*/
-BOOST_AUTO_TEST_CASE(constructorLoadFeatureQCs)
-{
-  LoadFeatureQCs* ptrLoadFeatureQCs = nullptr;
-  LoadFeatureQCs* nullPointerLoadFeatureQCs = nullptr;
->>>>>>> fix: tests, AppStateProcessor
   BOOST_CHECK_EQUAL(ptrLoadFeatureQCs, nullPointerLoadFeatureQCs);
 }
 
 BOOST_AUTO_TEST_CASE(destructorLoadFeatureQCs)
 {
-<<<<<<< HEAD
   LoadFeatureQCsRDP* ptrLoadFeatureQCs = nullptr;
   ptrLoadFeatureQCs = new LoadFeatureQCsRDP();
-=======
-  LoadFeatureQCs* ptrLoadFeatureQCs = nullptr;
-  ptrLoadFeatureQCs = new LoadFeatureQCs();
->>>>>>> fix: tests, AppStateProcessor
   delete ptrLoadFeatureQCs;
 }
 
 BOOST_AUTO_TEST_CASE(gettersLoadFeatureQCs)
 {
-<<<<<<< HEAD
   LoadFeatureQCsRDP processor;
-=======
-  LoadFeatureQCs processor;
->>>>>>> fix: tests, AppStateProcessor
 
   BOOST_CHECK_EQUAL(processor.getID(), -1);
   BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_QCS");
@@ -693,11 +644,7 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureQCs)
   filenames.featureQCComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureQCComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
 
-<<<<<<< HEAD
   LoadFeatureQCsRDP loadFeatureQCs;
-=======
-  LoadFeatureQCs loadFeatureQCs;
->>>>>>> fix: tests, AppStateProcessor
   loadFeatureQCs.process(rawDataHandler, {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = rawDataHandler.getFeatureQC();
 
@@ -708,7 +655,6 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureQCs)
 }
 
 /**
-<<<<<<< HEAD
   StoreFeatureFiltersRDP Tests
 */
 BOOST_AUTO_TEST_CASE(constructorStoreFeatureFilters)
@@ -813,8 +759,6 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureQCs)
 }
 
 /**
-=======
->>>>>>> fix: tests, AppStateProcessor
   LoadValidationData Tests
 */
 BOOST_AUTO_TEST_CASE(constructorLoadValidationData)
@@ -888,11 +832,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadParameters)
 
 BOOST_AUTO_TEST_CASE(processLoadParameters)
 {
-<<<<<<< HEAD
   // no tests, it calls FileReader::parseOpenMSParams and LoadParameters::sanitizeRawDataProcessorParameters
-=======
-  // no tests, it calls FileReader::parseOpenMSParams and OpenMSFile::sanitizeRawDataProcessorParameters
->>>>>>> fix: tests, AppStateProcessor
 }
 
 BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
@@ -912,11 +852,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
 
   LoadParameters loadParameters;
   loadParameters.sanitizeParameters(params);
-<<<<<<< HEAD
-  BOOST_CHECK_EQUAL(params.size(), 18);
-=======
-  BOOST_CHECK_EQUAL(params.size(), 13);
->>>>>>> fix: tests, AppStateProcessor
+  BOOST_CHECK_EQUAL(params.size(), 17);
   BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("AbsoluteQuantitation"), 1);
@@ -926,11 +862,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.count("MRMFeatureFinderScoring"), 1);
   BOOST_CHECK_EQUAL(params.count("MRMFeatureFilter.filter_MRMFeatures"), 1);
   BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_qmip"), 1);
-<<<<<<< HEAD
-  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.schedule_MRMFeatures_qmip"), 1);
-=======
   BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.schedule_MRMFeatures_qmip"), 0);
->>>>>>> fix: tests, AppStateProcessor
   BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_score"), 1);
   BOOST_CHECK_EQUAL(params.count("ReferenceDataMethods.getAndProcess_referenceData_samples"), 1);
   BOOST_CHECK_EQUAL(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
@@ -940,13 +872,10 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem2"), "value2");
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[1].at("map2_elem1"), "value3");
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeatures.qc").size(), 0);
-<<<<<<< HEAD
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences").size(), 0);
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc").size(), 0);
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesRSDs").size(), 0);
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc").size(), 0);
-=======
->>>>>>> fix: tests, AppStateProcessor
 }
 
 /**
@@ -1080,11 +1009,7 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
 
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-<<<<<<< HEAD
   LoadFeatureFiltersRDP loadFeatureFilters;
-=======
-  LoadFeatureFilters loadFeatureFilters;
->>>>>>> fix: tests, AppStateProcessor
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
 
   // Test feature filter
@@ -1121,11 +1046,7 @@ BOOST_AUTO_TEST_CASE(filterFeatures)
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getMetaValue("peak_apex_int")), 0.0, 1e-6);
   BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 1067.5447296543123, 1e-6);
-<<<<<<< HEAD
   BOOST_CHECK(!hsubordinate2.getMetaValue("used_").toBool());
-=======
-  BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
->>>>>>> fix: tests, AppStateProcessor
 }
 
 /**
@@ -1212,11 +1133,7 @@ BOOST_AUTO_TEST_CASE(selectFeatures)
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getMetaValue("peak_apex_int")), 49333.0, 1e-6);
   BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "arg-L.arg-L_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 46.652168337345103, 1e-6);
-<<<<<<< HEAD
   BOOST_CHECK(hsubordinate2.getMetaValue("used_").toBool());
-=======
-  BOOST_CHECK(hsubordinate1.getMetaValue("used_").toBool());
->>>>>>> fix: tests, AppStateProcessor
 }
 
 /**
@@ -1415,11 +1332,7 @@ BOOST_AUTO_TEST_CASE(checkFeatures)
 
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-<<<<<<< HEAD
   LoadFeatureQCsRDP loadFeatureQCs;
-=======
-  LoadFeatureQCs loadFeatureQCs;
->>>>>>> fix: tests, AppStateProcessor
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
   // Test check features
@@ -1444,7 +1357,6 @@ BOOST_AUTO_TEST_CASE(checkFeatures)
   BOOST_CHECK(hsub.getMetaValue("used_").toBool());
 }
 
-<<<<<<< HEAD
 /**
   FilterFeaturesRSDs Tests
 */
@@ -1789,8 +1701,6 @@ BOOST_AUTO_TEST_CASE(checkFeaturesRSDs)
   BOOST_CHECK(hsub.getMetaValue("used_").toBool());
 }
 
-=======
->>>>>>> fix: tests, AppStateProcessor
 BOOST_AUTO_TEST_CASE(process)
 {
   // Pre-requisites: load the parameters and associated raw data
@@ -1806,11 +1716,7 @@ BOOST_AUTO_TEST_CASE(process)
 
   filenames.featureFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
   filenames.featureFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-<<<<<<< HEAD
   LoadFeatureFiltersRDP loadFeatureFilters;
-=======
-  LoadFeatureFilters loadFeatureFilters;
->>>>>>> fix: tests, AppStateProcessor
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
 
   filenames.quantitationMethods_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv");
@@ -1819,11 +1725,7 @@ BOOST_AUTO_TEST_CASE(process)
   loadQuantitationMethods.process(sequenceSegmentHandler_IO, SequenceHandler(), {}, filenames);
   rawDataHandler.setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
 
-<<<<<<< HEAD
   LoadFeatureQCsRDP loadFeatureQCs;
-=======
-  LoadFeatureQCs loadFeatureQCs;
->>>>>>> fix: tests, AppStateProcessor
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
