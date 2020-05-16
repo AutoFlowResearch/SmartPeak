@@ -50,7 +50,6 @@ namespace SmartPeak
       standards_indices
     );
 
-
     // check if there are any standards to calculate the calibrators from
     if (standards_indices.empty()) {
       LOGE << "standards_indices argument is empty. Returning";
