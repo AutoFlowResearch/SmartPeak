@@ -1,5 +1,4 @@
 // TODO: Add copyright
-
 #include <SmartPeak/test_config.h>
 
 #define BOOST_TEST_MODULE RawDataProcessor test suite
@@ -853,7 +852,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
 
   LoadParameters loadParameters;
   loadParameters.sanitizeParameters(params);
-  BOOST_CHECK_EQUAL(params.size(), 18);
+  BOOST_CHECK_EQUAL(params.size(), 17);
   BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("AbsoluteQuantitation"), 1);
@@ -863,7 +862,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.count("MRMFeatureFinderScoring"), 1);
   BOOST_CHECK_EQUAL(params.count("MRMFeatureFilter.filter_MRMFeatures"), 1);
   BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_qmip"), 1);
-  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.schedule_MRMFeatures_qmip"), 1);
+  BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.schedule_MRMFeatures_qmip"), 0);
   BOOST_CHECK_EQUAL(params.count("MRMFeatureSelector.select_MRMFeatures_score"), 1);
   BOOST_CHECK_EQUAL(params.count("ReferenceDataMethods.getAndProcess_referenceData_samples"), 1);
   BOOST_CHECK_EQUAL(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
@@ -1858,6 +1857,29 @@ BOOST_AUTO_TEST_CASE(emg_processor)
   BOOST_CHECK_EQUAL(sub2.metaValueExists("noise_background_level") == false, 0);
   BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("area_background_level")), 0.0083339133585532514, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("noise_background_level")), 0.00012474754841647006, 1e-6);
+
+  // test feature storing
+  RawDataHandler rawDataHandler2;
+  filenames.featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.featureXML");
+  StoreFeatures storeFeatures;
+  storeFeatures.process(rawDataHandler, params_1, filenames);
+
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler2, params_1, filenames);
+
+  const OpenMS::FeatureMap& m2 = rawDataHandler2.getFeatureMap();
+  const OpenMS::Feature sub3 { m2[0].getSubordinates()[0] };
+
+  BOOST_CHECK_CLOSE(static_cast<double>(sub2.getIntensity()), static_cast<double>(sub3.getIntensity()), 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("peak_apex_position")), static_cast<double>(sub3.getMetaValue("peak_apex_position")), 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("peak_apex_int")), static_cast<double>(sub3.getMetaValue("peak_apex_int")), 1e-6);
+  BOOST_CHECK_EQUAL(sub3.metaValueExists("area_background_level") == false, 0);
+  BOOST_CHECK_EQUAL(sub3.metaValueExists("noise_background_level") == false, 0);
+  BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("area_background_level")), static_cast<double>(sub3.getMetaValue("area_background_level")), 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(sub2.getMetaValue("noise_background_level")), static_cast<double>(sub3.getMetaValue("noise_background_level")), 1e-6);
+
+  std::remove(SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.featureXML"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

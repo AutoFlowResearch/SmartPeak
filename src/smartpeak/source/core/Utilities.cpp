@@ -589,7 +589,6 @@ namespace SmartPeak
 
     fs::directory_iterator it = fs::directory_iterator(fs::path(pathname), ec);
     if (ec.value()) {
-      // std::cout << pathname << "\tec.value(): " << ec.value() << std::endl;
       return 0;
     }
     fs::directory_iterator it_end = fs::directory_iterator();

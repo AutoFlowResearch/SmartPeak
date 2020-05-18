@@ -42,7 +42,6 @@ namespace SmartPeak
     LOGD << "START optimizeCalibrationCurves";
 
     std::vector<size_t> standards_indices;
-
     // get all standards
     this->getSampleIndicesBySampleType(
       sequenceSegmentHandler_IO,
@@ -76,9 +75,7 @@ namespace SmartPeak
     absoluteQuantitation.setParameters(parameters);
 
     absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
-
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
-
     for (const OpenMS::AbsoluteQuantitationMethod& row : sequenceSegmentHandler_IO.getQuantitationMethods()) {
       // map standards to features
       OpenMS::AbsoluteQuantitationStandards absoluteQuantitationStandards;
@@ -90,7 +87,6 @@ namespace SmartPeak
         row.getComponentName(),
         feature_concentrations
       );
-
       // remove features with an actual concentration of 0.0 or less
       std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration> feature_concentrations_pruned;
       for (const OpenMS::AbsoluteQuantitationStandards::featureConcentration& feature : feature_concentrations) {
@@ -100,24 +96,31 @@ namespace SmartPeak
       }
 
       // remove components without any points
-      if (feature_concentrations_pruned.empty())
+      if (feature_concentrations_pruned.empty()) {
         continue;
+      }
 
+      try
+      {
+        absoluteQuantitation.optimizeSingleCalibrationCurve(
+          row.getComponentName(),
+          feature_concentrations_pruned
+        );
+      }
+      catch (OpenMS::Exception::DivisionByZero& )
+      {
+        LOGW << "Warning: '" << row.getComponentName() << "' cannot be analysed - division by zero\n";
+        continue;
+      }
       // find the optimal calibration curve for each component
-      absoluteQuantitation.optimizeSingleCalibrationCurve(
-        row.getComponentName(),
-        feature_concentrations_pruned
-      );
 
       components_to_concentrations.erase(row.getComponentName());
       components_to_concentrations.insert({row.getComponentName(), feature_concentrations_pruned});
     }
-
     // store results
     sequenceSegmentHandler_IO.setComponentsToConcentrations(components_to_concentrations);
     sequenceSegmentHandler_IO.getQuantitationMethods() = absoluteQuantitation.getQuantMethods();
     //sequenceSegmentHandler_IO.setQuantitationMethods(absoluteQuantitation.getQuantMethods());
-
     LOGD << "END optimizeCalibrationCurves";
   }
 

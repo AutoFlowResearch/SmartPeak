@@ -255,6 +255,7 @@ BOOST_AUTO_TEST_CASE(getMetaValue)
   OpenMS::Feature subordinate;
   subordinate.setIntensity(1.0e2);
   subordinate.setMetaValue("calculated_concentration", 10.0);
+  subordinate.setMetaValue("validation", "FP");
 
   CastValue result;
 
@@ -277,6 +278,10 @@ BOOST_AUTO_TEST_CASE(getMetaValue)
   result = SequenceHandler::getMetaValue(feature, subordinate, "absent_meta_value");
   BOOST_CHECK_EQUAL(result.getTag() == CastValue::Type::STRING, true);
   BOOST_CHECK_EQUAL(result.s_, "");
+
+  result = SequenceHandler::getMetaValue(feature, subordinate, "validation");
+  BOOST_CHECK_EQUAL(result.getTag() == CastValue::Type::STRING, true);
+  BOOST_CHECK_EQUAL(result.s_, "FP");
 }
 
 BOOST_AUTO_TEST_CASE(getSamplesInSequence)

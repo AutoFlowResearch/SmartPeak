@@ -192,10 +192,6 @@ namespace SmartPeak
       std::tm& adt = t.acquisition_date_and_time;
       std::istringstream iss(t_date);
       iss >> adt.tm_mon >> adt.tm_mday >> adt.tm_year >> adt.tm_hour >> adt.tm_min;
-      if (adt.tm_mday < 1 || adt.tm_mday > 31) {
-        LOGD << "Invalid value for std::tm::tm_mday: " << adt.tm_mday << ". Setting to 1.";
-        adt.tm_mday = 1;
-      }
 
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
     }
@@ -369,7 +365,6 @@ namespace SmartPeak
       const std::string& sample_name = mdh.getSampleName();
       data_dict.insert({sample_name, std::map<Row,float,Row_less>()});
       for (const std::string& meta_value_name : meta_data) {
-
         // feature_map_history is not needed here as we are only interested in the current/"used" features
         for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
           const std::string component_group_name = feature.getMetaValue(s_PeptideRef).toString();
@@ -389,6 +384,11 @@ namespace SmartPeak
               datum = validation_metrics.at(meta_value_name);
             } else {
               datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            }
+            if (meta_value_name == "validation") {
+              if (datum.s_ == "TP") datum = static_cast<float>(1.0);
+              else if (datum.s_ == "FP") datum = static_cast<float>(-1.0);
+              else datum = static_cast<float>(-2.0);
             }
             if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);

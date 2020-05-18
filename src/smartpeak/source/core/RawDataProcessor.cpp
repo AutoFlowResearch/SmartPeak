@@ -431,11 +431,11 @@ namespace SmartPeak
 
     OpenMS::FeatureMap output;
 
-    if (params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip").size()) {
+    if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_qmip")) {
       std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
         Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"), params_I.at("MRMFeatureSelector.select_MRMFeatures_qmip"));
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
-    } else if (params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score").size()) {
+    } else if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_score")) {
       std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
         Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
@@ -945,7 +945,7 @@ namespace SmartPeak
       "MRMFeatureFinderScoring",
       "MRMFeatureFilter.filter_MRMFeatures",
       "MRMFeatureSelector.select_MRMFeatures_qmip",
-      "MRMFeatureSelector.schedule_MRMFeatures_qmip",
+      // "MRMFeatureSelector.schedule_MRMFeatures_qmip",
       "MRMFeatureSelector.select_MRMFeatures_score",
       "ReferenceDataMethods.getAndProcess_referenceData_samples",
       "MRMFeatureValidator.validate_MRMFeatures",
@@ -1108,11 +1108,16 @@ namespace SmartPeak
           // integrate area and estimate background, update the subfeature
 
           std::cout << "emg peak # points: " << out_xs.size() << "\n";
+          OpenMS::ConvexHull2D::PointArrayType hull_points(out_xs.size());
           OpenMS::MSChromatogram emg_chrom;
           for (size_t i = 0; i < out_xs.size(); ++i) {
             emg_chrom.push_back(OpenMS::ChromatogramPeak(out_xs[i], out_ys[i]));
-            // std::cout << out_xs[i] << "\t" << out_ys[i] << "\n";
+            hull_points[i][0] = out_xs[i];
+            hull_points[i][1] = out_ys[i];
           }
+          OpenMS::ConvexHull2D hull;
+          hull.addPoints(hull_points);
+          subfeature.getConvexHulls().push_back(hull);
 
           OpenMS::PeakIntegrator pi;
           std::cout << "Updating ranges...\n";
@@ -1143,6 +1148,7 @@ namespace SmartPeak
           subfeature.setMetaValue("noise_background_level", pb.height);
         }
       }
+      rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
       std::cout << "I catched the exception (in SmartPeak)!\n";
@@ -1168,7 +1174,6 @@ namespace SmartPeak
     for (; it != end; ++it) {
       x.push_back(it->getPos());
       y.push_back(it->getIntensity());
-      // std::cout << x.back() << "\t" << y.back() << "\n";
     }
   }
 

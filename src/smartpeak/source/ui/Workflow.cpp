@@ -34,7 +34,9 @@ namespace SmartPeak
         "GCMS SIM Unknowns",
         "GCMS Full Scan Unknowns",
         "LCMS MRM Validation - QMIP",
-        "LCMS MRM Validation - LP"
+        "LCMS MRM Validation - LP",
+        "LCMS MRM Validation - QMIP META",
+        "LCMS MRM Validation - LP META"
       };
       for (const char* s : presets)
       {
@@ -58,7 +60,7 @@ namespace SmartPeak
           else if (s_string == "LCMS MRM Validation - LP")
             ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS PICK_FEATURES FILTER_FEATURES FILTER_FEATURES STORE_FEATURES VALIDATE_FEATURES STORE_FEATURES";
           else if (s_string == "LCMS MRM Validation - QMIP")
-            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_FEATURES STORE_FEATURES VALIDATE_FEATURES STORE_FEATURES";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_FEATURES FILTER_FEATURES FILTER_FEATURES VALIDATE_FEATURES STORE_FEATURES";
           commands_ = buildCommandsFromIds(ids);
           LOGI << "Local workflow has been replaced";
         }

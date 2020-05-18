@@ -42,10 +42,7 @@ namespace SmartPeak
     loadParameters.process(rawDataHandler, {}, filenames);
     LoadTransitions loadTransitions;
     loadTransitions.process(rawDataHandler, {}, filenames);
-    //LoadFeatureFiltersRDP loadFeatureFilters; // Ownership of FeatureFilter/QC changed from RawDataHandler to SequenceSegmentHandler
-    //loadFeatureFilters.process(rawDataHandler, {}, filenames);
-    //LoadFeatureQCsRDP loadFeatureQCs;
-    //loadFeatureQCs.process(rawDataHandler, {}, filenames);
+    // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
     LoadValidationData loadValidationData;
     loadValidationData.process(rawDataHandler, {}, filenames);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
@@ -116,7 +113,6 @@ namespace SmartPeak
         }
       }
     }
-
     if (filenames.size() != sequence_segments.size()) {
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
