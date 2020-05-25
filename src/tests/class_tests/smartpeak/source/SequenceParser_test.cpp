@@ -31,6 +31,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_volume_units, "uL");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().batch_name, "FluxTest");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_number, 2);
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSequenceSegmentName(), "Group01");
@@ -41,6 +42,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().inj_volume_units, "uL");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().batch_name, "FluxTest");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().inj_number, 5);
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
 
   sequenceHandler.clear();
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_semicolon.csv");
@@ -57,6 +59,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().inj_volume_units, "uL");
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().batch_name, "FluxTest");
   BOOST_CHECK_EQUAL(sequence2[0].getMetaData().inj_number, 1);
+  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSequenceSegmentName(), "Group01");
@@ -67,6 +70,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().inj_volume_units, "uL");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().batch_name, "FluxTest");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().inj_number, 5);
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
 
   sequenceHandler.clear();
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_tab.csv");
@@ -83,6 +87,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().inj_volume_units, "uL");
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().batch_name, "FluxTest");
   BOOST_CHECK_EQUAL(sequence3[0].getMetaData().inj_number, 1);
+  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSequenceSegmentName(), "Group01");
@@ -93,6 +98,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().inj_volume_units, "uL");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().batch_name, "FluxTest");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().inj_number, 5);
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
 }
 
 BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
