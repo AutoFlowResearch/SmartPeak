@@ -164,6 +164,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
 
 BOOST_AUTO_TEST_CASE(processSequence)
 {
+  #define _AVAILABLE_THREADS 4 
   SequenceHandler sequenceHandler;
   CreateSequence cs(sequenceHandler);
   cs.filenames        = generateTestFilenames();
@@ -197,6 +198,23 @@ BOOST_AUTO_TEST_CASE(processSequence)
 
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 340); // loaded
+
+  SmartPeak::SequenceProcessorMultithread spMT1(sequenceHandler.getSequence(),
+    dynamic_filenames,
+    raw_data_processing_methods);
+
+  SmartPeak::SequenceProcessorMultithread spMT2(sequenceHandler.getSequence(),
+    dynamic_filenames,
+    raw_data_processing_methods);
+
+  if (_AVAILABLE_THREADS != 0) {
+    BOOST_CHECK_EQUAL(spMT1.getNumWorkers(8), 3);
+    BOOST_CHECK_EQUAL(spMT2.getNumWorkers(3), 2);
+  }
+  else {
+    BOOST_CHECK_EQUAL(spMT1.getNumWorkers(8), 1);
+    BOOST_CHECK_EQUAL(spMT2.getNumWorkers(3), 1);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(processSequenceSegments)
