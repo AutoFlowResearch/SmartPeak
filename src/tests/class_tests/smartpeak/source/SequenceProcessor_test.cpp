@@ -164,7 +164,6 @@ BOOST_AUTO_TEST_CASE(createSequence)
 
 BOOST_AUTO_TEST_CASE(processSequence)
 {
-  #define _AVAILABLE_THREADS 4 
   SequenceHandler sequenceHandler;
   CreateSequence cs(sequenceHandler);
   cs.filenames        = generateTestFilenames();
@@ -207,8 +206,10 @@ BOOST_AUTO_TEST_CASE(processSequence)
     dynamic_filenames,
     raw_data_processing_methods);
 
-  if (_AVAILABLE_THREADS != 0) {
-    BOOST_CHECK_EQUAL(spMT1.getNumWorkers(8), 3);
+  const unsigned int max_threads = std::thread::hardware_concurrency();
+
+  if (max_threads != 0 && 4 <= max_threads) {
+    BOOST_CHECK_EQUAL(spMT1.getNumWorkers(4), 3);
     BOOST_CHECK_EQUAL(spMT2.getNumWorkers(3), 2);
   }
   else {
