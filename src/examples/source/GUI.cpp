@@ -44,6 +44,8 @@ int main(int argc, char **argv)
   std::string quickInfoText_;
   bool show_top_window_ = false;
   bool show_bottom_window_ = false;
+  bool show_left_window_ = false;
+  bool show_right_window_ = false;
 
   // to disable buttons
   bool workflow_is_done_ = true;
@@ -54,7 +56,7 @@ int main(int argc, char **argv)
   bool show_log_ = true;
   bool popup_about_ = false;
 
-  // View: Explorer pane
+  // View: left or right windows (i.e., Explorer pane)
   bool show_sequence_explorer = false;
   bool show_transitions_explorer = false;
   bool show_experiment_explorer = false;
@@ -145,8 +147,12 @@ int main(int argc, char **argv)
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
   const float main_menu_bar_y_size = 18.0f;
   float y_avail;
-  float y_avail_half;
+  float x_avail;
+  float bottom_window_y_size;
+  float bottom_and_top_window_x_size;
   float top_window_y_size;
+  float left_and_right_window_y_size;
+  float left_window_x_size;
 
   // Main loop
   bool done = false;
@@ -167,7 +173,10 @@ int main(int argc, char **argv)
 
     { // keeping this block to easily collapse/expand the bulk of the loop
     y_avail = io.DisplaySize.y - main_menu_bar_y_size;
-    y_avail_half = y_avail / 2;
+    x_avail = io.DisplaySize.x;
+    bottom_window_y_size = y_avail * 0.25;
+    left_and_right_window_y_size = y_avail;
+    left_window_x_size = x_avail * 0.25;
 
     workflow_is_done_ = manager_.isWorkflowDone();
     file_loading_is_done_ = file_picker_.fileLoadingIsDone();
@@ -559,9 +568,9 @@ int main(int argc, char **argv)
     // Top window
     if (show_top_window_)
     {
-      top_window_y_size = show_bottom_window_ ? y_avail_half : y_avail;
+      top_window_y_size = show_bottom_window_ ? y_avail - bottom_window_y_size : y_avail;
       ImGui::SetNextWindowPos(ImVec2(0, main_menu_bar_y_size));
-      ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, top_window_y_size));
+      ImGui::SetNextWindowSize(ImVec2(bottom_and_top_window_x_size, top_window_y_size));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags top_window_flags =
         ImGuiWindowFlags_NoTitleBar |
@@ -588,7 +597,7 @@ int main(int argc, char **argv)
     {
       const float bottom_window_y_pos = main_menu_bar_y_size + (show_top_window_ ? top_window_y_size : 0);
       ImGui::SetNextWindowPos(ImVec2(0, bottom_window_y_pos));
-      ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, show_top_window_ ? y_avail_half : y_avail));
+      ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, show_top_window_ ? bottom_window_y_size : y_avail));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags bottom_window_flags =
         ImGuiWindowFlags_NoTitleBar |
