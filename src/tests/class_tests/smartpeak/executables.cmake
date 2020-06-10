@@ -2,7 +2,6 @@ set(core_executables_list
 	ApplicationProcessor_test
 	CastValue_test
 	Filenames_test
-	GuiAppender_test
 	Helloworld_test
 	MetaDataHandler_test
 	RawDataHandler_test
@@ -28,6 +27,8 @@ set(algorithm_executables_list
 )
 
 set(ui_executables_list
+	GuiAppender_test
+	WindowSizesAndPositions_test
 )
 
 ### collect test executables

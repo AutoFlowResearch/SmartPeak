@@ -2,20 +2,20 @@
 
 #include <SmartPeak/test_config.h>
 
-#define BOOST_TEST_MODULE AppStateProcessor test suite
+#define BOOST_TEST_MODULE ApplicationProcessor test suite
 #include <boost/test/included/unit_test.hpp>
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 
 using namespace SmartPeak;
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(appstateprocessor)
+BOOST_AUTO_TEST_SUITE(applicationprocessor)
 
 BOOST_AUTO_TEST_CASE(buildcommandsfromids)
 {
-  AppState state;
+  ApplicationHandler state;
   BuildCommandsFromNames buildCommandsFromNames(state);
-  std::vector<AppState::Command> methods;
+  std::vector<ApplicationHandler::Command> methods;
 
   methods = buildCommandsFromNames(std::string(""));
   BOOST_CHECK_EQUAL(methods.size(), 0);

@@ -7,6 +7,7 @@ set(sources_list_h
 	GuiAppender.h
 	Report.h
 	Widget.h
+	WindowSizesAndPositions.h
 	Workflow.h
 )
 

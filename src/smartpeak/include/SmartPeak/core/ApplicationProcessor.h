@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SmartPeak/core/AppState.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <string>

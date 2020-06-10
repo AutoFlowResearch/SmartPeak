@@ -9,11 +9,12 @@
 #include <vector>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/ui/GuiAppender.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
-#include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <boost/filesystem.hpp>
@@ -29,10 +30,10 @@ namespace fs = boost::filesystem;
 
 void HelpMarker(const char* desc);
 
-void initializeDataDirs(AppState& state);
+void initializeDataDirs(ApplicationHandler& state);
 
 void initializeDataDir(
-  AppState& state,
+  ApplicationHandler& state,
   const std::string& label,
   std::string& data_dir_member,
   const std::string& default_dir
@@ -82,7 +83,7 @@ int main(int argc, char **argv)
   bool popup_run_workflow_ = false;
   bool popup_file_picker_ = false;
 
-  AppState state_;
+  ApplicationHandler state_;
   WorkflowManager manager_;
   GuiAppender appender_;
 
@@ -145,15 +146,7 @@ int main(int argc, char **argv)
   ImGui_ImplOpenGL2_Init();
 
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-  const float main_menu_bar_y_size = 18.0f;
-  float y_avail;
-  float x_avail;
-  float bottom_window_y_size;
-  float bottom_and_top_window_x_size;
-  float top_window_y_size;
-  float left_and_right_window_y_size;
-  float left_window_x_size;
-  float right_window_x_size;
+  WindowSizesAndPositions win_size_and_pos;
 
   // Main loop
   bool done = false;
@@ -173,12 +166,8 @@ int main(int argc, char **argv)
     ImGui::NewFrame();
 
     { // keeping this block to easily collapse/expand the bulk of the loop
-    y_avail = io.DisplaySize.y - main_menu_bar_y_size;
-    x_avail = io.DisplaySize.x;
-    bottom_window_y_size = y_avail * 0.25;
-    left_and_right_window_y_size = y_avail;
-    left_window_x_size = x_avail * 0.25;
-    right_window_x_size = x_avail * 0.25;
+    // Intialize the window sizes
+    win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
 
     workflow_is_done_ = manager_.isWorkflowDone();
     file_loading_is_done_ = file_picker_.fileLoadingIsDone();
@@ -256,7 +245,7 @@ int main(int argc, char **argv)
         for (const std::string& pathname : {state_.mzML_dir_, state_.features_in_dir_, state_.features_out_dir_}) {
           fs::create_directories(fs::path(pathname));
         }
-        for (AppState::Command& cmd : state_.commands_)
+        for (ApplicationHandler::Command& cmd : state_.commands_)
         {
           for (std::pair<const std::string, Filenames>& p : cmd.dynamic_filenames)
           {
@@ -564,17 +553,19 @@ int main(int argc, char **argv)
       ImGui::EndMainMenuBar();
     }
 
-    show_top_window_ = show_workflow_table;
+    show_top_window_ = show_sequence_table || show_transitions_table || show_workflow_table || show_parameters_table
+      || show_quant_method_table || show_stds_concs_table || show_comp_filters_table || show_comp_group_filters_table
+      || show_comp_qcs_table || show_comp_group_qcs_table || show_feature_plot || show_line_plot || show_heatmap_plot
+      || show_feature_summary_table || show_sequence_summary_table;
     show_bottom_window_ = show_info_ || show_log_;
+    show_left_window_ = show_sequence_explorer || show_transitions_explorer || show_experiment_explorer || show_features_explorer;
+    win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
 
     // Top window
     if (show_top_window_)
     {
-      top_window_y_size = show_bottom_window_ ? y_avail - bottom_window_y_size : y_avail;
-      bottom_and_top_window_x_size = show_left_window_ ? x_avail - left_window_x_size : x_avail;
-      const float top_window_x_pos = (show_left_window_ ? bottom_and_top_window_x_size : 0);
-      ImGui::SetNextWindowPos(ImVec2(top_window_x_pos, main_menu_bar_y_size));
-      ImGui::SetNextWindowSize(ImVec2(bottom_and_top_window_x_size, top_window_y_size));
+      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.bottom_and_top_window_x_pos_, win_size_and_pos.top_window_y_pos_));
+      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags top_window_flags =
         ImGuiWindowFlags_NoTitleBar |
@@ -599,11 +590,8 @@ int main(int argc, char **argv)
     // Bottom window
     if (show_bottom_window_)
     {
-      const float bottom_window_y_pos = main_menu_bar_y_size + (show_top_window_ ? top_window_y_size : 0);
-      bottom_and_top_window_x_size = show_left_window_ ? x_avail - left_window_x_size : x_avail;
-      const float bottom_window_x_pos = (show_left_window_ ? bottom_and_top_window_x_size : 0);
-      ImGui::SetNextWindowPos(ImVec2(bottom_window_x_pos, bottom_window_y_pos));
-      ImGui::SetNextWindowSize(ImVec2(bottom_and_top_window_x_size, show_top_window_ ? bottom_window_y_size : y_avail));
+      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.bottom_and_top_window_x_pos_, win_size_and_pos.bottom_window_y_pos_));
+      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.bottom_window_y_size_));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags bottom_window_flags =
         ImGuiWindowFlags_NoTitleBar |
@@ -685,7 +673,7 @@ void HelpMarker(const char* desc)
   }
 }
 
-void initializeDataDirs(AppState& state)
+void initializeDataDirs(ApplicationHandler& state)
 {
   initializeDataDir(state, "mzML", state.mzML_dir_, "mzML");
   initializeDataDir(state, "INPUT features", state.features_in_dir_, "features");
@@ -693,7 +681,7 @@ void initializeDataDirs(AppState& state)
 }
 
 void initializeDataDir(
-  AppState& state,
+  ApplicationHandler& state,
   const std::string& label,
   std::string& data_dir_member,
   const std::string& default_dir
