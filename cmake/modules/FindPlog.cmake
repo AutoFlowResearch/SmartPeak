@@ -1,18 +1,14 @@
 # - Try to find Plog lib
 #
-# This module supports requiring a minimum version, e.g. you can do
-#   find_package(Plog 3.1.2)
-# to require version 3.1.2 or newer of Plog.
-#
 # Once done this will define
 #
-#  PLOG_FOUND - system has eigen lib with correct version
-#  PLOG_INCLUDE_DIR - the eigen include directory
+#  PLOG_FOUND - system has plog lib with correct version
+#  PLOG_INCLUDE_DIR - the plog include directory
 
 if (PLOG_INCLUDE_DIR)
 
   # in cache already
-  set(PLOG_FOUND)
+  set(PLOG_FOUND true)
 
 else (PLOG_INCLUDE_DIR)
 

@@ -33,9 +33,11 @@ find_package(SDL2 REQUIRED)
 # Find ImGUI
 #------------------------------------------------------------------------------
 find_package(ImGUI REQUIRED)
-if (IMGUI_FOUND)
-  message(STATUS "ImGui_INCLUDE_DIR : ${ImGui_INCLUDE_DIR}")
-endif (IMGUI_FOUND)
+
+#------------------------------------------------------------------------------
+# Find ImPlot
+#------------------------------------------------------------------------------
+find_package(ImPlot REQUIRED)
 
 #------------------------------------------------------------------------------
 # Find plog
