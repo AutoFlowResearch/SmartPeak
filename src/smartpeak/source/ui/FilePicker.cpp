@@ -118,12 +118,12 @@ namespace SmartPeak
 
     ImGui::Separator();
 
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.9f);
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
     ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.5f);
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
     if (ImGui::Button("Open"))
     {
       picked_pathname_ = current_pathname_;
