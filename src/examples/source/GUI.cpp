@@ -58,7 +58,7 @@ int main(int argc, char **argv)
   bool popup_about_ = false;
 
   // View: left or right windows (i.e., Explorer pane)
-  bool show_sequence_explorer = false;
+  bool show_sequence_explorer = true;
   bool show_transitions_explorer = false;
   bool show_experiment_explorer = false;
   bool show_features_explorer = false;
@@ -77,8 +77,8 @@ int main(int argc, char **argv)
   bool show_feature_plot = false;
   bool show_line_plot = false;
   bool show_heatmap_plot = false;
-  bool show_feature_summary_table = false;
-  bool show_sequence_summary_table = false;
+  bool show_feat_db_table = false;
+  bool show_pivot_table = false;
 
   bool popup_run_workflow_ = false;
   bool popup_file_picker_ = false;
@@ -424,8 +424,8 @@ int main(int argc, char **argv)
         if (ImGui::MenuItem("Features", NULL, &show_feature_plot)) {}
         if (ImGui::MenuItem("Metric plot", NULL, &show_line_plot)) {}
         if (ImGui::MenuItem("Heatmap", NULL, &show_heatmap_plot)) {}
-        if (ImGui::MenuItem("Features table", NULL, &show_feature_summary_table)) {}
-        if (ImGui::MenuItem("Features pivot table", NULL, &show_sequence_summary_table)) {}
+        if (ImGui::MenuItem("Features table", NULL, &show_feat_db_table)) {}
+        if (ImGui::MenuItem("Features pivot table", NULL, &show_pivot_table)) {}
         ImGui::MenuItem("Info window", NULL, false, false);
         if (ImGui::MenuItem("Info", NULL, &show_info_)) {}
         if (ImGui::MenuItem("Log", NULL, &show_log_)) {}
@@ -556,10 +556,51 @@ int main(int argc, char **argv)
     show_top_window_ = show_sequence_table || show_transitions_table || show_workflow_table || show_parameters_table
       || show_quant_method_table || show_stds_concs_table || show_comp_filters_table || show_comp_group_filters_table
       || show_comp_qcs_table || show_comp_group_qcs_table || show_feature_plot || show_line_plot || show_heatmap_plot
-      || show_feature_summary_table || show_sequence_summary_table;
+      || show_feat_db_table || show_pivot_table;
     show_bottom_window_ = show_info_ || show_log_;
     show_left_window_ = show_sequence_explorer || show_transitions_explorer || show_experiment_explorer || show_features_explorer;
     win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
+
+    // Left window
+    if (show_left_window_)
+    {
+      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.left_window_x_pos_, win_size_and_pos.left_and_right_window_y_pos_));
+      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_));
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+      const ImGuiWindowFlags left_window_flags =
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoFocusOnAppearing;
+      ImGui::Begin("Left window", NULL, left_window_flags);
+      if (ImGui::BeginTabBar("Left window tab bar", ImGuiTabBarFlags_Reorderable))
+      {
+        if (show_sequence_explorer && ImGui::BeginTabItem("Sequence", &show_sequence_explorer))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_transitions_explorer && ImGui::BeginTabItem("Transitions", &show_transitions_explorer))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_experiment_explorer && ImGui::BeginTabItem("Experiment", &show_experiment_explorer))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_features_explorer && ImGui::BeginTabItem("Features", &show_features_explorer))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+      }
+      ImGui::End();
+      ImGui::PopStyleVar();
+    }
 
     // Top window
     if (show_top_window_)
@@ -576,9 +617,79 @@ int main(int argc, char **argv)
       ImGui::Begin("Top window", NULL, top_window_flags);
       if (ImGui::BeginTabBar("Top window tab bar", ImGuiTabBarFlags_Reorderable))
       {
+        if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
           ImGui::Text("Workflow status: %s", workflow_is_done_ ? "done" : "running...");
+          ImGui::EndTabItem();
+        }
+        if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_quant_method_table && ImGui::BeginTabItem("Quantitation Method", &show_quant_method_table))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_stds_concs_table && ImGui::BeginTabItem("Standards Concentrations", &show_stds_concs_table))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_comp_filters_table && ImGui::BeginTabItem("Component Filters", &show_comp_filters_table))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_comp_group_filters_table && ImGui::BeginTabItem("Component Group Filters", &show_comp_group_filters_table))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_comp_qcs_table && ImGui::BeginTabItem("Component QCs", &show_comp_qcs_table))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_comp_group_qcs_table && ImGui::BeginTabItem("Component Group QCs", &show_comp_group_qcs_table))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_feature_plot && ImGui::BeginTabItem("Features plot", &show_feature_plot))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_line_plot && ImGui::BeginTabItem("Line plot", &show_line_plot))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_heatmap_plot && ImGui::BeginTabItem("Heatmap", &show_heatmap_plot))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_feat_db_table && ImGui::BeginTabItem("Feature DB", &show_feat_db_table))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_pivot_table && ImGui::BeginTabItem("Pivot Table", &show_pivot_table))
+        {
+          ImGui::Text("TODO...");
           ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
