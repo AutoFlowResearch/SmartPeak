@@ -1,5 +1,5 @@
 #include <SmartPeak/ui/Workflow.h>
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <plog/Log.h>
@@ -13,7 +13,7 @@ namespace SmartPeak
 
     if (!state_)
     {
-      LOGE << "Workflow widget has no AppState object associated with it";
+      LOGE << "Workflow widget has no ApplicationHandler object associated with it";
       draw_ = false; // to avoid flooding the log
       return;
     }
@@ -24,7 +24,7 @@ namespace SmartPeak
 
     if (ImGui::BeginCombo("Presets", NULL))
     {
-      AppState::Command cmd;
+      ApplicationHandler::Command cmd;
       CreateCommand createCommand(*state_);
       const char* presets[] = {
         "LCMS MRM Unknowns",
@@ -70,7 +70,7 @@ namespace SmartPeak
 
     if (ImGui::BeginCombo("Add Raw data method", NULL))
     {
-      AppState::Command cmd;
+      ApplicationHandler::Command cmd;
       CreateCommand createCommand(*state_);
       for (const auto& p : n_to_raw_data_method_)
       {
@@ -87,7 +87,7 @@ namespace SmartPeak
 
     if (ImGui::BeginCombo("Add Sequence Segment method", NULL))
     {
-      AppState::Command cmd;
+      ApplicationHandler::Command cmd;
       CreateCommand createCommand(*state_);
       for (const auto& p : n_to_seq_seg_method_)
       {
@@ -128,7 +128,7 @@ namespace SmartPeak
         {
           IM_ASSERT(payload->DataSize == sizeof(int));
           int source_n = *(const int*)payload->Data;
-          AppState::Command tmp = commands_.at(source_n);
+          ApplicationHandler::Command tmp = commands_.at(source_n);
           commands_.erase(commands_.cbegin() + source_n);
           commands_.insert(commands_.cbegin() + i, tmp);
         }
@@ -172,12 +172,12 @@ namespace SmartPeak
     ImGui::EndPopup();
   }
 
-  std::vector<AppState::Command> Workflow::getCommands() const
+  std::vector<ApplicationHandler::Command> Workflow::getCommands() const
   {
     return commands_;
   }
 
-  void Workflow::setState(AppState& state)
+  void Workflow::setState(ApplicationHandler& state)
   {
     LOGD << "Setting state: " << (&state);
     state_ = &state;

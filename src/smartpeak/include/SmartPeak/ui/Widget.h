@@ -96,7 +96,7 @@ namespace SmartPeak
 
     TODO: potential refactors
     - Extract out methods for making the headers and columns
-    - Extract out method for maing the filters (unit testable)
+    - Extract out method for making the filters (unit testable)
   */
   class GenericTableWidget : public Widget
   {

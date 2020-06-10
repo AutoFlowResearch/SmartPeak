@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SmartPeak/core/AppState.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 
 namespace SmartPeak {
   class WorkflowManager {
@@ -11,7 +11,7 @@ namespace SmartPeak {
 
       @param[in,out] The state that gets copied and then updated at the end of the workflow run
     */
-    void addWorkflow(AppState& source_state);
+    void addWorkflow(ApplicationHandler& source_state);
 
     /**
       If this returns false, new workflows can't run and the following menu items
@@ -33,9 +33,9 @@ namespace SmartPeak {
       @param[in,out] done Points to the class' done member
       @param[out] source_state The modified state is copied back here
     */
-    static void run_and_join(AppState& state, bool& done, AppState& source_state);
+    static void run_and_join(ApplicationHandler& state, bool& done, ApplicationHandler& source_state);
 
-    AppState state_; ///< The workflow is run on this copy
+    ApplicationHandler state_; ///< The workflow is run on this copy
     bool done_ = true;
   };
 }

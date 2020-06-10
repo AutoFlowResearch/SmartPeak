@@ -11,7 +11,7 @@
 
 namespace SmartPeak
 {
-  struct AppState final {
+  struct ApplicationHandler final {
     class Command {
     public:
       enum CommandType {

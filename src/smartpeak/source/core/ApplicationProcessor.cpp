@@ -1,4 +1,4 @@
-#include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/AppStateProcessor.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>

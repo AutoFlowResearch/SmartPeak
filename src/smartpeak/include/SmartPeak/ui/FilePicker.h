@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/ui/Widget.h>
 #include <array>
@@ -17,11 +17,11 @@ namespace SmartPeak
     std::array<std::vector<std::string>, 4> pathname_content_;
     std::string current_pathname_ = ".";
     std::string picked_pathname_;
-    AppStateProcessor* processor_ = nullptr;
+    ApplicationProcessor* processor_ = nullptr;
     bool loading_is_done_ = true;
 
     void run_and_join(
-      AppStateProcessor* processor,
+      ApplicationProcessor* processor,
       const std::string& pathname,
       bool& loading_is_done
     );
@@ -37,7 +37,7 @@ namespace SmartPeak
 
     std::string getPickedPathname() const;
 
-    void setProcessor(AppStateProcessor& processor);
+    void setProcessor(ApplicationProcessor& processor);
 
     void runProcessor();
 

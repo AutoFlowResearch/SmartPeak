@@ -1,4 +1,4 @@
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/Utilities.h>
 #include <future>
@@ -161,7 +161,7 @@ namespace SmartPeak
     return picked_pathname_;
   }
 
-  void FilePicker::setProcessor(AppStateProcessor& processor)
+  void FilePicker::setProcessor(ApplicationProcessor& processor)
   {
     LOGD << "Setting processor: " << (&processor);
     processor_ = &processor;
@@ -183,7 +183,7 @@ namespace SmartPeak
   }
 
   void FilePicker::run_and_join(
-    AppStateProcessor* processor,
+    ApplicationProcessor* processor,
     const std::string& pathname,
     bool& loading_is_done
   )

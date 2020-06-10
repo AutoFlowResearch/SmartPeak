@@ -1,11 +1,11 @@
 #include <SmartPeak/core/WorkflowManager.h>
-#include <SmartPeak/core/AppState.h>
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <thread>
 #include <future>
 
 namespace SmartPeak {
-  void WorkflowManager::addWorkflow(AppState& source_state)
+  void WorkflowManager::addWorkflow(ApplicationHandler& source_state)
   {
     // do not run workflows concurrently
     if (!done_) {
@@ -24,7 +24,7 @@ namespace SmartPeak {
     return done_;
   }
 
-  void WorkflowManager::run_and_join(AppState& state, bool& done, AppState& source_state)
+  void WorkflowManager::run_and_join(ApplicationHandler& state, bool& done, ApplicationHandler& source_state)
   {
     // run workflow asynchronously
     std::future<void> f = std::async(

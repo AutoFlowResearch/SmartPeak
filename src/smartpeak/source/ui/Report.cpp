@@ -1,5 +1,5 @@
 #include <SmartPeak/ui/Report.h>
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/io/SequenceParser.h>
@@ -23,7 +23,7 @@ namespace SmartPeak
 
     if (!state_)
     {
-      LOGE << "Report widget has no AppState object associated with it";
+      LOGE << "Report widget has no ApplicationHandler object associated with it";
       draw_ = false; // to avoid flooding the log
       return;
     }
@@ -123,7 +123,7 @@ namespace SmartPeak
     ImGui::EndPopup();
   }
 
-  void Report::setState(AppState& state)
+  void Report::setState(ApplicationHandler& state)
   {
     LOGD << "Setting state: " << (&state);
     state_ = &state;

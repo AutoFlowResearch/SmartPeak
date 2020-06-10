@@ -7,8 +7,8 @@
 #include <chrono>
 #include <string>
 #include <vector>
-#include <SmartPeak/core/AppState.h>
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/ui/GuiAppender.h>
 #include <SmartPeak/ui/Report.h>
@@ -153,6 +153,7 @@ int main(int argc, char **argv)
   float top_window_y_size;
   float left_and_right_window_y_size;
   float left_window_x_size;
+  float right_window_x_size;
 
   // Main loop
   bool done = false;
@@ -177,6 +178,7 @@ int main(int argc, char **argv)
     bottom_window_y_size = y_avail * 0.25;
     left_and_right_window_y_size = y_avail;
     left_window_x_size = x_avail * 0.25;
+    right_window_x_size = x_avail * 0.25;
 
     workflow_is_done_ = manager_.isWorkflowDone();
     file_loading_is_done_ = file_picker_.fileLoadingIsDone();
@@ -569,7 +571,9 @@ int main(int argc, char **argv)
     if (show_top_window_)
     {
       top_window_y_size = show_bottom_window_ ? y_avail - bottom_window_y_size : y_avail;
-      ImGui::SetNextWindowPos(ImVec2(0, main_menu_bar_y_size));
+      bottom_and_top_window_x_size = show_left_window_ ? x_avail - left_window_x_size : x_avail;
+      const float top_window_x_pos = (show_left_window_ ? bottom_and_top_window_x_size : 0);
+      ImGui::SetNextWindowPos(ImVec2(top_window_x_pos, main_menu_bar_y_size));
       ImGui::SetNextWindowSize(ImVec2(bottom_and_top_window_x_size, top_window_y_size));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags top_window_flags =
@@ -596,8 +600,10 @@ int main(int argc, char **argv)
     if (show_bottom_window_)
     {
       const float bottom_window_y_pos = main_menu_bar_y_size + (show_top_window_ ? top_window_y_size : 0);
-      ImGui::SetNextWindowPos(ImVec2(0, bottom_window_y_pos));
-      ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, show_top_window_ ? bottom_window_y_size : y_avail));
+      bottom_and_top_window_x_size = show_left_window_ ? x_avail - left_window_x_size : x_avail;
+      const float bottom_window_x_pos = (show_left_window_ ? bottom_and_top_window_x_size : 0);
+      ImGui::SetNextWindowPos(ImVec2(bottom_window_x_pos, bottom_window_y_pos));
+      ImGui::SetNextWindowSize(ImVec2(bottom_and_top_window_x_size, show_top_window_ ? bottom_window_y_size : y_avail));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags bottom_window_flags =
         ImGuiWindowFlags_NoTitleBar |
