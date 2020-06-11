@@ -18,20 +18,20 @@ Download and install the pre-compiled Boost library binaries for windows
 Download and install QT5 using the offline installer for windows
 - NOTE: only install the 5.12.1 for the relevant version of visual studios
 - Add the "lib" folder in the newly created qt5 directory to the system path variable so that the .dll's will be found during run-time
-- or add `PATH=%PATH%;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/bin;C:/local/boost_1_67_0/lib64-msvc-14.1` to the environment
+- or add e.g. `PATH=%PATH%;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/bin;C:/local/boost_1_67_0/lib64-msvc-14.1` to the environment
 
 ### STEP 2: Build OpenMS
 Build OpenMS following the OpenMS wiki instructions. Example cmake command on windows
 ```
 cmake -DBoost_NO_SYSTEM_PATHS=ON -BOOST_INCLUDEDIR="C:/local/boost_1_67_0/boost" -DBOOST_ROOT="C:/local/boost_1_67_0" ^
 -DBOOST_LIBRARYDIR="C:/local/boost_1_67_0/lib64-msvc-14.1" -DBOOST_USE_STATIC=OFF -DWITH_GUI=OFF -DPYOPENMS=OFF ^
--DOPENMS_CONTRIB_LIBS="C:/Users/domccl/GitHub/OpenMS/contrib/build" -DCMAKE_PREFIX_PATH="C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib/cmake" ^
+-DOPENMS_CONTRIB_LIBS="[OpenMS directory]/contrib/build" -DCMAKE_PREFIX_PATH="C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib/cmake" ^
 -G "Visual Studio 15 2017 Win64" ..
 ```
 
 - Open "OpenMS_host" in visual studios and build only the solution for "OpenSwathAlgo" and then for "OpenMS" IN THAT ORDER
 - Add the "lib" folder in the openms-build directory to the system path variable so that the .dll's will be found during run-time
-- or add `PATH=%PATH%;C:/Users/domccl/GitHub/OpenMS/openms-build/bin/debug;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/bin;C:/local/boost_1_67_0/lib64-msvc-14.1;C:/Users/domccl/GitHub/SDL/lib/x64` to the environment
+- or add `PATH=%PATH%;[OpenMS directory]/openms-build/bin/debug;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/bin;C:/local/boost_1_67_0/lib64-msvc-14.1;[SDL directory]/lib/x64` to the environment
 
 ### STEP 3: Build SmartPeak dependencies
 Download the latest SDL2 libraries. Add the SDL2 folder to the path environmental variable. Compile using cmake and build for "external projects"
@@ -45,12 +45,12 @@ Example cmake command on windows
 ```
 cmake -DEIGEN_USE_GPU=OFF -DBoost_NO_SYSTEM_PATHS=ON -BOOST_INCLUDEDIR="C:/local/boost_1_67_0/boost" -DBOOST_ROOT="C:/local/boost_1_67_0" ^
 -DBOOST_LIBRARYDIR="C:/local/boost_1_67_0/lib64-msvc-14.1" -DBOOST_USE_STATIC=OFF -G "Visual Studio 15 2017 Win64" -T host=x64 -DUSE_SUPERBUILD=OFF ^
--DEIGEN3_INCLUDE_DIR=C:/Users/domccl/GitHub/smartPeak_cpp/build_external/Dependencies/Source/eigen ^
--DPLOG_INCLUDE_DIR=C:/Users/domccl/GitHub/smartPeak2/build2/Dependencies/Source/plog/include ^
--DIMGUI_DIR=C:/Users/domccl/GitHub/smartPeak2/build2/Dependencies/Source/imgui ^
--DCMAKE_PREFIX_PATH="C:/Users/domccl/GitHub/OpenMS/openms-build";"C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib/cmake";"C:/Users/domccl/GitHub/SDL"; ..
+-DEIGEN3_INCLUDE_DIR=[home directory]/smartPeak_cpp/build_external/Dependencies/Source/eigen ^
+-DPLOG_INCLUDE_DIR=[home directory]/smartPeak2/build2/Dependencies/Source/plog/include ^
+-DIMGUI_DIR=[home directory]/smartPeak2/build2/Dependencies/Source/imgui ^
+-DCMAKE_PREFIX_PATH="[OpenMS directory]/openms-build";"C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib/cmake";"[SDL directory]/SDL"; ..
 ```
-Open "SmartPeak2_host" in visual studios and build the project of choice
+Open "SmartPeak2_host" in visual studios and build the project of choice. Projects can be built using Visual Studios in the IDE by opening `msbuild [build_dir]/src/SmartPeak2_host` and selecting the specific target to build in the GUI or on the command line by running e.g., `msbuild [build_dir]/src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount` which will build the main SmartPeak library and then running e.g., `msbuild [build_dir]/examples/SmartPeak_class_examples_smartpeak.sln -target:GUI /verbosity:normal /maxcpucount` which will build the SmartPeak GUI.
 
 ## Linux
 In the below instructions it is assumed OpenMS code resides in  `~/OpenMS` and SmartPeak code is in `~/SmartPeak2`.
@@ -73,24 +73,8 @@ make -j4 OpenMS
 ```
 
 ### STEP 3: Building SmartPeak
-SuperBuild helps downloading the dependencies for SmartPeak. Feel free to comment out any dependency that you don't want to (super)build by modifying the file `CMakeLists.txt`.
+SuperBuild helps downloading the dependencies for SmartPeak. 
 
-Example:
-```cmake
-if (USE_SUPERBUILD)
-  project ("SuperBuild" NONE)
-  include(external/plog.cmake)
-  if (MSVC)
-    # include(external/eigen.cmake)
-    include(external/boost.cmake)
-    # include(external/openms.cmake)
-  endif()
-  return()
-else()
-  project ("SmartPeak_host")
-endif()
-```
-Then proceed with:
 ```
 cd ~
 mkdir SmartPeak2_superbuild SmartPeak2_build
@@ -131,6 +115,11 @@ The collection of examples is located at `src/example/data` directory of the Sma
 ```
 ./bin/GUI
 ```
+for Mac and Linux, or
+```
+./bin/[Debug or Release]/GUI
+```
+for Windows.
 or double-click `GUI` executable in the file browser of your OS.
 - Start the session with `File | Load session from sequence`
 - Choose the corresponding directory with `Change dir`. The path to example folder can be shortened to f.e. `/data/GCMS_SIM_Unknowns` 
@@ -151,3 +140,4 @@ The same operations can be performed with the command line interface. Run `./bin
 - `Edit -> Workflow`
 - `Actions -> Run workflow`
 - `Actions -> Report`
+The above applies for Mac and Linux.
