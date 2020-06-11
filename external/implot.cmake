@@ -8,7 +8,7 @@ set (IMPLOT_VERSION master)
 message (STATUS "Adding ImPlot ${IMPLOT_VERSION} as an external project.")
 
 ExternalProject_Add(implot
-  GIT_REPOSITORY "https://https://github.com/epezent/implot.git"
+  GIT_REPOSITORY "https://github.com/epezent/implot.git"
   GIT_TAG ${IMPLOT_VERSION}
   UPDATE_COMMAND ""
   CONFIGURE_COMMAND ""
