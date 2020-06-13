@@ -447,88 +447,6 @@ int main(int argc, char **argv)
           initializeDataDirs(state_);
           popup_run_workflow_ = true;
         }
-        if (ImGui::BeginMenu("Quick info"))
-        { // TODO: bug
-          if (ImGui::MenuItem("Sequence")) {
-            quickInfoText_ = InputDataValidation::getSequenceInfo(state_.sequenceHandler_);
-          }
-          if (ImGui::MenuItem("Transitions")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getTraMLInfo(state_.sequenceHandler_.getSequence().front().getRawData());
-            }
-          }
-          if (ImGui::MenuItem("Quant Method")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequenceSegments().size()) {
-              quickInfoText_ = InputDataValidation::getQuantitationMethodsInfo(state_.sequenceHandler_.getSequenceSegments().front());
-            }
-          }
-          if (ImGui::MenuItem("Standards Conc")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequenceSegments().size()) {
-              quickInfoText_ = InputDataValidation::getStandardsConcentrationsInfo(state_.sequenceHandler_.getSequenceSegments().front());
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) Filters")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), true);
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) QCs")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) %RSD Filters")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureRSDFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), true);
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) %RSD QCs")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureRSDFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) %Background Filters")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureBackgroundFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), true);
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) %Background QCs")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureBackgroundFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
-            }
-          }
-          if (ImGui::MenuItem("Parameters")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getParametersInfo(state_.sequenceHandler_.getSequence().front().getRawData().getParameters());
-            }
-          }
-          if (ImGui::MenuItem("Raw data files")) {
-            quickInfoText_ = state_.sequenceHandler_.getRawDataFilesInfo();
-          }
-          if (ImGui::MenuItem("Analyzed features")) {
-            quickInfoText_ = state_.sequenceHandler_.getAnalyzedFeaturesInfo();
-          }
-          if (ImGui::MenuItem("Selected features")) {
-            quickInfoText_ = state_.sequenceHandler_.getSelectedFeaturesInfo();
-          }
-          if (ImGui::MenuItem("Picked peaks")) {
-            quickInfoText_ = state_.sequenceHandler_.getPickedPeaksInfo();
-          }
-          if (ImGui::MenuItem("Filtered/selected peaks")) {
-            quickInfoText_ = state_.sequenceHandler_.getFilteredSelectedPeaksInfo();
-          }
-          ImGui::EndMenu();
-        }
         if (ImGui::BeginMenu("Integrity checks"))
         {  // TODO: bug
           if (ImGui::MenuItem("Sample consistency")) {}
@@ -619,12 +537,62 @@ int main(int argc, char **argv)
       {
         if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
         {
-          ImGui::Text("TODO...");
+          // TODO: encapsulate in it's own method
+          const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | 
+            //ImGuiTableFlags_Sortable | ImGuiTableFlags_Hideable |
+            ImGuiTableFlags_Borders | ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow | ImGuiTableFlags_ScrollFreezeLeftColumn;
+          std::vector<std::string> sequence_table_headers = {"inj_number", "sample_name", "sample_group_name" , "sequence_segment_name" , "original_filename",
+          "sample_type", "acq_method_name", "inj_volume", "inj_volume_units", "batch_name", "acquisition_date_and_time" };
+          if (ImGui::BeginTable("Sequence", sequence_table_headers.size(), table_flags)){
+            for (int column = 0; column < sequence_table_headers.size(); column++){
+              ImGui::TableSetupColumn(sequence_table_headers.at(column).c_str());
+            }
+            ImGui::TableAutoHeaders();
+            for (const auto& injection : state_.sequenceHandler_.getSequence()) {
+              ImGui::TableNextRow();
+              int column = 0;
+              ImGui::TableSetColumnIndex(column);
+              ImGui::Text(std::to_string(injection.getMetaData().inj_number).c_str());
+              ++column;
+              ImGui::TableSetColumnIndex(column);
+              ImGui::Text(injection.getMetaData().sample_name.c_str());
+              ++column;
+              ImGui::TableSetColumnIndex(column);
+              ImGui::Text(injection.getMetaData().sample_group_name.c_str());
+              ++column;
+              ImGui::TableSetColumnIndex(column);
+              ImGui::Text(injection.getMetaData().sequence_segment_name.c_str());
+              ++column;
+              ImGui::TableSetColumnIndex(column);
+              ImGui::Text(injection.getMetaData().original_filename.c_str());
+              ++column;
+              ImGui::TableSetColumnIndex(column);
+              ImGui::Text(injection.getMetaData().getSampleTypeAsString().c_str());
+              ++column;
+              ImGui::TableSetColumnIndex(column);
+              ImGui::Text(injection.getMetaData().acq_method_name.c_str());
+              ++column;
+              ImGui::TableSetColumnIndex(column);
+              ImGui::Text(std::to_string(injection.getMetaData().inj_volume).c_str());
+              ++column;
+              ImGui::TableSetColumnIndex(column);
+              ImGui::Text(injection.getMetaData().inj_volume_units.c_str());
+              ++column;
+              ImGui::TableSetColumnIndex(column);
+              ImGui::Text(injection.getMetaData().batch_name.c_str());
+              ++column;
+              ImGui::TableSetColumnIndex(column);
+              // Skipping optional members
+              ImGui::Text(injection.getMetaData().getAcquisitionDateAndTimeAsString().c_str());
+            }
+            ImGui::EndTable();
+          }
           ImGui::EndTabItem();
         }
         if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
         {
           ImGui::Text("TODO...");
+          //const auto& targeted_exp = state_.sequenceHandler_.getSequence().at(0).getRawDataShared()->getTargetedExperimentShared();
           ImGui::EndTabItem();
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
