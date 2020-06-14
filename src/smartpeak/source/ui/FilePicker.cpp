@@ -161,7 +161,7 @@ namespace SmartPeak
     return picked_pathname_;
   }
 
-  void FilePicker::setProcessor(ApplicationProcessor& processor)
+  void FilePicker::setProcessor(FilePickerProcessor& processor)
   {
     LOGD << "Setting processor: " << (&processor);
     processor_ = &processor;
@@ -183,15 +183,15 @@ namespace SmartPeak
   }
 
   void FilePicker::run_and_join(
-    ApplicationProcessor* processor,
+    FilePickerProcessor* processor,
     const std::string& pathname,
     bool& loading_is_done
   )
   {
+    processor->pathname_ = pathname;
     std::future<void> f = std::async(
-      std::launch::async,
-      [processor](const char* pathname){ (*processor)(pathname); },
-      pathname.c_str()
+      std::launch::async, 
+      [processor](){ processor->process(); }
     );
 
     LOGN << "File is being loaded...";

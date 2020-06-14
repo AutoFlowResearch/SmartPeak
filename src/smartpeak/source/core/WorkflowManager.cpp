@@ -11,9 +11,9 @@ namespace SmartPeak {
     if (!done_) {
       return;
     }
-    state_ = source_state;
+    application_handler_ = source_state;
     done_ = false;
-    std::thread t(run_and_join, std::ref(state_), std::ref(done_), std::ref(source_state));
+    std::thread t(run_and_join, std::ref(application_handler_), std::ref(done_), std::ref(source_state));
     LOGD << "Created thread (to be detached): " << t.get_id();
     t.detach();
     LOGD << "Thread has been detached";
@@ -29,7 +29,7 @@ namespace SmartPeak {
     // run workflow asynchronously
     std::future<void> f = std::async(
       std::launch::async,
-      AppStateProcessors::processCommands,
+      ApplicationProcessors::processCommands,
       std::ref(state),
       state.commands_
     );

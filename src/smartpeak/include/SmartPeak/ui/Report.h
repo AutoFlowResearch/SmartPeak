@@ -17,7 +17,7 @@ namespace SmartPeak
     std::array<bool, FeatureMetadataSize> md_checks_;
     std::set<SampleType>                  summarySampleTypes_;
     std::vector<FeatureMetadata>          summaryMetaData_;
-    ApplicationHandler*                             state_ = nullptr;
+    ApplicationHandler*                             application_handler_ = nullptr;
 
     bool initializeMetadataAndSampleTypes();
 

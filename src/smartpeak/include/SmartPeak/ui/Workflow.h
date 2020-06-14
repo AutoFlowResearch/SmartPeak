@@ -10,7 +10,7 @@ namespace SmartPeak
   class Workflow final : public Widget
   {
     std::vector<ApplicationHandler::Command> commands_;
-    ApplicationHandler* state_ = nullptr;
+    ApplicationHandler* application_handler_ = nullptr;
 
   public:
     bool draw_ = false;

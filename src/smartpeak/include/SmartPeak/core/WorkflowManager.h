@@ -35,7 +35,7 @@ namespace SmartPeak {
     */
     static void run_and_join(ApplicationHandler& state, bool& done, ApplicationHandler& source_state);
 
-    ApplicationHandler state_; ///< The workflow is run on this copy
+    ApplicationHandler application_handler_; ///< The workflow is run on this copy
     bool done_ = true;
   };
 }

@@ -23,11 +23,11 @@ namespace SmartPeak
 {
   bool LoadSessionFromSequence::buildStaticFilenames()
   {
-    Filenames& f = state_.static_filenames_;
-    state_.main_dir_ = state_.sequence_pathname_.substr(0, state_.sequence_pathname_.find_last_of('/'));
-    f = Filenames::getDefaultStaticFilenames(state_.main_dir_);
+    Filenames& f = application_handler_.static_filenames_;
+    application_handler_.main_dir_ = application_handler_.sequence_pathname_.substr(0, application_handler_.sequence_pathname_.find_last_of('/'));
+    f = Filenames::getDefaultStaticFilenames(application_handler_.main_dir_);
     clearNonExistantDefaultGeneratedFilenames(f);
-    f.sequence_csv_i = state_.sequence_pathname_;
+    f.sequence_csv_i = application_handler_.sequence_pathname_;
 
     LOGN << "\n\n"
       "The following list of file was searched for:\n";
@@ -106,31 +106,6 @@ namespace SmartPeak
     }
   }
 
-  void LoadSessionFromSequence::generatePathnamesTxt(
-    const std::string& pathname,
-    const Filenames& f,
-    const std::vector<InputDataValidation::FilenameInfo>& is_valid
-  )
-  {
-    std::ofstream ofs(pathname);
-    if (!ofs.is_open()) {
-      LOGF << "\n\nCan't open file: " << pathname << "\n";
-      return;
-    }
-    std::vector<InputDataValidation::FilenameInfo>::const_iterator it = is_valid.cbegin();
-    ofs <<
-      "sequence="            << getValidPathnameOrPlaceholder(f.sequence_csv_i, (it++)->validity) <<
-      "parameters="          << getValidPathnameOrPlaceholder(f.parameters_csv_i, (it++)->validity) <<
-      "traml="               << getValidPathnameOrPlaceholder(f.traML_csv_i, (it++)->validity) <<
-      "featureFilter="       << getValidPathnameOrPlaceholder(f.featureFilterComponents_csv_i, (it++)->validity) <<
-      "featureFilterGroups=" << getValidPathnameOrPlaceholder(f.featureFilterComponentGroups_csv_i, (it++)->validity) <<
-      "featureQC="           << getValidPathnameOrPlaceholder(f.featureQCComponents_csv_i, (it++)->validity) <<
-      "featureQCGroups="     << getValidPathnameOrPlaceholder(f.featureQCComponentGroups_csv_i, (it++)->validity) <<
-      "quantitationMethods=" << getValidPathnameOrPlaceholder(f.quantitationMethods_csv_i, (it++)->validity) <<
-      "standardsConcentrations=" << getValidPathnameOrPlaceholder(f.standardsConcentrations_csv_i, (it++)->validity) <<
-      "referenceData="       << getValidPathnameOrPlaceholder(f.referenceData_csv_i, (it++)->validity);
-  }
-
   std::string LoadSessionFromSequence::getValidPathnameOrPlaceholder(
     const std::string& pathname, const bool is_valid
   )
@@ -202,7 +177,7 @@ namespace SmartPeak
     }
   }
 
-  namespace AppStateProcessors {
+  namespace ApplicationProcessors {
   void processCommands(ApplicationHandler& state, std::vector<ApplicationHandler::Command> commands)
   {
     size_t i = 0;
@@ -237,8 +212,7 @@ namespace SmartPeak
   }
   }
 
-  bool CreateCommand::operator()(const std::string& names, ApplicationHandler::Command& cmd)
-  {
+  bool CreateCommand::process(){
     // Enumerate the valid command keys
     std::vector<std::string> valid_commands_raw_data_processor;
     for (const auto& it: n_to_raw_data_method_) { valid_commands_raw_data_processor.push_back(it.first); }
@@ -246,88 +220,92 @@ namespace SmartPeak
     for (const auto& it: n_to_seq_seg_method_) { valid_commands_sequence_segment_processor.push_back(it.first); }
 
     // Run the command depending on whether it is a raw data processor method or sequence segment processor method
-    if (std::count(valid_commands_raw_data_processor.begin(), valid_commands_raw_data_processor.end(), names)) {
-      cmd.setMethod(n_to_raw_data_method_.at(names));
-      for (const InjectionHandler& injection : state_.sequenceHandler_.getSequence()) {
+    if (std::count(valid_commands_raw_data_processor.begin(), valid_commands_raw_data_processor.end(), name_)) {
+      cmd_.setMethod(n_to_raw_data_method_.at(name_));
+      for (const InjectionHandler& injection : application_handler_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
-        cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-          state_.mzML_dir_,
-          state_.features_in_dir_,
-          state_.features_out_dir_,
+        cmd_.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+          application_handler_.mzML_dir_,
+          application_handler_.features_in_dir_,
+          application_handler_.features_out_dir_,
           injection.getMetaData().getSampleName(),
           key
         );
       }
-    } else if (std::count(valid_commands_sequence_segment_processor.begin(), valid_commands_sequence_segment_processor.end(), names)) {
-      cmd.setMethod(n_to_seq_seg_method_.at(names));
-      for (const SequenceSegmentHandler& sequence_segment : state_.sequenceHandler_.getSequenceSegments()) {
+    } else if (std::count(valid_commands_sequence_segment_processor.begin(), valid_commands_sequence_segment_processor.end(), name_)) {
+      cmd_.setMethod(n_to_seq_seg_method_.at(name_));
+      for (const SequenceSegmentHandler& sequence_segment : application_handler_.sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();
-        cmd.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-          state_.mzML_dir_,
-          state_.features_in_dir_,
-          state_.features_out_dir_,
+        cmd_.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+          application_handler_.mzML_dir_,
+          application_handler_.features_in_dir_,
+          application_handler_.features_out_dir_,
           key,
           key
         );
       }
     } else {
-      LOGE << "\nNo command for selection name " << names;
+      LOGE << "\nNo command for selection name " << name_;
       return false;
     }
     return true;
   }
 
-  void LoadSessionFromSequence::operator()(const char* const pathname)
+  bool LoadSessionFromSequence::process()
   {
-    state_.sequence_pathname_ = std::string(pathname);
-    state_.mzML_dir_.clear();
-    state_.features_in_dir_.clear();
-    state_.features_out_dir_.clear();
+    application_handler_.sequence_pathname_ = pathname_;
+    application_handler_.mzML_dir_.clear();
+    application_handler_.features_in_dir_.clear();
+    application_handler_.features_out_dir_.clear();
     LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
     const bool pathnamesAreCorrect = buildStaticFilenames();
     if (pathnamesAreCorrect) {
-      state_.sequenceHandler_.clear();
-      CreateSequence cs(state_.sequenceHandler_);
-      cs.filenames        = state_.static_filenames_;
+      application_handler_.sequenceHandler_.clear();
+      CreateSequence cs(application_handler_.sequenceHandler_);
+      cs.filenames        = application_handler_.static_filenames_;
       cs.delimiter        = ",";
       cs.checkConsistency = true;
       cs.process();
+      return true;
     } else {
       LOGE << "Provided and/or inferred pathnames are not correct."
         "The sequence has not been modified.";
+      return false;
     }
   }
 
-  std::vector<ApplicationHandler::Command> BuildCommandsFromNames::operator()(const std::string& names)
+  bool BuildCommandsFromNames::process()
   {
-    std::vector<ApplicationHandler::Command> commands;
+    commands_.clear();
 
-    std::istringstream iss {names};
+    std::istringstream iss {names_};
 
     for (std::string n; iss >> n;) {
-      ApplicationHandler::Command cmd;
-      CreateCommand createCommand(state_);
-      const bool created = createCommand(n, cmd);
+      CreateCommand createCommand(application_handler_);
+      createCommand.name_ = n;
+      const bool created = createCommand.process();
       if (created) {
-        commands.push_back(cmd);
+        commands_.push_back(createCommand.cmd_);
       }
     }
-
-    return commands;
+    return true;
   }
 
-  void SetRawDataPathname::operator()(const char* const pathname)
+  bool SetRawDataPathname::process()
   {
-    state_.mzML_dir_ = pathname;
+    application_handler_.mzML_dir_ = pathname_;
+    return true;
   }
 
-  void SetInputFeaturesPathname::operator()(const char* const pathname)
+  bool SetInputFeaturesPathname::process()
   {
-    state_.features_in_dir_ = pathname;
+    application_handler_.features_in_dir_ = pathname_;
+    return true;
   }
 
-  void SetOutputFeaturesPathname::operator()(const char* const pathname)
+  bool SetOutputFeaturesPathname::process()
   {
-    state_.features_out_dir_ = pathname;
+    application_handler_.features_out_dir_ = pathname_;
+    return true;
   }
 }

@@ -11,7 +11,7 @@ namespace SmartPeak
   {
     ImGui::OpenPopup("Select workflow's steps");
 
-    if (!state_)
+    if (!application_handler_)
     {
       LOGE << "Workflow widget has no ApplicationHandler object associated with it";
       draw_ = false; // to avoid flooding the log
@@ -25,7 +25,7 @@ namespace SmartPeak
     if (ImGui::BeginCombo("Presets", NULL))
     {
       ApplicationHandler::Command cmd;
-      CreateCommand createCommand(*state_);
+      CreateCommand createCommand(*application_handler_);
       const char* presets[] = {
         "LCMS MRM Unknowns",
         "LCMS MRM Standards",
@@ -42,7 +42,7 @@ namespace SmartPeak
       {
         if (ImGui::Selectable(s))
         {
-          BuildCommandsFromNames buildCommandsFromIds(*state_);
+          BuildCommandsFromNames buildCommandsFromIds(*application_handler_);
           std::string ids;
           const std::string s_string { s };
           if (s_string == "LCMS MRM Unknowns")
@@ -61,7 +61,9 @@ namespace SmartPeak
             ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS PICK_FEATURES FILTER_FEATURES FILTER_FEATURES STORE_FEATURES VALIDATE_FEATURES STORE_FEATURES";
           else if (s_string == "LCMS MRM Validation - QMIP")
             ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_FEATURES FILTER_FEATURES FILTER_FEATURES VALIDATE_FEATURES STORE_FEATURES";
-          commands_ = buildCommandsFromIds(ids);
+          buildCommandsFromIds.names_ = ids;
+          buildCommandsFromIds.process();
+          commands_ = buildCommandsFromIds.commands_;
           LOGI << "Local workflow has been replaced";
         }
       }
@@ -71,14 +73,15 @@ namespace SmartPeak
     if (ImGui::BeginCombo("Add Raw data method", NULL))
     {
       ApplicationHandler::Command cmd;
-      CreateCommand createCommand(*state_);
+      CreateCommand createCommand(*application_handler_);
       for (const auto& p : n_to_raw_data_method_)
       {
         if (ImGui::Selectable(p.second->getName().c_str()))
         {
-          const bool created = createCommand(p.second->getName(), cmd);
+          createCommand.name_ = p.second->getName();
+          const bool created = createCommand.process();
           if (created) {
-            commands_.push_back(cmd);
+            commands_.push_back(createCommand.cmd_);
           }
         }
       }
@@ -88,14 +91,15 @@ namespace SmartPeak
     if (ImGui::BeginCombo("Add Sequence Segment method", NULL))
     {
       ApplicationHandler::Command cmd;
-      CreateCommand createCommand(*state_);
+      CreateCommand createCommand(*application_handler_);
       for (const auto& p : n_to_seq_seg_method_)
       {
         if (ImGui::Selectable(p.second->getName().c_str()))
         {
-          const bool created = createCommand(p.second->getName(), cmd);
+          createCommand.name_ = p.second->getName();
+          const bool created = createCommand.process();
           if (created) {
-            commands_.push_back(cmd);
+            commands_.push_back(createCommand.cmd_);
           }
         }
       }
@@ -149,7 +153,7 @@ namespace SmartPeak
 
     if (ImGui::Button("Ok"))
     {
-      state_->commands_ = commands_;
+      application_handler_->commands_ = commands_;
       LOGI << "State of app has been updated with the new workflow.";
       draw_ = false;
       ImGui::CloseCurrentPopup();
@@ -180,6 +184,6 @@ namespace SmartPeak
   void Workflow::setState(ApplicationHandler& state)
   {
     LOGD << "Setting state: " << (&state);
-    state_ = &state;
+    application_handler_ = &state;
   }
 }
