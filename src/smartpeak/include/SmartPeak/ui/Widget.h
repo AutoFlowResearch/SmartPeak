@@ -35,7 +35,7 @@ namespace SmartPeak
       @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
       @param[in] values_indices Map containing unique row entries and their duplicate indices
     */
-    static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const std::vector<std::string>& column, bool* checked, 
+    static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const std::vector<std::string>& column, bool* checked,
       const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices);
 
     /**
@@ -78,7 +78,7 @@ namespace SmartPeak
       @param[in] n_rows The number of rows
       @param[in,out] checked_rows What rows are checked/filtered
     */
-    static void makeCheckedRows(const size_t n_rows, bool* checked_rows);
+    static void makeCheckedRows(const std::size_t& n_rows, bool* checked_rows);
   };
 
   /**
@@ -93,6 +93,11 @@ namespace SmartPeak
 
   /**
     @brief Base class for all tables
+
+    TODO: features
+    - row highlighting on focus
+    - sorting
+    - filtering
 
     TODO: potential refactors
     - Extract out methods for making the headers and columns

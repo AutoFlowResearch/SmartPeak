@@ -43,6 +43,11 @@ void initializeDataDir(
 int main(int argc, char **argv)
   // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
+  // Dummy data for testing the sequence table
+  static std::vector<std::string> sequence_table_headers;
+  static std::vector<std::vector<std::string>> sequence_table_body;
+  static bool* checked_rows = nullptr;
+
   std::string quickInfoText_;
   bool show_top_window_ = false;
   bool show_bottom_window_ = false;
@@ -538,58 +543,57 @@ int main(int argc, char **argv)
       {
         if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
         {
-          // TODO: encapsulate in it's own method
-          const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | 
-            //ImGuiTableFlags_Sortable | ImGuiTableFlags_Hideable |
-            ImGuiTableFlags_Borders | ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow | ImGuiTableFlags_ScrollFreezeLeftColumn;
-          std::vector<std::string> sequence_table_headers = {
+          // Dummy data for testing the sequence table
+          if (sequence_table_headers.size()<=0) sequence_table_headers = {
             "inj_number", "sample_name", "sample_group_name" , "sequence_segment_name" , "original_filename",
             "sample_type", "acq_method_name", "inj_volume", "inj_volume_units", "batch_name", // skipping optional members
             "acquisition_date_and_time" };
-          if (ImGui::BeginTable("Sequence", sequence_table_headers.size(), table_flags)){
-            for (int column = 0; column < sequence_table_headers.size(); column++){
-              ImGui::TableSetupColumn(sequence_table_headers.at(column).c_str());
+          const int n_cols = sequence_table_headers.size();
+          const int n_rows = application_handler_.sequenceHandler_.getSequence().size();
+          if (sequence_table_body.size() <= 0) {
+            sequence_table_body.resize(n_cols);
+            for (size_t col = 0; col < n_cols; ++col) {
+              sequence_table_body.at(col).resize(n_rows);
             }
-            ImGui::TableAutoHeaders();
+            int col = 0, row = 0;
             for (const auto& injection : application_handler_.sequenceHandler_.getSequence()) {
-              ImGui::TableNextRow();
-              int column = 0;
-              ImGui::TableSetColumnIndex(column);
-              ImGui::Text(std::to_string(injection.getMetaData().inj_number).c_str());
-              ++column;
-              ImGui::TableSetColumnIndex(column);
-              ImGui::Text(injection.getMetaData().sample_name.c_str());
-              ++column;
-              ImGui::TableSetColumnIndex(column);
-              ImGui::Text(injection.getMetaData().sample_group_name.c_str());
-              ++column;
-              ImGui::TableSetColumnIndex(column);
-              ImGui::Text(injection.getMetaData().sequence_segment_name.c_str());
-              ++column;
-              ImGui::TableSetColumnIndex(column);
-              ImGui::Text(injection.getMetaData().original_filename.c_str());
-              ++column;
-              ImGui::TableSetColumnIndex(column);
-              ImGui::Text(injection.getMetaData().getSampleTypeAsString().c_str());
-              ++column;
-              ImGui::TableSetColumnIndex(column);
-              ImGui::Text(injection.getMetaData().acq_method_name.c_str());
-              ++column;
-              ImGui::TableSetColumnIndex(column);
-              ImGui::Text(std::to_string(injection.getMetaData().inj_volume).c_str());
-              ++column;
-              ImGui::TableSetColumnIndex(column);
-              ImGui::Text(injection.getMetaData().inj_volume_units.c_str());
-              ++column;
-              ImGui::TableSetColumnIndex(column);
-              ImGui::Text(injection.getMetaData().batch_name.c_str());
-              ++column;
-              ImGui::TableSetColumnIndex(column);
+              sequence_table_body.at(col).at(row) = std::to_string(injection.getMetaData().inj_number);
+              ++col;
+              sequence_table_body.at(col).at(row) = injection.getMetaData().sample_name;
+              ++col;
+              sequence_table_body.at(col).at(row) = injection.getMetaData().sample_group_name;
+              ++col;
+              sequence_table_body.at(col).at(row) = injection.getMetaData().sequence_segment_name;
+              ++col;
+              sequence_table_body.at(col).at(row) = injection.getMetaData().original_filename;
+              ++col;
+              sequence_table_body.at(col).at(row) = injection.getMetaData().getSampleTypeAsString();
+              ++col;
+              sequence_table_body.at(col).at(row) = injection.getMetaData().acq_method_name;
+              ++col;
+              sequence_table_body.at(col).at(row) = std::to_string(injection.getMetaData().inj_volume);
+              ++col;
+              sequence_table_body.at(col).at(row) = injection.getMetaData().inj_volume_units;
+              ++col;
+              sequence_table_body.at(col).at(row) = injection.getMetaData().batch_name;
+              ++col;
               // Skipping optional members
-              ImGui::Text(injection.getMetaData().getAcquisitionDateAndTimeAsString().c_str());
+              sequence_table_body.at(col).at(row) = injection.getMetaData().getAcquisitionDateAndTimeAsString();
+              col = 0;
+              ++row;
             }
-            ImGui::EndTable();
           }
+          if (checked_rows == nullptr) {
+            checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, checked_rows);
+          }
+
+          // Call the table widget
+          GenericTableWidget Table;
+          Table.headers = sequence_table_headers;
+          Table.columns = sequence_table_body;
+          Table.checked_rows = checked_rows;
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))

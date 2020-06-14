@@ -9,14 +9,11 @@
 namespace SmartPeak
 {
   struct ApplicationProcessor {
-    // C.67: A polymorphic class should suppress copying
     ApplicationProcessor(const ApplicationProcessor& other) = delete;
     ApplicationProcessor& operator=(const ApplicationProcessor& other) = delete;
-
-    // C.35: A base class destructor should be either public and virtual, or protected and nonvirtual
-    // C.127: A class with a virtual function should have a virtual or protected destructor
     virtual ~ApplicationProcessor() = default;
 
+    // TODO: needs to be refactored...
     // Each of the derived classes implement one of the following virtual methods
     virtual void operator()(const std::vector<ApplicationHandler::Command>& commands) {}
     virtual bool operator()(const std::string& name, ApplicationHandler::Command& cmd) { return false; }

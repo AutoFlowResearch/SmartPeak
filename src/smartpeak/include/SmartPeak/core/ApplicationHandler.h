@@ -47,7 +47,6 @@ namespace SmartPeak
       std::map<std::string, Filenames> dynamic_filenames;
     };
 
-    std::string                     pathnamesFilename_       = "pathnames.txt"; // TODO: remove this
     std::string                           sequence_pathname_;
     std::string                           main_dir_                = ".";
     std::string                           mzML_dir_;

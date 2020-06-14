@@ -29,31 +29,6 @@ namespace SmartPeak
     clearNonExistantDefaultGeneratedFilenames(f);
     f.sequence_csv_i = state_.sequence_pathname_;
 
-    const std::string pathnamesFilePath = state_.main_dir_ + "/" + state_.pathnamesFilename_;
-
-    // if (InputDataValidation::fileExists(pathnamesFilePath)) {
-    //   LOGN << "\n\n"
-    //     "Pathnames file was found:\n" <<
-    //     " - " << pathnamesFilePath << "\n"
-    //     "Should its values be used to search for the input files? [Y/n]\n";
-    //   const std::string in = getLineInput("> ");
-    //   if (in.empty() || in.front() == 'y') {
-    //     LOGN << "\n\nValues in " << pathnamesFilePath << ": USED\n";
-    //     updateFilenames(f, pathnamesFilePath);
-    //   } else {
-    //     LOGN << "\n\nValues in " << pathnamesFilePath << ": IGNORED\n";
-    //   }
-    // }
-
-    if (InputDataValidation::fileExists(pathnamesFilePath)) {
-      LOGN << "\n\n"
-        "Pathnames file was found:\n" <<
-        " - " << pathnamesFilePath << "\n"
-        "Its values will be used.\n";
-      LOGN << "\n\nValues in " << pathnamesFilePath << ": USED\n";
-      updateFilenames(f, pathnamesFilePath);
-    }
-
     LOGN << "\n\n"
       "The following list of file was searched for:\n";
     std::vector<InputDataValidation::FilenameInfo> is_valid(10);
@@ -79,13 +54,8 @@ namespace SmartPeak
         { return arg.validity != InputDataValidation::FilenameInfo::invalid; });
 
     if (!requiredPathnamesAreValidBool || !otherPathnamesAreFine) {
-      generatePathnamesTxt(pathnamesFilePath, f, is_valid);
       LOGF << "\n\nERROR!!!\n"
-        "One or more pathnames are not valid.\n"
-        "A file has been generated for you to fix the pathnames:\n"
-        " - " << pathnamesFilePath << "\n"
-        "The incorrect information has been replaced with an empty value.\n"
-        "If a pathname is to be ignored, leave it blank.\n";
+        "One or more pathnames are not valid.\n";
       if (!requiredPathnamesAreValidBool) {
         LOGF << "\n\n"
         "Make sure that the following required pathnames are provided:\n"
@@ -94,7 +64,6 @@ namespace SmartPeak
         " - traml\n";
       }
       LOGN << "Apply the fixes and reload the sequence file.\n";
-      // getLineInput("Press Enter to go back to the Main menu.\n");
       return false;
     }
 
@@ -325,7 +294,7 @@ namespace SmartPeak
       cs.process();
     } else {
       LOGE << "Provided and/or inferred pathnames are not correct."
-        "The sequence has not been modified. Check file: " << state_.pathnamesFilename_;
+        "The sequence has not been modified.";
     }
   }
 
