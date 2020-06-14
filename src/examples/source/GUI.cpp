@@ -21,6 +21,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <imgui.h>
+#include <implot.h>
 #include <examples/imgui_impl_sdl.h>
 #include <examples/imgui_impl_opengl2.h>
 #include <misc/cpp/imgui_stdlib.h>
@@ -83,7 +84,7 @@ int main(int argc, char **argv)
   bool popup_run_workflow_ = false;
   bool popup_file_picker_ = false;
 
-  ApplicationHandler state_;
+  ApplicationHandler application_handler_;
   WorkflowManager manager_;
   GuiAppender appender_;
 
@@ -91,8 +92,8 @@ int main(int argc, char **argv)
   FilePicker file_picker_;
   Report     report_;
   Workflow   workflow_;
-  report_.setState(state_);
-  workflow_.setState(state_);
+  report_.setState(application_handler_);
+  workflow_.setState(application_handler_);
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   char filename[128];
   strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
@@ -190,13 +191,13 @@ int main(int argc, char **argv)
     {
       ImGui::Text("mzML folder");
       ImGui::PushID(1);
-      ImGui::InputTextWithHint("", state_.mzML_dir_.c_str(), &state_.mzML_dir_);
+      ImGui::InputTextWithHint("", application_handler_.mzML_dir_.c_str(), &application_handler_.mzML_dir_);
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(11);
       if (ImGui::Button("Select"))
       {
-        static SetRawDataPathname processor(state_);
+        static SetRawDataPathname processor(application_handler_);
         file_picker_.setProcessor(processor);
         popup_file_picker_ = true;
       }
@@ -204,13 +205,13 @@ int main(int argc, char **argv)
 
       ImGui::Text("Input features folder");
       ImGui::PushID(2);
-      ImGui::InputTextWithHint("", state_.features_in_dir_.c_str(), &state_.features_in_dir_);
+      ImGui::InputTextWithHint("", application_handler_.features_in_dir_.c_str(), &application_handler_.features_in_dir_);
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(22);
       if (ImGui::Button("Select"))
       {
-        static SetInputFeaturesPathname processor(state_);
+        static SetInputFeaturesPathname processor(application_handler_);
         file_picker_.setProcessor(processor);
         popup_file_picker_ = true;
       }
@@ -218,13 +219,13 @@ int main(int argc, char **argv)
 
       ImGui::Text("Output features folder");
       ImGui::PushID(3);
-      ImGui::InputTextWithHint("", state_.features_out_dir_.c_str(), &state_.features_out_dir_);
+      ImGui::InputTextWithHint("", application_handler_.features_out_dir_.c_str(), &application_handler_.features_out_dir_);
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(33);
       if (ImGui::Button("Select"))
       {
-        static SetOutputFeaturesPathname processor(state_);
+        static SetOutputFeaturesPathname processor(application_handler_);
         file_picker_.setProcessor(processor);
         popup_file_picker_ = true;
       }
@@ -242,22 +243,22 @@ int main(int argc, char **argv)
 
       if (ImGui::Button("Run workflow"))
       {
-        for (const std::string& pathname : {state_.mzML_dir_, state_.features_in_dir_, state_.features_out_dir_}) {
+        for (const std::string& pathname : {application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_}) {
           fs::create_directories(fs::path(pathname));
         }
-        for (ApplicationHandler::Command& cmd : state_.commands_)
+        for (ApplicationHandler::Command& cmd : application_handler_.commands_)
         {
           for (std::pair<const std::string, Filenames>& p : cmd.dynamic_filenames)
           {
             Filenames::updateDefaultDynamicFilenames(
-              state_.mzML_dir_,
-              state_.features_in_dir_,
-              state_.features_out_dir_,
+              application_handler_.mzML_dir_,
+              application_handler_.features_in_dir_,
+              application_handler_.features_out_dir_,
               p.second
             );
           }
         }
-        manager_.addWorkflow(state_);
+        manager_.addWorkflow(application_handler_);
         ImGui::CloseCurrentPopup();
       }
 
@@ -317,7 +318,7 @@ int main(int argc, char **argv)
         }
 
         if (ImGui::MenuItem("Load session from sequence", NULL, false, workflow_is_done_ && file_loading_is_done_)) {
-          static LoadSessionFromSequence processor(state_);
+          static LoadSessionFromSequence processor(application_handler_);
           file_picker_.setProcessor(processor);
           popup_file_picker_ = true;
         }
@@ -393,7 +394,7 @@ int main(int argc, char **argv)
         if (ImGui::MenuItem("Search", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_))
         {
-          initializeDataDirs(state_);
+          initializeDataDirs(application_handler_);
           workflow_.draw_ = true;
         }
         ImGui::EndMenu();
@@ -435,16 +436,16 @@ int main(int argc, char **argv)
       {
         if (ImGui::MenuItem("Run command", NULL, false, workflow_is_done_ && file_loading_is_done_))
         {
-          initializeDataDirs(state_);
+          initializeDataDirs(application_handler_);
           // do the rest
         }
         if (ImGui::MenuItem("Run workflow"))
         {
-          if (state_.commands_.empty())
+          if (application_handler_.commands_.empty())
           {
             LOGW << "Workflow has no steps to run. Please set the workflow's steps.";
           }
-          initializeDataDirs(state_);
+          initializeDataDirs(application_handler_);
           popup_run_workflow_ = true;
         }
         if (ImGui::BeginMenu("Integrity checks"))
@@ -541,14 +542,16 @@ int main(int argc, char **argv)
           const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | 
             //ImGuiTableFlags_Sortable | ImGuiTableFlags_Hideable |
             ImGuiTableFlags_Borders | ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow | ImGuiTableFlags_ScrollFreezeLeftColumn;
-          std::vector<std::string> sequence_table_headers = {"inj_number", "sample_name", "sample_group_name" , "sequence_segment_name" , "original_filename",
-          "sample_type", "acq_method_name", "inj_volume", "inj_volume_units", "batch_name", "acquisition_date_and_time" };
+          std::vector<std::string> sequence_table_headers = {
+            "inj_number", "sample_name", "sample_group_name" , "sequence_segment_name" , "original_filename",
+            "sample_type", "acq_method_name", "inj_volume", "inj_volume_units", "batch_name", // skipping optional members
+            "acquisition_date_and_time" };
           if (ImGui::BeginTable("Sequence", sequence_table_headers.size(), table_flags)){
             for (int column = 0; column < sequence_table_headers.size(); column++){
               ImGui::TableSetupColumn(sequence_table_headers.at(column).c_str());
             }
             ImGui::TableAutoHeaders();
-            for (const auto& injection : state_.sequenceHandler_.getSequence()) {
+            for (const auto& injection : application_handler_.sequenceHandler_.getSequence()) {
               ImGui::TableNextRow();
               int column = 0;
               ImGui::TableSetColumnIndex(column);
@@ -592,7 +595,7 @@ int main(int argc, char **argv)
         if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
         {
           ImGui::Text("TODO...");
-          //const auto& targeted_exp = state_.sequenceHandler_.getSequence().at(0).getRawDataShared()->getTargetedExperimentShared();
+          //const auto& targeted_exp = application_handler_.sequenceHandler_.getSequence().at(0).getRawDataShared()->getTargetedExperimentShared();
           ImGui::EndTabItem();
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
@@ -637,7 +640,10 @@ int main(int argc, char **argv)
         }
         if (show_feature_plot && ImGui::BeginTabItem("Features plot", &show_feature_plot))
         {
-          ImGui::Text("TODO...");
+          if (ImPlot::BeginPlot("My Plot")) {
+            //ImPlot::PlotLine("My Line Plot", x_data, y_data, 1000);
+            ImPlot::EndPlot();
+          }
           ImGui::EndTabItem();
         }
         if (show_line_plot && ImGui::BeginTabItem("Line plot", &show_line_plot))

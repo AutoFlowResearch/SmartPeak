@@ -105,6 +105,12 @@ else()
 endif()
 
 #------------------------------------------------------------------------------
+# IMPLOT
+#------------------------------------------------------------------------------
+find_package(ImPlot COMPONENTS Sources REQUIRED)
+include_directories(${IMPLOT_INCLUDE_DIR})
+
+#------------------------------------------------------------------------------
 # pipeline examples
 add_custom_target(PIPELINE_EXAMPLES)
 add_dependencies(PIPELINE_EXAMPLES ${pipeline_executables_list})
@@ -122,7 +128,7 @@ foreach(_examples ${EXAMPLE_executables})
   if(NOT ${_examples} STREQUAL "GUI")
     target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
   else()
-    target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+    target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
 	install_tool(${_examples}) # Required by CPack for bundling (see install_macros.cmake and package_general.cmake)
   endif()
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
