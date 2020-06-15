@@ -66,7 +66,7 @@ smartpeak_add_library(TARGET_NAME  SmartPeak
                    EXTERNAL_INCLUDES ${OpenMS_INCLUDE_DIRECTORIES}
                                      ${SDL2_INCLUDE_DIRS}
                                      ${ImGui_INCLUDE_DIR}
-                                     ${ImPlot_INCLUDE_DIR}
+                                     ${IMPLOT_INCLUDE_DIR}
                                      ${EIGEN3_INCLUDE_DIR}
                                      ${PLOG_INCLUDE_DIR}
                    LINK_LIBRARIES ${APPLE_EXTRA_LIBS}

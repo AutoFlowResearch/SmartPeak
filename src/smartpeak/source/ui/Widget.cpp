@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 #include <imgui.h>
+#include <implot.h>
 
 namespace SmartPeak
 {
@@ -122,7 +123,7 @@ namespace SmartPeak
 
   void GenericTableWidget::draw()
   {
-    if (headers.empty())
+    if (headers_.empty())
       return;
 
     // headers
@@ -130,18 +131,18 @@ namespace SmartPeak
       //ImGuiTableFlags_Sortable | ImGuiTableFlags_Hideable |
       ImGuiTableFlags_Borders | ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow | ImGuiTableFlags_ScrollFreezeLeftColumn;
 
-    if (ImGui::BeginTable("Table", headers.size(), table_flags)) {
+    if (ImGui::BeginTable("Table", headers_.size(), table_flags)) {
       // First row headers
-      for (int col = 0; col < headers.size(); col++) {
-        ImGui::TableSetupColumn(headers.at(col).c_str());
+      for (int col = 0; col < headers_.size(); col++) {
+        ImGui::TableSetupColumn(headers_.at(col).c_str());
       }
       ImGui::TableAutoHeaders();
 
       // Second row to end body
       //static size_t selected = -1;
-      if (columns.size() > 0) {
-        for (size_t row = 0; row < columns[0].size(); ++row) {
-          bool pass_all_columns = checked_rows[row];
+      if (columns_.size() > 0) {
+        for (size_t row = 0; row < columns_[0].size(); ++row) {
+          bool pass_all_columns = checked_rows_[row];
           if (pass_all_columns) {
             ImGui::TableNextRow();
 
@@ -151,16 +152,67 @@ namespace SmartPeak
             //if (ImGui::Selectable(label, selected == row, ImGuiSelectableFlags_SpanAllColumns))
             //  selected = row;
             //// bool hovered = ImGui::IsItemHovered();
-            for (size_t col = 0; col < headers.size(); ++col) {
+            for (size_t col = 0; col < headers_.size(); ++col) {
               ImGui::TableSetColumnIndex(col);
-              ImGui::Text("%s", columns[col][row].c_str());
+              ImGui::Text("%s", columns_[col][row].c_str());
 
               //// TODO: Testing random fixes to get input text to work
               //char buf[512];
-              //sprintf(buf, columns[col][row].c_str());
+              //sprintf(buf, columns_[col][row].c_str());
               //ImGui::InputText("", buf, IM_ARRAYSIZE(buf));
               //if (ImGui::IsItemHovered() || ImGui::IsItemFocused())
               //  ImGui::SetMouseCursor(1);
+            }
+          }
+        }
+      }
+      ImGui::EndTable();
+    }
+  }
+
+  void ExplorerWidget::draw()
+  {
+    if (headers_.empty())
+      return;
+
+    // headers
+    const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable |
+      ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow;
+
+    if (ImGui::BeginTable("Explorer", headers_.size(), table_flags)) {
+      // First row headers
+      for (int col = 0; col < headers_.size(); col++) {
+        ImGui::TableSetupColumn(headers_.at(col).c_str());
+      }
+      ImGui::TableAutoHeaders();
+
+      // Second row to end body
+      //static size_t selected = -1;
+      if (columns_.size() > 0) {
+        for (size_t row = 0; row < columns_[0].size(); ++row) {
+          bool pass_all_columns = checked_rows_;
+          if (pass_all_columns) {
+            ImGui::TableNextRow();
+
+            //// TODO: Bug in row highlighting
+            //char label[32];
+            //sprintf(label, "%lu", row);
+            //if (ImGui::Selectable(label, selected == row, ImGuiSelectableFlags_SpanAllColumns))
+            //  selected = row;
+            //// bool hovered = ImGui::IsItemHovered();
+            for (size_t col = 0; col < headers_.size(); ++col) {
+              if (col == headers_.size() - 2) {
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Checkbox("", &checked_rows_1_[row]);
+              }
+              else if (col == headers_.size() - 1) {
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Checkbox("", &checked_rows_2_[row]);
+              }
+              else {
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", columns_[col][row].c_str());
+              }
             }
           }
         }
@@ -197,10 +249,22 @@ namespace SmartPeak
       ImGui::SameLine();
     }
     ImGui::NewLine();
+    ImGui::TextWrapped("TODO: scatter plots for each feature (red, selected; green, not selected)");
+  }
+
+  void LinePlot2DWidget::draw()
+  {
 
     // Main graphic
-    ImGui::TextWrapped("TODO: scatter plot for the raw data");
-    ImGui::TextWrapped("TODO: scatter plots for each feature (red, selected; green, not selected)");
+    if (ImPlot::BeginPlot("Line Plot", x_axis_title_.c_str(), y_axis_title_.c_str())) {
+      for (int i = 0; i < x_data_.size(); ++i) {
+        assert(x_data_.at(i).size() == y_data_.at(i).size());
+        ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
+        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
+        ImPlot::PlotLine(series_names_.at(i).c_str(), x_data_.at(i).data(), y_data_.at(i).data(), x_data_.at(i).size());
+      }
+      ImPlot::EndPlot();
+    }
   }
 
   void GenericTreeWidget::draw()

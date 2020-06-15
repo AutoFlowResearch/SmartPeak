@@ -21,7 +21,6 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <imgui.h>
-#include <implot.h>
 #include <examples/imgui_impl_sdl.h>
 #include <examples/imgui_impl_opengl2.h>
 #include <misc/cpp/imgui_stdlib.h>
@@ -43,6 +42,17 @@ void initializeDataDir(
 int main(int argc, char **argv)
   // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
+  // Dummy data for testing the injection explorer
+  static std::vector<std::string> injection_explorer_headers;
+  static std::vector<std::vector<std::string>> injection_explorer_body;
+  static bool* injection_explorer_workflow_checked_rows = nullptr;
+  static bool* injection_explorer_plot_checked_rows = nullptr;
+  static bool* injection_explorer_checked_rows = nullptr;
+  // Dummy data for testing the transition explorer
+  static std::vector<std::string> transition_explorer_headers;
+  static std::vector<std::vector<std::string>> transition_explorer_body;
+  static bool* transition_explorer_workflow_checked_rows = nullptr;
+  static bool* transition_explorer_plot_checked_rows = nullptr;
   // Dummy data for testing the sequence table
   static std::vector<std::string> sequence_table_headers;
   static std::vector<std::vector<std::string>> sequence_table_body;
@@ -71,10 +81,9 @@ int main(int argc, char **argv)
   bool popup_about_ = false;
 
   // View: left or right windows (i.e., Explorer pane)
-  bool show_sequence_explorer = true;
-  bool show_transitions_explorer = false;
-  bool show_experiment_explorer = false;
-  bool show_features_explorer = false;
+  bool show_injection_explorer = true; // list of injection names with advanced options for filtering
+  bool show_transitions_explorer = true; // list of transition names (e.g., subset of the features for non-targeted case) with advanced options for filtering
+  bool show_features_explorer = false; // list of features with advanced options for filtering
 
   // View: Top window
   bool show_sequence_table = false;
@@ -87,11 +96,13 @@ int main(int argc, char **argv)
   bool show_comp_group_filters_table = false;
   bool show_comp_qcs_table = false;
   bool show_comp_group_qcs_table = false;
-  bool show_feature_plot = false;
-  bool show_line_plot = false;
-  bool show_heatmap_plot = false;
-  bool show_feat_db_table = false;
-  bool show_pivot_table = false;
+  bool show_chromatogram_line_plot = false; // time vs. intensity for the raw data and annotated feature
+  bool show_spectra_line_plot = false; // time vs. intensity for the raw data and annotated feature
+  bool show_feature_line_plot = false; // injection vs. metavalue for n selected features
+  bool show_feature_heatmap_plot = false; // injection vs. feature for a particular metavalue
+  bool show_calibrators_line_plot = false; // peak area/height ratio vs. concentration ratio
+  bool show_feature_table = false; // table of all injections, features, and metavalues
+  bool show_feature_pivot_table = false; // injection vs. feature for a particular metavalue
 
   // Popup modals
   bool popup_run_workflow_ = false;
@@ -421,12 +432,11 @@ int main(int argc, char **argv)
       if (ImGui::BeginMenu("View"))
       {
         ImGui::MenuItem("Explorer window", NULL, false, false);
-        if (ImGui::MenuItem("Sequence", NULL, &show_sequence_explorer)) {}
+        if (ImGui::MenuItem("Sequence", NULL, &show_injection_explorer)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {}
-        if (ImGui::MenuItem("Experiment", NULL, &show_experiment_explorer)) {}
         if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}  // including metadata?
         ImGui::Separator(); // Primary input
-        ImGui::MenuItem("Main window", NULL, false, false);
+        ImGui::MenuItem("Main window (Tables)", NULL, false, false);
         if (ImGui::MenuItem("Sequence", NULL, &show_sequence_table)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_table)) {}
         if (ImGui::MenuItem("Workflow", NULL, &show_workflow_table)) {}
@@ -441,11 +451,14 @@ int main(int argc, char **argv)
           if (ImGui::MenuItem("Comp Group QCs", NULL, &show_comp_group_qcs_table)) {}
           ImGui::EndMenu();
         }
-        if (ImGui::MenuItem("Features", NULL, &show_feature_plot)) {}
-        if (ImGui::MenuItem("Metric plot", NULL, &show_line_plot)) {}
-        if (ImGui::MenuItem("Heatmap", NULL, &show_heatmap_plot)) {}
-        if (ImGui::MenuItem("Features table", NULL, &show_feat_db_table)) {}
-        if (ImGui::MenuItem("Features pivot table", NULL, &show_pivot_table)) {}
+        if (ImGui::MenuItem("Features", NULL, &show_feature_table)) {}
+        if (ImGui::MenuItem("Pivot", NULL, &show_feature_pivot_table)) {}
+        ImGui::MenuItem("Main window (Plots)", NULL, false, false);
+        if (ImGui::MenuItem("Chromatogram", NULL, &show_chromatogram_line_plot)) {}
+        if (ImGui::MenuItem("Spectra", NULL, &show_spectra_line_plot)) {}
+        if (ImGui::MenuItem("Features (line)", NULL, &show_feature_line_plot)) {}
+        if (ImGui::MenuItem("Features (heatmap)", NULL, &show_feature_heatmap_plot)) {}
+        if (ImGui::MenuItem("Calibrators", NULL, &show_calibrators_line_plot)) {}
         ImGui::MenuItem("Info window", NULL, false, false);
         if (ImGui::MenuItem("Info", NULL, &show_info_)) {}
         if (ImGui::MenuItem("Log", NULL, &show_log_)) {}
@@ -493,15 +506,14 @@ int main(int argc, char **argv)
 
     show_top_window_ = show_sequence_table || show_transitions_table || show_workflow_table || show_parameters_table
       || show_quant_method_table || show_stds_concs_table || show_comp_filters_table || show_comp_group_filters_table
-      || show_comp_qcs_table || show_comp_group_qcs_table || show_feature_plot || show_line_plot || show_heatmap_plot
-      || show_feat_db_table || show_pivot_table;
+      || show_comp_qcs_table || show_comp_group_qcs_table || show_feature_table || show_feature_pivot_table
+      || show_chromatogram_line_plot || show_spectra_line_plot || show_feature_line_plot || show_feature_heatmap_plot || show_calibrators_line_plot;
     show_bottom_window_ = show_info_ || show_log_;
-    show_left_window_ = show_sequence_explorer || show_transitions_explorer || show_experiment_explorer || show_features_explorer;
+    show_left_window_ = show_injection_explorer || show_transitions_explorer || show_features_explorer;
     win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
 
     // Left window
-    if (show_left_window_)
-    {
+    if (show_left_window_) {
       ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.left_window_x_pos_, win_size_and_pos.left_and_right_window_y_pos_));
       ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
@@ -514,17 +526,47 @@ int main(int argc, char **argv)
       ImGui::Begin("Left window", NULL, left_window_flags);
       if (ImGui::BeginTabBar("Left window tab bar", ImGuiTabBarFlags_Reorderable))
       {
-        if (show_sequence_explorer && ImGui::BeginTabItem("Sequence", &show_sequence_explorer))
+        if (show_injection_explorer && ImGui::BeginTabItem("Injections", &show_injection_explorer))
         {
-          ImGui::Text("TODO...");
+          if (injection_explorer_headers.size() <= 0) injection_explorer_headers = {
+          "inj#", "sample_name", "workflow", "plot"};
+          const int n_cols = injection_explorer_headers.size() - 2;
+          const int n_rows = application_handler_.sequenceHandler_.getSequence().size();
+          if (injection_explorer_body.size() <= 0 && n_rows > 0) {
+            injection_explorer_body.resize(n_cols);
+            for (size_t col = 0; col < n_cols; ++col) {
+              injection_explorer_body.at(col).resize(n_rows);
+            }
+            int col = 0, row = 0;
+            for (const auto& injection : application_handler_.sequenceHandler_.getSequence()) {
+              injection_explorer_body.at(col).at(row) = std::to_string(injection.getMetaData().inj_number);
+              ++col;
+              injection_explorer_body.at(col).at(row) = injection.getMetaData().sample_name;
+              col = 0;
+              ++row;
+            }
+          }
+          if (injection_explorer_workflow_checked_rows == nullptr || injection_explorer_plot_checked_rows == nullptr || injection_explorer_checked_rows == nullptr) {
+            injection_explorer_workflow_checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, injection_explorer_workflow_checked_rows);
+            injection_explorer_plot_checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, injection_explorer_plot_checked_rows);
+            injection_explorer_checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, injection_explorer_checked_rows);
+          }
+
+          // Call the Explorer widget
+          ExplorerWidget Explorer;
+          Explorer.headers_ = injection_explorer_headers;
+          Explorer.columns_ = injection_explorer_body;
+          Explorer.checked_rows_ = injection_explorer_checked_rows;
+          Explorer.checked_rows_1_ = injection_explorer_workflow_checked_rows;
+          Explorer.checked_rows_2_ = injection_explorer_plot_checked_rows;
+          Explorer.draw();
+
           ImGui::EndTabItem();
         }
         if (show_transitions_explorer && ImGui::BeginTabItem("Transitions", &show_transitions_explorer))
-        {
-          ImGui::Text("TODO...");
-          ImGui::EndTabItem();
-        }
-        if (show_experiment_explorer && ImGui::BeginTabItem("Experiment", &show_experiment_explorer))
         {
           ImGui::Text("TODO...");
           ImGui::EndTabItem();
@@ -604,9 +646,9 @@ int main(int argc, char **argv)
 
           // Call the table widget
           GenericTableWidget Table;
-          Table.headers = sequence_table_headers;
-          Table.columns = sequence_table_body;
-          Table.checked_rows = sequence_table_checked_rows;
+          Table.headers_ = sequence_table_headers;
+          Table.columns_ = sequence_table_body;
+          Table.checked_rows_ = sequence_table_checked_rows;
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -617,47 +659,49 @@ int main(int argc, char **argv)
             "transition_group_id","transition_name","RetentionTime","PrecursorMz","ProductMz",
             "LabelType","quantifying_transition","identifying_transition","detecting_transition"};
           const int n_cols = transitions_table_headers.size();
-          const auto& targeted_exp = application_handler_.sequenceHandler_.getSequence().at(0).getRawDataShared()->getTargetedExperimentShared();
-          const int n_rows = targeted_exp->getTransitions().size();
-          if (transitions_table_body.size() <= 0) {
-            transitions_table_body.resize(n_cols);
-            for (size_t col = 0; col < n_cols; ++col) {
-              transitions_table_body.at(col).resize(n_rows);
+          if (application_handler_.sequenceHandler_.getSequence().size() > 0) {
+            const auto& targeted_exp = application_handler_.sequenceHandler_.getSequence().at(0).getRawDataShared()->getTargetedExperimentShared();
+            const int n_rows = targeted_exp->getTransitions().size();
+            if (transitions_table_body.size() <= 0) {
+              transitions_table_body.resize(n_cols);
+              for (size_t col = 0; col < n_cols; ++col) {
+                transitions_table_body.at(col).resize(n_rows);
+              }
+              int col = 0, row = 0;
+              for (const auto& transition : targeted_exp->getTransitions()) {
+                transitions_table_body.at(col).at(row) = transition.getPeptideRef();
+                ++col;
+                transitions_table_body.at(col).at(row) = transition.getNativeID();
+                ++col;
+                transitions_table_body.at(col).at(row) = std::to_string(targeted_exp->getPeptideByRef(transition.getPeptideRef()).getRetentionTime());
+                ++col;
+                transitions_table_body.at(col).at(row) = std::to_string(transition.getPrecursorMZ());
+                ++col;
+                transitions_table_body.at(col).at(row) = std::to_string(transition.getProductMZ());
+                ++col;
+                //transitions_table_body.at(col).at(row) = transition.getProduct().getMetaValue("LabelType");
+                transitions_table_body.at(col).at(row) = "?";
+                ++col;
+                transitions_table_body.at(col).at(row) = std::to_string(transition.isQuantifyingTransition());
+                ++col;
+                transitions_table_body.at(col).at(row) = std::to_string(transition.isIdentifyingTransition());
+                ++col;
+                transitions_table_body.at(col).at(row) = std::to_string(transition.isDetectingTransition());
+                col = 0;
+                ++row;
+              }
             }
-            int col = 0, row = 0;
-            for (const auto& transition : targeted_exp->getTransitions()) {
-              transitions_table_body.at(col).at(row) = transition.getPeptideRef();
-              ++col;
-              transitions_table_body.at(col).at(row) = transition.getNativeID();
-              ++col;
-              transitions_table_body.at(col).at(row) = std::to_string(targeted_exp->getPeptideByRef(transition.getPeptideRef()).getRetentionTime());
-              ++col;
-              transitions_table_body.at(col).at(row) = std::to_string(transition.getPrecursorMZ());
-              ++col;
-              transitions_table_body.at(col).at(row) = std::to_string(transition.getProductMZ());
-              ++col;
-              //transitions_table_body.at(col).at(row) = transition.getProduct().getMetaValue("LabelType");
-              transitions_table_body.at(col).at(row) = "?";
-              ++col;
-              transitions_table_body.at(col).at(row) = std::to_string(transition.isQuantifyingTransition());
-              ++col;
-              transitions_table_body.at(col).at(row) = std::to_string(transition.isIdentifyingTransition());
-              ++col;
-              transitions_table_body.at(col).at(row) = std::to_string(transition.isDetectingTransition());
-              col = 0;
-              ++row;
+            if (transitions_table_checked_rows == nullptr) {
+              transitions_table_checked_rows = new bool[n_rows];
+              Widget::makeCheckedRows(n_rows, transitions_table_checked_rows);
             }
-          }
-          if (transitions_table_checked_rows == nullptr) {
-            transitions_table_checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, transitions_table_checked_rows);
           }
 
           // Call the table widget
           GenericTableWidget Table;
-          Table.headers = transitions_table_headers;
-          Table.columns = transitions_table_body;
-          Table.checked_rows = transitions_table_checked_rows;
+          Table.headers_ = transitions_table_headers;
+          Table.columns_ = transitions_table_body;
+          Table.checked_rows_ = transitions_table_checked_rows;
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -689,9 +733,9 @@ int main(int argc, char **argv)
 
           // Call the table widget
           GenericTableWidget Table;
-          Table.headers = workflow_table_headers;
-          Table.columns = workflow_table_body;
-          Table.checked_rows = workflow_table_checked_rows;
+          Table.headers_ = workflow_table_headers;
+          Table.columns_ = workflow_table_body;
+          Table.checked_rows_ = workflow_table_checked_rows;
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -730,30 +774,63 @@ int main(int argc, char **argv)
           ImGui::Text("TODO...");
           ImGui::EndTabItem();
         }
-        if (show_feature_plot && ImGui::BeginTabItem("Features plot", &show_feature_plot))
+        if (show_feature_table && ImGui::BeginTabItem("Features table", &show_feature_table))
         {
-          if (ImPlot::BeginPlot("My Plot")) {
-            //ImPlot::PlotLine("My Line Plot", x_data, y_data, 1000);
-            ImPlot::EndPlot();
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_feature_pivot_table && ImGui::BeginTabItem("Pivot Table", &show_feature_pivot_table))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
+        {
+          // Dummy data
+          std::vector<float> x1_data, y1_data, x2_data, y2_data;
+          auto f1 = [](const float& x) { return 1 / (1 + std::exp(-x)); };
+          auto f2 = [](const float& x) { return x - 50; };
+          for (int i = 0; i < 100; i++) {
+            x1_data.push_back(50 - i);
+            y1_data.push_back(f1(50 - i));
+            x2_data.push_back(50 - i);
+            y2_data.push_back(f2(50 - i));
           }
+          std::vector<std::string> series_names = { "Sigmoid", "Linear" };
+          std::string x_axis_title = "x";
+          std::string y_axis_title = "f(x)";
+
+          // Show the line plot
+          LinePlot2DWidget plot2d;
+          plot2d.x_data_ = {x1_data, x2_data};
+          plot2d.y_data_ = { y1_data, y2_data };
+          plot2d.x_axis_title_ = x_axis_title;
+          plot2d.y_axis_title_ = y_axis_title;
+          plot2d.series_names_ = series_names;
+          plot2d.draw();
           ImGui::EndTabItem();
         }
-        if (show_line_plot && ImGui::BeginTabItem("Line plot", &show_line_plot))
+        if (show_spectra_line_plot && ImGui::BeginTabItem("Spectra", &show_spectra_line_plot))
         {
           ImGui::Text("TODO...");
           ImGui::EndTabItem();
         }
-        if (show_heatmap_plot && ImGui::BeginTabItem("Heatmap", &show_heatmap_plot))
+        if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
         {
           ImGui::Text("TODO...");
           ImGui::EndTabItem();
         }
-        if (show_feat_db_table && ImGui::BeginTabItem("Feature DB", &show_feat_db_table))
+        if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
         {
           ImGui::Text("TODO...");
           ImGui::EndTabItem();
         }
-        if (show_pivot_table && ImGui::BeginTabItem("Pivot Table", &show_pivot_table))
+        if (show_feature_heatmap_plot && ImGui::BeginTabItem("Features (heatmap)", &show_feature_heatmap_plot))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_calibrators_line_plot && ImGui::BeginTabItem("Calibrators", &show_calibrators_line_plot))
         {
           ImGui::Text("TODO...");
           ImGui::EndTabItem();

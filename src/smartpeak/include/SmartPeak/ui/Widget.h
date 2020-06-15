@@ -98,10 +98,6 @@ namespace SmartPeak
     - row highlighting on focus
     - sorting
     - filtering
-
-    TODO: potential refactors
-    - Extract out methods for making the headers and columns
-    - Extract out method for making the filters (unit testable)
   */
   class GenericTableWidget : public Widget
   {
@@ -114,9 +110,32 @@ namespace SmartPeak
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
-    std::vector<std::string> headers;
-    std::vector<std::vector<std::string>> columns;
-    bool* checked_rows;
+    std::vector<std::string> headers_;
+    std::vector<std::vector<std::string>> columns_;
+    bool* checked_rows_;
+  };
+
+  /**
+    @brief Base class for all tables
+
+    TODO: features
+    - row highlighting on focus
+    - searching
+    - color coding of rows by status
+  */
+  class ExplorerWidget : public GenericTableWidget
+  {
+  public:
+    /*
+    @brief Show the explorer
+
+    @param[in] headers Column header names
+    @param[in,out] columns Columns where the inner vector<string> are individual columns [TODO: refactor to use other types besides strings]
+    @param[in,out] checked_rows What rows are checked/filtered
+    */
+    void draw() override;
+    bool* checked_rows_1_;
+    bool* checked_rows_2_;
   };
 
   /**
@@ -126,6 +145,21 @@ namespace SmartPeak
   {
   public:
     void draw() override;
+  };
+
+  /**
+    @brief Class for plotting 2D line plots
+  */
+  class LinePlot2DWidget : public GenericGraphicWidget
+  {
+  public:
+    void draw() override;
+    std::vector<std::vector<float>> x_data_;
+    std::vector<std::vector<float>> y_data_;
+    std::string plot_title_;
+    std::string x_axis_title_;
+    std::string y_axis_title_;
+    std::vector<std::string> series_names_;
   };
 
   /**
