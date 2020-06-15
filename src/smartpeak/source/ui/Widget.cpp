@@ -127,8 +127,8 @@ namespace SmartPeak
       return;
 
     // headers
-    const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable |
-      //ImGuiTableFlags_Sortable | ImGuiTableFlags_Hideable |
+    const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable |
+      //ImGuiTableFlags_Sortable | 
       ImGuiTableFlags_Borders | ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow | ImGuiTableFlags_ScrollFreezeLeftColumn;
 
     if (ImGui::BeginTable("Table", headers_.size(), table_flags)) {
@@ -177,7 +177,7 @@ namespace SmartPeak
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable |
-      ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow;
+      ImGuiTableFlags_Hideable | ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow;
 
     if (ImGui::BeginTable("Explorer", headers_.size(), table_flags)) {
       // First row headers
@@ -203,11 +203,17 @@ namespace SmartPeak
             for (size_t col = 0; col < headers_.size(); ++col) {
               if (col == headers_.size() - 2) {
                 ImGui::TableSetColumnIndex(col);
-                ImGui::Checkbox("", &checked_rows_1_[row]);
+                std::string id = std::to_string(col) + std::to_string(row);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+                ImGui::Checkbox(id.c_str(), &checked_rows_1_[row]);
+                ImGui::PopStyleColor();
               }
               else if (col == headers_.size() - 1) {
                 ImGui::TableSetColumnIndex(col);
-                ImGui::Checkbox("", &checked_rows_2_[row]);
+                std::string id = std::to_string(col) + std::to_string(row);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+                ImGui::Checkbox(id.c_str(), &checked_rows_2_[row]);
+                ImGui::PopStyleColor();
               }
               else {
                 ImGui::TableSetColumnIndex(col);
