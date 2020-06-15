@@ -37,6 +37,6 @@ namespace SmartPeak
 
     void draw() override;
 
-    void setState(ApplicationHandler& state);
+    void setApplicationHandler(ApplicationHandler& application_handler);
   };
 }

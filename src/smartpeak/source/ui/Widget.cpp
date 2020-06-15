@@ -125,11 +125,6 @@ namespace SmartPeak
     if (headers.empty())
       return;
 
-    // row filters
-    static std::vector<ImGuiTextFilter> filter;
-    std::vector<std::vector<std::pair<std::string, std::vector<std::size_t>>>> columns_indices;
-    //this->makeFilters(headers, columns, columns_indices, filter);
-
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable |
       //ImGuiTableFlags_Sortable | ImGuiTableFlags_Hideable |
@@ -142,42 +137,31 @@ namespace SmartPeak
       }
       ImGui::TableAutoHeaders();
 
-      //// TODO: Second row filters
-      //ImGui::TableNextRow();
-      //for (size_t col = 0; col < headers.size(); ++col) {
-      //  ImGui::TableSetColumnIndex(col);
-      //  char s[128];
-      //  if (ImGui::Button(headers[col].c_str())) {
-      //    sprintf(s, "%lu", col);
-      //    ImGui::OpenPopup(s);
-      //  }
-      //  sprintf(s, "%lu", col);
-      //  this->FilterPopup(s, filter[col], columns[col], checked_rows, columns_indices[col]);
-      //}
-
-      // Third row to end body
+      // Second row to end body
       //static size_t selected = -1;
-      for (size_t row = 0; row < columns[0].size(); ++row) {
-        bool pass_all_columns = checked_rows[row];
-        if (pass_all_columns) {
-          ImGui::TableNextRow();
+      if (columns.size() > 0) {
+        for (size_t row = 0; row < columns[0].size(); ++row) {
+          bool pass_all_columns = checked_rows[row];
+          if (pass_all_columns) {
+            ImGui::TableNextRow();
 
-          //// TODO: Bug in row highlighting
-          //char label[32];
-          //sprintf(label, "%lu", row);
-          //if (ImGui::Selectable(label, selected == row, ImGuiSelectableFlags_SpanAllColumns))
-          //  selected = row;
-          //// bool hovered = ImGui::IsItemHovered();
-          for (size_t col = 0; col < headers.size(); ++col){
-            ImGui::TableSetColumnIndex(col);
-            ImGui::Text("%s", columns[col][row].c_str());
+            //// TODO: Bug in row highlighting
+            //char label[32];
+            //sprintf(label, "%lu", row);
+            //if (ImGui::Selectable(label, selected == row, ImGuiSelectableFlags_SpanAllColumns))
+            //  selected = row;
+            //// bool hovered = ImGui::IsItemHovered();
+            for (size_t col = 0; col < headers.size(); ++col) {
+              ImGui::TableSetColumnIndex(col);
+              ImGui::Text("%s", columns[col][row].c_str());
 
-            //// TODO: Testing random fixes to get input text to work
-            //char buf[512];
-            //sprintf(buf, columns[col][row].c_str());
-            //ImGui::InputText("", buf, IM_ARRAYSIZE(buf));
-            //if (ImGui::IsItemHovered() || ImGui::IsItemFocused())
-            //  ImGui::SetMouseCursor(1);
+              //// TODO: Testing random fixes to get input text to work
+              //char buf[512];
+              //sprintf(buf, columns[col][row].c_str());
+              //ImGui::InputText("", buf, IM_ARRAYSIZE(buf));
+              //if (ImGui::IsItemHovered() || ImGui::IsItemFocused())
+              //  ImGui::SetMouseCursor(1);
+            }
           }
         }
       }
@@ -430,7 +414,7 @@ namespace SmartPeak
   void GenericTextWidget::draw()
   {
     for (const std::string& line : text_lines) {
-      ImGui::Text("%s", line.c_str());
+      ImGui::TextWrapped("%s", line.c_str());
     }
   }
 }

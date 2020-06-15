@@ -181,7 +181,7 @@ namespace SmartPeak
     return commands_;
   }
 
-  void Workflow::setState(ApplicationHandler& state)
+  void Workflow::setApplicationHandler(ApplicationHandler& state)
   {
     LOGD << "Setting state: " << (&state);
     application_handler_ = &state;

@@ -123,7 +123,7 @@ namespace SmartPeak
     ImGui::EndPopup();
   }
 
-  void Report::setState(ApplicationHandler& state)
+  void Report::setApplicationHandler(ApplicationHandler& state)
   {
     LOGD << "Setting state: " << (&state);
     application_handler_ = &state;

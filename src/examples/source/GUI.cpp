@@ -46,9 +46,16 @@ int main(int argc, char **argv)
   // Dummy data for testing the sequence table
   static std::vector<std::string> sequence_table_headers;
   static std::vector<std::vector<std::string>> sequence_table_body;
-  static bool* checked_rows = nullptr;
+  static bool* sequence_table_checked_rows = nullptr;
+  // Dummy data for testing the transitions table
+  static std::vector<std::string> transitions_table_headers;
+  static std::vector<std::vector<std::string>> transitions_table_body;
+  static bool* transitions_table_checked_rows = nullptr;
+  // Dummy data for testing the workflow table
+  static std::vector<std::string> workflow_table_headers;
+  static std::vector<std::vector<std::string>> workflow_table_body;
+  static bool* workflow_table_checked_rows = nullptr;
 
-  std::string quickInfoText_;
   bool show_top_window_ = false;
   bool show_bottom_window_ = false;
   bool show_left_window_ = false;
@@ -86,6 +93,7 @@ int main(int argc, char **argv)
   bool show_feat_db_table = false;
   bool show_pivot_table = false;
 
+  // Popup modals
   bool popup_run_workflow_ = false;
   bool popup_file_picker_ = false;
 
@@ -94,11 +102,12 @@ int main(int argc, char **argv)
   GuiAppender appender_;
 
   // widgets
+  GenericTextWidget quickInfoText_;
   FilePicker file_picker_;
   Report     report_;
   Workflow   workflow_;
-  report_.setState(application_handler_);
-  workflow_.setState(application_handler_);
+  report_.setApplicationHandler(application_handler_);
+  workflow_.setApplicationHandler(application_handler_);
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   char filename[128];
   strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
@@ -177,6 +186,11 @@ int main(int argc, char **argv)
 
     workflow_is_done_ = manager_.isWorkflowDone();
     file_loading_is_done_ = file_picker_.fileLoadingIsDone();
+
+    // Make the quick info text
+    quickInfoText_.text_lines.clear();
+    quickInfoText_.text_lines.push_back(workflow_is_done_ ? "Workflow status: done" : "Workflow status: running...");
+    quickInfoText_.text_lines.push_back(file_loading_is_done_ ? "File loading status: done" : "File loading status: running...");
 
     if (popup_file_picker_)
     {
@@ -442,7 +456,7 @@ int main(int argc, char **argv)
         if (ImGui::MenuItem("Run command", NULL, false, workflow_is_done_ && file_loading_is_done_))
         {
           initializeDataDirs(application_handler_);
-          // do the rest
+          // TODO: do the rest
         }
         if (ImGui::MenuItem("Run workflow"))
         {
@@ -583,28 +597,102 @@ int main(int argc, char **argv)
               ++row;
             }
           }
-          if (checked_rows == nullptr) {
-            checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, checked_rows);
+          if (sequence_table_checked_rows == nullptr) {
+            sequence_table_checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, sequence_table_checked_rows);
           }
 
           // Call the table widget
           GenericTableWidget Table;
           Table.headers = sequence_table_headers;
           Table.columns = sequence_table_body;
-          Table.checked_rows = checked_rows;
+          Table.checked_rows = sequence_table_checked_rows;
           Table.draw();
           ImGui::EndTabItem();
         }
         if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
         {
-          ImGui::Text("TODO...");
-          //const auto& targeted_exp = application_handler_.sequenceHandler_.getSequence().at(0).getRawDataShared()->getTargetedExperimentShared();
+          // Dummy data for testing the transitions table
+          if (transitions_table_headers.size() <= 0) transitions_table_headers = { // NOTE: only showing a subset
+            "transition_group_id","transition_name","RetentionTime","PrecursorMz","ProductMz",
+            "LabelType","quantifying_transition","identifying_transition","detecting_transition"};
+          const int n_cols = transitions_table_headers.size();
+          const auto& targeted_exp = application_handler_.sequenceHandler_.getSequence().at(0).getRawDataShared()->getTargetedExperimentShared();
+          const int n_rows = targeted_exp->getTransitions().size();
+          if (transitions_table_body.size() <= 0) {
+            transitions_table_body.resize(n_cols);
+            for (size_t col = 0; col < n_cols; ++col) {
+              transitions_table_body.at(col).resize(n_rows);
+            }
+            int col = 0, row = 0;
+            for (const auto& transition : targeted_exp->getTransitions()) {
+              transitions_table_body.at(col).at(row) = transition.getPeptideRef();
+              ++col;
+              transitions_table_body.at(col).at(row) = transition.getNativeID();
+              ++col;
+              transitions_table_body.at(col).at(row) = std::to_string(targeted_exp->getPeptideByRef(transition.getPeptideRef()).getRetentionTime());
+              ++col;
+              transitions_table_body.at(col).at(row) = std::to_string(transition.getPrecursorMZ());
+              ++col;
+              transitions_table_body.at(col).at(row) = std::to_string(transition.getProductMZ());
+              ++col;
+              //transitions_table_body.at(col).at(row) = transition.getProduct().getMetaValue("LabelType");
+              transitions_table_body.at(col).at(row) = "?";
+              ++col;
+              transitions_table_body.at(col).at(row) = std::to_string(transition.isQuantifyingTransition());
+              ++col;
+              transitions_table_body.at(col).at(row) = std::to_string(transition.isIdentifyingTransition());
+              ++col;
+              transitions_table_body.at(col).at(row) = std::to_string(transition.isDetectingTransition());
+              col = 0;
+              ++row;
+            }
+          }
+          if (transitions_table_checked_rows == nullptr) {
+            transitions_table_checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, transitions_table_checked_rows);
+          }
+
+          // Call the table widget
+          GenericTableWidget Table;
+          Table.headers = transitions_table_headers;
+          Table.columns = transitions_table_body;
+          Table.checked_rows = transitions_table_checked_rows;
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
-          ImGui::Text("Workflow status: %s", workflow_is_done_ ? "done" : "running...");
+          // Dummy data for testing the sequence table
+          if (workflow_table_headers.size() <= 0) workflow_table_headers = {
+            "step", "command" };
+          const int n_cols = workflow_table_headers.size();
+          const int n_rows = workflow_.getCommands().size();
+          if (workflow_table_body.size() != workflow_.getCommands().size()) { // TODO: does not account for case of different commands of the same length
+            workflow_table_body.resize(n_cols);
+            for (size_t col = 0; col < n_cols; ++col) {
+              workflow_table_body.at(col).resize(n_rows);
+            }
+            int col = 0, row = 0;
+            for (const auto& command : workflow_.getCommands()) {
+              workflow_table_body.at(col).at(row) = std::to_string(row);
+              ++col;
+              workflow_table_body.at(col).at(row) = command.getName();
+              col = 0;
+              ++row;
+            }
+          }
+          if (workflow_table_checked_rows == nullptr) {
+            workflow_table_checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, workflow_table_checked_rows);
+          }
+
+          // Call the table widget
+          GenericTableWidget Table;
+          Table.headers = workflow_table_headers;
+          Table.columns = workflow_table_body;
+          Table.checked_rows = workflow_table_checked_rows;
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
@@ -694,7 +782,7 @@ int main(int argc, char **argv)
         if (show_info_ && ImGui::BeginTabItem("Info", &show_info_))
         {
           ImGui::BeginChild("Info child");
-          ImGui::TextWrapped("%s", quickInfoText_.c_str());
+          quickInfoText_.draw();
           ImGui::EndChild();
           ImGui::EndTabItem();
         }
@@ -711,6 +799,8 @@ int main(int argc, char **argv)
 
           ImGui::Separator();
           ImGui::BeginChild("Log child");
+          // TODO: this does not display correctly
+          // BUG: AUT-176
           for (const plog::util::nstring& s : appender_.getMessageList(severity))
           {
             ImGui::Text("%s", s.c_str());

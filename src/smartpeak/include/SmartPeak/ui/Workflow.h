@@ -19,6 +19,6 @@ namespace SmartPeak
 
     std::vector<ApplicationHandler::Command> getCommands() const;
 
-    void setState(ApplicationHandler& state);
+    void setApplicationHandler(ApplicationHandler& application_handler);
   };
 }
