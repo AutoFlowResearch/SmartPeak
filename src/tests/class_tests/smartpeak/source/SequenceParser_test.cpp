@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
     sequenceHandler.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
   }
 
-  vector<map<string,string>> data_out;
+  vector<vector<string>> data_out;
   vector<string> headers_out;
   const vector<string> meta_data {
     "peak_apex_int",
@@ -150,14 +150,14 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types);
 
   BOOST_CHECK_EQUAL(data_out.size(), 1657);
-  BOOST_CHECK_EQUAL(data_out.at(0).at("sample_name"), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(data_out.at(0).at("sample_type"), "Unknown");
-  BOOST_CHECK_EQUAL(data_out.at(0).at("component_group_name"), "23dpg");
-  BOOST_CHECK_EQUAL(data_out.at(0).at("component_name"), "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_EQUAL(data_out.at(0).at("peak_apex_int"), std::to_string(235.0));
-  BOOST_CHECK_EQUAL(data_out.at(0).at("logSN"), std::to_string(3.52866193485212));
-  BOOST_CHECK_EQUAL(data_out.at(0).at("leftWidth"), std::to_string(15.605367));
-  BOOST_CHECK_EQUAL(data_out.at(0).at("rightWidth"), std::to_string(15.836817));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "Unknown");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "23dpg");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(19), std::to_string(235.0));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(20), std::to_string(3.52866193485212));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(23), std::to_string(15.605367));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(24), std::to_string(15.836817));
   BOOST_CHECK_EQUAL(headers_out.size(), 25);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");

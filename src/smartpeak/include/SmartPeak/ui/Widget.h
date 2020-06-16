@@ -112,7 +112,9 @@ namespace SmartPeak
     void draw() override;
     std::vector<std::string> headers_;
     std::vector<std::vector<std::string>> columns_;
+    bool is_columnar_ = true;
     bool* checked_rows_;
+    std::string table_id_;
   };
 
   /**
@@ -156,7 +158,7 @@ namespace SmartPeak
     void draw() override;
     std::vector<std::vector<float>> x_data_;
     std::vector<std::vector<float>> y_data_;
-    std::string plot_title_;
+    std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     std::string x_axis_title_;
     std::string y_axis_title_;
     std::vector<std::string> series_names_;

@@ -206,7 +206,7 @@ namespace SmartPeak
 
   void SequenceParser::makeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
-    std::vector<std::map<std::string,std::string>>& list_dict,
+    std::vector<std::vector<std::string>>& rows_out,
     std::vector<std::string>& headers_out,
     const std::vector<std::string>& meta_data,
     const std::set<SampleType>& sample_types
@@ -231,7 +231,7 @@ namespace SmartPeak
 
     const std::string delimiter {"_____"};
 
-    list_dict.clear();
+    rows_out.clear();
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
       const SampleType st = mdh.getSampleType();
@@ -247,10 +247,10 @@ namespace SmartPeak
         }
         const std::string component_group_name = feature.getMetaValue(s_PeptideRef);
         for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
-          std::map<std::string,std::string> row;
-          row.emplace("sample_type", sampleTypeToString.at(st));
-          row.emplace("sample_name", sample_name);
-          row.emplace("component_group_name", component_group_name);
+          std::vector<std::string> row;
+          row.push_back(sample_name);
+          row.push_back(sampleTypeToString.at(st));
+          row.push_back(component_group_name);
           if (!subordinate.metaValueExists(s_native_id) ||
               subordinate.getMetaValue(s_native_id).isEmpty() ||
               subordinate.getMetaValue(s_native_id).toString().empty()) {
@@ -258,38 +258,32 @@ namespace SmartPeak
             continue;
           }
           const std::string component_name = subordinate.getMetaValue(s_native_id);
-          row.emplace("component_name", component_name);
-          row.emplace("proc_method_name", mdh.proc_method_name);
-          row.emplace("rack_number", std::to_string(mdh.rack_number));
-          row.emplace("plate_number", std::to_string(mdh.plate_number));
-          row.emplace("pos_number", std::to_string(mdh.pos_number));
-          row.emplace("inj_number", std::to_string(mdh.inj_number));
-          row.emplace("dilution_factor", std::to_string(mdh.dilution_factor));
-          row.emplace("acq_method_name", mdh.acq_method_name);
-          row.emplace("operator_name", mdh.operator_name);
-          row.emplace("original_filename", mdh.original_filename);
-          row.emplace("acquisition_date_and_time", mdh.getAcquisitionDateAndTimeAsString());
-          row.emplace("inj_volume", std::to_string(mdh.inj_volume));
-          row.emplace("inj_volume_units", mdh.inj_volume_units);
-          row.emplace("batch_name", mdh.batch_name);
-          row.emplace("injection_name", mdh.getInjectionName());
-          row.emplace(
-            "used_",
-            subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
-          );
+          row.push_back(component_name);
+          row.push_back(mdh.batch_name);
+          row.push_back(std::to_string(mdh.rack_number));
+          row.push_back(std::to_string(mdh.plate_number));
+          row.push_back(std::to_string(mdh.pos_number));
+          row.push_back(std::to_string(mdh.inj_number));
+          row.push_back(std::to_string(mdh.dilution_factor));
+          row.push_back(std::to_string(mdh.inj_volume));
+          row.push_back(mdh.inj_volume_units);
+          row.push_back(mdh.operator_name);
+          row.push_back(mdh.acq_method_name);
+          row.push_back(mdh.proc_method_name);
+          row.push_back(mdh.original_filename);
+          row.push_back(mdh.getAcquisitionDateAndTimeAsString());
+          row.push_back(mdh.getInjectionName());
+          row.push_back(subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : "");
           for (const std::string& meta_value_name : meta_data) {
             if (subordinate.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_message") {
-
               OpenMS::StringList messages = subordinate.getMetaValue(meta_value_name).toStringList();
-              row.emplace(
-                meta_value_name,
+              row.push_back(
                 Utilities::join(messages.begin(), messages.end(), delimiter)
               );
             }
             else if (feature.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_group_message") {
               OpenMS::StringList messages = feature.getMetaValue(meta_value_name).toStringList();
-              row.emplace(
-                meta_value_name,
+              row.push_back(
                 Utilities::join(messages.begin(), messages.end(), delimiter)
               );
             }
@@ -297,13 +291,13 @@ namespace SmartPeak
               CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
               if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
                 // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-                row.emplace(meta_value_name, std::to_string(datum.f_));
+                row.push_back(std::to_string(datum.f_));
               } else {
-                row.emplace(meta_value_name, "");
+                row.push_back("");
               }
             }
           }
-          list_dict.push_back(row);
+          rows_out.push_back(row);
         }
       }
     }
@@ -319,13 +313,13 @@ namespace SmartPeak
     LOGD << "START writeDataTableFromMetaValue";
     LOGI << "Storing: " << filename;
 
-    std::vector<std::map<std::string,std::string>> list_dict;
+    std::vector<std::vector<std::string>> rows;
     std::vector<std::string> headers;
     std::vector<std::string> meta_data_strings;
     for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
     }
-    makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data_strings, sample_types);
+    makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types);
 
     CSVWriter writer(filename, ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
@@ -335,11 +329,7 @@ namespace SmartPeak
       return false;
     }
 
-    for (const std::map<std::string,std::string>& m : list_dict) {
-      std::vector<std::string> line;
-      for (const std::string& h : headers) {
-        line.push_back(m.at(h));
-      }
+    for (const std::vector<std::string>& line : rows) {
       writer.writeDataInRow(line.cbegin(), line.cend());
     }
 

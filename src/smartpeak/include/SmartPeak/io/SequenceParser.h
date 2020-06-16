@@ -54,7 +54,7 @@ public:
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
     static void makeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
-      std::vector<std::map<std::string,std::string>>& list_dict,
+      std::vector<std::vector<std::string>>& rows_out,
       std::vector<std::string>& headers_out,
       const std::vector<std::string>& meta_data = {"calculated_concentration"},
       const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})

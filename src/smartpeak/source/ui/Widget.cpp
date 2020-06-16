@@ -131,7 +131,7 @@ namespace SmartPeak
       //ImGuiTableFlags_Sortable | 
       ImGuiTableFlags_Borders | ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow | ImGuiTableFlags_ScrollFreezeLeftColumn;
 
-    if (ImGui::BeginTable("Table", headers_.size(), table_flags)) {
+    if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
         ImGui::TableSetupColumn(headers_.at(col).c_str());
@@ -139,29 +139,18 @@ namespace SmartPeak
       ImGui::TableAutoHeaders();
 
       // Second row to end body
-      //static size_t selected = -1;
       if (columns_.size() > 0) {
-        for (size_t row = 0; row < columns_[0].size(); ++row) {
+        size_t n_rows = 0;
+        if (is_columnar_) n_rows = columns_[0].size();
+        else n_rows = columns_.size();
+        for (size_t row = 0; row < n_rows; ++row) {
           bool pass_all_columns = checked_rows_[row];
           if (pass_all_columns) {
             ImGui::TableNextRow();
-
-            //// TODO: Bug in row highlighting
-            //char label[32];
-            //sprintf(label, "%lu", row);
-            //if (ImGui::Selectable(label, selected == row, ImGuiSelectableFlags_SpanAllColumns))
-            //  selected = row;
-            //// bool hovered = ImGui::IsItemHovered();
             for (size_t col = 0; col < headers_.size(); ++col) {
               ImGui::TableSetColumnIndex(col);
-              ImGui::Text("%s", columns_[col][row].c_str());
-
-              //// TODO: Testing random fixes to get input text to work
-              //char buf[512];
-              //sprintf(buf, columns_[col][row].c_str());
-              //ImGui::InputText("", buf, IM_ARRAYSIZE(buf));
-              //if (ImGui::IsItemHovered() || ImGui::IsItemFocused())
-              //  ImGui::SetMouseCursor(1);
+              if (is_columnar_) ImGui::Text("%s", columns_[col][row].c_str());
+              else ImGui::Text("%s", columns_[row][col].c_str());
             }
           }
         }
@@ -179,7 +168,7 @@ namespace SmartPeak
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable |
       ImGuiTableFlags_Hideable | ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow;
 
-    if (ImGui::BeginTable("Explorer", headers_.size(), table_flags)) {
+    if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
         ImGui::TableSetupColumn(headers_.at(col).c_str());
@@ -187,37 +176,32 @@ namespace SmartPeak
       ImGui::TableAutoHeaders();
 
       // Second row to end body
-      //static size_t selected = -1;
       if (columns_.size() > 0) {
-        for (size_t row = 0; row < columns_[0].size(); ++row) {
+        size_t n_rows = 0;
+        if (is_columnar_) n_rows = columns_[0].size();
+        else n_rows = columns_.size();
+        for (size_t row = 0; row < n_rows; ++row) {
           bool pass_all_columns = checked_rows_;
           if (pass_all_columns) {
             ImGui::TableNextRow();
-
-            //// TODO: Bug in row highlighting
-            //char label[32];
-            //sprintf(label, "%lu", row);
-            //if (ImGui::Selectable(label, selected == row, ImGuiSelectableFlags_SpanAllColumns))
-            //  selected = row;
-            //// bool hovered = ImGui::IsItemHovered();
             for (size_t col = 0; col < headers_.size(); ++col) {
+              std::string id = table_id_ + std::to_string(col) + std::to_string(row*n_rows);
               if (col == headers_.size() - 2) {
                 ImGui::TableSetColumnIndex(col);
-                std::string id = std::to_string(col) + std::to_string(row);
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
                 ImGui::Checkbox(id.c_str(), &checked_rows_1_[row]);
                 ImGui::PopStyleColor();
               }
               else if (col == headers_.size() - 1) {
                 ImGui::TableSetColumnIndex(col);
-                std::string id = std::to_string(col) + std::to_string(row);
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
                 ImGui::Checkbox(id.c_str(), &checked_rows_2_[row]);
                 ImGui::PopStyleColor();
               }
               else {
                 ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", columns_[col][row].c_str());
+                if (is_columnar_) ImGui::Text("%s", columns_[col][row].c_str());
+                else ImGui::Text("%s", columns_[row][col].c_str());
               }
             }
           }
