@@ -10,6 +10,7 @@
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/WorkflowManager.h>
+#include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/ui/GuiAppender.h>
@@ -109,6 +110,19 @@ int main(int argc, char **argv)
   static std::vector<std::string> feature_pivot_table_headers;
   static std::vector<std::vector<std::string>> feature_pivot_table_body;
   static bool* feature_pivot_table_checked_rows = nullptr;
+  // data for the chromatogram scatter plot
+  static std::vector<std::vector<float>> chrom_time_data, chrom_intensity_data;
+  static std::vector<std::string> chrom_series_names;
+  static std::string chrom_x_axis_title = "Time (sec)";
+  static std::string chrom_y_axis_title = "Intensity (au)";
+  static float chrom_time_min = 1e6, chrom_time_max = 0, chrom_intensity_min = 1e6, chrom_intensity_max = 0;
+  // data for the calibrators scatter/line plot
+  static std::vector<std::vector<float>> calibrators_conc_raw_data, calibrators_feature_raw_data;
+  static std::vector<std::vector<float>> calibrators_conc_fit_data, calibrators_feature_fit_data;
+  static std::vector<std::string> calibrators_series_names;
+  static std::string calibrators_x_axis_title = "Concentration ratio (?)";
+  static std::string calibrators_y_axis_title = "Feature ratio (?)";
+  static float calibrators_conc_min = 1e6, calibrators_conc_max = 0, calibrators_feature_min = 1e6, calibrators_feature_max = 0;
 
   bool show_top_window_ = false;
   bool show_bottom_window_ = false;
@@ -1400,36 +1414,86 @@ int main(int argc, char **argv)
         }
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
         {
-          // Dummy data
-          std::vector<float> x1_data, y1_data, x2_data, y2_data;
-          auto f1 = [](const float& x) { return 1 / (1 + std::exp(-x)); };
-          auto f2 = [](const float& x) { return x - 50; };
-          for (int i = 0; i < 100; i++) {
-            x1_data.push_back(50 - i);
-            y1_data.push_back(f1(50 - i));
-            x2_data.push_back(50 - i);
-            y2_data.push_back(f2(50 - i));
+          if (application_handler_.sequenceHandler_.getSequence().size() > 0 &&
+            application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 &&
+            application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0) {
+            // TODO: filter by transition name (i.e., getNativeID() == component_name)
+            // TODO: filter by sample or injection name
+            if (chrom_time_data.size() <= 0) { // TODO: better check for updates
+              for (const auto& injection : application_handler_.sequenceHandler_.getSequence()) {
+                // Extract out the raw data for plotting
+                for (const auto& chromatogram : injection.getRawData().getChromatogramMap().getChromatograms()) {
+                  std::vector<float> x_data, y_data;
+                  for (const auto& point : chromatogram) {
+                    x_data.push_back(point.getRT());
+                    y_data.push_back(point.getIntensity());
+                    chrom_time_min = std::min((float)point.getRT(), chrom_time_min);
+                    chrom_intensity_min = std::min((float)point.getIntensity(), chrom_intensity_min);
+                    chrom_time_max = std::max((float)point.getRT(), chrom_time_max);
+                    chrom_intensity_max = std::max((float)point.getIntensity(), chrom_intensity_max);
+                  }
+                  chrom_time_data.push_back(x_data);
+                  chrom_intensity_data.push_back(y_data);
+                  chrom_series_names.push_back(injection.getMetaData().getSampleName() + "-" + chromatogram.getNativeID());
+                }
+                // Extract out the best left/right for plotting
+                for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
+                  for (const auto& subordinate : feature.getSubordinates()) {
+                    if (subordinate.getMetaValue("used_") == "true") {
+                      if (subordinate.metaValueExists("leftWidth") && subordinate.metaValueExists("rightWidth")) {
+                        std::vector<float> x_data, y_data;
+                        x_data.push_back(subordinate.getMetaValue("leftWidth"));
+                        y_data.push_back(0); // TODO: extract out chrom peak intensity
+                        x_data.push_back(subordinate.getMetaValue("rightWidth"));
+                        y_data.push_back(0); // TODO: extract out chrom peak intensity
+                        chrom_time_data.push_back(x_data);
+                        chrom_intensity_data.push_back(y_data);
+                        chrom_series_names.push_back(injection.getMetaData().getSampleName() + "-" + (std::string)subordinate.getMetaValue("native_id") + "-" + (std::string)subordinate.getMetaValue("timestamp_"));
+                      }
+                    }
+                  }
+                }
+                // Extract out the smoothed points for plotting
+                for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
+                  for (const auto& subordinate : feature.getSubordinates()) {
+                    if (subordinate.getMetaValue("used_") == "true") {
+                      std::vector<float> x_data, y_data;
+                      for (const auto& point : subordinate.getConvexHull().getHullPoints()) {
+                        x_data.push_back(point.getX());
+                        y_data.push_back(point.getY());
+                        chrom_time_min = std::min((float)point.getX(), chrom_time_min);
+                        chrom_intensity_min = std::min((float)point.getY(), chrom_intensity_min);
+                        chrom_time_max = std::max((float)point.getX(), chrom_time_max);
+                        chrom_intensity_max = std::max((float)point.getY(), chrom_intensity_max);
+                      }
+                      chrom_time_data.push_back(x_data);
+                      chrom_intensity_data.push_back(y_data);
+                      chrom_series_names.push_back(injection.getMetaData().getSampleName() + "-" + (std::string)subordinate.getMetaValue("native_id") + "-" + (std::string)subordinate.getMetaValue("timestamp_"));
+                    }
+                  }
+                }
+              }
+            }
           }
-          std::vector<std::string> series_names = { "Sigmoid", "Linear" };
-          std::string x_axis_title = "x";
-          std::string y_axis_title = "f(x)";
 
           // Show the line plot
-          LinePlot2DWidget plot2d;
-          plot2d.x_data_ = {x1_data, x2_data};
-          plot2d.y_data_ = { y1_data, y2_data };
-          plot2d.x_axis_title_ = x_axis_title;
-          plot2d.y_axis_title_ = y_axis_title;
-          plot2d.series_names_ = series_names;
+          ScatterPlot2DWidget plot2d;
+          plot2d.x_data_ = chrom_time_data;
+          plot2d.y_data_ = chrom_intensity_data;
+          plot2d.x_axis_title_ = chrom_x_axis_title;
+          plot2d.y_axis_title_ = chrom_y_axis_title;
+          plot2d.series_names_ = chrom_series_names;
+          plot2d.plot_title_ = "Chromatograms Main Window";
+          plot2d.x_min_ = chrom_time_min;
+          plot2d.x_max_ = chrom_time_max;
+          plot2d.y_min_ = chrom_intensity_min;
+          plot2d.y_max_ = chrom_intensity_max;
+          plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
+          plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
           plot2d.draw();
           ImGui::EndTabItem();
         }
         if (show_spectra_line_plot && ImGui::BeginTabItem("Spectra", &show_spectra_line_plot))
-        {
-          ImGui::Text("TODO...");
-          ImGui::EndTabItem();
-        }
-        if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
         {
           ImGui::Text("TODO...");
           ImGui::EndTabItem();
@@ -1446,7 +1510,94 @@ int main(int argc, char **argv)
         }
         if (show_calibrators_line_plot && ImGui::BeginTabItem("Calibrators", &show_calibrators_line_plot))
         {
-          ImGui::Text("TODO...");
+          if (application_handler_.sequenceHandler_.getSequenceSegments().size() > 0 &&
+            application_handler_.sequenceHandler_.getSequenceSegments().at(0).getQuantitationMethods().size() > 0 &&
+            application_handler_.sequenceHandler_.getSequenceSegments().at(0).getComponentsToConcentrations().size() > 0 &&
+            application_handler_.sequenceHandler_.getSequenceSegments().at(0).getStandardsConcentrations().size() > 0) {
+            if (calibrators_conc_fit_data.size() <= 0 && calibrators_conc_raw_data.size() <= 0) {
+              // Update the axis titles
+              calibrators_x_axis_title = "Concentration (" + application_handler_.sequenceHandler_.getSequenceSegments().at(0).getQuantitationMethods().at(0).getConcentrationUnits() + ")";
+              calibrators_y_axis_title = application_handler_.sequenceHandler_.getSequenceSegments().at(0).getQuantitationMethods().at(0).getFeatureName() + " (au)";
+              // TODO: filtering by the transition (i.e., getNativeID, getComponentName)
+              for (const auto& sequence_segment : application_handler_.sequenceHandler_.getSequenceSegments()) {
+                // Extract out raw data used to make the calibrators found in `StandardsConcentrations`
+                std::map<std::string, std::pair<std::vector<float>, std::vector<std::string>>> stand_concs_map; // map of x_data and sample_name for a component
+                for (const auto& stand_concs : sequence_segment.getStandardsConcentrations()) {
+                  // Skip components that have not been fitted with a calibration curve
+                  if (sequence_segment.getComponentsToConcentrations().count(stand_concs.component_name) > 0 &&
+                    sequence_segment.getComponentsToConcentrations().at(stand_concs.component_name).size() > 0) {
+                    const float x_datum = float(stand_concs.actual_concentration / stand_concs.IS_actual_concentration / stand_concs.dilution_factor);
+                    auto found = stand_concs_map.emplace(stand_concs.component_name,
+                      std::make_pair(std::vector<float>({ x_datum }),
+                        std::vector<std::string>({ stand_concs.sample_name })));
+                    if (!found.second) {
+                      stand_concs_map.at(stand_concs.component_name).first.push_back(x_datum);
+                      stand_concs_map.at(stand_concs.component_name).second.push_back(stand_concs.sample_name);
+                    }
+                    calibrators_conc_min = std::min(x_datum, calibrators_conc_min);
+                    calibrators_conc_max = std::max(x_datum, calibrators_conc_max);
+                  }
+                }
+
+                // Make the line of best fit using the `QuantitationMethods`
+                for (const auto& quant_method : sequence_segment.getQuantitationMethods()) {
+                  // Skip components that have not been fitted with a calibration curve
+                  if (sequence_segment.getComponentsToConcentrations().count(quant_method.getComponentName()) > 0 && 
+                    sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName()).size() > 0) {
+                    // Make the line of best fit using the `QuantitationMethods
+                    std::vector<float> y_fit_data;
+                    for (const auto& ratio : stand_concs_map.at(quant_method.getComponentName()).first) {
+                      // TODO: encapsulate in its own method e.g. sequenceSegmentProcessor
+                      // TODO: check that the calibration actually found a best fit (and set to all 0 if not)
+                      // calculate the absolute concentration
+                      OpenMS::TransformationModel::DataPoints data;
+                      OpenMS::TransformationDescription tmd(data);
+                      tmd.fitModel(quant_method.getTransformationModel(), quant_method.getTransformationModelParams());
+                      float calculated_feature_ratio = tmd.apply(ratio);
+                      // check for less than zero
+                      if (calculated_feature_ratio < 0.0) calculated_feature_ratio = 0.0;
+                      y_fit_data.push_back(calculated_feature_ratio);
+                      calibrators_feature_min = std::min(calculated_feature_ratio, calibrators_feature_min);
+                      calibrators_feature_max = std::max(calculated_feature_ratio, calibrators_feature_max);
+                    }
+                    calibrators_conc_fit_data.push_back(stand_concs_map.at(quant_method.getComponentName()).first);
+                    calibrators_feature_fit_data.push_back(y_fit_data);
+
+                    // Extract out the points used to make the line of best fit in `ComponentsToConcentrations`
+                    std::vector<float> x_raw_data, y_raw_data;
+                    OpenMS::AbsoluteQuantitation absQuant;
+                    for (const auto& point : sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName())) {
+                      x_raw_data.push_back(float(point.actual_concentration / point.IS_actual_concentration / point.dilution_factor));
+                      float y_datum = absQuant.calculateRatio(point.feature, point.IS_feature, quant_method.getFeatureName());
+                      y_raw_data.push_back(y_datum);
+                      calibrators_feature_min = std::min(y_datum, calibrators_feature_min);
+                      calibrators_feature_max = std::max(y_datum, calibrators_feature_max);
+                    }
+                    calibrators_conc_raw_data.push_back(x_raw_data);
+                    calibrators_feature_raw_data.push_back(y_raw_data);
+                    calibrators_series_names.push_back(quant_method.getComponentName());
+                  }
+                }
+              }
+            }
+          }
+          CalibratorsPlotWidget plot2d;
+          plot2d.x_fit_data_ = calibrators_conc_fit_data;
+          plot2d.y_fit_data_ = calibrators_feature_fit_data;
+          plot2d.x_raw_data_ = calibrators_conc_raw_data;
+          plot2d.y_raw_data_ = calibrators_feature_raw_data;
+          plot2d.x_axis_title_ = calibrators_x_axis_title;
+          plot2d.y_axis_title_ = calibrators_y_axis_title;
+          plot2d.series_names_ = calibrators_series_names;
+          plot2d.plot_title_ = "Calibrators Main Window";
+          plot2d.x_min_ = calibrators_conc_min;
+          plot2d.x_max_ = calibrators_conc_max;
+          plot2d.y_min_ = calibrators_feature_min;
+          plot2d.y_max_ = calibrators_feature_max;
+          plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
+          plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
+          plot2d.draw();
+
           ImGui::EndTabItem();
         }
         ImGui::EndTabBar();

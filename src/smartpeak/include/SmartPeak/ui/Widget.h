@@ -161,6 +161,56 @@ namespace SmartPeak
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     std::string x_axis_title_;
     std::string y_axis_title_;
+    float x_min_;
+    float x_max_;
+    float y_min_;
+    float y_max_;
+    float plot_width_;
+    float plot_height_;
+    std::vector<std::string> series_names_;
+  };
+
+  /**
+    @brief Class for plotting 2D line plots
+  */
+  class ScatterPlot2DWidget : public GenericGraphicWidget
+  {
+  public:
+    void draw() override;
+    std::vector<std::vector<float>> x_data_;
+    std::vector<std::vector<float>> y_data_;
+    std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
+    std::string x_axis_title_;
+    std::string y_axis_title_;
+    float x_min_;
+    float x_max_;
+    float y_min_;
+    float y_max_;
+    float plot_width_;
+    float plot_height_;
+    std::vector<std::string> series_names_;
+  };
+
+  /**
+    @brief Class for plotting 2D line plots
+  */
+  class CalibratorsPlotWidget : public GenericGraphicWidget
+  {
+  public:
+    void draw() override;
+    std::vector<std::vector<float>> x_fit_data_;
+    std::vector<std::vector<float>> y_fit_data_;
+    std::vector<std::vector<float>> x_raw_data_;
+    std::vector<std::vector<float>> y_raw_data_;
+    std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
+    std::string x_axis_title_;
+    std::string y_axis_title_;
+    float x_min_;
+    float x_max_;
+    float y_min_;
+    float y_max_;
+    float plot_width_;
+    float plot_height_;
     std::vector<std::string> series_names_;
   };
 
