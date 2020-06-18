@@ -82,7 +82,7 @@ if (NOT Qt5Core_FOUND)
 endif()
 
 #------------------------------------------------------------------------------
-# ImGUI SDL and OpenGL dependencies
+# ImGui SDL and OpenGL dependencies
 #------------------------------------------------------------------------------
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
@@ -94,9 +94,9 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
-# ImGUI
+# ImGui
 #------------------------------------------------------------------------------
-find_package(ImGUI COMPONENTS Sources Examples SourcesMiscCpp REQUIRED)
+find_package(ImGui COMPONENTS Sources Examples SourcesMiscCpp REQUIRED)
 include_directories(${ImGui_INCLUDE_DIR})
 if (ImGui_Examples_FOUND)
   message(STATUS "ImGui_Examples_FOUND has been set and found")
