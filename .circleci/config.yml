@@ -54,8 +54,8 @@ jobs:
     steps:
       - checkout
       - run:
-        name: install brew
-        command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+        name: install qt5 via brew
+        command: brew install qt5
 
 
 workflows:
