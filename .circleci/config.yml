@@ -53,9 +53,7 @@ jobs:
     resource_class: large
     steps:
       - checkout
-      - run:
-        name: install qt5 via brew
-        command: brew install qt5
+      - run: brew install qt5 boost
 
 
 workflows:
