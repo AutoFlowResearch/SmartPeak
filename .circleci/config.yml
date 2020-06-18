@@ -51,11 +51,11 @@ jobs:
     macos:
       xcode: "11.0.0"
     resource_class: large
-      steps:
-        - checkout
-        - run:
-          name: install brew
-          command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+    steps:
+      - checkout
+      - run:
+        name: install brew
+        command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
 
 workflows:
