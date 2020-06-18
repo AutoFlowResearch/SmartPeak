@@ -1695,15 +1695,15 @@ void HelpMarker(const char* desc)
   }
 }
 
-void initializeDataDirs(ApplicationHandler& state)
+void initializeDataDirs(ApplicationHandler& application_handler)
 {
-  initializeDataDir(state, "mzML", state.mzML_dir_, "mzML");
-  initializeDataDir(state, "INPUT features", state.features_in_dir_, "features");
-  initializeDataDir(state, "OUTPUT features", state.features_out_dir_, "features");
+  initializeDataDir(application_handler, "mzML", application_handler.mzML_dir_, "mzML");
+  initializeDataDir(application_handler, "INPUT features", application_handler.features_in_dir_, "features");
+  initializeDataDir(application_handler, "OUTPUT features", application_handler.features_out_dir_, "features");
 }
 
 void initializeDataDir(
-  ApplicationHandler& state,
+  ApplicationHandler& application_handler,
   const std::string& label,
   std::string& data_dir_member,
   const std::string& default_dir
@@ -1712,6 +1712,6 @@ void initializeDataDir(
   if (data_dir_member.size()) {
     return;
   }
-  data_dir_member = state.main_dir_ + "/" + default_dir;
+  data_dir_member = application_handler.main_dir_ + "/" + default_dir;
   LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member;
 }
