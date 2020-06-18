@@ -215,6 +215,25 @@ namespace SmartPeak
   };
 
   /**
+    @brief Class for plotting heatmaps
+  */
+  class Heatmap2DWidget : public GenericGraphicWidget
+  {
+  public:
+    void draw() override;
+    std::vector<float> data_; // Row major ordering
+    std::vector<std::string> columns_;
+    std::vector<std::string> rows_;
+    std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
+    std::string x_axis_title_;
+    std::string y_axis_title_;
+    float data_min_;
+    float data_max_;
+    float plot_width_;
+    float plot_height_;
+  };
+
+  /**
     @brief Base class for all tree layouts
   */
   class GenericTreeWidget : public Widget

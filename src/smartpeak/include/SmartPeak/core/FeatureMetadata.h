@@ -4,6 +4,7 @@
 #include <string>
 
 namespace SmartPeak {
+  // float/double/long double castable feature metadata
   enum class FeatureMetadata {
     asymmetry_factor = 1,
     baseline_delta_to_height,

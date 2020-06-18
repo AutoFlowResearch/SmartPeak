@@ -108,6 +108,7 @@ int main(int argc, char **argv)
   static bool* feature_table_checked_rows = nullptr;
   // data for the feature_pivot table
   static std::vector<std::string> feature_pivot_table_headers;
+  static std::vector<std::vector<std::string>> feature_pivot_table_rows;
   static std::vector<std::vector<std::string>> feature_pivot_table_body;
   static bool* feature_pivot_table_checked_rows = nullptr;
   // data for the chromatogram scatter plot
@@ -116,6 +117,17 @@ int main(int argc, char **argv)
   static std::string chrom_x_axis_title = "Time (sec)";
   static std::string chrom_y_axis_title = "Intensity (au)";
   static float chrom_time_min = 1e6, chrom_time_max = 0, chrom_intensity_min = 1e6, chrom_intensity_max = 0;
+  // data for the feature line plot
+  static std::vector<std::vector<float>> feat_sample_data, feat_value_data;
+  static std::vector<std::string> feat_line_series_names;
+  static std::string feat_line_x_axis_title = "Inj#";
+  static std::string feat_line_y_axis_title = "metadata (au)";
+  static float feat_line_sample_min = 1e6, feat_line_sample_max = 0, feat_value_min = 1e6, feat_value_max = 0;
+  // data for the feature heatmap (rows/colum labels are derived from feature pivot table)
+  static std::vector<float> feat_heatmap_data; // linearized feat_sample_data
+  static std::vector<std::string> feat_heatmap_row_labels, feat_heatmap_col_labels;
+  static std::string feat_heatmap_x_axis_title = "Sample name";
+  static std::string feat_heatmap_y_axis_title = "Component name";
   // data for the calibrators scatter/line plot
   static std::vector<std::vector<float>> calibrators_conc_raw_data, calibrators_feature_raw_data;
   static std::vector<std::vector<float>> calibrators_conc_fit_data, calibrators_feature_fit_data;
@@ -509,8 +521,8 @@ int main(int argc, char **argv)
           if (ImGui::MenuItem("Comp Group QCs", NULL, &show_comp_group_qcs_table)) {}
           ImGui::EndMenu();
         }
-        if (ImGui::MenuItem("Features", NULL, &show_feature_table)) {}
-        if (ImGui::MenuItem("Pivot", NULL, &show_feature_pivot_table)) {}
+        if (ImGui::MenuItem("Features (table)", NULL, &show_feature_table)) {}
+        if (ImGui::MenuItem("Features (matrix)", NULL, &show_feature_pivot_table)) {}
         ImGui::MenuItem("Main window (Plots)", NULL, false, false);
         if (ImGui::MenuItem("Chromatogram", NULL, &show_chromatogram_line_plot)) {}
         if (ImGui::MenuItem("Spectra", NULL, &show_spectra_line_plot)) {}
@@ -1354,44 +1366,65 @@ int main(int argc, char **argv)
           Table.headers_ = feature_table_headers;
           Table.columns_ = feature_table_body;
           Table.checked_rows_ = feature_table_checked_rows;
-          Table.table_id_ = "feature Main Window";
+          Table.table_id_ = "features (table) Main Window";
           Table.is_columnar_ = false;
           Table.draw();
           ImGui::EndTabItem();
         }
-        if (show_feature_pivot_table && ImGui::BeginTabItem("Pivot Table", &show_feature_pivot_table))
+        if (show_feature_pivot_table && ImGui::BeginTabItem("Features matrix", &show_feature_pivot_table))
         {
           if (application_handler_.sequenceHandler_.getSequence().size() > 0 &&
             application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
             // Make the feature_pivot table headers and body
-            if (feature_pivot_table_body.size() <= 0) {
+            if (feat_value_data.size() <= 0 ) {
+              // Create the initial data vectors and matrices from the feature map history
               //std::vector<std::string> meta_data; // TODO: options for the user to select what meta_data
               //for (const std::pair<FeatureMetadata, std::string>& p : metadataToString) meta_data.push_back(p.second);
               std::vector<std::string> meta_data = { "calculated_concentration" };
               std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
               for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
-              std::vector<std::vector<float>> data_out;
               std::vector<SequenceParser::Row> rows_out;
-              SequenceParser::makeDataMatrixFromMetaValue(application_handler_.sequenceHandler_, data_out, feature_pivot_table_headers, rows_out, meta_data, sample_types);
+              SequenceParser::makeDataMatrixFromMetaValue(application_handler_.sequenceHandler_, feat_value_data, feat_heatmap_col_labels, rows_out, meta_data, sample_types);
+              
+              // make the injection index for the line plot
+              const int n_samples = feat_heatmap_col_labels.size();
+              const int n_rows = rows_out.size();
+              std::vector<float> sample_data;
+              for (float i = 0; i < n_samples; i += 1) sample_data.push_back(i);
+              for (size_t i = 0; i < n_rows; ++i) feat_sample_data.push_back(sample_data);
+              feat_line_sample_min = 0;
+              feat_line_sample_max = n_samples - 1;
+
+              // update the pivot table headers with the columns for the pivot table/heatmap rows
+              feature_pivot_table_headers = feat_heatmap_col_labels;
               feature_pivot_table_headers.insert(feature_pivot_table_headers.begin(), "meta_value_name");
               feature_pivot_table_headers.insert(feature_pivot_table_headers.begin(), "component_group_name");
               feature_pivot_table_headers.insert(feature_pivot_table_headers.begin(), "component_name");
               const int n_cols = feature_pivot_table_headers.size();
-              const int n_rows = rows_out.size();
+
+              // allocate space for the pivot table body and heatmap row labels
+              feat_heatmap_row_labels.resize(n_rows);
               feature_pivot_table_body.resize(n_cols);
+              feat_heatmap_data.resize(n_rows*n_samples);
               for (size_t col = 0; col < n_cols; ++col) {
                 feature_pivot_table_body.at(col).resize(n_rows);
               }
+
+              // assign the pivot table body data and heatmap row labels
               int col = 0, row = 0;
               for (const auto& row_out : rows_out) {
+                feat_heatmap_row_labels.at(row) = row_out.component_name + "::" + row_out.meta_value_name;
                 feature_pivot_table_body.at(col).at(row) = row_out.component_name;
                 ++col;
                 feature_pivot_table_body.at(col).at(row) = row_out.component_group_name;
                 ++col;
                 feature_pivot_table_body.at(col).at(row) = row_out.meta_value_name;
                 ++col;
-                for (const float& datum_out : data_out.at(row)) {
+                for (const float& datum_out : feat_value_data.at(row)) {
                   feature_pivot_table_body.at(col).at(row) = std::to_string(datum_out);
+                  feat_heatmap_data.at(row*n_samples + (col - 3)) = datum_out;
+                  feat_value_min = std::min(feat_value_min, datum_out);
+                  feat_value_max = std::max(feat_value_max, datum_out);
                   ++col;
                 }
                 col = 0;
@@ -1434,7 +1467,7 @@ int main(int argc, char **argv)
                   }
                   chrom_time_data.push_back(x_data);
                   chrom_intensity_data.push_back(y_data);
-                  chrom_series_names.push_back(injection.getMetaData().getSampleName() + "-" + chromatogram.getNativeID());
+                  chrom_series_names.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
                 }
                 // Extract out the best left/right for plotting
                 for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
@@ -1448,7 +1481,7 @@ int main(int argc, char **argv)
                         y_data.push_back(0); // TODO: extract out chrom peak intensity
                         chrom_time_data.push_back(x_data);
                         chrom_intensity_data.push_back(y_data);
-                        chrom_series_names.push_back(injection.getMetaData().getSampleName() + "-" + (std::string)subordinate.getMetaValue("native_id") + "-" + (std::string)subordinate.getMetaValue("timestamp_"));
+                        chrom_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
                       }
                     }
                   }
@@ -1468,7 +1501,7 @@ int main(int argc, char **argv)
                       }
                       chrom_time_data.push_back(x_data);
                       chrom_intensity_data.push_back(y_data);
-                      chrom_series_names.push_back(injection.getMetaData().getSampleName() + "-" + (std::string)subordinate.getMetaValue("native_id") + "-" + (std::string)subordinate.getMetaValue("timestamp_"));
+                      chrom_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
                     }
                   }
                 }
@@ -1500,12 +1533,38 @@ int main(int argc, char **argv)
         }
         if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
         {
-          ImGui::Text("TODO...");
+          // Show the line plot
+          LinePlot2DWidget plot2d;
+          plot2d.x_data_ = feat_sample_data;
+          plot2d.y_data_ = feat_value_data;
+          plot2d.x_axis_title_ = feat_line_x_axis_title;
+          plot2d.y_axis_title_ = feat_line_y_axis_title;
+          plot2d.series_names_ = feat_heatmap_row_labels;
+          plot2d.plot_title_ = "Features (line) Main Window";
+          plot2d.x_min_ = feat_line_sample_min;
+          plot2d.x_max_ = feat_line_sample_max;
+          plot2d.y_min_ = feat_value_min;
+          plot2d.y_max_ = feat_value_max;
+          plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
+          plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
+          plot2d.draw();
           ImGui::EndTabItem();
         }
         if (show_feature_heatmap_plot && ImGui::BeginTabItem("Features (heatmap)", &show_feature_heatmap_plot))
         {
-          ImGui::Text("TODO...");
+          // Show the line plot
+          Heatmap2DWidget plot2d;
+          plot2d.data_ = feat_heatmap_data;
+          plot2d.columns_ = feat_heatmap_col_labels;
+          plot2d.rows_ = feat_heatmap_row_labels;
+          plot2d.y_axis_title_ = feat_heatmap_x_axis_title;
+          plot2d.y_axis_title_ = feat_heatmap_y_axis_title;
+          plot2d.plot_title_ = "Features (heatmap) Main Window";
+          plot2d.data_min_ = feat_value_min;
+          plot2d.data_max_ = feat_value_max;
+          plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
+          plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
+          plot2d.draw();
           ImGui::EndTabItem();
         }
         if (show_calibrators_line_plot && ImGui::BeginTabItem("Calibrators", &show_calibrators_line_plot))

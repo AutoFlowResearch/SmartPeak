@@ -209,9 +209,7 @@ namespace SmartPeak
     std::vector<std::vector<std::string>>& rows_out,
     std::vector<std::string>& headers_out,
     const std::vector<std::string>& meta_data,
-    const std::set<SampleType>& sample_types
-  )
-  {
+    const std::set<SampleType>& sample_types) {
     std::vector<std::string> headers = {
       "sample_name", "sample_type", "component_group_name", "component_name", "batch_name",
       "rack_number", "plate_number", "pos_number", "inj_number", "dilution_factor", "inj_volume",
@@ -385,7 +383,7 @@ namespace SmartPeak
               else if (datum.s_ == "FP") datum = static_cast<float>(-1.0);
               else datum = static_cast<float>(-2.0);
             }
-            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
+            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0 && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
@@ -401,7 +399,8 @@ namespace SmartPeak
     rows_out.insert(rows_out.cbegin(), rows.cbegin(), rows.cend());
     columns_out.insert(columns_out.cbegin(), columns.cbegin(), columns.cend());
 
-    std::vector<std::vector<float>> data(rows_out.size(), std::vector<float>(columns_out.size(), NAN));
+    //std::vector<std::vector<float>> data(rows_out.size(), std::vector<float>(columns_out.size(), NAN));
+    std::vector<std::vector<float>> data(rows_out.size(), std::vector<float>(columns_out.size(), 0.0)); // for now, initialize to 0 instead of NAN even though there are clear benefits to using NAN in packages that support NAN
 
     for (size_t r = 0; r < rows_out.size(); ++r) {
       const Row& row = rows_out[r];

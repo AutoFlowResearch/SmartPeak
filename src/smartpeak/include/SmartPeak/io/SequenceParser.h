@@ -51,7 +51,12 @@ public:
       return true;
     }
 
-    // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
+    /*
+    @brief make a table (row major) of string representations of
+      all meta_data for all sample_types in the feature history.
+
+    NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
+    */
     static void makeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       std::vector<std::vector<std::string>>& rows_out,
