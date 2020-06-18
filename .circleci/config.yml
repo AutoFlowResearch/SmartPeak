@@ -54,6 +54,8 @@ jobs:
     steps:
       - checkout
       - run: brew install cmake qt5 sdl2 boost glpk eigen sqlite brewsci/bio/seqan@2 hdf5 libsvm xerces-c
+      - run: brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib
+      - run: brew install coin-or-tools/coinor/coin_data_sample coin-or-tools/coinor/coinutils coin-or-tools/coinor/osi
       - run: |
           cd ~ &&
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
