@@ -53,7 +53,7 @@ jobs:
     resource_class: medium
     steps:
       - checkout
-      - run: brew install cmake qt5 sdl2 boost glpk eigen sqlite hdf5 libsvm xerces-c
+      - run: brew install cmake qt5 sdl2 boost glpk eigen sqlite seqan hdf5 libsvm xerces-c
       - run: |
           cd ~ &&
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
