@@ -1,7 +1,4 @@
-// Example application for SDL2 + OpenGL
-// **DO NOT USE THIS CODE IF YOUR CODE/ENGINE IS USING MODERN OPENGL (SHADERS, VBO, VAO, etc.)**
-// **Prefer using the code in the sdl_opengl3_example/ folder**
-// See imgui_impl_sdl.cpp for details.
+// TODO: Add copyright
 
 #include <stdio.h>
 #include <chrono>
@@ -49,18 +46,21 @@ int main(int argc, char **argv)
   static std::vector<std::vector<std::string>> injection_explorer_body;
   static bool* injection_explorer_workflow_checked_rows = nullptr;
   static bool* injection_explorer_plot_checked_rows = nullptr;
+  static bool* injection_explorer_table_checked_rows = nullptr;
   static bool* injection_explorer_checked_rows = nullptr;
   // data for the transition explorer
   static std::vector<std::string> transition_explorer_headers;
   static std::vector<std::vector<std::string>> transition_explorer_body;
   static bool* transition_explorer_workflow_checked_rows = nullptr;
   static bool* transition_explorer_plot_checked_rows = nullptr;
+  static bool* transition_explorer_table_checked_rows = nullptr;
   static bool* transition_explorer_checked_rows = nullptr;
   // data for the feature explorer
   static std::vector<std::string> feature_explorer_headers;
   static std::vector<std::vector<std::string>> feature_explorer_body;
   static bool* feature_explorer_workflow_checked_rows = nullptr;
   static bool* feature_explorer_plot_checked_rows = nullptr;
+  static bool* feature_explorer_table_checked_rows = nullptr;
   static bool* feature_explorer_checked_rows = nullptr;
   // data for the sequence table
   static std::vector<std::string> sequence_table_headers;
@@ -147,8 +147,7 @@ int main(int argc, char **argv)
 
   // View: Bottom window
   bool show_info_ = true;
-  bool show_log_ = true;
-  bool popup_about_ = false;
+  bool show_log_ = false;
 
   // View: left or right windows (i.e., Explorer pane)
   bool show_injection_explorer = true; // list of injection names with advanced options for filtering
@@ -175,6 +174,7 @@ int main(int argc, char **argv)
   bool show_calibrators_line_plot = false; // peak area/height ratio vs. concentration ratio
 
   // Popup modals
+  bool popup_about_ = false;
   bool popup_run_workflow_ = false;
   bool popup_file_picker_ = false;
 
@@ -600,8 +600,8 @@ int main(int argc, char **argv)
         {
           // Make the injection explorer headers
           if (injection_explorer_headers.size() <= 0) injection_explorer_headers = {
-          "inj#", "sample_name", "workflow", "plot"};
-          const int n_cols = injection_explorer_headers.size() - 2;
+          "inj#", "sample_name", "workflow", "plot", "table" };
+          const int n_cols = injection_explorer_headers.size() - 3;
           const int n_rows = application_handler_.sequenceHandler_.getSequence().size();
 
           // Make the injection explorer body
@@ -622,6 +622,8 @@ int main(int argc, char **argv)
             Widget::makeCheckedRows(n_rows, injection_explorer_workflow_checked_rows);
             injection_explorer_plot_checked_rows = new bool[n_rows];
             Widget::makeCheckedRows(n_rows, injection_explorer_plot_checked_rows);
+            injection_explorer_table_checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, injection_explorer_table_checked_rows);
             injection_explorer_checked_rows = new bool[n_rows];
             Widget::makeCheckedRows(n_rows, injection_explorer_checked_rows);
           }
@@ -633,7 +635,8 @@ int main(int argc, char **argv)
           Explorer.checked_rows_ = injection_explorer_checked_rows;
           Explorer.checked_rows_1_ = injection_explorer_workflow_checked_rows;
           Explorer.checked_rows_2_ = injection_explorer_plot_checked_rows;
-          Explorer.table_id_ = "Injections Explorer Window";
+          Explorer.checked_rows_3_ = injection_explorer_table_checked_rows;
+          Explorer.table_id_ = "InjectionsExplorerWindow";
           Explorer.draw();
 
           ImGui::EndTabItem();
@@ -642,8 +645,8 @@ int main(int argc, char **argv)
         {
           // Make the transition explorer headers
           if (transition_explorer_headers.size() <= 0) transition_explorer_headers = {
-          "transition_group","transition_name", "workflow", "plot" };
-          const int n_cols = transition_explorer_headers.size() - 2;
+          "transition_group","transition_name", "workflow", "plot", "table" };
+          const int n_cols = transition_explorer_headers.size() - 3;
 
           // Make the transition table body
           if (application_handler_.sequenceHandler_.getSequence().size() > 0) {
@@ -666,6 +669,8 @@ int main(int argc, char **argv)
               Widget::makeCheckedRows(n_rows, transition_explorer_workflow_checked_rows);
               transition_explorer_plot_checked_rows = new bool[n_rows];
               Widget::makeCheckedRows(n_rows, transition_explorer_plot_checked_rows);
+              transition_explorer_table_checked_rows = new bool[n_rows];
+              Widget::makeCheckedRows(n_rows, transition_explorer_table_checked_rows);
               transition_explorer_checked_rows = new bool[n_rows];
               Widget::makeCheckedRows(n_rows, transition_explorer_checked_rows);
             }
@@ -678,13 +683,51 @@ int main(int argc, char **argv)
           Explorer.checked_rows_ = transition_explorer_checked_rows;
           Explorer.checked_rows_1_ = transition_explorer_workflow_checked_rows;
           Explorer.checked_rows_2_ = transition_explorer_plot_checked_rows;
-          Explorer.table_id_ = "Transitions Explorer Window";
+          Explorer.checked_rows_3_ = transition_explorer_table_checked_rows;
+          Explorer.table_id_ = "TransitionsExplorerWindow";
           Explorer.draw();
           ImGui::EndTabItem();
         }
         if (show_features_explorer && ImGui::BeginTabItem("Features", &show_features_explorer))
         {
-          ImGui::Text("TODO...");
+          // Make the feature explorer headers
+          if (feature_explorer_headers.size() <= 0) feature_explorer_headers = {
+          "metavalue", "workflow", "plot", "table" };
+          const int n_cols = feature_explorer_headers.size() - 3;
+          const int n_rows = metadatafloatToString.size();
+
+          // Make the feature explorer body
+          if (feature_explorer_body.size() <= 0 && n_rows > 0) {
+            feature_explorer_body.resize(n_cols);
+            for (size_t col = 0; col < n_cols; ++col) {
+              feature_explorer_body.at(col).resize(n_rows);
+            }
+            int col = 0, row = 0;
+            for (const auto& metadata : metadatafloatToString) {
+              feature_explorer_body.at(col).at(row) = metadata.second;
+              col = 0;
+              ++row;
+            }
+            feature_explorer_workflow_checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, feature_explorer_workflow_checked_rows);
+            feature_explorer_plot_checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, feature_explorer_plot_checked_rows);
+            feature_explorer_table_checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, feature_explorer_table_checked_rows);
+            feature_explorer_checked_rows = new bool[n_rows];
+            Widget::makeCheckedRows(n_rows, feature_explorer_checked_rows);
+          }
+
+          // Call the Explorer widget
+          ExplorerWidget Explorer;
+          Explorer.headers_ = feature_explorer_headers;
+          Explorer.columns_ = feature_explorer_body;
+          Explorer.checked_rows_ = feature_explorer_checked_rows;
+          Explorer.checked_rows_1_ = feature_explorer_workflow_checked_rows;
+          Explorer.checked_rows_2_ = feature_explorer_plot_checked_rows;
+          Explorer.checked_rows_3_ = feature_explorer_table_checked_rows;
+          Explorer.table_id_ = "FeaturesExplorerWindow";
+          Explorer.draw();
           ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
@@ -760,7 +803,7 @@ int main(int argc, char **argv)
           Table.headers_ = sequence_table_headers;
           Table.columns_ = sequence_table_body;
           Table.checked_rows_ = sequence_table_checked_rows;
-          Table.table_id_ = "Sequence Main Window";
+          Table.table_id_ = "SequenceMainWindow";
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -814,7 +857,7 @@ int main(int argc, char **argv)
           Table.headers_ = transitions_table_headers;
           Table.columns_ = transitions_table_body;
           Table.checked_rows_ = transitions_table_checked_rows;
-          Table.table_id_ = "Transitions Main Window";
+          Table.table_id_ = "TransitionsMainWindow";
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -849,7 +892,7 @@ int main(int argc, char **argv)
           Table.headers_ = workflow_table_headers;
           Table.columns_ = workflow_table_body;
           Table.checked_rows_ = workflow_table_checked_rows;
-          Table.table_id_ = "Workflow Main Window";
+          Table.table_id_ = "WorkflowMainWindow";
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -897,7 +940,7 @@ int main(int argc, char **argv)
           Table.headers_ = parameters_table_headers;
           Table.columns_ = parameters_table_body;
           Table.checked_rows_ = parameters_table_checked_rows;
-          Table.table_id_ = "parameters Main Window";
+          Table.table_id_ = "ParametersMainWindow";
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -982,7 +1025,7 @@ int main(int argc, char **argv)
           Table.headers_ = quant_method_table_headers;
           Table.columns_ = quant_method_table_body;
           Table.checked_rows_ = quant_method_table_checked_rows;
-          Table.table_id_ = "quant_method Main Window";
+          Table.table_id_ = "QuantMethodMainWindow";
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -1031,7 +1074,7 @@ int main(int argc, char **argv)
           Table.headers_ = stds_concs_table_headers;
           Table.columns_ = stds_concs_table_body;
           Table.checked_rows_ = stds_concs_table_checked_rows;
-          Table.table_id_ = "stds_concs Main Window";
+          Table.table_id_ = "StdsConcsMainWindow";
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -1090,7 +1133,7 @@ int main(int argc, char **argv)
           Table.headers_ = comp_filters_table_headers;
           Table.columns_ = comp_filters_table_body;
           Table.checked_rows_ = comp_filters_table_checked_rows;
-          Table.table_id_ = "comp_filters Main Window";
+          Table.table_id_ = "CompFiltersMainWindow";
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -1185,7 +1228,7 @@ int main(int argc, char **argv)
           Table.headers_ = comp_group_filters_table_headers;
           Table.columns_ = comp_group_filters_table_body;
           Table.checked_rows_ = comp_group_filters_table_checked_rows;
-          Table.table_id_ = "comp_group_filters Main Window";
+          Table.table_id_ = "CompGroupFiltersMainWindow";
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -1244,7 +1287,7 @@ int main(int argc, char **argv)
           Table.headers_ = comp_qcs_table_headers;
           Table.columns_ = comp_qcs_table_body;
           Table.checked_rows_ = comp_qcs_table_checked_rows;
-          Table.table_id_ = "comp_qcs Main Window";
+          Table.table_id_ = "CompQCsMainWindow";
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -1339,7 +1382,7 @@ int main(int argc, char **argv)
           Table.headers_ = comp_group_qcs_table_headers;
           Table.columns_ = comp_group_qcs_table_body;
           Table.checked_rows_ = comp_group_qcs_table_checked_rows;
-          Table.table_id_ = "comp_group_qcs Main Window";
+          Table.table_id_ = "CompGroupQCsMainWindow";
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -1350,7 +1393,7 @@ int main(int argc, char **argv)
             // Make the feature table headers and body
             if (feature_table_body.size() <= 0) {
               std::vector<std::string> meta_data; // TODO: options for the user to select what meta_data
-              for (const std::pair<FeatureMetadata, std::string>& p : metadataToString) meta_data.push_back(p.second);
+              for (const std::pair<FeatureMetadata, std::string>& p : metadatafloatToString) meta_data.push_back(p.second);
               std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
               for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
               SequenceParser::makeDataTableFromMetaValue(application_handler_.sequenceHandler_, feature_table_body, feature_table_headers, meta_data, sample_types);
@@ -1366,7 +1409,7 @@ int main(int argc, char **argv)
           Table.headers_ = feature_table_headers;
           Table.columns_ = feature_table_body;
           Table.checked_rows_ = feature_table_checked_rows;
-          Table.table_id_ = "features (table) Main Window";
+          Table.table_id_ = "features(table)MainWindow";
           Table.is_columnar_ = false;
           Table.draw();
           ImGui::EndTabItem();
@@ -1379,7 +1422,7 @@ int main(int argc, char **argv)
             if (feat_value_data.size() <= 0 ) {
               // Create the initial data vectors and matrices from the feature map history
               //std::vector<std::string> meta_data; // TODO: options for the user to select what meta_data
-              //for (const std::pair<FeatureMetadata, std::string>& p : metadataToString) meta_data.push_back(p.second);
+              //for (const std::pair<FeatureMetadata, std::string>& p : metadatafloatToString) meta_data.push_back(p.second);
               std::vector<std::string> meta_data = { "calculated_concentration" };
               std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
               for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
@@ -1441,7 +1484,7 @@ int main(int argc, char **argv)
           Table.headers_ = feature_pivot_table_headers;
           Table.columns_ = feature_pivot_table_body;
           Table.checked_rows_ = feature_pivot_table_checked_rows;
-          Table.table_id_ = "feature_pivot Main Window";
+          Table.table_id_ = "feature(matrix)MainWindow";
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -1540,7 +1583,7 @@ int main(int argc, char **argv)
           plot2d.x_axis_title_ = feat_line_x_axis_title;
           plot2d.y_axis_title_ = feat_line_y_axis_title;
           plot2d.series_names_ = feat_heatmap_row_labels;
-          plot2d.plot_title_ = "Features (line) Main Window";
+          plot2d.plot_title_ = "Features(line)MainWindow";
           plot2d.x_min_ = feat_line_sample_min;
           plot2d.x_max_ = feat_line_sample_max;
           plot2d.y_min_ = feat_value_min;
@@ -1559,7 +1602,7 @@ int main(int argc, char **argv)
           plot2d.rows_ = feat_heatmap_row_labels;
           plot2d.y_axis_title_ = feat_heatmap_x_axis_title;
           plot2d.y_axis_title_ = feat_heatmap_y_axis_title;
-          plot2d.plot_title_ = "Features (heatmap) Main Window";
+          plot2d.plot_title_ = "Features(heatmap)MainWindow";
           plot2d.data_min_ = feat_value_min;
           plot2d.data_max_ = feat_value_max;
           plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
@@ -1649,7 +1692,7 @@ int main(int argc, char **argv)
           plot2d.x_axis_title_ = calibrators_x_axis_title;
           plot2d.y_axis_title_ = calibrators_y_axis_title;
           plot2d.series_names_ = calibrators_series_names;
-          plot2d.plot_title_ = "Calibrators Main Window";
+          plot2d.plot_title_ = "CalibratorsMainWindow";
           plot2d.x_min_ = calibrators_conc_min;
           plot2d.x_max_ = calibrators_conc_max;
           plot2d.y_min_ = calibrators_feature_min;

@@ -138,6 +138,7 @@ namespace SmartPeak
     void draw() override;
     bool* checked_rows_1_;
     bool* checked_rows_2_;
+    bool* checked_rows_3_;
   };
 
   /**

@@ -186,16 +186,22 @@ namespace SmartPeak
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col) {
               std::string id = table_id_ + std::to_string(col) + std::to_string(row*n_rows);
-              if (col == headers_.size() - 2) {
+              if (col == headers_.size() - 3) {
                 ImGui::TableSetColumnIndex(col);
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
                 ImGui::Checkbox(id.c_str(), &checked_rows_1_[row]);
                 ImGui::PopStyleColor();
               }
-              else if (col == headers_.size() - 1) {
+              else if (col == headers_.size() - 2) {
                 ImGui::TableSetColumnIndex(col);
                 ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
                 ImGui::Checkbox(id.c_str(), &checked_rows_2_[row]);
+                ImGui::PopStyleColor();
+              }
+              else if (col == headers_.size() - 1) {
+                ImGui::TableSetColumnIndex(col);
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+                ImGui::Checkbox(id.c_str(), &checked_rows_3_[row]);
                 ImGui::PopStyleColor();
               }
               else {
