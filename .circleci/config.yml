@@ -47,6 +47,15 @@ jobs:
           command: |
             ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
 
+    macos:
+      xcode: "11.0.0"
+    steps:
+      - checkout
+      - run:
+        name: install brew
+        command: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+
 workflows:
   version: 2
   build-deploy:
