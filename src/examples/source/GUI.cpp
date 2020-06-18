@@ -1525,7 +1525,7 @@ int main(int argc, char **argv)
                 for (const auto& stand_concs : sequence_segment.getStandardsConcentrations()) {
                   // Skip components that have not been fitted with a calibration curve
                   if (sequence_segment.getComponentsToConcentrations().count(stand_concs.component_name) > 0 &&
-                    sequence_segment.getComponentsToConcentrations().at(stand_concs.component_name).size() > 0) {
+                    sequence_segment.getComponentsToConcentrations().at(stand_concs.component_name).size() > 0) { // TODO: filter out components that have not been fitted
                     const float x_datum = float(stand_concs.actual_concentration / stand_concs.IS_actual_concentration / stand_concs.dilution_factor);
                     auto found = stand_concs_map.emplace(stand_concs.component_name,
                       std::make_pair(std::vector<float>({ x_datum }),
@@ -1534,8 +1534,6 @@ int main(int argc, char **argv)
                       stand_concs_map.at(stand_concs.component_name).first.push_back(x_datum);
                       stand_concs_map.at(stand_concs.component_name).second.push_back(stand_concs.sample_name);
                     }
-                    calibrators_conc_min = std::min(x_datum, calibrators_conc_min);
-                    calibrators_conc_max = std::max(x_datum, calibrators_conc_max);
                   }
                 }
 
@@ -1543,7 +1541,8 @@ int main(int argc, char **argv)
                 for (const auto& quant_method : sequence_segment.getQuantitationMethods()) {
                   // Skip components that have not been fitted with a calibration curve
                   if (sequence_segment.getComponentsToConcentrations().count(quant_method.getComponentName()) > 0 && 
-                    sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName()).size() > 0) {
+                    sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName()).size() > 0 &&
+                    (double)quant_method.getTransformationModelParams().getValue("slope") != 1.0) { // TODO: filter out components that have not been fitted
                     // Make the line of best fit using the `QuantitationMethods
                     std::vector<float> y_fit_data;
                     for (const auto& ratio : stand_concs_map.at(quant_method.getComponentName()).first) {
@@ -1557,6 +1556,8 @@ int main(int argc, char **argv)
                       // check for less than zero
                       if (calculated_feature_ratio < 0.0) calculated_feature_ratio = 0.0;
                       y_fit_data.push_back(calculated_feature_ratio);
+                      calibrators_conc_min = std::min(ratio, calibrators_conc_min);
+                      calibrators_conc_max = std::max(ratio, calibrators_conc_max);
                       calibrators_feature_min = std::min(calculated_feature_ratio, calibrators_feature_min);
                       calibrators_feature_max = std::max(calculated_feature_ratio, calibrators_feature_max);
                     }
