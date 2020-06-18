@@ -230,5 +230,5 @@ foreach(_component IN LISTS ImGUI_FIND_COMPONENTS)
 endforeach()
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(ImGui
+find_package_handle_standard_args(ImGUI
     REQUIRED_VARS ImGui_INCLUDE_DIR HANDLE_COMPONENTS)
