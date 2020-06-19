@@ -53,7 +53,7 @@ jobs:
     resource_class: medium
     steps:
       - checkout
-      - run: brew install cmake qt5 sdl2 boost glpk eigen sqlite brewsci/bio/seqan@2 hdf5 libsvm xerces-c
+      - run: brew install cmake qt5 sdl2 boost glpk eigen sqlite brewsci/bio/seqan@2 hdf5 libomp libsvm xerces-c
       - run: brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib
       - run: brew install coin-or-tools/coinor/coin_data_sample coin-or-tools/coinor/coinutils coin-or-tools/coinor/osi
       - run: |
@@ -62,7 +62,7 @@ jobs:
           cd OpenMS && git submodule update --init contrib && mkdir contrib_build && cd contrib_build && 
           cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DBUILD_TYPE=ALL ../contrib &&
           cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
-          cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix);$(brew --prefix qt5);$(brew --prefix boost)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=../contrib_build/ -DCOIN_INCLUDE_DIR=../contrib_build/include/ -DWM5_INCLUDE_DIR=../contrib_build/include/ -DWM5_Wm5Core_LIBRARY=../contrib_build/lib/libWm5Core.a -DWM5_Wm5Mathematics_LIBRARY=../contrib_build/lib/libWm5Mathematics.a -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
+          cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix);$(brew --prefix qt5);$(brew --prefix boost)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=../contrib_build/ -DCOIN_INCLUDE_DIR=../contrib_build/include/ -DWM5_INCLUDE_DIR=../contrib_build/include/WildMagic/ -DWM5_Wm5Core_LIBRARY=../contrib_build/lib/libWm5Core.a -DWM5_Wm5Mathematics_LIBRARY=../contrib_build/lib/libWm5Mathematics.a -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
           make -j4 OpenMS
 
 
