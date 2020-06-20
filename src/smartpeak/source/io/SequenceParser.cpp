@@ -337,9 +337,9 @@ namespace SmartPeak
 
   void SequenceParser::makeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
-    std::vector<std::vector<float>>& data_out,
-    std::vector<std::string>& columns_out,
-    std::vector<Row>& rows_out,
+    Eigen::Tensor<float, 2>& data_out,
+    Eigen::Tensor<std::string, 1>& columns_out,
+    Eigen::Tensor<std::string, 2>& rows_out,
     const std::vector<std::string>& meta_data,
     const std::set<SampleType>& sample_types
   )
@@ -393,26 +393,38 @@ namespace SmartPeak
       }
     }
 
-    rows_out.clear();
-    columns_out.clear();
-
-    rows_out.insert(rows_out.cbegin(), rows.cbegin(), rows.cend());
-    columns_out.insert(columns_out.cbegin(), columns.cbegin(), columns.cend());
-
-    //std::vector<std::vector<float>> data(rows_out.size(), std::vector<float>(columns_out.size(), NAN));
-    std::vector<std::vector<float>> data(rows_out.size(), std::vector<float>(columns_out.size(), 0.0)); // for now, initialize to 0 instead of NAN even though there are clear benefits to using NAN in packages that support NAN
-
-    for (size_t r = 0; r < rows_out.size(); ++r) {
-      const Row& row = rows_out[r];
-      for (size_t c = 0; c < columns_out.size(); ++c) {
-        const std::string& column = columns_out[c];
-        if (data_dict.count(column) && data_dict[column].count(row)) {
-          data[r][c] = data_dict[column][row];
-        }
-      }
+    // Copy over the rows
+    rows_out.resize((int)rows.size(), 3);
+    int row = 0;
+    for (const auto& r: rows) {
+      rows_out(row, 0) = r.component_name;
+      rows_out(row, 1) = r.component_group_name;
+      rows_out(row, 2) = r.meta_value_name;
+      ++row;
     }
 
-    data_out = std::move(data);
+    // Copy over the columns
+    columns_out.resize((int)columns.size());
+    int col = 0;
+    for (const auto& c : columns) {
+      columns_out(col) = c;
+      ++col;
+    }
+
+    // Copy over the data
+    data_out.resize((int)rows.size(), (int)columns.size());
+    data_out.setConstant(0.0); // for now, initialize to 0 instead of NAN even though there are clear benefits to using NAN in packages that support NAN
+    col = 0;
+    for (const auto& c : columns) {
+      row = 0;
+      for (const auto& r : rows) {
+        if (data_dict.count(c) && data_dict[c].count(r)) {
+          data_out(row,col) = data_dict[c][r];
+        }
+        ++row;
+      }
+      ++col;
+    }
   }
 
   bool SequenceParser::writeDataMatrixFromMetaValue(
@@ -426,9 +438,9 @@ namespace SmartPeak
 
     LOGI << "Storing: " << filename;
 
-    std::vector<std::vector<float>> data;
-    std::vector<std::string> columns;
-    std::vector<Row> rows;
+    Eigen::Tensor<float,2> data;
+    Eigen::Tensor<std::string,1> columns;
+    Eigen::Tensor<std::string, 2> rows;
     std::vector<std::string> meta_data_strings;
     for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
@@ -436,7 +448,7 @@ namespace SmartPeak
     makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_strings, sample_types);
 
     std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
-    headers.insert(headers.end(), columns.begin(), columns.end());
+    for (int i=0;i<columns.size();++i) headers.push_back(columns(i));
 
     CSVWriter writer(filename, ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
@@ -446,14 +458,14 @@ namespace SmartPeak
       return false;
     }
 
-    for (size_t i = 0; i < rows.size(); ++i) {
+    for (size_t i = 0; i < rows.dimension(0); ++i) {
       std::vector<std::string> line;
-      line.push_back(rows[i].component_group_name);
-      line.push_back(rows[i].component_name);
-      line.push_back(rows[i].meta_value_name);
-      for (size_t j = 0; j < data.at(i).size(); ++j) {
+      for (size_t j = 0; j < rows.dimension(1); ++j) {
+        line.push_back(rows(i,j));
+      }
+      for (size_t j = 0; j < data.dimension(1); ++j) {
         // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-        line.emplace_back(std::to_string(data[i][j]));
+        line.emplace_back(std::to_string(data(i,j)));
       }
       writer.writeDataInRow(line.cbegin(), line.cend());
     }

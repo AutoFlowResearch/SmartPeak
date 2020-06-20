@@ -12,7 +12,7 @@ namespace SmartPeak
   void Widget::FilterPopup(
     const char* popuop_id,
     ImGuiTextFilter& filter,
-    const std::vector<std::string>& column,
+    const Eigen::Tensor<std::string, 1>& column,
     bool* checked,
     const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices) {
     if (false == ImGui::BeginPopup(popuop_id))
@@ -85,19 +85,19 @@ namespace SmartPeak
   }
 
   void Widget::makeFilters(
-    const std::vector<std::string>& headers,
-    const std::vector<std::vector<std::string>>& columns,
+    const Eigen::Tensor<std::string, 1>& headers,
+    const Eigen::Tensor<std::string,2>& columns,
     std::vector<std::vector<std::pair<std::string, std::vector<std::size_t>>>>& columns_indices,
     std::vector<ImGuiTextFilter>& filter) {
     for (std::size_t col = 0; col < headers.size(); ++col)
     {
       // Extract out unique columns and replicate indices
       std::map<std::string, std::vector<std::size_t>> value_indices;
-      for (std::size_t row = 0; row < columns[col].size(); ++row) {
+      for (std::size_t row = 0; row < columns.dimension(0); ++row) {
         std::vector<std::size_t> index = { row };
-        auto found = value_indices.emplace(columns[col][row], index);
+        auto found = value_indices.emplace(columns(col,row), index);
         if (!found.second) {
-          value_indices.at(columns[col][row]).push_back(row);
+          value_indices.at(columns(col,row)).push_back(row);
         }
       }
 
@@ -123,7 +123,7 @@ namespace SmartPeak
 
   void GenericTableWidget::draw()
   {
-    if (headers_.empty())
+    if (headers_.size()<=0)
       return;
 
     // headers
@@ -134,23 +134,18 @@ namespace SmartPeak
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
-        ImGui::TableSetupColumn(headers_.at(col).c_str());
+        ImGui::TableSetupColumn(headers_(col).c_str());
       }
       ImGui::TableAutoHeaders();
 
       // Second row to end body
       if (columns_.size() > 0) {
-        size_t n_rows = 0;
-        if (is_columnar_) n_rows = columns_[0].size();
-        else n_rows = columns_.size();
-        for (size_t row = 0; row < n_rows; ++row) {
-          bool pass_all_columns = checked_rows_[row];
-          if (pass_all_columns) {
+        for (size_t row = 0; row < columns_.dimension(0); ++row) {
+          if (checked_rows_.size() > 0) {
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col) {
               ImGui::TableSetColumnIndex(col);
-              if (is_columnar_) ImGui::Text("%s", columns_[col][row].c_str());
-              else ImGui::Text("%s", columns_[row][col].c_str());
+              ImGui::Text("%s", columns_(row,col).c_str());
             }
           }
         }
@@ -161,54 +156,38 @@ namespace SmartPeak
 
   void ExplorerWidget::draw()
   {
-    if (headers_.empty())
+    if (headers_.size()<=0)
       return;
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable |
       ImGuiTableFlags_Hideable | ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow;
 
-    if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
+    if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + check_box_headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
-        ImGui::TableSetupColumn(headers_.at(col).c_str());
+        ImGui::TableSetupColumn(headers_(col).c_str());
+      }
+      for (int col = 0; col < check_box_headers_.size(); col++) {
+        ImGui::TableSetupColumn(check_box_headers_(col).c_str());
       }
       ImGui::TableAutoHeaders();
 
       // Second row to end body
       if (columns_.size() > 0) {
-        size_t n_rows = 0;
-        if (is_columnar_) n_rows = columns_[0].size();
-        else n_rows = columns_.size();
-        for (size_t row = 0; row < n_rows; ++row) {
-          bool pass_all_columns = checked_rows_;
-          if (pass_all_columns) {
+        for (size_t row = 0; row < columns_.dimension(0); ++row) {
+          if (checked_rows_.size() > 0) {
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col) {
-              std::string id = table_id_ + std::to_string(col) + std::to_string(row*n_rows);
-              if (col == headers_.size() - 3) {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-                ImGui::Checkbox(id.c_str(), &checked_rows_1_[row]);
-                ImGui::PopStyleColor();
-              }
-              else if (col == headers_.size() - 2) {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-                ImGui::Checkbox(id.c_str(), &checked_rows_2_[row]);
-                ImGui::PopStyleColor();
-              }
-              else if (col == headers_.size() - 1) {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-                ImGui::Checkbox(id.c_str(), &checked_rows_3_[row]);
-                ImGui::PopStyleColor();
-              }
-              else {
-                ImGui::TableSetColumnIndex(col);
-                if (is_columnar_) ImGui::Text("%s", columns_[col][row].c_str());
-                else ImGui::Text("%s", columns_[row][col].c_str());
-              }
+              ImGui::TableSetColumnIndex(col);
+              ImGui::Text("%s", columns_(row, col).c_str());
+            }
+            for (size_t col = 0; col < check_box_headers_.size(); ++col) {
+              std::string id = table_id_ + std::to_string(col) + std::to_string(row*columns_.dimension(0));
+              ImGui::TableSetColumnIndex(col + headers_.size());
+              ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+              ImGui::Checkbox(id.c_str(), &check_boxes_(row,col));
+              ImGui::PopStyleColor();
             }
           }
         }
@@ -219,45 +198,20 @@ namespace SmartPeak
 
   void GenericGraphicWidget::draw()
   {
-    // Dummy data
-    std::vector<std::string> headers = { "sample_name", "sample_type", "component_name" }; // feature or sample columns to filter on
-    std::vector<std::string> sample_name_col = {"S1", "S1", "S2", "S2", "S3", "S3", "S4", "S4"};
-    std::vector<std::string> sample_type_col = { "A", "A", "A", "A", "B", "B", "B" ,"B"};
-    std::vector<std::string> component_name_col = { "C1", "C2", "C1", "C2", "C1", "C2", "C1", "C2" };
-    std::vector<std::vector<std::string>> columns = { sample_name_col, sample_type_col, component_name_col };
-    bool checked_rows[] = { true, true, true, true, true, true, true, true };
-
-    // row filters
-    static std::vector<ImGuiTextFilter> filter;
-    std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>> columns_indices;
-    this->makeFilters(headers, columns, columns_indices, filter);
-
-    // Search and filtering options for the plot
-    for (size_t col = 0; col < headers.size(); ++col)
-    {
-      char s[128];
-      if (ImGui::Button(headers[col].c_str())) {
-        sprintf(s, "%lu", col);
-        ImGui::OpenPopup(s);
-      }
-      sprintf(s, "%lu", col);
-      this->FilterPopup(s, filter[col], columns[col], checked_rows, columns_indices[col]);
-      ImGui::SameLine();
-    }
-    ImGui::NewLine();
-    ImGui::TextWrapped("TODO: scatter plots for each feature (red, selected; green, not selected)");
   }
 
   void LinePlot2DWidget::draw()
   {
     // Main graphic
+    assert(x_data_.dimensions() == y_data_.dimensions());
     ImPlot::SetNextPlotLimits(x_min_, x_max_, y_min_, y_max_, ImGuiCond_Always);
     if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(plot_width_-25, plot_height_-40))) {
-      for (int i = 0; i < x_data_.size(); ++i) {
-        assert(x_data_.at(i).size() == y_data_.at(i).size());
+      for (int i = 0; i < x_data_.dimension(1); ++i) {
         ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotLine(series_names_.at(i).c_str(), x_data_.at(i).data(), y_data_.at(i).data(), x_data_.at(i).size());
+        Eigen::Tensor<float, 1> x_data = x_data_.chip(i, 1);
+        Eigen::Tensor<float, 1> y_data = y_data_.chip(i, 1);
+        ImPlot::PlotLine(series_names_(i).c_str(), x_data.data(), y_data.data(), x_data_.dimension(0));
       }
       ImPlot::EndPlot();
     }
@@ -300,6 +254,7 @@ namespace SmartPeak
   void Heatmap2DWidget::draw()
   {
     // Main graphic
+    assert(data_.dimension(0) == rows_.size() && data_.dimension(1) == columns_.size());
     const ImPlotFlags imPlotFlags = ImPlotFlags_MousePos | ImPlotFlags_Highlight | ImPlotFlags_BoxSelect | ImPlotFlags_ContextMenu;
     if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(plot_width_ - 25, plot_height_ - 40), imPlotFlags)) {
       ImPlot::PlotHeatmap(("##"+plot_title_).c_str(), data_.data(), rows_.size(), columns_.size(), data_min_, data_max_, NULL);
@@ -369,150 +324,6 @@ namespace SmartPeak
 
   void WorkflowWidget::draw()
   {
-    // Top
-    ImGui::BeginGroup();
-    ImGui::Text("Add processing step:");
-    ImGui::SameLine();
-    const char* sample_ps[] = { "load_mzML" }; // TODO
-    if (ImGui::Button("Sample"))
-      ImGui::OpenPopup("Sample");
-    if (ImGui::BeginPopup("Sample"))
-    {
-      static ImGuiTextFilter sample_filter;
-      sample_filter.Draw();
-      for (int i = 0; i < IM_ARRAYSIZE(sample_ps); ++i)
-      {
-        if (sample_filter.PassFilter(sample_ps[i]))
-        {
-          ImGui::Text("%s", sample_ps[i]);
-          if (ImGui::IsItemClicked())
-          {
-            //TODO:  add table row
-          }
-        }
-      }
-      ImGui::EndPopup();
-    }
-    ImGui::SameLine();
-    const char* sequence_segment_ps[] = { "calibrate" }; // TODO
-    if (ImGui::Button("Sequence Segment"))
-      ImGui::OpenPopup("Sequence Segment");
-    if (ImGui::BeginPopup("Sequence Segment"))
-    {
-      static ImGuiTextFilter sequence_segment_filter;
-      sequence_segment_filter.Draw();
-      for (int i = 0; i < IM_ARRAYSIZE(sequence_segment_ps); ++i)
-      {
-        if (sequence_segment_filter.PassFilter(sequence_segment_ps[i]))
-        {
-          ImGui::Text("%s", sequence_segment_ps[i]);
-          if (ImGui::IsItemClicked())
-          {
-            //TODO:  add table row
-          }
-        }
-      }
-      ImGui::EndPopup();
-    }
-    const char* sample_group_ps[] = { "normalize" }; // TODO
-    ImGui::SameLine();
-    if (ImGui::Button("Sample Group"))
-      ImGui::OpenPopup("Sample Group");
-    if (ImGui::BeginPopup("Sample Group"))
-    {
-      static ImGuiTextFilter sample_group_filter;
-      sample_group_filter.Draw();
-      for (int i = 0; i < IM_ARRAYSIZE(sample_group_ps); ++i)
-      {
-        if (sample_group_filter.PassFilter(sample_group_ps[i]))
-        {
-          ImGui::Text("%s", sample_group_ps[i]);
-          if (ImGui::IsItemClicked())
-          {
-            //TODO:  add table row
-          }
-        }
-      }
-      ImGui::EndPopup();
-    }
-    ImGui::EndGroup();
-
-    // Middle:
-    // Table Filters
-    static std::vector<ImGuiTextFilter> filter;
-    static ImGuiTextFilter filter0, filter1, filter2, filter3;
-    filter.push_back(filter0); filter.push_back(filter1);
-    filter.push_back(filter2); filter.push_back(filter3);
-
-    // Table Data
-    const std::vector<std::string> column0 = { "PS1", "PS2", "PS3" };
-    const std::vector<std::string> column1 = { "Sample", "SequenceSegment", "Sample" };
-    static bool checked_rows[] = { true, true, true };
-    static bool rows_enabled[] = { true, true, true };
-    std::vector<std::vector<std::string>> columns;
-    columns.push_back(column0);
-    columns.push_back(column1);
-
-    // Header
-    ImGui::BeginChild("Workflow table", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), true);
-    const char* headers[] = { "Processing Step", "Processing Type" };
-    ImGui::Columns(IM_ARRAYSIZE(headers) + 2, "mycolumns", true);
-    ImGui::Text("#");
-    ImGui::NextColumn();
-    for (int col = 0; col < IM_ARRAYSIZE(headers); ++col)
-    {
-      if (ImGui::Button(headers[col]))
-        ImGui::OpenPopup(headers[col]);
-      //FilterPopup(headers[col], filter[col], columns[col], checked_rows);
-      ImGui::NextColumn();
-    }
-    ImGui::Text("Enabled");
-    ImGui::NextColumn();
-
-    // Body
-    // TODO: 3 columns with order, process step, checkmark (enabled, disabled)
-    ImGui::Separator();
-    static size_t selected = -1;
-    for (size_t i = 0; i < columns[0].size(); ++i)
-    {
-      if (checked_rows[i])
-      {
-        char label[32];
-        sprintf(label, "%lu", i);
-        if (ImGui::Selectable(label, selected == i, ImGuiSelectableFlags_SpanAllColumns))
-          selected = i;
-        // bool hovered = ImGui::IsItemHovered();
-        ImGui::NextColumn();
-        for (int j = 0; j < IM_ARRAYSIZE(headers); ++j)
-        {
-          ImGui::Text("%s", columns[j][i].c_str());
-          // TODO: tooltip description of each processing step
-          ImGui::NextColumn();
-        }
-        ImGui::Checkbox("", &rows_enabled[i]);
-        ImGui::NextColumn();
-      }
-    }
-    ImGui::Dummy(ImVec2(0, 0));
-    ImGui::EndChild();
-
-    // Bottom:
-    ImGui::BeginGroup();
-    if (ImGui::Button("Run/Resume"))
-    {
-      // TODO execute the workflow
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Pause"))
-    {
-      // TODO pause the workflow
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Restart"))
-    {
-      // TODO restart the workflow
-    }
-    ImGui::EndGroup();
   }
 
   void GenericTextWidget::draw()

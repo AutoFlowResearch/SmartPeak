@@ -4,6 +4,7 @@
 #include <utility>
 #include <vector>
 #include <imgui.h>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 namespace SmartPeak
 {
@@ -35,7 +36,7 @@ namespace SmartPeak
       @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
       @param[in] values_indices Map containing unique row entries and their duplicate indices
     */
-    static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const std::vector<std::string>& column, bool* checked,
+    static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const Eigen::Tensor<std::string,1>& column, bool* checked,
       const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices);
 
     /**
@@ -48,8 +49,8 @@ namespace SmartPeak
       @param[in, out] columns_indices A vector of maps containing unique row entries and their duplicate indices
       @param[in] sort_asc Whether to sort in ascending order or descending order
     */
-    static void SortButton(const char* button_id, const std::vector<std::string>& headers, 
-      std::vector<std::vector<std::string>>& columns,
+    static void SortButton(const char* button_id, const Eigen::Tensor<std::string,1>& headers, 
+      Eigen::Tensor<std::string,2>& columns,
       const int n_col,
       bool* checked,
       std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
@@ -63,8 +64,8 @@ namespace SmartPeak
       @param[out] columns_indices A vector of maps containing unique row entries and their duplicate indices
       @param[out] filter Vector of ImGuiTextFilters
     */
-    static void makeFilters(const std::vector<std::string>& headers,
-      const std::vector<std::vector<std::string>>& columns, 
+    static void makeFilters(const Eigen::Tensor<std::string,1>& headers,
+      const Eigen::Tensor<std::string,2>& columns, 
       std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
       std::vector<ImGuiTextFilter>& filter);
 
@@ -106,14 +107,13 @@ namespace SmartPeak
     @brief Show the table
 
     @param[in] headers Column header names
-    @param[in,out] columns Columns where the inner vector<string> are individual columns [TODO: refactor to use other types besides strings]
+    @param[in,out] columns Table body or matrix
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
-    std::vector<std::string> headers_;
-    std::vector<std::vector<std::string>> columns_;
-    bool is_columnar_ = true;
-    bool* checked_rows_;
+    Eigen::Tensor<std::string,1> headers_;
+    Eigen::Tensor<std::string,2> columns_;
+    Eigen::Tensor<bool, 1> checked_rows_;
     std::string table_id_;
   };
 
@@ -132,13 +132,12 @@ namespace SmartPeak
     @brief Show the explorer
 
     @param[in] headers Column header names
-    @param[in,out] columns Columns where the inner vector<string> are individual columns [TODO: refactor to use other types besides strings]
+    @param[in,out] columns Table body or matrix
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
-    bool* checked_rows_1_;
-    bool* checked_rows_2_;
-    bool* checked_rows_3_;
+    Eigen::Tensor<std::string, 1> check_box_headers_;
+    Eigen::Tensor<bool, 2> check_boxes_;
   };
 
   /**
@@ -152,13 +151,16 @@ namespace SmartPeak
 
   /**
     @brief Class for plotting 2D line plots
+
+    NOTE: series data are assumed to be aligned column wise (i.e., each column is a series or x_data_.dimension(1) == series_names_.size())
+
   */
   class LinePlot2DWidget : public GenericGraphicWidget
   {
   public:
     void draw() override;
-    std::vector<std::vector<float>> x_data_;
-    std::vector<std::vector<float>> y_data_;
+    Eigen::Tensor<float, 2> x_data_;
+    Eigen::Tensor<float, 2> y_data_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     std::string x_axis_title_;
     std::string y_axis_title_;
@@ -168,7 +170,7 @@ namespace SmartPeak
     float y_max_;
     float plot_width_;
     float plot_height_;
-    std::vector<std::string> series_names_;
+    Eigen::Tensor<std::string,1> series_names_;
   };
 
   /**
@@ -222,9 +224,9 @@ namespace SmartPeak
   {
   public:
     void draw() override;
-    std::vector<float> data_; // Row major ordering
-    std::vector<std::string> columns_;
-    std::vector<std::string> rows_;
+    Eigen::Tensor<float, 2, Eigen::RowMajor> data_; // Row major ordering
+    Eigen::Tensor<std::string,1> columns_;
+    Eigen::Tensor<std::string,1> rows_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     std::string x_axis_title_;
     std::string y_axis_title_;

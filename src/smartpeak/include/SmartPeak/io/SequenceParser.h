@@ -7,6 +7,7 @@
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/Utilities.h>
 #include <plog/Log.h>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 namespace SmartPeak
 {
@@ -102,9 +103,9 @@ public:
 
     static void makeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
-      std::vector<std::vector<float>>& data_out,
-      std::vector<std::string>& columns_out,
-      std::vector<Row>& rows_out,
+      Eigen::Tensor<float,2>& data_out,
+      Eigen::Tensor<std::string, 1>& columns_out,
+      Eigen::Tensor<std::string, 2>& rows_out,
       const std::vector<std::string>& meta_data = {"calculated_concentration"},
       const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
     );

@@ -42,75 +42,60 @@ int main(int argc, char **argv)
   // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
   // data for the injection explorer
-  static std::vector<std::string> injection_explorer_headers;
-  static std::vector<std::vector<std::string>> injection_explorer_body;
-  static bool* injection_explorer_workflow_checked_rows = nullptr;
-  static bool* injection_explorer_plot_checked_rows = nullptr;
-  static bool* injection_explorer_table_checked_rows = nullptr;
-  static bool* injection_explorer_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> injection_explorer_headers;
+  static Eigen::Tensor<std::string, 1> injection_explorer_checkbox_headers(3);
+  static Eigen::Tensor<std::string, 2> injection_explorer_body;
+  static Eigen::Tensor<bool, 3> injection_explorer_checkbox_body;
+  static Eigen::Tensor<bool, 1> injection_explorer_checked_rows;
   // data for the transition explorer
-  static std::vector<std::string> transition_explorer_headers;
-  static std::vector<std::vector<std::string>> transition_explorer_body;
-  static bool* transition_explorer_workflow_checked_rows = nullptr;
-  static bool* transition_explorer_plot_checked_rows = nullptr;
-  static bool* transition_explorer_table_checked_rows = nullptr;
-  static bool* transition_explorer_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> transition_explorer_headers;
+  static Eigen::Tensor<std::string, 1> transition_explorer_checkbox_headers(3);
+  static Eigen::Tensor<std::string, 2> transition_explorer_body;
+  static Eigen::Tensor<bool, 3> transition_explorer_checkbox_body;
+  Eigen::Tensor<bool, 1> transition_explorer_checked_rows;
   // data for the feature explorer
-  static std::vector<std::string> feature_explorer_headers;
-  static std::vector<std::vector<std::string>> feature_explorer_body;
-  static bool* feature_explorer_workflow_checked_rows = nullptr;
-  static bool* feature_explorer_plot_checked_rows = nullptr;
-  static bool* feature_explorer_table_checked_rows = nullptr;
-  static bool* feature_explorer_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> feature_explorer_headers;
+  static Eigen::Tensor<std::string, 1> feature_explorer_checkbox_headers(3);
+  static Eigen::Tensor<std::string, 2> feature_explorer_body;
+  static Eigen::Tensor<bool, 3> feature_explorer_checkbox_body;
+  static Eigen::Tensor<bool, 1> feature_explorer_checked_rows;
   // data for the sequence table
-  static std::vector<std::string> sequence_table_headers;
-  static std::vector<std::vector<std::string>> sequence_table_body;
-  static bool* sequence_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> sequence_table_headers;
+  static Eigen::Tensor<std::string, 2> sequence_table_body;
   // data for the transitions table
-  static std::vector<std::string> transitions_table_headers;
-  static std::vector<std::vector<std::string>> transitions_table_body;
-  static bool* transitions_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> transitions_table_headers;
+  static Eigen::Tensor<std::string, 2> transitions_table_body;
   // data for the workflow table
-  static std::vector<std::string> workflow_table_headers;
-  static std::vector<std::vector<std::string>> workflow_table_body;
-  static bool* workflow_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> workflow_table_headers;
+  static Eigen::Tensor<std::string, 2> workflow_table_body;
   // data for the parameters table
-  static std::vector<std::string> parameters_table_headers;
-  static std::vector<std::vector<std::string>> parameters_table_body;
-  static bool* parameters_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> parameters_table_headers;
+  static Eigen::Tensor<std::string, 2> parameters_table_body;
   // data for the quant_method table
-  static std::vector<std::string> quant_method_table_headers;
-  static std::vector<std::vector<std::string>> quant_method_table_body;
-  static bool* quant_method_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> quant_method_table_headers;
+  static Eigen::Tensor<std::string, 2> quant_method_table_body;
   // data for the stds_concs table
-  static std::vector<std::string> stds_concs_table_headers;
-  static std::vector<std::vector<std::string>> stds_concs_table_body;
-  static bool* stds_concs_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> stds_concs_table_headers;
+  static Eigen::Tensor<std::string, 2> stds_concs_table_body;
   // data for the comp_filters table
-  static std::vector<std::string> comp_filters_table_headers;
-  static std::vector<std::vector<std::string>> comp_filters_table_body;
-  static bool* comp_filters_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> comp_filters_table_headers;
+  static Eigen::Tensor<std::string, 2> comp_filters_table_body;
   // data for the comp_group_filters table
-  static std::vector<std::string> comp_group_filters_table_headers;
-  static std::vector<std::vector<std::string>> comp_group_filters_table_body;
-  static bool* comp_group_filters_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> comp_group_filters_table_headers;
+  static Eigen::Tensor<std::string, 2> comp_group_filters_table_body;
   // data for the comp_qcs table
-  static std::vector<std::string> comp_qcs_table_headers;
-  static std::vector<std::vector<std::string>> comp_qcs_table_body;
-  static bool* comp_qcs_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> comp_qcs_table_headers;
+  static Eigen::Tensor<std::string, 2> comp_qcs_table_body;
   // data for the comp_group_qcs table
-  static std::vector<std::string> comp_group_qcs_table_headers;
-  static std::vector<std::vector<std::string>> comp_group_qcs_table_body;
-  static bool* comp_group_qcs_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> comp_group_qcs_table_headers;
+  static Eigen::Tensor<std::string, 2> comp_group_qcs_table_body;
   // data for the feature table
-  static std::vector<std::string> feature_table_headers;
-  static std::vector<std::vector<std::string>> feature_table_body;
-  static bool* feature_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> feature_table_headers;
+  static Eigen::Tensor<std::string, 2> feature_table_body;
   // data for the feature_pivot table
-  static std::vector<std::string> feature_pivot_table_headers;
-  static std::vector<std::vector<std::string>> feature_pivot_table_rows;
-  static std::vector<std::vector<std::string>> feature_pivot_table_body;
-  static bool* feature_pivot_table_checked_rows = nullptr;
+  static Eigen::Tensor<std::string, 1> feature_pivot_table_headers;
+  static Eigen::Tensor<std::string, 2> feature_pivot_table_rows;
+  static Eigen::Tensor<std::string, 2> feature_pivot_table_body;
   // data for the chromatogram scatter plot
   static std::vector<std::vector<float>> chrom_time_data, chrom_intensity_data;
   static std::vector<std::string> chrom_series_names;
@@ -118,14 +103,14 @@ int main(int argc, char **argv)
   static std::string chrom_y_axis_title = "Intensity (au)";
   static float chrom_time_min = 1e6, chrom_time_max = 0, chrom_intensity_min = 1e6, chrom_intensity_max = 0;
   // data for the feature line plot
-  static std::vector<std::vector<float>> feat_sample_data, feat_value_data;
-  static std::vector<std::string> feat_line_series_names;
+  static Eigen::Tensor<float, 2> feat_sample_data, feat_value_data;
+  static Eigen::Tensor<std::string, 1> feat_line_series_names;
   static std::string feat_line_x_axis_title = "Inj#";
   static std::string feat_line_y_axis_title = "metadata (au)";
   static float feat_line_sample_min = 1e6, feat_line_sample_max = 0, feat_value_min = 1e6, feat_value_max = 0;
   // data for the feature heatmap (rows/colum labels are derived from feature pivot table)
-  static std::vector<float> feat_heatmap_data; // linearized feat_sample_data
-  static std::vector<std::string> feat_heatmap_row_labels, feat_heatmap_col_labels;
+  static Eigen::Tensor<float, 2, Eigen::RowMajor> feat_heatmap_data; // same as feat_value_data but rowMajor
+  static Eigen::Tensor<std::string, 1> feat_heatmap_row_labels, feat_heatmap_col_labels;
   static std::string feat_heatmap_x_axis_title = "Sample name";
   static std::string feat_heatmap_y_axis_title = "Component name";
   // data for the calibrators scatter/line plot
@@ -599,33 +584,31 @@ int main(int argc, char **argv)
         if (show_injection_explorer && ImGui::BeginTabItem("Injections", &show_injection_explorer))
         {
           // Make the injection explorer headers
-          if (injection_explorer_headers.size() <= 0) injection_explorer_headers = {
-          "inj#", "sample_name", "workflow", "plot", "table" };
-          const int n_cols = injection_explorer_headers.size() - 3;
+          if (injection_explorer_headers.size() <= 0) {
+            injection_explorer_headers.resize(2);
+            injection_explorer_headers.setValues({"inj#", "sample_name" });
+            injection_explorer_checkbox_headers.resize(3);
+            injection_explorer_headers.setValues({ "workflow", "plot", "table" });
+          }
+          const int n_cols = injection_explorer_headers.size();
           const int n_rows = application_handler_.sequenceHandler_.getSequence().size();
 
           // Make the injection explorer body
           if (injection_explorer_body.size() <= 0 && n_rows > 0) {
-            injection_explorer_body.resize(n_cols);
-            for (size_t col = 0; col < n_cols; ++col) {
-              injection_explorer_body.at(col).resize(n_rows);
-            }
+
+            injection_explorer_body.resize(n_rows,n_cols);
             int col = 0, row = 0;
             for (const auto& injection : application_handler_.sequenceHandler_.getSequence()) {
-              injection_explorer_body.at(col).at(row) = std::to_string(injection.getMetaData().inj_number);
+              injection_explorer_body(row,col) = std::to_string(injection.getMetaData().inj_number);
               ++col;
-              injection_explorer_body.at(col).at(row) = injection.getMetaData().sample_name;
+              injection_explorer_body(row,col) = injection.getMetaData().sample_name;
               col = 0;
               ++row;
             }
-            injection_explorer_workflow_checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, injection_explorer_workflow_checked_rows);
-            injection_explorer_plot_checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, injection_explorer_plot_checked_rows);
-            injection_explorer_table_checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, injection_explorer_table_checked_rows);
-            injection_explorer_checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, injection_explorer_checked_rows);
+            injection_explorer_checkbox_body.resize(n_rows,3);
+            Widget::makeCheckedRows(n_rows, injection_explorer_checkbox_body.data());
+            injection_explorer_checked_rows.resize(n_rows);
+            Widget::makeCheckedRows(n_rows, injection_explorer_checked_rows.data());
           }
 
           // Call the Explorer widget
@@ -633,9 +616,7 @@ int main(int argc, char **argv)
           Explorer.headers_ = injection_explorer_headers;
           Explorer.columns_ = injection_explorer_body;
           Explorer.checked_rows_ = injection_explorer_checked_rows;
-          Explorer.checked_rows_1_ = injection_explorer_workflow_checked_rows;
-          Explorer.checked_rows_2_ = injection_explorer_plot_checked_rows;
-          Explorer.checked_rows_3_ = injection_explorer_table_checked_rows;
+          Explorer.check_boxes_ = injection_explorer_checkbox_body;
           Explorer.table_id_ = "InjectionsExplorerWindow";
           Explorer.draw();
 
@@ -644,8 +625,10 @@ int main(int argc, char **argv)
         if (show_transitions_explorer && ImGui::BeginTabItem("Transitions", &show_transitions_explorer))
         {
           // Make the transition explorer headers
-          if (transition_explorer_headers.size() <= 0) transition_explorer_headers = {
-          "transition_group","transition_name", "workflow", "plot", "table" };
+          if (transition_explorer_headers.size() <= 0) {
+            transition_explorer_headers.resize(5);
+            transition_explorer_headers.setValues({"transition_group","transition_name", "workflow", "plot", "table" });
+          }
           const int n_cols = transition_explorer_headers.size() - 3;
 
           // Make the transition table body
@@ -653,15 +636,12 @@ int main(int argc, char **argv)
             const auto& targeted_exp = application_handler_.sequenceHandler_.getSequence().at(0).getRawDataShared()->getTargetedExperimentShared();
             const int n_rows = targeted_exp->getTransitions().size();
             if (transition_explorer_body.size() <= 0 && n_rows > 0) {
-              transition_explorer_body.resize(n_cols);
-              for (size_t col = 0; col < n_cols; ++col) {
-                transition_explorer_body.at(col).resize(n_rows);
-              }
+              transition_explorer_body.resize(n_rows, n_cols);
               int col = 0, row = 0;
               for (const auto& transition : targeted_exp->getTransitions()) {
-                transition_explorer_body.at(col).at(row) = transition.getPeptideRef();
+                transition_explorer_body(row,col) = transition.getPeptideRef();
                 ++col;
-                transition_explorer_body.at(col).at(row) = transition.getNativeID();
+                transition_explorer_body(row,col) = transition.getNativeID();
                 col = 0;
                 ++row;
               }
@@ -691,20 +671,20 @@ int main(int argc, char **argv)
         if (show_features_explorer && ImGui::BeginTabItem("Features", &show_features_explorer))
         {
           // Make the feature explorer headers
-          if (feature_explorer_headers.size() <= 0) feature_explorer_headers = {
-          "metavalue", "workflow", "plot", "table" };
+          if (feature_explorer_headers.size() <= 0) {
+            feature_explorer_headers.resize(4);
+            feature_explorer_headers.setValues({
+          "metavalue", "workflow", "plot", "table" });
+          }
           const int n_cols = feature_explorer_headers.size() - 3;
           const int n_rows = metadatafloatToString.size();
 
           // Make the feature explorer body
           if (feature_explorer_body.size() <= 0 && n_rows > 0) {
-            feature_explorer_body.resize(n_cols);
-            for (size_t col = 0; col < n_cols; ++col) {
-              feature_explorer_body.at(col).resize(n_rows);
-            }
+            feature_explorer_body.resize(n_rows,n_cols);
             int col = 0, row = 0;
             for (const auto& metadata : metadatafloatToString) {
-              feature_explorer_body.at(col).at(row) = metadata.second;
+              feature_explorer_body(row,col) = metadata.second;
               col = 0;
               ++row;
             }
@@ -754,55 +734,52 @@ int main(int argc, char **argv)
         if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
         {
           // Make the sequence table headers
-          if (sequence_table_headers.size()<=0) sequence_table_headers = {
+          if (sequence_table_headers.size() <= 0) {
+            sequence_table_headers.resize(11);
+            sequence_table_headers.setValues({
             "inj_number", "sample_name", "sample_group_name" , "sequence_segment_name" , "original_filename",
             "sample_type", "acq_method_name", "inj_volume", "inj_volume_units", "batch_name", // skipping optional members
-            "acquisition_date_and_time" };
+            "acquisition_date_and_time" });
+          }
           const int n_cols = sequence_table_headers.size();
           const int n_rows = application_handler_.sequenceHandler_.getSequence().size();
 
           // Make the sequence table body
           if (sequence_table_body.size() <= 0 && n_rows > 0) {
-            sequence_table_body.resize(n_cols);
-            for (size_t col = 0; col < n_cols; ++col) {
-              sequence_table_body.at(col).resize(n_rows);
-            }
+            sequence_table_body.resize(n_rows,n_cols);
             int col = 0, row = 0;
             for (const auto& injection : application_handler_.sequenceHandler_.getSequence()) {
-              sequence_table_body.at(col).at(row) = std::to_string(injection.getMetaData().inj_number);
+              sequence_table_body(row,col) = std::to_string(injection.getMetaData().inj_number);
               ++col;
-              sequence_table_body.at(col).at(row) = injection.getMetaData().sample_name;
+              sequence_table_body(row,col) = injection.getMetaData().sample_name;
               ++col;
-              sequence_table_body.at(col).at(row) = injection.getMetaData().sample_group_name;
+              sequence_table_body(row,col) = injection.getMetaData().sample_group_name;
               ++col;
-              sequence_table_body.at(col).at(row) = injection.getMetaData().sequence_segment_name;
+              sequence_table_body(row,col) = injection.getMetaData().sequence_segment_name;
               ++col;
-              sequence_table_body.at(col).at(row) = injection.getMetaData().original_filename;
+              sequence_table_body(row,col) = injection.getMetaData().original_filename;
               ++col;
-              sequence_table_body.at(col).at(row) = injection.getMetaData().getSampleTypeAsString();
+              sequence_table_body(row,col) = injection.getMetaData().getSampleTypeAsString();
               ++col;
-              sequence_table_body.at(col).at(row) = injection.getMetaData().acq_method_name;
+              sequence_table_body(row,col) = injection.getMetaData().acq_method_name;
               ++col;
-              sequence_table_body.at(col).at(row) = std::to_string(injection.getMetaData().inj_volume);
+              sequence_table_body(row,col) = std::to_string(injection.getMetaData().inj_volume);
               ++col;
-              sequence_table_body.at(col).at(row) = injection.getMetaData().inj_volume_units;
+              sequence_table_body(row,col) = injection.getMetaData().inj_volume_units;
               ++col;
-              sequence_table_body.at(col).at(row) = injection.getMetaData().batch_name;
+              sequence_table_body(row,col) = injection.getMetaData().batch_name;
               ++col;
               // Skipping optional members
-              sequence_table_body.at(col).at(row) = injection.getMetaData().getAcquisitionDateAndTimeAsString();
+              sequence_table_body(row,col) = injection.getMetaData().getAcquisitionDateAndTimeAsString();
               col = 0;
               ++row;
             }
-            sequence_table_checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, sequence_table_checked_rows);
           }
 
           // Call the table widget
           GenericTableWidget Table;
           Table.headers_ = sequence_table_headers;
           Table.columns_ = sequence_table_body;
-          Table.checked_rows_ = sequence_table_checked_rows;
           Table.table_id_ = "SequenceMainWindow";
           Table.draw();
           ImGui::EndTabItem();
@@ -810,9 +787,12 @@ int main(int argc, char **argv)
         if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
         {
           // Make the transition table headers
-          if (transitions_table_headers.size() <= 0) transitions_table_headers = { // NOTE: only showing a subset
+          if (transitions_table_headers.size() <= 0) {
+            transitions_table_headers.resize(9);
+            transitions_table_headers.setValues({ // NOTE: only showing a subset
             "transition_group","transition_name","RetentionTime","PrecursorMz","ProductMz",
-            "LabelType","quantifying_transition","identifying_transition","detecting_transition"};
+            "LabelType","quantifying_transition","identifying_transition","detecting_transition" });
+          }
           const int n_cols = transitions_table_headers.size();
 
           // Make the transition table body
@@ -820,35 +800,30 @@ int main(int argc, char **argv)
             const auto& targeted_exp = application_handler_.sequenceHandler_.getSequence().at(0).getRawDataShared()->getTargetedExperimentShared();
             const int n_rows = targeted_exp->getTransitions().size();
             if (transitions_table_body.size() <= 0 && n_rows > 0) {
-              transitions_table_body.resize(n_cols);
-              for (size_t col = 0; col < n_cols; ++col) {
-                transitions_table_body.at(col).resize(n_rows);
-              }
+              transitions_table_body.resize(n_rows,n_cols);
               int col = 0, row = 0;
               for (const auto& transition : targeted_exp->getTransitions()) {
-                transitions_table_body.at(col).at(row) = transition.getPeptideRef();
+                transitions_table_body(row,col) = transition.getPeptideRef();
                 ++col;
-                transitions_table_body.at(col).at(row) = transition.getNativeID();
+                transitions_table_body(row,col) = transition.getNativeID();
                 ++col;
-                transitions_table_body.at(col).at(row) = std::to_string(targeted_exp->getPeptideByRef(transition.getPeptideRef()).getRetentionTime());
+                transitions_table_body(row,col) = std::to_string(targeted_exp->getPeptideByRef(transition.getPeptideRef()).getRetentionTime());
                 ++col;
-                transitions_table_body.at(col).at(row) = std::to_string(transition.getPrecursorMZ());
+                transitions_table_body(row,col) = std::to_string(transition.getPrecursorMZ());
                 ++col;
-                transitions_table_body.at(col).at(row) = std::to_string(transition.getProductMZ());
+                transitions_table_body(row,col) = std::to_string(transition.getProductMZ());
                 ++col;
-                //transitions_table_body.at(col).at(row) = transition.getProduct().getMetaValue("LabelType");
-                transitions_table_body.at(col).at(row) = "?";
+                //transitions_table_body(row,col) = transition.getProduct().getMetaValue("LabelType");
+                transitions_table_body(row,col) = "?";
                 ++col;
-                transitions_table_body.at(col).at(row) = std::to_string(transition.isQuantifyingTransition());
+                transitions_table_body(row,col) = std::to_string(transition.isQuantifyingTransition());
                 ++col;
-                transitions_table_body.at(col).at(row) = std::to_string(transition.isIdentifyingTransition());
+                transitions_table_body(row,col) = std::to_string(transition.isIdentifyingTransition());
                 ++col;
-                transitions_table_body.at(col).at(row) = std::to_string(transition.isDetectingTransition());
+                transitions_table_body(row,col) = std::to_string(transition.isDetectingTransition());
                 col = 0;
                 ++row;
               }
-              transitions_table_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, transitions_table_checked_rows);
             }
           }
 
@@ -856,7 +831,6 @@ int main(int argc, char **argv)
           GenericTableWidget Table;
           Table.headers_ = transitions_table_headers;
           Table.columns_ = transitions_table_body;
-          Table.checked_rows_ = transitions_table_checked_rows;
           Table.table_id_ = "TransitionsMainWindow";
           Table.draw();
           ImGui::EndTabItem();
@@ -864,34 +838,30 @@ int main(int argc, char **argv)
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
           // Make the workflow table headers
-          if (workflow_table_headers.size() <= 0) workflow_table_headers = {
-            "step", "command" };
+          if (workflow_table_headers.size() <= 0) {
+            workflow_table_headers.resize(2);
+            workflow_table_headers.setValues({ "step", "command" });
+          }
           const int n_cols = workflow_table_headers.size();
           const int n_rows = workflow_.getCommands().size();
 
           // Make the workflow table body
           if (workflow_table_body.size() != workflow_.getCommands().size()) { // TODO: does not account for case of different commands of the same length!
-            workflow_table_body.resize(n_cols);
-            for (size_t col = 0; col < n_cols; ++col) {
-              workflow_table_body.at(col).resize(n_rows);
-            }
+            workflow_table_body.resize(n_rows,n_cols);
             int col = 0, row = 0;
             for (const auto& command : workflow_.getCommands()) {
-              workflow_table_body.at(col).at(row) = std::to_string(row);
+              workflow_table_body(row,col) = std::to_string(row);
               ++col;
-              workflow_table_body.at(col).at(row) = command.getName();
+              workflow_table_body(row,col) = command.getName();
               col = 0;
               ++row;
             }
-            workflow_table_checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, workflow_table_checked_rows);
           }
 
           // Call the table widget
           GenericTableWidget Table;
           Table.headers_ = workflow_table_headers;
           Table.columns_ = workflow_table_body;
-          Table.checked_rows_ = workflow_table_checked_rows;
           Table.table_id_ = "WorkflowMainWindow";
           Table.draw();
           ImGui::EndTabItem();
@@ -901,7 +871,8 @@ int main(int argc, char **argv)
           if (application_handler_.sequenceHandler_.getSequenceSegments().size() > 0) {
             // Make the parameters table headers
             if (parameters_table_headers.size() <= 0) {
-              parameters_table_headers = { "function","name","type","value",/*"default","restrictions","description"*/ };
+              parameters_table_headers.resize(4);
+              parameters_table_headers.setValues({ "function","name","type","value",/*"default","restrictions","description"*/ });
             }
             const int n_cols = parameters_table_headers.size();
 
@@ -912,26 +883,21 @@ int main(int argc, char **argv)
               for (const auto& parameters : application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters()) {
                 n_rows += parameters.second.size();
               }
-              parameters_table_body.resize(n_cols);
-              for (size_t col = 0; col < n_cols; ++col) {
-                parameters_table_body.at(col).resize(n_rows);
-              }
+              parameters_table_body.resize(n_rows,n_cols);
               int col = 0, row = 0;
               for (const auto& parameters : application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters()) {
                 for (const auto& parameter : parameters.second) {
-                  parameters_table_body.at(col).at(row) = parameters.first;
+                  parameters_table_body(row,col) = parameters.first;
                   ++col;
-                  parameters_table_body.at(col).at(row) = parameter.at("name");
+                  parameters_table_body(row,col) = parameter.at("name");
                   ++col;
-                  parameters_table_body.at(col).at(row) = parameter.at("type");
+                  parameters_table_body(row,col) = parameter.at("type");
                   ++col;
-                  parameters_table_body.at(col).at(row) = parameter.at("value");
+                  parameters_table_body(row,col) = parameter.at("value");
                   col = 0;
                   ++row;
                 }
               }
-              parameters_table_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, parameters_table_checked_rows);
             }
           }
 
@@ -939,7 +905,6 @@ int main(int argc, char **argv)
           GenericTableWidget Table;
           Table.headers_ = parameters_table_headers;
           Table.columns_ = parameters_table_body;
-          Table.checked_rows_ = parameters_table_checked_rows;
           Table.table_id_ = "ParametersMainWindow";
           Table.draw();
           ImGui::EndTabItem();
@@ -948,75 +913,73 @@ int main(int argc, char **argv)
         {
           if (application_handler_.sequenceHandler_.getSequenceSegments().size() > 0) {
             // Make the quant_method table headers
-            if (quant_method_table_headers.size() <= 0) quant_method_table_headers = {
-              "component_name", "sequence_segment_name", "IS_name", "feature_name", "concentration_units",
-              "llod", "ulod", "lloq", "uloq", "correlation_coefficient",
-              "n_points", "transformation_model",
-              "transformation_model_param_slope",
-              "transformation_model_param_intercept",
-              "transformation_model_param_x_weight",
-              "transformation_model_param_y_weight",
-              "transformation_model_param_x_datum_min",
-              "transformation_model_param_x_datum_max",
-              "transformation_model_param_y_datum_min",
-              "transformation_model_param_y_datum_max" };
+            if (quant_method_table_headers.size() <= 0) {
+              quant_method_table_headers.resize(20);
+              quant_method_table_headers.setValues({
+                "component_name", "sequence_segment_name", "IS_name", "feature_name", "concentration_units",
+                "llod", "ulod", "lloq", "uloq", "correlation_coefficient",
+                "n_points", "transformation_model",
+                "transformation_model_param_slope",
+                "transformation_model_param_intercept",
+                "transformation_model_param_x_weight",
+                "transformation_model_param_y_weight",
+                "transformation_model_param_x_datum_min",
+                "transformation_model_param_x_datum_max",
+                "transformation_model_param_y_datum_min",
+                "transformation_model_param_y_datum_max" });
+            }
             const int n_cols = quant_method_table_headers.size();
 
             // Make the quant_method table body
             const int n_rows = application_handler_.sequenceHandler_.getSequenceSegments().at(0).getQuantitationMethodsShared()->size() * application_handler_.sequenceHandler_.getSequenceSegments().size();
             if (quant_method_table_body.size() <= 0 && n_rows > 0) {
-              quant_method_table_body.resize(n_cols);
-              for (size_t col = 0; col < n_cols; ++col) {
-                quant_method_table_body.at(col).resize(n_rows);
-              }
+              quant_method_table_body.resize(n_rows,n_cols);
               int col = 0, row = 0;
               for (const auto& seq_segment : application_handler_.sequenceHandler_.getSequenceSegments()) {
                 for (const auto& quant_method : seq_segment.getQuantitationMethods()) {
-                  quant_method_table_body.at(col).at(row) = quant_method.getComponentName();
+                  quant_method_table_body(row,col) = quant_method.getComponentName();
                   ++col;
-                  quant_method_table_body.at(col).at(row) = seq_segment.getSequenceSegmentName();
+                  quant_method_table_body(row,col) = seq_segment.getSequenceSegmentName();
                   ++col;
-                  quant_method_table_body.at(col).at(row) = quant_method.getISName();
+                  quant_method_table_body(row,col) = quant_method.getISName();
                   ++col;
-                  quant_method_table_body.at(col).at(row) = quant_method.getFeatureName();
+                  quant_method_table_body(row,col) = quant_method.getFeatureName();
                   ++col;
-                  quant_method_table_body.at(col).at(row) = quant_method.getConcentrationUnits();
+                  quant_method_table_body(row,col) = quant_method.getConcentrationUnits();
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string(quant_method.getLLOD());
+                  quant_method_table_body(row,col) = std::to_string(quant_method.getLLOD());
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string(quant_method.getULOD());
+                  quant_method_table_body(row,col) = std::to_string(quant_method.getULOD());
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string(quant_method.getLLOQ());
+                  quant_method_table_body(row,col) = std::to_string(quant_method.getLLOQ());
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string(quant_method.getULOQ());
+                  quant_method_table_body(row,col) = std::to_string(quant_method.getULOQ());
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string(quant_method.getCorrelationCoefficient());
+                  quant_method_table_body(row,col) = std::to_string(quant_method.getCorrelationCoefficient());
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string(quant_method.getNPoints());
+                  quant_method_table_body(row,col) = std::to_string(quant_method.getNPoints());
                   ++col;
-                  quant_method_table_body.at(col).at(row) = quant_method.getTransformationModel();
+                  quant_method_table_body(row,col) = quant_method.getTransformationModel();
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string((double)quant_method.getTransformationModelParams().getValue("slope"));
+                  quant_method_table_body(row,col) = std::to_string((double)quant_method.getTransformationModelParams().getValue("slope"));
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string((double)quant_method.getTransformationModelParams().getValue("intercept"));
+                  quant_method_table_body(row,col) = std::to_string((double)quant_method.getTransformationModelParams().getValue("intercept"));
                   ++col;
-                  quant_method_table_body.at(col).at(row) = (std::string)quant_method.getTransformationModelParams().getValue("x_weight");
+                  quant_method_table_body(row,col) = (std::string)quant_method.getTransformationModelParams().getValue("x_weight");
                   ++col;
-                  quant_method_table_body.at(col).at(row) = (std::string)quant_method.getTransformationModelParams().getValue("y_weight");
+                  quant_method_table_body(row,col) = (std::string)quant_method.getTransformationModelParams().getValue("y_weight");
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string((double)quant_method.getTransformationModelParams().getValue("x_datum_min"));
+                  quant_method_table_body(row,col) = std::to_string((double)quant_method.getTransformationModelParams().getValue("x_datum_min"));
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string((double)quant_method.getTransformationModelParams().getValue("x_datum_max"));
+                  quant_method_table_body(row,col) = std::to_string((double)quant_method.getTransformationModelParams().getValue("x_datum_max"));
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string((double)quant_method.getTransformationModelParams().getValue("y_datum_min"));
+                  quant_method_table_body(row,col) = std::to_string((double)quant_method.getTransformationModelParams().getValue("y_datum_min"));
                   ++col;
-                  quant_method_table_body.at(col).at(row) = std::to_string((double)quant_method.getTransformationModelParams().getValue("y_datum_max"));
+                  quant_method_table_body(row,col) = std::to_string((double)quant_method.getTransformationModelParams().getValue("y_datum_max"));
                   col = 0;
                   ++row;
                 }
               }
-              quant_method_table_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, quant_method_table_checked_rows);
             }
           }
 
@@ -1024,7 +987,6 @@ int main(int argc, char **argv)
           GenericTableWidget Table;
           Table.headers_ = quant_method_table_headers;
           Table.columns_ = quant_method_table_body;
-          Table.checked_rows_ = quant_method_table_checked_rows;
           Table.table_id_ = "QuantMethodMainWindow";
           Table.draw();
           ImGui::EndTabItem();
@@ -1032,9 +994,12 @@ int main(int argc, char **argv)
         if (show_stds_concs_table && ImGui::BeginTabItem("Standards Concentrations", &show_stds_concs_table))
         {
           // Make the stds_concs table headers
-          if (stds_concs_table_headers.size() <= 0) stds_concs_table_headers = {
-            "sample_name", "component_name", "IS_component_name", "actual_concentration",
-              "IS_actual_concentration", "concentration_units", "dilution_factor" };
+          if (stds_concs_table_headers.size() <= 0) {
+            stds_concs_table_headers.resize(7);
+            stds_concs_table_headers.setValues({
+              "sample_name", "component_name", "IS_component_name", "actual_concentration",
+                "IS_actual_concentration", "concentration_units", "dilution_factor" });
+          }
           const int n_cols = stds_concs_table_headers.size();
 
           // Make the stds_concs table body
@@ -1042,30 +1007,25 @@ int main(int argc, char **argv)
             const auto& stand_concs = application_handler_.sequenceHandler_.getSequenceSegments().at(0).getStandardsConcentrations();
             const int n_rows = stand_concs.size();
             if (stds_concs_table_body.size() <= 0 && n_rows > 0) {
-              stds_concs_table_body.resize(n_cols);
-              for (size_t col = 0; col < n_cols; ++col) {
-                stds_concs_table_body.at(col).resize(n_rows);
-              }
+              stds_concs_table_body.resize(n_rows,n_cols);
               int col = 0, row = 0;
               for (const auto& stds_concs : stand_concs) {
-                stds_concs_table_body.at(col).at(row) = stds_concs.sample_name;
+                stds_concs_table_body(row,col) = stds_concs.sample_name;
                 ++col;
-                stds_concs_table_body.at(col).at(row) = stds_concs.component_name;
+                stds_concs_table_body(row,col) = stds_concs.component_name;
                 ++col;
-                stds_concs_table_body.at(col).at(row) = stds_concs.IS_component_name;
+                stds_concs_table_body(row,col) = stds_concs.IS_component_name;
                 ++col;
-                stds_concs_table_body.at(col).at(row) = std::to_string(stds_concs.actual_concentration);
+                stds_concs_table_body(row,col) = std::to_string(stds_concs.actual_concentration);
                 ++col;
-                stds_concs_table_body.at(col).at(row) = std::to_string(stds_concs.IS_actual_concentration);
+                stds_concs_table_body(row,col) = std::to_string(stds_concs.IS_actual_concentration);
                 ++col;
-                stds_concs_table_body.at(col).at(row) = stds_concs.concentration_units;
+                stds_concs_table_body(row,col) = stds_concs.concentration_units;
                 ++col;
-                stds_concs_table_body.at(col).at(row) = std::to_string(stds_concs.dilution_factor);
+                stds_concs_table_body(row,col) = std::to_string(stds_concs.dilution_factor);
                 col = 0;
                 ++row;
               }
-              stds_concs_table_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, stds_concs_table_checked_rows);
             }
           }
 
@@ -1073,7 +1033,6 @@ int main(int argc, char **argv)
           GenericTableWidget Table;
           Table.headers_ = stds_concs_table_headers;
           Table.columns_ = stds_concs_table_body;
-          Table.checked_rows_ = stds_concs_table_checked_rows;
           Table.table_id_ = "StdsConcsMainWindow";
           Table.draw();
           ImGui::EndTabItem();
@@ -1083,48 +1042,45 @@ int main(int argc, char **argv)
           if (application_handler_.sequenceHandler_.getSequenceSegments().size() > 0) {
             // Make the comp_filters table headers
             if (comp_filters_table_headers.size() <= 0) {
-              comp_filters_table_headers = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+              std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
               for (const auto& meta_data : application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureFilter().component_qcs.at(0).meta_value_qc) {
-                comp_filters_table_headers.push_back("metaValue_" + meta_data.first + "_l");
-                comp_filters_table_headers.push_back("metaValue_" + meta_data.first + "_u");
+                tmp.push_back("metaValue_" + meta_data.first + "_l");
+                tmp.push_back("metaValue_" + meta_data.first + "_u");
               }
+              comp_filters_table_headers.resize((int)tmp.size());
+              for (int i=0;i<tmp.size();++i) comp_filters_table_headers(i) = tmp.at(i);
             }
             const int n_cols = comp_filters_table_headers.size();
 
             // Make the comp_filters table body
             const int n_rows = application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureFilter().component_qcs.size();
             if (comp_filters_table_body.size() <= 0 && n_rows > 0) {
-              comp_filters_table_body.resize(n_cols);
-              for (size_t col = 0; col < n_cols; ++col) {
-                comp_filters_table_body.at(col).resize(n_rows);
-              }
+              comp_filters_table_body.resize(n_rows,n_cols);
               int col = 0, row = 0;
               for (const auto& comp_qcs : application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureFilter().component_qcs) {
-                comp_filters_table_body.at(col).at(row) = comp_qcs.component_name;
+                comp_filters_table_body(row,col) = comp_qcs.component_name;
                 ++col;
-                comp_filters_table_body.at(col).at(row) = std::to_string(comp_qcs.retention_time_l);
+                comp_filters_table_body(row,col) = std::to_string(comp_qcs.retention_time_l);
                 ++col;
-                comp_filters_table_body.at(col).at(row) = std::to_string(comp_qcs.retention_time_u);
+                comp_filters_table_body(row,col) = std::to_string(comp_qcs.retention_time_u);
                 ++col;
-                comp_filters_table_body.at(col).at(row) = std::to_string(comp_qcs.intensity_l);
+                comp_filters_table_body(row,col) = std::to_string(comp_qcs.intensity_l);
                 ++col;
-                comp_filters_table_body.at(col).at(row) = std::to_string(comp_qcs.intensity_u);
+                comp_filters_table_body(row,col) = std::to_string(comp_qcs.intensity_u);
                 ++col;
-                comp_filters_table_body.at(col).at(row) = std::to_string(comp_qcs.overall_quality_l);
+                comp_filters_table_body(row,col) = std::to_string(comp_qcs.overall_quality_l);
                 ++col;
-                comp_filters_table_body.at(col).at(row) = std::to_string(comp_qcs.overall_quality_u);
+                comp_filters_table_body(row,col) = std::to_string(comp_qcs.overall_quality_u);
                 ++col;
                 for (const auto& meta_data : comp_qcs.meta_value_qc) {
-                  comp_filters_table_body.at(col).at(row) = std::to_string(meta_data.second.first);
+                  comp_filters_table_body(row,col) = std::to_string(meta_data.second.first);
                   ++col;
-                  comp_filters_table_body.at(col).at(row) = std::to_string(meta_data.second.second);
+                  comp_filters_table_body(row,col) = std::to_string(meta_data.second.second);
                   ++col;
                 }
                 col = 0;
                 ++row;
               }
-              comp_filters_table_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, comp_filters_table_checked_rows);
             }
           }
 
@@ -1132,7 +1088,6 @@ int main(int argc, char **argv)
           GenericTableWidget Table;
           Table.headers_ = comp_filters_table_headers;
           Table.columns_ = comp_filters_table_body;
-          Table.checked_rows_ = comp_filters_table_checked_rows;
           Table.table_id_ = "CompFiltersMainWindow";
           Table.draw();
           ImGui::EndTabItem();
@@ -1142,84 +1097,81 @@ int main(int argc, char **argv)
           if (application_handler_.sequenceHandler_.getSequenceSegments().size() > 0) {
             // Make the comp_group_filters table headers
             if (comp_group_filters_table_headers.size() <= 0) {
-              comp_group_filters_table_headers = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+              std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
                 "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
                 "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
               for (const auto& meta_data : application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureFilter().component_group_qcs.at(0).meta_value_qc) {
-                comp_group_filters_table_headers.push_back("metaValue_" + meta_data.first + "_l");
-                comp_group_filters_table_headers.push_back("metaValue_" + meta_data.first + "_u");
+                tmp.push_back("metaValue_" + meta_data.first + "_l");
+                tmp.push_back("metaValue_" + meta_data.first + "_u");
               }
+              comp_group_filters_table_headers.resize((int)tmp.size());
+              for (int i = 0; i < tmp.size(); ++i) comp_group_filters_table_headers(i) = tmp.at(i);
             }
             const int n_cols = comp_group_filters_table_headers.size();
 
             // Make the comp_group_filters table body
             const int n_rows = application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureFilter().component_group_qcs.size();
             if (comp_group_filters_table_body.size() <= 0 && n_rows > 0) {
-              comp_group_filters_table_body.resize(n_cols);
-              for (size_t col = 0; col < n_cols; ++col) {
-                comp_group_filters_table_body.at(col).resize(n_rows);
-              }
+              comp_group_filters_table_body.resize(n_rows,n_cols);
               int col = 0, row = 0;
               for (const auto& comp_group_qcs : application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureFilter().component_group_qcs) {
-                comp_group_filters_table_body.at(col).at(row) = comp_group_qcs.component_group_name;
+                comp_group_filters_table_body(row,col) = comp_group_qcs.component_group_name;
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.retention_time_l);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.retention_time_l);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.retention_time_u);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.retention_time_u);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.intensity_l);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.intensity_l);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.intensity_u);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.intensity_u);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.overall_quality_l);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.overall_quality_l);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.overall_quality_u);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.overall_quality_u);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_heavy_l);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_heavy_l);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_heavy_u);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_heavy_u);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_light_l);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_light_l);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_light_u);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_light_u);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_detecting_l);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_detecting_l);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_detecting_u);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_detecting_u);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_quantifying_l);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_quantifying_l);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_quantifying_u);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_quantifying_u);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_identifying_l);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_identifying_l);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_identifying_u);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_identifying_u);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_transitions_l);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_transitions_l);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_transitions_u);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.n_transitions_u);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = comp_group_qcs.ion_ratio_pair_name_1;
+                comp_group_filters_table_body(row,col) = comp_group_qcs.ion_ratio_pair_name_1;
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = comp_group_qcs.ion_ratio_pair_name_2;
+                comp_group_filters_table_body(row,col) = comp_group_qcs.ion_ratio_pair_name_2;
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.ion_ratio_l);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.ion_ratio_l);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = std::to_string(comp_group_qcs.ion_ratio_u);
+                comp_group_filters_table_body(row,col) = std::to_string(comp_group_qcs.ion_ratio_u);
                 ++col;
-                comp_group_filters_table_body.at(col).at(row) = comp_group_qcs.ion_ratio_feature_name;
+                comp_group_filters_table_body(row,col) = comp_group_qcs.ion_ratio_feature_name;
                 ++col;
                 for (const auto& meta_data : comp_group_qcs.meta_value_qc) {
-                  comp_group_filters_table_body.at(col).at(row) = std::to_string(meta_data.second.first);
+                  comp_group_filters_table_body(row,col) = std::to_string(meta_data.second.first);
                   ++col;
-                  comp_group_filters_table_body.at(col).at(row) = std::to_string(meta_data.second.second);
+                  comp_group_filters_table_body(row,col) = std::to_string(meta_data.second.second);
                   ++col;
                 }
                 col = 0;
                 ++row;
               }
-              comp_group_filters_table_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, comp_group_filters_table_checked_rows);
             }
           }
 
@@ -1227,7 +1179,6 @@ int main(int argc, char **argv)
           GenericTableWidget Table;
           Table.headers_ = comp_group_filters_table_headers;
           Table.columns_ = comp_group_filters_table_body;
-          Table.checked_rows_ = comp_group_filters_table_checked_rows;
           Table.table_id_ = "CompGroupFiltersMainWindow";
           Table.draw();
           ImGui::EndTabItem();
@@ -1237,48 +1188,45 @@ int main(int argc, char **argv)
           if (application_handler_.sequenceHandler_.getSequenceSegments().size() > 0) {
             // Make the comp_qcs table headers
             if (comp_qcs_table_headers.size() <= 0) {
-              comp_qcs_table_headers = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+              std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
               for (const auto& meta_data : application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureQC().component_qcs.at(0).meta_value_qc) {
-                comp_qcs_table_headers.push_back("metaValue_" + meta_data.first + "_l");
-                comp_qcs_table_headers.push_back("metaValue_" + meta_data.first + "_u");
+                tmp.push_back("metaValue_" + meta_data.first + "_l");
+                tmp.push_back("metaValue_" + meta_data.first + "_u");
               }
+              comp_qcs_table_headers.resize((int)tmp.size());
+              for (int i = 0; i < tmp.size(); ++i) comp_qcs_table_headers(i) = tmp.at(i);
             }
             const int n_cols = comp_qcs_table_headers.size();
 
             // Make the comp_qcs table body
             const int n_rows = application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureQC().component_qcs.size();
             if (comp_qcs_table_body.size() <= 0 && n_rows > 0) {
-              comp_qcs_table_body.resize(n_cols);
-              for (size_t col = 0; col < n_cols; ++col) {
-                comp_qcs_table_body.at(col).resize(n_rows);
-              }
+              comp_qcs_table_body.resize(n_rows,n_cols);
               int col = 0, row = 0;
               for (const auto& comp_qcs : application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureQC().component_qcs) {
-                comp_qcs_table_body.at(col).at(row) = comp_qcs.component_name;
+                comp_qcs_table_body(row,col) = comp_qcs.component_name;
                 ++col;
-                comp_qcs_table_body.at(col).at(row) = std::to_string(comp_qcs.retention_time_l);
+                comp_qcs_table_body(row,col) = std::to_string(comp_qcs.retention_time_l);
                 ++col;
-                comp_qcs_table_body.at(col).at(row) = std::to_string(comp_qcs.retention_time_u);
+                comp_qcs_table_body(row,col) = std::to_string(comp_qcs.retention_time_u);
                 ++col;
-                comp_qcs_table_body.at(col).at(row) = std::to_string(comp_qcs.intensity_l);
+                comp_qcs_table_body(row,col) = std::to_string(comp_qcs.intensity_l);
                 ++col;
-                comp_qcs_table_body.at(col).at(row) = std::to_string(comp_qcs.intensity_u);
+                comp_qcs_table_body(row,col) = std::to_string(comp_qcs.intensity_u);
                 ++col;
-                comp_qcs_table_body.at(col).at(row) = std::to_string(comp_qcs.overall_quality_l);
+                comp_qcs_table_body(row,col) = std::to_string(comp_qcs.overall_quality_l);
                 ++col;
-                comp_qcs_table_body.at(col).at(row) = std::to_string(comp_qcs.overall_quality_u);
+                comp_qcs_table_body(row,col) = std::to_string(comp_qcs.overall_quality_u);
                 ++col;
                 for (const auto& meta_data : comp_qcs.meta_value_qc) {
-                  comp_qcs_table_body.at(col).at(row) = std::to_string(meta_data.second.first);
+                  comp_qcs_table_body(row,col) = std::to_string(meta_data.second.first);
                   ++col;
-                  comp_qcs_table_body.at(col).at(row) = std::to_string(meta_data.second.second);
+                  comp_qcs_table_body(row,col) = std::to_string(meta_data.second.second);
                   ++col;
                 }
                 col = 0;
                 ++row;
               }
-              comp_qcs_table_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, comp_qcs_table_checked_rows);
             }
           }
 
@@ -1286,7 +1234,6 @@ int main(int argc, char **argv)
           GenericTableWidget Table;
           Table.headers_ = comp_qcs_table_headers;
           Table.columns_ = comp_qcs_table_body;
-          Table.checked_rows_ = comp_qcs_table_checked_rows;
           Table.table_id_ = "CompQCsMainWindow";
           Table.draw();
           ImGui::EndTabItem();
@@ -1296,84 +1243,81 @@ int main(int argc, char **argv)
           if (application_handler_.sequenceHandler_.getSequenceSegments().size() > 0) {
             // Make the comp_group_qcs table headers
             if (comp_group_qcs_table_headers.size() <= 0) {
-              comp_group_qcs_table_headers = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+              std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
                 "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
                 "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
               for (const auto& meta_data : application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureQC().component_group_qcs.at(0).meta_value_qc) {
-                comp_group_qcs_table_headers.push_back("metaValue_" + meta_data.first + "_l");
-                comp_group_qcs_table_headers.push_back("metaValue_" + meta_data.first + "_u");
+                tmp.push_back("metaValue_" + meta_data.first + "_l");
+                tmp.push_back("metaValue_" + meta_data.first + "_u");
               }
+              comp_group_qcs_table_headers.resize((int)tmp.size());
+              for (int i = 0; i < tmp.size(); ++i) comp_group_qcs_table_headers(i) = tmp.at(i);
             }
             const int n_cols = comp_group_qcs_table_headers.size();
+            const int n_rows = application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureQC().component_group_qcs.size();
 
             // Make the comp_group_qcs table body
-            const int n_rows = application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureQC().component_group_qcs.size();
             if (comp_group_qcs_table_body.size() <= 0 && n_rows > 0) {
-              comp_group_qcs_table_body.resize(n_cols);
-              for (size_t col = 0; col < n_cols; ++col) {
-                comp_group_qcs_table_body.at(col).resize(n_rows);
-              }
+              comp_group_qcs_table_body.resize(n_rows,n_cols);
               int col = 0, row = 0;
               for (const auto& comp_group_qcs : application_handler_.sequenceHandler_.getSequenceSegments().at(0).getFeatureQC().component_group_qcs) {
-                comp_group_qcs_table_body.at(col).at(row) = comp_group_qcs.component_group_name;
+                comp_group_qcs_table_body(row,col) = comp_group_qcs.component_group_name;
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.retention_time_l);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.retention_time_l);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.retention_time_u);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.retention_time_u);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.intensity_l);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.intensity_l);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.intensity_u);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.intensity_u);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.overall_quality_l);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.overall_quality_l);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.overall_quality_u);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.overall_quality_u);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_heavy_l);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_heavy_l);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_heavy_u);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_heavy_u);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_light_l);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_light_l);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_light_u);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_light_u);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_detecting_l);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_detecting_l);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_detecting_u);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_detecting_u);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_quantifying_l);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_quantifying_l);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_quantifying_u);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_quantifying_u);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_identifying_l);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_identifying_l);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_identifying_u);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_identifying_u);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_transitions_l);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_transitions_l);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.n_transitions_u);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.n_transitions_u);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = comp_group_qcs.ion_ratio_pair_name_1;
+                comp_group_qcs_table_body(row,col) = comp_group_qcs.ion_ratio_pair_name_1;
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = comp_group_qcs.ion_ratio_pair_name_2;
+                comp_group_qcs_table_body(row,col) = comp_group_qcs.ion_ratio_pair_name_2;
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.ion_ratio_l);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.ion_ratio_l);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = std::to_string(comp_group_qcs.ion_ratio_u);
+                comp_group_qcs_table_body(row,col) = std::to_string(comp_group_qcs.ion_ratio_u);
                 ++col;
-                comp_group_qcs_table_body.at(col).at(row) = comp_group_qcs.ion_ratio_feature_name;
+                comp_group_qcs_table_body(row,col) = comp_group_qcs.ion_ratio_feature_name;
                 ++col;
                 for (const auto& meta_data : comp_group_qcs.meta_value_qc) {
-                  comp_group_qcs_table_body.at(col).at(row) = std::to_string(meta_data.second.first);
+                  comp_group_qcs_table_body(row,col) = std::to_string(meta_data.second.first);
                   ++col;
-                  comp_group_qcs_table_body.at(col).at(row) = std::to_string(meta_data.second.second);
+                  comp_group_qcs_table_body(row,col) = std::to_string(meta_data.second.second);
                   ++col;
                 }
                 col = 0;
                 ++row;
               }
-              comp_group_qcs_table_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, comp_group_qcs_table_checked_rows);
             }
           }
 
@@ -1381,7 +1325,6 @@ int main(int argc, char **argv)
           GenericTableWidget Table;
           Table.headers_ = comp_group_qcs_table_headers;
           Table.columns_ = comp_group_qcs_table_body;
-          Table.checked_rows_ = comp_group_qcs_table_checked_rows;
           Table.table_id_ = "CompGroupQCsMainWindow";
           Table.draw();
           ImGui::EndTabItem();
@@ -1396,11 +1339,19 @@ int main(int argc, char **argv)
               for (const std::pair<FeatureMetadata, std::string>& p : metadatafloatToString) meta_data.push_back(p.second);
               std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
               for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
-              SequenceParser::makeDataTableFromMetaValue(application_handler_.sequenceHandler_, feature_table_body, feature_table_headers, meta_data, sample_types);
+              std::vector<std::vector<std::string>> table;
+              std::vector<std::string> headers;
+              SequenceParser::makeDataTableFromMetaValue(application_handler_.sequenceHandler_, table, headers, meta_data, sample_types);
               const int n_cols = feature_table_headers.size();
               const int n_rows = feature_table_body.size();
-              feature_table_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, feature_table_checked_rows);
+              feature_table_headers.resize(n_cols);
+              feature_table_body.resize(n_rows,n_cols);
+              for (int row = 0; row < n_rows; ++row) {
+                for (int col = 0; col < n_cols; ++col) {
+                  if (row == 0) feature_table_headers(col) = headers.at(col);
+                  feature_table_body(row, col) = table.at(row).at(col);
+                }
+              }
             }
           }
 
@@ -1408,9 +1359,7 @@ int main(int argc, char **argv)
           GenericTableWidget Table;
           Table.headers_ = feature_table_headers;
           Table.columns_ = feature_table_body;
-          Table.checked_rows_ = feature_table_checked_rows;
           Table.table_id_ = "features(table)MainWindow";
-          Table.is_columnar_ = false;
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -1426,56 +1375,48 @@ int main(int argc, char **argv)
               std::vector<std::string> meta_data = { "calculated_concentration" };
               std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
               for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
-              std::vector<SequenceParser::Row> rows_out;
+              Eigen::Tensor<std::string, 2> rows_out;
               SequenceParser::makeDataMatrixFromMetaValue(application_handler_.sequenceHandler_, feat_value_data, feat_heatmap_col_labels, rows_out, meta_data, sample_types);
-              
+              feat_heatmap_data.resize(feat_value_data.dimensions());
+              feat_heatmap_data = feat_value_data.swap_layout();
+
               // make the injection index for the line plot
               const int n_samples = feat_heatmap_col_labels.size();
-              const int n_rows = rows_out.size();
-              std::vector<float> sample_data;
-              for (float i = 0; i < n_samples; i += 1) sample_data.push_back(i);
-              for (size_t i = 0; i < n_rows; ++i) feat_sample_data.push_back(sample_data);
+              const int n_rows = rows_out.dimension(0);
+              for (float i = 0; i < n_samples; i += 1) feat_sample_data.chip(i, 1) = feat_sample_data.chip(i, 1).constant(i);
               feat_line_sample_min = 0;
               feat_line_sample_max = n_samples - 1;
+              const Eigen::Tensor<float,0> feat_value_data_maximum = feat_value_data.maximum();
+              feat_value_max = feat_value_data_maximum(0);
+              const Eigen::Tensor<float, 0> feat_value_data_minimum = feat_value_data.minimum();
+              feat_value_min = feat_value_data_minimum(0);
 
               // update the pivot table headers with the columns for the pivot table/heatmap rows
-              feature_pivot_table_headers = feat_heatmap_col_labels;
-              feature_pivot_table_headers.insert(feature_pivot_table_headers.begin(), "meta_value_name");
-              feature_pivot_table_headers.insert(feature_pivot_table_headers.begin(), "component_group_name");
-              feature_pivot_table_headers.insert(feature_pivot_table_headers.begin(), "component_name");
+              feature_pivot_table_headers.resize((int)feat_heatmap_col_labels.size() + 3);
+              feature_pivot_table_headers(0) = "meta_value_name";
+              feature_pivot_table_headers(1) = "component_group_name";
+              feature_pivot_table_headers(2) = "component_name";
+              feature_pivot_table_headers.slice(Eigen::array<Eigen::Index, 1>({ 3 }), Eigen::array<Eigen::Index, 1>({ feat_heatmap_col_labels.size() })) = feat_heatmap_col_labels;
               const int n_cols = feature_pivot_table_headers.size();
 
               // allocate space for the pivot table body and heatmap row labels
               feat_heatmap_row_labels.resize(n_rows);
-              feature_pivot_table_body.resize(n_cols);
-              feat_heatmap_data.resize(n_rows*n_samples);
-              for (size_t col = 0; col < n_cols; ++col) {
-                feature_pivot_table_body.at(col).resize(n_rows);
-              }
+              feature_pivot_table_body.resize(n_rows,n_cols);
 
               // assign the pivot table body data and heatmap row labels
-              int col = 0, row = 0;
-              for (const auto& row_out : rows_out) {
-                feat_heatmap_row_labels.at(row) = row_out.component_name + "::" + row_out.meta_value_name;
-                feature_pivot_table_body.at(col).at(row) = row_out.component_name;
-                ++col;
-                feature_pivot_table_body.at(col).at(row) = row_out.component_group_name;
-                ++col;
-                feature_pivot_table_body.at(col).at(row) = row_out.meta_value_name;
-                ++col;
-                for (const float& datum_out : feat_value_data.at(row)) {
-                  feature_pivot_table_body.at(col).at(row) = std::to_string(datum_out);
-                  feat_heatmap_data.at(row*n_samples + (col - 3)) = datum_out;
-                  feat_value_min = std::min(feat_value_min, datum_out);
-                  feat_value_max = std::max(feat_value_max, datum_out);
+              int col = 0;
+              for (int row = 0; row < n_rows;++row) {
+                feat_heatmap_row_labels(row) = rows_out(row, 0) + "::" + rows_out(row, 2);
+                for (int j = 0; j < rows_out.dimension(1); ++j) {
+                  feature_pivot_table_body(row, col) = rows_out(row,j);
+                  ++col;
+                }
+                for (int j = 0; j < feat_value_data.dimension(1); ++j) {
+                  feature_pivot_table_body(row, col) = std::to_string(feat_value_data(row, j));
                   ++col;
                 }
                 col = 0;
-                ++row;
               }
-              //feature_pivot_table_body
-              feature_pivot_table_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, feature_pivot_table_checked_rows);
             }
           }
 
@@ -1483,7 +1424,6 @@ int main(int argc, char **argv)
           GenericTableWidget Table;
           Table.headers_ = feature_pivot_table_headers;
           Table.columns_ = feature_pivot_table_body;
-          Table.checked_rows_ = feature_pivot_table_checked_rows;
           Table.table_id_ = "feature(matrix)MainWindow";
           Table.draw();
           ImGui::EndTabItem();

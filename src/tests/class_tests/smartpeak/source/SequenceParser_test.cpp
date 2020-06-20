@@ -225,9 +225,9 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
     sequenceHandler.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
   }
 
-  std::vector<std::vector<float>> data_out;
-  std::vector<std::string> columns_out;
-  std::vector<SequenceParser::Row> rows_out;
+  Eigen::Tensor<float, 2> data_out;
+  Eigen::Tensor<std::string, 1> columns_out;
+  Eigen::Tensor<std::string, 2> rows_out;
 
   const vector<string> meta_data = {
     "calculated_concentration",
@@ -240,11 +240,12 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types);
 
   BOOST_CHECK_EQUAL(columns_out.size(), 6);
-  BOOST_CHECK_EQUAL(columns_out[0], "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(rows_out.size(), 636);
-  BOOST_CHECK_EQUAL(rows_out[0].component_group_name, "23dpg");
-  BOOST_CHECK_CLOSE(data_out.front().front(), 15.6053667, 1e-3);
-  BOOST_CHECK_CLOSE(data_out.back().back(), 1.66744995, 1e-3);
+  BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(rows_out.dimension(0), 636);
+  BOOST_CHECK_EQUAL(rows_out.dimension(1), 3);
+  BOOST_CHECK_EQUAL(rows_out(0,1), "23dpg");
+  BOOST_CHECK_CLOSE(data_out(0,0), 15.6053667, 1e-3);
+  BOOST_CHECK_CLOSE(data_out(rows_out.dimension(0)-1,columns_out.size()-1), 1.66744995, 1e-3);
 
   // write sequence to output
   // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataMatrixFromMetaValue.csv");
