@@ -43,21 +43,21 @@ int main(int argc, char **argv)
 {
   // data for the injection explorer
   static Eigen::Tensor<std::string, 1> injection_explorer_headers;
-  static Eigen::Tensor<std::string, 1> injection_explorer_checkbox_headers(3);
+  static Eigen::Tensor<std::string, 1> injection_explorer_checkbox_headers;
   static Eigen::Tensor<std::string, 2> injection_explorer_body;
-  static Eigen::Tensor<bool, 3> injection_explorer_checkbox_body;
+  static Eigen::Tensor<bool, 2> injection_explorer_checkbox_body;
   static Eigen::Tensor<bool, 1> injection_explorer_checked_rows;
   // data for the transition explorer
   static Eigen::Tensor<std::string, 1> transition_explorer_headers;
-  static Eigen::Tensor<std::string, 1> transition_explorer_checkbox_headers(3);
+  static Eigen::Tensor<std::string, 1> transition_explorer_checkbox_headers;
   static Eigen::Tensor<std::string, 2> transition_explorer_body;
-  static Eigen::Tensor<bool, 3> transition_explorer_checkbox_body;
+  static Eigen::Tensor<bool, 2> transition_explorer_checkbox_body;
   Eigen::Tensor<bool, 1> transition_explorer_checked_rows;
   // data for the feature explorer
   static Eigen::Tensor<std::string, 1> feature_explorer_headers;
-  static Eigen::Tensor<std::string, 1> feature_explorer_checkbox_headers(3);
+  static Eigen::Tensor<std::string, 1> feature_explorer_checkbox_headers;
   static Eigen::Tensor<std::string, 2> feature_explorer_body;
-  static Eigen::Tensor<bool, 3> feature_explorer_checkbox_body;
+  static Eigen::Tensor<bool, 2> feature_explorer_checkbox_body;
   static Eigen::Tensor<bool, 1> feature_explorer_checked_rows;
   // data for the sequence table
   static Eigen::Tensor<std::string, 1> sequence_table_headers;
@@ -584,11 +584,11 @@ int main(int argc, char **argv)
         if (show_injection_explorer && ImGui::BeginTabItem("Injections", &show_injection_explorer))
         {
           // Make the injection explorer headers
-          if (injection_explorer_headers.size() <= 0) {
+          if (injection_explorer_headers.size() <= 0 && injection_explorer_checkbox_headers.size() <=0) {
             injection_explorer_headers.resize(2);
             injection_explorer_headers.setValues({"inj#", "sample_name" });
             injection_explorer_checkbox_headers.resize(3);
-            injection_explorer_headers.setValues({ "workflow", "plot", "table" });
+            injection_explorer_checkbox_headers.setValues({ "workflow", "plot", "table" });
           }
           const int n_cols = injection_explorer_headers.size();
           const int n_rows = application_handler_.sequenceHandler_.getSequence().size();
@@ -605,10 +605,10 @@ int main(int argc, char **argv)
               col = 0;
               ++row;
             }
-            injection_explorer_checkbox_body.resize(n_rows,3);
-            Widget::makeCheckedRows(n_rows, injection_explorer_checkbox_body.data());
+            injection_explorer_checkbox_body.resize(n_rows,(int)injection_explorer_checkbox_headers.size());
+            injection_explorer_checkbox_body.setConstant(true);
             injection_explorer_checked_rows.resize(n_rows);
-            Widget::makeCheckedRows(n_rows, injection_explorer_checked_rows.data());
+            injection_explorer_checked_rows.setConstant(true);
           }
 
           // Call the Explorer widget
@@ -616,7 +616,8 @@ int main(int argc, char **argv)
           Explorer.headers_ = injection_explorer_headers;
           Explorer.columns_ = injection_explorer_body;
           Explorer.checked_rows_ = injection_explorer_checked_rows;
-          Explorer.check_boxes_ = injection_explorer_checkbox_body;
+          Explorer.checkbox_headers_ = injection_explorer_checkbox_headers;
+          Explorer.checkbox_columns_ = injection_explorer_checkbox_body;
           Explorer.table_id_ = "InjectionsExplorerWindow";
           Explorer.draw();
 
@@ -625,11 +626,13 @@ int main(int argc, char **argv)
         if (show_transitions_explorer && ImGui::BeginTabItem("Transitions", &show_transitions_explorer))
         {
           // Make the transition explorer headers
-          if (transition_explorer_headers.size() <= 0) {
-            transition_explorer_headers.resize(5);
-            transition_explorer_headers.setValues({"transition_group","transition_name", "workflow", "plot", "table" });
+          if (transition_explorer_headers.size() <= 0 && transition_explorer_checkbox_headers.size()<=0) {
+            transition_explorer_headers.resize(2);
+            transition_explorer_headers.setValues({"transition_group","transition_name"});
+            transition_explorer_checkbox_headers.resize(3);
+            transition_explorer_checkbox_headers.setValues({ "workflow", "plot", "table" });
           }
-          const int n_cols = transition_explorer_headers.size() - 3;
+          const int n_cols = transition_explorer_headers.size();
 
           // Make the transition table body
           if (application_handler_.sequenceHandler_.getSequence().size() > 0) {
@@ -645,14 +648,10 @@ int main(int argc, char **argv)
                 col = 0;
                 ++row;
               }
-              transition_explorer_workflow_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, transition_explorer_workflow_checked_rows);
-              transition_explorer_plot_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, transition_explorer_plot_checked_rows);
-              transition_explorer_table_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, transition_explorer_table_checked_rows);
-              transition_explorer_checked_rows = new bool[n_rows];
-              Widget::makeCheckedRows(n_rows, transition_explorer_checked_rows);
+              transition_explorer_checkbox_body.resize(n_rows, (int)transition_explorer_checkbox_headers.size());
+              transition_explorer_checkbox_body.setConstant(true);
+              transition_explorer_checked_rows.resize(n_rows);
+              transition_explorer_checked_rows.setConstant(true);
             }
           }
 
@@ -661,9 +660,8 @@ int main(int argc, char **argv)
           Explorer.headers_ = transition_explorer_headers;
           Explorer.columns_ = transition_explorer_body;
           Explorer.checked_rows_ = transition_explorer_checked_rows;
-          Explorer.checked_rows_1_ = transition_explorer_workflow_checked_rows;
-          Explorer.checked_rows_2_ = transition_explorer_plot_checked_rows;
-          Explorer.checked_rows_3_ = transition_explorer_table_checked_rows;
+          Explorer.checkbox_headers_ = transition_explorer_checkbox_headers;
+          Explorer.checkbox_columns_ = transition_explorer_checkbox_body;
           Explorer.table_id_ = "TransitionsExplorerWindow";
           Explorer.draw();
           ImGui::EndTabItem();
@@ -672,11 +670,12 @@ int main(int argc, char **argv)
         {
           // Make the feature explorer headers
           if (feature_explorer_headers.size() <= 0) {
-            feature_explorer_headers.resize(4);
-            feature_explorer_headers.setValues({
-          "metavalue", "workflow", "plot", "table" });
+            feature_explorer_headers.resize(1);
+            feature_explorer_headers.setValues({ "metavalue" });
+            feature_explorer_checkbox_headers.resize(2);
+            feature_explorer_checkbox_headers.setValues({ "plot", "table" });
           }
-          const int n_cols = feature_explorer_headers.size() - 3;
+          const int n_cols = feature_explorer_headers.size();
           const int n_rows = metadatafloatToString.size();
 
           // Make the feature explorer body
@@ -688,14 +687,10 @@ int main(int argc, char **argv)
               col = 0;
               ++row;
             }
-            feature_explorer_workflow_checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, feature_explorer_workflow_checked_rows);
-            feature_explorer_plot_checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, feature_explorer_plot_checked_rows);
-            feature_explorer_table_checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, feature_explorer_table_checked_rows);
-            feature_explorer_checked_rows = new bool[n_rows];
-            Widget::makeCheckedRows(n_rows, feature_explorer_checked_rows);
+            feature_explorer_checkbox_body.resize(n_rows, (int)feature_explorer_checkbox_headers.size());
+            feature_explorer_checkbox_body.setConstant(true);
+            feature_explorer_checked_rows.resize(n_rows);
+            feature_explorer_checked_rows.setConstant(true);
           }
 
           // Call the Explorer widget
@@ -703,9 +698,8 @@ int main(int argc, char **argv)
           Explorer.headers_ = feature_explorer_headers;
           Explorer.columns_ = feature_explorer_body;
           Explorer.checked_rows_ = feature_explorer_checked_rows;
-          Explorer.checked_rows_1_ = feature_explorer_workflow_checked_rows;
-          Explorer.checked_rows_2_ = feature_explorer_plot_checked_rows;
-          Explorer.checked_rows_3_ = feature_explorer_table_checked_rows;
+          Explorer.checkbox_headers_ = feature_explorer_checkbox_headers;
+          Explorer.checkbox_columns_ = feature_explorer_checkbox_body;
           Explorer.table_id_ = "FeaturesExplorerWindow";
           Explorer.draw();
           ImGui::EndTabItem();
@@ -1378,11 +1372,12 @@ int main(int argc, char **argv)
               Eigen::Tensor<std::string, 2> rows_out;
               SequenceParser::makeDataMatrixFromMetaValue(application_handler_.sequenceHandler_, feat_value_data, feat_heatmap_col_labels, rows_out, meta_data, sample_types);
               feat_heatmap_data.resize(feat_value_data.dimensions());
-              feat_heatmap_data = feat_value_data.swap_layout();
+              feat_heatmap_data = feat_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({1,0}));
 
               // make the injection index for the line plot
               const int n_samples = feat_heatmap_col_labels.size();
               const int n_rows = rows_out.dimension(0);
+              feat_sample_data.resize(n_rows, n_samples);
               for (float i = 0; i < n_samples; i += 1) feat_sample_data.chip(i, 1) = feat_sample_data.chip(i, 1).constant(i);
               feat_line_sample_min = 0;
               feat_line_sample_max = n_samples - 1;
@@ -1518,8 +1513,8 @@ int main(int argc, char **argv)
         {
           // Show the line plot
           LinePlot2DWidget plot2d;
-          plot2d.x_data_ = feat_sample_data;
-          plot2d.y_data_ = feat_value_data;
+          plot2d.x_data_ = feat_sample_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+          plot2d.y_data_ = feat_value_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
           plot2d.x_axis_title_ = feat_line_x_axis_title;
           plot2d.y_axis_title_ = feat_line_y_axis_title;
           plot2d.series_names_ = feat_heatmap_row_labels;

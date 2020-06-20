@@ -68,18 +68,6 @@ namespace SmartPeak
       const Eigen::Tensor<std::string,2>& columns, 
       std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
       std::vector<ImGuiTextFilter>& filter);
-
-    /*
-      @brief Helper method to create the checked_rows param
-
-      @example
-      static bool checked_rows[n_rows];
-      makeCheckedRows(n_rows, checked_rows);
-
-      @param[in] n_rows The number of rows
-      @param[in,out] checked_rows What rows are checked/filtered
-    */
-    static void makeCheckedRows(const std::size_t& n_rows, bool* checked_rows);
   };
 
   /**
@@ -136,8 +124,8 @@ namespace SmartPeak
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
-    Eigen::Tensor<std::string, 1> check_box_headers_;
-    Eigen::Tensor<bool, 2> check_boxes_;
+    Eigen::Tensor<std::string, 1> checkbox_headers_;
+    Eigen::Tensor<bool, 2> checkbox_columns_;
   };
 
   /**
