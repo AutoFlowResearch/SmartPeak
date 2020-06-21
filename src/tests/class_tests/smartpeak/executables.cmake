@@ -12,6 +12,7 @@ set(core_executables_list
 	SequenceProcessor_test
 	SequenceSegmentHandler_test
 	SequenceSegmentProcessor_test
+	SessionHandler_test
 	Utilities_test
 )
 

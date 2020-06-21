@@ -19,6 +19,7 @@ set(sources_list_h
 	SequenceProcessor.h
 	SequenceSegmentHandler.h
 	SequenceSegmentProcessor.h
+	SessionHandler.h
 	SharedProcessors.h
 	Utilities.h
 	WorkflowManager.h
