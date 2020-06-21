@@ -19,6 +19,7 @@ namespace SmartPeak
   public:
     Widget() = default;
     virtual ~Widget() = default;
+    Widget(const Widget &&) = delete;
 
     /**
       Interface to show the widget
@@ -91,6 +92,8 @@ namespace SmartPeak
   class GenericTableWidget : public Widget
   {
   public:
+    GenericTableWidget(const Eigen::Tensor<std::string, 1>&headers, const Eigen::Tensor<std::string, 2>&columns, const Eigen::Tensor<bool, 1>&checked_rows, const std::string&table_id)
+      : headers_(headers), columns_(columns), checked_rows_(checked_rows), table_id_(table_id) {};
     /*
     @brief Show the table
 
@@ -99,10 +102,10 @@ namespace SmartPeak
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
-    Eigen::Tensor<std::string,1> headers_;
-    Eigen::Tensor<std::string,2> columns_;
-    Eigen::Tensor<bool, 1> checked_rows_;
-    std::string table_id_;
+    const Eigen::Tensor<std::string,1>& headers_;
+    const Eigen::Tensor<std::string,2>& columns_;
+    const Eigen::Tensor<bool, 1>& checked_rows_;
+    const std::string table_id_;
   };
 
   /**
@@ -116,6 +119,8 @@ namespace SmartPeak
   class ExplorerWidget : public GenericTableWidget
   {
   public:
+    ExplorerWidget(const Eigen::Tensor<std::string, 1>&headers, const Eigen::Tensor<std::string, 2>&columns, const Eigen::Tensor<bool, 1>&checked_rows, const std::string&table_id, const Eigen::Tensor<std::string, 1>&checkbox_headers, Eigen::Tensor<bool, 2>&checkbox_columns)
+      :GenericTableWidget(headers, columns, checked_rows, table_id), checkbox_headers_(checkbox_headers), checkbox_columns_(checkbox_columns) {};
     /*
     @brief Show the explorer
 
@@ -124,8 +129,8 @@ namespace SmartPeak
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
-    Eigen::Tensor<std::string, 1> checkbox_headers_;
-    bool* checkbox_columns_;
+    const Eigen::Tensor<std::string, 1>& checkbox_headers_;
+    Eigen::Tensor<bool,2>& checkbox_columns_;
   };
 
   /**

@@ -7,16 +7,16 @@
 namespace SmartPeak
 {
   class SessionHandler {
-  private:
-    SessionHandler() = default;
+  //public:
+  //  static SessionHandler& getInstance() {
+  //    static SessionHandler instance;
+  //    return instance;
+  //  }
+  //  SessionHandler(SessionHandler const&) = delete;
+  //  void operator=(SessionHandler const&) = delete;
+  //private:
+  //  SessionHandler() = default;
   public:
-    static SessionHandler& getInstance() {
-      static SessionHandler instance;
-      return instance;
-    }
-    SessionHandler(SessionHandler const&) = delete;
-    void operator=(SessionHandler const&) = delete;
-
     void setSequenceDataAndFilters(const SequenceHandler& sequence_handler);
     void setTransitionsDataAndFilters(const SequenceHandler& sequence_handler);
     void setInjectionExplorer();

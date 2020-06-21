@@ -83,6 +83,7 @@ int main(int argc, char **argv)
   bool popup_file_picker_ = false;
 
   ApplicationHandler application_handler_;
+  SessionHandler session_handler_;
   WorkflowManager manager_;
   GuiAppender appender_;
 
@@ -503,14 +504,11 @@ int main(int argc, char **argv)
         if (show_injection_explorer && ImGui::BeginTabItem("Injections", &show_injection_explorer))
         {
           // Call the Explorer widget
-          SessionHandler::getInstance().setSequenceDataAndFilters(application_handler_.sequenceHandler_);
-          ExplorerWidget Explorer;
-          Explorer.headers_ = SessionHandler::getInstance().getInjectionExplorerHeader();
-          Explorer.columns_ = SessionHandler::getInstance().getInjectionExplorerBody();
-          Explorer.checked_rows_ = SessionHandler::getInstance().injection_explorer_checked_rows;
-          Explorer.checkbox_headers_ = SessionHandler::getInstance().injection_explorer_checkbox_headers;
-          Explorer.checkbox_columns_ = SessionHandler::getInstance().injection_explorer_checkbox_body.data();
-          Explorer.table_id_ = "InjectionsExplorerWindow";
+          session_handler_.setSequenceDataAndFilters(application_handler_.sequenceHandler_);
+          Eigen::Tensor<std::string, 1> headers = session_handler_.getInjectionExplorerHeader();
+          Eigen::Tensor<std::string, 2> body = session_handler_.getInjectionExplorerBody();
+          ExplorerWidget Explorer(headers, body,
+            session_handler_.injection_explorer_checked_rows, "InjectionsExplorerWindow", session_handler_.injection_explorer_checkbox_headers, session_handler_.injection_explorer_checkbox_body);
           Explorer.draw();
 
           ImGui::EndTabItem();
@@ -518,28 +516,20 @@ int main(int argc, char **argv)
         if (show_transitions_explorer && ImGui::BeginTabItem("Transitions", &show_transitions_explorer))
         {
           // Call the Explorer widget
-          SessionHandler::getInstance().setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          ExplorerWidget Explorer;
-          Explorer.headers_ = SessionHandler::getInstance().getTransitionExplorerHeader();
-          Explorer.columns_ = SessionHandler::getInstance().getTransitionExplorerBody();
-          Explorer.checked_rows_ = SessionHandler::getInstance().transition_explorer_checked_rows;
-          Explorer.checkbox_headers_ = SessionHandler::getInstance().transition_explorer_checkbox_headers;
-          Explorer.checkbox_columns_ = SessionHandler::getInstance().transition_explorer_checkbox_body.data();
-          Explorer.table_id_ = "TransitionsExplorerWindow";
+          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          Eigen::Tensor<std::string, 1> headers = session_handler_.getTransitionExplorerHeader();
+          Eigen::Tensor<std::string, 2> body = session_handler_.getTransitionExplorerBody();
+          ExplorerWidget Explorer(headers, body,
+            session_handler_.transition_explorer_checked_rows, "TransitionsExplorerWindow", session_handler_.transition_explorer_checkbox_headers, session_handler_.transition_explorer_checkbox_body);
           Explorer.draw();
           ImGui::EndTabItem();
         }
         if (show_features_explorer && ImGui::BeginTabItem("Features", &show_features_explorer))
         {
           // Call the Explorer widget
-          SessionHandler::getInstance().setFeatureExplorer();
-          ExplorerWidget Explorer;
-          Explorer.headers_ = SessionHandler::getInstance().feature_explorer_headers;
-          Explorer.columns_ = SessionHandler::getInstance().feature_explorer_body;
-          Explorer.checked_rows_ = SessionHandler::getInstance().feature_explorer_checked_rows;
-          Explorer.checkbox_headers_ = SessionHandler::getInstance().feature_explorer_checkbox_headers;
-          Explorer.checkbox_columns_ = SessionHandler::getInstance().feature_explorer_checkbox_body.data();
-          Explorer.table_id_ = "FeaturesExplorerWindow";
+          session_handler_.setFeatureExplorer();
+          ExplorerWidget Explorer(session_handler_.feature_explorer_headers, session_handler_.feature_explorer_body,
+            session_handler_.feature_explorer_checked_rows, "FeaturesExplorerWindow", session_handler_.feature_explorer_checkbox_headers, session_handler_.feature_explorer_checkbox_body);
           Explorer.draw();
           ImGui::EndTabItem();
         }
@@ -567,150 +557,144 @@ int main(int argc, char **argv)
         if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
         {
           // Call the table widget
-          SessionHandler::getInstance().setSequenceDataAndFilters(application_handler_.sequenceHandler_);
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().sequence_table_headers;
-          Table.columns_ = SessionHandler::getInstance().sequence_table_body;
-          Table.table_id_ = "SequenceMainWindow";
+          session_handler_.setSequenceDataAndFilters(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.sequence_table_headers, session_handler_.sequence_table_body, Eigen::Tensor<bool, 1>(), "SequenceMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
         if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
         {
           // Call the table widget
-          SessionHandler::getInstance().setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().transitions_table_headers;
-          Table.columns_ = SessionHandler::getInstance().transitions_table_body;
-          Table.table_id_ = "TransitionsMainWindow";
+          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.transitions_table_headers, session_handler_.transitions_table_body, Eigen::Tensor<bool, 1>(), "TransitionsMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
-          // Call the table widget
-          SessionHandler::getInstance().setWorkflowTable(workflow_.getCommands());
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().workflow_table_headers;
-          Table.columns_ = SessionHandler::getInstance().workflow_table_body;
-          Table.table_id_ = "WorkflowMainWindow";
-          Table.draw();
+          //// Call the table widget
+          //session_handler_.setWorkflowTable(workflow_.getCommands());
+          //GenericTableWidget Table;
+          //Table.headers_ = session_handler_.workflow_table_headers;
+          //Table.columns_ = session_handler_.workflow_table_body;
+          //Table.table_id_ = "WorkflowMainWindow";
+          //Table.draw();
           ImGui::EndTabItem();
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
         {
-          // Call the table widget
-          SessionHandler::getInstance().setParametersTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().parameters_table_headers;
-          Table.columns_ = SessionHandler::getInstance().parameters_table_body;
-          Table.table_id_ = "ParametersMainWindow";
-          Table.draw();
+          //// Call the table widget
+          //session_handler_.setParametersTable(application_handler_.sequenceHandler_);
+          //GenericTableWidget Table;
+          //Table.headers_ = session_handler_.parameters_table_headers;
+          //Table.columns_ = session_handler_.parameters_table_body;
+          //Table.table_id_ = "ParametersMainWindow";
+          //Table.draw();
           ImGui::EndTabItem();
         }
         if (show_quant_method_table && ImGui::BeginTabItem("Quantitation Method", &show_quant_method_table))
         {
-          // Call the table widget
-          SessionHandler::getInstance().setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().quant_method_table_headers;
-          Table.columns_ = SessionHandler::getInstance().quant_method_table_body;
-          Table.table_id_ = "QuantMethodMainWindow";
-          Table.draw();
+          //// Call the table widget
+          //session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          //GenericTableWidget Table;
+          //Table.headers_ = session_handler_.quant_method_table_headers;
+          //Table.columns_ = session_handler_.quant_method_table_body;
+          //Table.table_id_ = "QuantMethodMainWindow";
+          //Table.draw();
           ImGui::EndTabItem();
         }
         if (show_stds_concs_table && ImGui::BeginTabItem("Standards Concentrations", &show_stds_concs_table))
         {
-          // Call the table widget
-          SessionHandler::getInstance().setStdsConcsTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().stds_concs_table_headers;
-          Table.columns_ = SessionHandler::getInstance().stds_concs_table_body;
-          Table.table_id_ = "StdsConcsMainWindow";
-          Table.draw();
+          //// Call the table widget
+          //session_handler_.setStdsConcsTable(application_handler_.sequenceHandler_);
+          //GenericTableWidget Table;
+          //Table.headers_ = session_handler_.stds_concs_table_headers;
+          //Table.columns_ = session_handler_.stds_concs_table_body;
+          //Table.table_id_ = "StdsConcsMainWindow";
+          //Table.draw();
           ImGui::EndTabItem();
         }
         if (show_comp_filters_table && ImGui::BeginTabItem("Component Filters", &show_comp_filters_table))
         {
-          // Call the table widget
-          SessionHandler::getInstance().setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().comp_filters_table_headers;
-          Table.columns_ = SessionHandler::getInstance().comp_filters_table_body;
-          Table.table_id_ = "CompFiltersMainWindow";
-          Table.draw();
+          //// Call the table widget
+          //session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          //GenericTableWidget Table;
+          //Table.headers_ = session_handler_.comp_filters_table_headers;
+          //Table.columns_ = session_handler_.comp_filters_table_body;
+          //Table.table_id_ = "CompFiltersMainWindow";
+          //Table.draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_filters_table && ImGui::BeginTabItem("Component Group Filters", &show_comp_group_filters_table))
         {
-          // Call the table widget
-          SessionHandler::getInstance().setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().comp_group_filters_table_headers;
-          Table.columns_ = SessionHandler::getInstance().comp_group_filters_table_body;
-          Table.table_id_ = "CompGroupFiltersMainWindow";
-          Table.draw();
+          //// Call the table widget
+          //session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          //GenericTableWidget Table;
+          //Table.headers_ = session_handler_.comp_group_filters_table_headers;
+          //Table.columns_ = session_handler_.comp_group_filters_table_body;
+          //Table.table_id_ = "CompGroupFiltersMainWindow";
+          //Table.draw();
           ImGui::EndTabItem();
         }
         if (show_comp_qcs_table && ImGui::BeginTabItem("Component QCs", &show_comp_qcs_table))
         {
-          // Call the table widget
-          SessionHandler::getInstance().setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().comp_qcs_table_headers;
-          Table.columns_ = SessionHandler::getInstance().comp_qcs_table_body;
-          Table.table_id_ = "CompQCsMainWindow";
-          Table.draw();
+          //// Call the table widget
+          //session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          //GenericTableWidget Table;
+          //Table.headers_ = session_handler_.comp_qcs_table_headers;
+          //Table.columns_ = session_handler_.comp_qcs_table_body;
+          //Table.table_id_ = "CompQCsMainWindow";
+          //Table.draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_qcs_table && ImGui::BeginTabItem("Component Group QCs", &show_comp_group_qcs_table))
         {
-          // Call the table widget
-          SessionHandler::getInstance().setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().comp_group_qcs_table_headers;
-          Table.columns_ = SessionHandler::getInstance().comp_group_qcs_table_body;
-          Table.table_id_ = "CompGroupQCsMainWindow";
-          Table.draw();
+          //// Call the table widget
+          //session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          //GenericTableWidget Table;
+          //Table.headers_ = session_handler_.comp_group_qcs_table_headers;
+          //Table.columns_ = session_handler_.comp_group_qcs_table_body;
+          //Table.table_id_ = "CompGroupQCsMainWindow";
+          //Table.draw();
           ImGui::EndTabItem();
         }
         if (show_feature_table && ImGui::BeginTabItem("Features table", &show_feature_table))
         {
-          // Call the table widget
-          SessionHandler::getInstance().setFeatureTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().feature_table_headers;
-          Table.columns_ = SessionHandler::getInstance().feature_table_body;
-          Table.table_id_ = "features(table)MainWindow";
-          Table.draw();
+          //// Call the table widget
+          //session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
+          //GenericTableWidget Table;
+          //Table.headers_ = session_handler_.feature_table_headers;
+          //Table.columns_ = session_handler_.feature_table_body;
+          //Table.table_id_ = "features(table)MainWindow";
+          //Table.draw();
           ImGui::EndTabItem();
         }
         if (show_feature_pivot_table && ImGui::BeginTabItem("Features matrix", &show_feature_pivot_table))
         {
-          // Call the table widget
-          SessionHandler::getInstance().setFeatureMatrix(application_handler_.sequenceHandler_);
-          GenericTableWidget Table;
-          Table.headers_ = SessionHandler::getInstance().feature_pivot_table_headers;
-          Table.columns_ = SessionHandler::getInstance().feature_pivot_table_body;
-          Table.table_id_ = "feature(matrix)MainWindow";
-          Table.draw();
+          //// Call the table widget
+          //session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
+          //GenericTableWidget Table;
+          //Table.headers_ = session_handler_.feature_pivot_table_headers;
+          //Table.columns_ = session_handler_.feature_pivot_table_body;
+          //Table.table_id_ = "feature(matrix)MainWindow";
+          //Table.draw();
           ImGui::EndTabItem();
         }
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
         {
           // Show the line plot
-          SessionHandler::getInstance().setChromatogramScatterPlot(application_handler_.sequenceHandler_);
+          session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
           ScatterPlot2DWidget plot2d;
-          plot2d.x_data_ = SessionHandler::getInstance().chrom_time_data;
-          plot2d.y_data_ = SessionHandler::getInstance().chrom_intensity_data;
-          plot2d.x_axis_title_ = SessionHandler::getInstance().chrom_x_axis_title;
-          plot2d.y_axis_title_ = SessionHandler::getInstance().chrom_y_axis_title;
-          plot2d.series_names_ = SessionHandler::getInstance().chrom_series_names;
+          plot2d.x_data_ = session_handler_.chrom_time_data;
+          plot2d.y_data_ = session_handler_.chrom_intensity_data;
+          plot2d.x_axis_title_ = session_handler_.chrom_x_axis_title;
+          plot2d.y_axis_title_ = session_handler_.chrom_y_axis_title;
+          plot2d.series_names_ = session_handler_.chrom_series_names;
           plot2d.plot_title_ = "Chromatograms Main Window";
-          plot2d.x_min_ = SessionHandler::getInstance().chrom_time_min;
-          plot2d.x_max_ = SessionHandler::getInstance().chrom_time_max;
-          plot2d.y_min_ = SessionHandler::getInstance().chrom_intensity_min;
-          plot2d.y_max_ = SessionHandler::getInstance().chrom_intensity_max;
+          plot2d.x_min_ = session_handler_.chrom_time_min;
+          plot2d.x_max_ = session_handler_.chrom_time_max;
+          plot2d.y_min_ = session_handler_.chrom_intensity_min;
+          plot2d.y_max_ = session_handler_.chrom_intensity_max;
           plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
           plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
           plot2d.draw();
@@ -724,18 +708,18 @@ int main(int argc, char **argv)
         if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
         {
           // Show the line plot
-          SessionHandler::getInstance().setFeatureMatrix(application_handler_.sequenceHandler_);
+          session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
           LinePlot2DWidget plot2d;
-          plot2d.x_data_ = SessionHandler::getInstance().feat_sample_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
-          plot2d.y_data_ = SessionHandler::getInstance().feat_value_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
-          plot2d.x_axis_title_ = SessionHandler::getInstance().feat_line_x_axis_title;
-          plot2d.y_axis_title_ = SessionHandler::getInstance().feat_line_y_axis_title;
-          plot2d.series_names_ = SessionHandler::getInstance().feat_heatmap_row_labels;
+          plot2d.x_data_ = session_handler_.feat_sample_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+          plot2d.y_data_ = session_handler_.feat_value_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+          plot2d.x_axis_title_ = session_handler_.feat_line_x_axis_title;
+          plot2d.y_axis_title_ = session_handler_.feat_line_y_axis_title;
+          plot2d.series_names_ = session_handler_.feat_heatmap_row_labels;
           plot2d.plot_title_ = "Features(line)MainWindow";
-          plot2d.x_min_ = SessionHandler::getInstance().feat_line_sample_min;
-          plot2d.x_max_ = SessionHandler::getInstance().feat_line_sample_max;
-          plot2d.y_min_ = SessionHandler::getInstance().feat_value_min;
-          plot2d.y_max_ = SessionHandler::getInstance().feat_value_max;
+          plot2d.x_min_ = session_handler_.feat_line_sample_min;
+          plot2d.x_max_ = session_handler_.feat_line_sample_max;
+          plot2d.y_min_ = session_handler_.feat_value_min;
+          plot2d.y_max_ = session_handler_.feat_value_max;
           plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
           plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
           plot2d.draw();
@@ -744,16 +728,16 @@ int main(int argc, char **argv)
         if (show_feature_heatmap_plot && ImGui::BeginTabItem("Features (heatmap)", &show_feature_heatmap_plot))
         {
           // Show the line plot
-          SessionHandler::getInstance().setFeatureMatrix(application_handler_.sequenceHandler_);
+          session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
           Heatmap2DWidget plot2d;
-          plot2d.data_ = SessionHandler::getInstance().feat_heatmap_data;
-          plot2d.columns_ = SessionHandler::getInstance().feat_heatmap_col_labels;
-          plot2d.rows_ = SessionHandler::getInstance().feat_heatmap_row_labels;
-          plot2d.y_axis_title_ = SessionHandler::getInstance().feat_heatmap_x_axis_title;
-          plot2d.y_axis_title_ = SessionHandler::getInstance().feat_heatmap_y_axis_title;
+          plot2d.data_ = session_handler_.feat_heatmap_data;
+          plot2d.columns_ = session_handler_.feat_heatmap_col_labels;
+          plot2d.rows_ = session_handler_.feat_heatmap_row_labels;
+          plot2d.y_axis_title_ = session_handler_.feat_heatmap_x_axis_title;
+          plot2d.y_axis_title_ = session_handler_.feat_heatmap_y_axis_title;
           plot2d.plot_title_ = "Features(heatmap)MainWindow";
-          plot2d.data_min_ = SessionHandler::getInstance().feat_value_min;
-          plot2d.data_max_ = SessionHandler::getInstance().feat_value_max;
+          plot2d.data_min_ = session_handler_.feat_value_min;
+          plot2d.data_max_ = session_handler_.feat_value_max;
           plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
           plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
           plot2d.draw();
@@ -761,20 +745,20 @@ int main(int argc, char **argv)
         }
         if (show_calibrators_line_plot && ImGui::BeginTabItem("Calibrators", &show_calibrators_line_plot))
         {
-          SessionHandler::getInstance().setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
+          session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
           CalibratorsPlotWidget plot2d;
-          plot2d.x_fit_data_ = SessionHandler::getInstance().calibrators_conc_fit_data;
-          plot2d.y_fit_data_ = SessionHandler::getInstance().calibrators_feature_fit_data;
-          plot2d.x_raw_data_ = SessionHandler::getInstance().calibrators_conc_raw_data;
-          plot2d.y_raw_data_ = SessionHandler::getInstance().calibrators_feature_raw_data;
-          plot2d.x_axis_title_ = SessionHandler::getInstance().calibrators_x_axis_title;
-          plot2d.y_axis_title_ = SessionHandler::getInstance().calibrators_y_axis_title;
-          plot2d.series_names_ = SessionHandler::getInstance().calibrators_series_names;
+          plot2d.x_fit_data_ = session_handler_.calibrators_conc_fit_data;
+          plot2d.y_fit_data_ = session_handler_.calibrators_feature_fit_data;
+          plot2d.x_raw_data_ = session_handler_.calibrators_conc_raw_data;
+          plot2d.y_raw_data_ = session_handler_.calibrators_feature_raw_data;
+          plot2d.x_axis_title_ = session_handler_.calibrators_x_axis_title;
+          plot2d.y_axis_title_ = session_handler_.calibrators_y_axis_title;
+          plot2d.series_names_ = session_handler_.calibrators_series_names;
           plot2d.plot_title_ = "CalibratorsMainWindow";
-          plot2d.x_min_ = SessionHandler::getInstance().calibrators_conc_min;
-          plot2d.x_max_ = SessionHandler::getInstance().calibrators_conc_max;
-          plot2d.y_min_ = SessionHandler::getInstance().calibrators_feature_min;
-          plot2d.y_max_ = SessionHandler::getInstance().calibrators_feature_max;
+          plot2d.x_min_ = session_handler_.calibrators_conc_min;
+          plot2d.x_max_ = session_handler_.calibrators_conc_max;
+          plot2d.y_min_ = session_handler_.calibrators_feature_min;
+          plot2d.y_max_ = session_handler_.calibrators_feature_max;
           plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
           plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
           plot2d.draw();
