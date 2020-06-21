@@ -102,10 +102,10 @@ namespace SmartPeak
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
-    const Eigen::Tensor<std::string,1>& headers_;
+    const Eigen::Tensor<std::string,1>& headers_; // keep these `const` and references so that the data is not copied on each call!
     const Eigen::Tensor<std::string,2>& columns_;
     const Eigen::Tensor<bool, 1>& checked_rows_;
-    const std::string table_id_;
+    const std::string table_id_; // keep this `const` and non-reference so that the table is not built de-novo on each call!
   };
 
   /**
