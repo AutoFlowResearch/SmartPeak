@@ -632,8 +632,9 @@ namespace SmartPeak
         //std::vector<std::string> meta_data = { "calculated_concentration" };
         std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
         for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
+        std::set<std::string> sample_names, component_names;
         Eigen::Tensor<std::string, 2> rows_out;
-        SequenceParser::makeDataMatrixFromMetaValue(sequence_handler, feat_value_data, feat_heatmap_col_labels, rows_out, meta_data, sample_types);
+        SequenceParser::makeDataMatrixFromMetaValue(sequence_handler, feat_value_data, feat_heatmap_col_labels, rows_out, meta_data, sample_types, sample_names, component_names);
         setFeatureLinePlot();
         setFeatureHeatMap();
         // update the pivot table headers with the columns for the pivot table/heatmap rows

@@ -341,7 +341,9 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 1>& columns_out,
     Eigen::Tensor<std::string, 2>& rows_out,
     const std::vector<std::string>& meta_data,
-    const std::set<SampleType>& sample_types
+    const std::set<SampleType>& sample_types,
+    const std::set<std::string>& sample_names,
+    const std::set<std::string>& component_names
   )
   {
     std::set<std::string> columns;
@@ -351,31 +353,29 @@ namespace SmartPeak
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
       std::map<std::string, float> validation_metrics = sampleHandler.getRawData().getValidationMetrics();
-      const SampleType st = mdh.getSampleType();
-      if (sample_types.count(st) == 0) {
-        continue;
-      }
       const std::string& sample_name = mdh.getSampleName();
-      data_dict.insert({sample_name, std::map<Row,float,Row_less>()});
+      if (sample_names.size() && sample_names.count(sample_name) == 0) continue;
+      if (sample_types.count(mdh.getSampleType()) == 0) continue;
+      data_dict.insert({ sample_name, std::map<Row,float,Row_less>() });
       for (const std::string& meta_value_name : meta_data) {
         // feature_map_history is not needed here as we are only interested in the current/"used" features
         for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
-          const std::string component_group_name = feature.getMetaValue(s_PeptideRef).toString();
           for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
+            if (component_names.size() && component_names.count(subordinate.getMetaValue(s_native_id).toString()) == 0) continue;
             if (subordinate.metaValueExists("used_")) {
               const std::string used = subordinate.getMetaValue("used_").toString();
-                if (used.empty() || used[0] == 'f' || used[0] == 'F')
-                  continue;
+              if (used.empty() || used[0] == 'f' || used[0] == 'F') continue;
             }
             const Row row_tuple_name(
-              component_group_name,
+              feature.getMetaValue(s_PeptideRef).toString(),
               subordinate.getMetaValue(s_native_id).toString(),
               meta_value_name
             );
             CastValue datum;
             if (meta_value_name == "accuracy" || meta_value_name == "n_features") {
               datum = validation_metrics.at(meta_value_name);
-            } else {
+            }
+            else {
               datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
             }
             if (meta_value_name == "validation") {
@@ -445,7 +445,7 @@ namespace SmartPeak
     for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
     }
-    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_strings, sample_types);
+    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>());
 
     std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
     for (int i=0;i<columns.size();++i) headers.push_back(columns(i));

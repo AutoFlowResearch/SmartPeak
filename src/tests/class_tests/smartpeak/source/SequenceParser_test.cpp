@@ -237,7 +237,7 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   // const vector<string> meta_data = {"calculated_concentration"};
   const set<SampleType> sample_types = {SampleType::Unknown};
 
-  SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types);
+  SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>());
 
   BOOST_CHECK_EQUAL(columns_out.size(), 6);
   BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");

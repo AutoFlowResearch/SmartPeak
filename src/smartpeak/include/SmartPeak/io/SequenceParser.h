@@ -106,16 +106,18 @@ public:
       Eigen::Tensor<float,2>& data_out,
       Eigen::Tensor<std::string, 1>& columns_out,
       Eigen::Tensor<std::string, 2>& rows_out,
-      const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
+      const std::vector<std::string>& meta_data,
+      const std::set<SampleType>& sample_types,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_names
     );
 
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
     static bool writeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::vector<FeatureMetadata>& meta_data = {FeatureMetadata::calculated_concentration},
-      const std::set<SampleType>& sample_types = std::set<SampleType>({SampleType::Unknown})
+      const std::vector<FeatureMetadata>& meta_data,
+      const std::set<SampleType>& sample_types
     );
   };
 }
