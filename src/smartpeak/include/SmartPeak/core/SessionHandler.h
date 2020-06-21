@@ -6,9 +6,21 @@
 
 namespace SmartPeak
 {
-  struct SessionHandler {
-    void setInjectionExplorer(const SequenceHandler& sequence_handler);
-    void setTransitionExplorer(const SequenceHandler& sequence_handler);
+  class SessionHandler {
+  private:
+    SessionHandler() = default;
+  public:
+    static SessionHandler& getInstance() {
+      static SessionHandler instance;
+      return instance;
+    }
+    SessionHandler(SessionHandler const&) = delete;
+    void operator=(SessionHandler const&) = delete;
+
+    void setSequenceDataAndFilters(const SequenceHandler& sequence_handler);
+    void setTransitionsDataAndFilters(const SequenceHandler& sequence_handler);
+    void setInjectionExplorer();
+    void setTransitionExplorer();
     void setFeatureExplorer();
     void setSequenceTable(const SequenceHandler& sequence_handler);
     void setTransitionsTable(const SequenceHandler& sequence_handler);
@@ -27,16 +39,25 @@ namespace SmartPeak
     void setFeatureHeatMap();
     void setCalibratorsScatterLinePlot(const SequenceHandler& sequence_handler);
 
+    Eigen::Tensor<std::string, 1> getInjectionExplorerHeader();
+    Eigen::Tensor<std::string, 2> getInjectionExplorerBody();
+    Eigen::Tensor<std::string, 1> getTransitionExplorerHeader();
+    Eigen::Tensor<std::string, 2> getTransitionExplorerBody();
+
+    Eigen::Tensor<bool, 1> getSequenceTableFilters();
+    Eigen::Tensor<bool, 1> getTransitionsTableFilters();
+    Eigen::Tensor<bool, 1> getQuantMethodsTableFilters();
+    Eigen::Tensor<bool, 1> getComonentFiltersTableFilters();
+    Eigen::Tensor<bool, 1> getComponentGroupFiltersTableFilters();
+    Eigen::Tensor<bool, 1> getComonentQCsTableFilters();
+    Eigen::Tensor<bool, 1> getComponentGroupQCsTableFilters();
+
     // data for the injection explorer
-    Eigen::Tensor<std::string, 1> injection_explorer_headers; // injection_number, sample_name, (sample_group_name, sequence_segment, sample_type)
     Eigen::Tensor<std::string, 1> injection_explorer_checkbox_headers;
-    Eigen::Tensor<std::string, 2> injection_explorer_body;
     Eigen::Tensor<bool, 2> injection_explorer_checkbox_body;
     Eigen::Tensor<bool, 1> injection_explorer_checked_rows;
     // data for the transition explorer
-    Eigen::Tensor<std::string, 1> transition_explorer_headers; // component_name, component_group_name
     Eigen::Tensor<std::string, 1> transition_explorer_checkbox_headers;
-    Eigen::Tensor<std::string, 2> transition_explorer_body;
     Eigen::Tensor<bool, 2> transition_explorer_checkbox_body;
     Eigen::Tensor<bool, 1> transition_explorer_checked_rows;
     // data for the feature explorer

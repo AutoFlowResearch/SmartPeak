@@ -178,10 +178,10 @@ namespace SmartPeak
               ImGui::Text("%s", columns_(row, col).c_str());
             }
             for (size_t col = 0; col < checkbox_headers_.size(); ++col) {
-              std::string id = table_id_ + std::to_string(col) + std::to_string(row*columns_.dimension(0));
+              std::string id = table_id_ + std::to_string(col) + std::to_string(row*columns_.dimension(1));
               ImGui::TableSetColumnIndex(col + headers_.size());
               ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-              ImGui::Checkbox(id.c_str(), &checkbox_columns_(row,col));
+              ImGui::Checkbox(id.c_str(), &checkbox_columns_[col + row * columns_.dimension(1)]);
               ImGui::PopStyleColor();
             }
           }

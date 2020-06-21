@@ -8,62 +8,55 @@
 
 namespace SmartPeak
 {
-  void SessionHandler::setInjectionExplorer(const SequenceHandler& sequence_handler) {
+  void SessionHandler::setSequenceDataAndFilters(const SequenceHandler & sequence_handler)
+  {
+    // Set the data for the sequence table
+    setSequenceTable(sequence_handler);
+    // Set the data for the injection explorer
+    setInjectionExplorer();
+  }
+  void SessionHandler::setTransitionsDataAndFilters(const SequenceHandler & sequence_handler)
+  {
+    // Set the data for all tables that are based on the transitions
+    setTransitionsTable(sequence_handler);
+    setQuantMethodTable(sequence_handler);
+    setComponentFiltersTable(sequence_handler);
+    setComponentGroupFiltersTable(sequence_handler);
+    setComponentQCsTable(sequence_handler);
+    setComponentGroupQCsTable(sequence_handler);
+    // Set the data for the transitions explorer
+    setTransitionExplorer();
+  }
+  void SessionHandler::setInjectionExplorer(){//(const SequenceHandler& sequence_handler) {
     // Make the injection explorer headers
-    if (injection_explorer_headers.size() <= 0 && injection_explorer_checkbox_headers.size() <= 0) {
-      injection_explorer_headers.resize(2);
-      injection_explorer_headers.setValues({ "inj#", "sample_name" });
+    if (injection_explorer_checkbox_headers.size() <= 0) {
       injection_explorer_checkbox_headers.resize(3);
       injection_explorer_checkbox_headers.setValues({ "workflow", "plot", "table" });
     }
-    const int n_cols = injection_explorer_headers.size();
-    const int n_rows = sequence_handler.getSequence().size();
+    const int n_rows = sequence_table_body.dimension(0);
     // Make the injection explorer body
-    if (injection_explorer_body.size() <= 0 && n_rows > 0) {
-
-      injection_explorer_body.resize(n_rows, n_cols);
-      int col = 0, row = 0;
-      for (const auto& injection : sequence_handler.getSequence()) {
-        injection_explorer_body(row, col) = std::to_string(injection.getMetaData().inj_number);
-        ++col;
-        injection_explorer_body(row, col) = injection.getMetaData().sample_name;
-        col = 0;
-        ++row;
-      }
+    if (injection_explorer_checkbox_body.size() <= 0 && n_rows > 0) {
       injection_explorer_checkbox_body.resize(n_rows, (int)injection_explorer_checkbox_headers.size());
       injection_explorer_checkbox_body.setConstant(true);
+      for (int i = 1; i < injection_explorer_checkbox_body.dimension(0); ++i) injection_explorer_checkbox_body(i, 1) = false; // only the first injection
       injection_explorer_checked_rows.resize(n_rows);
       injection_explorer_checked_rows.setConstant(true);
     }
   }
-  void SessionHandler::setTransitionExplorer(const SequenceHandler& sequence_handler) {
+  void SessionHandler::setTransitionExplorer() {
     // Make the transition explorer headers
-    if (transition_explorer_headers.size() <= 0 && transition_explorer_checkbox_headers.size() <= 0) {
-      transition_explorer_headers.resize(2);
-      transition_explorer_headers.setValues({ "transition_group","transition_name" });
+    if (transition_explorer_checkbox_headers.size() <= 0) {
       transition_explorer_checkbox_headers.resize(3);
       transition_explorer_checkbox_headers.setValues({ "workflow", "plot", "table" });
     }
-    const int n_cols = transition_explorer_headers.size();
+    const int n_rows = transitions_table_body.dimension(0);
     // Make the transition table body
-    if (sequence_handler.getSequence().size() > 0) {
-      const auto& targeted_exp = sequence_handler.getSequence().at(0).getRawData().getTargetedExperiment();
-      const int n_rows = targeted_exp.getTransitions().size();
-      if (transition_explorer_body.size() <= 0 && n_rows > 0) {
-        transition_explorer_body.resize(n_rows, n_cols);
-        int col = 0, row = 0;
-        for (const auto& transition : targeted_exp.getTransitions()) {
-          transition_explorer_body(row, col) = transition.getPeptideRef();
-          ++col;
-          transition_explorer_body(row, col) = transition.getNativeID();
-          col = 0;
-          ++row;
-        }
-        transition_explorer_checkbox_body.resize(n_rows, (int)transition_explorer_checkbox_headers.size());
-        transition_explorer_checkbox_body.setConstant(true);
-        transition_explorer_checked_rows.resize(n_rows);
-        transition_explorer_checked_rows.setConstant(true);
-      }
+    if (transition_explorer_checkbox_body.size() <= 0 && n_rows > 0) {
+      transition_explorer_checkbox_body.resize(n_rows, (int)transition_explorer_checkbox_headers.size());
+      transition_explorer_checkbox_body.setConstant(true);
+      for (int i = 1; i < transition_explorer_checkbox_body.dimension(0); ++i) transition_explorer_checkbox_body(i, 1) = false; // only the first transition
+      transition_explorer_checked_rows.resize(n_rows);
+      transition_explorer_checked_rows.setConstant(true);
     }
   }
   void SessionHandler::setFeatureExplorer() {
@@ -87,6 +80,7 @@ namespace SmartPeak
       }
       feature_explorer_checkbox_body.resize(n_rows, (int)feature_explorer_checkbox_headers.size());
       feature_explorer_checkbox_body.setConstant(true);
+      for (int i = 0; i < feature_explorer_checkbox_body.dimension(0); ++i) if (i!=2) feature_explorer_checkbox_body(i, 1) = false; // only calculated_concentration
       feature_explorer_checked_rows.resize(n_rows);
       feature_explorer_checked_rows.setConstant(true);
     }
@@ -96,8 +90,8 @@ namespace SmartPeak
     if (sequence_table_headers.size() <= 0) {
       sequence_table_headers.resize(11);
       sequence_table_headers.setValues({
-      "inj_number", "sample_name", "sample_group_name" , "sequence_segment_name" , "original_filename",
-      "sample_type", "acq_method_name", "inj_volume", "inj_volume_units", "batch_name", // skipping optional members
+      "inj#", "sample_name", "sample_group_name" , "sequence_segment_name" , "sample_type", 
+      "original_filename", "acq_method_name", "inj_volume", "inj_volume_units", "batch_name", // skipping optional members
       "acquisition_date_and_time" });
     }
     const int n_cols = sequence_table_headers.size();
@@ -115,9 +109,9 @@ namespace SmartPeak
         ++col;
         sequence_table_body(row, col) = injection.getMetaData().sequence_segment_name;
         ++col;
-        sequence_table_body(row, col) = injection.getMetaData().original_filename;
-        ++col;
         sequence_table_body(row, col) = injection.getMetaData().getSampleTypeAsString();
+        ++col;
+        sequence_table_body(row, col) = injection.getMetaData().original_filename;
         ++col;
         sequence_table_body(row, col) = injection.getMetaData().acq_method_name;
         ++col;
@@ -239,7 +233,7 @@ namespace SmartPeak
       if (quant_method_table_headers.size() <= 0) {
         quant_method_table_headers.resize(20);
         quant_method_table_headers.setValues({
-          "component_name", "sequence_segment_name", "IS_name", "feature_name", "concentration_units",
+          "component_name", "feature_name", "sequence_segment_name", "IS_name", "concentration_units",
           "llod", "ulod", "lloq", "uloq", "correlation_coefficient",
           "n_points", "transformation_model",
           "transformation_model_param_slope",
@@ -261,11 +255,11 @@ namespace SmartPeak
           for (const auto& quant_method : seq_segment.getQuantitationMethods()) {
             quant_method_table_body(row, col) = quant_method.getComponentName();
             ++col;
+            quant_method_table_body(row, col) = quant_method.getFeatureName();
+            ++col;
             quant_method_table_body(row, col) = seq_segment.getSequenceSegmentName();
             ++col;
             quant_method_table_body(row, col) = quant_method.getISName();
-            ++col;
-            quant_method_table_body(row, col) = quant_method.getFeatureName();
             ++col;
             quant_method_table_body(row, col) = quant_method.getConcentrationUnits();
             ++col;
@@ -633,9 +627,9 @@ namespace SmartPeak
       // Make the feature_pivot table headers and body
       if (feat_value_data.size() <= 0) {
         // Create the initial data vectors and matrices from the feature map history
-        //std::vector<std::string> meta_data; // TODO: options for the user to select what meta_data
-        //for (const std::pair<FeatureMetadata, std::string>& p : metadatafloatToString) meta_data.push_back(p.second);
-        std::vector<std::string> meta_data = { "calculated_concentration" };
+        std::vector<std::string> meta_data; // TODO: options for the user to select what meta_data
+        for (const std::pair<FeatureMetadata, std::string>& p : metadatafloatToString) meta_data.push_back(p.second);
+        //std::vector<std::string> meta_data = { "calculated_concentration" };
         std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
         for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
         Eigen::Tensor<std::string, 2> rows_out;
@@ -644,7 +638,7 @@ namespace SmartPeak
         setFeatureHeatMap();
         // update the pivot table headers with the columns for the pivot table/heatmap rows
         feature_pivot_table_headers.resize((int)feat_heatmap_col_labels.size() + 3);
-        feature_pivot_table_headers(0) = "meta_value_name";
+        feature_pivot_table_headers(0) = "feature_name";
         feature_pivot_table_headers(1) = "component_group_name";
         feature_pivot_table_headers(2) = "component_name";
         feature_pivot_table_headers.slice(Eigen::array<Eigen::Index, 1>({ 3 }), Eigen::array<Eigen::Index, 1>({ feat_heatmap_col_labels.size() })) = feat_heatmap_col_labels;
@@ -675,16 +669,16 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0) {
-      // Set the axes titles and min/max defaults
-      chrom_x_axis_title = "Time (sec)";
-      chrom_y_axis_title = "Intensity (au)";
-      chrom_time_min = 1e6; 
-      chrom_time_max = 0; 
-      chrom_intensity_min = 1e6; 
-      chrom_intensity_max = 0;
       // TODO: filter by transition name (i.e., getNativeID() == component_name)
       // TODO: filter by sample or injection name
       if (chrom_time_data.size() <= 0) { // TODO: better check for updates
+      // Set the axes titles and min/max defaults
+        chrom_x_axis_title = "Time (sec)";
+        chrom_y_axis_title = "Intensity (au)";
+        chrom_time_min = 1e6;
+        chrom_time_max = 0;
+        chrom_intensity_min = 1e6;
+        chrom_intensity_max = 0;
         for (const auto& injection : sequence_handler.getSequence()) {
           // Extract out the raw data for plotting
           for (const auto& chromatogram : injection.getRawData().getChromatogramMap().getChromatograms()) {
@@ -847,5 +841,33 @@ namespace SmartPeak
         }
       }
     }
+  }
+  Eigen::Tensor<std::string, 1> SessionHandler::getInjectionExplorerHeader()
+  {
+    if (sequence_table_headers.size())
+      return sequence_table_headers.slice(Eigen::array<Eigen::Index, 1>({ 0 }), Eigen::array<Eigen::Index, 1>({ 2 }));
+    else
+      return Eigen::Tensor<std::string, 1>();
+  }
+  Eigen::Tensor<std::string, 2> SessionHandler::getInjectionExplorerBody()
+  {
+    if (sequence_table_body.size())
+      return sequence_table_body.slice(Eigen::array<Eigen::Index, 2>({ 0,0 }), Eigen::array<Eigen::Index, 2>({ sequence_table_body.dimension(0), 2 }));
+    else
+      return Eigen::Tensor<std::string, 2>();
+  }
+  Eigen::Tensor<std::string, 1> SessionHandler::getTransitionExplorerHeader()
+  {
+    if (transitions_table_headers.size())
+      return transitions_table_headers.slice(Eigen::array<Eigen::Index, 1>({ 0 }), Eigen::array<Eigen::Index, 1>({ 2 }));
+    else
+      return Eigen::Tensor<std::string, 1>();
+  }
+  Eigen::Tensor<std::string, 2> SessionHandler::getTransitionExplorerBody()
+  {
+    if (transitions_table_body.size())
+      return transitions_table_body.slice(Eigen::array<Eigen::Index, 2>({ 0,0 }), Eigen::array<Eigen::Index, 2>({ transitions_table_body.dimension(0), 2 }));
+    else
+      return Eigen::Tensor<std::string, 2>();
   }
 }
