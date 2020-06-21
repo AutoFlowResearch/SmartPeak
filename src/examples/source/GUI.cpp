@@ -580,101 +580,74 @@ int main(int argc, char **argv)
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
         {
-          //// Call the table widget
-          //session_handler_.setParametersTable(application_handler_.sequenceHandler_);
-          //GenericTableWidget Table;
-          //Table.headers_ = session_handler_.parameters_table_headers;
-          //Table.columns_ = session_handler_.parameters_table_body;
-          //Table.table_id_ = "ParametersMainWindow";
-          //Table.draw();
+          // Call the table widget
+          session_handler_.setParametersTable(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.parameters_table_headers, session_handler_.parameters_table_body, Eigen::Tensor<bool, 1>(), "ParametersMainWindow");
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_quant_method_table && ImGui::BeginTabItem("Quantitation Method", &show_quant_method_table))
         {
-          //// Call the table widget
-          //session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          //GenericTableWidget Table;
-          //Table.headers_ = session_handler_.quant_method_table_headers;
-          //Table.columns_ = session_handler_.quant_method_table_body;
-          //Table.table_id_ = "QuantMethodMainWindow";
-          //Table.draw();
+          // Call the table widget
+          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.quant_method_table_headers, session_handler_.quant_method_table_body, Eigen::Tensor<bool, 1>(), "QuantMethodMainWindow");
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_stds_concs_table && ImGui::BeginTabItem("Standards Concentrations", &show_stds_concs_table))
         {
-          //// Call the table widget
-          //session_handler_.setStdsConcsTable(application_handler_.sequenceHandler_);
-          //GenericTableWidget Table;
-          //Table.headers_ = session_handler_.stds_concs_table_headers;
-          //Table.columns_ = session_handler_.stds_concs_table_body;
-          //Table.table_id_ = "StdsConcsMainWindow";
-          //Table.draw();
+          // Call the table widget
+          session_handler_.setStdsConcsTable(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.stds_concs_table_headers, session_handler_.stds_concs_table_body, Eigen::Tensor<bool, 1>(), "StdsConcsMainWindow");
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_comp_filters_table && ImGui::BeginTabItem("Component Filters", &show_comp_filters_table))
         {
-          //// Call the table widget
-          //session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          //GenericTableWidget Table;
-          //Table.headers_ = session_handler_.comp_filters_table_headers;
-          //Table.columns_ = session_handler_.comp_filters_table_body;
-          //Table.table_id_ = "CompFiltersMainWindow";
-          //Table.draw();
+          // Call the table widget
+          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.comp_filters_table_headers, session_handler_.comp_filters_table_body, Eigen::Tensor<bool, 1>(), "CompFiltersMainWindow");
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_filters_table && ImGui::BeginTabItem("Component Group Filters", &show_comp_group_filters_table))
         {
-          //// Call the table widget
-          //session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          //GenericTableWidget Table;
-          //Table.headers_ = session_handler_.comp_group_filters_table_headers;
-          //Table.columns_ = session_handler_.comp_group_filters_table_body;
-          //Table.table_id_ = "CompGroupFiltersMainWindow";
-          //Table.draw();
+          // Call the table widget
+          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.comp_group_filters_table_headers, session_handler_.comp_group_filters_table_body, Eigen::Tensor<bool, 1>(), "CompGroupFiltersMainWindow");
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_comp_qcs_table && ImGui::BeginTabItem("Component QCs", &show_comp_qcs_table))
         {
-          //// Call the table widget
-          //session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          //GenericTableWidget Table;
-          //Table.headers_ = session_handler_.comp_qcs_table_headers;
-          //Table.columns_ = session_handler_.comp_qcs_table_body;
-          //Table.table_id_ = "CompQCsMainWindow";
-          //Table.draw();
+          // Call the table widget
+          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.comp_qcs_table_headers, session_handler_.comp_qcs_table_body, Eigen::Tensor<bool, 1>(), "CompQCsMainWindow");
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_qcs_table && ImGui::BeginTabItem("Component Group QCs", &show_comp_group_qcs_table))
         {
-          //// Call the table widget
-          //session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
-          //GenericTableWidget Table;
-          //Table.headers_ = session_handler_.comp_group_qcs_table_headers;
-          //Table.columns_ = session_handler_.comp_group_qcs_table_body;
-          //Table.table_id_ = "CompGroupQCsMainWindow";
-          //Table.draw();
+          // Call the table widget
+          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.comp_group_qcs_table_headers, session_handler_.comp_group_qcs_table_body, Eigen::Tensor<bool, 1>(), "CompGroupQCsMainWindow");
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_feature_table && ImGui::BeginTabItem("Features table", &show_feature_table))
         {
-          //// Call the table widget
-          //session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
-          //GenericTableWidget Table;
-          //Table.headers_ = session_handler_.feature_table_headers;
-          //Table.columns_ = session_handler_.feature_table_body;
-          //Table.table_id_ = "features(table)MainWindow";
-          //Table.draw();
+          // Call the table widget
+          session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.feature_table_headers, session_handler_.feature_table_body, Eigen::Tensor<bool, 1>(), "features(table)MainWindow");
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_feature_pivot_table && ImGui::BeginTabItem("Features matrix", &show_feature_pivot_table))
         {
-          //// Call the table widget
-          //session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
-          //GenericTableWidget Table;
-          //Table.headers_ = session_handler_.feature_pivot_table_headers;
-          //Table.columns_ = session_handler_.feature_pivot_table_body;
-          //Table.table_id_ = "feature(matrix)MainWindow";
-          //Table.draw();
+          // Call the table widget
+          session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.feature_pivot_table_headers, session_handler_.feature_pivot_table_body, Eigen::Tensor<bool, 1>(), "feature(matrix)MainWindow");
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))

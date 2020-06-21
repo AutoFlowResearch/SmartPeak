@@ -80,7 +80,7 @@ namespace SmartPeak
       }
       feature_explorer_checkbox_body.resize(n_rows, (int)feature_explorer_checkbox_headers.size());
       feature_explorer_checkbox_body.setConstant(true);
-      for (int i = 0; i < feature_explorer_checkbox_body.dimension(0); ++i) if (i!=2) feature_explorer_checkbox_body(i, 1) = false; // only calculated_concentration
+      for (int i = 0; i < feature_explorer_checkbox_body.dimension(0); ++i) if (i!=2) feature_explorer_checkbox_body(i, 0) = false; // only calculated_concentration for the plot
       feature_explorer_checked_rows.resize(n_rows);
       feature_explorer_checked_rows.setConstant(true);
     }
@@ -625,16 +625,34 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature_pivot table headers and body
-      if (feat_value_data.size() <= 0) {
-        // Create the initial data vectors and matrices from the feature map history
-        std::vector<std::string> meta_data; // TODO: options for the user to select what meta_data
-        for (const std::pair<FeatureMetadata, std::string>& p : metadatafloatToString) meta_data.push_back(p.second);
-        //std::vector<std::string> meta_data = { "calculated_concentration" };
+      if (feat_value_data.dimension(0) != getNSelectedFeatureNamesPlot() *getNSelectedSampleNamesPlot() || feat_value_data.dimension(1) != getNSelectedTransitionsPlot()) {
+        // get the selected feature names
+        Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureNamesPlot();
+        std::vector<std::string> feature_names;
+        for (int i = 0; i < selected_feature_names.size(); ++i) {
+          if (std::count(feature_names.begin(), feature_names.end(), selected_feature_names(i)) == 0 && !selected_feature_names(i).empty())
+            feature_names.push_back(selected_feature_names(i));
+        }
+        // get the selected sample types
         std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
         for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
-        std::set<std::string> sample_names, component_names;
+        // get the selected sample names
+        Eigen::Tensor<std::string, 1> selected_sample_names = getSelectSampleNamesPlot();
+        std::set<std::string> sample_names;
+        for (int i = 0; i < selected_sample_names.size(); ++i) {
+          if (!selected_sample_names(i).empty())
+            sample_names.insert(selected_sample_names(i));
+        }
+        // get the selected transitions
+        Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsPlot();
+        std::set<std::string> component_names;
+        for (int i = 0; i < selected_transitions.size(); ++i) {
+          if (!selected_transitions(i).empty())
+            component_names.insert(selected_transitions(i));
+        }
+        // get the matrix of data
         Eigen::Tensor<std::string, 2> rows_out;
-        SequenceParser::makeDataMatrixFromMetaValue(sequence_handler, feat_value_data, feat_heatmap_col_labels, rows_out, meta_data, sample_types, sample_names, component_names);
+        SequenceParser::makeDataMatrixFromMetaValue(sequence_handler, feat_value_data, feat_heatmap_col_labels, rows_out, feature_names, sample_types, sample_names, component_names);
         setFeatureLinePlot();
         setFeatureHeatMap();
         // update the pivot table headers with the columns for the pivot table/heatmap rows
@@ -670,9 +688,21 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0) {
-      // TODO: filter by transition name (i.e., getNativeID() == component_name)
-      // TODO: filter by sample or injection name
-      if (chrom_time_data.size() <= 0) { // TODO: better check for updates
+      // get the selected sample names
+      Eigen::Tensor<std::string, 1> selected_sample_names = getSelectSampleNamesPlot();
+      std::set<std::string> sample_names;
+      for (int i = 0; i < selected_sample_names.size(); ++i) {
+        if (!selected_sample_names(i).empty())
+          sample_names.insert(selected_sample_names(i));
+      }
+      // get the selected transitions
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsPlot();
+      std::set<std::string> component_names;
+      for (int i = 0; i < selected_transitions.size(); ++i) {
+        if (!selected_transitions(i).empty())
+          component_names.insert(selected_transitions(i));
+      }
+      if (chrom_time_data.size() != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot()) { // TODO: better check for updates
       // Set the axes titles and min/max defaults
         chrom_x_axis_title = "Time (sec)";
         chrom_y_axis_title = "Intensity (au)";
@@ -681,8 +711,10 @@ namespace SmartPeak
         chrom_intensity_min = 1e6;
         chrom_intensity_max = 0;
         for (const auto& injection : sequence_handler.getSequence()) {
+          if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
           // Extract out the raw data for plotting
           for (const auto& chromatogram : injection.getRawData().getChromatogramMap().getChromatograms()) {
+            if (component_names.count(chromatogram.getNativeID()) == 0) continue;
             std::vector<float> x_data, y_data;
             for (const auto& point : chromatogram) {
               x_data.push_back(point.getRT());
@@ -699,7 +731,7 @@ namespace SmartPeak
           // Extract out the best left/right for plotting
           for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
             for (const auto& subordinate : feature.getSubordinates()) {
-              if (subordinate.getMetaValue("used_") == "true") {
+              if (subordinate.getMetaValue("used_") == "true" && component_names.count(subordinate.getMetaValue("native_id").toString())) {
                 if (subordinate.metaValueExists("leftWidth") && subordinate.metaValueExists("rightWidth")) {
                   std::vector<float> x_data, y_data;
                   x_data.push_back(subordinate.getMetaValue("leftWidth"));
@@ -716,7 +748,7 @@ namespace SmartPeak
           // Extract out the smoothed points for plotting
           for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
             for (const auto& subordinate : feature.getSubordinates()) {
-              if (subordinate.getMetaValue("used_") == "true") {
+              if (subordinate.getMetaValue("used_") == "true" && component_names.count(subordinate.getMetaValue("native_id").toString())) {
                 std::vector<float> x_data, y_data;
                 for (const auto& point : subordinate.getConvexHull().getHullPoints()) {
                   x_data.push_back(point.getX());
@@ -772,22 +804,34 @@ namespace SmartPeak
       sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().size() > 0 &&
       sequence_handler.getSequenceSegments().at(0).getComponentsToConcentrations().size() > 0 &&
       sequence_handler.getSequenceSegments().at(0).getStandardsConcentrations().size() > 0) {
-      if (calibrators_conc_fit_data.size() <= 0 && calibrators_conc_raw_data.size() <= 0) {
-        // Update the axis titles
+      // get the selected transitions
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsPlot();
+      std::set<std::string> component_names;
+      for (int i = 0; i < selected_transitions.size(); ++i) {
+        if (!selected_transitions(i).empty())
+          component_names.insert(selected_transitions(i));
+      }
+      if (calibrators_conc_fit_data.size() != component_names.size() && calibrators_conc_raw_data.size() != component_names.size()) {
+        // Update the axis titles and clear the data
         calibrators_x_axis_title = "Concentration (" + sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getConcentrationUnits() + ")";
         calibrators_y_axis_title = sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getFeatureName() + " (au)";
         calibrators_conc_min = 1e6;
         calibrators_conc_max = 0;
         calibrators_feature_min = 1e6;
         calibrators_feature_max = 0;
-        // TODO: filtering by the transition (i.e., getNativeID, getComponentName)
+        calibrators_conc_fit_data.clear();
+        calibrators_feature_fit_data.clear();
+        calibrators_conc_raw_data.clear();
+        calibrators_feature_raw_data.clear();
+        calibrators_series_names.clear();
         for (const auto& sequence_segment : sequence_handler.getSequenceSegments()) {
           // Extract out raw data used to make the calibrators found in `StandardsConcentrations`
           std::map<std::string, std::pair<std::vector<float>, std::vector<std::string>>> stand_concs_map; // map of x_data and sample_name for a component
           for (const auto& stand_concs : sequence_segment.getStandardsConcentrations()) {
             // Skip components that have not been fitted with a calibration curve
             if (sequence_segment.getComponentsToConcentrations().count(stand_concs.component_name) > 0 &&
-              sequence_segment.getComponentsToConcentrations().at(stand_concs.component_name).size() > 0) { // TODO: filter out components that have not been fitted
+              sequence_segment.getComponentsToConcentrations().at(stand_concs.component_name).size() > 0 &&
+              component_names.count(stand_concs.component_name) > 0) { // TODO: filter out components that have not been fitted
               const float x_datum = float(stand_concs.actual_concentration / stand_concs.IS_actual_concentration / stand_concs.dilution_factor);
               auto found = stand_concs_map.emplace(stand_concs.component_name,
                 std::make_pair(std::vector<float>({ x_datum }),
@@ -803,7 +847,8 @@ namespace SmartPeak
             // Skip components that have not been fitted with a calibration curve
             if (sequence_segment.getComponentsToConcentrations().count(quant_method.getComponentName()) > 0 &&
               sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName()).size() > 0 &&
-              (double)quant_method.getTransformationModelParams().getValue("slope") != 1.0) { // TODO: filter out components that have not been fitted
+              (double)quant_method.getTransformationModelParams().getValue("slope") != 1.0&&
+              component_names.count(quant_method.getComponentName()) > 0) { // TODO: filter out components that have not been fitted
               // Make the line of best fit using the `QuantitationMethods
               std::vector<float> y_fit_data;
               for (const auto& ratio : stand_concs_map.at(quant_method.getComponentName()).first) {
@@ -870,5 +915,53 @@ namespace SmartPeak
       return transitions_table_body.slice(Eigen::array<Eigen::Index, 2>({ 0,0 }), Eigen::array<Eigen::Index, 2>({ transitions_table_body.dimension(0), 2 }));
     else
       return Eigen::Tensor<std::string, 2>();
+  }
+  Eigen::Tensor<std::string, 1> SessionHandler::getSelectSampleNamesPlot()
+  {
+    if (sequence_table_body.size() && injection_explorer_checkbox_headers.size())
+      return (injection_explorer_checkbox_body.chip(1,1)).select(sequence_table_body.chip(1,1), sequence_table_body.chip(1, 1).constant(""));
+    else
+      return Eigen::Tensor<std::string, 1>();
+  }
+  Eigen::Tensor<std::string, 1> SessionHandler::getSelectTransitionsPlot()
+  {
+    if (transitions_table_body.size() && transition_explorer_checkbox_headers.size())
+      return (transition_explorer_checkbox_body.chip(1, 1)).select(transitions_table_body.chip(1, 1), transitions_table_body.chip(1, 1).constant(""));
+    else
+      return Eigen::Tensor<std::string, 1>();
+  }
+  Eigen::Tensor<std::string, 1> SessionHandler::getSelectFeatureNamesPlot()
+  {
+    if (feature_explorer_body.size() && feature_explorer_checkbox_headers.size())
+      return (feature_explorer_checkbox_body.chip(0, 1)).select(feature_explorer_body.chip(0, 1), feature_explorer_body.chip(0, 1).constant(""));
+    else
+      return Eigen::Tensor<std::string, 1>();
+  }
+  int SessionHandler::getNSelectedSampleNamesPlot()
+  {
+    if (injection_explorer_checkbox_body.size()) {
+      Eigen::Tensor<int, 0> n_sample_names = injection_explorer_checkbox_body.chip(1, 1).cast<int>().sum();
+      return n_sample_names(0);
+    }
+    else
+      return 0;
+  }
+  int SessionHandler::getNSelectedTransitionsPlot()
+  {
+    if (transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<int, 0> n_transitions = transition_explorer_checkbox_body.chip(1, 1).cast<int>().sum();
+      return n_transitions(0);
+    }
+    else
+      return 0;
+  }
+  int SessionHandler::getNSelectedFeatureNamesPlot()
+  {
+    if (feature_explorer_checkbox_body.size()) {
+      Eigen::Tensor<int, 0> n_feature_names = feature_explorer_checkbox_body.chip(0, 1).cast<int>().sum();
+      return n_feature_names(0);
+    }
+    else
+      return 0;
   }
 }
