@@ -247,6 +247,16 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   BOOST_CHECK_CLOSE(data_out(0,0), 15.6053667, 1e-3);
   BOOST_CHECK_CLOSE(data_out(rows_out.dimension(0)-1,columns_out.size()-1), 1.66744995, 1e-3);
 
+  SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, std::vector<std::string>({ "leftWidth" }), sample_types,
+    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
+
+  BOOST_CHECK_EQUAL(columns_out.size(), 1);
+  BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(rows_out.dimension(0), 1);
+  BOOST_CHECK_EQUAL(rows_out.dimension(1), 3);
+  BOOST_CHECK_EQUAL(rows_out(0, 1), "23dpg");
+  BOOST_CHECK_CLOSE(data_out(0, 0), 15.6053667, 1e-3);
+
   // write sequence to output
   // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataMatrixFromMetaValue.csv");
   // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);

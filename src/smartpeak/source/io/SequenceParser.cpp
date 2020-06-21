@@ -354,17 +354,21 @@ namespace SmartPeak
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
       std::map<std::string, float> validation_metrics = sampleHandler.getRawData().getValidationMetrics();
       const std::string& sample_name = mdh.getSampleName();
-      if (sample_names.size() && sample_names.count(sample_name) == 0) continue;
-      if (sample_types.count(mdh.getSampleType()) == 0) continue;
+      if (sample_names.size() && sample_names.count(sample_name) == 0) 
+        continue;
+      if (sample_types.count(mdh.getSampleType()) == 0) 
+        continue;
       data_dict.insert({ sample_name, std::map<Row,float,Row_less>() });
       for (const std::string& meta_value_name : meta_data) {
         // feature_map_history is not needed here as we are only interested in the current/"used" features
         for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
           for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
-            if (component_names.size() && component_names.count(subordinate.getMetaValue(s_native_id).toString()) == 0) continue;
+            if (component_names.size() && component_names.count(subordinate.getMetaValue(s_native_id).toString()) == 0) 
+              continue;
             if (subordinate.metaValueExists("used_")) {
               const std::string used = subordinate.getMetaValue("used_").toString();
-              if (used.empty() || used[0] == 'f' || used[0] == 'F') continue;
+              if (used.empty() || used[0] == 'f' || used[0] == 'F') 
+                continue;
             }
             const Row row_tuple_name(
               feature.getMetaValue(s_PeptideRef).toString(),

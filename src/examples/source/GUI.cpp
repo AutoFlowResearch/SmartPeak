@@ -572,13 +572,10 @@ int main(int argc, char **argv)
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
-          //// Call the table widget
-          //session_handler_.setWorkflowTable(workflow_.getCommands());
-          //GenericTableWidget Table;
-          //Table.headers_ = session_handler_.workflow_table_headers;
-          //Table.columns_ = session_handler_.workflow_table_body;
-          //Table.table_id_ = "WorkflowMainWindow";
-          //Table.draw();
+          // Call the table widget
+          session_handler_.setWorkflowTable(workflow_.getCommands());
+          GenericTableWidget Table(session_handler_.workflow_table_headers, session_handler_.workflow_table_body, Eigen::Tensor<bool, 1>(), "WorkflowMainWindow");
+          Table.draw();
           ImGui::EndTabItem();
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
