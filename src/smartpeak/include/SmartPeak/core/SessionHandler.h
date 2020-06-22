@@ -17,8 +17,7 @@ namespace SmartPeak
   //private:
   //  SessionHandler() = default;
   public:
-    void setSequenceDataAndFilters(const SequenceHandler& sequence_handler);
-    void setTransitionsDataAndFilters(const SequenceHandler& sequence_handler);
+    void setMinimalDataAndFilters(const SequenceHandler& sequence_handler);
     void setInjectionExplorer();
     void setTransitionExplorer();
     void setFeatureExplorer();

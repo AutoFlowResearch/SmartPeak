@@ -388,15 +388,11 @@ int main(int argc, char **argv)
       }
       if (ImGui::BeginMenu("Edit"))
       {
-        ImGui::MenuItem("Session", NULL, false, false);
-        if (ImGui::MenuItem("Undo", "CTRL+Z", false, false)) {}
-        if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {} // Disabled item
-        ImGui::Separator();
         ImGui::MenuItem("Settings", NULL, false, false);
         if (ImGui::MenuItem("Tables", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Plots", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Explorer", NULL, false, false)) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Search", NULL, false, false)) {} // TODO: modal of settings
+        if (ImGui::MenuItem("Parameters", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_))
         {
           initializeDataDirs(application_handler_);
@@ -504,7 +500,7 @@ int main(int argc, char **argv)
         if (show_injection_explorer && ImGui::BeginTabItem("Injections", &show_injection_explorer))
         {
           // Call the Explorer widget
-          session_handler_.setSequenceDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<std::string, 1> headers = session_handler_.getInjectionExplorerHeader();
           Eigen::Tensor<std::string, 2> body = session_handler_.getInjectionExplorerBody();
           ExplorerWidget Explorer(headers, body,
@@ -516,7 +512,7 @@ int main(int argc, char **argv)
         if (show_transitions_explorer && ImGui::BeginTabItem("Transitions", &show_transitions_explorer))
         {
           // Call the Explorer widget
-          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<std::string, 1> headers = session_handler_.getTransitionExplorerHeader();
           Eigen::Tensor<std::string, 2> body = session_handler_.getTransitionExplorerBody();
           ExplorerWidget Explorer(headers, body,
@@ -557,7 +553,7 @@ int main(int argc, char **argv)
         if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
         {
           // Call the table widget
-          session_handler_.setSequenceDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.sequence_table_headers, session_handler_.sequence_table_body, Eigen::Tensor<bool, 1>(), "SequenceMainWindow");
           Table.draw();
           ImGui::EndTabItem();
@@ -565,7 +561,7 @@ int main(int argc, char **argv)
         if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
         {
           // Call the table widget
-          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.transitions_table_headers, session_handler_.transitions_table_body, Eigen::Tensor<bool, 1>(), "TransitionsMainWindow");
           Table.draw();
           ImGui::EndTabItem();
@@ -589,7 +585,8 @@ int main(int argc, char **argv)
         if (show_quant_method_table && ImGui::BeginTabItem("Quantitation Method", &show_quant_method_table))
         {
           // Call the table widget
-          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setQuantMethodTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.quant_method_table_headers, session_handler_.quant_method_table_body, Eigen::Tensor<bool, 1>(), "QuantMethodMainWindow");
           Table.draw();
           ImGui::EndTabItem();
@@ -597,6 +594,7 @@ int main(int argc, char **argv)
         if (show_stds_concs_table && ImGui::BeginTabItem("Standards Concentrations", &show_stds_concs_table))
         {
           // Call the table widget
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setStdsConcsTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.stds_concs_table_headers, session_handler_.stds_concs_table_body, Eigen::Tensor<bool, 1>(), "StdsConcsMainWindow");
           Table.draw();
@@ -605,7 +603,8 @@ int main(int argc, char **argv)
         if (show_comp_filters_table && ImGui::BeginTabItem("Component Filters", &show_comp_filters_table))
         {
           // Call the table widget
-          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentFiltersTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.comp_filters_table_headers, session_handler_.comp_filters_table_body, Eigen::Tensor<bool, 1>(), "CompFiltersMainWindow");
           Table.draw();
           ImGui::EndTabItem();
@@ -613,7 +612,8 @@ int main(int argc, char **argv)
         if (show_comp_group_filters_table && ImGui::BeginTabItem("Component Group Filters", &show_comp_group_filters_table))
         {
           // Call the table widget
-          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentGroupFiltersTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.comp_group_filters_table_headers, session_handler_.comp_group_filters_table_body, Eigen::Tensor<bool, 1>(), "CompGroupFiltersMainWindow");
           Table.draw();
           ImGui::EndTabItem();
@@ -621,7 +621,8 @@ int main(int argc, char **argv)
         if (show_comp_qcs_table && ImGui::BeginTabItem("Component QCs", &show_comp_qcs_table))
         {
           // Call the table widget
-          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentQCsTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.comp_qcs_table_headers, session_handler_.comp_qcs_table_body, Eigen::Tensor<bool, 1>(), "CompQCsMainWindow");
           Table.draw();
           ImGui::EndTabItem();
@@ -629,7 +630,8 @@ int main(int argc, char **argv)
         if (show_comp_group_qcs_table && ImGui::BeginTabItem("Component Group QCs", &show_comp_group_qcs_table))
         {
           // Call the table widget
-          session_handler_.setTransitionsDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentGroupQCsTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.comp_group_qcs_table_headers, session_handler_.comp_group_qcs_table_body, Eigen::Tensor<bool, 1>(), "CompGroupQCsMainWindow");
           Table.draw();
           ImGui::EndTabItem();
@@ -637,6 +639,7 @@ int main(int argc, char **argv)
         if (show_feature_table && ImGui::BeginTabItem("Features table", &show_feature_table))
         {
           // Call the table widget
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.feature_table_headers, session_handler_.feature_table_body, Eigen::Tensor<bool, 1>(), "features(table)MainWindow");
           Table.draw();
@@ -645,6 +648,7 @@ int main(int argc, char **argv)
         if (show_feature_pivot_table && ImGui::BeginTabItem("Features matrix", &show_feature_pivot_table))
         {
           // Call the table widget
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.feature_pivot_table_headers, session_handler_.feature_pivot_table_body, Eigen::Tensor<bool, 1>(), "feature(matrix)MainWindow");
           Table.draw();
@@ -653,6 +657,7 @@ int main(int argc, char **argv)
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
         {
           // Show the line plot
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
           ScatterPlot2DWidget plot2d;
           plot2d.x_data_ = session_handler_.chrom_time_data;
@@ -678,6 +683,7 @@ int main(int argc, char **argv)
         if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
         {
           // Show the line plot
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
           LinePlot2DWidget plot2d;
           plot2d.x_data_ = session_handler_.feat_sample_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
@@ -698,6 +704,7 @@ int main(int argc, char **argv)
         if (show_feature_heatmap_plot && ImGui::BeginTabItem("Features (heatmap)", &show_feature_heatmap_plot))
         {
           // Show the line plot
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
           Heatmap2DWidget plot2d;
           plot2d.data_ = session_handler_.feat_heatmap_data;
@@ -715,6 +722,7 @@ int main(int argc, char **argv)
         }
         if (show_calibrators_line_plot && ImGui::BeginTabItem("Calibrators", &show_calibrators_line_plot))
         {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
           CalibratorsPlotWidget plot2d;
           plot2d.x_fit_data_ = session_handler_.calibrators_conc_fit_data;

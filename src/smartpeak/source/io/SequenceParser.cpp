@@ -209,7 +209,9 @@ namespace SmartPeak
     std::vector<std::vector<std::string>>& rows_out,
     std::vector<std::string>& headers_out,
     const std::vector<std::string>& meta_data,
-    const std::set<SampleType>& sample_types) {
+    const std::set<SampleType>& sample_types,
+    const std::set<std::string>& sample_names,
+    const std::set<std::string>& component_names) {
     std::vector<std::string> headers = {
       "sample_name", "sample_type", "component_group_name", "component_name", "batch_name",
       "rack_number", "plate_number", "pos_number", "inj_number", "dilution_factor", "inj_volume",
@@ -232,10 +234,10 @@ namespace SmartPeak
     rows_out.clear();
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
-      const SampleType st = mdh.getSampleType();
-      if (sample_types.count(st) == 0)
+      if (sample_types.count(mdh.getSampleType()) == 0)
         continue;
-      const std::string& sample_name = mdh.getSampleName();
+      if (sample_names.size() > 0 && sample_names.count(mdh.getSampleName()) == 0)
+        continue;
 
       // feature_map_history_ is needed in order to export all "used_" = true and false features
       for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMapHistory()) {
@@ -246,16 +248,18 @@ namespace SmartPeak
         const std::string component_group_name = feature.getMetaValue(s_PeptideRef);
         for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
           std::vector<std::string> row;
-          row.push_back(sample_name);
-          row.push_back(sampleTypeToString.at(st));
+          row.push_back(mdh.getSampleName());
+          row.push_back(sampleTypeToString.at(mdh.getSampleType()));
           row.push_back(component_group_name);
           if (!subordinate.metaValueExists(s_native_id) ||
               subordinate.getMetaValue(s_native_id).isEmpty() ||
               subordinate.getMetaValue(s_native_id).toString().empty()) {
-            LOGV << "component_group_name is absent or empty. Skipping this subordinate";
+            LOGV << "component_name is absent or empty. Skipping this subordinate";
             continue;
           }
           const std::string component_name = subordinate.getMetaValue(s_native_id);
+          if (component_names.size() > 0 && component_names.count(component_name) == 0)
+            continue;
           row.push_back(component_name);
           row.push_back(mdh.batch_name);
           row.push_back(std::to_string(mdh.rack_number));
@@ -317,7 +321,7 @@ namespace SmartPeak
     for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
     }
-    makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types);
+    makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>());
 
     CSVWriter writer(filename, ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());

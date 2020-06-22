@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   };
   const set<SampleType> sample_types = {SampleType::Unknown};
 
-  SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types);
+  SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>());
 
   BOOST_CHECK_EQUAL(data_out.size(), 1657);
   BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
@@ -185,6 +185,38 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(headers_out[22], "QC_transition_group_message");
   BOOST_CHECK_EQUAL(headers_out[23], "leftWidth");
   BOOST_CHECK_EQUAL(headers_out[24], "rightWidth");
+
+  SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, std::vector<std::string>({ "leftWidth" }), sample_types,
+    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
+
+  BOOST_CHECK_EQUAL(data_out.size(), 1);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "Unknown");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "23dpg");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(19), std::to_string(15.605367));
+  BOOST_CHECK_EQUAL(headers_out.size(), 20);
+  BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
+  BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
+  BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
+  BOOST_CHECK_EQUAL(headers_out[3], "component_name");
+  BOOST_CHECK_EQUAL(headers_out[4], "batch_name");
+  BOOST_CHECK_EQUAL(headers_out[5], "rack_number");
+  BOOST_CHECK_EQUAL(headers_out[6], "plate_number");
+  BOOST_CHECK_EQUAL(headers_out[7], "pos_number");
+  BOOST_CHECK_EQUAL(headers_out[8], "inj_number");
+  BOOST_CHECK_EQUAL(headers_out[9], "dilution_factor");
+  BOOST_CHECK_EQUAL(headers_out[10], "inj_volume");
+  BOOST_CHECK_EQUAL(headers_out[11], "inj_volume_units");
+  BOOST_CHECK_EQUAL(headers_out[12], "operator_name");
+  BOOST_CHECK_EQUAL(headers_out[13], "acq_method_name");
+  BOOST_CHECK_EQUAL(headers_out[14], "proc_method_name");
+  BOOST_CHECK_EQUAL(headers_out[15], "original_filename");
+  BOOST_CHECK_EQUAL(headers_out[16], "acquisition_date_and_time");
+  BOOST_CHECK_EQUAL(headers_out[17], "injection_name");
+  BOOST_CHECK_EQUAL(headers_out[18], "used_");
+  // metadata
+  BOOST_CHECK_EQUAL(headers_out[19], "leftWidth");
 
   // write sequence to output
   // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataTableFromMetaValue.csv");

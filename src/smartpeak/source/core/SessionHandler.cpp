@@ -8,24 +8,16 @@
 
 namespace SmartPeak
 {
-  void SessionHandler::setSequenceDataAndFilters(const SequenceHandler & sequence_handler)
+  void SessionHandler::setMinimalDataAndFilters(const SequenceHandler & sequence_handler)
   {
-    // Set the data for the sequence table
-    setSequenceTable(sequence_handler);
-    // Set the data for the injection explorer
-    setInjectionExplorer();
-  }
-  void SessionHandler::setTransitionsDataAndFilters(const SequenceHandler & sequence_handler)
-  {
-    // Set the data for all tables that are based on the transitions
+    // Set the minimal data for the transitions
     setTransitionsTable(sequence_handler);
-    setQuantMethodTable(sequence_handler);
-    setComponentFiltersTable(sequence_handler);
-    setComponentGroupFiltersTable(sequence_handler);
-    setComponentQCsTable(sequence_handler);
-    setComponentGroupQCsTable(sequence_handler);
-    // Set the data for the transitions explorer
     setTransitionExplorer();
+    // Set the minimal data for the injections
+    setSequenceTable(sequence_handler);
+    setInjectionExplorer();
+    // Set the minimal data for the filters
+    setFeatureExplorer();
   }
   void SessionHandler::setInjectionExplorer(){//(const SequenceHandler& sequence_handler) {
     // Make the injection explorer headers
@@ -35,7 +27,7 @@ namespace SmartPeak
     }
     const int n_rows = sequence_table_body.dimension(0);
     // Make the injection explorer body
-    if (injection_explorer_checkbox_body.size() <= 0 && n_rows > 0) {
+    if (injection_explorer_checkbox_body.dimension(0) != n_rows) {
       injection_explorer_checkbox_body.resize(n_rows, (int)injection_explorer_checkbox_headers.size());
       injection_explorer_checkbox_body.setConstant(true);
       for (int i = 1; i < injection_explorer_checkbox_body.dimension(0); ++i) injection_explorer_checkbox_body(i, 1) = false; // only the first injection
@@ -51,7 +43,7 @@ namespace SmartPeak
     }
     const int n_rows = transitions_table_body.dimension(0);
     // Make the transition table body
-    if (transition_explorer_checkbox_body.size() <= 0 && n_rows > 0) {
+    if (transition_explorer_checkbox_body.dimension(0) != n_rows) {
       transition_explorer_checkbox_body.resize(n_rows, (int)transition_explorer_checkbox_headers.size());
       transition_explorer_checkbox_body.setConstant(true);
       for (int i = 1; i < transition_explorer_checkbox_body.dimension(0); ++i) transition_explorer_checkbox_body(i, 1) = false; // only the first transition
@@ -70,7 +62,7 @@ namespace SmartPeak
     const int n_cols = feature_explorer_headers.size();
     const int n_rows = metadatafloatToString.size();
     // Make the feature explorer body
-    if (feature_explorer_body.size() <= 0 && n_rows > 0) {
+    if (feature_explorer_body.dimension(0) != n_rows) {
       feature_explorer_body.resize(n_rows, n_cols);
       int col = 0, row = 0;
       for (const auto& metadata : metadatafloatToString) {
@@ -97,7 +89,7 @@ namespace SmartPeak
     const int n_cols = sequence_table_headers.size();
     const int n_rows = sequence_handler.getSequence().size();
     // Make the sequence table body
-    if (sequence_table_body.size() <= 0 && n_rows > 0) {
+    if (sequence_table_body.dimension(0) != n_rows) {
       sequence_table_body.resize(n_rows, n_cols);
       int col = 0, row = 0;
       for (const auto& injection : sequence_handler.getSequence()) {
@@ -142,7 +134,7 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0) {
       const auto& targeted_exp = sequence_handler.getSequence().at(0).getRawData().getTargetedExperiment();
       const int n_rows = targeted_exp.getTransitions().size();
-      if (transitions_table_body.size() <= 0 && n_rows > 0) {
+      if (transitions_table_body.dimension(0) != n_rows) {
         transitions_table_body.resize(n_rows, n_cols);
         int col = 0, row = 0;
         for (const auto& transition : targeted_exp.getTransitions()) {
@@ -203,7 +195,7 @@ namespace SmartPeak
       const int n_cols = parameters_table_headers.size();
       // Make the parameters table body
       const int n_funcs = sequence_handler.getSequence().at(0).getRawData().getParameters().size();
-      if (parameters_table_body.size() <= 0 && n_funcs > 0) {
+      if (parameters_table_body.dimension(0) != n_funcs) {
         int n_rows = 0;
         for (const auto& parameters : sequence_handler.getSequence().at(0).getRawData().getParameters()) {
           n_rows += parameters.second.size();
@@ -248,7 +240,7 @@ namespace SmartPeak
       const int n_cols = quant_method_table_headers.size();
       // Make the quant_method table body
       const int n_rows = sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().size() * sequence_handler.getSequenceSegments().size();
-      if (quant_method_table_body.size() <= 0 && n_rows > 0) {
+      if (quant_method_table_body.dimension(0) != n_rows) {
         quant_method_table_body.resize(n_rows, n_cols);
         int col = 0, row = 0;
         for (const auto& seq_segment : sequence_handler.getSequenceSegments()) {
@@ -313,7 +305,7 @@ namespace SmartPeak
     if (sequence_handler.getSequenceSegments().size() > 0) {
       const auto& stand_concs = sequence_handler.getSequenceSegments().at(0).getStandardsConcentrations();
       const int n_rows = stand_concs.size();
-      if (stds_concs_table_body.size() <= 0 && n_rows > 0) {
+      if (stds_concs_table_body.dimension(0) != n_rows) {
         stds_concs_table_body.resize(n_rows, n_cols);
         int col = 0, row = 0;
         for (const auto& stds_concs : stand_concs) {
@@ -353,7 +345,7 @@ namespace SmartPeak
 
       // Make the comp_filters table body
       const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureFilter().component_qcs.size();
-      if (comp_filters_table_body.size() <= 0 && n_rows > 0) {
+      if (comp_filters_table_body.dimension(0) != n_rows) {
         comp_filters_table_body.resize(n_rows, n_cols);
         int col = 0, row = 0;
         for (const auto& comp_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureFilter().component_qcs) {
@@ -401,7 +393,7 @@ namespace SmartPeak
       const int n_cols = comp_group_filters_table_headers.size();
       // Make the comp_group_filters table body
       const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureFilter().component_group_qcs.size();
-      if (comp_group_filters_table_body.size() <= 0 && n_rows > 0) {
+      if (comp_group_filters_table_body.dimension(0) != n_rows) {
         comp_group_filters_table_body.resize(n_rows, n_cols);
         int col = 0, row = 0;
         for (const auto& comp_group_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureFilter().component_group_qcs) {
@@ -482,7 +474,7 @@ namespace SmartPeak
 
       // Make the comp_qcs table body
       const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureQC().component_qcs.size();
-      if (comp_qcs_table_body.size() <= 0 && n_rows > 0) {
+      if (comp_qcs_table_body.dimension(0) != n_rows) {
         comp_qcs_table_body.resize(n_rows, n_cols);
         int col = 0, row = 0;
         for (const auto& comp_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureQC().component_qcs) {
@@ -530,7 +522,7 @@ namespace SmartPeak
       const int n_cols = comp_group_qcs_table_headers.size();
       const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureQC().component_group_qcs.size();
       // Make the comp_group_qcs table body
-      if (comp_group_qcs_table_body.size() <= 0 && n_rows > 0) {
+      if (comp_group_qcs_table_body.dimension(0) != n_rows) {
         comp_group_qcs_table_body.resize(n_rows, n_cols);
         int col = 0, row = 0;
         for (const auto& comp_group_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureQC().component_group_qcs) {
@@ -599,14 +591,34 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature table headers and body
-      if (feature_table_body.size() <= 0) {
-        std::vector<std::string> meta_data; // TODO: options for the user to select what meta_data
-        for (const std::pair<FeatureMetadata, std::string>& p : metadatafloatToString) meta_data.push_back(p.second);
+      if (feature_table_body.dimension(0) != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot() || feat_value_data.dimension(1) != 19 + getNSelectedFeatureNamesPlot()) {
+        // get the selected feature names
+        Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureNamesPlot();
+        std::vector<std::string> feature_names;
+        for (int i = 0; i < selected_feature_names.size(); ++i) {
+          if (std::count(feature_names.begin(), feature_names.end(), selected_feature_names(i)) == 0 && !selected_feature_names(i).empty())
+            feature_names.push_back(selected_feature_names(i));
+        }
+        // get the selected sample types
         std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
         for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
+        // get the selected sample names
+        Eigen::Tensor<std::string, 1> selected_sample_names = getSelectSampleNamesPlot();
+        std::set<std::string> sample_names;
+        for (int i = 0; i < selected_sample_names.size(); ++i) {
+          if (!selected_sample_names(i).empty())
+            sample_names.insert(selected_sample_names(i));
+        }
+        // get the selected transitions
+        Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsPlot();
+        std::set<std::string> component_names;
+        for (int i = 0; i < selected_transitions.size(); ++i) {
+          if (!selected_transitions(i).empty())
+            component_names.insert(selected_transitions(i));
+        }
         std::vector<std::vector<std::string>> table;
         std::vector<std::string> headers;
-        SequenceParser::makeDataTableFromMetaValue(sequence_handler, table, headers, meta_data, sample_types);
+        SequenceParser::makeDataTableFromMetaValue(sequence_handler, table, headers, feature_names, sample_types, sample_names, component_names);
         const int n_cols = feature_table_headers.size();
         const int n_rows = feature_table_body.size();
         feature_table_headers.resize(n_cols);
