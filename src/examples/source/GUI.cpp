@@ -659,7 +659,8 @@ int main(int argc, char **argv)
           // Show the line plot
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
-          ScatterPlot2DWidget plot2d(session_handler_.chrom_time_data, session_handler_.chrom_intensity_data, session_handler_.chrom_series_names,
+          ChromatogramPlotWidget plot2d(session_handler_.chrom_time_raw_data, session_handler_.chrom_intensity_raw_data, session_handler_.chrom_series_raw_names,
+            session_handler_.chrom_time_hull_data, session_handler_.chrom_intensity_hull_data, session_handler_.chrom_series_hull_names,
             session_handler_.chrom_x_axis_title, session_handler_.chrom_y_axis_title,
             session_handler_.chrom_time_min, session_handler_.chrom_time_max, session_handler_.chrom_intensity_min, session_handler_.chrom_intensity_max,
             win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "Chromatograms Main Window");

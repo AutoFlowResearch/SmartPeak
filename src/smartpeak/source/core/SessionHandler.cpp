@@ -714,7 +714,7 @@ namespace SmartPeak
         if (!selected_transitions(i).empty())
           component_names.insert(selected_transitions(i));
       }
-      if (chrom_time_data.size() != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot()*2) {
+      if (chrom_time_raw_data.size() != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot()) {
       // Set the axes titles and min/max defaults
         chrom_x_axis_title = "Time (sec)";
         chrom_y_axis_title = "Intensity (au)";
@@ -722,9 +722,12 @@ namespace SmartPeak
         chrom_time_max = 0;
         chrom_intensity_min = 1e6;
         chrom_intensity_max = 0;
-        chrom_time_data.clear();
-        chrom_intensity_data.clear();
-        chrom_series_names.clear();
+        chrom_time_hull_data.clear();
+        chrom_intensity_hull_data.clear();
+        chrom_series_hull_names.clear();
+        chrom_time_raw_data.clear();
+        chrom_intensity_raw_data.clear();
+        chrom_series_raw_names.clear();
         for (const auto& injection : sequence_handler.getSequence()) {
           if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
           // Extract out the raw data for plotting
@@ -739,27 +742,27 @@ namespace SmartPeak
               chrom_time_max = std::max((float)point.getRT(), chrom_time_max);
               chrom_intensity_max = std::max((float)point.getIntensity(), chrom_intensity_max);
             }
-            chrom_time_data.push_back(x_data);
-            chrom_intensity_data.push_back(y_data);
-            chrom_series_names.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
+            chrom_time_raw_data.push_back(x_data);
+            chrom_intensity_raw_data.push_back(y_data);
+            chrom_series_raw_names.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
           }
-          // Extract out the best left/right for plotting
-          for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
-            for (const auto& subordinate : feature.getSubordinates()) {
-              if (subordinate.getMetaValue("used_") == "true" && component_names.count(subordinate.getMetaValue("native_id").toString())) {
-                if (subordinate.metaValueExists("leftWidth") && subordinate.metaValueExists("rightWidth")) {
-                  std::vector<float> x_data, y_data;
-                  x_data.push_back(subordinate.getMetaValue("leftWidth"));
-                  y_data.push_back(0); // TODO: extract out chrom peak intensity
-                  x_data.push_back(subordinate.getMetaValue("rightWidth"));
-                  y_data.push_back(0); // TODO: extract out chrom peak intensity
-                  chrom_time_data.push_back(x_data);
-                  chrom_intensity_data.push_back(y_data);
-                  chrom_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
-                }
-              }
-            }
-          }
+          //// Extract out the best left/right for plotting
+          //for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
+          //  for (const auto& subordinate : feature.getSubordinates()) {
+          //    if (subordinate.getMetaValue("used_") == "true" && component_names.count(subordinate.getMetaValue("native_id").toString())) {
+          //      if (subordinate.metaValueExists("leftWidth") && subordinate.metaValueExists("rightWidth")) {
+          //        std::vector<float> x_data, y_data;
+          //        x_data.push_back(subordinate.getMetaValue("leftWidth"));
+          //        y_data.push_back(0); // TODO: extract out chrom peak intensity
+          //        x_data.push_back(subordinate.getMetaValue("rightWidth"));
+          //        y_data.push_back(0); // TODO: extract out chrom peak intensity
+          //        chrom_time_data.push_back(x_data);
+          //        chrom_intensity_data.push_back(y_data);
+          //        chrom_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
+          //      }
+          //    }
+          //  }
+          //}
           // Extract out the smoothed points for plotting
           for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
             for (const auto& subordinate : feature.getSubordinates()) {
@@ -773,9 +776,9 @@ namespace SmartPeak
                   chrom_time_max = std::max((float)point.getX(), chrom_time_max);
                   chrom_intensity_max = std::max((float)point.getY(), chrom_intensity_max);
                 }
-                chrom_time_data.push_back(x_data);
-                chrom_intensity_data.push_back(y_data);
-                chrom_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
+                chrom_time_hull_data.push_back(x_data);
+                chrom_intensity_hull_data.push_back(y_data);
+                chrom_series_hull_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
               }
             }
           }

@@ -115,8 +115,9 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 2> feature_pivot_table_rows;
     Eigen::Tensor<std::string, 2> feature_pivot_table_body;
     // data for the chromatogram scatter plot
-    std::vector<std::vector<float>> chrom_time_data, chrom_intensity_data;
-    std::vector<std::string> chrom_series_names;
+    std::vector<std::vector<float>> chrom_time_hull_data, chrom_intensity_hull_data;
+    std::vector<std::vector<float>> chrom_time_raw_data, chrom_intensity_raw_data;
+    std::vector<std::string> chrom_series_hull_names,chrom_series_raw_names;
     std::string chrom_x_axis_title;
     std::string chrom_y_axis_title;
     float chrom_time_min, chrom_time_max, chrom_intensity_min, chrom_intensity_max;

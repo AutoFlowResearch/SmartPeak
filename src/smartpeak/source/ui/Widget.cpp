@@ -212,15 +212,20 @@ namespace SmartPeak
     }
   }
 
-  void ScatterPlot2DWidget::draw()
+  void ChromatogramPlotWidget::draw()
   {
     // Main graphic
     ImPlot::SetNextPlotLimits(x_min_, x_max_, y_min_, y_max_, ImGuiCond_Always);
     if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(plot_width_ - 25, plot_height_ - 40))) {
-      for (int i = 0; i < x_data_.size(); ++i) {
-        assert(x_data_.at(i).size() == y_data_.at(i).size());
+      for (int i = 0; i < x_data_scatter_.size(); ++i) {
+        assert(x_data_scatter_.at(i).size() == y_data_scatter_.at(i).size());
+        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_None);
+        ImPlot::PlotLine(series_names_scatter_.at(i).c_str(), x_data_scatter_.at(i).data(), y_data_scatter_.at(i).data(), x_data_scatter_.at(i).size());
+      }
+      for (int i = 0; i < x_data_area_.size(); ++i) {
+        assert(x_data_area_.at(i).size() == y_data_area_.at(i).size());
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotScatter(series_names_.at(i).c_str(), x_data_.at(i).data(), y_data_.at(i).data(), x_data_.at(i).size());
+        ImPlot::PlotScatter(series_names_area_.at(i).c_str(), x_data_area_.at(i).data(), y_data_area_.at(i).data(), x_data_area_.at(i).size());
       }
       ImPlot::EndPlot();
     }

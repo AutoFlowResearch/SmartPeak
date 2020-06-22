@@ -174,18 +174,24 @@ namespace SmartPeak
   /**
     @brief Class for plotting 2D line plots
   */
-  class ScatterPlot2DWidget : public GenericGraphicWidget
+  class ChromatogramPlotWidget : public GenericGraphicWidget
   {
   public:
-    ScatterPlot2DWidget(const std::vector<std::vector<float>>&x_data, const std::vector<std::vector<float>>&y_data, const std::vector<std::string>&series_names,
+    ChromatogramPlotWidget(const std::vector<std::vector<float>>&x_data_scatter, const std::vector<std::vector<float>>&y_data_scatter, const std::vector<std::string>&series_names_scatter,
+      const std::vector<std::vector<float>>&x_data_area, const std::vector<std::vector<float>>&y_data_area, const std::vector<std::string>&series_names_area,
       const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
       const float& plot_width, const float& plot_height, const std::string& plot_title) :
-      x_data_(x_data), y_data_(y_data), series_names_(series_names), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
+      x_data_scatter_(x_data_scatter), y_data_scatter_(y_data_scatter), series_names_scatter_(series_names_scatter),
+      x_data_area_(x_data_area), y_data_area_(y_data_area), series_names_area_(series_names_area),
+      x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
       x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title) {};
     void draw() override;
-    const std::vector<std::vector<float>>& x_data_;
-    const std::vector<std::vector<float>>& y_data_;
-    const std::vector<std::string>& series_names_;
+    const std::vector<std::vector<float>>& x_data_scatter_;
+    const std::vector<std::vector<float>>& y_data_scatter_;
+    const std::vector<std::string>& series_names_scatter_;
+    const std::vector<std::vector<float>>& x_data_area_;
+    const std::vector<std::vector<float>>& y_data_area_;
+    const std::vector<std::string>& series_names_area_;
     const std::string& x_axis_title_;
     const std::string& y_axis_title_;
     const float& x_min_;
