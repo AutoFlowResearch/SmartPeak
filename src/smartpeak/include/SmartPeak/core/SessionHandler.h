@@ -55,6 +55,7 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 1> getSelectSampleNamesTable(); // Should be injection name?
     Eigen::Tensor<std::string, 1> getSelectSampleNamesPlot(); // Should be injection name?
     Eigen::Tensor<std::string, 1> getSelectTransitionsTable();
+    Eigen::Tensor<std::string, 1> getSelectTransitionGroupsTable();
     Eigen::Tensor<std::string, 1> getSelectTransitionsPlot();
     Eigen::Tensor<std::string, 1> getSelectFeatureNamesTable();
     Eigen::Tensor<std::string, 1> getSelectFeatureNamesPlot();
