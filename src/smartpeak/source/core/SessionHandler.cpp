@@ -38,15 +38,15 @@ namespace SmartPeak
   void SessionHandler::setTransitionExplorer() {
     // Make the transition explorer headers
     if (transition_explorer_checkbox_headers.size() <= 0) {
-      transition_explorer_checkbox_headers.resize(3);
-      transition_explorer_checkbox_headers.setValues({ "workflow", "plot", "table" });
+      transition_explorer_checkbox_headers.resize(2);
+      transition_explorer_checkbox_headers.setValues({ "plot", "table" });
     }
     const int n_rows = transitions_table_body.dimension(0);
     // Make the transition table body
     if (transition_explorer_checkbox_body.dimension(0) != n_rows) {
       transition_explorer_checkbox_body.resize(n_rows, (int)transition_explorer_checkbox_headers.size());
       transition_explorer_checkbox_body.setConstant(true);
-      for (int i = 1; i < transition_explorer_checkbox_body.dimension(0); ++i) transition_explorer_checkbox_body(i, 1) = false; // only the first transition
+      for (int i = 1; i < transition_explorer_checkbox_body.dimension(0); ++i) transition_explorer_checkbox_body(i, 0) = false; // only the first transition
       transition_explorer_checked_rows.resize(n_rows);
       transition_explorer_checked_rows.setConstant(true);
     }
@@ -619,8 +619,8 @@ namespace SmartPeak
         std::vector<std::vector<std::string>> table;
         std::vector<std::string> headers;
         SequenceParser::makeDataTableFromMetaValue(sequence_handler, table, headers, feature_names, sample_types, sample_names, component_names);
-        const int n_cols = feature_table_headers.size();
-        const int n_rows = feature_table_body.size();
+        const int n_cols = headers.size();
+        const int n_rows = table.size();
         feature_table_headers.resize(n_cols);
         feature_table_body.resize(n_rows, n_cols);
         for (int row = 0; row < n_rows; ++row) {
@@ -714,7 +714,7 @@ namespace SmartPeak
         if (!selected_transitions(i).empty())
           component_names.insert(selected_transitions(i));
       }
-      if (chrom_time_data.size() != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot()) { // TODO: better check for updates
+      if (chrom_time_data.size() != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot()*2) {
       // Set the axes titles and min/max defaults
         chrom_x_axis_title = "Time (sec)";
         chrom_y_axis_title = "Intensity (au)";
@@ -722,6 +722,9 @@ namespace SmartPeak
         chrom_time_max = 0;
         chrom_intensity_min = 1e6;
         chrom_intensity_max = 0;
+        chrom_time_data.clear();
+        chrom_intensity_data.clear();
+        chrom_series_names.clear();
         for (const auto& injection : sequence_handler.getSequence()) {
           if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
           // Extract out the raw data for plotting
@@ -938,7 +941,7 @@ namespace SmartPeak
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectTransitionsPlot()
   {
     if (transitions_table_body.size() && transition_explorer_checkbox_headers.size())
-      return (transition_explorer_checkbox_body.chip(1, 1)).select(transitions_table_body.chip(1, 1), transitions_table_body.chip(1, 1).constant(""));
+      return (transition_explorer_checkbox_body.chip(0, 1)).select(transitions_table_body.chip(0, 1), transitions_table_body.chip(0, 1).constant(""));
     else
       return Eigen::Tensor<std::string, 1>();
   }
@@ -961,7 +964,7 @@ namespace SmartPeak
   int SessionHandler::getNSelectedTransitionsPlot()
   {
     if (transition_explorer_checkbox_body.size()) {
-      Eigen::Tensor<int, 0> n_transitions = transition_explorer_checkbox_body.chip(1, 1).cast<int>().sum();
+      Eigen::Tensor<int, 0> n_transitions = transition_explorer_checkbox_body.chip(0, 1).cast<int>().sum();
       return n_transitions(0);
     }
     else

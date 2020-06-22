@@ -151,19 +151,24 @@ namespace SmartPeak
   class LinePlot2DWidget : public GenericGraphicWidget
   {
   public:
+    LinePlot2DWidget(const Eigen::Tensor<float, 2>&x_data, const Eigen::Tensor<float, 2>&y_data, const Eigen::Tensor<std::string, 1>&series_names,
+      const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
+      const float& plot_width, const float& plot_height, const std::string& plot_title) :
+      x_data_(x_data), y_data_(y_data), series_names_(series_names), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
+      x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title) {};
     void draw() override;
-    Eigen::Tensor<float, 2> x_data_;
-    Eigen::Tensor<float, 2> y_data_;
-    std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
-    std::string x_axis_title_;
-    std::string y_axis_title_;
-    float x_min_;
-    float x_max_;
-    float y_min_;
-    float y_max_;
-    float plot_width_;
-    float plot_height_;
-    Eigen::Tensor<std::string,1> series_names_;
+    const Eigen::Tensor<float, 2>& x_data_;
+    const Eigen::Tensor<float, 2>& y_data_;
+    const Eigen::Tensor<std::string, 1>& series_names_;
+    const std::string& x_axis_title_;
+    const std::string& y_axis_title_;
+    const float& x_min_;
+    const float& x_max_;
+    const float& y_min_;
+    const float& y_max_;
+    const float& plot_width_;
+    const float& plot_height_;
+    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
   };
 
   /**
@@ -172,19 +177,24 @@ namespace SmartPeak
   class ScatterPlot2DWidget : public GenericGraphicWidget
   {
   public:
+    ScatterPlot2DWidget(const std::vector<std::vector<float>>&x_data, const std::vector<std::vector<float>>&y_data, const std::vector<std::string>&series_names,
+      const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
+      const float& plot_width, const float& plot_height, const std::string& plot_title) :
+      x_data_(x_data), y_data_(y_data), series_names_(series_names), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
+      x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title) {};
     void draw() override;
-    std::vector<std::vector<float>> x_data_;
-    std::vector<std::vector<float>> y_data_;
-    std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
-    std::string x_axis_title_;
-    std::string y_axis_title_;
-    float x_min_;
-    float x_max_;
-    float y_min_;
-    float y_max_;
-    float plot_width_;
-    float plot_height_;
-    std::vector<std::string> series_names_;
+    const std::vector<std::vector<float>>& x_data_;
+    const std::vector<std::vector<float>>& y_data_;
+    const std::vector<std::string>& series_names_;
+    const std::string& x_axis_title_;
+    const std::string& y_axis_title_;
+    const float& x_min_;
+    const float& x_max_;
+    const float& y_min_;
+    const float& y_max_;
+    const float& plot_width_;
+    const float& plot_height_;
+    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
   };
 
   /**
@@ -193,21 +203,27 @@ namespace SmartPeak
   class CalibratorsPlotWidget : public GenericGraphicWidget
   {
   public:
+    CalibratorsPlotWidget(const std::vector<std::vector<float>>&x_fit_data, const std::vector<std::vector<float>>&y_fit_data,
+      const std::vector<std::vector<float>>&x_raw_data, const std::vector<std::vector<float>>&y_raw_data, const std::vector<std::string>&series_names,
+      const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
+      const float& plot_width, const float& plot_height, const std::string& plot_title) :
+      x_fit_data_(x_fit_data), y_fit_data_(y_fit_data), x_raw_data_(x_raw_data), y_raw_data_(y_raw_data), series_names_(series_names), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
+      x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title) {};
     void draw() override;
-    std::vector<std::vector<float>> x_fit_data_;
-    std::vector<std::vector<float>> y_fit_data_;
-    std::vector<std::vector<float>> x_raw_data_;
-    std::vector<std::vector<float>> y_raw_data_;
-    std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
-    std::string x_axis_title_;
-    std::string y_axis_title_;
-    float x_min_;
-    float x_max_;
-    float y_min_;
-    float y_max_;
-    float plot_width_;
-    float plot_height_;
-    std::vector<std::string> series_names_;
+    const std::vector<std::vector<float>>& x_fit_data_;
+    const std::vector<std::vector<float>>& y_fit_data_;
+    const std::vector<std::vector<float>>& x_raw_data_;
+    const std::vector<std::vector<float>>& y_raw_data_;
+    const std::vector<std::string>& series_names_;
+    const std::string& x_axis_title_;
+    const std::string& y_axis_title_;
+    const float& x_min_;
+    const float& x_max_;
+    const float& y_min_;
+    const float& y_max_;
+    const float& plot_width_;
+    const float& plot_height_;
+    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
   };
 
   /**
@@ -216,17 +232,22 @@ namespace SmartPeak
   class Heatmap2DWidget : public GenericGraphicWidget
   {
   public:
+    Heatmap2DWidget(const Eigen::Tensor<float, 2, Eigen::RowMajor>& data, const Eigen::Tensor<std::string, 1>& columns, const Eigen::Tensor<std::string, 1>& rows,
+      const std::string& x_axis_title, const std::string& y_axis_title, const float& data_min, const float& data_max,
+      const float& plot_width, const float& plot_height, const std::string& plot_title)
+      :data_(data), columns_(columns), rows_(rows), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title_), data_min_(data_min), data_max_(data_max),
+      plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title){};
     void draw() override;
-    Eigen::Tensor<float, 2, Eigen::RowMajor> data_; // Row major ordering
-    Eigen::Tensor<std::string,1> columns_;
-    Eigen::Tensor<std::string,1> rows_;
-    std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
-    std::string x_axis_title_;
-    std::string y_axis_title_;
-    float data_min_;
-    float data_max_;
-    float plot_width_;
-    float plot_height_;
+    const Eigen::Tensor<float, 2, Eigen::RowMajor>& data_; // Row major ordering
+    const Eigen::Tensor<std::string,1>& columns_;
+    const Eigen::Tensor<std::string,1>& rows_;
+    const std::string& x_axis_title_;
+    const std::string& y_axis_title_;
+    const float& data_min_;
+    const float& data_max_;
+    const float& plot_width_;
+    const float& plot_height_;
+    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
   };
 
   /**

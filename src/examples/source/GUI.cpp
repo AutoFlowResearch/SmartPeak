@@ -659,19 +659,10 @@ int main(int argc, char **argv)
           // Show the line plot
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
-          ScatterPlot2DWidget plot2d;
-          plot2d.x_data_ = session_handler_.chrom_time_data;
-          plot2d.y_data_ = session_handler_.chrom_intensity_data;
-          plot2d.x_axis_title_ = session_handler_.chrom_x_axis_title;
-          plot2d.y_axis_title_ = session_handler_.chrom_y_axis_title;
-          plot2d.series_names_ = session_handler_.chrom_series_names;
-          plot2d.plot_title_ = "Chromatograms Main Window";
-          plot2d.x_min_ = session_handler_.chrom_time_min;
-          plot2d.x_max_ = session_handler_.chrom_time_max;
-          plot2d.y_min_ = session_handler_.chrom_intensity_min;
-          plot2d.y_max_ = session_handler_.chrom_intensity_max;
-          plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
-          plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
+          ScatterPlot2DWidget plot2d(session_handler_.chrom_time_data, session_handler_.chrom_intensity_data, session_handler_.chrom_series_names,
+            session_handler_.chrom_x_axis_title, session_handler_.chrom_y_axis_title,
+            session_handler_.chrom_time_min, session_handler_.chrom_time_max, session_handler_.chrom_intensity_min, session_handler_.chrom_intensity_max,
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "Chromatograms Main Window");
           plot2d.draw();
           ImGui::EndTabItem();
         }
@@ -685,19 +676,11 @@ int main(int argc, char **argv)
           // Show the line plot
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
-          LinePlot2DWidget plot2d;
-          plot2d.x_data_ = session_handler_.feat_sample_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
-          plot2d.y_data_ = session_handler_.feat_value_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
-          plot2d.x_axis_title_ = session_handler_.feat_line_x_axis_title;
-          plot2d.y_axis_title_ = session_handler_.feat_line_y_axis_title;
-          plot2d.series_names_ = session_handler_.feat_heatmap_row_labels;
-          plot2d.plot_title_ = "Features(line)MainWindow";
-          plot2d.x_min_ = session_handler_.feat_line_sample_min;
-          plot2d.x_max_ = session_handler_.feat_line_sample_max;
-          plot2d.y_min_ = session_handler_.feat_value_min;
-          plot2d.y_max_ = session_handler_.feat_value_max;
-          plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
-          plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
+          Eigen::Tensor<float, 2> x_data = session_handler_.feat_sample_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+          Eigen::Tensor<float, 2> y_data = session_handler_.feat_value_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+          LinePlot2DWidget plot2d(x_data, y_data, session_handler_.feat_heatmap_row_labels, session_handler_.feat_line_x_axis_title, session_handler_.feat_line_y_axis_title,
+            session_handler_.feat_line_sample_min, session_handler_.feat_line_sample_max, session_handler_.feat_value_min, session_handler_.feat_value_max,
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "Features(line)MainWindow");
           plot2d.draw();
           ImGui::EndTabItem();
         }
@@ -706,17 +689,9 @@ int main(int argc, char **argv)
           // Show the line plot
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
-          Heatmap2DWidget plot2d;
-          plot2d.data_ = session_handler_.feat_heatmap_data;
-          plot2d.columns_ = session_handler_.feat_heatmap_col_labels;
-          plot2d.rows_ = session_handler_.feat_heatmap_row_labels;
-          plot2d.y_axis_title_ = session_handler_.feat_heatmap_x_axis_title;
-          plot2d.y_axis_title_ = session_handler_.feat_heatmap_y_axis_title;
-          plot2d.plot_title_ = "Features(heatmap)MainWindow";
-          plot2d.data_min_ = session_handler_.feat_value_min;
-          plot2d.data_max_ = session_handler_.feat_value_max;
-          plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
-          plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
+          Heatmap2DWidget plot2d(session_handler_.feat_heatmap_data, session_handler_.feat_heatmap_col_labels, session_handler_.feat_heatmap_row_labels, 
+            session_handler_.feat_heatmap_x_axis_title, session_handler_.feat_heatmap_y_axis_title, session_handler_.feat_value_min, session_handler_.feat_value_max,
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "Features(heatmap)MainWindow");
           plot2d.draw();
           ImGui::EndTabItem();
         }
@@ -724,21 +699,11 @@ int main(int argc, char **argv)
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
-          CalibratorsPlotWidget plot2d;
-          plot2d.x_fit_data_ = session_handler_.calibrators_conc_fit_data;
-          plot2d.y_fit_data_ = session_handler_.calibrators_feature_fit_data;
-          plot2d.x_raw_data_ = session_handler_.calibrators_conc_raw_data;
-          plot2d.y_raw_data_ = session_handler_.calibrators_feature_raw_data;
-          plot2d.x_axis_title_ = session_handler_.calibrators_x_axis_title;
-          plot2d.y_axis_title_ = session_handler_.calibrators_y_axis_title;
-          plot2d.series_names_ = session_handler_.calibrators_series_names;
-          plot2d.plot_title_ = "CalibratorsMainWindow";
-          plot2d.x_min_ = session_handler_.calibrators_conc_min;
-          plot2d.x_max_ = session_handler_.calibrators_conc_max;
-          plot2d.y_min_ = session_handler_.calibrators_feature_min;
-          plot2d.y_max_ = session_handler_.calibrators_feature_max;
-          plot2d.plot_width_ = win_size_and_pos.bottom_and_top_window_x_size_;
-          plot2d.plot_height_ = win_size_and_pos.top_window_y_size_;
+          CalibratorsPlotWidget plot2d(session_handler_.calibrators_conc_fit_data, session_handler_.calibrators_feature_fit_data, 
+            session_handler_.calibrators_conc_raw_data, session_handler_.calibrators_feature_raw_data, session_handler_.calibrators_series_names,
+            session_handler_.calibrators_x_axis_title, session_handler_.calibrators_y_axis_title, session_handler_.calibrators_conc_min, session_handler_.calibrators_conc_max,
+            session_handler_.calibrators_feature_min, session_handler_.calibrators_feature_max, win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_,
+            "CalibratorsMainWindow");
           plot2d.draw();
 
           ImGui::EndTabItem();

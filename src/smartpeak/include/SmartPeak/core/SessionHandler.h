@@ -51,10 +51,9 @@ namespace SmartPeak
     Eigen::Tensor<bool, 1> getComonentQCsTableFilters();
     Eigen::Tensor<bool, 1> getComponentGroupQCsTableFilters();
 
-    Eigen::Tensor<std::string, 1> getSelectSampleNamesWorkflow();
-    Eigen::Tensor<std::string, 1> getSelectSampleNamesTable();
-    Eigen::Tensor<std::string, 1> getSelectSampleNamesPlot();
-    Eigen::Tensor<std::string, 1> getSelectTransitionsWorkflow();
+    Eigen::Tensor<std::string, 1> getSelectInjectionNamesWorkflow();
+    Eigen::Tensor<std::string, 1> getSelectSampleNamesTable(); // Should be injection name?
+    Eigen::Tensor<std::string, 1> getSelectSampleNamesPlot(); // Should be injection name?
     Eigen::Tensor<std::string, 1> getSelectTransitionsTable();
     Eigen::Tensor<std::string, 1> getSelectTransitionsPlot();
     Eigen::Tensor<std::string, 1> getSelectFeatureNamesTable();
