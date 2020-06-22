@@ -934,10 +934,102 @@ namespace SmartPeak
     else
       return Eigen::Tensor<std::string, 2>();
   }
+  Eigen::Tensor<bool, 1> SessionHandler::getSequenceTableFilters()
+  {
+    if (sequence_table_body.size() && injection_explorer_checkbox_body.size())
+      return injection_explorer_checkbox_body.chip(2, 1);
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getTransitionsTableFilters()
+  {
+    if (transitions_table_body.size() && transition_explorer_checkbox_body.size())
+      return transition_explorer_checkbox_body.chip(1, 1);
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getQuantMethodsTableFilters()
+  {
+    if (quant_method_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = quant_method_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(quant_method_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < quant_method_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentFiltersTableFilters()
+  {
+    if (comp_filters_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_filters_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_filters_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_filters_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentQCsTableFilters()
+  {
+    if (comp_qcs_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_qcs_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_qcs_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_qcs_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  std::set<std::string> SessionHandler::getSelectInjectionNamesWorkflow(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_table_body.size() && injection_explorer_checkbox_headers.size()) {
+      Eigen::Tensor<bool, 1> selected_injections_workflow = injection_explorer_checkbox_body.chip(0, 1);
+      std::set<std::string> injection_names;
+      for (int row = 0; row < selected_injections_workflow.size(); ++row) {
+        if (selected_injections_workflow(row)) {
+          std::string injection_name = sequence_handler.getSequence().at(row).getMetaData().getInjectionName();
+          injection_names.insert(injection_name);
+        }
+      }
+      return injection_names;
+    }
+    else
+      return std::set<std::string>();
+  }
+  Eigen::Tensor<std::string, 1> SessionHandler::getSelectSampleNamesTable()
+  {
+    if (sequence_table_body.size() && injection_explorer_checkbox_headers.size())
+      return (injection_explorer_checkbox_body.chip(2, 1)).select(sequence_table_body.chip(2, 1), sequence_table_body.chip(2, 1).constant(""));
+    else
+      return Eigen::Tensor<std::string, 1>();
+  }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectSampleNamesPlot()
   {
     if (sequence_table_body.size() && injection_explorer_checkbox_headers.size())
       return (injection_explorer_checkbox_body.chip(1,1)).select(sequence_table_body.chip(1,1), sequence_table_body.chip(1, 1).constant(""));
+    else
+      return Eigen::Tensor<std::string, 1>();
+  }
+  Eigen::Tensor<std::string, 1> SessionHandler::getSelectTransitionsTable()
+  {
+    if (transitions_table_body.size() && transition_explorer_checkbox_headers.size())
+      return (transition_explorer_checkbox_body.chip(1, 1)).select(transitions_table_body.chip(1, 1), transitions_table_body.chip(1, 1).constant(""));
     else
       return Eigen::Tensor<std::string, 1>();
   }
@@ -948,12 +1040,28 @@ namespace SmartPeak
     else
       return Eigen::Tensor<std::string, 1>();
   }
+  Eigen::Tensor<std::string, 1> SessionHandler::getSelectFeatureNamesTable()
+  {
+    if (feature_explorer_body.size() && feature_explorer_checkbox_headers.size())
+      return (feature_explorer_checkbox_body.chip(1, 1)).select(feature_explorer_body.chip(1, 1), feature_explorer_body.chip(1, 1).constant(""));
+    else
+      return Eigen::Tensor<std::string, 1>();
+  }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectFeatureNamesPlot()
   {
     if (feature_explorer_body.size() && feature_explorer_checkbox_headers.size())
       return (feature_explorer_checkbox_body.chip(0, 1)).select(feature_explorer_body.chip(0, 1), feature_explorer_body.chip(0, 1).constant(""));
     else
       return Eigen::Tensor<std::string, 1>();
+  }
+  int SessionHandler::getNSelectedSampleNamesTable()
+  {
+    if (injection_explorer_checkbox_body.size()) {
+      Eigen::Tensor<int, 0> n_sample_names = injection_explorer_checkbox_body.chip(2, 1).cast<int>().sum();
+      return n_sample_names(0);
+    }
+    else
+      return 0;
   }
   int SessionHandler::getNSelectedSampleNamesPlot()
   {
@@ -964,11 +1072,29 @@ namespace SmartPeak
     else
       return 0;
   }
+  int SessionHandler::getNSelectedTransitionsTable()
+  {
+    if (transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<int, 0> n_transitions = transition_explorer_checkbox_body.chip(1, 1).cast<int>().sum();
+      return n_transitions(0);
+    }
+    else
+      return 0;
+  }
   int SessionHandler::getNSelectedTransitionsPlot()
   {
     if (transition_explorer_checkbox_body.size()) {
       Eigen::Tensor<int, 0> n_transitions = transition_explorer_checkbox_body.chip(0, 1).cast<int>().sum();
       return n_transitions(0);
+    }
+    else
+      return 0;
+  }
+  int SessionHandler::getNSelectedFeatureNamesTable()
+  {
+    if (feature_explorer_checkbox_body.size()) {
+      Eigen::Tensor<int, 0> n_feature_names = feature_explorer_checkbox_body.chip(1, 1).cast<int>().sum();
+      return n_feature_names(0);
     }
     else
       return 0;

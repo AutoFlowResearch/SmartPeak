@@ -554,7 +554,8 @@ int main(int argc, char **argv)
         {
           // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.sequence_table_headers, session_handler_.sequence_table_body, Eigen::Tensor<bool, 1>(), "SequenceMainWindow");
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getSequenceTableFilters();
+          GenericTableWidget Table(session_handler_.sequence_table_headers, session_handler_.sequence_table_body, table_filters, "SequenceMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -562,7 +563,8 @@ int main(int argc, char **argv)
         {
           // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.transitions_table_headers, session_handler_.transitions_table_body, Eigen::Tensor<bool, 1>(), "TransitionsMainWindow");
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getTransitionsTableFilters();
+          GenericTableWidget Table(session_handler_.transitions_table_headers, session_handler_.transitions_table_body, table_filters, "TransitionsMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -587,7 +589,8 @@ int main(int argc, char **argv)
           // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setQuantMethodTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.quant_method_table_headers, session_handler_.quant_method_table_body, Eigen::Tensor<bool, 1>(), "QuantMethodMainWindow");
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getQuantMethodsTableFilters();
+          GenericTableWidget Table(session_handler_.quant_method_table_headers, session_handler_.quant_method_table_body, table_filters, "QuantMethodMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -605,7 +608,8 @@ int main(int argc, char **argv)
           // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentFiltersTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.comp_filters_table_headers, session_handler_.comp_filters_table_body, Eigen::Tensor<bool, 1>(), "CompFiltersMainWindow");
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentFiltersTableFilters();
+          GenericTableWidget Table(session_handler_.comp_filters_table_headers, session_handler_.comp_filters_table_body, table_filters, "CompFiltersMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -623,7 +627,8 @@ int main(int argc, char **argv)
           // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentQCsTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.comp_qcs_table_headers, session_handler_.comp_qcs_table_body, Eigen::Tensor<bool, 1>(), "CompQCsMainWindow");
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentQCsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_qcs_table_headers, session_handler_.comp_qcs_table_body, table_filters, "CompQCsMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }

@@ -46,12 +46,12 @@ namespace SmartPeak
     Eigen::Tensor<bool, 1> getSequenceTableFilters();
     Eigen::Tensor<bool, 1> getTransitionsTableFilters();
     Eigen::Tensor<bool, 1> getQuantMethodsTableFilters();
-    Eigen::Tensor<bool, 1> getComonentFiltersTableFilters();
+    Eigen::Tensor<bool, 1> getComponentFiltersTableFilters();
+    Eigen::Tensor<bool, 1> getComponentQCsTableFilters();
     Eigen::Tensor<bool, 1> getComponentGroupFiltersTableFilters();
-    Eigen::Tensor<bool, 1> getComonentQCsTableFilters();
     Eigen::Tensor<bool, 1> getComponentGroupQCsTableFilters();
 
-    Eigen::Tensor<std::string, 1> getSelectInjectionNamesWorkflow();
+    std::set<std::string> getSelectInjectionNamesWorkflow(const SequenceHandler& sequence_handler);
     Eigen::Tensor<std::string, 1> getSelectSampleNamesTable(); // Should be injection name?
     Eigen::Tensor<std::string, 1> getSelectSampleNamesPlot(); // Should be injection name?
     Eigen::Tensor<std::string, 1> getSelectTransitionsTable();
@@ -59,8 +59,11 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 1> getSelectFeatureNamesTable();
     Eigen::Tensor<std::string, 1> getSelectFeatureNamesPlot();
 
+    int getNSelectedSampleNamesTable();
     int getNSelectedSampleNamesPlot();
+    int getNSelectedTransitionsTable();
     int getNSelectedTransitionsPlot();
+    int getNSelectedFeatureNamesTable();
     int getNSelectedFeatureNamesPlot();
 
     // data for the injection explorer
