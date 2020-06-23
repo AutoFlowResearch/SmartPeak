@@ -48,6 +48,8 @@ int main(int argc, char **argv)
   // to disable buttons
   bool workflow_is_done_ = true;
   bool file_loading_is_done_ = true;
+  bool exceeding_plot_points_ = false;
+  bool exceeding_table_size_ = false;
 
   // View: Bottom window
   bool show_info_ = true;
@@ -177,6 +179,8 @@ int main(int argc, char **argv)
     quickInfoText_.text_lines.clear();
     quickInfoText_.text_lines.push_back(workflow_is_done_ ? "Workflow status: done" : "Workflow status: running...");
     quickInfoText_.text_lines.push_back(file_loading_is_done_ ? "File loading status: done" : "File loading status: running...");
+    if (exceeding_plot_points_) quickInfoText_.text_lines.push_back("Plot rendering limit reached.  Not plotting all selected data.");
+    if (exceeding_table_size_) quickInfoText_.text_lines.push_back("Table rendering limit reached.  Not showing all selected data.");
 
     if (popup_file_picker_)
     {
@@ -618,7 +622,8 @@ int main(int argc, char **argv)
           // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupFiltersTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.comp_group_filters_table_headers, session_handler_.comp_group_filters_table_body, Eigen::Tensor<bool, 1>(), "CompGroupFiltersMainWindow");
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupFiltersTableFilters();
+          GenericTableWidget Table(session_handler_.comp_group_filters_table_headers, session_handler_.comp_group_filters_table_body, table_filters, "CompGroupFiltersMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -637,7 +642,8 @@ int main(int argc, char **argv)
           // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupQCsTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.comp_group_qcs_table_headers, session_handler_.comp_group_qcs_table_body, Eigen::Tensor<bool, 1>(), "CompGroupQCsMainWindow");
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupQCsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_group_qcs_table_headers, session_handler_.comp_group_qcs_table_body, table_filters, "CompGroupQCsMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -645,7 +651,7 @@ int main(int argc, char **argv)
         {
           // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
+          exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.feature_table_headers, session_handler_.feature_table_body, Eigen::Tensor<bool, 1>(), "features(table)MainWindow");
           Table.draw();
           ImGui::EndTabItem();
@@ -663,7 +669,7 @@ int main(int argc, char **argv)
         {
           // Show the line plot
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
+          exceeding_plot_points_ = !session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
           ChromatogramPlotWidget plot2d(session_handler_.chrom_time_raw_data, session_handler_.chrom_intensity_raw_data, session_handler_.chrom_series_raw_names,
             session_handler_.chrom_time_hull_data, session_handler_.chrom_intensity_hull_data, session_handler_.chrom_series_hull_names,
             session_handler_.chrom_x_axis_title, session_handler_.chrom_y_axis_title,

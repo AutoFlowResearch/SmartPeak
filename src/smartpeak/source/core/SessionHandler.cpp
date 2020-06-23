@@ -585,8 +585,10 @@ namespace SmartPeak
       }
     }
   }
-  void SessionHandler::setFeatureTable(const SequenceHandler & sequence_handler)
+  bool SessionHandler::setFeatureTable(const SequenceHandler & sequence_handler)
   {
+    int MAX_SIZE = 5000;
+    bool within_max_size = true;
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature table headers and body
@@ -623,6 +625,10 @@ namespace SmartPeak
         feature_table_headers.resize(n_cols);
         feature_table_body.resize(n_rows, n_cols);
         for (int row = 0; row < n_rows; ++row) {
+          if (row*n_cols > MAX_SIZE) {
+            within_max_size = false;
+            break;
+          }
           for (int col = 0; col < n_cols; ++col) {
             if (row == 0) feature_table_headers(col) = headers.at(col);
             feature_table_body(row, col) = table.at(row).at(col);
@@ -630,6 +636,7 @@ namespace SmartPeak
         }
       }
     }
+    return within_max_size;
   }
   void SessionHandler::setFeatureMatrix(const SequenceHandler & sequence_handler)
   {
@@ -694,8 +701,10 @@ namespace SmartPeak
       }
     }
   }
-  void SessionHandler::setChromatogramScatterPlot(const SequenceHandler & sequence_handler)
+  bool SessionHandler::setChromatogramScatterPlot(const SequenceHandler & sequence_handler)
   {
+    const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
+    int n_points = 0;
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0) {
@@ -741,9 +750,12 @@ namespace SmartPeak
               chrom_time_max = std::max((float)point.getRT(), chrom_time_max);
               chrom_intensity_max = std::max((float)point.getIntensity(), chrom_intensity_max);
             }
-            chrom_time_raw_data.push_back(x_data);
-            chrom_intensity_raw_data.push_back(y_data);
-            chrom_series_raw_names.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
+            n_points += x_data.size();
+            if (n_points<MAX_POINTS) {
+              chrom_time_raw_data.push_back(x_data);
+              chrom_intensity_raw_data.push_back(y_data);
+              chrom_series_raw_names.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
+            }
           }
           //// Extract out the best left/right for plotting
           //for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
@@ -755,9 +767,12 @@ namespace SmartPeak
           //        y_data.push_back(0); // TODO: extract out chrom peak intensity
           //        x_data.push_back(subordinate.getMetaValue("rightWidth"));
           //        y_data.push_back(0); // TODO: extract out chrom peak intensity
-          //        chrom_time_data.push_back(x_data);
-          //        chrom_intensity_data.push_back(y_data);
-          //        chrom_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
+          //        n_points += x_data.size();
+          //        if (n_points < MAX_POINTS) {
+          //          chrom_time_data.push_back(x_data);
+          //          chrom_intensity_data.push_back(y_data);
+          //          chrom_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
+          //        }
           //      }
           //    }
           //  }
@@ -775,15 +790,20 @@ namespace SmartPeak
                   chrom_time_max = std::max((float)point.getX(), chrom_time_max);
                   chrom_intensity_max = std::max((float)point.getY(), chrom_intensity_max);
                 }
-                chrom_time_hull_data.push_back(x_data);
-                chrom_intensity_hull_data.push_back(y_data);
-                chrom_series_hull_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
+                n_points += x_data.size();
+                if (n_points < MAX_POINTS) {
+                  chrom_time_hull_data.push_back(x_data);
+                  chrom_intensity_hull_data.push_back(y_data);
+                  chrom_series_hull_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
+                }
               }
             }
           }
         }
       }
     }
+    if (n_points < MAX_POINTS) return true;
+    else return false;
   }
   void SessionHandler::setFeatureLinePlot()
   {

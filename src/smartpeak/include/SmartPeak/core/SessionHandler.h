@@ -7,33 +7,46 @@
 namespace SmartPeak
 {
   class SessionHandler {
-  //public:
-  //  static SessionHandler& getInstance() {
-  //    static SessionHandler instance;
-  //    return instance;
-  //  }
-  //  SessionHandler(SessionHandler const&) = delete;
-  //  void operator=(SessionHandler const&) = delete;
-  //private:
-  //  SessionHandler() = default;
   public:
+    /*
+    @brief Sets minimal amount of data needed for injection, transition, and feature filters.
+      The method sets the SequenceTable, TransitionsTable, InjectionExplorer, TransitionExplorer, and FeatureExplorer
+
+    @param[in] sequence_handler
+
+    @returns true if all rows/columns were added and false if rows/columns were omitted due to performance
+    */
     void setMinimalDataAndFilters(const SequenceHandler& sequence_handler);
-    void setInjectionExplorer();
-    void setTransitionExplorer();
-    void setFeatureExplorer();
-    void setSequenceTable(const SequenceHandler& sequence_handler);
-    void setTransitionsTable(const SequenceHandler& sequence_handler);
-    void setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands);
-    void setParametersTable(const SequenceHandler& sequence_handler);
-    void setQuantMethodTable(const SequenceHandler& sequence_handler);
-    void setStdsConcsTable(const SequenceHandler& sequence_handler);
-    void setComponentFiltersTable(const SequenceHandler& sequence_handler);
-    void setComponentGroupFiltersTable(const SequenceHandler& sequence_handler);
-    void setComponentQCsTable(const SequenceHandler& sequence_handler);
-    void setComponentGroupQCsTable(const SequenceHandler& sequence_handler);
-    void setFeatureTable(const SequenceHandler& sequence_handler);
+    void setInjectionExplorer(); ///< set the InjectionExplorer-speciic data
+    void setTransitionExplorer(); ///< set the TransitionExplorer-speciic data
+    void setFeatureExplorer(); ///< set the FeatureExplorer-speciic data
+    void setSequenceTable(const SequenceHandler& sequence_handler); ///< set the SequenceTable-speciic data
+    void setTransitionsTable(const SequenceHandler& sequence_handler); ///< set the SequenceTable-speciic data
+    void setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands); ///< set the WorkflowTable-speciic data
+    void setParametersTable(const SequenceHandler& sequence_handler); ///< set the ParametersTable-speciic data
+    void setQuantMethodTable(const SequenceHandler& sequence_handler); ///< set the QuantMethodTable-speciic data
+    void setStdsConcsTable(const SequenceHandler& sequence_handler); ///< set the StdsConcsTable-speciic data
+    void setComponentFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentFiltersTable-speciic data
+    void setComponentGroupFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupFiltersTable-speciic data
+    void setComponentQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentQCsTable-speciic data
+    void setComponentGroupQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupQCsTable-speciic data
+    /*
+    @brief Sets the feature table
+
+    @param[in] sequence_handler
+
+    @returns true if all rows/columns were added and false if rows/columns were omitted due to performance
+    */
+    bool setFeatureTable(const SequenceHandler& sequence_handler);
     void setFeatureMatrix(const SequenceHandler& sequence_handler); /// including line/heatmap
-    void setChromatogramScatterPlot(const SequenceHandler& sequence_handler);
+    /*
+    @brief Sets the chromatogram data
+
+    @param[in] sequence_handler
+
+    @returns true if all points were added and false if points were omitted due to performance
+    */
+    bool setChromatogramScatterPlot(const SequenceHandler& sequence_handler);
     void setFeatureLinePlot();
     void setFeatureHeatMap();
     void setCalibratorsScatterLinePlot(const SequenceHandler& sequence_handler);
