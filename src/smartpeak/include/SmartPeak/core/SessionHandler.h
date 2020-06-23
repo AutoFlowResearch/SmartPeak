@@ -38,7 +38,14 @@ namespace SmartPeak
     @returns true if all rows/columns were added and false if rows/columns were omitted due to performance
     */
     bool setFeatureTable(const SequenceHandler& sequence_handler);
-    void setFeatureMatrix(const SequenceHandler& sequence_handler); /// including line/heatmap
+    /*
+    @brief Sets the Feature matrix data used for the matrix table, line plots, and heatmap
+
+    @param[in] sequence_handler
+
+    @returns true if all points were added and false if points were omitted due to performance
+    */
+    void setFeatureMatrix(const SequenceHandler& sequence_handler);
     /*
     @brief Sets the chromatogram data
 
@@ -49,7 +56,14 @@ namespace SmartPeak
     bool setChromatogramScatterPlot(const SequenceHandler& sequence_handler);
     void setFeatureLinePlot();
     void setFeatureHeatMap();
-    void setCalibratorsScatterLinePlot(const SequenceHandler& sequence_handler);
+    /*
+    @brief Sets the data used for rendering the calibrators
+
+    @param[in] sequence_handler
+
+    @returns true if all points were added and false if points were omitted due to performance
+    */
+    bool setCalibratorsScatterLinePlot(const SequenceHandler& sequence_handler);
 
     Eigen::Tensor<std::string, 1> getInjectionExplorerHeader();
     Eigen::Tensor<std::string, 2> getInjectionExplorerBody();

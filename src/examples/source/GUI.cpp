@@ -710,7 +710,7 @@ int main(int argc, char **argv)
         if (show_calibrators_line_plot && ImGui::BeginTabItem("Calibrators", &show_calibrators_line_plot))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
+          exceeding_plot_points_ = !session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
           CalibratorsPlotWidget plot2d(session_handler_.calibrators_conc_fit_data, session_handler_.calibrators_feature_fit_data, 
             session_handler_.calibrators_conc_raw_data, session_handler_.calibrators_feature_raw_data, session_handler_.calibrators_series_names,
             session_handler_.calibrators_x_axis_title, session_handler_.calibrators_y_axis_title, session_handler_.calibrators_conc_min, session_handler_.calibrators_conc_max,

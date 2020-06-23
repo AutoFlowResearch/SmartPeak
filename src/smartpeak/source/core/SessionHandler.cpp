@@ -756,6 +756,9 @@ namespace SmartPeak
               chrom_intensity_raw_data.push_back(y_data);
               chrom_series_raw_names.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
             }
+            else {
+              return false;
+            }
           }
           //// Extract out the best left/right for plotting
           //for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
@@ -796,6 +799,9 @@ namespace SmartPeak
                   chrom_intensity_hull_data.push_back(y_data);
                   chrom_series_hull_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
                 }
+                else {
+                  return false;
+                }
               }
             }
           }
@@ -835,8 +841,10 @@ namespace SmartPeak
     feat_heatmap_data.resize(feat_value_data.dimensions());
     feat_heatmap_data = feat_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
   }
-  void SessionHandler::setCalibratorsScatterLinePlot(const SequenceHandler & sequence_handler)
+  bool SessionHandler::setCalibratorsScatterLinePlot(const SequenceHandler & sequence_handler)
   {
+    const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
+    int n_points = 0;
     if (sequence_handler.getSequenceSegments().size() > 0 &&
       sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().size() > 0 &&
       sequence_handler.getSequenceSegments().at(0).getComponentsToConcentrations().size() > 0 &&
@@ -904,8 +912,14 @@ namespace SmartPeak
                 calibrators_feature_min = std::min(calculated_feature_ratio, calibrators_feature_min);
                 calibrators_feature_max = std::max(calculated_feature_ratio, calibrators_feature_max);
               }
-              calibrators_conc_fit_data.push_back(stand_concs_map.at(quant_method.getComponentName()).first);
-              calibrators_feature_fit_data.push_back(y_fit_data);
+              n_points += y_fit_data.size();
+              if (n_points < MAX_POINTS) {
+                calibrators_conc_fit_data.push_back(stand_concs_map.at(quant_method.getComponentName()).first);
+                calibrators_feature_fit_data.push_back(y_fit_data);
+              }
+              else {
+                return false;
+              }
               // Extract out the points used to make the line of best fit in `ComponentsToConcentrations`
               std::vector<float> x_raw_data, y_raw_data;
               OpenMS::AbsoluteQuantitation absQuant;
@@ -916,14 +930,22 @@ namespace SmartPeak
                 calibrators_feature_min = std::min(y_datum, calibrators_feature_min);
                 calibrators_feature_max = std::max(y_datum, calibrators_feature_max);
               }
-              calibrators_conc_raw_data.push_back(x_raw_data);
-              calibrators_feature_raw_data.push_back(y_raw_data);
-              calibrators_series_names.push_back(quant_method.getComponentName());
+              n_points += x_raw_data.size();
+              if (n_points < MAX_POINTS) {
+                calibrators_conc_raw_data.push_back(x_raw_data);
+                calibrators_feature_raw_data.push_back(y_raw_data);
+                calibrators_series_names.push_back(quant_method.getComponentName());
+              }
+              else {
+                return false;
+              }
             }
           }
         }
       }
     }
+    if (n_points < MAX_POINTS) return true;
+    else return false;
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getInjectionExplorerHeader()
   {
