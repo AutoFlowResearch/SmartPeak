@@ -23,7 +23,7 @@ platform: x64
 configuration: Debug
 
 cache:
-  - C:\projects\deps
+  #- C:\projects\deps
   - C:\projects\OpenMS
   - C:\projects\OpenMS-build
   - C:\projects\clcache
