@@ -315,31 +315,27 @@ int main(int argc, char **argv)
       if (ImGui::BeginMenu("File"))
       {
         ImGui::MenuItem("Session", NULL, false, false);
-        if (ImGui::MenuItem("New Session", NULL, false, false))
-        {
-          //TODO: SQL light interface
-        }
-
-        if (ImGui::MenuItem("Load Session", NULL, false, false))
-        {
-          //TODO: open file browser modal
-          // ImGui::OpenPopup("Delete?");
-        }
-
+        //if (ImGui::MenuItem("New Session", NULL, false, false))
+        //{
+        //  //TODO: Session (see AUT-280)
+        //}
+        //if (ImGui::MenuItem("Load Session", NULL, false, false))
+        //{
+        //  //TODO: Session (see AUT-280)
+        //}
         if (ImGui::MenuItem("Load session from sequence", NULL, false, workflow_is_done_ && file_loading_is_done_)) {
           static LoadSessionFromSequence processor(application_handler_);
           file_picker_.setProcessor(processor);
           popup_file_picker_ = true;
         }
-
-        if (ImGui::MenuItem("Save Session", NULL, false, false))
-        {
-          //TODO
-        }
-        if (ImGui::MenuItem("Save Session As...", NULL, false, false))
-        {
-          //TODO: open save as File browser modal
-        }
+        //if (ImGui::MenuItem("Save Session", NULL, false, false))
+        //{
+        //  //TODO: Session (see AUT-280)
+        //}
+        //if (ImGui::MenuItem("Save Session As...", NULL, false, false))
+        //{
+        //  //TODO: Session (see AUT-280)
+        //}
         ImGui::Separator();
         ImGui::MenuItem("Text file", NULL, false, false);
         if (ImGui::BeginMenu("Import File", false))
@@ -385,9 +381,6 @@ int main(int argc, char **argv)
           if (ImGui::MenuItem("Comp Group %Background QCs")) {}
           ImGui::EndMenu();
         }
-        // TODO
-        //ImGui::Separator();
-        //if (ImGui::MenuItem("Quit", "Alt+F4")) {}
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Edit"))
@@ -409,7 +402,7 @@ int main(int argc, char **argv)
         ImGui::MenuItem("Explorer window", NULL, false, false);
         if (ImGui::MenuItem("Injections", NULL, &show_injection_explorer)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {}
-        if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}  // including metadata?
+        if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}
         ImGui::Separator(); // Primary input
         ImGui::MenuItem("Main window (Tables)", NULL, false, false);
         if (ImGui::MenuItem("Sequence", NULL, &show_sequence_table)) {}
@@ -424,6 +417,7 @@ int main(int argc, char **argv)
           if (ImGui::MenuItem("Comp Group Filters", NULL, &show_comp_group_filters_table)) {}
           if (ImGui::MenuItem("Comp QCs", NULL, &show_comp_qcs_table)) {}
           if (ImGui::MenuItem("Comp Group QCs", NULL, &show_comp_group_qcs_table)) {}
+          // TODO: missing workflow setting tables...
           ImGui::EndMenu();
         }
         if (ImGui::MenuItem("Features (table)", NULL, &show_feature_table)) {}
@@ -441,11 +435,6 @@ int main(int argc, char **argv)
       }
       if (ImGui::BeginMenu("Actions"))
       {
-        if (ImGui::MenuItem("Run command", NULL, false, workflow_is_done_ && file_loading_is_done_))
-        {
-          initializeDataDirs(application_handler_);
-          // TODO: do the rest
-        }
         if (ImGui::MenuItem("Run workflow"))
         {
           if (application_handler_.commands_.empty())
@@ -456,7 +445,7 @@ int main(int argc, char **argv)
           popup_run_workflow_ = true;
         }
         if (ImGui::BeginMenu("Integrity checks"))
-        {  // TODO: bug
+        {  // TODO: see AUT-398
           if (ImGui::MenuItem("Sample consistency")) {}
           if (ImGui::MenuItem("Comp consistency")) {}
           if (ImGui::MenuItem("Comp Group consistency")) {}
@@ -472,8 +461,9 @@ int main(int argc, char **argv)
       if (ImGui::BeginMenu("Help"))
       {
         ImGui::MenuItem("About", NULL, &popup_about_);
-        if (ImGui::MenuItem("Documentation")) {}
-        if (ImGui::MenuItem("Version")) {}
+        if (ImGui::MenuItem("Documentation")) { 
+          // TODO: Render the SmartPeak documentation (See AUT-178)
+        }
         ImGui::EndMenu();
       }
       ImGui::EndMainMenuBar();
@@ -503,19 +493,16 @@ int main(int argc, char **argv)
       {
         if (show_injection_explorer && ImGui::BeginTabItem("Injections", &show_injection_explorer))
         {
-          // Call the Explorer widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<std::string, 1> headers = session_handler_.getInjectionExplorerHeader();
           Eigen::Tensor<std::string, 2> body = session_handler_.getInjectionExplorerBody();
           ExplorerWidget Explorer(headers, body,
             session_handler_.injection_explorer_checked_rows, "InjectionsExplorerWindow", session_handler_.injection_explorer_checkbox_headers, session_handler_.injection_explorer_checkbox_body);
           Explorer.draw();
-
           ImGui::EndTabItem();
         }
         if (show_transitions_explorer && ImGui::BeginTabItem("Transitions", &show_transitions_explorer))
         {
-          // Call the Explorer widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<std::string, 1> headers = session_handler_.getTransitionExplorerHeader();
           Eigen::Tensor<std::string, 2> body = session_handler_.getTransitionExplorerBody();
@@ -526,7 +513,6 @@ int main(int argc, char **argv)
         }
         if (show_features_explorer && ImGui::BeginTabItem("Features", &show_features_explorer))
         {
-          // Call the Explorer widget
           session_handler_.setFeatureExplorer();
           ExplorerWidget Explorer(session_handler_.feature_explorer_headers, session_handler_.feature_explorer_body,
             session_handler_.feature_explorer_checked_rows, "FeaturesExplorerWindow", session_handler_.feature_explorer_checkbox_headers, session_handler_.feature_explorer_checkbox_body);
@@ -556,7 +542,6 @@ int main(int argc, char **argv)
       {
         if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
         {
-          // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getSequenceTableFilters();
           GenericTableWidget Table(session_handler_.sequence_table_headers, session_handler_.sequence_table_body, table_filters, "SequenceMainWindow");
@@ -565,7 +550,6 @@ int main(int argc, char **argv)
         }
         if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
         {
-          // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getTransitionsTableFilters();
           GenericTableWidget Table(session_handler_.transitions_table_headers, session_handler_.transitions_table_body, table_filters, "TransitionsMainWindow");
@@ -574,7 +558,6 @@ int main(int argc, char **argv)
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
-          // Call the table widget
           session_handler_.setWorkflowTable(workflow_.getCommands());
           GenericTableWidget Table(session_handler_.workflow_table_headers, session_handler_.workflow_table_body, Eigen::Tensor<bool, 1>(), "WorkflowMainWindow");
           Table.draw();
@@ -582,7 +565,6 @@ int main(int argc, char **argv)
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
         {
-          // Call the table widget
           session_handler_.setParametersTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.parameters_table_headers, session_handler_.parameters_table_body, Eigen::Tensor<bool, 1>(), "ParametersMainWindow");
           Table.draw();
@@ -590,7 +572,6 @@ int main(int argc, char **argv)
         }
         if (show_quant_method_table && ImGui::BeginTabItem("Quantitation Method", &show_quant_method_table))
         {
-          // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setQuantMethodTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getQuantMethodsTableFilters();
@@ -600,7 +581,6 @@ int main(int argc, char **argv)
         }
         if (show_stds_concs_table && ImGui::BeginTabItem("Standards Concentrations", &show_stds_concs_table))
         {
-          // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setStdsConcsTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.stds_concs_table_headers, session_handler_.stds_concs_table_body, Eigen::Tensor<bool, 1>(), "StdsConcsMainWindow");
@@ -609,7 +589,6 @@ int main(int argc, char **argv)
         }
         if (show_comp_filters_table && ImGui::BeginTabItem("Component Filters", &show_comp_filters_table))
         {
-          // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentFiltersTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentFiltersTableFilters();
@@ -619,7 +598,6 @@ int main(int argc, char **argv)
         }
         if (show_comp_group_filters_table && ImGui::BeginTabItem("Component Group Filters", &show_comp_group_filters_table))
         {
-          // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupFiltersTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupFiltersTableFilters();
@@ -629,7 +607,6 @@ int main(int argc, char **argv)
         }
         if (show_comp_qcs_table && ImGui::BeginTabItem("Component QCs", &show_comp_qcs_table))
         {
-          // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentQCsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentQCsTableFilters();
@@ -639,7 +616,6 @@ int main(int argc, char **argv)
         }
         if (show_comp_group_qcs_table && ImGui::BeginTabItem("Component Group QCs", &show_comp_group_qcs_table))
         {
-          // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupQCsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupQCsTableFilters();
@@ -649,7 +625,6 @@ int main(int argc, char **argv)
         }
         if (show_feature_table && ImGui::BeginTabItem("Features table", &show_feature_table))
         {
-          // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.feature_table_headers, session_handler_.feature_table_body, Eigen::Tensor<bool, 1>(), "features(table)MainWindow");
@@ -658,7 +633,6 @@ int main(int argc, char **argv)
         }
         if (show_feature_pivot_table && ImGui::BeginTabItem("Features matrix", &show_feature_pivot_table))
         {
-          // Call the table widget
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.feature_pivot_table_headers, session_handler_.feature_pivot_table_body, Eigen::Tensor<bool, 1>(), "feature(matrix)MainWindow");
@@ -667,7 +641,6 @@ int main(int argc, char **argv)
         }
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
         {
-          // Show the line plot
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           exceeding_plot_points_ = !session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
           ChromatogramPlotWidget plot2d(session_handler_.chrom_time_raw_data, session_handler_.chrom_intensity_raw_data, session_handler_.chrom_series_raw_names,
@@ -685,7 +658,6 @@ int main(int argc, char **argv)
         }
         if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
         {
-          // Show the line plot
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
           Eigen::Tensor<float, 2> x_data = session_handler_.feat_sample_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
@@ -698,7 +670,6 @@ int main(int argc, char **argv)
         }
         if (show_feature_heatmap_plot && ImGui::BeginTabItem("Features (heatmap)", &show_feature_heatmap_plot))
         {
-          // Show the line plot
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
           Heatmap2DWidget plot2d(session_handler_.feat_heatmap_data, session_handler_.feat_heatmap_col_labels, session_handler_.feat_heatmap_row_labels, 
@@ -763,9 +734,12 @@ int main(int argc, char **argv)
           ImGui::BeginChild("Log child");
           // TODO: this does not display correctly
           // BUG: AUT-176
-          for (const plog::util::nstring& s : appender_.getMessageList(severity))
+          const std::vector<plog::util::nstring> message_list = appender_.getMessageList(severity);
+          int message_list_start = (message_list.size() > 500) ? message_list.size() - 500 : 0;
+          for (int i= message_list_start;i< message_list.size();++i)
           {
-            ImGui::Text("%s", s.c_str());
+            std::string str(message_list.at(i).data(), message_list.at(i).data() + message_list.at(i).size());
+            ImGui::Text("%s", str.c_str());
           }
           ImGui::EndChild();
           ImGui::EndTabItem();
