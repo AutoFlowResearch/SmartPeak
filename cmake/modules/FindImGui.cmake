@@ -126,7 +126,7 @@ macro(_imgui_setup_source_file source_var)
 endmacro()
 
 # Find components
-foreach(_component IN LISTS ImGUI_FIND_COMPONENTS)
+foreach(_component IN LISTS ImGui_FIND_COMPONENTS)
     if(_component STREQUAL "Sources")
         if(NOT TARGET ImGui::Sources)
             set(ImGui_Sources_FOUND TRUE)
