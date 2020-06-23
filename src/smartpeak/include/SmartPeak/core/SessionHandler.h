@@ -57,15 +57,15 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 1> getSelectTransitionsTable();
     Eigen::Tensor<std::string, 1> getSelectTransitionGroupsTable();
     Eigen::Tensor<std::string, 1> getSelectTransitionsPlot();
-    Eigen::Tensor<std::string, 1> getSelectFeatureNamesTable();
-    Eigen::Tensor<std::string, 1> getSelectFeatureNamesPlot();
+    Eigen::Tensor<std::string, 1> getSelectFeatureMetaValuesTable();
+    Eigen::Tensor<std::string, 1> getSelectFeatureMetaValuesPlot();
 
     int getNSelectedSampleNamesTable();
     int getNSelectedSampleNamesPlot();
     int getNSelectedTransitionsTable();
     int getNSelectedTransitionsPlot();
-    int getNSelectedFeatureNamesTable();
-    int getNSelectedFeatureNamesPlot();
+    int getNSelectedFeatureMetaValuesTable();
+    int getNSelectedFeatureMetaValuesPlot();
 
     // data for the injection explorer
     Eigen::Tensor<std::string, 1> injection_explorer_checkbox_headers;

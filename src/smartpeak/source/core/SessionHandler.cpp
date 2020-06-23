@@ -590,9 +590,9 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature table headers and body
-      if (feature_table_body.dimension(0) != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot() || feat_value_data.dimension(1) != 19 + getNSelectedFeatureNamesPlot()) {
+      if (feature_table_body.dimension(0) != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot() || feat_value_data.dimension(1) != 19 + getNSelectedFeatureMetaValuesPlot()) {
         // get the selected feature names
-        Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureNamesPlot();
+        Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureMetaValuesPlot();
         std::vector<std::string> feature_names;
         for (int i = 0; i < selected_feature_names.size(); ++i) {
           if (std::count(feature_names.begin(), feature_names.end(), selected_feature_names(i)) == 0 && !selected_feature_names(i).empty())
@@ -636,9 +636,9 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature_pivot table headers and body
-      if (feat_value_data.dimension(0) != getNSelectedFeatureNamesPlot() *getNSelectedSampleNamesPlot() || feat_value_data.dimension(1) != getNSelectedTransitionsPlot()) {
+      if (feat_value_data.dimension(0) != getNSelectedFeatureMetaValuesPlot() *getNSelectedSampleNamesPlot() || feat_value_data.dimension(1) != getNSelectedTransitionsPlot()) {
         // get the selected feature names
-        Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureNamesPlot();
+        Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureMetaValuesPlot();
         std::vector<std::string> feature_names;
         for (int i = 0; i < selected_feature_names.size(); ++i) {
           if (std::count(feature_names.begin(), feature_names.end(), selected_feature_names(i)) == 0 && !selected_feature_names(i).empty())
@@ -1078,14 +1078,14 @@ namespace SmartPeak
     else
       return Eigen::Tensor<std::string, 1>();
   }
-  Eigen::Tensor<std::string, 1> SessionHandler::getSelectFeatureNamesTable()
+  Eigen::Tensor<std::string, 1> SessionHandler::getSelectFeatureMetaValuesTable()
   {
     if (feature_explorer_body.size() && feature_explorer_checkbox_headers.size())
       return (feature_explorer_checkbox_body.chip(1, 1)).select(feature_explorer_body.chip(0, 1), feature_explorer_body.chip(0, 1).constant(""));
     else
       return Eigen::Tensor<std::string, 1>();
   }
-  Eigen::Tensor<std::string, 1> SessionHandler::getSelectFeatureNamesPlot()
+  Eigen::Tensor<std::string, 1> SessionHandler::getSelectFeatureMetaValuesPlot()
   {
     if (feature_explorer_body.size() && feature_explorer_checkbox_headers.size())
       return (feature_explorer_checkbox_body.chip(0, 1)).select(feature_explorer_body.chip(0, 1), feature_explorer_body.chip(0, 1).constant(""));
@@ -1128,7 +1128,7 @@ namespace SmartPeak
     else
       return 0;
   }
-  int SessionHandler::getNSelectedFeatureNamesTable()
+  int SessionHandler::getNSelectedFeatureMetaValuesTable()
   {
     if (feature_explorer_checkbox_body.size()) {
       Eigen::Tensor<int, 0> n_feature_names = feature_explorer_checkbox_body.chip(1, 1).cast<int>().sum();
@@ -1137,7 +1137,7 @@ namespace SmartPeak
     else
       return 0;
   }
-  int SessionHandler::getNSelectedFeatureNamesPlot()
+  int SessionHandler::getNSelectedFeatureMetaValuesPlot()
   {
     if (feature_explorer_checkbox_body.size()) {
       Eigen::Tensor<int, 0> n_feature_names = feature_explorer_checkbox_body.chip(0, 1).cast<int>().sum();
