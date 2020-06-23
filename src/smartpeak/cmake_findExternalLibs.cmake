@@ -30,9 +30,9 @@ find_package(Eigen3 3.1.0 REQUIRED)
 find_package(SDL2 REQUIRED)
 
 #------------------------------------------------------------------------------
-# Find ImGUI
+# Find ImGui
 #------------------------------------------------------------------------------
-find_package(ImGUI REQUIRED)
+find_package(ImGui REQUIRED)
 
 #------------------------------------------------------------------------------
 # Find ImPlot

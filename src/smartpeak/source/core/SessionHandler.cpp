@@ -10,6 +10,7 @@ namespace SmartPeak
 {
   void SessionHandler::setMinimalDataAndFilters(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setMinimalDataAndFilters";
     // Set the minimal data for the transitions
     setTransitionsTable(sequence_handler);
     setTransitionExplorer();
@@ -18,8 +19,10 @@ namespace SmartPeak
     setInjectionExplorer();
     // Set the minimal data for the filters
     setFeatureExplorer();
+    LOGD << "END setMinimalDataAndFilters";
   }
-  void SessionHandler::setInjectionExplorer(){//(const SequenceHandler& sequence_handler) {
+  void SessionHandler::setInjectionExplorer(){
+    LOGD << "START setInjectionExplorer";
     // Make the injection explorer headers
     if (injection_explorer_checkbox_headers.size() <= 0) {
       injection_explorer_checkbox_headers.resize(3);
@@ -34,8 +37,10 @@ namespace SmartPeak
       injection_explorer_checked_rows.resize(n_rows);
       injection_explorer_checked_rows.setConstant(true);
     }
+    LOGD << "END setInjectionExplorer";
   }
   void SessionHandler::setTransitionExplorer() {
+    LOGD << "START setTransitionExplorer";
     // Make the transition explorer headers
     if (transition_explorer_checkbox_headers.size() <= 0) {
       transition_explorer_checkbox_headers.resize(2);
@@ -50,8 +55,10 @@ namespace SmartPeak
       transition_explorer_checked_rows.resize(n_rows);
       transition_explorer_checked_rows.setConstant(true);
     }
+    LOGD << "END setTransitionExplorer";
   }
   void SessionHandler::setFeatureExplorer() {
+    LOGD << "START setFeatureExplorer";
     // Make the feature explorer headers
     if (feature_explorer_headers.size() <= 0) {
       feature_explorer_headers.resize(1);
@@ -76,8 +83,10 @@ namespace SmartPeak
       feature_explorer_checked_rows.resize(n_rows);
       feature_explorer_checked_rows.setConstant(true);
     }
+    LOGD << "END setFeatureExplorer";
   }
   void SessionHandler::setSequenceTable(const SequenceHandler & sequence_handler){
+    LOGD << "START setSequenceTable";
     // Make the sequence table headers
     if (sequence_table_headers.size() <= 0) {
       sequence_table_headers.resize(11);
@@ -119,9 +128,11 @@ namespace SmartPeak
         ++row;
       }
     }
+    LOGD << "END setSequenceTable";
   }
   void SessionHandler::setTransitionsTable(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setTransitionsTable";
     // Make the transition table headers
     if (transitions_table_headers.size() <= 0) {
       transitions_table_headers.resize(9);
@@ -161,9 +172,11 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setTransitionsTable";
   }
   void SessionHandler::setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands)
   {
+    LOGD << "START setWorkflowTable";
     // Make the workflow table headers
     if (workflow_table_headers.size() <= 0) {
       workflow_table_headers.resize(2);
@@ -183,9 +196,11 @@ namespace SmartPeak
         ++row;
       }
     }
+    LOGD << "END setWorkflowTable";
   }
   void SessionHandler::setParametersTable(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setParametersTable";
     if (sequence_handler.getSequence().size() > 0) {
       // Make the parameters table headers
       if (parameters_table_headers.size() <= 0) {
@@ -216,9 +231,11 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setParametersTable";
   }
   void SessionHandler::setQuantMethodTable(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setQuantMethodTable";
     if (sequence_handler.getSequenceSegments().size() > 0) {
       // Make the quant_method table headers
       if (quant_method_table_headers.size() <= 0) {
@@ -289,9 +306,11 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setQuantMethodTable";
   }
   void SessionHandler::setStdsConcsTable(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setStdsConcsTable";
     // Make the stds_concs table headers
     if (stds_concs_table_headers.size() <= 0) {
       stds_concs_table_headers.resize(7);
@@ -326,9 +345,11 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setStdsConcsTable";
   }
   void SessionHandler::setComponentFiltersTable(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setComponentFiltersTable";
     if (sequence_handler.getSequenceSegments().size() > 0) {
       // Make the comp_filters table headers
       if (comp_filters_table_headers.size() <= 0) {
@@ -373,9 +394,11 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setComponentFiltersTable";
   }
   void SessionHandler::setComponentGroupFiltersTable(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setComponentGroupFiltersTable";
     if (sequence_handler.getSequenceSegments().size() > 0) {
       // Make the comp_group_filters table headers
       if (comp_group_filters_table_headers.size() <= 0) {
@@ -455,9 +478,11 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setComponentGroupFiltersTable";
   }
   void SessionHandler::setComponentQCsTable(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setComponentQCsTable";
     if (sequence_handler.getSequenceSegments().size() > 0) {
       // Make the comp_qcs table headers
       if (comp_qcs_table_headers.size() <= 0) {
@@ -502,9 +527,11 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setComponentQCsTable";
   }
   void SessionHandler::setComponentGroupQCsTable(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setComponentGroupQCsTable";
     if (sequence_handler.getSequenceSegments().size() > 0) {
       // Make the comp_group_qcs table headers
       if (comp_group_qcs_table_headers.size() <= 0) {
@@ -584,9 +611,11 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setComponentGroupQCsTable";
   }
   bool SessionHandler::setFeatureTable(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setFeatureTable";
     int MAX_SIZE = 5000;
     bool within_max_size = true;
     if (sequence_handler.getSequence().size() > 0 &&
@@ -627,6 +656,7 @@ namespace SmartPeak
         for (int row = 0; row < n_rows; ++row) {
           if (row*n_cols > MAX_SIZE) {
             within_max_size = false;
+            LOGI << "Stopped adding rows to the feature table";
             break;
           }
           for (int col = 0; col < n_cols; ++col) {
@@ -636,10 +666,12 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setFeatureTable";
     return within_max_size;
   }
   void SessionHandler::setFeatureMatrix(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setFeatureMatrix";
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature_pivot table headers and body
@@ -700,9 +732,11 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setFeatureMatrix";
   }
   bool SessionHandler::setChromatogramScatterPlot(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setChromatogramScatterPlot";
     const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
     int n_points = 0;
     if (sequence_handler.getSequence().size() > 0 &&
@@ -757,6 +791,8 @@ namespace SmartPeak
               chrom_series_raw_names.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
             }
             else {
+              LOGI << "Stopped adding points to the chromatogram plot";
+              LOGD << "END setChromatogramScatterPlot";
               return false;
             }
           }
@@ -800,6 +836,8 @@ namespace SmartPeak
                   chrom_series_hull_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
                 }
                 else {
+                  LOGI << "Stopped adding points to the chromatogram plot";
+                  LOGD << "END setChromatogramScatterPlot";
                   return false;
                 }
               }
@@ -808,11 +846,13 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setChromatogramScatterPlot";
     if (n_points < MAX_POINTS) return true;
     else return false;
   }
   void SessionHandler::setFeatureLinePlot()
   {
+    LOGD << "START setFeatureLinePlot";
     // Set the axes titles and min/max defaults
     feat_line_x_axis_title = "Inj#";
     std::string feat_line_y_axis_title = "metadata (au)";
@@ -831,18 +871,22 @@ namespace SmartPeak
     feat_value_max = feat_value_data_maximum(0);
     const Eigen::Tensor<float, 0> feat_value_data_minimum = feat_value_data.minimum();
     feat_value_min = feat_value_data_minimum(0);
+    LOGD << "END setFeatureLinePlot";
   }
   void SessionHandler::setFeatureHeatMap()
   {
+    LOGD << "START setFeatureHeatMap";
     // Set the axes titles
     feat_heatmap_x_axis_title = "Sample name";
     feat_heatmap_y_axis_title = "Component name";
     // assign the heatmap data
     feat_heatmap_data.resize(feat_value_data.dimensions());
     feat_heatmap_data = feat_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+    LOGD << "END setFeatureHeatMap";
   }
   bool SessionHandler::setCalibratorsScatterLinePlot(const SequenceHandler & sequence_handler)
   {
+    LOGD << "START setCalibratorsScatterLinePlot";
     const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
     int n_points = 0;
     if (sequence_handler.getSequenceSegments().size() > 0 &&
@@ -918,6 +962,8 @@ namespace SmartPeak
                 calibrators_feature_fit_data.push_back(y_fit_data);
               }
               else {
+                LOGI << "Stopped adding points to calibrators plot";
+                LOGD << "END setCalibratorsScatterLinePlot";
                 return false;
               }
               // Extract out the points used to make the line of best fit in `ComponentsToConcentrations`
@@ -937,6 +983,8 @@ namespace SmartPeak
                 calibrators_series_names.push_back(quant_method.getComponentName());
               }
               else {
+                LOGI << "Stopped adding points to calibrators plot";
+                LOGD << "END setCalibratorsScatterLinePlot";
                 return false;
               }
             }
@@ -944,11 +992,13 @@ namespace SmartPeak
         }
       }
     }
+    LOGD << "END setCalibratorsScatterLinePlot";
     if (n_points < MAX_POINTS) return true;
     else return false;
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getInjectionExplorerHeader()
   {
+    LOGD << "START getInjectionExplorerHeader";
     if (sequence_table_headers.size())
       return sequence_table_headers.slice(Eigen::array<Eigen::Index, 1>({ 0 }), Eigen::array<Eigen::Index, 1>({ 2 }));
     else
@@ -956,6 +1006,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 2> SessionHandler::getInjectionExplorerBody()
   {
+    LOGD << "START getInjectionExplorerBody";
     if (sequence_table_body.size())
       return sequence_table_body.slice(Eigen::array<Eigen::Index, 2>({ 0,0 }), Eigen::array<Eigen::Index, 2>({ sequence_table_body.dimension(0), 2 }));
     else
@@ -963,6 +1014,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getTransitionExplorerHeader()
   {
+    LOGD << "START getTransitionExplorerHeader";
     if (transitions_table_headers.size())
       return transitions_table_headers.slice(Eigen::array<Eigen::Index, 1>({ 0 }), Eigen::array<Eigen::Index, 1>({ 2 }));
     else
@@ -970,6 +1022,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 2> SessionHandler::getTransitionExplorerBody()
   {
+    LOGD << "START getTransitionExplorerBody";
     if (transitions_table_body.size())
       return transitions_table_body.slice(Eigen::array<Eigen::Index, 2>({ 0,0 }), Eigen::array<Eigen::Index, 2>({ transitions_table_body.dimension(0), 2 }));
     else
@@ -977,6 +1030,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<bool, 1> SessionHandler::getSequenceTableFilters()
   {
+    LOGD << "START getSequenceTableFilters";
     if (sequence_table_body.size() && injection_explorer_checkbox_body.size())
       return injection_explorer_checkbox_body.chip(2, 1);
     else
@@ -984,6 +1038,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<bool, 1> SessionHandler::getTransitionsTableFilters()
   {
+    LOGD << "START getTransitionsTableFilters";
     if (transitions_table_body.size() && transition_explorer_checkbox_body.size())
       return transition_explorer_checkbox_body.chip(1, 1);
     else
@@ -991,6 +1046,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<bool, 1> SessionHandler::getQuantMethodsTableFilters()
   {
+    LOGD << "START getQuantMethodsTableFilters";
     if (quant_method_table_body.size() && transition_explorer_checkbox_body.size()) {
       Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
       Eigen::Tensor<std::string, 1> table_transitions = quant_method_table_body.chip(0, 1);
@@ -1007,6 +1063,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<bool, 1> SessionHandler::getComponentFiltersTableFilters()
   {
+    LOGD << "START getComponentFiltersTableFilters";
     if (comp_filters_table_body.size() && transition_explorer_checkbox_body.size()) {
       Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
       Eigen::Tensor<std::string, 1> table_transitions = comp_filters_table_body.chip(0, 1);
@@ -1023,6 +1080,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<bool, 1> SessionHandler::getComponentQCsTableFilters()
   {
+    LOGD << "START getComponentQCsTableFilters";
     if (comp_qcs_table_body.size() && transition_explorer_checkbox_body.size()) {
       Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
       Eigen::Tensor<std::string, 1> table_transitions = comp_qcs_table_body.chip(0, 1);
@@ -1039,6 +1097,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupFiltersTableFilters()
   {
+    LOGD << "START getComponentGroupFiltersTableFilters";
     if (comp_group_filters_table_body.size() && transition_explorer_checkbox_body.size()) {
       Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
       Eigen::Tensor<std::string, 1> table_transitions = comp_group_filters_table_body.chip(0, 1);
@@ -1055,6 +1114,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupQCsTableFilters()
   {
+    LOGD << "START getComponentGroupQCsTableFilters";
     if (comp_group_qcs_table_body.size() && transition_explorer_checkbox_body.size()) {
       Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
       Eigen::Tensor<std::string, 1> table_transitions = comp_group_qcs_table_body.chip(0, 1);
@@ -1071,6 +1131,7 @@ namespace SmartPeak
   }
   std::set<std::string> SessionHandler::getSelectInjectionNamesWorkflow(const SequenceHandler& sequence_handler)
   {
+    LOGD << "START getSelectInjectionNamesWorkflow";
     if (sequence_table_body.size() && injection_explorer_checkbox_headers.size()) {
       Eigen::Tensor<bool, 1> selected_injections_workflow = injection_explorer_checkbox_body.chip(0, 1);
       std::set<std::string> injection_names;
@@ -1087,6 +1148,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectSampleNamesTable()
   {
+    LOGD << "START getSelectSampleNamesTable";
     if (sequence_table_body.size() && injection_explorer_checkbox_headers.size())
       return (injection_explorer_checkbox_body.chip(2, 1)).select(sequence_table_body.chip(1, 1), sequence_table_body.chip(1, 1).constant(""));
     else
@@ -1094,6 +1156,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectSampleNamesPlot()
   {
+    LOGD << "START getSelectSampleNamesPlot";
     if (sequence_table_body.size() && injection_explorer_checkbox_headers.size())
       return (injection_explorer_checkbox_body.chip(1,1)).select(sequence_table_body.chip(1,1), sequence_table_body.chip(1, 1).constant(""));
     else
@@ -1101,6 +1164,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectTransitionsTable()
   {
+    LOGD << "START getSelectTransitionsTable";
     if (transitions_table_body.size() && transition_explorer_checkbox_headers.size())
       return (transition_explorer_checkbox_body.chip(1, 1)).select(transitions_table_body.chip(1, 1), transitions_table_body.chip(1, 1).constant(""));
     else
@@ -1108,6 +1172,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectTransitionGroupsTable()
   {
+    LOGD << "START getSelectTransitionGroupsTable";
     if (transitions_table_body.size() && transition_explorer_checkbox_headers.size())
       return (transition_explorer_checkbox_body.chip(1, 1)).select(transitions_table_body.chip(0, 1), transitions_table_body.chip(0, 1).constant(""));
     else
@@ -1115,6 +1180,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectTransitionsPlot()
   {
+    LOGD << "START getSelectTransitionsPlot";
     if (transitions_table_body.size() && transition_explorer_checkbox_headers.size())
       return (transition_explorer_checkbox_body.chip(0, 1)).select(transitions_table_body.chip(1, 1), transitions_table_body.chip(1, 1).constant(""));
     else
@@ -1122,6 +1188,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectFeatureMetaValuesTable()
   {
+    LOGD << "START getSelectFeatureMetaValuesTable";
     if (feature_explorer_body.size() && feature_explorer_checkbox_headers.size())
       return (feature_explorer_checkbox_body.chip(1, 1)).select(feature_explorer_body.chip(0, 1), feature_explorer_body.chip(0, 1).constant(""));
     else
@@ -1129,6 +1196,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectFeatureMetaValuesPlot()
   {
+    LOGD << "START getSelectFeatureMetaValuesPlot";
     if (feature_explorer_body.size() && feature_explorer_checkbox_headers.size())
       return (feature_explorer_checkbox_body.chip(0, 1)).select(feature_explorer_body.chip(0, 1), feature_explorer_body.chip(0, 1).constant(""));
     else

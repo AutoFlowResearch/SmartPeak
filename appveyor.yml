@@ -23,9 +23,9 @@ platform: x64
 configuration: Debug
 
 cache:
-  #- C:\projects\deps
-  #- C:\projects\OpenMS
-  #- C:\projects\OpenMS-build
+  - C:\projects\deps
+  - C:\projects\OpenMS
+  - C:\projects\OpenMS-build
   - C:\projects\clcache
 
 # artifacts can only be found in the repo dir (i.e. C:\projects\SmartPeak2) or subdirs
