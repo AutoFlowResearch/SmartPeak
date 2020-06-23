@@ -722,8 +722,8 @@ int main(int argc, char **argv)
         if (show_log_ && ImGui::BeginTabItem("Log", &show_log_))
         {
           const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
-          static int selected_severity = 5;
-          static plog::Severity severity = plog::Severity::debug;
+          static int selected_severity = 4;
+          static plog::Severity severity = plog::Severity::info;
 
           if (ImGui::Combo("Level", &selected_severity, items, IM_ARRAYSIZE(items)))
           {
@@ -732,8 +732,6 @@ int main(int argc, char **argv)
 
           ImGui::Separator();
           ImGui::BeginChild("Log child");
-          // TODO: this does not display correctly
-          // BUG: AUT-176
           const std::vector<plog::util::nstring> message_list = appender_.getMessageList(severity);
           int message_list_start = (message_list.size() > 500) ? message_list.size() - 500 : 0;
           for (int i= message_list_start;i< message_list.size();++i)
