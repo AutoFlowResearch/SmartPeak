@@ -241,7 +241,7 @@ namespace SmartPeak
     Heatmap2DWidget(const Eigen::Tensor<float, 2, Eigen::RowMajor>& data, const Eigen::Tensor<std::string, 1>& columns, const Eigen::Tensor<std::string, 1>& rows,
       const std::string& x_axis_title, const std::string& y_axis_title, const float& data_min, const float& data_max,
       const float& plot_width, const float& plot_height, const std::string& plot_title)
-      :data_(data), columns_(columns), rows_(rows), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title_), data_min_(data_min), data_max_(data_max),
+      :data_(data), columns_(columns), rows_(rows), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title), data_min_(data_min), data_max_(data_max),
       plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title){};
     void draw() override;
     const Eigen::Tensor<float, 2, Eigen::RowMajor>& data_; // Row major ordering

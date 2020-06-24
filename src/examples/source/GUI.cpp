@@ -627,7 +627,7 @@ int main(int argc, char **argv)
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.feature_table_headers, session_handler_.feature_table_body, Eigen::Tensor<bool, 1>(), "features(table)MainWindow");
+          GenericTableWidget Table(session_handler_.feature_table_headers, session_handler_.feature_table_body, Eigen::Tensor<bool, 1>(), "featuresTableMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -635,7 +635,7 @@ int main(int argc, char **argv)
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.feature_pivot_table_headers, session_handler_.feature_pivot_table_body, Eigen::Tensor<bool, 1>(), "feature(matrix)MainWindow");
+          GenericTableWidget Table(session_handler_.feature_pivot_table_headers, session_handler_.feature_pivot_table_body, Eigen::Tensor<bool, 1>(), "featureMatrixMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -664,7 +664,7 @@ int main(int argc, char **argv)
           Eigen::Tensor<float, 2> y_data = session_handler_.feat_value_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
           LinePlot2DWidget plot2d(x_data, y_data, session_handler_.feat_heatmap_row_labels, session_handler_.feat_line_x_axis_title, session_handler_.feat_line_y_axis_title,
             session_handler_.feat_line_sample_min, session_handler_.feat_line_sample_max, session_handler_.feat_value_min, session_handler_.feat_value_max,
-            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "Features(line)MainWindow");
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "FeaturesLineMainWindow");
           plot2d.draw();
           ImGui::EndTabItem();
         }
@@ -674,7 +674,7 @@ int main(int argc, char **argv)
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
           Heatmap2DWidget plot2d(session_handler_.feat_heatmap_data, session_handler_.feat_heatmap_col_labels, session_handler_.feat_heatmap_row_labels, 
             session_handler_.feat_heatmap_x_axis_title, session_handler_.feat_heatmap_y_axis_title, session_handler_.feat_value_min, session_handler_.feat_value_max,
-            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "Features(heatmap)MainWindow");
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "FeaturesHeatmapMainWindow");
           plot2d.draw();
           ImGui::EndTabItem();
         }

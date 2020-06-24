@@ -128,17 +128,32 @@ or double-click `GUI` executable in the file browser of your OS.
 ![Sequence](images/sequence_file.png)
 - Edit the workflow with `Edit | Workflow`. You have an option to cherry pick the custom workflow or to choose the predefined set of operations. For example, the workflow steps for GC-MS SIM Unknowns are the following:
 ![Workflow](images/workflow.png)
-- Run the workflow with `Actions | Run workflow`
-- After the workflow has finished, export the results with `Actions | Report`. There is an option to choose the set of variables of interest
+- View and verify the workflow steps and input files with `View | [table]`. 
+![InputTablesWorkflow](images/SmartPeakGUIWorkflowTable.png)
+- The explorer panes can be used to filter the table views with `View | Injections or Transitions`.  Click on the checkbox under plot or table to include or exclude the injection or tansition from the view.
+![InputTablesSequence](images/SmartPeakGUISequenceTable.png)
+- Run the workflow with `Actions | Run workflow`. Verify or change the data input/output directories before running the workflow.
+![RunWorkflowModal](images/SmartPeakGUIRunWorkflowModal.png)
+- The status of the workflow can be monitored with `View | info`. 
+![Info](images/SmartPeakGUIInfo.png)
+- Alternatively, a more detailed status can be obtained with `View | log` which will display the most recent SmartPeak log information.
+![Log](images/SmartPeakGUILog.png)
+- After the workflow has finished, the results can be viewed in a tabular form as a large data table with `View | features (table)`.  The feature metavalues shown can be added or removed with `View | Features` and clicking on the checkboxes under plot or table.  For performance reasons, the amount of data that one can view is limited to 5000 entries.
+- The results can be viewed in a graphical form as a line plot or as a heatmap with `View | features (line)`.
+![FeaturesLinePlot](images/SmartPeakGUIFeatureLinePlot.png)
+or `View | features (heatmap)`
+![FeaturesHeatmap](images/SmartPeakGUIFeatureHeatmap.png)
+- The underlying data can also be displayed as a table matrix with `View | features (matrix)`. Samples, transitions, or feature metavalues can be included or excluded from any of the views using the explorer panes.
+![FeaturesMatrix](images/SmartPeakGUIFeatureMatrix.png)
+- The results of calibration curve fitting can be inspected with `View | Workflow settings | Quant Methods`.
+![QuantMethod](images/SmartPeakGUIQuantMethod.png)
+- A detailed look at the calibration fitted model and selected points for the model can be seen with `View | Calibrators`.
+![Calibrators](images/SmartPeakGUICalibrators.png)
+- For debugging problematic peaks, the raw chromatographic data and the picked and selected peaks can be viewed graphically with `View | Chromatograms`. For performance reasons, the amount of data that one can view is limited to 9000 points.
+![Chromatograms](images/SmartPeakGUIChromViewer.png)
+- Export the results with `Actions | Report`. There is an option to choose the set of variables of interest
 ![Dialog](images/report_dialog.png)
 - The results will be exported to `PivotTable.csv` in the same folder
 ![Report](images/csv_file.png)
 
-## Using CLI
-
-The same operations can be performed with the command line interface. Run `./bin/CLI` or double-click `CLI` executable to start it. To run the examples, follow the same steps as in GUI:
-- `File -> Load session from sequence`
-- `Edit -> Workflow`
-- `Actions -> Run workflow`
-- `Actions -> Report`
 The above applies for Mac and Linux.
