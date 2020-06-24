@@ -75,7 +75,7 @@ jobs:
       - run:
           command: |
             cd ~/SmartPeak2/smartpeak2_debug_build
-            ctest -V -F -j6
+            ctest -V -F -j4
 
 
 workflows:
