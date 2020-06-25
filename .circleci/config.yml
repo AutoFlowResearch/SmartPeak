@@ -75,6 +75,7 @@ jobs:
       - run:
           command: |
             cd ~/SmartPeak2/smartpeak2_debug_build
+            ls -althR ~/SmartPeak2/src/tests/class_tests/smartpeak/data
             ctest -VV -F
 
 
