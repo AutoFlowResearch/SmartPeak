@@ -25,7 +25,7 @@ endif()
 find_package(Eigen3 3.1.0 REQUIRED)
 
 #------------------------------------------------------------------------------
-# ImGui SDL and OpenGL dependencies
+# ImGUI SDL and OpenGL dependencies
 #------------------------------------------------------------------------------
 find_package(SDL2 REQUIRED)
 
@@ -33,9 +33,11 @@ find_package(SDL2 REQUIRED)
 # Find ImGui
 #------------------------------------------------------------------------------
 find_package(ImGui REQUIRED)
-if (IMGUI_FOUND)
-  message(STATUS "ImGui_INCLUDE_DIR : ${ImGui_INCLUDE_DIR}")
-endif (IMGUI_FOUND)
+
+#------------------------------------------------------------------------------
+# Find ImPlot
+#------------------------------------------------------------------------------
+find_package(ImPlot REQUIRED)
 
 #------------------------------------------------------------------------------
 # Find plog

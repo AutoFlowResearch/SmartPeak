@@ -1,19 +1,18 @@
-// Example application for SDL2 + OpenGL
-// **DO NOT USE THIS CODE IF YOUR CODE/ENGINE IS USING MODERN OPENGL (SHADERS, VBO, VAO, etc.)**
-// **Prefer using the code in the sdl_opengl3_example/ folder**
-// See imgui_impl_sdl.cpp for details.
+// TODO: Add copyright
 
 #include <stdio.h>
 #include <chrono>
 #include <string>
 #include <vector>
-#include <SmartPeak/core/AppState.h>
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/ui/GuiAppender.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
-#include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <boost/filesystem.hpp>
@@ -29,10 +28,10 @@ namespace fs = boost::filesystem;
 
 void HelpMarker(const char* desc);
 
-void initializeDataDirs(AppState& state);
+void initializeDataDirs(ApplicationHandler& state);
 
 void initializeDataDir(
-  AppState& state,
+  ApplicationHandler& state,
   const std::string& label,
   std::string& data_dir_member,
   const std::string& default_dir
@@ -41,24 +40,25 @@ void initializeDataDir(
 int main(int argc, char **argv)
   // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
-  std::string quickInfoText_;
   bool show_top_window_ = false;
   bool show_bottom_window_ = false;
+  bool show_left_window_ = false;
+  bool show_right_window_ = false;
 
   // to disable buttons
   bool workflow_is_done_ = true;
   bool file_loading_is_done_ = true;
+  bool exceeding_plot_points_ = false;
+  bool exceeding_table_size_ = false;
 
   // View: Bottom window
   bool show_info_ = true;
-  bool show_log_ = true;
-  bool popup_about_ = false;
+  bool show_log_ = false;
 
-  // View: Explorer pane
-  bool show_sequence_explorer = false;
-  bool show_transitions_explorer = false;
-  bool show_experiment_explorer = false;
-  bool show_features_explorer = false;
+  // View: left or right windows (i.e., Explorer pane)
+  bool show_injection_explorer = true; // list of injection names with advanced options for filtering
+  bool show_transitions_explorer = true; // list of transition names (e.g., subset of the features for non-targeted case) with advanced options for filtering
+  bool show_features_explorer = false; // list of features with advanced options for filtering
 
   // View: Top window
   bool show_sequence_table = false;
@@ -71,25 +71,31 @@ int main(int argc, char **argv)
   bool show_comp_group_filters_table = false;
   bool show_comp_qcs_table = false;
   bool show_comp_group_qcs_table = false;
-  bool show_feature_plot = false;
-  bool show_line_plot = false;
-  bool show_heatmap_plot = false;
-  bool show_feature_summary_table = false;
-  bool show_sequence_summary_table = false;
+  bool show_feature_table = false; // table of all injections, features, and metavalues
+  bool show_feature_pivot_table = false; // injection vs. feature for a particular metavalue
+  bool show_chromatogram_line_plot = false; // time vs. intensity for the raw data and annotated feature
+  bool show_spectra_line_plot = false; // time vs. intensity for the raw data and annotated feature
+  bool show_feature_line_plot = false; // injection vs. metavalue for n selected features
+  bool show_feature_heatmap_plot = false; // injection vs. feature for a particular metavalue
+  bool show_calibrators_line_plot = false; // peak area/height ratio vs. concentration ratio
 
+  // Popup modals
+  bool popup_about_ = false;
   bool popup_run_workflow_ = false;
   bool popup_file_picker_ = false;
 
-  AppState state_;
+  ApplicationHandler application_handler_;
+  SessionHandler session_handler_;
   WorkflowManager manager_;
   GuiAppender appender_;
 
   // widgets
+  GenericTextWidget quickInfoText_;
   FilePicker file_picker_;
   Report     report_;
   Workflow   workflow_;
-  report_.setState(state_);
-  workflow_.setState(state_);
+  report_.setApplicationHandler(application_handler_);
+  workflow_.setApplicationHandler(application_handler_);
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   char filename[128];
   strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
@@ -143,10 +149,7 @@ int main(int argc, char **argv)
   ImGui_ImplOpenGL2_Init();
 
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-  const float main_menu_bar_y_size = 18.0f;
-  float y_avail;
-  float y_avail_half;
-  float top_window_y_size;
+  WindowSizesAndPositions win_size_and_pos;
 
   // Main loop
   bool done = false;
@@ -166,11 +169,18 @@ int main(int argc, char **argv)
     ImGui::NewFrame();
 
     { // keeping this block to easily collapse/expand the bulk of the loop
-    y_avail = io.DisplaySize.y - main_menu_bar_y_size;
-    y_avail_half = y_avail / 2;
+    // Intialize the window sizes
+    win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
 
     workflow_is_done_ = manager_.isWorkflowDone();
     file_loading_is_done_ = file_picker_.fileLoadingIsDone();
+
+    // Make the quick info text
+    quickInfoText_.text_lines.clear();
+    quickInfoText_.text_lines.push_back(workflow_is_done_ ? "Workflow status: done" : "Workflow status: running...");
+    quickInfoText_.text_lines.push_back(file_loading_is_done_ ? "File loading status: done" : "File loading status: running...");
+    if (exceeding_plot_points_) quickInfoText_.text_lines.push_back("Plot rendering limit reached.  Not plotting all selected data.");
+    if (exceeding_table_size_) quickInfoText_.text_lines.push_back("Table rendering limit reached.  Not showing all selected data.");
 
     if (popup_file_picker_)
     {
@@ -190,13 +200,13 @@ int main(int argc, char **argv)
     {
       ImGui::Text("mzML folder");
       ImGui::PushID(1);
-      ImGui::InputTextWithHint("", state_.mzML_dir_.c_str(), &state_.mzML_dir_);
+      ImGui::InputTextWithHint("", application_handler_.mzML_dir_.c_str(), &application_handler_.mzML_dir_);
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(11);
       if (ImGui::Button("Select"))
       {
-        static SetRawDataPathname processor(state_);
+        static SetRawDataPathname processor(application_handler_);
         file_picker_.setProcessor(processor);
         popup_file_picker_ = true;
       }
@@ -204,13 +214,13 @@ int main(int argc, char **argv)
 
       ImGui::Text("Input features folder");
       ImGui::PushID(2);
-      ImGui::InputTextWithHint("", state_.features_in_dir_.c_str(), &state_.features_in_dir_);
+      ImGui::InputTextWithHint("", application_handler_.features_in_dir_.c_str(), &application_handler_.features_in_dir_);
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(22);
       if (ImGui::Button("Select"))
       {
-        static SetInputFeaturesPathname processor(state_);
+        static SetInputFeaturesPathname processor(application_handler_);
         file_picker_.setProcessor(processor);
         popup_file_picker_ = true;
       }
@@ -218,13 +228,13 @@ int main(int argc, char **argv)
 
       ImGui::Text("Output features folder");
       ImGui::PushID(3);
-      ImGui::InputTextWithHint("", state_.features_out_dir_.c_str(), &state_.features_out_dir_);
+      ImGui::InputTextWithHint("", application_handler_.features_out_dir_.c_str(), &application_handler_.features_out_dir_);
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(33);
       if (ImGui::Button("Select"))
       {
-        static SetOutputFeaturesPathname processor(state_);
+        static SetOutputFeaturesPathname processor(application_handler_);
         file_picker_.setProcessor(processor);
         popup_file_picker_ = true;
       }
@@ -242,22 +252,22 @@ int main(int argc, char **argv)
 
       if (ImGui::Button("Run workflow"))
       {
-        for (const std::string& pathname : {state_.mzML_dir_, state_.features_in_dir_, state_.features_out_dir_}) {
+        for (const std::string& pathname : {application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_}) {
           fs::create_directories(fs::path(pathname));
         }
-        for (AppState::Command& cmd : state_.commands_)
+        for (ApplicationHandler::Command& cmd : application_handler_.commands_)
         {
           for (std::pair<const std::string, Filenames>& p : cmd.dynamic_filenames)
           {
             Filenames::updateDefaultDynamicFilenames(
-              state_.mzML_dir_,
-              state_.features_in_dir_,
-              state_.features_out_dir_,
+              application_handler_.mzML_dir_,
+              application_handler_.features_in_dir_,
+              application_handler_.features_out_dir_,
               p.second
             );
           }
         }
-        manager_.addWorkflow(state_);
+        manager_.addWorkflow(application_handler_);
         ImGui::CloseCurrentPopup();
       }
 
@@ -305,31 +315,27 @@ int main(int argc, char **argv)
       if (ImGui::BeginMenu("File"))
       {
         ImGui::MenuItem("Session", NULL, false, false);
-        if (ImGui::MenuItem("New Session", NULL, false, false))
-        {
-          //TODO: SQL light interface
-        }
-
-        if (ImGui::MenuItem("Load Session", NULL, false, false))
-        {
-          //TODO: open file browser modal
-          // ImGui::OpenPopup("Delete?");
-        }
-
+        //if (ImGui::MenuItem("New Session", NULL, false, false))
+        //{
+        //  //TODO: Session (see AUT-280)
+        //}
+        //if (ImGui::MenuItem("Load Session", NULL, false, false))
+        //{
+        //  //TODO: Session (see AUT-280)
+        //}
         if (ImGui::MenuItem("Load session from sequence", NULL, false, workflow_is_done_ && file_loading_is_done_)) {
-          static LoadSessionFromSequence processor(state_);
+          static LoadSessionFromSequence processor(application_handler_);
           file_picker_.setProcessor(processor);
           popup_file_picker_ = true;
         }
-
-        if (ImGui::MenuItem("Save Session", NULL, false, false))
-        {
-          //TODO
-        }
-        if (ImGui::MenuItem("Save Session As...", NULL, false, false))
-        {
-          //TODO: open save as File browser modal
-        }
+        //if (ImGui::MenuItem("Save Session", NULL, false, false))
+        //{
+        //  //TODO: Session (see AUT-280)
+        //}
+        //if (ImGui::MenuItem("Save Session As...", NULL, false, false))
+        //{
+        //  //TODO: Session (see AUT-280)
+        //}
         ImGui::Separator();
         ImGui::MenuItem("Text file", NULL, false, false);
         if (ImGui::BeginMenu("Import File", false))
@@ -375,25 +381,18 @@ int main(int argc, char **argv)
           if (ImGui::MenuItem("Comp Group %Background QCs")) {}
           ImGui::EndMenu();
         }
-        // TODO
-        //ImGui::Separator();
-        //if (ImGui::MenuItem("Quit", "Alt+F4")) {}
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Edit"))
       {
-        ImGui::MenuItem("Session", NULL, false, false);
-        if (ImGui::MenuItem("Undo", "CTRL+Z", false, false)) {}
-        if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {} // Disabled item
-        ImGui::Separator();
         ImGui::MenuItem("Settings", NULL, false, false);
         if (ImGui::MenuItem("Tables", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Plots", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Explorer", NULL, false, false)) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Search", NULL, false, false)) {} // TODO: modal of settings
+        if (ImGui::MenuItem("Parameters", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_))
         {
-          initializeDataDirs(state_);
+          initializeDataDirs(application_handler_);
           workflow_.draw_ = true;
         }
         ImGui::EndMenu();
@@ -401,12 +400,11 @@ int main(int argc, char **argv)
       if (ImGui::BeginMenu("View"))
       {
         ImGui::MenuItem("Explorer window", NULL, false, false);
-        if (ImGui::MenuItem("Sequence", NULL, &show_sequence_explorer)) {}
+        if (ImGui::MenuItem("Injections", NULL, &show_injection_explorer)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {}
-        if (ImGui::MenuItem("Experiment", NULL, &show_experiment_explorer)) {}
-        if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}  // including metadata?
+        if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}
         ImGui::Separator(); // Primary input
-        ImGui::MenuItem("Main window", NULL, false, false);
+        ImGui::MenuItem("Main window (Tables)", NULL, false, false);
         if (ImGui::MenuItem("Sequence", NULL, &show_sequence_table)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_table)) {}
         if (ImGui::MenuItem("Workflow", NULL, &show_workflow_table)) {}
@@ -419,13 +417,17 @@ int main(int argc, char **argv)
           if (ImGui::MenuItem("Comp Group Filters", NULL, &show_comp_group_filters_table)) {}
           if (ImGui::MenuItem("Comp QCs", NULL, &show_comp_qcs_table)) {}
           if (ImGui::MenuItem("Comp Group QCs", NULL, &show_comp_group_qcs_table)) {}
+          // TODO: missing workflow setting tables...
           ImGui::EndMenu();
         }
-        if (ImGui::MenuItem("Features", NULL, &show_feature_plot)) {}
-        if (ImGui::MenuItem("Metric plot", NULL, &show_line_plot)) {}
-        if (ImGui::MenuItem("Heatmap", NULL, &show_heatmap_plot)) {}
-        if (ImGui::MenuItem("Features table", NULL, &show_feature_summary_table)) {}
-        if (ImGui::MenuItem("Features pivot table", NULL, &show_sequence_summary_table)) {}
+        if (ImGui::MenuItem("Features (table)", NULL, &show_feature_table)) {}
+        if (ImGui::MenuItem("Features (matrix)", NULL, &show_feature_pivot_table)) {}
+        ImGui::MenuItem("Main window (Plots)", NULL, false, false);
+        if (ImGui::MenuItem("Chromatogram", NULL, &show_chromatogram_line_plot)) {}
+        if (ImGui::MenuItem("Spectra", NULL, &show_spectra_line_plot)) {}
+        if (ImGui::MenuItem("Features (line)", NULL, &show_feature_line_plot)) {}
+        if (ImGui::MenuItem("Features (heatmap)", NULL, &show_feature_heatmap_plot)) {}
+        if (ImGui::MenuItem("Calibrators", NULL, &show_calibrators_line_plot)) {}
         ImGui::MenuItem("Info window", NULL, false, false);
         if (ImGui::MenuItem("Info", NULL, &show_info_)) {}
         if (ImGui::MenuItem("Log", NULL, &show_log_)) {}
@@ -433,104 +435,17 @@ int main(int argc, char **argv)
       }
       if (ImGui::BeginMenu("Actions"))
       {
-        if (ImGui::MenuItem("Run command", NULL, false, workflow_is_done_ && file_loading_is_done_))
-        {
-          initializeDataDirs(state_);
-          // do the rest
-        }
         if (ImGui::MenuItem("Run workflow"))
         {
-          if (state_.commands_.empty())
+          if (application_handler_.commands_.empty())
           {
             LOGW << "Workflow has no steps to run. Please set the workflow's steps.";
           }
-          initializeDataDirs(state_);
+          initializeDataDirs(application_handler_);
           popup_run_workflow_ = true;
         }
-        if (ImGui::BeginMenu("Quick info"))
-        { // TODO: bug
-          if (ImGui::MenuItem("Sequence")) {
-            quickInfoText_ = InputDataValidation::getSequenceInfo(state_.sequenceHandler_);
-          }
-          if (ImGui::MenuItem("Transitions")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getTraMLInfo(state_.sequenceHandler_.getSequence().front().getRawData());
-            }
-          }
-          if (ImGui::MenuItem("Quant Method")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequenceSegments().size()) {
-              quickInfoText_ = InputDataValidation::getQuantitationMethodsInfo(state_.sequenceHandler_.getSequenceSegments().front());
-            }
-          }
-          if (ImGui::MenuItem("Standards Conc")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequenceSegments().size()) {
-              quickInfoText_ = InputDataValidation::getStandardsConcentrationsInfo(state_.sequenceHandler_.getSequenceSegments().front());
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) Filters")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), true);
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) QCs")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) %RSD Filters")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureRSDFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), true);
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) %RSD QCs")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureRSDFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) %Background Filters")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureBackgroundFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), true);
-            }
-          }
-          if (ImGui::MenuItem("Comp (Group) %Background QCs")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getFeatureBackgroundFiltersInfo(state_.sequenceHandler_.getSequence().front().getRawData(), false);
-            }
-          }
-          if (ImGui::MenuItem("Parameters")) {
-            quickInfoText_.clear();
-            if (state_.sequenceHandler_.getSequence().size()) {
-              quickInfoText_ = InputDataValidation::getParametersInfo(state_.sequenceHandler_.getSequence().front().getRawData().getParameters());
-            }
-          }
-          if (ImGui::MenuItem("Raw data files")) {
-            quickInfoText_ = state_.sequenceHandler_.getRawDataFilesInfo();
-          }
-          if (ImGui::MenuItem("Analyzed features")) {
-            quickInfoText_ = state_.sequenceHandler_.getAnalyzedFeaturesInfo();
-          }
-          if (ImGui::MenuItem("Selected features")) {
-            quickInfoText_ = state_.sequenceHandler_.getSelectedFeaturesInfo();
-          }
-          if (ImGui::MenuItem("Picked peaks")) {
-            quickInfoText_ = state_.sequenceHandler_.getPickedPeaksInfo();
-          }
-          if (ImGui::MenuItem("Filtered/selected peaks")) {
-            quickInfoText_ = state_.sequenceHandler_.getFilteredSelectedPeaksInfo();
-          }
-          ImGui::EndMenu();
-        }
         if (ImGui::BeginMenu("Integrity checks"))
-        {  // TODO: bug
+        {  // TODO: see AUT-398
           if (ImGui::MenuItem("Sample consistency")) {}
           if (ImGui::MenuItem("Comp consistency")) {}
           if (ImGui::MenuItem("Comp Group consistency")) {}
@@ -546,22 +461,75 @@ int main(int argc, char **argv)
       if (ImGui::BeginMenu("Help"))
       {
         ImGui::MenuItem("About", NULL, &popup_about_);
-        if (ImGui::MenuItem("Documentation")) {}
-        if (ImGui::MenuItem("Version")) {}
+        if (ImGui::MenuItem("Documentation")) { 
+          // TODO: Render the SmartPeak documentation (See AUT-178)
+        }
         ImGui::EndMenu();
       }
       ImGui::EndMainMenuBar();
     }
 
-    show_top_window_ = show_workflow_table;
+    show_top_window_ = show_sequence_table || show_transitions_table || show_workflow_table || show_parameters_table
+      || show_quant_method_table || show_stds_concs_table || show_comp_filters_table || show_comp_group_filters_table
+      || show_comp_qcs_table || show_comp_group_qcs_table || show_feature_table || show_feature_pivot_table
+      || show_chromatogram_line_plot || show_spectra_line_plot || show_feature_line_plot || show_feature_heatmap_plot || show_calibrators_line_plot;
     show_bottom_window_ = show_info_ || show_log_;
+    show_left_window_ = show_injection_explorer || show_transitions_explorer || show_features_explorer;
+    win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
+
+    // Left window
+    if (show_left_window_) {
+      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.left_window_x_pos_, win_size_and_pos.left_and_right_window_y_pos_));
+      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_));
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
+      const ImGuiWindowFlags left_window_flags =
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoCollapse |
+        ImGuiWindowFlags_NoFocusOnAppearing;
+      ImGui::Begin("Left window", NULL, left_window_flags);
+      if (ImGui::BeginTabBar("Left window tab bar", ImGuiTabBarFlags_Reorderable))
+      {
+        if (show_injection_explorer && ImGui::BeginTabItem("Injections", &show_injection_explorer))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          Eigen::Tensor<std::string, 1> headers = session_handler_.getInjectionExplorerHeader();
+          Eigen::Tensor<std::string, 2> body = session_handler_.getInjectionExplorerBody();
+          ExplorerWidget Explorer(headers, body,
+            session_handler_.injection_explorer_checked_rows, "InjectionsExplorerWindow", session_handler_.injection_explorer_checkbox_headers, session_handler_.injection_explorer_checkbox_body);
+          Explorer.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_transitions_explorer && ImGui::BeginTabItem("Transitions", &show_transitions_explorer))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          Eigen::Tensor<std::string, 1> headers = session_handler_.getTransitionExplorerHeader();
+          Eigen::Tensor<std::string, 2> body = session_handler_.getTransitionExplorerBody();
+          ExplorerWidget Explorer(headers, body,
+            session_handler_.transition_explorer_checked_rows, "TransitionsExplorerWindow", session_handler_.transition_explorer_checkbox_headers, session_handler_.transition_explorer_checkbox_body);
+          Explorer.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_features_explorer && ImGui::BeginTabItem("Features", &show_features_explorer))
+        {
+          session_handler_.setFeatureExplorer();
+          ExplorerWidget Explorer(session_handler_.feature_explorer_headers, session_handler_.feature_explorer_body,
+            session_handler_.feature_explorer_checked_rows, "FeaturesExplorerWindow", session_handler_.feature_explorer_checkbox_headers, session_handler_.feature_explorer_checkbox_body);
+          Explorer.draw();
+          ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
+      }
+      ImGui::End();
+      ImGui::PopStyleVar();
+    }
 
     // Top window
     if (show_top_window_)
     {
-      top_window_y_size = show_bottom_window_ ? y_avail_half : y_avail;
-      ImGui::SetNextWindowPos(ImVec2(0, main_menu_bar_y_size));
-      ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, top_window_y_size));
+      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.bottom_and_top_window_x_pos_, win_size_and_pos.top_window_y_pos_));
+      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags top_window_flags =
         ImGuiWindowFlags_NoTitleBar |
@@ -572,9 +540,155 @@ int main(int argc, char **argv)
       ImGui::Begin("Top window", NULL, top_window_flags);
       if (ImGui::BeginTabBar("Top window tab bar", ImGuiTabBarFlags_Reorderable))
       {
+        if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getSequenceTableFilters();
+          GenericTableWidget Table(session_handler_.sequence_table_headers, session_handler_.sequence_table_body, table_filters, "SequenceMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getTransitionsTableFilters();
+          GenericTableWidget Table(session_handler_.transitions_table_headers, session_handler_.transitions_table_body, table_filters, "TransitionsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
-          ImGui::Text("Workflow status: %s", workflow_is_done_ ? "done" : "running...");
+          session_handler_.setWorkflowTable(workflow_.getCommands());
+          GenericTableWidget Table(session_handler_.workflow_table_headers, session_handler_.workflow_table_body, Eigen::Tensor<bool, 1>(), "WorkflowMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
+        {
+          session_handler_.setParametersTable(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.parameters_table_headers, session_handler_.parameters_table_body, Eigen::Tensor<bool, 1>(), "ParametersMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_quant_method_table && ImGui::BeginTabItem("Quantitation Method", &show_quant_method_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setQuantMethodTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getQuantMethodsTableFilters();
+          GenericTableWidget Table(session_handler_.quant_method_table_headers, session_handler_.quant_method_table_body, table_filters, "QuantMethodMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_stds_concs_table && ImGui::BeginTabItem("Standards Concentrations", &show_stds_concs_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setStdsConcsTable(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.stds_concs_table_headers, session_handler_.stds_concs_table_body, Eigen::Tensor<bool, 1>(), "StdsConcsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_filters_table && ImGui::BeginTabItem("Component Filters", &show_comp_filters_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentFiltersTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentFiltersTableFilters();
+          GenericTableWidget Table(session_handler_.comp_filters_table_headers, session_handler_.comp_filters_table_body, table_filters, "CompFiltersMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_group_filters_table && ImGui::BeginTabItem("Component Group Filters", &show_comp_group_filters_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentGroupFiltersTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupFiltersTableFilters();
+          GenericTableWidget Table(session_handler_.comp_group_filters_table_headers, session_handler_.comp_group_filters_table_body, table_filters, "CompGroupFiltersMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_qcs_table && ImGui::BeginTabItem("Component QCs", &show_comp_qcs_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentQCsTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentQCsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_qcs_table_headers, session_handler_.comp_qcs_table_body, table_filters, "CompQCsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_group_qcs_table && ImGui::BeginTabItem("Component Group QCs", &show_comp_group_qcs_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentGroupQCsTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupQCsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_group_qcs_table_headers, session_handler_.comp_group_qcs_table_body, table_filters, "CompGroupQCsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_feature_table && ImGui::BeginTabItem("Features table", &show_feature_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.feature_table_headers, session_handler_.feature_table_body, Eigen::Tensor<bool, 1>(), "featuresTableMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_feature_pivot_table && ImGui::BeginTabItem("Features matrix", &show_feature_pivot_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
+          GenericTableWidget Table(session_handler_.feature_pivot_table_headers, session_handler_.feature_pivot_table_body, Eigen::Tensor<bool, 1>(), "featureMatrixMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          exceeding_plot_points_ = !session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
+          ChromatogramPlotWidget plot2d(session_handler_.chrom_time_raw_data, session_handler_.chrom_intensity_raw_data, session_handler_.chrom_series_raw_names,
+            session_handler_.chrom_time_hull_data, session_handler_.chrom_intensity_hull_data, session_handler_.chrom_series_hull_names,
+            session_handler_.chrom_x_axis_title, session_handler_.chrom_y_axis_title,
+            session_handler_.chrom_time_min, session_handler_.chrom_time_max, session_handler_.chrom_intensity_min, session_handler_.chrom_intensity_max,
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "Chromatograms Main Window");
+          plot2d.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_spectra_line_plot && ImGui::BeginTabItem("Spectra", &show_spectra_line_plot))
+        {
+          ImGui::Text("TODO...");
+          ImGui::EndTabItem();
+        }
+        if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
+          Eigen::Tensor<float, 2> x_data = session_handler_.feat_sample_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+          Eigen::Tensor<float, 2> y_data = session_handler_.feat_value_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+          LinePlot2DWidget plot2d(x_data, y_data, session_handler_.feat_heatmap_row_labels, session_handler_.feat_line_x_axis_title, session_handler_.feat_line_y_axis_title,
+            session_handler_.feat_line_sample_min, session_handler_.feat_line_sample_max, session_handler_.feat_value_min, session_handler_.feat_value_max,
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "FeaturesLineMainWindow");
+          plot2d.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_feature_heatmap_plot && ImGui::BeginTabItem("Features (heatmap)", &show_feature_heatmap_plot))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
+          Heatmap2DWidget plot2d(session_handler_.feat_heatmap_data, session_handler_.feat_heatmap_col_labels, session_handler_.feat_heatmap_row_labels, 
+            session_handler_.feat_heatmap_x_axis_title, session_handler_.feat_heatmap_y_axis_title, session_handler_.feat_value_min, session_handler_.feat_value_max,
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "FeaturesHeatmapMainWindow");
+          plot2d.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_calibrators_line_plot && ImGui::BeginTabItem("Calibrators", &show_calibrators_line_plot))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          exceeding_plot_points_ = !session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
+          CalibratorsPlotWidget plot2d(session_handler_.calibrators_conc_fit_data, session_handler_.calibrators_feature_fit_data, 
+            session_handler_.calibrators_conc_raw_data, session_handler_.calibrators_feature_raw_data, session_handler_.calibrators_series_names,
+            session_handler_.calibrators_x_axis_title, session_handler_.calibrators_y_axis_title, session_handler_.calibrators_conc_min, session_handler_.calibrators_conc_max,
+            session_handler_.calibrators_feature_min, session_handler_.calibrators_feature_max, win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_,
+            "CalibratorsMainWindow");
+          plot2d.draw();
+
           ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
@@ -586,9 +700,8 @@ int main(int argc, char **argv)
     // Bottom window
     if (show_bottom_window_)
     {
-      const float bottom_window_y_pos = main_menu_bar_y_size + (show_top_window_ ? top_window_y_size : 0);
-      ImGui::SetNextWindowPos(ImVec2(0, bottom_window_y_pos));
-      ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, show_top_window_ ? y_avail_half : y_avail));
+      ImGui::SetNextWindowPos(ImVec2(win_size_and_pos.bottom_and_top_window_x_pos_, win_size_and_pos.bottom_window_y_pos_));
+      ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.bottom_window_y_size_));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags bottom_window_flags =
         ImGuiWindowFlags_NoTitleBar |
@@ -602,15 +715,15 @@ int main(int argc, char **argv)
         if (show_info_ && ImGui::BeginTabItem("Info", &show_info_))
         {
           ImGui::BeginChild("Info child");
-          ImGui::TextWrapped("%s", quickInfoText_.c_str());
+          quickInfoText_.draw();
           ImGui::EndChild();
           ImGui::EndTabItem();
         }
         if (show_log_ && ImGui::BeginTabItem("Log", &show_log_))
         {
           const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
-          static int selected_severity = 5;
-          static plog::Severity severity = plog::Severity::debug;
+          static int selected_severity = 4;
+          static plog::Severity severity = plog::Severity::info;
 
           if (ImGui::Combo("Level", &selected_severity, items, IM_ARRAYSIZE(items)))
           {
@@ -619,9 +732,12 @@ int main(int argc, char **argv)
 
           ImGui::Separator();
           ImGui::BeginChild("Log child");
-          for (const plog::util::nstring& s : appender_.getMessageList(severity))
+          const std::vector<plog::util::nstring> message_list = appender_.getMessageList(severity);
+          int message_list_start = (message_list.size() > 500) ? message_list.size() - 500 : 0;
+          for (int i= message_list_start;i< message_list.size();++i)
           {
-            ImGui::Text("%s", s.c_str());
+            std::string str(message_list.at(i).data(), message_list.at(i).data() + message_list.at(i).size());
+            ImGui::Text("%s", str.c_str());
           }
           ImGui::EndChild();
           ImGui::EndTabItem();
@@ -670,15 +786,15 @@ void HelpMarker(const char* desc)
   }
 }
 
-void initializeDataDirs(AppState& state)
+void initializeDataDirs(ApplicationHandler& application_handler)
 {
-  initializeDataDir(state, "mzML", state.mzML_dir_, "mzML");
-  initializeDataDir(state, "INPUT features", state.features_in_dir_, "features");
-  initializeDataDir(state, "OUTPUT features", state.features_out_dir_, "features");
+  initializeDataDir(application_handler, "mzML", application_handler.mzML_dir_, "mzML");
+  initializeDataDir(application_handler, "INPUT features", application_handler.features_in_dir_, "features");
+  initializeDataDir(application_handler, "OUTPUT features", application_handler.features_out_dir_, "features");
 }
 
 void initializeDataDir(
-  AppState& state,
+  ApplicationHandler& application_handler,
   const std::string& label,
   std::string& data_dir_member,
   const std::string& default_dir
@@ -687,6 +803,6 @@ void initializeDataDir(
   if (data_dir_member.size()) {
     return;
   }
-  data_dir_member = state.main_dir_ + "/" + default_dir;
+  data_dir_member = application_handler.main_dir_ + "/" + default_dir;
   LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member;
 }

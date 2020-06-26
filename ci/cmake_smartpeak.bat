@@ -15,5 +15,6 @@ cmake ^
   -DBOOST_LIBRARYDIR="C:/Libraries/boost_1_67_0/lib64-msvc-14.1" ^
   -DPLOG_INCLUDE_DIR="C:/projects/deps/plog/include" ^
   -DIMGUI_DIR="C:/projects/deps/imgui" ^
+  -DIMPLOT_DIR="C:/projects/deps/implot" ^
   -DCMAKE_BUILD_TYPE=Debug ^
   ..

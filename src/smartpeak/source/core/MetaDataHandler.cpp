@@ -89,6 +89,11 @@ namespace SmartPeak
     return sample_type;
   }
 
+  const std::string MetaDataHandler::getSampleTypeAsString() const
+  {
+    return sampleTypeToString.at(sample_type);
+  }
+
   bool MetaDataHandler::validateMetaData(const MetaDataHandler& meta_data)
   {
     // std::vector<std::string> sample_types {"Unknown", "Standard", "QC", "Blank", "Double Blank", "Solvent"};

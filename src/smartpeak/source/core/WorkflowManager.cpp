@@ -1,19 +1,19 @@
 #include <SmartPeak/core/WorkflowManager.h>
-#include <SmartPeak/core/AppState.h>
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <thread>
 #include <future>
 
 namespace SmartPeak {
-  void WorkflowManager::addWorkflow(AppState& source_state)
+  void WorkflowManager::addWorkflow(ApplicationHandler& source_state)
   {
     // do not run workflows concurrently
     if (!done_) {
       return;
     }
-    state_ = source_state;
+    application_handler_ = source_state;
     done_ = false;
-    std::thread t(run_and_join, std::ref(state_), std::ref(done_), std::ref(source_state));
+    std::thread t(run_and_join, std::ref(application_handler_), std::ref(done_), std::ref(source_state));
     LOGD << "Created thread (to be detached): " << t.get_id();
     t.detach();
     LOGD << "Thread has been detached";
@@ -24,12 +24,12 @@ namespace SmartPeak {
     return done_;
   }
 
-  void WorkflowManager::run_and_join(AppState& state, bool& done, AppState& source_state)
+  void WorkflowManager::run_and_join(ApplicationHandler& state, bool& done, ApplicationHandler& source_state)
   {
     // run workflow asynchronously
     std::future<void> f = std::async(
       std::launch::async,
-      AppStateProcessors::processCommands,
+      ApplicationProcessors::processCommands,
       std::ref(state),
       state.commands_
     );

@@ -1,5 +1,5 @@
 #include <SmartPeak/ui/Workflow.h>
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <plog/Log.h>
@@ -11,9 +11,9 @@ namespace SmartPeak
   {
     ImGui::OpenPopup("Select workflow's steps");
 
-    if (!state_)
+    if (!application_handler_)
     {
-      LOGE << "Workflow widget has no AppState object associated with it";
+      LOGE << "Workflow widget has no ApplicationHandler object associated with it";
       draw_ = false; // to avoid flooding the log
       return;
     }
@@ -24,8 +24,8 @@ namespace SmartPeak
 
     if (ImGui::BeginCombo("Presets", NULL))
     {
-      AppState::Command cmd;
-      CreateCommand createCommand(*state_);
+      ApplicationHandler::Command cmd;
+      CreateCommand createCommand(*application_handler_);
       const char* presets[] = {
         "LCMS MRM Unknowns",
         "LCMS MRM Standards",
@@ -42,26 +42,28 @@ namespace SmartPeak
       {
         if (ImGui::Selectable(s))
         {
-          BuildCommandsFromNames buildCommandsFromIds(*state_);
+          BuildCommandsFromNames buildCommandsFromIds(*application_handler_);
           std::string ids;
           const std::string s_string { s };
           if (s_string == "LCMS MRM Unknowns")
-            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_FEATURES QUANTIFY_FEATURES CHECK_FEATURES STORE_FEATURES STORE_FEATURES";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_FEATURES QUANTIFY_FEATURES CHECK_FEATURES SELECT_FEATURES STORE_FEATURES";
           else if (s_string == "LCMS MRM Standards")
-            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_FEATURES CHECK_FEATURES STORE_FEATURES CALCULATE_CALIBRATION STORE_QUANTITATION_METHODS QUANTIFY_FEATURES STORE_FEATURES";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_FEATURES CHECK_FEATURES SELECT_FEATURES CALCULATE_CALIBRATION STORE_QUANTITATION_METHODS QUANTIFY_FEATURES STORE_FEATURES";
           else if (s_string == "HPLC UV Unknowns")
-            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES QUANTIFY_FEATURES CHECK_FEATURES STORE_FEATURES STORE_FEATURES";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES QUANTIFY_FEATURES CHECK_FEATURES SELECT_FEATURES STORE_FEATURES";
           else if (s_string == "HPLC UV Standards")
-            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES CHECK_FEATURES STORE_FEATURES CALCULATE_CALIBRATION STORE_QUANTITATION_METHODS QUANTIFY_FEATURES STORE_FEATURES";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES CHECK_FEATURES SELECT_FEATURES CALCULATE_CALIBRATION STORE_QUANTITATION_METHODS QUANTIFY_FEATURES STORE_FEATURES";
           else if (s_string == "GCMS SIM Unknowns")
-            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES QUANTIFY_FEATURES CHECK_FEATURES STORE_FEATURES STORE_FEATURES";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES QUANTIFY_FEATURES CHECK_FEATURES SELECT_FEATURES STORE_FEATURES";
           else if (s_string == "GCMS Full Scan Unknowns")
-            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES CHECK_FEATURES STORE_FEATURES CALCULATE_CALIBRATION STORE_QUANTITATION_METHODS QUANTIFY_FEATURES STORE_FEATURES";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS ZERO_CHROMATOGRAM_BASELINE PICK_FEATURES CHECK_FEATURES SELECT_FEATURES CALCULATE_CALIBRATION STORE_QUANTITATION_METHODS QUANTIFY_FEATURES STORE_FEATURES";
           else if (s_string == "LCMS MRM Validation - LP")
-            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS PICK_FEATURES FILTER_FEATURES FILTER_FEATURES STORE_FEATURES VALIDATE_FEATURES STORE_FEATURES";
+            ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS PICK_FEATURES FILTER_FEATURES FILTER_FEATURES SELECT_FEATURES VALIDATE_FEATURES STORE_FEATURES";
           else if (s_string == "LCMS MRM Validation - QMIP")
             ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_FEATURES FILTER_FEATURES FILTER_FEATURES VALIDATE_FEATURES STORE_FEATURES";
-          commands_ = buildCommandsFromIds(ids);
+          buildCommandsFromIds.names_ = ids;
+          buildCommandsFromIds.process();
+          commands_ = buildCommandsFromIds.commands_;
           LOGI << "Local workflow has been replaced";
         }
       }
@@ -70,15 +72,16 @@ namespace SmartPeak
 
     if (ImGui::BeginCombo("Add Raw data method", NULL))
     {
-      AppState::Command cmd;
-      CreateCommand createCommand(*state_);
+      ApplicationHandler::Command cmd;
+      CreateCommand createCommand(*application_handler_);
       for (const auto& p : n_to_raw_data_method_)
       {
         if (ImGui::Selectable(p.second->getName().c_str()))
         {
-          const bool created = createCommand(p.second->getName(), cmd);
+          createCommand.name_ = p.second->getName();
+          const bool created = createCommand.process();
           if (created) {
-            commands_.push_back(cmd);
+            commands_.push_back(createCommand.cmd_);
           }
         }
       }
@@ -87,15 +90,16 @@ namespace SmartPeak
 
     if (ImGui::BeginCombo("Add Sequence Segment method", NULL))
     {
-      AppState::Command cmd;
-      CreateCommand createCommand(*state_);
+      ApplicationHandler::Command cmd;
+      CreateCommand createCommand(*application_handler_);
       for (const auto& p : n_to_seq_seg_method_)
       {
         if (ImGui::Selectable(p.second->getName().c_str()))
         {
-          const bool created = createCommand(p.second->getName(), cmd);
+          createCommand.name_ = p.second->getName();
+          const bool created = createCommand.process();
           if (created) {
-            commands_.push_back(cmd);
+            commands_.push_back(createCommand.cmd_);
           }
         }
       }
@@ -128,7 +132,7 @@ namespace SmartPeak
         {
           IM_ASSERT(payload->DataSize == sizeof(int));
           int source_n = *(const int*)payload->Data;
-          AppState::Command tmp = commands_.at(source_n);
+          ApplicationHandler::Command tmp = commands_.at(source_n);
           commands_.erase(commands_.cbegin() + source_n);
           commands_.insert(commands_.cbegin() + i, tmp);
         }
@@ -149,7 +153,7 @@ namespace SmartPeak
 
     if (ImGui::Button("Ok"))
     {
-      state_->commands_ = commands_;
+      application_handler_->commands_ = commands_;
       LOGI << "State of app has been updated with the new workflow.";
       draw_ = false;
       ImGui::CloseCurrentPopup();
@@ -172,14 +176,14 @@ namespace SmartPeak
     ImGui::EndPopup();
   }
 
-  std::vector<AppState::Command> Workflow::getCommands() const
+  std::vector<ApplicationHandler::Command> Workflow::getCommands() const
   {
     return commands_;
   }
 
-  void Workflow::setState(AppState& state)
+  void Workflow::setApplicationHandler(ApplicationHandler& state)
   {
     LOGD << "Setting state: " << (&state);
-    state_ = &state;
+    application_handler_ = &state;
   }
 }

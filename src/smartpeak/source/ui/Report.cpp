@@ -1,5 +1,5 @@
 #include <SmartPeak/ui/Report.h>
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/io/SequenceParser.h>
@@ -21,9 +21,9 @@ namespace SmartPeak
   {
     ImGui::OpenPopup("Report dialog");
 
-    if (!state_)
+    if (!application_handler_)
     {
-      LOGE << "Report widget has no AppState object associated with it";
+      LOGE << "Report widget has no ApplicationHandler object associated with it";
       draw_ = false; // to avoid flooding the log
       return;
     }
@@ -73,11 +73,11 @@ namespace SmartPeak
       const bool checkboxes_check = initializeMetadataAndSampleTypes();
       if (checkboxes_check)
       {
-        const std::string pathname = state_->main_dir_ + "/FeatureDB.csv";
+        const std::string pathname = application_handler_->main_dir_ + "/FeatureDB.csv";
         run_and_join(
           SequenceParser::writeDataTableFromMetaValue,
           "FeatureDB.csv",
-          state_->sequenceHandler_,
+          application_handler_->sequenceHandler_,
           pathname,
           summaryMetaData_,
           summarySampleTypes_
@@ -96,11 +96,11 @@ namespace SmartPeak
       const bool checkboxes_check = initializeMetadataAndSampleTypes();
       if (checkboxes_check)
       {
-        const std::string pathname = state_->main_dir_ + "/PivotTable.csv";
+        const std::string pathname = application_handler_->main_dir_ + "/PivotTable.csv";
         run_and_join(
           SequenceParser::writeDataMatrixFromMetaValue,
           "PivotTable.csv",
-          state_->sequenceHandler_,
+          application_handler_->sequenceHandler_,
           pathname,
           summaryMetaData_,
           summarySampleTypes_
@@ -123,10 +123,10 @@ namespace SmartPeak
     ImGui::EndPopup();
   }
 
-  void Report::setState(AppState& state)
+  void Report::setApplicationHandler(ApplicationHandler& state)
   {
     LOGD << "Setting state: " << (&state);
-    state_ = &state;
+    application_handler_ = &state;
   }
 
   bool Report::initializeMetadataAndSampleTypes()

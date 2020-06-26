@@ -1,4 +1,4 @@
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/Utilities.h>
 #include <future>
@@ -118,12 +118,12 @@ namespace SmartPeak
 
     ImGui::Separator();
 
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.9f);
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
     ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.5f);
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
     if (ImGui::Button("Open"))
     {
       picked_pathname_ = current_pathname_;
@@ -161,7 +161,7 @@ namespace SmartPeak
     return picked_pathname_;
   }
 
-  void FilePicker::setProcessor(AppStateProcessor& processor)
+  void FilePicker::setProcessor(FilePickerProcessor& processor)
   {
     LOGD << "Setting processor: " << (&processor);
     processor_ = &processor;
@@ -183,15 +183,15 @@ namespace SmartPeak
   }
 
   void FilePicker::run_and_join(
-    AppStateProcessor* processor,
+    FilePickerProcessor* processor,
     const std::string& pathname,
     bool& loading_is_done
   )
   {
+    processor->pathname_ = pathname;
     std::future<void> f = std::async(
-      std::launch::async,
-      [processor](const char* pathname){ (*processor)(pathname); },
-      pathname.c_str()
+      std::launch::async, 
+      [processor](){ processor->process(); }
     );
 
     LOGN << "File is being loaded...";
