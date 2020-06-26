@@ -522,7 +522,7 @@ namespace SmartPeak
       }
 
       const std::string filename(entry.path().filename().string());
-      if (filename == "." || filename == "..") {
+      if (filename == "." || filename == ".." || (*(&filename.at(0))) == '.') {
         continue;
       }
 
