@@ -14,23 +14,23 @@ Filenames generateTestFilenames()
 {
   const std::string dir = SMARTPEAK_GET_TEST_DATA_PATH("");
   Filenames filenames;
-  filenames.sequence_csv_i                     = dir + "SequenceProcessor_sequence.csv";
-  filenames.parameters_csv_i                   = dir + "RawDataProcessor_params_1_core.csv";
-  filenames.traML_csv_i                        = dir + "OpenMSFile_traML_1.csv";
-  filenames.featureFilterComponents_csv_i      = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureFilterComponentGroups_csv_i = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureQCComponents_csv_i          = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureQCComponentGroups_csv_i     = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureRSDFilterComponents_csv_i = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureRSDFilterComponentGroups_csv_i = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureRSDQCComponents_csv_i = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureRSDQCComponentGroups_csv_i = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureBackgroundFilterComponents_csv_i = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureBackgroundFilterComponentGroups_csv_i = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureBackgroundQCComponents_csv_i = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureBackgroundQCComponentGroups_csv_i = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.quantitationMethods_csv_i          = dir + "OpenMSFile_quantitationMethods_1.csv";
-  filenames.standardsConcentrations_csv_i      = dir + "OpenMSFile_standardsConcentrations_1.csv";
+  filenames.sequence_csv_i                                = dir + "SequenceProcessor_sequence.csv";
+  filenames.parameters_csv_i                              = dir + "RawDataProcessor_params_1_core.csv";
+  filenames.traML_csv_i                                   = dir + "OpenMSFile_traML_1.csv";
+  filenames.featureFilterComponents_csv_i                 = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
+  filenames.featureFilterComponentGroups_csv_i            = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
+  filenames.featureQCComponents_csv_i                     = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
+  filenames.featureQCComponentGroups_csv_i                = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
+  filenames.featureRSDFilterComponents_csv_i              = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
+  filenames.featureRSDFilterComponentGroups_csv_i         = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
+  filenames.featureRSDQCComponents_csv_i                  = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
+  filenames.featureRSDQCComponentGroups_csv_i             = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
+  filenames.featureBackgroundFilterComponents_csv_i       = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
+  filenames.featureBackgroundFilterComponentGroups_csv_i  = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
+  filenames.featureBackgroundQCComponents_csv_i           = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
+  filenames.featureBackgroundQCComponentGroups_csv_i      = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
+  filenames.quantitationMethods_csv_i                     = dir + "OpenMSFile_quantitationMethods_1.csv";
+  filenames.standardsConcentrations_csv_i                 = dir + "OpenMSFile_standardsConcentrations_1.csv";
   return filenames;
 }
 
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 18);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 19);
   BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(injection5.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 18);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 19);
   BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
@@ -197,6 +197,38 @@ BOOST_AUTO_TEST_CASE(processSequence)
 
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 340); // loaded
+  
+  
+  std::map<std::string, std::vector<std::map<std::string, std::string>>> const* params;
+  params = &rawDataHandler0.getParameters();
+  BOOST_CHECK_EQUAL(params->count("SequenceProcessor"), 1);
+  
+  SmartPeak::SequenceProcessorMultithread spMT3(sequenceHandler.getSequence(),
+    dynamic_filenames,
+    raw_data_processing_methods);
+  
+  unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].at("value"));
+  BOOST_CHECK_EQUAL(spMT3.getNumWorkers(n_threads), 3);
+  
+  
+  SmartPeak::SequenceProcessorMultithread spMT1(sequenceHandler.getSequence(),
+    dynamic_filenames,
+    raw_data_processing_methods);
+
+  SmartPeak::SequenceProcessorMultithread spMT2(sequenceHandler.getSequence(),
+    dynamic_filenames,
+    raw_data_processing_methods);
+
+  const unsigned int max_threads = std::thread::hardware_concurrency();
+
+  if (max_threads != 0 && 4 <= max_threads) {
+    BOOST_CHECK_EQUAL(spMT1.getNumWorkers(4), 3);
+    BOOST_CHECK_EQUAL(spMT2.getNumWorkers(3), 2);
+  }
+  else {
+    BOOST_CHECK_EQUAL(spMT1.getNumWorkers(8), 1);
+    BOOST_CHECK_EQUAL(spMT2.getNumWorkers(3), 1);
+  }
 }
 
 BOOST_AUTO_TEST_CASE(processSequenceSegments)

@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <atomic>
+#include <thread>
 
 namespace SmartPeak
 {
@@ -33,7 +34,16 @@ namespace SmartPeak
       @note If the API is unable to fetch the required information, only a
       single thread will be used
     */
-    void spawn_workers();
+    void spawn_workers(unsigned int n_threads);
+
+    /**
+      Determine the number of workers available based on the maximum available
+      threads and the desired thread count. 1 thread will always be preserved for
+      the GUI unless the maximum number of available threads couldn't be determined
+
+      @param[in] n_threads desired number of threads to use
+    */
+    size_t getNumWorkers(unsigned int n_threads) const;
 
     /**
       Workers run this function. It implements a loop that runs the following steps:
