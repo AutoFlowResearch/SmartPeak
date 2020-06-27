@@ -165,6 +165,9 @@ namespace SmartPeak
   {
     LOGD << "Setting processor: " << (&processor);
     processor_ = &processor;
+    processor_name_ = processor.getName();
+    error_loading_file_ = false;
+    file_was_loaded_ = false;
   }
 
   void FilePicker::runProcessor()
@@ -200,21 +203,18 @@ namespace SmartPeak
 
     try {
       file_was_loaded = f.get();
-      if(file_was_loaded) LOGN << "File has been loaded.";
-      else LOGN << "File has not been loaded.";
+      if (file_was_loaded) {
+        LOGN << "File has been loaded.";
+      }
+      else {
+        error_loading_file_ = true;
+        LOGN << "File has not been loaded.";
+      }
     } catch (const std::exception& e) {
+      error_loading_file_ = true;
       LOGE << e.what();
     }
 
     loading_is_done = true;    
-  }
-
-  bool FilePicker::fileLoadingIsDone()
-  {
-    return loading_is_done_;
-  }
-  bool FilePicker::fileWasLoaded()
-  {
-    return file_was_loaded_;
   }
 }
