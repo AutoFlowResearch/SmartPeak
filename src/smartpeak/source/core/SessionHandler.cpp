@@ -1124,6 +1124,22 @@ namespace SmartPeak
     else
       return std::set<std::string>();
   }
+  std::set<std::string> SessionHandler::getSelectSequenceSegmentNamesWorkflow(const SequenceHandler & sequence_handler)
+  {
+    if (sequence_table_body.size() && injection_explorer_checkbox_headers.size()) {
+      Eigen::Tensor<bool, 1> selected_injections_workflow = injection_explorer_checkbox_body.chip(0, 1);
+      std::set<std::string> sequence_segment_names;
+      for (int row = 0; row < selected_injections_workflow.size(); ++row) {
+        if (selected_injections_workflow(row)) {
+          std::string sequence_segment_name = sequence_handler.getSequence().at(row).getMetaData().getSequenceSegmentName();
+          sequence_segment_names.insert(sequence_segment_name);
+        }
+      }
+      return sequence_segment_names;
+    }
+    else
+      return std::set<std::string>();
+  }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectSampleNamesTable()
   {
     if (sequence_table_body.size() && injection_explorer_checkbox_headers.size())

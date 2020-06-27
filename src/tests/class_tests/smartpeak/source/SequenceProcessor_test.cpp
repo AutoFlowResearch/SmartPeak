@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
     dynamic_filenames,
     raw_data_processing_methods);  
   unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].at("value"));
-  BOOST_CHECK_EQUAL(spMT3.getNumWorkers(n_threads), 3);  
+  BOOST_CHECK_EQUAL(n_threads, 3);
   
   SmartPeak::SequenceProcessorMultithread spMT1(sequenceHandler.getSequence(),
     dynamic_filenames,

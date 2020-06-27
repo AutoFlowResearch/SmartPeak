@@ -746,29 +746,6 @@ namespace SmartPeak
     LOGD << "END storeFeatureBackgroundQC";
   }
 
-  void PlotCalibrators::process(
-    SequenceSegmentHandler& sequenceSegmentHandler_IO,
-    const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-    const Filenames& filenames
-  ) const
-  {
-    LOGD << "START PlotCalibrators";
-
-    if (params_I.count("SequenceSegmentPlotter") &&
-        params_I.at("SequenceSegmentPlotter").empty()) {
-      LOGE << "No parameters for SequenceSegmentPlotter";
-      LOGD << "END PlotCalibrators";
-      return;
-    }
-
-    //// TODO: Uncomment when SequenceSegmentPlotter is implemented
-    //SequenceSegmentPlotter sequenceSegmentPlotter;
-    //sequenceSegmentPlotter.setParameters(SequenceSegmentPlotter_params_I);
-    //sequenceSegmentPlotter.plotCalibrationPoints(calibrators_pdf_o, sequenceSegmentHandler_I);
-    LOGD << "END PlotCalibrators";
-  }
-
   void EstimateFeatureFilterValues::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,

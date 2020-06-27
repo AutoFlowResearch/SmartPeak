@@ -303,7 +303,8 @@ int main(int argc, char **argv)
           }
         }
         const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
-        manager_.addWorkflow(application_handler_, injection_names, std::set<std::string>());
+        const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
+        manager_.addWorkflow(application_handler_, injection_names, sequence_segment_names);
         ImGui::CloseCurrentPopup();
       }
       ImGui::SameLine();
