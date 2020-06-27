@@ -178,7 +178,7 @@ namespace SmartPeak
   }
 
   namespace ApplicationProcessors {
-  void processCommands(ApplicationHandler& state, std::vector<ApplicationHandler::Command> commands)
+  void processCommands(ApplicationHandler& state, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names)
   {
     size_t i = 0;
     while (i < commands.size()) {
@@ -193,16 +193,18 @@ namespace SmartPeak
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(raw_methods),
           [](const ApplicationHandler::Command& command){ return command.raw_data_method; });
         ProcessSequence ps(state.sequenceHandler_);
-        ps.filenames                     = cmd.dynamic_filenames;
+        ps.filenames = cmd.dynamic_filenames;
         ps.raw_data_processing_methods_I = raw_methods;
+        ps.injection_names = injection_names;
         ps.process();
       } else if (cmd.type == ApplicationHandler::Command::SequenceSegmentMethod) {
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(seq_seg_methods),
           [](const ApplicationHandler::Command& command){ return command.seq_seg_method; });
         ProcessSequenceSegments pss(state.sequenceHandler_);
-        pss.filenames                             = cmd.dynamic_filenames;
+        pss.filenames = cmd.dynamic_filenames;
         pss.sequence_segment_processing_methods_I = seq_seg_methods;
+        pss.sequence_segment_names = sequence_segment_names;
         pss.process();
       } else {
         LOGW << "Skipping a command: " << cmd.type << "\n";

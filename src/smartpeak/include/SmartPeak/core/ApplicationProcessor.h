@@ -19,23 +19,12 @@ namespace SmartPeak
     ApplicationHandler& application_handler_;
 
   protected:
-    // Forced to write this, because the other user-defined constructors inhibit
-    // the implicit definition of a default constructor
-    // I implement these constructors as protected so nobody will instantiate
-    // an ApplicationProcessor outside of a derived class
     ApplicationProcessor() = default;
     ApplicationProcessor(ApplicationHandler& application_handler) : application_handler_(application_handler) {}
   };
 
   namespace ApplicationProcessors {
-    // Passing a copy of "commands" because "application_handler" is passed by reference, and
-    // its "commands" (currently part of the "application_handler" object) could not possibly
-    // be passed as const reference.
-    // I prefer not to pass "commands" by non-const reference because it would
-    // tell the reader/developer "this is an input/output variable".
-    // Since this function is called once every N minutes, the cost of the copy
-    // can be ignored.
-    void processCommands(ApplicationHandler& application_handler, std::vector<ApplicationHandler::Command> commands);
+    void processCommands(ApplicationHandler& application_handler, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names);
   }
 
   struct CreateCommand : ApplicationProcessor {

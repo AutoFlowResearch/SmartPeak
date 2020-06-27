@@ -267,7 +267,7 @@ int main(int argc, char **argv)
             );
           }
         }
-        manager_.addWorkflow(application_handler_);
+        manager_.addWorkflow(application_handler_, session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_), {});
         ImGui::CloseCurrentPopup();
       }
 
