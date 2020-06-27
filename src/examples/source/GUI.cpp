@@ -50,6 +50,8 @@ int main(int argc, char **argv)
   bool file_loading_is_done_ = true;
   bool exceeding_plot_points_ = false;
   bool exceeding_table_size_ = false;
+  bool ran_integrity_check_ = false;
+  bool integrity_check_failed_ = false;
 
   // View: Bottom window
   bool show_info_ = true;
@@ -181,6 +183,8 @@ int main(int argc, char **argv)
     quickInfoText_.text_lines.push_back(file_loading_is_done_ ? "File loading status: done" : "File loading status: running...");
     if (exceeding_plot_points_) quickInfoText_.text_lines.push_back("Plot rendering limit reached.  Not plotting all selected data.");
     if (exceeding_table_size_) quickInfoText_.text_lines.push_back("Table rendering limit reached.  Not showing all selected data.");
+    if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_.text_lines.push_back("Integrity check failed.  Check the `Information` log.");
+    if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_.text_lines.push_back("Integrity check passed.");
 
     if (popup_file_picker_)
     {
@@ -267,7 +271,8 @@ int main(int argc, char **argv)
             );
           }
         }
-        manager_.addWorkflow(application_handler_, session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_), {});
+        const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
+        manager_.addWorkflow(application_handler_, injection_names, std::set<std::string>());
         ImGui::CloseCurrentPopup();
       }
 
@@ -340,7 +345,6 @@ int main(int argc, char **argv)
         ImGui::MenuItem("Text file", NULL, false, false);
         if (ImGui::BeginMenu("Import File", false))
         {
-          if (ImGui::MenuItem("Sequence")) {}
           if (ImGui::MenuItem("Transitions")) {}
           if (ImGui::MenuItem("Parameters")) {}
           if (ImGui::MenuItem("Reference data")) {}
@@ -445,11 +449,23 @@ int main(int argc, char **argv)
           popup_run_workflow_ = true;
         }
         if (ImGui::BeginMenu("Integrity checks"))
-        {  // TODO: see AUT-398
-          if (ImGui::MenuItem("Sample consistency")) {}
-          if (ImGui::MenuItem("Comp consistency")) {}
-          if (ImGui::MenuItem("Comp Group consistency")) {}
-          if (ImGui::MenuItem("IS consistency")) {}
+        {
+          if (ImGui::MenuItem("Sample consistency")) {
+            ran_integrity_check_ = true;
+            integrity_check_failed_ = !InputDataValidation::sampleNamesAreConsistent(application_handler_.sequenceHandler_);
+          }
+          if (ImGui::MenuItem("Comp consistency")) {
+            ran_integrity_check_ = true;
+            integrity_check_failed_ = !InputDataValidation::componentNamesAreConsistent(application_handler_.sequenceHandler_);
+          }
+          if (ImGui::MenuItem("Comp Group consistency")) {
+            ran_integrity_check_ = true;
+            integrity_check_failed_ = !InputDataValidation::componentNameGroupsAreConsistent(application_handler_.sequenceHandler_);
+          }
+          if (ImGui::MenuItem("IS consistency")) {
+            ran_integrity_check_ = true;
+            integrity_check_failed_ = !InputDataValidation::heavyComponentsAreConsistent(application_handler_.sequenceHandler_);
+          }
           ImGui::EndMenu();
         }
         if (ImGui::MenuItem("Report"))
