@@ -248,6 +248,7 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getNSelectedFeatureMetaValuesPlot(), 1);
   // Selected string values
   BOOST_CHECK(session_handler.getSelectInjectionNamesWorkflow(testData.sequenceHandler) == std::set<std::string>({"150516_CM1_Level10_2_BatchName_1900-01-01_000000", "150516_CM1_Level1_1_BatchName_1900-01-01_000000"}));
+  BOOST_CHECK(session_handler.getSelectSequenceSegmentNamesWorkflow(testData.sequenceHandler) == std::set<std::string>({ "segment1" }));
   BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesTable().size(), 2);
   BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesTable()(0), "150516_CM1_Level1");
   BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesTable()(session_handler.getSelectSampleNamesTable().dimension(0)-1), "150516_CM1_Level10");

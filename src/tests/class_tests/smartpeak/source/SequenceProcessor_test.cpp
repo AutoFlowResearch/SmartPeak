@@ -190,37 +190,45 @@ BOOST_AUTO_TEST_CASE(processSequence)
 
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), dynamic_filenames.size());
 
+  // Select injection names
+  std::set<std::string> injection_names;
+  for (int i = 0; i < 2; ++i) injection_names.insert(sequenceHandler.getSequence().at(i).getMetaData().getInjectionName());
   ProcessSequence ps(sequenceHandler);
-  ps.filenames                     = dynamic_filenames;
+  ps.filenames = dynamic_filenames;
   ps.raw_data_processing_methods_I = raw_data_processing_methods;
+  ps.injection_names = injection_names;
   ps.process();
-
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
-  BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 340); // loaded
-  
-  
+  int n_chroms = 0;
+  for (int i = 0; i < sequenceHandler.getSequence().size(); ++i) n_chroms += sequenceHandler.getSequence().at(i).getRawData().getExperiment().getChromatograms().size();
+  BOOST_CHECK_EQUAL(n_chroms, 680); // loaded only the first two injections
+
+  // Default injection names (i.e., the entire sequence)
+  ps.injection_names = {};
+  ps.process();
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
+  n_chroms = 0;
+  for (int i = 0; i < sequenceHandler.getSequence().size(); ++i) n_chroms += sequenceHandler.getSequence().at(i).getRawData().getExperiment().getChromatograms().size();
+  BOOST_CHECK_EQUAL(n_chroms, 2040); // loaded all injections
+
+  // Test multi threading parameters  
   std::map<std::string, std::vector<std::map<std::string, std::string>>> const* params;
   params = &rawDataHandler0.getParameters();
   BOOST_CHECK_EQUAL(params->count("SequenceProcessor"), 1);
   
   SmartPeak::SequenceProcessorMultithread spMT3(sequenceHandler.getSequence(),
     dynamic_filenames,
-    raw_data_processing_methods);
-  
+    raw_data_processing_methods);  
   unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].at("value"));
-  BOOST_CHECK_EQUAL(spMT3.getNumWorkers(n_threads), 3);
-  
+  BOOST_CHECK_EQUAL(n_threads, 4);
   
   SmartPeak::SequenceProcessorMultithread spMT1(sequenceHandler.getSequence(),
     dynamic_filenames,
     raw_data_processing_methods);
-
   SmartPeak::SequenceProcessorMultithread spMT2(sequenceHandler.getSequence(),
     dynamic_filenames,
     raw_data_processing_methods);
-
   const unsigned int max_threads = std::thread::hardware_concurrency();
-
   if (max_threads != 0 && 4 <= max_threads) {
     BOOST_CHECK_EQUAL(spMT1.getNumWorkers(4), 3);
     BOOST_CHECK_EQUAL(spMT2.getNumWorkers(3), 2);
@@ -256,6 +264,7 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
     );
   }
 
+  // Default sequence segment names (i.e., all)
   ProcessSequenceSegments pss(sequenceHandler);
   pss.filenames                             = dynamic_filenames;
   pss.sequence_segment_processing_methods_I = sequence_segment_processing_methods;
@@ -296,6 +305,8 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getCorrelationCoefficient()), 0.99547012000000001, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getLLOQ()), 0.008, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 0.8, 1e-6);
+
+  // TODO: Selected sequence segment names
 }
 
 BOOST_AUTO_TEST_SUITE_END()

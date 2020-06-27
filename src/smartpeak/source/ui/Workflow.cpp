@@ -34,9 +34,7 @@ namespace SmartPeak
         "GCMS SIM Unknowns",
         "GCMS Full Scan Unknowns",
         "LCMS MRM Validation - QMIP",
-        "LCMS MRM Validation - LP",
-        "LCMS MRM Validation - QMIP META",
-        "LCMS MRM Validation - LP META"
+        "LCMS MRM Validation - LP"
       };
       for (const char* s : presets)
       {

@@ -165,6 +165,9 @@ namespace SmartPeak
   {
     LOGD << "Setting processor: " << (&processor);
     processor_ = &processor;
+    processor_name_ = processor.getName();
+    error_loading_file_ = false;
+    file_was_loaded_ = false;
   }
 
   void FilePicker::runProcessor()
@@ -173,7 +176,7 @@ namespace SmartPeak
     if (!processor_)
       return;
     loading_is_done_ = false;
-    run_and_join(processor_, picked_pathname_, loading_is_done_);
+    run_and_join(processor_, picked_pathname_, loading_is_done_, file_was_loaded_);
   }
 
   void FilePicker::clearProcessor()
@@ -185,30 +188,33 @@ namespace SmartPeak
   void FilePicker::run_and_join(
     FilePickerProcessor* processor,
     const std::string& pathname,
-    bool& loading_is_done
+    bool& loading_is_done,
+    bool& file_was_loaded
   )
   {
     processor->pathname_ = pathname;
-    std::future<void> f = std::async(
+    std::future<bool> f = std::async(
       std::launch::async, 
-      [processor](){ processor->process(); }
+      [processor](){ return processor->process(); }
     );
 
     LOGN << "File is being loaded...";
     f.wait();
 
     try {
-      f.get(); // checking for exception
+      file_was_loaded = f.get();
+      if (file_was_loaded) {
+        LOGN << "File has been loaded.";
+      }
+      else {
+        error_loading_file_ = true;
+        LOGN << "File has not been loaded.";
+      }
     } catch (const std::exception& e) {
+      error_loading_file_ = true;
       LOGE << e.what();
     }
 
-    loading_is_done = true;
-    LOGN << "File has been loaded.";
-  }
-
-  bool FilePicker::fileLoadingIsDone()
-  {
-    return loading_is_done_;
+    loading_is_done = true;    
   }
 }

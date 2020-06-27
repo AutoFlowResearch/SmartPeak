@@ -126,12 +126,14 @@ or double-click `GUI` executable in the file browser of your OS.
 - Choose the corresponding directory with `Change dir`. The path to example folder can be shortened to f.e. `/data/GCMS_SIM_Unknowns` 
 - Select the sequence file
 ![Sequence](images/sequence_file.png)
+- The integrity of the loaded data can be checked with `Actions | Integrity checks`.  The results of the integrity checks can be viewed with `View | Info`.
 - Edit the workflow with `Edit | Workflow`. You have an option to cherry pick the custom workflow or to choose the predefined set of operations. For example, the workflow steps for GC-MS SIM Unknowns are the following:
 ![Workflow](images/workflow.png)
 - View and verify the workflow steps and input files with `View | [table]`. 
 ![InputTablesWorkflow](images/SmartPeakGUIWorkflowTable.png)
 - The explorer panes can be used to filter the table views with `View | Injections or Transitions`.  Click on the checkbox under plot or table to include or exclude the injection or tansition from the view.
 ![InputTablesSequence](images/SmartPeakGUISequenceTable.png)
+- Changes to any of the input files can be made by reloading a modified .csv version of the file with `File | Import File`.
 - Run the workflow with `Actions | Run workflow`. Verify or change the data input/output directories before running the workflow.
 ![RunWorkflowModal](images/SmartPeakGUIRunWorkflowModal.png)
 - The status of the workflow can be monitored with `View | info`. 
