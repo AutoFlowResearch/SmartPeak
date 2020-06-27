@@ -141,7 +141,6 @@ namespace SmartPeak
     // data for the feature table
     Eigen::Tensor<std::string, 1> feature_table_headers;
     Eigen::Tensor<std::string, 2> feature_table_body;
-    int feature_table_unique_samples_transitions_ = 0; // used to decide when to update the feature table data
     // data for the feature_pivot table
     Eigen::Tensor<std::string, 1> feature_pivot_table_headers;
     Eigen::Tensor<std::string, 2> feature_pivot_table_rows;
@@ -171,5 +170,7 @@ namespace SmartPeak
     std::string calibrators_x_axis_title;
     std::string calibrators_y_axis_title;
     float calibrators_conc_min , calibrators_conc_max, calibrators_feature_min, calibrators_feature_max;
+  private:
+    int feature_table_unique_samples_transitions_ = 0; // used to decide when to update the feature table data
   };
 }

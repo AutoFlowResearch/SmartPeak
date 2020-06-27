@@ -276,6 +276,287 @@ namespace SmartPeak
     }
   }
 
+  bool LoadSequenceParameters::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
+      LoadParameters loadParameters;
+      Filenames filenames = application_handler_.static_filenames_;
+      filenames.parameters_csv_i = pathname_;
+      loadParameters.process(rawDataHandler, {}, filenames);
+      return true;
+    }
+    else {
+      LOGE << "Parameters file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceTransitions::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
+      LoadTransitions loadTransitions;
+      Filenames filenames = application_handler_.static_filenames_;
+      filenames.traML_csv_i = pathname_;
+      loadTransitions.process(rawDataHandler, {}, filenames);
+      return true;
+    }
+    else {
+      LOGE << "Transitions file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceValidationData::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
+      LoadValidationData loadValidationData;
+      Filenames filenames = application_handler_.static_filenames_;
+      filenames.referenceData_csv_i = pathname_;
+      loadValidationData.process(rawDataHandler, {}, filenames);
+      return true;
+    }
+    else {
+      LOGE << "Reference data file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentQuantitationMethods::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadQuantitationMethods loadFile;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.quantitationMethods_csv_i = pathname_;
+        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Quantitation Methods file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentStandardsConcentrations::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadStandardsConcentrations loadStandardsConcentrations;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.standardsConcentrations_csv_i = pathname_;
+        loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Standards concentrations file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureFilterComponents::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureFilters loadFeatureFilters;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureFilterComponents_csv_i = pathname_;
+        filenames.featureFilterComponentGroups_csv_i = "";
+        loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature filters file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureFilterComponentGroups::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureFilters loadFeatureFilters;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureFilterComponents_csv_i = "";
+        filenames.featureFilterComponentGroups_csv_i = pathname_;
+        loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature filters file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureQCComponents::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureQCs loadFeatureQCs;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureQCComponents_csv_i = pathname_;
+        filenames.featureQCComponentGroups_csv_i = "";
+        loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature QCs file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureQCComponentGroups::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureQCs loadFeatureQCs;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureQCComponents_csv_i = "";
+        filenames.featureQCComponentGroups_csv_i = pathname_;
+        loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature QCs file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureRSDFilterComponents::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureRSDFilters loadFile;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureRSDFilterComponents_csv_i = pathname_;
+        filenames.featureRSDFilterComponentGroups_csv_i = "";
+        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature filter RSD file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureRSDFilterComponentGroups::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureRSDFilters loadFile;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureRSDFilterComponents_csv_i = "";
+        filenames.featureRSDFilterComponentGroups_csv_i = pathname_;
+        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature filter RSD file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureRSDQCComponents::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureRSDQCs loadFile;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureRSDQCComponents_csv_i = pathname_;
+        filenames.featureRSDQCComponentGroups_csv_i = "";
+        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature RSD QCs file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureRSDQCComponentGroups::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureRSDQCs loadFile;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureRSDQCComponents_csv_i = "";
+        filenames.featureRSDQCComponentGroups_csv_i = pathname_;
+        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature RSD QCs file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureBackgroundFilterComponents::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureBackgroundFilters loadFile;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureBackgroundFilterComponents_csv_i = pathname_;
+        filenames.featureBackgroundFilterComponentGroups_csv_i = "";
+        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature background filters file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureBackgroundFilterComponentGroups::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureBackgroundFilters loadFile;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureBackgroundFilterComponents_csv_i = "";
+        filenames.featureBackgroundFilterComponentGroups_csv_i = pathname_;
+        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature background filters file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureBackgroundQCComponents::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureBackgroundQCs loadFile;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureBackgroundQCComponents_csv_i = pathname_;
+        filenames.featureBackgroundQCComponentGroups_csv_i = "";
+        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature background QCs file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool LoadSequenceSegmentFeatureBackgroundQCComponentGroups::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        LoadFeatureBackgroundQCs loadFile;
+        Filenames filenames = application_handler_.static_filenames_;
+        filenames.featureBackgroundQCComponents_csv_i = "";
+        filenames.featureBackgroundQCComponentGroups_csv_i = pathname_;
+        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      }
+      return true;
+    }
+    else {
+      LOGE << "Feature background QCs file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
   bool BuildCommandsFromNames::process()
   {
     commands_.clear();

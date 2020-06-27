@@ -58,6 +58,91 @@ namespace SmartPeak
     std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
   };
 
+  struct LoadSequenceParameters : FilePickerProcessor {
+    LoadSequenceParameters(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceTransitions : FilePickerProcessor {
+    LoadSequenceTransitions(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceValidationData : FilePickerProcessor {
+    LoadSequenceValidationData(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentQuantitationMethods : FilePickerProcessor {
+    LoadSequenceSegmentQuantitationMethods(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentStandardsConcentrations : FilePickerProcessor {
+    LoadSequenceSegmentStandardsConcentrations(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureFilterComponents : FilePickerProcessor {
+    LoadSequenceSegmentFeatureFilterComponents(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureFilterComponentGroups : FilePickerProcessor {
+    LoadSequenceSegmentFeatureFilterComponentGroups(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureQCComponents : FilePickerProcessor {
+    LoadSequenceSegmentFeatureQCComponents(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureQCComponentGroups : FilePickerProcessor {
+    LoadSequenceSegmentFeatureQCComponentGroups(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureRSDFilterComponents : FilePickerProcessor {
+    LoadSequenceSegmentFeatureRSDFilterComponents(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureRSDFilterComponentGroups : FilePickerProcessor {
+    LoadSequenceSegmentFeatureRSDFilterComponentGroups(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureRSDQCComponents : FilePickerProcessor {
+    LoadSequenceSegmentFeatureRSDQCComponents(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureRSDQCComponentGroups : FilePickerProcessor {
+    LoadSequenceSegmentFeatureRSDQCComponentGroups(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureBackgroundFilterComponents : FilePickerProcessor {
+    LoadSequenceSegmentFeatureBackgroundFilterComponents(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureBackgroundFilterComponentGroups : FilePickerProcessor {
+    LoadSequenceSegmentFeatureBackgroundFilterComponentGroups(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureBackgroundQCComponents : FilePickerProcessor {
+    LoadSequenceSegmentFeatureBackgroundQCComponents(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
+  struct LoadSequenceSegmentFeatureBackgroundQCComponentGroups : FilePickerProcessor {
+    LoadSequenceSegmentFeatureBackgroundQCComponentGroups(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
+    bool process() override;
+  };
+
   struct SetRawDataPathname : FilePickerProcessor {
     SetRawDataPathname(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
     bool process() override;
