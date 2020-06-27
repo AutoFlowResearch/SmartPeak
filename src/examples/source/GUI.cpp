@@ -473,25 +473,12 @@ int main(int argc, char **argv)
           }
           ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu("Export File"))
-        {
+        if (ImGui::BeginMenu("Export File", false))
+        { // TODO: once table editing is enabled
           if (ImGui::MenuItem("Sequence")) {}
           if (ImGui::MenuItem("Transitions")) {}
           if (ImGui::MenuItem("Parameters")) {}
-          if (ImGui::MenuItem("Quant Method")) {}
           if (ImGui::MenuItem("Standards Conc")) {}
-          if (ImGui::MenuItem("Comp Filters")) {}
-          if (ImGui::MenuItem("Comp Group Filters")) {}
-          if (ImGui::MenuItem("Comp QCs")) {}
-          if (ImGui::MenuItem("Comp Group QCs")) {}
-          if (ImGui::MenuItem("Comp %RSD Filters")) {}
-          if (ImGui::MenuItem("Comp Group %RSD Filters")) {}
-          if (ImGui::MenuItem("Comp %RSD QCs")) {}
-          if (ImGui::MenuItem("Comp Group %RSD QCs")) {}
-          if (ImGui::MenuItem("Comp %Background Filters")) {}
-          if (ImGui::MenuItem("Comp Group %Background Filters")) {}
-          if (ImGui::MenuItem("Comp %Background QCs")) {}
-          if (ImGui::MenuItem("Comp Group %Background QCs")) {}
           ImGui::EndMenu();
         }
         ImGui::EndMenu();
