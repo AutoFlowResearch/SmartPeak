@@ -72,12 +72,11 @@ jobs:
           cd ../smartpeak2_debug_build
           cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;$(brew --prefix qt5);$(brew --prefix boost@1.60)" -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/imgui -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
           make -j4
-      - run:
-          command: |
-            cd /usr/local/lib
-            sudo ln -s /Applications/Xcode.app/Contents/Developer/usr/lib/libLeaksAtExit.dylib
-            leaks -atExit -- ~/SmartPeak2/smartpeak2_debug_build/src/tests/class_tests/bin/Debug/Utilities_test
-            leaks -atExit -- ~/SmartPeak2/smartpeak2_debug_build/src/tests/class_tests/bin/Debug/SequenceProcessor_test  
+      - run: |
+          cd /usr/local/lib &&
+          sudo ln -s /Applications/Xcode.app/Contents/Developer/usr/lib/libLeaksAtExit.dylib &&
+          leaks -atExit -- ~/SmartPeak2/smartpeak2_debug_build/src/tests/class_tests/bin/Debug/Utilities_test &&
+          leaks -atExit -- ~/SmartPeak2/smartpeak2_debug_build/src/tests/class_tests/bin/Debug/SequenceProcessor_test  
       - run:
           command: | 
             cd ~/SmartPeak2/smartpeak2_debug_build
