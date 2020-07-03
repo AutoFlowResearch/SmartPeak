@@ -5,7 +5,6 @@
 #define BOOST_TEST_MODULE Utilities test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/Utilities.h>
-#include <boost/filesystem.hpp>
 
 using namespace SmartPeak;
 using namespace std;
@@ -386,69 +385,7 @@ BOOST_AUTO_TEST_CASE(endsWith)
 BOOST_AUTO_TEST_CASE(getPathnameContent)
 {
   const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
-  // const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname, true);
-  ////
-  namespace fs = boost::filesystem;
-  const bool asc = true;
-  std::array<std::vector<std::string>, 4> c;
-  boost::system::error_code ec;
-
-  fs::directory_iterator it = fs::directory_iterator(fs::path(pathname), ec);
-  if (ec.value()) {
-    return c;
-  }
-  const fs::path p(pathname);
-  fs::directory_iterator it_end = fs::directory_iterator();
-
-  for ( ; it != it_end; it++) {
-    const fs::directory_entry& entry = *it;
-
-    if (!exists(entry.path())) { // protects from e.g. "dangling" symbolic links
-      LOGD << "Path does not exist. Skipping: " << entry.path();
-      continue;
-    }
-
-    const std::string filename(entry.path().filename().string());
-    if (filename == "." || filename == ".." || (*(&filename.at(0))) == '.') {
-      continue;
-    }
-
-    size_t filesize = fs::is_directory(entry)
-    ? SmartPeak::Utilities::directorySize(entry.path().string())
-      : fs::file_size(entry, ec);
-    if (ec.value()) {
-      filesize = 0;
-      ec.clear();
-    }
-
-    const std::string filetype = fs::is_directory(entry) ? "Directory" : entry.path().extension().string();
-
-    char buff[128];
-    const std::time_t t(fs::last_write_time(entry));
-    std::strftime(buff, sizeof buff, "%Y-%m-%d %H:%M:%S", std::localtime(&t)); // ISO 8601 date format
-
-    c[0].push_back(filename);
-    c[1].push_back(std::to_string(filesize));
-    c[2].push_back(filetype);
-    c[3].push_back(std::string(buff));
-  }
-
-  std::vector<size_t> indices(c[0].size());
-  std::iota(indices.begin(), indices.end(), 0);
-  const std::vector<std::string>& names = c[0];
-  std::sort(
-    indices.begin(),
-    indices.end(),
-    [&names, asc](const size_t l, const size_t r)
-    {
-    const bool b = SmartPeak::Utilities::is_less_than_icase(names[l], names[r]);
-      return asc ? b : !b;
-    }
-  );
-  SmartPeak::Utilities::sortPairs(indices, c[0]);
-  SmartPeak::Utilities::sortPairs(indices, c[1]);
-  SmartPeak::Utilities::sortPairs(indices, c[2]);
-  SmartPeak::Utilities::sortPairs(indices, c[3]);
+  const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname, true);
 
   // number of items in the pathname, taking .gitignore into account
   BOOST_TEST_CHECKPOINT( "'c[0].size()'= " << c[0].size() );
