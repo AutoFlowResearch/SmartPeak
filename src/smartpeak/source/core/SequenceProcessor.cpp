@@ -201,7 +201,7 @@ namespace SmartPeak
           else if (n_threads <= max_threads && n_threads > 1) {
               n_workers = n_threads - 1;
           }
-          else if (n_threads == 0) {
+          else if (n_threads >= 0) {
               LOGD << "Max available threads: " << max_threads;
               LOGD << "but using just 1 thread.";
               n_workers = 1;
