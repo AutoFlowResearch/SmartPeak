@@ -387,7 +387,7 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
   const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
   // const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname);
   ////
-  const std::array<std::vector<std::string>, 4> c;
+  std::array<std::vector<std::string>, 4> c;
     boost::system::error_code ec;
 
     fs::directory_iterator it = fs::directory_iterator(fs::path(pathname), ec);
