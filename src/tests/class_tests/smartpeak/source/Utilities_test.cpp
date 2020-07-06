@@ -384,6 +384,7 @@ BOOST_AUTO_TEST_CASE(endsWith)
 
 BOOST_AUTO_TEST_CASE(getPathnameContent)
 {
+  #ifndef __APPLE__
   const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
   const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname, true);
 
@@ -411,6 +412,7 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
   BOOST_CHECK_EQUAL(c[1][38], "20"); // number of items within the folder
   BOOST_TEST_CHECKPOINT( "'c[2][38]'= 'Directory'" << c[2][38] );
   BOOST_CHECK_EQUAL(c[2][38], "Directory");
+  #endif
 }
 
 BOOST_AUTO_TEST_CASE(getParentPathname)
