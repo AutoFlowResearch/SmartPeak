@@ -24,14 +24,35 @@ namespace SmartPeak {
     width_at_50_peak_height,
     retention_time,
     integration_left_boundary,
-    integration_right_boundary,
+    integration_right_boundary/*,
     accuracy,
     n_features,
-    validation
+    validation*/
+  };
+
+  // float/double/long double castable feature metadata
+  enum class FeatureMetadataFloat {
+    asymmetry_factor = 1,
+    baseline_delta_to_height,
+    calculated_concentration,
+    log_signal_to_noise,
+    peak_apex_intensity,
+    peak_area,
+    points_across_baseline,
+    points_across_half_height,
+    qc_transition_score,
+    qc_transition_group_score,
+    tailing_factor,
+    total_width,
+    width_at_50_peak_height,
+    retention_time,
+    integration_left_boundary,
+    integration_right_boundary
   };
 
   // Returns the string representation that a FeatureMetadata would have in OpenMS
   extern const std::map<FeatureMetadata, std::string> metadataToString;
+  extern const std::map<FeatureMetadata, std::string> metadatafloatToString;
 
-  constexpr size_t FeatureMetadataSize { 23 };
+  constexpr size_t FeatureMetadataSize { 20 }; // was 23 with accuracy, n_features, and validation
 }

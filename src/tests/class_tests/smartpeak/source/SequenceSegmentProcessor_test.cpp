@@ -687,36 +687,6 @@ BOOST_AUTO_TEST_CASE(processCalculateCalibration)
 }
 
 /**
-  PlotCalibrators Tests
-*/
-BOOST_AUTO_TEST_CASE(constructorPlotCalibrators)
-{
-  PlotCalibrators* ptrPlotCalibrators = nullptr;
-  PlotCalibrators* nullPointerPlotCalibrators = nullptr;
-  BOOST_CHECK_EQUAL(ptrPlotCalibrators, nullPointerPlotCalibrators);
-}
-
-BOOST_AUTO_TEST_CASE(destructorPlotCalibrators)
-{
-  PlotCalibrators* ptrPlotCalibrators = nullptr;
-  ptrPlotCalibrators = new PlotCalibrators();
-  delete ptrPlotCalibrators;
-}
-
-BOOST_AUTO_TEST_CASE(gettersPlotCalibrators)
-{
-  PlotCalibrators processor;
-
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "PLOT_CALIBRATORS");
-}
-
-BOOST_AUTO_TEST_CASE(processPlotCalibrators)
-{
-  // TODO: Implementation plotCalibrators
-}
-
-/**
   LoadStandardsConcentrations Tests
 */
 BOOST_AUTO_TEST_CASE(constructorLoadStandardsConcentrations)

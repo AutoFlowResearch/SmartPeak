@@ -7,6 +7,7 @@ set(sources_list
 	GuiAppender.cpp
 	Report.cpp
 	Widget.cpp
+	WindowSizesAndPositions.cpp
 	Workflow.cpp
 )
 

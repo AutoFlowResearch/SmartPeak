@@ -318,25 +318,6 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct PlotCalibrators : SequenceSegmentProcessor
-  {
-    int getID() const { return -1; }
-    std::string getName() const { return "PLOT_CALIBRATORS"; }
-    std::string getDescription() const { return "Plot the calibration points for each component where the x-axis is concentration ratio and the y-axis is intensity ratio."; }
-
-    /**
-      Plot the calibration points for each component.
-
-      NOTE: Not yet implemented
-    */
-    void process(
-      SequenceSegmentHandler& sequenceSegmentHandler_IO,
-      const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
-      const Filenames& filenames
-    ) const override;
-  };
-
   struct EstimateFeatureFilterValues : SequenceSegmentProcessor
   {
     int getID() const { return -1; }

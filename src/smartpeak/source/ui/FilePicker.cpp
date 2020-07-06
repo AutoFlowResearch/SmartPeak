@@ -1,4 +1,4 @@
-#include <SmartPeak/core/AppStateProcessor.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/Utilities.h>
 #include <future>
@@ -118,12 +118,12 @@ namespace SmartPeak
 
     ImGui::Separator();
 
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.9f);
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
     ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.5f);
+    ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
     if (ImGui::Button("Open"))
     {
       picked_pathname_ = current_pathname_;
@@ -161,10 +161,13 @@ namespace SmartPeak
     return picked_pathname_;
   }
 
-  void FilePicker::setProcessor(AppStateProcessor& processor)
+  void FilePicker::setProcessor(FilePickerProcessor& processor)
   {
     LOGD << "Setting processor: " << (&processor);
     processor_ = &processor;
+    processor_name_ = processor.getName();
+    error_loading_file_ = false;
+    file_was_loaded_ = false;
   }
 
   void FilePicker::runProcessor()
@@ -173,7 +176,7 @@ namespace SmartPeak
     if (!processor_)
       return;
     loading_is_done_ = false;
-    run_and_join(processor_, picked_pathname_, loading_is_done_);
+    run_and_join(processor_, picked_pathname_, loading_is_done_, file_was_loaded_);
   }
 
   void FilePicker::clearProcessor()
@@ -183,32 +186,35 @@ namespace SmartPeak
   }
 
   void FilePicker::run_and_join(
-    AppStateProcessor* processor,
+    FilePickerProcessor* processor,
     const std::string& pathname,
-    bool& loading_is_done
+    bool& loading_is_done,
+    bool& file_was_loaded
   )
   {
-    std::future<void> f = std::async(
-      std::launch::async,
-      [processor](const char* pathname){ (*processor)(pathname); },
-      pathname.c_str()
+    processor->pathname_ = pathname;
+    std::future<bool> f = std::async(
+      std::launch::async, 
+      [processor](){ return processor->process(); }
     );
 
     LOGN << "File is being loaded...";
     f.wait();
 
     try {
-      f.get(); // checking for exception
+      file_was_loaded = f.get();
+      if (file_was_loaded) {
+        LOGN << "File has been loaded.";
+      }
+      else {
+        error_loading_file_ = true;
+        LOGN << "File has not been loaded.";
+      }
     } catch (const std::exception& e) {
+      error_loading_file_ = true;
       LOGE << e.what();
     }
 
-    loading_is_done = true;
-    LOGN << "File has been loaded.";
-  }
-
-  bool FilePicker::fileLoadingIsDone()
-  {
-    return loading_is_done_;
+    loading_is_done = true;    
   }
 }

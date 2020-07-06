@@ -18,7 +18,13 @@ cd C:\projects\deps
 
 git clone -n https://github.com/ocornut/imgui.git
 cd imgui
-git checkout ebe79bbed00a13fd4455f04131b63d49c28ebd5d
+git checkout tables
+
+cd C:\projects\deps
+
+git clone -n https://github.com/epezent/implot.git
+cd implot
+git checkout master
 
 cd C:\projects\deps
 

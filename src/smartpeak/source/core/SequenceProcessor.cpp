@@ -87,7 +87,7 @@ namespace SmartPeak
       ? sequenceHandler_IO->getSequence()
       : sequenceHandler_IO->getSamplesInSequence(injection_names);
 
-    if (filenames.size() != injections.size()) {
+    if (filenames.size() < injections.size()) {
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
@@ -113,7 +113,7 @@ namespace SmartPeak
         }
       }
     }
-    if (filenames.size() != sequence_segments.size()) {
+    if (filenames.size() < sequence_segments.size()) {
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 

@@ -3,7 +3,7 @@ set(directory source/core)
 
 ### list all filenames of the directory here
 set(sources_list
-	AppStateProcessor.cpp
+	ApplicationProcessor.cpp
 	CastValue.cpp
 	FeatureMetadata.cpp
 	Filenames.cpp
@@ -18,6 +18,7 @@ set(sources_list
 	SequenceProcessor.cpp
 	SequenceSegmentHandler.cpp
 	SequenceSegmentProcessor.cpp
+	SessionHandler.cpp
 	SharedProcessors.cpp
 	Utilities.cpp
 	WorkflowManager.cpp
