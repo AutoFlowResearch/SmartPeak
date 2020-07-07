@@ -180,9 +180,9 @@ BOOST_AUTO_TEST_CASE(processSequence)
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-      path + "mzML/",
-      path + "features/",
-      path + "features/",
+      path + "mzML",
+      path + "features",
+      path + "features",
       injection.getMetaData().getSampleName(),
       key
     );
@@ -199,6 +199,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
   ps.process();
 
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
+  BOOST_TEST_MESSAGE("rawDataHandler0.getExperiment().getChromatograms().size() (340) : " << dynamic_filenames.size());
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 340); // loaded
 }
 
