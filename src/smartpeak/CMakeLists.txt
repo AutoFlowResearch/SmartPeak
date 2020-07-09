@@ -111,22 +111,22 @@ add_custom_command( OUTPUT            ${DOXYGEN_INDEX_FILE}
                     COMMENT           "Generating docs for SmartPeak lib")
 
 
-add_custom_target(libdoc ALL DEPENDS ${DOXYGEN_INDEX_FILE})
+add_custom_target(libdoc-doxygen ALL DEPENDS ${DOXYGEN_INDEX_FILE})
 
 
 #sphinx
-# find_package(Sphinx REQUIRED)
+find_package(Sphinx REQUIRED)
 
-# set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/source)
-# message(">>>>>>>>>>>>>>>>>>>" ${CMAKE_CURRENT_SOURCE_DIR})
-# set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
-# # file(MAKE_DIRECTORY ${SPHINX_BUILD})
+set(SPHINX_SOURCE   ${CMAKE_CURRENT_SOURCE_DIR})
+set(SPHINX_BUILD    ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
+file(MAKE_DIRECTORY ${SPHINX_BUILD})
 
-# add_custom_target(Sphinx ALL COMMAND
-#                   ${SPHINX_EXECUTABLE} -b html
-#                   ${SPHINX_SOURCE} ${SPHINX_BUILD}
-#                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#                   COMMENT "Generating sphinx docs for SmartPeak lib")
+add_custom_target(libdoc-sphinx ALL 
+                  COMMAND ${SPHINX_EXECUTABLE} -b html
+                  -Dbreathe_projects.SmartPeak=${DOXYGEN_OUTPUT_DIR}/xml
+                  ${SPHINX_SOURCE}  ${SPHINX_BUILD}
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                  COMMENT "Generating sphinx docs for SmartPeak lib")
 
 
 
