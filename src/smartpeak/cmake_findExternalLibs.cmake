@@ -91,3 +91,8 @@ endif(OpenMS_FOUND)
 if(NOT MSVC AND NOT APPLE)
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ".so;.a")
 endif()
+
+#------------------------------------------------------------------------------
+# Find Doxygen
+#------------------------------------------------------------------------------
+find_package(Doxygen REQUIRED)
