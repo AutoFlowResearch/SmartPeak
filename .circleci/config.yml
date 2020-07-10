@@ -20,7 +20,7 @@ jobs:
           libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
           libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
       - run: |
-          apt-get install -y graphviz doxygen
+          apt-get install -y graphviz doxygen doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
           export DEBIAN_FRONTEND=noninteractive &&
           apt-get install -y tzdata &&
           ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
