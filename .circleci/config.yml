@@ -20,6 +20,7 @@ jobs:
           libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
           libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
       - run: |
+          export DEBIAN_FRONTEND=noninteractive &&
           apt-get install -y tzdata &&
           ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
           dpkg-reconfigure --frontend noninteractive tzdata
