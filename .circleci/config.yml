@@ -20,8 +20,9 @@ jobs:
           libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
           libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
       - run: |
-          RUN DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata &&
-          apt-get -y doxygen python3 python3-sphinx
+          apt-get install -y tzdata &&
+          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
+          dpkg-reconfigure --frontend noninteractive tzdata
       - run: |
           cd ~ &&
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
