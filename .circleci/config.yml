@@ -20,11 +20,12 @@ jobs:
           libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
           libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
       - run: |
-          apt-get install -y doxygen
+          apt-get install -y graphviz doxygen
           export DEBIAN_FRONTEND=noninteractive &&
           apt-get install -y tzdata &&
           ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
-          dpkg-reconfigure --frontend noninteractive tzdata
+          dpkg-reconfigure --frontend noninteractive tzdata &&
+          apt-get install -y python3-sphinx 
       - run: |
           cd ~ &&
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
