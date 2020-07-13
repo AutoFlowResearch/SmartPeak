@@ -13,7 +13,7 @@ namespace SmartPeak {
     }
     application_handler_ = source_app_handler;
     done_ = false;
-    std::thread t(run_and_join, std::ref(application_handler_), std::ref(done_), std::ref(source_app_handler), std::cref(injection_names), std::cref(sequence_segment_names));
+    std::thread t(run_and_join, std::ref(application_handler_), std::ref(done_), std::ref(source_app_handler), std::ref(injection_names), std::ref(sequence_segment_names));
     LOGD << "Created thread (to be detached): " << t.get_id();
     t.detach();
     LOGD << "Thread has been detached";
@@ -32,7 +32,7 @@ namespace SmartPeak {
       ApplicationProcessors::processCommands,
       std::ref(application_handler),
       application_handler.commands_,
-      std::cref(injection_names), std::cref(sequence_segment_names)
+      injection_names, sequence_segment_names
     );
 
     LOGD << "Waiting on async operation...";
