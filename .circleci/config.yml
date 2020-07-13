@@ -46,6 +46,10 @@ jobs:
       - run:
           command: |
             ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
+      - run:
+          command: |
+            cd ~/SmartPeak2_build
+            cpack -V
 
 workflows:
   version: 2

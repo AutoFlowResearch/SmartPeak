@@ -68,19 +68,41 @@ if (OpenMS_FOUND)
   string(SUBSTRING ${OpenMS_DIR} 0 ${OpenMS_DIR_suffix_pos} OpenMS_ROOT)
   set(OpenMS_SHARE_DIR ${OpenMS_ROOT}/share/OpenMS)
 endif (OpenMS_FOUND)
-install(CODE "
- include(InstallRequiredSystemLibraries)
- include(BundleUtilities)
- # GET_BUNDLE_ALL_EXECUTABLES(${CMAKE_RUNTIME_OUTPUT_DIRECTORY} EXECS)
- SET(EXECS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/GUI.exe)
- SET(DEST \"\${CMAKE_INSTALL_PREFIX}/bin/GUI.exe\")
- execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"\${EXECS}\" \"\${DEST}\")
- SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR} ${BOOST_LIBRARYDIR} ${SDL2_LIBRARIES_DIR})
- fixup_bundle(\"\${DEST}\" \"\" \"\${DIRS}\")
- " 
- COMPONENT applications)
-install(CODE "
- execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${OpenMS_SHARE_DIR} \"\${CMAKE_INSTALL_PREFIX}/share/OpenMS\")
- " 
- COMPONENT share)
+if (WIN32)
+
+  install(CODE "
+  include(InstallRequiredSystemLibraries)
+  include(BundleUtilities)
+  # GET_BUNDLE_ALL_EXECUTABLES(${CMAKE_RUNTIME_OUTPUT_DIRECTORY} EXECS)
+  SET(EXECS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/GUI.exe)
+  SET(DEST \"\${CMAKE_INSTALL_PREFIX}/bin/GUI.exe\")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"\${EXECS}\" \"\${DEST}\")
+  SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR} ${BOOST_LIBRARYDIR} ${SDL2_LIBRARIES_DIR})
+  fixup_bundle(\"\${DEST}\" \"\" \"\${DIRS}\")
+  " 
+  COMPONENT applications)
+  install(CODE "
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${OpenMS_SHARE_DIR} \"\${CMAKE_INSTALL_PREFIX}/share/OpenMS\")
+  " 
+  COMPONENT share)
+
+ elseif(UNIX AND NOT APPLE AND NOT CYGWIN)
+
+  install(CODE "
+  include(InstallRequiredSystemLibraries)
+  include(BundleUtilities)
+  # GET_BUNDLE_ALL_EXECUTABLES(${CMAKE_RUNTIME_OUTPUT_DIRECTORY} EXECS)
+  SET(EXECS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GUI)
+  SET(DEST \"\${CMAKE_INSTALL_PREFIX}/bin/GUI\")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"\${EXECS}\" \"\${DEST}\")
+  SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR} ${BOOST_LIBRARYDIR} ${SDL2_LIBRARIES_DIR})
+  fixup_bundle(\"\${DEST}\" \"\" \"\${DIRS}\")
+  " 
+  COMPONENT applications)
+  install(CODE "
+  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${OpenMS_SHARE_DIR} \"\${CMAKE_INSTALL_PREFIX}/share/OpenMS\")
+  " 
+  COMPONENT share)
+  
+ endif()
 
