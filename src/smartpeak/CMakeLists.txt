@@ -117,16 +117,27 @@ add_custom_target(libdoc-doxygen ALL DEPENDS ${DOXYGEN_INDEX_FILE})
 #sphinx
 find_package(Sphinx REQUIRED)
 
-set(SPHINX_SOURCE   ${CMAKE_CURRENT_SOURCE_DIR})
-set(SPHINX_BUILD    ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
-file(MAKE_DIRECTORY ${SPHINX_BUILD})
+set(SPHINX_SOURCE     ${CMAKE_CURRENT_SOURCE_DIR})
+set(SPHINX_BUILD      ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
+set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 
-add_custom_target(libdoc-sphinx ALL 
-                  COMMAND ${SPHINX_EXECUTABLE} -b html
-                  -Dbreathe_projects.SmartPeak=${DOXYGEN_OUTPUT_DIR}/xml
-                  ${SPHINX_SOURCE}  ${SPHINX_BUILD}
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                  COMMENT "Generating sphinx docs for SmartPeak lib")
+
+add_custom_command( OUTPUT  ${SPHINX_INDEX_FILE} 
+                    COMMAND ${SPHINX_EXECUTABLE} -b html
+                    -Dbreathe_projects.SmartPeak=${DOXYGEN_OUTPUT_DIR}/xml
+                    ${SPHINX_SOURCE}  ${SPHINX_BUILD}
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                    DEPENDS           ${CMAKE_CURRENT_SOURCE_DIR}/index.rst
+                                      ${DOXYGEN_INDEX_FILE}
+                    MAIN_DEPENDENCY   ${SPHINX_SOURCE}/conf.py
+                    COMMENT           "Generating sphinx docs for SmartPeak lib")
+
+add_custom_target(libdoc-sphinx ALL DEPENDS ${SPHINX_INDEX_FILE})
+
+get_filename_component(SMARTPEAK_DOCS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../docs ABSOLUTE)
+
+install(DIRECTORY ${SPHINX_BUILD}/ DESTINATION ${SMARTPEAK_DOCS_DIR})
+
 
 
 
