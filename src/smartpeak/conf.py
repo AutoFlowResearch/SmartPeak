@@ -39,7 +39,7 @@ docs_build_on_RtD = os.environ.get('READTHEDOCS', None) == 'True'
 breathe_projects = {}
 
 if docs_build_on_RtD:
-    input_dir = '../SmartPeak'
+    input_dir = '../smartpeak'
     output_dir = 'build'
     configureDoxyfile(input_dir, output_dir)
     subprocess.call('doxygen', shell=True)
