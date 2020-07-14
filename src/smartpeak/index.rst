@@ -1,6 +1,10 @@
 SmartPeak
 =============================================================================
 
+.. include:: ../../README.rst
+   :start-after: begin_introduction
+   :end-before:  end_introduction
+
 See it in Action
 -----------------------------------------------------------------------------
 TODO

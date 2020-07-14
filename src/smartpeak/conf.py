@@ -25,7 +25,7 @@ todo_link_only          = True
 
 breathe_default_project = "SmartPeak"
 
-exclude_patterns        = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns        = ['_build', 'Thumbs.db', '.DS_Store', '*.csv']
 master_doc              = 'index'
 html_theme              = 'sphinx_rtd_theme'
 
