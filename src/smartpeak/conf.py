@@ -16,7 +16,13 @@ project     = 'SmartPeak'
 copyright   = '2020, SmartPeak Team'
 author      = 'SmartPeak Team'
 
-extensions              = [ "breathe"]
+extensions              = [ "breathe", 
+                            "exhale",
+                            "sphinx.ext.todo" ]
+
+todo_include_todos      = True
+todo_link_only          = True
+
 breathe_default_project = "SmartPeak"
 
 exclude_patterns        = ['_build', 'Thumbs.db', '.DS_Store']
@@ -36,7 +42,7 @@ def configureDoxyfile(input_dir, output_dir):
 
 docs_build_on_RtD = os.environ.get('READTHEDOCS', None) == 'True'
 
-breathe_projects = {}
+# breathe_projects = {}
 
 if docs_build_on_RtD:
     input_dir = '../smartpeak'
@@ -46,3 +52,22 @@ if docs_build_on_RtD:
     breathe_projects['SmartPeak'] = output_dir + '/xml'
 
 
+
+breathe_projects = {"SmartPeak" : "docs/xml"}
+exhale_args = {
+    # These arguments are required
+    "containmentFolder":     "./api",
+    "rootFileName":          "library_root.rst",
+    "rootFileTitle":         "Library API",
+    "doxygenStripFromPath":  "..",
+    # Suggested optional arguments
+    "createTreeView":        True,
+    # TIP: if using the sphinx-bootstrap-theme, you need
+    # "treeViewIsBootstrap": True,
+    "exhaleExecutesDoxygen": True,
+    "exhaleDoxygenStdin":    "INPUT = include/SmartPeak"
+}
+
+
+primary_domain      = 'cpp'
+highlight_language  = 'cpp'
