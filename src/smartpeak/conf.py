@@ -42,7 +42,7 @@ def configureDoxyfile(input_dir, output_dir):
 
 docs_build_on_RtD = os.environ.get('READTHEDOCS', None) == 'True'
 
-# breathe_projects = {}
+breathe_projects = {"SmartPeak" : "docs/xml"}
 
 if docs_build_on_RtD:
     input_dir = '../smartpeak'
@@ -52,8 +52,6 @@ if docs_build_on_RtD:
     breathe_projects['SmartPeak'] = output_dir + '/xml'
 
 
-
-breathe_projects = {"SmartPeak" : "docs/xml"}
 exhale_args = {
     # These arguments are required
     "containmentFolder":     "./api",
