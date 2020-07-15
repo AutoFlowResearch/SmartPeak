@@ -24,6 +24,8 @@ set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
 set(CPACK_RESOURCE_FILE_WELCOME ${PROJECT_SOURCE_DIR}/cmake/SmartPeakPackageResourceWelcomeFile.txt)
 set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/cmake/SmartPeakPackageResourceReadme.txt)
 
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "mccloskey")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 # --------------------------------------------------------------------------
 # general components and groupings for SmartPeak installation
 set(CPACK_COMPONENTS_ALL share library applications doc)
@@ -86,21 +88,20 @@ if (WIN32)
   " 
   COMPONENT share)
 
- elseif(UNIX AND NOT APPLE AND NOT CYGWIN)
-
+ elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
+ 
   install(CODE "
   include(InstallRequiredSystemLibraries)
   include(BundleUtilities)
-  # GET_BUNDLE_ALL_EXECUTABLES(${CMAKE_RUNTIME_OUTPUT_DIRECTORY} EXECS)
   SET(EXECS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/GUI)
-  SET(DEST \"\${CMAKE_INSTALL_PREFIX}/bin/GUI\")
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"\${EXECS}\" \"\${DEST}\")
+  # execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"\${EXECS}\" \"\${DEST}\")
   SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR} ${BOOST_LIBRARYDIR} ${SDL2_LIBRARIES_DIR})
-  fixup_bundle(\"\${DEST}\" \"\" \"\${DIRS}\")
+  fixup_bundle(\"\${EXECS}\" \"\" \"\${DIRS}\")
   " 
   COMPONENT applications)
+
   install(CODE "
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${OpenMS_SHARE_DIR} \"\${CMAKE_INSTALL_PREFIX}/share/OpenMS\")
+  # execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${OpenMS_SHARE_DIR} \"\${CMAKE_INSTALL_PREFIX}/share/OpenMS\")
   " 
   COMPONENT share)
   

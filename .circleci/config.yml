@@ -50,6 +50,7 @@ jobs:
           command: |
             cd ~/SmartPeak2_build
             cpack -V
+            cpack -G DEB
 
 workflows:
   version: 2
