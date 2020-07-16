@@ -3,7 +3,8 @@ include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
 set_property (DIRECTORY PROPERTY EP_BASE Dependencies)
 
 set (DEPENDENCIES)
-set (IMGUI_VERSION ebe79bbed00a13fd4455f04131b63d49c28ebd5d) # tag: v1.69
+#set (IMGUI_VERSION 6a0d0dab5a9f0b9518a2bc9bb456a69895ae0962) # tag: v1.72b, 2019/07/31
+set (IMGUI_VERSION tables)
 message (STATUS "Adding imgui ${IMGUI_VERSION} as an external project.")
 
 ExternalProject_Add(imgui

@@ -52,6 +52,21 @@ else(OpenMS_FOUND)
 endif(OpenMS_FOUND)
 
 #------------------------------------------------------------------------------
+# Find BOOST
+#------------------------------------------------------------------------------
+find_boost(filesystem)
+
+if(Boost_FOUND)
+  message(STATUS "Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}" )
+  set(CF_OPENMS_BOOST_VERSION_MAJOR ${Boost_MAJOR_VERSION})
+	set(CF_OPENMS_BOOST_VERSION_MINOR ${Boost_MINOR_VERSION})
+  set(CF_OPENMS_BOOST_VERSION_SUBMINOR ${Boost_SUBMINOR_VERSION})
+	set(CF_OPENMS_BOOST_VERSION ${Boost_VERSION})
+else()
+  message(FATAL_ERROR "Boost or one of its components not found!")
+endif()
+
+#------------------------------------------------------------------------------
 # OpenMS QT5 dependencies
 #------------------------------------------------------------------------------
 find_package(Qt5 COMPONENTS Core Network REQUIRED)
@@ -67,7 +82,7 @@ if (NOT Qt5Core_FOUND)
 endif()
 
 #------------------------------------------------------------------------------
-# ImGUI SDL and OpenGL dependencies
+# ImGui SDL and OpenGL dependencies
 #------------------------------------------------------------------------------
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
@@ -79,9 +94,9 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
-# ImGUI
+# ImGui
 #------------------------------------------------------------------------------
-find_package(ImGUI COMPONENTS Sources Examples REQUIRED)
+find_package(ImGui COMPONENTS Sources Examples SourcesMiscCpp REQUIRED)
 include_directories(${ImGui_INCLUDE_DIR})
 if (ImGui_Examples_FOUND)
   message(STATUS "ImGui_Examples_FOUND has been set and found")
@@ -90,14 +105,12 @@ else()
 endif()
 
 #------------------------------------------------------------------------------
-# disable optimization for examples for gcc like compilers
-if (CMAKE_COMPILER_IS_INTELCXX OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG)
-  set(_TMP_CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-  set(CMAKE_CXX_FLAGS_RELEASE "-O0")
-endif()
+# IMPLOT
+#------------------------------------------------------------------------------
+find_package(ImPlot COMPONENTS Sources REQUIRED)
+include_directories(${IMPLOT_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
-
 # pipeline examples
 add_custom_target(PIPELINE_EXAMPLES)
 add_dependencies(PIPELINE_EXAMPLES ${pipeline_executables_list})
@@ -111,8 +124,13 @@ add_dependencies(INTERACTIVE_EXAMPLES ${interactive_executables_list})
 # Add the actual examples
 foreach(_examples ${EXAMPLE_executables})
   add_executable(${_examples} source/${_examples})
-  # TODO: only link SDL2 and ImGUI libraries with the GUI 
-  target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples)
+  # message(STATUS "${_examples}")
+  if(NOT ${_examples} STREQUAL "GUI")
+    target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
+  else()
+    target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+	install_tool(${_examples}) # Required by CPack for bundling (see install_macros.cmake and package_general.cmake)
+  endif()
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
   # see https://sourceforge.net/apps/trac/open-ms/ticket/280 for details)
   if (OPENMP_FOUND AND NOT MSVC AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")

@@ -10,7 +10,7 @@
 #include <OpenMS/KERNEL/MSExperiment.h>
 
 #include <SmartPeak/core/MetaDataHandler.h>
-#include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/CastValue.h>
 
 #include <map>
 #include <vector>
@@ -47,11 +47,11 @@ public:
     const OpenMS::TargetedExperiment& getTargetedExperiment() const;
     std::shared_ptr<OpenMS::TargetedExperiment>& getTargetedExperimentShared();
 
-    void setReferenceData(const std::vector<std::map<std::string, Utilities::CastValue>>& reference_data);
-    void setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>& reference_data);
-    std::vector<std::map<std::string, Utilities::CastValue>>& getReferenceData();
-    const std::vector<std::map<std::string, Utilities::CastValue>>& getReferenceData() const;
-    std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>& getReferenceDataShared();
+    void setReferenceData(const std::vector<std::map<std::string, CastValue>>& reference_data);
+    void setReferenceData(std::shared_ptr<std::vector<std::map<std::string, CastValue>>>& reference_data);
+    std::vector<std::map<std::string, CastValue>>& getReferenceData();
+    const std::vector<std::map<std::string, CastValue>>& getReferenceData() const;
+    std::shared_ptr<std::vector<std::map<std::string, CastValue>>>& getReferenceDataShared();
 
     void setQuantitationMethods(const std::vector<OpenMS::AbsoluteQuantitationMethod>& quantitation_methods);
     void setQuantitationMethods(std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>>& quantitation_methods);
@@ -70,6 +70,42 @@ public:
     OpenMS::MRMFeatureQC& getFeatureQC();
     const OpenMS::MRMFeatureQC& getFeatureQC() const;
     std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureQCShared();
+
+    void setFeatureRSDFilter(const OpenMS::MRMFeatureQC& feature_rsd_filter);
+    void setFeatureRSDFilter(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_rsd_filter);
+    OpenMS::MRMFeatureQC& getFeatureRSDFilter();
+    const OpenMS::MRMFeatureQC& getFeatureRSDFilter() const;
+    std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureRSDFilterShared();
+
+    void setFeatureRSDQC(const OpenMS::MRMFeatureQC& feature_rsd_qc);
+    void setFeatureRSDQC(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_rsd_qc);
+    OpenMS::MRMFeatureQC& getFeatureRSDQC();
+    const OpenMS::MRMFeatureQC& getFeatureRSDQC() const;
+    std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureRSDQCShared();
+
+    void setFeatureBackgroundFilter(const OpenMS::MRMFeatureQC& feature_background_filter);
+    void setFeatureBackgroundFilter(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_background_filter);
+    OpenMS::MRMFeatureQC& getFeatureBackgroundFilter();
+    const OpenMS::MRMFeatureQC& getFeatureBackgroundFilter() const;
+    std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureBackgroundFilterShared();
+
+    void setFeatureBackgroundQC(const OpenMS::MRMFeatureQC& feature_background_qc);
+    void setFeatureBackgroundQC(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_background_qc);
+    OpenMS::MRMFeatureQC& getFeatureBackgroundQC();
+    const OpenMS::MRMFeatureQC& getFeatureBackgroundQC() const;
+    std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureBackgroundQCShared();
+
+    void setFeatureRSDEstimations(const OpenMS::MRMFeatureQC& feature_rsd_estimations);
+    void setFeatureRSDEstimations(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_rsd_estimations);
+    OpenMS::MRMFeatureQC& getFeatureRSDEstimations();
+    const OpenMS::MRMFeatureQC& getFeatureRSDEstimations() const;
+    std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureRSDEstimationsShared();
+
+    void setFeatureBackgroundEstimations(const OpenMS::MRMFeatureQC& feature_background_estimations);
+    void setFeatureBackgroundEstimations(std::shared_ptr<OpenMS::MRMFeatureQC>& feature_background_estimations);
+    OpenMS::MRMFeatureQC& getFeatureBackgroundEstimations();
+    const OpenMS::MRMFeatureQC& getFeatureBackgroundEstimations() const;
+    std::shared_ptr<OpenMS::MRMFeatureQC>& getFeatureBackgroundEstimationsShared();
 
     void setFeatureMapHistory(const OpenMS::FeatureMap& feature_map_history);
     OpenMS::FeatureMap& getFeatureMapHistory();
@@ -123,9 +159,15 @@ private:
     // input (reused between RawDataHandlers)
     std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>> parameters_ = nullptr;  ///< algorithm parameters; shared between all raw data handlers in the sequence
     std::shared_ptr<OpenMS::TargetedExperiment> targeted_exp_ = nullptr;  ///< transitions for the SRM experiments; shared between all raw data handlers in the sequence
-    std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>> reference_data_ = nullptr;  ///< Reference data to compare algorithm accuracy; shared between all raw data handlers in the sequence
+    std::shared_ptr<std::vector<std::map<std::string, CastValue>>> reference_data_ = nullptr;  ///< Reference data to compare algorithm accuracy; shared between all raw data handlers in the sequence
     std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> quantitation_methods_ = nullptr;  ///< Transition quantitation methods; shared between all raw data handlers in the sequence segment
-    std::shared_ptr<OpenMS::MRMFeatureQC> feature_filter_ = nullptr;  ///< Feature Filters; shared between all raw data handlers in the sequence
-    std::shared_ptr<OpenMS::MRMFeatureQC> feature_qc_ = nullptr;  ///< Feature QCs; shared between all raw data handlers in the sequence
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_filter_ = nullptr;  ///< Feature Filters; shared between all raw data handlers in the sequence segment
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_qc_ = nullptr;  ///< Feature QCs; shared between all raw data handlers in the sequence segment
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_rsd_filter_ = nullptr;  ///< Feature Filters; shared between all raw data handlers in the sequence segment
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_rsd_qc_ = nullptr;  ///< Feature QCs; shared between all raw data handlers in the sequence segment
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_background_filter_ = nullptr;  ///< Feature Filters; shared between all raw data handlers in the sequence segment
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_background_qc_ = nullptr;  ///< Feature QCs; shared between all raw data handlers in the sequence segment
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_rsd_estimations_ = nullptr;  ///< Percent RSD estimations; shared between all raw data handlers in the sequence segment
+    std::shared_ptr<OpenMS::MRMFeatureQC> feature_background_estimations_ = nullptr;  ///< Background interference estimations; shared between all raw data handlers in the sequence segment
   };
 }

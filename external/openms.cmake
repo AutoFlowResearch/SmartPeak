@@ -4,7 +4,7 @@ set_property (DIRECTORY PROPERTY EP_BASE Dependencies)
 
 set (DEPENDENCIES)
 
-set (CONTRIB_VERSION 8440071)
+set (CONTRIB_VERSION 8eb2d4ab51)
 message (STATUS "Adding CONTRIB ${CONTRIB_VERSION} as an external project.")
 
 ExternalProject_Add(contrib
@@ -25,6 +25,7 @@ message (STATUS "Adding OPENMS ${OPENMS_VERSION} as an external project.")
 ExternalProject_Add(openms
     GIT_REPOSITORY "https://github.com/OpenMS/OpenMS.git"
     GIT_TAG ${OPENMS_VERSION}
+	GIT_SUBMODULE "THIRDPARTY"
     CMAKE_ARGS 
         -DPYOPENMS=OFF
         -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/Dependencies/Source/contrib/build

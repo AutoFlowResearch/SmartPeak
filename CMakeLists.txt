@@ -18,6 +18,7 @@ if (USE_SUPERBUILD)
   project ("SuperBuild" NONE)
   include(external/plog.cmake)
   include(external/imgui.cmake)
+  include(external/implot.cmake)
   if (MSVC)
     include(external/eigen.cmake)
     include(external/boost.cmake)
@@ -77,9 +78,9 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Windows")
 #------------------------------------------------------------------------------
 # SmartPeak Version Information
 #------------------------------------------------------------------------------
-set (smartPeak_VERSION_MAJOR 1)
-set (smartPeak_VERSION_MINOR 0)
-set (smartPeak_VERSION_PATCH 0)
+set (SMARTPEAK_PACKAGE_VERSION_MAJOR 1)
+set (SMARTPEAK_PACKAGE_VERSION_MINOR 0)
+set (SMARTPEAK_PACKAGE_VERSION_PATCH 0)
 
 #------------------------------------------------------------------------------
 # retrieve detailed informations on the working copy (git)
@@ -153,11 +154,19 @@ endif()
 set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel." FORCE)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpedantic -Wconversion -g")
+  if (MSVC)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W3 /Z7")
+  elseif (CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wpedantic -Wconversion -g")
+  endif()
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
 elseif (CMAKE_BUILD_TYPE STREQUAL "Release")
-  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -Wpedantic -Wconversion")
+  if (MSVC)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /W3")
+  elseif (CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Wall -Wextra -Wpedantic -Wconversion")
+  endif()
 endif()
 
 # Windows/Linux specific issues
@@ -265,6 +274,7 @@ install_export_targets()
 # Installation and packaging:
 #------------------------------------------------------------------------------
 # packaging routines:
+
 if(NOT "${PACKAGE_TYPE}" STREQUAL "none")
   include(cmake/package_general.cmake)
   if("${PACKAGE_TYPE}" STREQUAL "dmg") # .. MacOSX
@@ -274,13 +284,7 @@ if(NOT "${PACKAGE_TYPE}" STREQUAL "none")
   elseif("${PACKAGE_TYPE}" STREQUAL "deb") # .. debs
     include(cmake/package_deb.cmake)
   elseif("${PACKAGE_TYPE}" STREQUAL "nsis") # .. Windows nsis
-    # For now we use the old NSIS script AS IS
-    # i.e. although CMake runs make install etc. NSIS
-    # will use everything from the usual build folder like before.
-    # TODO automate more and let CMake generate install commands
-    # in the script. Unfortunately we have a lot of specific code in the script.
     include(cmake/package_nsis.cmake)
   endif()
   include(CPack)
-  include(cmake/package_components.cmake)
 endif()

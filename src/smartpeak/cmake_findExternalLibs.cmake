@@ -30,17 +30,34 @@ find_package(Eigen3 3.1.0 REQUIRED)
 find_package(SDL2 REQUIRED)
 
 #------------------------------------------------------------------------------
-# Find ImGUI
+# Find ImGui
 #------------------------------------------------------------------------------
-find_package(ImGUI REQUIRED)
-if (IMGUI_FOUND)
-  message(STATUS "ImGui_INCLUDE_DIR : ${ImGui_INCLUDE_DIR}")
-endif (IMGUI_FOUND)
+find_package(ImGui REQUIRED)
+
+#------------------------------------------------------------------------------
+# Find ImPlot
+#------------------------------------------------------------------------------
+find_package(ImPlot REQUIRED)
 
 #------------------------------------------------------------------------------
 # Find plog
 #------------------------------------------------------------------------------
 find_package(Plog REQUIRED)
+
+#------------------------------------------------------------------------------
+# Find BOOST
+#------------------------------------------------------------------------------
+find_boost(filesystem)
+
+if(Boost_FOUND)
+  message(STATUS "Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}" )
+  set(CF_OPENMS_BOOST_VERSION_MAJOR ${Boost_MAJOR_VERSION})
+	set(CF_OPENMS_BOOST_VERSION_MINOR ${Boost_MINOR_VERSION})
+  set(CF_OPENMS_BOOST_VERSION_SUBMINOR ${Boost_SUBMINOR_VERSION})
+	set(CF_OPENMS_BOOST_VERSION ${Boost_VERSION})
+else()
+  message(FATAL_ERROR "Boost or one of its components not found!")
+endif()
 
 #------------------------------------------------------------------------------
 # Find OpenMS
@@ -56,9 +73,6 @@ if (OpenMS_FOUND)
     set(_message "${_message}Please use the latest version from the OpenMS release!")
     message(FATAL_ERROR ${_message})
   endif()
-  ## include directories for OpenMS headers (and contrib)
-  #       OpenMS_GUI -> ${OpenMS_GUI_INCLUDE_DIRECTORIES}
-  #include_directories(${OpenMS_INCLUDE_DIRECTORIES})
 
   ## append precompiler macros and compiler flags specific to OpenMS
   ## Warning: this could be harmful to your project. Check this if problems occur.

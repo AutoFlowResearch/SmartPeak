@@ -18,6 +18,7 @@ void test_main_LCMS_MRM_Unknown()
 
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;
+  LoadParameters loadParameters;
   Filenames filenames;
 
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_1_BatchName_1900-01-01_000000.featureXML");
@@ -29,6 +30,21 @@ void test_main_LCMS_MRM_Unknown()
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_test.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
+  
+  rawDataHandler.clear();
+  
+  filenames.parameters_csv_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/parameters.csv");
+  loadParameters.process(rawDataHandler,{}, filenames);
+  
+  std::map<std::string, std::vector<std::map<std::string, std::string>>>* params;
+  params = &rawDataHandler.getParameters();
+  assert(params->count("SequenceProcessor")==1 && "None or more 'SequenceProcessor' found");
+
+  SequenceHandler sequenceHandler;
+  const std::vector<std::shared_ptr<RawDataProcessor>> methods;
+  SmartPeak::SequenceProcessorMultithread spMT(sequenceHandler.getSequence(), {}, methods);
+  unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].at("value"));
+  assert(spMT.getNumWorkers(n_threads)== 3 && "Defined n_threads parameter isn't 4");
 
 cout << "fm1 size: " << fm1.size() << endl;
 cout << "fm2 size: " << fm2.size() << endl;

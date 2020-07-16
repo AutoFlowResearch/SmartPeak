@@ -2,15 +2,12 @@
 
 #pragma once
 
+#include <SmartPeak/core/CastValue.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 
-#include <iomanip>
-#include <ios>
-#include <iostream>
 #include <regex>
 #include <string>
-#include <unordered_set>
 
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
@@ -31,283 +28,6 @@ public:
     Utilities& operator=(const Utilities&) = delete;
     Utilities(Utilities&&)                 = delete;
     Utilities& operator=(Utilities&&)      = delete;
-
-    class CastValue
-    {
-    public:
-      CastValue() : tag_(UNINITIALIZED), b_(false), is_clear_(true) {}
-      CastValue(const std::string& s) : tag_(STRING), s_(s), is_clear_(false) {}
-      CastValue(const char *s) : tag_(STRING), s_(s), is_clear_(false) {}
-      CastValue(const float f) : tag_(FLOAT), f_(f), is_clear_(true) {}
-
-      CastValue(const CastValue& other) : tag_(UNINITIALIZED), b_(false), is_clear_(true)
-      {
-        *this = other;
-      }
-
-      CastValue(CastValue&& other) : tag_(UNINITIALIZED), b_(false), is_clear_(true)
-      {
-        *this = std::move(other);
-      }
-
-      CastValue& operator=(const CastValue& other)
-      {
-        if (this == &other)
-          return *this;
-        switch (other.tag_) {
-          case UNKNOWN:
-          case STRING:
-            setTagAndData(other.tag_, other.s_);
-            break;
-          case UNINITIALIZED:
-          case BOOL:
-            setTagAndData(other.tag_, other.b_);
-            break;
-          case FLOAT:
-            setTagAndData(other.tag_, other.f_);
-            break;
-          case INT:
-            setTagAndData(other.tag_, other.i_);
-            break;
-          case BOOL_LIST:
-            setTagAndData(other.tag_, other.bl_);
-            break;
-          case FLOAT_LIST:
-            setTagAndData(other.tag_, other.fl_);
-            break;
-          case INT_LIST:
-            setTagAndData(other.tag_, other.il_);
-            break;
-          case STRING_LIST:
-            setTagAndData(other.tag_, other.sl_);
-            break;
-          default:
-            throw "Tag type not managed in copy assignment constructor. Implement it.";
-        }
-        return *this;
-      }
-
-      CastValue& operator=(CastValue&& other)
-      {
-        if (this == &other)
-          return *this;
-        clear();
-        switch (other.tag_) {
-          case UNKNOWN:
-          case STRING:
-            new (&s_) std::string(std::move(other.s_));
-            is_clear_ = false;
-            break;
-          case UNINITIALIZED:
-          case BOOL:
-            b_ = other.b_;
-            break;
-          case FLOAT:
-            f_ = other.f_;
-            break;
-          case INT:
-            i_ = other.i_;
-            break;
-          case BOOL_LIST:
-            new (&bl_) std::vector<bool>(std::move(other.bl_));
-            is_clear_ = false;
-            break;
-          case FLOAT_LIST:
-            new (&fl_) std::vector<float>(std::move(other.fl_));
-            is_clear_ = false;
-            break;
-          case INT_LIST:
-            new (&il_) std::vector<int>(std::move(other.il_));
-            is_clear_ = false;
-            break;
-          case STRING_LIST:
-            new (&sl_) std::vector<std::string>(std::move(other.sl_));
-            is_clear_ = false;
-            break;
-          default:
-            throw "Tag type not managed in move assignment operator. Implement it.";
-        }
-        tag_ = other.tag_;
-        other.tag_ = UNINITIALIZED;
-        other.is_clear_ = true;
-        other.b_ = false;
-        return *this;
-      }
-
-      CastValue& operator=(const bool data)
-      {
-        setTagAndData(BOOL, data);
-        return *this;
-      }
-
-      CastValue& operator=(const float data)
-      {
-        setTagAndData(FLOAT, data);
-        return *this;
-      }
-
-      CastValue& operator=(const int data)
-      {
-        setTagAndData(INT, data);
-        return *this;
-      }
-
-      CastValue& operator=(const char *data)
-      {
-        setTagAndData(STRING, std::move(std::string(data)));
-        return *this;
-      }
-
-      CastValue& operator=(const std::string& data)
-      {
-        setTagAndData(STRING, data);
-        return *this;
-      }
-
-      CastValue& operator=(const std::vector<bool>& data)
-      {
-        setTagAndData(BOOL_LIST, data);
-        return *this;
-      }
-
-      CastValue& operator=(const std::vector<float>& data)
-      {
-        setTagAndData(FLOAT_LIST, data);
-        return *this;
-      }
-
-      CastValue& operator=(const std::vector<int>& data)
-      {
-        setTagAndData(INT_LIST, data);
-        return *this;
-      }
-
-      CastValue& operator=(const std::vector<std::string>& data)
-      {
-        setTagAndData(STRING_LIST, data);
-        return *this;
-      }
-
-      ~CastValue()
-      {
-        clear();
-      }
-
-      // TODO: rename to deallocate() or similar
-      void clear()
-      {
-        if (is_clear_)
-          return;
-
-        switch (tag_) {
-          case UNKNOWN:
-          case STRING:
-            s_.~basic_string();
-            break;
-          case BOOL_LIST:
-            bl_.~vector();
-            break;
-          case FLOAT_LIST:
-            fl_.~vector();
-            break;
-          case INT_LIST:
-            il_.~vector();
-            break;
-          case STRING_LIST:
-            sl_.~vector();
-            break;
-          default:
-            // nothing to deallocate
-            break;
-        }
-
-        is_clear_ = true;
-      }
-
-      enum Type {
-        UNINITIALIZED,
-        UNKNOWN,
-        BOOL,
-        FLOAT,
-        INT,
-        STRING,
-        BOOL_LIST,
-        FLOAT_LIST,
-        INT_LIST,
-        STRING_LIST
-      };
-
-      Type tag_;
-
-      union {
-        bool b_;
-        float f_;
-        int i_;
-        std::string s_;
-        std::vector<bool> bl_;
-        std::vector<float> fl_;
-        std::vector<int> il_;
-        std::vector<std::string> sl_;
-      };
-
-      CastValue::Type getTag() const { return tag_; }
-
-      template<typename T>
-      void setTagAndData(const CastValue::Type type, const T& data)
-      {
-        clear();
-        tag_ = type;
-        setData(data);
-      }
-
-    private:
-      void setData(const bool data)
-      {
-        b_ = data;
-      }
-
-      void setData(const float data)
-      {
-        f_ = data;
-      }
-
-      void setData(const int data)
-      {
-        i_ = data;
-      }
-
-      void setData(const std::string& data)
-      {
-        new (&s_) std::string(data);
-        is_clear_ = false;
-      }
-
-      void setData(const std::vector<bool>& data)
-      {
-        new (&bl_) std::vector<bool>(data);
-        is_clear_ = false;
-      }
-
-      void setData(const std::vector<float>& data)
-      {
-        new (&fl_) std::vector<float>(data);
-        is_clear_ = false;
-      }
-
-      void setData(const std::vector<int>& data)
-      {
-        new (&il_) std::vector<int>(data);
-        is_clear_ = false;
-      }
-
-      void setData(const std::vector<std::string>& data)
-      {
-        new (&sl_) std::vector<std::string>(data);
-        is_clear_ = false;
-      }
-
-      bool is_clear_;
-    };
 
     /**
       Cast a string to the desired type and return the evaluation.
@@ -372,7 +92,13 @@ public:
     )
     {
       if (y_true.empty() || y_pred.empty()) {
-        throw std::invalid_argument("Actual and predicted values' vectors cannot be empty.");
+        LOGD << "Actual size " << y_true.size() << ", predicted size " << y_pred.size();
+        return {
+          {"accuracy", 0},
+          {"recall", 0},
+          {"precision", 0},
+          {"n_features", 0},
+        };
       }
 
       const std::array<size_t, 4> conf = computeConfusionMatrix(y_true, y_pred);
@@ -388,6 +114,7 @@ public:
         {"accuracy", accuracy},
         {"recall", recall},
         {"precision", precision},
+        {"n_features", y_true.size()},
       };
     }
 
@@ -467,5 +194,98 @@ public:
 
     // To validate quantitation methods stored in examples' tests
     static bool testStoredQuantitationMethods(const std::string& pathname);
+
+    /**
+      @brief Check if str ends with suffix
+
+      Useful for filtering filenames by the extension
+
+      @param[in] str Input string
+      @param[in] suffix Suffix
+      @param[in] case_sensitive Case sensitive string comparison
+
+      @returns True if str ends with suffix. Otherwise false.
+    */
+    static bool endsWith(
+      std::string str,
+      std::string suffix,
+      const bool case_sensitive = true
+    );
+
+    /**
+      @brief Get information about name, size, type and modified date of all
+      entries in a folder
+
+      @note Elements "." and ".." are not part of the content
+
+      @param[in] pathname Folder pathname
+      @param[in] asc Sort entries in ascending order
+
+      @returns A container with the desired information
+    */
+    static std::array<std::vector<std::string>, 4> getPathnameContent(
+      const std::string& pathname,
+      const bool asc = true
+    );
+
+    /**
+      @brief Get parent pathname from a pathname string
+
+      @param[in] pathname Input string pathname
+
+      @returns A string representation of the parent pathname
+    */
+    static std::string getParentPathname(const std::string& pathname);
+
+    /**
+      @brief Moves the elements in vector v according to indices
+
+      Example:
+      indices: {3, 4, 2, 0, 1}
+      old v:   {'a', 'b', 'c', 'd', 'e'}
+      new v:   {'d', 'e', 'c', 'a', 'b'}
+
+      @throws std::invalid_argument Sizes of indices and v differ
+
+      @param[in] indices The vector of indices that decides the sorting
+      @param[in,out] v The vector of elements to be sorted
+    */
+    template<typename T>
+    static void sortPairs(
+      const std::vector<size_t>& indices,
+      std::vector<T>& v
+    )
+    {
+      if (indices.size() != v.size()) {
+        throw std::invalid_argument("sortPairs: arguments' sizes do not match");
+      }
+      const std::vector<T> cp(v); // a copy of v
+      for (size_t i = 0; i < v.size(); ++i) {
+        v[i] = cp[indices[i]];
+      }
+    }
+
+    /**
+      @brief Case-insensitive string comparison
+
+      Equivalent to a.compare(b) < 0, ignoring letter case.
+
+      @param[in] a left-side string
+      @param[in] b right-side string
+
+      @returns True if 'a' is lexicographically less than 'b'. Otherwise false.
+    */
+    static bool is_less_than_icase(const std::string& a, const std::string& b);
+
+    /**
+      @brief Count the number of elements in a folder
+
+      @note Elements "." and ".." are not counted
+
+      @param[in] pathname Pathname to a folder
+
+      @returns The numbers of elements found
+    */
+    static size_t directorySize(const std::string& pathname);
   };
 }

@@ -1,9 +1,10 @@
 #pragma once
 
-#include <imgui.h>
 #include <string>
+#include <utility>
 #include <vector>
-#include <map>
+#include <imgui.h>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 namespace SmartPeak
 {
@@ -17,14 +18,15 @@ namespace SmartPeak
   {
   public:
     Widget() = default;
-    ~Widget() = default;
+    virtual ~Widget() = default;
+    Widget(const Widget &&) = delete;
 
     /**
       Interface to show the widget
 
       NOTE: free to override in inherited implmementations
     */
-    virtual void show() {};
+    virtual void draw() = 0;
 
     /**
       Method to make a filter and search popup
@@ -35,7 +37,7 @@ namespace SmartPeak
       @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
       @param[in] values_indices Map containing unique row entries and their duplicate indices
     */
-    static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const std::vector<std::string>& column, bool* checked, 
+    static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const Eigen::Tensor<std::string,1>& column, bool* checked,
       const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices);
 
     /**
@@ -48,8 +50,8 @@ namespace SmartPeak
       @param[in, out] columns_indices A vector of maps containing unique row entries and their duplicate indices
       @param[in] sort_asc Whether to sort in ascending order or descending order
     */
-    static void SortButton(const char* button_id, const std::vector<std::string>& headers, 
-      std::vector<std::vector<std::string>>& columns,
+    static void SortButton(const char* button_id, const Eigen::Tensor<std::string,1>& headers, 
+      Eigen::Tensor<std::string,2>& columns,
       const int n_col,
       bool* checked,
       std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
@@ -63,22 +65,10 @@ namespace SmartPeak
       @param[out] columns_indices A vector of maps containing unique row entries and their duplicate indices
       @param[out] filter Vector of ImGuiTextFilters
     */
-    static void makeFilters(const std::vector<std::string>& headers,
-      const std::vector<std::vector<std::string>>& columns, 
+    static void makeFilters(const Eigen::Tensor<std::string,1>& headers,
+      const Eigen::Tensor<std::string,2>& columns, 
       std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
       std::vector<ImGuiTextFilter>& filter);
-
-    /*
-      @brief Helper method to create the checked_rows param
-
-      @example
-      static bool checked_rows[n_rows];
-      makeCheckedRows(n_rows, checked_rows);
-
-      @param[in] n_rows The number of rows
-      @param[in,out] checked_rows What rows are checked/filtered
-    */
-    static void makeCheckedRows(const size_t n_rows, bool* checked_rows);
   };
 
   /**
@@ -87,29 +77,60 @@ namespace SmartPeak
   class GenericTextWidget : public Widget
   {
   public:
-    void show(const std::vector<std::string>& text_lines);
+    void draw() override;
+    std::vector<std::string> text_lines;
   };
 
   /**
     @brief Base class for all tables
 
-    TODO: potential refactors
-    - Extract out methods for making the headers and columns
-    - Extract out method for maing the filters (unit testable)
+    TODO: features
+    - row highlighting on focus
+    - sorting
+    - filtering
   */
   class GenericTableWidget : public Widget
   {
   public:
+    GenericTableWidget(const Eigen::Tensor<std::string, 1>&headers, const Eigen::Tensor<std::string, 2>&columns, const Eigen::Tensor<bool, 1>&checked_rows, const std::string&table_id)
+      : headers_(headers), columns_(columns), checked_rows_(checked_rows), table_id_(table_id) {};
     /*
     @brief Show the table
 
     @param[in] headers Column header names
-    @param[in,out] columns Columns where the inner vector<string> are individual columns [TODO: refactor to use other types besides strings]
+    @param[in,out] columns Table body or matrix
     @param[in,out] checked_rows What rows are checked/filtered
     */
-    void show(const std::vector<std::string>& headers,
-      std::vector<std::vector<std::string>>& columns,
-    bool* checked_rows);
+    void draw() override;
+    const Eigen::Tensor<std::string,1>& headers_; // keep these `const` and references so that the data is not copied on each call!
+    const Eigen::Tensor<std::string,2>& columns_;
+    const Eigen::Tensor<bool, 1>& checked_rows_;
+    const std::string table_id_; // keep this `const` and non-reference so that the table is not built de-novo on each call!
+  };
+
+  /**
+    @brief Base class for all tables
+
+    TODO: features
+    - row highlighting on focus
+    - searching
+    - color coding of rows by status
+  */
+  class ExplorerWidget : public GenericTableWidget
+  {
+  public:
+    ExplorerWidget(const Eigen::Tensor<std::string, 1>&headers, const Eigen::Tensor<std::string, 2>&columns, const Eigen::Tensor<bool, 1>&checked_rows, const std::string&table_id, const Eigen::Tensor<std::string, 1>&checkbox_headers, Eigen::Tensor<bool, 2>&checkbox_columns)
+      :GenericTableWidget(headers, columns, checked_rows, table_id), checkbox_headers_(checkbox_headers), checkbox_columns_(checkbox_columns) {};
+    /*
+    @brief Show the explorer
+
+    @param[in] headers Column header names
+    @param[in,out] columns Table body or matrix
+    @param[in,out] checked_rows What rows are checked/filtered
+    */
+    void draw() override;
+    const Eigen::Tensor<std::string, 1>& checkbox_headers_;
+    Eigen::Tensor<bool,2>& checkbox_columns_;
   };
 
   /**
@@ -118,7 +139,121 @@ namespace SmartPeak
   class GenericGraphicWidget : public Widget
   {
   public:
-    void show();
+    void draw() override;
+  };
+
+  /**
+    @brief Class for plotting 2D line plots
+
+    NOTE: series data are assumed to be aligned column wise (i.e., each column is a series or x_data_.dimension(1) == series_names_.size())
+
+  */
+  class LinePlot2DWidget : public GenericGraphicWidget
+  {
+  public:
+    LinePlot2DWidget(const Eigen::Tensor<float, 2>&x_data, const Eigen::Tensor<float, 2>&y_data, const Eigen::Tensor<std::string, 1>&series_names,
+      const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
+      const float& plot_width, const float& plot_height, const std::string& plot_title) :
+      x_data_(x_data), y_data_(y_data), series_names_(series_names), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
+      x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title) {};
+    void draw() override;
+    const Eigen::Tensor<float, 2>& x_data_;
+    const Eigen::Tensor<float, 2>& y_data_;
+    const Eigen::Tensor<std::string, 1>& series_names_;
+    const std::string& x_axis_title_;
+    const std::string& y_axis_title_;
+    const float& x_min_;
+    const float& x_max_;
+    const float& y_min_;
+    const float& y_max_;
+    const float& plot_width_;
+    const float& plot_height_;
+    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
+  };
+
+  /**
+    @brief Class for plotting 2D line plots
+  */
+  class ChromatogramPlotWidget : public GenericGraphicWidget
+  {
+  public:
+    ChromatogramPlotWidget(const std::vector<std::vector<float>>&x_data_scatter, const std::vector<std::vector<float>>&y_data_scatter, const std::vector<std::string>&series_names_scatter,
+      const std::vector<std::vector<float>>&x_data_area, const std::vector<std::vector<float>>&y_data_area, const std::vector<std::string>&series_names_area,
+      const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
+      const float& plot_width, const float& plot_height, const std::string& plot_title) :
+      x_data_scatter_(x_data_scatter), y_data_scatter_(y_data_scatter), series_names_scatter_(series_names_scatter),
+      x_data_area_(x_data_area), y_data_area_(y_data_area), series_names_area_(series_names_area),
+      x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
+      x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title) {};
+    void draw() override;
+    const std::vector<std::vector<float>>& x_data_scatter_;
+    const std::vector<std::vector<float>>& y_data_scatter_;
+    const std::vector<std::string>& series_names_scatter_;
+    const std::vector<std::vector<float>>& x_data_area_;
+    const std::vector<std::vector<float>>& y_data_area_;
+    const std::vector<std::string>& series_names_area_;
+    const std::string& x_axis_title_;
+    const std::string& y_axis_title_;
+    const float& x_min_;
+    const float& x_max_;
+    const float& y_min_;
+    const float& y_max_;
+    const float& plot_width_;
+    const float& plot_height_;
+    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
+  };
+
+  /**
+    @brief Class for plotting 2D line plots
+  */
+  class CalibratorsPlotWidget : public GenericGraphicWidget
+  {
+  public:
+    CalibratorsPlotWidget(const std::vector<std::vector<float>>&x_fit_data, const std::vector<std::vector<float>>&y_fit_data,
+      const std::vector<std::vector<float>>&x_raw_data, const std::vector<std::vector<float>>&y_raw_data, const std::vector<std::string>&series_names,
+      const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
+      const float& plot_width, const float& plot_height, const std::string& plot_title) :
+      x_fit_data_(x_fit_data), y_fit_data_(y_fit_data), x_raw_data_(x_raw_data), y_raw_data_(y_raw_data), series_names_(series_names), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
+      x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title) {};
+    void draw() override;
+    const std::vector<std::vector<float>>& x_fit_data_;
+    const std::vector<std::vector<float>>& y_fit_data_;
+    const std::vector<std::vector<float>>& x_raw_data_;
+    const std::vector<std::vector<float>>& y_raw_data_;
+    const std::vector<std::string>& series_names_;
+    const std::string& x_axis_title_;
+    const std::string& y_axis_title_;
+    const float& x_min_;
+    const float& x_max_;
+    const float& y_min_;
+    const float& y_max_;
+    const float& plot_width_;
+    const float& plot_height_;
+    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
+  };
+
+  /**
+    @brief Class for plotting heatmaps
+  */
+  class Heatmap2DWidget : public GenericGraphicWidget
+  {
+  public:
+    Heatmap2DWidget(const Eigen::Tensor<float, 2, Eigen::RowMajor>& data, const Eigen::Tensor<std::string, 1>& columns, const Eigen::Tensor<std::string, 1>& rows,
+      const std::string& x_axis_title, const std::string& y_axis_title, const float& data_min, const float& data_max,
+      const float& plot_width, const float& plot_height, const std::string& plot_title)
+      :data_(data), columns_(columns), rows_(rows), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title), data_min_(data_min), data_max_(data_max),
+      plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title){};
+    void draw() override;
+    const Eigen::Tensor<float, 2, Eigen::RowMajor>& data_; // Row major ordering
+    const Eigen::Tensor<std::string,1>& columns_;
+    const Eigen::Tensor<std::string,1>& rows_;
+    const std::string& x_axis_title_;
+    const std::string& y_axis_title_;
+    const float& data_min_;
+    const float& data_max_;
+    const float& plot_width_;
+    const float& plot_height_;
+    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
   };
 
   /**
@@ -127,17 +262,7 @@ namespace SmartPeak
   class GenericTreeWidget : public Widget
   {
   public:
-    void show();
-  };
-  
-  /**
-    @brief Base class used for all file browsing used in
-       loading and storing files
-  */
-  class FileBrowserWidget : public Widget
-  {
-  public:
-    void show();
+    void draw() override;
   };
 
   /**
@@ -146,6 +271,6 @@ namespace SmartPeak
   class WorkflowWidget : public GenericGraphicWidget
   {
   public:
-    void show();
+    void draw() override;
   };
 }

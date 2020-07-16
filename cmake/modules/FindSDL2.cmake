@@ -1,10 +1,3 @@
-# Distributed under the OSI-approved BSD 3-Clause License.  See accompanying
-# file Copyright.txt or https://cmake.org/licensing for details.
-
-#  Copyright 2019 Amine Ben Hassouna <amine.benhassouna@gmail.com>
-#  Copyright 2000-2019 Kitware, Inc. and Contributors
-#  All rights reserved.
-
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
 #  are met:
@@ -194,7 +187,6 @@ find_library(SDL2_LIBRARY
   PATHS ${SDL2_PATH}
   DOC "Where the SDL2 Library can be found"
 )
-
 set(SDL2_LIBRARIES "${SDL2_LIBRARY}")
 
 if(NOT SDL2_BUILDING_LIBRARY)

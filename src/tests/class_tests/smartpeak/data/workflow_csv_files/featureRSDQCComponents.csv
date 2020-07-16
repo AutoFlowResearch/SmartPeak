@@ -1,0 +1,11 @@
+component_name,metaValue_peak_apex_int_l,metaValue_peak_apex_int_u,metaValue_sn_score_l,metaValue_sn_score_u,metaValue_var_xcorr_coelution_l,metaValue_var_xcorr_coelution_u,metaValue_var_xcorr_coelution_weighted_l,metaValue_var_xcorr_coelution_weighted_u,metaValue_var_xcorr_shape_l,metaValue_var_xcorr_shape_u,metaValue_var_xcorr_shape_weighted_l,metaValue_var_xcorr_shape_weighted_u
+arg-L.arg-L_1.Heavy,100,5.00E+06,10,1.00E+06,0,1.00E+09,0,1.00E+09,0,1.00E+09,0,1.00E+09
+arg-L.arg-L_1.Light,100,5.00E+06,10,1.00E+06,0,1.00E+09,0,1.00E+09,0,1.00E+09,0,1.00E+09
+orn.orn_1.Heavy,100,5.00E+06,10,1.00E+06,0,1.00E+09,0,1.00E+09,0,1.00E+09,0,1.00E+09
+orn.orn_1.Light,100,5.00E+06,10,1.00E+06,0,1.00E+09,0,1.00E+09,0,1.00E+09,0,1.00E+09
+asn-L.asn-L_1.Heavy,100,5.00E+06,10,1.00E+06,0,1.00E+09,0,1.00E+09,0,1.00E+09,0,1.00E+09
+asn-L.asn-L_1.Light,100,5.00E+06,10,1.00E+06,0,1.00E+09,0,1.00E+09,0,1.00E+09,0,1.00E+09
+asn-L.asn-L_2.Light,100,5.00E+06,10,1.00E+06,0,1.00E+09,0,1.00E+09,0,1.00E+09,0,1.00E+09
+ser-L.ser-L_1.Heavy,100,5.00E+06,10,1.00E+06,0,1.00E+09,0,1.00E+09,0,1.00E+09,0,1.00E+09
+ser-L.ser-L_1.Light,100,5.00E+06,10,1.00E+06,0,1.00E+09,0,1.00E+09,0,1.00E+09,0,1.00E+09
+ser-L.ser-L_2.Light,100,5.00E+06,10,1.00E+06,0,1.00E+09,0,1.00E+09,0,1.00E+09,0,1.00E+09

@@ -3,6 +3,9 @@ set(directory source/core)
 
 ### list all filenames of the directory here
 set(sources_list
+	ApplicationProcessor.cpp
+	CastValue.cpp
+	FeatureMetadata.cpp
 	Filenames.cpp
 	Helloworld.cpp
 	MetaDataHandler.cpp
@@ -10,11 +13,15 @@ set(sources_list
 	RawDataProcessor.cpp
 	SampleGroupHandler.cpp
 	InjectionHandler.cpp
+	SampleType.cpp
 	SequenceHandler.cpp
 	SequenceProcessor.cpp
 	SequenceSegmentHandler.cpp
 	SequenceSegmentProcessor.cpp
+	SessionHandler.cpp
+	SharedProcessors.cpp
 	Utilities.cpp
+	WorkflowManager.cpp
 )
 
 ### add path to the filenames

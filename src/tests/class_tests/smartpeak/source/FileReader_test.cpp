@@ -21,7 +21,6 @@ BOOST_AUTO_TEST_CASE(parseopenmsparams)
   const string func1 {"func1"};
 
   BOOST_CHECK_EQUAL(parameters[func1].size(), 3);
-
   BOOST_CHECK_EQUAL(parameters[func1][0].count("name"), 1);
   BOOST_CHECK_EQUAL(parameters[func1][0].count("type"), 1);
   BOOST_CHECK_EQUAL(parameters[func1][0].count("value"), 1);
@@ -61,7 +60,6 @@ BOOST_AUTO_TEST_CASE(parseopenmsparams)
   const string func2 {"func2"};
 
   BOOST_CHECK_EQUAL(parameters[func2].size(), 2);
-
   BOOST_CHECK_EQUAL(parameters[func2][0].count("name"), 1);
   BOOST_CHECK_EQUAL(parameters[func2][0].count("type"), 1);
   BOOST_CHECK_EQUAL(parameters[func2][0].count("value"), 1);
@@ -83,7 +81,6 @@ BOOST_AUTO_TEST_CASE(parseopenmsparams)
   const string func3 {"func3"};
 
   BOOST_CHECK_EQUAL(parameters[func3].size(), 1);
-
   BOOST_CHECK_EQUAL(parameters[func3][0].count("name"), 1);
   BOOST_CHECK_EQUAL(parameters[func3][0].count("type"), 1);
   BOOST_CHECK_EQUAL(parameters[func3][0].count("value"), 1);

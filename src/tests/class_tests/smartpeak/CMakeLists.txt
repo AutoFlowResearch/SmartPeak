@@ -80,10 +80,26 @@ include_directories(${SMARTPEAK_CLASS_TESTS_INTERNAL_INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SMARTPEAK_CLASS_TESTS_EXTERNAL_INCLUDE_DIRECTORIES})
 
 #------------------------------------------------------------------------------
-# disable optimization for tests for gcc like compilers
-if (CMAKE_COMPILER_IS_INTELCXX OR CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG)
-  set(_TMP_CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
-  set(CMAKE_CXX_FLAGS_RELEASE "-O0")
+# ImGUI SDL and OpenGL dependencies
+#------------------------------------------------------------------------------
+find_package(SDL2 REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
+
+#------------------------------------------------------------------------------
+# OpenGL
+#------------------------------------------------------------------------------
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIR})
+
+#------------------------------------------------------------------------------
+# ImGUI
+#------------------------------------------------------------------------------
+find_package(ImGui COMPONENTS Sources Examples REQUIRED)
+include_directories(${ImGui_INCLUDE_DIR})
+if (ImGui_Examples_FOUND)
+  message(STATUS "ImGui_Examples_FOUND has been set and found")
+else()
+  message(STATUS "imgui has not been found")
 endif()
 
 #------------------------------------------------------------------------------
@@ -99,15 +115,20 @@ add_dependencies(IO_TEST ${io_executables_list})
 add_custom_target(ALGORITHM_TEST)
 add_dependencies(ALGORITHM_TEST ${algorithm_executables_list})
 
-# algorithm
-add_custom_target(UI_TEST)
-add_dependencies(UI_TEST ${ui_executables_list})
+# ui
+# add_custom_target(UI_TEST)
+# add_dependencies(UI_TEST ${ui_executables_list})
 
 #------------------------------------------------------------------------------
 # Add the actual tests
 foreach(_class_test ${TEST_executables})
   add_executable(${_class_test} source/${_class_test})
-  target_link_libraries(${_class_test} ${SmartPeak_LIBRARIES} ${Boost_LIBRARIES} OpenMS)
+  # message(STATUS "${_class_test}")
+  if(NOT (${_class_test} STREQUAL "GuiAppender_test" OR ${_class_test} STREQUAL "AppWindow_test"))
+    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} ${Boost_LIBRARIES} OpenMS)
+  else()
+    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} ${Boost_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples)
+  endif()
   add_test(${_class_test} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_class_test})
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
   # see https://sourceforge.net/apps/trac/open-ms/ticket/280 for details)

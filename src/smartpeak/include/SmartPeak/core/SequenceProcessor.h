@@ -1,72 +1,127 @@
 // TODO: Add copyright
 
 #pragma once
+
 #include <SmartPeak/core/Filenames.h>
-#include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceHandler.h>
-#include <SmartPeak/core/SequenceSegmentHandler.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <map>
+#include <memory> // shared_ptr
+#include <set>
+#include <string>
 #include <vector>
-#include <memory>
+#include <atomic>
+#include <thread>
 
 namespace SmartPeak
 {
-  class SequenceProcessor
-  {
-public:
-    SequenceProcessor()                                    = delete;
-    ~SequenceProcessor()                                   = delete;
-    SequenceProcessor(const SequenceProcessor&)            = delete;
-    SequenceProcessor& operator=(const SequenceProcessor&) = delete;
-    SequenceProcessor(SequenceProcessor&&)                 = delete;
-    SequenceProcessor& operator=(SequenceProcessor&&)      = delete;
-
-    /**
-      Create a new sequence from files or wizard.
-
-      @param[in,out] sequenceHandler_IO Sequence handler
-      @param[in] filenames Pathnames to load
-      @param[in] delimiter String delimiter of the imported file
-      @param[in] checkConsistency Check consistency of data contained in files
-    */
-    static void createSequence(
-      SequenceHandler& sequenceHandler_IO,
-      const Filenames& filenames,
-      const std::string& delimiter = ",",
-      const bool checkConsistency = true
-    );
-
-    /**
-      Apply a processing workflow to all injections in a sequence.
-
-      @param[in,out] sequenceHandler_IO Sequence handler
-      @param[in] filenames Mapping from injection names to pathnames
-      @param[in] injection_names Injections to select from the sequence
-      @param[in] raw_data_processing_methods_I Events to process
-    */
-    static void processSequence(
-      SequenceHandler& sequenceHandler_IO,
+  /**
+    Processes injections onto multiple threads of execution
+  */
+  class SequenceProcessorMultithread {
+  public:
+    SequenceProcessorMultithread(
+      std::vector<InjectionHandler>& injections,
       const std::map<std::string, Filenames>& filenames,
-      const std::set<std::string>& injection_names = {},
-      const std::vector<std::shared_ptr<RawDataProcessor>>&
-        raw_data_processing_methods_I = {}
-    );
+      const std::vector<std::shared_ptr<RawDataProcessor>>& methods
+    ) : injections_(injections), filenames_(filenames), methods_(methods) {}
 
     /**
-      Apply a processing workflow to all injections in a sequence segment.
+      Spawn a number of workers equal to the number of threads of execution
+      offered by the CPU
 
-      @param[in,out] sequenceHandler_IO Sequence handler
-      @param[in] filenames Mapping from sequence groups names to pathnames
-      @param[in] sequence_segment_names Sequence groups to select from the sequence
-      @param[in] sequence_segment_processing_methods_I Events to process
+      @note If the API is unable to fetch the required information, only a
+      single thread will be used
     */
-    static void processSequenceSegments(
-      SequenceHandler& sequenceHandler_IO,
-      const std::map<std::string, Filenames>& filenames,
-      const std::set<std::string>& sequence_segment_names = {},
-      const std::vector<std::shared_ptr<SequenceSegmentProcessor>>&
-        sequence_segment_processing_methods_I = {}
-    );
+    void spawn_workers(unsigned int n_threads);
+
+    /**
+      Determine the number of workers available based on the maximum available
+      threads and the desired thread count. 1 thread will always be preserved for
+      the GUI unless the maximum number of available threads couldn't be determined
+
+      @param[in] n_threads desired number of threads to use
+    */
+    size_t getNumWorkers(unsigned int n_threads) const;
+
+    /**
+      Workers run this function. It implements a loop that runs the following steps:
+      - fetch an injection
+      - process all methods on it
+
+      Workers decide on which injection to work according to an index fetched and
+      incremented atomically (i_).
+
+      The loop ends when the worker fetches an index that is out of range.
+    */
+    void run_injection_processing();
+
+  private:
+    std::atomic_size_t i_ { 0 }; ///< a worker works on the i_-th injection
+    std::vector<InjectionHandler>& injections_; ///< the injections to be processed
+    const std::map<std::string, Filenames>& filenames_; ///< mapping from injections names to the associated filenames
+    const std::vector<std::shared_ptr<RawDataProcessor>>& methods_; ///< methods to run on each injection
+  };
+
+  /**
+    Apply a processing workflow to a single injection
+
+    @param[in,out] injection The injection to process
+    @param[in] filenames Used by the methods
+    @param[in] methods Methods to process on the injection
+  */
+  void processInjection(
+    InjectionHandler& injection,
+    const Filenames& filenames,
+    const std::vector<std::shared_ptr<RawDataProcessor>>& methods
+  );
+
+  struct SequenceProcessor {
+    SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}
+    virtual ~SequenceProcessor() = default;
+
+    virtual void process() const = 0;
+
+    SequenceHandler* sequenceHandler_IO = nullptr; /// Sequence handler, used by all SequenceProcessor derived classes
+  };
+
+  /**
+    Create a new sequence from files or wizard
+  */
+  struct CreateSequence : SequenceProcessor {
+    Filenames        filenames;                    /// Pathnames to load
+    std::string      delimiter          = ",";     /// String delimiter of the imported file
+    bool             checkConsistency   = true;    /// Check consistency of data contained in files
+
+    CreateSequence() = default;
+    CreateSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    void process() const override;
+  };
+
+  /**
+    Apply a processing workflow to all injections in a sequence
+  */
+  struct ProcessSequence : SequenceProcessor {
+    std::map<std::string, Filenames>               filenames;                     /// Mapping from injection names to pathnames
+    std::set<std::string>                          injection_names;               /// Injections to select from the sequence (all if empty)
+    std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods_I; /// Events to process
+
+    ProcessSequence() = default;
+    ProcessSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    void process() const override;
+  };
+
+  /**
+    Apply a processing workflow to all injections in a sequence segment
+  */
+  struct ProcessSequenceSegments : SequenceProcessor {
+    std::map<std::string, Filenames>                       filenames;                             /// Mapping from sequence groups names to pathnames
+    std::set<std::string>                                  sequence_segment_names;                /// Sequence groups to select from the sequence (all if empty)
+    std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods_I; /// Events to process
+
+    ProcessSequenceSegments() = default;
+    ProcessSequenceSegments(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    void process() const override;
   };
 }

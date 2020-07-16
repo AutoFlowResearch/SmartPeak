@@ -30,11 +30,16 @@
 // feature selection
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMBatchFeatureSelector.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/PeakIntegrator.h>
 
 #include <SmartPeak/algorithm/MRMFeatureValidator.h>  // feature validaiton
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>  // feature filter/QC
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>  // feature picker
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h> // feature quantification
+#include <OpenMS/MATH/MISC/EmgGradientDescent.h>
+
+#include <algorithm>
+#include <exception>
 
 namespace SmartPeak
 {
@@ -50,9 +55,9 @@ namespace SmartPeak
     if (filenames.mzML_i.size()) {
       if (params_I.at("mzML").size()) {
         // # convert parameters
-        std::map<std::string, Utilities::CastValue> mzML_params;
+        std::map<std::string, CastValue> mzML_params;
         for (const std::map<std::string, std::string>& param : params_I.at("mzML")) {
-          Utilities::CastValue c;
+          CastValue c;
           Utilities::castString(param.at("value"), param.at("type"), c);
           mzML_params.emplace(param.at("name"), c);
         }
@@ -94,9 +99,9 @@ namespace SmartPeak
     OpenMS::TargetedExperiment& targeted_exp = rawDataHandler_IO.getTargetedExperiment();
     if (params_I.at("ChromatogramExtractor").size()) {
       // # convert parameters
-      std::map<std::string, Utilities::CastValue> chromatogramExtractor_params;
+      std::map<std::string, CastValue> chromatogramExtractor_params;
       for (const std::map<std::string, std::string>& param : params_I.at("ChromatogramExtractor")) {
-        Utilities::CastValue c;
+        CastValue c;
         Utilities::castString(param.at("value"), param.at("type"), c);
         chromatogramExtractor_params.emplace(param.at("name"), c);
       }
@@ -426,11 +431,11 @@ namespace SmartPeak
 
     OpenMS::FeatureMap output;
 
-    if (params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip").size()) {
+    if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_qmip")) {
       std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
         Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"), params_I.at("MRMFeatureSelector.select_MRMFeatures_qmip"));
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
-    } else if (params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score").size()) {
+    } else if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_score")) {
       std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
         Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
       OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
@@ -585,7 +590,7 @@ namespace SmartPeak
     LOGD << "END loadTraML";
   }
 
-  void LoadFeatureFilters::process(
+  void LoadFeatureFiltersRDP::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
@@ -636,7 +641,7 @@ namespace SmartPeak
     LOGD << "END loadFeatureFilter";
   }
 
-  void LoadFeatureQCs::process(
+  void LoadFeatureQCsRDP::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
@@ -685,6 +690,74 @@ namespace SmartPeak
     }
 
     LOGD << "END loadFeatureQC";
+  }
+
+  void StoreFeatureFiltersRDP::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START storeFeatureFilter";
+    LOGI << "Storing: " << filenames.featureFilterComponents_csv_i << " and " <<
+      filenames.featureFilterComponentGroups_csv_i;
+
+    if (filenames.featureFilterComponents_csv_i.empty() &&
+      filenames.featureFilterComponentGroups_csv_i.empty()) {
+      LOGE << "Filenames are both empty";
+      LOGD << "END storeFeatureFilter";
+      return;
+    }
+
+    try {
+      OpenMS::MRMFeatureQCFile featureQCFile;
+      if (filenames.featureFilterComponents_csv_i.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.featureFilterComponents_csv_i, rawDataHandler_IO.getFeatureFilter(), false);
+      }
+      if (filenames.featureFilterComponentGroups_csv_i.size()) {
+        featureQCFile.store(filenames.featureFilterComponentGroups_csv_i, rawDataHandler_IO.getFeatureFilter(), true);
+      }
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+      LOGI << "feature filter store exception";
+    }
+
+    LOGD << "END storeFeatureFilter";
+  }
+
+  void StoreFeatureQCsRDP::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START storeFeatureQC";
+    LOGI << "Loading: " << filenames.featureQCComponents_csv_i << " and " <<
+      filenames.featureQCComponentGroups_csv_i;
+
+    if (filenames.featureQCComponents_csv_i.empty() &&
+      filenames.featureQCComponentGroups_csv_i.empty()) {
+      LOGE << "Filenames are both empty";
+      LOGD << "END storeFeatureQC";
+      return;
+    }
+
+    try {
+      OpenMS::MRMFeatureQCFile featureQCFile;
+      if (filenames.featureQCComponents_csv_i.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.featureQCComponents_csv_i, rawDataHandler_IO.getFeatureQC(), false);
+      }
+      if (filenames.featureQCComponentGroups_csv_i.size()) {
+        featureQCFile.store(filenames.featureQCComponentGroups_csv_i, rawDataHandler_IO.getFeatureQC(), true);
+      }
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+      LOGI << "Feature qc store exception";
+    }
+
+    LOGD << "END storeFeatureQC";
   }
 
   void LoadValidationData::process(
@@ -767,7 +840,7 @@ namespace SmartPeak
     float height;
     float area;
 
-    std::vector<std::map<std::string, Utilities::CastValue>> reference_data;
+    std::vector<std::map<std::string, CastValue>>& reference_data = rawDataHandler_IO.getReferenceData();
 
     while (in.read_row(
       sample_index,
@@ -791,7 +864,7 @@ namespace SmartPeak
       std::transform(used.begin(), used.end(), used.begin(), ::tolower);
       if (used == "false")
         continue;
-      std::map<std::string, Utilities::CastValue> m;
+      std::map<std::string, CastValue> m;
       m.emplace(s_sample_index, sample_index);
       m.emplace(s_original_filename, original_filename);
       m.emplace(s_sample_name, sample_name);
@@ -872,11 +945,16 @@ namespace SmartPeak
       "MRMFeatureFinderScoring",
       "MRMFeatureFilter.filter_MRMFeatures",
       "MRMFeatureSelector.select_MRMFeatures_qmip",
-      "MRMFeatureSelector.schedule_MRMFeatures_qmip",
+      // "MRMFeatureSelector.schedule_MRMFeatures_qmip",
       "MRMFeatureSelector.select_MRMFeatures_score",
       "ReferenceDataMethods.getAndProcess_referenceData_samples",
       "MRMFeatureValidator.validate_MRMFeatures",
       "MRMFeatureFilter.filter_MRMFeatures.qc",
+      "MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences",
+      "MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc",
+      "MRMFeatureFilter.filter_MRMFeaturesRSDs",
+      "MRMFeatureFilter.filter_MRMFeaturesRSDs.qc",
+      "SequenceProcessor"
     };
     for (const std::string& parameter : required_parameters) {
       if (!params_I.count(parameter)) {
@@ -952,5 +1030,287 @@ namespace SmartPeak
     }
 
     LOGD << "END ExtractChromatogramWindows";
+  }
+
+  void FitFeaturesEMG::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START FitFeaturesEMG";
+
+    OpenMS::EmgGradientDescent emg;
+
+    if (params_I.count("EmgGradientDescent") && params_I.at("EmgGradientDescent").size()) {
+      OpenMS::Param parameters = emg.getParameters();
+      Utilities::updateParameters(parameters, params_I.at("EmgGradientDescent"));
+      emg.setParameters(parameters);
+    }
+
+    // TODO: Remove these lines after testing/debugging is done
+    OpenMS::Param parameters = emg.getParameters();
+    parameters.setValue("print_debug", 1);
+    parameters.setValue("max_gd_iter", 10000u);
+    emg.setParameters(parameters);
+
+    OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
+
+    const std::vector<OpenMS::MSChromatogram>& chromatograms {
+      rawDataHandler_IO.getChromatogramMap().getChromatograms() };
+
+    auto getChromatogramByName = [&chromatograms](const OpenMS::String& name) -> const OpenMS::MSChromatogram&
+    {
+      const std::vector<OpenMS::MSChromatogram>::const_iterator it =
+        std::find_if(chromatograms.cbegin(), chromatograms.cend(), [&name](const OpenMS::MSChromatogram& chrom){
+          return name == chrom.getNativeID();
+        });
+      if (it == chromatograms.cend()) {
+        throw std::string("Can't find a chromatogram with NativeID == ") + name;
+      }
+      return *it;
+    };
+
+    try {
+      for (OpenMS::Feature& feature : featureMap) {
+        std::cout << "NEW FEATURE\n";
+        const double left { feature.getMetaValue("leftWidth") };
+        const double right { feature.getMetaValue("rightWidth") };
+        std::cout << "Boundaries: [" << left << ", " << right << "]\n";
+        std::vector<OpenMS::Feature>& subordinates { feature.getSubordinates() };
+        std::cout << "n. subordinates: " << subordinates.size() << "\n";
+        for (OpenMS::Feature& subfeature : subordinates) {
+          std::cout << "NEW SUBFEATURE\n";
+          const OpenMS::String name = subfeature.getMetaValue("native_id");
+          std::cout << "Subordinate name: " << name << "\n";
+          const OpenMS::MSChromatogram& chromatogram = getChromatogramByName(name);
+          std::cout << "Chromatogram found!\n";
+          std::vector<double> x;
+          std::vector<double> y;
+          extractPointsIntoVectors(chromatogram, left, right, x, y);
+          std::cout << "Extracted n. points: " << x.size() << "\n";
+
+          if (x.size() < 3) {
+            std::cout << "Less than 2 points. Skipping: " << name << "\n\n";
+            continue;
+          }
+
+          // EMG parameter estimation with gradient descent
+          double h, mu, sigma, tau;
+          std::cout << "Estimating EMG parameters...\n";
+          emg.estimateEmgParameters(x, y, h, mu, sigma, tau);
+
+          // Estimate the intensities for each point
+          std::vector<double> out_xs;
+          std::vector<double> out_ys;
+          std::cout << "Applying estimated parameters...\n";
+          emg.applyEstimatedParameters(x, h, mu, sigma, tau, out_xs, out_ys);
+
+          // integrate area and estimate background, update the subfeature
+
+          std::cout << "emg peak # points: " << out_xs.size() << "\n";
+          OpenMS::ConvexHull2D::PointArrayType hull_points(out_xs.size());
+          OpenMS::MSChromatogram emg_chrom;
+          for (size_t i = 0; i < out_xs.size(); ++i) {
+            emg_chrom.push_back(OpenMS::ChromatogramPeak(out_xs[i], out_ys[i]));
+            hull_points[i][0] = out_xs[i];
+            hull_points[i][1] = out_ys[i];
+          }
+          OpenMS::ConvexHull2D hull;
+          hull.addPoints(hull_points);
+          subfeature.getConvexHulls().push_back(hull);
+
+          OpenMS::PeakIntegrator pi;
+          std::cout << "Updating ranges...\n";
+          emg_chrom.updateRanges();
+          std::cout << "Ranges updated.\n";
+          const double emg_chrom_left { emg_chrom.getMin()[0] };
+          const double emg_chrom_right { emg_chrom.getMax()[0] };
+          std::cout << "Positions calculated.\n";
+          OpenMS::PeakIntegrator::PeakArea pa = pi.integratePeak(emg_chrom, emg_chrom_left, emg_chrom_right);
+          std::cout << "Area calculated.\n";
+          OpenMS::PeakIntegrator::PeakBackground pb = pi.estimateBackground(emg_chrom, emg_chrom_left, emg_chrom_right, pa.apex_pos);
+          std::cout << "Background calculated.\n";
+          double peak_integral { pa.area - pb.area };
+          double peak_apex_int { pa.height - pb.height };
+          if (peak_integral < 0) { peak_integral = 0; }
+          if (peak_apex_int < 0) { peak_apex_int = 0; }
+
+          std::cout << "Intensity: " << subfeature.getIntensity() << "\t" << peak_integral << "\n";
+          std::cout << "peak_apex_position: " << subfeature.getMetaValue("peak_apex_position") << "\t" << pa.apex_pos << "\n";
+          std::cout << "peak_apex_int: " << subfeature.getMetaValue("peak_apex_int") << "\t" << peak_apex_int << "\n";
+          std::cout << "area_background_level: " << subfeature.getMetaValue("area_background_level") << "\t" << pb.area << "\n";
+          std::cout << "noise_background_level: " << subfeature.getMetaValue("noise_background_level") << "\t" << pb.height << "\n\n";
+
+          subfeature.setIntensity(peak_integral);
+          subfeature.setMetaValue("peak_apex_position", pa.apex_pos);
+          subfeature.setMetaValue("peak_apex_int", peak_apex_int);
+          subfeature.setMetaValue("area_background_level", pb.area);
+          subfeature.setMetaValue("noise_background_level", pb.height);
+        }
+      }
+      rawDataHandler_IO.updateFeatureMapHistory();
+    }
+    catch (const std::exception& e) {
+      std::cout << "I catched the exception (in SmartPeak)!\n";
+      LOGE << e.what();
+    }
+
+    LOGD << "END FitFeaturesEMG";
+  }
+
+  void FitFeaturesEMG::extractPointsIntoVectors(
+    const OpenMS::MSChromatogram& chromatogram,
+    const double left,
+    const double right,
+    std::vector<double>& x,
+    std::vector<double>& y
+  ) const
+  {
+    x.clear();
+    y.clear();
+    OpenMS::MSChromatogram::ConstIterator it = chromatogram.PosBegin(left);
+    const OpenMS::MSChromatogram::ConstIterator end = chromatogram.PosEnd(right);
+    std::cout << "empty range: " << (it == end) << "\n";
+    for (; it != end; ++it) {
+      x.push_back(it->getPos());
+      y.push_back(it->getIntensity());
+    }
+  }
+
+  void FilterFeaturesRSDs::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START filterFeaturesRSDs";
+    LOGI << "Feature Filter input size: " << rawDataHandler_IO.getFeatureMap().size();
+
+    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesRSDs") &&
+      params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs").empty()) {
+      LOGE << "No parameters passed to filterFeatures. Not filtering";
+      LOGD << "END filterFeaturesRSDs";
+      return;
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    OpenMS::Param parameters = featureFilter.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs"));
+    featureFilter.setParameters(parameters);
+
+    OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
+
+    featureFilter.FilterFeatureMapPercRSD(
+      featureMap,
+      rawDataHandler_IO.getFeatureRSDFilter(),
+      rawDataHandler_IO.getFeatureRSDEstimations()
+    );
+
+    rawDataHandler_IO.updateFeatureMapHistory();
+
+    LOGI << "Feature Filter output size: " << featureMap.size();
+    LOGD << "END filterFeaturesRSDs";
+  }
+
+  void CheckFeaturesRSDs::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START checkFeaturesRSDs";
+    LOGI << "Feature Checker input size: " << rawDataHandler_IO.getFeatureMap().size();
+
+    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc") &&
+      params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc").empty()) {
+      LOGE << "No parameters passed to checkFeatures. Not checking";
+      LOGD << "END checkFeaturesRSDs";
+      return;
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    OpenMS::Param parameters = featureFilter.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc"));
+    featureFilter.setParameters(parameters);
+
+    featureFilter.FilterFeatureMapPercRSD(
+      rawDataHandler_IO.getFeatureMap(),
+      rawDataHandler_IO.getFeatureRSDQC(),
+      rawDataHandler_IO.getFeatureRSDEstimations()
+    );
+
+    rawDataHandler_IO.updateFeatureMapHistory();
+
+    LOGI << "Feature Checker output size: " << rawDataHandler_IO.getFeatureMap().size();
+    LOGD << "END checkFeaturesRSDs";
+  }
+
+  void FilterFeaturesBackgroundInterferences::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START filterFeaturesBackgroundInterferences";
+    LOGI << "Feature Filter input size: " << rawDataHandler_IO.getFeatureMap().size();
+
+    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences") &&
+      params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences").empty()) {
+      LOGE << "No parameters passed to filterFeatures. Not filtering";
+      LOGD << "END filterFeaturesBackgroundInterferences";
+      return;
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    OpenMS::Param parameters = featureFilter.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences"));
+    featureFilter.setParameters(parameters);
+
+    OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
+
+    featureFilter.FilterFeatureMapBackgroundInterference(
+      featureMap,
+      rawDataHandler_IO.getFeatureBackgroundFilter(),
+      rawDataHandler_IO.getFeatureBackgroundEstimations()
+    );
+
+    rawDataHandler_IO.updateFeatureMapHistory();
+
+    LOGI << "Feature Filter output size: " << featureMap.size();
+    LOGD << "END filterFeaturesBackgroundInterferences";
+  }
+
+  void CheckFeaturesBackgroundInterferences::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START checkFeaturesBackgroundInterferences";
+    LOGI << "Feature Checker input size: " << rawDataHandler_IO.getFeatureMap().size();
+
+    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc") &&
+      params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc").empty()) {
+      LOGE << "No parameters passed to checkFeatures. Not checking";
+      LOGD << "END checkFeaturesBackgroundInterferences";
+      return;
+    }
+
+    OpenMS::MRMFeatureFilter featureFilter;
+    OpenMS::Param parameters = featureFilter.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc"));
+    featureFilter.setParameters(parameters);
+
+    featureFilter.FilterFeatureMapBackgroundInterference(
+      rawDataHandler_IO.getFeatureMap(),
+      rawDataHandler_IO.getFeatureBackgroundQC(),
+      rawDataHandler_IO.getFeatureBackgroundEstimations()
+    );
+
+    rawDataHandler_IO.updateFeatureMapHistory();
+
+    LOGI << "Feature Checker output size: " << rawDataHandler_IO.getFeatureMap().size();
+    LOGD << "END checkFeaturesBackgroundInterferences";
   }
 }

@@ -1,7 +1,9 @@
 // TODO: Add copyright
 
-#include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/io/SequenceParser.h>
+#include <SmartPeak/core/FeatureMetadata.h>
+#include <SmartPeak/core/SampleType.h>
+#include <SmartPeak/core/SequenceHandler.h>
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
 #endif
@@ -181,10 +183,20 @@ namespace SmartPeak
       validateAndConvert(t_dilution_factor, t.dilution_factor);
       validateAndConvert(t_inj_volume,      t.inj_volume);
 
-      t.sample_type = MetaDataHandler::stringToSampleType(t_sample_type);
+      if (stringToSampleType.count(t_sample_type)) {
+        t.sample_type = stringToSampleType.at(t_sample_type);
+      } else {
+        t.sample_type = SampleType::Unrecognized;
+      }
+
       std::tm& adt = t.acquisition_date_and_time;
       std::istringstream iss(t_date);
-      iss >> adt.tm_mday >> adt.tm_mon >> adt.tm_year >> adt.tm_hour >> adt.tm_min >> adt.tm_sec;
+      iss.imbue(std::locale(""));
+      iss >> std::get_time(&adt, "%d/%m/%Y %H:%M:%S");
+      if (adt.tm_mday < 1 || adt.tm_mday > 31) {
+        LOGD << "Invalid value for std::tm::tm_mday: " << adt.tm_mday << ". Setting to 1.";
+        adt.tm_mday = 1;
+      }
 
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
     }
@@ -194,12 +206,12 @@ namespace SmartPeak
 
   void SequenceParser::makeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
-    std::vector<std::map<std::string,std::string>>& list_dict,
+    std::vector<std::vector<std::string>>& rows_out,
     std::vector<std::string>& headers_out,
     const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types // TODO: can overload with a vector of strings
-  )
-  {
+    const std::set<SampleType>& sample_types,
+    const std::set<std::string>& sample_names,
+    const std::set<std::string>& component_names) {
     std::vector<std::string> headers = {
       "sample_name", "sample_type", "component_group_name", "component_name", "batch_name",
       "rack_number", "plate_number", "pos_number", "inj_number", "dilution_factor", "inj_volume",
@@ -219,13 +231,13 @@ namespace SmartPeak
 
     const std::string delimiter {"_____"};
 
-    list_dict.clear();
+    rows_out.clear();
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
-      const MetaDataHandler::SampleType st = mdh.getSampleType();
-      if (sample_types.count(st) == 0)
+      if (sample_types.count(mdh.getSampleType()) == 0)
         continue;
-      const std::string& sample_name = mdh.getSampleName();
+      if (sample_names.size() > 0 && sample_names.count(mdh.getSampleName()) == 0)
+        continue;
 
       // feature_map_history_ is needed in order to export all "used_" = true and false features
       for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMapHistory()) {
@@ -235,63 +247,59 @@ namespace SmartPeak
         }
         const std::string component_group_name = feature.getMetaValue(s_PeptideRef);
         for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
-          std::map<std::string,std::string> row;
-          row.emplace("sample_type", MetaDataHandler::SampleTypeToString(st));
-          row.emplace("sample_name", sample_name);
-          row.emplace("component_group_name", component_group_name);
+          std::vector<std::string> row;
+          row.push_back(mdh.getSampleName());
+          row.push_back(sampleTypeToString.at(mdh.getSampleType()));
+          row.push_back(component_group_name);
           if (!subordinate.metaValueExists(s_native_id) ||
               subordinate.getMetaValue(s_native_id).isEmpty() ||
               subordinate.getMetaValue(s_native_id).toString().empty()) {
-            LOGV << "component_group_name is absent or empty. Skipping this subordinate";
+            LOGV << "component_name is absent or empty. Skipping this subordinate";
             continue;
           }
           const std::string component_name = subordinate.getMetaValue(s_native_id);
-          row.emplace("component_name", component_name);
-          row.emplace("proc_method_name", mdh.proc_method_name);
-          row.emplace("rack_number", std::to_string(mdh.rack_number));
-          row.emplace("plate_number", std::to_string(mdh.plate_number));
-          row.emplace("pos_number", std::to_string(mdh.pos_number));
-          row.emplace("inj_number", std::to_string(mdh.inj_number));
-          row.emplace("dilution_factor", std::to_string(mdh.dilution_factor));
-          row.emplace("acq_method_name", mdh.acq_method_name);
-          row.emplace("operator_name", mdh.operator_name);
-          row.emplace("original_filename", mdh.original_filename);
-          row.emplace("acquisition_date_and_time", mdh.getAcquisitionDateAndTimeAsString());
-          row.emplace("inj_volume", std::to_string(mdh.inj_volume));
-          row.emplace("inj_volume_units", mdh.inj_volume_units);
-          row.emplace("batch_name", mdh.batch_name);
-          row.emplace("injection_name", mdh.getInjectionName());
-          row.emplace(
-            "used_",
-            subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : ""
-          );
+          if (component_names.size() > 0 && component_names.count(component_name) == 0)
+            continue;
+          row.push_back(component_name);
+          row.push_back(mdh.batch_name);
+          row.push_back(std::to_string(mdh.rack_number));
+          row.push_back(std::to_string(mdh.plate_number));
+          row.push_back(std::to_string(mdh.pos_number));
+          row.push_back(std::to_string(mdh.inj_number));
+          row.push_back(std::to_string(mdh.dilution_factor));
+          row.push_back(std::to_string(mdh.inj_volume));
+          row.push_back(mdh.inj_volume_units);
+          row.push_back(mdh.operator_name);
+          row.push_back(mdh.acq_method_name);
+          row.push_back(mdh.proc_method_name);
+          row.push_back(mdh.original_filename);
+          row.push_back(mdh.getAcquisitionDateAndTimeAsString());
+          row.push_back(mdh.getInjectionName());
+          row.push_back(subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : "");
           for (const std::string& meta_value_name : meta_data) {
             if (subordinate.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_message") {
-
               OpenMS::StringList messages = subordinate.getMetaValue(meta_value_name).toStringList();
-              row.emplace(
-                meta_value_name,
+              row.push_back(
                 Utilities::join(messages.begin(), messages.end(), delimiter)
               );
             }
             else if (feature.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_group_message") {
               OpenMS::StringList messages = feature.getMetaValue(meta_value_name).toStringList();
-              row.emplace(
-                meta_value_name,
+              row.push_back(
                 Utilities::join(messages.begin(), messages.end(), delimiter)
               );
             }
             else {
-              Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-              if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
+              CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+              if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
                 // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-                row.emplace(meta_value_name, std::to_string(datum.f_));
+                row.push_back(std::to_string(datum.f_));
               } else {
-                row.emplace(meta_value_name, "");
+                row.push_back("");
               }
             }
           }
-          list_dict.push_back(row);
+          rows_out.push_back(row);
         }
       }
     }
@@ -300,16 +308,20 @@ namespace SmartPeak
   bool SequenceParser::writeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
-    const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types
+    const std::vector<FeatureMetadata>& meta_data,
+    const std::set<SampleType>& sample_types
   )
   {
     LOGD << "START writeDataTableFromMetaValue";
     LOGI << "Storing: " << filename;
 
-    std::vector<std::map<std::string,std::string>> list_dict;
+    std::vector<std::vector<std::string>> rows;
     std::vector<std::string> headers;
-    makeDataTableFromMetaValue(sequenceHandler, list_dict, headers, meta_data, sample_types);
+    std::vector<std::string> meta_data_strings;
+    for (const FeatureMetadata& m : meta_data) {
+      meta_data_strings.push_back(metadataToString.at(m));
+    }
+    makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>());
 
     CSVWriter writer(filename, ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
@@ -319,11 +331,7 @@ namespace SmartPeak
       return false;
     }
 
-    for (const std::map<std::string,std::string>& m : list_dict) {
-      std::vector<std::string> line;
-      for (const std::string& h : headers) {
-        line.push_back(m.at(h));
-      }
+    for (const std::vector<std::string>& line : rows) {
       writer.writeDataInRow(line.cbegin(), line.cend());
     }
 
@@ -333,11 +341,13 @@ namespace SmartPeak
 
   void SequenceParser::makeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
-    std::vector<std::vector<float>>& data_out,
-    std::vector<std::string>& columns_out,
-    std::vector<Row>& rows_out,
+    Eigen::Tensor<float, 2>& data_out,
+    Eigen::Tensor<std::string, 1>& columns_out,
+    Eigen::Tensor<std::string, 2>& rows_out,
     const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types
+    const std::set<SampleType>& sample_types,
+    const std::set<std::string>& sample_names,
+    const std::set<std::string>& component_names
   )
   {
     std::set<std::string> columns;
@@ -346,30 +356,42 @@ namespace SmartPeak
 
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
-      const MetaDataHandler::SampleType st = mdh.getSampleType();
-      if (sample_types.count(st) == 0) {
-        continue;
-      }
+      std::map<std::string, float> validation_metrics = sampleHandler.getRawData().getValidationMetrics();
       const std::string& sample_name = mdh.getSampleName();
-      data_dict.insert({sample_name, std::map<Row,float,Row_less>()});
+      if (sample_names.size() && sample_names.count(sample_name) == 0) 
+        continue;
+      if (sample_types.count(mdh.getSampleType()) == 0) 
+        continue;
+      data_dict.insert({ sample_name, std::map<Row,float,Row_less>() });
       for (const std::string& meta_value_name : meta_data) {
-
         // feature_map_history is not needed here as we are only interested in the current/"used" features
         for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
-          const std::string component_group_name = feature.getMetaValue(s_PeptideRef).toString();
           for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
+            if (component_names.size() && component_names.count(subordinate.getMetaValue(s_native_id).toString()) == 0) 
+              continue;
             if (subordinate.metaValueExists("used_")) {
               const std::string used = subordinate.getMetaValue("used_").toString();
-                if (used.empty() || used[0] == 'f' || used[0] == 'F')
-                  continue;
+              if (used.empty() || used[0] == 'f' || used[0] == 'F') 
+                continue;
             }
             const Row row_tuple_name(
-              component_group_name,
+              feature.getMetaValue(s_PeptideRef).toString(),
               subordinate.getMetaValue(s_native_id).toString(),
               meta_value_name
             );
-            Utilities::CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
-            if (datum.getTag() == Utilities::CastValue::FLOAT && datum.f_ != 0.0) {
+            CastValue datum;
+            if (meta_value_name == "accuracy" || meta_value_name == "n_features") {
+              datum = validation_metrics.at(meta_value_name);
+            }
+            else {
+              datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
+            }
+            if (meta_value_name == "validation") {
+              if (datum.s_ == "TP") datum = static_cast<float>(1.0);
+              else if (datum.s_ == "FP") datum = static_cast<float>(-1.0);
+              else datum = static_cast<float>(-2.0);
+            }
+            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0 && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
               data_dict[sample_name].emplace(row_tuple_name, datum.f_);
               columns.insert(sample_name);
               rows.insert(row_tuple_name);
@@ -379,45 +401,62 @@ namespace SmartPeak
       }
     }
 
-    rows_out.clear();
-    columns_out.clear();
-
-    rows_out.insert(rows_out.cbegin(), rows.cbegin(), rows.cend());
-    columns_out.insert(columns_out.cbegin(), columns.cbegin(), columns.cend());
-
-    std::vector<std::vector<float>> data(rows_out.size(), std::vector<float>(columns_out.size(), NAN));
-
-    for (size_t r = 0; r < rows_out.size(); ++r) {
-      const Row& row = rows_out[r];
-      for (size_t c = 0; c < columns_out.size(); ++c) {
-        const std::string& column = columns_out[c];
-        if (data_dict.count(column) && data_dict[column].count(row)) {
-          data[r][c] = data_dict[column][row];
-        }
-      }
+    // Copy over the rows
+    rows_out.resize((int)rows.size(), 3);
+    int row = 0;
+    for (const auto& r: rows) {
+      rows_out(row, 0) = r.component_name;
+      rows_out(row, 1) = r.component_group_name;
+      rows_out(row, 2) = r.meta_value_name;
+      ++row;
     }
 
-    data_out = std::move(data);
+    // Copy over the columns
+    columns_out.resize((int)columns.size());
+    int col = 0;
+    for (const auto& c : columns) {
+      columns_out(col) = c;
+      ++col;
+    }
+
+    // Copy over the data
+    data_out.resize((int)rows.size(), (int)columns.size());
+    data_out.setConstant(0.0); // for now, initialize to 0 instead of NAN even though there are clear benefits to using NAN in packages that support NAN
+    col = 0;
+    for (const auto& c : columns) {
+      row = 0;
+      for (const auto& r : rows) {
+        if (data_dict.count(c) && data_dict[c].count(r)) {
+          data_out(row,col) = data_dict[c][r];
+        }
+        ++row;
+      }
+      ++col;
+    }
   }
 
   bool SequenceParser::writeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
     const std::string& filename,
-    const std::vector<std::string>& meta_data,
-    const std::set<MetaDataHandler::SampleType>& sample_types
+    const std::vector<FeatureMetadata>& meta_data,
+    const std::set<SampleType>& sample_types
   )
   {
     LOGD << "START writeDataMatrixFromMetaValue";
 
     LOGI << "Storing: " << filename;
 
-    std::vector<std::vector<float>> data;
-    std::vector<std::string> columns;
-    std::vector<Row> rows;
-    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data, sample_types);
+    Eigen::Tensor<float,2> data;
+    Eigen::Tensor<std::string,1> columns;
+    Eigen::Tensor<std::string, 2> rows;
+    std::vector<std::string> meta_data_strings;
+    for (const FeatureMetadata& m : meta_data) {
+      meta_data_strings.push_back(metadataToString.at(m));
+    }
+    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>());
 
     std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
-    headers.insert(headers.end(), columns.begin(), columns.end());
+    for (int i=0;i<columns.size();++i) headers.push_back(columns(i));
 
     CSVWriter writer(filename, ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
@@ -427,14 +466,14 @@ namespace SmartPeak
       return false;
     }
 
-    for (size_t i = 0; i < rows.size(); ++i) {
+    for (size_t i = 0; i < rows.dimension(0); ++i) {
       std::vector<std::string> line;
-      line.push_back(rows[i].component_group_name);
-      line.push_back(rows[i].component_name);
-      line.push_back(rows[i].meta_value_name);
-      for (size_t j = 0; j < data.at(i).size(); ++j) {
+      for (size_t j = 0; j < rows.dimension(1); ++j) {
+        line.push_back(rows(i,j));
+      }
+      for (size_t j = 0; j < data.dimension(1); ++j) {
         // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
-        line.emplace_back(std::to_string(data[i][j]));
+        line.emplace_back(std::to_string(data(i,j)));
       }
       writer.writeDataInRow(line.cbegin(), line.cend());
     }

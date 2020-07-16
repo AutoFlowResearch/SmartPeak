@@ -2,6 +2,7 @@
 
 #include <SmartPeak/core/Filenames.h>
 #include <string>
+#include <boost/filesystem.hpp>
 
 namespace SmartPeak
 {
@@ -17,11 +18,19 @@ namespace SmartPeak
     static_filenames.featureFilterComponentGroups_csv_i = dir + "/featureFilterComponentGroups.csv";
     static_filenames.featureQCComponents_csv_i = dir + "/featureQCComponents.csv";
     static_filenames.featureQCComponentGroups_csv_i = dir + "/featureQCComponentGroups.csv";
+    static_filenames.featureRSDFilterComponents_csv_i = dir + "/featureRSDFilterComponents.csv";
+    static_filenames.featureRSDFilterComponentGroups_csv_i = dir + "/featureRSDFilterComponentGroups.csv";
+    static_filenames.featureRSDQCComponents_csv_i = dir + "/featureRSDQCComponents.csv";
+    static_filenames.featureRSDQCComponentGroups_csv_i = dir + "/featureRSDQCComponentGroups.csv";
+    static_filenames.featureBackgroundFilterComponents_csv_i = dir + "/featureBackgroundFilterComponents.csv";
+    static_filenames.featureBackgroundFilterComponentGroups_csv_i = dir + "/featureBackgroundFilterComponentGroups.csv";
+    static_filenames.featureBackgroundQCComponents_csv_i = dir + "/featureBackgroundQCComponents.csv";
+    static_filenames.featureBackgroundQCComponentGroups_csv_i = dir + "/featureBackgroundQCComponentGroups.csv";
     static_filenames.quantitationMethods_csv_i = dir + "/quantitationMethods.csv";
     static_filenames.standardsConcentrations_csv_i = dir + "/standardsConcentrations.csv";
     static_filenames.referenceData_csv_i = dir + "/referenceData.csv";
-    static_filenames.sequenceSummary_csv_o = dir + "/SequenceSummary.csv";
-    static_filenames.featureSummary_csv_o = dir + "/FeatureSummary.csv";
+    static_filenames.pivotTable_csv_o = dir + "/PivotTable.csv";
+    static_filenames.featureDB_csv_o = dir + "/FeatureDB.csv";
     return static_filenames;
   }
 
@@ -42,10 +51,69 @@ namespace SmartPeak
     dynamic_filenames.featureXML_o                     = prefix + ".featureXML";
     dynamic_filenames.feature_csv_o                    = prefix + ".csv";
     dynamic_filenames.features_pdf_o                   = prefix;
+    dynamic_filenames.featureFilterComponents_csv_o = prefix + "_featureFilterComponents.csv";
+    dynamic_filenames.featureFilterComponentGroups_csv_o = prefix + "_featureFilterComponentGroups.csv";
+    dynamic_filenames.featureQCComponents_csv_o = prefix + "_featureQCComponents.csv";
+    dynamic_filenames.featureQCComponentGroups_csv_o = prefix + "_featureQCComponentGroups.csv";
+    dynamic_filenames.featureRSDFilterComponents_csv_o = prefix + "_featureRSDFilterComponents.csv";
+    dynamic_filenames.featureRSDFilterComponentGroups_csv_o = prefix + "_featureRSDFilterComponentGroups.csv";
+    dynamic_filenames.featureRSDQCComponents_csv_o = prefix + "_featureRSDQCComponents.csv";
+    dynamic_filenames.featureRSDQCComponentGroups_csv_o = prefix + "_featureRSDQCComponentGroups.csv";
+    dynamic_filenames.featureBackgroundFilterComponents_csv_o = prefix + "_featureBackgroundFilterComponents.csv";
+    dynamic_filenames.featureBackgroundFilterComponentGroups_csv_o = prefix + "_featureBackgroundFilterComponentGroups.csv";
+    dynamic_filenames.featureBackgroundQCComponents_csv_o = prefix + "_featureBackgroundQCComponents.csv";
+    dynamic_filenames.featureBackgroundQCComponentGroups_csv_o = prefix + "_featureBackgroundQCComponentGroups.csv";
     dynamic_filenames.quantitationMethods_csv_o        = prefix + "_quantitationMethods.csv";
     dynamic_filenames.componentsToConcentrations_csv_o = prefix + "_componentsToConcentrations.csv";
 
+    dynamic_filenames.mzml_input_path = mzml_input_path;
+    dynamic_filenames.features_input_path = features_input_path;
+    dynamic_filenames.output_path = output_path;
+
     return dynamic_filenames;
+  }
+
+  void Filenames::updateDefaultDynamicFilenames(
+    const std::string& mzml_input_path,
+    const std::string& features_input_path,
+    const std::string& output_path,
+    Filenames& filenames
+  )
+  {
+    namespace fs = boost::filesystem;
+
+    filenames.mzML_i = fs::path(mzml_input_path)
+      .append(fs::path(filenames.mzML_i).filename().c_str())
+      .string();
+
+    filenames.featureXML_i = fs::path(features_input_path)
+      .append(fs::path(filenames.featureXML_i).filename().c_str())
+      .string();
+
+    const fs::path prefix { output_path };
+
+    filenames.featureXML_o = fs::path(prefix).append(fs::path(filenames.featureXML_o).filename().c_str()).string();
+
+    filenames.feature_csv_o = fs::path(prefix).append(fs::path(filenames.feature_csv_o).filename().c_str()).string();
+
+    filenames.features_pdf_o = fs::path(prefix).append(fs::path(filenames.features_pdf_o).filename().c_str()).string();
+
+    filenames.featureFilterComponents_csv_o = fs::path(prefix).append(fs::path(filenames.featureFilterComponents_csv_o).filename().c_str()).string();
+    filenames.featureFilterComponentGroups_csv_o = fs::path(prefix).append(fs::path(filenames.featureFilterComponentGroups_csv_o).filename().c_str()).string();
+    filenames.featureQCComponents_csv_o = fs::path(prefix).append(fs::path(filenames.featureQCComponents_csv_o).filename().c_str()).string();
+    filenames.featureQCComponentGroups_csv_o = fs::path(prefix).append(fs::path(filenames.featureQCComponentGroups_csv_o).filename().c_str()).string();
+    filenames.featureRSDFilterComponents_csv_o = fs::path(prefix).append(fs::path(filenames.featureRSDFilterComponents_csv_o).filename().c_str()).string();
+    filenames.featureRSDFilterComponentGroups_csv_o = fs::path(prefix).append(fs::path(filenames.featureRSDFilterComponentGroups_csv_o).filename().c_str()).string();
+    filenames.featureRSDQCComponents_csv_o = fs::path(prefix).append(fs::path(filenames.featureRSDQCComponents_csv_o).filename().c_str()).string();
+    filenames.featureRSDQCComponentGroups_csv_o = fs::path(prefix).append(fs::path(filenames.featureRSDQCComponentGroups_csv_o).filename().c_str()).string();
+    filenames.featureBackgroundFilterComponents_csv_o = fs::path(prefix).append(fs::path(filenames.featureBackgroundFilterComponents_csv_o).filename().c_str()).string();
+    filenames.featureBackgroundFilterComponentGroups_csv_o = fs::path(prefix).append(fs::path(filenames.featureBackgroundFilterComponentGroups_csv_o).filename().c_str()).string();
+    filenames.featureBackgroundQCComponents_csv_o = fs::path(prefix).append(fs::path(filenames.featureBackgroundQCComponents_csv_o).filename().c_str()).string();
+    filenames.featureBackgroundQCComponentGroups_csv_o = fs::path(prefix).append(fs::path(filenames.featureBackgroundQCComponentGroups_csv_o).filename().c_str()).string();
+
+    filenames.quantitationMethods_csv_o = fs::path(prefix).append(fs::path(filenames.quantitationMethods_csv_o).filename().c_str()).string();
+
+    filenames.componentsToConcentrations_csv_o = fs::path(prefix).append(fs::path(filenames.componentsToConcentrations_csv_o).filename().c_str()).string();
   }
 
   void Filenames::clear()
@@ -57,6 +125,14 @@ namespace SmartPeak
     featureFilterComponentGroups_csv_i.clear();
     featureQCComponents_csv_i.clear();
     featureQCComponentGroups_csv_i.clear();
+    featureRSDFilterComponents_csv_i.clear();
+    featureRSDFilterComponentGroups_csv_i.clear();
+    featureRSDQCComponents_csv_i.clear();
+    featureRSDQCComponentGroups_csv_i.clear();
+    featureBackgroundFilterComponents_csv_i.clear();
+    featureBackgroundFilterComponentGroups_csv_i.clear();
+    featureBackgroundQCComponents_csv_i.clear();
+    featureBackgroundQCComponentGroups_csv_i.clear();
     quantitationMethods_csv_i.clear();
     standardsConcentrations_csv_i.clear();
     referenceData_csv_i.clear();
@@ -65,9 +141,21 @@ namespace SmartPeak
     feature_csv_o.clear();
     featureXML_i.clear();
     features_pdf_o.clear();
+    featureFilterComponents_csv_o.clear();
+    featureFilterComponentGroups_csv_o.clear();
+    featureQCComponents_csv_o.clear();
+    featureQCComponentGroups_csv_o.clear();
+    featureRSDFilterComponents_csv_o.clear();
+    featureRSDFilterComponentGroups_csv_o.clear();
+    featureRSDQCComponents_csv_o.clear();
+    featureRSDQCComponentGroups_csv_o.clear();
+    featureBackgroundFilterComponents_csv_o.clear();
+    featureBackgroundFilterComponentGroups_csv_o.clear();
+    featureBackgroundQCComponents_csv_o.clear();
+    featureBackgroundQCComponentGroups_csv_o.clear();
     quantitationMethods_csv_o.clear();
     componentsToConcentrations_csv_o.clear();
-    sequenceSummary_csv_o.clear();
-    featureSummary_csv_o.clear();
+    pivotTable_csv_o.clear();
+    featureDB_csv_o.clear();
   }
 }

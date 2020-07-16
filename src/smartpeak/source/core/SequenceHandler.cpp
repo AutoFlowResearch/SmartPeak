@@ -1,8 +1,8 @@
 // TODO: Add copyright
 
+#include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SequenceHandler.h>
-#include <SmartPeak/core/Utilities.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
@@ -68,8 +68,8 @@ namespace SmartPeak
   )
   {
     if (!MetaDataHandler::validateMetaData(meta_data_I))
-      throw std::invalid_argument("Metadata argument is not valid.");
-    std::shared_ptr<MetaDataHandler> meta_data_ptr(new MetaDataHandler(meta_data_I));
+      throw std::invalid_argument("FeatureMetadata argument is not valid.");
+    auto meta_data_ptr = std::make_shared<MetaDataHandler>(MetaDataHandler(meta_data_I));
 
     // initialize the raw data
     RawDataHandler rdh;
@@ -82,10 +82,13 @@ namespace SmartPeak
     if (sequence_.size()) {
       auto parameters_ptr = sequence_.begin()->getRawDataShared()->getParametersShared();
       rdh.setParameters(parameters_ptr);
-      auto feature_filters_ptr = sequence_.begin()->getRawDataShared()->getFeatureFilterShared();
-      rdh.setFeatureFilter(feature_filters_ptr);
-      auto feature_qc_ptr = sequence_.begin()->getRawDataShared()->getFeatureQCShared();
-      rdh.setFeatureQC(feature_qc_ptr);
+
+      /// ownership was changed from the RawDataHandler to the SequenceSegmentHandler
+      //auto feature_filters_ptr = sequence_.begin()->getRawDataShared()->getFeatureFilterShared();
+      //rdh.setFeatureFilter(feature_filters_ptr);
+      //auto feature_qc_ptr = sequence_.begin()->getRawDataShared()->getFeatureQCShared();
+      //rdh.setFeatureQC(feature_qc_ptr);
+
       auto transitions_ptr = sequence_.begin()->getRawDataShared()->getTargetedExperimentShared();
       rdh.setTargetedExperiment(transitions_ptr);
       auto reference_data_ptr = sequence_.begin()->getRawDataShared()->getReferenceDataShared();
@@ -93,11 +96,27 @@ namespace SmartPeak
       // look up the sequence segment, 
       // add the sample index to the sequence segment list of injection indices
       // and copy over the quantitation method
-      std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> absQuantMethods_ptr(new std::vector<OpenMS::AbsoluteQuantitationMethod>());
+      auto absQuantMethods_ptr = std::make_shared<std::vector<OpenMS::AbsoluteQuantitationMethod>>(std::vector<OpenMS::AbsoluteQuantitationMethod>());
+      auto feature_filters_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_qc_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_rsd_filters_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_rsd_qc_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_background_filters_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_background_qc_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_rsd_estimations_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_background_estimations_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
       bool found_seq_seg = false;
       for (SequenceSegmentHandler& sequenceSegmentHandler : sequence_segments_) {
         if (meta_data_I.getSequenceSegmentName() == sequenceSegmentHandler.getSequenceSegmentName()) {
           absQuantMethods_ptr = sequenceSegmentHandler.getQuantitationMethodsShared();
+          feature_filters_ptr = sequenceSegmentHandler.getFeatureFilterShared();
+          feature_qc_ptr = sequenceSegmentHandler.getFeatureQCShared();
+          feature_rsd_filters_ptr = sequenceSegmentHandler.getFeatureRSDFilterShared();
+          feature_rsd_qc_ptr = sequenceSegmentHandler.getFeatureRSDQCShared();
+          feature_background_filters_ptr = sequenceSegmentHandler.getFeatureBackgroundFilterShared();
+          feature_background_qc_ptr = sequenceSegmentHandler.getFeatureBackgroundQCShared();
+          feature_rsd_estimations_ptr = sequenceSegmentHandler.getFeatureRSDEstimationsShared();
+          feature_background_estimations_ptr = sequenceSegmentHandler.getFeatureBackgroundEstimationsShared();
           found_seq_seg = true;
           sequenceSegmentHandler.getSampleIndices().push_back(sequence_.size()); // index = the size of the sequence
           break;
@@ -105,16 +124,40 @@ namespace SmartPeak
       }
       if (found_seq_seg) {
         rdh.setQuantitationMethods(absQuantMethods_ptr);
+        rdh.setFeatureFilter(feature_filters_ptr);
+        rdh.setFeatureQC(feature_qc_ptr);
+        rdh.setFeatureRSDFilter(feature_rsd_filters_ptr);
+        rdh.setFeatureRSDQC(feature_rsd_qc_ptr);
+        rdh.setFeatureBackgroundFilter(feature_background_filters_ptr);
+        rdh.setFeatureBackgroundQC(feature_background_qc_ptr);
+        rdh.setFeatureRSDEstimations(feature_rsd_estimations_ptr);
+        rdh.setFeatureBackgroundEstimations(feature_background_estimations_ptr);
       }
       else {  // New sequence segment
         // initialize the sequence segment
         SequenceSegmentHandler sequenceSegmentHandler;
         sequenceSegmentHandler.setSampleIndices({ sequence_.size() }); // index = the size of the sequence
         sequenceSegmentHandler.setQuantitationMethods(absQuantMethods_ptr);
+        sequenceSegmentHandler.setFeatureFilter(feature_filters_ptr);
+        sequenceSegmentHandler.setFeatureQC(feature_qc_ptr);
+        sequenceSegmentHandler.setFeatureRSDFilter(feature_rsd_filters_ptr);
+        sequenceSegmentHandler.setFeatureRSDQC(feature_rsd_qc_ptr);
+        sequenceSegmentHandler.setFeatureBackgroundFilter(feature_background_filters_ptr);
+        sequenceSegmentHandler.setFeatureBackgroundQC(feature_background_qc_ptr);
+        sequenceSegmentHandler.setFeatureRSDEstimations(feature_rsd_estimations_ptr);
+        sequenceSegmentHandler.setFeatureBackgroundEstimations(feature_background_estimations_ptr);
         sequenceSegmentHandler.setSequenceSegmentName(meta_data_I.getSequenceSegmentName());
         sequence_segments_.push_back(sequenceSegmentHandler);
 
         rdh.setQuantitationMethods(absQuantMethods_ptr);
+        rdh.setFeatureFilter(feature_filters_ptr);
+        rdh.setFeatureQC(feature_qc_ptr);
+        rdh.setFeatureRSDFilter(feature_rsd_filters_ptr);
+        rdh.setFeatureRSDQC(feature_rsd_qc_ptr);
+        rdh.setFeatureBackgroundFilter(feature_background_filters_ptr);
+        rdh.setFeatureBackgroundQC(feature_background_qc_ptr);
+        rdh.setFeatureRSDEstimations(feature_rsd_estimations_ptr);
+        rdh.setFeatureBackgroundEstimations(feature_background_estimations_ptr);
       }
     }
     else {
@@ -123,17 +166,41 @@ namespace SmartPeak
       //rdh.setFeatureFilter(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
       //rdh.setFeatureQC(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
       //rdh.setTargetedExperiment(std::shared_ptr<OpenMS::TargetedExperiment>(new OpenMS::TargetedExperiment()));
-      //rdh.setReferenceData(std::shared_ptr<std::vector<std::map<std::string, Utilities::CastValue>>>(new std::vector<std::map<std::string, Utilities::CastValue>>()));
+      //rdh.setReferenceData(std::shared_ptr<std::vector<std::map<std::string, CastValue>>>(new std::vector<std::map<std::string, CastValue>>()));
 
       // initialize the sequence segment
       SequenceSegmentHandler sequenceSegmentHandler;
-      std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> absQuantMethods_ptr(new std::vector<OpenMS::AbsoluteQuantitationMethod>());
+      auto absQuantMethods_ptr = std::make_shared<std::vector<OpenMS::AbsoluteQuantitationMethod>>(std::vector<OpenMS::AbsoluteQuantitationMethod>());
+      auto feature_filters_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_qc_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_rsd_filters_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_rsd_qc_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_background_filters_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_background_qc_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_rsd_estimations_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+      auto feature_background_estimations_ptr = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
       sequenceSegmentHandler.setSampleIndices({ 0 }); // first index of the sequence
       sequenceSegmentHandler.setQuantitationMethods(absQuantMethods_ptr);
+      sequenceSegmentHandler.setFeatureFilter(feature_filters_ptr);
+      sequenceSegmentHandler.setFeatureQC(feature_qc_ptr);
+      sequenceSegmentHandler.setFeatureRSDFilter(feature_rsd_filters_ptr);
+      sequenceSegmentHandler.setFeatureRSDQC(feature_rsd_qc_ptr);
+      sequenceSegmentHandler.setFeatureBackgroundFilter(feature_background_filters_ptr);
+      sequenceSegmentHandler.setFeatureBackgroundQC(feature_background_qc_ptr);
+      sequenceSegmentHandler.setFeatureRSDEstimations(feature_rsd_estimations_ptr);
+      sequenceSegmentHandler.setFeatureBackgroundEstimations(feature_background_estimations_ptr);
       sequenceSegmentHandler.setSequenceSegmentName(meta_data_I.getSequenceSegmentName());
       sequence_segments_.push_back(sequenceSegmentHandler);
 
       rdh.setQuantitationMethods(absQuantMethods_ptr);
+      rdh.setFeatureFilter(feature_filters_ptr);
+      rdh.setFeatureQC(feature_qc_ptr);
+      rdh.setFeatureRSDFilter(feature_rsd_filters_ptr);
+      rdh.setFeatureRSDQC(feature_rsd_qc_ptr);
+      rdh.setFeatureBackgroundFilter(feature_background_filters_ptr);
+      rdh.setFeatureBackgroundQC(feature_background_qc_ptr);
+      rdh.setFeatureRSDEstimations(feature_rsd_estimations_ptr);
+      rdh.setFeatureBackgroundEstimations(feature_background_estimations_ptr);
     }
 
     // intialize the meta data
@@ -168,13 +235,13 @@ namespace SmartPeak
     return samples;
   }
 
-  Utilities::CastValue SequenceHandler::getMetaValue(
+  CastValue SequenceHandler::getMetaValue(
     const OpenMS::Feature& feature,
     const OpenMS::Feature& subordinate,
     const std::string& meta_value
   )
   {
-    Utilities::CastValue cast;
+    CastValue cast;
 
     if (meta_value == "RT") {
       cast = static_cast<float>(feature.getRT());
@@ -182,6 +249,8 @@ namespace SmartPeak
       cast = static_cast<float>(feature.getIntensity());
     } else if (meta_value == "peak_area") { // Subordinate intensity (also called "peak area)
       cast = static_cast<float>(subordinate.getIntensity());
+    } else if (meta_value == "validation") { // The result of the validation
+      cast = static_cast<std::string>(subordinate.getMetaValue(meta_value));
     } else if (feature.metaValueExists(meta_value) && !feature.getMetaValue(meta_value).isEmpty()) {
       cast = static_cast<float>(feature.getMetaValue(meta_value));
     } else if (subordinate.metaValueExists(meta_value) && !subordinate.getMetaValue(meta_value).isEmpty()) {

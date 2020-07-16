@@ -1,4 +1,6 @@
 set(core_executables_list
+	ApplicationProcessor_test
+	CastValue_test
 	Filenames_test
 	Helloworld_test
 	MetaDataHandler_test
@@ -10,6 +12,7 @@ set(core_executables_list
 	SequenceProcessor_test
 	SequenceSegmentHandler_test
 	SequenceSegmentProcessor_test
+	SessionHandler_test
 	Utilities_test
 )
 
@@ -25,9 +28,8 @@ set(algorithm_executables_list
 )
 
 set(ui_executables_list
-	AppManager_test
-	AppWindow_test
-	Widget_test
+	GuiAppender_test
+	WindowSizesAndPositions_test
 )
 
 ### collect test executables

@@ -1,6 +1,7 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/MetaDataHandler.h>
+#include <SmartPeak/core/SampleType.h>
 #include <iostream>
 #include <plog/Log.h>
 
@@ -13,43 +14,6 @@
 
 namespace SmartPeak
 {
-  std::string MetaDataHandler::SampleTypeToString(const SampleType sample_type)
-  {
-    switch (sample_type) {
-      case SampleType::Unknown:
-        return "Unknown";
-      case SampleType::Standard:
-        return "Standard";
-      case SampleType::QC:
-        return "QC";
-      case SampleType::Blank:
-        return "Blank";
-      case SampleType::DoubleBlank:
-        return "Double Blank";
-      case SampleType::Solvent:
-        return "Solvent";
-      default:
-        return "Unrecognized";
-    }
-  }
-
-  MetaDataHandler::SampleType MetaDataHandler::stringToSampleType(const std::string& sample_type)
-  {
-    if (sample_type == "Unknown")
-      return SampleType::Unknown;
-    if (sample_type == "Standard")
-      return SampleType::Standard;
-    if (sample_type == "QC")
-      return SampleType::QC;
-    if (sample_type == "Blank")
-      return SampleType::Blank;
-    if (sample_type == "Double Blank")
-      return SampleType::DoubleBlank;
-    if (sample_type == "Solvent")
-      return SampleType::Solvent;
-    return SampleType::Unrecognized;
-  }
-
   void MetaDataHandler::setSampleName(const std::string& sample_name_I)
   {
     sample_name = sample_name_I;
@@ -115,14 +79,19 @@ namespace SmartPeak
     sample_type = sample_type_I;
   }
 
-  MetaDataHandler::SampleType& MetaDataHandler::getSampleType()
+  SampleType& MetaDataHandler::getSampleType()
   {
     return sample_type;
   }
 
-  const MetaDataHandler::SampleType& MetaDataHandler::getSampleType() const
+  const SampleType& MetaDataHandler::getSampleType() const
   {
     return sample_type;
+  }
+
+  const std::string MetaDataHandler::getSampleTypeAsString() const
+  {
+    return sampleTypeToString.at(sample_type);
   }
 
   bool MetaDataHandler::validateMetaData(const MetaDataHandler& meta_data)

@@ -2,38 +2,14 @@
 
 #pragma once
 
+#include <SmartPeak/core/SampleType.h>
+
 #include <string>
 #include <ctime>
 
-namespace SmartPeak
-{
-
-  class MetaDataHandler
-  {
+namespace SmartPeak {
+  class MetaDataHandler {
 public:
-    enum SampleType
-    {
-      Unknown = 1,
-      Standard,
-      QC,
-      Blank,
-      DoubleBlank,
-      Solvent,
-      Unrecognized
-    };
-
-    static std::string SampleTypeToString(const SampleType sample_type);
-    static SampleType stringToSampleType(const std::string& sample_type);
-
-    /*
-    * TODO:
-    * All properties are now public.
-    * Keeping the getters / setters for retro-compatibility.
-    * Given the high number of properties, I prefer to remove the getters / setters
-    * at some point because their current implementation represents more a
-    * premature optimization than an actual advantage (KISS and YAGNI principles).
-    */
-
     void setSampleName(const std::string& sample_name_I);
     std::string& getSampleName();
     const std::string& getSampleName() const;
@@ -53,6 +29,7 @@ public:
     void setSampleType(SampleType sample_type_I);
     SampleType& getSampleType();
     const SampleType& getSampleType() const;
+    const std::string getSampleTypeAsString() const;
 
     static bool validateMetaData(const MetaDataHandler& meta_data);
 

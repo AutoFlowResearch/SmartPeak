@@ -2,8 +2,12 @@
 
 #pragma once
 
+#include <SmartPeak/core/FeatureMetadata.h>
+#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/core/Utilities.h>
 #include <plog/Log.h>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 namespace SmartPeak
 {
@@ -48,20 +52,27 @@ public:
       return true;
     }
 
-    // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
+    /*
+    @brief make a table (row major) of string representations of
+      all meta_data for all sample_types in the feature history.
+
+    NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
+    */
     static void makeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
-      std::vector<std::map<std::string,std::string>>& list_dict,
+      std::vector<std::vector<std::string>>& rows_out,
       std::vector<std::string>& headers_out,
-      const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
+      const std::vector<std::string>& meta_data,
+      const std::set<SampleType>& sample_types,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_names
     );
 
     static bool writeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
+      const std::vector<FeatureMetadata>& meta_data,
+      const std::set<SampleType>& sample_types
     );
 
     struct Row
@@ -94,19 +105,21 @@ public:
 
     static void makeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
-      std::vector<std::vector<float>>& data_out,
-      std::vector<std::string>& columns_out,
-      std::vector<Row>& rows_out,
-      const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
+      Eigen::Tensor<float,2>& data_out,
+      Eigen::Tensor<std::string, 1>& columns_out,
+      Eigen::Tensor<std::string, 2>& rows_out,
+      const std::vector<std::string>& meta_data,
+      const std::set<SampleType>& sample_types,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_names
     );
 
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
     static bool writeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
       const std::string& filename,
-      const std::vector<std::string>& meta_data = {"calculated_concentration"},
-      const std::set<MetaDataHandler::SampleType>& sample_types = std::set<MetaDataHandler::SampleType>({MetaDataHandler::SampleType::Unknown})
+      const std::vector<FeatureMetadata>& meta_data,
+      const std::set<SampleType>& sample_types
     );
   };
 }

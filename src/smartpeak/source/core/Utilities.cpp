@@ -1,11 +1,17 @@
 // TODO: Add copyright
 
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/CastValue.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
+#include <algorithm>
 #include <iostream>
+#include <numeric>
 #include <regex>
 #include <unordered_set>
 #include <plog/Log.h>
+#include <boost/filesystem.hpp>
+
+namespace fs = boost::filesystem;
 
 namespace SmartPeak
 {
@@ -33,7 +39,7 @@ namespace SmartPeak
       cast = value;
     } else {
       LOGW << "Type not supported: " << type;
-      cast.setTagAndData(CastValue::UNKNOWN, value);
+      cast.setTagAndData(CastValue::Type::UNKNOWN, value);
     }
   }
 
@@ -117,7 +123,7 @@ namespace SmartPeak
               break;
             }
           default:
-            c.setTagAndData(CastValue::UNKNOWN, Param_IO.getValue(name).toString());
+            c.setTagAndData(CastValue::Type::UNKNOWN, Param_IO.getValue(name).toString());
         }
       }
 
@@ -146,19 +152,19 @@ namespace SmartPeak
       }
       // update the params
       switch (c.getTag()) {
-        case CastValue::BOOL:
+        case CastValue::Type::BOOL:
           Param_IO.setValue(name, c.b_ ? "true" : "false", description, tags);
           break;
-        case CastValue::FLOAT:
+        case CastValue::Type::FLOAT:
           Param_IO.setValue(name, static_cast<double>(c.f_), description, tags);
           break;
-        case CastValue::INT:
+        case CastValue::Type::INT:
           Param_IO.setValue(name, c.i_, description, tags);
           break;
-        case CastValue::STRING:
+        case CastValue::Type::STRING:
           Param_IO.setValue(name, c.s_, description, tags);
           break;
-        case CastValue::FLOAT_LIST:
+        case CastValue::Type::FLOAT_LIST:
           {
             std::vector<double> dl;
             for (const float f : c.fl_) {
@@ -167,7 +173,7 @@ namespace SmartPeak
             Param_IO.setValue(name, dl, description, tags);
             break;
           }
-        case CastValue::INT_LIST:
+        case CastValue::Type::INT_LIST:
           {
             std::vector<int> il;
             for (const int i : c.il_) {
@@ -176,7 +182,7 @@ namespace SmartPeak
             Param_IO.setValue(name, il, description, tags);
             break;
           }
-        case CastValue::STRING_LIST:
+        case CastValue::Type::STRING_LIST:
           {
             OpenMS::StringList sl;
             for (const std::string& s : c.sl_) {
@@ -185,7 +191,7 @@ namespace SmartPeak
             Param_IO.setValue(name, sl, description, tags);
             break;
           }
-        case CastValue::BOOL_LIST:
+        case CastValue::Type::BOOL_LIST:
           {
             OpenMS::StringList sl;
             for (const bool b : c.bl_) {
@@ -194,7 +200,7 @@ namespace SmartPeak
             Param_IO.setValue(name, sl, description, tags);
             break;
           }
-        case CastValue::UNKNOWN:
+        case CastValue::Type::UNKNOWN:
           Param_IO.setValue(name, c.s_, description, tags);
           break;
         default:
@@ -263,13 +269,13 @@ namespace SmartPeak
     std::sregex_iterator matches_begin = std::sregex_iterator(line.begin(), line.end(), re);
     std::sregex_iterator matches_end = std::sregex_iterator();
     for (std::sregex_iterator it = matches_begin; it != matches_end; ++it) {
-      if (cast.getTag() == CastValue::BOOL_LIST) {
+      if (cast.getTag() == CastValue::Type::BOOL_LIST) {
         cast.bl_.push_back(it->str()[0] == 't' || it->str()[0] == 'T');
-      } else if (cast.getTag() == CastValue::FLOAT_LIST) {
+      } else if (cast.getTag() == CastValue::Type::FLOAT_LIST) {
         cast.fl_.push_back(std::strtof(it->str().c_str(), NULL));
-      } else if (cast.getTag() == CastValue::INT_LIST) {
+      } else if (cast.getTag() == CastValue::Type::INT_LIST) {
         cast.il_.push_back(std::stoi(it->str()));
-      } else if (cast.getTag() == CastValue::STRING_LIST) {
+      } else if (cast.getTag() == CastValue::Type::STRING_LIST) {
         cast.sl_.push_back((*it)[1].str());
       } else {
         throw std::invalid_argument("unexcepted tag type");
@@ -469,5 +475,132 @@ namespace SmartPeak
     }
 
     return is_ok;
+  }
+
+  bool Utilities::endsWith(
+    std::string str,
+    std::string suffix,
+    const bool case_sensitive
+  )
+  {
+    if (str.size() < suffix.size())
+      return false;
+
+    if (!case_sensitive)
+    {
+      std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+      std::transform(suffix.begin(), suffix.end(), suffix.begin(), ::tolower);
+    }
+
+    if (str.rfind(suffix) == str.size() - suffix.size())
+      return true;
+
+    return false;
+  }
+
+  std::array<std::vector<std::string>, 4> Utilities::getPathnameContent(
+    const std::string& pathname,
+    const bool asc
+  )
+  {
+    std::array<std::vector<std::string>, 4> content;
+    boost::system::error_code ec;
+
+    fs::directory_iterator it = fs::directory_iterator(fs::path(pathname), ec);
+    if (ec.value()) {
+      return content;
+    }
+    const fs::path p(pathname);
+    fs::directory_iterator it_end = fs::directory_iterator();
+
+    for ( ; it != it_end; it++) {
+      const fs::directory_entry& entry = *it;
+
+      if (!exists(entry.path())) { // protects from e.g. "dangling" symbolic links
+        LOGD << "Path does not exist. Skipping: " << entry.path();
+        continue;
+      }
+
+      const std::string filename(entry.path().filename().string());
+      if (filename == "." || filename == "..") {
+        continue;
+      }
+
+      size_t filesize = fs::is_directory(entry)
+        ? directorySize(entry.path().string())
+        : fs::file_size(entry, ec);
+      if (ec.value()) {
+        filesize = 0;
+        ec.clear();
+      }
+
+      const std::string filetype = fs::is_directory(entry) ? "Directory" : entry.path().extension().string();
+
+      char buff[128];
+      const std::time_t t(fs::last_write_time(entry));
+      std::strftime(buff, sizeof buff, "%Y-%m-%d %H:%M:%S", std::localtime(&t)); // ISO 8601 date format
+
+      content[0].push_back(filename);
+      content[1].push_back(std::to_string(filesize));
+      content[2].push_back(filetype);
+      content[3].push_back(std::string(buff));
+    }
+
+    std::vector<size_t> indices(content[0].size());
+    std::iota(indices.begin(), indices.end(), 0);
+    const std::vector<std::string>& names = content[0];
+    std::sort(
+      indices.begin(),
+      indices.end(),
+      [&names, asc](const size_t l, const size_t r)
+      {
+        const bool b = is_less_than_icase(names[l], names[r]);
+        return asc ? b : !b;
+      }
+    );
+    sortPairs(indices, content[0]);
+    sortPairs(indices, content[1]);
+    sortPairs(indices, content[2]);
+    sortPairs(indices, content[3]);
+    return content;
+  }
+
+  std::string Utilities::getParentPathname(const std::string& pathname)
+  {
+    const fs::path p(pathname);
+    const fs::directory_entry entry(p);
+    return entry.path().parent_path().string();
+  }
+
+  bool Utilities::is_less_than_icase(const std::string& a, const std::string& b)
+  {
+    std::string a_lowercase, b_lowercase;
+    a_lowercase.resize(a.size());
+    b_lowercase.resize(b.size());
+    std::transform(a.begin(), a.end(), a_lowercase.begin(), ::tolower);
+    std::transform(b.begin(), b.end(), b_lowercase.begin(), ::tolower);
+    return a_lowercase.compare(b_lowercase) < 0;
+  }
+
+  size_t Utilities::directorySize(const std::string& pathname)
+  {
+    size_t n { 0 };
+    boost::system::error_code ec;
+
+    fs::directory_iterator it = fs::directory_iterator(fs::path(pathname), ec);
+    if (ec.value()) {
+      return 0;
+    }
+    fs::directory_iterator it_end = fs::directory_iterator();
+
+    for ( ; it != it_end; it++) {
+      const fs::path& filename { it->path().filename() };
+      if (filename == fs::path(".") || filename == fs::path("..")) {
+        continue;
+      }
+      ++n;
+    }
+
+    return n;
   }
 }

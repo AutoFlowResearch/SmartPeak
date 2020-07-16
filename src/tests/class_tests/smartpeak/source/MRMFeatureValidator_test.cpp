@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
   RawDataHandler rawDataHandler;
   LoadValidationData loadValidationData;
   loadValidationData.process(rawDataHandler, {}, filenames);
-  const std::vector<std::map<std::string, Utilities::CastValue>>& ref_data = rawDataHandler.getReferenceData();
+  const std::vector<std::map<std::string, CastValue>>& ref_data = rawDataHandler.getReferenceData();
 
   BOOST_CHECK_EQUAL(ref_data.size(), 179);
 

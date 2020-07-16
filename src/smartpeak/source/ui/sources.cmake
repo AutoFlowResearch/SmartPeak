@@ -3,9 +3,12 @@ set(directory source/ui)
 
 ### list all filenames of the directory here
 set(sources_list
-	AppManager.cpp
+	FilePicker.cpp
+	GuiAppender.cpp
+	Report.cpp
 	Widget.cpp
-	AppWindow.cpp
+	WindowSizesAndPositions.cpp
+	Workflow.cpp
 )
 
 ### add path to the filenames
