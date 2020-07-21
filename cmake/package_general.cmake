@@ -26,6 +26,9 @@ set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/cmake/SmartPeakPackageResou
 set(BUNDLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin/GUI.app")
 set(CPACK_MONOLITHIC_INSTALL on)
 
+# set( CMAKE_MACOSX_RPATH TRUE )
+# set( CMAKE_SKIP_BUILD_RPATH  FALSE )
+# set( CMAKE_BUILD_WITH_INSTALL_RPATH TRUE )  
 # --------------------------------------------------------------------------
 # general components and groupings for SmartPeak installation
 set(CPACK_COMPONENTS_ALL share library applications doc)

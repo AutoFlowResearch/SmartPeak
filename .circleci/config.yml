@@ -83,7 +83,9 @@ jobs:
           cpack -G DragNDrop && ls -alth
           hdiutil attach -noautoopen -noverify SmartPeak-*.dmg
           otool -l /Volumes/SmartPeak-1.0.0-Darwin/GUI.app/Contents/MacOS/GUI | grep -a name
-          /Volumes/SmartPeak-*/GUI.app/Contents/MacOS/GUI
+          open /Volumes/SmartPeak-*/GUI.app
+      - store_artifacts:
+          path: /tmp/artifacts
             
 
 workflows:
