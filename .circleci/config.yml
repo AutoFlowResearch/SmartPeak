@@ -55,7 +55,9 @@ jobs:
     steps:
       - checkout
       - run: brew install cmake qt5 sdl2 boost@1.60 glpk eigen sqlite hdf5  libsvm xerces-c
-      - run: brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib
+      - run: |
+          set -o pipefail
+          brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib
       - run: |
           set -o pipefail
           brew install coin-or-tools/coinor/coin_data_sample coin-or-tools/coinor/coinutils coin-or-tools/coinor/osi || true
