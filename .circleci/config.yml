@@ -84,8 +84,12 @@ jobs:
           hdiutil attach -noautoopen -noverify SmartPeak-*.dmg
           otool -l /Volumes/SmartPeak-1.0.0-Darwin/GUI.app/Contents/MacOS/GUI | grep -a name
           open /Volumes/SmartPeak-*/GUI.app
+      - run:
+          command: |
+            mkdir -p /tmp/builds
+            cp *.dmg /tmp/builds
       - store_artifacts:
-          path: /tmp/artifacts
+          path: /tmp/builds
             
 
 workflows:
