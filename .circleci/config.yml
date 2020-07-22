@@ -86,10 +86,10 @@ jobs:
           open /Volumes/SmartPeak-*/GUI.app
       - run:
           command: |
-            mkdir -p /tmp/builds
-            cp *.dmg /tmp/builds
+            mkdir -p /tmp/artifacts
+            cp *.dmg /tmp/artifacts
       - store_artifacts:
-          path: /tmp/builds
+          path: /tmp/artifacts
             
 
 workflows:
