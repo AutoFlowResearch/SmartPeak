@@ -54,7 +54,7 @@ jobs:
     working_directory: ~/SmartPeak2
     steps:
       - checkout
-      - run: brew install cmake qt5 boost@1.60 glpk eigen sqlite hdf5  libsvm xerces-c
+      - run: brew install cmake qt5 sdl2 boost@1.60 glpk eigen sqlite hdf5  libsvm xerces-c
       - run: |
           set +o pipefail
           brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib || true
@@ -83,7 +83,10 @@ jobs:
           cpack -G DragNDrop && ls -alth
           hdiutil attach -noautoopen -noverify SmartPeak-*.dmg
           otool -l /Volumes/SmartPeak-1.0.0-Darwin/GUI.app/Contents/MacOS/GUI | grep -a name
-          open /Volumes/SmartPeak-*/GUI.app
+          cp -r /Volumes/SmartPeak-*-Darwin/GUI.app /Volumes/SmartPeak-*-Darwin/share .
+          xattr -l GUI.app/*
+          sudo xattr -dr com.apple.quarantine GUI.app
+          open GUI.app
       - run:
           command: |
             mkdir -p /tmp/artifacts
