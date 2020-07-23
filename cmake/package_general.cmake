@@ -11,44 +11,69 @@
 
 # --------------------------------------------------------------------------
 # general definitions used for building SmartPeak packages
-set(CPACK_PACKAGE_NAME "SmartPeak")
-set(CPACK_PACKAGE_VENDOR "SmartPeak.com")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SmartPeak - metabolomics, lipidomics, proteomics, and fluxomics data processing")
-set(CPACK_PACKAGE_VERSION "${SMARTPEAK_PACKAGE_VERSION_MAJOR}.${SMARTPEAK_PACKAGE_VERSION_MINOR}.${SMARTPEAK_PACKAGE_VERSION_PATCH}")
-set(CPACK_PACKAGE_VERSION_MAJOR "${SMARTPEAK_PACKAGE_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${SMARTPEAK_PACKAGE_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${SMARTPEAK_PACKAGE_VERSION_PATCH}")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "SmartPeak-${CPACK_PACKAGE_VERSION}")
-set(CPACK_PACKAGE_DESCRIPTION_FILE ${PROJECT_SOURCE_DIR}/cmake/SmartPeakPackageDescriptionFile.cmake)
-# set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
-set(CPACK_RESOURCE_FILE_WELCOME ${PROJECT_SOURCE_DIR}/cmake/SmartPeakPackageResourceWelcomeFile.txt)
-set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/cmake/SmartPeakPackageResourceReadme.txt)
-set(BUNDLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin/GUI.app")
-set(CPACK_MONOLITHIC_INSTALL on)
+set(CPACK_PACKAGE_NAME                  "SmartPeak")
+set(CPACK_PACKAGE_VENDOR                "SmartPeak.com")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY   "SmartPeak - metabolomics, lipidomics, proteomics, and fluxomics data processing")
+set(CPACK_PACKAGE_VERSION               "${SMARTPEAK_PACKAGE_VERSION_MAJOR}.${SMARTPEAK_PACKAGE_VERSION_MINOR}.${SMARTPEAK_PACKAGE_VERSION_PATCH}")
+set(CPACK_PACKAGE_VERSION_MAJOR         "${SMARTPEAK_PACKAGE_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR         "${SMARTPEAK_PACKAGE_VERSION_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH         "${SMARTPEAK_PACKAGE_VERSION_PATCH}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY     "SmartPeak-${CPACK_PACKAGE_VERSION}")
+set(CPACK_PACKAGE_DESCRIPTION_FILE      ${PROJECT_SOURCE_DIR}/cmake/SmartPeakPackageDescriptionFile.cmake)
+# set(CPACK_RESOURCE_FILE_LICENSE     ${PROJECT_SOURCE_DIR}/License.txt)
+set(CPACK_RESOURCE_FILE_WELCOME         ${PROJECT_SOURCE_DIR}/cmake/SmartPeakPackageResourceWelcomeFile.txt)
+set(CPACK_RESOURCE_FILE_README          ${PROJECT_SOURCE_DIR}/cmake/SmartPeakPackageResourceReadme.txt)
 
-# set( CMAKE_MACOSX_RPATH TRUE )
-# set( CMAKE_SKIP_BUILD_RPATH  FALSE )
-# set( CMAKE_BUILD_WITH_INSTALL_RPATH TRUE )  
+
+
+if (APPLE)
+  set(CPACK_GENERATOR           "DragNDrop")
+  set(BUNDLE_OUTPUT_PATH        "${CMAKE_BINARY_DIR}/bin/GUI.app")
+  set(CPACK_MONOLITHIC_INSTALL  ON)
+  set(CPACK_BUNDLE_NAME         "SmartPeak")
+  set(CPACK_BUNDLE_PLIST        ${PROJECT_SOURCE_DIR}/cmake/MacOSX/Info.plist)
+  set(CPACK_BUNDLE_ICON         ${PROJECT_SOURCE_DIR}/cmake/MacOSX/sp.icns)
+
+  # set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY 0) 
+  # set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY 1)
+  # # use, i.e. don't skip the full RPATH for the build tree
+  # set(CMAKE_SKIP_BUILD_RPATH FALSE)
+
+  # # when building, don't use the install RPATH already
+  # # (but later on when installing)
+  # set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
+
+  # # the RPATH to be used when installing
+  # set(CMAKE_INSTALL_RPATH "")
+
+  # # don't add the automatically determined parts of the RPATH
+  # # which point to directories outside the build tree to the install RPATH
+  # set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+  # set(CPACK_COMMAND_CODESIGN "codesign -o runtime --timestamp")
+  # SET(CPACK_BUNDLE_APPLE_CERT_APP "Apple Development: Ahmed Khalil (Ahmed Khalil)")
+  # # SET(CPACK_APPLE_BUNDLE_ID "com.smartpeak")
+endif()
+
 # --------------------------------------------------------------------------
 # general components and groupings for SmartPeak installation
-set(CPACK_COMPONENTS_ALL share library applications doc)
-set(CPACK_COMPONENT_SHARE_DISPLAY_NAME "SmartPeak shared files")
-set(CPACK_COMPONENT_LIBRARY_DISPLAY_NAME "Libraries")
-set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME "SmartPeak binaries")
-set(CPACK_COMPONENT_DOC_DISPLAY_NAME "Documentation")
-set(CPACK_COMPONENT_SHARE_DESCRIPTION "SmartPeak shared files")
-set(CPACK_COMPONENT_LIBRARY_DESCRIPTION "SmartPeak libraries for building applications against")
-set(CPACK_COMPONENT_APPLICATIONS_DESCRIPTION "SmartPeak executables to run the GUI or scripts")
-set(CPACK_COMPONENT_DOC_DESCRIPTION "Class documentation with tutorials")
-set(CPACK_COMPONENT_SHARE_GROUP "Development")
-set(CPACK_COMPONENT_LIBRARY_GROUP "Runtime")
-set(CPACK_COMPONENT_APPLICATIONS_GROUP "Runtime")
-set(CPACK_COMPONENT_DOC_GROUP "Runtime")
-set(CPACK_ALL_INSTALL_TYPES Full Developer)
-set(CPACK_COMPONENT_SHARE_INSTALL_TYPES Developer Full)
-set(CPACK_COMPONENT_LIBRARY_INSTALL_TYPES Full)
-set(CPACK_COMPONENT_APPLICATIONS_INSTALL_TYPES Full)
-set(CPACK_COMPONENT_DOC_INSTALL_TYPES Full)
+set(CPACK_COMPONENTS_ALL                        share library applications doc)
+set(CPACK_COMPONENT_SHARE_DISPLAY_NAME          "SmartPeak shared files")
+set(CPACK_COMPONENT_LIBRARY_DISPLAY_NAME        "Libraries")
+set(CPACK_COMPONENT_APPLICATIONS_DISPLAY_NAME   "SmartPeak binaries")
+set(CPACK_COMPONENT_DOC_DISPLAY_NAME            "Documentation")
+set(CPACK_COMPONENT_SHARE_DESCRIPTION           "SmartPeak shared files")
+set(CPACK_COMPONENT_LIBRARY_DESCRIPTION         "SmartPeak libraries for building applications against")
+set(CPACK_COMPONENT_APPLICATIONS_DESCRIPTION    "SmartPeak executables to run the GUI or scripts")
+set(CPACK_COMPONENT_DOC_DESCRIPTION             "Class documentation with tutorials")
+set(CPACK_COMPONENT_SHARE_GROUP                 "Development")
+set(CPACK_COMPONENT_LIBRARY_GROUP               "Runtime")
+set(CPACK_COMPONENT_APPLICATIONS_GROUP          "Runtime")
+set(CPACK_COMPONENT_DOC_GROUP                   "Runtime")
+set(CPACK_ALL_INSTALL_TYPES                     Full Developer)
+set(CPACK_COMPONENT_SHARE_INSTALL_TYPES         Developer Full)
+set(CPACK_COMPONENT_LIBRARY_INSTALL_TYPES       Full)
+set(CPACK_COMPONENT_APPLICATIONS_INSTALL_TYPES  Full)
+set(CPACK_COMPONENT_DOC_INSTALL_TYPES           Full)
   
 # --------------------------------------------------------------------------
 # runtime code to ensure the .exe files are "fixed up" by copying all needed runtime components
@@ -78,12 +103,12 @@ endif (SDL2_FOUND)
 find_package(OpenMS REQUIRED)
 if (OpenMS_FOUND)
   ## Add the directory for later calls to CPACK
-  set(OpenMS_LIBRARY_DIR ${OpenMS_DIR}/bin/Release)
+  set(OpenMS_LIBRARY_DIR ${OpenMS_DIR}/lib)
   string(FIND ${OpenMS_DIR} "/" OpenMS_DIR_suffix_pos REVERSE)
   string(SUBSTRING ${OpenMS_DIR} 0 ${OpenMS_DIR_suffix_pos} OpenMS_ROOT)
   set(OpenMS_SHARE_DIR ${OpenMS_ROOT}/share/OpenMS)
-  message(">>{OpenMS_ROOT}" ${OpenMS_ROOT})
-  message(">>{OpenMS_DIR}" ${OpenMS_DIR})
+  # message(">>{OpenMS_ROOT}" ${OpenMS_ROOT})
+  # message(">>{OpenMS_DIR}" ${OpenMS_DIR})
 endif (OpenMS_FOUND)
 
 if (WIN32)
@@ -97,15 +122,9 @@ if (WIN32)
   SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${BOOST_LIBRARYDIR} ${SDL2_LIBRARIES_DIR})
   fixup_bundle(\"\${DEST}\" \"\" \"\${DIRS}\")
   " 
- " 
-  " 
- " 
-  " 
   COMPONENT applications)
   install(CODE "
   execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${OpenMS_SHARE_DIR} \"\${CMAKE_INSTALL_PREFIX}/share/OpenMS\")
-  " 
- " 
   " 
   COMPONENT share)
 
@@ -119,13 +138,12 @@ if (WIN32)
  
   SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR} ${BOOST_LIBRARYDIR}  ${SDL2_LIBRARIES_DIR} ${HIDAPI_DIR})
   fixup_bundle(\"${BUNDLE_OUTPUT_PATH}\" \"\" \"\${DIRS}\")
-  verify_app(\"\${BUNDLE_OUTPUT_PATH}\")
+  verify_app(\"${BUNDLE_OUTPUT_PATH}\")
   " 
   COMPONENT applications)
+  
   install(CODE "
   execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${OpenMS_SHARE_DIR} \"\${CMAKE_INSTALL_PREFIX}/share/OpenMS\")
-  " 
- " 
   " 
   COMPONENT share)
 

@@ -90,7 +90,7 @@ jobs:
       - run:
           command: |
             mkdir -p /tmp/artifacts
-            cp *.dmg /tmp/artifacts
+            cp SmartPeak2/smartpeak2_debug_build/*.dmg /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
             
