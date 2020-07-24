@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
 
   const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::shared_ptr<RawDataProcessor>(new LoadRawData()) };
   const RawDataHandler& rawDataHandler0 = sequenceHandler.getSequence()[0].getRawData();
-  BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
+  // BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
 
   std::map<std::string, Filenames> dynamic_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
