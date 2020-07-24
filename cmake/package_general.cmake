@@ -24,8 +24,19 @@ set(CPACK_RESOURCE_FILE_LICENSE ${PROJECT_SOURCE_DIR}/License.txt)
 set(CPACK_RESOURCE_FILE_WELCOME ${PROJECT_SOURCE_DIR}/cmake/SmartPeakPackageResourceWelcomeFile.txt)
 set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/cmake/SmartPeakPackageResourceReadme.txt)
 
-set(CPACK_DEBIAN_PACKAGE_MAINTAINER "mccloskey")
-set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER   "The SmartPeak Team")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS    ON)
+set(CPACK_DEBIAN_PACKAGE_NAME         "SmartPeak")
+set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE "amd64")
+  
+set(CPACK_DEBIAN_ARCHIVE_TYPE         "gnutar")
+# set(CPACK_DEBIAN_COMPRESSION_TYPE "gzip")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY     "optional")
+set(CPACK_DEBIAN_PACKAGE_SECTION      "science")
+set(CPACK_MONOLITHIC_INSTALL          ON)
+# set(CPACK_DEBIAN_PACKAGE_DEPENDS "libOpenMS")
+
 # --------------------------------------------------------------------------
 # general components and groupings for SmartPeak installation
 set(CPACK_COMPONENTS_ALL share library applications doc)
@@ -65,7 +76,7 @@ endif (SDL2_FOUND)
 find_package(OpenMS REQUIRED)
 if (OpenMS_FOUND)
   ## Add the directory for later calls to CPACK
-  set(OpenMS_LIBRARY_DIR ${OpenMS_DIR}/bin/Release)
+  set(OpenMS_LIBRARY_DIR ${OpenMS_DIR}/lib)
   string(FIND ${OpenMS_DIR} "/" OpenMS_DIR_suffix_pos REVERSE)
   string(SUBSTRING ${OpenMS_DIR} 0 ${OpenMS_DIR_suffix_pos} OpenMS_ROOT)
   set(OpenMS_SHARE_DIR ${OpenMS_ROOT}/share/OpenMS)
