@@ -133,9 +133,9 @@ foreach(_examples ${EXAMPLE_executables})
 
   install(FILES ${OpenMS_DIR}/lib/libOpenMS.so
                 ${OpenMS_DIR}/lib/libOpenSwathAlgo.so
-                ${OpenMS_DIR}/lib/libSuperHirn.so
+                # ${OpenMS_DIR}/lib/libSuperHirn.so
           DESTINATION lib)
-          
+
   endif()
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
   # see https://sourceforge.net/apps/trac/open-ms/ticket/280 for details)
