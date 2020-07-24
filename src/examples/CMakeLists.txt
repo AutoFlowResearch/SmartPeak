@@ -130,11 +130,8 @@ foreach(_examples ${EXAMPLE_executables})
   else()
     target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
 	install_tool(${_examples}) # Required by CPack for bundling (see install_macros.cmake and package_general.cmake)
-
-  install(FILES ${OpenMS_DIR}/lib/libOpenMS.so
-                ${OpenMS_DIR}/lib/libOpenSwathAlgo.so
-                # ${OpenMS_DIR}/lib/libSuperHirn.so
-          DESTINATION lib)
+  file(GLOB_RECURSE OpenMSLibs ${OpenMS_DIR}/lib/*.so)
+  install(FILES ${OpenMSLibs} DESTINATION lib)
 
   endif()
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
