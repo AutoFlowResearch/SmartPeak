@@ -86,7 +86,7 @@ jobs:
           cp -r /Volumes/SmartPeak-*-Darwin/GUI.app /Volumes/SmartPeak-*-Darwin/share .
           xattr -l GUI.app/*
           sudo xattr -dr com.apple.quarantine GUI.app
-          open GUI.app
+          # open GUI.app
       - run:
           command: |
             mkdir -p /tmp/artifacts
