@@ -48,11 +48,16 @@ jobs:
             ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
       - run:
           command: |
+            set -o xtrace
             cd ~/SmartPeak2_build
             cpack -V
             cpack -G DEB
             ls -lh ~/SmartPeak2_build | grep -a .deb
             dpkg -c ~/SmartPeak2_build/*.deb
+            mkdir -p /tmp/packages
+            cp ~/SmartPeak2_build/*.deb /tmp/packages
+      - store_artifacts:
+          path: /tmp/packages
 
 workflows:
   version: 2
