@@ -133,7 +133,14 @@ foreach(_examples ${EXAMPLE_executables})
     if (UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
       file(GLOB_RECURSE OpenMSLibs ${OpenMS_DIR}/lib/*.so)
       install(FILES ${OpenMSLibs} DESTINATION lib)
-      install(DIRECTORY ${OpenMS_DIR}/../share/OpenMS/ DESTINATION share/OpenMS COMPONENT share)
+
+      if (EXISTS ${OpenMS_DIR}/share)
+        set(OpenMS_SHARE_DIR ${OpenMS_DIR}/share/OpenMS/)
+      elseif(EXISTS ${OpenMS_DIR}/../share)
+        set(OpenMS_SHARE_DIR ${OpenMS_DIR}/../share/OpenMS/)
+      endif()
+      install(DIRECTORY ${OpenMS_SHARE_DIR} DESTINATION share/OpenMS COMPONENT share)
+      
     endif()
 
   endif()
