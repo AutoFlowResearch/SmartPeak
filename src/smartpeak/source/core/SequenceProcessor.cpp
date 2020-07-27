@@ -97,7 +97,7 @@ namespace SmartPeak
       raw_data_processing_methods_I
     );
 
-    manager.spawn_workers(2);
+    manager.spawn_workers(6);
   }
 
   void ProcessSequenceSegments::process() const
