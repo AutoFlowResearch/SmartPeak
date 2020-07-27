@@ -476,11 +476,18 @@ BOOST_AUTO_TEST_CASE(is_less_than_icase)
 
 BOOST_AUTO_TEST_CASE(directorySize)
 {
+  // #ifndef __APPLE__
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto& f = Utilities::directorySize;
   BOOST_CHECK_EQUAL(f(path), 39);
   BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 22);
   BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
+
+  boost::unit_test::unit_test_log_t::instance().set_threshold_level( boost::unit_test::log_messages );
+  BOOST_TEST_MESSAGE("f(path) (39 ?): "                             << f(path));
+  BOOST_TEST_MESSAGE("f(path + \"/workflow_csv_files\") (22 ?): "   << f(path + "/workflow_csv_files"));
+  BOOST_TEST_MESSAGE("f(path + \"/mzML\") (6 ?): "                  << f(path + "/mzML"));
+  // #endif
 }
 
 BOOST_AUTO_TEST_SUITE_END()
