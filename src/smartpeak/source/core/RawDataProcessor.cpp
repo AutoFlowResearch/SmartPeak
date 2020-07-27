@@ -953,7 +953,8 @@ namespace SmartPeak
       "MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences",
       "MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc",
       "MRMFeatureFilter.filter_MRMFeaturesRSDs",
-      "MRMFeatureFilter.filter_MRMFeaturesRSDs.qc"
+      "MRMFeatureFilter.filter_MRMFeaturesRSDs.qc",
+      "SequenceProcessor"
     };
     for (const std::string& parameter : required_parameters) {
       if (!params_I.count(parameter)) {

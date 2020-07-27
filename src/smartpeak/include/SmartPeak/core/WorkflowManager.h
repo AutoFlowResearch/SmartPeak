@@ -1,17 +1,19 @@
 #pragma once
 
-#include <SmartPeak/core/AppState.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 
 namespace SmartPeak {
   class WorkflowManager {
   public:
     /**
-      Copies the passed state and sets up the async run of the workflow. Only one
+      Copies the passed application_handler and sets up the async run of the workflow. Only one
       workflow is managed at a time
 
-      @param[in,out] The state that gets copied and then updated at the end of the workflow run
+      @param[in,out] The application_handler that gets copied and then updated at the end of the workflow run
+      @param[in] injection_names Injection names to use for Sequence Processing
+      @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
     */
-    void addWorkflow(AppState& source_state);
+    void addWorkflow(ApplicationHandler& source_state, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names);
 
     /**
       If this returns false, new workflows can't run and the following menu items
@@ -26,16 +28,18 @@ namespace SmartPeak {
   private:
     /**
       Spawns a thread that runs the workflow, and waits for it to finish. The
-      modified state is copied back to the source, keeping the state of the app
+      modified application_handler is copied back to the source, keeping the application_handler of the app
       up-to-date
 
-      @param[in,out] state Points to the class' state member
+      @param[in,out] application_handler Points to the class' application_handler member
       @param[in,out] done Points to the class' done member
-      @param[out] source_state The modified state is copied back here
+      @param[out] source_app_handler The modified application_handler is copied back here
+      @param[in] injection_names Injection names to use for Sequence Processing
+      @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
     */
-    static void run_and_join(AppState& state, bool& done, AppState& source_state);
+    static void run_and_join(ApplicationHandler& application_handler, bool& done, ApplicationHandler& source_app_handler, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names);
 
-    AppState state_; ///< The workflow is run on this copy
+    ApplicationHandler application_handler_; ///< The workflow is run on this copy
     bool done_ = true;
   };
 }

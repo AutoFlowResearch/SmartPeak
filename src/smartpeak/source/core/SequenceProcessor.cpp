@@ -13,12 +13,12 @@
 #include <atomic>
 #include <future>
 #include <list>
-#include <map>
-#include <memory> // shared_ptr
-#include <set>
-#include <string>
-#include <thread>
-#include <vector>
+//#include <map>
+//#include <memory> // shared_ptr
+//#include <set>
+//#include <string>
+
+//#include <vector>
 
 namespace SmartPeak
 {
@@ -87,7 +87,7 @@ namespace SmartPeak
       ? sequenceHandler_IO->getSequence()
       : sequenceHandler_IO->getSamplesInSequence(injection_names);
 
-    if (filenames.size() != injections.size()) {
+    if (filenames.size() < injections.size()) {
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
@@ -97,7 +97,7 @@ namespace SmartPeak
       raw_data_processing_methods_I
     );
 
-    manager.spawn_workers();
+    manager.spawn_workers(6);
   }
 
   void ProcessSequenceSegments::process() const
@@ -113,7 +113,7 @@ namespace SmartPeak
         }
       }
     }
-    if (filenames.size() != sequence_segments.size()) {
+    if (filenames.size() < sequence_segments.size()) {
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
@@ -146,10 +146,10 @@ namespace SmartPeak
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
   }
 
-  void SequenceProcessorMultithread::spawn_workers()
+  void SequenceProcessorMultithread::spawn_workers(unsigned int n_threads)
   {
-    const unsigned int n_threads = std::thread::hardware_concurrency(); // might return 0
-    const size_t n_workers = n_threads ? n_threads : 1;
+    size_t n_workers = getNumWorkers(n_threads);
+
     LOGD << "Number of workers: " << n_workers;
     std::list<std::future<void>> futures;
     LOGD << "Spawning workers...";
@@ -188,6 +188,30 @@ namespace SmartPeak
       }
     }
     LOGD << "Worker is done";
+  }
+
+  size_t SequenceProcessorMultithread::getNumWorkers(unsigned int n_threads) const {
+      const unsigned int max_threads = std::thread::hardware_concurrency(); // might return 0
+      size_t n_workers = 0;
+
+      if (max_threads != 0) {
+          if (n_threads > max_threads) {
+              n_workers = max_threads - 1;
+          }
+          else if (n_threads <= max_threads && n_threads > 1) {
+              n_workers = n_threads - 1;
+          }
+          else if (n_threads >= 0) {
+              LOGD << "Max available threads: " << max_threads;
+              LOGD << "but using just 1 thread.";
+              n_workers = 1;
+          }
+      }
+      else {
+          LOGD << "Couldn't determine # of threads, using just 1 thread!";
+          n_workers = 1;
+      }
+      return n_workers;
   }
 
   void processInjection(

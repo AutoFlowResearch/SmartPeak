@@ -408,9 +408,7 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
   BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
 
   BOOST_CHECK_EQUAL(c[0][38], "workflow_csv_files");
-  BOOST_TEST_CHECKPOINT( "number of items within the folder : 'c[1][38]'= " << c[1][38] );
-  BOOST_CHECK_EQUAL(c[1][38], "20"); // number of items within the folder
-  BOOST_TEST_CHECKPOINT( "'c[2][38]'= 'Directory'" << c[2][38] );
+  BOOST_CHECK_EQUAL(c[1][38], "22"); // number of items within the folder
   BOOST_CHECK_EQUAL(c[2][38], "Directory");
   #endif
 }
@@ -480,8 +478,8 @@ BOOST_AUTO_TEST_CASE(directorySize)
 {
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto& f = Utilities::directorySize;
-  // BOOST_CHECK_EQUAL(f(path), 39);
-  BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 20);
+  BOOST_CHECK_EQUAL(f(path), 39);
+  BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 22);
   BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
 }
 

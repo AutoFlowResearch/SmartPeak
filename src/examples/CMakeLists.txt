@@ -82,7 +82,7 @@ if (NOT Qt5Core_FOUND)
 endif()
 
 #------------------------------------------------------------------------------
-# ImGUI SDL and OpenGL dependencies
+# ImGui SDL and OpenGL dependencies
 #------------------------------------------------------------------------------
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
@@ -94,15 +94,21 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
-# ImGUI
+# ImGui
 #------------------------------------------------------------------------------
-find_package(ImGUI COMPONENTS Sources Examples SourcesMiscCpp REQUIRED)
+find_package(ImGui COMPONENTS Sources Examples SourcesMiscCpp REQUIRED)
 include_directories(${ImGui_INCLUDE_DIR})
 if (ImGui_Examples_FOUND)
   message(STATUS "ImGui_Examples_FOUND has been set and found")
 else()
   message(STATUS "imgui has not been found")
 endif()
+
+#------------------------------------------------------------------------------
+# IMPLOT
+#------------------------------------------------------------------------------
+find_package(ImPlot COMPONENTS Sources REQUIRED)
+include_directories(${IMPLOT_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
 # pipeline examples
@@ -122,7 +128,7 @@ foreach(_examples ${EXAMPLE_executables})
   if(NOT ${_examples} STREQUAL "GUI")
     target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
   else()
-    target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+    target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
 	install_tool(${_examples}) # Required by CPack for bundling (see install_macros.cmake and package_general.cmake)
   endif()
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
