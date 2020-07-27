@@ -595,7 +595,7 @@ namespace SmartPeak
 
     for ( ; it != it_end; it++) {
       const fs::path& filename { it->path().filename() };
-      if (filename == fs::path(".") || filename == fs::path("..")) {
+      if (filename == fs::path(".") || filename == fs::path("..") || (*(&filename.at(0))) == '.') {
         continue;
       }
       ++n;
