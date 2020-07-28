@@ -58,10 +58,10 @@ jobs:
       - checkout
       - run: systeminfo
       - run: |
-        cd ~
-        git clone https://github.com/microsoft/vcpkg
-        cd vcpkg; .\vcpkg\bootstrap-vcpkg.bat
-        .\vcpkg\vcpkg install boost:x64-windows qt5:x64-windows sdl2:x64-windows
+          cd ~
+          git clone https://github.com/microsoft/vcpkg
+          cd vcpkg; .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg install boost:x64-windows qt5:x64-windows sdl2:x64-windows
 
 
 
