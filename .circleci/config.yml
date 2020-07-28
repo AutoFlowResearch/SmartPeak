@@ -1,8 +1,12 @@
 
 
-version: 2
+version: 2.1
+
+orbs:
+  win: circleci/windows@2.4.0
+
 jobs:
-  build:
+  build_ubuntu:
     docker:
       - image: ubuntu:18.04
 
@@ -47,8 +51,18 @@ jobs:
           command: |
             ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
 
+  build_windows:
+    working_directory: ~/SmartPeak2
+    executor: win/default
+    steps:
+      - checkout
+      - run: systeminfo
+
+
+
 workflows:
   version: 2
   build-deploy:
     jobs:
-      - build
+      - build_ubuntu
+      - build_windows
