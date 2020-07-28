@@ -476,7 +476,7 @@ BOOST_AUTO_TEST_CASE(is_less_than_icase)
 
 BOOST_AUTO_TEST_CASE(directorySize)
 {
-  // #ifndef __APPLE__
+  #ifndef __APPLE__
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto& f = Utilities::directorySize;
 
@@ -487,7 +487,7 @@ BOOST_AUTO_TEST_CASE(directorySize)
   BOOST_CHECK_EQUAL(f(path), 39);
   BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 22);
   BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
-  // #endif
+  #endif
 }
 
 BOOST_AUTO_TEST_SUITE_END()
