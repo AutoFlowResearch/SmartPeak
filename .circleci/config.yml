@@ -76,6 +76,9 @@ jobs:
           cd ../smartpeak2_debug_build
           cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;$(brew --prefix qt5);$(brew --prefix boost@1.60)" -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
           make -j4
+      - run: |
+          set +o pipefail
+          ctest -VV -F --timeout 1200 || true
       - run: | 
           set +e
           cd ~/SmartPeak2/smartpeak2_debug_build
