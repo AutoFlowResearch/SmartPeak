@@ -81,7 +81,7 @@ jobs:
             set -e
             cd ~/SmartPeak2/smartpeak2_debug_build
             ls -althR ~/SmartPeak2/src/tests/class_tests/smartpeak/data
-            sudo ctest -VV -F --timeout 120
+            ctest -VV -F --timeout 1200
       - run: |
           cd /usr/local/lib &&
           sudo ln -s /Applications/Xcode.app/Contents/Developer/usr/lib/libLeaksAtExit.dylib
