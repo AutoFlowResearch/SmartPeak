@@ -8,7 +8,7 @@ SmartPeak provides graphical- and/or command-line-based user input validation, w
 
 .. end_introduction
 
-.. |sp_overview| image:: images/Fig01_SmartPeak_overview.*
+.. |sp_overview| image:: images/csv_file.*
 
 .. role:: bash(code)
    :language: bash
@@ -120,14 +120,16 @@ Some dependencies one might have to install:
 
 
 Running the tests
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------------------------------------------------------------------------------------
 
 The tests are run with ``ctest`` command.
+
 .. code-block:: bash
     ctest
 
 
 In order to run a specific test, use ``-R`` option and the test class name (without ``.cpp`` extension)
+
 .. code-block:: bash
     ctest -R Utilities_test
 
@@ -141,10 +143,12 @@ Using GUI
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - To start the GUI, from the build directory run
+
     .. code-block:: bash
         ./bin/GUI
 
 for Mac and Linux, or
+
 .. code-block:: bash
     ./bin/[Debug or Release]/GUI
 
