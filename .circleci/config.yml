@@ -60,12 +60,11 @@ jobs:
       - run: |
           cd ~
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
           $ProgressPreference = "SilentlyContinue"
           $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
           $tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'tmp$', '7z' } –PassThru
           Invoke-WebRequest $qt_url -OutFile $tmp 
-          7z $tmp -o'C:\lib\Qt'
+          7z x $tmp -o'C:\lib\Qt'
           $Qt_DIR = 'C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64'
           $tmp | Remove-Item
 
