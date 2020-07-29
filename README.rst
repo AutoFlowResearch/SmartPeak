@@ -144,8 +144,8 @@ Using GUI
 
 - To start the GUI, from the build directory run
 
-    .. code-block:: bash
-        ./bin/GUI
+.. code-block:: bash
+    ./bin/GUI
 
 for Mac and Linux, or
 
