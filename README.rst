@@ -8,7 +8,7 @@ SmartPeak provides graphical- and/or command-line-based user input validation, w
 
 .. end_introduction
 
-.. |sp_overview| image:: images/csv_file.png
+.. |sp_overview| image:: images/Fig01_SmartPeak_overview.jpg
 
 .. role:: bash(code)
    :language: bash
@@ -157,37 +157,37 @@ or double-click ``GUI`` executable in the file browser of your OS.
 - Start the session with `File | Load session from sequence`
 - Choose the corresponding directory with `Change dir`. The path to example folder can be shortened to f.e. `/data/GCMS_SIM_Unknowns` 
 - Select the sequence file
-![Sequence](images/sequence_file.png)
+.. |Sequence| image:: images/sequence_file.png
 - The integrity of the loaded data can be checked with `Actions | Integrity checks`.  The results of the integrity checks can be viewed with `View | Info`.
 - Edit the workflow with `Edit | Workflow`. You have an option to cherry pick the custom workflow or to choose the predefined set of operations. For example, the workflow steps for GC-MS SIM Unknowns are the following:
-![Workflow](images/workflow.png)
+.. |Workflow| image:: images/workflow.png
 - View and verify the workflow steps and input files with `View | [table]`. 
-![InputTablesWorkflow](images/SmartPeakGUIWorkflowTable.png)
+.. |InputTablesWorkflow| image:: images/SmartPeakGUIWorkflowTable.png
 - The explorer panes can be used to filter the table views with `View | Injections or Transitions`.  Click on the checkbox under plot or table to include or exclude the injection or tansition from the view.
-![InputTablesSequence](images/SmartPeakGUISequenceTable.png)
+.. |InputTablesSequence| image:: images/SmartPeakGUISequenceTable.png
 - Changes to any of the input files can be made by reloading a modified .csv version of the file with `File | Import File`.
 - Run the workflow with `Actions | Run workflow`. Verify or change the data input/output directories before running the workflow.
-![RunWorkflowModal](images/SmartPeakGUIRunWorkflowModal.png)
+.. |RunWorkflowModal| image:: images/SmartPeakGUIRunWorkflowModal.png
 - The status of the workflow can be monitored with `View | info`. 
-![Info](images/SmartPeakGUIInfo.png)
+.. |Info| image:: images/SmartPeakGUIInfo.png)
 - Alternatively, a more detailed status can be obtained with `View | log` which will display the most recent SmartPeak log information.
-![Log](images/SmartPeakGUILog.png)
+.. |Log| image:: images/SmartPeakGUILog.png)
 - After the workflow has finished, the results can be viewed in a tabular form as a large data table with `View | features (table)`.  The feature metavalues shown can be added or removed with `View | Features` and clicking on the checkboxes under plot or table.  For performance reasons, the amount of data that one can view is limited to 5000 entries.
 - The results can be viewed in a graphical form as a line plot or as a heatmap with `View | features (line)`.
-![FeaturesLinePlot](images/SmartPeakGUIFeatureLinePlot.png)
+.. |FeaturesLinePlot| image:: images/SmartPeakGUIFeatureLinePlot.png
 or `View | features (heatmap)`
-![FeaturesHeatmap](images/SmartPeakGUIFeatureHeatmap.png)
+.. |FeaturesHeatmap| image:: images/SmartPeakGUIFeatureHeatmap.png
 - The underlying data can also be displayed as a table matrix with `View | features (matrix)`. Samples, transitions, or feature metavalues can be included or excluded from any of the views using the explorer panes.
-![FeaturesMatrix](images/SmartPeakGUIFeatureMatrix.png)
+.. |FeaturesMatrix| image:: images/SmartPeakGUIFeatureMatrix.png
 - The results of calibration curve fitting can be inspected with `View | Workflow settings | Quant Methods`.
-![QuantMethod](images/SmartPeakGUIQuantMethod.png)
+.. |QuantMethod| image:: images/SmartPeakGUIQuantMethod.png
 - A detailed look at the calibration fitted model and selected points for the model can be seen with `View | Calibrators`.
-![Calibrators](images/SmartPeakGUICalibrators.png)
+.. |Calibrators| image:: images/SmartPeakGUICalibrators.png
 - For debugging problematic peaks, the raw chromatographic data and the picked and selected peaks can be viewed graphically with `View | Chromatograms`. For performance reasons, the amount of data that one can view is limited to 9000 points.
-![Chromatograms](images/SmartPeakGUIChromViewer.png)
+.. |Chromatograms| image:: images/SmartPeakGUIChromViewer.png
 - Export the results with `Actions | Report`. There is an option to choose the set of variables of interest
-![Dialog](images/report_dialog.png)
+.. |Dialog| image:: images/report_dialog.png
 - The results will be exported to `PivotTable.csv` in the same folder
-![Report](images/csv_file.png)
+.. |Report| image:: images/csv_file.png
 
 The above applies for Mac and Linux.
