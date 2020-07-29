@@ -8,7 +8,11 @@ SmartPeak provides graphical- and/or command-line-based user input validation, w
 
 .. end_introduction
 
-![Figure 1](images/Fig01_SmartPeak_overview.jpg)
+.. |sp_overview| image:: images/Fig01_SmartPeak_overview.*
+
+.. role:: bash(code)
+   :language: bash
+
 
 Building from source
 ==========================================================================================================
@@ -27,7 +31,7 @@ Download and install the pre-compiled Boost library binaries for windows
 Download and install QT5 using the offline installer for windows
 - NOTE: only install the 5.12.1 for the relevant version of visual studios
 - Add the "lib" folder in the newly created qt5 directory to the system path variable so that the .dll's will be found during run-time
-- or add e.g. `PATH=%PATH%;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/bin;C:/local/boost_1_67_0/lib64-msvc-14.1` to the environment
+- or add e.g. :bash:`PATH=%PATH%;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/bin;C:/local/boost_1_67_0/lib64-msvc-14.1` to the environment
 
 STEP 2: Build OpenMS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -43,19 +47,19 @@ Build OpenMS following the OpenMS wiki instructions. Example cmake command on wi
 
 - Open "OpenMS_host" in visual studios and build only the solution for "OpenSwathAlgo" and then for "OpenMS" IN THAT ORDER
 - Add the "lib" folder in the openms-build directory to the system path variable so that the .dll's will be found during run-time
-- or add `PATH=%PATH%;[OpenMS directory]/openms-build/bin/debug;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/bin;C:/local/boost_1_67_0/lib64-msvc-14.1;[SDL directory]/lib/x64` to the environment
+- or add :bash:`PATH=%PATH%;[OpenMS directory]/openms-build/bin/debug;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/bin;C:/local/boost_1_67_0/lib64-msvc-14.1;[SDL directory]/lib/x64` to the environment
 
 STEP 3: Build SmartPeak dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Download the latest SDL2 libraries. Add the SDL2 folder to the path environmental variable. Compile using cmake and build for "external projects"
-Example cmake command to download all external projects assuming that you are in the location `[home directory]/smartPeak2/build_external`
-`cmake -G "Visual Studio 15 2017 Win64" -T host=x64 -DUSE_SUPERBUILD=ON ..`
+Example cmake command to download all external projects assuming that you are in the location :code:`[home directory]/smartPeak2/build_external`
+:bash:`cmake -G "Visual Studio 15 2017 Win64" -T host=x64 -DUSE_SUPERBUILD=ON ..`
 However, many of the requirements overlap with OpenMS so for practical purposes the only libraries that will need to be download are "ImGui", "ImPlot", and "Plog"
 
 STEP 4: Build SmartPeak
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Compile using cmake.
-Example cmake command on windows assuming that all external dependency libraries are in the path `[home directory]/smartPeak2/build_external`
+Example cmake command on windows assuming that all external dependency libraries are in the path :code:`[home directory]/smartPeak2/build_external`
 
 .. code-block:: bash
 
@@ -67,17 +71,17 @@ Example cmake command on windows assuming that all external dependency libraries
     -DIMPLOT_DIR=[home directory]/smartPeak2/build_external/Dependencies/Source/implot ^
     -DCMAKE_PREFIX_PATH="[OpenMS directory]/openms-build";"C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib/cmake";"[SDL directory]/SDL"; ..
 
-Open "SmartPeak2_host" in visual studios and build the project of choice. Projects can be built using Visual Studios in the IDE by opening `msbuild [build_dir]/src/SmartPeak2_host` and selecting the specific target to build in the GUI or on the command line by running e.g., `msbuild [build_dir]/src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount` which will build the main SmartPeak library and then running e.g., `msbuild [build_dir]/examples/SmartPeak_class_examples_smartpeak.sln -target:GUI /verbosity:normal /maxcpucount` which will build the SmartPeak GUI.
+Open "SmartPeak2_host" in visual studios and build the project of choice. Projects can be built using Visual Studios in the IDE by opening :code:`msbuild [build_dir]/src/SmartPeak2_host` and selecting the specific target to build in the GUI or on the command line by running e.g., `msbuild [build_dir]/src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount` which will build the main SmartPeak library and then running e.g., `msbuild [build_dir]/examples/SmartPeak_class_examples_smartpeak.sln -target:GUI /verbosity:normal /maxcpucount` which will build the SmartPeak GUI.
 
 Linux
 ----------------------------------------------------------------------------------------------------------
-In the below instructions it is assumed OpenMS code resides in  `~/OpenMS` and SmartPeak code is in `~/SmartPeak2`.
+In the below instructions it is assumed OpenMS code resides in  :code:`~/OpenMS` and SmartPeak code is in :code:`~/SmartPeak2`.
 
 STEP 1: Build OpenMS dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Build OpenMS-contrib by following the OpenMS wiki instructions.
 
-Starting from _Ubuntu 18.04_, it's not necessary to manually build _OpenMS' contrib_. The packages available in the repositories are recent enough.
+Starting from ``Ubuntu 18.04``, it's not necessary to manually build ``OpenMS' contrib``. The packages available in the repositories are recent enough.
 
 STEP 2: Build OpenMS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -118,13 +122,13 @@ Some dependencies one might have to install:
 Running the tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The tests are run with `ctest` command.
-::
+The tests are run with ``ctest`` command.
+.. code-block:: bash
     ctest
 
 
-In order to run a specific test, use `-R` option and the test class name (without `.cpp` extension)
-::
+In order to run a specific test, use ``-R`` option and the test class name (without ``.cpp`` extension)
+.. code-block:: bash
     ctest -R Utilities_test
 
 
@@ -137,15 +141,15 @@ Using GUI
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - To start the GUI, from the build directory run
-::
-    ./bin/GUI
+    .. code-block:: bash
+        ./bin/GUI
 
 for Mac and Linux, or
-::
+.. code-block:: bash
     ./bin/[Debug or Release]/GUI
 
 for Windows.
-or double-click `GUI` executable in the file browser of your OS.
+or double-click ``GUI`` executable in the file browser of your OS.
 - Start the session with `File | Load session from sequence`
 - Choose the corresponding directory with `Change dir`. The path to example folder can be shortened to f.e. `/data/GCMS_SIM_Unknowns` 
 - Select the sequence file
