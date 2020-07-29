@@ -8,7 +8,7 @@ SmartPeak provides graphical- and/or command-line-based user input validation, w
 
 .. end_introduction
 
-.. |sp_overview| image:: images/Fig01_SmartPeak_overview.jpg
+.. image:: images/Fig01_SmartPeak_overview.jpg
 
 .. role:: bash(code)
    :language: bash
