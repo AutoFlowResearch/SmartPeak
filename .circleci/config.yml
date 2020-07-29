@@ -60,7 +60,7 @@ jobs:
       - run: |
           cd ~
           $ProgressPreference = "SilentlyContinue"
-          $qt_url = https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z
+          $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
           $qt_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'qt_tmp$', 'zip' } –PassThru
           Invoke-WebRequest $qt_url -OutFile $qt_tmp 
           $qt_tmp | Expand-Archive -DestinationPath C:\lib\Qt -Force
