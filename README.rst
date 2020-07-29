@@ -50,7 +50,7 @@ Build OpenMS following the OpenMS wiki instructions. Example cmake command on wi
 - or add :bash:`PATH=%PATH%;[OpenMS directory]/openms-build/bin/debug;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/bin;C:/local/boost_1_67_0/lib64-msvc-14.1;[SDL directory]/lib/x64` to the environment
 
 STEP 3: Build SmartPeak dependencies
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Download the latest SDL2 libraries. Add the SDL2 folder to the path environmental variable. Compile using cmake and build for "external projects"
 Example cmake command to download all external projects assuming that you are in the location :code:`[home directory]/smartPeak2/build_external`
 :bash:`cmake -G "Visual Studio 15 2017 Win64" -T host=x64 -DUSE_SUPERBUILD=ON ..`
@@ -133,7 +133,7 @@ ctest -R Utilities_test
 
 
 Running the examples
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The collection of examples is located at `src/example/data` directory of the SmartPeak source code. The directory contains examples of different kinds of data in `.mzML` format and their corresponding configuration files.
 
