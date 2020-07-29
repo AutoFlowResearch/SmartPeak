@@ -63,7 +63,8 @@ jobs:
           $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
           $tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'tmp$', 'zip' } –PassThru
           Invoke-WebRequest $qt_url -OutFile $tmp 
-          $tmp | Expand-Archive -DestinationPath C:\lib\Qt -Force
+          $tmp
+          Expand-Archive -Path $tmp -DestinationPath C:\lib\Qt -Force
           $tmp | Remove-Item
 
 
