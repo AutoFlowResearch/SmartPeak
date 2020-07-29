@@ -157,18 +157,7 @@ The collection of examples is located at ``src/example/data`` directory of the S
 Using GUI
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- To start the GUI, from the build directory run
-    
-    .. code-block:: bash    
-        ./bin/GUI
-
-for Mac and Linux, or
-
-.. code-block:: bash
-    ./bin/[Debug or Release]/GUI
-
-for Windows.
-or double-click ``GUI`` executable in the file browser of your OS.
+- To start the GUI, from the build directory run :bash:`./bin/GUI` for Mac and Linux, or :bash:`./bin/[Debug or Release]/GUI` for Windows. Or double-click ``GUI`` executable in the file browser of your OS.
 - Start the session with ``File | Load session from sequence``
 - Choose the corresponding directory with ``Change dir``. The path to example folder can be shortened to f.e. ``/data/GCMS_SIM_Unknowns`` 
 - Select the sequence file
