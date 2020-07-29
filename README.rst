@@ -124,14 +124,12 @@ Running the tests
 
 The tests are run with ``ctest`` command.
 
-.. code-block:: bash
-    ctest
+ctest
 
 
 In order to run a specific test, use ``-R`` option and the test class name (without ``.cpp`` extension)
 
-.. code-block:: bash
-    ctest -R Utilities_test
+ctest -R Utilities_test
 
 
 Running the examples
@@ -144,13 +142,11 @@ Using GUI
 
 - To start the GUI, from the build directory run
 
-.. code-block:: bash
-    ./bin/GUI
+./bin/GUI
 
 for Mac and Linux, or
 
-.. code-block:: bash
-    ./bin/[Debug or Release]/GUI
+./bin/[Debug or Release]/GUI
 
 for Windows.
 or double-click ``GUI`` executable in the file browser of your OS.
