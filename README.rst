@@ -184,11 +184,11 @@ Using GUI
 
 - The status of the workflow can be monitored with ``View | info``. 
 
-.. image:: images/SmartPeakGUIInfo.png)
+.. image:: images/SmartPeakGUIInfo.png
 
 - Alternatively, a more detailed status can be obtained with ``View | log`` which will display the most recent SmartPeak log information.
 
-.. image:: images/SmartPeakGUILog.png)
+.. image:: images/SmartPeakGUILog.png
 
 - After the workflow has finished, the results can be viewed in a tabular form as a large data table with ``View | features (table)``.  The feature metavalues shown can be added or removed with ``View | Features`` and clicking on the checkboxes under plot or table.  For performance reasons, the amount of data that one can view is limited to 5000 entries.
 
