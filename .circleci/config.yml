@@ -59,9 +59,8 @@ jobs:
       - run: systeminfo
       - run: |
           cd ~
-          git clone https://github.com/microsoft/vcpkg
-          cd vcpkg; .\bootstrap-vcpkg.bat
-          .\vcpkg install boost:x64-windows qt5:x64-windows sdl2:x64-windows
+          $ProgressPreference = "SilentlyContinue"
+          (Invoke-WebRequest https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z).Content | Expand-Archive -DestinationPath C:\Qt
 
 
 
