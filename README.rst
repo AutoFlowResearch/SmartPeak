@@ -214,6 +214,6 @@ or `View | features (heatmap)`
 
 - The results will be exported to `PivotTable.csv` in the same folder
 
-.. image:: images/csv_file.png
+.. |Report| image:: images/csv_file.png
 
 The above applies for Mac and Linux.
