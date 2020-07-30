@@ -18,7 +18,10 @@ author      = 'SmartPeak Team'
 
 extensions              = [ "breathe", 
                             "exhale",
-                            "sphinx.ext.todo" ]
+                            "sphinx.ext.todo",
+                            "sphinx.ext.autodoc",
+                            "sphinx.ext.intersphinx",
+                            "sphinx.ext.viewcode"]
 
 todo_include_todos      = True
 todo_link_only          = True
