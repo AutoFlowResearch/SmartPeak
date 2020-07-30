@@ -32,7 +32,7 @@ Download and install the pre-compiled Boost library binaries for windows
 Download and install QT5 using the offline installer for windows
 - NOTE: only install the 5.12.1 for the relevant version of visual studios
 - Add the "lib" folder in the newly created qt5 directory to the system path variable so that the .dll's will be found during run-time
-- or add e.g. :bash:`PATH=%PATH%;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/bin;C:/local/boost_1_67_0/lib64-msvc-14.1` to the environment
+- or add e.g. :bash:`PATH=%PATH%;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib;C:/local/boost_1_67_0/lib64-msvc-14.1` to the environment
 
 STEP 2: Build OpenMS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -48,7 +48,12 @@ Build OpenMS following the OpenMS wiki instructions. Example cmake command on wi
 
 - Open "OpenMS_host" in visual studios and build only the solution for "OpenSwathAlgo" and then for "OpenMS" IN THAT ORDER
 - Add the "lib" folder in the openms-build directory to the system path variable so that the .dll's will be found during run-time
-- or add :bash:`PATH=%PATH%;[OpenMS directory]/openms-build/bin/debug;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/bin;C:/local/boost_1_67_0/lib64-msvc-14.1;[SDL directory]/lib/x64` to the environment
+- or extend your current path with the following command in powershell as an elevated user:
+
+.. code-block:: powershell
+
+    setx path "%PATH%;[OpenMS directory]\openms-build\lib\debug;C:\qt\Qt5.12.1b\5.12.1\msvc2017_64\lib"
+    setx path "%PATH%;C:\local\boost_1_67_0\lib64-msvc-14.1;[SDL directory]\lib\x64"
 
 STEP 3: Build SmartPeak dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -125,6 +130,79 @@ Some dependencies one might have to install:
 
 .. end_linux
 
+.. begin_macos
+
+macOS
+----------------------------------------------------------------------------------------------------------
+Building SmartPeak and all its dependencies is as easy as on Linux. Assuming the source code for OpenMS and SmartPeak2 reside 
+in the home directory i.e. :code:`~/OpenMS` :code:`~/SmartPeak2`, the following steps can be taken verbatim:
+
+STEP 1: Installing external libraries
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+brew is the tool of choice to get all the necessary libraries installed with ease, if it's not present on your machines, 
+you can install it using the following command:
+
+.. code-block:: bash
+
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+
+.. code-block:: bash
+
+    brew install cmake qt5 sdl2 boost@1.60 glpk eigen sqlite hdf5 libsvm xerces-c
+    brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib
+    brew install coin-or-tools/coinor/coin_data_sample coin-or-tools/coinor/coinutils coin-or-tools/coinor/osi
+
+
+
+STEP 2: Build OpenMS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OpemMS libs can be built wihtout GUI capabilities using the following set of commands:
+
+.. code-block:: bash
+
+    cd ~
+    git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
+    cd OpenMS && git submodule update --init contrib && mkdir contrib_build && cd contrib_build
+    cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DBUILD_TYPE=ALL ../contrib
+    cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build
+    cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 \ 
+    -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost@1.60);$(brew --prefix)" \ 
+    -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ \   
+    -DSEQAN_INCLUDE_DIRS=~/OpenMS/contrib_build/include/seqan -DCOIN_INCLUDE_DIR=../contrib_build/include/ \
+    -DWM5_INCLUDE_DIR=../contrib_build/include/WildMagic/ -DWM5_Wm5Core_LIBRARY=../contrib_build/lib/libWm5Core.a \
+    -DWM5_Wm5Mathematics_LIBRARY=../contrib_build/lib/libWm5Mathematics.a -DHAS_XSERVER=OFF -DWITH_GUI=OFF \
+    -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug \
+    -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
+    make -j4 OpenMS
+
+
+STEP 3: Building SmartPeak
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Building SmartPeak is done in 2 steps:
+
+- Fetching required libraries for SmartPeak (SuperBuild)
+- Building SmartPeak library, examples and GUI
+
+This can be done using the following set of commands:
+
+
+.. code-block:: bash
+
+    cd ~/SmartPeak2 && mkdir smartpeak2_debug_superbuild smartpeak2_debug_build
+    cd smartpeak2_debug_superbuild
+    cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug .. && make -j4
+
+    cd ../smartpeak2_debug_build
+    cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF \
+    -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;$(brew --prefix qt5);$(brew --prefix boost@1.60)" \
+    -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/plog/include \
+    -DIMGUI_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/imgui \
+    -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/implot \
+    -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+    make -j4
+
+.. end_macos
+
 .. begin_runningtests
 
 Running the tests
@@ -162,7 +240,7 @@ Using GUI
 - Choose the corresponding directory with ``Change dir``. The path to example folder can be shortened to f.e. ``/data/GCMS_SIM_Unknowns`` 
 - Select the sequence file
 
-.. image:: images/sequence_file.png
+.. image:: https://github.com/dmccloskey/SmartPeak2/blob/feat/aut312/images/sequence_file.png
 
 - The integrity of the loaded data can be checked with ``Actions | Integrity checks``.  The results of the integrity checks can be viewed with ``View | Info``.
 - Edit the workflow with ``Edit | Workflow``. You have an option to cherry pick the custom workflow or to choose the predefined set of operations. For example, the workflow steps for GC-MS SIM Unknowns are the following:
