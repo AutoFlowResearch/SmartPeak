@@ -7,7 +7,9 @@ SmartPeak
 
 See it in Action
 -----------------------------------------------------------------------------
-TODO
+.. include:: ../../README.rst
+   :start-after: begin_windows
+   :end-before:  end_linux
 
 Getting Started
 -----------------------------------------------------------------------------
