@@ -1,6 +1,18 @@
 SmartPeak
 =============================================================================
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Table of Contents
+   :name: mastertoc
+   :titlesonly:
+   :glob:
+   *
+   api/library_root
+
+Overview
+-----------------------------------------------------------------------------
+
 .. role:: bash(code)
    :language: bash
 
@@ -17,27 +29,36 @@ Getting Started
    :end-before:  end_macos
 
 
-.. toctree::
-   :maxdepth: 2
-   
-   overview
-   usage
-   reference
-   faq
-   testing
-   todo
-   changelog
+Usage
+-----------------------------------------------------------------------------
 
-   api/library_root
+.. include:: ../../README.rst
+   :start-after: begin_gui
+   :end-before:  end_gui
 
-   
+
+Testing
+-----------------------------------------------------------------------------
+
+.. include:: ../../README.rst
+   :start-after: begin_runningtests
+   :end-before:  end_runningexamples
+
+
 Indices and tables
-------------------
+-----------------------------------------------------------------------------
+
 * :ref:`genindex`
 
 
+TODO
+============================================================================
+
+.. todolist::
+
+
 Credit
-==============================================================================
+=============================================================================
 
 .. begin_credit
 
@@ -48,7 +69,7 @@ Boost, ImGui, ImPlot, Plog, Qt, Eigen, Doxygen, Sphinx, and many others.
 
 
 License
-==============================================================================
+=============================================================================
 
 This project uses a MIT license, with the hope that it'll be accessible to most users. 
 If you require a different license, please raise an issue and I will consider
