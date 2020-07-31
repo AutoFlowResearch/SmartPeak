@@ -95,7 +95,7 @@ jobs:
           cd ~/SmartPeak2/smartpeak2_debug_build
           ls -alt bin
           cpack -G DragNDrop && ls -alth
-          hdiutil attach -noautoopen -noverify SmartPeak-*.dmg
+          yes | hdiutil attach -noautoopen -noverify SmartPeak-*.dmg > /dev/null
           otool -l /Volumes/SmartPeak-1.0.0-Darwin/GUI.app/Contents/MacOS/GUI | grep -a name
           cp -r /Volumes/SmartPeak-*-Darwin/GUI.app /Volumes/SmartPeak-*-Darwin/share .
           xattr -l GUI.app/*
