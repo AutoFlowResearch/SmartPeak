@@ -129,22 +129,51 @@ foreach(_examples ${EXAMPLE_executables})
       set(ASSETS ${PROJECT_SOURCE_DIR}/../../cmake/MacOSX/sp.icns)
       set_source_files_properties(${ASSETS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
       add_executable(${_examples} MACOSX_BUNDLE source/${_examples} ${ASSETS})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
+            OpenMS ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
+            PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
       install(TARGETS ${_examples}  BUNDLE DESTINATION .  COMPONENT Applications)
     else()
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
     endif()
 
-  else()
+  elseif(elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)) 
+
+    if (${_examples} STREQUAL "GUI")
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
+          OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
+          PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+      install_tool(${_examples}) 
+    
+      file(GLOB_RECURSE OpenMSLibs ${OpenMS_DIR}/lib/*.so)
+      install(FILES ${OpenMSLibs} DESTINATION lib)
+
+      if (EXISTS ${OpenMS_DIR}/share)
+        set(OpenMS_SHARE_DIR ${OpenMS_DIR}/share/OpenMS/)
+      elseif(EXISTS ${OpenMS_DIR}/../share)
+        set(OpenMS_SHARE_DIR ${OpenMS_DIR}/../share/OpenMS/)
+      endif()
+      install(DIRECTORY ${OpenMS_SHARE_DIR} DESTINATION share/OpenMS COMPONENT share)
+
+    else()
+
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
+
+    endif()
+
+  else() # Win
 
     add_executable(${_examples} source/${_examples})
-    # message(STATUS "${_examples}")
     if(NOT ${_examples} STREQUAL "GUI")
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
     else()
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
-      install_tool(${_examples}) # Required by CPack for bundling (see install_macros.cmake and package_general.cmake)
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
+          OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
+          PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+      install_tool(${_examples})
     endif()
 
   endif()
