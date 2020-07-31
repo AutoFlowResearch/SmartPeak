@@ -89,6 +89,7 @@ jobs:
           make -j4
       - run: |
           set +o pipefail
+          cd ~/SmartPeak2/smartpeak2_debug_build
           ctest -VV -F --timeout 1200 || true
       - run: | 
           set +e
