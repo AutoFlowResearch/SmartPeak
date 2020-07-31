@@ -138,7 +138,7 @@ foreach(_examples ${EXAMPLE_executables})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
     endif()
 
-  elseif(elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)) 
+  elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux) 
 
     if (${_examples} STREQUAL "GUI")
       add_executable(${_examples} source/${_examples})
