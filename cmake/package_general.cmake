@@ -44,8 +44,9 @@ if (APPLE)
   set(CPACK_BUNDLE_PLIST                ${PROJECT_SOURCE_DIR}/cmake/MacOSX/Info.plist)
   set(CPACK_BUNDLE_ICON                 ${PROJECT_SOURCE_DIR}/cmake/MacOSX/sp.icns)
 
-elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES LINUX)
+elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
 
+  set(CPACK_GENERATOR                   "DEB")
   set(CPACK_DEBIAN_PACKAGE_MAINTAINER   "The SmartPeak Team")
   set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS    ON)
   set(CPACK_DEBIAN_PACKAGE_NAME         "SmartPeak")

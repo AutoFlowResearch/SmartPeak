@@ -51,7 +51,6 @@ jobs:
             set -o xtrace
             cd ~/SmartPeak2_build
             cpack -V
-            cpack -G DEB
             ls -lh ~/SmartPeak2_build | grep -a .deb
             dpkg -c ~/SmartPeak2_build/*.deb
             mkdir -p /tmp/packages
