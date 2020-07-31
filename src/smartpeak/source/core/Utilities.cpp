@@ -522,9 +522,7 @@ namespace SmartPeak
       }
 
       const std::string filename(entry.path().filename().string());
-      if (filename == "." || filename == ".." 
-      // || (*(&filename.at(0))) == '.'
-      ) {
+      if (filename == "." || filename == ".." || (*(&filename.at(0))) == '.') {
         continue;
       }
 
@@ -597,9 +595,7 @@ namespace SmartPeak
 
     for ( ; it != it_end; it++) {
       const fs::path& filename { it->path().filename() };
-      if (filename == fs::path(".") || filename == fs::path("..") 
-      // || filename.generic_string().at(0)  == '.'
-      ) {
+      if (filename == fs::path(".") || filename == fs::path("..") || filename.generic_string().at(0)  == '.') {
         continue;
       }
       ++n;
