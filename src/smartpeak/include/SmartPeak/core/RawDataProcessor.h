@@ -190,13 +190,28 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct PickFeatures : RawDataProcessor
+  struct PickMRMFeatures : RawDataProcessor
   {
     int getID() const override { return 3; }
-    std::string getName() const override { return "PICK_FEATURES"; }
-    std::string getDescription() const override { return "Run the peak picking algorithm."; }
+    std::string getName() const override { return "PICK_MRM_FEATURES"; }
+    std::string getDescription() const override { return "Run the peak picking algorithm for SRMs/MRMs."; }
 
     /** Run the openSWATH pick peaking and scoring workflow for a single raw data file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct PickMS1Features : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "PICK_MS1_FEATURES"; }
+    std::string getDescription() const override { return "Run the peak picking algorithm for MS1 spectra."; }
+
+    /** Run the MS1 peak picking and scoring algorithm.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,

@@ -129,3 +129,7 @@ FIAMS,acquisition_end,float,60,60,,The end time to use when extracting out the s
 FIAMS,resolution,float,120000,120000,,The instrument settings: resolution,TRUE,,
 FIAMS,max_mz,float,1500,1500,,Maximum mz,TRUE,,
 FIAMS,bin_step,float,20,20,,The size of the step to recalculated the bin size used for adding up spectra along the time axis,TRUE,,
+FIAMS,frame_length,int,11,11,,SavitzkyGolayFilter parameter. The number of subsequent data points used for smoothing,TRUE,,
+FIAMS,polynomial_order,int,4,4,,SavitzkyGolayFilter parameter. Order or the polynomial that is fitted,TRUE,,
+FIAMS,sne:window,float,10,10,,SignalToNoiseEstimatorMedianRapid parameter. Signal-to-noise estimation window (in mz),TRUE,,
+FIAMS,polarity,string,positive,positive,postive; negative,The instrument settings: polarity,TRUE,,

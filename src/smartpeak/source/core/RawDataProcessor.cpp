@@ -37,7 +37,12 @@
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>  // feature picker
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h> // feature quantification
 #include <OpenMS/MATH/MISC/EmgGradientDescent.h>
+
+// FIA-MS
 #include <OpenMS/ANALYSIS/OPENSWATH/SpectrumAddition.h> // MergeSpectra
+#include <OpenMS/FILTERING/SMOOTHING/SavitzkyGolayFilter.h> // PickMS1Features
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PeakPickerHiRes.h> // PickMS1Features
+#include <OpenMS/FILTERING/NOISEESTIMATION/SignalToNoiseEstimatorMedianRapid.h>
 
 #include <algorithm>
 #include <exception>
@@ -293,16 +298,16 @@ namespace SmartPeak
     LOGD << "END storeFeatureMap";
   }
 
-  void PickFeatures::process(
+  void PickMRMFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
   ) const
   {
-    LOGD << "START pickFeatures";
+    LOGD << "START PickMRMFeatures";
 
     if (params_I.count("MRMFeatureFinderScoring") && params_I.at("MRMFeatureFinderScoring").empty()) {
-      LOGE << "No parameters passed to PickFeatures. Not picking";
+      LOGE << "No parameters passed to PickMRMFeatures. Not picking";
       LOGD << "END pickFeatures";
       return;
     }
@@ -336,7 +341,7 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "Feature Picker output size: " << featureMap.size();
-    LOGD << "END pickFeatures";
+    LOGD << "END PickMRMFeatures";
   }
 
   void FilterFeatures::process(
@@ -1424,5 +1429,101 @@ namespace SmartPeak
     rawDataHandler_IO.getExperiment().setSpectra({ output });
 
     LOGD << "END MergeSpectra";
+  }
+
+  void PickMS1Features::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START PickMS1Features";
+
+    if (params_I.count("FIAMS") && params_I.at("FIAMS").empty()) {
+      LOGE << "No parameters passed to PickMS1Features. Not picking";
+      LOGD << "END PickMS1Features";
+      return;
+    }
+
+    double sn_window = 0;
+    std::string polarity;
+    for (const auto& fia_params : params_I.at("FIAMS")) {
+      if (fia_params.at("name") == "sne:window") {
+        try {
+          sn_window = std::stod(fia_params.at("value"));
+        }
+        catch (const std::exception& e) {
+          LOGE << e.what();
+        }
+      }
+      if (fia_params.at("name") == "polarity") {
+        try {
+          polarity = fia_params.at("value");
+        }
+        catch (const std::exception& e) {
+          LOGE << e.what();
+        }
+      }
+    }
+    if (sn_window == 0) {
+      LOGE << "Missing sne:window parameter for PickMS1Features. Not picking";
+      LOGD << "END PickMS1Features";
+      return;
+    }
+
+    OpenMS::SavitzkyGolayFilter sgfilter;
+    OpenMS::Param parameters = sgfilter.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("FIAMS"));
+    sgfilter.setParameters(parameters);
+
+    OpenMS::PeakPickerHiRes picker;
+    parameters = picker.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("FIAMS"));
+    picker.setParameters(parameters);
+
+    OpenMS::FeatureMap featureMap;
+    try {
+      for (const OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
+        // Smooth and pick
+        OpenMS::MSSpectrum input(spec);
+        sgfilter.filter(input);
+        OpenMS::MSSpectrum output;
+        picker.pick(input, output);
+
+        if (output.size() > 0) {
+          // Estimate the S/N
+          OpenMS::SignalToNoiseEstimatorMedianRapid sne(sn_window);
+          std::vector<double> mzs, intensities;
+          mzs.reserve(output.size());
+          intensities.reserve(output.size());
+          for (auto it = output.begin(); it != output.end(); ++it)
+          {
+            mzs.push_back(it->getMZ());
+            intensities.push_back(it->getIntensity());
+          }
+          OpenMS::SignalToNoiseEstimatorMedianRapid::NoiseEstimator e = sne.estimateNoise(mzs, intensities);
+
+          // Create the featureMap
+          for (auto it = output.begin(); it != output.end(); ++it)
+          {
+            OpenMS::Feature f;
+            f.setIntensity(it->getIntensity());
+            f.setMZ(it->getMZ());
+            f.setMetaValue("scan_polarity", polarity);
+            f.setMetaValue("signal_to_noise", e.get_noise_value(it->getMZ()));
+            featureMap.push_back(f);
+          }
+        }
+      }
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
+    featureMap.setPrimaryMSRunPath({ rawDataHandler_IO.getMetaData().getFilename() });
+    LOGD << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename();
+
+    rawDataHandler_IO.setFeatureMap(featureMap);
+    rawDataHandler_IO.updateFeatureMapHistory();
+
+    LOGI << "Feature Picker output size: " << featureMap.size();
+    LOGD << "END PickMS1Features";
   }
 }
