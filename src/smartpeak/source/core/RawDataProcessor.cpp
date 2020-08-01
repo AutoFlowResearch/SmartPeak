@@ -160,7 +160,7 @@ namespace SmartPeak
         samplename = samplename.substr(pos + 1);
     }
     else {
-      throw "no mzml_id found\n";
+      samplename = filename;
     }
 
     const OpenMS::MSExperiment& chromatograms = rawDataHandler_IO.getExperiment();
@@ -1030,6 +1030,49 @@ namespace SmartPeak
     }
 
     LOGD << "END ExtractChromatogramWindows";
+  }
+
+  void ExtractSpectraWindows::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START ExtractSpectraWindows";
+
+    float start = 0, stop = 0;
+    if (params_I.count("FIAMS") && params_I.at("FIAMS").size()){
+      for (const auto& fia_params: params_I.at("FIAMS")){
+        if (fia_params.at("name") == "acquisition_start") {
+          try {
+            start = std::stof(fia_params.at("value"));
+          }
+          catch (const std::exception& e) {
+            LOGE << e.what();
+          }
+        }
+        if (fia_params.at("name") == "acquisition_end") {
+          try {
+            stop = std::stof(fia_params.at("value"));
+          }
+          catch (const std::exception& e) {
+            LOGE << e.what();
+          }
+        }
+      }
+    }
+
+    if (stop == 0) {
+      LOGE << "No parameters passed to ExtractSpectraWindows.  Spectra will not be extracted.";
+      LOGD << "END ExtractSpectraWindows";
+      return;
+    }
+
+    std::vector<OpenMS::MSSpectrum> output;
+    for (OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
+      if (spec.getRT() >= start && spec.getRT() <= stop) {
+        output.push_back(spec);
+      }
+    }
+    rawDataHandler_IO.getExperiment().setSpectra(output);
+
+    LOGD << "END ExtractSpectraWindows";
   }
 
   void FitFeaturesEMG::process(

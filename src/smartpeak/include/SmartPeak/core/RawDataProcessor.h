@@ -130,6 +130,21 @@ namespace SmartPeak
     ) const override;
   };
 
+  struct ExtractSpectraWindows : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "EXTRACT_SPECTRA_WINDOWS"; }
+    std::string getDescription() const override { return "Extract out specified spectra windows based on the user parameters."; }
+
+    /** Extract out specified spectra windows from an MSExperiment using the range specified in the parameters
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
   struct LoadFeatures : RawDataProcessor
   {
     int getID() const override { return 2; }

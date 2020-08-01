@@ -2,6 +2,7 @@
 
 #include <map>
 #include <memory>
+#include <string>
 
 namespace SmartPeak {
   struct RawDataProcessor;

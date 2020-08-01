@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(extractMetaData)
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
-  BOOST_CHECK_EQUAL(params_1.size(), 19);
+  BOOST_CHECK_EQUAL(params_1.size(), 20);
   BOOST_CHECK_EQUAL(params_2.size(), 20);
   RawDataHandler rawDataHandler;
 
@@ -421,6 +421,62 @@ BOOST_AUTO_TEST_CASE(processorExtractChromatogramWindows)
   BOOST_CHECK_CLOSE(chromatograms2.back()[1].getMZ(), 952.31299, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms2.back()[2].getIntensity(), 0.0, 1e-3);
   BOOST_CHECK_CLOSE(chromatograms2.back()[2].getMZ(), 953.40699, 1e-3);
+}
+
+/**
+  ExtractSpectraWindows Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorExtractSpectraWindows)
+{
+  ExtractSpectraWindows* ptrExtractSpectraWindows = nullptr;
+  ExtractSpectraWindows* nullPointerExtractSpectraWindows = nullptr;
+  BOOST_CHECK_EQUAL(ptrExtractSpectraWindows, nullPointerExtractSpectraWindows);
+}
+
+BOOST_AUTO_TEST_CASE(destructorExtractSpectraWindows)
+{
+  ExtractSpectraWindows* ptrExtractSpectraWindows = nullptr;
+  ptrExtractSpectraWindows = new ExtractSpectraWindows();
+  delete ptrExtractSpectraWindows;
+}
+
+BOOST_AUTO_TEST_CASE(gettersExtractSpectraWindows)
+{
+  ExtractSpectraWindows processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "EXTRACT_SPECTRA_WINDOWS");
+}
+
+BOOST_AUTO_TEST_CASE(processorExtractSpectraWindows)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_SerumTest.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  // Control
+  const vector<OpenMS::MSSpectrum>& spectra1 = rawDataHandler.getExperiment().getSpectra();
+  BOOST_CHECK_EQUAL(spectra1.size(), 873);
+  BOOST_CHECK_CLOSE(spectra1.front().getRT(), 0.56525150400000002, 1e-3);
+  BOOST_CHECK_CLOSE(spectra1.back().getRT(), 300.56175465600001, 1e-3);
+
+  // Test window extraction
+
+  ExtractSpectraWindows extractSpectraWin;
+  extractSpectraWin.process(rawDataHandler, params_1, filenames);
+
+  const vector<OpenMS::MSSpectrum>& spectra2 = rawDataHandler.getExperiment().getSpectra();
+  BOOST_CHECK_EQUAL(spectra2.size(), 173);
+  BOOST_CHECK_CLOSE(spectra2.front().getRT(), 0.56525150400000002, 1e-3);
+  BOOST_CHECK_CLOSE(spectra2.back().getRT(), 59.74130393598, 1e-3);
 }
 
 /**

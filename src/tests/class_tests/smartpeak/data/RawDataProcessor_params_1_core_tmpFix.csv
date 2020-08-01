@@ -124,3 +124,5 @@ MRMFeatureFilter.filter_MRMFeaturesRSDs,flag_or_filter,string,filter,flag,filter
 MRMFeatureFilter.filter_MRMFeaturesRSDs.qc,flag_or_filter,string,flag,flag,filter; flag,"Flag or Filter (i.e., remove) Components or transitions that do not pass the QC.",TRUE,,
 MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences,flag_or_filter,string,filter,flag,filter; flag,"Flag or Filter (i.e., remove) Components or transitions that do not pass the QC.",TRUE,,
 MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc,flag_or_filter,string,flag,flag,filter; flag,"Flag or Filter (i.e., remove) Components or transitions that do not pass the QC.",TRUE,,
+FIAMS,acquisition_start,float,0,0,0,The start time to use when extracting out the spectra windows from the MSExperiment,TRUE,,
+FIAMS,acquisition_end,float,60,60,,The end time to use when extracting out the spectra windows from the MSExperiment,TRUE,,
