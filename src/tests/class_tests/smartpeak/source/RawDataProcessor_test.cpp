@@ -6,6 +6,8 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 
+#include <OpenMS/FORMAT/MzMLFile.h>
+
 using namespace SmartPeak;
 using namespace std;
 
@@ -477,6 +479,63 @@ BOOST_AUTO_TEST_CASE(processorExtractSpectraWindows)
   BOOST_CHECK_EQUAL(spectra2.size(), 173);
   BOOST_CHECK_CLOSE(spectra2.front().getRT(), 0.56525150400000002, 1e-3);
   BOOST_CHECK_CLOSE(spectra2.back().getRT(), 59.74130393598, 1e-3);
+}
+
+/**
+  MergeSpectra Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorMergeSpectra)
+{
+  MergeSpectra* ptrMergeSpectra = nullptr;
+  MergeSpectra* nullPointerMergeSpectra = nullptr;
+  BOOST_CHECK_EQUAL(ptrMergeSpectra, nullPointerMergeSpectra);
+}
+
+BOOST_AUTO_TEST_CASE(destructorMergeSpectra)
+{
+  MergeSpectra* ptrMergeSpectra = nullptr;
+  ptrMergeSpectra = new MergeSpectra();
+  delete ptrMergeSpectra;
+}
+
+BOOST_AUTO_TEST_CASE(gettersMergeSpectra)
+{
+  MergeSpectra processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "MERGE_SPECTRA");
+}
+
+BOOST_AUTO_TEST_CASE(processorMergeSpectra)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_SerumTest.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  // Control
+  const vector<OpenMS::MSSpectrum>& spectra1 = rawDataHandler.getExperiment().getSpectra();
+  BOOST_CHECK_EQUAL(spectra1.size(), 873);
+
+  // Test merge spectra
+  MergeSpectra mergeSpectra;
+  mergeSpectra.process(rawDataHandler, params_1, filenames);
+
+  const vector<OpenMS::MSSpectrum>& spectra2 = rawDataHandler.getExperiment().getSpectra();
+  BOOST_CHECK_EQUAL(spectra2.size(), 1);
+  BOOST_CHECK_CLOSE(spectra2.front().getRT(), -1, 1e-3);
+  BOOST_CHECK_EQUAL(spectra2.front().size(), 240);
+  BOOST_CHECK_EQUAL(spectra2.front().front().getMZ(), 109.95009243262952);
+  BOOST_CHECK_EQUAL(spectra2.front().back().getMZ(), 109.99988410050186);
+  BOOST_CHECK_EQUAL(spectra2.front().front().getIntensity(), 0);
+  BOOST_CHECK_EQUAL(spectra2.front().back().getIntensity(), 3236006.75);
 }
 
 /**

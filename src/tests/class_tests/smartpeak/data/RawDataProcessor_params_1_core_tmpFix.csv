@@ -126,3 +126,6 @@ MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences,flag_or_filter,string
 MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc,flag_or_filter,string,flag,flag,filter; flag,"Flag or Filter (i.e., remove) Components or transitions that do not pass the QC.",TRUE,,
 FIAMS,acquisition_start,float,0,0,0,The start time to use when extracting out the spectra windows from the MSExperiment,TRUE,,
 FIAMS,acquisition_end,float,60,60,,The end time to use when extracting out the spectra windows from the MSExperiment,TRUE,,
+FIAMS,resolution,float,120000,120000,,The instrument settings: resolution,TRUE,,
+FIAMS,max_mz,float,1500,1500,,Maximum mz,TRUE,,
+FIAMS,bin_step,float,20,20,,The size of the step to recalculated the bin size used for adding up spectra along the time axis,TRUE,,

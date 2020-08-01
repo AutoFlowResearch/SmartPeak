@@ -145,6 +145,21 @@ namespace SmartPeak
     ) const override;
   };
 
+  struct MergeSpectra : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "MERGE_SPECTRA"; }
+    std::string getDescription() const override { return "Merge all spectra along the time axis."; }
+
+    /** Merge all spectra along the time axis using a binning strategy that is resolution dependent
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
   struct LoadFeatures : RawDataProcessor
   {
     int getID() const override { return 2; }
