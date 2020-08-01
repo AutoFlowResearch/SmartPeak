@@ -1151,6 +1151,84 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
 }
 
 /**
+  SearchAccurateMass Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorSearchAccurateMass)
+{
+  SearchAccurateMass* ptrPickFeatures = nullptr;
+  SearchAccurateMass* nullPointerPickFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrPickFeatures, nullPointerPickFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorSearchAccurateMass)
+{
+  SearchAccurateMass* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new SearchAccurateMass();
+  delete ptrPickFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersSearchAccurateMass)
+{
+  SearchAccurateMass processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "SEARCH_ACCURATE_MASS");
+}
+
+BOOST_AUTO_TEST_CASE(searchAccurateMass)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_SerumTest_merged.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  // Test accurate mass search
+  PickMS1Features pickFeatures;
+  pickFeatures.process(rawDataHandler, params_1, filenames);
+  SearchAccurateMass searchAccurateMass;
+  searchAccurateMass.process(rawDataHandler, params_1, filenames);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 10);
+
+  const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
+  BOOST_CHECK_EQUAL(feature1.getMetaValue("polarity").toString(), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMZ()), 109.95124192810006, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getIntensity()), 1971.066162109375, 1e-6);
+
+  const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
+  BOOST_CHECK_EQUAL(feature2.getMetaValue("polarity").toString(), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMZ()), 109.99435797732117, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getIntensity()), 1576.05419921875, 1e-6);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 10);
+
+  const OpenMS::Feature& hfeature1 = rawDataHandler.getFeatureMapHistory().at(0); // feature_map_history_
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
+  BOOST_CHECK_EQUAL(hfeature1.getMetaValue("polarity").toString(), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMZ()), 109.95124192810006, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getIntensity()), 1971.066162109375, 1e-6);
+
+  const OpenMS::Feature& hfeature2 = rawDataHandler.getFeatureMapHistory().back();
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
+  BOOST_CHECK_EQUAL(hfeature2.getMetaValue("polarity").toString(), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMZ()), 109.99435797732117, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getIntensity()), 1576.05419921875, 1e-6);
+}
+
+/**
   FilterFeatures Tests
 */
 BOOST_AUTO_TEST_CASE(constructorFilterFeatures)

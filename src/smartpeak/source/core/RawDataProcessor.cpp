@@ -42,7 +42,8 @@
 #include <OpenMS/ANALYSIS/OPENSWATH/SpectrumAddition.h> // MergeSpectra
 #include <OpenMS/FILTERING/SMOOTHING/SavitzkyGolayFilter.h> // PickMS1Features
 #include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PeakPickerHiRes.h> // PickMS1Features
-#include <OpenMS/FILTERING/NOISEESTIMATION/SignalToNoiseEstimatorMedianRapid.h>
+#include <OpenMS/FILTERING/NOISEESTIMATION/SignalToNoiseEstimatorMedianRapid.h> // PickMS1Features
+#include <OpenMS/ANALYSIS/ID/AccurateMassSearchEngine.h>
 
 #include <algorithm>
 #include <exception>
@@ -1435,7 +1436,7 @@ namespace SmartPeak
   {
     LOGD << "START PickMS1Features";
 
-    if (params_I.count("FIAMS") && params_I.at("FIAMS").empty()) {
+    if (params_I.count("PickMS1Features") && params_I.at("PickMS1Features").empty()) {
       LOGE << "No parameters passed to PickMS1Features. Not picking";
       LOGD << "END PickMS1Features";
       return;
@@ -1443,7 +1444,7 @@ namespace SmartPeak
 
     double sn_window = 0;
     std::string polarity;
-    for (const auto& fia_params : params_I.at("FIAMS")) {
+    for (const auto& fia_params : params_I.at("PickMS1Features")) {
       if (fia_params.at("name") == "sne:window") {
         try {
           sn_window = std::stod(fia_params.at("value"));
@@ -1469,12 +1470,12 @@ namespace SmartPeak
 
     OpenMS::SavitzkyGolayFilter sgfilter;
     OpenMS::Param parameters = sgfilter.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("FIAMS"));
+    Utilities::updateParameters(parameters, params_I.at("PickMS1Features"));
     sgfilter.setParameters(parameters);
 
     OpenMS::PeakPickerHiRes picker;
     parameters = picker.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("FIAMS"));
+    Utilities::updateParameters(parameters, params_I.at("PickMS1Features"));
     picker.setParameters(parameters);
 
     OpenMS::FeatureMap featureMap;
@@ -1525,5 +1526,33 @@ namespace SmartPeak
 
     LOGI << "Feature Picker output size: " << featureMap.size();
     LOGD << "END PickMS1Features";
+  }
+
+  void SearchAccurateMass::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START SearchAccurateMass";
+
+    if (params_I.count("AccurateMassSearchEngine") && params_I.at("AccurateMassSearchEngine").empty()) {
+      LOGE << "No parameters passed to AccurateMassSearchEngine. Not searching.";
+      LOGD << "END SearchAccurateMass";
+      return;
+    }
+
+    OpenMS::AccurateMassSearchEngine ams;
+    OpenMS::Param parameters = ams.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("AccurateMassSearchEngine"));
+    ams.setParameters(parameters);
+
+    OpenMS::MzTab output;
+    try {
+      ams.init();
+      ams.run(rawDataHandler_IO.getFeatureMap(), output);
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+    rawDataHandler_IO.setMzTab(output);
+
+    LOGD << "END SearchAccurateMass";
   }
 }

@@ -454,6 +454,21 @@ namespace SmartPeak
     return validation_metrics_;
   }
 
+  void RawDataHandler::setMzTab(const OpenMS::MzTab& mz_tab)
+  {
+    mz_tab_ = mz_tab;
+  }
+
+  OpenMS::MzTab& RawDataHandler::getMzTab()
+  {
+    return mz_tab_;
+  }
+
+  const OpenMS::MzTab& RawDataHandler::getMzTab() const
+  {
+    return mz_tab_;
+  }
+
   void RawDataHandler::clear()
   {
     experiment_.clear(true);
@@ -464,6 +479,7 @@ namespace SmartPeak
     feature_map_history_.clear(true);
     if (meta_data_!=nullptr) meta_data_->clear();
     validation_metrics_.clear();
+    mz_tab_ = OpenMS::MzTab();
     if (parameters_!=nullptr) parameters_->clear();
     if (targeted_exp_!=nullptr) targeted_exp_->clear(true);
     if (quantitation_methods_ != nullptr) quantitation_methods_->clear();

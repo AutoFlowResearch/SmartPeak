@@ -8,6 +8,7 @@
 #include <OpenMS/ANALYSIS/TARGETED/TargetedExperiment.h>
 #include <OpenMS/KERNEL/FeatureMap.h>
 #include <OpenMS/KERNEL/MSExperiment.h>
+#include <OpenMS/FORMAT/MzTab.h>
 
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/CastValue.h>
@@ -131,6 +132,10 @@ public:
     std::map<std::string, float>& getValidationMetrics();
     const std::map<std::string, float>& getValidationMetrics() const;
 
+    void setMzTab(const OpenMS::MzTab& mz_tab);
+    OpenMS::MzTab& getMzTab();
+    const OpenMS::MzTab& getMzTab() const;
+
     void clear();
 
     /** Update the Feature map history based on the
@@ -155,6 +160,7 @@ private:
     OpenMS::FeatureMap feature_map_history_; ///< A record of all changes that have occured to the features in the experiment
     std::shared_ptr<MetaDataHandler> meta_data_;  ///< sample meta data; shared between the injection handler and the raw data handler
     std::map<std::string, float> validation_metrics_;
+    OpenMS::MzTab mz_tab_;
 
     // input (reused between RawDataHandlers)
     std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>> parameters_ = nullptr;  ///< algorithm parameters; shared between all raw data handlers in the sequence

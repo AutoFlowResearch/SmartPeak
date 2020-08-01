@@ -517,6 +517,27 @@ BOOST_AUTO_TEST_CASE(set_get_ReferenceData)
   BOOST_CHECK_EQUAL(data3[1].at("foo3").s_, "bar3");
 }
 
+BOOST_AUTO_TEST_CASE(set_get_MzTab)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::MzTab mz_tab;
+  OpenMS::MzTabMetaData md;
+  md.mz_tab_type.fromCellString("Quantification");
+  mz_tab.setMetaData(md);
+
+  rawDataHandler.setMzTab(mz_tab);
+
+  const OpenMS::MzTab& mztab1 = rawDataHandler.getMzTab(); // testing const getter
+  BOOST_CHECK_EQUAL(mztab1.getMetaData().mz_tab_type.get(), "Quantification");
+
+  md.mz_tab_type.fromCellString("Qualification");
+  rawDataHandler.getMzTab().setMetaData(md); // testing non-const getter
+
+  const OpenMS::MzTab& mztab2 = rawDataHandler.getMzTab();
+  BOOST_CHECK_EQUAL(mztab2.getMetaData().mz_tab_type.get(), "Qualification");
+}
+
 BOOST_AUTO_TEST_CASE(clear)
 {
   RawDataHandler rawDataHandler;
@@ -557,6 +578,12 @@ BOOST_AUTO_TEST_CASE(clear)
   chromatogram_map.setMetaValue("name", "foo");
   rawDataHandler.setChromatogramMap(chromatogram_map);
 
+  OpenMS::MzTab mz_tab;
+  OpenMS::MzTabMetaData md;
+  md.mz_tab_type.fromCellString("foo");
+  mz_tab.setMetaData(md);
+  rawDataHandler.setMzTab(mz_tab);
+
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().getMetaValue("name"), "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getMetaData().getSampleName(), "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getQuantitationMethods().front().getComponentName(), "foo");
@@ -572,6 +599,7 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundQC().component_qcs.front().component_name, "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDEstimations().component_qcs.front().component_name, "foo");
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundEstimations().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getMetaData().mz_tab_type.get(), "foo");
 
   rawDataHandler.clear();
 
@@ -589,6 +617,7 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundQC().component_qcs.size(), 0);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDEstimations().component_qcs.size(), 0);
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundEstimations().component_qcs.size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getMetaData().mz_tab_type.get(), "");
 }
 
 BOOST_AUTO_TEST_CASE(updateFeatureMapHistory)
