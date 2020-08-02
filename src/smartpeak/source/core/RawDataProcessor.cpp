@@ -1523,19 +1523,10 @@ namespace SmartPeak
     }
 
     double sn_window = 0;
-    std::string polarity;
     for (const auto& fia_params : params_I.at("PickMS1Features")) {
       if (fia_params.at("name") == "sne:window") {
         try {
           sn_window = std::stod(fia_params.at("value"));
-        }
-        catch (const std::exception& e) {
-          LOGE << e.what();
-        }
-      }
-      if (fia_params.at("name") == "polarity") {
-        try {
-          polarity = fia_params.at("value");
         }
         catch (const std::exception& e) {
           LOGE << e.what();
@@ -1586,7 +1577,6 @@ namespace SmartPeak
             OpenMS::Feature f;
             f.setIntensity(it->getIntensity());
             f.setMZ(it->getMZ());
-            f.setMetaValue("scan_polarity", polarity);
             f.setMetaValue("signal_to_noise", e.get_noise_value(it->getMZ()));
             featureMap.push_back(f);
           }
