@@ -34,7 +34,8 @@ namespace SmartPeak
         "GCMS SIM Unknowns",
         "GCMS Full Scan Unknowns",
         "LCMS MRM Validation - QMIP",
-        "LCMS MRM Validation - LP"
+        "LCMS MRM Validation - LP",
+        "FIAMS Unknowns"
       };
       for (const char* s : presets)
       {
@@ -59,6 +60,8 @@ namespace SmartPeak
             ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS EXTRACT_CHROMATOGRAM_WINDOWS PICK_MRM_FEATURES FILTER_FEATURES FILTER_FEATURES SELECT_FEATURES VALIDATE_FEATURES STORE_FEATURES";
           else if (s_string == "LCMS MRM Validation - QMIP")
             ids = "LOAD_RAW_DATA MAP_CHROMATOGRAMS PICK_MRM_FEATURES FILTER_FEATURES FILTER_FEATURES VALIDATE_FEATURES STORE_FEATURES";
+          else if (s_string == "FIAMS Unknowns")
+            ids = "LOAD_RAW_DATA EXTRACT_SPECTRA_WINDOWS MERGE_SPECTRA PICK_MS1_FEATURES SEARCH_ACCURATE_MASS STORE_ANNOTATIONS STORE_FEATURES";
           buildCommandsFromIds.names_ = ids;
           buildCommandsFromIds.process();
           commands_ = buildCommandsFromIds.commands_;

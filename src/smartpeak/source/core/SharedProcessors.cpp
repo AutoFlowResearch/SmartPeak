@@ -25,7 +25,13 @@ namespace SmartPeak {
     {"FILTER_FEATURES_RSDS", std::make_shared<FilterFeaturesRSDs>()},
     {"CHECK_FEATURES_RSDS", std::make_shared<CheckFeaturesRSDs>()},
     {"FILTER_FEATURES_BACKGROUND_INTERFERENCES", std::make_shared<FilterFeaturesBackgroundInterferences>()},
-    {"FILTER_FEATURES_BACKGROUND_INTERFERENCES", std::make_shared<CheckFeaturesBackgroundInterferences>()}
+    {"FILTER_FEATURES_BACKGROUND_INTERFERENCES", std::make_shared<CheckFeaturesBackgroundInterferences>()},
+    {"EXTRACT_SPECTRA_WINDOWS", std::make_shared<ExtractSpectraWindows>()},
+    {"MERGE_SPECTRA", std::make_shared<MergeSpectra>()},
+    {"PICK_MS1_FEATURES", std::make_shared<PickMS1Features>()},
+    {"SEARCH_ACCURATE_MASS", std::make_shared<SearchAccurateMass>()},
+    {"LOAD_ANNOTATIONS", std::make_shared<LoadAnnotations>()},
+    {"STORE_ANNOTATIONS", std::make_shared<StoreAnnotations>()}
   };
   const std::map<std::string, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
     {"CALCULATE_CALIBRATION", std::make_shared<CalculateCalibration>()},

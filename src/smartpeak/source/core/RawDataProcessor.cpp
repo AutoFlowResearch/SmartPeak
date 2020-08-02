@@ -10,6 +10,7 @@
 #include <OpenMS/FORMAT/TraMLFile.h>  // load traML as well
 #include <OpenMS/FORMAT/FileHandler.h>
 #include <OpenMS/FORMAT/MzMLFile.h>
+#include <OpenMS/FORMAT/MzTabFile.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/ChromatogramExtractor.h>
 #include <OpenMS/ANALYSIS/TARGETED/MRMMapping.h>
 #include <OpenMS/KERNEL/SpectrumHelper.h>
@@ -297,6 +298,68 @@ namespace SmartPeak
     }
 
     LOGD << "END storeFeatureMap";
+  }
+
+  void LoadAnnotations::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START LoadAnnotations";
+    LOGI << "Loading: " << filenames.mzTab_i;
+
+    if (filenames.mzTab_i.empty()) {
+      LOGE << "Filename is empty";
+      LOGD << "END LoadAnnotations";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(filenames.mzTab_i)) {
+      LOGE << "File not found";
+      LOGD << "END LoadAnnotations";
+      return;
+    }
+
+    try {
+      OpenMS::MzTabFile mztabfile;
+      mztabfile.load(filenames.mzTab_i, rawDataHandler_IO.getMzTab());
+      rawDataHandler_IO.updateFeatureMapHistory();
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+      rawDataHandler_IO.setMzTab(OpenMS::MzTab());
+      LOGE << "feature map clear";
+    }
+
+    LOGD << "END LoadAnnotations";
+  }
+
+  void StoreAnnotations::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START StoreAnnotations";
+    LOGI << "Storing: " << filenames.mzTab_o;
+
+    if (filenames.mzTab_o.empty()) {
+      LOGE << "Filename is empty";
+      LOGD << "END StoreAnnotations";
+      return;
+    }
+
+    try {
+      // Store outfile as mzTab
+      OpenMS::MzTabFile mztabfile;
+      mztabfile.store(filenames.mzTab_o, rawDataHandler_IO.getMzTab());
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    LOGD << "END StoreAnnotations";
   }
 
   void PickMRMFeatures::process(
@@ -961,7 +1024,10 @@ namespace SmartPeak
       "MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc",
       "MRMFeatureFilter.filter_MRMFeaturesRSDs",
       "MRMFeatureFilter.filter_MRMFeaturesRSDs.qc",
-      "SequenceProcessor"
+      "SequenceProcessor",
+      "FIAMS",
+      "PickMS1Features",
+      "AccurateMassSearchEngine"
     };
     for (const std::string& parameter : required_parameters) {
       if (!params_I.count(parameter)) {
@@ -1408,22 +1474,36 @@ namespace SmartPeak
     int n_bins = max_mz / bin_step;
     std::vector<float> mzs;
     std::vector<float> bin_sizes;
+    std::vector<std::vector<OpenMS::MSSpectrum>> binned_spectrum;
     mzs.reserve(n_bins);
     bin_sizes.reserve(n_bins);
+    binned_spectrum.resize(n_bins);
     for (int i = 0; i < n_bins; i++) {
       mzs.push_back((i + 1) * bin_step);
       bin_sizes.push_back(mzs.at(i) / (resolution * 4.0));
+      binned_spectrum.at(i).resize(rawDataHandler_IO.getExperiment().getSpectra().size());
     }
 
-    // Merge spectra along time
+    // Divide the spectra into mass ranges
+    for (int s = 0; s < rawDataHandler_IO.getExperiment().getSpectra().size(); ++s) {
+      const OpenMS::MSSpectrum spectrum = rawDataHandler_IO.getExperiment().getSpectra().at(s);
+      for (auto it = spectrum.begin(); it != spectrum.end(); ++it) {
+        for (int i = 0; i < mzs.size() - 1; ++i) {
+          if (it->getMZ() >= mzs.at(i) && it->getMZ() < mzs.at(i + 1)) {
+            binned_spectrum.at(i).at(s).push_back(*it);
+          }
+        }
+      }
+    }
+
+    // Merge spectra along time for each of the different mass ranges
     OpenMS::MSSpectrum output;
     for (int i = 0; i < mzs.size() - 1; ++i) {
       OpenMS::MSSpectrum full_spectrum = OpenMS::SpectrumAddition::addUpSpectra(
-        rawDataHandler_IO.getExperiment().getSpectra(), bin_sizes.at(i), false
+        binned_spectrum.at(i), bin_sizes.at(i), false
       );
       for (auto it = full_spectrum.begin(); it != full_spectrum.end(); ++it) {
-        if (it->getMZ() > mzs.at(i + 1)) break;
-        if (it->getMZ() >= mzs.at(i)) output.push_back(*it);
+        output.push_back(*it);
       }
     }
     output.sortByPosition();
