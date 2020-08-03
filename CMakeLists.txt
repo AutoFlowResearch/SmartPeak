@@ -277,13 +277,7 @@ install_export_targets()
 
 if(NOT "${PACKAGE_TYPE}" STREQUAL "none")
   include(cmake/package_general.cmake)
-  if("${PACKAGE_TYPE}" STREQUAL "dmg") # .. MacOSX
-    include(cmake/package_dragndrop_dmg.cmake)
-  elseif("${PACKAGE_TYPE}" STREQUAL "rpm") # .. rpms
-    include(cmake/package_rpm.cmake)
-  elseif("${PACKAGE_TYPE}" STREQUAL "deb") # .. debs
-    include(cmake/package_deb.cmake)
-  elseif("${PACKAGE_TYPE}" STREQUAL "nsis") # .. Windows nsis
+  if("${PACKAGE_TYPE}" STREQUAL "nsis") # .. Windows nsis
     include(cmake/package_nsis.cmake)
   endif()
   include(CPack)
