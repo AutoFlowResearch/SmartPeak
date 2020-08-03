@@ -121,6 +121,7 @@ set(SPHINX_SOURCE     ${CMAKE_CURRENT_SOURCE_DIR})
 set(SPHINX_BUILD      ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
 set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/../../images  ${CMAKE_CURRENT_SOURCE_DIR}/images)
 
 add_custom_command( OUTPUT  ${SPHINX_INDEX_FILE} 
                     COMMAND ${SPHINX_EXECUTABLE} -b html
