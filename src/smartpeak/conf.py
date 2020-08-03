@@ -11,6 +11,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os, subprocess
+from distutils.dir_util import copy_tree
 
 project     = 'SmartPeak'
 copyright   = '2020, SmartPeak Team'
@@ -50,6 +51,7 @@ breathe_projects = {"SmartPeak" : "docs/xml"}
 if docs_build_on_RtD:
     input_dir = '../smartpeak'
     output_dir = 'build'
+    copy_tree('../../images', 'images')
     configureDoxyfile(input_dir, output_dir)
     subprocess.call('doxygen', shell=True)
     breathe_projects['SmartPeak'] = output_dir + '/xml'
