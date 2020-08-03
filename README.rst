@@ -1,5 +1,23 @@
 SmartPeak
 ##########################################################################################################
+|docs| |circleci| |license|
+
+.. begin_badges
+
+.. |docs| image:: https://readthedocs.com/projects/ak-smartpeak2/badge/?version=latest
+   :alt: Documentation Status
+   :target: https://ak-smartpeak2.readthedocs-hosted.com/en/latest/?badge=latest
+
+.. |circleci| image:: https://circleci.com/gh/dmccloskey/SmartPeak2.svg?branch=feat/aut312?style=svg
+   :alt: Travis CI Build Status (Unix, Flake8 and Docs Tests)
+   :target: https://circleci.com/gh/dmccloskey/SmartPeak2
+
+.. |license| image:: https://img.shields.io/github/license/dmccloskey/SmartPeak2.svg
+   :alt: License MIT Clause
+   :target: https://github.com/dmccloskey/SmartPeak2/blob/develop/LICENSE
+
+.. end_badges
+
 .. begin_introduction
 
 SmartPeak is an application that encapsulates advanced algorithms to enable fast, accurate, and automated processing of CE-, GC- and LC-MS(/MS) data, and HPLC data for targeted and semi-targeted metabolomics, lipidomics, and fluxomics experiments. The software is based on the OpenMS toolkit.
