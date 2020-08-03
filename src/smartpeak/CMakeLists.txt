@@ -84,9 +84,7 @@ install_directory(${SMARTPEAK_HOST_DIRECTORY}/share/SmartPeak/ ${INSTALL_SHARE_D
 # register relevant paths for the doxygen doc generation
 smartpeak_doc_path("${PROJECT_SOURCE_DIR}/include")
 
-#-------------------------
-# docs
-add_subdirectory(docs)
+
 
 
 

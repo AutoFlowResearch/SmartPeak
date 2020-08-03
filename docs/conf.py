@@ -49,9 +49,9 @@ docs_build_on_RtD = os.environ.get('READTHEDOCS', None) == 'True'
 breathe_projects = {"SmartPeak" : "docs/xml"}
 
 if docs_build_on_RtD:
-    input_dir = '../../smartpeak'
+    input_dir = '../src/smartpeak/'
     output_dir = 'build'
-    copy_tree('../../../images', 'images')
+    copy_tree('../images', 'images')
     configureDoxyfile(input_dir, output_dir)
     subprocess.call('doxygen', shell=True)
     breathe_projects['SmartPeak'] = output_dir + '/xml'
@@ -68,7 +68,7 @@ exhale_args = {
     # TIP: if using the sphinx-bootstrap-theme, you need
     # "treeViewIsBootstrap": True,
     "exhaleExecutesDoxygen": True,
-    "exhaleDoxygenStdin":    "INPUT = ../include/SmartPeak"
+    "exhaleDoxygenStdin":    "INPUT = ../src/smartpeak/include/SmartPeak"
 }
 
 

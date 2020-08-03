@@ -261,9 +261,9 @@ endif()
 add_subdirectory(src)
 
 #------------------------------------------------------------------------------
-# Documentation [TODO]
+# Documentation
 #------------------------------------------------------------------------------
-#add_subdirectory(doc)
+add_subdirectory(docs)
 
 #------------------------------------------------------------------------------
 # Handle export of targets and install them

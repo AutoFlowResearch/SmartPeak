@@ -16,7 +16,7 @@ Overview
 .. role:: bash(code)
    :language: bash
 
-.. include:: ../../../README.rst
+.. include:: ../README.rst
    :start-after: begin_introduction
    :end-before:  end_introduction
 
@@ -24,7 +24,7 @@ Overview
 Getting Started
 -----------------------------------------------------------------------------
 
-.. include:: ../../../README.rst
+.. include:: ../README.rst
    :start-after: begin_windows
    :end-before:  end_macos
 
@@ -32,7 +32,7 @@ Getting Started
 Usage
 -----------------------------------------------------------------------------
 
-.. include:: ../../../README.rst
+.. include:: ../README.rst
    :start-after: begin_gui
    :end-before:  end_gui
 
@@ -40,7 +40,7 @@ Usage
 Testing
 -----------------------------------------------------------------------------
 
-.. include:: ../../../README.rst
+.. include:: ../README.rst
    :start-after: begin_runningtests
    :end-before:  end_runningexamples
 

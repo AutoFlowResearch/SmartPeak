@@ -7,12 +7,12 @@
 # doxygen
 find_package(Doxygen REQUIRED)
 
-set(SMARTPEAK_PUBLIC_HEADER_DIR ${PROJECT_SOURCE_DIR}/../include/SmartPeak)
+set(SMARTPEAK_PUBLIC_HEADER_DIR ${PROJECT_SOURCE_DIR}/../src/smartpeak/include/SmartPeak)
 get_target_property(${SMARTPEAK_PUBLIC_HEADER_DIR} SmartPeak INTERFACE_INCLUDE_DIRECTORIES)
 file(GLOB_RECURSE SMARTPEAK_PUBLIC_HEADERS LIST_DIRECTORIES true ${SMARTPEAK_PUBLIC_HEADER_DIR}/*.h)
 
 
-set(DOXYGEN_INPUT_DIR   ${PROJECT_SOURCE_DIR}/..)
+set(DOXYGEN_INPUT_DIR   ${PROJECT_SOURCE_DIR}/../src/smartpeak/)
 set(DOXYGEN_OUTPUT_DIR  ${CMAKE_CURRENT_BINARY_DIR}/docs)
 set(DOXYGEN_INDEX_FILE  ${DOXYGEN_OUTPUT_DIR}/html/index.html )
 
@@ -42,7 +42,7 @@ set(SPHINX_SOURCE     ${CMAKE_CURRENT_SOURCE_DIR})
 set(SPHINX_BUILD      ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
 set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
 
-execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/../../../images  
+execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/../images  
                                                             ${CMAKE_CURRENT_SOURCE_DIR}/images)
 
 add_custom_command( OUTPUT  ${SPHINX_INDEX_FILE} 
@@ -57,6 +57,6 @@ add_custom_command( OUTPUT  ${SPHINX_INDEX_FILE}
 
 add_custom_target(libdoc-sphinx ALL DEPENDS ${SPHINX_INDEX_FILE})
 
-get_filename_component(SMARTPEAK_DOCS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../docs ABSOLUTE)
+# get_filename_component(SMARTPEAK_DOCS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../docs ABSOLUTE)
 
-install(DIRECTORY ${SPHINX_BUILD}/ DESTINATION ${SMARTPEAK_DOCS_DIR})
+# install(DIRECTORY ${SPHINX_BUILD}/ DESTINATION ${SMARTPEAK_DOCS_DIR})
