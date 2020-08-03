@@ -12,4 +12,4 @@ sphinx:
 python:
   version: 3.7
   install:
-    - requirements: src/smartpeak/requirements.txt
+    - requirements: src/smartpeak/docs/requirements.txt
