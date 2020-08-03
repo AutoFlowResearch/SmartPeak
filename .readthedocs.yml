@@ -7,7 +7,7 @@ version: 2
 
 # Build documentation in the src/smartpeak/ directory with Sphinx
 sphinx:
-  configuration: src/smartpeak/conf.py
+  configuration: src/smartpeak/docs/conf.py
 
 python:
   version: 3.7
