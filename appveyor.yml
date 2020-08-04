@@ -18,9 +18,9 @@ init:
   - set PYTHONPATH=C:\projects\clcache\install
   - ps: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
   - choco install -y doxygen.install
-  - pip3 install --user sphinx exhale
   - cmake --version
   - pip3 --version
+  - pip3 install --user sphinx exhale
 
 platform: x64
 configuration: Debug
