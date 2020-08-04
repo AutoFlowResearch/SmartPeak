@@ -55,6 +55,12 @@ jobs:
           command: |
             ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
 
+      - run:
+          command: |
+            [ ! -d ~/SmartPeak2_build/docs/docs/sphinx/_image ]     && exit 0
+            [ ! -f ~/SmartPeak2_build/docs/docs/sphinx/index.html ] && exit 0
+
+            
 workflows:
   version: 2
   build-deploy:
