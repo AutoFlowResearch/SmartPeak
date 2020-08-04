@@ -37,6 +37,8 @@ namespace SmartPeak
       cast = lowercase_value == "true";
     } else if (lowercase_type == "string") {
       cast = value;
+    } else if (lowercase_type == "list") {
+      parseString(value, cast);
     } else {
       LOGW << "Type not supported: " << type;
       cast.setTagAndData(CastValue::Type::UNKNOWN, value);

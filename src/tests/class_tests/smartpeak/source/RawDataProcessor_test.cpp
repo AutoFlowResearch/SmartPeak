@@ -6,6 +6,8 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 
+#include <OpenMS/FORMAT/MzMLFile.h>
+
 using namespace SmartPeak;
 using namespace std;
 
@@ -124,8 +126,8 @@ BOOST_AUTO_TEST_CASE(extractMetaData)
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
-  BOOST_CHECK_EQUAL(params_1.size(), 19);
-  BOOST_CHECK_EQUAL(params_2.size(), 20);
+  BOOST_CHECK_EQUAL(params_1.size(), 22);
+  BOOST_CHECK_EQUAL(params_2.size(), 23);
   RawDataHandler rawDataHandler;
 
   // Pre-requisites: load the transitions and raw data
@@ -424,6 +426,118 @@ BOOST_AUTO_TEST_CASE(processorExtractChromatogramWindows)
 }
 
 /**
+  ExtractSpectraWindows Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorExtractSpectraWindows)
+{
+  ExtractSpectraWindows* ptrExtractSpectraWindows = nullptr;
+  ExtractSpectraWindows* nullPointerExtractSpectraWindows = nullptr;
+  BOOST_CHECK_EQUAL(ptrExtractSpectraWindows, nullPointerExtractSpectraWindows);
+}
+
+BOOST_AUTO_TEST_CASE(destructorExtractSpectraWindows)
+{
+  ExtractSpectraWindows* ptrExtractSpectraWindows = nullptr;
+  ptrExtractSpectraWindows = new ExtractSpectraWindows();
+  delete ptrExtractSpectraWindows;
+}
+
+BOOST_AUTO_TEST_CASE(gettersExtractSpectraWindows)
+{
+  ExtractSpectraWindows processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "EXTRACT_SPECTRA_WINDOWS");
+}
+
+BOOST_AUTO_TEST_CASE(processorExtractSpectraWindows)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_SerumTest.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  // Control
+  const vector<OpenMS::MSSpectrum>& spectra1 = rawDataHandler.getExperiment().getSpectra();
+  BOOST_CHECK_EQUAL(spectra1.size(), 873);
+  BOOST_CHECK_CLOSE(spectra1.front().getRT(), 0.56525150400000002, 1e-3);
+  BOOST_CHECK_CLOSE(spectra1.back().getRT(), 300.56175465600001, 1e-3);
+
+  // Test window extraction
+  ExtractSpectraWindows extractSpectraWin;
+  extractSpectraWin.process(rawDataHandler, params_1, filenames);
+
+  const vector<OpenMS::MSSpectrum>& spectra2 = rawDataHandler.getExperiment().getSpectra();
+  BOOST_CHECK_EQUAL(spectra2.size(), 173);
+  BOOST_CHECK_CLOSE(spectra2.front().getRT(), 0.56525150400000002, 1e-3);
+  BOOST_CHECK_CLOSE(spectra2.back().getRT(), 59.74130393598, 1e-3);
+}
+
+/**
+  MergeSpectra Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorMergeSpectra)
+{
+  MergeSpectra* ptrMergeSpectra = nullptr;
+  MergeSpectra* nullPointerMergeSpectra = nullptr;
+  BOOST_CHECK_EQUAL(ptrMergeSpectra, nullPointerMergeSpectra);
+}
+
+BOOST_AUTO_TEST_CASE(destructorMergeSpectra)
+{
+  MergeSpectra* ptrMergeSpectra = nullptr;
+  ptrMergeSpectra = new MergeSpectra();
+  delete ptrMergeSpectra;
+}
+
+BOOST_AUTO_TEST_CASE(gettersMergeSpectra)
+{
+  MergeSpectra processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "MERGE_SPECTRA");
+}
+
+BOOST_AUTO_TEST_CASE(processorMergeSpectra)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_SerumTest.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  // Control
+  const vector<OpenMS::MSSpectrum>& spectra1 = rawDataHandler.getExperiment().getSpectra();
+  BOOST_CHECK_EQUAL(spectra1.size(), 873);
+
+  // Test merge spectra
+  MergeSpectra mergeSpectra;
+  mergeSpectra.process(rawDataHandler, params_1, filenames);
+
+  const vector<OpenMS::MSSpectrum>& spectra2 = rawDataHandler.getExperiment().getSpectra();
+  BOOST_CHECK_EQUAL(spectra2.size(), 1);
+  BOOST_CHECK_CLOSE(spectra2.front().getRT(), -1, 1e-3);
+  BOOST_CHECK_EQUAL(spectra2.front().size(), 240);
+  BOOST_CHECK_EQUAL(spectra2.front().front().getMZ(), 109.95009243262952);
+  BOOST_CHECK_EQUAL(spectra2.front().back().getMZ(), 109.99988410050186);
+  BOOST_CHECK_EQUAL(spectra2.front().front().getIntensity(), 0);
+  BOOST_CHECK_EQUAL(spectra2.front().back().getIntensity(), 3236006.75);
+}
+
+/**
   LoadFeatures Tests
 */
 BOOST_AUTO_TEST_CASE(constructorLoadFeatures)
@@ -515,6 +629,78 @@ BOOST_AUTO_TEST_CASE(gettersStoreFeatures)
 }
 
 BOOST_AUTO_TEST_CASE(processStoreFeatures)
+{
+  // no tests, it wraps OpenMS store function
+}
+
+/**
+  LoadAnnotations Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadAnnotations)
+{
+  LoadAnnotations* ptrLoadAnnotations = nullptr;
+  LoadAnnotations* nullPointerLoadAnnotations = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadAnnotations, nullPointerLoadAnnotations);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadAnnotations)
+{
+  LoadAnnotations* ptrLoadAnnotations = nullptr;
+  ptrLoadAnnotations = new LoadAnnotations();
+  delete ptrLoadAnnotations;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadAnnotations)
+{
+  LoadAnnotations processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_ANNOTATIONS");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadAnnotations)
+{
+  Filenames filenames;
+  filenames.mzTab_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_SerumTest.mzTab");
+  RawDataHandler rawDataHandler;
+  LoadAnnotations loadAnnotations;
+  loadAnnotations.process(rawDataHandler, {}, filenames);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().size(), 108);
+  BOOST_CHECK_CLOSE(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().calc_mass_to_charge.get(), 500.02851705499575, 1e-6);
+  BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().chemical_formula.get()), "C82H156O17P2");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().identifier.get().at(0).get(), "HMDB:HMDB0073108");
+  BOOST_CHECK_CLOSE(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().back().calc_mass_to_charge.get(), 799.94828338599575, 1e-6);
+  BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().back().chemical_formula.get()), "C76H135N3O29");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().back().identifier.get().at(0).get(), "HMDB:HMDB0011867");
+}
+
+/**
+  StoreAnnotations Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorStoreAnnotations)
+{
+  StoreAnnotations* ptrStoreAnnotations = nullptr;
+  StoreAnnotations* nullPointerStoreAnnotations = nullptr;
+  BOOST_CHECK_EQUAL(ptrStoreAnnotations, nullPointerStoreAnnotations);
+}
+
+BOOST_AUTO_TEST_CASE(destructorStoreAnnotations)
+{
+  StoreAnnotations* ptrStoreAnnotations = nullptr;
+  ptrStoreAnnotations = new StoreAnnotations();
+  delete ptrStoreAnnotations;
+}
+
+BOOST_AUTO_TEST_CASE(gettersStoreAnnotations)
+{
+  StoreAnnotations processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "STORE_ANNOTATIONS");
+}
+
+BOOST_AUTO_TEST_CASE(processStoreAnnotations)
 {
   // no tests, it wraps OpenMS store function
 }
@@ -852,7 +1038,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
 
   LoadParameters loadParameters;
   loadParameters.sanitizeParameters(params);
-  BOOST_CHECK_EQUAL(params.size(), 18);
+  BOOST_CHECK_EQUAL(params.size(), 21);
   BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("AbsoluteQuantitation"), 1);
@@ -868,6 +1054,9 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
   BOOST_CHECK_EQUAL(params.count("MRMFeatureFilter.filter_MRMFeatures.qc"), 1);
   BOOST_CHECK_EQUAL(params.count("SequenceProcessor"), 1);
+  BOOST_CHECK_EQUAL(params.count("FIAMS"), 1);
+  BOOST_CHECK_EQUAL(params.count("PickMS1Features"), 1);
+  BOOST_CHECK_EQUAL(params.count("AccurateMassSearchEngine"), 1);
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter").size(), 2);
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem1"), "value1");
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem2"), "value2");
@@ -878,34 +1067,37 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesRSDs").size(), 0);
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc").size(), 0);
   BOOST_CHECK_EQUAL(params.at("SequenceProcessor").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("FIAMS").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("PickMS1Features").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("AccurateMassSearchEngine").size(), 0);
 }
 
 /**
-  PickFeatures Tests
+  PickMRMFeatures Tests
 */
-BOOST_AUTO_TEST_CASE(constructorPickFeatures)
+BOOST_AUTO_TEST_CASE(constructorPickMRMFeatures)
 {
-  PickFeatures* ptrPickFeatures = nullptr;
-  PickFeatures* nullPointerPickFeatures = nullptr;
+  PickMRMFeatures* ptrPickFeatures = nullptr;
+  PickMRMFeatures* nullPointerPickFeatures = nullptr;
   BOOST_CHECK_EQUAL(ptrPickFeatures, nullPointerPickFeatures);
 }
 
-BOOST_AUTO_TEST_CASE(destructorPickFeatures)
+BOOST_AUTO_TEST_CASE(destructorPickMRMFeatures)
 {
-  PickFeatures* ptrPickFeatures = nullptr;
-  ptrPickFeatures = new PickFeatures();
+  PickMRMFeatures* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new PickMRMFeatures();
   delete ptrPickFeatures;
 }
 
-BOOST_AUTO_TEST_CASE(gettersPickFeatures)
+BOOST_AUTO_TEST_CASE(gettersPickMRMFeatures)
 {
-  PickFeatures processor;
+  PickMRMFeatures processor;
 
   BOOST_CHECK_EQUAL(processor.getID(), 3);
-  BOOST_CHECK_EQUAL(processor.getName(), "PICK_FEATURES");
+  BOOST_CHECK_EQUAL(processor.getName(), "PICK_MRM_FEATURES");
 }
 
-BOOST_AUTO_TEST_CASE(pickFeatures)
+BOOST_AUTO_TEST_CASE(pickFeaturesMRM)
 {
   // Pre-requisites: load the parameters and associated raw data
   map<string, vector<map<string, string>>> params_1;
@@ -927,7 +1119,7 @@ BOOST_AUTO_TEST_CASE(pickFeatures)
   mapChroms.process(rawDataHandler, params_1, filenames);
 
   // Test pick features
-  PickFeatures pickFeatures;
+  PickMRMFeatures pickFeatures;
   pickFeatures.process(rawDataHandler, params_1, filenames);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 481);
@@ -957,6 +1149,129 @@ BOOST_AUTO_TEST_CASE(pickFeatures)
   BOOST_CHECK_EQUAL(hsubordinate2.getMetaValue("native_id").toString(), "accoa.accoa_1.Heavy");
   BOOST_CHECK_CLOSE(static_cast<double>(hsubordinate2.getRT()), 1067.5447296543123, 1e-6);
   BOOST_CHECK(hsubordinate2.getMetaValue("used_").toBool());
+}
+
+/**
+  PickMS1Features Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorPickMS1Features)
+{
+  PickMS1Features* ptrPickFeatures = nullptr;
+  PickMS1Features* nullPointerPickFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrPickFeatures, nullPointerPickFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorPickMS1Features)
+{
+  PickMS1Features* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new PickMS1Features();
+  delete ptrPickFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersPickMS1Features)
+{
+  PickMS1Features processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "PICK_MS1_FEATURES");
+}
+
+BOOST_AUTO_TEST_CASE(pickMS1Features)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_SerumTest_merged.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  // Test pick features
+  PickMS1Features pickFeatures;
+  pickFeatures.process(rawDataHandler, params_1, filenames);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 10);
+
+  const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMZ()), 109.95124192810006, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getIntensity()), 1971.066162109375, 1e-6);
+
+  const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMZ()), 109.99435797732117, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getIntensity()), 1576.05419921875, 1e-6);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 10);
+
+  const OpenMS::Feature& hfeature1 = rawDataHandler.getFeatureMapHistory().at(0); // feature_map_history_
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMZ()), 109.95124192810006, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getIntensity()), 1971.066162109375, 1e-6);
+
+  const OpenMS::Feature& hfeature2 = rawDataHandler.getFeatureMapHistory().back();
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMZ()), 109.99435797732117, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getIntensity()), 1576.05419921875, 1e-6);
+}
+
+/**
+  SearchAccurateMass Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorSearchAccurateMass)
+{
+  SearchAccurateMass* ptrPickFeatures = nullptr;
+  SearchAccurateMass* nullPointerPickFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrPickFeatures, nullPointerPickFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorSearchAccurateMass)
+{
+  SearchAccurateMass* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new SearchAccurateMass();
+  delete ptrPickFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersSearchAccurateMass)
+{
+  SearchAccurateMass processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "SEARCH_ACCURATE_MASS");
+}
+
+BOOST_AUTO_TEST_CASE(searchAccurateMass)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_serumTest.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+  // Test accurate mass search
+  SearchAccurateMass searchAccurateMass;
+  searchAccurateMass.process(rawDataHandler, params_1, filenames);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().size(), 51045);
+  BOOST_CHECK_CLOSE(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().calc_mass_to_charge.get(), 500.02851705499575, 1e-6);
+  BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().chemical_formula.get()), "C82H156O17P2");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().identifier.get().at(0).get(), "HMDB:HMDB0073108");
+  BOOST_CHECK_CLOSE(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().back().calc_mass_to_charge.get(), 799.94828338599575, 1e-6);
+  BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().back().chemical_formula.get()), "C76H135N3O29");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().back().identifier.get().at(0).get(), "HMDB:HMDB0011867");
 }
 
 /**
@@ -1744,7 +2059,7 @@ BOOST_AUTO_TEST_CASE(process)
   mapChroms.process(rawDataHandler, params_1, filenames);
 
   // Test integrated workflow: pickFeatures, filterFeatures, SelectFeatures, quantifyFeatures, and checkFeatures
-  PickFeatures pickFeatures;
+  PickMRMFeatures pickFeatures;
   pickFeatures.process(rawDataHandler, params_1, filenames);
   FilterFeatures filterFeatures;
   filterFeatures.process(rawDataHandler, params_1, filenames);
@@ -1823,7 +2138,7 @@ BOOST_AUTO_TEST_CASE(emg_processor)
   mapChroms.process(rawDataHandler, params_1, filenames);
 
   // Test pick features
-  PickFeatures pickFeatures;
+  PickMRMFeatures pickFeatures;
   pickFeatures.process(rawDataHandler, params_1, filenames);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 481);

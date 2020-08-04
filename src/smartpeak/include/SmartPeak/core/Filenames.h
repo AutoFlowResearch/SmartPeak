@@ -28,6 +28,8 @@ public:
     std::string standardsConcentrations_csv_i;
     std::string referenceData_csv_i;
     std::string mzML_i;
+    std::string mzTab_i;
+    std::string mzTab_o;
     std::string featureXML_o;
     std::string feature_csv_o;
     std::string featureXML_i;

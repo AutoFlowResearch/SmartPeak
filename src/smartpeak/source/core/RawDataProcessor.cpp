@@ -10,6 +10,7 @@
 #include <OpenMS/FORMAT/TraMLFile.h>  // load traML as well
 #include <OpenMS/FORMAT/FileHandler.h>
 #include <OpenMS/FORMAT/MzMLFile.h>
+#include <OpenMS/FORMAT/MzTabFile.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/ChromatogramExtractor.h>
 #include <OpenMS/ANALYSIS/TARGETED/MRMMapping.h>
 #include <OpenMS/KERNEL/SpectrumHelper.h>
@@ -37,6 +38,13 @@
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>  // feature picker
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h> // feature quantification
 #include <OpenMS/MATH/MISC/EmgGradientDescent.h>
+
+// FIA-MS
+#include <OpenMS/ANALYSIS/OPENSWATH/SpectrumAddition.h> // MergeSpectra
+#include <OpenMS/FILTERING/SMOOTHING/SavitzkyGolayFilter.h> // PickMS1Features
+#include <OpenMS/TRANSFORMATIONS/RAW2PEAK/PeakPickerHiRes.h> // PickMS1Features
+#include <OpenMS/FILTERING/NOISEESTIMATION/SignalToNoiseEstimatorMedianRapid.h> // PickMS1Features
+#include <OpenMS/ANALYSIS/ID/AccurateMassSearchEngine.h>
 
 #include <algorithm>
 #include <exception>
@@ -160,7 +168,7 @@ namespace SmartPeak
         samplename = samplename.substr(pos + 1);
     }
     else {
-      throw "no mzml_id found\n";
+      samplename = filename;
     }
 
     const OpenMS::MSExperiment& chromatograms = rawDataHandler_IO.getExperiment();
@@ -292,16 +300,78 @@ namespace SmartPeak
     LOGD << "END storeFeatureMap";
   }
 
-  void PickFeatures::process(
+  void LoadAnnotations::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
   ) const
   {
-    LOGD << "START pickFeatures";
+    LOGD << "START LoadAnnotations";
+    LOGI << "Loading: " << filenames.mzTab_i;
+
+    if (filenames.mzTab_i.empty()) {
+      LOGE << "Filename is empty";
+      LOGD << "END LoadAnnotations";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(filenames.mzTab_i)) {
+      LOGE << "File not found";
+      LOGD << "END LoadAnnotations";
+      return;
+    }
+
+    try {
+      OpenMS::MzTabFile mztabfile;
+      mztabfile.load(filenames.mzTab_i, rawDataHandler_IO.getMzTab());
+      rawDataHandler_IO.updateFeatureMapHistory();
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+      rawDataHandler_IO.setMzTab(OpenMS::MzTab());
+      LOGE << "feature map clear";
+    }
+
+    LOGD << "END LoadAnnotations";
+  }
+
+  void StoreAnnotations::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START StoreAnnotations";
+    LOGI << "Storing: " << filenames.mzTab_o;
+
+    if (filenames.mzTab_o.empty()) {
+      LOGE << "Filename is empty";
+      LOGD << "END StoreAnnotations";
+      return;
+    }
+
+    try {
+      // Store outfile as mzTab
+      OpenMS::MzTabFile mztabfile;
+      mztabfile.store(filenames.mzTab_o, rawDataHandler_IO.getMzTab());
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    LOGD << "END StoreAnnotations";
+  }
+
+  void PickMRMFeatures::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START PickMRMFeatures";
 
     if (params_I.count("MRMFeatureFinderScoring") && params_I.at("MRMFeatureFinderScoring").empty()) {
-      LOGE << "No parameters passed to PickFeatures. Not picking";
+      LOGE << "No parameters passed to PickMRMFeatures. Not picking";
       LOGD << "END pickFeatures";
       return;
     }
@@ -335,7 +405,7 @@ namespace SmartPeak
     rawDataHandler_IO.updateFeatureMapHistory();
 
     LOGI << "Feature Picker output size: " << featureMap.size();
-    LOGD << "END pickFeatures";
+    LOGD << "END PickMRMFeatures";
   }
 
   void FilterFeatures::process(
@@ -954,7 +1024,10 @@ namespace SmartPeak
       "MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc",
       "MRMFeatureFilter.filter_MRMFeaturesRSDs",
       "MRMFeatureFilter.filter_MRMFeaturesRSDs.qc",
-      "SequenceProcessor"
+      "SequenceProcessor",
+      "FIAMS",
+      "PickMS1Features",
+      "AccurateMassSearchEngine"
     };
     for (const std::string& parameter : required_parameters) {
       if (!params_I.count(parameter)) {
@@ -1030,6 +1103,49 @@ namespace SmartPeak
     }
 
     LOGD << "END ExtractChromatogramWindows";
+  }
+
+  void ExtractSpectraWindows::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START ExtractSpectraWindows";
+
+    float start = 0, stop = 0;
+    if (params_I.count("FIAMS") && params_I.at("FIAMS").size()){
+      for (const auto& fia_params: params_I.at("FIAMS")){
+        if (fia_params.at("name") == "acquisition_start") {
+          try {
+            start = std::stof(fia_params.at("value"));
+          }
+          catch (const std::exception& e) {
+            LOGE << e.what();
+          }
+        }
+        if (fia_params.at("name") == "acquisition_end") {
+          try {
+            stop = std::stof(fia_params.at("value"));
+          }
+          catch (const std::exception& e) {
+            LOGE << e.what();
+          }
+        }
+      }
+    }
+
+    if (stop == 0) {
+      LOGE << "No parameters passed to ExtractSpectraWindows.  Spectra will not be extracted.";
+      LOGD << "END ExtractSpectraWindows";
+      return;
+    }
+
+    std::vector<OpenMS::MSSpectrum> output;
+    for (OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
+      if (spec.getRT() >= start && spec.getRT() <= stop) {
+        output.push_back(spec);
+      }
+    }
+    rawDataHandler_IO.getExperiment().setSpectra(output);
+
+    LOGD << "END ExtractSpectraWindows";
   }
 
   void FitFeaturesEMG::process(
@@ -1312,5 +1428,201 @@ namespace SmartPeak
 
     LOGI << "Feature Checker output size: " << rawDataHandler_IO.getFeatureMap().size();
     LOGD << "END checkFeaturesBackgroundInterferences";
+  }
+
+  void MergeSpectra::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START MergeSpectra";
+
+    float resolution = 0, max_mz = 0, bin_step = 0;
+    if (params_I.count("FIAMS") && params_I.at("FIAMS").size()) {
+      for (const auto& fia_params : params_I.at("FIAMS")) {
+        if (fia_params.at("name") == "max_mz") {
+          try {
+            max_mz = std::stof(fia_params.at("value"));
+          }
+          catch (const std::exception& e) {
+            LOGE << e.what();
+          }
+        }
+        if (fia_params.at("name") == "bin_step") {
+          try {
+            bin_step = std::stof(fia_params.at("value"));
+          }
+          catch (const std::exception& e) {
+            LOGE << e.what();
+          }
+        }
+        if (fia_params.at("name") == "resolution") {
+          try {
+            resolution = std::stof(fia_params.at("value"));
+          }
+          catch (const std::exception& e) {
+            LOGE << e.what();
+          }
+        }
+      }
+    }
+
+    if (resolution == 0 || max_mz == 0 || bin_step == 0) {
+      LOGE << "Missing parameters for MergeSpectra.  Spectra will not be merged.";
+      LOGD << "END MergeSpectra";
+      return;
+    }
+
+    // calculate the bin sizes and mass buckets
+    int n_bins = max_mz / bin_step;
+    std::vector<float> mzs;
+    std::vector<float> bin_sizes;
+    std::vector<std::vector<OpenMS::MSSpectrum>> binned_spectrum;
+    mzs.reserve(n_bins);
+    bin_sizes.reserve(n_bins);
+    binned_spectrum.resize(n_bins);
+    for (int i = 0; i < n_bins; i++) {
+      mzs.push_back((i + 1) * bin_step);
+      bin_sizes.push_back(mzs.at(i) / (resolution * 4.0));
+      binned_spectrum.at(i).resize(rawDataHandler_IO.getExperiment().getSpectra().size());
+    }
+
+    // Divide the spectra into mass ranges
+    for (int s = 0; s < rawDataHandler_IO.getExperiment().getSpectra().size(); ++s) {
+      const OpenMS::MSSpectrum spectrum = rawDataHandler_IO.getExperiment().getSpectra().at(s);
+      for (auto it = spectrum.begin(); it != spectrum.end(); ++it) {
+        for (int i = 0; i < mzs.size() - 1; ++i) {
+          if (it->getMZ() >= mzs.at(i) && it->getMZ() < mzs.at(i + 1)) {
+            binned_spectrum.at(i).at(s).push_back(*it);
+          }
+        }
+      }
+    }
+
+    // Merge spectra along time for each of the different mass ranges
+    OpenMS::MSSpectrum output;
+    for (int i = 0; i < mzs.size() - 1; ++i) {
+      OpenMS::MSSpectrum full_spectrum = OpenMS::SpectrumAddition::addUpSpectra(
+        binned_spectrum.at(i), bin_sizes.at(i), false
+      );
+      for (auto it = full_spectrum.begin(); it != full_spectrum.end(); ++it) {
+        output.push_back(*it);
+      }
+    }
+    output.sortByPosition();
+    rawDataHandler_IO.getExperiment().setSpectra({ output });
+
+    LOGD << "END MergeSpectra";
+  }
+
+  void PickMS1Features::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START PickMS1Features";
+
+    if (params_I.count("PickMS1Features") && params_I.at("PickMS1Features").empty()) {
+      LOGE << "No parameters passed to PickMS1Features. Not picking";
+      LOGD << "END PickMS1Features";
+      return;
+    }
+
+    double sn_window = 0;
+    for (const auto& fia_params : params_I.at("PickMS1Features")) {
+      if (fia_params.at("name") == "sne:window") {
+        try {
+          sn_window = std::stod(fia_params.at("value"));
+        }
+        catch (const std::exception& e) {
+          LOGE << e.what();
+        }
+      }
+    }
+    if (sn_window == 0) {
+      LOGE << "Missing sne:window parameter for PickMS1Features. Not picking";
+      LOGD << "END PickMS1Features";
+      return;
+    }
+
+    OpenMS::SavitzkyGolayFilter sgfilter;
+    OpenMS::Param parameters = sgfilter.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("PickMS1Features"));
+    sgfilter.setParameters(parameters);
+
+    OpenMS::PeakPickerHiRes picker;
+    parameters = picker.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("PickMS1Features"));
+    picker.setParameters(parameters);
+
+    OpenMS::FeatureMap featureMap;
+    try {
+      for (const OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
+        // Smooth and pick
+        OpenMS::MSSpectrum input(spec);
+        sgfilter.filter(input);
+        OpenMS::MSSpectrum output;
+        picker.pick(input, output);
+
+        if (output.size() > 0) {
+          // Estimate the S/N
+          OpenMS::SignalToNoiseEstimatorMedianRapid sne(sn_window);
+          std::vector<double> mzs, intensities;
+          mzs.reserve(output.size());
+          intensities.reserve(output.size());
+          for (auto it = output.begin(); it != output.end(); ++it)
+          {
+            mzs.push_back(it->getMZ());
+            intensities.push_back(it->getIntensity());
+          }
+          OpenMS::SignalToNoiseEstimatorMedianRapid::NoiseEstimator e = sne.estimateNoise(mzs, intensities);
+
+          // Create the featureMap
+          for (auto it = output.begin(); it != output.end(); ++it)
+          {
+            OpenMS::Feature f;
+            f.setIntensity(it->getIntensity());
+            f.setMZ(it->getMZ());
+            f.setMetaValue("signal_to_noise", e.get_noise_value(it->getMZ()));
+            featureMap.push_back(f);
+          }
+        }
+      }
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
+    featureMap.setPrimaryMSRunPath({ rawDataHandler_IO.getMetaData().getFilename() });
+    LOGD << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename();
+
+    rawDataHandler_IO.setFeatureMap(featureMap);
+    rawDataHandler_IO.updateFeatureMapHistory();
+
+    LOGI << "Feature Picker output size: " << featureMap.size();
+    LOGD << "END PickMS1Features";
+  }
+
+  void SearchAccurateMass::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START SearchAccurateMass";
+
+    if (params_I.count("AccurateMassSearchEngine") && params_I.at("AccurateMassSearchEngine").empty()) {
+      LOGE << "No parameters passed to AccurateMassSearchEngine. Not searching.";
+      LOGD << "END SearchAccurateMass";
+      return;
+    }
+
+    OpenMS::AccurateMassSearchEngine ams;
+    OpenMS::Param parameters = ams.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("AccurateMassSearchEngine"));
+    ams.setParameters(parameters);
+
+    OpenMS::MzTab output;
+    try {
+      ams.init();
+      ams.run(rawDataHandler_IO.getFeatureMap(), output);
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+    rawDataHandler_IO.setMzTab(output);
+
+    LOGD << "END SearchAccurateMass";
   }
 }

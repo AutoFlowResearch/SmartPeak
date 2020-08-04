@@ -33,6 +33,8 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultStaticFilenames)
   BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "/home/user/standardsConcentrations.csv");
   BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "/home/user/referenceData.csv");
   BOOST_CHECK_EQUAL(filenames.mzML_i, "");
+  BOOST_CHECK_EQUAL(filenames.mzTab_o, "");
+  BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.feature_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
@@ -82,6 +84,8 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultDynamicFilenames)
   BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.mzML_i, "/home/user/mzML/injIn.mzML");
+  BOOST_CHECK_EQUAL(filenames.mzTab_o, "/home/user/featuresOut/injOut.mzTab");
+  BOOST_CHECK_EQUAL(filenames.mzTab_i, "/home/user/featuresIn/injOut.mzTab");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "/home/user/featuresOut/injOut.featureXML");
   BOOST_CHECK_EQUAL(filenames.feature_csv_o, "/home/user/featuresOut/injOut.csv");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "/home/user/featuresIn/injOut.featureXML");
@@ -119,6 +123,8 @@ BOOST_AUTO_TEST_CASE(clear1)
   BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.mzML_i, "");
+  BOOST_CHECK_EQUAL(filenames.mzTab_o, "");
+  BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.feature_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
@@ -149,6 +155,8 @@ BOOST_AUTO_TEST_CASE(clear2)
   BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.mzML_i, "");
+  BOOST_CHECK_EQUAL(filenames.mzTab_o, "");
+  BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.feature_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
