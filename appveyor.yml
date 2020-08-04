@@ -19,8 +19,7 @@ init:
   - cmake --version
   - pip3 --version
   - pip3 install --user sphinx exhale
-  - ps: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-  - choco install -y doxygen.install
+  
 
 platform: x64
 configuration: Debug
@@ -45,6 +44,8 @@ before_build:
   - if not exist "C:\projects\OpenMS" git clone --depth=1 --branch develop https://github.com/OpenMS/OpenMS.git C:\projects\OpenMS
   - if not exist "C:\projects\OpenMS-build" call "C:\projects\SmartPeak2\ci\build_openms.bat"
   - if not exist "C:\projects\SmartPeak2\build" call "C:\projects\SmartPeak2\ci\cmake_smartpeak.bat"
+  - ps: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+  - choco install -y doxygen.install
 
 build_script:
   - cd C:\projects\SmartPeak2\build
