@@ -16,9 +16,14 @@ init:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - PATH=C:\Python37-x64;C:\Python37-x64\Scripts;C:\projects\clcache\install\bin;C:\projects\OpenMS-build\bin\Debug;C:\Qt\5.12\msvc2017_64\bin;C:\projects\deps\SDL2-2.0.9\lib\x64;%PATH%
   - set PYTHONPATH=C:\projects\clcache\install
+  - pip3 install --user sphinx exhale
   - cmake --version
   - pip3 --version
-  - pip3 install --user sphinx exhale
+  - ps: >- 
+      $doxygen_url = 'http://doxygen.nl/files/doxygen-1.8.18.windows.x64.bin.zip'
+      $tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'tmp$', '7z' } –PassThru
+      Invoke-WebRequest $doxygen_url -OutFile $tmp 
+      7z x $tmp -o'C:\bin\doxygen'
   
 
 platform: x64
@@ -43,8 +48,6 @@ before_build:
   - if not exist "C:\projects\deps" call "C:\projects\SmartPeak2\ci\prepare_deps.bat"
   - if not exist "C:\projects\OpenMS" git clone --depth=1 --branch develop https://github.com/OpenMS/OpenMS.git C:\projects\OpenMS
   - if not exist "C:\projects\OpenMS-build" call "C:\projects\SmartPeak2\ci\build_openms.bat"
-  - ps: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-  - choco install -y doxygen.install
   - if not exist "C:\projects\SmartPeak2\build" call "C:\projects\SmartPeak2\ci\cmake_smartpeak.bat"
 
 build_script:
