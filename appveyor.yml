@@ -16,7 +16,7 @@ init:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - PATH=C:\Python37-x64;C:\Python37-x64\Scripts;C:\projects\clcache\install\bin;C:\projects\OpenMS-build\bin\Debug;C:\Qt\5.12\msvc2017_64\bin;C:\projects\deps\SDL2-2.0.9\lib\x64;%PATH%
   - set PYTHONPATH=C:\projects\clcache\install
-  - Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+  - @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command " [System.Net.ServicePointManager]::SecurityProtocol = 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
   - choco install -y doxygen.install
   - pip3 install --user sphinx exhale
   - cmake --version
