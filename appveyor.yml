@@ -16,11 +16,11 @@ init:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
   - PATH=C:\Python37-x64;C:\Python37-x64\Scripts;C:\projects\clcache\install\bin;C:\projects\OpenMS-build\bin\Debug;C:\Qt\5.12\msvc2017_64\bin;C:\projects\deps\SDL2-2.0.9\lib\x64;%PATH%
   - set PYTHONPATH=C:\projects\clcache\install
-  # - ps: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-  # - choco install -y doxygen.install
   - cmake --version
   - pip3 --version
   - pip3 install --user sphinx exhale
+  # - ps: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+  # - choco install -y doxygen.install
 
 platform: x64
 configuration: Debug
