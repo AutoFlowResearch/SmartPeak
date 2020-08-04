@@ -21,7 +21,7 @@ init:
   - pip3 --version
   - ps: >- 
       $doxygen_url = 'http://doxygen.nl/files/doxygen-1.8.18.windows.x64.bin.zip';
-      $tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'tmp$', '7z' } –PassThru;
+      $tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'tmp$', 'zip' } –PassThru;
       Invoke-WebRequest $doxygen_url -OutFile $tmp;
       7z x $tmp -o'C:\bin\doxygen'
   
