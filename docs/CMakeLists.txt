@@ -57,6 +57,3 @@ add_custom_command( OUTPUT  ${SPHINX_INDEX_FILE}
 
 add_custom_target(libdoc-sphinx ALL DEPENDS ${SPHINX_INDEX_FILE})
 
-# get_filename_component(SMARTPEAK_DOCS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../docs ABSOLUTE)
-
-# install(DIRECTORY ${SPHINX_BUILD}/ DESTINATION ${SMARTPEAK_DOCS_DIR})
