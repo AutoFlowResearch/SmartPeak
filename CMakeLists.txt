@@ -238,12 +238,6 @@ endif()
 set(INSTALL_CMAKE_DIR ${DEF_INSTALL_CMAKE_DIR} CACHE PATH "Installation directory for CMake files")
 set(INSTALL_LIB_DIR ${DEF_INSTALL_LIB_DIR} CACHE PATH "Installation directory for libraries")
 
-# Never use RPATH. We have other means on every platform.
-# E.g. not yet compatible with our fix_mac_dependencies script.
-# SET(CMAKE_MACOSX_RPATH FALSE)
-# macOS-specific variable used when installing own libraries/bins. Use relative paths here.
-# SET(CMAKE_INSTALL_NAME_DIR "@executable_path/../${INSTALL_LIB_DIR}")
-
 #------------------------------------------------------------------------------
 # lib naming when building with msvc & convenience location of build.bat
 if (MSVC)
