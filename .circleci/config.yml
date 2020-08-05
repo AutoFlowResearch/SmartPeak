@@ -85,7 +85,6 @@ jobs:
               Set-Content "env:\$($matches[1])" $matches[2]
             }
           }
-      - run: |
           cd ~
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
           cd ~/OpenMS; git submodule update --init contrib; mkdir contrib_build; cd contrib_build
