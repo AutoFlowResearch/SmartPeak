@@ -79,6 +79,7 @@ jobs:
           ls C:\lib\boost\boost_1_73_0\
           $boost_tmp | Remove-Item
           cd ~
+          C:\'Program Files (x86)'\'Microsoft Visual Studio'\2019\Community\VC\Auxiliary\Build\vcvars64.bat
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
           cd ~/OpenMS; git submodule update --init contrib; mkdir contrib_build; cd contrib_build
           cmake -DBUILD_TYPE=ALL ~/OpenMS/contrib
