@@ -77,7 +77,6 @@ jobs:
           $Boost_DIR = 'C:\lib\boost'
           ls C:\lib\boost\boost_1_73_0\
           $boost_tmp | Remove-Item
-      - run: |
           cd ~
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
           cd ~/OpenMS; git submodule update --init THIRDPARTY; mkdir contrib_build; cd contrib_build
