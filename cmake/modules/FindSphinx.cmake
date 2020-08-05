@@ -5,7 +5,7 @@
 # This module will set the following variables when 
 # find_package(Sphinx) is called :
 # 
-# SPHINX_EXECUTABLE : Path to the sphinx-build execuatble
+# SPHINX_EXECUTABLE : Path to the sphinx-build executable
 
 find_program(SPHINX_EXECUTABLE
             NAMES sphinx-build
