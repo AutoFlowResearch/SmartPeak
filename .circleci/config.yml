@@ -75,8 +75,18 @@ jobs:
           Invoke-WebRequest $boost_url -OutFile $boost_tmp 
           7z x $boost_tmp -o'C:\lib\boost'
           $Boost_DIR = 'C:\lib\boost'
-          ls C:\lib\boost\boost_1_73_0\lib64-msvc-14.2\
+          ls C:\lib\boost\boost_1_73_0\
           $boost_tmp | Remove-Item
+      - run: |
+          cd ~
+          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
+          cd ~/OpenMS; git submodule update --init THIRDPARTY; mkdir contrib_build; cd contrib_build
+          cmake -DBUILD_TYPE=ALL ../contrib
+          cd ~/OpenMS;  mkdir openms_debug_build; cd openms_debug_build
+          cmake -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DOPENMS_CONTRIB_LIBS=../contrib_build -D CMAKE_PREFIX_PATH="C:\lib\boost\boost_1_73_0;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64" -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
+          make -j4 OpenMS
+
+
 
 
 
