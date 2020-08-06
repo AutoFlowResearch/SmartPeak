@@ -63,6 +63,7 @@ jobs:
           $ProgressPreference = "SilentlyContinue"
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
           choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"'
+          choco install boost-msvc-14.1
           choco install doxygen.install
           refreshenv
           $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
