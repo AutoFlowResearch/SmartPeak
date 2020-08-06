@@ -63,7 +63,6 @@ jobs:
           $ProgressPreference = "SilentlyContinue"
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
           choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"'
-          choco install boost-msvc-14.1
           choco install doxygen.install
           refreshenv
           $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
@@ -73,12 +72,6 @@ jobs:
           7z x $qt_tmp -o'C:\lib\Qt'
           $Qt_DIR = 'C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64'
           $qt_tmp | Remove-Item
-          $boost_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'boost_tmp$', '7z' } –PassThru
-          Invoke-WebRequest $boost_url -OutFile $boost_tmp 
-          7z x $boost_tmp -o'C:\lib\boost'
-          $Boost_DIR = 'C:\lib\boost'
-          ls C:\lib\boost\boost_1_73_0\
-          $boost_tmp | Remove-Item
       - run: |
           cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars64.txt"
           Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
