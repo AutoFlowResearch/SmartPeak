@@ -66,12 +66,17 @@ jobs:
           choco install doxygen.install
           refreshenv
           $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
-          $boost_url = 'https://github.com/ahmedskhalil/Boost-1.73-Prebuilts/releases/download/0.0.1/boost_1_73_0.7z'
+          $sdl2_url = 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
           $qt_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'qt_tmp$', '7z' } –PassThru
           Invoke-WebRequest $qt_url -OutFile $qt_tmp 
           7z x $qt_tmp -o'C:\lib\Qt'
           $Qt_DIR = 'C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64'
           $qt_tmp | Remove-Item
+          $sdl2_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'sdl2_tmp$', '7z' } –PassThru
+          Invoke-WebRequest $sdl2_url -OutFile $sdl2_tmp 
+          7z x $sdl2_tmp -o'C:\lib\sdl2'
+          $Qt_DIR = 'C:\lib\sdl2\SDL2-2.0.12'
+          $sdl2_tmp | Remove-Item
       - run: |
           cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars64.txt"
           Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
@@ -95,7 +100,7 @@ jobs:
           cd smartpeak2_debug_superbuild
           cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug ../; cmake --build .
           cd ../smartpeak2_debug_build
-          cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build/;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64" -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+          cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build/;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64;C:\lib\sdl2\SDL2-2.0.12" -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
           cmake --build .
           
 
