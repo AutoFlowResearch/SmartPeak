@@ -91,7 +91,7 @@ jobs:
           keys:
             - oms1-{{ checksum "OpenMS.7z" }}
       - run: |
-          cd ~/SmartPeak2; mkdir smartpeak2_debug_superbuild smartpeak2_debug_build
+          cd ~/SmartPeak2; mkdir smartpeak2_debug_superbuild, smartpeak2_debug_build
           cd smartpeak2_debug_superbuild
           cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug ../; cmake --build .
           cd ../smartpeak2_debug_build
