@@ -91,10 +91,10 @@ jobs:
           cd ~/OpenMS; mkdir openms_debug_build; cd openms_debug_build
           cmake -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
           cmake --build . --target OpenMS
-          cd ~; 7z a OpenMS OpenMS/*
-      - restore_cache:
-          keys:
-            - oms1-{{ checksum "OpenMS.7z" }}
+          # cd ~; 7z a OpenMS OpenMS/*
+      # - restore_cache:
+          # keys:
+            # - oms1-{{ checksum "OpenMS.7z" }}
       - run: |
           cd ~/SmartPeak2; mkdir smartpeak2_debug_superbuild, smartpeak2_debug_build
           cd smartpeak2_debug_superbuild
