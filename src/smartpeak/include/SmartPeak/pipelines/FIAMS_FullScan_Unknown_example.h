@@ -1,8 +1,5 @@
-#include <SmartPeak/core/FeatureMetadata.h>
-#include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
-#include <SmartPeak/io/SequenceParser.h>
 
 using namespace SmartPeak;
 
@@ -46,13 +43,6 @@ OpenMS::MzTab example_FIAMS_FullScan_Unknowns(
   ps.filenames                     = dynamic_filenames;
   ps.raw_data_processing_methods_I = raw_data_processing_methods;
   ps.process();
-
-  SequenceParser::writeDataMatrixFromMetaValue(
-    sequenceHandler,
-    static_filenames.pivotTable_csv_o,
-    {FeatureMetadata::peak_apex_intensity},
-    {SampleType::Unknown}
-  );
 
   return sequenceHandler.getSequence().front().getRawData().getMzTab();
 }

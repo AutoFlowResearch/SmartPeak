@@ -1189,6 +1189,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params_1, filenames);
   loadRawData.extractMetaData(rawDataHandler);
+  rawDataHandler.getMetaData().scan_polarity = "positive";
 
   // Test pick features
   PickMS1Features pickFeatures;
@@ -1206,8 +1207,8 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
 
   const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("peak_apex_int")), 1576.05419921875, 1e-6);
-  BOOST_CHECK_EQUAL(feature1.getMetaValue("scan_polarity"), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("peak_apex_int")), 1576.05419921875, 1e-6);
+  BOOST_CHECK_EQUAL(feature2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getRT()), 0, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMZ()), 109.99435797732117, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getIntensity()), 1576.05419921875, 1e-6);

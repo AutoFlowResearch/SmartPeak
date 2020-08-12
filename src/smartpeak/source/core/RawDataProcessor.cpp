@@ -1590,7 +1590,7 @@ namespace SmartPeak
             f.setIntensity(it->getIntensity());
             f.setMZ(it->getMZ());
             f.setRT(0);
-            f.setMetaValue("scan_polarity", "negative"); //TODO
+            f.setMetaValue("scan_polarity", rawDataHandler_IO.getMetaData().scan_polarity);
             f.setMetaValue("peak_apex_int", it->getIntensity());
             f.setMetaValue("signal_to_noise", e.get_noise_value(it->getMZ()));
             // TODO: convex hull points
