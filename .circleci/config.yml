@@ -73,7 +73,7 @@ jobs:
           7z x $qt_tmp -o'C:\lib\Qt'
           $Qt_DIR = 'C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64'
           $qt_tmp | Remove-Item
-          $sdl2_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'sdl2_tmp$', '7z' } –PassThru
+          $sdl2_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'sdl2_tmp$', 'zip' } –PassThru
           Invoke-WebRequest $sdl2_url -OutFile $sdl2_tmp 
           7z x $sdl2_tmp -o'C:\lib\sdl2'
           $SDL_DIR = 'C:\lib\sdl2\SDL2-2.0.12'
