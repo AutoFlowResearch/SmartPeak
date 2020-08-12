@@ -20,6 +20,14 @@ jobs:
           libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
           libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
       - run: |
+          apt-get install -y graphviz doxygen python3-pip &&
+          export DEBIAN_FRONTEND=noninteractive &&
+          apt-get install -y tzdata &&
+          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
+          dpkg-reconfigure --frontend noninteractive tzdata &&
+          apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
+          pip3 install exhale
+      - run: |
           cd ~ &&
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
           cd OpenMS && git submodule update --init THIRDPARTY &&
@@ -46,6 +54,12 @@ jobs:
       - run:
           command: |
             ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
+
+      - run:
+          command: |
+            [ ! -d ~/SmartPeak2_build/docs/docs/sphinx/_image ]     && exit 0
+            [ ! -f ~/SmartPeak2_build/docs/docs/sphinx/index.html ] && exit 0
+
 
 workflows:
   version: 2
