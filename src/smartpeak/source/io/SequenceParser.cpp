@@ -240,7 +240,7 @@ namespace SmartPeak
       "sample_name", "sample_type", "component_group_name", "component_name", "batch_name",
       "rack_number", "plate_number", "pos_number", "inj_number", "dilution_factor", "inj_volume",
       "inj_volume_units", "operator_name", "acq_method_name", "proc_method_name",
-      "original_filename", "acquisition_date_and_time", "injection_name", "used_"
+      "original_filename", "acquisition_date_and_time", "scan_polarity", "scan_mass_low", "scan_mass_high", "injection_name", "used_"
     };
     headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
     for (size_t i = 0; i < headers.size() - 1; ++i) { // checking headers are unique, stable (maintaining the same positions)
@@ -298,6 +298,9 @@ namespace SmartPeak
           row.push_back(mdh.proc_method_name);
           row.push_back(mdh.original_filename);
           row.push_back(mdh.getAcquisitionDateAndTimeAsString());
+          row.push_back(mdh.scan_polarity);
+          row.push_back(std::to_string(mdh.scan_mass_low));
+          row.push_back(std::to_string(mdh.scan_mass_high));
           row.push_back(mdh.getInjectionName());
           row.push_back(subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : "");
           for (const std::string& meta_value_name : meta_data) {

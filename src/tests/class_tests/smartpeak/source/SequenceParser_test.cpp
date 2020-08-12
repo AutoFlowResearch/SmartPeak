@@ -163,11 +163,11 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(data_out.at(0).at(1), "Unknown");
   BOOST_CHECK_EQUAL(data_out.at(0).at(2), "23dpg");
   BOOST_CHECK_EQUAL(data_out.at(0).at(3), "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(19), std::to_string(235.0));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(20), std::to_string(3.52866193485212));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(23), std::to_string(15.605367));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(24), std::to_string(15.836817));
-  BOOST_CHECK_EQUAL(headers_out.size(), 25);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(22), std::to_string(235.0));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(23), std::to_string(3.52866193485212));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(26), std::to_string(15.605367));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(27), std::to_string(15.836817));
+  BOOST_CHECK_EQUAL(headers_out.size(), 28);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
@@ -206,8 +206,8 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(data_out.at(0).at(1), "Unknown");
   BOOST_CHECK_EQUAL(data_out.at(0).at(2), "23dpg");
   BOOST_CHECK_EQUAL(data_out.at(0).at(3), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(19), std::to_string(15.605367));
-  BOOST_CHECK_EQUAL(headers_out.size(), 20);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(22), std::to_string(15.605367));
+  BOOST_CHECK_EQUAL(headers_out.size(), 23);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
