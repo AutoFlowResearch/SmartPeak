@@ -54,6 +54,7 @@ after_build:
   - ps: fsutil behavior set disablelastaccess 1 # Disable Access time feature on Windows (better performance)
   - ps: Stop-Process -Id $Clcacheserver.Id
   - clcache -s & clcache -z
+  - cpack -G NSIS64
 
 test_script:
   - cd C:\projects\SmartPeak2\build
