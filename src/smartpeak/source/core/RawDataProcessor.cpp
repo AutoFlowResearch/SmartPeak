@@ -1523,6 +1523,7 @@ namespace SmartPeak
     }
 
     double sn_window = 0;
+    //bool write_convex_hull = false;
     for (const auto& fia_params : params_I.at("PickMS1Features")) {
       if (fia_params.at("name") == "sne:window") {
         try {
@@ -1532,6 +1533,16 @@ namespace SmartPeak
           LOGE << e.what();
         }
       }
+      //if (fia_params.at("name") == "write_convex_hull") {
+      //  try {
+      //    std::string value = fia_params.at("value");
+      //    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+      //    write_convex_hull = (value == "true")?true:false;
+      //  }
+      //  catch (const std::exception& e) {
+      //    LOGE << e.what();
+      //  }
+      //}
     }
     if (sn_window == 0) {
       LOGE << "Missing sne:window parameter for PickMS1Features. Not picking";
@@ -1575,9 +1586,14 @@ namespace SmartPeak
           for (auto it = output.begin(); it != output.end(); ++it)
           {
             OpenMS::Feature f;
+            f.setUniqueId();
             f.setIntensity(it->getIntensity());
             f.setMZ(it->getMZ());
+            f.setRT(0);
+            f.setMetaValue("scan_polarity", "negative"); //TODO
+            f.setMetaValue("peak_apex_int", it->getIntensity());
             f.setMetaValue("signal_to_noise", e.get_noise_value(it->getMZ()));
+            // TODO: convex hull points
             featureMap.push_back(f);
           }
         }

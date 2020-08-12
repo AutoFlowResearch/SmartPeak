@@ -1,0 +1,10 @@
+MTD	mzTab-version	1.0.0
+MTD	mzTab-mode	Summary
+MTD	mzTab-type	Quantification
+MTD	description	Result summary from accurate mass search.
+MTD	smallmolecule_search_engine_score[1]	[, , AccurateMassSearchScore, ]
+MTD	study_variable[1]-description	Accurate mass search result file.
+
+SMH	identifier	chemical_formula	smiles	inchi_key	description	exp_mass_to_charge	calc_mass_to_charge	charge	retention_time	taxid	species	database	database_version	spectra_ref	search_engine	best_search_engine_score[1]	search_engine_score[1]_ms_run[1]	modifications	smallmolecule_abundance_study_variable[1]	smallmolecule_abundance_stdev_study_variable[1]	smallmolecule_abundance_std_error_study_variable[1]	opt_global_mz_ppm_error	opt_global_adduct_ion	opt_global_isosim_score	opt_global_neutral_mass	opt_global_id_group
+SML	HMDB:HMDB0015336	C15H14FN3O3	CCOC(=O)C1=C2CN(C)C(=O)C3=C(C=CC(F)=C3)N2C=N1	InChI=1S/C15H14FN3O3/c1-3-22-15(21)13-12-7-18(2)14(20)10-6-9(16)4-5-11(10)19(12)8-17-13/h4-6,8H,3,7H2,1-2H3	Flumazenil	100.026615855953978	100.026696726004289	3	0.0	null	null	HMDB	4.0	null	[, , AccurateMassSearch, ]	null	null	null	705.6800537109375	0.0	0.0	-0.808484664178741	M-3H;3-	-1	303.101676923849027	1
+SML	HMDB:HMDB0038683	C29H42O5	C[C@@H]1CC[C@@]2(CCC3C(=CC(=O)C4[C@@]3(C)CCC3C(C)(C)C(=O)CC[C@]43C)C2C1(C)O)C(O)=O	InChI=1S/C29H42O5/c1-16-7-13-29(24(32)33)14-8-18-17(22(29)28(16,6)34)15-19(30)23-26(18,4)11-9-20-25(2,3)21(31)10-12-27(20,23)5/h15-16,18,20,22-23,34H,7-14H2,1-6H3,(H,32,33)/t16-,18?,20?,22?,23?,26+,27+,28-,29+/m1/s1	19alpha-19-Hydroxy-3,11-dioxo-12-ursen-28-oic acid	999.623976393524572	999.620302583604257	1	0.0	null	null	HMDB	4.0	null	[, , AccurateMassSearch, ]	null	null	null	2429.43798828125	0.0	0.0	3.675205386304756	2M+C2H4O2-H;1-	-1	470.305061358960131	6826

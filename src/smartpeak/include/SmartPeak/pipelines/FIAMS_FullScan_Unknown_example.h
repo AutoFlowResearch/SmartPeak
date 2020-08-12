@@ -6,7 +6,7 @@
 
 using namespace SmartPeak;
 
-void example_FIAMS_FullScan_Unknowns(
+OpenMS::MzTab example_FIAMS_FullScan_Unknowns(
   const std::string& dir_I,
   const Filenames& static_filenames,
   const std::string& delimiter_I = ","
@@ -26,7 +26,7 @@ void example_FIAMS_FullScan_Unknowns(
     std::make_shared<MergeSpectra>(),
     std::make_shared<PickMS1Features>(),
     std::make_shared<SearchAccurateMass>(),
-    std::make_shared<StoreAnnotations>(),
+    //std::make_shared<StoreAnnotations>(), // Files are quite large
     std::make_shared<StoreFeatures>()
   };
 
@@ -53,4 +53,6 @@ void example_FIAMS_FullScan_Unknowns(
     {FeatureMetadata::peak_apex_intensity},
     {SampleType::Unknown}
   );
+
+  return sequenceHandler.getSequence().front().getRawData().getMzTab();
 }
