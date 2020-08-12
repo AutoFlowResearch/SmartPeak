@@ -97,6 +97,25 @@ Example cmake command on windows assuming that all external dependency libraries
 
 Open "SmartPeak2_host" in visual studios and build the project of choice. Projects can be built using Visual Studios in the IDE by opening :code:`msbuild [build_dir]/src/SmartPeak2_host` and selecting the specific target to build in the GUI or on the command line by running e.g., `msbuild [build_dir]/src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount` which will build the main SmartPeak library and then running e.g., `msbuild [build_dir]/examples/SmartPeak_class_examples_smartpeak.sln -target:GUI /verbosity:normal /maxcpucount` which will build the SmartPeak GUI.
 
+STEP 5: Build SmartPeak-Docs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Generating the docs for SmartPeak on windows platforms is done by calling the :code:`docs` build target.
+
+In ordert to build the docs locally the following dependencies are needed:
+
+- `Doxygen`__   : Download and install
+- `Sphinx`__    : :code:`pip install --user sphinx`
+- `Breathe`__   : :code:`pip install --user breathe`
+- `Exhale`__    : :code:`pip install --user exhale`
+
+__ http://doxygen.nl/files/doxygen-1.8.19-setup.exe
+__ https://www.sphinx-doc.org/en/master/
+__ https://breathe.readthedocs.io/en/latest/
+__ https://exhale.readthedocs.io/en/latest/
+
+.. note:: 
+    Sphinx needs to be present in :code:`PATH` so that the sphinx-executable can be found by CMake i.e. :code:`C:\Users\$USER\AppData\Roaming\Python\Python37\Scripts`
+
 .. end_windows
 
 .. begin_linux
@@ -145,7 +164,24 @@ Some dependencies one might have to install:
 
 .. code-block:: bash
 
-    sudo apt install qt5-default libboost-dev libeigen3-dev libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev libglpk-dev seqan-dev libhdf5-dev
+    sudo apt install qt5-default libboost-dev libeigen3-dev libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev libglpk-dev seqan-dev libhdf5-dev python3-pip
+
+STEP 4: Build SmartPeak-Docs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Generating the docs for SmartPeak on Linux is done by calling the :code:`make -B docs` build target.
+
+In ordert to build the docs locally the following dependencies are needed:
+
+- `Doxygen`__   : :code:`sudo apt-get install -y graphviz doxygen doxygen-doc`
+- `Sphinx`__    : :code:`pip install --user sphinx`
+- `Breathe`__   : :code:`pip install --user breathe`
+- `Exhale`__    : :code:`pip install --user exhale`
+
+__ http://doxygen.nl/
+__ https://www.sphinx-doc.org/en/master/
+__ https://breathe.readthedocs.io/en/latest/
+__ https://exhale.readthedocs.io/en/latest/
+
 
 .. end_linux
 
@@ -219,6 +255,23 @@ This can be done using the following set of commands:
     -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/implot \
     -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
     make -j4
+
+STEP 4: Build SmartPeak-Docs
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Generating the docs for SmartPeak on macOS is done by calling the :code:`make -B docs` build target.
+
+In ordert to build the docs locally the following dependencies are needed:
+
+- `Doxygen`__   : :code:`brew install doxygen`
+- `Sphinx`__    : :code:`pip install --user sphinx`
+- `Breathe`__   : :code:`pip install --user breathe`
+- `Exhale`__    : :code:`pip install --user exhale`
+
+__ http://doxygen.nl/
+__ https://www.sphinx-doc.org/en/master/
+__ https://breathe.readthedocs.io/en/latest/
+__ https://exhale.readthedocs.io/en/latest/
+
 
 .. end_macos
 

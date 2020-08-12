@@ -55,5 +55,5 @@ add_custom_command( OUTPUT  ${SPHINX_INDEX_FILE}
                     MAIN_DEPENDENCY   ${SPHINX_SOURCE}/conf.py
                     COMMENT           "Generating sphinx docs for SmartPeak lib")
 
-add_custom_target(libdoc-sphinx ALL DEPENDS ${SPHINX_INDEX_FILE})
+add_custom_target(docs ALL DEPENDS ${SPHINX_INDEX_FILE})
 
