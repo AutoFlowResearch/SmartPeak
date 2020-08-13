@@ -8,7 +8,7 @@ orbs:
 jobs:
   build_ubuntu:
     docker:
-      - image: ubuntu:18.04
+      - image: ubuntu:20.04
 
     working_directory: ~/SmartPeak2
 
