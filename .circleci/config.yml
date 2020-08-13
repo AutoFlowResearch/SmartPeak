@@ -63,6 +63,8 @@ jobs:
       - checkout
       - run: |
           apt-get update
+          export DEBIAN_FRONTEND=noninteractive &&
+          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
       - run: >
           apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev
           libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev
