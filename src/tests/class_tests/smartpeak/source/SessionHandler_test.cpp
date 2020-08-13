@@ -304,22 +304,20 @@ BOOST_AUTO_TEST_CASE(setFeatureTable1)
   TestData testData(true, true);
   SessionHandler session_handler;
   session_handler.setFeatureTable(testData.sequenceHandler);
-  std::cout << session_handler.feature_table_body << std::endl;
-  BOOST_CHECK_EQUAL(session_handler.feature_table_headers.size(), 19);
+  BOOST_CHECK_EQUAL(session_handler.feature_table_headers.size(), 22);
   BOOST_CHECK_EQUAL(session_handler.feature_table_headers(0), "sample_name");
   BOOST_CHECK_EQUAL(session_handler.feature_table_headers(session_handler.feature_table_headers.size() - 1), "used_");
   BOOST_CHECK_EQUAL(session_handler.feature_table_body.dimension(0), 13);
-  BOOST_CHECK_EQUAL(session_handler.feature_table_body.dimension(1), 19);
+  BOOST_CHECK_EQUAL(session_handler.feature_table_body.dimension(1), 22);
   BOOST_CHECK_EQUAL(session_handler.feature_table_body(0, 0), "150516_CM1_Level1");
   BOOST_CHECK_EQUAL(session_handler.feature_table_body(session_handler.feature_table_body.dimension(0) - 1, session_handler.feature_table_body.dimension(1) - 1), "true");
   session_handler.setMinimalDataAndFilters(testData.sequenceHandler);
   session_handler.setFeatureTable(testData.sequenceHandler);
-  BOOST_CHECK_EQUAL(session_handler.feature_table_headers.size(), 20);
+  BOOST_CHECK_EQUAL(session_handler.feature_table_headers.size(), 23);
   BOOST_CHECK_EQUAL(session_handler.feature_table_headers(0), "sample_name");
   BOOST_CHECK_EQUAL(session_handler.feature_table_headers(session_handler.feature_table_headers.size() - 1), "calculated_concentration");
-  std::cout << session_handler.feature_table_body << std::endl;
   BOOST_CHECK_EQUAL(session_handler.feature_table_body.dimension(0), 1);
-  BOOST_CHECK_EQUAL(session_handler.feature_table_body.dimension(1), 20);
+  BOOST_CHECK_EQUAL(session_handler.feature_table_body.dimension(1), 23);
   BOOST_CHECK_EQUAL(session_handler.feature_table_body(0, 0), "150516_CM1_Level1");
   BOOST_CHECK_EQUAL(session_handler.feature_table_body(session_handler.feature_table_body.dimension(0) - 1, session_handler.feature_table_body.dimension(1) - 1), "");
 }

@@ -1523,6 +1523,7 @@ namespace SmartPeak
     }
 
     double sn_window = 0;
+    //bool write_convex_hull = false;
     for (const auto& fia_params : params_I.at("PickMS1Features")) {
       if (fia_params.at("name") == "sne:window") {
         try {
@@ -1532,6 +1533,16 @@ namespace SmartPeak
           LOGE << e.what();
         }
       }
+      //if (fia_params.at("name") == "write_convex_hull") {
+      //  try {
+      //    std::string value = fia_params.at("value");
+      //    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+      //    write_convex_hull = (value == "true")?true:false;
+      //  }
+      //  catch (const std::exception& e) {
+      //    LOGE << e.what();
+      //  }
+      //}
     }
     if (sn_window == 0) {
       LOGE << "Missing sne:window parameter for PickMS1Features. Not picking";
@@ -1558,28 +1569,34 @@ namespace SmartPeak
         OpenMS::MSSpectrum output;
         picker.pick(input, output);
 
-        if (output.size() > 0) {
-          // Estimate the S/N
-          OpenMS::SignalToNoiseEstimatorMedianRapid sne(sn_window);
-          std::vector<double> mzs, intensities;
-          mzs.reserve(output.size());
-          intensities.reserve(output.size());
-          for (auto it = output.begin(); it != output.end(); ++it)
-          {
-            mzs.push_back(it->getMZ());
-            intensities.push_back(it->getIntensity());
-          }
-          OpenMS::SignalToNoiseEstimatorMedianRapid::NoiseEstimator e = sne.estimateNoise(mzs, intensities);
+        if (output.size() <= 0) continue;
+        // Estimate the S/N
+        OpenMS::SignalToNoiseEstimatorMedianRapid sne(sn_window);
+        std::vector<double> mzs, intensities;
+        mzs.reserve(output.size());
+        intensities.reserve(output.size());
+        for (auto it = output.begin(); it != output.end(); ++it)
+        {
+          mzs.push_back(it->getMZ());
+          intensities.push_back(it->getIntensity());
+        }
+        if (mzs.size() <= 2) continue;
+        OpenMS::SignalToNoiseEstimatorMedianRapid::NoiseEstimator e = sne.estimateNoise(mzs, intensities);
 
-          // Create the featureMap
-          for (auto it = output.begin(); it != output.end(); ++it)
-          {
-            OpenMS::Feature f;
-            f.setIntensity(it->getIntensity());
-            f.setMZ(it->getMZ());
-            f.setMetaValue("signal_to_noise", e.get_noise_value(it->getMZ()));
-            featureMap.push_back(f);
-          }
+        // Create the featureMap
+        for (auto it = output.begin(); it != output.end(); ++it)
+        {
+          OpenMS::Feature f;
+          f.setUniqueId();
+          f.setIntensity(it->getIntensity());
+          f.setMZ(it->getMZ());
+          f.setRT(0);
+          f.setMetaValue("PeptideRef", std::to_string(f.getUniqueId()));
+          f.setMetaValue("scan_polarity", rawDataHandler_IO.getMetaData().scan_polarity);
+          f.setMetaValue("peak_apex_int", it->getIntensity());
+          f.setMetaValue("signal_to_noise", e.get_noise_value(it->getMZ()));
+          // TODO: convex hull points
+          featureMap.push_back(f);
         }
       }
     }
@@ -1601,6 +1618,7 @@ namespace SmartPeak
   void SearchAccurateMass::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
   {
     LOGD << "START SearchAccurateMass";
+    LOGI << "SearchAccurateMass input size: " << rawDataHandler_IO.getFeatureMap().size();
 
     if (params_I.count("AccurateMassSearchEngine") && params_I.at("AccurateMassSearchEngine").empty()) {
       LOGE << "No parameters passed to AccurateMassSearchEngine. Not searching.";
@@ -1615,14 +1633,42 @@ namespace SmartPeak
 
     OpenMS::MzTab output;
     try {
+      // Run the accurate mass search engine
       ams.init();
       ams.run(rawDataHandler_IO.getFeatureMap(), output);
+
+      // Replace the peptide hits as subordinate features
+      OpenMS::FeatureMap fmap;
+      for (const OpenMS::Feature& f : rawDataHandler_IO.getFeatureMap()) {
+        OpenMS::Feature feat = f;
+        bool add_feature = true;
+        for (const auto& ident : f.getPeptideIdentifications()) {
+          for (const auto& hit : ident.getHits()) {
+            OpenMS::Feature sub = f;
+            sub.setUniqueId();
+            sub.setMetaValue("PeptideRef", hit.getMetaValue("identifier").toStringList().at(0));
+            sub.setMetaValue("identifier", hit.getMetaValue("identifier"));
+            sub.setMetaValue("description", hit.getMetaValue("description"));
+            sub.setMetaValue("modifications", hit.getMetaValue("modifications"));
+            sub.setMetaValue("chemical_formula", hit.getMetaValue("chemical_formula"));
+            sub.setMetaValue("mz_error_ppm", hit.getMetaValue("mz_error_ppm"));
+            sub.setMetaValue("mz_error_Da", hit.getMetaValue("mz_error_Da"));
+            sub.setCharge(hit.getCharge());
+            fmap.push_back(sub);
+            add_feature = false;
+          }
+        }
+        if (add_feature) fmap.push_back(feat);
+      }
+      rawDataHandler_IO.setFeatureMap(fmap);
     }
     catch (const std::exception& e) {
       LOGE << e.what();
     }
     rawDataHandler_IO.setMzTab(output);
+    rawDataHandler_IO.updateFeatureMapHistory();
 
+    LOGI << "SearchAccurateMass output size: " << rawDataHandler_IO.getFeatureMap().size();
     LOGD << "END SearchAccurateMass";
   }
 }
