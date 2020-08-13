@@ -79,7 +79,7 @@ endif (SDL2_FOUND)
 find_package(OpenMS REQUIRED)
 if (OpenMS_FOUND)
   ## Add the directory for later calls to CPACK
-  set(OpenMS_LIBRARY_DIR ${OpenMS_DIR}/lib)
+  set(OpenMS_LIBRARY_DIR ${OpenMS_DIR}/bin/Release)
   string(FIND ${OpenMS_DIR} "/" OpenMS_DIR_suffix_pos REVERSE)
   string(SUBSTRING ${OpenMS_DIR} 0 ${OpenMS_DIR_suffix_pos} OpenMS_ROOT)
   set(OpenMS_SHARE_DIR ${OpenMS_ROOT}/share/OpenMS)
