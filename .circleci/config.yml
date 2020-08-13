@@ -6,7 +6,7 @@ orbs:
   win: circleci/windows@2.4.0
 
 jobs:
-  build_ubuntu_1804:
+  build_ubuntu:
     docker:
       - image: ubuntu:18.04
 
@@ -50,66 +50,6 @@ jobs:
       - run:
           command: |
             ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
-
-  build_ubuntu_2004:
-    docker:
-      - image: ubuntu:20.04
-
-    working_directory: ~/SmartPeak2
-
-    resource_class: large
-
-    steps:
-      - checkout
-      - run: |
-          apt-get update
-          export DEBIAN_FRONTEND=noninteractive &&
-          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
-      - run: >
-          apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev
-          libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev
-          libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
-          libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
-      - run: |
-          apt-get install -y graphviz doxygen python3-pip &&
-          export DEBIAN_FRONTEND=noninteractive &&
-          apt-get install -y tzdata &&
-          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
-          dpkg-reconfigure --frontend noninteractive tzdata &&
-          apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
-          pip3 install exhale
-      - run: |
-          cd ~ &&
-          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-          cd OpenMS && git submodule update --init THIRDPARTY &&
-          cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
-          make -j4 OpenMS
-      - run:
-          command: |
-            mkdir ~/SmartPeak2_superbuild
-            cd ~/SmartPeak2_superbuild
-            cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
-            make -j4
-      - run:
-          command: |
-            mkdir ~/SmartPeak2_build
-            cd ~/SmartPeak2_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -Dboost_DIR=/usr/include -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/imgui -DImGui_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
-            make -j4
-      - run:
-          command: |
-            cd ~/SmartPeak2_build || exit 1
-            ls -l ~/SmartPeak2/src/tests/class_tests/smartpeak/data
-            ctest -V
-            ls -l ~/SmartPeak2/src/tests/class_tests/smartpeak/data
-      - run:
-          command: |
-            ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
-
-      - run:
-          command: |
-            [ ! -d ~/SmartPeak2_build/docs/docs/sphinx/_image ]     && exit 0
-            [ ! -f ~/SmartPeak2_build/docs/docs/sphinx/index.html ] && exit 0
 
 
   build_windows:
@@ -198,6 +138,5 @@ workflows:
   version: 2
   build-deploy:
     jobs:
-      - build_ubuntu_1804
-      - build_ubuntu_2004
+      - build_ubuntu
       - build_windows
