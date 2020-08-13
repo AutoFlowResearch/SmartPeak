@@ -103,21 +103,21 @@ jobs:
           cd ~
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
           cd ~/OpenMS; git submodule update --init contrib; mkdir contrib_build; cd contrib_build
-          cmake -DBUILD_TYPE=SEQAN ~/OpenMS/contrib
-          cmake -DBUILD_TYPE=LIBSVM ~/OpenMS/contrib
-          cmake -DBUILD_TYPE=XERCESC ~/OpenMS/contrib
-          cmake -DBUILD_TYPE=COINOR ~/OpenMS/contrib
-          cmake -DBUILD_TYPE=BZIP2 ~/OpenMS/contrib
-          cmake -DBUILD_TYPE=ZLIB ~/OpenMS/contrib
-          cmake -DBUILD_TYPE=GLPK ~/OpenMS/contrib
-          cmake -DBUILD_TYPE=EIGEN ~/OpenMS/contrib
-          cmake -DBUILD_TYPE=WILDMAGIC ~/OpenMS/contrib
-          cmake -DBUILD_TYPE=SQLITE ~/OpenMS/contrib
-          cmake -DBUILD_TYPE=KISSFFT ~/OpenMS/contrib
-          cmake -DBUILD_TYPE=HDF5 ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=SEQAN ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=LIBSVM ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=XERCESC ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=COINOR ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=BZIP2 ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=ZLIB ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=GLPK ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=EIGEN ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=WILDMAGIC ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=SQLITE ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=KISSFFT ~/OpenMS/contrib
+          cmake -G "Visual Studio 15 2017 Win64" -DBUILD_TYPE=HDF5 ~/OpenMS/contrib
           cd ~/OpenMS; mkdir openms_debug_build; cd openms_debug_build
           # cmake -G "Visual Studio 16 2019" -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/lib/boost/boost_1_73_0" -DBOOST_INCLUDEDIR="C:/lib/boost/boost_1_73_0" -DBOOST_LIBRARYDIR="C:/lib/boost/boost_1_73_0/lib64-msvc-14.2" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
-          cmake -G "Visual Studio 15 2017" -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/local/boost/boost_1_67_0" -DBOOST_INCLUDEDIR="C:/local/boost/boost_1_67_0" -DBOOST_LIBRARYDIR="C:/local/boost/boost_1_67_0/lib64-msvc-14.1" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
+          cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/local/boost/boost_1_67_0" -DBOOST_INCLUDEDIR="C:/local/boost/boost_1_67_0" -DBOOST_LIBRARYDIR="C:/local/boost/boost_1_67_0/lib64-msvc-14.1" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
           cmake --build . --target OpenMS
           # cd ~; 7z a OpenMS OpenMS/*
       # - restore_cache:
