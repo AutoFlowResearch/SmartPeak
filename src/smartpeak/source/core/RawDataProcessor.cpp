@@ -1523,7 +1523,7 @@ namespace SmartPeak
     }
 
     double sn_window = 0;
-    //bool write_convex_hull = false;
+    bool write_convex_hull = false;
     for (const auto& fia_params : params_I.at("PickMS1Features")) {
       if (fia_params.at("name") == "sne:window") {
         try {
@@ -1533,16 +1533,16 @@ namespace SmartPeak
           LOGE << e.what();
         }
       }
-      //if (fia_params.at("name") == "write_convex_hull") {
-      //  try {
-      //    std::string value = fia_params.at("value");
-      //    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
-      //    write_convex_hull = (value == "true")?true:false;
-      //  }
-      //  catch (const std::exception& e) {
-      //    LOGE << e.what();
-      //  }
-      //}
+      if (fia_params.at("name") == "write_convex_hull") {
+        try {
+          std::string value = fia_params.at("value");
+          std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+          write_convex_hull = (value == "true")?true:false;
+        }
+        catch (const std::exception& e) {
+          LOGE << e.what();
+        }
+      }
     }
     if (sn_window == 0) {
       LOGE << "Missing sne:window parameter for PickMS1Features. Not picking";
@@ -1566,16 +1566,17 @@ namespace SmartPeak
         // Smooth and pick
         OpenMS::MSSpectrum input(spec);
         sgfilter.filter(input);
+        std::vector<OpenMS::PeakPickerHiRes::PeakBoundary> boundaries;
         OpenMS::MSSpectrum output;
-        picker.pick(input, output);
+        picker.pick(input, output, boundaries);
 
         if (output.size() <= 0) continue;
         // Estimate the S/N
         OpenMS::SignalToNoiseEstimatorMedianRapid sne(sn_window);
         std::vector<double> mzs, intensities;
-        mzs.reserve(output.size());
-        intensities.reserve(output.size());
-        for (auto it = output.begin(); it != output.end(); ++it)
+        mzs.reserve(spec.size());
+        intensities.reserve(spec.size());
+        for (auto& it = spec.begin(); it != spec.end(); ++it)
         {
           mzs.push_back(it->getMZ());
           intensities.push_back(it->getIntensity());
@@ -1584,8 +1585,10 @@ namespace SmartPeak
         OpenMS::SignalToNoiseEstimatorMedianRapid::NoiseEstimator e = sne.estimateNoise(mzs, intensities);
 
         // Create the featureMap
-        for (auto it = output.begin(); it != output.end(); ++it)
+        int i = 0;
+        for (auto& it = output.begin(); it != output.end(); ++it)
         {
+          // set the metadata
           OpenMS::Feature f;
           f.setUniqueId();
           f.setIntensity(it->getIntensity());
@@ -1595,8 +1598,22 @@ namespace SmartPeak
           f.setMetaValue("scan_polarity", rawDataHandler_IO.getMetaData().scan_polarity);
           f.setMetaValue("peak_apex_int", it->getIntensity());
           f.setMetaValue("signal_to_noise", e.get_noise_value(it->getMZ()));
-          // TODO: convex hull points
+          f.setMetaValue("leftWidth", boundaries.at(i).mz_min);
+          f.setMetaValue("rightWidth", boundaries.at(i).mz_max);
+
+          // extract out the convex hull
+          if (write_convex_hull) {
+            OpenMS::ConvexHull2D hull;
+            OpenMS::ConvexHull2D::PointArrayType hull_points;
+            for (auto& h = input.PosBegin(boundaries.at(i).mz_min); h != input.PosEnd(boundaries.at(i).mz_max); ++it)
+            {
+              hull_points.push_back(OpenMS::DPosition<2>(h->getPos(), h->getIntensity()));
+            }
+            hull.setHullPoints(hull_points);
+            f.setConvexHulls({ hull });
+          }
           featureMap.push_back(f);
+          ++i;
         }
       }
     }
