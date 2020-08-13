@@ -6,9 +6,9 @@ orbs:
   win: circleci/windows@2.4.0
 
 jobs:
-  build_ubuntu:
+  build_ubuntu_1804:
     docker:
-      - image: ubuntu:20.04
+      - image: ubuntu:18.04
 
     working_directory: ~/SmartPeak2
 
@@ -50,6 +50,65 @@ jobs:
       - run:
           command: |
             ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
+
+  build_ubuntu_2004:
+    docker:
+      - image: ubuntu:20.04
+
+    working_directory: ~/SmartPeak2
+
+    resource_class: large
+
+    steps:
+      - checkout
+      - run: |
+          apt-get update
+      - run: >
+          apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev
+          libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev
+          libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
+          libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
+      - run: |
+          apt-get install -y graphviz doxygen python3-pip &&
+          export DEBIAN_FRONTEND=noninteractive &&
+          apt-get install -y tzdata &&
+          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
+          dpkg-reconfigure --frontend noninteractive tzdata &&
+          apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
+          pip3 install exhale
+      - run: |
+          cd ~ &&
+          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
+          cd OpenMS && git submodule update --init THIRDPARTY &&
+          cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
+          make -j4 OpenMS
+      - run:
+          command: |
+            mkdir ~/SmartPeak2_superbuild
+            cd ~/SmartPeak2_superbuild
+            cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+            make -j4
+      - run:
+          command: |
+            mkdir ~/SmartPeak2_build
+            cd ~/SmartPeak2_build
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/imgui -DImGui_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+            make -j4
+      - run:
+          command: |
+            cd ~/SmartPeak2_build || exit 1
+            ls -l ~/SmartPeak2/src/tests/class_tests/smartpeak/data
+            ctest -V
+            ls -l ~/SmartPeak2/src/tests/class_tests/smartpeak/data
+      - run:
+          command: |
+            ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
+
+      - run:
+          command: |
+            [ ! -d ~/SmartPeak2_build/docs/docs/sphinx/_image ]     && exit 0
+            [ ! -f ~/SmartPeak2_build/docs/docs/sphinx/index.html ] && exit 0
+
 
   build_windows:
     working_directory: ~/SmartPeak2
@@ -129,17 +188,14 @@ jobs:
           cd ~/SmartPeak2/smartpeak2_debug_build
           cmake -G "Visual Studio 16 2019" -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT=C:/lib/boost/boost_1_73_0 -DBOOST_INCLUDEDIR=C:/lib/boost/boost_1_73_0 -DBOOST_LIBRARYDIR=C:/lib/boost/boost_1_73_0/lib64-msvc-14.2 -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
           cmake --build .
-          cpack
-          ctest -VV -F
+          # cpack
+          # ctest -VV -F
           
-
-
-
-
 
 workflows:
   version: 2
   build-deploy:
     jobs:
-      - build_ubuntu
+      - build_ubuntu_1804
+      - build_ubuntu_2004
       - build_windows
