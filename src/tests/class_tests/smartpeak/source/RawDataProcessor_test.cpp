@@ -1198,6 +1198,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 10);
 
   const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
+  BOOST_CHECK_EQUAL(feature1.getMetaValue("PeptideRef"), "6522689044818182128");
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("peak_apex_int")), 1971.066162109375, 1e-6);
   BOOST_CHECK_EQUAL(feature1.getMetaValue("scan_polarity"), "positive");
@@ -1206,6 +1207,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getIntensity()), 1971.066162109375, 1e-6);
 
   const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
+  BOOST_CHECK_EQUAL(feature2.getMetaValue("PeptideRef"), "3094626196081697405");
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("peak_apex_int")), 1576.05419921875, 1e-6);
   BOOST_CHECK_EQUAL(feature2.getMetaValue("scan_polarity"), "positive");
@@ -1216,6 +1218,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 10);
 
   const OpenMS::Feature& hfeature1 = rawDataHandler.getFeatureMapHistory().at(0); // feature_map_history_
+  BOOST_CHECK_EQUAL(hfeature1.getMetaValue("PeptideRef"), "6522689044818182128");
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("peak_apex_int")), 1971.066162109375, 1e-6);
   BOOST_CHECK_EQUAL(hfeature1.getMetaValue("scan_polarity"), "positive");
@@ -1224,6 +1227,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getIntensity()), 1971.066162109375, 1e-6);
 
   const OpenMS::Feature& hfeature2 = rawDataHandler.getFeatureMapHistory().back();
+  BOOST_CHECK_EQUAL(hfeature2.getMetaValue("PeptideRef"), "3094626196081697405");
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("signal_to_noise")), 1565.7152099609375, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("peak_apex_int")), 1576.05419921875, 1e-6);
   BOOST_CHECK_EQUAL(hfeature2.getMetaValue("scan_polarity"), "positive");
@@ -1274,13 +1278,49 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   SearchAccurateMass searchAccurateMass;
   searchAccurateMass.process(rawDataHandler, params_1, filenames);
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().size(), 51045);
-  BOOST_CHECK_CLOSE(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().calc_mass_to_charge.get(), 500.02851705499575, 1e-6);
-  BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().chemical_formula.get()), "C82H156O17P2");
-  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().identifier.get().at(0).get(), "HMDB:HMDB0073108");
-  BOOST_CHECK_CLOSE(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().back().calc_mass_to_charge.get(), 799.94828338599575, 1e-6);
-  BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().back().chemical_formula.get()), "C76H135N3O29");
-  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().back().identifier.get().at(0).get(), "HMDB:HMDB0011867");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().size(), 21);
+  BOOST_CHECK_CLOSE(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().calc_mass_to_charge.get(), 109.9994567849957, 1e-6);
+  BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().chemical_formula.get()), "C9H11NO6S");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().identifier.get().at(0).get(), "HMDB:HMDB0062550");
+  BOOST_CHECK_CLOSE(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().at(1).calc_mass_to_charge.get(), 109.99915278004569, 1e-6);
+  BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().at(1).chemical_formula.get()), "C6H12O2S2");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().at(1).identifier.get().at(0).get(), "HMDB:HMDB0033556");
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 53);
+
+  const auto& hits2 = rawDataHandler.getFeatureMap().at(2);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("signal_to_noise")), 1782.034423828125, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("peak_apex_int")), 1782.034423828125, 1e-6);
+  BOOST_CHECK_EQUAL(hits2.getMetaValue("scan_polarity"), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMZ()), 109.99950621264246, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getIntensity()), 1782.034423828125, 1e-6);
+  BOOST_CHECK_EQUAL(hits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+  BOOST_CHECK_EQUAL(hits2.getMetaValue("identifier").toString(), "[HMDB:HMDB0062550]");
+  BOOST_CHECK_EQUAL(hits2.getMetaValue("description").toString(), "[2-Methoxyacetaminophen sulfate]");
+  BOOST_CHECK_EQUAL(hits2.getMetaValue("modifications").toString(), "M+3Na;3+");
+  BOOST_CHECK_EQUAL(hits2.getMetaValue("chemical_formula").toString(), "C9H11NO6S");
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("mz_error_ppm")), 0.449344462258211, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("mz_error_Da")), 4.942764675774924e-05, 1e-6);
+  BOOST_CHECK_EQUAL(static_cast<int>(hits2.getCharge()), 3);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 71);
+
+  const auto& hhits2 = rawDataHandler.getFeatureMapHistory().at(51);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("signal_to_noise")), 1782.034423828125, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("peak_apex_int")), 1782.034423828125, 1e-6);
+  BOOST_CHECK_EQUAL(hhits2.getMetaValue("scan_polarity"), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMZ()), 109.99950621264246, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getIntensity()), 1782.034423828125, 1e-6);
+  BOOST_CHECK_EQUAL(hhits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+  BOOST_CHECK_EQUAL(hhits2.getMetaValue("identifier").toString(), "[HMDB:HMDB0062550]");
+  BOOST_CHECK_EQUAL(hhits2.getMetaValue("description").toString(), "[2-Methoxyacetaminophen sulfate]");
+  BOOST_CHECK_EQUAL(hhits2.getMetaValue("modifications").toString(), "M+3Na;3+");
+  BOOST_CHECK_EQUAL(hhits2.getMetaValue("chemical_formula").toString(), "C9H11NO6S");
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("mz_error_ppm")), 0.449344462258211, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("mz_error_Da")), 4.942764675774924e-05, 1e-6);
+  BOOST_CHECK_EQUAL(static_cast<int>(hhits2.getCharge()), 3);
 }
 
 /**
