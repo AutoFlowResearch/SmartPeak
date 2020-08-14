@@ -1605,7 +1605,7 @@ namespace SmartPeak
           if (write_convex_hull) {
             OpenMS::ConvexHull2D hull;
             OpenMS::ConvexHull2D::PointArrayType hull_points;
-            for (auto& h = input.PosBegin(boundaries.at(i).mz_min); h != input.PosEnd(boundaries.at(i).mz_max); ++it)
+            for (auto& h = input.PosBegin(boundaries.at(i).mz_min); h != input.PosEnd(boundaries.at(i).mz_max); ++h)
             {
               hull_points.push_back(OpenMS::DPosition<2>(h->getPos(), h->getIntensity()));
             }
