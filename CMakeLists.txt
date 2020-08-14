@@ -261,7 +261,10 @@ add_subdirectory(src)
 #------------------------------------------------------------------------------
 # Documentation
 #------------------------------------------------------------------------------
-add_subdirectory(docs)
+option (BUILD_DOCS "Whether or not to build the documentation" OFF)
+if(BUILD_DOCS)
+    add_subdirectory(docs)
+endif()
 
 #------------------------------------------------------------------------------
 # Handle export of targets and install them
