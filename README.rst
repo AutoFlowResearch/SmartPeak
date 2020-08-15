@@ -4,12 +4,12 @@ SmartPeak
 
 .. begin_badges
 
-.. |docs| image:: https://readthedocs.com/projects/ak-smartpeak2/badge/?version=latest
+.. |docs| image:: https://readthedocs.com/projects/smartpeak2/badge/?version=latest
    :alt: Documentation Status
-   :target: https://ak-smartpeak2.readthedocs-hosted.com/en/latest/?badge=latest
+   :target: https://smartpeak2.readthedocs.io/en/latest/?badge=latest
 
-.. |circleci| image:: https://circleci.com/gh/dmccloskey/SmartPeak2.svg?branch=feat/aut312?style=svg
-   :alt: Travis CI Build Status (Unix, Flake8 and Docs Tests)
+.. |circleci| image:: https://circleci.com/gh/dmccloskey/SmartPeak2.svg?branch=develop?style=svg
+   :alt: CircleCI Build Status (Windows, Linux & macOS)
    :target: https://circleci.com/gh/dmccloskey/SmartPeak2
 
 .. |license| image:: https://img.shields.io/github/license/dmccloskey/SmartPeak2.svg
