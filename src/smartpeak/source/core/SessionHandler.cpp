@@ -847,6 +847,123 @@ namespace SmartPeak
     if (n_points < MAX_POINTS) return true;
     else return false;
   }
+  bool SessionHandler::setSpectrumScatterPlot(const SequenceHandler& sequence_handler)
+  {
+    const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
+    int n_points = 0;
+    if (sequence_handler.getSequence().size() > 0 &&
+      sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 &&
+      sequence_handler.getSequence().at(0).getRawData().getExperiment().getSpectra().size() > 0) {
+      // get the selected sample names
+      Eigen::Tensor<std::string, 1> selected_sample_names = getSelectSampleNamesPlot();
+      std::set<std::string> sample_names;
+      for (int i = 0; i < selected_sample_names.size(); ++i) {
+        if (!selected_sample_names(i).empty())
+          sample_names.insert(selected_sample_names(i));
+      }
+      // get the selected transitions
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsPlot();
+      std::set<std::string> component_names;
+      for (int i = 0; i < selected_transitions.size(); ++i) {
+        if (!selected_transitions(i).empty())
+          component_names.insert(selected_transitions(i));
+      }
+      if (spec_mz_raw_data.size() != getNSelectedSampleNamesPlot() * getNSelectedTransitionsPlot()) {
+        LOGD << "Making the spectra data for plotting";
+        // Set the axes titles and min/max defaults
+        spec_x_axis_title = "m/z (Da)";
+        spec_y_axis_title = "Intensity (au)";
+        spec_mz_min = 1e6;
+        spec_mz_max = 0;
+        spec_intensity_min = 1e6;
+        spec_intensity_max = 0;
+        spec_mz_hull_data.clear();
+        spec_intensity_hull_data.clear();
+        spec_series_hull_names.clear();
+        spec_mz_raw_data.clear();
+        spec_intensity_raw_data.clear();
+        spec_series_raw_names.clear();
+        for (const auto& injection : sequence_handler.getSequence()) {
+          if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
+          // Extract out the raw data for plotting
+          for (const auto& specatogram : injection.getRawData().getExperiment().getSpectra()) {
+            if (component_names.count(specatogram.getNativeID()) == 0) continue;
+            std::vector<float> x_data, y_data;
+            for (const auto& point : specatogram) {
+              x_data.push_back(point.getRT());
+              y_data.push_back(point.getIntensity());
+              spec_mz_min = std::min((float)point.getRT(), spec_mz_min);
+              spec_intensity_min = std::min((float)point.getIntensity(), spec_intensity_min);
+              spec_mz_max = std::max((float)point.getRT(), spec_mz_max);
+              spec_intensity_max = std::max((float)point.getIntensity(), spec_intensity_max);
+            }
+            n_points += x_data.size();
+            if (n_points < MAX_POINTS) {
+              spec_mz_raw_data.push_back(x_data);
+              spec_intensity_raw_data.push_back(y_data);
+              spec_series_raw_names.push_back(injection.getMetaData().getSampleName() + "::" + specatogram.getNativeID());
+            }
+            else {
+              LOGD << "Stopped adding points to the spectra plot";
+              return false;
+            }
+          }
+          // Extract out the best left/right for plotting
+          for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
+            for (const auto& subordinate : feature.getSubordinates()) {
+              if (subordinate.getMetaValue("used_") == "true" && component_names.count(subordinate.getMetaValue("native_id").toString())) {
+                if (subordinate.metaValueExists("leftWidth") && subordinate.metaValueExists("rightWidth")) {
+                  std::vector<float> x_data, y_data;
+                  x_data.push_back(subordinate.getMetaValue("leftWidth"));
+                  y_data.push_back(0); // TODO: extract out spec peak intensity
+                  x_data.push_back(subordinate.getMetaValue("rightWidth"));
+                  y_data.push_back(0); // TODO: extract out spec peak intensity
+                  n_points += x_data.size();
+                  if (n_points < MAX_POINTS) {
+                    spec_mz_data.push_back(x_data);
+                    spec_intensity_data.push_back(y_data);
+                    spec_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
+                  }
+                  else {
+                    LOGD << "Stopped adding points to the spectra plot";
+                    return false;
+                  }
+                }
+              }
+            }
+          }
+          // Extract out the smoothed points for plotting
+          for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
+            for (const auto& subordinate : feature.getSubordinates()) {
+              if (subordinate.getMetaValue("used_") == "true" && component_names.count(subordinate.getMetaValue("native_id").toString())) {
+                std::vector<float> x_data, y_data;
+                for (const auto& point : subordinate.getConvexHull().getHullPoints()) {
+                  x_data.push_back(point.getX());
+                  y_data.push_back(point.getY());
+                  spec_mz_min = std::min((float)point.getX(), spec_mz_min);
+                  spec_intensity_min = std::min((float)point.getY(), spec_intensity_min);
+                  spec_mz_max = std::max((float)point.getX(), spec_mz_max);
+                  spec_intensity_max = std::max((float)point.getY(), spec_intensity_max);
+                }
+                n_points += x_data.size();
+                if (n_points < MAX_POINTS) {
+                  spec_mz_hull_data.push_back(x_data);
+                  spec_intensity_hull_data.push_back(y_data);
+                  spec_series_hull_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
+                }
+                else {
+                  LOGD << "Stopped adding points to the spectra plot";
+                  return false;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (n_points < MAX_POINTS) return true;
+    else return false;
+  }
   void SessionHandler::setFeatureLinePlot()
   {
     // Set the axes titles and min/max defaults
