@@ -1507,6 +1507,16 @@ namespace SmartPeak
       }
     }
     output.sortByPosition();
+
+    // Update the metavalue and members
+    output.setNativeID("MergeSpectra");
+    output.setMSLevel(rawDataHandler_IO.getExperiment().getSpectra().front().getMSLevel());
+    output.setType(rawDataHandler_IO.getExperiment().getSpectra().front().getType());
+    output.setMetaValue("base peak m/z", 0.0);
+    output.setMetaValue("base peak intensity", 0.0);
+    output.setMetaValue("total ion current", 0.0);
+    output.setMetaValue("lowest observed m/z", rawDataHandler_IO.getExperiment().getSpectra().front().front().getMZ());
+    output.setMetaValue("highest observed m/z", rawDataHandler_IO.getExperiment().getSpectra().back().back().getMZ());
     rawDataHandler_IO.getExperiment().setSpectra({ output });
 
     LOGD << "END MergeSpectra";
@@ -1594,6 +1604,7 @@ namespace SmartPeak
           f.setIntensity(it->getIntensity());
           f.setMZ(it->getMZ());
           f.setRT(0);
+          f.setMetaValue("native_id", spec.getNativeID());
           f.setMetaValue("PeptideRef", std::to_string(f.getUniqueId()));
           f.setMetaValue("scan_polarity", rawDataHandler_IO.getMetaData().scan_polarity);
           f.setMetaValue("peak_apex_int", it->getIntensity());

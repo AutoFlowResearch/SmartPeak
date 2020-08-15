@@ -110,6 +110,30 @@ BOOST_AUTO_TEST_CASE(setFeatureExplorer1)
   BOOST_CHECK(session_handler.feature_explorer_checkbox_body(session_handler.feature_explorer_checkbox_body.dimension(0) - 1, session_handler.feature_explorer_checkbox_body.dimension(1) - 1));
 }
 
+BOOST_AUTO_TEST_CASE(setSpectrumExplorer1)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  session_handler.setSpectrumTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.spectrum_table_headers.size(), 8);
+  BOOST_CHECK_EQUAL(session_handler.spectrum_table_headers(0), "native_id");
+  BOOST_CHECK_EQUAL(session_handler.spectrum_table_headers(session_handler.spectrum_table_headers.size() - 1), "highest observed m/z");
+  BOOST_CHECK_EQUAL(session_handler.spectrum_table_body.dimension(0), 6);
+  BOOST_CHECK_EQUAL(session_handler.spectrum_table_body.dimension(1), 8);
+  BOOST_CHECK_EQUAL(session_handler.spectrum_table_body(0, 0), "arg-L");
+  BOOST_CHECK_EQUAL(session_handler.spectrum_table_body(session_handler.spectrum_table_body.dimension(0) - 1, session_handler.spectrum_table_body.dimension(1) - 1), "1");
+
+  session_handler.setSpectrumExplorer();
+  BOOST_CHECK_EQUAL(session_handler.transition_explorer_checkbox_headers.size(), 2);
+  BOOST_CHECK_EQUAL(session_handler.transition_explorer_checkbox_headers(0), "plot");
+  BOOST_CHECK_EQUAL(session_handler.transition_explorer_checkbox_headers(session_handler.transition_explorer_checkbox_headers.size() - 1), "table");
+  BOOST_CHECK_EQUAL(session_handler.transition_explorer_checkbox_body.dimension(0), 6);
+  BOOST_CHECK_EQUAL(session_handler.transition_explorer_checkbox_body.dimension(1), 2);
+  BOOST_CHECK(session_handler.transition_explorer_checkbox_body(0, 0));
+  BOOST_CHECK(!session_handler.transition_explorer_checkbox_body(1, 0));
+  BOOST_CHECK(session_handler.transition_explorer_checkbox_body(session_handler.transition_explorer_checkbox_body.dimension(0) - 1, session_handler.transition_explorer_checkbox_body.dimension(1) - 1));
+}
+
 BOOST_AUTO_TEST_CASE(setWorkflowTable1)
 {
   TestData testData;
@@ -264,12 +288,18 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionsPlot().size(), 6);
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionsPlot()(0), "arg-L.arg-L_1.Light");
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionsPlot()(session_handler.getSelectTransitionsPlot().dimension(0) - 1), "");
+  BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot().size(), 6);
+  BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot()(0), "arg-L");
+  BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot()(session_handler.getSelectTransitionsPlot().dimension(0) - 1), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable().size(), 16);
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable()(0), "asymmetry_factor");
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable()(session_handler.getSelectFeatureMetaValuesTable().dimension(0) - 1), "rightWidth");
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesPlot().size(), 16);
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesPlot()(0), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesPlot()(session_handler.getSelectFeatureMetaValuesPlot().dimension(0) - 1), "");
+  BOOST_CHECK_EQUAL(session_handler.getSelectSpectrumPlot().size(), 6);
+  BOOST_CHECK_EQUAL(session_handler.getSelectSpectrumPlot()(0), "");
+  BOOST_CHECK_EQUAL(session_handler.getSelectSpectrumPlot()(session_handler.getSelectTransitionsPlot().dimension(0) - 1), "");
   // Table filters
   BOOST_CHECK_EQUAL(session_handler.getSequenceTableFilters().size(), 2);
   BOOST_CHECK(session_handler.getSequenceTableFilters()(0));
@@ -277,6 +307,9 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getTransitionsTableFilters().size(), 6);
   BOOST_CHECK(session_handler.getTransitionsTableFilters()(0));
   BOOST_CHECK(session_handler.getTransitionsTableFilters()(session_handler.getTransitionsTableFilters().dimension(0) - 1));
+  BOOST_CHECK_EQUAL(session_handler.getSpectrumTableFilters().size(), 6);
+  BOOST_CHECK(session_handler.getSpectrumTableFilters()(0));
+  BOOST_CHECK(session_handler.getSpectrumTableFilters()(session_handler.getSpectrumTableFilters().dimension(0) - 1));
   session_handler.setQuantMethodTable(testData.sequenceHandler);
   BOOST_CHECK_EQUAL(session_handler.getQuantMethodsTableFilters().size(), 10);
   BOOST_CHECK(session_handler.getQuantMethodsTableFilters()(0));
@@ -332,6 +365,13 @@ BOOST_AUTO_TEST_CASE(setChromatogramScatterPlot1)
 {
   TestData testData;
   SessionHandler session_handler; session_handler.setChromatogramScatterPlot(testData.sequenceHandler);
+}
+
+
+BOOST_AUTO_TEST_CASE(setSpectrumScatterPlot1)
+{
+  TestData testData;
+  SessionHandler session_handler; session_handler.setSpectrumScatterPlot(testData.sequenceHandler);
 }
 
 BOOST_AUTO_TEST_CASE(setCalibratorsScatterLinePlot1)

@@ -531,6 +531,7 @@ BOOST_AUTO_TEST_CASE(processorMergeSpectra)
   BOOST_CHECK_EQUAL(spectra2.size(), 1);
   BOOST_CHECK_CLOSE(spectra2.front().getRT(), -1, 1e-3);
   BOOST_CHECK_EQUAL(spectra2.front().size(), 240);
+  BOOST_CHECK_EQUAL(spectra2.front().getNativeID(), "MergeSpectra");
   BOOST_CHECK_EQUAL(spectra2.front().front().getMZ(), 109.95009243262952);
   BOOST_CHECK_EQUAL(spectra2.front().back().getMZ(), 109.99988410050186);
   BOOST_CHECK_EQUAL(spectra2.front().front().getIntensity(), 0);
@@ -1198,6 +1199,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 10);
 
   const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
+  BOOST_CHECK_EQUAL(feature1.getMetaValue("native_id"), "MergeSpectra");
   BOOST_CHECK(feature1.metaValueExists("PeptideRef"));
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("signal_to_noise")), 34198.520319918811, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("peak_apex_int")), 1971.066162109375, 1e-6);
