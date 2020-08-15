@@ -263,6 +263,13 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getTransitionExplorerBody().dimension(1), 2);
   BOOST_CHECK_EQUAL(session_handler.getTransitionExplorerBody()(0,0), "arg-L");
   BOOST_CHECK_EQUAL(session_handler.getTransitionExplorerBody()(session_handler.getTransitionExplorerBody().dimension(0) - 1, session_handler.getTransitionExplorerBody().dimension(1) - 1), "ser-L.ser-L_2.Light");
+  BOOST_CHECK_EQUAL(session_handler.getSpectrumExplorerHeader().size(), 1);
+  BOOST_CHECK_EQUAL(session_handler.getSpectrumExplorerHeader()(0), "native_id");
+  BOOST_CHECK_EQUAL(session_handler.getSpectrumExplorerHeader()(session_handler.getSpectrumExplorerHeader().dimension(0) - 1), "native_id");
+  BOOST_CHECK_EQUAL(session_handler.getSpectrumExplorerBody().dimension(0), 6);
+  BOOST_CHECK_EQUAL(session_handler.getSpectrumExplorerBody().dimension(1), 1);
+  BOOST_CHECK_EQUAL(session_handler.getSpectrumExplorerBody()(0, 0), "arg-L");
+  BOOST_CHECK_EQUAL(session_handler.getSpectrumExplorerBody()(session_handler.getSpectrumExplorerBody().dimension(0) - 1, session_handler.getSpectrumExplorerBody().dimension(1) - 1), "ser-L.ser-L_2.Light");
   // N selected counts
   BOOST_CHECK_EQUAL(session_handler.getNSelectedSampleNamesTable(), 2);
   BOOST_CHECK_EQUAL(session_handler.getNSelectedSampleNamesPlot(), 1);

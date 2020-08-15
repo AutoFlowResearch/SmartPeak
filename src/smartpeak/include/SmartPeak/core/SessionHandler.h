@@ -79,6 +79,8 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 2> getInjectionExplorerBody();
     Eigen::Tensor<std::string, 1> getTransitionExplorerHeader();
     Eigen::Tensor<std::string, 2> getTransitionExplorerBody();
+    Eigen::Tensor<std::string, 1> getSpectrumExplorerHeader();
+    Eigen::Tensor<std::string, 2> getSpectrumExplorerBody();
 
     Eigen::Tensor<bool, 1> getSequenceTableFilters();
     Eigen::Tensor<bool, 1> getTransitionsTableFilters();
@@ -100,7 +102,7 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 1> getSelectFeatureMetaValuesTable();
     Eigen::Tensor<std::string, 1> getSelectFeatureMetaValuesPlot();
     Eigen::Tensor<std::string, 1> getSelectSpectrumPlot();
-    std::pair<float, float> getSelectPositionsPlot() { return spec_pos_range; };
+    std::pair<float, float> getSelectPositionsPlot();
 
     int getNSelectedSampleNamesTable();
     int getNSelectedSampleNamesPlot();

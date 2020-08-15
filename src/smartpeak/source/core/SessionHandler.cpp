@@ -940,8 +940,7 @@ namespace SmartPeak
         if (!selected_transitions(i).empty())
           component_group_names.insert(selected_transitions(i));
       }
-      if (spec_mz_raw_data.size() != sample_names.size() * scan_names.size() ||
-        spec_series_hull_names.size() != component_group_names.size()) {
+      if (spec_mz_raw_data.size() != sample_names.size() * scan_names.size() /*||spec_series_hull_names.size() != component_group_names.size()*/) {
         LOGD << "Making the spectra data for plotting";
         // Set the axes titles and min/max defaults
         spec_x_axis_title = "m/z (Da)";
@@ -1202,6 +1201,20 @@ namespace SmartPeak
     else
       return Eigen::Tensor<std::string, 2>();
   }
+  Eigen::Tensor<std::string, 1> SessionHandler::getSpectrumExplorerHeader()
+  {
+    if (spectrum_table_headers.size())
+      return spectrum_table_headers.slice(Eigen::array<Eigen::Index, 1>({ 0 }), Eigen::array<Eigen::Index, 1>({ 1 }));
+    else
+      return Eigen::Tensor<std::string, 1>();
+  }
+  Eigen::Tensor<std::string, 2> SessionHandler::getSpectrumExplorerBody()
+  {
+    if (spectrum_table_body.size())
+      return spectrum_table_body.slice(Eigen::array<Eigen::Index, 2>({ 0,0 }), Eigen::array<Eigen::Index, 2>({ spectrum_table_body.dimension(0), 1 }));
+    else
+      return Eigen::Tensor<std::string, 2>();
+  }
   Eigen::Tensor<bool, 1> SessionHandler::getSequenceTableFilters()
   {
     if (sequence_table_body.size() && injection_explorer_checkbox_body.size())
@@ -1394,9 +1407,14 @@ namespace SmartPeak
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectSpectrumPlot()
   {
     if (spectrum_table_body.size() && transition_explorer_checkbox_headers.size())
-      return (transition_explorer_checkbox_body.chip(0, 1)).select(spectrum_table_body.chip(0, 1), spectrum_table_body.chip(0, 1).constant(""));
+      return (spectrum_explorer_checkbox_body.chip(0, 1)).select(spectrum_table_body.chip(0, 1), spectrum_table_body.chip(0, 1).constant(""));
     else
       return Eigen::Tensor<std::string, 1>();
+  }
+  std::pair<float, float> SessionHandler::getSelectPositionsPlot()
+  {
+    //return spec_pos_range;
+    return std::make_pair(179, 181);
   }
   int SessionHandler::getNSelectedSampleNamesTable()
   {
