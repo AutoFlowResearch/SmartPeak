@@ -1699,4 +1699,11 @@ namespace SmartPeak
     LOGI << "SearchAccurateMass output size: " << rawDataHandler_IO.getFeatureMap().size();
     LOGD << "END SearchAccurateMass";
   }
+
+  void ClearData::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START ClearData";
+    rawDataHandler_IO.clearNonSharedData();
+    LOGD << "END ClearData";
+  }
 }
