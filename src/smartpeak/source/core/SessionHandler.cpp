@@ -682,7 +682,7 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature table headers and body
-      if (feature_table_unique_samples_transitions_ != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot() || feature_table_body.dimension(1) != 19 + getNSelectedFeatureMetaValuesPlot()) {
+      if (feature_table_unique_samples_transitions_ != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot() || feature_table_body.dimension(1) != 22 + getNSelectedFeatureMetaValuesPlot()) {
         LOGD << "Making feature_table_body and feature_table_headers";
         // get the selected feature names
         Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureMetaValuesPlot();
@@ -708,11 +708,18 @@ namespace SmartPeak
           if (!selected_transitions(i).empty())
             component_names.insert(selected_transitions(i));
         }
+        // get the selected transition groups
+        Eigen::Tensor<std::string, 1> selected_transition_groups = getSelectTransitionGroupsPlot();
+        std::set<std::string> component_group_names;
+        for (int i = 0; i < selected_transition_groups.size(); ++i) {
+          if (!selected_transition_groups(i).empty())
+            component_group_names.insert(selected_transition_groups(i));
+        }
         // update the number of unique samples, transitions, and feature metavalues
-        feature_table_unique_samples_transitions_ = component_names.size()*sample_names.size();
+        feature_table_unique_samples_transitions_ = getNSelectedSampleNamesPlot() * getNSelectedTransitionsPlot();
         std::vector<std::vector<std::string>> table;
         std::vector<std::string> headers;
-        SequenceParser::makeDataTableFromMetaValue(sequence_handler, table, headers, feature_names, sample_types, sample_names, component_names);
+        SequenceParser::makeDataTableFromMetaValue(sequence_handler, table, headers, feature_names, sample_types, sample_names, component_group_names, component_names);
         const int n_cols = headers.size();
         const int n_rows = table.size();
         feature_table_headers.resize(n_cols);
@@ -737,7 +744,7 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature_pivot table headers and body
-      if (feat_value_data.dimension(1) != getNSelectedFeatureMetaValuesPlot() *getNSelectedSampleNamesPlot() || feat_value_data.dimension(0) != getNSelectedTransitionsPlot()) {
+      if (feat_value_data.dimension(1) != getNSelectedSampleNamesPlot() || feature_matrix_unique_transitions_ != getNSelectedTransitionsPlot() * getNSelectedFeatureMetaValuesPlot()) {
         LOGD << "Making feature matrix, line plot, and heatmap data tables";
         // get the selected feature names
         Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureMetaValuesPlot();
@@ -763,9 +770,18 @@ namespace SmartPeak
           if (!selected_transitions(i).empty())
             component_names.insert(selected_transitions(i));
         }
+        // get the selected transition groups
+        Eigen::Tensor<std::string, 1> selected_transition_groups = getSelectTransitionGroupsPlot();
+        std::set<std::string> component_group_names;
+        for (int i = 0; i < selected_transition_groups.size(); ++i) {
+          if (!selected_transition_groups(i).empty())
+            component_group_names.insert(selected_transition_groups(i));
+        }
+        // Update teh unique transitions
+        feature_matrix_unique_transitions_ = getNSelectedTransitionsPlot() * getNSelectedFeatureMetaValuesPlot();
         // get the matrix of data
         Eigen::Tensor<std::string, 2> rows_out;
-        SequenceParser::makeDataMatrixFromMetaValue(sequence_handler, feat_value_data, feat_heatmap_col_labels, rows_out, feature_names, sample_types, sample_names, component_names);
+        SequenceParser::makeDataMatrixFromMetaValue(sequence_handler, feat_value_data, feat_heatmap_col_labels, rows_out, feature_names, sample_types, sample_names, component_group_names, component_names);
         setFeatureLinePlot();
         setFeatureHeatMap();
         // update the pivot table headers with the columns for the pivot table/heatmap rows

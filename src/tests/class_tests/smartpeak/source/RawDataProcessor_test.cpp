@@ -1201,7 +1201,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
   const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
   BOOST_CHECK_EQUAL(feature1.getMetaValue("native_id"), "MergeSpectra");
   BOOST_CHECK(feature1.metaValueExists("PeptideRef"));
-  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("signal_to_noise")), 34198.520319918811, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("logSN")), 34198.520319918811, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("peak_apex_int")), 1971.066162109375, 1e-6);
   BOOST_CHECK_EQUAL(feature1.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("leftWidth")), 109.95009243262952, 1e-6);
@@ -1214,7 +1214,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
 
   const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
   BOOST_CHECK(feature2.metaValueExists("PeptideRef"));
-  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("signal_to_noise")), 34198.520319918811, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("logSN")), 34198.520319918811, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("peak_apex_int")), 1576.05419921875, 1e-6);
   BOOST_CHECK_EQUAL(feature2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("leftWidth")), 109.99321743367376, 1e-6);
@@ -1229,7 +1229,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
 
   const OpenMS::Feature& hfeature1 = rawDataHandler.getFeatureMapHistory().at(0); // feature_map_history_
   BOOST_CHECK(hfeature1.metaValueExists("PeptideRef"));
-  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("signal_to_noise")), 34198.520319918811, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("logSN")), 34198.520319918811, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("peak_apex_int")), 1971.066162109375, 1e-6);
   BOOST_CHECK_EQUAL(hfeature1.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("leftWidth")), 109.95009243262952, 1e-6);
@@ -1242,7 +1242,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
 
   const OpenMS::Feature& hfeature2 = rawDataHandler.getFeatureMapHistory().back();
   BOOST_CHECK(hfeature2.metaValueExists("PeptideRef"));
-  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("signal_to_noise")), 34198.520319918811, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("logSN")), 34198.520319918811, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("peak_apex_int")), 1576.05419921875, 1e-6);
   BOOST_CHECK_EQUAL(hfeature2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("leftWidth")), 109.99321743367376, 1e-6);
@@ -1307,7 +1307,7 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 53);
 
   const auto& hits2 = rawDataHandler.getFeatureMap().at(2);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("signal_to_noise")), 1782.034423828125, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("logSN")), 1782.034423828125, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("peak_apex_int")), 1782.034423828125, 1e-6);
   BOOST_CHECK_EQUAL(hits2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hits2.getRT()), 0, 1e-6);
@@ -1325,7 +1325,7 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 71);
 
   const auto& hhits2 = rawDataHandler.getFeatureMapHistory().at(51);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("signal_to_noise")), 1782.034423828125, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("logSN")), 1782.034423828125, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("peak_apex_int")), 1782.034423828125, 1e-6);
   BOOST_CHECK_EQUAL(hhits2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getRT()), 0, 1e-6);

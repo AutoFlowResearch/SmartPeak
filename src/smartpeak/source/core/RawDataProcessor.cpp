@@ -1608,7 +1608,7 @@ namespace SmartPeak
           f.setMetaValue("PeptideRef", std::to_string(f.getUniqueId()));
           f.setMetaValue("scan_polarity", rawDataHandler_IO.getMetaData().scan_polarity);
           f.setMetaValue("peak_apex_int", it->getIntensity());
-          f.setMetaValue("signal_to_noise", e.get_noise_value(it->getMZ()));
+          f.setMetaValue("logSN", std::log(e.get_noise_value(it->getMZ())));
           f.setMetaValue("leftWidth", boundaries.at(i).mz_min);
           f.setMetaValue("rightWidth", boundaries.at(i).mz_max);
 

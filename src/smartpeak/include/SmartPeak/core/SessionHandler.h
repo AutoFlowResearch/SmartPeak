@@ -172,7 +172,6 @@ namespace SmartPeak
     std::vector<std::vector<float>> chrom_time_hull_data, chrom_intensity_hull_data;
     std::vector<std::vector<float>> chrom_time_raw_data, chrom_intensity_raw_data;
     std::vector<std::string> chrom_series_hull_names,chrom_series_raw_names;
-    std::set<std::string> chrom_series_hull_names_;
     std::string chrom_x_axis_title;
     std::string chrom_y_axis_title;
     float chrom_time_min, chrom_time_max, chrom_intensity_min, chrom_intensity_max;
@@ -181,7 +180,6 @@ namespace SmartPeak
     std::vector<std::vector<float>> spec_mz_hull_data, spec_intensity_hull_data;
     std::vector<std::vector<float>> spec_mz_raw_data, spec_intensity_raw_data;
     std::vector<std::string> spec_series_hull_names, spec_series_raw_names;
-    std::set<std::string> spec_series_hull_names_;
     std::string spec_x_axis_title;
     std::string spec_y_axis_title;
     float spec_mz_min, spec_mz_max, spec_intensity_min, spec_intensity_max;
@@ -205,6 +203,9 @@ namespace SmartPeak
     std::string calibrators_y_axis_title;
     float calibrators_conc_min , calibrators_conc_max, calibrators_feature_min, calibrators_feature_max;
   private:
+    std::set<std::string> chrom_series_hull_names_;
+    std::set<std::string> spec_series_hull_names_;
     int feature_table_unique_samples_transitions_ = 0; // used to decide when to update the feature table data
+    int feature_matrix_unique_transitions_ = 0; // used to decide when to update the feature matrix data
   };
 }
