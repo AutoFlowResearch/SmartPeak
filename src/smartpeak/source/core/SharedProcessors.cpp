@@ -31,7 +31,8 @@ namespace SmartPeak {
     {"PICK_MS1_FEATURES", std::make_shared<PickMS1Features>()},
     {"SEARCH_ACCURATE_MASS", std::make_shared<SearchAccurateMass>()},
     {"LOAD_ANNOTATIONS", std::make_shared<LoadAnnotations>()},
-    {"STORE_ANNOTATIONS", std::make_shared<StoreAnnotations>()}
+    {"STORE_ANNOTATIONS", std::make_shared<StoreAnnotations>()},
+    {"CLEAR_DATA", std::make_shared<ClearData>()}
   };
   const std::map<std::string, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
     {"CALCULATE_CALIBRATION", std::make_shared<CalculateCalibration>()},
