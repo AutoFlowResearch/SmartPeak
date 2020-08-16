@@ -506,12 +506,12 @@ int main(int argc, char **argv)
         if (ImGui::MenuItem("Injections", NULL, &show_injection_explorer)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {}
         if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}
-        if (ImGui::MenuItem("Spectrum", NULL, &show_spectrum_explorer)) {}
+        if (ImGui::MenuItem("Scans", NULL, &show_spectrum_explorer)) {}
         ImGui::Separator(); // Primary input
         ImGui::MenuItem("Main window (Tables)", NULL, false, false);
         if (ImGui::MenuItem("Sequence", NULL, &show_sequence_table)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_table)) {}
-        if (ImGui::MenuItem("spectrum", NULL, &show_spectrum_table)) {}
+        if (ImGui::MenuItem("Scans", NULL, &show_spectrum_table)) {}
         if (ImGui::MenuItem("Workflow", NULL, &show_workflow_table)) {}
         if (ImGui::BeginMenu("Workflow settings"))
         {
@@ -776,25 +776,35 @@ int main(int argc, char **argv)
         }
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
         {
+          // Filter for the position
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          ImGui::SliderFloat("min time (sec)", &session_handler_.chrom_time_range.first, 0.0f, session_handler_.chrom_time_range.second, "%.4f", 2.0f);
+          ImGui::SliderFloat("max time (sec)", &session_handler_.chrom_time_range.second, session_handler_.chrom_time_range.first, 2000.0f, "%.4f", 2.0f);
+
+          // The actual plot
           exceeding_plot_points_ = !session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
           ChromatogramPlotWidget plot2d(session_handler_.chrom_time_raw_data, session_handler_.chrom_intensity_raw_data, session_handler_.chrom_series_raw_names,
             session_handler_.chrom_time_hull_data, session_handler_.chrom_intensity_hull_data, session_handler_.chrom_series_hull_names,
             session_handler_.chrom_x_axis_title, session_handler_.chrom_y_axis_title,
             session_handler_.chrom_time_min, session_handler_.chrom_time_max, session_handler_.chrom_intensity_min, session_handler_.chrom_intensity_max,
-            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "Chromatograms Main Window");
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_ - 20, "Chromatograms Main Window");
           plot2d.draw();
           ImGui::EndTabItem();
         }
         if (show_spectra_line_plot && ImGui::BeginTabItem("Spectra", &show_spectra_line_plot))
         {
+          // Filter for the position
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          ImGui::SliderFloat("min m/z (Da)", &session_handler_.spec_mz_range.first, 0.0f, session_handler_.spec_mz_range.second, "%.4f", 2.0f);
+          ImGui::SliderFloat("max m/z (Da)", &session_handler_.spec_mz_range.second, session_handler_.spec_mz_range.first, 2000.0f, "%.4f", 2.0f);
+
+          // The actual plot
           exceeding_plot_points_ = !session_handler_.setSpectrumScatterPlot(application_handler_.sequenceHandler_);
           ChromatogramPlotWidget plot2d(session_handler_.spec_mz_raw_data, session_handler_.spec_intensity_raw_data, session_handler_.spec_series_raw_names,
             session_handler_.spec_mz_hull_data, session_handler_.spec_intensity_hull_data, session_handler_.spec_series_hull_names,
             session_handler_.spec_x_axis_title, session_handler_.spec_y_axis_title,
             session_handler_.spec_mz_min, session_handler_.spec_mz_max, session_handler_.spec_intensity_min, session_handler_.spec_intensity_max,
-            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "Spectra Main Window");
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_ - 20, "Spectra Main Window");
           plot2d.draw();
           ImGui::EndTabItem();
         }

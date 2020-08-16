@@ -266,7 +266,7 @@ namespace SmartPeak
       CreateSequence cs(application_handler_.sequenceHandler_);
       cs.filenames        = application_handler_.static_filenames_;
       cs.delimiter        = ",";
-      cs.checkConsistency = true;
+      cs.checkConsistency = false; // NOTE: Requires a lot of time on large sequences with a large number of components
       cs.process();
       return true;
     } else {

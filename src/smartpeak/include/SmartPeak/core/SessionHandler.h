@@ -102,7 +102,6 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 1> getSelectFeatureMetaValuesTable();
     Eigen::Tensor<std::string, 1> getSelectFeatureMetaValuesPlot();
     Eigen::Tensor<std::string, 1> getSelectSpectrumPlot();
-    std::pair<float, float> getSelectPositionsPlot();
 
     int getNSelectedSampleNamesTable();
     int getNSelectedSampleNamesPlot();
@@ -173,17 +172,20 @@ namespace SmartPeak
     std::vector<std::vector<float>> chrom_time_hull_data, chrom_intensity_hull_data;
     std::vector<std::vector<float>> chrom_time_raw_data, chrom_intensity_raw_data;
     std::vector<std::string> chrom_series_hull_names,chrom_series_raw_names;
+    std::set<std::string> chrom_series_hull_names_;
     std::string chrom_x_axis_title;
     std::string chrom_y_axis_title;
     float chrom_time_min, chrom_time_max, chrom_intensity_min, chrom_intensity_max;
+    std::pair<float, float> chrom_time_range = std::make_pair(0, 1800);
     // data for the spectrum scatter plot
     std::vector<std::vector<float>> spec_mz_hull_data, spec_intensity_hull_data;
     std::vector<std::vector<float>> spec_mz_raw_data, spec_intensity_raw_data;
     std::vector<std::string> spec_series_hull_names, spec_series_raw_names;
+    std::set<std::string> spec_series_hull_names_;
     std::string spec_x_axis_title;
     std::string spec_y_axis_title;
     float spec_mz_min, spec_mz_max, spec_intensity_min, spec_intensity_max;
-    std::pair<float, float> spec_pos_range = std::make_pair(0, 2000);
+    std::pair<float, float> spec_mz_range = std::make_pair(0, 2000);
     // data for the feature line plot
     Eigen::Tensor<float, 2> feat_sample_data, feat_value_data;
     Eigen::Tensor<std::string, 1> feat_line_series_names;
