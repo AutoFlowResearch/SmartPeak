@@ -620,6 +620,88 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getMetaData().mz_tab_type.get(), "");
 }
 
+BOOST_AUTO_TEST_CASE(clearNonSharedData)
+{
+  RawDataHandler rawDataHandler;
+
+  OpenMS::FeatureMap f1;
+  f1.setMetaValue("name", "foo");
+  rawDataHandler.setFeatureMap(f1);
+
+  MetaDataHandler m1;
+  m1.setSampleName("foo");
+  rawDataHandler.setMetaData(m1);
+
+  OpenMS::AbsoluteQuantitationMethod aqm;
+  aqm.setComponentName("foo");
+  vector<OpenMS::AbsoluteQuantitationMethod> AQMs1 = { aqm };
+  rawDataHandler.setQuantitationMethods(AQMs1);
+
+  OpenMS::MRMFeatureQC::ComponentQCs qc;
+  qc.component_name = "foo";
+  OpenMS::MRMFeatureQC fqc1;
+  fqc1.component_qcs.push_back(qc);
+  rawDataHandler.setFeatureFilter(fqc1);
+  rawDataHandler.setFeatureQC(fqc1);
+  rawDataHandler.setFeatureRSDFilter(fqc1);
+  rawDataHandler.setFeatureRSDQC(fqc1);
+  rawDataHandler.setFeatureBackgroundFilter(fqc1);
+  rawDataHandler.setFeatureBackgroundQC(fqc1);
+  rawDataHandler.setFeatureRSDEstimations(fqc1);
+  rawDataHandler.setFeatureBackgroundEstimations(fqc1);
+
+  rawDataHandler.setFeatureMapHistory(f1);
+
+  OpenMS::MSExperiment experiment;
+  experiment.setMetaValue("name", "foo");
+  rawDataHandler.setExperiment(experiment);
+
+  OpenMS::MSExperiment chromatogram_map;
+  chromatogram_map.setMetaValue("name", "foo");
+  rawDataHandler.setChromatogramMap(chromatogram_map);
+
+  OpenMS::MzTab mz_tab;
+  OpenMS::MzTabMetaData md;
+  md.mz_tab_type.fromCellString("foo");
+  mz_tab.setMetaData(md);
+  rawDataHandler.setMzTab(mz_tab);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMetaData().getSampleName(), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getQuantitationMethods().front().getComponentName(), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureFilter().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureQC().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getExperiment().getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getChromatogramMap().getMetaValue("name"), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureQC().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDFilter().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDQC().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundFilter().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundQC().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDEstimations().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundEstimations().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getMetaData().mz_tab_type.get(), "foo");
+
+  rawDataHandler.clearNonSharedData();
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getMetaData().getSampleName(), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getQuantitationMethods().front().getComponentName(), "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureFilter().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureQC().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getExperiment().size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getChromatogramMap().size(), 0);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDFilter().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDQC().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundFilter().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundQC().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureRSDEstimations().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureBackgroundEstimations().component_qcs.front().component_name, "foo");
+  BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getMetaData().mz_tab_type.get(), "");
+}
+
 BOOST_AUTO_TEST_CASE(updateFeatureMapHistory)
 {
   RawDataHandler rawDataHandler;

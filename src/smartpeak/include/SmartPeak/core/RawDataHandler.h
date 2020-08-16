@@ -137,6 +137,7 @@ public:
     const OpenMS::MzTab& getMzTab() const;
 
     void clear();
+    void clearNonSharedData();
 
     /** Update the Feature map history based on the
       filtered, selected, or new features in the current featureMap.
