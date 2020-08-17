@@ -66,6 +66,7 @@ jobs:
           choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"'
           choco install boost-msvc-14.1
           choco install doxygen.install
+          cd ~
           git clone https://github.com/martinrotter/nsis.git
           refreshenv
           $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
