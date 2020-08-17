@@ -24,7 +24,7 @@ cd C:\projects\deps
 
 git clone -n https://github.com/epezent/implot.git
 cd implot
-git checkout master
+git checkout v0.4
 
 cd C:\projects\deps
 
