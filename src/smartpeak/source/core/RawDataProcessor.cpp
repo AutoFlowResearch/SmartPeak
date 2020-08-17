@@ -48,6 +48,7 @@
 
 #include <algorithm>
 #include <exception>
+#include <math.h>
 
 namespace SmartPeak
 {
