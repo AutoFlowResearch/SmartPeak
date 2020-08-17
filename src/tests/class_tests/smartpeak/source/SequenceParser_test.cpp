@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   };
   const set<SampleType> sample_types = {SampleType::Unknown};
 
-  SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>());
+  SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
   BOOST_CHECK_EQUAL(data_out.size(), 1657);
   BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(headers_out[27], "rightWidth");
 
   SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, std::vector<std::string>({ "leftWidth" }), sample_types,
-    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
+    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
 
   BOOST_CHECK_EQUAL(data_out.size(), 1);
   BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
@@ -288,7 +288,7 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   // const vector<string> meta_data = {"calculated_concentration"};
   const set<SampleType> sample_types = {SampleType::Unknown};
 
-  SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>());
+  SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
   BOOST_CHECK_EQUAL(columns_out.size(), 6);
   BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   BOOST_CHECK_CLOSE(data_out(rows_out.dimension(0)-1,columns_out.size()-1), 1.66744995, 1e-3);
 
   SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, std::vector<std::string>({ "leftWidth" }), sample_types,
-    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
+    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
 
   BOOST_CHECK_EQUAL(columns_out.size(), 1);
   BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");

@@ -493,6 +493,18 @@ namespace SmartPeak
     if (feature_background_estimations_ != nullptr) feature_background_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
   }
 
+  void RawDataHandler::clearNonSharedData()
+  {
+    experiment_.clear(true);
+    chromatogram_map_.clear(true);
+    trafo_ = OpenMS::TransformationDescription();
+    swath_.clear(true);
+    feature_map_.clear(true);
+    feature_map_history_.clear(true);
+    validation_metrics_.clear();
+    mz_tab_ = OpenMS::MzTab();
+  }
+
   void RawDataHandler::updateFeatureMapHistory()
   {
     // Current time stamp

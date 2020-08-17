@@ -1,0 +1,2 @@
+ProteinName,FullPeptideName,transition_group_id,transition_name,RetentionTime,Annotation,PrecursorMz,MS1 Res,ProductMz,MS2 Res,Dwell,Fragmentor,Collision Energy,Cell Accelerator Voltage,LibraryIntensity,decoy,PeptideSequence,LabelType,PrecursorCharge,FragmentCharge,FragmentType,FragmentSeriesNumber,quantifying_transition,identifying_transition,detecting_transition
+HMDB:HMDB0000122,,HMDB:HMDB0000122,MergedSpectra,0,,180.0633881,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE

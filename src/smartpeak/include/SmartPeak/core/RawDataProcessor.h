@@ -546,4 +546,19 @@ namespace SmartPeak
       const Filenames& filenames
     ) const override;
   };
+
+  struct ClearData : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "CLEAR_DATA"; }
+    std::string getDescription() const override { return "Clear raw and processed data."; }
+
+    /** Clear all raw and process data
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
 }

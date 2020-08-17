@@ -62,10 +62,12 @@ int main(int argc, char **argv)
   bool show_injection_explorer = true; // list of injection names with advanced options for filtering
   bool show_transitions_explorer = true; // list of transition names (e.g., subset of the features for non-targeted case) with advanced options for filtering
   bool show_features_explorer = false; // list of features with advanced options for filtering
+  bool show_spectrum_explorer = false; // list of spectrum with advanced options for filtering
 
   // View: Top window
   bool show_sequence_table = false;
   bool show_transitions_table = false;
+  bool show_spectrum_table = false;
   bool show_workflow_table = true;
   bool show_parameters_table = false;
   bool show_quant_method_table = false;
@@ -504,10 +506,12 @@ int main(int argc, char **argv)
         if (ImGui::MenuItem("Injections", NULL, &show_injection_explorer)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {}
         if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}
+        if (ImGui::MenuItem("Scans", NULL, &show_spectrum_explorer)) {}
         ImGui::Separator(); // Primary input
         ImGui::MenuItem("Main window (Tables)", NULL, false, false);
         if (ImGui::MenuItem("Sequence", NULL, &show_sequence_table)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_table)) {}
+        if (ImGui::MenuItem("Scans", NULL, &show_spectrum_table)) {}
         if (ImGui::MenuItem("Workflow", NULL, &show_workflow_table)) {}
         if (ImGui::BeginMenu("Workflow settings"))
         {
@@ -582,12 +586,12 @@ int main(int argc, char **argv)
       ImGui::EndMainMenuBar();
     }
 
-    show_top_window_ = show_sequence_table || show_transitions_table || show_workflow_table || show_parameters_table
+    show_top_window_ = show_sequence_table || show_transitions_table || show_spectrum_table || show_workflow_table || show_parameters_table
       || show_quant_method_table || show_stds_concs_table || show_comp_filters_table || show_comp_group_filters_table
       || show_comp_qcs_table || show_comp_group_qcs_table || show_feature_table || show_feature_pivot_table
       || show_chromatogram_line_plot || show_spectra_line_plot || show_feature_line_plot || show_feature_heatmap_plot || show_calibrators_line_plot;
     show_bottom_window_ = show_info_ || show_log_;
-    show_left_window_ = show_injection_explorer || show_transitions_explorer || show_features_explorer;
+    show_left_window_ = show_injection_explorer || show_transitions_explorer || show_features_explorer || show_spectrum_explorer;
     win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
 
     // Left window
@@ -632,6 +636,16 @@ int main(int argc, char **argv)
           Explorer.draw();
           ImGui::EndTabItem();
         }
+        if (show_spectrum_explorer && ImGui::BeginTabItem("Spectrum", &show_spectrum_explorer))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          Eigen::Tensor<std::string, 1> headers = session_handler_.getSpectrumExplorerHeader();
+          Eigen::Tensor<std::string, 2> body = session_handler_.getSpectrumExplorerBody();
+          ExplorerWidget Explorer(headers, body,
+            session_handler_.spectrum_explorer_checked_rows, "SpectrumExplorerWindow", session_handler_.spectrum_explorer_checkbox_headers, session_handler_.spectrum_explorer_checkbox_body);
+          Explorer.draw();
+          ImGui::EndTabItem();
+        }
         ImGui::EndTabBar();
       }
       ImGui::End();
@@ -666,6 +680,14 @@ int main(int argc, char **argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getTransitionsTableFilters();
           GenericTableWidget Table(session_handler_.transitions_table_headers, session_handler_.transitions_table_body, table_filters, "TransitionsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_spectrum_table && ImGui::BeginTabItem("Spectrum", &show_spectrum_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getSpectrumTableFilters();
+          GenericTableWidget Table(session_handler_.spectrum_table_headers, session_handler_.spectrum_table_body, table_filters, "SpectrumMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -754,19 +776,36 @@ int main(int argc, char **argv)
         }
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
         {
+          // Filter for the position
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          ImGui::SliderFloat("min time (sec)", &session_handler_.chrom_time_range.first, 0.0f, session_handler_.chrom_time_range.second, "%.4f", 2.0f);
+          ImGui::SliderFloat("max time (sec)", &session_handler_.chrom_time_range.second, session_handler_.chrom_time_range.first, 2000.0f, "%.4f", 2.0f);
+
+          // The actual plot
           exceeding_plot_points_ = !session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
           ChromatogramPlotWidget plot2d(session_handler_.chrom_time_raw_data, session_handler_.chrom_intensity_raw_data, session_handler_.chrom_series_raw_names,
             session_handler_.chrom_time_hull_data, session_handler_.chrom_intensity_hull_data, session_handler_.chrom_series_hull_names,
             session_handler_.chrom_x_axis_title, session_handler_.chrom_y_axis_title,
             session_handler_.chrom_time_min, session_handler_.chrom_time_max, session_handler_.chrom_intensity_min, session_handler_.chrom_intensity_max,
-            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "Chromatograms Main Window");
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_ - 20, "Chromatograms Main Window");
           plot2d.draw();
           ImGui::EndTabItem();
         }
         if (show_spectra_line_plot && ImGui::BeginTabItem("Spectra", &show_spectra_line_plot))
         {
-          ImGui::Text("TODO...");
+          // Filter for the position
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          ImGui::SliderFloat("min m/z (Da)", &session_handler_.spec_mz_range.first, 0.0f, session_handler_.spec_mz_range.second, "%.4f", 2.0f);
+          ImGui::SliderFloat("max m/z (Da)", &session_handler_.spec_mz_range.second, session_handler_.spec_mz_range.first, 2000.0f, "%.4f", 2.0f);
+
+          // The actual plot
+          exceeding_plot_points_ = !session_handler_.setSpectrumScatterPlot(application_handler_.sequenceHandler_);
+          ChromatogramPlotWidget plot2d(session_handler_.spec_mz_raw_data, session_handler_.spec_intensity_raw_data, session_handler_.spec_series_raw_names,
+            session_handler_.spec_mz_hull_data, session_handler_.spec_intensity_hull_data, session_handler_.spec_series_hull_names,
+            session_handler_.spec_x_axis_title, session_handler_.spec_y_axis_title,
+            session_handler_.spec_mz_min, session_handler_.spec_mz_max, session_handler_.spec_intensity_min, session_handler_.spec_intensity_max,
+            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_ - 20, "Spectra Main Window");
+          plot2d.draw();
           ImGui::EndTabItem();
         }
         if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
