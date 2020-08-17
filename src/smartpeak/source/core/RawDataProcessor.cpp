@@ -48,7 +48,6 @@
 
 #include <algorithm>
 #include <exception>
-#include <math.h>
 
 namespace SmartPeak
 {
@@ -1587,7 +1586,7 @@ namespace SmartPeak
         std::vector<double> mzs, intensities;
         mzs.reserve(spec.size());
         intensities.reserve(spec.size());
-        for (auto& it = spec.begin(); it != spec.end(); ++it)
+        for (auto it = spec.begin(); it != spec.end(); ++it)
         {
           mzs.push_back(it->getMZ());
           intensities.push_back(it->getIntensity());
@@ -1597,7 +1596,7 @@ namespace SmartPeak
 
         // Create the featureMap
         int i = 0;
-        for (auto& it = output.begin(); it != output.end(); ++it)
+        for (auto it = output.begin(); it != output.end(); ++it)
         {
           // set the metadata
           OpenMS::Feature f;
@@ -1617,7 +1616,7 @@ namespace SmartPeak
           if (write_convex_hull) {
             OpenMS::ConvexHull2D hull;
             OpenMS::ConvexHull2D::PointArrayType hull_points;
-            for (auto& h = input.PosBegin(boundaries.at(i).mz_min); h != input.PosEnd(boundaries.at(i).mz_max); ++h)
+            for (auto h = input.PosBegin(boundaries.at(i).mz_min); h != input.PosEnd(boundaries.at(i).mz_max); ++h)
             {
               hull_points.push_back(OpenMS::DPosition<2>(h->getPos(), h->getIntensity()));
             }
