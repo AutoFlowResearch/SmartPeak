@@ -1256,7 +1256,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
   BOOST_CHECK_EQUAL(feature1.getMetaValue("PeptideRef").toString(), "Unknown");
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("peak_apex_int")), 1930.90576171875, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("peak_area")), 11011.527626037598, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("peak_area")), 2.2940683133581419, 1e-6);
   BOOST_CHECK_EQUAL(feature1.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("leftWidth")), 109.95009243262952, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMetaValue("rightWidth")), 109.95238409935168, 1e-6);
@@ -1270,7 +1270,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
   BOOST_CHECK_EQUAL(feature2.getMetaValue("PeptideRef").toString(), "Unknown");
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("peak_apex_int")), 1564.805908203125, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("peak_area")), 11066.307159423828, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("peak_area")), 2.3054807108601838, 1e-6);
   BOOST_CHECK_EQUAL(feature2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("leftWidth")), 109.99321743367376, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMetaValue("rightWidth")), 109.99550910039592, 1e-6);
@@ -1287,7 +1287,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
   BOOST_CHECK_EQUAL(hfeature1.getMetaValue("PeptideRef").toString(), "Unknown");
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("peak_apex_int")), 1930.90576171875, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("peak_area")), 11011.527626037598, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("peak_area")), 2.2940683133581419, 1e-6);
   BOOST_CHECK_EQUAL(hfeature1.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("leftWidth")), 109.95009243262952, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMetaValue("rightWidth")), 109.95238409935168, 1e-6);
@@ -1301,7 +1301,7 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
   BOOST_CHECK_EQUAL(hfeature2.getMetaValue("PeptideRef").toString(), "Unknown");
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("logSN")), 10.439937656615268, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("peak_apex_int")), 1564.805908203125, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("peak_area")), 11066.307159423828, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("peak_area")), 2.3054807108601838, 1e-6);
   BOOST_CHECK_EQUAL(hfeature2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("leftWidth")), 109.99321743367376, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMetaValue("rightWidth")), 109.99550910039592, 1e-6);

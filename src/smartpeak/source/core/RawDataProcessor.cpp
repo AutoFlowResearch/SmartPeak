@@ -1675,12 +1675,7 @@ namespace SmartPeak
           // extract out the convex hull
           if (write_convex_hull) {
             OpenMS::ConvexHull2D hull;
-            OpenMS::ConvexHull2D::PointArrayType hull_points;
-            for (auto h = input.PosBegin(boundaries.at(i).mz_min); h != input.PosEnd(boundaries.at(i).mz_max); ++h)
-            {
-              hull_points.push_back(OpenMS::DPosition<2>(h->getPos(), h->getIntensity()));
-            }
-            hull.setHullPoints(hull_points);
+            hull.setHullPoints(pa.hull_points);
             f.setConvexHulls({ hull });
           }
           featureMap.push_back(f);
@@ -1728,33 +1723,42 @@ namespace SmartPeak
       // Remake the feature map replacing the peptide hits as features
       // and change the `Feature` to the `ConsensusFeature`
       // and move all adducts of the `Feature` into the `SubordinateFeatures`
-      OpenMS::FeatureMap fmap;
+      std::map<std::string, std::vector<OpenMS::Feature>> fmapmap;
       for (const OpenMS::Feature& f : rawDataHandler_IO.getFeatureMap()) {
-        OpenMS::Feature feat = f;
-        bool add_feature = true;
         for (const auto& ident : f.getPeptideIdentifications()) {
           for (const auto& hit : ident.getHits()) {
             OpenMS::Feature f_updated = f;
             f_updated.setUniqueId();
             f_updated.setMetaValue("PeptideRef", hit.getMetaValue("identifier").toStringList().at(0));
+            std::string native_id = hit.getMetaValue("chemical_formula") + ";" + hit.getMetaValue("modifications").toString();
+            f_updated.setMetaValue("native_id", native_id);
             f_updated.setMetaValue("identifier", hit.getMetaValue("identifier"));
             f_updated.setMetaValue("description", hit.getMetaValue("description"));
             f_updated.setMetaValue("modifications", hit.getMetaValue("modifications"));
+            std::string s = hit.getMetaValue("modifications").toString();
+            std::string delimiter = ";";
+            std::string adducts = s.substr(0, s.find(delimiter));
+            f_updated.setMetaValue("adducts", adducts);
+            OpenMS::EmpiricalFormula chemform(hit.getMetaValue("chemical_formula"));            
+            double adduct_mass = f.getMZ() + static_cast<double>(hit.getMetaValue("mz_error_Da")) - chemform.getMonoWeight();
+            f_updated.setMetaValue("dc_charge_adduct_mass", adduct_mass);
             f_updated.setMetaValue("chemical_formula", hit.getMetaValue("chemical_formula"));
             f_updated.setMetaValue("mz_error_ppm", hit.getMetaValue("mz_error_ppm"));
             f_updated.setMetaValue("mz_error_Da", hit.getMetaValue("mz_error_Da"));
             f_updated.setCharge(hit.getCharge());
-            //OpenMS::Feature sub = f_updated;
-            //if (sub.getConvexHulls().size()) { // remove the convex hull to save space
-            //  sub.setConvexHulls(std::vector<OpenMS::ConvexHull2D>());
-            //}
-            //f_updated.setSubordinates({sub});
-            fmap.push_back(f_updated);
-            add_feature = false;
+            auto found = fmapmap.emplace(hit.getMetaValue("identifier").toStringList().at(0), std::vector<OpenMS::Feature>({ f_updated }));
+            if (!found.second) {
+              fmapmap.at(hit.getMetaValue("identifier").toStringList().at(0)).push_back(f_updated);
+            }
           }
         }
-        if (add_feature) fmap.push_back(feat);
       }
+      for (const auto& f_map : fmapmap) {
+        OpenMS::ConsensusFeature cf;
+
+      }
+      OpenMS::FeatureMap fmap;
+
       rawDataHandler_IO.setFeatureMap(fmap);
     }
     catch (const std::exception& e) {
