@@ -95,7 +95,7 @@ if (WIN32)
     SET(EXECS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/GUI.exe)
     SET(DEST \"\${CMAKE_INSTALL_PREFIX}/bin/GUI.exe\")
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"\${EXECS}\" \"\${DEST}\")
-    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${BOOST_LIBRARYDIR} ${SDL2_LIBRARIES_DIR})
+    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR} ${BOOST_LIBRARYDIR} ${SDL2_LIBRARIES_DIR})
     fixup_bundle(\"\${DEST}\" \"\" \"\${DIRS}\")
     " 
     COMPONENT applications)
