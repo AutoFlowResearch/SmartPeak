@@ -1725,8 +1725,10 @@ namespace SmartPeak
       // and move all adducts of the `Feature` into the `SubordinateFeatures`
 
       // Pass 1: organize into a map
+      OpenMS::FeatureMap fmap;
       std::map<std::string, std::vector<OpenMS::Feature>> fmapmap;
       for (const OpenMS::Feature& f : rawDataHandler_IO.getFeatureMap()) {
+        bool is_not_hit = true;
         for (const auto& ident : f.getPeptideIdentifications()) {
           for (const auto& hit : ident.getHits()) {
             OpenMS::Feature f_updated = f;
@@ -1758,12 +1760,14 @@ namespace SmartPeak
             if (!found.second) {
               fmapmap.at(hit.getMetaValue("identifier").toStringList().at(0)).push_back(f_updated);
             }
+            is_not_hit = false;
           }
         }
+        if (is_not_hit)
+          fmap.push_back(f);
       }
 
       // Pass 2: compute the consensus manually
-      OpenMS::FeatureMap fmap;
       for (const auto& f_map : fmapmap) {
 
         // compute the total intensity for weighting
@@ -1803,6 +1807,7 @@ namespace SmartPeak
         f.setMetaValue("PeptideRef", f_map.first);
         f.setMZ(m);
         f.setRT(rt);
+        f.setMetaValue("scan_polarity", f_map.second.front().getMetaValue("scan_polarity"));
         f.setIntensity(intensity);
         f.setMetaValue("peak_apex_int", peak_apex_int);
         f.setMetaValue("peak_area", peak_area);
