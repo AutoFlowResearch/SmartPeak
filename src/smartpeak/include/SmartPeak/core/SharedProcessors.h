@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdlib> // C2039
+#include <string> // C2039
 #include <map>
 #include <memory>
 
