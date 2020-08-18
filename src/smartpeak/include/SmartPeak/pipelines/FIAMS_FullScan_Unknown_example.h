@@ -22,7 +22,9 @@ OpenMS::MzTab example_FIAMS_FullScan_Unknowns(
     std::make_shared<ExtractSpectraWindows>(),
     std::make_shared<MergeSpectra>(),
     std::make_shared<PickMS1Features>(),
+    std::make_shared<FilterFeatures>(), // Filter "Unknowns" based on min intensity prior to accurate mass search
     std::make_shared<SearchAccurateMass>(),
+    std::make_shared<FilterFeatures>(), // Filter "Unknowns" and annotated features based on mass error
     //std::make_shared<StoreAnnotations>(), // Files are quite large
     std::make_shared<StoreFeatures>()
   };
