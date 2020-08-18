@@ -1723,6 +1723,8 @@ namespace SmartPeak
       // Remake the feature map replacing the peptide hits as features
       // and change the `Feature` to the `ConsensusFeature`
       // and move all adducts of the `Feature` into the `SubordinateFeatures`
+
+      // Pass 1: organize into a map
       std::map<std::string, std::vector<OpenMS::Feature>> fmapmap;
       for (const OpenMS::Feature& f : rawDataHandler_IO.getFeatureMap()) {
         for (const auto& ident : f.getPeptideIdentifications()) {
@@ -1730,17 +1732,23 @@ namespace SmartPeak
             OpenMS::Feature f_updated = f;
             f_updated.setUniqueId();
             f_updated.setMetaValue("PeptideRef", hit.getMetaValue("identifier").toStringList().at(0));
-            std::string native_id = hit.getMetaValue("chemical_formula") + ";" + hit.getMetaValue("modifications").toString();
+            std::string native_id = hit.getMetaValue("chemical_formula").toString() + ";" + hit.getMetaValue("modifications").toString();
             f_updated.setMetaValue("native_id", native_id);
             f_updated.setMetaValue("identifier", hit.getMetaValue("identifier"));
             f_updated.setMetaValue("description", hit.getMetaValue("description"));
             f_updated.setMetaValue("modifications", hit.getMetaValue("modifications"));
-            std::string s = hit.getMetaValue("modifications").toString();
-            std::string delimiter = ";";
-            std::string adducts = s.substr(0, s.find(delimiter));
+            std::string adducts;
+            try {
+              std::string s = hit.getMetaValue("modifications").toString();
+              std::string delimiter = ";";
+              adducts = s.substr(1, s.find(delimiter) - 1);
+            }
+            catch (std::exception& e) {
+              std::cout << e.what() << std::endl;
+            }
             f_updated.setMetaValue("adducts", adducts);
-            OpenMS::EmpiricalFormula chemform(hit.getMetaValue("chemical_formula"));            
-            double adduct_mass = f.getMZ() + static_cast<double>(hit.getMetaValue("mz_error_Da")) - chemform.getMonoWeight();
+            OpenMS::EmpiricalFormula chemform(hit.getMetaValue("chemical_formula").toString());
+            double adduct_mass = f.getMZ()*std::abs(hit.getCharge()) + static_cast<double>(hit.getMetaValue("mz_error_Da")) - chemform.getMonoWeight();
             f_updated.setMetaValue("dc_charge_adduct_mass", adduct_mass);
             f_updated.setMetaValue("chemical_formula", hit.getMetaValue("chemical_formula"));
             f_updated.setMetaValue("mz_error_ppm", hit.getMetaValue("mz_error_ppm"));
@@ -1753,12 +1761,54 @@ namespace SmartPeak
           }
         }
       }
-      for (const auto& f_map : fmapmap) {
-        OpenMS::ConsensusFeature cf;
 
-      }
+      // Pass 2: compute the consensus manually
       OpenMS::FeatureMap fmap;
+      for (const auto& f_map : fmapmap) {
 
+        // compute the total intensity for weighting
+        double total_intensity = 0;
+        for (const auto& f : f_map.second) {
+          if (f.metaValueExists("peak_apex_int")) 
+            total_intensity += (double)f.getMetaValue("peak_apex_int");
+          else 
+            total_intensity += f.getIntensity();
+        }
+
+        // compute the weighted averages
+        double rt = 0.0, m = 0.0, intensity = 0.0, peak_apex_int = 0.0, peak_area = 0.0;
+        double weighting_factor = 1.0 / f_map.second.size(); // will be updated
+        for (const auto& f : f_map.second) {
+          // compute the weighting factor
+          if (f.metaValueExists("peak_apex_int")) 
+            weighting_factor = (double)f.getMetaValue("peak_apex_int") / total_intensity;
+          else 
+            weighting_factor = f.getIntensity() / total_intensity;
+
+          // compute the weighted averages
+          rt += f.getRT() * weighting_factor;
+          if (f.getCharge() == 0)
+            LOGW << "ConsensusFeature::computeDechargeConsensus() WARNING: Feature's charge is 0! This will lead to M=0!";
+          m += (f.getMZ() * std::abs(f.getCharge()) + (double)f.getMetaValue("dc_charge_adduct_mass")) * weighting_factor;
+          intensity += f.getIntensity() * weighting_factor;
+          if (f.metaValueExists("peak_apex_int")) 
+            peak_apex_int += (double)f.getMetaValue("peak_apex_int") * weighting_factor;
+          if (f.metaValueExists("peak_area")) 
+            peak_area += (double)f.getMetaValue("peak_area") * weighting_factor;
+        }
+
+        // make the feature map and assign subordinates
+        OpenMS::Feature f;
+        f.setUniqueId();
+        f.setMetaValue("PeptideRef", f_map.first);
+        f.setMZ(m);
+        f.setRT(rt);
+        f.setIntensity(intensity);
+        f.setMetaValue("peak_apex_int", peak_apex_int);
+        f.setMetaValue("peak_area", peak_area);
+        f.setSubordinates(f_map.second);
+        fmap.push_back(f);
+      }
       rawDataHandler_IO.setFeatureMap(fmap);
     }
     catch (const std::exception& e) {
