@@ -1,15 +1,14 @@
-
-
 version: 2.1
+
+orbs:
+  win: circleci/windows@2.4.0
+
 jobs:
   build_ubuntu:
     docker:
       - image: ubuntu:18.04
-
     working_directory: ~/SmartPeak2
-
     resource_class: large
-
     steps:
       - checkout
       - run: |
@@ -168,10 +167,6 @@ jobs:
           cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/local/boost_1_67_0" -DBOOST_INCLUDE_DIR="C:/local/boost_1_67_0" -DBOOST_LIBRARYDIR="C:/local/boost_1_67_0/lib64-msvc-14.2" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
           msbuild src\openswathalgo\OpenSWATHAlgo.sln /maxcpucount /p:Configuration=Release
           msbuild src\openms\OpenMS.sln /maxcpucount /p:Configuration=Release
-          # cd ~; 7z a OpenMS OpenMS/*
-          # - restore_cache:
-          # keys:
-          # - oms1-{{ checksum "OpenMS.7z" }}
       - run: |
           Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
           if ($_ -match "^(.*?)=(.*)$") {
@@ -195,7 +190,6 @@ jobs:
       - store_artifacts:
           path: ~/artifacts
             
-
 workflows:
   version: 2.1
   build:
