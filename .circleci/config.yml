@@ -169,8 +169,10 @@ jobs:
           msbuild src\openms\OpenMS.sln /maxcpucount /p:Configuration=Release
       - run: |
           Start-Process powershell -Verb runas
-          [Environment]::SetEnvironmentVariable("Path", $env:Path + ";~\OpenMS\openms_build\bin\Release;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin", [EnvironmentVariableTarget]::Machine)
+          [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Users\circleci\OpenMS\openms_build\bin\Release;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin", [EnvironmentVariableTarget]::Machine)
           refreshenv
+          (gcm OpenMS.dll).Path
+          (gcm Qt5Core.dll).Path
       - run: |
           Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
           if ($_ -match "^(.*?)=(.*)$") {
