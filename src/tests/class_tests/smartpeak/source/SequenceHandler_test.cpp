@@ -145,6 +145,12 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices()[0], 1);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[1].getSampleIndices()[1], 2);
 
+  BOOST_CHECK_EQUAL(sequenceHandler.getSampleGroups()[0].getSampleGroupName(), "sample");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSampleGroups()[0].getSampleIndices().size(), 3);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSampleGroups()[0].getSampleIndices()[0], 0);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSampleGroups()[0].getSampleIndices()[1], 1);
+  BOOST_CHECK_EQUAL(sequenceHandler.getSampleGroups()[0].getSampleIndices()[2], 2);
+
   // Test non-shared resources
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
   injection0.getMetaData().setSampleName("samp1");
@@ -169,16 +175,6 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
-  //injection0.getRawData().getFeatureFilter().component_qcs.resize(1); // Ownership of FeatureFilter/QC changed from RawDataHandler to SequenceSegmentHandler
-  //injection0.getRawData().getFeatureFilter().component_qcs[0].component_name = "arg-L.arg-L_1.Heavy";
-  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  //injection0.getRawData().getFeatureQC().component_qcs.resize(1);
-  //injection0.getRawData().getFeatureQC().component_qcs[0].component_name = "arg-L.arg-L_1.Light";
-  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
-  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
-  //BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Light");
 
   // Test shared resources across sequence segment handlers
   sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().resize(1);
