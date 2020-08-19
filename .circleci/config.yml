@@ -189,6 +189,9 @@ jobs:
           msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
           msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
           msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
+          refreshenv
+          (gcm OpenMS.dll).Path
+          (gcm Qt5Core.dll).Path
           & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
           & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
       - run:
