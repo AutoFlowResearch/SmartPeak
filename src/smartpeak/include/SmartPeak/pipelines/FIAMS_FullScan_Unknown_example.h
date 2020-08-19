@@ -3,7 +3,7 @@
 
 using namespace SmartPeak;
 
-OpenMS::MzTab example_FIAMS_FullScan_Unknowns(
+void example_FIAMS_FullScan_Unknowns(
   const std::string& dir_I,
   const Filenames& static_filenames,
   const std::string& delimiter_I = ","
@@ -22,10 +22,8 @@ OpenMS::MzTab example_FIAMS_FullScan_Unknowns(
     std::make_shared<ExtractSpectraWindows>(),
     std::make_shared<MergeSpectra>(),
     std::make_shared<PickMS1Features>(),
-    std::make_shared<FilterFeatures>(), // Filter "Unknowns" based on min intensity prior to accurate mass search
     std::make_shared<SearchAccurateMass>(),
-    std::make_shared<FilterFeatures>(), // Filter "Unknowns" and annotated features based on mass error
-    //std::make_shared<StoreAnnotations>(), // Files are quite large
+    std::make_shared<StoreAnnotations>(),
     std::make_shared<StoreFeatures>()
   };
 
@@ -45,6 +43,4 @@ OpenMS::MzTab example_FIAMS_FullScan_Unknowns(
   ps.filenames                     = dynamic_filenames;
   ps.raw_data_processing_methods_I = raw_data_processing_methods;
   ps.process();
-
-  return sequenceHandler.getSequence().front().getRawData().getMzTab();
 }

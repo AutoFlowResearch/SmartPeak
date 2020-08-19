@@ -1028,28 +1028,30 @@ namespace SmartPeak
           //}
           // Extract out the smoothed points for plotting
           for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
-            if (feature.getMetaValue("used_") == "true" /*&& scan_names.count(feature.getMetaValue("native_id").toString())*/ && component_group_names.count(feature.getMetaValue("PeptideRef").toString())) {
-              std::vector<float> x_data, y_data;
-              for (const auto& point : feature.getConvexHull().getHullPoints()) {
-                if (point.getX() < spec_mz_range.first || point.getX() > spec_mz_range.second) continue;
-                x_data.push_back(point.getX());
-                y_data.push_back(point.getY());
-                spec_mz_min = std::min((float)point.getX(), spec_mz_min);
-                spec_intensity_min = std::min((float)point.getY(), spec_intensity_min);
-                spec_mz_max = std::max((float)point.getX(), spec_mz_max);
-                spec_intensity_max = std::max((float)point.getY(), spec_intensity_max);
-              }
-              if (x_data.size() <= 0) continue;
-              n_points += x_data.size();
-              if (n_points < MAX_POINTS) {
-                spec_mz_hull_data.push_back(x_data);
-                spec_intensity_hull_data.push_back(y_data);
-                spec_series_hull_names_.insert(injection.getMetaData().getSampleName() + "::" + feature.getMetaValue("PeptideRef").toString());
-                spec_series_hull_names.push_back(injection.getMetaData().getSampleName() + "::" + feature.getMetaValue("chemical_formula").toString() + ":" + feature.getMetaValue("modifications").toString());
-              }
-              else {
-                LOGD << "Stopped adding points to the spectra plot";
-                return false;
+            for (const auto& subordinate : feature.getSubordinates()) {
+              if (subordinate.getMetaValue("used_") == "true" && component_group_names.count(subordinate.getMetaValue("PeptideRef").toString())) {
+                std::vector<float> x_data, y_data;
+                for (const auto& point : subordinate.getConvexHull().getHullPoints()) {
+                  if (point.getX() < spec_mz_range.first || point.getX() > spec_mz_range.second) continue;
+                  x_data.push_back(point.getX());
+                  y_data.push_back(point.getY());
+                  spec_mz_min = std::min((float)point.getX(), spec_mz_min);
+                  spec_intensity_min = std::min((float)point.getY(), spec_intensity_min);
+                  spec_mz_max = std::max((float)point.getX(), spec_mz_max);
+                  spec_intensity_max = std::max((float)point.getY(), spec_intensity_max);
+                }
+                if (x_data.size() <= 0) continue;
+                n_points += x_data.size();
+                if (n_points < MAX_POINTS) {
+                  spec_mz_hull_data.push_back(x_data);
+                  spec_intensity_hull_data.push_back(y_data);
+                  spec_series_hull_names_.insert(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("PeptideRef").toString());
+                  spec_series_hull_names.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("chemical_formula").toString() + ":" + subordinate.getMetaValue("modifications").toString());
+                }
+                else {
+                  LOGD << "Stopped adding points to the spectra plot";
+                  return false;
+                }
               }
             }
           }

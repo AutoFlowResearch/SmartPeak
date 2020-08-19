@@ -1,0 +1,13 @@
+ProteinName,FullPeptideName,transition_group_id,transition_name,RetentionTime,Annotation,PrecursorMz,MS1 Res,ProductMz,MS2 Res,Dwell,Fragmentor,Collision Energy,Cell Accelerator Voltage,LibraryIntensity,decoy,PeptideSequence,LabelType,PrecursorCharge,FragmentCharge,FragmentType,FragmentSeriesNumber,quantifying_transition,identifying_transition,detecting_transition
+HMDB:HMDB0000294,,HMDB:HMDB0000294,Urea,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE
+HMDB:HMDB0000190,,HMDB:HMDB0000190,Lactic acid,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE
+HMDB:HMDB0000289,,HMDB:HMDB0000289,Uric acid,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE
+HMDB:HMDB0004068,,HMDB:HMDB0004068,Melanin,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE
+HMDB:HMDB0002030,,HMDB:HMDB0002030,Fructosamine,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE
+HMDB:HMDB0001875,,HMDB:HMDB0001875,Methanol,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE
+HMDB:HMDB0000641,,HMDB:HMDB0000641,L-Glutamine,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE
+HMDB:HMDB0000067,,HMDB:HMDB0000067,Cholesterol,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE
+HMDB:HMDB0000182,,HMDB:HMDB0000182,L-Lysine,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE
+HMDB:HMDB0000122,,HMDB:HMDB0000122,D-Glucose,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE
+HMDB:HMDB0000161,,HMDB:HMDB0000161,L-Alanine,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE
+HMDB:HMDB0000123,,HMDB:HMDB0000123,Glycine,0,,0,5 ppm,0,5 ppm,,,,,1,0,,Light,1,1,,1,FALSE,FALSE,FALSE

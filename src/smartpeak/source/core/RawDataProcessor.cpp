@@ -1648,7 +1648,11 @@ namespace SmartPeak
           f.setMetaValue("peak_apex_position", it->getMZ());
 
           // check the min intensity threshold
-          if (pa.height < min_intensity) continue;
+          if (pa.height < min_intensity) {
+            //LOGD << "Feature: " << f.getUniqueId() << " with peak_apex_int=" << pa.height << " did not pass the `min_threshold`=" << min_intensity;
+            ++i;
+            continue;
+          }
 
           // Calculate peak shape metrics that will be used for later QC
           OpenMS::PeakIntegrator::PeakShapeMetrics psm = pi.calculatePeakShapeMetrics(input, boundaries.at(i).mz_min, boundaries.at(i).mz_max, pa.height, it->getMZ());
@@ -1745,8 +1749,8 @@ namespace SmartPeak
               std::string delimiter = ";";
               adducts = s.substr(1, s.find(delimiter) - 1);
             }
-            catch (std::exception& e) {
-              std::cout << e.what() << std::endl;
+            catch (const std::exception& e) {
+              LOGE << e.what();
             }
             f_updated.setMetaValue("adducts", adducts);
             OpenMS::EmpiricalFormula chemform(hit.getMetaValue("chemical_formula").toString());
