@@ -168,6 +168,8 @@ jobs:
           msbuild src\openswathalgo\OpenSWATHAlgo.sln /maxcpucount /p:Configuration=Release
           msbuild src\openms\OpenMS.sln /maxcpucount /p:Configuration=Release
       - run: |
+          [Environment]::SetEnvironmentVariable("Path", $env:Path + ";~\OpenMS\openms_build\bin\Release", [EnvironmentVariableTarget]::Machine)
+      - run: |
           Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
           if ($_ -match "^(.*?)=(.*)$") {
               Set-Content "env:\$($matches[1])" $matches[2]
