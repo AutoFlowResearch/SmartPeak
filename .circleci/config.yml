@@ -169,6 +169,7 @@ jobs:
           msbuild src\openms\OpenMS.sln /maxcpucount /p:Configuration=Release
       - run: |
           [Environment]::SetEnvironmentVariable("Path", $env:Path + ";~\OpenMS\openms_build\bin\Release", [EnvironmentVariableTarget]::Machine)
+          refreshenv
       - run: |
           Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
           if ($_ -match "^(.*?)=(.*)$") {
@@ -185,6 +186,7 @@ jobs:
           msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
           msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
           msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
+          & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
           & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
       - run:
           command: |
