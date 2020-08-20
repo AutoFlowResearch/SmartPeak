@@ -82,7 +82,8 @@ namespace SmartPeak
 
     if (scan_polarities.size() > 1) {
       // Get the different scan polarity fmaps
-      std::vector<OpenMS::FeatureMap> mixed_scan_polarity_fmaps;
+      std::vector<OpenMS::FeatureMap> scan_polarity_fmaps;
+      std::vector<std::string> scan_polarities;
       for (const std::size_t& index : sampleGroupHandler_IO.getSampleIndices()) {
         const OpenMS::FeatureMap& fmap = sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap();
 
@@ -90,7 +91,7 @@ namespace SmartPeak
         OpenMS::FeatureMap fmap_scan_polarity;
         for (const OpenMS::Feature& f : fmap) {
           // Feature level merge
-          if (!merge_subordinates && fmap.metaValueExists("scan_polarity")) {
+          if (!merge_subordinates) {
             OpenMS::Feature f_scan_polarity = f;
             f_scan_polarity.setSubordinates(std::vector<OpenMS::Feature>());
             fmap_scan_polarity.push_back(f_scan_polarity);
@@ -100,15 +101,15 @@ namespace SmartPeak
             OpenMS::Feature f_scan_polarity = f;
             std::vector<OpenMS::Feature> s_scan_polarity;
             for (const OpenMS::Feature& s : f.getSubordinates()) {
-              if (s.metaValueExists("scan_polarity")) {
-                s_scan_polarity.push_back(s);
-              }
+              s_scan_polarity.push_back(s);
             }
             f_scan_polarity.setSubordinates(s_scan_polarity);
           }
         }
-
-        mixed_scan_polarity_fmaps.push_back(fmap_scan_polarity);
+        if (fmap_scan_polarity.size()) {
+          scan_polarity_fmaps.push_back(fmap_scan_polarity);
+          scan_polarities.push_back(sequenceHandler_I.getSequence().at(index).getMetaData().scan_polarity);
+        }
       }
 
       // Merge the scan polarities
