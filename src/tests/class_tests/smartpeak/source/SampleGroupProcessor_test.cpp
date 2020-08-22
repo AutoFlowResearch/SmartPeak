@@ -205,6 +205,18 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
   MergeInjections sampleGroupProcessor;
   sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
 
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
+
+  const OpenMS::Feature& feat0 = sampleGroupHandler.getFeatureMap().at(0);
+  BOOST_CHECK_EQUAL(feat0.getMetaValue("PeptideRef").toString(), "amp");
+  const OpenMS::Feature& sub0 = sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0);
+  BOOST_CHECK_EQUAL(sub0.getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<float>(sub0.getMetaValue("peak_apex_int")), 253000, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sub0.getMetaValue("QC_transition_score")), 2010, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sub0.getMetaValue("calculated_concentration")), 0.0199999996, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sub0.getRT()), 0.0199999996, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sub0.getMZ()), 200, 1e-4);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

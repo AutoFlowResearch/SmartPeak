@@ -121,8 +121,14 @@ namespace SmartPeak
       merge_keys_to_injection_name, component_to_feature_to_injection_to_values);
 
     // Make the final merged feature
+    OpenMS::FeatureMap fmap;
+    makeFeatureMap(merge_subordinates, scan_polarities_keys_tup, scan_mass_ranges_keys_tup, dilution_factors_keys_tup,
+      merge_keys_to_injection_name, component_to_feature_to_injection_to_values, fmap);
 
-    LOGD << "END optimizeCalibrationCurves";
+    sampleGroupHandler_IO.setFeatureMap(fmap);
+
+    LOGI << "MergeInjections output size: " << fmap.size();
+    LOGD << "END MergeInjections";
   }
   void MergeInjections::getMergeKeysToInjections(const SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, std::set<std::string>& scan_polarities, std::set<std::pair<float, float>>& scan_mass_ranges, std::set<float>& dilution_factors, std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>>& merge_keys_to_injection_name)
   {
@@ -241,7 +247,6 @@ namespace SmartPeak
       for (const auto& scan_mass_range : scan_mass_ranges) {
         for (const auto& dilution_factor : dilution_factors) {
           const auto key = std::make_tuple(scan_polarity, scan_mass_range, dilution_factor);
-
           for (auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values) {
             if (component_to_feature_to_injection_to_value.second.count(feature_name) <= 0) {
               LOGD << "Feature name: " << feature_name << " was not found in the FeatureMap.";
@@ -331,6 +336,96 @@ namespace SmartPeak
               feature_to_injection_to_value.second.at(injections) = merged_value;
             }
           }
+        }
+      }
+    }
+  }
+  void MergeInjections::makeFeatureMap(const bool& merge_subordinates, std::set<std::string>& scan_polarities, const std::set<std::pair<float, float>>& scan_mass_ranges, const std::set<float>& dilution_factors, const std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>>& merge_keys_to_injection_name, const std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values, OpenMS::FeatureMap& feature_map)
+  {
+    for (const auto& scan_polarity : scan_polarities) {
+      for (const auto& scan_mass_range : scan_mass_ranges) {
+        for (const auto& dilution_factor : dilution_factors) {
+          const auto key = std::make_tuple(scan_polarity, scan_mass_range, dilution_factor);
+          OpenMS::Feature f, s;
+          std::vector<OpenMS::Feature> subs;
+          std::string peptide_ref_cur = "";
+          for (const auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values) {
+
+            // Decide whether to make a new feature or continue adding subordinates
+            if (merge_subordinates) {
+              subs.push_back(s);
+              s = OpenMS::Feature();
+              s.setMetaValue("native_id", component_to_feature_to_injection_to_value.first.second);
+            }
+            if (component_to_feature_to_injection_to_value.first.first != peptide_ref_cur) {
+              if (merge_subordinates) {
+                f.setSubordinates(subs);
+                subs.clear();
+              }
+              feature_map.push_back(f);
+              f = OpenMS::Feature();
+              f.setMetaValue("PeptideRef", component_to_feature_to_injection_to_value.first.first);
+              peptide_ref_cur = component_to_feature_to_injection_to_value.first.first;              
+            }
+
+            // Get the metadata
+            for (const auto& feature_to_injection_to_value : component_to_feature_to_injection_to_value.second) {
+              for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
+                if (feature_to_injection_to_value.second.count(injection_names_set) <= 0) continue;
+                float value = feature_to_injection_to_value.second.at(injection_names_set);
+                if (!merge_subordinates) {
+                  if (feature_to_injection_to_value.first == "RT") {
+                    f.setRT(value);
+                  }
+                  else if (feature_to_injection_to_value.first == "Intensity") {
+                    f.setIntensity(value);
+                  }
+                  else if (feature_to_injection_to_value.first == "peak_area") {
+                    f.setIntensity(value);
+                  }
+                  else if (feature_to_injection_to_value.first == "mz") {
+                    f.setMZ(value);
+                  }
+                  else if (feature_to_injection_to_value.first == "charge") {
+                    f.setCharge(static_cast<int>(value));
+                  }
+                  else {
+                    f.setMetaValue(feature_to_injection_to_value.first, value);
+                  }
+                }
+                else if (merge_subordinates) {
+                  if (feature_to_injection_to_value.first == "RT") {
+                    s.setRT(value);
+                  }
+                  else if (feature_to_injection_to_value.first == "Intensity") {
+                    s.setIntensity(value);
+                  }
+                  else if (feature_to_injection_to_value.first == "peak_area") {
+                    s.setIntensity(value);
+                  }
+                  else if (feature_to_injection_to_value.first == "mz") {
+                    s.setMZ(value);
+                  }
+                  else if (feature_to_injection_to_value.first == "charge") {
+                    s.setCharge(static_cast<int>(value));
+                  }
+                  else {
+                    s.setMetaValue(feature_to_injection_to_value.first, value);
+                  }
+                }
+              }
+            }
+          }
+
+          // Add in the last feature
+          if (merge_subordinates) {
+            subs.push_back(s);
+            f.setSubordinates(subs);
+          }
+          feature_map.push_back(f);
+
+          // Remove the first feature
+          feature_map.erase(feature_map.begin());
         }
       }
     }

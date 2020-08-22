@@ -257,6 +257,10 @@ namespace SmartPeak
 
     if (meta_value == "RT") {
       cast = static_cast<float>(feature.getRT());
+    } else if (meta_value == "mz") { // Mass to charge ratio
+      cast = static_cast<float>(feature.getMZ());
+    } else if (meta_value == "charge") { // Mass to charge ratio
+      cast = static_cast<int>(feature.getCharge());
     } else if (meta_value == "intensity") { // Sum of each subordinate intensity
       cast = static_cast<float>(feature.getIntensity());
     } else if (meta_value == "peak_area") { // Subordinate intensity (also called "peak area)
