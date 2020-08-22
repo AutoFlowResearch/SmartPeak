@@ -66,6 +66,16 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
     }
   }}};
 
+  // Setup the dummy data set
+  // neg, low mass, 1x dilution
+  // neg, low mass, 10x dilution
+  // neg, high mass, 1x dilution
+  // neg, high mass, 10x dilution
+  // pos, low mass, 1x dilution
+  // pos, low mass, 10x dilution
+  // pos, high mass, 1x dilution
+  // pos, high mass, 10x dilution
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

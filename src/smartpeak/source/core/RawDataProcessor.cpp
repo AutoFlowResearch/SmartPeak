@@ -1631,7 +1631,6 @@ namespace SmartPeak
           // set the metadata
           OpenMS::Feature f;
           f.setUniqueId();
-          f.setIntensity(it->getIntensity());
           f.setMZ(it->getMZ());
           f.setRT(0);
           f.setMetaValue("native_id", spec.getNativeID());
@@ -1643,7 +1642,7 @@ namespace SmartPeak
 
           // compute the peak area
           OpenMS::PeakIntegrator::PeakArea pa = pi.integratePeak(input, boundaries.at(i).mz_min, boundaries.at(i).mz_max);
-          f.setMetaValue("peak_area", pa.area);
+          f.setIntensity(pa.area);
           f.setMetaValue("peak_apex_int", pa.height);
           f.setMetaValue("peak_apex_position", it->getMZ());
 
@@ -1784,7 +1783,7 @@ namespace SmartPeak
         }
 
         // compute the weighted averages
-        double rt = 0.0, m = 0.0, intensity = 0.0, peak_apex_int = 0.0, peak_area = 0.0;
+        double rt = 0.0, m = 0.0, intensity = 0.0, peak_apex_int = 0.0;
         double weighting_factor = 1.0 / f_map.second.size(); // will be updated
         for (const auto& f : f_map.second) {
           // compute the weighting factor
@@ -1801,8 +1800,6 @@ namespace SmartPeak
           intensity += f.getIntensity() * weighting_factor;
           if (f.metaValueExists("peak_apex_int")) 
             peak_apex_int += (double)f.getMetaValue("peak_apex_int") * weighting_factor;
-          if (f.metaValueExists("peak_area")) 
-            peak_area += (double)f.getMetaValue("peak_area") * weighting_factor;
         }
 
         // make the feature map and assign subordinates
@@ -1814,7 +1811,6 @@ namespace SmartPeak
         f.setMetaValue("scan_polarity", f_map.second.front().getMetaValue("scan_polarity"));
         f.setIntensity(intensity);
         f.setMetaValue("peak_apex_int", peak_apex_int);
-        f.setMetaValue("peak_area", peak_area);
         f.setSubordinates(f_map.second);
         fmap.push_back(f);
       }
