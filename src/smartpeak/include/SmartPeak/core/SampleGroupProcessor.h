@@ -41,9 +41,9 @@ namespace SmartPeak
 
   struct MergeInjections : SampleGroupProcessor
   {
-    int getID() const { return -1; }
-    std::string getName() const { return "MERGE_INJECTIONS"; }
-    std::string getDescription() const { return "Merge multiple injections of the same sample."; }
+    int getID() const override { return -1; }
+    std::string getName() const override { return "MERGE_INJECTIONS"; }
+    std::string getDescription() const override { return "Merge multiple injections of the same sample."; }
 
     /**
       Merge multiple injections of the same sample.

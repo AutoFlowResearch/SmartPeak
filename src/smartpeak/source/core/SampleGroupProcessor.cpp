@@ -210,6 +210,10 @@ namespace SmartPeak
           auto found = component_to_feature_to_injection_to_values.emplace(component, features_to_values);
           for (const auto& f_to_v : features_to_values) {
             CastValue datum = SequenceHandler::getMetaValue(f, f, f_to_v.first);
+            if (datum.getTag() == CastValue::Type::UNINITIALIZED || datum.getTag() == CastValue::Type::STRING) {
+              LOGD << "Feature name: " << f_to_v.first << " was not found in the FeatureMap.";
+              continue;
+            }
             component_to_feature_to_injection_to_values.at(component).at(f_to_v.first).emplace(std::set<std::string>({ injection_name }), datum.f_);
           }
         }
@@ -220,6 +224,10 @@ namespace SmartPeak
             auto found = component_to_feature_to_injection_to_values.emplace(component, features_to_values);
             for (const auto& f_to_v : features_to_values) {
               CastValue datum = SequenceHandler::getMetaValue(s, s, f_to_v.first);
+              if (datum.getTag() == CastValue::Type::UNINITIALIZED || datum.getTag() == CastValue::Type::STRING) {
+                LOGD << "Feature name: " << f_to_v.first << " was not found in the FeatureMap.";
+                continue;
+              }
               component_to_feature_to_injection_to_values.at(component).at(f_to_v.first).emplace(std::set<std::string>({ injection_name }), datum.f_);
             }
           }
@@ -235,6 +243,10 @@ namespace SmartPeak
           const auto key = std::make_tuple(scan_polarity, scan_mass_range, dilution_factor);
 
           for (auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values) {
+            if (component_to_feature_to_injection_to_value.second.count(feature_name) <= 0) {
+              LOGD << "Feature name: " << feature_name << " was not found in the FeatureMap.";
+              continue;
+            }
 
             // Find the total value for weighting
             float total_value = 0;
@@ -291,6 +303,7 @@ namespace SmartPeak
             // Repeat for all other features
             for (auto& feature_to_injection_to_value : component_to_feature_to_injection_to_value.second) {
               if (feature_name == feature_to_injection_to_value.first) continue;
+              if (feature_to_injection_to_value.second.count(max_or_min_injections) <= 0) continue;
 
               // Calculated the merged value
               float merged_value = 0;
