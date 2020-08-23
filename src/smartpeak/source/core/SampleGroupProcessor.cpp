@@ -156,6 +156,7 @@ namespace SmartPeak
         merge_keys_to_injection_name.emplace(key, std::vector<std::set<std::string>>());
         for (const auto& dilution_factor : dilution_factors) {
           const auto key_tmp = std::make_tuple(scan_polarity, scan_mass_range, dilution_factor);
+          if (merge_keys_to_injection_name.count(key_tmp) <= 0) continue;
           for (const auto& injection_name_set : merge_keys_to_injection_name.at(key_tmp)) {
             merge_keys_to_injection_name.at(key).push_back(injection_name_set);
           }
@@ -169,6 +170,7 @@ namespace SmartPeak
       merge_keys_to_injection_name.emplace(key, std::vector<std::set<std::string>>());
       for (const auto& scan_mass_range : scan_mass_ranges) {
         const auto key_tmp = std::make_tuple(scan_polarity, scan_mass_range, -1);
+        if (merge_keys_to_injection_name.count(key_tmp) <= 0) continue;
         // merge the injection name sets from the previous merge
         std::set<std::string> injection_names_prev_merge;
         for (const auto& injection_name_set : merge_keys_to_injection_name.at(key_tmp)) {
@@ -186,6 +188,7 @@ namespace SmartPeak
     merge_keys_to_injection_name.emplace(key, std::vector<std::set<std::string>>());
     for (const auto& scan_polarity : scan_polarities) {
       const auto key_tmp = std::make_tuple(scan_polarity, std::make_pair(-1, -1), -1);
+      if (merge_keys_to_injection_name.count(key_tmp) <= 0) continue;
       // merge the injection name sets from the previous merge
       std::set<std::string> injection_names_prev_merge;
       for (const auto& injection_name_set : merge_keys_to_injection_name.at(key_tmp)) {

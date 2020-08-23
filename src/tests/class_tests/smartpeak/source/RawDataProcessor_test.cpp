@@ -1092,7 +1092,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
 
   LoadParameters loadParameters;
   loadParameters.sanitizeParameters(params);
-  BOOST_CHECK_EQUAL(params.size(), 21);
+  BOOST_CHECK_EQUAL(params.size(), 22);
   BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("AbsoluteQuantitation"), 1);
@@ -1111,6 +1111,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.count("FIAMS"), 1);
   BOOST_CHECK_EQUAL(params.count("PickMS1Features"), 1);
   BOOST_CHECK_EQUAL(params.count("AccurateMassSearchEngine"), 1);
+  BOOST_CHECK_EQUAL(params.count("MergeInjections"), 1);
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter").size(), 2);
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem1"), "value1");
   BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem2"), "value2");
@@ -1124,6 +1125,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.at("FIAMS").size(), 0);
   BOOST_CHECK_EQUAL(params.at("PickMS1Features").size(), 0);
   BOOST_CHECK_EQUAL(params.at("AccurateMassSearchEngine").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("MergeInjections").size(), 0);
 }
 
 /**

@@ -1032,7 +1032,8 @@ namespace SmartPeak
       "SequenceProcessor",
       "FIAMS",
       "PickMS1Features",
-      "AccurateMassSearchEngine"
+      "AccurateMassSearchEngine",
+      "MergeInjections"
     };
     for (const std::string& parameter : required_parameters) {
       if (!params_I.count(parameter)) {

@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
     metaDataHandler.scan_mass_low = 60;
 
     Filenames filenames;
-    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
+    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + "_1_FluxTest_1900-01-07_000000.featureXML");
     RawDataHandler rawDataHandler;
     LoadFeatures loadFeatures;
     loadFeatures.process(rawDataHandler, {}, filenames);
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
 
 
     Filenames filenames;
-    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
+    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + "_1_FluxTest_1900-01-07_000000.featureXML");
     RawDataHandler rawDataHandler;
     LoadFeatures loadFeatures;
     loadFeatures.process(rawDataHandler, {}, filenames);

@@ -35,6 +35,74 @@ Filenames generateTestFilenames()
 }
 
 BOOST_AUTO_TEST_SUITE(sequenceprocessor)
+BOOST_AUTO_TEST_CASE(processSampleGroups1)
+{
+  // Create the sequence
+  SequenceHandler sequenceHandler;
+  CreateSequence cs(sequenceHandler);
+  cs.filenames = generateTestFilenames();
+  cs.delimiter = ",";
+  cs.checkConsistency = false;
+  cs.process();
+
+  // Generate the filenames
+  std::map<std::string, Filenames> dynamic_filenames;
+  const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
+  for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+    const std::string key = injection.getMetaData().getInjectionName();
+    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+      path + "mzML/",
+      path + "features/",
+      path + "features/",
+      injection.getMetaData().getSampleName(),
+      key
+    );
+  }
+
+  // Load in the raw data featureMaps
+  const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };
+  ProcessSequence ps(sequenceHandler);
+  ps.filenames = dynamic_filenames;
+  ps.raw_data_processing_methods_I = raw_data_processing_methods;
+  ps.process();
+
+  // Update the filenames
+  dynamic_filenames.clear();
+  for (const SampleGroupHandler& sampleGroupHandler : sequenceHandler.getSampleGroups()) {
+    const std::string key = sampleGroupHandler.getSampleGroupName();
+    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+      path + "mzML/",
+      path + "features/",
+      path + "features/",
+      sampleGroupHandler.getSampleGroupName(),
+      key
+    );
+  }
+
+  const vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods =
+  { std::make_shared<MergeInjections>() };
+
+  // Default sample group names (i.e., all)
+  ProcessSampleGroups psg(sequenceHandler);
+  psg.filenames = dynamic_filenames;
+  psg.sample_group_processing_methods_I = sample_group_processing_methods;
+  psg.process();
+
+  BOOST_CHECK_EQUAL(sequenceHandler.getSampleGroups().size(), 2);
+  SampleGroupHandler sampleGroupHandler = sequenceHandler.getSampleGroups().at(0);
+
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString(), "amp");
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 600238.125, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("QC_transition_score")), 49636.1914, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("calculated_concentration")), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 400, 1e-4);
+
+  // TODO: Selected sample group names
+}
 
 BOOST_AUTO_TEST_CASE(createSequence)
 {
@@ -51,7 +119,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 22);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 23);
   BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
@@ -71,9 +139,9 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
   InjectionHandler& injection5 = sequenceHandler.getSequence()[5];
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleGroupName(), "Test01");
+  BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleGroupName(), "Test02");
   BOOST_CHECK_EQUAL(injection5.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 22);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 23);
   BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
@@ -307,6 +375,62 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 0.8, 1e-6);
 
   // TODO: Selected sequence segment names
+}
+
+BOOST_AUTO_TEST_CASE(processSampleGroups)
+{
+  // Create the sequence
+  SequenceHandler sequenceHandler;
+  CreateSequence cs(sequenceHandler);
+  cs.filenames = generateTestFilenames();
+  cs.delimiter = ",";
+  cs.checkConsistency = false;
+  cs.process();
+
+  // Generate the filenames
+  std::map<std::string, Filenames> dynamic_filenames;
+  const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
+  for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+    const std::string key = injection.getMetaData().getInjectionName();
+    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+      path + "mzML/",
+      path + "features/",
+      path + "features/",
+      injection.getMetaData().getSampleName(),
+      key
+    );
+  }
+
+  // Load in the raw data featureMaps
+  const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };
+  ProcessSequence ps(sequenceHandler);
+  ps.filenames = dynamic_filenames;
+  ps.raw_data_processing_methods_I = raw_data_processing_methods;
+  ps.process();
+
+  const vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods =
+  { std::make_shared<MergeInjections>() };
+
+  // Default sample group names (i.e., all)
+  ProcessSampleGroups psg(sequenceHandler);
+  psg.filenames = dynamic_filenames;
+  psg.sample_group_processing_methods_I = sample_group_processing_methods;
+  psg.process();
+
+  BOOST_CHECK_EQUAL(sequenceHandler.getSampleGroups().size(), 1);
+  SampleGroupHandler sampleGroupHandler = sequenceHandler.getSampleGroups().at(0);
+
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString(), "amp");
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 600238.125, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("QC_transition_score")), 49636.1914, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("calculated_concentration")), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 400, 1e-4);
+
+  // TODO: Selected sample group names
 }
 
 BOOST_AUTO_TEST_SUITE_END()
