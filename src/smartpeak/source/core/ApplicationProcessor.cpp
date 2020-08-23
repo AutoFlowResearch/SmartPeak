@@ -178,7 +178,7 @@ namespace SmartPeak
   }
 
   namespace ApplicationProcessors {
-  void processCommands(ApplicationHandler& state, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names)
+  void processCommands(ApplicationHandler& state, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names)
   {
     size_t i = 0;
     while (i < commands.size()) {
@@ -206,7 +206,17 @@ namespace SmartPeak
         pss.sequence_segment_processing_methods_I = seq_seg_methods;
         pss.sequence_segment_names = sequence_segment_names;
         pss.process();
-      } else {
+      } else if (cmd.type == ApplicationHandler::Command::SampleGroupMethod) {
+        std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_methods;
+        std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(sample_group_methods),
+          [](const ApplicationHandler::Command& command) { return command.sample_group_method; });
+        ProcessSampleGroups psg(state.sequenceHandler_);
+        psg.filenames = cmd.dynamic_filenames;
+        psg.sample_group_processing_methods_I = sample_group_methods;
+        psg.sample_group_names = sample_group_names;
+        psg.process();
+      }
+      else {
         LOGW << "Skipping a command: " << cmd.type << "\n";
       }
       i = j;
@@ -220,6 +230,8 @@ namespace SmartPeak
     for (const auto& it: n_to_raw_data_method_) { valid_commands_raw_data_processor.push_back(it.first); }
     std::vector<std::string> valid_commands_sequence_segment_processor;
     for (const auto& it: n_to_seq_seg_method_) { valid_commands_sequence_segment_processor.push_back(it.first); }
+    std::vector<std::string> valid_commands_sample_group_processor;
+    for (const auto& it : n_to_sample_group_method_) { valid_commands_sample_group_processor.push_back(it.first); }
 
     // Run the command depending on whether it is a raw data processor method or sequence segment processor method
     if (std::count(valid_commands_raw_data_processor.begin(), valid_commands_raw_data_processor.end(), name_)) {
@@ -246,7 +258,20 @@ namespace SmartPeak
           key
         );
       }
-    } else {
+    } else if (std::count(valid_commands_sample_group_processor.begin(), valid_commands_sample_group_processor.end(), name_)) {
+      cmd_.setMethod(n_to_seq_seg_method_.at(name_));
+      for (const SampleGroupHandler& sample_group : application_handler_.sequenceHandler_.getSampleGroups()) {
+        const std::string& key = sample_group.getSampleGroupName();
+        cmd_.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+          application_handler_.mzML_dir_,
+          application_handler_.features_in_dir_,
+          application_handler_.features_out_dir_,
+          key,
+          key
+        );
+      }
+    }
+    else {
       LOGE << "\nNo command for selection name " << name_;
       return false;
     }

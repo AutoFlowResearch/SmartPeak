@@ -146,6 +146,53 @@ namespace SmartPeak
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
   }
 
+  void ProcessSampleGroups::process() const
+  {
+    std::vector<SampleGroupHandler> sample_groups;
+
+    if (sample_group_names.empty()) { // select all
+      sample_groups = sequenceHandler_IO->getSampleGroups();
+    }
+    else { // select those with specific sample group names
+      for (SampleGroupHandler& s : sequenceHandler_IO->getSampleGroups()) {
+        if (sample_group_names.count(s.getSampleGroupName())) {
+          sample_groups.push_back(s);
+        }
+      }
+    }
+    if (filenames.size() < sample_groups.size()) {
+      throw std::invalid_argument("The number of provided filenames locations is not correct.");
+    }
+
+    // process by sample group
+    for (SampleGroupHandler& sample_group : sample_groups) {
+
+      // handle user-desired sample_group_processing_methods
+      if (!sample_group_processing_methods_I.size()) {
+        throw "no sample group processing methods given.\n";
+      }
+
+      const size_t n = sample_group_processing_methods_I.size();
+
+      // process the sample group
+      for (size_t i = 0; i < n; ++i) {
+        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sample groups";
+        sample_group_processing_methods_I[i]->process(
+          sample_group,
+          *sequenceHandler_IO,
+          (*sequenceHandler_IO)
+          .getSequence()
+          .at(sample_group.getSampleIndices().front())
+          .getRawData()
+          .getParameters(), // assumption: all parameters are the same for each sample in the sample group!
+          filenames.at(sample_group.getSampleGroupName())
+        );
+      }
+    }
+
+    sequenceHandler_IO->setSampleGroups(sample_groups);
+  }
+
   void SequenceProcessorMultithread::spawn_workers(unsigned int n_threads)
   {
     size_t n_workers = getNumWorkers(n_threads);

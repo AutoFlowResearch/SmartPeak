@@ -107,6 +107,24 @@ namespace SmartPeak
       ImGui::EndCombo();
     }
 
+    if (ImGui::BeginCombo("Add Sample Group method", NULL))
+    {
+      ApplicationHandler::Command cmd;
+      CreateCommand createCommand(*application_handler_);
+      for (const auto& p : n_to_sample_group_method_)
+      {
+        if (ImGui::Selectable(p.second->getName().c_str()))
+        {
+          createCommand.name_ = p.second->getName();
+          const bool created = createCommand.process();
+          if (created) {
+            commands_.push_back(createCommand.cmd_);
+          }
+        }
+      }
+      ImGui::EndCombo();
+    }
+
     ImGui::Separator();
     ImGui::Text("Steps");
     ImGui::Separator();

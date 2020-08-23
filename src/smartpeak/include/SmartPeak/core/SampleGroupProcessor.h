@@ -55,7 +55,6 @@ namespace SmartPeak
       const Filenames& filenames
     ) const override;
 
-  private:
     static void getMergeKeysToInjections(const SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I, 
       std::set<std::string>& scan_polarities,

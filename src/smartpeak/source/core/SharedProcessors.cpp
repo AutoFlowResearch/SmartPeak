@@ -2,6 +2,7 @@
 
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/core/SampleGroupProcessor.h>
 #include <map>
 #include <memory>
 
@@ -57,5 +58,8 @@ namespace SmartPeak {
     {"LOAD_FEATURE_BACKGROUND_FILTERS", std::make_shared<LoadFeatureBackgroundFilters>()},
     {"STORE_FEATURE_BACKGROUND_QCS", std::make_shared<StoreFeatureBackgroundQCs>()},
     {"LOAD_FEATURE_BACKGROUND_QCS", std::make_shared<LoadFeatureBackgroundQCs>()}
+  };
+  const std::map<std::string, std::shared_ptr<SampleGroupProcessor>> n_to_sample_group_method_ {
+    {"MERGE_INJECTIONS", std::make_shared<MergeInjections>()}
   };
 }

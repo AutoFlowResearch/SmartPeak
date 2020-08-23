@@ -112,14 +112,14 @@ BOOST_AUTO_TEST_CASE(setFeatureExplorer1)
   session_handler.setFeatureExplorer();
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_headers.size(), 1);
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_headers(0), "name");
-  BOOST_CHECK_EQUAL(session_handler.feature_explorer_body.dimension(0), 18);
+  BOOST_CHECK_EQUAL(session_handler.feature_explorer_body.dimension(0), 20);
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_body.dimension(1), 1);
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_body(0, 0), "asymmetry_factor");
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_body(session_handler.feature_explorer_body.dimension(0) - 1, session_handler.feature_explorer_body.dimension(1) - 1), "mz_error_Da");
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_headers.size(), 2);
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_headers(0), "plot");
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_headers(session_handler.feature_explorer_checkbox_headers.size() - 1), "table");
-  BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_body.dimension(0), 18);
+  BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_body.dimension(0), 20);
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_body.dimension(1), 2);
   BOOST_CHECK(!session_handler.feature_explorer_checkbox_body(0, 0));
   BOOST_CHECK(session_handler.feature_explorer_checkbox_body(2, 0));
@@ -291,11 +291,12 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getNSelectedSampleNamesPlot(), 1);
   BOOST_CHECK_EQUAL(session_handler.getNSelectedTransitionsTable(), 6);
   BOOST_CHECK_EQUAL(session_handler.getNSelectedTransitionsPlot(), 1);
-  BOOST_CHECK_EQUAL(session_handler.getNSelectedFeatureMetaValuesTable(), 18);
+  BOOST_CHECK_EQUAL(session_handler.getNSelectedFeatureMetaValuesTable(), 20);
   BOOST_CHECK_EQUAL(session_handler.getNSelectedFeatureMetaValuesPlot(), 1);
   // Selected string values
   BOOST_CHECK(session_handler.getSelectInjectionNamesWorkflow(testData.sequenceHandler) == std::set<std::string>({"150516_CM1_Level10_2_BatchName_1900-01-01_000000", "150516_CM1_Level1_1_BatchName_1900-01-01_000000"}));
   BOOST_CHECK(session_handler.getSelectSequenceSegmentNamesWorkflow(testData.sequenceHandler) == std::set<std::string>({ "segment1" }));
+  BOOST_CHECK(session_handler.getSelectSampleGroupNamesWorkflow(testData.sequenceHandler) == std::set<std::string>({ "CM" }));
   BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesTable().size(), 2);
   BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesTable()(0), "150516_CM1_Level1");
   BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesTable()(session_handler.getSelectSampleNamesTable().dimension(0)-1), "150516_CM1_Level10");
@@ -314,10 +315,10 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot().size(), 6);
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot()(0), "arg-L");
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot()(session_handler.getSelectTransitionsPlot().dimension(0) - 1), "");
-  BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable().size(), 18);
+  BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable().size(), 20);
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable()(0), "asymmetry_factor");
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable()(session_handler.getSelectFeatureMetaValuesTable().dimension(0) - 1), "mz_error_Da");
-  BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesPlot().size(), 18);
+  BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesPlot().size(), 20);
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesPlot()(0), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesPlot()(session_handler.getSelectFeatureMetaValuesPlot().dimension(0) - 1), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectSpectrumPlot().size(), 1);
