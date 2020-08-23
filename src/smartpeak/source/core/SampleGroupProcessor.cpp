@@ -110,20 +110,23 @@ namespace SmartPeak
 
     // pass 2: mass ranges
     scan_mass_ranges_keys_tup = std::set<std::pair<float, float>>({std::make_pair(-1,-1)});
-    mergeComponentsToFeaturesToInjectionsToValues(dilution_series_merge_feature_name, dilution_series_merge_rule,
+    mergeComponentsToFeaturesToInjectionsToValues(scan_polarity_merge_feature_name, mass_range_merge_rule,
       scan_polarities_keys_tup, scan_mass_ranges_keys_tup, dilution_factors_keys_tup,
       merge_keys_to_injection_name, component_to_feature_to_injection_to_values);
 
     // pass 3: scan polarities
     scan_polarities_keys_tup = std::set<std::string>({ "" });
-    mergeComponentsToFeaturesToInjectionsToValues(dilution_series_merge_feature_name, dilution_series_merge_rule,
+    mergeComponentsToFeaturesToInjectionsToValues(scan_polarity_merge_feature_name, scan_polarity_merge_rule,
       scan_polarities_keys_tup, scan_mass_ranges_keys_tup, dilution_factors_keys_tup,
       merge_keys_to_injection_name, component_to_feature_to_injection_to_values);
 
     // Make the final merged feature
+    std::set<std::string> injection_names_set;
+    for (const std::size_t& index : sampleGroupHandler_IO.getSampleIndices()) {
+      injection_names_set.insert(sequenceHandler_I.getSequence().at(index).getMetaData().getInjectionName() );
+    }
     OpenMS::FeatureMap fmap;
-    makeFeatureMap(merge_subordinates, scan_polarities_keys_tup, scan_mass_ranges_keys_tup, dilution_factors_keys_tup,
-      merge_keys_to_injection_name, component_to_feature_to_injection_to_values, fmap);
+    makeFeatureMap(merge_subordinates, injection_names_set, component_to_feature_to_injection_to_values, fmap);
 
     sampleGroupHandler_IO.setFeatureMap(fmap);
 
@@ -267,36 +270,42 @@ namespace SmartPeak
             int cnt = 0;
             for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
               float value = component_to_feature_to_injection_to_value.second.at(feature_name).at(injection_names_set);
-              weights.push_back(value / total_value);
+              weights.push_back(value / total_value); // add to the weights
+
+              // record the injections
               for (const std::string& inj : injection_names_set) {
                 injections.insert(inj);
               }
+
+              // initializations
               if (cnt == 0) {
-                merged_value = value;
                 max_or_min_injections = injection_names_set;
+                if (merge_rule == "Min" || merge_rule == "Max") {
+                  merged_value = value;
+                }
               }
-              else {
-                if (merge_rule == "Sum") {
-                  merged_value += value;
+
+              // calculations
+              if (merge_rule == "Sum") {
+                merged_value += value;
+              }
+              else if (merge_rule == "Min") {
+                if (value < merged_value) {
+                  merged_value = value;
+                  max_or_min_injections = injection_names_set;
                 }
-                else if (merge_rule == "Min") {
-                  if (value < merged_value) {
-                    merged_value = value;
-                    max_or_min_injections = injection_names_set;
-                  }
+              }
+              else if (merge_rule == "Max") {
+                if (value > merged_value) {
+                  merged_value = value;
+                  max_or_min_injections = injection_names_set;
                 }
-                else if (merge_rule == "Max") {
-                  if (value > merged_value) {
-                    merged_value = value;
-                    max_or_min_injections = injection_names_set;
-                  }
-                }
-                else if (merge_rule == "Mean") {
-                  merged_value += value / merge_keys_to_injection_name.at(key).size();
-                }
-                else if (merge_rule == "WeightedMean") {
-                  merged_value += value / total_value;
-                }
+              }
+              else if (merge_rule == "Mean") {
+                merged_value += (value / merge_keys_to_injection_name.at(key).size());
+              }
+              else if (merge_rule == "WeightedMean") {
+                merged_value += (value * value / total_value);
               }
               ++cnt;
             }
@@ -319,14 +328,9 @@ namespace SmartPeak
                 int cnt = 0;
                 for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
                   float value = feature_to_injection_to_value.second.at(injection_names_set);
-                  if (cnt == 0) {
-                    merged_value = value;
-                  }
-                  else {
-                    if (merge_rule == "Sum") merged_value += value;
-                    else if (merge_rule == "Mean") merged_value += value / weights.size();
-                    else if (merge_rule == "WeightedMean") merged_value += value * weights.at(cnt);
-                  }
+                  if (merge_rule == "Sum") merged_value += value;
+                  else if (merge_rule == "Mean") merged_value += (value / weights.size());
+                  else if (merge_rule == "WeightedMean") merged_value += (value * weights.at(cnt));
                   ++cnt;
                 }
               }
@@ -340,94 +344,86 @@ namespace SmartPeak
       }
     }
   }
-  void MergeInjections::makeFeatureMap(const bool& merge_subordinates, std::set<std::string>& scan_polarities, const std::set<std::pair<float, float>>& scan_mass_ranges, const std::set<float>& dilution_factors, const std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>>& merge_keys_to_injection_name, const std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values, OpenMS::FeatureMap& feature_map)
+  void MergeInjections::makeFeatureMap(const bool& merge_subordinates, std::set<std::string>& injection_names_set, const std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values, OpenMS::FeatureMap& feature_map)
   {
-    for (const auto& scan_polarity : scan_polarities) {
-      for (const auto& scan_mass_range : scan_mass_ranges) {
-        for (const auto& dilution_factor : dilution_factors) {
-          const auto key = std::make_tuple(scan_polarity, scan_mass_range, dilution_factor);
-          OpenMS::Feature f, s;
-          std::vector<OpenMS::Feature> subs;
-          std::string peptide_ref_cur = "";
-          for (const auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values) {
+    OpenMS::Feature f, s;
+    std::vector<OpenMS::Feature> subs;
+    std::string peptide_ref_cur = "";
+    for (const auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values) {
 
-            // Decide whether to make a new feature or continue adding subordinates
-            if (merge_subordinates) {
-              subs.push_back(s);
-              s = OpenMS::Feature();
-              s.setMetaValue("native_id", component_to_feature_to_injection_to_value.first.second);
-            }
-            if (component_to_feature_to_injection_to_value.first.first != peptide_ref_cur) {
-              if (merge_subordinates) {
-                f.setSubordinates(subs);
-                subs.clear();
-              }
-              feature_map.push_back(f);
-              f = OpenMS::Feature();
-              f.setMetaValue("PeptideRef", component_to_feature_to_injection_to_value.first.first);
-              peptide_ref_cur = component_to_feature_to_injection_to_value.first.first;              
-            }
-
-            // Get the metadata
-            for (const auto& feature_to_injection_to_value : component_to_feature_to_injection_to_value.second) {
-              for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
-                if (feature_to_injection_to_value.second.count(injection_names_set) <= 0) continue;
-                float value = feature_to_injection_to_value.second.at(injection_names_set);
-                if (!merge_subordinates) {
-                  if (feature_to_injection_to_value.first == "RT") {
-                    f.setRT(value);
-                  }
-                  else if (feature_to_injection_to_value.first == "Intensity") {
-                    f.setIntensity(value);
-                  }
-                  else if (feature_to_injection_to_value.first == "peak_area") {
-                    f.setIntensity(value);
-                  }
-                  else if (feature_to_injection_to_value.first == "mz") {
-                    f.setMZ(value);
-                  }
-                  else if (feature_to_injection_to_value.first == "charge") {
-                    f.setCharge(static_cast<int>(value));
-                  }
-                  else {
-                    f.setMetaValue(feature_to_injection_to_value.first, value);
-                  }
-                }
-                else if (merge_subordinates) {
-                  if (feature_to_injection_to_value.first == "RT") {
-                    s.setRT(value);
-                  }
-                  else if (feature_to_injection_to_value.first == "Intensity") {
-                    s.setIntensity(value);
-                  }
-                  else if (feature_to_injection_to_value.first == "peak_area") {
-                    s.setIntensity(value);
-                  }
-                  else if (feature_to_injection_to_value.first == "mz") {
-                    s.setMZ(value);
-                  }
-                  else if (feature_to_injection_to_value.first == "charge") {
-                    s.setCharge(static_cast<int>(value));
-                  }
-                  else {
-                    s.setMetaValue(feature_to_injection_to_value.first, value);
-                  }
-                }
-              }
-            }
-          }
-
-          // Add in the last feature
-          if (merge_subordinates) {
-            subs.push_back(s);
-            f.setSubordinates(subs);
-          }
-          feature_map.push_back(f);
-
-          // Remove the first feature
-          feature_map.erase(feature_map.begin());
+      // Decide whether to make a new feature or continue adding subordinates
+      if (merge_subordinates) {
+        subs.push_back(s);
+        s = OpenMS::Feature();
+        s.setMetaValue("native_id", component_to_feature_to_injection_to_value.first.second);
+      }
+      if (component_to_feature_to_injection_to_value.first.first != peptide_ref_cur) {
+        if (merge_subordinates) {
+          f.setSubordinates(subs);
+          subs.clear();
         }
+        feature_map.push_back(f);
+        f = OpenMS::Feature();
+        f.setMetaValue("PeptideRef", component_to_feature_to_injection_to_value.first.first);
+        peptide_ref_cur = component_to_feature_to_injection_to_value.first.first;              
+      }
+
+      // Get the metadata
+      for (const auto& feature_to_injection_to_value : component_to_feature_to_injection_to_value.second) {
+        if (feature_to_injection_to_value.second.count(injection_names_set) <= 0) continue;
+        float value = feature_to_injection_to_value.second.at(injection_names_set);
+        if (!merge_subordinates) {
+          if (feature_to_injection_to_value.first == "RT") {
+            f.setRT(value);
+          }
+          else if (feature_to_injection_to_value.first == "Intensity") {
+            f.setIntensity(value);
+          }
+          else if (feature_to_injection_to_value.first == "peak_area") {
+            f.setIntensity(value);
+          }
+          else if (feature_to_injection_to_value.first == "mz") {
+            f.setMZ(value);
+          }
+          else if (feature_to_injection_to_value.first == "charge") {
+            f.setCharge(static_cast<int>(value));
+          }
+          else {
+            f.setMetaValue(feature_to_injection_to_value.first, value);
+          }
+        }
+        else if (merge_subordinates) {
+          if (feature_to_injection_to_value.first == "RT") {
+            s.setRT(value);
+          }
+          else if (feature_to_injection_to_value.first == "Intensity") {
+            s.setIntensity(value);
+          }
+          else if (feature_to_injection_to_value.first == "peak_area") {
+            s.setIntensity(value);
+          }
+          else if (feature_to_injection_to_value.first == "mz") {
+            s.setMZ(value);
+          }
+          else if (feature_to_injection_to_value.first == "charge") {
+            s.setCharge(static_cast<int>(value));
+          }
+          else {
+            s.setMetaValue(feature_to_injection_to_value.first, value);
+          }
+        }
+             
       }
     }
+
+    // Add in the last feature
+    if (merge_subordinates) {
+      subs.push_back(s);
+      f.setSubordinates(subs);
+    }
+    feature_map.push_back(f);
+
+    // Remove the first feature
+    feature_map.erase(feature_map.begin());
   }
 }

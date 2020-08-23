@@ -9,7 +9,7 @@
 using namespace SmartPeak;
 using namespace std;
 
-void makeSequence(SequenceHandler& sequenceHandler_IO) {
+void makeSequence(SequenceHandler& sequenceHandler_IO, const bool& test_only_polarity) {
   // ser-L.ser-L_1.Light
   const vector<double> x1 = {
     2.32e4, 2.45e4, 1.78e4, 2.11e4, 1.91e4,
@@ -52,12 +52,14 @@ void makeSequence(SequenceHandler& sequenceHandler_IO) {
       8.00e-2, 2.00e-1, 4.00e-1
   };
 
-  for (size_t i = 0; i < x1.size(); ++i) {
+  size_t max_iters = x1.size();
+  if (test_only_polarity) max_iters = 2;
+  for (size_t i = 0; i < max_iters; ++i) {
     const string sample_name = "level" + std::to_string(i);
     OpenMS::FeatureMap feature_map;
 
     // ser-L.ser-L_1.Light
-    OpenMS::MRMFeature mrm_feature;
+    OpenMS::Feature mrm_feature;
     OpenMS::Feature component, IS_component;
     component.setMetaValue("native_id", "ser-L.ser-L_1.Light");
     component.setMetaValue("peak_apex_int", x1[i]);
@@ -72,15 +74,20 @@ void makeSequence(SequenceHandler& sequenceHandler_IO) {
     IS_component.setRT(z1[i]);
     IS_component.setMZ(100);
     mrm_feature.setMetaValue("PeptideRef", "ser-L");
+    mrm_feature.setMetaValue("peak_apex_int", x1[i]);
+    mrm_feature.setMetaValue("QC_transition_score", y1[i]);
+    mrm_feature.setMetaValue("calculated_concentration", z1[i]);
+    mrm_feature.setRT(z1[i]);
+    mrm_feature.setMZ(100);
     mrm_feature.setSubordinates({ component, IS_component });
     feature_map.push_back(mrm_feature);
 
     // amp.amp_1.Light
     component.setMetaValue("native_id", "amp.amp_1.Light");
-    component.setMetaValue("peak_apex_int", x1[i]);
-    component.setMetaValue("QC_transition_score", y1[i]);
-    component.setMetaValue("calculated_concentration", z1[i]);
-    component.setRT(z1[i]);
+    component.setMetaValue("peak_apex_int", x2[i]);
+    component.setMetaValue("QC_transition_score", y2[i]);
+    component.setMetaValue("calculated_concentration", z2[i]);
+    component.setRT(z2[i]);
     component.setMZ(200);
     IS_component.setMetaValue("native_id", "amp.amp_1.Heavy");
     IS_component.setMetaValue("peak_apex_int", x2[i]);
@@ -89,6 +96,11 @@ void makeSequence(SequenceHandler& sequenceHandler_IO) {
     IS_component.setRT(z2[i]);
     IS_component.setMZ(200);
     mrm_feature.setMetaValue("PeptideRef", "amp");
+    mrm_feature.setMetaValue("peak_apex_int", x2[i]);
+    mrm_feature.setMetaValue("QC_transition_score", y2[i]);
+    mrm_feature.setMetaValue("calculated_concentration", z2[i]);
+    mrm_feature.setRT(z2[i]);
+    mrm_feature.setMZ(200);
     mrm_feature.setSubordinates({ component, IS_component });
     feature_map.push_back(mrm_feature);
 
@@ -106,6 +118,11 @@ void makeSequence(SequenceHandler& sequenceHandler_IO) {
     IS_component.setRT(z3[i]);
     IS_component.setMZ(300);
     mrm_feature.setMetaValue("PeptideRef", "atp");
+    mrm_feature.setMetaValue("peak_apex_int", x3[i]);
+    mrm_feature.setMetaValue("QC_transition_score", y3[i]);
+    mrm_feature.setMetaValue("calculated_concentration", z3[i]);
+    mrm_feature.setRT(z3[i]);
+    mrm_feature.setMZ(300);
     mrm_feature.setSubordinates({ component, IS_component });
     feature_map.push_back(mrm_feature);
 
@@ -121,11 +138,19 @@ void makeSequence(SequenceHandler& sequenceHandler_IO) {
     meta_data.inj_volume = 7.0;
     meta_data.inj_volume_units = "8";
     meta_data.batch_name = "9";
-    meta_data.scan_polarity = (i < 4 )? "positive":"negative";
-    std::vector<int> ranges = {0,0,1,1,0,0,1,1};
-    meta_data.scan_mass_low = (ranges.at(i)==0) ? 50: 200;
-    meta_data.scan_mass_high = (ranges.at(i) == 0) ? 200 : 2000;
-    meta_data.dilution_factor = (i % 2 == 0) ? 1.0 : 10.0;
+    if (test_only_polarity) {
+      meta_data.scan_polarity = (i % 2 == 0) ? "positive" : "negative";
+      meta_data.scan_mass_low = 100;
+      meta_data.scan_mass_high = 1000;
+      meta_data.dilution_factor = 1.0;
+    }
+    else {
+      meta_data.scan_polarity = (i < 4) ? "positive" : "negative";
+      std::vector<int> ranges = { 0,0,1,1,0,0,1,1 };
+      meta_data.scan_mass_low = (ranges.at(i) == 0) ? 50 : 200;
+      meta_data.scan_mass_high = (ranges.at(i) == 0) ? 200 : 2000;
+      meta_data.dilution_factor = (i % 2 == 0) ? 1.0 : 10.0;
+    }
 
     sequenceHandler_IO.addSampleToSequence(meta_data, OpenMS::FeatureMap());
 
@@ -165,7 +190,7 @@ BOOST_AUTO_TEST_CASE(gettersMergeInjections)
 BOOST_AUTO_TEST_CASE(processMergeInjections)
 {
   // setup the parameters
-  const map<string, vector<map<string, string>>> mergeinjs_params = {{"MergeInjections", {
+  map<string, vector<map<string, string>>> mergeinjs_params = {{"MergeInjections", {
     {
       {"name", "scan_polarity_merge_rule"},
       {"value", "WeightedMean"}
@@ -198,25 +223,122 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
 
   // setup the sequence
   SequenceHandler sequenceHandler;
-  makeSequence(sequenceHandler);
+  makeSequence(sequenceHandler, false);
   SampleGroupHandler sampleGroupHandler = sequenceHandler.getSampleGroups().front();
 
-  // test merge injections
+  // test merge injections on all with subordinates
   MergeInjections sampleGroupProcessor;
   sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
 
   BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
   BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString(), "amp");
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 600238.125, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("QC_transition_score")), 49636.1914, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("calculated_concentration")), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 400, 1e-4);
 
-  const OpenMS::Feature& feat0 = sampleGroupHandler.getFeatureMap().at(0);
-  BOOST_CHECK_EQUAL(feat0.getMetaValue("PeptideRef").toString(), "amp");
-  const OpenMS::Feature& sub0 = sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0);
-  BOOST_CHECK_EQUAL(sub0.getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<float>(sub0.getMetaValue("peak_apex_int")), 253000, 1e-4);
-  BOOST_CHECK_CLOSE(static_cast<float>(sub0.getMetaValue("QC_transition_score")), 2010, 1e-4);
-  BOOST_CHECK_CLOSE(static_cast<float>(sub0.getMetaValue("calculated_concentration")), 0.0199999996, 1e-4);
-  BOOST_CHECK_CLOSE(static_cast<float>(sub0.getRT()), 0.0199999996, 1e-4);
-  BOOST_CHECK_CLOSE(static_cast<float>(sub0.getMZ()), 200, 1e-4);
+  // test merge injections on all with out subordinates
+  mergeinjs_params.at("MergeInjections").at(6).at("value") = std::string("false");
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 0);
+  const OpenMS::Feature& feat1 = sampleGroupHandler.getFeatureMap().at(0);
+  BOOST_CHECK_EQUAL(feat1.getMetaValue("PeptideRef").toString(), "amp");
+  BOOST_CHECK_CLOSE(static_cast<float>(feat1.getMetaValue("peak_apex_int")), 600238.125, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(feat1.getMetaValue("QC_transition_score")), 49636.1914, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(feat1.getMetaValue("calculated_concentration")), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(feat1.getRT()), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(feat1.getMZ()), 400, 1e-4);
+
+  // Test merge injections on polarities with Max
+  sequenceHandler.clear();
+  makeSequence(sequenceHandler, true);
+  sampleGroupHandler = sequenceHandler.getSampleGroups().front();
+  mergeinjs_params.at("MergeInjections").at(0).at("value") = std::string("Max");
+  mergeinjs_params.at("MergeInjections").at(6).at("value") = std::string("true");
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);  
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString(), "amp");
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 232000, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("QC_transition_score")), 1150, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("calculated_concentration")), 0.004, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 0.004, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 200, 1e-4);
+
+  // Test merge injections on polarities with Min
+  sequenceHandler.clear();
+  makeSequence(sequenceHandler, true);
+  sampleGroupHandler = sequenceHandler.getSampleGroups().front();
+  mergeinjs_params.at("MergeInjections").at(0).at("value") = std::string("Min");
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);  
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString(), "amp");
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 215000, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("QC_transition_score")), 440, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("calculated_concentration")), 0.002, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 0.002, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 200, 1e-4);
+
+  // Test merge injections on polarities with Sum
+  sequenceHandler.clear();
+  makeSequence(sequenceHandler, true);
+  sampleGroupHandler = sequenceHandler.getSampleGroups().front();
+  mergeinjs_params.at("MergeInjections").at(0).at("value") = std::string("Sum");
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);  
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString(), "amp");
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 4.47E+05, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("QC_transition_score")), 1.59E+03, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("calculated_concentration")), 6.00E-03, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 6.00E-03, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 400, 1e-4);
+
+  // Test merge injections on polarities with Mean
+  sequenceHandler.clear();
+  makeSequence(sequenceHandler, true);
+  sampleGroupHandler = sequenceHandler.getSampleGroups().front();
+  mergeinjs_params.at("MergeInjections").at(0).at("value") = std::string("Mean");
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);  
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString(), "amp");
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 223500, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("QC_transition_score")), 7.95E+02, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("calculated_concentration")), 3.00E-03, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 3.00E-03, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 200, 1e-4);
+
+  // Test merge injections on polarities with WeightedMean
+  sequenceHandler.clear();
+  makeSequence(sequenceHandler, true);
+  sampleGroupHandler = sequenceHandler.getSampleGroups().front();
+  mergeinjs_params.at("MergeInjections").at(0).at("value") = std::string("WeightedMean");
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);  
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString(), "amp");
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 226333.344, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("QC_transition_score")), 913.333374, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("calculated_concentration")), 0.00333333365, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 0.00333333365, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 200, 1e-4);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

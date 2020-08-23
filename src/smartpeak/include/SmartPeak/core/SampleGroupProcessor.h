@@ -55,6 +55,7 @@ namespace SmartPeak
       const Filenames& filenames
     ) const override;
 
+  private:
     static void getMergeKeysToInjections(const SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I, 
       std::set<std::string>& scan_polarities,
@@ -76,10 +77,7 @@ namespace SmartPeak
       const std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>>& merge_keys_to_injection_name,
       std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values);
     static void makeFeatureMap(const bool& merge_subordinates,
-      std::set<std::string>& scan_polarities,
-      const std::set<std::pair<float, float>>& scan_mass_ranges,
-      const std::set<float>& dilution_factors,
-      const std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>>& merge_keys_to_injection_name,
+      std::set<std::string>& injection_names_set,
       const std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values,
       OpenMS::FeatureMap& feature_map);
   };

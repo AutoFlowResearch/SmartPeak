@@ -157,7 +157,7 @@ namespace SmartPeak
       bool found_sample_group = false;
       for (SampleGroupHandler& sampleGroupHandler : sample_groups_) {
         if (meta_data_I.getSampleGroupName() == sampleGroupHandler.getSampleGroupName()) {
-          found_seq_seg = true;
+          found_sample_group = true;
           sampleGroupHandler.getSampleIndices().push_back(sequence_.size()); // index = the size of the sequence
           break;
         }
