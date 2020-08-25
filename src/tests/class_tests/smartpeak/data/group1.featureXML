@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<featureMap version="1.9" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/OpenMS/OpenMS/develop/share/OpenMS/SCHEMAS/FeatureXML_1_9.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<featureList count="3">
+		<feature id="f_0">
+			<position dim="0">0.0</position>
+			<position dim="1">0.0</position>
+			<intensity>0.0</intensity>
+			<quality dim="0">0.0</quality>
+			<quality dim="1">0.0</quality>
+			<overallquality>0.0</overallquality>
+			<charge>0</charge>
+			<subordinate>
+				<feature id="f_0_0">
+					<position dim="0">0.458285748958588</position>
+					<position dim="1">400.0</position>
+					<intensity>0.0</intensity>
+					<quality dim="0">0.0</quality>
+					<quality dim="1">0.0</quality>
+					<overallquality>0.0</overallquality>
+					<charge>0</charge>
+					<UserParam type="string" name="native_id" value="amp.amp_1.Heavy"/>
+					<UserParam type="float" name="peak_apex_int" value="6.00238125e05"/>
+					<UserParam type="float" name="QC_transition_score" value="4.963619140625e04"/>
+					<UserParam type="float" name="calculated_concentration" value="0.458285719156265"/>
+				</feature>
+				<feature id="f_0_0">
+					<position dim="0">0.458285748958588</position>
+					<position dim="1">400.0</position>
+					<intensity>0.0</intensity>
+					<quality dim="0">0.0</quality>
+					<quality dim="1">0.0</quality>
+					<overallquality>0.0</overallquality>
+					<charge>0</charge>
+					<UserParam type="string" name="native_id" value="amp.amp_1.Light"/>
+					<UserParam type="float" name="peak_apex_int" value="6.00238125e05"/>
+					<UserParam type="float" name="QC_transition_score" value="4.963619140625e04"/>
+					<UserParam type="float" name="calculated_concentration" value="0.458285719156265"/>
+				</feature>
+			</subordinate>
+			<UserParam type="string" name="PeptideRef" value="amp"/>
+		</feature>
+		<feature id="f_0">
+			<position dim="0">0.0</position>
+			<position dim="1">0.0</position>
+			<intensity>0.0</intensity>
+			<quality dim="0">0.0</quality>
+			<quality dim="1">0.0</quality>
+			<overallquality>0.0</overallquality>
+			<charge>0</charge>
+			<subordinate>
+				<feature id="f_0_0">
+					<position dim="0">0.468585401773453</position>
+					<position dim="1">600.0</position>
+					<intensity>0.0</intensity>
+					<quality dim="0">0.0</quality>
+					<quality dim="1">0.0</quality>
+					<overallquality>0.0</overallquality>
+					<charge>0</charge>
+					<UserParam type="string" name="native_id" value="atp.atp_1.Heavy"/>
+					<UserParam type="float" name="peak_apex_int" value="1.24900009765625e04"/>
+					<UserParam type="float" name="QC_transition_score" value="3029.56103515625"/>
+					<UserParam type="float" name="calculated_concentration" value="0.46858537197113"/>
+				</feature>
+				<feature id="f_0_0">
+					<position dim="0">0.468585401773453</position>
+					<position dim="1">600.0</position>
+					<intensity>0.0</intensity>
+					<quality dim="0">0.0</quality>
+					<quality dim="1">0.0</quality>
+					<overallquality>0.0</overallquality>
+					<charge>0</charge>
+					<UserParam type="string" name="native_id" value="atp.atp_1.Light"/>
+					<UserParam type="float" name="peak_apex_int" value="1.24900009765625e04"/>
+					<UserParam type="float" name="QC_transition_score" value="3029.56103515625"/>
+					<UserParam type="float" name="calculated_concentration" value="0.46858537197113"/>
+				</feature>
+			</subordinate>
+			<UserParam type="string" name="PeptideRef" value="atp"/>
+		</feature>
+		<feature id="f_0">
+			<position dim="0">0.0</position>
+			<position dim="1">0.0</position>
+			<intensity>0.0</intensity>
+			<quality dim="0">0.0</quality>
+			<quality dim="1">0.0</quality>
+			<overallquality>0.0</overallquality>
+			<charge>0</charge>
+			<subordinate>
+				<feature id="f_0_0">
+					<position dim="0">2.291428804397583</position>
+					<position dim="1">200.0</position>
+					<intensity>0.0</intensity>
+					<quality dim="0">0.0</quality>
+					<quality dim="1">0.0</quality>
+					<overallquality>0.0</overallquality>
+					<charge>0</charge>
+					<UserParam type="string" name="native_id" value="ser-L.ser-L_1.Heavy"/>
+					<UserParam type="float" name="peak_apex_int" value="3.636190625e04"/>
+					<UserParam type="float" name="QC_transition_score" value="2.2875953125e05"/>
+					<UserParam type="float" name="calculated_concentration" value="2.291428565979004"/>
+				</feature>
+				<feature id="f_0_0">
+					<position dim="0">2.291428804397583</position>
+					<position dim="1">200.0</position>
+					<intensity>0.0</intensity>
+					<quality dim="0">0.0</quality>
+					<quality dim="1">0.0</quality>
+					<overallquality>0.0</overallquality>
+					<charge>0</charge>
+					<UserParam type="string" name="native_id" value="ser-L.ser-L_1.Light"/>
+					<UserParam type="float" name="peak_apex_int" value="3.636190625e04"/>
+					<UserParam type="float" name="QC_transition_score" value="2.2875953125e05"/>
+					<UserParam type="float" name="calculated_concentration" value="2.291428565979004"/>
+				</feature>
+			</subordinate>
+			<UserParam type="string" name="PeptideRef" value="ser-L"/>
+		</feature>
+	</featureList>
+</featureMap>

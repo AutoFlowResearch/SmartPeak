@@ -3,6 +3,8 @@
 #include <SmartPeak/core/SampleGroupProcessor.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/FeatureMetadata.h>
+#include <SmartPeak/io/InputDataValidation.h>
+#include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
 #include <plog/Log.h>
 
 namespace SmartPeak
@@ -433,5 +435,56 @@ namespace SmartPeak
 
     // Remove the first feature
     feature_map.erase(feature_map.begin());
+  }
+  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START LoadFeaturesSampleGroup";
+    LOGI << "Loading: " << filenames.featureXMLSampleGroup_i;
+
+    if (filenames.featureXMLSampleGroup_i.empty()) {
+      LOGE << "Filename is empty";
+      LOGD << "END LoadFeaturesSampleGroup";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(filenames.featureXMLSampleGroup_i)) {
+      LOGE << "File not found";
+      LOGD << "END LoadFeaturesSampleGroup";
+      return;
+    }
+
+    try {
+      OpenMS::FeatureXMLFile featurexml;
+      featurexml.load(filenames.featureXMLSampleGroup_i, sampleGroupHandler_IO.getFeatureMap());
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+      sampleGroupHandler_IO.getFeatureMap().clear();
+      LOGE << "feature map clear";
+    }
+
+    LOGD << "END LoadFeaturesSampleGroup";
+  }
+  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START storeFeaturesSampleGroup";
+    LOGI << "Storing: " << filenames.featureXMLSampleGroup_o;
+
+    if (filenames.featureXMLSampleGroup_o.empty()) {
+      LOGE << "Filename is empty";
+      LOGD << "END storeFeaturesSampleGroup";
+      return;
+    }
+
+    try {
+      // Store outfile as featureXML
+      OpenMS::FeatureXMLFile featurexml;
+      featurexml.store(filenames.featureXMLSampleGroup_o, sampleGroupHandler_IO.getFeatureMap());
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    LOGD << "END storeFeaturesSampleGroup";
   }
 }

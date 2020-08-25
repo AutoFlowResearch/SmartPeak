@@ -341,4 +341,83 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
   BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 200, 1e-4);
 }
 
+/**
+  LoadFeaturesSampleGroup Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorLoadFeaturesSampleGroup)
+{
+  LoadFeaturesSampleGroup* ptrLoadFeaturesSampleGroup = nullptr;
+  LoadFeaturesSampleGroup* nullPointerLoadFeaturesSampleGroup = nullptr;
+  BOOST_CHECK_EQUAL(ptrLoadFeaturesSampleGroup, nullPointerLoadFeaturesSampleGroup);
+}
+
+BOOST_AUTO_TEST_CASE(destructorLoadFeaturesSampleGroup)
+{
+  LoadFeaturesSampleGroup* ptrLoadFeaturesSampleGroup = nullptr;
+  ptrLoadFeaturesSampleGroup = new LoadFeaturesSampleGroup();
+  delete ptrLoadFeaturesSampleGroup;
+}
+
+BOOST_AUTO_TEST_CASE(gettersLoadFeaturesSampleGroup)
+{
+  LoadFeaturesSampleGroup processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURES_SAMPLE_GROUP");
+}
+
+BOOST_AUTO_TEST_CASE(processLoadFeaturesSampleGroup)
+{
+  // setup the sequence
+  SequenceHandler sequenceHandler;
+  makeSequence(sequenceHandler, false);
+  SampleGroupHandler sampleGroupHandler = sequenceHandler.getSampleGroups().front();
+
+  // test store features
+  LoadFeaturesSampleGroup process;
+  Filenames filenames;
+  filenames.featureXMLSampleGroup_i = SMARTPEAK_GET_TEST_DATA_PATH(sampleGroupHandler.getSampleGroupName() + ".featureXML");
+  process.process(sampleGroupHandler, sequenceHandler, {}, filenames);
+
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString(), "amp");
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString(), "amp.amp_1.Heavy");
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 600238.125, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("QC_transition_score")), 49636.1914, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("calculated_concentration")), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 400, 1e-4);
+}
+
+/**
+  StoreFeaturesSampleGroup Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorStoreFeaturesSampleGroup)
+{
+  StoreFeaturesSampleGroup* ptrStoreFeaturesSampleGroup = nullptr;
+  StoreFeaturesSampleGroup* nullPointerStoreFeaturesSampleGroup = nullptr;
+  BOOST_CHECK_EQUAL(ptrStoreFeaturesSampleGroup, nullPointerStoreFeaturesSampleGroup);
+}
+
+BOOST_AUTO_TEST_CASE(destructorStoreFeaturesSampleGroup)
+{
+  StoreFeaturesSampleGroup* ptrStoreFeaturesSampleGroup = nullptr;
+  ptrStoreFeaturesSampleGroup = new StoreFeaturesSampleGroup();
+  delete ptrStoreFeaturesSampleGroup;
+}
+
+BOOST_AUTO_TEST_CASE(gettersStoreFeaturesSampleGroup)
+{
+  StoreFeaturesSampleGroup processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURES_SAMPLE_GROUP");
+}
+
+BOOST_AUTO_TEST_CASE(processStoreFeaturesSampleGroup)
+{
+  // no tests, it wraps OpenMS store function
+}
+
 BOOST_AUTO_TEST_SUITE_END()

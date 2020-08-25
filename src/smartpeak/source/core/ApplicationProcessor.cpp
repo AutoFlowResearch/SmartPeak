@@ -243,7 +243,9 @@ namespace SmartPeak
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
           injection.getMetaData().getSampleName(),
-          key
+          key,
+          injection.getMetaData().getSampleGroupName(),
+          injection.getMetaData().getSampleGroupName()
         );
       }
     } else if (std::count(valid_commands_sequence_segment_processor.begin(), valid_commands_sequence_segment_processor.end(), name_)) {
@@ -254,6 +256,8 @@ namespace SmartPeak
           application_handler_.mzML_dir_,
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
+          key,
+          key,
           key,
           key
         );
@@ -266,6 +270,8 @@ namespace SmartPeak
           application_handler_.mzML_dir_,
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
+          key,
+          key,
           key,
           key
         );

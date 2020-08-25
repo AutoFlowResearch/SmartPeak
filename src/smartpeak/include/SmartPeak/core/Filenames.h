@@ -31,8 +31,10 @@ public:
     std::string mzTab_i;
     std::string mzTab_o;
     std::string featureXML_o;
+    std::string featureXMLSampleGroup_o;
     std::string feature_csv_o;
     std::string featureXML_i;
+    std::string featureXMLSampleGroup_i;
     std::string features_pdf_o;
     std::string featureFilterComponents_csv_o;
     std::string featureFilterComponentGroups_csv_o;
@@ -65,7 +67,9 @@ public:
       const std::string& features_input_path,
       const std::string& output_path,
       const std::string& input_inj_name,
-      const std::string& output_inj_name
+      const std::string& output_inj_name,
+      const std::string& input_sample_name,
+      const std::string& output_sample_name
     );
 
     static void updateDefaultDynamicFilenames(

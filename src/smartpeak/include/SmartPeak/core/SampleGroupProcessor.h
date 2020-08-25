@@ -80,4 +80,38 @@ namespace SmartPeak
       const std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values,
       OpenMS::FeatureMap& feature_map);
   };
+
+  struct LoadFeaturesSampleGroup : SampleGroupProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_FEATURES_SAMPLE_GROUP"; }
+    std::string getDescription() const override { return "Load the features for the sample group."; }
+
+    /**
+      Load the features for the sample group.
+    */
+    void process(
+      SampleGroupHandler& sampleGroupHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeaturesSampleGroup : SampleGroupProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURES_SAMPLE_GROUP"; }
+    std::string getDescription() const override { return "Store the features for the sample group."; }
+
+    /**
+      Store the features for the sample group.
+    */
+    void process(
+      SampleGroupHandler& sampleGroupHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
 }

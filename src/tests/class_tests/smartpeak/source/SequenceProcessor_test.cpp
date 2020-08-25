@@ -184,7 +184,9 @@ BOOST_AUTO_TEST_CASE(processSequence)
       path + "features/",
       path + "features/",
       injection.getMetaData().getSampleName(),
-      key
+      key,
+      injection.getMetaData().getSampleGroupName(),
+      injection.getMetaData().getSampleGroupName()
     );
   }
 
@@ -260,6 +262,8 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
       path + "features/",
       path + "features/",
       key,
+      key,
+      key,
       key
     );
   }
@@ -329,7 +333,9 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
       path,
       path,
       injection.getMetaData().getSampleName(),
-      key
+      key,
+      injection.getMetaData().getSampleGroupName(),
+      injection.getMetaData().getSampleGroupName()
     );
   }
 
@@ -343,13 +349,14 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
   // Update the filenames
   dynamic_filenames.clear();
   for (const SampleGroupHandler& sampleGroupHandler : sequenceHandler.getSampleGroups()) {
-    const std::string key = sampleGroupHandler.getSampleGroupName();
-    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()] = Filenames::getDefaultDynamicFilenames(
       path + "mzML/",
       path + "features/",
       path + "features/",
       sampleGroupHandler.getSampleGroupName(),
-      key
+      sampleGroupHandler.getSampleGroupName(),
+      sampleGroupHandler.getSampleGroupName(),
+      sampleGroupHandler.getSampleGroupName()
     );
   }
 
