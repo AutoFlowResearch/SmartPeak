@@ -45,10 +45,12 @@ namespace SmartPeak
     Filenames dynamic_filenames;
     dynamic_filenames.mzML_i       = mzml_input_path + "/" + input_inj_name + ".mzML";
     dynamic_filenames.featureXML_i = features_input_path + "/" + output_inj_name + ".featureXML";
+    dynamic_filenames.mzTab_i = features_input_path + "/" + output_inj_name + ".mzTab";
     // NOTE: input featureXML is almost always derived from the output featureXML
 
     const std::string prefix = output_path + "/" + output_inj_name;
     dynamic_filenames.featureXML_o                     = prefix + ".featureXML";
+    dynamic_filenames.mzTab_o = prefix + ".mzTab";
     dynamic_filenames.feature_csv_o                    = prefix + ".csv";
     dynamic_filenames.features_pdf_o                   = prefix;
     dynamic_filenames.featureFilterComponents_csv_o = prefix + "_featureFilterComponents.csv";
@@ -90,9 +92,14 @@ namespace SmartPeak
       .append(fs::path(filenames.featureXML_i).filename().c_str())
       .string();
 
+    filenames.mzTab_i = fs::path(features_input_path)
+      .append(fs::path(filenames.mzTab_i).filename().c_str())
+      .string();
+
     const fs::path prefix { output_path };
 
     filenames.featureXML_o = fs::path(prefix).append(fs::path(filenames.featureXML_o).filename().c_str()).string();
+    filenames.mzTab_o = fs::path(prefix).append(fs::path(filenames.mzTab_o).filename().c_str()).string();
 
     filenames.feature_csv_o = fs::path(prefix).append(fs::path(filenames.feature_csv_o).filename().c_str()).string();
 
@@ -137,6 +144,8 @@ namespace SmartPeak
     standardsConcentrations_csv_i.clear();
     referenceData_csv_i.clear();
     mzML_i.clear();
+    mzTab_i.clear();
+    mzTab_o.clear();
     featureXML_o.clear();
     feature_csv_o.clear();
     featureXML_i.clear();

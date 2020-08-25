@@ -31,6 +31,9 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_volume_units, "uL");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().batch_name, "FluxTest");
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_number, 2);
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().scan_polarity, "positive");
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().scan_mass_low, 60);
+  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().scan_mass_high, 2000);
   BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleGroupName(), "Test01");
@@ -42,6 +45,9 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().inj_volume_units, "uL");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().batch_name, "FluxTest");
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().inj_number, 5);
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().scan_polarity, "negative");
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().scan_mass_low, 60);
+  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().scan_mass_high, 2000);
   BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
 
   sequenceHandler.clear();
@@ -125,6 +131,9 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
     metaDataHandler.inj_volume = 7.0;
     metaDataHandler.inj_volume_units = "8";
     metaDataHandler.batch_name = "9";
+    metaDataHandler.scan_polarity = "negative";
+    metaDataHandler.scan_mass_high = 2000;
+    metaDataHandler.scan_mass_low = 60;
 
     Filenames filenames;
     filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
@@ -147,18 +156,18 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   };
   const set<SampleType> sample_types = {SampleType::Unknown};
 
-  SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>());
+  SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
   BOOST_CHECK_EQUAL(data_out.size(), 1657);
   BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(data_out.at(0).at(1), "Unknown");
   BOOST_CHECK_EQUAL(data_out.at(0).at(2), "23dpg");
   BOOST_CHECK_EQUAL(data_out.at(0).at(3), "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(19), std::to_string(235.0));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(20), std::to_string(3.52866193485212));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(23), std::to_string(15.605367));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(24), std::to_string(15.836817));
-  BOOST_CHECK_EQUAL(headers_out.size(), 25);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(22), std::to_string(235.0));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(23), std::to_string(3.52866193485212));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(26), std::to_string(15.605367));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(27), std::to_string(15.836817));
+  BOOST_CHECK_EQUAL(headers_out.size(), 28);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
@@ -176,26 +185,29 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(headers_out[14], "proc_method_name");
   BOOST_CHECK_EQUAL(headers_out[15], "original_filename");
   BOOST_CHECK_EQUAL(headers_out[16], "acquisition_date_and_time");
-  BOOST_CHECK_EQUAL(headers_out[17], "injection_name");
-  BOOST_CHECK_EQUAL(headers_out[18], "used_");
+  BOOST_CHECK_EQUAL(headers_out[17], "scan_polarity");
+  BOOST_CHECK_EQUAL(headers_out[18], "scan_mass_low");
+  BOOST_CHECK_EQUAL(headers_out[19], "scan_mass_high");
+  BOOST_CHECK_EQUAL(headers_out[20], "injection_name");
+  BOOST_CHECK_EQUAL(headers_out[21], "used_");
   // metadata
-  BOOST_CHECK_EQUAL(headers_out[19], "peak_apex_int");
-  BOOST_CHECK_EQUAL(headers_out[20], "logSN");
-  BOOST_CHECK_EQUAL(headers_out[21], "QC_transition_message");
-  BOOST_CHECK_EQUAL(headers_out[22], "QC_transition_group_message");
-  BOOST_CHECK_EQUAL(headers_out[23], "leftWidth");
-  BOOST_CHECK_EQUAL(headers_out[24], "rightWidth");
+  BOOST_CHECK_EQUAL(headers_out[22], "peak_apex_int");
+  BOOST_CHECK_EQUAL(headers_out[23], "logSN");
+  BOOST_CHECK_EQUAL(headers_out[24], "QC_transition_message");
+  BOOST_CHECK_EQUAL(headers_out[25], "QC_transition_group_message");
+  BOOST_CHECK_EQUAL(headers_out[26], "leftWidth");
+  BOOST_CHECK_EQUAL(headers_out[27], "rightWidth");
 
   SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, std::vector<std::string>({ "leftWidth" }), sample_types,
-    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
+    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
 
   BOOST_CHECK_EQUAL(data_out.size(), 1);
   BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(data_out.at(0).at(1), "Unknown");
   BOOST_CHECK_EQUAL(data_out.at(0).at(2), "23dpg");
   BOOST_CHECK_EQUAL(data_out.at(0).at(3), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(19), std::to_string(15.605367));
-  BOOST_CHECK_EQUAL(headers_out.size(), 20);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(22), std::to_string(15.605367));
+  BOOST_CHECK_EQUAL(headers_out.size(), 23);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
@@ -213,10 +225,13 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   BOOST_CHECK_EQUAL(headers_out[14], "proc_method_name");
   BOOST_CHECK_EQUAL(headers_out[15], "original_filename");
   BOOST_CHECK_EQUAL(headers_out[16], "acquisition_date_and_time");
-  BOOST_CHECK_EQUAL(headers_out[17], "injection_name");
-  BOOST_CHECK_EQUAL(headers_out[18], "used_");
+  BOOST_CHECK_EQUAL(headers_out[17], "scan_polarity");
+  BOOST_CHECK_EQUAL(headers_out[18], "scan_mass_low");
+  BOOST_CHECK_EQUAL(headers_out[19], "scan_mass_high");
+  BOOST_CHECK_EQUAL(headers_out[20], "injection_name");
+  BOOST_CHECK_EQUAL(headers_out[21], "used_");
   // metadata
-  BOOST_CHECK_EQUAL(headers_out[19], "leftWidth");
+  BOOST_CHECK_EQUAL(headers_out[22], "leftWidth");
 
   // write sequence to output
   // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataTableFromMetaValue.csv");
@@ -247,6 +262,10 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
     metaDataHandler.inj_volume = 7.0;
     metaDataHandler.inj_volume_units = "8";
     metaDataHandler.batch_name = "9";
+    metaDataHandler.scan_polarity = "negative";
+    metaDataHandler.scan_mass_high = 2000;
+    metaDataHandler.scan_mass_low = 60;
+
 
     Filenames filenames;
     filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
@@ -269,7 +288,7 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   // const vector<string> meta_data = {"calculated_concentration"};
   const set<SampleType> sample_types = {SampleType::Unknown};
 
-  SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>());
+  SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
   BOOST_CHECK_EQUAL(columns_out.size(), 6);
   BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");
@@ -280,7 +299,7 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   BOOST_CHECK_CLOSE(data_out(rows_out.dimension(0)-1,columns_out.size()-1), 1.66744995, 1e-3);
 
   SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, std::vector<std::string>({ "leftWidth" }), sample_types,
-    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
+    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
 
   BOOST_CHECK_EQUAL(columns_out.size(), 1);
   BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");

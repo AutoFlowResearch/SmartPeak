@@ -130,6 +130,36 @@ namespace SmartPeak
     ) const override;
   };
 
+  struct ExtractSpectraWindows : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "EXTRACT_SPECTRA_WINDOWS"; }
+    std::string getDescription() const override { return "Extract out specified spectra windows based on the user parameters."; }
+
+    /** Extract out specified spectra windows from an MSExperiment using the range specified in the parameters
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct MergeSpectra : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "MERGE_SPECTRA"; }
+    std::string getDescription() const override { return "Merge all spectra along the time axis."; }
+
+    /** Merge all spectra along the time axis using a binning strategy that is resolution dependent
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
   struct LoadFeatures : RawDataProcessor
   {
     int getID() const override { return 2; }
@@ -160,13 +190,73 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct PickFeatures : RawDataProcessor
+  struct LoadAnnotations : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_ANNOTATIONS"; }
+    std::string getDescription() const override { return "Read in the annotations from disk."; }
+
+    /** Read in the annotations from disk.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreAnnotations : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_ANNOTATIONS"; }
+    std::string getDescription() const override { return "Write the annotations to disk."; }
+
+    /** Write the annotations to disk.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct PickMRMFeatures : RawDataProcessor
   {
     int getID() const override { return 3; }
-    std::string getName() const override { return "PICK_FEATURES"; }
-    std::string getDescription() const override { return "Run the peak picking algorithm."; }
+    std::string getName() const override { return "PICK_MRM_FEATURES"; }
+    std::string getDescription() const override { return "Run the peak picking algorithm for SRMs/MRMs."; }
 
     /** Run the openSWATH pick peaking and scoring workflow for a single raw data file.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct PickMS1Features : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "PICK_MS1_FEATURES"; }
+    std::string getDescription() const override { return "Run the peak picking algorithm for MS1 spectra."; }
+
+    /** Run the MS1 peak picking and scoring algorithm.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct SearchAccurateMass : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "SEARCH_ACCURATE_MASS"; }
+    std::string getDescription() const override { return "Run the accurate mass search algorithm."; }
+
+    /** Run the accurate mass search algorithm.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
@@ -449,6 +539,21 @@ namespace SmartPeak
     std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
 
     /** Flag features that do not pass the filter QCs.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct ClearData : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "CLEAR_DATA"; }
+    std::string getDescription() const override { return "Clear raw and processed data."; }
+
+    /** Clear all raw and process data
     */
     void process(
       RawDataHandler& rawDataHandler_IO,

@@ -24,7 +24,7 @@ void example_GCMS_SIM_Unknowns(
     std::shared_ptr<RawDataProcessor>(new LoadRawData()),
     std::shared_ptr<RawDataProcessor>(new MapChromatograms()),
     std::shared_ptr<RawDataProcessor>(new ExtractChromatogramWindows()),
-    std::shared_ptr<RawDataProcessor>(new PickFeatures()),
+    std::shared_ptr<RawDataProcessor>(new PickMRMFeatures()),
     std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new SelectFeatures()),

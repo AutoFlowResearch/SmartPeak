@@ -454,6 +454,21 @@ namespace SmartPeak
     return validation_metrics_;
   }
 
+  void RawDataHandler::setMzTab(const OpenMS::MzTab& mz_tab)
+  {
+    mz_tab_ = mz_tab;
+  }
+
+  OpenMS::MzTab& RawDataHandler::getMzTab()
+  {
+    return mz_tab_;
+  }
+
+  const OpenMS::MzTab& RawDataHandler::getMzTab() const
+  {
+    return mz_tab_;
+  }
+
   void RawDataHandler::clear()
   {
     experiment_.clear(true);
@@ -464,6 +479,7 @@ namespace SmartPeak
     feature_map_history_.clear(true);
     if (meta_data_!=nullptr) meta_data_->clear();
     validation_metrics_.clear();
+    mz_tab_ = OpenMS::MzTab();
     if (parameters_!=nullptr) parameters_->clear();
     if (targeted_exp_!=nullptr) targeted_exp_->clear(true);
     if (quantitation_methods_ != nullptr) quantitation_methods_->clear();
@@ -475,6 +491,18 @@ namespace SmartPeak
     if (feature_background_qc_ != nullptr) feature_background_qc_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     if (feature_rsd_estimations_ != nullptr) feature_rsd_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
     if (feature_background_estimations_ != nullptr) feature_background_estimations_ = std::make_shared<OpenMS::MRMFeatureQC>(OpenMS::MRMFeatureQC());
+  }
+
+  void RawDataHandler::clearNonSharedData()
+  {
+    experiment_.clear(true);
+    chromatogram_map_.clear(true);
+    trafo_ = OpenMS::TransformationDescription();
+    swath_.clear(true);
+    feature_map_.clear(true);
+    feature_map_history_.clear(true);
+    validation_metrics_.clear();
+    mz_tab_ = OpenMS::MzTab();
   }
 
   void RawDataHandler::updateFeatureMapHistory()
@@ -491,6 +519,12 @@ namespace SmartPeak
     if (feature_map_history_.empty()) {
       feature_map_history_ = feature_map_; // ensures PrimaryMSRunPath is copied
       for (OpenMS::Feature& feature_new : feature_map_history_) {
+        if (!feature_new.metaValueExists("used_")) { // prevents overwriting feature_maps with existing "used_" attributes
+          feature_new.setMetaValue("used_", "true");
+        }
+        if (!feature_new.metaValueExists("timestamp_")) { // prevents overwriting feature_maps with existing "timestamp_" attributes
+          feature_new.setMetaValue("timestamp_", timestamp);
+        }
         for (OpenMS::Feature& subordinate_new : feature_new.getSubordinates()) {
           if (!subordinate_new.metaValueExists("used_")) { // prevents overwriting feature_maps with existing "used_" attributes
             subordinate_new.setMetaValue("used_", "true");
@@ -564,6 +598,7 @@ namespace SmartPeak
             update_feature = true;
           }
 
+          // Check the subordinates for changes
           for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
             if (unique_ids_sub_select.count(subordinate_copy.getMetaValue("native_id")) == 0) { // Removed subordinate
               subordinate_copy.setMetaValue("used_", "false");
@@ -583,9 +618,16 @@ namespace SmartPeak
               }
             }
           }
+          
+          // Case of no subordinates
+          if (feature_select.getSubordinates().size() <= 0) {
+            update_feature = true;
+          }
+
           if (update_feature) { // copy over the updated subordinates and change the feature to the updated version
             feature_tmp.setSubordinates(feature_copy.getSubordinates());
             feature_copy = feature_tmp;
+            feature_copy.setMetaValue("timestamp_", timestamp);
           }
           if (new_subordinates.size()) { // append new subordinates to the existing subordinates list
             for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {

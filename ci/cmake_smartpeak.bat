@@ -2,7 +2,7 @@ REM Used in AppVeyor
 mkdir C:\projects\SmartPeak2\build
 cd C:\projects\SmartPeak2\build
 cmake ^
-  -DCMAKE_PREFIX_PATH="C:/projects/OpenMS-build;C:/Qt/5.12/msvc2017_64/lib/cmake;C:/projects/deps/SDL2-2.0.9" ^
+  -DCMAKE_PREFIX_PATH="C:/projects/OpenMS-build;C:/Qt/5.12/msvc2017_64/lib/cmake;C:/projects/deps/SDL2-2.0.9;C:/bin/doxygen" ^
   -G "Visual Studio 15 2017 Win64" ^
   -T host=x64 ^
   -DUSE_SUPERBUILD=OFF ^

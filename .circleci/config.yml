@@ -19,6 +19,14 @@ jobs:
           libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
           libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
       - run: |
+          apt-get install -y graphviz doxygen python3-pip &&
+          export DEBIAN_FRONTEND=noninteractive &&
+          apt-get install -y tzdata &&
+          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
+          dpkg-reconfigure --frontend noninteractive tzdata &&
+          apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
+          pip3 install exhale
+      - run: |
           cd ~ &&
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
           cd OpenMS && git submodule update --init THIRDPARTY &&
@@ -197,6 +205,7 @@ jobs:
       - store_artifacts:
           path: ~/artifacts
             
+
 workflows:
   version: 2.1
   build:

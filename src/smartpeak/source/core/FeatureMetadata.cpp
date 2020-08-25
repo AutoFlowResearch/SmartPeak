@@ -23,7 +23,11 @@ namespace SmartPeak {
     { FeatureMetadata::width_at_50_peak_height,     "width_at_50"                 },
     { FeatureMetadata::retention_time,              "RT"                          },
     { FeatureMetadata::integration_left_boundary,   "leftWidth"                   },
-    { FeatureMetadata::integration_right_boundary,  "rightWidth"                  }/*,
+    { FeatureMetadata::integration_right_boundary,  "rightWidth"                  },
+    { FeatureMetadata::scan_polarity,               "scan_polarity"               },
+    { FeatureMetadata::description,                 "description"                 },
+    { FeatureMetadata::modifications,               "modifications"               },
+    { FeatureMetadata::chemical_formula,            "chemical_formula"            }/*,
     { FeatureMetadata::accuracy,                    "accuracy"                    },
     { FeatureMetadata::n_features,                  "n_features"                  },
     { FeatureMetadata::validation,                  "validation"                  }*/
@@ -44,7 +48,9 @@ namespace SmartPeak {
     { FeatureMetadata::width_at_50_peak_height,     "width_at_50"                 },
     { FeatureMetadata::retention_time,              "RT"                          },
     { FeatureMetadata::integration_left_boundary,   "leftWidth"                   },
-    { FeatureMetadata::integration_right_boundary,  "rightWidth"                  }/*,
+    { FeatureMetadata::integration_right_boundary,  "rightWidth"                  },
+    { FeatureMetadata::mz_error_ppm,                "mz_error_ppm"                },
+    { FeatureMetadata::mz_error_Da,                 "mz_error_Da"                 }/*,
     { FeatureMetadata::accuracy,                    "accuracy"                    },
     { FeatureMetadata::n_features,                  "n_features"                  },
     { FeatureMetadata::validation,                  "validation"                  }*/

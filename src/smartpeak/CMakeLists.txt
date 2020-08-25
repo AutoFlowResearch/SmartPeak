@@ -79,7 +79,3 @@ smartpeak_add_library(TARGET_NAME  SmartPeak
 # Note: that slash(/) is important here, otherwise the whole directory
 #       (not its content) will be copied!
 install_directory(${SMARTPEAK_HOST_DIRECTORY}/share/SmartPeak/ ${INSTALL_SHARE_DIR} share)
-
-#------------------------------------------------------------------------------
-# register relevant paths for the doxygen doc generation
-smartpeak_doc_path("${PROJECT_SOURCE_DIR}/include")

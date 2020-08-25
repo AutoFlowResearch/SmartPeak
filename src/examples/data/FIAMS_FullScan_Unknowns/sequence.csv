@@ -1,0 +1,3 @@
+sample_name,sample_type,sample_group_name,sequence_segment_name,original_filename,batch_name,rack_number,plate_number,pos_number,inj_number,dilution_factor,inj_volume,inj_volume_units,operator_name,acq_method_name,proc_method_name,acquisition_date_and_time,scan_polarity,scan_mass_low,scan_mass_high
+20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1,Unknown,CM,segment1,20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1,BatchName,,,,13,,2,uL,,MethodName,,,negative,100,1000
+20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_POS_1,Unknown,CM,segment1,20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_POS_1,BatchName,,,,16,,2,uL,,MethodName,,,positive,100,1000

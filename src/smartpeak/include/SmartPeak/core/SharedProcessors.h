@@ -4,6 +4,7 @@
 #include <string> // C2039
 #include <map>
 #include <memory>
+#include <string>
 
 namespace SmartPeak {
   struct RawDataProcessor;
