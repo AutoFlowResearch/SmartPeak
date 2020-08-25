@@ -179,8 +179,8 @@ BOOST_AUTO_TEST_CASE(extractMetaData)
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
-  BOOST_CHECK_EQUAL(params_1.size(), 22);
-  BOOST_CHECK_EQUAL(params_2.size(), 23);
+  BOOST_CHECK_EQUAL(params_1.size(), 23);
+  BOOST_CHECK_EQUAL(params_2.size(), 24);
   RawDataHandler rawDataHandler;
 
   // Pre-requisites: load the transitions and raw data

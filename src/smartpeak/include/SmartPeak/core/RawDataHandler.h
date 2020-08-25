@@ -139,7 +139,8 @@ public:
     void clear();
     void clearNonSharedData();
 
-    /** Update the Feature map history based on the
+    /**
+    @brief Update the Feature map history based on the
       filtered, selected, or new features in the current featureMap.
 
       All new features are initialized as "used_" = True with the "modified_" attribute set to the current time-stamp.
@@ -148,6 +149,12 @@ public:
       ASSUMPTIONS: the unique ID attribute is set within OpenMS
     */
     void updateFeatureMapHistory();
+
+    /** 
+    @brief Make the feature map from the feature map history by
+      filtering out all features/subordinates where "used_" = False.
+    */
+    void makeFeatureMapFromHistory();
 
 private:
     // input

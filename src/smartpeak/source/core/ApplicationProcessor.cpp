@@ -259,7 +259,7 @@ namespace SmartPeak
         );
       }
     } else if (std::count(valid_commands_sample_group_processor.begin(), valid_commands_sample_group_processor.end(), name_)) {
-      cmd_.setMethod(n_to_seq_seg_method_.at(name_));
+      cmd_.setMethod(n_to_sample_group_method_.at(name_));
       for (const SampleGroupHandler& sample_group : application_handler_.sequenceHandler_.getSampleGroups()) {
         const std::string& key = sample_group.getSampleGroupName();
         cmd_.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(

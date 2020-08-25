@@ -258,10 +258,12 @@ namespace SmartPeak
               LOGD << "Feature name: " << feature_name << " was not found in the FeatureMap.";
               continue;
             }
+            if (merge_keys_to_injection_name.count(key) <= 0) continue;
 
             // Find the total value for weighting
             float total_value = 0;
             for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
+              if (component_to_feature_to_injection_to_value.second.at(feature_name).count(injection_names_set) <= 0) continue;
               total_value += component_to_feature_to_injection_to_value.second.at(feature_name).at(injection_names_set);
             }
 
@@ -272,6 +274,7 @@ namespace SmartPeak
             std::set<std::string> max_or_min_injections;
             int cnt = 0;
             for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
+              if (component_to_feature_to_injection_to_value.second.at(feature_name).count(injection_names_set) <= 0) continue;
               float value = component_to_feature_to_injection_to_value.second.at(feature_name).at(injection_names_set);
               weights.push_back(value / total_value); // add to the weights
 
@@ -314,6 +317,7 @@ namespace SmartPeak
             }
 
             // Make the merged feature
+            if (injections.size() <= 0) continue;
             component_to_feature_to_injection_to_value.second.at(feature_name).emplace(injections, 0);
             component_to_feature_to_injection_to_value.second.at(feature_name).at(injections) = merged_value;
 
@@ -330,6 +334,7 @@ namespace SmartPeak
               else {
                 int cnt = 0;
                 for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
+                  if (feature_to_injection_to_value.second.count(injection_names_set) <= 0) continue;
                   float value = feature_to_injection_to_value.second.at(injection_names_set);
                   if (merge_rule == "Sum") merged_value += value;
                   else if (merge_rule == "Mean") merged_value += (value / weights.size());
