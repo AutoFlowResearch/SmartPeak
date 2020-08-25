@@ -33,7 +33,9 @@ struct TestData {
           pathname + "/features",
           pathname + "/features",
           injection.getMetaData().getInjectionName(),
-          injection.getMetaData().getInjectionName());
+          injection.getMetaData().getInjectionName(),
+          injection.getMetaData().getSampleGroupName(),
+          injection.getMetaData().getSampleGroupName());
         loadFeatures.process(injection.getRawData(), {}, filenames);
       }
     }
@@ -49,7 +51,9 @@ struct TestData {
           pathname + "/features",
           pathname + "/features",
           injection.getMetaData().getSampleName(),
-          injection.getMetaData().getSampleName());
+          injection.getMetaData().getSampleName(),
+          injection.getMetaData().getSampleGroupName(),
+          injection.getMetaData().getSampleGroupName());
         loadRawData.process(injection.getRawData(), params, filenames);
       }
     }

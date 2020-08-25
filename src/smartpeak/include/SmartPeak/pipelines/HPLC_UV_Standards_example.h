@@ -40,7 +40,9 @@ void example_HPLC_UV_Standards(
       dir_I + "/features/",
       dir_I + "/features/",
       injection.getMetaData().getSampleName(),
-      key
+      key,
+      injection.getMetaData().getSampleGroupName(),
+      injection.getMetaData().getSampleGroupName()
     );
   }
 
@@ -62,7 +64,8 @@ void example_HPLC_UV_Standards(
       dir_I + "/features/",
       dir_I + "/features/",
       key,
-      key
+      key,
+      "",""
     );
   }
 
@@ -85,7 +88,9 @@ void example_HPLC_UV_Standards(
       dir_I + "/features/",
       dir_I + "/features/",
       injection.getMetaData().getSampleName(),
-      key
+      key,
+      injection.getMetaData().getSampleGroupName(),
+      injection.getMetaData().getSampleGroupName()
     );
   }
 
