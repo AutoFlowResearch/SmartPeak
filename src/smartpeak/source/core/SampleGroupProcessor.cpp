@@ -276,14 +276,15 @@ namespace SmartPeak
             std::set<std::string> max_or_min_injections;
             int cnt = 0;
             for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
-              if (component_to_feature_to_injection_to_value.second.at(feature_name).count(injection_names_set) <= 0) continue;
-              float value = component_to_feature_to_injection_to_value.second.at(feature_name).at(injection_names_set);
-              weights.push_back(value / total_value); // add to the weights
 
               // record the injections
               for (const std::string& inj : injection_names_set) {
                 injections.insert(inj);
               }
+
+              if (component_to_feature_to_injection_to_value.second.at(feature_name).count(injection_names_set) <= 0) continue;
+              float value = component_to_feature_to_injection_to_value.second.at(feature_name).at(injection_names_set);
+              weights.push_back(value / total_value); // add to the weights
 
               // initializations
               if (cnt == 0) {
@@ -319,7 +320,7 @@ namespace SmartPeak
             }
 
             // Make the merged feature
-            if (injections.size() <= 0) continue;
+            if (weights.size() <= 0) continue;
             component_to_feature_to_injection_to_value.second.at(feature_name).emplace(injections, 0);
             component_to_feature_to_injection_to_value.second.at(feature_name).at(injections) = merged_value;
 
@@ -365,6 +366,7 @@ namespace SmartPeak
       if (merge_subordinates) {
         subs.push_back(s);
         s = OpenMS::Feature();
+        s.setUniqueId();
         s.setMetaValue("native_id", component_to_feature_to_injection_to_value.first.second);
       }
       if (component_to_feature_to_injection_to_value.first.first != peptide_ref_cur) {
@@ -374,6 +376,7 @@ namespace SmartPeak
         }
         feature_map.push_back(f);
         f = OpenMS::Feature();
+        f.setUniqueId();
         f.setMetaValue("PeptideRef", component_to_feature_to_injection_to_value.first.first);
         peptide_ref_cur = component_to_feature_to_injection_to_value.first.first;              
       }
