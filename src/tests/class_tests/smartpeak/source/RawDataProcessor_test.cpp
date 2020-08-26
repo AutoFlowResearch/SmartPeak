@@ -1360,8 +1360,8 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().at(1).chemical_formula.get()), "C6H12O2S2");
   BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().at(1).identifier.get().at(0).get(), "HMDB:HMDB0033556");
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 37);
-  const auto& hits2 = rawDataHandler.getFeatureMap().at(36);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 4);
+  const auto& hits2 = rawDataHandler.getFeatureMap().at(3);
   BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("peak_apex_int")), 4823.5292528163145, 1e-6);
   BOOST_CHECK_EQUAL(hits2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hits2.getRT()), 0, 1e-6);

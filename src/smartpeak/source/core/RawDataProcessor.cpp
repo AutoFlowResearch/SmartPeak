@@ -1768,8 +1768,9 @@ namespace SmartPeak
             is_not_hit = false;
           }
         }
-        if (is_not_hit)
-          fmap.push_back(f);
+        // NOTE: This will keep the feature in the featureMapHistory but remove from the featureMap
+        //if (is_not_hit)
+        //  fmap.push_back(f);
       }
 
       // Pass 2: compute the consensus manually
