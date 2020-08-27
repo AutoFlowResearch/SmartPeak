@@ -6,7 +6,7 @@ SmartPeak
 
 .. |docs| image:: https://readthedocs.com/projects/smartpeak2/badge/?version=develop
    :alt: Documentation Status
-   :target: https://smartpeak2.readthedocs.io/en/latest/?badge=develop
+   :target: https://smartpeak2.readthedocs.io/en/develop/?badge=develop
 
 .. |circleci| image:: https://circleci.com/gh/dmccloskey/SmartPeak2.svg?branch=develop?style=svg
    :alt: CircleCI Build Status (Windows, Linux & macOS)
