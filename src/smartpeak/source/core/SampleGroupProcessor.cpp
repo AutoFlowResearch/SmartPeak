@@ -225,7 +225,7 @@ namespace SmartPeak
           for (const auto& f_to_v : features_to_values) {
             CastValue datum = SequenceHandler::getMetaValue(f, f, f_to_v.first);
             if (datum.getTag() == CastValue::Type::UNINITIALIZED || datum.getTag() == CastValue::Type::STRING) {
-              LOGD << "Feature name: " << f_to_v.first << " was not found in the FeatureMap.";
+              //LOGD << "Feature name: " << f_to_v.first << " was not found in the FeatureMap."; // This will polute the log
               continue;
             }
             component_to_feature_to_injection_to_values.at(component).at(f_to_v.first).emplace(std::set<std::string>({ injection_name }), datum.f_);
@@ -239,7 +239,7 @@ namespace SmartPeak
             for (const auto& f_to_v : features_to_values) {
               CastValue datum = SequenceHandler::getMetaValue(s, s, f_to_v.first);
               if (datum.getTag() == CastValue::Type::UNINITIALIZED || datum.getTag() == CastValue::Type::STRING) {
-                LOGD << "Feature name: " << f_to_v.first << " was not found in the FeatureMap.";
+                //LOGD << "Feature name: " << f_to_v.first << " was not found in the FeatureMap."; // This will polute the log
                 continue;
               }
               component_to_feature_to_injection_to_values.at(component).at(f_to_v.first).emplace(std::set<std::string>({ injection_name }), datum.f_);
@@ -257,7 +257,7 @@ namespace SmartPeak
           const auto key = std::make_tuple(scan_polarity, scan_mass_range, dilution_factor);
           for (auto& component_to_feature_to_injection_to_value : component_to_feature_to_injection_to_values) {
             if (component_to_feature_to_injection_to_value.second.count(feature_name) <= 0) {
-              LOGD << "Feature name: " << feature_name << " was not found in the FeatureMap.";
+              //LOGD << "Feature name: " << feature_name << " was not found in the FeatureMap."; // This will polute the log
               continue;
             }
             if (merge_keys_to_injection_name.count(key) <= 0) continue;
@@ -278,10 +278,12 @@ namespace SmartPeak
             for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
 
               // record the injections
+              // Note: this is done before checking if the feature exists to ensure that all injections are propogated to the next iteration
               for (const std::string& inj : injection_names_set) {
                 injections.insert(inj);
               }
 
+              // check if the feature is in the FeatureMap
               if (component_to_feature_to_injection_to_value.second.at(feature_name).count(injection_names_set) <= 0) continue;
               float value = component_to_feature_to_injection_to_value.second.at(feature_name).at(injection_names_set);
               weights.push_back(value / total_value); // add to the weights
@@ -320,7 +322,7 @@ namespace SmartPeak
             }
 
             // Make the merged feature
-            if (weights.size() <= 0) continue;
+            if (weights.size() <= 0) continue; // Note: we use the weights to check instead of the injections as the weights will be empty if no features exist for any of the injections
             component_to_feature_to_injection_to_value.second.at(feature_name).emplace(injections, 0);
             component_to_feature_to_injection_to_value.second.at(feature_name).at(injections) = merged_value;
 

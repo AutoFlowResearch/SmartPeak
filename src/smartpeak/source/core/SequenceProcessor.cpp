@@ -225,13 +225,13 @@ namespace SmartPeak
         std::cref(filenames_.at(injection.getMetaData().getInjectionName())),
         std::cref(methods_)
       );
-      LOGD << "Injenction [" << i << "]: waiting...";
+      LOGD << "Injection [" << i << "]: waiting...";
       f.wait();
-      LOGD << "Injenction [" << i << "]: done";
+      LOGD << "Injection [" << i << "]: done";
       try {
         f.get(); // check for exceptions
       } catch (const std::exception& e) {
-        LOGE << "Injenction [" << i << "]: " << e.what();
+        LOGE << "Injection [" << i << "]: " << e.what();
       }
     }
     LOGD << "Worker is done";
