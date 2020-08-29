@@ -93,6 +93,7 @@ namespace SmartPeak
 
     std::set<std::string> getSelectInjectionNamesWorkflow(const SequenceHandler& sequence_handler);
     std::set<std::string> getSelectSequenceSegmentNamesWorkflow(const SequenceHandler& sequence_handler);
+    std::set<std::string> getSelectSampleGroupNamesWorkflow(const SequenceHandler& sequence_handler);
     Eigen::Tensor<std::string, 1> getSelectSampleNamesTable(); // Should be injection name?
     Eigen::Tensor<std::string, 1> getSelectSampleNamesPlot(); // Should be injection name?
     Eigen::Tensor<std::string, 1> getSelectTransitionsTable();

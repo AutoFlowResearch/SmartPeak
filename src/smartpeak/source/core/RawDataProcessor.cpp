@@ -229,7 +229,12 @@ namespace SmartPeak
 
     try {
       OpenMS::MzMLFile mzmlfile;
-      mzmlfile.store(filenames.mzML_i, rawDataHandler_IO.getChromatogramMap());
+      if (rawDataHandler_IO.getChromatogramMap().size()) {
+        mzmlfile.store(filenames.mzML_i, rawDataHandler_IO.getChromatogramMap());
+      }
+      else {
+        mzmlfile.store(filenames.mzML_i, rawDataHandler_IO.getExperiment());
+      }
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -261,11 +266,12 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.load(filenames.featureXML_i, rawDataHandler_IO.getFeatureMap());
-      rawDataHandler_IO.updateFeatureMapHistory();
+      featurexml.load(filenames.featureXML_i, rawDataHandler_IO.getFeatureMapHistory());
+      rawDataHandler_IO.makeFeatureMapFromHistory();
     }
     catch (const std::exception& e) {
       LOGE << e.what();
+      rawDataHandler_IO.getFeatureMapHistory().clear();
       rawDataHandler_IO.getFeatureMap().clear();
       LOGE << "feature map clear";
     }
@@ -501,19 +507,26 @@ namespace SmartPeak
 
     OpenMS::FeatureMap output;
 
-    if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_qmip")) {
-      std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
-        Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"), params_I.at("MRMFeatureSelector.select_MRMFeatures_qmip"));
-      OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
-    } else if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_score")) {
-      std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
-        Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
-      OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
-    } else {
-      LOGE << "Both arguments 'select params' and 'schedule params' are empty";
-      LOGD << "END selectFeatures";
-      // TODO: replace throw with return?
-      throw std::invalid_argument("Both arguments 'select params' and 'schedule params' are empty.");
+    try {
+      if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_qmip")) {
+        std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
+          Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"), params_I.at("MRMFeatureSelector.select_MRMFeatures_qmip"));
+        OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
+      }
+      else if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_score")) {
+        std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
+          Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
+        OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
+      }
+      else {
+        LOGE << "Both arguments 'select params' and 'schedule params' are empty";
+        LOGD << "END selectFeatures";
+        // TODO: replace throw with return?
+        throw std::invalid_argument("Both arguments 'select params' and 'schedule params' are empty.");
+      }
+    }
+    catch (std::exception& e) {
+      LOGE << e.what();
     }
 
     output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
@@ -1027,7 +1040,8 @@ namespace SmartPeak
       "SequenceProcessor",
       "FIAMS",
       "PickMS1Features",
-      "AccurateMassSearchEngine"
+      "AccurateMassSearchEngine",
+      "MergeInjections"
     };
     for (const std::string& parameter : required_parameters) {
       if (!params_I.count(parameter)) {
@@ -1532,22 +1546,42 @@ namespace SmartPeak
       return;
     }
 
-    double sn_window = 0;
+    float sn_window = 0;
+    bool compute_peak_shape_metrics = false;
+    float min_intensity = 0;
     bool write_convex_hull = false;
-    for (const auto& fia_params : params_I.at("PickMS1Features")) {
-      if (fia_params.at("name") == "sne:window") {
+    for (const auto& pms1f_params : params_I.at("PickMS1Features")) {
+      if (pms1f_params.at("name") == "sne:window") {
         try {
-          sn_window = std::stod(fia_params.at("value"));
+          sn_window = std::stof(pms1f_params.at("value"));
         }
         catch (const std::exception& e) {
           LOGE << e.what();
         }
       }
-      if (fia_params.at("name") == "write_convex_hull") {
+      if (pms1f_params.at("name") == "write_convex_hull") {
         try {
-          std::string value = fia_params.at("value");
+          std::string value = pms1f_params.at("value");
           std::transform(value.begin(), value.end(), value.begin(), ::tolower);
           write_convex_hull = (value == "true")?true:false;
+        }
+        catch (const std::exception& e) {
+          LOGE << e.what();
+        }
+      }
+      if (pms1f_params.at("name") == "compute_peak_shape_metrics") {
+        try {
+          std::string value = pms1f_params.at("value");
+          std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+          compute_peak_shape_metrics = (value == "true") ? true : false;
+        }
+        catch (const std::exception& e) {
+          LOGE << e.what();
+        }
+      }
+      if (pms1f_params.at("name") == "min_intensity") {
+        try {
+          min_intensity = std::stof(pms1f_params.at("value"));
         }
         catch (const std::exception& e) {
           LOGE << e.what();
@@ -1570,6 +1604,11 @@ namespace SmartPeak
     Utilities::updateParameters(parameters, params_I.at("PickMS1Features"));
     picker.setParameters(parameters);
 
+    OpenMS::PeakIntegrator pi;
+    parameters = pi.getParameters();
+    Utilities::updateParameters(parameters, params_I.at("PickMS1Features"));
+    pi.setParameters(parameters);
+
     OpenMS::FeatureMap featureMap;
     try {
       for (const OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
@@ -1579,8 +1618,8 @@ namespace SmartPeak
         std::vector<OpenMS::PeakPickerHiRes::PeakBoundary> boundaries;
         OpenMS::MSSpectrum output;
         picker.pick(input, output, boundaries);
-
         if (output.size() <= 0) continue;
+
         // Estimate the S/N
         OpenMS::SignalToNoiseEstimatorMedianRapid sne(sn_window);
         std::vector<double> mzs, intensities;
@@ -1601,26 +1640,54 @@ namespace SmartPeak
           // set the metadata
           OpenMS::Feature f;
           f.setUniqueId();
-          f.setIntensity(it->getIntensity());
           f.setMZ(it->getMZ());
           f.setRT(0);
           f.setMetaValue("native_id", spec.getNativeID());
-          f.setMetaValue("PeptideRef", std::to_string(f.getUniqueId()));
+          f.setMetaValue("PeptideRef", "Unknown");
           f.setMetaValue("scan_polarity", rawDataHandler_IO.getMetaData().scan_polarity);
-          f.setMetaValue("peak_apex_int", it->getIntensity());
           f.setMetaValue("logSN", std::log(e.get_noise_value(it->getMZ())));
           f.setMetaValue("leftWidth", boundaries.at(i).mz_min);
           f.setMetaValue("rightWidth", boundaries.at(i).mz_max);
 
+          // compute the peak area
+          OpenMS::PeakIntegrator::PeakArea pa = pi.integratePeak(input, boundaries.at(i).mz_min, boundaries.at(i).mz_max);
+          f.setIntensity(pa.area);
+          f.setMetaValue("peak_apex_int", pa.height);
+          f.setMetaValue("peak_apex_position", it->getMZ());
+
+          // check the min intensity threshold
+          if (pa.height < min_intensity) {
+            //LOGD << "Feature: " << f.getUniqueId() << " with peak_apex_int=" << pa.height << " did not pass the `min_threshold`=" << min_intensity;
+            ++i;
+            continue;
+          }
+
+          // Calculate peak shape metrics that will be used for later QC
+          OpenMS::PeakIntegrator::PeakShapeMetrics psm = pi.calculatePeakShapeMetrics(input, boundaries.at(i).mz_min, boundaries.at(i).mz_max, pa.height, it->getMZ());
+          f.setMetaValue("width_at_50", psm.width_at_50);
+          if (compute_peak_shape_metrics)
+          {
+            f.setMetaValue("width_at_5", psm.width_at_5);
+            f.setMetaValue("width_at_10", psm.width_at_10);
+            f.setMetaValue("start_position_at_5", psm.start_position_at_5);
+            f.setMetaValue("start_position_at_10", psm.start_position_at_10);
+            f.setMetaValue("start_position_at_50", psm.start_position_at_50);
+            f.setMetaValue("end_position_at_5", psm.end_position_at_5);
+            f.setMetaValue("end_position_at_10", psm.end_position_at_10);
+            f.setMetaValue("end_position_at_50", psm.end_position_at_50);
+            f.setMetaValue("total_width", psm.total_width);
+            f.setMetaValue("tailing_factor", psm.tailing_factor);
+            f.setMetaValue("asymmetry_factor", psm.asymmetry_factor);
+            f.setMetaValue("slope_of_baseline", psm.slope_of_baseline);
+            f.setMetaValue("baseline_delta_2_height", psm.baseline_delta_2_height);
+            f.setMetaValue("points_across_baseline", psm.points_across_baseline);
+            f.setMetaValue("points_across_half_height", psm.points_across_half_height);
+          }
+
           // extract out the convex hull
           if (write_convex_hull) {
             OpenMS::ConvexHull2D hull;
-            OpenMS::ConvexHull2D::PointArrayType hull_points;
-            for (auto h = input.PosBegin(boundaries.at(i).mz_min); h != input.PosEnd(boundaries.at(i).mz_max); ++h)
-            {
-              hull_points.push_back(OpenMS::DPosition<2>(h->getPos(), h->getIntensity()));
-            }
-            hull.setHullPoints(hull_points);
+            hull.setHullPoints(pa.hull_points);
             f.setConvexHulls({ hull });
           }
           featureMap.push_back(f);
@@ -1665,28 +1732,97 @@ namespace SmartPeak
       ams.init();
       ams.run(rawDataHandler_IO.getFeatureMap(), output);
 
-      // Replace the peptide hits as subordinate features
+      // Remake the feature map replacing the peptide hits as features
+      // and change the `Feature` to the `ConsensusFeature`
+      // and move all adducts of the `Feature` into the `SubordinateFeatures`
+
+      // Pass 1: organize into a map
       OpenMS::FeatureMap fmap;
+      std::map<std::string, std::vector<OpenMS::Feature>> fmapmap;
       for (const OpenMS::Feature& f : rawDataHandler_IO.getFeatureMap()) {
-        OpenMS::Feature feat = f;
-        bool add_feature = true;
+        bool is_not_hit = true;
         for (const auto& ident : f.getPeptideIdentifications()) {
           for (const auto& hit : ident.getHits()) {
-            OpenMS::Feature sub = f;
-            sub.setUniqueId();
-            sub.setMetaValue("PeptideRef", hit.getMetaValue("identifier").toStringList().at(0));
-            sub.setMetaValue("identifier", hit.getMetaValue("identifier"));
-            sub.setMetaValue("description", hit.getMetaValue("description"));
-            sub.setMetaValue("modifications", hit.getMetaValue("modifications"));
-            sub.setMetaValue("chemical_formula", hit.getMetaValue("chemical_formula"));
-            sub.setMetaValue("mz_error_ppm", hit.getMetaValue("mz_error_ppm"));
-            sub.setMetaValue("mz_error_Da", hit.getMetaValue("mz_error_Da"));
-            sub.setCharge(hit.getCharge());
-            fmap.push_back(sub);
-            add_feature = false;
+            OpenMS::Feature f_updated = f;
+            f_updated.setUniqueId();
+            f_updated.setMetaValue("PeptideRef", hit.getMetaValue("identifier").toStringList().at(0));
+            std::string native_id = hit.getMetaValue("chemical_formula").toString() + ";" + hit.getMetaValue("modifications").toString();
+            f_updated.setMetaValue("native_id", native_id);
+            f_updated.setMetaValue("identifier", hit.getMetaValue("identifier"));
+            f_updated.setMetaValue("description", hit.getMetaValue("description"));
+            f_updated.setMetaValue("modifications", hit.getMetaValue("modifications"));
+            std::string adducts;
+            try {
+              std::string s = hit.getMetaValue("modifications").toString();
+              std::string delimiter = ";";
+              adducts = s.substr(1, s.find(delimiter) - 1);
+            }
+            catch (const std::exception& e) {
+              LOGE << e.what();
+            }
+            f_updated.setMetaValue("adducts", adducts);
+            OpenMS::EmpiricalFormula chemform(hit.getMetaValue("chemical_formula").toString());
+            double adduct_mass = f.getMZ()*std::abs(hit.getCharge()) + static_cast<double>(hit.getMetaValue("mz_error_Da")) - chemform.getMonoWeight();
+            f_updated.setMetaValue("dc_charge_adduct_mass", adduct_mass);
+            f_updated.setMetaValue("chemical_formula", hit.getMetaValue("chemical_formula"));
+            f_updated.setMetaValue("mz_error_ppm", hit.getMetaValue("mz_error_ppm"));
+            f_updated.setMetaValue("mz_error_Da", hit.getMetaValue("mz_error_Da"));
+            f_updated.setCharge(hit.getCharge());
+            auto found = fmapmap.emplace(hit.getMetaValue("identifier").toStringList().at(0), std::vector<OpenMS::Feature>({ f_updated }));
+            if (!found.second) {
+              fmapmap.at(hit.getMetaValue("identifier").toStringList().at(0)).push_back(f_updated);
+            }
+            is_not_hit = false;
           }
         }
-        if (add_feature) fmap.push_back(feat);
+        // NOTE: This will keep the feature in the featureMapHistory but remove from the featureMap
+        //if (is_not_hit)
+        //  fmap.push_back(f);
+      }
+
+      // Pass 2: compute the consensus manually
+      for (const auto& f_map : fmapmap) {
+
+        // compute the total intensity for weighting
+        double total_intensity = 0;
+        for (const auto& f : f_map.second) {
+          if (f.metaValueExists("peak_apex_int")) 
+            total_intensity += (double)f.getMetaValue("peak_apex_int");
+          else 
+            total_intensity += f.getIntensity();
+        }
+
+        // compute the weighted averages
+        double rt = 0.0, m = 0.0, intensity = 0.0, peak_apex_int = 0.0;
+        double weighting_factor = 1.0 / f_map.second.size(); // will be updated
+        for (const auto& f : f_map.second) {
+          // compute the weighting factor
+          if (f.metaValueExists("peak_apex_int")) 
+            weighting_factor = (double)f.getMetaValue("peak_apex_int") / total_intensity;
+          else 
+            weighting_factor = f.getIntensity() / total_intensity;
+
+          // compute the weighted averages
+          rt += f.getRT() * weighting_factor;
+          if (f.getCharge() == 0)
+            LOGW << "ConsensusFeature::computeDechargeConsensus() WARNING: Feature's charge is 0! This will lead to M=0!";
+          m += (f.getMZ() * std::abs(f.getCharge()) + (double)f.getMetaValue("dc_charge_adduct_mass")) * weighting_factor;
+          intensity += f.getIntensity() * weighting_factor;
+          if (f.metaValueExists("peak_apex_int")) 
+            peak_apex_int += (double)f.getMetaValue("peak_apex_int") * weighting_factor;
+        }
+
+        // make the feature map and assign subordinates
+        OpenMS::Feature f;
+        f.setUniqueId();
+        f.setMetaValue("PeptideRef", f_map.first);
+        f.setMZ(m);
+        f.setRT(rt);
+        f.setMetaValue("scan_polarity", f_map.second.front().getMetaValue("scan_polarity"));
+        f.setIntensity(intensity);
+        f.setMetaValue("peak_apex_int", peak_apex_int);
+        f.setSubordinates(f_map.second);
+        fmap.push_back(f);
       }
       rawDataHandler_IO.setFeatureMap(fmap);
     }

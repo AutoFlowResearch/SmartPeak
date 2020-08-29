@@ -83,12 +83,6 @@ namespace SmartPeak
       auto parameters_ptr = sequence_.begin()->getRawDataShared()->getParametersShared();
       rdh.setParameters(parameters_ptr);
 
-      /// ownership was changed from the RawDataHandler to the SequenceSegmentHandler
-      //auto feature_filters_ptr = sequence_.begin()->getRawDataShared()->getFeatureFilterShared();
-      //rdh.setFeatureFilter(feature_filters_ptr);
-      //auto feature_qc_ptr = sequence_.begin()->getRawDataShared()->getFeatureQCShared();
-      //rdh.setFeatureQC(feature_qc_ptr);
-
       auto transitions_ptr = sequence_.begin()->getRawDataShared()->getTargetedExperimentShared();
       rdh.setTargetedExperiment(transitions_ptr);
       auto reference_data_ptr = sequence_.begin()->getRawDataShared()->getReferenceDataShared();
@@ -159,15 +153,27 @@ namespace SmartPeak
         rdh.setFeatureRSDEstimations(feature_rsd_estimations_ptr);
         rdh.setFeatureBackgroundEstimations(feature_background_estimations_ptr);
       }
+
+      bool found_sample_group = false;
+      for (SampleGroupHandler& sampleGroupHandler : sample_groups_) {
+        if (meta_data_I.getSampleGroupName() == sampleGroupHandler.getSampleGroupName()) {
+          found_sample_group = true;
+          sampleGroupHandler.getSampleIndices().push_back(sequence_.size()); // index = the size of the sequence
+          break;
+        }
+      }
+      if (found_sample_group) {
+        // Nothing yet...
+      }
+      else {  // New sample group
+        // initialize the sample group
+        SampleGroupHandler sampleGroupHandler;
+        sampleGroupHandler.setSampleIndices({ sequence_.size() }); // index = the size of the sequence
+        sampleGroupHandler.setSampleGroupName(meta_data_I.getSampleGroupName());
+        sample_groups_.push_back(sampleGroupHandler);
+      }
     }
     else {
-      // Not needed because the constructors initialize the shared pointers
-      //rdh.setParameters(std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>(new std::map<std::string, std::vector<std::map<std::string, std::string>>>()));
-      //rdh.setFeatureFilter(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
-      //rdh.setFeatureQC(std::shared_ptr<OpenMS::MRMFeatureQC>(new OpenMS::MRMFeatureQC()));
-      //rdh.setTargetedExperiment(std::shared_ptr<OpenMS::TargetedExperiment>(new OpenMS::TargetedExperiment()));
-      //rdh.setReferenceData(std::shared_ptr<std::vector<std::map<std::string, CastValue>>>(new std::vector<std::map<std::string, CastValue>>()));
-
       // initialize the sequence segment
       SequenceSegmentHandler sequenceSegmentHandler;
       auto absQuantMethods_ptr = std::make_shared<std::vector<OpenMS::AbsoluteQuantitationMethod>>(std::vector<OpenMS::AbsoluteQuantitationMethod>());
@@ -201,6 +207,12 @@ namespace SmartPeak
       rdh.setFeatureBackgroundQC(feature_background_qc_ptr);
       rdh.setFeatureRSDEstimations(feature_rsd_estimations_ptr);
       rdh.setFeatureBackgroundEstimations(feature_background_estimations_ptr);
+
+      // initialize the sample groups
+      SampleGroupHandler sampleGroupHandler;
+      sampleGroupHandler.setSampleIndices({ 0 }); // first index of the sequence
+      sampleGroupHandler.setSampleGroupName(meta_data_I.getSampleGroupName());
+      sample_groups_.push_back(sampleGroupHandler);
     }
 
     // intialize the meta data
@@ -245,6 +257,10 @@ namespace SmartPeak
 
     if (meta_value == "RT") {
       cast = static_cast<float>(feature.getRT());
+    } else if (meta_value == "mz") { // Mass to charge ratio
+      cast = static_cast<float>(feature.getMZ());
+    } else if (meta_value == "charge") { // Mass to charge ratio
+      cast = static_cast<int>(feature.getCharge());
     } else if (meta_value == "intensity") { // Sum of each subordinate intensity
       cast = static_cast<float>(feature.getIntensity());
     } else if (meta_value == "peak_area") { // Subordinate intensity (also called "peak area)

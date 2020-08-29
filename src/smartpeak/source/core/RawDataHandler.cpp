@@ -550,6 +550,8 @@ namespace SmartPeak
         }
         // New Feature
         OpenMS::Feature new_feature = feature_select;
+        new_feature.setMetaValue("used_", "true");
+        new_feature.setMetaValue("timestamp_", timestamp);
         for (OpenMS::Feature& subordinate_new : new_feature.getSubordinates()) {
           subordinate_new.setMetaValue("used_", "true");
           subordinate_new.setMetaValue("timestamp_", timestamp);
@@ -559,6 +561,8 @@ namespace SmartPeak
 
       for (OpenMS::Feature& feature_copy : feature_map_history_) {
         if (unique_ids_feat_select.count(feature_copy.getUniqueId()) == 0) { // Removed feature
+          feature_copy.setMetaValue("used_", "false");
+          feature_copy.setMetaValue("timestamp_", timestamp);
           for (OpenMS::Feature& subordinate_copy : feature_copy.getSubordinates()) {
             subordinate_copy.setMetaValue("used_", "false");
             subordinate_copy.setMetaValue("timestamp_", timestamp);
@@ -627,6 +631,7 @@ namespace SmartPeak
           if (update_feature) { // copy over the updated subordinates and change the feature to the updated version
             feature_tmp.setSubordinates(feature_copy.getSubordinates());
             feature_copy = feature_tmp;
+            feature_copy.setMetaValue("used_", "true");
             feature_copy.setMetaValue("timestamp_", timestamp);
           }
           if (new_subordinates.size()) { // append new subordinates to the existing subordinates list
@@ -647,4 +652,53 @@ namespace SmartPeak
       }
     }
   }
+  void RawDataHandler::makeFeatureMapFromHistory()
+  {
+    // Current time stamp
+    std::chrono::time_point<std::chrono::system_clock> time_now = std::chrono::system_clock::now();
+    std::time_t time_now_t = std::chrono::system_clock::to_time_t(time_now);
+    std::tm now_tm = *std::localtime(&time_now_t);
+    char timestamp_char[64];
+    std::strftime(timestamp_char, 64, "%Y-%m-%d-%H-%M-%S", &now_tm);
+    std::string timestamp(timestamp_char);
+
+    feature_map_.clear();
+    for (OpenMS::Feature& feature_new : feature_map_history_) {
+      std::vector<OpenMS::Feature> subs;
+      bool copy_feature = false;
+
+      // Case 1a: No subordinates
+      if (feature_new.metaValueExists("used_") && feature_new.getMetaValue("used_").toString() == "true" && feature_new.getSubordinates().size() <= 0) {
+        copy_feature = true;
+      }
+      // Case 1b: No subordinates and missing "used_"
+      else if (!feature_new.metaValueExists("used_") && feature_new.getSubordinates().size() <= 0) {
+        feature_new.setMetaValue("used_", "true");
+        feature_new.setMetaValue("timestamp_", timestamp);
+        copy_feature = true;
+      }
+      else {
+        // Case 2a: Subordinates
+        for (OpenMS::Feature& subordinate_new : feature_new.getSubordinates()) {
+          if (subordinate_new.metaValueExists("used_") && subordinate_new.getMetaValue("used_").toString() == "true") {
+            subs.push_back(subordinate_new);
+            copy_feature = true;
+          }
+          // Case 2b: Subordinates and missing "used_
+          else if (!subordinate_new.metaValueExists("used_")) {
+            subordinate_new.setMetaValue("used_", "true");
+            subordinate_new.setMetaValue("timestamp_", timestamp);
+            subs.push_back(subordinate_new);
+            copy_feature = true;
+          }
+        }
+      }
+      // Add the feature to the featureMap
+      if (copy_feature) {
+        OpenMS::Feature f = feature_new;
+        f.setSubordinates(subs);
+        feature_map_.push_back(f);
+      }
+    }
+  }  
 }

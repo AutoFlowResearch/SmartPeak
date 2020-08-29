@@ -7,6 +7,7 @@ set(core_executables_list
 	RawDataHandler_test
 	RawDataProcessor_test
 	SampleGroupHandler_test
+	SampleGroupProcessor_test
 	InjectionHandler_test
 	SequenceHandler_test
 	SequenceProcessor_test

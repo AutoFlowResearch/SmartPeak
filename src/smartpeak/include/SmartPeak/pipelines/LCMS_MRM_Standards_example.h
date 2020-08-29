@@ -39,7 +39,9 @@ void example_LCMS_MRM_Standards(
       dir_I + "/features/",
       dir_I + "/features/",
       injection.getMetaData().getSampleName(),
-      key
+      key,
+      injection.getMetaData().getSampleGroupName(),
+      injection.getMetaData().getSampleGroupName()
     );
   }
 
@@ -61,7 +63,8 @@ void example_LCMS_MRM_Standards(
       dir_I + "/features/",
       dir_I + "/features/",
       key,
-      key
+      key,
+      "", ""
     );
   }
 
@@ -84,7 +87,9 @@ void example_LCMS_MRM_Standards(
       dir_I + "/features/",
       dir_I + "/features/",
       injection.getMetaData().getSampleName(),
-      key
+      key,
+      injection.getMetaData().getSampleGroupName(),
+      injection.getMetaData().getSampleGroupName()
     );
   }
 

@@ -13,12 +13,6 @@
 #include <atomic>
 #include <future>
 #include <list>
-//#include <map>
-//#include <memory> // shared_ptr
-//#include <set>
-//#include <string>
-
-//#include <vector>
 
 namespace SmartPeak
 {
@@ -79,25 +73,45 @@ namespace SmartPeak
 
   void ProcessSequence::process() const
   {
+    // Check that there are raw data processing methods
     if (raw_data_processing_methods_I.empty()) {
       throw "no raw data processing methods given.\n";
     }
 
+    // Get the specified injections to process
     std::vector<InjectionHandler> injections = injection_names.empty()
       ? sequenceHandler_IO->getSequence()
       : sequenceHandler_IO->getSamplesInSequence(injection_names);
 
+    // Check that the filenames is consistent with the number of injections
     if (filenames.size() < injections.size()) {
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
+    // Determine the number of threads to launch
+    const auto& params = injections.front().getRawData().getParameters();
+    int n_threads = 6;
+    if (params.count("SequenceProcessor") && !params.at("SequenceProcessor").empty()) {
+      for (const auto& p : params.at("SequenceProcessor")) {
+        if (p.at("name") == "n_thread") {
+          try {
+            n_threads = std::stoi(p.at("value"));
+            LOGI << "n_threads set to " << n_threads;
+          }
+          catch (const std::exception& e) {
+            LOGE << e.what();
+          }
+        }
+      }
+    }
+
+    // Launch
     SequenceProcessorMultithread manager(
       injections,
       filenames,
       raw_data_processing_methods_I
     );
-
-    manager.spawn_workers(2);
+    manager.spawn_workers(n_threads);
   }
 
   void ProcessSequenceSegments::process() const
@@ -146,72 +160,134 @@ namespace SmartPeak
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
   }
 
+  void ProcessSampleGroups::process() const
+  {
+    std::vector<SampleGroupHandler> sample_groups;
+
+    if (sample_group_names.empty()) { // select all
+      sample_groups = sequenceHandler_IO->getSampleGroups();
+    }
+    else { // select those with specific sample group names
+      for (SampleGroupHandler& s : sequenceHandler_IO->getSampleGroups()) {
+        if (sample_group_names.count(s.getSampleGroupName())) {
+          sample_groups.push_back(s);
+        }
+      }
+    }
+    if (filenames.size() < sample_groups.size()) {
+      throw std::invalid_argument("The number of provided filenames locations is not correct.");
+    }
+
+    // process by sample group
+    for (SampleGroupHandler& sample_group : sample_groups) {
+
+      // handle user-desired sample_group_processing_methods
+      if (!sample_group_processing_methods_I.size()) {
+        throw "no sample group processing methods given.\n";
+      }
+
+      const size_t n = sample_group_processing_methods_I.size();
+
+      // process the sample group
+      for (size_t i = 0; i < n; ++i) {
+        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sample groups";
+        sample_group_processing_methods_I[i]->process(
+          sample_group,
+          *sequenceHandler_IO,
+          (*sequenceHandler_IO)
+          .getSequence()
+          .at(sample_group.getSampleIndices().front())
+          .getRawData()
+          .getParameters(), // assumption: all parameters are the same for each sample in the sample group!
+          filenames.at(sample_group.getSampleGroupName())
+        );
+      }
+    }
+
+    sequenceHandler_IO->setSampleGroups(sample_groups);
+  }
+
   void SequenceProcessorMultithread::spawn_workers(unsigned int n_threads)
   {
+    // Refine the # of threads based on the hardware
     size_t n_workers = getNumWorkers(n_threads);
-
     LOGD << "Number of workers: " << n_workers;
-    std::list<std::future<void>> futures;
-    LOGD << "Spawning workers...";
-    for (size_t i = 0; i < n_workers; ++i) {
-      futures.emplace_back(std::async(std::launch::async, &SequenceProcessorMultithread::run_injection_processing, this));
+
+    // Spawn the workers
+    try {
+      std::list<std::future<void>> futures;
+      LOGD << "Spawning workers...";
+      for (size_t i = 0; i < n_workers; ++i) {
+        futures.emplace_back(std::async(std::launch::async, &SequenceProcessorMultithread::run_injection_processing, this));
+      }
+      LOGD << "Waiting for workers...";
+      for (std::future<void>& f : futures) {
+        f.wait();
+      }
+      LOGD << "Workers are done";
     }
-    LOGD << "Waiting for workers...";
-    for (std::future<void>& f : futures) {
-      f.wait();
+    catch (const std::exception& e) {
+      LOGE << e.what();
     }
-    LOGD << "Workers are done";
   }
 
   void SequenceProcessorMultithread::run_injection_processing()
   {
     while (true) {
+      // fetch the atomic injection counter
       const size_t i = i_.fetch_add(1);
       if (i >= injections_.size()) {
         break;
       }
+
+      // Launch the processing method
       InjectionHandler& injection { injections_[i] };
-      std::future<void> f = std::async(
-        std::launch::async,
-        processInjection,
-        std::ref(injection),
-        std::cref(filenames_.at(injection.getMetaData().getInjectionName())),
-        std::cref(methods_)
-      );
-      LOGD << "Injenction [" << i << "]: waiting...";
-      f.wait();
-      LOGD << "Injenction [" << i << "]: done";
       try {
-        f.get(); // check for exceptions
-      } catch (const std::exception& e) {
-        LOGE << "Injenction [" << i << "]: " << e.what();
+        std::future<void> f = std::async(
+          std::launch::async,
+          processInjection,
+          std::ref(injection),
+          std::cref(filenames_.at(injection.getMetaData().getInjectionName())),
+          std::cref(methods_));
+        LOGD << "Injection [" << i << "]: waiting...";
+        f.wait();
+        LOGD << "Injection [" << i << "]: done";
+        try {
+          f.get(); // check for exceptions
+        }
+        catch (const std::exception& e) {
+          LOGE << "Injection [" << i << "]: " << e.what();
+        }
+      }
+      catch (const std::exception& e) {
+        LOGE << "Injection [" << i << "]: " << e.what();
       }
     }
     LOGD << "Worker is done";
   }
 
   size_t SequenceProcessorMultithread::getNumWorkers(unsigned int n_threads) const {
-      const unsigned int max_threads = std::thread::hardware_concurrency(); // might return 0
-      size_t n_workers = 0;
+    const unsigned int max_threads = std::thread::hardware_concurrency(); // might return 0
+    size_t n_workers = 0;
 
-      if (max_threads != 0) {
-          if (n_threads > max_threads) {
-              n_workers = max_threads - 1;
-          }
-          else if (n_threads <= max_threads && n_threads > 1) {
-              n_workers = n_threads - 1;
-          }
-          else if (n_threads >= 0) {
-              LOGD << "Max available threads: " << max_threads;
-              LOGD << "but using just 1 thread.";
-              n_workers = 1;
-          }
+    if (max_threads != 0) {
+      if (n_threads > max_threads) {
+        n_workers = max_threads - 1;
       }
-      else {
-          LOGD << "Couldn't determine # of threads, using just 1 thread!";
-          n_workers = 1;
+      else if (n_threads <= max_threads && n_threads > 1) {
+        n_workers = n_threads - 1;
       }
-      return n_workers;
+      else if (n_threads >= 0) {
+        LOGD << "Max available threads: " << max_threads;
+        LOGD << "but using just 1 thread.";
+        n_workers = 1;
+      }
+    }
+    else {
+      LOGD << "Couldn't determine # of threads, using just 1 thread!";
+      n_workers = 1;
+    }
+    return n_workers;
   }
 
   void processInjection(

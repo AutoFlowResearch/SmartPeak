@@ -170,9 +170,9 @@ namespace SmartPeak
     operator_name.clear();
     proc_method_name.clear();
     acquisition_date_and_time = { 0, 0, 0, 1, 0, 0, 0, 0, 0 };
-    scan_polarity.clear();
-    scan_mass_low = -1;
-    scan_mass_high = -1;
+    scan_polarity = "Unknown";
+    scan_mass_low = 0.0;
+    scan_mass_high = 1e12;
   }
 
   std::string MetaDataHandler::getInjectionName() const

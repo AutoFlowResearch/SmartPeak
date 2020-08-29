@@ -14,7 +14,7 @@ void test_main_FIAMS_FullScan_Unknown()
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns");
   const Filenames static_filenames = Filenames::getDefaultStaticFilenames(main_dir);
 
-  OpenMS::MzTab mt1 = example_FIAMS_FullScan_Unknowns(main_dir, static_filenames, ",");
+  example_FIAMS_FullScan_Unknowns(main_dir, static_filenames, ",");
 
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;
@@ -24,6 +24,9 @@ void test_main_FIAMS_FullScan_Unknown()
   filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns/features/20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1_13_BatchName_1900-01-01_000000.featureXML");
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
+  filenames.mzTab_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns/features/20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1_13_BatchName_1900-01-01_000000.mzTab");
+  loadAnnotations.process(rawDataHandler, {}, filenames);
+  OpenMS::MzTab mt1 = rawDataHandler.getMzTab();
 
   rawDataHandler.clear();
 
@@ -36,29 +39,28 @@ void test_main_FIAMS_FullScan_Unknown()
   
   rawDataHandler.clear();
   
-  cout << "fm1 size: " << fm1.size() << endl;
-  cout << "fm2 size: " << fm2.size() << endl;
+  std::cout << "fm1 size: " << fm1.size() << std::endl;
+  std::cout << "fm2 size: " << fm2.size() << std::endl;
   assert(fm1.size() == fm2.size());
 
-  cout << "mt1 size: " << mt1.getSmallMoleculeSectionRows().size() << endl;
-  cout << "mt2 size: " << mt2.getSmallMoleculeSectionRows().size() << endl;
-  assert(mt1.getSmallMoleculeSectionRows().size() == 91439);
+  std::cout << "mt1 size: " << mt1.getSmallMoleculeSectionRows().size() << std::endl;
+  std::cout << "mt2 size: " << mt2.getSmallMoleculeSectionRows().size() << std::endl;
+  assert(mt1.getSmallMoleculeSectionRows().size() == 7865);
 
   const OpenMS::Feature* f1 = &fm1[0];
   const OpenMS::Feature* f2 = &fm2[0];
-  cout << "0 peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
-  cout << "0 getRT: " << f1->getRT() << endl;
+  std::cout << "0 peak_apex_int: " << f1->getMetaValue("peak_apex_int") << std::endl;
+  std::cout << "0 getRT: " << f1->getRT() << std::endl;
   const auto* a1 = &mt1.getSmallMoleculeSectionRows().front();
   const auto* a2 = &mt2.getSmallMoleculeSectionRows().front();
-  cout << "0 calc_mass_to_charge: " << a1->calc_mass_to_charge.get() << endl;
-  cout << "0 chemical_formula: " << a1->chemical_formula.get() << endl;
-  cout << "0 identifier: " << a1->identifier.get().at(0).get() << endl;
-  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 1052.97229));
-  assert(Utilities::assert_close((double)f1->getIntensity(), 1052.97229));
+  std::cout << "0 calc_mass_to_charge: " << a1->calc_mass_to_charge.get() << std::endl;
+  std::cout << "0 chemical_formula: " << a1->chemical_formula.get() << std::endl;
+  std::cout << "0 identifier: " << a1->identifier.get().at(0).get() << std::endl;
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 3.5241834375e05));
   assert(Utilities::assert_close((double)f1->getRT(), 0.0));
-  assert(Utilities::assert_close((double)a1->calc_mass_to_charge.get(), 100.027));
-  assert(static_cast<std::string>(a1->chemical_formula.get()) == "C15H14FN3O3");
-  assert(a1->identifier.get().at(0).get() == "HMDB:HMDB0015336");
+  assert(Utilities::assert_close((double)a1->calc_mass_to_charge.get(), 102.957));
+  assert(static_cast<std::string>(a1->chemical_formula.get()) == "H3O3P");
+  assert(a1->identifier.get().at(0).get() == "HMDB:HMDB0001443");
   assert(Utilities::assert_close((double)f1->getIntensity(), (double)f2->getIntensity()));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
@@ -68,19 +70,18 @@ void test_main_FIAMS_FullScan_Unknown()
 
   f1 = &fm1.back();
   f2 = &fm2.back();
-  cout << "50 peak_apex_int: " << f1->getMetaValue("peak_apex_int") << endl;
-  cout << "50 getRT: " << f1->getRT() << endl;
+  std::cout << "50 peak_apex_int: " << f1->getMetaValue("peak_apex_int") << std::endl;
+  std::cout << "50 getRT: " << f1->getRT() << std::endl;
   a1 = &mt1.getSmallMoleculeSectionRows().back();
   a2 = &mt2.getSmallMoleculeSectionRows().back();
-  cout << "-1 calc_mass_to_charge: " << a1->calc_mass_to_charge.get() << endl;
-  cout << "-1 chemical_formula: " << a1->chemical_formula.get() << endl;
-  cout << "-1 identifier: " << a1->identifier.get().at(0).get() << endl;
-  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 2429.437988));
-  assert(Utilities::assert_close((double)f1->getIntensity(), 2429.437988));
+  std::cout << "-1 calc_mass_to_charge: " << a1->calc_mass_to_charge.get() << std::endl;
+  std::cout << "-1 chemical_formula: " << a1->chemical_formula.get() << std::endl;
+  std::cout << "-1 identifier: " << a1->identifier.get().at(0).get() << std::endl;
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 4.832108065631822e07));
   assert(Utilities::assert_close((double)f1->getRT(), 0.0));
-  assert(Utilities::assert_close((double)a1->calc_mass_to_charge.get(), 999.620302583604257));
-  assert(static_cast<std::string>(a1->chemical_formula.get()) == "C29H42O5");
-  assert(a1->identifier.get().at(0).get() == "HMDB:HMDB0038683");
+  assert(Utilities::assert_close((double)a1->calc_mass_to_charge.get(), 942.346));
+  assert(static_cast<std::string>(a1->chemical_formula.get()) == "C37H59N5O12S2");
+  assert(a1->identifier.get().at(0).get() == "HMDB:HMDB0127611");
   assert(Utilities::assert_close((double)f1->getIntensity(), (double)f2->getIntensity()));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));

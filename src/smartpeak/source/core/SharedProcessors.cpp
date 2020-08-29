@@ -2,6 +2,7 @@
 
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/core/SampleGroupProcessor.h>
 #include <map>
 #include <memory>
 
@@ -32,7 +33,8 @@ namespace SmartPeak {
     {"SEARCH_ACCURATE_MASS", std::make_shared<SearchAccurateMass>()},
     {"LOAD_ANNOTATIONS", std::make_shared<LoadAnnotations>()},
     {"STORE_ANNOTATIONS", std::make_shared<StoreAnnotations>()},
-    {"CLEAR_DATA", std::make_shared<ClearData>()}
+    {"CLEAR_DATA", std::make_shared<ClearData>()},
+    {"STORE_RAW_DATA", std::make_shared<StoreRawData>()}
   };
   const std::map<std::string, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
     {"CALCULATE_CALIBRATION", std::make_shared<CalculateCalibration>()},
@@ -56,5 +58,10 @@ namespace SmartPeak {
     {"LOAD_FEATURE_BACKGROUND_FILTERS", std::make_shared<LoadFeatureBackgroundFilters>()},
     {"STORE_FEATURE_BACKGROUND_QCS", std::make_shared<StoreFeatureBackgroundQCs>()},
     {"LOAD_FEATURE_BACKGROUND_QCS", std::make_shared<LoadFeatureBackgroundQCs>()}
+  };
+  const std::map<std::string, std::shared_ptr<SampleGroupProcessor>> n_to_sample_group_method_ {
+    {"MERGE_INJECTIONS", std::make_shared<MergeInjections>()},
+    {"LOAD_FEATURES_SAMPLE_GROUP", std::make_shared<LoadFeaturesSampleGroup>()},
+    {"STORE_FEATURES_SAMPLE_GROUP", std::make_shared<StoreFeaturesSampleGroup>()}
   };
 }

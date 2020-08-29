@@ -120,23 +120,26 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
     "170808_Jonathan_yeast_Yarr3_1x"
   };
 
+  int inj_num = 0;
   for (const string& sample_name : sample_names) {
+    ++inj_num;
     MetaDataHandler metaDataHandler;
     metaDataHandler.setSampleName(sample_name);
     metaDataHandler.setFilename(sample_name + ".mzML");
     metaDataHandler.setSampleType(SampleType::Unknown);
     metaDataHandler.setSampleGroupName("sample_group");
     metaDataHandler.setSequenceSegmentName("sequence_segment");
+    metaDataHandler.inj_number = inj_num;
     metaDataHandler.acq_method_name = "6";
     metaDataHandler.inj_volume = 7.0;
     metaDataHandler.inj_volume_units = "8";
-    metaDataHandler.batch_name = "9";
+    metaDataHandler.batch_name = "FluxTest";
     metaDataHandler.scan_polarity = "negative";
     metaDataHandler.scan_mass_high = 2000;
     metaDataHandler.scan_mass_low = 60;
 
     Filenames filenames;
-    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
+    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML");
     RawDataHandler rawDataHandler;
     LoadFeatures loadFeatures;
     loadFeatures.process(rawDataHandler, {}, filenames);
@@ -251,7 +254,9 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
     "170808_Jonathan_yeast_Yarr3_1x"
   };
 
+  int inj_num = 0;
   for (const string& sample_name : sample_names) {
+    ++inj_num;
     MetaDataHandler metaDataHandler;
     metaDataHandler.setSampleName(sample_name);
     metaDataHandler.setFilename(sample_name + ".mzML");
@@ -259,16 +264,16 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
     metaDataHandler.setSampleGroupName("sample_group");
     metaDataHandler.setSequenceSegmentName("sequence_segment");
     metaDataHandler.acq_method_name = "6";
+    metaDataHandler.inj_number = inj_num;
     metaDataHandler.inj_volume = 7.0;
     metaDataHandler.inj_volume_units = "8";
-    metaDataHandler.batch_name = "9";
+    metaDataHandler.batch_name = "FluxTest";
     metaDataHandler.scan_polarity = "negative";
     metaDataHandler.scan_mass_high = 2000;
     metaDataHandler.scan_mass_low = 60;
 
-
     Filenames filenames;
-    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(sample_name + ".featureXML");
+    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML");
     RawDataHandler rawDataHandler;
     LoadFeatures loadFeatures;
     loadFeatures.process(rawDataHandler, {}, filenames);

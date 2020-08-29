@@ -29,6 +29,8 @@ namespace SmartPeak {
     description,
     modifications, 
     chemical_formula,
+    mz,
+    charge,
     mz_error_ppm,
     mz_error_Da/*,
     accuracy,
@@ -40,5 +42,5 @@ namespace SmartPeak {
   extern const std::map<FeatureMetadata, std::string> metadataToString;
   extern const std::map<FeatureMetadata, std::string> metadatafloatToString;
 
-  constexpr size_t FeatureMetadataSize { 26 }; // was 29 with accuracy, n_features, and validation
+  constexpr size_t FeatureMetadataSize { 28 }; // was 31 with accuracy, n_features, and validation
 }

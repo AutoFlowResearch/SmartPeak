@@ -13,6 +13,7 @@ set(sources_list_h
 	RawDataHandler.h
 	RawDataProcessor.h
 	SampleGroupHandler.h
+	SampleGroupProcessor.h
 	InjectionHandler.h
 	SampleType.h
 	SequenceHandler.h
