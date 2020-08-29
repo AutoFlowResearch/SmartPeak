@@ -1,15 +1,14 @@
+version: 2.1
 
+orbs:
+  win: circleci/windows@2.4.0
 
-version: 2
 jobs:
-  build:
+  build_ubuntu:
     docker:
       - image: ubuntu:18.04
-
     working_directory: ~/SmartPeak2
-
     resource_class: large
-
     steps:
       - checkout
       - run: |
@@ -43,7 +42,7 @@ jobs:
           command: |
             mkdir ~/SmartPeak2_build
             cd ~/SmartPeak2_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/imgui -DImGui_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/implot -DBUILD_DOCS=ON -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
             make -j4
       - run:
           command: |
@@ -54,15 +53,163 @@ jobs:
       - run:
           command: |
             ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
-
       - run:
           command: |
-            [ ! -d ~/SmartPeak2_build/docs/docs/sphinx/_image ]     && exit 0
-            [ ! -f ~/SmartPeak2_build/docs/docs/sphinx/index.html ] && exit 0
+            set -o xtrace
+            cd ~/SmartPeak2_build
+            cpack -V
+            ls -lh ~/SmartPeak2_build | grep -a .deb
+            dpkg -c ~/SmartPeak2_build/*.deb
+            mkdir -p /tmp/packages
+            cp ~/SmartPeak2_build/*.deb /tmp/packages
+      - store_artifacts:
+          path: /tmp/packages
 
+  build_macos:
+    macos:
+      xcode: "11.0.0"
+    resource_class: medium
+    working_directory: ~/SmartPeak2
+    steps:
+      - checkout
+      - run: brew install cmake qt5 sdl2 boost@1.60 glpk eigen sqlite hdf5  libsvm xerces-c
+      - run: |
+          set +o pipefail
+          brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib || true
+      - run: |
+          set -o pipefail
+          brew install coin-or-tools/coinor/coin_data_sample coin-or-tools/coinor/coinutils coin-or-tools/coinor/osi || true
+      - run: |
+          cd ~ &&
+          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
+          cd OpenMS && git submodule update --init contrib && mkdir contrib_build && cd contrib_build && 
+          cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DBUILD_TYPE=ALL ../contrib &&
+          cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
+          cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost@1.60);$(brew --prefix)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/   -DSEQAN_INCLUDE_DIRS=~/OpenMS/contrib_build/include/seqan -DCOIN_INCLUDE_DIR=../contrib_build/include/ -DWM5_INCLUDE_DIR=../contrib_build/include/WildMagic/ -DWM5_Wm5Core_LIBRARY=../contrib_build/lib/libWm5Core.a -DWM5_Wm5Mathematics_LIBRARY=../contrib_build/lib/libWm5Mathematics.a -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
+          make -j4 OpenMS
+      - run: |
+          cd ~/SmartPeak2 && mkdir smartpeak2_debug_superbuild smartpeak2_debug_build
+          cd smartpeak2_debug_superbuild
+          cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug .. && make -j4
+          cd ../smartpeak2_debug_build
+          cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;$(brew --prefix qt5);$(brew --prefix boost@1.60)" -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+          make -j4
+      - run: |
+          set +o pipefail
+          cd ~/SmartPeak2/smartpeak2_debug_build
+          ctest -VV -F --timeout 1200 || true
+      - run: | 
+          set +e
+          cd ~/SmartPeak2/smartpeak2_debug_build
+          ls -alt bin
+          cpack -G DragNDrop && ls -alth
+          yes | hdiutil attach -noautoopen -noverify SmartPeak-*.dmg > /dev/null
+          otool -l /Volumes/SmartPeak-1.0.0-Darwin/GUI.app/Contents/MacOS/GUI | grep -a name
+          cp -r /Volumes/SmartPeak-*-Darwin/GUI.app /Volumes/SmartPeak-*-Darwin/share .
+          xattr -l GUI.app/*
+          sudo xattr -dr com.apple.quarantine GUI.app
+          # open GUI.app
+      - run:
+          command: |
+            mkdir -p /tmp/artifacts
+            cp ~/SmartPeak2/smartpeak2_debug_build/*.dmg /tmp/artifacts
+      - store_artifacts:
+          path: /tmp/artifacts
+
+
+  build_windows:
+    working_directory: ~/SmartPeak2
+    executor: win/default
+    steps:
+      - checkout
+      - run: systeminfo
+      - run: |
+          cd ~
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          $ProgressPreference = "SilentlyContinue"
+          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+          choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"'
+          choco install boost-msvc-14.1
+          choco install doxygen.install
+          choco install nsis.portable
+          refreshenv
+          $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
+          $sdl2_url = 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
+          $qt_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'qt_tmp$', '7z' } –PassThru
+          Invoke-WebRequest $qt_url -OutFile $qt_tmp 
+          7z x $qt_tmp -o'C:\lib\Qt'
+          cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\Qt5Core.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\
+          cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\Qt5Network.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\
+          cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\libcrypto-1_1-x64.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\
+          cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\libssl-1_1-x64.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\
+          $Qt_DIR = 'C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64'
+          $qt_tmp | Remove-Item
+          $sdl2_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'sdl2_tmp$', 'zip' } –PassThru
+          Invoke-WebRequest $sdl2_url -OutFile $sdl2_tmp 
+          7z x $sdl2_tmp -o'C:\lib\sdl2'
+          $SDL_DIR = 'C:\lib\sdl2\SDL2-2.0.12'
+          $sdl2_tmp | Remove-Item
+      - run: |
+          cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars64.txt"
+          Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
+          if ($_ -match "^(.*?)=(.*)$") {
+              Set-Content "env:\$($matches[1])" $matches[2]
+              }
+          }
+          cd ~
+          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
+          cd ~/OpenMS; git submodule update --init contrib; mkdir contrib_build; cd contrib_build
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=SEQAN ~/OpenMS/contrib
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=LIBSVM ~/OpenMS/contrib
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=XERCESC ~/OpenMS/contrib
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=COINOR ~/OpenMS/contrib
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=BZIP2 ~/OpenMS/contrib
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=ZLIB ~/OpenMS/contrib
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=GLPK ~/OpenMS/contrib
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=EIGEN ~/OpenMS/contrib
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=WILDMAGIC ~/OpenMS/contrib
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=SQLITE ~/OpenMS/contrib
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=KISSFFT ~/OpenMS/contrib
+          cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=HDF5 ~/OpenMS/contrib
+          cd ~/OpenMS; mkdir openms_build; cd openms_build
+          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/local/boost_1_67_0" -DBOOST_INCLUDE_DIR="C:/local/boost_1_67_0" -DBOOST_LIBRARYDIR="C:/local/boost_1_67_0/lib64-msvc-14.2" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
+          msbuild src\openswathalgo\OpenSWATHAlgo.sln /maxcpucount /p:Configuration=Release
+          msbuild src\openms\OpenMS.sln /maxcpucount /p:Configuration=Release
+      - run: |
+          Start-Process powershell -Verb runas
+          [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Users\circleci\OpenMS\openms_build\bin\Release;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin", [EnvironmentVariableTarget]::Machine)
+          refreshenv
+      - run: |
+          Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
+          if ($_ -match "^(.*?)=(.*)$") {
+              Set-Content "env:\$($matches[1])" $matches[2]
+              }
+          }
+          cd ~/SmartPeak2
+          mkdir smartpeak2_superbuild, smartpeak2_build
+          cd ~/SmartPeak2/smartpeak2_superbuild
+          cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak2
+          cmake --build .
+          cd ~/SmartPeak2/smartpeak2_build
+          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/local/boost_1_67_0" -DBOOST_INCLUDE_DIR="C:/local/boost_1_67_0" -DBOOST_LIBRARYDIR="C:/local/boost_1_67_0/lib64-msvc-14.1" -DCMAKE_PREFIX_PATH="~/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak2
+          msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
+          msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
+          msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
+          refreshenv
+          & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
+          & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
+      - run:
+          command: |
+            mkdir -p ~/artifacts
+            cp ~/SmartPeak2/smartpeak2_build/*.exe ~/artifacts
+      - store_artifacts:
+          path: ~/artifacts
+            
 
 workflows:
-  version: 2
-  build-deploy:
+  version: 2.1
+  build:
     jobs:
-      - build
+      - build_ubuntu
+      - build_macos
+      - build_windows
