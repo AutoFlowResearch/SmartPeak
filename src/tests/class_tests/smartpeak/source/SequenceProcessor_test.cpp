@@ -217,10 +217,6 @@ BOOST_AUTO_TEST_CASE(processSequence)
   std::map<std::string, std::vector<std::map<std::string, std::string>>> const* params;
   params = &rawDataHandler0.getParameters();
   BOOST_CHECK_EQUAL(params->count("SequenceProcessor"), 1);
-  
-  SmartPeak::SequenceProcessorMultithread spMT3(sequenceHandler.getSequence(),
-    dynamic_filenames,
-    raw_data_processing_methods);  
   unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].at("value"));
   BOOST_CHECK_EQUAL(n_threads, 4);
   

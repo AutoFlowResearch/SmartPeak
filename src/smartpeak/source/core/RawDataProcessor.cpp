@@ -507,19 +507,26 @@ namespace SmartPeak
 
     OpenMS::FeatureMap output;
 
-    if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_qmip")) {
-      std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
-        Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"), params_I.at("MRMFeatureSelector.select_MRMFeatures_qmip"));
-      OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
-    } else if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_score")) {
-      std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
-        Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
-      OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
-    } else {
-      LOGE << "Both arguments 'select params' and 'schedule params' are empty";
-      LOGD << "END selectFeatures";
-      // TODO: replace throw with return?
-      throw std::invalid_argument("Both arguments 'select params' and 'schedule params' are empty.");
+    try {
+      if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_qmip")) {
+        std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
+          Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"), params_I.at("MRMFeatureSelector.select_MRMFeatures_qmip"));
+        OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
+      }
+      else if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_score")) {
+        std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
+          Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
+        OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
+      }
+      else {
+        LOGE << "Both arguments 'select params' and 'schedule params' are empty";
+        LOGD << "END selectFeatures";
+        // TODO: replace throw with return?
+        throw std::invalid_argument("Both arguments 'select params' and 'schedule params' are empty.");
+      }
+    }
+    catch (std::exception& e) {
+      LOGE << e.what();
     }
 
     output.setPrimaryMSRunPath({rawDataHandler_IO.getMetaData().getFilename()});
