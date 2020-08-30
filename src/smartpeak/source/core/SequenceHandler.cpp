@@ -266,11 +266,11 @@ namespace SmartPeak
     } else if (meta_value == "peak_area") { // Subordinate intensity (also called "peak area)
       cast = static_cast<float>(subordinate.getIntensity());
     } else if (meta_value == "validation") { // The result of the validation
-      cast = static_cast<std::string>(subordinate.getMetaValue(meta_value));
-    } else if (feature.metaValueExists(meta_value) && !feature.getMetaValue(meta_value).isEmpty()) {
-      cast = static_cast<float>(feature.getMetaValue(meta_value));
+      cast = static_cast<std::string>(subordinate.getMetaValue(meta_value)); // Prioritize the subordinate over the feature
     } else if (subordinate.metaValueExists(meta_value) && !subordinate.getMetaValue(meta_value).isEmpty()) {
       cast = static_cast<float>(subordinate.getMetaValue(meta_value));
+    } else if (feature.metaValueExists(meta_value) && !feature.getMetaValue(meta_value).isEmpty()) {
+      cast = static_cast<float>(feature.getMetaValue(meta_value));
     } else {
       LOGV << "meta_value not found: " << meta_value;
       cast = "";
