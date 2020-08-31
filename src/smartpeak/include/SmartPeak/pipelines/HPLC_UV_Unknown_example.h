@@ -25,7 +25,7 @@ void example_HPLC_UV_Unknowns(
     std::shared_ptr<RawDataProcessor>(new MapChromatograms()),
     std::shared_ptr<RawDataProcessor>(new ExtractChromatogramWindows()),
     std::shared_ptr<RawDataProcessor>(new ZeroChromatogramBaseline()),
-    std::shared_ptr<RawDataProcessor>(new PickFeatures()),
+    std::shared_ptr<RawDataProcessor>(new PickMRMFeatures()),
     std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
     std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
@@ -42,7 +42,9 @@ void example_HPLC_UV_Unknowns(
       dir_I + "/features/",
       dir_I + "/features/",
       injection.getMetaData().getSampleName(),
-      key
+      key,
+      injection.getMetaData().getSampleGroupName(),
+      injection.getMetaData().getSampleGroupName()
     );
   }
 

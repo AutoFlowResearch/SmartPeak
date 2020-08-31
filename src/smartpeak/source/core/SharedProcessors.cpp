@@ -2,6 +2,7 @@
 
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/core/SampleGroupProcessor.h>
 #include <map>
 #include <memory>
 
@@ -11,7 +12,7 @@ namespace SmartPeak {
   const std::map<std::string, std::shared_ptr<RawDataProcessor>> n_to_raw_data_method_ {
     {"LOAD_RAW_DATA", std::make_shared<LoadRawData>()},
     {"LOAD_FEATURES", std::make_shared<LoadFeatures>()},
-    {"PICK_FEATURES", std::make_shared<PickFeatures>()},
+    {"PICK_MRM_FEATURES", std::make_shared<PickMRMFeatures>()},
     {"FILTER_FEATURES", std::make_shared<FilterFeatures>()},
     {"SELECT_FEATURES", std::make_shared<SelectFeatures>()},
     {"VALIDATE_FEATURES", std::make_shared<ValidateFeatures>()},
@@ -25,7 +26,15 @@ namespace SmartPeak {
     {"FILTER_FEATURES_RSDS", std::make_shared<FilterFeaturesRSDs>()},
     {"CHECK_FEATURES_RSDS", std::make_shared<CheckFeaturesRSDs>()},
     {"FILTER_FEATURES_BACKGROUND_INTERFERENCES", std::make_shared<FilterFeaturesBackgroundInterferences>()},
-    {"FILTER_FEATURES_BACKGROUND_INTERFERENCES", std::make_shared<CheckFeaturesBackgroundInterferences>()}
+    {"FILTER_FEATURES_BACKGROUND_INTERFERENCES", std::make_shared<CheckFeaturesBackgroundInterferences>()},
+    {"EXTRACT_SPECTRA_WINDOWS", std::make_shared<ExtractSpectraWindows>()},
+    {"MERGE_SPECTRA", std::make_shared<MergeSpectra>()},
+    {"PICK_MS1_FEATURES", std::make_shared<PickMS1Features>()},
+    {"SEARCH_ACCURATE_MASS", std::make_shared<SearchAccurateMass>()},
+    {"LOAD_ANNOTATIONS", std::make_shared<LoadAnnotations>()},
+    {"STORE_ANNOTATIONS", std::make_shared<StoreAnnotations>()},
+    {"CLEAR_DATA", std::make_shared<ClearData>()},
+    {"STORE_RAW_DATA", std::make_shared<StoreRawData>()}
   };
   const std::map<std::string, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
     {"CALCULATE_CALIBRATION", std::make_shared<CalculateCalibration>()},
@@ -49,5 +58,10 @@ namespace SmartPeak {
     {"LOAD_FEATURE_BACKGROUND_FILTERS", std::make_shared<LoadFeatureBackgroundFilters>()},
     {"STORE_FEATURE_BACKGROUND_QCS", std::make_shared<StoreFeatureBackgroundQCs>()},
     {"LOAD_FEATURE_BACKGROUND_QCS", std::make_shared<LoadFeatureBackgroundQCs>()}
+  };
+  const std::map<std::string, std::shared_ptr<SampleGroupProcessor>> n_to_sample_group_method_ {
+    {"MERGE_INJECTIONS", std::make_shared<MergeInjections>()},
+    {"LOAD_FEATURES_SAMPLE_GROUP", std::make_shared<LoadFeaturesSampleGroup>()},
+    {"STORE_FEATURES_SAMPLE_GROUP", std::make_shared<StoreFeaturesSampleGroup>()}
   };
 }

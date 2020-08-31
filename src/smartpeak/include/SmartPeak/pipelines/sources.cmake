@@ -3,6 +3,7 @@ set(directory include/SmartPeak/pipelines)
 
 ### list all header files of the directory here
 set(sources_list_h
+	FIAMS_FullScan_Unknown_example.h
 	GCMS_SIM_Unknown_example.h
 	HPLC_UV_Standards_example.h
 	HPLC_UV_Unknown_example.h

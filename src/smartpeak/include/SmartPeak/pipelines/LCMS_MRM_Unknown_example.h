@@ -23,7 +23,7 @@ void example_LCMS_MRM_Unknowns(
   const std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
     std::shared_ptr<RawDataProcessor>(new LoadRawData()),
     std::shared_ptr<RawDataProcessor>(new MapChromatograms()),
-    std::shared_ptr<RawDataProcessor>(new PickFeatures()),
+    std::shared_ptr<RawDataProcessor>(new PickMRMFeatures()),
     std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
@@ -40,7 +40,9 @@ void example_LCMS_MRM_Unknowns(
       dir_I + "/features/",
       dir_I + "/features/",
       injection.getMetaData().getSampleName(),
-      key
+      key,
+      injection.getMetaData().getSampleGroupName(),
+      injection.getMetaData().getSampleGroupName()
     );
   }
 

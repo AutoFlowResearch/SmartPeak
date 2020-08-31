@@ -14,18 +14,25 @@ environment:
 init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - PATH=C:\Python37-x64;C:\Python37-x64\Scripts;C:\projects\clcache\install\bin;C:\projects\OpenMS-build\bin\Debug;C:\Qt\5.12\msvc2017_64\bin;C:\projects\deps\SDL2-2.0.9\lib\x64;%PATH%
+  - PATH=C:\Python37-x64;C:\Python37-x64\Scripts;C:\projects\clcache\install\bin;C:\projects\OpenMS-build\bin\Debug;C:\Qt\5.12\msvc2017_64\bin;C:\projects\deps\SDL2-2.0.9\lib\x64;C:\Users\appveyor\AppData\Roaming\Python\Python37\Scripts;%PATH%
   - set PYTHONPATH=C:\projects\clcache\install
+  - pip3 install --user sphinx exhale
   - cmake --version
   - pip3 --version
+  - ps: >- 
+      $doxygen_url = 'https://netix.dl.sourceforge.net/project/doxygen/rel-1.8.18/doxygen-1.8.18.windows.x64.bin.zip';
+      $tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'tmp$', 'zip' } –PassThru;
+      Invoke-WebRequest $doxygen_url -OutFile $tmp;
+      7z x $tmp -o'C:\bin\doxygen'; ls C:\bin\doxygen
+  
 
 platform: x64
 configuration: Debug
 
 cache:
   #- C:\projects\deps
-  - C:\projects\OpenMS
-  - C:\projects\OpenMS-build
+  #- C:\projects\OpenMS
+  #- C:\projects\OpenMS-build
   - C:\projects\clcache
 
 # artifacts can only be found in the repo dir (i.e. C:\projects\SmartPeak2) or subdirs

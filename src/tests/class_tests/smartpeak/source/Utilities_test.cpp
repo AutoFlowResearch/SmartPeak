@@ -388,12 +388,12 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
   const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname);
 
   // number of items in the pathname, taking .gitignore into account
-  BOOST_CHECK_EQUAL(c[0].size(), 39);
-  BOOST_CHECK_EQUAL(c[1].size(), 39);
-  BOOST_CHECK_EQUAL(c[2].size(), 39);
-  BOOST_CHECK_EQUAL(c[3].size(), 39);
+  BOOST_CHECK_EQUAL(c[0].size(), 44);
+  BOOST_CHECK_EQUAL(c[1].size(), 44);
+  BOOST_CHECK_EQUAL(c[2].size(), 44);
+  BOOST_CHECK_EQUAL(c[3].size(), 44);
 
-  BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x.featureXML");
+  BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_1900-01-01_000000.featureXML");
  #ifdef _WIN32
    // NOTE: depending on the build machine...
    //BOOST_CHECK_EQUAL(c[1][0], "774620"); // file size
@@ -402,9 +402,9 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
  #endif
   BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
 
-  BOOST_CHECK_EQUAL(c[0][38], "workflow_csv_files");
-  BOOST_CHECK_EQUAL(c[1][38], "22"); // number of items within the folder
-  BOOST_CHECK_EQUAL(c[2][38], "Directory");
+  BOOST_CHECK_EQUAL(c[0][43], "workflow_csv_files");
+  BOOST_CHECK_EQUAL(c[1][43], "22"); // number of items within the folder
+  BOOST_CHECK_EQUAL(c[2][43], "Directory");
 }
 
 BOOST_AUTO_TEST_CASE(getParentPathname)
@@ -472,7 +472,7 @@ BOOST_AUTO_TEST_CASE(directorySize)
 {
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto& f = Utilities::directorySize;
-  BOOST_CHECK_EQUAL(f(path), 39);
+  BOOST_CHECK_EQUAL(f(path), 44);
   BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 22);
   BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
 }

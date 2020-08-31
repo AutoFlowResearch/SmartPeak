@@ -37,6 +37,8 @@ namespace SmartPeak
       cast = lowercase_value == "true";
     } else if (lowercase_type == "string") {
       cast = value;
+    } else if (lowercase_type == "list") {
+      parseString(value, cast);
     } else {
       LOGW << "Type not supported: " << type;
       cast.setTagAndData(CastValue::Type::UNKNOWN, value);
@@ -522,7 +524,7 @@ namespace SmartPeak
       }
 
       const std::string filename(entry.path().filename().string());
-      if (filename == "." || filename == "..") {
+      if (filename == "." || filename == ".." || (*(&filename.at(0))) == '.') {
         continue;
       }
 
@@ -595,7 +597,7 @@ namespace SmartPeak
 
     for ( ; it != it_end; it++) {
       const fs::path& filename { it->path().filename() };
-      if (filename == fs::path(".") || filename == fs::path("..")) {
+      if (filename == fs::path(".") || filename == fs::path("..") || filename.generic_string().at(0)  == '.') {
         continue;
       }
       ++n;

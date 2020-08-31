@@ -95,6 +95,10 @@ BOOST_AUTO_TEST_CASE(clear)
   m.inj_volume_units = "8";
   m.batch_name = "9";
   m.acquisition_date_and_time = { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
+  m.dilution_factor = 10;
+  m.scan_polarity = "negative";
+  m.scan_mass_high = 1000;
+  m.scan_mass_low = 100;
 
   m.clear();
 
@@ -108,6 +112,10 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK_EQUAL(m.inj_volume_units, "");
   BOOST_CHECK_EQUAL(m.batch_name, "");
   BOOST_CHECK_EQUAL(m.getAcquisitionDateAndTimeAsString(), "1900-01-01_000000");
+  BOOST_CHECK_CLOSE(m.dilution_factor, 1.0, 1e-3);
+  BOOST_CHECK_EQUAL(m.scan_polarity, "Unknown");
+  BOOST_CHECK_CLOSE(m.scan_mass_high, 1e12, 1e-3);
+  BOOST_CHECK_CLOSE(m.scan_mass_low, 0.0, 1e-3);
 }
 
 BOOST_AUTO_TEST_CASE(SampleTypeToString)

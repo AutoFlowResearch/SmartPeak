@@ -25,7 +25,7 @@ namespace SmartPeak
   };
 
   namespace ApplicationProcessors {
-    void processCommands(ApplicationHandler& application_handler, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names);
+    void processCommands(ApplicationHandler& application_handler, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names);
   }
 
   struct CreateCommand : ApplicationProcessor {
