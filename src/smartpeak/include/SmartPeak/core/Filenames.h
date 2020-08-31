@@ -79,13 +79,6 @@ public:
       Filenames& filenames
     );
 
-    static void updateDefaultDynamicFilenames(
-      const std::string& mzml_input_path,
-      const std::string& features_input_path,
-      const std::string& output_path,
-      Filenames& filenames
-    );
-
     void clear();
   };
 }
