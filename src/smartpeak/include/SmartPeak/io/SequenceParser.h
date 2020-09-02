@@ -65,6 +65,7 @@ public:
       const std::vector<std::string>& meta_data,
       const std::set<SampleType>& sample_types,
       const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_group_names,
       const std::set<std::string>& component_names
     );
 
@@ -111,6 +112,7 @@ public:
       const std::vector<std::string>& meta_data,
       const std::set<SampleType>& sample_types,
       const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_group_names,
       const std::set<std::string>& component_names
     );
 

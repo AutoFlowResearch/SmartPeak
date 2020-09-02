@@ -6,6 +6,7 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/core/SampleGroupProcessor.h>
 #include <map>
 #include <memory> // shared_ptr
 #include <set>
@@ -122,6 +123,19 @@ namespace SmartPeak
 
     ProcessSequenceSegments() = default;
     ProcessSequenceSegments(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    void process() const override;
+  };
+
+  /**
+    Apply a processing workflow to all injections in a sample group
+  */
+  struct ProcessSampleGroups : SequenceProcessor {
+    std::map<std::string, Filenames>                       filenames;                     /// Mapping from sample groups names to pathnames
+    std::set<std::string>                                  sample_group_names;            /// sample groups to select from the sequence (all if empty)
+    std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods_I; /// Events to process
+
+    ProcessSampleGroups() = default;
+    ProcessSampleGroups(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() const override;
   };
 }

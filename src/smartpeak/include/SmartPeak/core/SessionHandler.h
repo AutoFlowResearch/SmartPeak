@@ -20,8 +20,10 @@ namespace SmartPeak
     void setInjectionExplorer(); ///< set the InjectionExplorer-speciic data
     void setTransitionExplorer(); ///< set the TransitionExplorer-speciic data
     void setFeatureExplorer(); ///< set the FeatureExplorer-speciic data
+    void setSpectrumExplorer(); ///< set the SpectrumExplorer-speciic data
     void setSequenceTable(const SequenceHandler& sequence_handler); ///< set the SequenceTable-speciic data
-    void setTransitionsTable(const SequenceHandler& sequence_handler); ///< set the SequenceTable-speciic data
+    void setTransitionsTable(const SequenceHandler& sequence_handler); ///< set the TransitionsTable-speciic data
+    void setSpectrumTable(const SequenceHandler& sequence_handler); ///< set the SpectrumTable-speciic data
     void setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands); ///< set the WorkflowTable-speciic data
     void setParametersTable(const SequenceHandler& sequence_handler); ///< set the ParametersTable-speciic data
     void setQuantMethodTable(const SequenceHandler& sequence_handler); ///< set the QuantMethodTable-speciic data
@@ -54,6 +56,14 @@ namespace SmartPeak
     @returns true if all points were added and false if points were omitted due to performance
     */
     bool setChromatogramScatterPlot(const SequenceHandler& sequence_handler);
+    /*
+    @brief Sets the spectrum data
+
+    @param[in] sequence_handler
+
+    @returns true if all points were added and false if points were omitted due to performance
+    */
+    bool setSpectrumScatterPlot(const SequenceHandler& sequence_handler);
     void setFeatureLinePlot();
     void setFeatureHeatMap();
     /*
@@ -69,9 +79,12 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 2> getInjectionExplorerBody();
     Eigen::Tensor<std::string, 1> getTransitionExplorerHeader();
     Eigen::Tensor<std::string, 2> getTransitionExplorerBody();
+    Eigen::Tensor<std::string, 1> getSpectrumExplorerHeader();
+    Eigen::Tensor<std::string, 2> getSpectrumExplorerBody();
 
     Eigen::Tensor<bool, 1> getSequenceTableFilters();
     Eigen::Tensor<bool, 1> getTransitionsTableFilters();
+    Eigen::Tensor<bool, 1> getSpectrumTableFilters();
     Eigen::Tensor<bool, 1> getQuantMethodsTableFilters();
     Eigen::Tensor<bool, 1> getComponentFiltersTableFilters();
     Eigen::Tensor<bool, 1> getComponentQCsTableFilters();
@@ -80,13 +93,16 @@ namespace SmartPeak
 
     std::set<std::string> getSelectInjectionNamesWorkflow(const SequenceHandler& sequence_handler);
     std::set<std::string> getSelectSequenceSegmentNamesWorkflow(const SequenceHandler& sequence_handler);
+    std::set<std::string> getSelectSampleGroupNamesWorkflow(const SequenceHandler& sequence_handler);
     Eigen::Tensor<std::string, 1> getSelectSampleNamesTable(); // Should be injection name?
     Eigen::Tensor<std::string, 1> getSelectSampleNamesPlot(); // Should be injection name?
     Eigen::Tensor<std::string, 1> getSelectTransitionsTable();
     Eigen::Tensor<std::string, 1> getSelectTransitionGroupsTable();
     Eigen::Tensor<std::string, 1> getSelectTransitionsPlot();
+    Eigen::Tensor<std::string, 1> getSelectTransitionGroupsPlot();
     Eigen::Tensor<std::string, 1> getSelectFeatureMetaValuesTable();
     Eigen::Tensor<std::string, 1> getSelectFeatureMetaValuesPlot();
+    Eigen::Tensor<std::string, 1> getSelectSpectrumPlot();
 
     int getNSelectedSampleNamesTable();
     int getNSelectedSampleNamesPlot();
@@ -103,6 +119,10 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 1> transition_explorer_checkbox_headers;
     Eigen::Tensor<bool, 2> transition_explorer_checkbox_body;
     Eigen::Tensor<bool, 1> transition_explorer_checked_rows;
+    // data for the spectrum explorer
+    Eigen::Tensor<std::string, 1> spectrum_explorer_checkbox_headers;
+    Eigen::Tensor<bool, 2> spectrum_explorer_checkbox_body;
+    Eigen::Tensor<bool, 1> spectrum_explorer_checked_rows;
     // data for the feature explorer
     Eigen::Tensor<std::string, 1> feature_explorer_headers; // feature_metavalue_name
     Eigen::Tensor<std::string, 1> feature_explorer_checkbox_headers;
@@ -115,6 +135,9 @@ namespace SmartPeak
     // data for the transitions table
     Eigen::Tensor<std::string, 1> transitions_table_headers;
     Eigen::Tensor<std::string, 2> transitions_table_body;
+    // data for the spectrum table
+    Eigen::Tensor<std::string, 1> spectrum_table_headers;
+    Eigen::Tensor<std::string, 2> spectrum_table_body;
     // data for the workflow table
     Eigen::Tensor<std::string, 1> workflow_table_headers;
     Eigen::Tensor<std::string, 2> workflow_table_body;
@@ -153,6 +176,15 @@ namespace SmartPeak
     std::string chrom_x_axis_title;
     std::string chrom_y_axis_title;
     float chrom_time_min, chrom_time_max, chrom_intensity_min, chrom_intensity_max;
+    std::pair<float, float> chrom_time_range = std::make_pair(0, 1800);
+    // data for the spectrum scatter plot
+    std::vector<std::vector<float>> spec_mz_hull_data, spec_intensity_hull_data;
+    std::vector<std::vector<float>> spec_mz_raw_data, spec_intensity_raw_data;
+    std::vector<std::string> spec_series_hull_names, spec_series_raw_names;
+    std::string spec_x_axis_title;
+    std::string spec_y_axis_title;
+    float spec_mz_min, spec_mz_max, spec_intensity_min, spec_intensity_max;
+    std::pair<float, float> spec_mz_range = std::make_pair(0, 2000);
     // data for the feature line plot
     Eigen::Tensor<float, 2> feat_sample_data, feat_value_data;
     Eigen::Tensor<std::string, 1> feat_line_series_names;
@@ -172,6 +204,9 @@ namespace SmartPeak
     std::string calibrators_y_axis_title;
     float calibrators_conc_min , calibrators_conc_max, calibrators_feature_min, calibrators_feature_max;
   private:
+    std::set<std::string> chrom_series_hull_names_;
+    std::set<std::string> spec_series_hull_names_;
     int feature_table_unique_samples_transitions_ = 0; // used to decide when to update the feature table data
+    int feature_matrix_unique_transitions_ = 0; // used to decide when to update the feature matrix data
   };
 }

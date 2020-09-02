@@ -66,6 +66,9 @@ public:
     std::string operator_name;
     std::string proc_method_name;
     std::tm acquisition_date_and_time = { 0, 0, 0, 1, 0, 0, 0, 0, 0 }; // Need to start at Day 1 of the month
+    std::string scan_polarity = "Unknown";
+    float scan_mass_low = 0.0; // in Da
+    float scan_mass_high = 1e12; // in Da
   };
 
 }

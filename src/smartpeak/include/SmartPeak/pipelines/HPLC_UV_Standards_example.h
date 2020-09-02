@@ -25,7 +25,7 @@ void example_HPLC_UV_Standards(
     std::shared_ptr<RawDataProcessor>(new MapChromatograms()),
     std::shared_ptr<RawDataProcessor>(new ExtractChromatogramWindows()),
     std::shared_ptr<RawDataProcessor>(new ZeroChromatogramBaseline()),
-    std::shared_ptr<RawDataProcessor>(new PickFeatures()),
+    std::shared_ptr<RawDataProcessor>(new PickMRMFeatures()),
     //std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
     std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
@@ -40,7 +40,9 @@ void example_HPLC_UV_Standards(
       dir_I + "/features/",
       dir_I + "/features/",
       injection.getMetaData().getSampleName(),
-      key
+      key,
+      injection.getMetaData().getSampleGroupName(),
+      injection.getMetaData().getSampleGroupName()
     );
   }
 
@@ -62,7 +64,8 @@ void example_HPLC_UV_Standards(
       dir_I + "/features/",
       dir_I + "/features/",
       key,
-      key
+      key,
+      "",""
     );
   }
 
@@ -85,7 +88,9 @@ void example_HPLC_UV_Standards(
       dir_I + "/features/",
       dir_I + "/features/",
       injection.getMetaData().getSampleName(),
-      key
+      key,
+      injection.getMetaData().getSampleGroupName(),
+      injection.getMetaData().getSampleGroupName()
     );
   }
 

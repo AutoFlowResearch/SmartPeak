@@ -25,12 +25,12 @@ BOOST_AUTO_TEST_CASE(buildcommandsfromids)
   buildCommandsFromNames.process();
   BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.size(), 0);
 
-  buildCommandsFromNames.names_ = std::string("LOAD_RAW_DATA LOAD_FEATURES PICK_FEATURES");
+  buildCommandsFromNames.names_ = std::string("LOAD_RAW_DATA LOAD_FEATURES PICK_MRM_FEATURES");
   buildCommandsFromNames.process();
   BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.size(), 3);
   BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(0).getName(), "LOAD_RAW_DATA");
   BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(1).getName(), "LOAD_FEATURES");
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(2).getName(), "PICK_FEATURES");
+  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(2).getName(), "PICK_MRM_FEATURES");
 
   buildCommandsFromNames.names_ = std::string("LOAD_RAW_DATA PLOT_FEATURES LOAD_FEATURES"); // no plotting processor yet
   buildCommandsFromNames.process();

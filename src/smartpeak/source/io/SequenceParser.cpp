@@ -56,14 +56,17 @@ namespace SmartPeak
     const std::string s_inj_volume {"inj_volume"};
     const std::string s_inj_volume_units {"inj_volume_units"};
     const std::string s_batch_name {"batch_name"};
+    const std::string s_scan_polarity{ "scan_polarity" };
+    const std::string s_scan_mass_low{ "scan_mass_low" };
+    const std::string s_scan_mass_high{ "scan_mass_high" };
 
     const std::string s_comma {","};
     const std::string s_semicolon {";"};
     const std::string s_tab {"\t"};
 
-    io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in_comma(pathname);
-    io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<';'>> in_semicolon(pathname);
-    io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<'\t'>> in_tab(pathname);
+    io::CSVReader<20, io::trim_chars<>, io::no_quote_escape<','>> in_comma(pathname);
+    io::CSVReader<20, io::trim_chars<>, io::no_quote_escape<';'>> in_semicolon(pathname);
+    io::CSVReader<20, io::trim_chars<>, io::no_quote_escape<'\t'>> in_tab(pathname);
 
     if (delimiter == s_comma) {
       in_comma.read_header(
@@ -84,7 +87,10 @@ namespace SmartPeak
         s_acquisition_date_and_time,
         s_inj_volume,
         s_inj_volume_units,
-        s_batch_name
+        s_batch_name,
+        s_scan_polarity,
+        s_scan_mass_low,
+        s_scan_mass_high
       );
     } else if (delimiter == s_semicolon) {
       in_semicolon.read_header(
@@ -105,7 +111,10 @@ namespace SmartPeak
         s_acquisition_date_and_time,
         s_inj_volume,
         s_inj_volume_units,
-        s_batch_name
+        s_batch_name,
+        s_scan_polarity,
+        s_scan_mass_low,
+        s_scan_mass_high
       );
     } else if (delimiter == s_tab) {
       in_tab.read_header(
@@ -126,7 +135,10 @@ namespace SmartPeak
         s_acquisition_date_and_time,
         s_inj_volume,
         s_inj_volume_units,
-        s_batch_name
+        s_batch_name,
+        s_scan_polarity,
+        s_scan_mass_low,
+        s_scan_mass_high
       );
     } else {
       throw std::invalid_argument("Delimiter \"" + delimiter + "\" is not supported.");
@@ -142,6 +154,8 @@ namespace SmartPeak
       std::string t_inj_number;
       std::string t_dilution_factor;
       std::string t_inj_volume;
+      std::string t_scan_mass_low;
+      std::string t_scan_mass_high;
       bool is_valid = false;
 
       if (delimiter == s_comma) {
@@ -149,19 +163,22 @@ namespace SmartPeak
           t.sequence_segment_name, t_sample_type, t.original_filename,
           t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
           t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t_inj_volume, t.inj_volume_units, t.batch_name);
+          t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
+          t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
       } else if (delimiter == s_semicolon) {
         is_valid = in_semicolon.read_row(t.sample_name, t.sample_group_name,
           t.sequence_segment_name, t_sample_type, t.original_filename,
           t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
           t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t_inj_volume, t.inj_volume_units, t.batch_name);
+          t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
+          t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
       } else if (delimiter == s_tab) {
         is_valid = in_tab.read_row(t.sample_name, t.sample_group_name,
           t.sequence_segment_name, t_sample_type, t.original_filename,
           t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
           t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t_inj_volume, t.inj_volume_units, t.batch_name);
+          t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
+          t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
       }
 
       if (!is_valid)
@@ -177,11 +194,18 @@ namespace SmartPeak
         continue;
       }
 
+      if (!(t.scan_polarity == "positive" || t.scan_polarity == "negative" || t.scan_polarity == "")) {
+        LOGW << "Warning: Value '" << t.scan_polarity << "' is not valid for column '" << s_scan_polarity << "'. Only 'positive' and 'negative' are allowed.  Skipping entire row";
+        continue;
+      }
+
       validateAndConvert(t_rack_number,     t.rack_number);
       validateAndConvert(t_plate_number,    t.plate_number);
       validateAndConvert(t_pos_number,      t.pos_number);
       validateAndConvert(t_dilution_factor, t.dilution_factor);
       validateAndConvert(t_inj_volume,      t.inj_volume);
+      validateAndConvert(t_scan_mass_low,   t.scan_mass_low);
+      validateAndConvert(t_scan_mass_high,  t.scan_mass_high);
 
       if (stringToSampleType.count(t_sample_type)) {
         t.sample_type = stringToSampleType.at(t_sample_type);
@@ -211,12 +235,13 @@ namespace SmartPeak
     const std::vector<std::string>& meta_data,
     const std::set<SampleType>& sample_types,
     const std::set<std::string>& sample_names,
+    const std::set<std::string>& component_group_names,
     const std::set<std::string>& component_names) {
     std::vector<std::string> headers = {
       "sample_name", "sample_type", "component_group_name", "component_name", "batch_name",
       "rack_number", "plate_number", "pos_number", "inj_number", "dilution_factor", "inj_volume",
       "inj_volume_units", "operator_name", "acq_method_name", "proc_method_name",
-      "original_filename", "acquisition_date_and_time", "injection_name", "used_"
+      "original_filename", "acquisition_date_and_time", "scan_polarity", "scan_mass_low", "scan_mass_high", "injection_name", "used_"
     };
     headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
     for (size_t i = 0; i < headers.size() - 1; ++i) { // checking headers are unique, stable (maintaining the same positions)
@@ -246,6 +271,56 @@ namespace SmartPeak
           continue;
         }
         const std::string component_group_name = feature.getMetaValue(s_PeptideRef);
+        if (component_group_names.size() > 0 && component_group_names.count(component_group_name) == 0)
+          continue;
+
+        // Case #1: Features only
+        if (feature.getSubordinates().size() <= 0) {
+          std::vector<std::string> row;
+          row.push_back(mdh.getSampleName());
+          row.push_back(sampleTypeToString.at(mdh.getSampleType()));
+          row.push_back(component_group_name);
+          row.push_back("");
+          row.push_back(mdh.batch_name);
+          row.push_back(std::to_string(mdh.rack_number));
+          row.push_back(std::to_string(mdh.plate_number));
+          row.push_back(std::to_string(mdh.pos_number));
+          row.push_back(std::to_string(mdh.inj_number));
+          row.push_back(std::to_string(mdh.dilution_factor));
+          row.push_back(std::to_string(mdh.inj_volume));
+          row.push_back(mdh.inj_volume_units);
+          row.push_back(mdh.operator_name);
+          row.push_back(mdh.acq_method_name);
+          row.push_back(mdh.proc_method_name);
+          row.push_back(mdh.original_filename);
+          row.push_back(mdh.getAcquisitionDateAndTimeAsString());
+          row.push_back(mdh.scan_polarity);
+          row.push_back(std::to_string(mdh.scan_mass_low));
+          row.push_back(std::to_string(mdh.scan_mass_high));
+          row.push_back(mdh.getInjectionName());
+          row.push_back(feature.metaValueExists("used_") ? feature.getMetaValue("used_").toString() : "");
+          for (const std::string& meta_value_name : meta_data) {
+            if (feature.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_group_message") {
+              OpenMS::StringList messages = feature.getMetaValue(meta_value_name).toStringList();
+              row.push_back(
+                Utilities::join(messages.begin(), messages.end(), delimiter)
+              );
+            }
+            else {
+              CastValue datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
+              if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
+                // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
+                row.push_back(std::to_string(datum.f_));
+              }
+              else {
+                row.push_back("");
+              }
+            }
+          }
+          rows_out.push_back(row);
+        }
+
+        // Case #2: Features and subordinates
         for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
           std::vector<std::string> row;
           row.push_back(mdh.getSampleName());
@@ -274,6 +349,9 @@ namespace SmartPeak
           row.push_back(mdh.proc_method_name);
           row.push_back(mdh.original_filename);
           row.push_back(mdh.getAcquisitionDateAndTimeAsString());
+          row.push_back(mdh.scan_polarity);
+          row.push_back(std::to_string(mdh.scan_mass_low));
+          row.push_back(std::to_string(mdh.scan_mass_high));
           row.push_back(mdh.getInjectionName());
           row.push_back(subordinate.metaValueExists("used_") ? subordinate.getMetaValue("used_").toString() : "");
           for (const std::string& meta_value_name : meta_data) {
@@ -321,7 +399,7 @@ namespace SmartPeak
     for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
     }
-    makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>());
+    makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
     CSVWriter writer(filename, ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
@@ -347,6 +425,7 @@ namespace SmartPeak
     const std::vector<std::string>& meta_data,
     const std::set<SampleType>& sample_types,
     const std::set<std::string>& sample_names,
+    const std::set<std::string>& component_group_names,
     const std::set<std::string>& component_names
   )
   {
@@ -365,7 +444,37 @@ namespace SmartPeak
       data_dict.insert({ sample_name, std::map<Row,float,Row_less>() });
       for (const std::string& meta_value_name : meta_data) {
         // feature_map_history is not needed here as we are only interested in the current/"used" features
-        for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMap()) {
+        for (const OpenMS::Feature& feature : sampleHandler.getRawData().getFeatureMapHistory()) {
+          if (component_group_names.size() && component_group_names.count(feature.getMetaValue(s_PeptideRef).toString()) == 0)
+            continue;
+          if (feature.metaValueExists("used_")) {
+            const std::string used = feature.getMetaValue("used_").toString();
+            if (used.empty() || used[0] == 'f' || used[0] == 'F')
+              continue;
+          }
+
+          // Case #1 Features only
+          if (feature.getSubordinates().size() <= 0) {
+            const Row row_tuple_name(
+              feature.getMetaValue(s_PeptideRef).toString(),
+              "",
+              meta_value_name
+            );
+            CastValue datum;
+            if (meta_value_name == "accuracy" || meta_value_name == "n_features") {
+              datum = validation_metrics.at(meta_value_name);
+            }
+            else {
+              datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
+            }
+            if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0 && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
+              data_dict[sample_name].emplace(row_tuple_name, datum.f_);
+              columns.insert(sample_name);
+              rows.insert(row_tuple_name);
+            }
+          }
+
+          // Case #2 Features and subordinates
           for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
             if (component_names.size() && component_names.count(subordinate.getMetaValue(s_native_id).toString()) == 0) 
               continue;
@@ -453,7 +562,7 @@ namespace SmartPeak
     for (const FeatureMetadata& m : meta_data) {
       meta_data_strings.push_back(metadataToString.at(m));
     }
-    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>());
+    makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
     std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
     for (int i=0;i<columns.size();++i) headers.push_back(columns(i));

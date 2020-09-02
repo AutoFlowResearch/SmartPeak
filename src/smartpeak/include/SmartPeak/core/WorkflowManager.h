@@ -12,8 +12,9 @@ namespace SmartPeak {
       @param[in,out] The application_handler that gets copied and then updated at the end of the workflow run
       @param[in] injection_names Injection names to use for Sequence Processing
       @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
+      @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
     */
-    void addWorkflow(ApplicationHandler& source_state, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names);
+    void addWorkflow(ApplicationHandler& source_state, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names);
 
     /**
       If this returns false, new workflows can't run and the following menu items
@@ -36,8 +37,9 @@ namespace SmartPeak {
       @param[out] source_app_handler The modified application_handler is copied back here
       @param[in] injection_names Injection names to use for Sequence Processing
       @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
+      @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
     */
-    static void run_and_join(ApplicationHandler& application_handler, bool& done, ApplicationHandler& source_app_handler, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names);
+    static void run_and_join(ApplicationHandler& application_handler, bool& done, ApplicationHandler& source_app_handler, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names);
 
     ApplicationHandler application_handler_; ///< The workflow is run on this copy
     bool done_ = true;

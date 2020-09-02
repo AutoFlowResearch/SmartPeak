@@ -8,6 +8,7 @@
 #include <OpenMS/ANALYSIS/TARGETED/TargetedExperiment.h>
 #include <OpenMS/KERNEL/FeatureMap.h>
 #include <OpenMS/KERNEL/MSExperiment.h>
+#include <OpenMS/FORMAT/MzTab.h>
 
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/CastValue.h>
@@ -131,9 +132,15 @@ public:
     std::map<std::string, float>& getValidationMetrics();
     const std::map<std::string, float>& getValidationMetrics() const;
 
-    void clear();
+    void setMzTab(const OpenMS::MzTab& mz_tab);
+    OpenMS::MzTab& getMzTab();
+    const OpenMS::MzTab& getMzTab() const;
 
-    /** Update the Feature map history based on the
+    void clear();
+    void clearNonSharedData();
+
+    /**
+    @brief Update the Feature map history based on the
       filtered, selected, or new features in the current featureMap.
 
       All new features are initialized as "used_" = True with the "modified_" attribute set to the current time-stamp.
@@ -142,6 +149,12 @@ public:
       ASSUMPTIONS: the unique ID attribute is set within OpenMS
     */
     void updateFeatureMapHistory();
+
+    /** 
+    @brief Make the feature map from the feature map history by
+      filtering out all features/subordinates where "used_" = False.
+    */
+    void makeFeatureMapFromHistory();
 
 private:
     // input
@@ -155,6 +168,7 @@ private:
     OpenMS::FeatureMap feature_map_history_; ///< A record of all changes that have occured to the features in the experiment
     std::shared_ptr<MetaDataHandler> meta_data_;  ///< sample meta data; shared between the injection handler and the raw data handler
     std::map<std::string, float> validation_metrics_;
+    OpenMS::MzTab mz_tab_;
 
     // input (reused between RawDataHandlers)
     std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>> parameters_ = nullptr;  ///< algorithm parameters; shared between all raw data handlers in the sequence

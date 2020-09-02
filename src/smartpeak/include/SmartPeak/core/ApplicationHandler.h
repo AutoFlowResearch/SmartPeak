@@ -4,6 +4,7 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <SmartPeak/core/SampleGroupProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <map>
 #include <string>
@@ -17,6 +18,7 @@ namespace SmartPeak
       enum CommandType {
         RawDataMethod,
         SequenceSegmentMethod,
+        SampleGroupMethod,
       } type;
 
       void setMethod(const std::shared_ptr<RawDataProcessor> method)
@@ -31,18 +33,35 @@ namespace SmartPeak
         seq_seg_method = method;
       }
 
+      void setMethod(const std::shared_ptr<SampleGroupProcessor> method)
+      {
+        type = SampleGroupMethod;
+        sample_group_method = method;
+      }
+
       int getID() const
       {
-        return type == RawDataMethod ? raw_data_method->getID() : seq_seg_method->getID();
+        if (type == RawDataMethod)
+          return raw_data_method->getID();
+        else if (type == SequenceSegmentMethod)
+          return seq_seg_method->getID();
+        else
+          return sample_group_method->getID();
       }
 
       std::string getName() const
       {
-        return type == RawDataMethod ? raw_data_method->getName() : seq_seg_method->getName();
+        if (type == RawDataMethod)
+          return raw_data_method->getName();
+        else if (type == SequenceSegmentMethod)
+          return seq_seg_method->getName();
+        else
+          return sample_group_method->getName();
       }
 
       std::shared_ptr<RawDataProcessor> raw_data_method;
       std::shared_ptr<SequenceSegmentProcessor> seq_seg_method;
+      std::shared_ptr<SampleGroupProcessor> sample_group_method;
 
       std::map<std::string, Filenames> dynamic_filenames;
     };
