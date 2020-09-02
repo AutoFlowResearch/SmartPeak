@@ -150,6 +150,8 @@ jobs:
           $SDL_DIR = 'C:\lib\sdl2\SDL2-2.0.12'
           $sdl2_tmp | Remove-Item
       - run: |
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+          $ProgressPreference = "SilentlyContinue"
           cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars64.txt"
           Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
           if ($_ -match "^(.*?)=(.*)$") {
