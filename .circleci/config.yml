@@ -161,15 +161,16 @@ jobs:
           cd ~
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
           cd ~/OpenMS
-          # git submodule update --init contrib; mkdir contrib_build; cd contrib_build
-          # $url_contrib = 'https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/windows/x64/msvc-14.2/contrib_build.tar.gz'
-          $url_contrib = 'https://github.com/ahmedskhalil/openms-contrib-prebuilts/releases/download/0.0.1/contrib_build.7z'
-          $contrib_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'contrib_tmp$', '7z' } –PassThru
+          # git submodule update --init contrib
+          mkdir contrib_build; cd contrib_build
+          $url_contrib = 'https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/windows/x64/msvc-14.2/contrib_build.tar.gz'
+          # $url_contrib = 'https://github.com/ahmedskhalil/openms-contrib-prebuilts/releases/download/0.0.1/contrib_build.7z'
+          $contrib_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'contrib_tmp$', 'tar.gz' } –PassThru
           Invoke-WebRequest $url_contrib -OutFile $contrib_tmp
           7z x $contrib_tmp -o'.'
-          # 7z x $contrib_tmp.BaseName -o'.'
-          # rm  .\lib\libboost_*
-          # rm  -r .\include\boost
+          7z x $contrib_tmp.BaseName -o'.'
+          rm  .\lib\libboost_*
+          rm  -r .\include\boost
           # cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=SEQAN ~/OpenMS/contrib
           # cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=LIBSVM ~/OpenMS/contrib
           # cmake -G "Visual Studio 16 2019" -A x64 -DBUILD_TYPE=XERCESC ~/OpenMS/contrib
