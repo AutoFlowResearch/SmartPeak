@@ -72,7 +72,8 @@ jobs:
     working_directory: ~/SmartPeak2
     steps:
       - checkout
-      - run: brew install cmake qt5 sdl2 boost glpk eigen sqlite hdf5  libsvm xerces-c
+      - run: brew link --overwrite yarn
+      - run: brew install cmake qt5 sdl2 boost glpk eigen sqlite hdf5 libsvm xerces-c
       - run: |
           set +o pipefail
           brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib || true
