@@ -72,6 +72,7 @@ jobs:
     working_directory: ~/SmartPeak2
     steps:
       - checkout
+      - run: brew install boost@1.60
       - run: brew install cmake qt5 sdl2
       - run: |
           set +o pipefail
