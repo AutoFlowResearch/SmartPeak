@@ -13,6 +13,7 @@
 #include <atomic>
 #include <future>
 #include <list>
+#include <chrono>
 //#include <map>
 //#include <memory> // shared_ptr
 //#include <set>
@@ -90,7 +91,8 @@ namespace SmartPeak
     if (filenames.size() < injections.size()) {
       throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
-
+    
+    auto start = std::chrono::steady_clock::now();
     SequenceProcessorMultithread manager(
       injections,
       filenames,
@@ -98,6 +100,8 @@ namespace SmartPeak
     );
 
     manager.spawn_workers(2);
+    auto end = std::chrono::steady_clock::now();
+    std::cout << "SequenceProcessorMultithread took : " << std::chrono::duration <double, std::milli> (end - start).count() << " ms \n";
   }
 
   void ProcessSequenceSegments::process() const
@@ -153,7 +157,7 @@ namespace SmartPeak
     LOGD << "Number of workers: " << n_workers;
     std::list<std::future<void>> futures;
     LOGD << "Spawning workers...";
-    for (size_t i = 0; i < n_workers; ++i) {
+    for (size_t i = 0; i < injections_.size(); ++i) {
       futures.emplace_back(std::async(std::launch::async, &SequenceProcessorMultithread::run_injection_processing, this));
     }
     LOGD << "Waiting for workers...";
