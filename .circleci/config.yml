@@ -72,7 +72,7 @@ jobs:
     working_directory: ~/SmartPeak2
     steps:
       - checkout
-      - run: brew install cmake qt5 sdl2 boost@1.60 glpk eigen sqlite hdf5  libsvm xerces-c
+      - run: brew install cmake qt5 sdl2 boost@1.60 
       - run: |
           set +o pipefail
           brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib || true
@@ -86,7 +86,7 @@ jobs:
           curl -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
           tar -xzf contrib_build.tar.gz && rm lib/libboost_* && rm -r include/boost
           cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
-          cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost@1.60);$(brew --prefix)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/   -DSEQAN_INCLUDE_DIRS=~/OpenMS/contrib_build/include/seqan -DCOIN_INCLUDE_DIR=../contrib_build/include/ -DWM5_INCLUDE_DIR=../contrib_build/include/WildMagic/ -DWM5_Wm5Core_LIBRARY=../contrib_build/lib/libWm5Core.a -DWM5_Wm5Mathematics_LIBRARY=../contrib_build/lib/libWm5Mathematics.a -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
+          cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost@1.60);$(brew --prefix)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/   -DSEQAN_INCLUDE_DIRS=~/OpenMS/contrib_build/include/seqan -DCOIN_INCLUDE_DIR=../contrib_build/include/ -DWM5_INCLUDE_DIR=../contrib_build/include/WildMagic/ -DWM5_Wm5Core_LIBRARY=../contrib_build/lib/libWm5Core.a -DWM5_Wm5Mathematics_LIBRARY=../contrib_build/lib/libWm5Mathematics.a -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
           make -j4 OpenMS
       - run: |
           cd ~/SmartPeak2 && mkdir smartpeak2_debug_superbuild smartpeak2_debug_build
