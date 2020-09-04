@@ -75,6 +75,7 @@ jobs:
       - run: brew remove yarn
       - run: brew install boost
       - run: brew install cmake qt5 sdl2
+      - run: brew search boost
       - run: |
           set +o pipefail
           brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib || true
@@ -96,7 +97,7 @@ jobs:
           cd smartpeak2_debug_superbuild
           cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug .. && make -j4
           cd ../smartpeak2_debug_build
-          cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost)" -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+          cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
           make -j4
       - run: |
           set +o pipefail
@@ -212,6 +213,6 @@ workflows:
   version: 2.1
   build:
     jobs:
-      - build_ubuntu
+      # - build_ubuntu
       - build_macos
-      - build_windows
+      # - build_windows
