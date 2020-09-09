@@ -213,6 +213,6 @@ workflows:
   version: 2.1
   build:
     jobs:
-      # - build_ubuntu
+      - build_ubuntu
       - build_macos
-      # - build_windows
+      - build_windows
