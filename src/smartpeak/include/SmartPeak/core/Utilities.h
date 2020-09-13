@@ -8,6 +8,8 @@
 
 #include <regex>
 #include <string>
+#include <filesystem>
+#include <tuple>
 
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
@@ -227,7 +229,21 @@ public:
       const std::string& pathname,
       const bool asc = true
     );
+    
+    /**
+      @brief Retrieves information about files in a given directory
 
+      @param[in] p Given path to inspect and scan
+      @param[in] sorting Desired order of the results in the form of a tuple,
+      where the first element is "name", "extension", "size" and "last_write_time", the second element can either be "ascending" or "descending".
+      @param[out] directory_entries List of files found where each element in the vector is a representation of a file, file info is saved in
+      the following order: "name", "extension", "size" and "last_write_time".
+    */
+    static void getFolderContents(
+      std::filesystem::path& p,
+      std::vector<std::tuple<std::string, std::string, uintmax_t, std::time_t>>& directory_entries,
+      std::tuple<std::string, std::string>& sorting);
+    
     /**
       @brief Get parent pathname from a pathname string
 

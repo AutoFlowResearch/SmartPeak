@@ -407,6 +407,30 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
   BOOST_CHECK_EQUAL(c[2][43], "Directory");
 }
 
+BOOST_AUTO_TEST_CASE(getFolderContents)
+{
+  std::filesystem::path pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
+  
+  std::vector<std::tuple<std::string, std::string, uintmax_t, std::time_t>> directory_entries;
+  
+  std::tuple<std::string, std::string> order_by_name = std::make_tuple ("name", "ascending");
+  Utilities::getFolderContents(pathname, directory_entries, order_by_name);
+  BOOST_CHECK_EQUAL(std::get<0>(directory_entries[0]), "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_1900-01-01_000000.featureXML");
+  directory_entries.clear();
+  
+  std::tuple<std::string, std::string> order_by_file_extension = std::make_tuple ("extension", "descending");
+  Utilities::getFolderContents(pathname, directory_entries, order_by_file_extension);
+  BOOST_CHECK_EQUAL(std::get<1>(directory_entries[0]), ".txt");
+  BOOST_CHECK_EQUAL(std::get<1>(directory_entries[directory_entries.size()-1]), ".csv");
+  directory_entries.clear();
+  
+  std::tuple<std::string, std::string> order_by_size = std::make_tuple ("size", "descending");
+  Utilities::getFolderContents(pathname, directory_entries, order_by_size);
+  BOOST_CHECK_EQUAL(std::get<2>(directory_entries[0]), 3804256);
+  BOOST_CHECK_EQUAL(std::get<2>(directory_entries[directory_entries.size()-1]), 192);
+  directory_entries.clear();
+}
+
 BOOST_AUTO_TEST_CASE(getParentPathname)
 {
 #ifdef _WIN32
