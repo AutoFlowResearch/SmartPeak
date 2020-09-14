@@ -17,9 +17,9 @@ jobs:
           export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
           ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
           dpkg-reconfigure --frontend noninteractive tzdata &&
-          apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev &&
-          libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev &&
-          libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev &&
+          apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev
+          libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev
+          libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
           libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
       - run: |
           apt-get install -y graphviz doxygen python3-pip &&
