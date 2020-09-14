@@ -17,7 +17,10 @@ jobs:
           apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev
           libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev
           libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
-          libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
+          libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev &&
+          export DEBIAN_FRONTEND=noninteractive && ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
+          dpkg-reconfigure --frontend noninteractive tzdata
+
       - run: |
           apt-get install -y graphviz doxygen python3-pip &&
           export DEBIAN_FRONTEND=noninteractive &&
@@ -73,7 +76,6 @@ jobs:
     steps:
       - checkout
       - run: brew remove yarn
-      - run: brew search boost
       - run: brew install cmake qt5 sdl2
       - run: brew install boost
       - run: |
@@ -215,4 +217,4 @@ workflows:
     jobs:
       - build_ubuntu
       - build_macos
-      - build_windows
+      # - build_windows
