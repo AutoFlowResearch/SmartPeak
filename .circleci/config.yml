@@ -157,10 +157,11 @@ jobs:
           7z x $sdl2_tmp -o'C:\lib\sdl2'
           $SDL_DIR = 'C:\lib\sdl2\SDL2-2.0.12'
           $sdl2_tmp | Remove-Item
-          
           $boost_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'boost_tmp$', '7z' } –PassThru
           Invoke-WebRequest $boost_url -OutFile $boost_tmp 
           7z x $boost_tmp -o'C:\lib\boost'
+          ls C:\lib\boost\boost_1_73_0
+          ls C:\lib\boost\
           $BOOST_DIR = 'C:\lib\boost\boost_1_73_0'
           $boost_tmp | Remove-Item
       - run: |
