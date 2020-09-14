@@ -14,7 +14,8 @@ jobs:
       - run: |
           apt-get update
       - run: >
-          export DEBIAN_FRONTEND=noninteractive && ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
+          apt-get install -y tzdata && export DEBIAN_FRONTEND=noninteractive && 
+          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
           dpkg-reconfigure --frontend noninteractive tzdata && 
           apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev
           libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev
