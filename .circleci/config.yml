@@ -14,12 +14,13 @@ jobs:
       - run: |
           apt-get update
       - run: >
+          export DEBIAN_FRONTEND=noninteractive && ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
+          dpkg-reconfigure --frontend noninteractive tzdata && 
           apt-get install -y git cmake qt5-default libboost-dev libeigen3-dev
           libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev
           libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
-          libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev &&
-          export DEBIAN_FRONTEND=noninteractive && ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
-          dpkg-reconfigure --frontend noninteractive tzdata
+          libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
+          
 
       - run: |
           apt-get install -y graphviz doxygen python3-pip &&
@@ -75,7 +76,7 @@ jobs:
     working_directory: ~/SmartPeak2
     steps:
       - checkout
-      - run: brew remove yarn
+      - run: brew remove yarn node
       - run: brew install cmake qt5 sdl2
       - run: brew install boost
       - run: |
@@ -136,12 +137,13 @@ jobs:
           $ProgressPreference = "SilentlyContinue"
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
           choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"'
-          choco install boost-msvc-14.1
+          # choco install boost-msvc-14.1
           choco install doxygen.install
           choco install nsis.portable
           refreshenv
           $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
           $sdl2_url = 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
+          $boost_url = 'https://github.com/ahmedskhalil/Boost-1.73-Prebuilts/releases/download/0.0.1/boost_1_73_0.7z'
           $qt_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'qt_tmp$', '7z' } –PassThru
           Invoke-WebRequest $qt_url -OutFile $qt_tmp 
           7z x $qt_tmp -o'C:\lib\Qt'
@@ -156,6 +158,12 @@ jobs:
           7z x $sdl2_tmp -o'C:\lib\sdl2'
           $SDL_DIR = 'C:\lib\sdl2\SDL2-2.0.12'
           $sdl2_tmp | Remove-Item
+          
+          $boost_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'boost_tmp$', '7z' } –PassThru
+          Invoke-WebRequest $boost_url -OutFile $boost_tmp 
+          7z x $boost_tmp -o'C:\lib\boost'
+          $BOOST_DIR = 'C:\lib\boost\boost_1_73_0'
+          $boost_tmp | Remove-Item
       - run: |
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
           $ProgressPreference = "SilentlyContinue"
@@ -177,7 +185,7 @@ jobs:
           rm  .\lib\libboost_*
           rm  -r .\include\boost
           cd ~/OpenMS; mkdir openms_build; cd openms_build
-          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/local/boost_1_67_0" -DBOOST_INCLUDE_DIR="C:/local/boost_1_67_0" -DBOOST_LIBRARYDIR="C:/local/boost_1_67_0/lib64-msvc-14.1" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
+          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:\lib\boost\boost_1_73_0" -DBOOST_INCLUDE_DIR="C:\lib\boost\boost_1_73_0" -DBOOST_LIBRARYDIR="C:\lib\boost\boost_1_73_0/lib64-msvc-14.2" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
           msbuild src\openswathalgo\OpenSWATHAlgo.sln /maxcpucount /p:Configuration=Release
           msbuild src\openms\OpenMS.sln /maxcpucount /p:Configuration=Release
       - run: |
@@ -196,7 +204,7 @@ jobs:
           cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak2
           cmake --build .
           cd ~/SmartPeak2/smartpeak2_build
-          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/local/boost_1_67_0" -DBOOST_INCLUDE_DIR="C:/local/boost_1_67_0" -DBOOST_LIBRARYDIR="C:/local/boost_1_67_0/lib64-msvc-14.1" -DCMAKE_PREFIX_PATH="~/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak2
+          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:\lib\boost\boost_1_73_0" -DBOOST_INCLUDE_DIR="C:\lib\boost\boost_1_73_0" -DBOOST_LIBRARYDIR="C:\lib\boost\boost_1_73_0\lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="~/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak2
           msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
           msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
           msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
@@ -217,4 +225,4 @@ workflows:
     jobs:
       - build_ubuntu
       - build_macos
-      # - build_windows
+      - build_windows
