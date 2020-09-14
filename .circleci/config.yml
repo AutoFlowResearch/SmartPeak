@@ -13,7 +13,7 @@ jobs:
       - checkout
       - run: |
           apt-get update
-      - run: >
+      - run: |
           apt-get install -y tzdata && export DEBIAN_FRONTEND=noninteractive && 
           ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
           dpkg-reconfigure --frontend noninteractive tzdata && 
@@ -21,8 +21,6 @@ jobs:
           libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev
           libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev
           libglpk-dev seqan-dev libsdl2-dev libhdf5-dev libboost-filesystem-dev
-          
-
       - run: |
           apt-get install -y graphviz doxygen python3-pip &&
           export DEBIAN_FRONTEND=noninteractive &&
