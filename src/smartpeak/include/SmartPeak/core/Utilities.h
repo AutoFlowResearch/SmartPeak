@@ -233,16 +233,14 @@ public:
     /**
       @brief Retrieves information about files in a given directory
 
-      @param[in] p Given path to inspect and scan
+      @param[in] folder_path Given path to inspect and scan
       @param[in] sorting Desired order of the results in the form of a tuple,
       where the first element is "name", "extension", "size" and "last_write_time", the second element can either be "ascending" or "descending".
-      @param[out] directory_entries List of files found where each element in the vector is a representation of a file, file info is saved in
-      the following order: "name", "extension", "size" and "last_write_time".
+      @return List of files found where each string of vectors is a representation of a file's name, size, type and date.
     */
-    static void getFolderContents(
-      std::filesystem::path& p,
-      std::vector<std::tuple<std::string, std::string, uintmax_t, std::time_t>>& directory_entries,
-      std::tuple<std::string, std::string>& sorting);
+    static std::array<std::vector<std::string>, 4> getFolderContents(
+      const std::filesystem::path& folder_path,
+      const std::tuple<std::string, std::string>& sorting);
     
     /**
       @brief Get parent pathname from a pathname string
@@ -252,6 +250,14 @@ public:
       @returns A string representation of the parent pathname
     */
     static std::string getParentPathname(const std::string& pathname);
+    
+    /**
+      @brief Get the parent path from a given path, the given path is returned when the parent path isn't existent
+
+      @param[in] p Path to a directory of interest.
+      @param[out] parent_path The parent path of the given path as a standard string.
+    */
+    static std::string getParentPath(const std::filesystem::path& p);
 
     /**
       @brief Moves the elements in vector v according to indices
@@ -303,5 +309,14 @@ public:
       @returns The numbers of elements found
     */
     static size_t directorySize(const std::string& pathname);
+    
+    /**
+      @brief Retrieves basic information on a given directory
+
+      @param[in] p Path to inspect
+      @param[out] directory_info A tuple where the first element is the total size of files in the directory,
+      and the second is the total entries in the directory (files and directories).
+    */
+    static void getDirectoryInfo(const std::filesystem::path& p, std::tuple<float, uintmax_t>& directory_info);
   };
 }

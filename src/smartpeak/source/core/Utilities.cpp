@@ -569,118 +569,155 @@ namespace SmartPeak
   }
 
 
-  void Utilities::getFolderContents(
-    std::filesystem::path& folder_path,
-    std::vector<std::tuple<std::string, std::string, uintmax_t, std::time_t>>& directory_entries,
-    std::tuple<std::string, std::string>& sorting)
+std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
+  const std::filesystem::path& folder_path,
+  const std::tuple<std::string, std::string>& sorting)
+
   {
+     // name, ext, size, date
+    std::array<std::vector<std::string>, 4> directory_entries;
+    std::vector<std::tuple<std::string, uintmax_t, std::string, std::time_t>> entries_temp;
     
     for (auto & p : std::filesystem::directory_iterator(folder_path))
     {
-      if (p.is_regular_file() && !p.is_directory())
+      if (p.is_regular_file() && (p.path().filename().string().at(0) != '.') )
       {
-        auto time = std::filesystem::last_write_time(p.path());
-        std::time_t cftime = decltype(time)::clock::to_time_t(time);
+        auto time           = std::filesystem::last_write_time(p.path());
+        std::time_t cftime  = decltype(time)::clock::to_time_t(time);
+        entries_temp.push_back(std::make_tuple(p.path().filename(), p.file_size(), p.path().extension(), cftime));
+      }
+       else if (p.is_directory())
+       {
+         auto time          = std::filesystem::last_write_time(p.path());
+         std::time_t cftime = decltype(time)::clock::to_time_t(time);
+         entries_temp.push_back(std::make_tuple(p.path().filename(), 0, "Directory", cftime));
+       }
+    }
+    
+    
+    if (!entries_temp.empty() || entries_temp.size() >= 2)
+    {
+      // sorting by filename
+      if (std::get<0>(sorting) == "name")
+      {
+        if (std::get<1>(sorting) == "ascending")
+        {
+          std::sort(entries_temp.begin(), entries_temp.end(),
+                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
+                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
+                    { return (std::get<0>(a) < std::get<0>(b));
+          });
+        }
+        else if (std::get<1>(sorting) == "descending")
+        {
+          std::sort(entries_temp.begin(), entries_temp.end(),
+                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
+                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
+                    { return (std::get<0>(a) > std::get<0>(b));
+          });
+        }
+      }
+ 
+      // sorting by size
+      if (std::get<0>(sorting) == "size")
+      {
+        if (std::get<1>(sorting) == "ascending")
+        {
+          std::sort(entries_temp.begin(), entries_temp.end(),
+                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
+                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
+                    { return (std::get<1>(a) < std::get<1>(b));
+          });
+        }
+        else if (std::get<1>(sorting) == "descending")
+        {
+          std::sort(entries_temp.begin(), entries_temp.end(),
+                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
+                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
+                    { return (std::get<1>(a) > std::get<1>(b));
+          });
+        }
+      }
       
-        directory_entries.push_back(std::make_tuple(p.path().filename(), p.path().extension(), p.file_size(), cftime));
+      // sorting by type
+      if (std::get<0>(sorting) == "extension")
+      {
+        if (std::get<1>(sorting) == "ascending")
+        {
+          std::sort(entries_temp.begin(), entries_temp.end(),
+                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
+                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
+                    { return (std::get<2>(a) < std::get<2>(b));
+          });
+        }
+        else if (std::get<1>(sorting) == "descending")
+        {
+          std::sort(entries_temp.begin(), entries_temp.end(),
+                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
+                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
+                    { return (std::get<2>(a) > std::get<2>(b));
+          });
+        }
+      }
+      
+      // sorting by last write time
+      if (std::get<0>(sorting) == "last_write_time")
+      {
+        if (std::get<1>(sorting) == "ascending")
+        {
+          std::sort(entries_temp.begin(), entries_temp.end(),
+                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
+                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
+                    { return (std::get<3>(a) < std::get<3>(b));
+          });
+        }
+        else if (std::get<1>(sorting) == "descending")
+        {
+          std::sort(entries_temp.begin(), entries_temp.end(),
+                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
+                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
+                    { return (std::get<3>(a) > std::get<3>(b));
+          });
+        }
       }
     }
     
-    // sorting by filename
-    if (std::get<0>(sorting) == "name")
+    for (uintmax_t i = entries_temp.size()-1; i > 0; i--)
     {
-      if (std::get<1>(sorting) == "ascending")
-      {
-        std::sort(directory_entries.begin(), directory_entries.end());
-      }
-      else if (std::get<1>(sorting) == "descending")
-      {
-        std::sort(directory_entries.begin(), directory_entries.end(),
-            [](const std::tuple<std::string, std::string, uintmax_t, std::time_t>& a,
-               std::tuple<std::string, std::string, uintmax_t, std::time_t>& b) -> bool
-        {
-            return (std::get<0>(a) > std::get<0>(b));
-        });
-      }
+      directory_entries[0].push_back(std::get<0>(entries_temp[i]));
+      directory_entries[1].push_back((std::get<1>(entries_temp[i]) == 0 ? "-" : std::to_string(std::get<1>(entries_temp[i])) ));
+      directory_entries[2].push_back(std::get<2>(entries_temp[i]));
+      char buff[128];
+      std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&std::get<3>(entries_temp[i])));
+      directory_entries[3].push_back(buff);
     }
     
-    // sorting by file extension
-    if (std::get<0>(sorting) == "extension")
-    {
-      if (std::get<1>(sorting) == "ascending")
-      {
-        std::sort(directory_entries.begin(), directory_entries.end(),
-            [](const std::tuple<std::string, std::string, uintmax_t, std::time_t>& a,
-               std::tuple<std::string, std::string, uintmax_t, std::time_t>& b) -> bool
-        {
-            return (std::get<1>(a) < std::get<1>(b));
-        });
-      }
-      else if (std::get<1>(sorting) == "descending")
-      {
-        std::sort(directory_entries.begin(), directory_entries.end(),
-            [](const std::tuple<std::string, std::string, uintmax_t, std::time_t>& a,
-               std::tuple<std::string, std::string, uintmax_t, std::time_t>& b) -> bool
-        {
-            return (std::get<1>(a) > std::get<1>(b));
-        });
-      }
-    }
-    
-    // sorting by file size
-    if (std::get<0>(sorting) == "size")
-    {
-      if (std::get<1>(sorting) == "ascending")
-      {
-        std::sort(directory_entries.begin(), directory_entries.end(),
-            [](const std::tuple<std::string, std::string, uintmax_t, std::time_t>& a,
-               std::tuple<std::string, std::string, uintmax_t, std::time_t>& b) -> bool
-        {
-            return (std::get<2>(a) < std::get<2>(b));
-        });
-      }
-      else if (std::get<1>(sorting) == "descending")
-      {
-        std::sort(directory_entries.begin(), directory_entries.end(),
-            [](const std::tuple<std::string, std::string, uintmax_t, std::time_t>& a,
-               std::tuple<std::string, std::string, uintmax_t, std::time_t>& b) -> bool
-        {
-            return (std::get<2>(a) > std::get<2>(b));
-        });
-      }
-    }
-    
-    // sorting by last write time
-    if (std::get<0>(sorting) == "last_write_time")
-    {
-      if (std::get<1>(sorting) == "ascending")
-      {
-        std::sort(directory_entries.begin(), directory_entries.end(),
-            [](const std::tuple<std::string, std::string, uintmax_t, std::time_t>& a,
-               std::tuple<std::string, std::string, uintmax_t, std::time_t>& b) -> bool
-        {
-            return (std::get<3>(a) < std::get<3>(b));
-        });
-      }
-      else if (std::get<1>(sorting) == "descending")
-      {
-        std::sort(directory_entries.begin(), directory_entries.end(),
-            [](const std::tuple<std::string, std::string, uintmax_t, std::time_t>& a,
-               std::tuple<std::string, std::string, uintmax_t, std::time_t>& b) -> bool
-        {
-            return (std::get<3>(a) > std::get<3>(b));
-        });
-      }
-    }
-
+    return directory_entries;
   }
-
 
   std::string Utilities::getParentPathname(const std::string& pathname)
   {
     const boost::filesystem::path p(pathname);
     const boost::filesystem::directory_entry entry(p);
     return entry.path().parent_path().string();
+  }
+
+  std::string Utilities::getParentPath(const std::filesystem::path& p)
+  {
+    std::filesystem::path parent_path;
+    
+    if ( p.string() == ".")
+    {
+    std::filesystem::path working_dir(std::filesystem::current_path());
+    parent_path = (working_dir.parent_path());
+    
+    }
+    else if (p.has_parent_path())
+    {
+      parent_path = (p.parent_path());
+    }
+    
+    return parent_path.string();
   }
 
   bool Utilities::is_less_than_icase(const std::string& a, const std::string& b)
@@ -714,4 +751,27 @@ namespace SmartPeak
 
     return n;
   }
+
+  void Utilities::getDirectoryInfo(const std::filesystem::path& folder_path, std::tuple<float, uintmax_t>& directory_info)
+  {
+    float size_in_mb = 0;
+    uintmax_t entries = 0;
+    for (auto & p : std::filesystem::directory_iterator(folder_path))
+    {
+      
+      if (p.is_regular_file() && !p.is_directory())
+      {
+        size_in_mb += p.file_size();
+        entries += 1;
+      }
+      else if (p.is_directory())
+      {
+        entries += 1;
+      }
+    }
+    
+    std::get<0>(directory_info) = size_in_mb / 1e6;
+    std::get<1>(directory_info) = entries;
+  }
+
 }
