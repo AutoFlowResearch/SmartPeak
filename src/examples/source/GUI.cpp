@@ -15,7 +15,7 @@
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <imgui.h>
@@ -24,7 +24,6 @@
 #include <misc/cpp/imgui_stdlib.h>
 
 using namespace SmartPeak;
-namespace fs = boost::filesystem;
 
 void HelpMarker(const char* desc);
 
@@ -290,7 +289,7 @@ int main(int argc, char **argv)
       if (ImGui::Button("Run workflow"))
       {
         for (const std::string& pathname : {application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_}) {
-          fs::create_directories(fs::path(pathname));
+          std::filesystem::create_directories(std::filesystem::path(pathname));
         }
         for (ApplicationHandler::Command& cmd : application_handler_.commands_)
         {

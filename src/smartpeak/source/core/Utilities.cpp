@@ -9,10 +9,6 @@
 #include <regex>
 #include <unordered_set>
 #include <plog/Log.h>
-#include <boost/filesystem.hpp>
-//#include <filesystem>
-
-//namespace fs = boost::filesystem;
 
 namespace SmartPeak
 {
@@ -501,74 +497,6 @@ namespace SmartPeak
     return false;
   }
 
-  std::array<std::vector<std::string>, 4> Utilities::getPathnameContent(
-    const std::string& pathname,
-    const bool asc
-  )
-  {
-    std::array<std::vector<std::string>, 4> content;
-    boost::system::error_code ec;
-
-    boost::filesystem::directory_iterator it = boost::filesystem::directory_iterator(boost::filesystem::path(pathname), ec);
-    if (ec.value()) {
-      return content;
-    }
-    const boost::filesystem::path p(pathname);
-    boost::filesystem::directory_iterator it_end = boost::filesystem::directory_iterator();
-
-    for ( ; it != it_end; it++) {
-      const boost::filesystem::directory_entry& entry = *it;
-
-      if (!exists(entry.path())) { // protects from e.g. "dangling" symbolic links
-        LOGD << "Path does not exist. Skipping: " << entry.path();
-        continue;
-      }
-
-      const std::string filename(entry.path().filename().string());
-      if (filename == "." || filename == ".." || (*(&filename.at(0))) == '.') {
-        continue;
-      }
-
-      size_t filesize = boost::filesystem::is_directory(entry)
-        ? directorySize(entry.path().string())
-        : boost::filesystem::file_size(entry, ec);
-      if (ec.value()) {
-        filesize = 0;
-        ec.clear();
-      }
-
-      const std::string filetype = boost::filesystem::is_directory(entry) ? "Directory" : entry.path().extension().string();
-
-      char buff[128];
-      const std::time_t t(boost::filesystem::last_write_time(entry));
-      std::strftime(buff, sizeof buff, "%Y-%m-%d %H:%M:%S", std::localtime(&t)); // ISO 8601 date format
-
-      content[0].push_back(filename);
-      content[1].push_back(std::to_string(filesize));
-      content[2].push_back(filetype);
-      content[3].push_back(std::string(buff));
-    }
-
-    std::vector<size_t> indices(content[0].size());
-    std::iota(indices.begin(), indices.end(), 0);
-    const std::vector<std::string>& names = content[0];
-    std::sort(
-      indices.begin(),
-      indices.end(),
-      [&names, asc](const size_t l, const size_t r)
-      {
-        const bool b = is_less_than_icase(names[l], names[r]);
-        return asc ? b : !b;
-      }
-    );
-    sortPairs(indices, content[0]);
-    sortPairs(indices, content[1]);
-    sortPairs(indices, content[2]);
-    sortPairs(indices, content[3]);
-    return content;
-  }
-
-
 std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
   const std::filesystem::path& folder_path,
   const std::tuple<std::string, std::string>& sorting)
@@ -605,7 +533,7 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
           std::sort(entries_temp.begin(), entries_temp.end(),
                     [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
                        std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<0>(a) < std::get<0>(b));
+                    { return (std::get<0>(a) > std::get<0>(b));
           });
         }
         else if (std::get<1>(sorting) == "descending")
@@ -613,7 +541,7 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
           std::sort(entries_temp.begin(), entries_temp.end(),
                     [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
                        std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<0>(a) > std::get<0>(b));
+                    { return (std::get<0>(a) < std::get<0>(b));
           });
         }
       }
@@ -626,7 +554,7 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
           std::sort(entries_temp.begin(), entries_temp.end(),
                     [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
                        std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<1>(a) < std::get<1>(b));
+                    { return (std::get<1>(a) > std::get<1>(b));
           });
         }
         else if (std::get<1>(sorting) == "descending")
@@ -634,7 +562,7 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
           std::sort(entries_temp.begin(), entries_temp.end(),
                     [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
                        std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<1>(a) > std::get<1>(b));
+                    { return (std::get<1>(a) < std::get<1>(b));
           });
         }
       }
@@ -647,7 +575,7 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
           std::sort(entries_temp.begin(), entries_temp.end(),
                     [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
                        std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<2>(a) < std::get<2>(b));
+                    { return (std::get<2>(a) > std::get<2>(b));
           });
         }
         else if (std::get<1>(sorting) == "descending")
@@ -655,7 +583,7 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
           std::sort(entries_temp.begin(), entries_temp.end(),
                     [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
                        std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<2>(a) > std::get<2>(b));
+                    { return (std::get<2>(a) < std::get<2>(b));
           });
         }
       }
@@ -668,7 +596,7 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
           std::sort(entries_temp.begin(), entries_temp.end(),
                     [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
                        std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<3>(a) < std::get<3>(b));
+                    { return (std::get<3>(a) > std::get<3>(b));
           });
         }
         else if (std::get<1>(sorting) == "descending")
@@ -676,7 +604,7 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
           std::sort(entries_temp.begin(), entries_temp.end(),
                     [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
                        std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<3>(a) > std::get<3>(b));
+                    { return (std::get<3>(a) < std::get<3>(b));
           });
         }
       }
@@ -693,13 +621,6 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
     }
     
     return directory_entries;
-  }
-
-  std::string Utilities::getParentPathname(const std::string& pathname)
-  {
-    const boost::filesystem::path p(pathname);
-    const boost::filesystem::directory_entry entry(p);
-    return entry.path().parent_path().string();
   }
 
   std::string Utilities::getParentPath(const std::filesystem::path& p)
@@ -728,28 +649,6 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
     std::transform(a.begin(), a.end(), a_lowercase.begin(), ::tolower);
     std::transform(b.begin(), b.end(), b_lowercase.begin(), ::tolower);
     return a_lowercase.compare(b_lowercase) < 0;
-  }
-
-  size_t Utilities::directorySize(const std::string& pathname)
-  {
-    size_t n { 0 };
-    boost::system::error_code ec;
-
-    boost::filesystem::directory_iterator it = boost::filesystem::directory_iterator(boost::filesystem::path(pathname), ec);
-    if (ec.value()) {
-      return 0;
-    }
-    boost::filesystem::directory_iterator it_end = boost::filesystem::directory_iterator();
-
-    for ( ; it != it_end; it++) {
-      const boost::filesystem::path& filename { it->path().filename() };
-      if (filename == boost::filesystem::path(".") || filename == boost::filesystem::path("..") || filename.generic_string().at(0)  == '.') {
-        continue;
-      }
-      ++n;
-    }
-
-    return n;
   }
 
   void Utilities::getDirectoryInfo(const std::filesystem::path& folder_path, std::tuple<float, uintmax_t>& directory_info)

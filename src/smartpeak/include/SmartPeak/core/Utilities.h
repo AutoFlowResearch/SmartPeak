@@ -213,22 +213,6 @@ public:
       std::string suffix,
       const bool case_sensitive = true
     );
-
-    /**
-      @brief Get information about name, size, type and modified date of all
-      entries in a folder
-
-      @note Elements "." and ".." are not part of the content
-
-      @param[in] pathname Folder pathname
-      @param[in] asc Sort entries in ascending order
-
-      @returns A container with the desired information
-    */
-    static std::array<std::vector<std::string>, 4> getPathnameContent(
-      const std::string& pathname,
-      const bool asc = true
-    );
     
     /**
       @brief Retrieves information about files in a given directory
@@ -241,15 +225,6 @@ public:
     static std::array<std::vector<std::string>, 4> getFolderContents(
       const std::filesystem::path& folder_path,
       const std::tuple<std::string, std::string>& sorting);
-    
-    /**
-      @brief Get parent pathname from a pathname string
-
-      @param[in] pathname Input string pathname
-
-      @returns A string representation of the parent pathname
-    */
-    static std::string getParentPathname(const std::string& pathname);
     
     /**
       @brief Get the parent path from a given path, the given path is returned when the parent path isn't existent
@@ -298,17 +273,6 @@ public:
       @returns True if 'a' is lexicographically less than 'b'. Otherwise false.
     */
     static bool is_less_than_icase(const std::string& a, const std::string& b);
-
-    /**
-      @brief Count the number of elements in a folder
-
-      @note Elements "." and ".." are not counted
-
-      @param[in] pathname Pathname to a folder
-
-      @returns The numbers of elements found
-    */
-    static size_t directorySize(const std::string& pathname);
     
     /**
       @brief Retrieves basic information on a given directory
