@@ -72,7 +72,7 @@ jobs:
 
   build_macos:
     macos:
-      xcode: "11.0.0"
+      xcode: "11.2.1"
     resource_class: medium
     working_directory: ~/SmartPeak2
     steps:
