@@ -86,47 +86,47 @@ namespace SmartPeak
   )
   {
     filenames.mzML_i = std::filesystem::path(mzml_input_path)
-      .append(std::filesystem::path(filenames.mzML_i).filename().c_str())
+      .append(std::filesystem::path(filenames.mzML_i).filename().string())
       .string();
 
     filenames.featureXML_i = std::filesystem::path(features_input_path)
-      .append(std::filesystem::path(filenames.featureXML_i).filename().c_str())
+      .append(std::filesystem::path(filenames.featureXML_i).filename().string())
       .string();
 
     filenames.featureXMLSampleGroup_i = std::filesystem::path(features_input_path)
-      .append(std::filesystem::path(filenames.featureXMLSampleGroup_i).filename().c_str())
+      .append(std::filesystem::path(filenames.featureXMLSampleGroup_i).filename().string())
       .string();
 
     filenames.mzTab_i = std::filesystem::path(features_input_path)
-      .append(std::filesystem::path(filenames.mzTab_i).filename().c_str())
+      .append(std::filesystem::path(filenames.mzTab_i).filename().string())
       .string();
 
     const std::filesystem::path prefix { output_path };
 
-    filenames.featureXML_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureXML_o).filename().c_str()).string();
-    filenames.featureXMLSampleGroup_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureXMLSampleGroup_o).filename().c_str()).string();
-    filenames.mzTab_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.mzTab_o).filename().c_str()).string();
+    filenames.featureXML_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureXML_o).filename().string()).string();
+    filenames.featureXMLSampleGroup_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureXMLSampleGroup_o).filename().string()).string();
+    filenames.mzTab_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.mzTab_o).filename().string()).string();
 
-    filenames.feature_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.feature_csv_o).filename().c_str()).string();
+    filenames.feature_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.feature_csv_o).filename().string()).string();
 
-    filenames.features_pdf_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.features_pdf_o).filename().c_str()).string();
+    filenames.features_pdf_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.features_pdf_o).filename().string()).string();
 
-    filenames.featureFilterComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureFilterComponents_csv_o).filename().c_str()).string();
-    filenames.featureFilterComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureFilterComponentGroups_csv_o).filename().c_str()).string();
-    filenames.featureQCComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureQCComponents_csv_o).filename().c_str()).string();
-    filenames.featureQCComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureQCComponentGroups_csv_o).filename().c_str()).string();
-    filenames.featureRSDFilterComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureRSDFilterComponents_csv_o).filename().c_str()).string();
-    filenames.featureRSDFilterComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureRSDFilterComponentGroups_csv_o).filename().c_str()).string();
-    filenames.featureRSDQCComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureRSDQCComponents_csv_o).filename().c_str()).string();
-    filenames.featureRSDQCComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureRSDQCComponentGroups_csv_o).filename().c_str()).string();
-    filenames.featureBackgroundFilterComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureBackgroundFilterComponents_csv_o).filename().c_str()).string();
-    filenames.featureBackgroundFilterComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureBackgroundFilterComponentGroups_csv_o).filename().c_str()).string();
-    filenames.featureBackgroundQCComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureBackgroundQCComponents_csv_o).filename().c_str()).string();
-    filenames.featureBackgroundQCComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureBackgroundQCComponentGroups_csv_o).filename().c_str()).string();
+    filenames.featureFilterComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureFilterComponents_csv_o).filename().string()).string();
+    filenames.featureFilterComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureFilterComponentGroups_csv_o).filename().string()).string();
+    filenames.featureQCComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureQCComponents_csv_o).filename().string()).string();
+    filenames.featureQCComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureQCComponentGroups_csv_o).filename().string()).string();
+    filenames.featureRSDFilterComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureRSDFilterComponents_csv_o).filename().string()).string();
+    filenames.featureRSDFilterComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureRSDFilterComponentGroups_csv_o).filename().string()).string();
+    filenames.featureRSDQCComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureRSDQCComponents_csv_o).filename().string()).string();
+    filenames.featureRSDQCComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureRSDQCComponentGroups_csv_o).filename().string()).string();
+    filenames.featureBackgroundFilterComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureBackgroundFilterComponents_csv_o).filename().string()).string();
+    filenames.featureBackgroundFilterComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureBackgroundFilterComponentGroups_csv_o).filename().string()).string();
+    filenames.featureBackgroundQCComponents_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureBackgroundQCComponents_csv_o).filename().string()).string();
+    filenames.featureBackgroundQCComponentGroups_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureBackgroundQCComponentGroups_csv_o).filename().string()).string();
 
-    filenames.quantitationMethods_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.quantitationMethods_csv_o).filename().c_str()).string();
+    filenames.quantitationMethods_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.quantitationMethods_csv_o).filename().string()).string();
 
-    filenames.componentsToConcentrations_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.componentsToConcentrations_csv_o).filename().c_str()).string();
+    filenames.componentsToConcentrations_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.componentsToConcentrations_csv_o).filename().string()).string();
   }
 
   void Filenames::clear()
