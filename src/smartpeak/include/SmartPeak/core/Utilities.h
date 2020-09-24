@@ -9,6 +9,7 @@
 #include <regex>
 #include <string>
 #include <filesystem>
+#include <chrono>
 #include <tuple>
 
 #ifndef CSV_IO_NO_THREAD

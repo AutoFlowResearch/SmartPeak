@@ -511,13 +511,17 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
       if (p.is_regular_file() && (p.path().filename().string().at(0) != '.') )
       {
         auto time           = std::filesystem::last_write_time(p.path());
-        std::time_t cftime  = decltype(time)::clock::to_time_t(time);
+        auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(time - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+        std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
+        //std::time_t cftime  = decltype(time)::clock::to_time_t(time);
         entries_temp.push_back(std::make_tuple(p.path().filename(), p.file_size(), p.path().extension(), cftime));
       }
        else if (p.is_directory())
        {
          auto time          = std::filesystem::last_write_time(p.path());
-         std::time_t cftime = decltype(time)::clock::to_time_t(time);
+         auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(time - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+         std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
+         //std::time_t cftime = decltype(time)::clock::to_time_t(time);
          entries_temp.push_back(std::make_tuple(p.path().filename(), 0, "Directory", cftime));
        }
     }
