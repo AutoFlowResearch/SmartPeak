@@ -561,4 +561,64 @@ namespace SmartPeak
       const Filenames& filenames
     ) const override;
   };
+  
+  struct CalculateMDVs : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "CALCULATE_MDVS"; }
+    std::string getDescription() const override { return "Calculate MDVs."; }
+    
+    /** Calculate MDVs
+     */
+    void process(
+                 RawDataHandler& rawDataHandler_IO,
+                 const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+                 const Filenames& filenames
+                 ) const override;
+  };
+  
+  struct CorrectMDVs : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "CORRECT_MDVS"; }
+    std::string getDescription() const override { return "Correct MDVs."; }
+    
+    /** Correct MDVs
+     */
+    void process(
+                 RawDataHandler& rawDataHandler_IO,
+                 const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+                 const Filenames& filenames
+                 ) const override;
+  };
+  
+  struct CalculateMDVIsotopicPurity : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "CALCULATE_MDV_ISOTOPIC_PURITY"; }
+    std::string getDescription() const override { return "Calculate MDV Isotopic Purity."; }
+    
+    /** Calculate MDV Isotopic Purity
+     */
+    void process(
+                 RawDataHandler& rawDataHandler_IO,
+                 const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+                 const Filenames& filenames
+                 ) const override;
+  };
+
+  struct CompareMDVsToTheoretical : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "COMPARE_MDV_TO_THEORETICAL"; }
+    std::string getDescription() const override { return "Compare MDVs to Theoretical"; }
+    
+    /** Compare MDVs to Theoretical
+     */
+    void process(
+                 RawDataHandler& rawDataHandler_IO,
+                 const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+                 const Filenames& filenames
+                 ) const override;
+  };
 }
