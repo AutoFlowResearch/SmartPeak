@@ -7,6 +7,7 @@
 #include <OpenMS/KERNEL/MSExperiment.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureQC.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
+#include <OpenMS/ANALYSIS/QUANTITATION/IsotopeLabelingMDVs.h>
 #include <OpenMS/ANALYSIS/MAPMATCHING/TransformationDescription.h>
 
 #include <SmartPeak/core/Filenames.h>
@@ -564,7 +565,7 @@ namespace SmartPeak
   
   struct CalculateMDVs : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    int getID() const override { return 0; }
     std::string getName() const override { return "CALCULATE_MDVS"; }
     std::string getDescription() const override { return "Calculate MDVs."; }
     
@@ -577,9 +578,9 @@ namespace SmartPeak
                  ) const override;
   };
   
-  struct CorrectMDVs : RawDataProcessor
+  struct isotopicCorrections : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    int getID() const override { return 0; }
     std::string getName() const override { return "CORRECT_MDVS"; }
     std::string getDescription() const override { return "Correct MDVs."; }
     
@@ -592,13 +593,13 @@ namespace SmartPeak
                  ) const override;
   };
   
-  struct CalculateMDVIsotopicPurity : RawDataProcessor
+  struct calculateIsotopicPurities : RawDataProcessor
   {
-    int getID() const override { return -1; }
-    std::string getName() const override { return "CALCULATE_MDV_ISOTOPIC_PURITY"; }
-    std::string getDescription() const override { return "Calculate MDV Isotopic Purity."; }
+    int getID() const override { return 0; }
+    std::string getName() const override { return "CALCULATE_MDV_ISOTOPIC_PURITIES"; }
+    std::string getDescription() const override { return "Calculate MDV Isotopic Purities."; }
     
-    /** Calculate MDV Isotopic Purity
+    /** Calculate MDV Isotopic Purities
      */
     void process(
                  RawDataHandler& rawDataHandler_IO,
@@ -607,9 +608,9 @@ namespace SmartPeak
                  ) const override;
   };
 
-  struct CompareMDVsToTheoretical : RawDataProcessor
+  struct calculateMDVAccuracies : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    int getID() const override { return 0; }
     std::string getName() const override { return "COMPARE_MDV_TO_THEORETICAL"; }
     std::string getDescription() const override { return "Compare MDVs to Theoretical"; }
     
