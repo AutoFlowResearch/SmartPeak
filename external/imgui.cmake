@@ -5,11 +5,12 @@ set_property (DIRECTORY PROPERTY EP_BASE Dependencies)
 set (DEPENDENCIES)
 #set (IMGUI_VERSION 6a0d0dab5a9f0b9518a2bc9bb456a69895ae0962) # tag: v1.72b, 2019/07/31
 #set (IMGUI_VERSION tables)
-set (IMGUI_VERSION e3ed9ef1bf115532762e90a621d9a3b5c5b39e25) # tables, 2020/09/02
+set (IMGUI_VERSION main)
 message (STATUS "Adding imgui ${IMGUI_VERSION} as an external project.")
 
 ExternalProject_Add(imgui
-  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  #GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_REPOSITORY https://github.com/ahmedskhalil/imgui_e3ed9ef1b.git
   GIT_TAG ${IMGUI_VERSION}
   UPDATE_COMMAND ""
   CONFIGURE_COMMAND ""
