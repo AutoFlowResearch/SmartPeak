@@ -401,7 +401,7 @@ BOOST_AUTO_TEST_CASE(getFolderContents)
   directory_entries[0].clear(); directory_entries[1].clear();
   directory_entries[2].clear(); directory_entries[3].clear();
   
-  #elif defined(__APPLE__) && defined(__linux__)
+  #elif defined(__APPLE__) || defined(__linux__)
   std::tuple<std::string, std::string> order_by_size = std::make_tuple ("size", "descending");
   directory_entries = Utilities::getFolderContents(pathname, order_by_size);
   BOOST_CHECK_EQUAL(directory_entries[1][0], "3804256");
