@@ -385,9 +385,9 @@ BOOST_AUTO_TEST_CASE(endsWith)
 BOOST_AUTO_TEST_CASE(getFolderContents)
 {
   std::filesystem::path pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
-  
   std::array<std::vector<std::string>, 4> directory_entries;
   
+  #if defined(__APPLE__) && defined(__linux__) && defined(_WIN32)
   std::tuple<std::string, std::string> order_by_name = std::make_tuple ("name", "ascending");
   directory_entries = Utilities::getFolderContents(pathname, order_by_name);
   BOOST_CHECK_EQUAL(directory_entries[0][0], "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_1900-01-01_000000.featureXML");
@@ -401,12 +401,14 @@ BOOST_AUTO_TEST_CASE(getFolderContents)
   directory_entries[0].clear(); directory_entries[1].clear();
   directory_entries[2].clear(); directory_entries[3].clear();
   
+  #elif defined(__APPLE__) && defined(__linux__)
   std::tuple<std::string, std::string> order_by_size = std::make_tuple ("size", "descending");
   directory_entries = Utilities::getFolderContents(pathname, order_by_size);
   BOOST_CHECK_EQUAL(directory_entries[1][0], "3804256");
   BOOST_CHECK_EQUAL(directory_entries[1][directory_entries[1].size()-3], "192");
   directory_entries[0].clear(); directory_entries[1].clear();
   directory_entries[2].clear(); directory_entries[3].clear();
+  #endif
 }
 
 
