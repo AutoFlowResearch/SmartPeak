@@ -411,19 +411,25 @@ BOOST_AUTO_TEST_CASE(getFolderContents)
 
 
 BOOST_AUTO_TEST_CASE(getParentPath)
-{  
-  std::filesystem::path path_2("/home/user/Downloads");
-  BOOST_CHECK_EQUAL(Utilities::getParentPath(path_2), "/home/user");
+{
+  BOOST_CHECK_EQUAL(Utilities::getParentPath(""), "");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/"), "/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/home"), "/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/home/file.txt"), "/home");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/home/user/Downloads"), "/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("//home///user//Downloads"), "//home///user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/home/user/Downloads/"), "/home/user/Downloads");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/home/user/Downloads and a space"), "/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("C:/Users/user/Downloads"), "C:/Users/user");
   
-  std::filesystem::path path_3("/home/user/Downloads/");
-  BOOST_CHECK_EQUAL(Utilities::getParentPath(path_3), "/home/user/Downloads");
-  
-  std::filesystem::path path_4("/");
-  BOOST_CHECK_EQUAL(Utilities::getParentPath(path_4), "/");
-  
-  std::filesystem::path path_5("C:/Users/user/Downloads");
-  BOOST_CHECK_EQUAL(Utilities::getParentPath(path_5), "C:/Users/user");
-  
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D:"), "");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D:/"), "D:");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D://"), "D:");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D://///"), "D:");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("E:/home/user/Downloads"), "E:/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("E://home///user//Downloads"), "E://home///user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("E:/home/user/Downloads and a space"), "E:/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("E:/home/user/Downloads/"), "E:/home/user/Downloads");
 }
 
 BOOST_AUTO_TEST_CASE(sortPairs)

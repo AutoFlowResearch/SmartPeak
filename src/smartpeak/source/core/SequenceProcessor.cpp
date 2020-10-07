@@ -217,7 +217,7 @@ namespace SmartPeak
     try {
       std::list<std::future<void>> futures;
       LOGD << "Spawning workers...";
-      for (size_t i = 0; i < injections_.size(); ++i) {
+      for (size_t i = 0; i < n_workers; ++i) {
         futures.emplace_back(std::async(std::launch::async, &SequenceProcessorMultithread::run_injection_processing, this));
       }
       LOGD << "Waiting for workers...";
