@@ -336,11 +336,11 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureFilter";
-    LOGI << "Storing: " << filenames.featureFilterComponents_csv_i << " and " <<
-      filenames.featureFilterComponentGroups_csv_i;
+    LOGI << "Storing: " << filenames.featureFilterComponents_csv_o << " and " <<
+      filenames.featureFilterComponentGroups_csv_o;
 
-    if (filenames.featureFilterComponents_csv_i.empty() &&
-      filenames.featureFilterComponentGroups_csv_i.empty()) {
+    if (filenames.featureFilterComponents_csv_o.empty() &&
+      filenames.featureFilterComponentGroups_csv_o.empty()) {
       LOGE << "Filenames are both empty";
       LOGD << "END storeFeatureFilter";
       return;
@@ -348,11 +348,11 @@ namespace SmartPeak
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (filenames.featureFilterComponents_csv_i.size()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.featureFilterComponents_csv_i, sequenceSegmentHandler_IO.getFeatureFilter(), false);
+      if (filenames.featureFilterComponents_csv_o.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.featureFilterComponents_csv_o, sequenceSegmentHandler_IO.getFeatureFilter(), false);
       }
-      if (filenames.featureFilterComponentGroups_csv_i.size()) {
-        featureQCFile.store(filenames.featureFilterComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureFilter(), true);
+      if (filenames.featureFilterComponentGroups_csv_o.size()) {
+        featureQCFile.store(filenames.featureFilterComponentGroups_csv_o, sequenceSegmentHandler_IO.getFeatureFilter(), true);
       }
     }
     catch (const std::exception& e) {
@@ -371,11 +371,11 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureQC";
-    LOGI << "Loading: " << filenames.featureQCComponents_csv_i << " and " <<
-      filenames.featureQCComponentGroups_csv_i;
+    LOGI << "Loading: " << filenames.featureQCComponents_csv_o << " and " <<
+      filenames.featureQCComponentGroups_csv_o;
 
-    if (filenames.featureQCComponents_csv_i.empty() &&
-      filenames.featureQCComponentGroups_csv_i.empty()) {
+    if (filenames.featureQCComponents_csv_o.empty() &&
+      filenames.featureQCComponentGroups_csv_o.empty()) {
       LOGE << "Filenames are both empty";
       LOGD << "END storeFeatureQC";
       return;
@@ -383,11 +383,11 @@ namespace SmartPeak
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (filenames.featureQCComponents_csv_i.size()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.featureQCComponents_csv_i, sequenceSegmentHandler_IO.getFeatureQC(), false);
+      if (filenames.featureQCComponents_csv_o.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.featureQCComponents_csv_o, sequenceSegmentHandler_IO.getFeatureQC(), false);
       }
-      if (filenames.featureQCComponentGroups_csv_i.size()) {
-        featureQCFile.store(filenames.featureQCComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureQC(), true);
+      if (filenames.featureQCComponentGroups_csv_o.size()) {
+        featureQCFile.store(filenames.featureQCComponentGroups_csv_o, sequenceSegmentHandler_IO.getFeatureQC(), true);
       }
     }
     catch (const std::exception& e) {
@@ -510,11 +510,11 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureRSDFilter";
-    LOGI << "Storing: " << filenames.featureRSDFilterComponents_csv_i << " and " <<
-      filenames.featureRSDFilterComponentGroups_csv_i;
+    LOGI << "Storing: " << filenames.featureRSDFilterComponents_csv_o << " and " <<
+      filenames.featureRSDFilterComponentGroups_csv_o;
 
-    if (filenames.featureRSDFilterComponents_csv_i.empty() &&
-      filenames.featureRSDFilterComponentGroups_csv_i.empty()) {
+    if (filenames.featureRSDFilterComponents_csv_o.empty() &&
+      filenames.featureRSDFilterComponentGroups_csv_o.empty()) {
       LOGE << "Filenames are both empty";
       LOGD << "END storeFeatureRSDFilter";
       return;
@@ -522,11 +522,11 @@ namespace SmartPeak
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (filenames.featureRSDFilterComponents_csv_i.size()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.featureRSDFilterComponents_csv_i, sequenceSegmentHandler_IO.getFeatureRSDFilter(), false);
+      if (filenames.featureRSDFilterComponents_csv_o.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.featureRSDFilterComponents_csv_o, sequenceSegmentHandler_IO.getFeatureRSDFilter(), false);
       }
-      if (filenames.featureRSDFilterComponentGroups_csv_i.size()) {
-        featureQCFile.store(filenames.featureRSDFilterComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureRSDFilter(), true);
+      if (filenames.featureRSDFilterComponentGroups_csv_o.size()) {
+        featureQCFile.store(filenames.featureRSDFilterComponentGroups_csv_o, sequenceSegmentHandler_IO.getFeatureRSDFilter(), true);
       }
     }
     catch (const std::exception& e) {
@@ -545,11 +545,11 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureRSDQC";
-    LOGI << "Loading: " << filenames.featureRSDQCComponents_csv_i << " and " <<
-      filenames.featureRSDQCComponentGroups_csv_i;
+    LOGI << "Loading: " << filenames.featureRSDQCComponents_csv_o << " and " <<
+      filenames.featureRSDQCComponentGroups_csv_o;
 
-    if (filenames.featureRSDQCComponents_csv_i.empty() &&
-      filenames.featureRSDQCComponentGroups_csv_i.empty()) {
+    if (filenames.featureRSDQCComponents_csv_o.empty() &&
+      filenames.featureRSDQCComponentGroups_csv_o.empty()) {
       LOGE << "Filenames are both empty";
       LOGD << "END storeFeatureRSDQC";
       return;
@@ -557,11 +557,11 @@ namespace SmartPeak
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (filenames.featureRSDQCComponents_csv_i.size()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.featureRSDQCComponents_csv_i, sequenceSegmentHandler_IO.getFeatureRSDQC(), false);
+      if (filenames.featureRSDQCComponents_csv_o.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.featureRSDQCComponents_csv_o, sequenceSegmentHandler_IO.getFeatureRSDQC(), false);
       }
-      if (filenames.featureRSDQCComponentGroups_csv_i.size()) {
-        featureQCFile.store(filenames.featureRSDQCComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureRSDQC(), true);
+      if (filenames.featureRSDQCComponentGroups_csv_o.size()) {
+        featureQCFile.store(filenames.featureRSDQCComponentGroups_csv_o, sequenceSegmentHandler_IO.getFeatureRSDQC(), true);
       }
     }
     catch (const std::exception& e) {
@@ -684,11 +684,11 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureBackgroundFilter";
-    LOGI << "Storing: " << filenames.featureBackgroundFilterComponents_csv_i << " and " <<
-      filenames.featureBackgroundFilterComponentGroups_csv_i;
+    LOGI << "Storing: " << filenames.featureBackgroundFilterComponents_csv_o << " and " <<
+      filenames.featureBackgroundFilterComponentGroups_csv_o;
 
-    if (filenames.featureBackgroundFilterComponents_csv_i.empty() &&
-      filenames.featureBackgroundFilterComponentGroups_csv_i.empty()) {
+    if (filenames.featureBackgroundFilterComponents_csv_o.empty() &&
+      filenames.featureBackgroundFilterComponentGroups_csv_o.empty()) {
       LOGE << "Filenames are both empty";
       LOGD << "END storeFeatureBackgroundFilter";
       return;
@@ -696,11 +696,11 @@ namespace SmartPeak
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (filenames.featureBackgroundFilterComponents_csv_i.size()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.featureBackgroundFilterComponents_csv_i, sequenceSegmentHandler_IO.getFeatureBackgroundFilter(), false);
+      if (filenames.featureBackgroundFilterComponents_csv_o.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.featureBackgroundFilterComponents_csv_o, sequenceSegmentHandler_IO.getFeatureBackgroundFilter(), false);
       }
-      if (filenames.featureBackgroundFilterComponentGroups_csv_i.size()) {
-        featureQCFile.store(filenames.featureBackgroundFilterComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureBackgroundFilter(), true);
+      if (filenames.featureBackgroundFilterComponentGroups_csv_o.size()) {
+        featureQCFile.store(filenames.featureBackgroundFilterComponentGroups_csv_o, sequenceSegmentHandler_IO.getFeatureBackgroundFilter(), true);
       }
     }
     catch (const std::exception& e) {
@@ -719,11 +719,11 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureBackgroundQC";
-    LOGI << "Loading: " << filenames.featureBackgroundQCComponents_csv_i << " and " <<
-      filenames.featureBackgroundQCComponentGroups_csv_i;
+    LOGI << "Loading: " << filenames.featureBackgroundQCComponents_csv_o << " and " <<
+      filenames.featureBackgroundQCComponentGroups_csv_o;
 
-    if (filenames.featureBackgroundQCComponents_csv_i.empty() &&
-      filenames.featureBackgroundQCComponentGroups_csv_i.empty()) {
+    if (filenames.featureBackgroundQCComponents_csv_o.empty() &&
+      filenames.featureBackgroundQCComponentGroups_csv_o.empty()) {
       LOGE << "Filenames are both empty";
       LOGD << "END storeFeatureBackgroundQC";
       return;
@@ -731,11 +731,11 @@ namespace SmartPeak
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (filenames.featureBackgroundQCComponents_csv_i.size()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.featureBackgroundQCComponents_csv_i, sequenceSegmentHandler_IO.getFeatureBackgroundQC(), false);
+      if (filenames.featureBackgroundQCComponents_csv_o.size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.featureBackgroundQCComponents_csv_o, sequenceSegmentHandler_IO.getFeatureBackgroundQC(), false);
       }
-      if (filenames.featureBackgroundQCComponentGroups_csv_i.size()) {
-        featureQCFile.store(filenames.featureBackgroundQCComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureBackgroundQC(), true);
+      if (filenames.featureBackgroundQCComponentGroups_csv_o.size()) {
+        featureQCFile.store(filenames.featureBackgroundQCComponentGroups_csv_o, sequenceSegmentHandler_IO.getFeatureBackgroundQC(), true);
       }
     }
     catch (const std::exception& e) {
