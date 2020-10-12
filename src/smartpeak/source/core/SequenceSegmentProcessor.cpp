@@ -934,12 +934,13 @@ namespace SmartPeak
     }
 
     OpenMS::MRMFeatureFilter featureFilter;
-    sequenceSegmentHandler_IO.setFeatureRSDEstimations(sequenceSegmentHandler_IO.getFeatureRSDFilter()); // Transfer over the estimations
+    OpenMS::MRMFeatureQC rsd_estimations = sequenceSegmentHandler_IO.getFeatureRSDFilter();
     featureFilter.EstimatePercRSD(
       qcs_featureMaps, 
-      sequenceSegmentHandler_IO.getFeatureRSDEstimations(),
+      rsd_estimations,
       sequenceHandler_I.getSequence().front().getRawData().getTargetedExperiment() // Targeted experiment used by all injections in the sequence
     );
+    sequenceSegmentHandler_IO.getFeatureRSDEstimations() = rsd_estimations; // Transfer over the estimations
 
     LOGD << "END EstimateFeatureRSDs";
   }
