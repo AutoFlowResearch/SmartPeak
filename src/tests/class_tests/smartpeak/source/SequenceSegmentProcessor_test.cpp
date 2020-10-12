@@ -2159,7 +2159,7 @@ BOOST_AUTO_TEST_CASE(processEstimateFeatureRSDs)
   feature_filter_template.component_qcs.at(4).meta_value_qc.emplace("peak_apex_int", std::make_pair(0.0, 5000.0));
   feature_filter_template.component_qcs.at(5).component_name = "atp.atp_1.Heavy";
   feature_filter_template.component_qcs.at(5).meta_value_qc.emplace("peak_apex_int", std::make_pair(0.0, 5000.0));
-  sequenceHandler.getSequenceSegments().front().setFeatureRSDEstimations(feature_filter_template);
+  sequenceHandler.getSequenceSegments().front().setFeatureRSDFilter(feature_filter_template);
 
   // Make other constructs
   const map<string, vector<map<string, string>>> params;
@@ -2372,7 +2372,7 @@ BOOST_AUTO_TEST_CASE(processEstimateFeatureBackgroundInterferences)
   feature_filter_template.component_qcs.at(3).component_name = "amp.amp_1.Heavy";
   feature_filter_template.component_qcs.at(4).component_name = "atp.atp_1.Light";
   feature_filter_template.component_qcs.at(5).component_name = "atp.atp_1.Heavy";
-  sequenceHandler.getSequenceSegments().front().setFeatureBackgroundEstimations(feature_filter_template);
+  sequenceHandler.getSequenceSegments().front().setFeatureBackgroundFilter(feature_filter_template);
 
   // Make other constructs
   const map<string, vector<map<string, string>>> params;

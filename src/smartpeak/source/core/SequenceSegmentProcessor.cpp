@@ -934,6 +934,7 @@ namespace SmartPeak
     }
 
     OpenMS::MRMFeatureFilter featureFilter;
+    sequenceSegmentHandler_IO.setFeatureRSDEstimations(sequenceSegmentHandler_IO.getFeatureRSDFilter()); // Transfer over the estimations
     featureFilter.EstimatePercRSD(
       qcs_featureMaps, 
       sequenceSegmentHandler_IO.getFeatureRSDEstimations(),
@@ -975,7 +976,7 @@ namespace SmartPeak
 
     // Initialize with a zero filter
     OpenMS::MRMFeatureFilter featureFilter;
-    featureFilter.zeroFilterValues(sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(), sequenceSegmentHandler_IO.getFeatureBackgroundEstimations());
+    featureFilter.zeroFilterValues(sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(), sequenceSegmentHandler_IO.getFeatureBackgroundFilter());
 
     // Then estimate the background interferences
     featureFilter.EstimateBackgroundInterferences(
