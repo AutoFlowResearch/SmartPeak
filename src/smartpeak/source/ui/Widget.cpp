@@ -123,15 +123,15 @@ namespace SmartPeak
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable |
-      //ImGuiTableFlags_Sortable | 
-      ImGuiTableFlags_Borders | ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow | ImGuiTableFlags_ScrollFreezeLeftColumn;
+      //ImGuiTableFlags_Sortable |
+      ImGuiTableFlags_Borders | ImGuiTableFlags_Scroll ;
 
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
         ImGui::TableSetupColumn(headers_(col).c_str());
       }
-      ImGui::TableAutoHeaders();
+      ImGui::TableHeadersRow();
 
       // Second row to end body
       if (columns_.size() > 0) {
@@ -141,48 +141,6 @@ namespace SmartPeak
             for (size_t col = 0; col < headers_.size(); ++col) {
               ImGui::TableSetColumnIndex(col);
               ImGui::Text("%s", columns_(row,col).c_str());
-            }
-          }
-        }
-      }
-      ImGui::EndTable();
-    }
-  }
-
-  void ExplorerWidget::draw()
-  {
-    if (headers_.size()<=0)
-      return;
-
-    // headers
-    const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable |
-      ImGuiTableFlags_Hideable | ImGuiTableFlags_Scroll | ImGuiTableFlags_ScrollFreezeTopRow;
-
-    if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
-      // First row headers
-      for (int col = 0; col < headers_.size(); col++) {
-        ImGui::TableSetupColumn(headers_(col).c_str());
-      }
-      for (int col = 0; col < checkbox_headers_.size(); col++) {
-        ImGui::TableSetupColumn(checkbox_headers_(col).c_str());
-      }
-      ImGui::TableAutoHeaders();
-
-      // Second row to end body
-      if (columns_.size() > 0) {
-        for (size_t row = 0; row < columns_.dimension(0); ++row) {
-          if (checked_rows_.size() <=0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
-            ImGui::TableNextRow();
-            for (size_t col = 0; col < headers_.size(); ++col) {
-              ImGui::TableSetColumnIndex(col);
-              ImGui::Text("%s", columns_(row, col).c_str());
-            }
-            for (size_t col = 0; col < checkbox_headers_.size(); ++col) {
-              std::string id = table_id_ + std::to_string(col) + std::to_string(row*columns_.dimension(1));
-              ImGui::TableSetColumnIndex(col + headers_.size());
-              ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-              ImGui::Checkbox(id.c_str(), &checkbox_columns_(row,col));
-              ImGui::PopStyleColor();
             }
           }
         }
