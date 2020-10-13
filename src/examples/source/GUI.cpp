@@ -778,9 +778,10 @@ int main(int argc, char **argv)
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
         {
           // Filter for the position
+          const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_Logarithmic;
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          ImGui::SliderFloat("min time (sec)", &session_handler_.chrom_time_range.first, 0.0f, session_handler_.chrom_time_range.second, "%.4f", 2.0f);
-          ImGui::SliderFloat("max time (sec)", &session_handler_.chrom_time_range.second, session_handler_.chrom_time_range.first, 2000.0f, "%.4f", 2.0f);
+          ImGui::SliderFloat("min time (sec)", &session_handler_.chrom_time_range.first, 0.0f, session_handler_.chrom_time_range.second, "%.4f", slider_flags);
+          ImGui::SliderFloat("max time (sec)", &session_handler_.chrom_time_range.second, session_handler_.chrom_time_range.first, 2000.0f, "%.4f", slider_flags);
 
           // The actual plot
           exceeding_plot_points_ = !session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
@@ -795,9 +796,10 @@ int main(int argc, char **argv)
         if (show_spectra_line_plot && ImGui::BeginTabItem("Spectra", &show_spectra_line_plot))
         {
           // Filter for the position
+          const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_Logarithmic;
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          ImGui::SliderFloat("min m/z (Da)", &session_handler_.spec_mz_range.first, 0.0f, session_handler_.spec_mz_range.second, "%.4f", 2.0f);
-          ImGui::SliderFloat("max m/z (Da)", &session_handler_.spec_mz_range.second, session_handler_.spec_mz_range.first, 2000.0f, "%.4f", 2.0f);
+          ImGui::SliderFloat("min m/z (Da)", &session_handler_.spec_mz_range.first, 0.0f, session_handler_.spec_mz_range.second, "%.4f", slider_flags);
+          ImGui::SliderFloat("max m/z (Da)", &session_handler_.spec_mz_range.second, session_handler_.spec_mz_range.first, 2000.0f, "%.4f", slider_flags);
 
           // The actual plot
           exceeding_plot_points_ = !session_handler_.setSpectrumScatterPlot(application_handler_.sequenceHandler_);

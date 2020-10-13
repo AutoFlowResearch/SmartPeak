@@ -130,6 +130,7 @@ namespace SmartPeak
       for (int col = 0; col < headers_.size(); col++) {
         ImGui::TableSetupColumn(headers_(col).c_str());
       }
+      ImGui::TableSetupScrollFreeze(headers_.size(), 1);
       ImGui::TableHeadersRow();
 
       // Second row to end body
@@ -156,7 +157,7 @@ namespace SmartPeak
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable |
       ImGuiTableFlags_Hideable | ImGuiTableFlags_Scroll ;
-
+    
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
@@ -165,6 +166,7 @@ namespace SmartPeak
       for (int col = 0; col < checkbox_headers_.size(); col++) {
         ImGui::TableSetupColumn(checkbox_headers_(col).c_str());
       }
+      ImGui::TableSetupScrollFreeze(headers_.size() + checkbox_headers_.size(), 1);
       ImGui::TableHeadersRow();
 
       // Second row to end body
