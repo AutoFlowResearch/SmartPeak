@@ -675,6 +675,803 @@ namespace SmartPeak
       }
     }
   }
+  void SessionHandler::setComponentRSDFiltersTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_rsd_filters table headers
+      if (comp_rsd_filters_table_headers.size() <= 0) {
+        LOGD << "Making comp_rsd_filters_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_rsd_filters_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_rsd_filters_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_rsd_filters_table_headers.size();
+
+      // Make the comp_rsd_filters table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_qcs.size();
+      if (comp_rsd_filters_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_rsd_filters_table_body";
+        comp_rsd_filters_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_qcs) {
+          comp_rsd_filters_table_body(row, col) = comp_rsd_qcs.component_name;
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_l);
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_u);
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_l);
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_u);
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_rsd_qcs.meta_value_qc) {
+            comp_rsd_filters_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_rsd_filters_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupRSDFiltersTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_group_rsd_filters table headers
+      if (comp_group_rsd_filters_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_rsd_filters_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_rsd_filters_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_rsd_filters_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_rsd_filters_table_headers.size();
+      // Make the comp_group_rsd_filters table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_group_qcs.size();
+      if (comp_group_rsd_filters_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_rsd_filters_table_body";
+        comp_group_rsd_filters_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_group_qcs) {
+          comp_group_rsd_filters_table_body(row, col) = comp_group_rsd_qcs.component_group_name;
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_rsd_qcs.meta_value_qc) {
+            comp_group_rsd_filters_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_rsd_filters_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentRSDQCsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_rsd_qcs table headers
+      if (comp_rsd_qcs_table_headers.size() <= 0) {
+        LOGD << "Making comp_rsd_qcs_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_rsd_qcs_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_rsd_qcs_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_rsd_qcs_table_headers.size();
+
+      // Make the comp_rsd_qcs table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_qcs.size();
+      if (comp_rsd_qcs_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_rsd_qcs_table_body";
+        comp_rsd_qcs_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_qcs) {
+          comp_rsd_qcs_table_body(row, col) = comp_rsd_qcs.component_name;
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_l);
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_u);
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_l);
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_u);
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_rsd_qcs.meta_value_qc) {
+            comp_rsd_qcs_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_rsd_qcs_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupRSDQCsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_group_rsd_qcs table headers
+      if (comp_group_rsd_qcs_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_rsd_qcs_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_rsd_qcs_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_rsd_qcs_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_rsd_qcs_table_headers.size();
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_group_qcs.size();
+      // Make the comp_group_rsd_qcs table body
+      if (comp_group_rsd_qcs_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_rsd_qcs_table_body";
+        comp_group_rsd_qcs_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_group_qcs) {
+          comp_group_rsd_qcs_table_body(row, col) = comp_group_rsd_qcs.component_group_name;
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_rsd_qcs.meta_value_qc) {
+            comp_group_rsd_qcs_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_rsd_qcs_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentBackgroundFiltersTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_background_filters table headers
+      if (comp_background_filters_table_headers.size() <= 0) {
+        LOGD << "Making comp_background_filters_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_background_filters_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_background_filters_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_background_filters_table_headers.size();
+
+      // Make the comp_background_filters table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_qcs.size();
+      if (comp_background_filters_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_background_filters_table_body";
+        comp_background_filters_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_qcs) {
+          comp_background_filters_table_body(row, col) = comp_background_qcs.component_name;
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_l);
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_u);
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.intensity_l);
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.intensity_u);
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_l);
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_background_qcs.meta_value_qc) {
+            comp_background_filters_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_background_filters_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupBackgroundFiltersTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_group_background_filters table headers
+      if (comp_group_background_filters_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_background_filters_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_background_filters_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_background_filters_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_background_filters_table_headers.size();
+      // Make the comp_group_background_filters table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_group_qcs.size();
+      if (comp_group_background_filters_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_background_filters_table_body";
+        comp_group_background_filters_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_group_qcs) {
+          comp_group_background_filters_table_body(row, col) = comp_group_background_qcs.component_group_name;
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_background_filters_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = comp_group_background_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_background_qcs.meta_value_qc) {
+            comp_group_background_filters_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_background_filters_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentBackgroundQCsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_background_qcs table headers
+      if (comp_background_qcs_table_headers.size() <= 0) {
+        LOGD << "Making comp_background_qcs_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_background_qcs_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_background_qcs_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_background_qcs_table_headers.size();
+
+      // Make the comp_background_qcs table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.size();
+      if (comp_background_qcs_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_background_qcs_table_body";
+        comp_background_qcs_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs) {
+          comp_background_qcs_table_body(row, col) = comp_background_qcs.component_name;
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_l);
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_u);
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.intensity_l);
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.intensity_u);
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_l);
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_background_qcs.meta_value_qc) {
+            comp_background_qcs_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_background_qcs_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupBackgroundQCsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_group_background_qcs table headers
+      if (comp_group_background_qcs_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_background_qcs_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_background_qcs_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_background_qcs_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_background_qcs_table_headers.size();
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_group_qcs.size();
+      // Make the comp_group_background_qcs table body
+      if (comp_group_background_qcs_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_background_qcs_table_body";
+        comp_group_background_qcs_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_group_qcs) {
+          comp_group_background_qcs_table_body(row, col) = comp_group_background_qcs.component_group_name;
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = comp_group_background_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_background_qcs.meta_value_qc) {
+            comp_group_background_qcs_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_background_qcs_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }  void SessionHandler::setComponentRSDEstimationsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_rsd_estimations table headers
+      if (comp_rsd_estimations_table_headers.size() <= 0) {
+        LOGD << "Making comp_rsd_estimations_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_rsd_estimations_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_rsd_estimations_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_rsd_estimations_table_headers.size();
+
+      // Make the comp_rsd_estimations table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_qcs.size();
+      if (comp_rsd_estimations_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_rsd_estimations_table_body";
+        comp_rsd_estimations_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_qcs) {
+          comp_rsd_estimations_table_body(row, col) = comp_rsd_qcs.component_name;
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_l);
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_u);
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_l);
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_u);
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_rsd_qcs.meta_value_qc) {
+            comp_rsd_estimations_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_rsd_estimations_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupRSDEstimationsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_group_rsd_estimations table headers
+      if (comp_group_rsd_estimations_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_rsd_estimations_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_rsd_estimations_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_rsd_estimations_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_rsd_estimations_table_headers.size();
+      // Make the comp_group_rsd_estimations table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_group_qcs.size();
+      if (comp_group_rsd_estimations_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_rsd_estimations_table_body";
+        comp_group_rsd_estimations_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_group_qcs) {
+          comp_group_rsd_estimations_table_body(row, col) = comp_group_rsd_qcs.component_group_name;
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_rsd_qcs.meta_value_qc) {
+            comp_group_rsd_estimations_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_rsd_estimations_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentBackgroundEstimationsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_background_estimations table headers
+      if (comp_background_estimations_table_headers.size() <= 0) {
+        LOGD << "Making comp_background_estimations_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_background_estimations_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_background_estimations_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_background_estimations_table_headers.size();
+
+      // Make the comp_background_estimations table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_qcs.size();
+      if (comp_background_estimations_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_background_estimations_table_body";
+        comp_background_estimations_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_qcs) {
+          comp_background_estimations_table_body(row, col) = comp_background_qcs.component_name;
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_l);
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_u);
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.intensity_l);
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.intensity_u);
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_l);
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_background_qcs.meta_value_qc) {
+            comp_background_estimations_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_background_estimations_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupBackgroundEstimationsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0) {
+      // Make the comp_group_background_estimations table headers
+      if (comp_group_background_estimations_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_background_estimations_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_background_estimations_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_background_estimations_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_background_estimations_table_headers.size();
+      // Make the comp_group_background_estimations table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_group_qcs.size();
+      if (comp_group_background_estimations_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_background_estimations_table_body";
+        comp_group_background_estimations_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_group_qcs) {
+          comp_group_background_estimations_table_body(row, col) = comp_group_background_qcs.component_group_name;
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = comp_group_background_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_background_qcs.meta_value_qc) {
+            comp_group_background_estimations_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_background_estimations_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
   bool SessionHandler::setFeatureTable(const SequenceHandler & sequence_handler)
   {
     int MAX_SIZE = 5000;
@@ -1339,6 +2136,198 @@ namespace SmartPeak
           table_filters(row) = false;
       }
       return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentRSDFiltersTableFilters()
+  {
+    if (comp_rsd_filters_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_rsd_filters_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_rsd_filters_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_rsd_filters_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentRSDQCsTableFilters()
+  {
+    if (comp_rsd_qcs_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_rsd_qcs_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_rsd_qcs_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_rsd_qcs_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupRSDFiltersTableFilters()
+  {
+    if (comp_group_rsd_filters_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_rsd_filters_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_group_rsd_filters_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_group_rsd_filters_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupRSDQCsTableFilters()
+  {
+    if (comp_group_rsd_qcs_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_rsd_qcs_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_group_rsd_qcs_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_group_rsd_qcs_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentBackgroundFiltersTableFilters()
+  {
+    if (comp_background_filters_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_background_filters_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_background_filters_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_background_filters_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentBackgroundQCsTableFilters()
+  {
+    if (comp_background_qcs_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_background_qcs_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_background_qcs_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_background_qcs_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupBackgroundFiltersTableFilters()
+  {
+    if (comp_group_background_filters_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_background_filters_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_group_background_filters_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_group_background_filters_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupBackgroundQCsTableFilters()
+  {
+    if (comp_group_background_qcs_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_background_qcs_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_group_background_qcs_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_group_background_qcs_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentRSDEstimationsTableFilters()
+  {
+    if (comp_rsd_estimations_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_rsd_estimations_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_estimations(comp_rsd_estimations_table_body.dimension(0));
+      table_estimations.setConstant(true);
+      for (int row = 0; row < comp_rsd_estimations_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_estimations(row) = false;
+      }
+      return table_estimations;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupRSDEstimationsTableFilters()
+  {
+    if (comp_group_rsd_estimations_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_rsd_estimations_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_estimations(comp_group_rsd_estimations_table_body.dimension(0));
+      table_estimations.setConstant(true);
+      for (int row = 0; row < comp_group_rsd_estimations_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_estimations(row) = false;
+      }
+      return table_estimations;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentBackgroundEstimationsTableFilters()
+  {
+    if (comp_background_estimations_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_background_estimations_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_estimations(comp_background_estimations_table_body.dimension(0));
+      table_estimations.setConstant(true);
+      for (int row = 0; row < comp_background_estimations_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_estimations(row) = false;
+      }
+      return table_estimations;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupBackgroundEstimationsTableFilters()
+  {
+    if (comp_group_background_estimations_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_background_estimations_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_estimations(comp_group_background_estimations_table_body.dimension(0));
+      table_estimations.setConstant(true);
+      for (int row = 0; row < comp_group_background_estimations_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_estimations(row) = false;
+      }
+      return table_estimations;
     }
     else
       return Eigen::Tensor<bool, 1>();
