@@ -2446,17 +2446,17 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureRSDEstimations)
   SequenceSegmentHandler ssh, ssh_test;
 
   Filenames filenames;
-  filenames.featureRSDFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.featureRSDFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.featureRSDEstimationComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureRSDEstimationComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
   LoadFeatureRSDEstimations loadFeatureRSDEstimations;
   loadFeatureRSDEstimations.process(ssh, SequenceHandler(), {}, filenames);
-  filenames.featureRSDFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
-  filenames.featureRSDFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
+  filenames.featureRSDEstimationComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
+  filenames.featureRSDEstimationComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
   StoreFeatureRSDEstimations storeFeatureRSDEstimations;
   storeFeatureRSDEstimations.process(ssh, SequenceHandler(), {}, filenames);
   loadFeatureRSDEstimations.process(ssh_test, SequenceHandler(), {}, filenames);
-  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDFilter();
-  const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureRSDFilter();
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDEstimations();
+  const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureRSDEstimations();
 
   BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
   for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
@@ -2467,8 +2467,6 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureRSDEstimations)
     BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
   }
 }
-
-
 
 /**
   StoreFeatureBackgroundEstimations Tests
@@ -2500,17 +2498,17 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureBackgroundEstimations)
   SequenceSegmentHandler ssh, ssh_test;
 
   Filenames filenames;
-  filenames.featureBackgroundFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.featureBackgroundFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.featureBackgroundEstimationComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureBackgroundEstimationComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
   LoadFeatureBackgroundEstimations loadFeatureBackgroundEstimations;
   loadFeatureBackgroundEstimations.process(ssh, SequenceHandler(), {}, filenames);
-  filenames.featureBackgroundFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
-  filenames.featureBackgroundFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
+  filenames.featureBackgroundEstimationComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv");
+  filenames.featureBackgroundEstimationComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv");
   StoreFeatureBackgroundEstimations storeFeatureBackgroundEstimations;
   storeFeatureBackgroundEstimations.process(ssh, SequenceHandler(), {}, filenames);
   loadFeatureBackgroundEstimations.process(ssh_test, SequenceHandler(), {}, filenames);
-  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundFilter();
-  const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureBackgroundFilter();
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundEstimations();
+  const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureBackgroundEstimations();
 
   BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
   for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
@@ -2552,12 +2550,12 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureRSDEstimations)
   SequenceSegmentHandler ssh;
 
   Filenames filenames;
-  filenames.featureRSDFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.featureRSDFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.featureRSDEstimationComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureRSDEstimationComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
 
   LoadFeatureRSDEstimations loadFeatureRSDEstimations;
   loadFeatureRSDEstimations.process(ssh, SequenceHandler(), {}, filenames);
-  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDFilter();
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDEstimations();
 
   BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
   BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
@@ -2596,12 +2594,12 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureBackgroundEstimations)
   SequenceSegmentHandler ssh;
 
   Filenames filenames;
-  filenames.featureBackgroundFilterComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.featureBackgroundFilterComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.featureBackgroundEstimationComponents_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.featureBackgroundEstimationComponentGroups_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
 
   LoadFeatureBackgroundEstimations loadFeatureBackgroundEstimations;
   loadFeatureBackgroundEstimations.process(ssh, SequenceHandler(), {}, filenames);
-  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundFilter();
+  const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundEstimations();
 
   BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
   BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
