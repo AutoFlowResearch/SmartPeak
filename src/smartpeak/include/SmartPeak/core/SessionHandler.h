@@ -17,21 +17,21 @@ namespace SmartPeak
     @returns true if all rows/columns were added and false if rows/columns were omitted due to performance
     */
     void setMinimalDataAndFilters(const SequenceHandler& sequence_handler);
-    void setInjectionExplorer(); ///< set the InjectionExplorer-speciic data
-    void setTransitionExplorer(); ///< set the TransitionExplorer-speciic data
-    void setFeatureExplorer(); ///< set the FeatureExplorer-speciic data
-    void setSpectrumExplorer(); ///< set the SpectrumExplorer-speciic data
-    void setSequenceTable(const SequenceHandler& sequence_handler); ///< set the SequenceTable-speciic data
-    void setTransitionsTable(const SequenceHandler& sequence_handler); ///< set the TransitionsTable-speciic data
-    void setSpectrumTable(const SequenceHandler& sequence_handler); ///< set the SpectrumTable-speciic data
-    void setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands); ///< set the WorkflowTable-speciic data
-    void setParametersTable(const SequenceHandler& sequence_handler); ///< set the ParametersTable-speciic data
-    void setQuantMethodTable(const SequenceHandler& sequence_handler); ///< set the QuantMethodTable-speciic data
-    void setStdsConcsTable(const SequenceHandler& sequence_handler); ///< set the StdsConcsTable-speciic data
-    void setComponentFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentFiltersTable-speciic data
-    void setComponentGroupFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupFiltersTable-speciic data
-    void setComponentQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentQCsTable-speciic data
-    void setComponentGroupQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupQCsTable-speciic data
+    void setInjectionExplorer(); ///< set the InjectionExplorer-specific data
+    void setTransitionExplorer(); ///< set the TransitionExplorer-specific data
+    void setFeatureExplorer(); ///< set the FeatureExplorer-specific data
+    void setSpectrumExplorer(); ///< set the SpectrumExplorer-specific data
+    void setSequenceTable(const SequenceHandler& sequence_handler); ///< set the SequenceTable-specific data
+    void setTransitionsTable(const SequenceHandler& sequence_handler); ///< set the TransitionsTable-specific data
+    void setSpectrumTable(const SequenceHandler& sequence_handler); ///< set the SpectrumTable-specific data
+    void setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands); ///< set the WorkflowTable-specific data
+    void setParametersTable(const SequenceHandler& sequence_handler); ///< set the ParametersTable-specific data
+    void setQuantMethodTable(const SequenceHandler& sequence_handler); ///< set the QuantMethodTable-specific data
+    void setStdsConcsTable(const SequenceHandler& sequence_handler); ///< set the StdsConcsTable-specific data
+    void setComponentFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentFiltersTable-specific data
+    void setComponentGroupFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupFiltersTable-specific data
+    void setComponentQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentQCsTable-specific data
+    void setComponentGroupQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupQCsTable-specific data
     /*
     @brief Sets the feature table
 
