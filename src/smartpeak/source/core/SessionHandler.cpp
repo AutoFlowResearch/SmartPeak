@@ -1208,7 +1208,7 @@ namespace SmartPeak
     }
   }  void SessionHandler::setComponentRSDEstimationsTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_qcs.size() > 0) {
       // Make the comp_rsd_estimations table headers
       if (comp_rsd_estimations_table_headers.size() <= 0) {
         LOGD << "Making comp_rsd_estimations_table_headers";
@@ -1257,7 +1257,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentGroupRSDEstimationsTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_group_qcs.size() > 0) {
       // Make the comp_group_rsd_estimations table headers
       if (comp_group_rsd_estimations_table_headers.size() <= 0) {
         LOGD << "Making comp_group_rsd_estimations_table_headers";
@@ -1341,7 +1341,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentBackgroundEstimationsTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_qcs.size() > 0) {
       // Make the comp_background_estimations table headers
       if (comp_background_estimations_table_headers.size() <= 0) {
         LOGD << "Making comp_background_estimations_table_headers";
@@ -1390,7 +1390,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentGroupBackgroundEstimationsTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_group_qcs.size() > 0) {
       // Make the comp_group_background_estimations table headers
       if (comp_group_background_estimations_table_headers.size() <= 0) {
         LOGD << "Making comp_group_background_estimations_table_headers";
