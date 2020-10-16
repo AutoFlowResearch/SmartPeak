@@ -19,8 +19,8 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <imgui.h>
-#include <examples/imgui_impl_sdl.h>
-#include <examples/imgui_impl_opengl2.h>
+#include <backends/imgui_impl_sdl.h>
+#include <backends/imgui_impl_opengl2.h>
 #include <misc/cpp/imgui_stdlib.h>
 
 using namespace SmartPeak;
