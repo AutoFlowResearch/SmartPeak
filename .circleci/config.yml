@@ -178,11 +178,11 @@ jobs:
           cd ~
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
           cd ~/OpenMS
+          ((Get-Content -path src\openswathalgo\include\OpenMS\OPENSWATHALGO\ALGO\Scoring.h -Raw) '#include <vector>',"#include <vector>`r`n#include <algorithm>") | Get-Content -path src\openswathalgo\include\OpenMS\OPENSWATHALGO\ALGO\Scoring.h
           mkdir contrib_build; cd contrib_build
           $url_contrib = 'https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/windows/x64/msvc-14.2/contrib_build.tar.gz'
           $contrib_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'contrib_tmp$', 'tar.gz' } –PassThru
           Invoke-WebRequest $url_contrib -OutFile $contrib_tmp
-          7z x $contrib_tmp -o'.'
           7z x $contrib_tmp.BaseName -o'.'
           rm  .\lib\libboost_*
           rm  -r .\include\boost
