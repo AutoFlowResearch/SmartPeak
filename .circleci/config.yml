@@ -188,6 +188,7 @@ jobs:
           $url_contrib = 'https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/windows/x64/msvc-14.2/contrib_build.tar.gz'
           $contrib_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'contrib_tmp$', 'tar.gz' } –PassThru
           Invoke-WebRequest $url_contrib -OutFile $contrib_tmp
+          7z x $contrib_tmp -o'.'
           7z x $contrib_tmp.BaseName -o'.'
           rm  .\lib\libboost_*
           rm  -r .\include\boost
