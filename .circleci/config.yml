@@ -167,6 +167,11 @@ jobs:
           $BOOST_DIR = 'C:\lib\boost\boost_1_73_0'
           $boost_tmp | Remove-Item
       - run: |
+          cd ~
+          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
+          cd ~/OpenMS
+          ((Get-Content -path src\openswathalgo\include\OpenMS\OPENSWATHALGO\ALGO\Scoring.h -Raw) -replace '#include <vector>',"#include <vector>`r`n#include <algorithm>") | Set-Content -Path src\openswathalgo\include\OpenMS\OPENSWATHALGO\ALGO\Scoring.h
+      - run: |
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
           $ProgressPreference = "SilentlyContinue"
           cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars64.txt"
@@ -175,10 +180,10 @@ jobs:
               Set-Content "env:\$($matches[1])" $matches[2]
               }
           }
-          cd ~
-          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
+          # cd ~
+          # git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
           cd ~/OpenMS
-          ((Get-Content -path src\openswathalgo\include\OpenMS\OPENSWATHALGO\ALGO\Scoring.h -Raw) -replace '#include <vector>',"#include <vector>`r`n#include <algorithm>") | Set-Content -path src\openswathalgo\include\OpenMS\OPENSWATHALGO\ALGO\Scoring.h
+          # ((Get-Content -path src\openswathalgo\include\OpenMS\OPENSWATHALGO\ALGO\Scoring.h -Raw) -replace '#include <vector>',"#include <vector>`r`n#include <algorithm>") | Set-Content -path src\openswathalgo\include\OpenMS\OPENSWATHALGO\ALGO\Scoring.h
           mkdir contrib_build; cd contrib_build
           $url_contrib = 'https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/windows/x64/msvc-14.2/contrib_build.tar.gz'
           $contrib_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'contrib_tmp$', 'tar.gz' } –PassThru
