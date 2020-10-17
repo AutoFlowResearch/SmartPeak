@@ -579,7 +579,7 @@ int main(int argc, char **argv)
       if (ImGui::BeginMenu("Help"))
       {
         ImGui::MenuItem("About", NULL, &popup_about_);
-        if (ImGui::MenuItem("Documentation")) { 
+        if (ImGui::MenuItem("Documentation")) {
           // TODO: Render the SmartPeak documentation (See AUT-178)
         }
         ImGui::EndMenu();
@@ -778,9 +778,10 @@ int main(int argc, char **argv)
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
         {
           // Filter for the position
+          const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_Logarithmic;
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          ImGui::SliderFloat("min time (sec)", &session_handler_.chrom_time_range.first, 0.0f, session_handler_.chrom_time_range.second, "%.4f", 2.0f);
-          ImGui::SliderFloat("max time (sec)", &session_handler_.chrom_time_range.second, session_handler_.chrom_time_range.first, 2000.0f, "%.4f", 2.0f);
+          ImGui::SliderFloat("min time (sec)", &session_handler_.chrom_time_range.first, 0.0f, session_handler_.chrom_time_range.second, "%.4f", slider_flags);
+          ImGui::SliderFloat("max time (sec)", &session_handler_.chrom_time_range.second, session_handler_.chrom_time_range.first, 2000.0f, "%.4f", slider_flags);
 
           // The actual plot
           exceeding_plot_points_ = !session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
@@ -795,9 +796,10 @@ int main(int argc, char **argv)
         if (show_spectra_line_plot && ImGui::BeginTabItem("Spectra", &show_spectra_line_plot))
         {
           // Filter for the position
+          const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_Logarithmic;
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          ImGui::SliderFloat("min m/z (Da)", &session_handler_.spec_mz_range.first, 0.0f, session_handler_.spec_mz_range.second, "%.4f", 2.0f);
-          ImGui::SliderFloat("max m/z (Da)", &session_handler_.spec_mz_range.second, session_handler_.spec_mz_range.first, 2000.0f, "%.4f", 2.0f);
+          ImGui::SliderFloat("min m/z (Da)", &session_handler_.spec_mz_range.first, 0.0f, session_handler_.spec_mz_range.second, "%.4f", slider_flags);
+          ImGui::SliderFloat("max m/z (Da)", &session_handler_.spec_mz_range.second, session_handler_.spec_mz_range.first, 2000.0f, "%.4f", slider_flags);
 
           // The actual plot
           exceeding_plot_points_ = !session_handler_.setSpectrumScatterPlot(application_handler_.sequenceHandler_);
@@ -825,7 +827,7 @@ int main(int argc, char **argv)
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
-          Heatmap2DWidget plot2d(session_handler_.feat_heatmap_data, session_handler_.feat_heatmap_col_labels, session_handler_.feat_heatmap_row_labels, 
+          Heatmap2DWidget plot2d(session_handler_.feat_heatmap_data, session_handler_.feat_heatmap_col_labels, session_handler_.feat_heatmap_row_labels,
             session_handler_.feat_heatmap_x_axis_title, session_handler_.feat_heatmap_y_axis_title, session_handler_.feat_value_min, session_handler_.feat_value_max,
             win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "FeaturesHeatmapMainWindow");
           plot2d.draw();
@@ -835,7 +837,7 @@ int main(int argc, char **argv)
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           exceeding_plot_points_ = !session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
-          CalibratorsPlotWidget plot2d(session_handler_.calibrators_conc_fit_data, session_handler_.calibrators_feature_fit_data, 
+          CalibratorsPlotWidget plot2d(session_handler_.calibrators_conc_fit_data, session_handler_.calibrators_feature_fit_data,
             session_handler_.calibrators_conc_raw_data, session_handler_.calibrators_feature_raw_data, session_handler_.calibrators_series_names,
             session_handler_.calibrators_x_axis_title, session_handler_.calibrators_y_axis_title, session_handler_.calibrators_conc_min, session_handler_.calibrators_conc_max,
             session_handler_.calibrators_feature_min, session_handler_.calibrators_feature_max, win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_,
