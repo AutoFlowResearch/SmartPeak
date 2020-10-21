@@ -4,7 +4,7 @@ set_property (DIRECTORY PROPERTY EP_BASE Dependencies)
 
 set (DEPENDENCIES)
 #set (IMGUI_VERSION 6a0d0dab5a9f0b9518a2bc9bb456a69895ae0962) # tag: v1.72b, 2019/07/31
-set (IMGUI_VERSION a933cc4f4d366340eff5c6dcb3a927478c9006a7) # tables 2020/06/10
+set (IMGUI_VERSION 02f976a7b5c3b0ad0875ca0ed08e6bcc39d73e68) # tables
 message (STATUS "Adding imgui ${IMGUI_VERSION} as an external project.")
 
 ExternalProject_Add(imgui
