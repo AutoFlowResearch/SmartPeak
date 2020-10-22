@@ -18,7 +18,7 @@ cd C:\projects\deps
 
 git clone -n https://github.com/ocornut/imgui.git
 cd imgui
-git checkout tables
+git checkout 13f718337ac4df2c66727e85174d48e9a91eabcf
 
 cd C:\projects\deps
 

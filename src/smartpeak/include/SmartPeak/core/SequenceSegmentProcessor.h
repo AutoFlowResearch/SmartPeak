@@ -425,4 +425,69 @@ namespace SmartPeak
       const Filenames& filenames
     ) const override;
   };
+
+
+  struct LoadFeatureRSDEstimations : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_FEATURE_RSD_ESTIMATIONS"; }
+    std::string getDescription() const override { return "Load the component and component group percent RSD estimations from file."; }
+
+    /** Load the component and component group percent RSD estimations from file.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureRSDEstimations : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_RSD_ESTIMATIONS"; }
+    std::string getDescription() const override { return "Store the component and component group percent RSD estimations to disk."; }
+
+    /** Store the component and component group percent RSD estimations to disk.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct LoadFeatureBackgroundEstimations : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_ESTIMATIONS"; }
+    std::string getDescription() const override { return "Load the component and component group percent Background Interference estimations from file."; }
+
+    /** Load the component and component group percent Background Interference estimations from file.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct StoreFeatureBackgroundEstimations : SequenceSegmentProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_FEATURE_BACKGROUND_ESTIMATIONS"; }
+    std::string getDescription() const override { return "Store the component and component group percent Background Interference estimations to disk."; }
+
+    /** Store the component and component group percent Background Interference estimations to disk.
+    */
+    void process(
+      SequenceSegmentHandler& sequenceSegmentHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
 }
