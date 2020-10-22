@@ -39,15 +39,16 @@ jobs:
           make -j4 OpenMS
       - run:
           command: |
-            mkdir ~/SmartPeak2_superbuild
-            cd ~/SmartPeak2_superbuild
+            cd ~/SmartPeak2
+            mkdir ~/superbuild
+            cd ~/superbuild
             cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
             make -j4
       - run:
           command: |
             mkdir ~/SmartPeak2_build
             cd ~/SmartPeak2_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak2/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak2/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak2/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
             make -j4
       - run:
           command: |
@@ -97,11 +98,11 @@ jobs:
           cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
           make -j4 OpenMS
       - run: |
-          cd ~/SmartPeak2 && mkdir smartpeak2_debug_superbuild smartpeak2_debug_build
-          cd smartpeak2_debug_superbuild
+          cd ~/SmartPeak2 && mkdir superbuild smartpeak2_debug_build
+          cd superbuild
           cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug .. && make -j4
           cd ../smartpeak2_debug_build
-          cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+          cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak2/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak2/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak2/superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
           make -j4
       - run: |
           set +o pipefail
@@ -204,12 +205,12 @@ jobs:
               }
           }
           cd ~/SmartPeak2
-          mkdir smartpeak2_superbuild, smartpeak2_build
-          cd ~/SmartPeak2/smartpeak2_superbuild
+          mkdir superbuild, smartpeak2_build
+          cd ~/SmartPeak2/superbuild
           cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak2
           cmake --build .
           cd ~/SmartPeak2/smartpeak2_build
-          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:\lib\boost\boost_1_73_0" -DBOOST_INCLUDE_DIR="C:\lib\boost\boost_1_73_0" -DBOOST_LIBRARYDIR="C:\lib\boost\boost_1_73_0\lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="~/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak2
+          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:\lib\boost\boost_1_73_0" -DBOOST_INCLUDE_DIR="C:\lib\boost\boost_1_73_0" -DBOOST_LIBRARYDIR="C:\lib\boost\boost_1_73_0\lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="~/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=~/SmartPeak2/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=~/SmartPeak2/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=~/SmartPeak2/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak2
           msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
           msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
           msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
