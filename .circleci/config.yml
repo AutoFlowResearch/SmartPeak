@@ -40,8 +40,8 @@ jobs:
       - run:
           command: |
             cd ~/SmartPeak2
-            # mkdir ~/superbuild
-            cd ~/superbuild
+            # mkdir superbuild
+            cd superbuild
             cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
             make -j4
       - run:
