@@ -76,6 +76,18 @@ int main(int argc, char **argv)
   bool show_comp_group_filters_table = false;
   bool show_comp_qcs_table = false;
   bool show_comp_group_qcs_table = false;
+  bool show_comp_rsd_filters_table = false;
+  bool show_comp_group_rsd_filters_table = false;
+  bool show_comp_rsd_qcs_table = false;
+  bool show_comp_group_rsd_qcs_table = false;
+  bool show_comp_background_filters_table = false;
+  bool show_comp_group_background_filters_table = false;
+  bool show_comp_background_qcs_table = false;
+  bool show_comp_group_background_qcs_table = false;
+  bool show_comp_rsd_estimations_table = false;
+  bool show_comp_group_rsd_estimations_table = false;
+  bool show_comp_background_estimations_table = false;
+  bool show_comp_group_background_estimations_table = false;
   bool show_feature_table = false; // table of all injections, features, and metavalues
   bool show_feature_pivot_table = false; // injection vs. feature for a particular metavalue
   bool show_chromatogram_line_plot = false; // time vs. intensity for the raw data and annotated feature
@@ -523,6 +535,18 @@ int main(int argc, char **argv)
           if (ImGui::MenuItem("Comp Group Filters", NULL, &show_comp_group_filters_table)) {}
           if (ImGui::MenuItem("Comp QCs", NULL, &show_comp_qcs_table)) {}
           if (ImGui::MenuItem("Comp Group QCs", NULL, &show_comp_group_qcs_table)) {}
+          if (ImGui::MenuItem("Comp RSD Filters", NULL, &show_comp_rsd_filters_table)) {}
+          if (ImGui::MenuItem("Comp Group RSD Filters", NULL, &show_comp_group_rsd_filters_table)) {}
+          if (ImGui::MenuItem("Comp RSD QCs", NULL, &show_comp_rsd_qcs_table)) {}
+          if (ImGui::MenuItem("Comp Group RSD QCs", NULL, &show_comp_group_rsd_qcs_table)) {}
+          if (ImGui::MenuItem("Comp Background Filters", NULL, &show_comp_background_filters_table)) {}
+          if (ImGui::MenuItem("Comp Group Background Filters", NULL, &show_comp_group_background_filters_table)) {}
+          if (ImGui::MenuItem("Comp Background QCs", NULL, &show_comp_background_qcs_table)) {}
+          if (ImGui::MenuItem("Comp Group Background QCs", NULL, &show_comp_group_background_qcs_table)) {}
+          if (ImGui::MenuItem("Comp RSD Estimations", NULL, &show_comp_rsd_estimations_table)) {}
+          if (ImGui::MenuItem("Comp Group RSD Estimations", NULL, &show_comp_group_rsd_estimations_table)) {}
+          if (ImGui::MenuItem("Comp Background Estimations", NULL, &show_comp_background_estimations_table)) {}
+          if (ImGui::MenuItem("Comp Group Background Estimations", NULL, &show_comp_group_background_estimations_table)) {}
           // TODO: missing workflow setting tables...
           ImGui::EndMenu();
         }
@@ -588,8 +612,12 @@ int main(int argc, char **argv)
     }
 
     show_top_window_ = show_sequence_table || show_transitions_table || show_spectrum_table || show_workflow_table || show_parameters_table
-      || show_quant_method_table || show_stds_concs_table || show_comp_filters_table || show_comp_group_filters_table
-      || show_comp_qcs_table || show_comp_group_qcs_table || show_feature_table || show_feature_pivot_table
+      || show_quant_method_table || show_stds_concs_table 
+      || show_comp_filters_table || show_comp_group_filters_table || show_comp_qcs_table || show_comp_group_qcs_table
+      || show_comp_rsd_filters_table || show_comp_group_rsd_filters_table || show_comp_rsd_qcs_table || show_comp_group_rsd_qcs_table
+      || show_comp_background_filters_table || show_comp_group_background_filters_table || show_comp_background_qcs_table || show_comp_group_background_qcs_table
+      || show_comp_rsd_estimations_table || show_comp_group_rsd_estimations_table || show_comp_background_estimations_table || show_comp_group_background_estimations_table
+      || show_feature_table || show_feature_pivot_table
       || show_chromatogram_line_plot || show_spectra_line_plot || show_feature_line_plot || show_feature_heatmap_plot || show_calibrators_line_plot;
     show_bottom_window_ = show_info_ || show_log_;
     show_left_window_ = show_injection_explorer || show_transitions_explorer || show_features_explorer || show_spectrum_explorer;
@@ -764,6 +792,114 @@ int main(int argc, char **argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
           GenericTableWidget Table(session_handler_.feature_table_headers, session_handler_.feature_table_body, Eigen::Tensor<bool, 1>(), "featuresTableMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_rsd_filters_table && ImGui::BeginTabItem("Component RSD Filters", &show_comp_rsd_filters_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentRSDFiltersTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentRSDFiltersTableFilters();
+          GenericTableWidget Table(session_handler_.comp_rsd_filters_table_headers, session_handler_.comp_rsd_filters_table_body, table_filters, "CompRSDFiltersMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_group_rsd_filters_table && ImGui::BeginTabItem("Component Group RSD Filters", &show_comp_group_rsd_filters_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentGroupRSDFiltersTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupRSDFiltersTableFilters();
+          GenericTableWidget Table(session_handler_.comp_group_rsd_filters_table_headers, session_handler_.comp_group_rsd_filters_table_body, table_filters, "CompGroupRSDFiltersMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_rsd_qcs_table && ImGui::BeginTabItem("Component RSD QCs", &show_comp_rsd_qcs_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentRSDQCsTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentRSDQCsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_rsd_qcs_table_headers, session_handler_.comp_rsd_qcs_table_body, table_filters, "CompRSDQCsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_group_rsd_qcs_table && ImGui::BeginTabItem("Component Group RSD QCs", &show_comp_group_rsd_qcs_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentGroupRSDQCsTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupRSDQCsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_group_rsd_qcs_table_headers, session_handler_.comp_group_rsd_qcs_table_body, table_filters, "CompGroupRSDQCsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_background_filters_table && ImGui::BeginTabItem("Component Background Filters", &show_comp_background_filters_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentBackgroundFiltersTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentBackgroundFiltersTableFilters();
+          GenericTableWidget Table(session_handler_.comp_background_filters_table_headers, session_handler_.comp_background_filters_table_body, table_filters, "CompBackgroundFiltersMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_group_background_filters_table && ImGui::BeginTabItem("Component Group Background Filters", &show_comp_group_background_filters_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentGroupBackgroundFiltersTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupBackgroundFiltersTableFilters();
+          GenericTableWidget Table(session_handler_.comp_group_background_filters_table_headers, session_handler_.comp_group_background_filters_table_body, table_filters, "CompGroupBackgroundFiltersMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_background_qcs_table && ImGui::BeginTabItem("Component Background QCs", &show_comp_background_qcs_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentBackgroundQCsTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentBackgroundQCsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_background_qcs_table_headers, session_handler_.comp_background_qcs_table_body, table_filters, "CompBackgroundQCsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_group_background_qcs_table && ImGui::BeginTabItem("Component Group Background QCs", &show_comp_group_background_qcs_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentGroupBackgroundQCsTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupBackgroundQCsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_group_background_qcs_table_headers, session_handler_.comp_group_background_qcs_table_body, table_filters, "CompGroupBackgroundQCsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_rsd_estimations_table && ImGui::BeginTabItem("Component RSD Filters", &show_comp_rsd_estimations_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentRSDEstimationsTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_estimations = session_handler_.getComponentRSDEstimationsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_rsd_estimations_table_headers, session_handler_.comp_rsd_estimations_table_body, table_estimations, "CompRSDEstimationsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_group_rsd_estimations_table && ImGui::BeginTabItem("Component Group RSD Filters", &show_comp_group_rsd_estimations_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentGroupRSDEstimationsTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_estimations = session_handler_.getComponentGroupRSDEstimationsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_group_rsd_estimations_table_headers, session_handler_.comp_group_rsd_estimations_table_body, table_estimations, "CompGroupRSDEstimationsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_background_estimations_table && ImGui::BeginTabItem("Component Background Filters", &show_comp_background_estimations_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentBackgroundEstimationsTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_estimations = session_handler_.getComponentBackgroundEstimationsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_background_estimations_table_headers, session_handler_.comp_background_estimations_table_body, table_estimations, "CompBackgroundEstimationsMainWindow");
+          Table.draw();
+          ImGui::EndTabItem();
+        }
+        if (show_comp_group_background_estimations_table && ImGui::BeginTabItem("Component Group Background Filters", &show_comp_group_background_estimations_table))
+        {
+          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
+          session_handler_.setComponentGroupBackgroundEstimationsTable(application_handler_.sequenceHandler_);
+          Eigen::Tensor<bool, 1> table_estimations = session_handler_.getComponentGroupBackgroundEstimationsTableFilters();
+          GenericTableWidget Table(session_handler_.comp_group_background_estimations_table_headers, session_handler_.comp_group_background_estimations_table_body, table_estimations, "CompGroupBackgroundEstimationsMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }

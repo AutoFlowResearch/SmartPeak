@@ -17,21 +17,33 @@ namespace SmartPeak
     @returns true if all rows/columns were added and false if rows/columns were omitted due to performance
     */
     void setMinimalDataAndFilters(const SequenceHandler& sequence_handler);
-    void setInjectionExplorer(); ///< set the InjectionExplorer-speciic data
-    void setTransitionExplorer(); ///< set the TransitionExplorer-speciic data
-    void setFeatureExplorer(); ///< set the FeatureExplorer-speciic data
-    void setSpectrumExplorer(); ///< set the SpectrumExplorer-speciic data
-    void setSequenceTable(const SequenceHandler& sequence_handler); ///< set the SequenceTable-speciic data
-    void setTransitionsTable(const SequenceHandler& sequence_handler); ///< set the TransitionsTable-speciic data
-    void setSpectrumTable(const SequenceHandler& sequence_handler); ///< set the SpectrumTable-speciic data
-    void setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands); ///< set the WorkflowTable-speciic data
-    void setParametersTable(const SequenceHandler& sequence_handler); ///< set the ParametersTable-speciic data
-    void setQuantMethodTable(const SequenceHandler& sequence_handler); ///< set the QuantMethodTable-speciic data
-    void setStdsConcsTable(const SequenceHandler& sequence_handler); ///< set the StdsConcsTable-speciic data
-    void setComponentFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentFiltersTable-speciic data
-    void setComponentGroupFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupFiltersTable-speciic data
-    void setComponentQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentQCsTable-speciic data
-    void setComponentGroupQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupQCsTable-speciic data
+    void setInjectionExplorer(); ///< set the InjectionExplorer-specific data
+    void setTransitionExplorer(); ///< set the TransitionExplorer-specific data
+    void setFeatureExplorer(); ///< set the FeatureExplorer-specific data
+    void setSpectrumExplorer(); ///< set the SpectrumExplorer-specific data
+    void setSequenceTable(const SequenceHandler& sequence_handler); ///< set the SequenceTable-specific data
+    void setTransitionsTable(const SequenceHandler& sequence_handler); ///< set the TransitionsTable-specific data
+    void setSpectrumTable(const SequenceHandler& sequence_handler); ///< set the SpectrumTable-specific data
+    void setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands); ///< set the WorkflowTable-specific data
+    void setParametersTable(const SequenceHandler& sequence_handler); ///< set the ParametersTable-specific data
+    void setQuantMethodTable(const SequenceHandler& sequence_handler); ///< set the QuantMethodTable-specific data
+    void setStdsConcsTable(const SequenceHandler& sequence_handler); ///< set the StdsConcsTable-specific data
+    void setComponentFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentFiltersTable-specific data
+    void setComponentGroupFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupFiltersTable-specific data
+    void setComponentQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentQCsTable-specific data
+    void setComponentGroupQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupQCsTable-specific data
+    void setComponentRSDFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentFiltersTable-specific data
+    void setComponentGroupRSDFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupFiltersTable-specific data
+    void setComponentRSDQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentQCsTable-specific data
+    void setComponentGroupRSDQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupQCsTable-specific data
+    void setComponentBackgroundFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentFiltersTable-specific data
+    void setComponentGroupBackgroundFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupFiltersTable-specific data
+    void setComponentBackgroundQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentQCsTable-specific data
+    void setComponentGroupBackgroundQCsTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupQCsTable-specific data
+    void setComponentRSDEstimationsTable(const SequenceHandler& sequence_handler); ///< set the ComponentEstimationsTable-specific data
+    void setComponentGroupRSDEstimationsTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupEstimationsTable-specific data
+    void setComponentBackgroundEstimationsTable(const SequenceHandler& sequence_handler); ///< set the ComponentEstimationsTable-specific data
+    void setComponentGroupBackgroundEstimationsTable(const SequenceHandler& sequence_handler); ///< set the ComponentGroupEstimationsTable-specific data
     /*
     @brief Sets the feature table
 
@@ -90,6 +102,18 @@ namespace SmartPeak
     Eigen::Tensor<bool, 1> getComponentQCsTableFilters();
     Eigen::Tensor<bool, 1> getComponentGroupFiltersTableFilters();
     Eigen::Tensor<bool, 1> getComponentGroupQCsTableFilters();
+    Eigen::Tensor<bool, 1> getComponentRSDFiltersTableFilters();
+    Eigen::Tensor<bool, 1> getComponentRSDQCsTableFilters();
+    Eigen::Tensor<bool, 1> getComponentGroupRSDFiltersTableFilters();
+    Eigen::Tensor<bool, 1> getComponentGroupRSDQCsTableFilters();
+    Eigen::Tensor<bool, 1> getComponentBackgroundFiltersTableFilters();
+    Eigen::Tensor<bool, 1> getComponentBackgroundQCsTableFilters();
+    Eigen::Tensor<bool, 1> getComponentGroupBackgroundFiltersTableFilters();
+    Eigen::Tensor<bool, 1> getComponentGroupBackgroundQCsTableFilters();
+    Eigen::Tensor<bool, 1> getComponentRSDEstimationsTableFilters();
+    Eigen::Tensor<bool, 1> getComponentGroupRSDEstimationsTableFilters();
+    Eigen::Tensor<bool, 1> getComponentBackgroundEstimationsTableFilters();
+    Eigen::Tensor<bool, 1> getComponentGroupBackgroundEstimationsTableFilters();
 
     std::set<std::string> getSelectInjectionNamesWorkflow(const SequenceHandler& sequence_handler);
     std::set<std::string> getSelectSequenceSegmentNamesWorkflow(const SequenceHandler& sequence_handler);
@@ -162,6 +186,42 @@ namespace SmartPeak
     // data for the comp_group_qcs table
     Eigen::Tensor<std::string, 1> comp_group_qcs_table_headers;
     Eigen::Tensor<std::string, 2> comp_group_qcs_table_body;
+    // data for the comp_rsd_filters table
+    Eigen::Tensor<std::string, 1> comp_rsd_filters_table_headers;
+    Eigen::Tensor<std::string, 2> comp_rsd_filters_table_body;
+    // data for the comp_group_rsd_filters table
+    Eigen::Tensor<std::string, 1> comp_group_rsd_filters_table_headers;
+    Eigen::Tensor<std::string, 2> comp_group_rsd_filters_table_body;
+    // data for the comp_rsd_qcs table
+    Eigen::Tensor<std::string, 1> comp_rsd_qcs_table_headers;
+    Eigen::Tensor<std::string, 2> comp_rsd_qcs_table_body;
+    // data for the comp_group_rsd_qcs table
+    Eigen::Tensor<std::string, 1> comp_group_rsd_qcs_table_headers;
+    Eigen::Tensor<std::string, 2> comp_group_rsd_qcs_table_body;
+    // data for the comp_background_filters table
+    Eigen::Tensor<std::string, 1> comp_background_filters_table_headers;
+    Eigen::Tensor<std::string, 2> comp_background_filters_table_body;
+    // data for the comp_group_background_filters table
+    Eigen::Tensor<std::string, 1> comp_group_background_filters_table_headers;
+    Eigen::Tensor<std::string, 2> comp_group_background_filters_table_body;
+    // data for the comp_background_qcs table
+    Eigen::Tensor<std::string, 1> comp_background_qcs_table_headers;
+    Eigen::Tensor<std::string, 2> comp_background_qcs_table_body;
+    // data for the comp_group_background_qcs table
+    Eigen::Tensor<std::string, 1> comp_group_background_qcs_table_headers;
+    Eigen::Tensor<std::string, 2> comp_group_background_qcs_table_body;
+    // data for the comp_rsd_estimations table
+    Eigen::Tensor<std::string, 1> comp_rsd_estimations_table_headers;
+    Eigen::Tensor<std::string, 2> comp_rsd_estimations_table_body;
+    // data for the comp_group_rsd_estimations table
+    Eigen::Tensor<std::string, 1> comp_group_rsd_estimations_table_headers;
+    Eigen::Tensor<std::string, 2> comp_group_rsd_estimations_table_body;
+    // data for the comp_background_estimations table
+    Eigen::Tensor<std::string, 1> comp_background_estimations_table_headers;
+    Eigen::Tensor<std::string, 2> comp_background_estimations_table_body;
+    // data for the comp_group_background_estimations table
+    Eigen::Tensor<std::string, 1> comp_group_background_estimations_table_headers;
+    Eigen::Tensor<std::string, 2> comp_group_background_estimations_table_body;
     // data for the feature table
     Eigen::Tensor<std::string, 1> feature_table_headers;
     Eigen::Tensor<std::string, 2> feature_table_body;

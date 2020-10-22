@@ -26,6 +26,10 @@ namespace SmartPeak
     static_filenames.featureBackgroundFilterComponentGroups_csv_i = dir + "/featureBackgroundFilterComponentGroups.csv";
     static_filenames.featureBackgroundQCComponents_csv_i = dir + "/featureBackgroundQCComponents.csv";
     static_filenames.featureBackgroundQCComponentGroups_csv_i = dir + "/featureBackgroundQCComponentGroups.csv";
+    static_filenames.featureRSDEstimationComponents_csv_i = dir + "/featureRSDEstimationComponents.csv";
+    static_filenames.featureRSDEstimationComponentGroups_csv_i = dir + "/featureRSDEstimationComponentGroups.csv";
+    static_filenames.featureBackgroundEstimationComponents_csv_i = dir + "/featureBackgroundEstimationComponents.csv";
+    static_filenames.featureBackgroundEstimationComponentGroups_csv_i = dir + "/featureBackgroundEstimationComponentGroups.csv";
     static_filenames.quantitationMethods_csv_i = dir + "/quantitationMethods.csv";
     static_filenames.standardsConcentrations_csv_i = dir + "/standardsConcentrations.csv";
     static_filenames.referenceData_csv_i = dir + "/referenceData.csv";
@@ -69,6 +73,10 @@ namespace SmartPeak
     dynamic_filenames.featureBackgroundFilterComponentGroups_csv_o = prefix + "_featureBackgroundFilterComponentGroups.csv";
     dynamic_filenames.featureBackgroundQCComponents_csv_o = prefix + "_featureBackgroundQCComponents.csv";
     dynamic_filenames.featureBackgroundQCComponentGroups_csv_o = prefix + "_featureBackgroundQCComponentGroups.csv";
+    dynamic_filenames.featureRSDEstimationComponents_csv_o = prefix + "_featureRSDEstimationComponents.csv";
+    dynamic_filenames.featureRSDEstimationComponentGroups_csv_o = prefix + "_featureRSDEstimationComponentGroups.csv";
+    dynamic_filenames.featureBackgroundEstimationComponents_csv_o = prefix + "_featureBackgroundEstimationComponents.csv";
+    dynamic_filenames.featureBackgroundEstimationComponentGroups_csv_o = prefix + "_featureBackgroundEstimationComponentGroups.csv";
     dynamic_filenames.quantitationMethods_csv_o        = prefix + "_quantitationMethods.csv";
     dynamic_filenames.componentsToConcentrations_csv_o = prefix + "_componentsToConcentrations.csv";
 
@@ -126,6 +134,10 @@ namespace SmartPeak
     filenames.featureBackgroundFilterComponentGroups_csv_o = fs::path(prefix).append(fs::path(filenames.featureBackgroundFilterComponentGroups_csv_o).filename().c_str()).string();
     filenames.featureBackgroundQCComponents_csv_o = fs::path(prefix).append(fs::path(filenames.featureBackgroundQCComponents_csv_o).filename().c_str()).string();
     filenames.featureBackgroundQCComponentGroups_csv_o = fs::path(prefix).append(fs::path(filenames.featureBackgroundQCComponentGroups_csv_o).filename().c_str()).string();
+    filenames.featureRSDEstimationComponents_csv_o = fs::path(prefix).append(fs::path(filenames.featureRSDEstimationComponents_csv_o).filename().c_str()).string();
+    filenames.featureRSDEstimationComponentGroups_csv_o = fs::path(prefix).append(fs::path(filenames.featureRSDEstimationComponentGroups_csv_o).filename().c_str()).string();
+    filenames.featureBackgroundEstimationComponents_csv_o = fs::path(prefix).append(fs::path(filenames.featureBackgroundEstimationComponents_csv_o).filename().c_str()).string();
+    filenames.featureBackgroundEstimationComponentGroups_csv_o = fs::path(prefix).append(fs::path(filenames.featureBackgroundEstimationComponentGroups_csv_o).filename().c_str()).string();
 
     filenames.quantitationMethods_csv_o = fs::path(prefix).append(fs::path(filenames.quantitationMethods_csv_o).filename().c_str()).string();
 
@@ -149,6 +161,10 @@ namespace SmartPeak
     featureBackgroundFilterComponentGroups_csv_i.clear();
     featureBackgroundQCComponents_csv_i.clear();
     featureBackgroundQCComponentGroups_csv_i.clear();
+    featureRSDEstimationComponents_csv_i.clear();
+    featureRSDEstimationComponentGroups_csv_i.clear();
+    featureBackgroundEstimationComponents_csv_i.clear();
+    featureBackgroundEstimationComponentGroups_csv_i.clear();
     quantitationMethods_csv_i.clear();
     standardsConcentrations_csv_i.clear();
     referenceData_csv_i.clear();
@@ -173,6 +189,10 @@ namespace SmartPeak
     featureBackgroundFilterComponentGroups_csv_o.clear();
     featureBackgroundQCComponents_csv_o.clear();
     featureBackgroundQCComponentGroups_csv_o.clear();
+    featureRSDEstimationComponents_csv_o.clear();
+    featureRSDEstimationComponentGroups_csv_o.clear();
+    featureBackgroundEstimationComponents_csv_o.clear();
+    featureBackgroundEstimationComponentGroups_csv_o.clear();
     quantitationMethods_csv_o.clear();
     componentsToConcentrations_csv_o.clear();
     pivotTable_csv_o.clear();
