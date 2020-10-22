@@ -173,7 +173,6 @@ jobs:
           cd ~
           git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
           cd ~/OpenMS
-          ((Get-Content -path src\openswathalgo\include\OpenMS\OPENSWATHALGO\ALGO\Scoring.h -Raw) -replace '#include <vector>',"#include <vector>`r`n#include <algorithm>") | Set-Content -Path src\openswathalgo\include\OpenMS\OPENSWATHALGO\ALGO\Scoring.h
       - run: |
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
           $ProgressPreference = "SilentlyContinue"
