@@ -1859,13 +1859,27 @@ namespace SmartPeak
 
     OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
     OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("calculateMDVs"));
+    //Utilities::updateParameters(parameters, params_I.at("calculateMDVs"));
     isotopelabelingmdvs.setParameters(parameters);
 
     try {
       OpenMS::FeatureMap normalized_featureMap;
-      //auto res = rawDataHandler_IO.getParameters().find("mass_intensity_type")->first.at(0);
-      isotopelabelingmdvs.calculateMDVs(rawDataHandler_IO.getFeatureMap(), normalized_featureMap, "normsum", "peak_apex_int");
+      std::vector<std::map<std::string, std::string>> CalculateMDVs_params = params_I.find("CalculateMDVs")->second;
+      
+      std::string mass_intensity_type, feature_name;
+      for(auto& param : CalculateMDVs_params)
+      {
+        if (param.find("name")->second == "mass_intensity_type")
+        {
+          mass_intensity_type = param.find("value")->second;
+        }
+        else if (param.find("name")->second == "feature_name")
+        {
+          feature_name = param.find("value")->second;
+        }
+      }
+      
+      isotopelabelingmdvs.calculateMDVs(rawDataHandler_IO.getFeatureMap(), normalized_featureMap, mass_intensity_type, feature_name);
       rawDataHandler_IO.setFeatureMap(normalized_featureMap);
     }
     catch (const std::exception& e) {

@@ -34,7 +34,8 @@ namespace SmartPeak {
     {"LOAD_ANNOTATIONS", std::make_shared<LoadAnnotations>()},
     {"STORE_ANNOTATIONS", std::make_shared<StoreAnnotations>()},
     {"CLEAR_DATA", std::make_shared<ClearData>()},
-    {"STORE_RAW_DATA", std::make_shared<StoreRawData>()}
+    {"STORE_RAW_DATA", std::make_shared<StoreRawData>()},
+    {"CALCULATE_MDVS", std::make_shared<CalculateMDVs>()}
   };
   const std::map<std::string, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
     {"CALCULATE_CALIBRATION", std::make_shared<CalculateCalibration>()},

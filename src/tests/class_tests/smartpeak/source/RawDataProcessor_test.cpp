@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(extractMetaData)
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
-  BOOST_CHECK_EQUAL(params_1.size(), 23);
+  BOOST_CHECK_EQUAL(params_1.size(), 24);
   BOOST_CHECK_EQUAL(params_2.size(), 24);
   RawDataHandler rawDataHandler;
 
@@ -2344,5 +2344,166 @@ BOOST_AUTO_TEST_CASE(emg_processor)
 
   std::remove(SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.featureXML"));
 }
+
+BOOST_AUTO_TEST_CASE(calculateMDVs)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("GCMS_SIM.featureXML");
+//
+//  LoadFeatures loadFeatures;
+//  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+//  SequenceHandler sequenceHandler;
+//  MetaDataHandler metaDataHandler;
+//
+//  metaDataHandler.setSampleName("GCMS_SIM");
+//  metaDataHandler.setFilename("GCMS_SIM.featureXML");
+//  metaDataHandler.setSampleType(SampleType::Unknown);
+//  metaDataHandler.setSampleGroupName("sample_group");
+//  metaDataHandler.setSequenceSegmentName("sequence_segment");
+//  metaDataHandler.inj_number = 0;
+//  metaDataHandler.acq_method_name = "6";
+//  metaDataHandler.inj_volume = 7.0;
+//  metaDataHandler.inj_volume_units = "8";
+//  metaDataHandler.batch_name = "FluxTest";
+//  metaDataHandler.scan_polarity = "negative";
+//  metaDataHandler.scan_mass_high = 2000;
+//  metaDataHandler.scan_mass_low = 60;
+//
+//  sequenceHandler.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
+//
+//  OpenMS::FeatureMap fm_Lactate;
+  
+  // ver.1
+//  const std::vector<InjectionHandler> sampleHandl = sequenceHandler.getSequence(); // 1
+//  for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()){
+//    for (const OpenMS::Feature& feature :  sampleHandler.getRawData().getFeatureMapHistory()){
+//      if (feature.getMetaValue("PeptideRef") == "Lactate") {
+//        for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
+//          native_ids_lactates.push_back(subordinate.getMetaValue("native_id")) ;
+//          peak_apex_ints_lactates.push_back(subordinate.getMetaValue("peak_apex_int"));
+//        }
+//        fm_Lactate.push_back(feature);
+//      }
+//    }
+//  }
+  
+  // ver.2
+//  for (const OpenMS::Feature& feature :  rawDataHandler.getFeatureMap()){
+//    if (feature.getMetaValue("PeptideRef") == "Lactate") {
+//      fm_Lactate.push_back(feature);
+//    }
+//  }
+//
+//  rawDataHandler.setFeatureMap(fm_Lactate);
+  
+
+  std::vector<OpenMS::Peak2D::IntensityType> L1_peak_apex_int {3.61e+08, 1.20e+04, 1.02e+05, 2.59e+04};
+  std::vector<OpenMS::Peak2D::IntensityType> L2_peak_apex_int {2.77e+07, 5.45e+04, 6.26e+05, 7.46e+04, 2.75e+04};
+
+  std::vector<OpenMS::Peak2D::IntensityType> L1_norm_max {1.00e+00, 3.324e-05, 2.825e-04, 7.174e-05};
+  std::vector<OpenMS::Peak2D::IntensityType> L1_norm_sum {9.9961e-01, 3.3228e-05, 2.8243e-04, 7.1717e-05};
+
+  std::vector<OpenMS::Peak2D::IntensityType> L2_norm_max {1.00e+00, 1.967e-03, 2.259e-02, 2.693e-03, 9.927e-04};
+  std::vector<OpenMS::Peak2D::IntensityType> L2_norm_sum {9.7252e-01, 1.9134e-03, 2.1978e-02, 2.6191e-03, 9.655e-04};
+  
+
+  // Lactate1 & Lactate2 - peak_apex_int - norm_max
+  OpenMS::Feature               lactate_1_normmax;
+  OpenMS::Feature               lactate_1_normalized_normmax;
+  std::vector<OpenMS::Feature>  L1_subordinates_normmax;
+
+  lactate_1_normmax.setMetaValue("PeptideRef", "Lactate1");
+  for (uint16_t i = 0; i < L1_peak_apex_int.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate1_"+std::to_string(117+i));
+    sub.setMetaValue("peak_apex_int", L1_peak_apex_int[i]);
+    L1_subordinates_normmax.push_back(sub);
+  }
+  lactate_1_normmax.setSubordinates(L1_subordinates_normmax);
+  
+  OpenMS::Feature               lactate_2_normmax;
+  OpenMS::Feature               lactate_2_normalized_normmax;
+  std::vector<OpenMS::Feature>  L2_subordinates_normmax;
+
+  lactate_2_normmax.setMetaValue("PeptideRef", "Lactate2");
+  for (uint16_t i = 0; i < L2_peak_apex_int.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate2_"+std::to_string(219+i));
+    sub.setMetaValue("peak_apex_int", L2_peak_apex_int[i]);
+    L2_subordinates_normmax.push_back(sub);
+  }
+  lactate_2_normmax.setSubordinates(L2_subordinates_normmax);
+  
+  OpenMS::Feature               lactate_1_normsum;
+  OpenMS::Feature               lactate_1_normalized_normsum;
+  std::vector<OpenMS::Feature>  L1_subordinates_normsum;
+
+  lactate_1_normsum.setMetaValue("PeptideRef", "Lactate1");
+  for (uint16_t i = 0; i < L1_peak_apex_int.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate1_"+std::to_string(117+i));
+    sub.setMetaValue("peak_apex_int", L1_peak_apex_int[i]);
+    L1_subordinates_normsum.push_back(sub);
+  }
+  lactate_1_normsum.setSubordinates(L1_subordinates_normsum);
+  
+  OpenMS::Feature lactate_2_normsum; OpenMS::Feature lactate_2_normalized_normsum;
+  std::vector<OpenMS::Feature> L2_subordinates_normsum;
+
+  lactate_2_normsum.setMetaValue("PeptideRef", "Lactate2");
+  for (uint16_t i = 0; i < L2_peak_apex_int.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate2_"+std::to_string(219+i));
+    sub.setMetaValue("peak_apex_int", L2_peak_apex_int[i]);
+    L2_subordinates_normsum.push_back(sub);
+  }
+  lactate_2_normsum.setSubordinates(L2_subordinates_normsum);
+  
+  OpenMS::FeatureMap  lactate_normmax;
+  OpenMS::FeatureMap  lactate_normsum;
+  OpenMS::FeatureMap  lactate_normalized_normmax;
+  OpenMS::FeatureMap  lactate_normalized_normsum;
+
+  lactate_normmax.push_back(lactate_1_normmax);
+  lactate_normmax.push_back(lactate_2_normmax);
+
+  lactate_normsum.push_back(lactate_1_normsum);
+  lactate_normsum.push_back(lactate_2_normsum);
+
+  rawDataHandler.setFeatureMap(lactate_normmax);
+
+  CalculateMDVs calculateMDVs;
+  calculateMDVs.process(rawDataHandler, params_1, filenames);
+  
+  lactate_normalized_normsum = rawDataHandler.getFeatureMap();
+  
+  for(size_t i = 0; i < lactate_normalized_normsum.size(); ++i)
+  {
+    for(size_t j = 0; j < lactate_1_normalized_normsum.getSubordinates().size(); ++j)
+    {
+      if (i == 0) // lactate_1
+      {
+        BOOST_CHECK_CLOSE(lactate_normalized_normsum.at(i).getSubordinates().at(j).getIntensity(), L1_norm_sum.at(j), 1e-6);
+      }
+      else if (i == 1) // lactate_2
+      {
+        BOOST_CHECK_CLOSE(lactate_normalized_normsum.at(i).getSubordinates().at(j).getIntensity(), L2_norm_sum.at(j), 1e-6);
+      }
+    }
+  }
+
+}
+///
 
 BOOST_AUTO_TEST_SUITE_END()
