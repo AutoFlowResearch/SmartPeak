@@ -123,7 +123,7 @@ namespace SmartPeak
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-      ImGuiTableFlags_Borders | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
 
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
@@ -156,8 +156,9 @@ namespace SmartPeak
       return;
 
     // headers
-    const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable |
-      ImGuiTableFlags_Hideable | ImGuiTableFlags_Scroll ;
+    const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
+      ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
 
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
       // First row headers
