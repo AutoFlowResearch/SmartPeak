@@ -16,6 +16,7 @@
 
 #include <map>
 #include <vector>
+#include <sstream>
 
 namespace SmartPeak
 {
@@ -578,10 +579,10 @@ namespace SmartPeak
                  ) const override;
   };
   
-  struct isotopicCorrections : RawDataProcessor
+  struct IsotopicCorrections : RawDataProcessor
   {
     int getID() const override { return 0; }
-    std::string getName() const override { return "CORRECT_MDVS"; }
+    std::string getName() const override { return "ISOTOPIC_CORRECTIONS"; }
     std::string getDescription() const override { return "Correct MDVs."; }
     
     /** Correct MDVs
@@ -593,7 +594,7 @@ namespace SmartPeak
                  ) const override;
   };
   
-  struct calculateIsotopicPurities : RawDataProcessor
+  struct CalculateIsotopicPurities : RawDataProcessor
   {
     int getID() const override { return 0; }
     std::string getName() const override { return "CALCULATE_MDV_ISOTOPIC_PURITIES"; }
@@ -608,7 +609,7 @@ namespace SmartPeak
                  ) const override;
   };
 
-  struct calculateMDVAccuracies : RawDataProcessor
+  struct CalculateMDVAccuracies : RawDataProcessor
   {
     int getID() const override { return 0; }
     std::string getName() const override { return "COMPARE_MDV_TO_THEORETICAL"; }

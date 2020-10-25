@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(extractMetaData)
   map<string, vector<map<string, string>>> params_1;
   map<string, vector<map<string, string>>> params_2;
   load_data(params_1, params_2);
-  BOOST_CHECK_EQUAL(params_1.size(), 24);
+  BOOST_CHECK_EQUAL(params_1.size(), 27);
   BOOST_CHECK_EQUAL(params_2.size(), 24);
   RawDataHandler rawDataHandler;
 
@@ -2502,7 +2502,151 @@ BOOST_AUTO_TEST_CASE(calculateMDVs)
       }
     }
   }
+}
 
+BOOST_AUTO_TEST_CASE(isotopicCorrections)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("GCMS_SIM.featureXML");
+  
+  
+  // case 1: validating corrected results (corrected peak_apex_int)
+  IsotopicCorrections                   isotopicCorrections;
+  OpenMS::Feature                       lactate_1_normalized;
+  OpenMS::Feature                       lactate_1_corrected;
+  OpenMS::FeatureMap                    lactate_1_featureMap;
+  OpenMS::FeatureMap                    lactate_1_corrected_featureMap;
+  std::vector<std::vector<double>>      correction_matrix_inversed(4, std::vector<double>(4,0));
+
+  // L1_norm_max, L1_peak_apex_int From CHO_190316_Flux.xlsx provided by Douglas McCloskey
+  // L1_corrected self calculated
+  std::vector<double>                         L1_norm_max       {1.00e+00, 3.324e-05, 2.825e-04, 7.174e-05};
+  std::vector<double>                         L1_corrected      {-12.7699, 140.7289, -45.3788, -47.2081};
+  std::vector<OpenMS::Peak2D::IntensityType>  L1_peak_apex_int  {3.61e+08, 1.20e+04, 1.02e+05, 2.59e+04};
+  std::vector<OpenMS::Feature>                L1_subordinates_normmax;
+
+  
+  lactate_1_normalized.setMetaValue("PeptideRef", "Lactate1");
+  for (uint16_t i = 0; i < L1_norm_max.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate1_"+std::to_string(117+i));
+    sub.setMetaValue("peak_apex_int", L1_norm_max[i]);
+    L1_subordinates_normmax.push_back(sub);
+  }
+  lactate_1_normalized.setSubordinates(L1_subordinates_normmax);
+
+  for(uint8_t i = 0; i < 3; ++i)
+  {
+    lactate_1_featureMap.push_back(lactate_1_normalized);
+  }
+ 
+  rawDataHandler.setFeatureMap(lactate_1_featureMap);
+  isotopicCorrections.process(rawDataHandler, params_1, filenames);
+  lactate_1_corrected_featureMap = rawDataHandler.getFeatureMap();
+  
+  for(uint8_t i = 0; i < lactate_1_corrected_featureMap.size(); ++i)
+  {
+    for(uint8_t j = 0; j < lactate_1_corrected_featureMap.at(i).getSubordinates().size(); ++j)
+    {
+      BOOST_CHECK_CLOSE(lactate_1_corrected_featureMap.at(i).getSubordinates().at(j).getIntensity(), L1_corrected[j], 1e-3);
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(calculateIsotopicPurities)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("GCMS_SIM.featureXML");
+  
+
+  CalculateIsotopicPurities     calculateIsotopicPurities;
+  OpenMS::Feature               lactate_1_normalized;
+  OpenMS::FeatureMap            lactate_1_featureMap;
+  OpenMS::FeatureMap            lactate_1_with_isotopic_purity_featureMap;
+  std::vector<double>           L1_norm_max {1.00e+00, 3.324e-05, 2.825e-04, 7.174e-05};
+  std::vector<OpenMS::Feature>  L1_subordinates_normmax;
+  
+  lactate_1_normalized.setMetaValue("PeptideRef", "Lactate1");
+  for (uint16_t i = 0; i < L1_norm_max.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate1_"+std::to_string(117+i));
+    sub.setMetaValue("peak_apex_int", L1_norm_max[i]);
+    L1_subordinates_normmax.push_back(sub);
+  }
+  lactate_1_normalized.setSubordinates(L1_subordinates_normmax);
+
+  for(uint8_t i = 0; i < 3; ++i)
+  {
+    lactate_1_featureMap.push_back(lactate_1_normalized);
+  }
+  
+  rawDataHandler.setFeatureMap(lactate_1_featureMap);
+  calculateIsotopicPurities.process(rawDataHandler, params_1, filenames);
+  lactate_1_with_isotopic_purity_featureMap = rawDataHandler.getFeatureMap();
+  
+  for(uint8_t i = 0; i < lactate_1_with_isotopic_purity_featureMap.size(); ++i)
+  {
+    BOOST_CHECK_CLOSE((double)(lactate_1_with_isotopic_purity_featureMap.at(i).getMetaValue("1_2-13C_glucose_experiment")) * 100,
+                      99.6469, 1e-4);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(calculateMDVAccuracies)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("GCMS_SIM.featureXML");
+  
+  CalculateMDVAccuracies        calculateMDVAccuracies;
+  OpenMS::Feature               lactate_1_normalized;
+  OpenMS::Feature               lactate_1_with_accuracy_info;
+  OpenMS::FeatureMap            lactate_1_featureMap;
+  OpenMS::FeatureMap            lactate_1_with_accuracy_info_featureMap;
+  std::vector<double>           L1_norm_max {1.00e+00, 3.324e-05, 2.825e-04, 7.174e-05};
+  std::vector<OpenMS::Feature>  L1_subordinates_normmax;
+  
+  lactate_1_normalized.setMetaValue("PeptideRef", "Lactate1");
+  for (uint16_t i = 0; i < L1_norm_max.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate1_"+std::to_string(117+i));
+    sub.setMetaValue("peak_apex_int", L1_norm_max[i]);
+    L1_subordinates_normmax.push_back(sub);
+  }
+  lactate_1_normalized.setSubordinates(L1_subordinates_normmax);
+
+  for (uint8_t i = 0; i < 3; ++i)
+  {
+    lactate_1_featureMap.push_back(lactate_1_normalized);
+  }
+
+  rawDataHandler.setFeatureMap(lactate_1_featureMap);
+  calculateMDVAccuracies.process(rawDataHandler, params_1, filenames);
+  lactate_1_with_accuracy_info_featureMap = rawDataHandler.getFeatureMap();
+   
+  for (uint8_t i = 0; i < lactate_1_with_accuracy_info_featureMap.size(); ++i)
+  {
+    BOOST_CHECK_CLOSE( (double)(lactate_1_with_accuracy_info_featureMap.at(i).getMetaValue("average_accuracy")), 0.0237455, 1e-3 );
+  }
 }
 ///
 

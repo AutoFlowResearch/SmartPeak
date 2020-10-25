@@ -1889,38 +1889,48 @@ namespace SmartPeak
     LOGD << "END calculateMDVs";
   }
 
-  void isotopicCorrections::process(
+  void IsotopicCorrections::process( // TODO:captitalise
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
   ) const
   {
-    LOGD << "START isotopicCorrections";
+    LOGD << "START IsotopicCorrections";
 
-    if (params_I.count("isotopicCorrections") && params_I.at("isotopicCorrections").empty()) {
-      LOGE << "No parameters passed to isotopicCorrections.";
-      LOGD << "END isotopicCorrections";
+    if (params_I.count("IsotopicCorrections") && params_I.at("IsotopicCorrections").empty()) {
+      LOGE << "No parameters passed to IsotopicCorrections.";
+      LOGD << "END IsotopicCorrections";
       return;
     }
 
     OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
     OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("isotopicCorrections"));
     isotopelabelingmdvs.setParameters(parameters);
 
     try {
       OpenMS::FeatureMap corrected_featureMap;
-      isotopelabelingmdvs.isotopicCorrections(rawDataHandler_IO.getFeatureMap(), corrected_featureMap, {}, "TBDMS");
+      std::vector<std::map<std::string, std::string>> IsotopicCorrections_params = params_I.find("IsotopicCorrections")->second;
+      
+      std::string correction_matrix_agent;
+      for(auto& param : IsotopicCorrections_params)
+      {
+        if (param.find("name")->second == "correction_matrix_agent")
+        {
+          correction_matrix_agent = param.find("value")->second;
+        }
+      }
+      
+      isotopelabelingmdvs.isotopicCorrections(rawDataHandler_IO.getFeatureMap(), corrected_featureMap, {}, correction_matrix_agent);
       rawDataHandler_IO.setFeatureMap(corrected_featureMap);
     }
     catch (const std::exception& e) {
       LOGE << e.what();
     }
 
-    LOGD << "END isotopicCorrections";
+    LOGD << "END IsotopicCorrections";
   }
 
-  void calculateIsotopicPurities::process(
+  void CalculateIsotopicPurities::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
@@ -1928,58 +1938,110 @@ namespace SmartPeak
   {
     LOGD << "START calculateIsotopicPurities";
 
-    if (params_I.count("calculateIsotopicPurities") && params_I.at("calculateIsotopicPurities").empty()) {
-      LOGE << "No parameters passed to calculateIsotopicPurities.";
-      LOGD << "END calculateIsotopicPurities";
+    if (params_I.count("CalculateIsotopicPurities") && params_I.at("CalculateIsotopicPurities").empty()) {
+      LOGE << "No parameters passed to CalculateIsotopicPurities.";
+      LOGD << "END CalculateIsotopicPurities";
       return;
     }
 
     OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
     OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("calculateIsotopicPurities"));
     isotopelabelingmdvs.setParameters(parameters);
 
     try {
       OpenMS::FeatureMap normalized_featureMap;
-      //isotopelabelingmdvs.calculateIsotopicPurities(rawDataHandler_IO.getFeatureMap(), normalized_featureMap, {}, {});
+      std::vector<std::map<std::string, std::string>> CalculateIsotopicPurities_params = params_I.find("CalculateIsotopicPurities")->second;
+      
+      std::string experiment_data_s, isotopic_purity_name;
+      std::vector<double> experiment_data;
+      for(auto& param : CalculateIsotopicPurities_params)
+      {
+        if (!param.find("comment_")->second.empty())
+        {
+          experiment_data_s = param.find("comment_")->second;
+          std::stringstream experiment_data_ss(experiment_data_s);
+          std::string experiment_data_buf;
+          while (experiment_data_ss >> experiment_data_buf)
+            experiment_data.push_back(std::stod(experiment_data_buf));
+          
+        }
+        if (param.find("name")->second == "isotopic_purity_name")
+        {
+          isotopic_purity_name = param.find("value")->second;
+        }
+      }
+      isotopelabelingmdvs.calculateIsotopicPurities(rawDataHandler_IO.getFeatureMap(), normalized_featureMap, experiment_data, isotopic_purity_name);
       rawDataHandler_IO.setFeatureMap(normalized_featureMap);
     }
     catch (const std::exception& e) {
       LOGE << e.what();
     }
 
-    LOGD << "END calculateIsotopicPurities";
+    LOGD << "END CalculateIsotopicPurities";
   }
 
-  void calculateMDVAccuracies::process(
+  void CalculateMDVAccuracies::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
   ) const
   {
-    LOGD << "START calculateMDVAccuracies";
+    LOGD << "START CalculateMDVAccuracies";
 
-    if (params_I.count("calculateMDVAccuracies") && params_I.at("calculateMDVAccuracies").empty()) {
-      LOGE << "No parameters passed to calculateMDVAccuracies.";
-      LOGD << "END calculateMDVAccuracies";
+    if (params_I.count("CalculateMDVAccuracies") && params_I.at("CalculateMDVAccuracies").empty()) {
+      LOGE << "No parameters passed to CalculateMDVAccuracies.";
+      LOGD << "END CalculateMDVAccuracies";
       return;
     }
 
     // Set up CalculateMDVs and parse params
     OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
     OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("calculateMDVAccuracies"));
     isotopelabelingmdvs.setParameters(parameters);
 
     try {
       OpenMS::FeatureMap featureMap_with_accuracy_info;
-      isotopelabelingmdvs.calculateMDVAccuracies(rawDataHandler_IO.getFeatureMap(), featureMap_with_accuracy_info, {}, {});
+      std::vector<std::map<std::string, std::string>> CalculateMDVAccuracies_params = params_I.find("CalculateMDVAccuracies")->second;
+      
+      std::vector<double> fragment_isotopomer_measured, fragment_isotopomer_theoretical;
+      
+      std::string fragment_isotopomer_measured_s, fragment_isotopomer_theoretical_s;
+      
+      for(auto& param : CalculateMDVAccuracies_params)
+      {
+        if (param.find("name")->second == "fragment_isotopomer_measured")
+        {
+          if (!param.find("comment_")->second.empty())
+          {
+            fragment_isotopomer_measured_s = param.find("comment_")->second;
+            std::stringstream fragment_isotopomer_measured_ss(fragment_isotopomer_measured_s);
+            std::string fragment_isotopomer_measured_buf;
+            while (fragment_isotopomer_measured_ss >> fragment_isotopomer_measured_buf)
+              fragment_isotopomer_measured.push_back(std::stod(fragment_isotopomer_measured_buf));
+          }
+        }
+        if (param.find("name")->second == "fragment_isotopomer_theoretical")
+        {
+          if (!param.find("comment_")->second.empty())
+          {
+            fragment_isotopomer_theoretical_s = param.find("comment_")->second;
+            std::stringstream fragment_isotopomer_theoretical_ss(fragment_isotopomer_theoretical_s);
+            std::string fragment_isotopomer_theoretical_buf;
+            while (fragment_isotopomer_theoretical_ss >> fragment_isotopomer_theoretical_buf)
+              fragment_isotopomer_theoretical.push_back(std::stod(fragment_isotopomer_theoretical_buf));
+          }
+        }
+      }
+      
+      
+      isotopelabelingmdvs.calculateMDVAccuracies(rawDataHandler_IO.getFeatureMap(), featureMap_with_accuracy_info,
+                                                 fragment_isotopomer_measured, fragment_isotopomer_theoretical);
       rawDataHandler_IO.setFeatureMap(featureMap_with_accuracy_info);
     }
     catch (const std::exception& e) {
       LOGE << e.what();
     }
 
-    LOGD << "END calculateMDVAccuracies";
+    LOGD << "END CalculateMDVAccuracies";
   }
 }
