@@ -58,6 +58,11 @@ struct TestData {
       }
     }
   }
+  void changeSampleType(const SampleType& sample_type) {
+    for (auto& injection : sequenceHandler.getSequence()) {
+      injection.getMetaData().setSampleType(sample_type);
+    }
+  }
   SequenceHandler sequenceHandler;
 };
 
@@ -263,6 +268,204 @@ BOOST_AUTO_TEST_CASE(setComponentGroupQCsTable1)
   BOOST_CHECK_EQUAL(session_handler.comp_group_qcs_table_body(session_handler.comp_group_qcs_table_body.dimension(0) - 1, session_handler.comp_group_qcs_table_body.dimension(1) - 1), "");
 }
 
+BOOST_AUTO_TEST_CASE(setComponentRSDFiltersTable1)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  session_handler.setComponentRSDFiltersTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_filters_table_headers.size(), 11);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_filters_table_headers(0), "component_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_filters_table_headers(session_handler.comp_rsd_filters_table_headers.size() - 1), "metaValue_peak_apex_int_u");
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_filters_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_filters_table_body.dimension(1), 11);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_filters_table_body(0, 0), "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_filters_table_body(session_handler.comp_rsd_filters_table_body.dimension(0) - 1, session_handler.comp_rsd_filters_table_body.dimension(1) - 1), "1000000000000.000000");
+
+}
+
+BOOST_AUTO_TEST_CASE(setComponentGroupRSDFiltersTable1)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  session_handler.setComponentGroupRSDFiltersTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_filters_table_headers.size(), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_filters_table_headers(0), "component_group_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_filters_table_headers(session_handler.comp_group_rsd_filters_table_headers.size() - 1), "ion_ratio_feature_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_filters_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_filters_table_body.dimension(1), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_filters_table_body(0, 0), "arg-L");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_filters_table_body(session_handler.comp_group_rsd_filters_table_body.dimension(0) - 1, session_handler.comp_group_rsd_filters_table_body.dimension(1) - 1), "");
+
+}
+
+BOOST_AUTO_TEST_CASE(setComponentRSDQCsTable1)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  session_handler.setComponentRSDQCsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_qcs_table_headers.size(), 19);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_qcs_table_headers(0), "component_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_qcs_table_headers(session_handler.comp_rsd_qcs_table_headers.size() - 1), "metaValue_var_xcorr_shape_weighted_u");
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_qcs_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_qcs_table_body.dimension(1), 19);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_qcs_table_body(0, 0), "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_qcs_table_body(session_handler.comp_rsd_qcs_table_body.dimension(0) - 1, session_handler.comp_rsd_qcs_table_body.dimension(1) - 1), "1000000000.000000");
+
+}
+
+BOOST_AUTO_TEST_CASE(setComponentGroupRSDQCsTable1)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  session_handler.setComponentGroupRSDQCsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_qcs_table_headers.size(), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_qcs_table_headers(0), "component_group_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_qcs_table_headers(session_handler.comp_group_rsd_qcs_table_headers.size() - 1), "ion_ratio_feature_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_qcs_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_qcs_table_body.dimension(1), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_qcs_table_body(0, 0), "arg-L");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_qcs_table_body(session_handler.comp_group_rsd_qcs_table_body.dimension(0) - 1, session_handler.comp_group_rsd_qcs_table_body.dimension(1) - 1), "");
+}
+
+BOOST_AUTO_TEST_CASE(setComponentBackgroundFiltersTable1)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  session_handler.setComponentBackgroundFiltersTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_filters_table_headers.size(), 11);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_filters_table_headers(0), "component_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_background_filters_table_headers(session_handler.comp_background_filters_table_headers.size() - 1), "metaValue_peak_apex_int_u");
+  BOOST_CHECK_EQUAL(session_handler.comp_background_filters_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_filters_table_body.dimension(1), 11);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_filters_table_body(0, 0), "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(session_handler.comp_background_filters_table_body(session_handler.comp_background_filters_table_body.dimension(0) - 1, session_handler.comp_background_filters_table_body.dimension(1) - 1), "1000000000000.000000");
+
+}
+
+BOOST_AUTO_TEST_CASE(setComponentGroupBackgroundFiltersTable1)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  session_handler.setComponentGroupBackgroundFiltersTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_filters_table_headers.size(), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_filters_table_headers(0), "component_group_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_filters_table_headers(session_handler.comp_group_background_filters_table_headers.size() - 1), "ion_ratio_feature_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_filters_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_filters_table_body.dimension(1), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_filters_table_body(0, 0), "arg-L");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_filters_table_body(session_handler.comp_group_background_filters_table_body.dimension(0) - 1, session_handler.comp_group_background_filters_table_body.dimension(1) - 1), "");
+
+}
+
+BOOST_AUTO_TEST_CASE(setComponentBackgroundQCsTable1)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  session_handler.setComponentBackgroundQCsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_qcs_table_headers.size(), 19);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_qcs_table_headers(0), "component_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_background_qcs_table_headers(session_handler.comp_background_qcs_table_headers.size() - 1), "metaValue_var_xcorr_shape_weighted_u");
+  BOOST_CHECK_EQUAL(session_handler.comp_background_qcs_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_qcs_table_body.dimension(1), 19);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_qcs_table_body(0, 0), "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(session_handler.comp_background_qcs_table_body(session_handler.comp_background_qcs_table_body.dimension(0) - 1, session_handler.comp_background_qcs_table_body.dimension(1) - 1), "1000000000.000000");
+
+}
+
+BOOST_AUTO_TEST_CASE(setComponentGroupBackgroundQCsTable1)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  session_handler.setComponentGroupBackgroundQCsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_qcs_table_headers.size(), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_qcs_table_headers(0), "component_group_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_qcs_table_headers(session_handler.comp_group_background_qcs_table_headers.size() - 1), "ion_ratio_feature_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_qcs_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_qcs_table_body.dimension(1), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_qcs_table_body(0, 0), "arg-L");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_qcs_table_body(session_handler.comp_group_background_qcs_table_body.dimension(0) - 1, session_handler.comp_group_background_qcs_table_body.dimension(1) - 1), "");
+}
+
+BOOST_AUTO_TEST_CASE(setComponentRSDEstimationsTable1)
+{
+  TestData testData;
+  testData.changeSampleType(SampleType::QC);
+  const map<string, vector<map<string, string>>> params;
+  Filenames filenames;
+  EstimateFeatureRSDs processor;
+  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  SessionHandler session_handler;
+  session_handler.setComponentRSDEstimationsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_estimations_table_headers.size(), 11);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_estimations_table_headers(0), "component_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_estimations_table_headers(session_handler.comp_rsd_estimations_table_headers.size() - 1), "metaValue_peak_apex_int_u");
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_estimations_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_estimations_table_body.dimension(1), 11);
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_estimations_table_body(0, 0), "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(session_handler.comp_rsd_estimations_table_body(session_handler.comp_rsd_estimations_table_body.dimension(0) - 1, session_handler.comp_rsd_estimations_table_body.dimension(1) - 1), "0.000000");
+
+}
+
+BOOST_AUTO_TEST_CASE(setComponentGroupRSDEstimationsTable1)
+{
+  TestData testData;
+  testData.changeSampleType(SampleType::QC);
+  const map<string, vector<map<string, string>>> params;
+  Filenames filenames;
+  EstimateFeatureRSDs processor;
+  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  SessionHandler session_handler;
+  session_handler.setComponentGroupRSDEstimationsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_estimations_table_headers.size(), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_estimations_table_headers(0), "component_group_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_estimations_table_headers(session_handler.comp_group_rsd_estimations_table_headers.size() - 1), "ion_ratio_feature_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_estimations_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_estimations_table_body.dimension(1), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_estimations_table_body(0, 0), "arg-L");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_estimations_table_body(session_handler.comp_group_rsd_estimations_table_body.dimension(0) - 1, session_handler.comp_group_rsd_estimations_table_body.dimension(1) - 1), "");
+
+}
+
+BOOST_AUTO_TEST_CASE(setComponentBackgroundEstimationsTable1)
+{
+  TestData testData;
+  testData.changeSampleType(SampleType::Blank);
+  const map<string, vector<map<string, string>>> params;
+  Filenames filenames;
+  EstimateFeatureBackgroundInterferences processor;
+  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  SessionHandler session_handler;
+  session_handler.setComponentBackgroundEstimationsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_estimations_table_headers.size(), 11);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_estimations_table_headers(0), "component_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_background_estimations_table_headers(session_handler.comp_background_estimations_table_headers.size() - 1), "metaValue_peak_apex_int_u");
+  BOOST_CHECK_EQUAL(session_handler.comp_background_estimations_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_estimations_table_body.dimension(1), 11);
+  BOOST_CHECK_EQUAL(session_handler.comp_background_estimations_table_body(0, 0), "arg-L.arg-L_1.Heavy");
+  BOOST_CHECK_EQUAL(session_handler.comp_background_estimations_table_body(session_handler.comp_background_estimations_table_body.dimension(0) - 1, session_handler.comp_background_estimations_table_body.dimension(1) - 1), "0.000000");
+
+}
+
+BOOST_AUTO_TEST_CASE(setComponentGroupBackgroundEstimationsTable1)
+{
+  TestData testData;
+  testData.changeSampleType(SampleType::Blank);
+  const map<string, vector<map<string, string>>> params;
+  Filenames filenames;
+  EstimateFeatureBackgroundInterferences processor;
+  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  SessionHandler session_handler;
+  session_handler.setComponentGroupBackgroundEstimationsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_estimations_table_headers.size(), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_estimations_table_headers(0), "component_group_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_estimations_table_headers(session_handler.comp_group_background_estimations_table_headers.size() - 1), "ion_ratio_feature_name");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_estimations_table_body.dimension(0), 10);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_estimations_table_body.dimension(1), 24);
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_estimations_table_body(0, 0), "arg-L");
+  BOOST_CHECK_EQUAL(session_handler.comp_group_background_estimations_table_body(session_handler.comp_group_background_estimations_table_body.dimension(0) - 1, session_handler.comp_group_background_estimations_table_body.dimension(1) - 1), "");
+
+}
+
 BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
 {
   TestData testData(true, false, true);
@@ -358,6 +561,66 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getComponentGroupQCsTableFilters().size(), 10);
   BOOST_CHECK(session_handler.getComponentGroupQCsTableFilters()(0));
   BOOST_CHECK(!session_handler.getComponentGroupQCsTableFilters()(session_handler.getComponentGroupQCsTableFilters().dimension(0) - 1));
+
+  session_handler.setComponentRSDFiltersTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentRSDFiltersTableFilters().size(), 10);
+  BOOST_CHECK(!session_handler.getComponentRSDFiltersTableFilters()(0));
+  BOOST_CHECK(session_handler.getComponentRSDFiltersTableFilters()(session_handler.getComponentRSDFiltersTableFilters().dimension(0) - 1));
+  session_handler.setComponentRSDQCsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentRSDQCsTableFilters().size(), 10);
+  BOOST_CHECK(!session_handler.getComponentRSDQCsTableFilters()(0));
+  BOOST_CHECK(session_handler.getComponentRSDQCsTableFilters()(session_handler.getComponentRSDQCsTableFilters().dimension(0) - 1));
+  session_handler.setComponentGroupRSDFiltersTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentGroupRSDFiltersTableFilters().size(), 10);
+  BOOST_CHECK(session_handler.getComponentGroupRSDFiltersTableFilters()(0));
+  BOOST_CHECK(!session_handler.getComponentGroupRSDFiltersTableFilters()(session_handler.getComponentGroupRSDFiltersTableFilters().dimension(0) - 1));
+  session_handler.setComponentGroupRSDQCsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentGroupRSDQCsTableFilters().size(), 10);
+  BOOST_CHECK(session_handler.getComponentGroupRSDQCsTableFilters()(0));
+  BOOST_CHECK(!session_handler.getComponentGroupRSDQCsTableFilters()(session_handler.getComponentGroupRSDQCsTableFilters().dimension(0) - 1));  
+  session_handler.setComponentBackgroundFiltersTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentBackgroundFiltersTableFilters().size(), 10);
+  BOOST_CHECK(!session_handler.getComponentBackgroundFiltersTableFilters()(0));
+  BOOST_CHECK(session_handler.getComponentBackgroundFiltersTableFilters()(session_handler.getComponentBackgroundFiltersTableFilters().dimension(0) - 1));
+  session_handler.setComponentBackgroundQCsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentBackgroundQCsTableFilters().size(), 10);
+  BOOST_CHECK(!session_handler.getComponentBackgroundQCsTableFilters()(0));
+  BOOST_CHECK(session_handler.getComponentBackgroundQCsTableFilters()(session_handler.getComponentBackgroundQCsTableFilters().dimension(0) - 1));
+  session_handler.setComponentGroupBackgroundFiltersTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentGroupBackgroundFiltersTableFilters().size(), 10);
+  BOOST_CHECK(session_handler.getComponentGroupBackgroundFiltersTableFilters()(0));
+  BOOST_CHECK(!session_handler.getComponentGroupBackgroundFiltersTableFilters()(session_handler.getComponentGroupBackgroundFiltersTableFilters().dimension(0) - 1));
+  session_handler.setComponentGroupBackgroundQCsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentGroupBackgroundQCsTableFilters().size(), 10);
+  BOOST_CHECK(session_handler.getComponentGroupBackgroundQCsTableFilters()(0));
+  BOOST_CHECK(!session_handler.getComponentGroupBackgroundQCsTableFilters()(session_handler.getComponentGroupBackgroundQCsTableFilters().dimension(0) - 1));
+
+  testData.changeSampleType(SampleType::QC);
+  const map<string, vector<map<string, string>>> params;
+  Filenames filenames;
+  EstimateFeatureRSDs estimateFeatureRSDs;
+  estimateFeatureRSDs.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  session_handler.setComponentRSDEstimationsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentRSDEstimationsTableFilters().size(), 10);
+  BOOST_CHECK(!session_handler.getComponentRSDEstimationsTableFilters()(0));
+  BOOST_CHECK(session_handler.getComponentRSDEstimationsTableFilters()(session_handler.getComponentRSDEstimationsTableFilters().dimension(0) - 1));
+  session_handler.setComponentGroupRSDEstimationsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentGroupRSDEstimationsTableFilters().size(), 10);
+  BOOST_CHECK(session_handler.getComponentGroupRSDEstimationsTableFilters()(0));
+  BOOST_CHECK(!session_handler.getComponentGroupRSDEstimationsTableFilters()(session_handler.getComponentGroupRSDEstimationsTableFilters().dimension(0) - 1));
+
+  testData.changeSampleType(SampleType::Blank);
+  EstimateFeatureBackgroundInterferences estimateFeatureBackgroundInterferences;
+  estimateFeatureBackgroundInterferences.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  session_handler.setComponentBackgroundEstimationsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentBackgroundEstimationsTableFilters().size(), 10);
+  BOOST_CHECK(!session_handler.getComponentBackgroundEstimationsTableFilters()(0));
+  BOOST_CHECK(session_handler.getComponentBackgroundEstimationsTableFilters()(session_handler.getComponentBackgroundEstimationsTableFilters().dimension(0) - 1));
+  session_handler.setComponentGroupBackgroundEstimationsTable(testData.sequenceHandler);
+  BOOST_CHECK_EQUAL(session_handler.getComponentGroupBackgroundEstimationsTableFilters().size(), 10);
+  BOOST_CHECK(session_handler.getComponentGroupBackgroundEstimationsTableFilters()(0));
+  BOOST_CHECK(!session_handler.getComponentGroupBackgroundEstimationsTableFilters()(session_handler.getComponentGroupBackgroundEstimationsTableFilters().dimension(0) - 1));
+
 }
 
 BOOST_AUTO_TEST_CASE(setFeatureTable1)
@@ -386,26 +649,30 @@ BOOST_AUTO_TEST_CASE(setFeatureTable1)
 BOOST_AUTO_TEST_CASE(setFeatureMatrix1)
 {
   TestData testData;
-  SessionHandler session_handler; session_handler.setFeatureMatrix(testData.sequenceHandler);
+  SessionHandler session_handler;
+  session_handler.setFeatureMatrix(testData.sequenceHandler);
 }
 
 BOOST_AUTO_TEST_CASE(setChromatogramScatterPlot1)
 {
   TestData testData;
-  SessionHandler session_handler; session_handler.setChromatogramScatterPlot(testData.sequenceHandler);
+  SessionHandler session_handler;
+  session_handler.setChromatogramScatterPlot(testData.sequenceHandler);
 }
 
 
 BOOST_AUTO_TEST_CASE(setSpectrumScatterPlot1)
 {
   TestData testData;
-  SessionHandler session_handler; session_handler.setSpectrumScatterPlot(testData.sequenceHandler);
+  SessionHandler session_handler;
+  session_handler.setSpectrumScatterPlot(testData.sequenceHandler);
 }
 
 BOOST_AUTO_TEST_CASE(setCalibratorsScatterLinePlot1)
 {
   TestData testData;
-  SessionHandler session_handler; session_handler.setCalibratorsScatterLinePlot(testData.sequenceHandler);
+  SessionHandler session_handler;
+  session_handler.setCalibratorsScatterLinePlot(testData.sequenceHandler);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

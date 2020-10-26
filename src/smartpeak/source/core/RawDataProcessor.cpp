@@ -509,11 +509,13 @@ namespace SmartPeak
 
     try {
       if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_qmip")) {
+        LOGD << "Using MRMFeatures_qmip";
         std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
           Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"), params_I.at("MRMFeatureSelector.select_MRMFeatures_qmip"));
         OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
       }
       else if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_score")) {
+        LOGD << "Using MRMFeatures_score";
         std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
           Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
         OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
