@@ -17,7 +17,7 @@ option (USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
 if (USE_SUPERBUILD)
   project ("SuperBuild" NONE)
   include(external/plog.cmake)
-  include(external/imgui.cmake)
+  # include(external/imgui.cmake)
   include(external/implot.cmake)
   if (MSVC)
     include(external/eigen.cmake)
@@ -35,8 +35,7 @@ endif()
 SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 # Set C++ version
-add_compile_definitions(_LIBCPP_ENABLE_CXX17_REMOVED_AUTO_PTR)
-SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD 14)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_EXTENSIONS OFF)
 
