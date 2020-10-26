@@ -6,21 +6,22 @@
 #include <array>
 #include <string>
 #include <vector>
-#include <filesystem>
+// #include <boost/filesystem.hpp>
+
+// namespace fs = boost::filesystem;
 
 namespace SmartPeak
 {
   class FilePicker final : public Widget
   {
     std::array<std::vector<std::string>, 4> pathname_content_;
-    std::string current_pathname_ = std::filesystem::current_path();
+    std::string current_pathname_ = ".";
     std::string picked_pathname_;
-    
     FilePickerProcessor* processor_ = nullptr;
-    std::string processor_name_     = "";
-    bool loading_is_done_           = true;
-    bool file_was_loaded_           = true;
-    bool error_loading_file_        = false;
+    std::string processor_name_ = "";
+    bool loading_is_done_ = true;
+    bool file_was_loaded_ = true;
+    bool error_loading_file_ = false;
 
     void run_and_join(
       FilePickerProcessor* processor,
@@ -33,7 +34,7 @@ namespace SmartPeak
     FilePicker()
     {
       // current_pathname_ = fs::current_path().root_path().string();
-      // pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+      pathname_content_ = Utilities::getPathnameContent(current_pathname_);
     }
 
     void draw() override;

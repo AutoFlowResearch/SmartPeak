@@ -8,9 +8,6 @@
 
 #include <regex>
 #include <string>
-#include <filesystem>
-#include <chrono>
-#include <tuple>
 
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
@@ -214,26 +211,31 @@ public:
       std::string suffix,
       const bool case_sensitive = true
     );
-    
-    /**
-      @brief Retrieves information about files in a given directory
 
-      @param[in] folder_path Given path to inspect and scan
-      @param[in] sorting Desired order of the results in the form of a tuple,
-      where the first element is "name", "extension", "size" and "last_write_time", the second element can either be "ascending" or "descending".
-      @return List of files found where each string of vectors is a representation of a file's name, size, type and date.
-    */
-    static std::array<std::vector<std::string>, 4> getFolderContents(
-      const std::filesystem::path& folder_path,
-      const std::tuple<std::string, std::string>& sorting);
-    
     /**
-      @brief Get the parent path from a given path, the given path is returned when the parent path isn't existent
+      @brief Get information about name, size, type and modified date of all
+      entries in a folder
 
-      @param[in] p Path to a directory of interest.
-      @param[out] parent_path The parent path of the given path as a standard string.
+      @note Elements "." and ".." are not part of the content
+
+      @param[in] pathname Folder pathname
+      @param[in] asc Sort entries in ascending order
+
+      @returns A container with the desired information
     */
-    static std::string getParentPath(const std::filesystem::path& p);
+    static std::array<std::vector<std::string>, 4> getPathnameContent(
+      const std::string& pathname,
+      const bool asc = true
+    );
+
+    /**
+      @brief Get parent pathname from a pathname string
+
+      @param[in] pathname Input string pathname
+
+      @returns A string representation of the parent pathname
+    */
+    static std::string getParentPathname(const std::string& pathname);
 
     /**
       @brief Moves the elements in vector v according to indices
@@ -274,14 +276,16 @@ public:
       @returns True if 'a' is lexicographically less than 'b'. Otherwise false.
     */
     static bool is_less_than_icase(const std::string& a, const std::string& b);
-    
-    /**
-      @brief Retrieves basic information on a given directory
 
-      @param[in] p Path to inspect
-      @param[out] directory_info A tuple where the first element is the total size of files in the directory,
-      and the second is the total entries in the directory (files and directories).
+    /**
+      @brief Count the number of elements in a folder
+
+      @note Elements "." and ".." are not counted
+
+      @param[in] pathname Pathname to a folder
+
+      @returns The numbers of elements found
     */
-    static void getDirectoryInfo(const std::filesystem::path& p, std::tuple<float, uintmax_t>& directory_info);
+    static size_t directorySize(const std::string& pathname);
   };
 }

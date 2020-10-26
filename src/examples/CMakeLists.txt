@@ -54,17 +54,17 @@ endif(OpenMS_FOUND)
 #------------------------------------------------------------------------------
 # Find BOOST
 #------------------------------------------------------------------------------
-# find_boost(filesystem)
+find_boost(filesystem)
 
-# if(Boost_FOUND)
-#   message(STATUS "Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}" )
-#   set(CF_OPENMS_BOOST_VERSION_MAJOR ${Boost_MAJOR_VERSION})
-# 	set(CF_OPENMS_BOOST_VERSION_MINOR ${Boost_MINOR_VERSION})
-#   set(CF_OPENMS_BOOST_VERSION_SUBMINOR ${Boost_SUBMINOR_VERSION})
-# 	set(CF_OPENMS_BOOST_VERSION ${Boost_VERSION})
-# else()
-#   message(FATAL_ERROR "Boost or one of its components not found!")
-# endif()
+if(Boost_FOUND)
+  message(STATUS "Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}" )
+  set(CF_OPENMS_BOOST_VERSION_MAJOR ${Boost_MAJOR_VERSION})
+	set(CF_OPENMS_BOOST_VERSION_MINOR ${Boost_MINOR_VERSION})
+  set(CF_OPENMS_BOOST_VERSION_SUBMINOR ${Boost_SUBMINOR_VERSION})
+	set(CF_OPENMS_BOOST_VERSION ${Boost_VERSION})
+else()
+  message(FATAL_ERROR "Boost or one of its components not found!")
+endif()
 
 #------------------------------------------------------------------------------
 # OpenMS QT5 dependencies

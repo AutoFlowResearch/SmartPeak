@@ -382,48 +382,52 @@ BOOST_AUTO_TEST_CASE(endsWith)
   BOOST_CHECK_EQUAL(Utilities::endsWith(names[4], "does_not_end_with_this", false), false);
 }
 
-BOOST_AUTO_TEST_CASE(getFolderContents)
+BOOST_AUTO_TEST_CASE(getPathnameContent)
 {
-  std::filesystem::path pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
-  
-  std::array<std::vector<std::string>, 4> directory_entries;
-  
-  std::tuple<std::string, std::string> order_by_name = std::make_tuple ("name", "ascending");
-  directory_entries = Utilities::getFolderContents(pathname, order_by_name);
-  BOOST_CHECK_EQUAL(directory_entries[0][0], "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_1900-01-01_000000.featureXML");
-  directory_entries[0].clear(); directory_entries[1].clear();
-  directory_entries[2].clear(); directory_entries[3].clear();
-  
-  std::tuple<std::string, std::string> order_by_file_extension = std::make_tuple ("extension", "descending");
-  directory_entries = Utilities::getFolderContents(pathname, order_by_file_extension);
-  BOOST_CHECK_EQUAL(directory_entries[2][0], "Directory");
-  BOOST_CHECK_EQUAL(directory_entries[2][directory_entries.size()-1], ".txt");
-  directory_entries[0].clear(); directory_entries[1].clear();
-  directory_entries[2].clear(); directory_entries[3].clear();
-  
-  std::tuple<std::string, std::string> order_by_size = std::make_tuple ("size", "descending");
-  directory_entries = Utilities::getFolderContents(pathname, order_by_size);
-  BOOST_CHECK_EQUAL(directory_entries[1][0], "3804256");
-  BOOST_CHECK_EQUAL(directory_entries[1][directory_entries[1].size()-3], "192");
-  directory_entries[0].clear(); directory_entries[1].clear();
-  directory_entries[2].clear(); directory_entries[3].clear();
+  const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
+  const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname);
+
+  // number of items in the pathname, taking .gitignore into account
+  BOOST_CHECK_EQUAL(c[0].size(), 44);
+  BOOST_CHECK_EQUAL(c[1].size(), 44);
+  BOOST_CHECK_EQUAL(c[2].size(), 44);
+  BOOST_CHECK_EQUAL(c[3].size(), 44);
+
+  BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_1900-01-01_000000.featureXML");
+ #ifdef _WIN32
+   // NOTE: depending on the build machine...
+   //BOOST_CHECK_EQUAL(c[1][0], "774620"); // file size
+ #else
+  BOOST_CHECK_EQUAL(c[1][0], "761937"); // file size
+ #endif
+  BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
+
+  BOOST_CHECK_EQUAL(c[0][43], "workflow_csv_files");
+  BOOST_CHECK_EQUAL(c[1][43], "22"); // number of items within the folder
+  BOOST_CHECK_EQUAL(c[2][43], "Directory");
 }
 
-
-BOOST_AUTO_TEST_CASE(getParentPath)
-{  
-  std::filesystem::path path_2("/home/user/Downloads");
-  BOOST_CHECK_EQUAL(Utilities::getParentPath(path_2), "/home/user");
-  
-  std::filesystem::path path_3("/home/user/Downloads/");
-  BOOST_CHECK_EQUAL(Utilities::getParentPath(path_3), "/home/user/Downloads");
-  
-  std::filesystem::path path_4("/");
-  BOOST_CHECK_EQUAL(Utilities::getParentPath(path_4), "/");
-  
-  std::filesystem::path path_5("C:/Users/user/Downloads");
-  BOOST_CHECK_EQUAL(Utilities::getParentPath(path_5), "C:/Users/user");
-  
+BOOST_AUTO_TEST_CASE(getParentPathname)
+{
+#ifdef _WIN32
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D://///"), "D:/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:\\"), "D:");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:/"), "D:");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:"), "");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs"), "E:/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E://home///user//docs"), "E://home///user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs and a space"), "E:/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs/"), "E:/home/user/docs");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("//home///user//docs"), "//home///user");
+#else
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname(""), "");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/"), "");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs and a space"), "/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs/"), "/home/user/docs");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs"), "/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home"), "/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/file.txt"), "/home");
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(sortPairs)
@@ -464,14 +468,13 @@ BOOST_AUTO_TEST_CASE(is_less_than_icase)
   BOOST_CHECK_EQUAL(f("boot", "grub"), true);
 }
 
-
-BOOST_AUTO_TEST_CASE(getDirectorySize)
+BOOST_AUTO_TEST_CASE(directorySize)
 {
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
-  std::tuple<float , uintmax_t > directory_info;
-  Utilities::getDirectoryInfo(path, directory_info);
-  
-  BOOST_CHECK_EQUAL(std::get<1>(directory_info), 44);
+  auto& f = Utilities::directorySize;
+  BOOST_CHECK_EQUAL(f(path), 44);
+  BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 22);
+  BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

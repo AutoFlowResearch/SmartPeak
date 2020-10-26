@@ -9,6 +9,9 @@
 #include <regex>
 #include <unordered_set>
 #include <plog/Log.h>
+#include <boost/filesystem.hpp>
+
+namespace fs = boost::filesystem;
 
 namespace SmartPeak
 {
@@ -497,163 +500,78 @@ namespace SmartPeak
     return false;
   }
 
-std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
-  const std::filesystem::path& folder_path,
-  const std::tuple<std::string, std::string>& sorting)
-
+  std::array<std::vector<std::string>, 4> Utilities::getPathnameContent(
+    const std::string& pathname,
+    const bool asc
+  )
   {
-     // name, ext, size, date
-    std::array<std::vector<std::string>, 4> directory_entries;
-    std::vector<std::tuple<std::string, uintmax_t, std::string, std::time_t>> entries_temp;
-    
-    for (auto & p : std::filesystem::directory_iterator(folder_path))
-    {
-      if (p.is_regular_file() && (p.path().filename().string().at(0) != '.') )
-      {
-        auto time           = std::filesystem::last_write_time(p.path());
-        auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(time - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
-        std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
-        //std::time_t cftime  = decltype(time)::clock::to_time_t(time);
-        entries_temp.push_back(std::make_tuple(p.path().filename(), p.file_size(), p.path().extension(), cftime));
-      }
-       else if (p.is_directory())
-       {
-         auto time          = std::filesystem::last_write_time(p.path());
-         auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(time - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
-         std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
-         //std::time_t cftime = decltype(time)::clock::to_time_t(time);
-         entries_temp.push_back(std::make_tuple(p.path().filename(), 0, "Directory", cftime));
-       }
+    std::array<std::vector<std::string>, 4> content;
+    boost::system::error_code ec;
+
+    fs::directory_iterator it = fs::directory_iterator(fs::path(pathname), ec);
+    if (ec.value()) {
+      return content;
     }
-    
-    
-    if (!entries_temp.empty() || entries_temp.size() >= 2)
-    {
-      // sorting by filename
-      if (std::get<0>(sorting) == "name")
-      {
-        if (std::get<1>(sorting) == "ascending")
-        {
-          std::sort(entries_temp.begin(), entries_temp.end(),
-                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
-                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<0>(a) > std::get<0>(b));
-          });
-        }
-        else if (std::get<1>(sorting) == "descending")
-        {
-          std::sort(entries_temp.begin(), entries_temp.end(),
-                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
-                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<0>(a) < std::get<0>(b));
-          });
-        }
+    const fs::path p(pathname);
+    fs::directory_iterator it_end = fs::directory_iterator();
+
+    for ( ; it != it_end; it++) {
+      const fs::directory_entry& entry = *it;
+
+      if (!exists(entry.path())) { // protects from e.g. "dangling" symbolic links
+        LOGD << "Path does not exist. Skipping: " << entry.path();
+        continue;
       }
- 
-      // sorting by size
-      if (std::get<0>(sorting) == "size")
-      {
-        if (std::get<1>(sorting) == "ascending")
-        {
-          std::sort(entries_temp.begin(), entries_temp.end(),
-                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
-                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<1>(a) > std::get<1>(b));
-          });
-        }
-        else if (std::get<1>(sorting) == "descending")
-        {
-          std::sort(entries_temp.begin(), entries_temp.end(),
-                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
-                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<1>(a) < std::get<1>(b));
-          });
-        }
+
+      const std::string filename(entry.path().filename().string());
+      if (filename == "." || filename == ".." || (*(&filename.at(0))) == '.') {
+        continue;
       }
-      
-      // sorting by type
-      if (std::get<0>(sorting) == "extension")
-      {
-        if (std::get<1>(sorting) == "ascending")
-        {
-          std::sort(entries_temp.begin(), entries_temp.end(),
-                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
-                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<2>(a) > std::get<2>(b));
-          });
-        }
-        else if (std::get<1>(sorting) == "descending")
-        {
-          std::sort(entries_temp.begin(), entries_temp.end(),
-                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
-                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<2>(a) < std::get<2>(b));
-          });
-        }
+
+      size_t filesize = fs::is_directory(entry)
+        ? directorySize(entry.path().string())
+        : fs::file_size(entry, ec);
+      if (ec.value()) {
+        filesize = 0;
+        ec.clear();
       }
-      
-      // sorting by last write time
-      if (std::get<0>(sorting) == "last_write_time")
-      {
-        if (std::get<1>(sorting) == "ascending")
-        {
-          std::sort(entries_temp.begin(), entries_temp.end(),
-                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
-                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<3>(a) > std::get<3>(b));
-          });
-        }
-        else if (std::get<1>(sorting) == "descending")
-        {
-          std::sort(entries_temp.begin(), entries_temp.end(),
-                    [](const std::tuple<std::string, uintmax_t, std::string, std::time_t>& a,
-                       std::tuple<std::string, uintmax_t, std::string, std::time_t>& b) -> bool
-                    { return (std::get<3>(a) < std::get<3>(b));
-          });
-        }
-      }
-    }
-    
-    if (entries_temp.size() > 1)
-    {
-      for (uintmax_t i = entries_temp.size()-1; i > 0; i--)
-      {
-        directory_entries[0].push_back(std::get<0>(entries_temp[i]));
-        directory_entries[1].push_back((std::get<1>(entries_temp[i]) == 0 ? "-" : std::to_string(std::get<1>(entries_temp[i])) ));
-        directory_entries[2].push_back(std::get<2>(entries_temp[i]));
-        char buff[128];
-        std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&std::get<3>(entries_temp[i])));
-        directory_entries[3].push_back(buff);
-      }
-    } else if (entries_temp.size() == 1)
-    {
-      directory_entries[0].push_back(std::get<0>(entries_temp[0]));
-      directory_entries[1].push_back((std::get<1>(entries_temp[0]) == 0 ? "-" : std::to_string(std::get<1>(entries_temp[0])) ));
-      directory_entries[2].push_back(std::get<2>(entries_temp[0]));
+
+      const std::string filetype = fs::is_directory(entry) ? "Directory" : entry.path().extension().string();
+
       char buff[128];
-      std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&std::get<3>(entries_temp[0])));
-      directory_entries[3].push_back(buff);
+      const std::time_t t(fs::last_write_time(entry));
+      std::strftime(buff, sizeof buff, "%Y-%m-%d %H:%M:%S", std::localtime(&t)); // ISO 8601 date format
+
+      content[0].push_back(filename);
+      content[1].push_back(std::to_string(filesize));
+      content[2].push_back(filetype);
+      content[3].push_back(std::string(buff));
     }
-    
-    return directory_entries;
+
+    std::vector<size_t> indices(content[0].size());
+    std::iota(indices.begin(), indices.end(), 0);
+    const std::vector<std::string>& names = content[0];
+    std::sort(
+      indices.begin(),
+      indices.end(),
+      [&names, asc](const size_t l, const size_t r)
+      {
+        const bool b = is_less_than_icase(names[l], names[r]);
+        return asc ? b : !b;
+      }
+    );
+    sortPairs(indices, content[0]);
+    sortPairs(indices, content[1]);
+    sortPairs(indices, content[2]);
+    sortPairs(indices, content[3]);
+    return content;
   }
 
-  std::string Utilities::getParentPath(const std::filesystem::path& p)
+  std::string Utilities::getParentPathname(const std::string& pathname)
   {
-    std::filesystem::path parent_path;
-    
-    if ( p.string() == ".")
-    {
-    std::filesystem::path working_dir(std::filesystem::current_path());
-    parent_path = (working_dir.parent_path());
-    
-    }
-    else if (p.has_parent_path())
-    {
-      parent_path = (p.parent_path());
-    }
-    
-    return parent_path.string();
+    const fs::path p(pathname);
+    const fs::directory_entry entry(p);
+    return entry.path().parent_path().string();
   }
 
   bool Utilities::is_less_than_icase(const std::string& a, const std::string& b)
@@ -666,26 +584,25 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
     return a_lowercase.compare(b_lowercase) < 0;
   }
 
-  void Utilities::getDirectoryInfo(const std::filesystem::path& folder_path, std::tuple<float, uintmax_t>& directory_info)
+  size_t Utilities::directorySize(const std::string& pathname)
   {
-    float size_in_mb = 0;
-    uintmax_t entries = 0;
-    for (auto & p : std::filesystem::directory_iterator(folder_path))
-    {
-      
-      if (p.is_regular_file() && !p.is_directory())
-      {
-        size_in_mb += p.file_size();
-        entries += 1;
-      }
-      else if (p.is_directory())
-      {
-        entries += 1;
-      }
-    }
-    
-    std::get<0>(directory_info) = size_in_mb / 1e6;
-    std::get<1>(directory_info) = entries;
-  }
+    size_t n { 0 };
+    boost::system::error_code ec;
 
+    fs::directory_iterator it = fs::directory_iterator(fs::path(pathname), ec);
+    if (ec.value()) {
+      return 0;
+    }
+    fs::directory_iterator it_end = fs::directory_iterator();
+
+    for ( ; it != it_end; it++) {
+      const fs::path& filename { it->path().filename() };
+      if (filename == fs::path(".") || filename == fs::path("..") || filename.generic_string().at(0)  == '.') {
+        continue;
+      }
+      ++n;
+    }
+
+    return n;
+  }
 }

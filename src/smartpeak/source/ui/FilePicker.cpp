@@ -18,13 +18,11 @@ namespace SmartPeak
 
     if (ImGui::Button("Up"))
     {
-      const std::string parent = Utilities::getParentPath(current_pathname_);
+      const std::string parent = Utilities::getParentPathname(current_pathname_);
       if (parent.size()) {
         current_pathname_ = parent;
       }
-      
-      pathname_content_ = Utilities::getFolderContents(current_pathname_, std::make_tuple ("last_write_time", "descending"));
-      
+      pathname_content_ = Utilities::getPathnameContent(current_pathname_);
       selected_entry = -1;
     }
     ImGui::SameLine();
@@ -43,7 +41,7 @@ namespace SmartPeak
       if (ImGui::Button("Set") || ImGui::IsKeyPressedMap(ImGuiKey_Enter))
       {
         current_pathname_.assign(new_pathname);
-        pathname_content_ = Utilities::getFolderContents(current_pathname_, std::make_tuple ("last_write_time", "descending"));
+        pathname_content_ = Utilities::getPathnameContent(current_pathname_);
         selected_entry = -1;
         ImGui::CloseCurrentPopup();
       }
@@ -101,7 +99,7 @@ namespace SmartPeak
             current_pathname_.append("/");
           }
           current_pathname_.append(pathname_content_[0][selected_entry]);
-          pathname_content_ = Utilities::getFolderContents(current_pathname_, std::make_tuple ("last_write_time", "descending"));
+          pathname_content_ = Utilities::getPathnameContent(current_pathname_);
           filter.Clear();
           selected_entry = -1;
           selected_filename[0] = '\0';

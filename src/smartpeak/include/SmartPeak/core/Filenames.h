@@ -3,7 +3,6 @@
 #pragma once
 
 #include <string>
-#include <filesystem>
 
 namespace SmartPeak
 {
@@ -25,6 +24,10 @@ public:
     std::string featureBackgroundFilterComponentGroups_csv_i;
     std::string featureBackgroundQCComponents_csv_i;
     std::string featureBackgroundQCComponentGroups_csv_i;
+    std::string featureRSDEstimationComponents_csv_i;
+    std::string featureRSDEstimationComponentGroups_csv_i;
+    std::string featureBackgroundEstimationComponents_csv_i;
+    std::string featureBackgroundEstimationComponentGroups_csv_i;
     std::string quantitationMethods_csv_i;
     std::string standardsConcentrations_csv_i;
     std::string referenceData_csv_i;
@@ -49,6 +52,10 @@ public:
     std::string featureBackgroundFilterComponentGroups_csv_o;
     std::string featureBackgroundQCComponents_csv_o;
     std::string featureBackgroundQCComponentGroups_csv_o;
+    std::string featureRSDEstimationComponents_csv_o;
+    std::string featureRSDEstimationComponentGroups_csv_o;
+    std::string featureBackgroundEstimationComponents_csv_o;
+    std::string featureBackgroundEstimationComponentGroups_csv_o;
     std::string quantitationMethods_csv_o;
     std::string componentsToConcentrations_csv_o;
     std::string pivotTable_csv_o;
