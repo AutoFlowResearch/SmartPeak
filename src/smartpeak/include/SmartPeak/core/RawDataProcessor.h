@@ -16,6 +16,7 @@
 
 #include <map>
 #include <vector>
+#include <regex>
 #include <sstream>
 
 namespace SmartPeak

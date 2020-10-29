@@ -1960,16 +1960,16 @@ namespace SmartPeak
       std::vector<double> experiment_data;
       for(auto& param : CalculateIsotopicPurities_params)
       {
-        if (!param.find("comment_")->second.empty())
+        if (param.find("name")->second == "isotopic_purity_values" && !param.find("value")->second.empty())
         {
-          experiment_data_s = param.find("comment_")->second;
-          std::stringstream experiment_data_ss(experiment_data_s);
-          std::string experiment_data_buf;
-          while (experiment_data_ss >> experiment_data_buf)
-            experiment_data.push_back(std::stod(experiment_data_buf));
-          
+          experiment_data_s = param.find("value")->second;
+          std::regex regex_double("[+-]?\\d+(?:\\.\\d+)?");
+          std::sregex_iterator values_begin = std::sregex_iterator(experiment_data_s.begin(), experiment_data_s.end(), regex_double);
+          std::sregex_iterator values_end = std::sregex_iterator();
+          for (std::sregex_iterator it = values_begin; it != values_end; ++it)
+            experiment_data.push_back(std::strtof(it->str().c_str(), NULL));
         }
-        if (param.find("name")->second == "isotopic_purity_name")
+        if (param.find("name")->second == "isotopic_purity_name" && !param.find("value")->second.empty())
         {
           isotopic_purity_name = param.find("value")->second;
         }
