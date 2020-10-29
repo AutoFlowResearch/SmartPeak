@@ -79,6 +79,11 @@ namespace SmartPeak
           OpenMS::ChromeleonFile chfh;
           LOGI << "Loading: " << txt_name;
           chfh.load(txt_name, chromatograms);
+          // If the peak height is less than 1.0 (which is quite common in RI and UV detection), 
+          // the peak will not be picked, so we artificially scale the data by 1e3
+          for (auto& peak : chromatograms.getChromatograms().at(0)) {
+            peak.setIntensity(peak.getIntensity() * 1e3);
+          }
         }
         // Deal with .mzXML format
         else if (mzML_params.count("format") && mzML_params.at("format").s_ == "XML") {
