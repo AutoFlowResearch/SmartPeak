@@ -2355,55 +2355,7 @@ BOOST_AUTO_TEST_CASE(calculateMDVs)
 
   Filenames filenames;
   filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("GCMS_SIM.featureXML");
-//
-//  LoadFeatures loadFeatures;
-//  loadFeatures.process(rawDataHandler, params_1, filenames);
-
-//  SequenceHandler sequenceHandler;
-//  MetaDataHandler metaDataHandler;
-//
-//  metaDataHandler.setSampleName("GCMS_SIM");
-//  metaDataHandler.setFilename("GCMS_SIM.featureXML");
-//  metaDataHandler.setSampleType(SampleType::Unknown);
-//  metaDataHandler.setSampleGroupName("sample_group");
-//  metaDataHandler.setSequenceSegmentName("sequence_segment");
-//  metaDataHandler.inj_number = 0;
-//  metaDataHandler.acq_method_name = "6";
-//  metaDataHandler.inj_volume = 7.0;
-//  metaDataHandler.inj_volume_units = "8";
-//  metaDataHandler.batch_name = "FluxTest";
-//  metaDataHandler.scan_polarity = "negative";
-//  metaDataHandler.scan_mass_high = 2000;
-//  metaDataHandler.scan_mass_low = 60;
-//
-//  sequenceHandler.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
-//
-//  OpenMS::FeatureMap fm_Lactate;
   
-  // ver.1
-//  const std::vector<InjectionHandler> sampleHandl = sequenceHandler.getSequence(); // 1
-//  for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()){
-//    for (const OpenMS::Feature& feature :  sampleHandler.getRawData().getFeatureMapHistory()){
-//      if (feature.getMetaValue("PeptideRef") == "Lactate") {
-//        for (const OpenMS::Feature& subordinate : feature.getSubordinates()) {
-//          native_ids_lactates.push_back(subordinate.getMetaValue("native_id")) ;
-//          peak_apex_ints_lactates.push_back(subordinate.getMetaValue("peak_apex_int"));
-//        }
-//        fm_Lactate.push_back(feature);
-//      }
-//    }
-//  }
-  
-  // ver.2
-//  for (const OpenMS::Feature& feature :  rawDataHandler.getFeatureMap()){
-//    if (feature.getMetaValue("PeptideRef") == "Lactate") {
-//      fm_Lactate.push_back(feature);
-//    }
-//  }
-//
-//  rawDataHandler.setFeatureMap(fm_Lactate);
-  
-
   std::vector<OpenMS::Peak2D::IntensityType> L1_peak_apex_int {3.61e+08, 1.20e+04, 1.02e+05, 2.59e+04};
   std::vector<OpenMS::Peak2D::IntensityType> L2_peak_apex_int {2.77e+07, 5.45e+04, 6.26e+05, 7.46e+04, 2.75e+04};
 
@@ -2412,7 +2364,6 @@ BOOST_AUTO_TEST_CASE(calculateMDVs)
 
   std::vector<OpenMS::Peak2D::IntensityType> L2_norm_max {1.00e+00, 1.967e-03, 2.259e-02, 2.693e-03, 9.927e-04};
   std::vector<OpenMS::Peak2D::IntensityType> L2_norm_sum {9.7252e-01, 1.9134e-03, 2.1978e-02, 2.6191e-03, 9.655e-04};
-  
 
   // Lactate1 & Lactate2 - peak_apex_int - norm_max
   OpenMS::Feature               lactate_1_normmax;
@@ -2515,7 +2466,6 @@ BOOST_AUTO_TEST_CASE(isotopicCorrections)
   Filenames filenames;
   filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("GCMS_SIM.featureXML");
   
-  
   // case 1: validating corrected results (corrected peak_apex_int)
   IsotopicCorrections                   isotopicCorrections;
   OpenMS::Feature                       lactate_1_normalized;
@@ -2570,7 +2520,6 @@ BOOST_AUTO_TEST_CASE(calculateIsotopicPurities)
 
   Filenames filenames;
   filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("GCMS_SIM.featureXML");
-  
 
   CalculateIsotopicPurities     calculateIsotopicPurities;
   OpenMS::Feature               lactate_1_normalized;

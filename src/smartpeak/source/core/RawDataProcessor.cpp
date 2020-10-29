@@ -1883,6 +1883,7 @@ namespace SmartPeak
       
       isotopelabelingmdvs.calculateMDVs(rawDataHandler_IO.getFeatureMap(), normalized_featureMap, mass_intensity_type, feature_name);
       rawDataHandler_IO.setFeatureMap(normalized_featureMap);
+      rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -1924,6 +1925,7 @@ namespace SmartPeak
       
       isotopelabelingmdvs.isotopicCorrections(rawDataHandler_IO.getFeatureMap(), corrected_featureMap, {}, correction_matrix_agent);
       rawDataHandler_IO.setFeatureMap(corrected_featureMap);
+      rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -1974,6 +1976,7 @@ namespace SmartPeak
       }
       isotopelabelingmdvs.calculateIsotopicPurities(rawDataHandler_IO.getFeatureMap(), normalized_featureMap, experiment_data, isotopic_purity_name);
       rawDataHandler_IO.setFeatureMap(normalized_featureMap);
+      rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -2039,6 +2042,7 @@ namespace SmartPeak
       isotopelabelingmdvs.calculateMDVAccuracies(rawDataHandler_IO.getFeatureMap(), featureMap_with_accuracy_info,
                                                  fragment_isotopomer_measured, fragment_isotopomer_theoretical);
       rawDataHandler_IO.setFeatureMap(featureMap_with_accuracy_info);
+      rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
       LOGE << e.what();

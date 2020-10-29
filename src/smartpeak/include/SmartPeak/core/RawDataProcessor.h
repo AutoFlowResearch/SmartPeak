@@ -583,7 +583,7 @@ namespace SmartPeak
   {
     int getID() const override { return 0; }
     std::string getName() const override { return "ISOTOPIC_CORRECTIONS"; }
-    std::string getDescription() const override { return "Correct MDVs."; }
+    std::string getDescription() const override { return "Perform Isotopic Corrections."; }
     
     /** Correct MDVs
      */
