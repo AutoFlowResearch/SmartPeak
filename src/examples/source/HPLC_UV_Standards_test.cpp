@@ -33,7 +33,7 @@ void test_main_HPLC_UV_Standards()
   cout << "fm1.size(): " << fm1.size() << endl;
   cout << "fm2.size(): " << fm2.size() << endl;
 
-  assert(fm1.size() == 10);
+  assert(fm1.size() == 8);
   assert(fm1.size() == fm2.size());
 
   cout << "fm1[0].getSubordinates().size(): " << fm1[0].getSubordinates().size() << endl;
@@ -52,7 +52,7 @@ void test_main_HPLC_UV_Standards()
   cout << "f2 0 0 getRT: "         << f2->getRT() << endl;
 
   assert(f1->getMetaValue("native_id") == "5-HTP");
-  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 29.522835363288479));
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 2.952283536328848e04));
   assert(Utilities::assert_close((double)f1->getRT(), 2.03216));
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
@@ -74,9 +74,9 @@ void test_main_HPLC_UV_Standards()
   cout << "f2 6 0 peak_apex_int: " << f2->getMetaValue("peak_apex_int") << endl;
   cout << "f2 6 0 getRT: "         << f2->getRT() << endl;
 
-  assert(f1->getMetaValue("native_id") == "Riboflavin");
-  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 30.768488494563741));
-  assert(Utilities::assert_close((double)f1->getRT(), 5.07083));
+  assert(f1->getMetaValue("native_id") == "Tryptamine");
+  assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), 3.796930796956271e04));
+  assert(Utilities::assert_close((double)f1->getRT(), 3.43251));
   assert(f1->getMetaValue("native_id") == f2->getMetaValue("native_id"));
   assert(Utilities::assert_close((double)f1->getMetaValue("peak_apex_int"), (double)f2->getMetaValue("peak_apex_int")));
   assert(Utilities::assert_close((double)f1->getRT(), (double)f2->getRT()));
