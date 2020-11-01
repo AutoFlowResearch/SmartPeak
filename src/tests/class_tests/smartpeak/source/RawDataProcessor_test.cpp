@@ -166,11 +166,11 @@ BOOST_AUTO_TEST_CASE(processorLoadRawData)
   BOOST_CHECK_EQUAL(chromatograms3[0].size(), 3301);
 
   BOOST_CHECK_CLOSE(chromatograms3[0][0].getIntensity(), 0.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms3[0][600].getIntensity(), -0.503815, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms3[0][1200].getIntensity(), -0.666694, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms3[0][1800].getIntensity(), -0.232843, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms3[0][2400].getIntensity(), -0.223644, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms3[0][3300].getIntensity(), 0.126958, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][600].getIntensity(), -503.815, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][1200].getIntensity(), -666.694, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][1800].getIntensity(), -232.843, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][2400].getIntensity(), -223.644, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][3300].getIntensity(), 126.958, 1e-3);
 }
 
 BOOST_AUTO_TEST_CASE(extractMetaData)
@@ -383,12 +383,12 @@ BOOST_AUTO_TEST_CASE(processorZeroChromatogramBaseline)
   const vector<OpenMS::MSChromatogram>& chromatograms4 = rawDataHandler.getChromatogramMap().getChromatograms();
   BOOST_CHECK_EQUAL(chromatograms4.size(), 1);
   BOOST_CHECK_EQUAL(chromatograms4[0].size(), 3301);
-  BOOST_CHECK_CLOSE(chromatograms4[0][0].getIntensity(), 1.004634, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][600].getIntensity(), 0.500819, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][1200].getIntensity(), 0.33794, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][1800].getIntensity(), 0.771791, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][2400].getIntensity(), 0.78099, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][3300].getIntensity(), 1.131592, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][0].getIntensity(), 1004.634, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][600].getIntensity(), 500.819, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][1200].getIntensity(), 337.94, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][1800].getIntensity(), 771.791, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][2400].getIntensity(), 780.99, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][3300].getIntensity(), 1131.592, 1e-3);
 }
 
 /**
