@@ -67,18 +67,19 @@ namespace SmartPeak
     
     const int column_count = 4;
     const char* column_names[column_count] = { "Name", "Size", "Type", "Date Modified" };
-    static ImGuiTableColumnFlags column_flags[column_count] = { ImGuiTableColumnFlags_DefaultSort, ImGuiTableColumnFlags_DefaultHide,
-      ImGuiTableColumnFlags_DefaultSort
+    static ImGuiTableColumnFlags column_flags[column_count] = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide
     };
     
-    static ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Sortable;
-        
+    static ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
+        ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
+    
     ImVec2 size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 2);
     if (ImGui::BeginTable("Content", column_count, table_flags, size))
     {
       for (int column = 0; column < column_count; column++){
         ImGui::TableSetupColumn(column_names[column], column_flags[column]);
       }
+      ImGui::TableSetupScrollFreeze(column_count, 1);
       ImGui::TableHeadersRow();
 
       const ImGuiWindowFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick;
