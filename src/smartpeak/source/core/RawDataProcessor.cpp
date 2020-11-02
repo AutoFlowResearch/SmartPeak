@@ -79,6 +79,11 @@ namespace SmartPeak
           OpenMS::ChromeleonFile chfh;
           LOGI << "Loading: " << txt_name;
           chfh.load(txt_name, chromatograms);
+          // If the peak height is less than 1.0 (which is quite common in RI and UV detection), 
+          // the peak will not be picked, so we artificially scale the data by 1e3
+          for (auto& peak : chromatograms.getChromatograms().at(0)) {
+            peak.setIntensity(peak.getIntensity() * 1e3);
+          }
         }
         // Deal with .mzXML format
         else if (mzML_params.count("format") && mzML_params.at("format").s_ == "XML") {
@@ -509,11 +514,13 @@ namespace SmartPeak
 
     try {
       if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_qmip")) {
+        LOGD << "Using MRMFeatures_qmip";
         std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
           Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"), params_I.at("MRMFeatureSelector.select_MRMFeatures_qmip"));
         OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
       }
       else if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_score")) {
+        LOGD << "Using MRMFeatures_score";
         std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
           Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
         OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);

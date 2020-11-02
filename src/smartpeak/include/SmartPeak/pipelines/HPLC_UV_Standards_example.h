@@ -26,7 +26,7 @@ void example_HPLC_UV_Standards(
     std::shared_ptr<RawDataProcessor>(new ExtractChromatogramWindows()),
     std::shared_ptr<RawDataProcessor>(new ZeroChromatogramBaseline()),
     std::shared_ptr<RawDataProcessor>(new PickMRMFeatures()),
-    //std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
+    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
     std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
     std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
     std::shared_ptr<RawDataProcessor>(new StoreFeatures())
