@@ -344,7 +344,7 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
     metaDataHandler.rack_number = 4;
     metaDataHandler.pos_number = inj_num;
     metaDataHandler.dilution_factor = 8.0;
-    metaDataHandler.setAcquisitionDateAndTimeFromString("2020-01-02 17:14:00", "%m-%d-%Y %H:%M:%S");
+    metaDataHandler.setAcquisitionDateAndTimeFromString("01-01-2020 17:14:00", "%m-%d-%Y %H:%M:%S");
     metaDataHandler.inj_number = inj_num;
     metaDataHandler.acq_method_name = "RapidRIP";
     metaDataHandler.inj_volume = 7.0;
@@ -377,8 +377,8 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
   BOOST_CHECK_EQUAL(data_out.at(0).at(11), "Unknown");
   BOOST_CHECK_EQUAL(data_out.at(0).at(12), "4");
   BOOST_CHECK_EQUAL(data_out.at(0).at(13), "3");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(14), "2002-01-01_171400");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(15), "2002-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2002-01-01_171400");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(14), "2020-01-01_171400");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(15), "2020-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
   BOOST_CHECK_EQUAL(headers_out.size(), 16);
   BOOST_CHECK_EQUAL(headers_out.at(0), "% header=SampleName");
   BOOST_CHECK_EQUAL(headers_out.at(1), "SampleID");
