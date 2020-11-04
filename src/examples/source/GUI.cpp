@@ -490,17 +490,16 @@ int main(int argc, char **argv)
           ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Export File"))
-        { // TODO: once table editing is enabled
-          if (ImGui::MenuItem("Sequence for Analyst")) {
-            static LoadSequenceTransitions processor(application_handler_);
-            file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
-            update_session_cache_ = true;
+        {
+          if (ImGui::MenuItem("Sequence Analyst")) {
+            static StoreSequenceFileAnalyst processor(application_handler_);
+            processor.process();
+            // TODO: modal to allow for changing the filename and directory of where to write the file
           }
-          if (ImGui::MenuItem("Sequence")) {}
-          if (ImGui::MenuItem("Transitions")) {}
-          if (ImGui::MenuItem("Parameters")) {}
-          if (ImGui::MenuItem("Standards Conc")) {}
+          //if (ImGui::MenuItem("Sequence")) {}
+          //if (ImGui::MenuItem("Transitions")) {}
+          //if (ImGui::MenuItem("Parameters")) {}
+          //if (ImGui::MenuItem("Standards Conc")) {}
           ImGui::EndMenu();
         }
         ImGui::EndMenu();
