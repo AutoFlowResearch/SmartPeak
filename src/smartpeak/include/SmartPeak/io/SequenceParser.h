@@ -30,6 +30,18 @@ public:
       const std::string& delimiter
     );
 
+    static void makeSequenceFileAnalyst(
+      SequenceHandler& sequenceHandler,
+      std::vector<std::vector<std::string>>& rows_out,
+      std::vector<std::string>& headers_out
+    );
+
+    static void writeSequenceFileAnalyst(
+      SequenceHandler& sequenceHandler,
+      const std::string& filename,
+      const std::string& delimiter = "\t"
+    );
+
     template<typename T>
     static bool validateAndConvert(
       const std::string& s,

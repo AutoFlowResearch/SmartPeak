@@ -489,8 +489,14 @@ int main(int argc, char **argv)
           }
           ImGui::EndMenu();
         }
-        if (ImGui::BeginMenu("Export File", false))
+        if (ImGui::BeginMenu("Export File"))
         { // TODO: once table editing is enabled
+          if (ImGui::MenuItem("Sequence for Analyst")) {
+            static LoadSequenceTransitions processor(application_handler_);
+            file_picker_.setProcessor(processor);
+            popup_file_picker_ = true;
+            update_session_cache_ = true;
+          }
           if (ImGui::MenuItem("Sequence")) {}
           if (ImGui::MenuItem("Transitions")) {}
           if (ImGui::MenuItem("Parameters")) {}

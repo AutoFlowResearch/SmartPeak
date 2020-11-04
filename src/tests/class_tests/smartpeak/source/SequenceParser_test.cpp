@@ -318,4 +318,84 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
 }
 
+BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
+{
+  SequenceHandler sequenceHandler;
+
+  const vector<string> sample_names = {
+    "170808_Jonathan_yeast_Sacc1_1x",
+    "170808_Jonathan_yeast_Sacc2_1x",
+    "170808_Jonathan_yeast_Sacc3_1x",
+    "170808_Jonathan_yeast_Yarr1_1x",
+    "170808_Jonathan_yeast_Yarr2_1x",
+    "170808_Jonathan_yeast_Yarr3_1x"
+  };
+
+  int inj_num = 0;
+  for (const string& sample_name : sample_names) {
+    ++inj_num;
+    MetaDataHandler metaDataHandler;
+    metaDataHandler.setSampleName(sample_name);
+    metaDataHandler.setFilename(sample_name + ".mzML");
+    metaDataHandler.setSampleType(SampleType::Unknown);
+    metaDataHandler.setSampleGroupName("sample_group");
+    metaDataHandler.setSequenceSegmentName("sequence_segment");
+    metaDataHandler.plate_number = 3;
+    metaDataHandler.rack_number = 4;
+    metaDataHandler.pos_number = inj_num;
+    metaDataHandler.dilution_factor = 8.0;
+    metaDataHandler.setAcquisitionDateAndTimeFromString("2020-01-02 17:14:00", "%m-%d-%Y %H:%M:%S");
+    metaDataHandler.inj_number = inj_num;
+    metaDataHandler.acq_method_name = "RapidRIP";
+    metaDataHandler.inj_volume = 7.0;
+    metaDataHandler.inj_volume_units = "8";
+    metaDataHandler.batch_name = "FluxTest";
+    metaDataHandler.scan_polarity = "negative";
+    metaDataHandler.scan_mass_high = 2000;
+    metaDataHandler.scan_mass_low = 60;
+
+    sequenceHandler.addSampleToSequence(metaDataHandler, OpenMS::FeatureMap());
+  }
+
+  vector<vector<string>> data_out;
+  vector<string> headers_out;
+
+  SequenceParser::makeSequenceFileAnalyst(sequenceHandler, data_out, headers_out);
+
+  BOOST_CHECK_EQUAL(data_out.size(), 6);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "sample_group");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "RapidRIP.dam");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "none");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(5), "CStk1-4");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(6), "MT96_or_VT54");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(7), "1");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(8), "7.000000");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(9), "8.000000");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(10), "0");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(11), "Unknown");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(12), "4");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(13), "3");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(14), "2002-01-01_171400");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(15), "2002-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2002-01-01_171400");
+  BOOST_CHECK_EQUAL(headers_out.size(), 16);
+  BOOST_CHECK_EQUAL(headers_out.at(0), "% header=SampleName");
+  BOOST_CHECK_EQUAL(headers_out.at(1), "SampleID");
+  BOOST_CHECK_EQUAL(headers_out.at(2), "Comments");
+  BOOST_CHECK_EQUAL(headers_out.at(3), "AcqMethod");
+  BOOST_CHECK_EQUAL(headers_out.at(4), "ProcMethod");
+  BOOST_CHECK_EQUAL(headers_out.at(5), "RackCode");
+  BOOST_CHECK_EQUAL(headers_out.at(6), "PlateCode");
+  BOOST_CHECK_EQUAL(headers_out.at(7), "VialPos");
+  BOOST_CHECK_EQUAL(headers_out.at(8), "SmplInjVol");
+  BOOST_CHECK_EQUAL(headers_out.at(9), "DilutFact");
+  BOOST_CHECK_EQUAL(headers_out.at(10), "WghtToVol");
+  BOOST_CHECK_EQUAL(headers_out.at(11), "Type");
+  BOOST_CHECK_EQUAL(headers_out.at(12), "RackPos");
+  BOOST_CHECK_EQUAL(headers_out.at(13), "PlatePos");
+  BOOST_CHECK_EQUAL(headers_out.at(14), "SetName");
+  BOOST_CHECK_EQUAL(headers_out.at(15), "OutputFile");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
