@@ -39,7 +39,8 @@ void example_HPLC_UV_Standards(
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
-      injection.getMetaData().getSampleName(),
+      injection.getMetaData().getFilename(),
+      key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
@@ -63,6 +64,7 @@ void example_HPLC_UV_Standards(
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
+      "",
       key,
       key,
       "",""
@@ -87,7 +89,8 @@ void example_HPLC_UV_Standards(
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
-      injection.getMetaData().getSampleName(),
+      injection.getMetaData().getFilename(),
+      key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()

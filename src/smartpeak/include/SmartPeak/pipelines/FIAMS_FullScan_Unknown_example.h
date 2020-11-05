@@ -34,7 +34,8 @@ void example_FIAMS_FullScan_Unknowns(
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
-      injection.getMetaData().getSampleName(),
+      injection.getMetaData().getFilename(),
+      key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
