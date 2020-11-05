@@ -184,6 +184,11 @@ namespace SmartPeak
       if (!is_valid)
         break;
 
+      if (t.original_filename.empty()) {
+        LOGW << "Warning: No value provided for the original filename. Will create a unique default filename.";
+        t.original_filename = t.getInjectionName();
+      }
+
       if (false == validateAndConvert(t_inj_number, t.inj_number)) {
         LOGW << "Warning: Empty cell in column '" << s_inj_number << "'. Skipping entire row";
         continue;

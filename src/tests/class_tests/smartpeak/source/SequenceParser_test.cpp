@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSequenceSegmentName(), "Group01");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleType() == SampleType::Unknown, true);
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getFilename(), "170808_Jonathan_yeast_Yarr2_1x_-1_FluxTest_1900-01-01_000000"); // No default provided
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().acq_method_name, "LCMS");
   BOOST_CHECK_CLOSE(sequence2[4].getMetaData().inj_volume, 10.0, 1e-3);
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().inj_volume_units, "uL");
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSequenceSegmentName(), "Group01");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleType() == SampleType::Unknown, true);
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getFilename(), "170808_Jonathan_yeast_Yarr2_1x_-1_FluxTest_1900-01-01_000000"); // No default provided
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().acq_method_name, "LCMS");
   BOOST_CHECK_CLOSE(sequence3[4].getMetaData().inj_volume, 10.0, 1e-3);
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().inj_volume_units, "uL");
