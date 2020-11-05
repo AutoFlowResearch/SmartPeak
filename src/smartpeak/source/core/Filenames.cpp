@@ -42,6 +42,7 @@ namespace SmartPeak
     const std::string& mzml_input_path,
     const std::string& features_input_path,
     const std::string& output_path,
+    const std::string& input_mzML_filename,
     const std::string& input_inj_name,
     const std::string& output_inj_name,
     const std::string& input_sample_name,
@@ -49,36 +50,36 @@ namespace SmartPeak
   )
   {
     Filenames dynamic_filenames;
-    dynamic_filenames.mzML_i       = mzml_input_path + "/" + input_inj_name + ".mzML";
-    dynamic_filenames.featureXML_i = features_input_path + "/" + output_inj_name + ".featureXML";
-    dynamic_filenames.featureXMLSampleGroup_i = features_input_path + "/" + input_sample_name + ".featureXML";
-    dynamic_filenames.mzTab_i = features_input_path + "/" + output_inj_name + ".mzTab";
-    // NOTE: input featureXML is almost always derived from the output featureXML
+    dynamic_filenames.mzML_i       = mzml_input_path + "/" + input_mzML_filename + ".mzML";
 
-    const std::string prefix = output_path + "/" + output_inj_name;
-    dynamic_filenames.featureXML_o                     = prefix + ".featureXML";
+    const std::string prefix_in = features_input_path + "/" + input_inj_name;
+    dynamic_filenames.featureXML_i = prefix_in + ".featureXML";
+    dynamic_filenames.mzTab_i = prefix_in + ".mzTab";
+
+    dynamic_filenames.featureXMLSampleGroup_i = features_input_path + "/" + input_sample_name + ".featureXML";
     dynamic_filenames.featureXMLSampleGroup_o = output_path + "/" + output_sample_name + ".featureXML";
-    dynamic_filenames.mzTab_o = prefix + ".mzTab";
-    dynamic_filenames.feature_csv_o                    = prefix + ".csv";
-    dynamic_filenames.features_pdf_o                   = prefix;
-    dynamic_filenames.featureFilterComponents_csv_o = prefix + "_featureFilterComponents.csv";
-    dynamic_filenames.featureFilterComponentGroups_csv_o = prefix + "_featureFilterComponentGroups.csv";
-    dynamic_filenames.featureQCComponents_csv_o = prefix + "_featureQCComponents.csv";
-    dynamic_filenames.featureQCComponentGroups_csv_o = prefix + "_featureQCComponentGroups.csv";
-    dynamic_filenames.featureRSDFilterComponents_csv_o = prefix + "_featureRSDFilterComponents.csv";
-    dynamic_filenames.featureRSDFilterComponentGroups_csv_o = prefix + "_featureRSDFilterComponentGroups.csv";
-    dynamic_filenames.featureRSDQCComponents_csv_o = prefix + "_featureRSDQCComponents.csv";
-    dynamic_filenames.featureRSDQCComponentGroups_csv_o = prefix + "_featureRSDQCComponentGroups.csv";
-    dynamic_filenames.featureBackgroundFilterComponents_csv_o = prefix + "_featureBackgroundFilterComponents.csv";
-    dynamic_filenames.featureBackgroundFilterComponentGroups_csv_o = prefix + "_featureBackgroundFilterComponentGroups.csv";
-    dynamic_filenames.featureBackgroundQCComponents_csv_o = prefix + "_featureBackgroundQCComponents.csv";
-    dynamic_filenames.featureBackgroundQCComponentGroups_csv_o = prefix + "_featureBackgroundQCComponentGroups.csv";
-    dynamic_filenames.featureRSDEstimationComponents_csv_o = prefix + "_featureRSDEstimationComponents.csv";
-    dynamic_filenames.featureRSDEstimationComponentGroups_csv_o = prefix + "_featureRSDEstimationComponentGroups.csv";
-    dynamic_filenames.featureBackgroundEstimationComponents_csv_o = prefix + "_featureBackgroundEstimationComponents.csv";
-    dynamic_filenames.featureBackgroundEstimationComponentGroups_csv_o = prefix + "_featureBackgroundEstimationComponentGroups.csv";
-    dynamic_filenames.quantitationMethods_csv_o        = prefix + "_quantitationMethods.csv";
-    dynamic_filenames.componentsToConcentrations_csv_o = prefix + "_componentsToConcentrations.csv";
+
+    const std::string prefix_out = output_path + "/" + output_inj_name;
+    dynamic_filenames.featureXML_o                     = prefix_out + ".featureXML";
+    dynamic_filenames.mzTab_o = prefix_out + ".mzTab";
+    dynamic_filenames.featureFilterComponents_csv_o = prefix_out + "_featureFilterComponents.csv";
+    dynamic_filenames.featureFilterComponentGroups_csv_o = prefix_out + "_featureFilterComponentGroups.csv";
+    dynamic_filenames.featureQCComponents_csv_o = prefix_out + "_featureQCComponents.csv";
+    dynamic_filenames.featureQCComponentGroups_csv_o = prefix_out + "_featureQCComponentGroups.csv";
+    dynamic_filenames.featureRSDFilterComponents_csv_o = prefix_out + "_featureRSDFilterComponents.csv";
+    dynamic_filenames.featureRSDFilterComponentGroups_csv_o = prefix_out + "_featureRSDFilterComponentGroups.csv";
+    dynamic_filenames.featureRSDQCComponents_csv_o = prefix_out + "_featureRSDQCComponents.csv";
+    dynamic_filenames.featureRSDQCComponentGroups_csv_o = prefix_out + "_featureRSDQCComponentGroups.csv";
+    dynamic_filenames.featureBackgroundFilterComponents_csv_o = prefix_out + "_featureBackgroundFilterComponents.csv";
+    dynamic_filenames.featureBackgroundFilterComponentGroups_csv_o = prefix_out + "_featureBackgroundFilterComponentGroups.csv";
+    dynamic_filenames.featureBackgroundQCComponents_csv_o = prefix_out + "_featureBackgroundQCComponents.csv";
+    dynamic_filenames.featureBackgroundQCComponentGroups_csv_o = prefix_out + "_featureBackgroundQCComponentGroups.csv";
+    dynamic_filenames.featureRSDEstimationComponents_csv_o = prefix_out + "_featureRSDEstimationComponents.csv";
+    dynamic_filenames.featureRSDEstimationComponentGroups_csv_o = prefix_out + "_featureRSDEstimationComponentGroups.csv";
+    dynamic_filenames.featureBackgroundEstimationComponents_csv_o = prefix_out + "_featureBackgroundEstimationComponents.csv";
+    dynamic_filenames.featureBackgroundEstimationComponentGroups_csv_o = prefix_out + "_featureBackgroundEstimationComponentGroups.csv";
+    dynamic_filenames.quantitationMethods_csv_o        = prefix_out + "_quantitationMethods.csv";
+    dynamic_filenames.componentsToConcentrations_csv_o = prefix_out + "_componentsToConcentrations.csv";
 
     dynamic_filenames.mzml_input_path = mzml_input_path;
     dynamic_filenames.features_input_path = features_input_path;
@@ -117,10 +118,6 @@ namespace SmartPeak
     filenames.featureXML_o = fs::path(prefix).append(fs::path(filenames.featureXML_o).filename().c_str()).string();
     filenames.featureXMLSampleGroup_o = fs::path(prefix).append(fs::path(filenames.featureXMLSampleGroup_o).filename().c_str()).string();
     filenames.mzTab_o = fs::path(prefix).append(fs::path(filenames.mzTab_o).filename().c_str()).string();
-
-    filenames.feature_csv_o = fs::path(prefix).append(fs::path(filenames.feature_csv_o).filename().c_str()).string();
-
-    filenames.features_pdf_o = fs::path(prefix).append(fs::path(filenames.features_pdf_o).filename().c_str()).string();
 
     filenames.featureFilterComponents_csv_o = fs::path(prefix).append(fs::path(filenames.featureFilterComponents_csv_o).filename().c_str()).string();
     filenames.featureFilterComponentGroups_csv_o = fs::path(prefix).append(fs::path(filenames.featureFilterComponentGroups_csv_o).filename().c_str()).string();
@@ -173,10 +170,8 @@ namespace SmartPeak
     mzTab_o.clear();
     featureXML_o.clear();
     featureXMLSampleGroup_o.clear();
-    feature_csv_o.clear();
     featureXML_i.clear();
     featureXMLSampleGroup_i.clear();
-    features_pdf_o.clear();
     featureFilterComponents_csv_o.clear();
     featureFilterComponentGroups_csv_o.clear();
     featureQCComponents_csv_o.clear();

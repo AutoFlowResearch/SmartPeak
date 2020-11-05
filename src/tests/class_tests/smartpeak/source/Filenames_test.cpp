@@ -41,10 +41,8 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultStaticFilenames)
   BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
-  BOOST_CHECK_EQUAL(filenames.feature_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "");
-  BOOST_CHECK_EQUAL(filenames.features_pdf_o, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "");
@@ -73,6 +71,7 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultDynamicFilenames)
     "/home/user/mzML",
     "/home/user/featuresIn", 
     "/home/user/featuresOut", 
+    "mzMLIn",
     "injIn",
     "injOut",
     "sampleIn",
@@ -99,15 +98,13 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultDynamicFilenames)
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.mzML_i, "/home/user/mzML/injIn.mzML");
+  BOOST_CHECK_EQUAL(filenames.mzML_i, "/home/user/mzML/mzMLIn.mzML");
   BOOST_CHECK_EQUAL(filenames.mzTab_o, "/home/user/featuresOut/injOut.mzTab");
-  BOOST_CHECK_EQUAL(filenames.mzTab_i, "/home/user/featuresIn/injOut.mzTab");
+  BOOST_CHECK_EQUAL(filenames.mzTab_i, "/home/user/featuresIn/injIn.mzTab");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "/home/user/featuresOut/injOut.featureXML");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "/home/user/featuresOut/sampleOut.featureXML");
-  BOOST_CHECK_EQUAL(filenames.feature_csv_o, "/home/user/featuresOut/injOut.csv");
-  BOOST_CHECK_EQUAL(filenames.featureXML_i, "/home/user/featuresIn/injOut.featureXML");
+  BOOST_CHECK_EQUAL(filenames.featureXML_i, "/home/user/featuresIn/injIn.featureXML");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "/home/user/featuresIn/sampleIn.featureXML");
-  BOOST_CHECK_EQUAL(filenames.features_pdf_o, "/home/user/featuresOut/injOut");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "/home/user/featuresOut/injOut_featureFilterComponents.csv");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureFilterComponentGroups.csv");
   BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "/home/user/featuresOut/injOut_featureQCComponents.csv");
@@ -161,10 +158,8 @@ BOOST_AUTO_TEST_CASE(clear1)
   BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
-  BOOST_CHECK_EQUAL(filenames.feature_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "");
-  BOOST_CHECK_EQUAL(filenames.features_pdf_o, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "");
@@ -193,6 +188,7 @@ BOOST_AUTO_TEST_CASE(clear2)
     "/home/user/mzML",
     "/home/user/featuresIn",
     "/home/user/featuresOut",
+    "mzMLIn",
     "injIn",
     "injOut",
     "sampleIn",
@@ -223,10 +219,8 @@ BOOST_AUTO_TEST_CASE(clear2)
   BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
-  BOOST_CHECK_EQUAL(filenames.feature_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "");
-  BOOST_CHECK_EQUAL(filenames.features_pdf_o, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "");

@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
 {
   SequenceHandler sequenceHandler;
   CreateSequence cs(sequenceHandler);
-  cs.filenames        = generateTestFilenames();
+  cs.filenames_        = generateTestFilenames();
   cs.delimiter        = ",";
   cs.checkConsistency = false;
   cs.process();
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   Filenames filenames { generateTestFilenames() };
   filenames.sequence_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv");
 
-  cs.filenames = filenames;
+  cs.filenames_ = filenames;
   cs.process();
 
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 0);
@@ -166,7 +166,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
 {
   SequenceHandler sequenceHandler;
   CreateSequence cs(sequenceHandler);
-  cs.filenames        = generateTestFilenames();
+  cs.filenames_        = generateTestFilenames();
   cs.delimiter        = ",";
   cs.checkConsistency = false;
   cs.process();
@@ -183,7 +183,8 @@ BOOST_AUTO_TEST_CASE(processSequence)
       path + "mzML/",
       path + "features/",
       path + "features/",
-      injection.getMetaData().getSampleName(),
+      injection.getMetaData().getFilename(), // previous: injection.getMetaData().getSampleName(),
+      key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
@@ -196,9 +197,9 @@ BOOST_AUTO_TEST_CASE(processSequence)
   std::set<std::string> injection_names;
   for (int i = 0; i < 2; ++i) injection_names.insert(sequenceHandler.getSequence().at(i).getMetaData().getInjectionName());
   ProcessSequence ps(sequenceHandler);
-  ps.filenames = dynamic_filenames;
-  ps.raw_data_processing_methods_I = raw_data_processing_methods;
-  ps.injection_names = injection_names;
+  ps.filenames_ = dynamic_filenames;
+  ps.raw_data_processing_methods_ = raw_data_processing_methods;
+  ps.injection_names_ = injection_names;
   ps.process();
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
   int n_chroms = 0;
@@ -206,7 +207,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
   BOOST_CHECK_EQUAL(n_chroms, 680); // loaded only the first two injections
 
   // Default injection names (i.e., the entire sequence)
-  ps.injection_names = {};
+  ps.injection_names_ = {};
   ps.process();
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
   n_chroms = 0;
@@ -241,7 +242,7 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
 {
   SequenceHandler sequenceHandler;
   CreateSequence cs(sequenceHandler);
-  cs.filenames        = generateTestFilenames();
+  cs.filenames_        = generateTestFilenames();
   cs.delimiter        = ",";
   cs.checkConsistency = false;
   cs.process();
@@ -257,6 +258,7 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
       path + "mzML/",
       path + "features/",
       path + "features/",
+      "",
       key,
       key,
       key,
@@ -266,8 +268,8 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
 
   // Default sequence segment names (i.e., all)
   ProcessSequenceSegments pss(sequenceHandler);
-  pss.filenames                             = dynamic_filenames;
-  pss.sequence_segment_processing_methods_I = sequence_segment_processing_methods;
+  pss.filenames_                             = dynamic_filenames;
+  pss.sequence_segment_processing_methods_ = sequence_segment_processing_methods;
   pss.process();
 
   BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 1);
@@ -314,7 +316,7 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
   // Create the sequence
   SequenceHandler sequenceHandler;
   CreateSequence cs(sequenceHandler);
-  cs.filenames = generateTestFilenames();
+  cs.filenames_ = generateTestFilenames();
   cs.delimiter = ",";
   cs.checkConsistency = false;
   cs.process();
@@ -328,7 +330,8 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
       path,
       path,
       path,
-      injection.getMetaData().getSampleName(),
+      injection.getMetaData().getFilename(),
+      key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
@@ -338,8 +341,8 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
   // Load in the raw data featureMaps
   const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };
   ProcessSequence ps(sequenceHandler);
-  ps.filenames = dynamic_filenames;
-  ps.raw_data_processing_methods_I = raw_data_processing_methods;
+  ps.filenames_ = dynamic_filenames;
+  ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.process();
 
   // Update the filenames
@@ -349,6 +352,7 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
       path + "mzML/",
       path + "features/",
       path + "features/",
+      "",
       sampleGroupHandler.getSampleGroupName(),
       sampleGroupHandler.getSampleGroupName(),
       sampleGroupHandler.getSampleGroupName(),
@@ -361,8 +365,8 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
 
   // Default sample group names (i.e., all)
   ProcessSampleGroups psg(sequenceHandler);
-  psg.filenames = dynamic_filenames;
-  psg.sample_group_processing_methods_I = sample_group_processing_methods;
+  psg.filenames_ = dynamic_filenames;
+  psg.sample_group_processing_methods_ = sample_group_processing_methods;
   psg.process();
 
   BOOST_CHECK_EQUAL(sequenceHandler.getSampleGroups().size(), 2);
