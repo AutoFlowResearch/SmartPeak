@@ -195,7 +195,7 @@ namespace SmartPeak
         ProcessSequence ps(state.sequenceHandler_);
         ps.filenames_ = cmd.dynamic_filenames;
         ps.raw_data_processing_methods_ = raw_methods;
-        ps.injection_names_ = injection_names_;
+        ps.injection_names_ = injection_names;
         ps.process();
       } else if (cmd.type == ApplicationHandler::Command::SequenceSegmentMethod) {
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
@@ -204,7 +204,7 @@ namespace SmartPeak
         ProcessSequenceSegments pss(state.sequenceHandler_);
         pss.filenames_ = cmd.dynamic_filenames;
         pss.sequence_segment_processing_methods_ = seq_seg_methods;
-        pss.sequence_segment_names_ = sequence_segment_names_;
+        pss.sequence_segment_names_ = sequence_segment_names;
         pss.process();
       } else if (cmd.type == ApplicationHandler::Command::SampleGroupMethod) {
         std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_methods;
@@ -213,7 +213,7 @@ namespace SmartPeak
         ProcessSampleGroups psg(state.sequenceHandler_);
         psg.filenames_ = cmd.dynamic_filenames;
         psg.sample_group_processing_methods_ = sample_group_methods;
-        psg.sample_group_names_ = sample_group_names_;
+        psg.sample_group_names_ = sample_group_names;
         psg.process();
       }
       else {
@@ -242,7 +242,8 @@ namespace SmartPeak
           application_handler_.mzML_dir_,
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
-          injection.getMetaData().getSampleName(),
+          injection.getMetaData().getFilename(),
+          key,
           key,
           injection.getMetaData().getSampleGroupName(),
           injection.getMetaData().getSampleGroupName()
@@ -256,6 +257,7 @@ namespace SmartPeak
           application_handler_.mzML_dir_,
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
+          "",
           key,
           key,
           key,
@@ -270,6 +272,7 @@ namespace SmartPeak
           application_handler_.mzML_dir_,
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
+          "",
           key,
           key,
           key,

@@ -20,7 +20,7 @@ namespace SmartPeak
   {
     LOGD << "START createSequence";
 
-    SequenceParser::readSequenceFile(*sequenceHandler_IO, filenames.sequence_csv_i, delimiter);
+    SequenceParser::readSequenceFile(*sequenceHandler_IO, filenames_.sequence_csv_i, delimiter);
     if (sequenceHandler_IO->getSequence().empty()) {
       LOGE << "Empty sequence. Returning";
       LOGD << "END createSequence";
@@ -33,32 +33,32 @@ namespace SmartPeak
 
     // load rawDataHandler files (applies to the whole session)
     LoadParameters loadParameters;
-    loadParameters.process(rawDataHandler, {}, filenames);
+    loadParameters.process(rawDataHandler, {}, filenames_);
     LoadTransitions loadTransitions;
-    loadTransitions.process(rawDataHandler, {}, filenames);
+    loadTransitions.process(rawDataHandler, {}, filenames_);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
     LoadValidationData loadValidationData;
-    loadValidationData.process(rawDataHandler, {}, filenames);
+    loadValidationData.process(rawDataHandler, {}, filenames_);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
 
     // load sequenceSegmentHandler files
     for (SequenceSegmentHandler& sequenceSegmentHandler: sequenceHandler_IO->getSequenceSegments()) {
       LoadQuantitationMethods loadQuantitationMethods;
-      loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadStandardsConcentrations loadStandardsConcentrations;
-      loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureFilters loadFeatureFilters;
-      loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureQCs loadFeatureQCs;
-      loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureRSDFilters loadFeatureRSDFilters;
-      loadFeatureRSDFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      loadFeatureRSDFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureRSDQCs loadFeatureRSDQCs;
-      loadFeatureRSDQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      loadFeatureRSDQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureBackgroundFilters loadFeatureBackgroundFilters;
-      loadFeatureBackgroundFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      loadFeatureBackgroundFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureBackgroundQCs loadFeatureBackgroundQCs;
-      loadFeatureBackgroundQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+      loadFeatureBackgroundQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
     }
 
     if (checkConsistency) {
@@ -84,8 +84,8 @@ namespace SmartPeak
       : sequenceHandler_IO->getSamplesInSequence(injection_names_);
 
     // Check that the filenames is consistent with the number of injections
-    if (filenames.size() < injections.size()) {
-      throw std::invalid_argument("The number of provided filenames_ locations is not correct.");
+    if (filenames_.size() < injections.size()) {
+      throw std::invalid_argument("The number of provided filenames locations is not correct.");
     }
 
     // Determine the number of threads to launch
@@ -108,7 +108,7 @@ namespace SmartPeak
     // Launch
     SequenceProcessorMultithread manager(
       injections,
-      filenames,
+      filenames_,
       raw_data_processing_methods_
     );
     manager.spawn_workers(n_threads);
@@ -127,7 +127,7 @@ namespace SmartPeak
         }
       }
     }
-    if (filenames.size() < sequence_segments.size()) {
+    if (filenames_.size() < sequence_segments.size()) {
       throw std::invalid_argument("The number of provided filenames_ locations is not correct.");
     }
 
@@ -152,7 +152,7 @@ namespace SmartPeak
             .at(sequence_segment.getSampleIndices().front())
             .getRawData()
             .getParameters(), // assumption: all parameters are the same for each sample in the sequence segment!
-          filenames.at(sequence_segment.getSequenceSegmentName())
+          filenames_.at(sequence_segment.getSequenceSegmentName())
         );
       }
     }
@@ -174,7 +174,7 @@ namespace SmartPeak
         }
       }
     }
-    if (filenames.size() < sample_groups.size()) {
+    if (filenames_.size() < sample_groups.size()) {
       throw std::invalid_argument("The number of provided filenames_ locations is not correct.");
     }
 
@@ -199,7 +199,7 @@ namespace SmartPeak
           .at(sample_group.getSampleIndices().front())
           .getRawData()
           .getParameters(), // assumption: all parameters are the same for each sample in the sample group!
-          filenames.at(sample_group.getSampleGroupName())
+          filenames_.at(sample_group.getSampleGroupName())
         );
       }
     }

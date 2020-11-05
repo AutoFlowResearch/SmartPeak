@@ -491,15 +491,15 @@ int main(int argc, char **argv)
         }
         if (ImGui::BeginMenu("Export File"))
         {
+          //if (ImGui::MenuItem("Sequence")) {} // TODO: updated sequence file
+          //if (ImGui::MenuItem("Transitions")) {} // TODO: updated transitions file
+          //if (ImGui::MenuItem("Parameters")) {} // TODO: updated parameters file
+          //if (ImGui::MenuItem("Standards Conc")) {} // TODO: updated standards concentration file
           if (ImGui::MenuItem("Sequence Analyst")) {
             static StoreSequenceFileAnalyst processor(application_handler_);
             processor.process();
             // TODO: modal to allow for changing the filename and directory of where to write the file
           }
-          //if (ImGui::MenuItem("Sequence")) {}
-          //if (ImGui::MenuItem("Transitions")) {}
-          //if (ImGui::MenuItem("Parameters")) {}
-          //if (ImGui::MenuItem("Standards Conc")) {}
           ImGui::EndMenu();
         }
         ImGui::EndMenu();
