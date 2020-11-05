@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   Filenames filenames { generateTestFilenames() };
   filenames.sequence_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv");
 
-  cs.filenames_ = filenames_;
+  cs.filenames_ = filenames;
   cs.process();
 
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 0);
@@ -183,7 +183,8 @@ BOOST_AUTO_TEST_CASE(processSequence)
       path + "mzML/",
       path + "features/",
       path + "features/",
-      injection.getMetaData().getSampleName(),
+      injection.getMetaData().getFilename(), // previous: injection.getMetaData().getSampleName(),
+      key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
@@ -198,7 +199,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
   ProcessSequence ps(sequenceHandler);
   ps.filenames_ = dynamic_filenames;
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
-  ps.injection_names_ = injection_names_;
+  ps.injection_names_ = injection_names;
   ps.process();
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
   int n_chroms = 0;
@@ -257,6 +258,7 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
       path + "mzML/",
       path + "features/",
       path + "features/",
+      "",
       key,
       key,
       key,
@@ -328,7 +330,8 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
       path,
       path,
       path,
-      injection.getMetaData().getSampleName(),
+      injection.getMetaData().getFilename(),
+      key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
@@ -349,6 +352,7 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
       path + "mzML/",
       path + "features/",
       path + "features/",
+      "",
       sampleGroupHandler.getSampleGroupName(),
       sampleGroupHandler.getSampleGroupName(),
       sampleGroupHandler.getSampleGroupName(),
