@@ -336,7 +336,6 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
     ++inj_num;
     MetaDataHandler metaDataHandler;
     metaDataHandler.setSampleName(sample_name);
-    metaDataHandler.setFilename(sample_name + ".mzML");
     metaDataHandler.setSampleType(SampleType::Unknown);
     metaDataHandler.setSampleGroupName("sample_group");
     metaDataHandler.setSequenceSegmentName("sequence_segment");
@@ -353,6 +352,7 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
     metaDataHandler.scan_polarity = "negative";
     metaDataHandler.scan_mass_high = 2000;
     metaDataHandler.scan_mass_low = 60;
+    metaDataHandler.setFilename(metaDataHandler.getInjectionName());
 
     sequenceHandler.addSampleToSequence(metaDataHandler, OpenMS::FeatureMap());
   }

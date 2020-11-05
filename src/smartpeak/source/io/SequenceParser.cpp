@@ -263,7 +263,7 @@ namespace SmartPeak
       row.push_back(std::to_string(mdh.rack_number));
       row.push_back(std::to_string(mdh.plate_number));
       row.push_back(mdh.getAcquisitionDateAndTimeAsString());
-      row.push_back(mdh.getAcquisitionDateAndTimeAsString() + "\\" + mdh.getInjectionName());
+      row.push_back(mdh.getAcquisitionDateAndTimeAsString() + "\\" + mdh.getFilename());
       rows_out.push_back(row);
     }
   }
