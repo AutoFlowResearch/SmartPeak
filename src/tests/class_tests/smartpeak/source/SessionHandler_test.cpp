@@ -17,9 +17,9 @@ struct TestData {
     const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
     // Load the sequence
     if (load_sequence) {
-      Filenames filenames = Filenames::getDefaultStaticFilenames(pathname);
+      Filenames filenames_ = Filenames::getDefaultStaticFilenames(pathname);
       CreateSequence cs(sequenceHandler);
-      cs.filenames = filenames;
+      cs.filenames_ = filenames_;
       cs.delimiter = ",";
       cs.checkConsistency = false;
       cs.process();
@@ -28,7 +28,7 @@ struct TestData {
     if (load_features) {
       LoadFeatures loadFeatures;
       for (auto& injection : sequenceHandler.getSequence()) {
-        Filenames filenames = Filenames::getDefaultDynamicFilenames(
+        Filenames filenames_ = Filenames::getDefaultDynamicFilenames(
           pathname + "/mzML",
           pathname + "/features",
           pathname + "/features",
@@ -36,7 +36,7 @@ struct TestData {
           injection.getMetaData().getInjectionName(),
           injection.getMetaData().getSampleGroupName(),
           injection.getMetaData().getSampleGroupName());
-        loadFeatures.process(injection.getRawData(), {}, filenames);
+        loadFeatures.process(injection.getRawData(), {}, filenames_);
       }
     }
     // Load the raw data
@@ -46,7 +46,7 @@ struct TestData {
       params.emplace("ChromatogramExtractor", std::vector<std::map<std::string, std::string>>());
       LoadRawData loadRawData;
       for (auto& injection : sequenceHandler.getSequence()) {
-        Filenames filenames = Filenames::getDefaultDynamicFilenames(
+        Filenames filenames_ = Filenames::getDefaultDynamicFilenames(
           pathname + "/mzML",
           pathname + "/features",
           pathname + "/features",
@@ -54,7 +54,7 @@ struct TestData {
           injection.getMetaData().getSampleName(),
           injection.getMetaData().getSampleGroupName(),
           injection.getMetaData().getSampleGroupName());
-        loadRawData.process(injection.getRawData(), params, filenames);
+        loadRawData.process(injection.getRawData(), params, filenames_);
       }
     }
   }
@@ -391,9 +391,9 @@ BOOST_AUTO_TEST_CASE(setComponentRSDEstimationsTable1)
   TestData testData;
   testData.changeSampleType(SampleType::QC);
   const map<string, vector<map<string, string>>> params;
-  Filenames filenames;
+  Filenames filenames_;
   EstimateFeatureRSDs processor;
-  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
   SessionHandler session_handler;
   session_handler.setComponentRSDEstimationsTable(testData.sequenceHandler);
   BOOST_CHECK_EQUAL(session_handler.comp_rsd_estimations_table_headers.size(), 11);
@@ -411,9 +411,9 @@ BOOST_AUTO_TEST_CASE(setComponentGroupRSDEstimationsTable1)
   TestData testData;
   testData.changeSampleType(SampleType::QC);
   const map<string, vector<map<string, string>>> params;
-  Filenames filenames;
+  Filenames filenames_;
   EstimateFeatureRSDs processor;
-  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
   SessionHandler session_handler;
   session_handler.setComponentGroupRSDEstimationsTable(testData.sequenceHandler);
   BOOST_CHECK_EQUAL(session_handler.comp_group_rsd_estimations_table_headers.size(), 24);
@@ -431,9 +431,9 @@ BOOST_AUTO_TEST_CASE(setComponentBackgroundEstimationsTable1)
   TestData testData;
   testData.changeSampleType(SampleType::Blank);
   const map<string, vector<map<string, string>>> params;
-  Filenames filenames;
+  Filenames filenames_;
   EstimateFeatureBackgroundInterferences processor;
-  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
   SessionHandler session_handler;
   session_handler.setComponentBackgroundEstimationsTable(testData.sequenceHandler);
   BOOST_CHECK_EQUAL(session_handler.comp_background_estimations_table_headers.size(), 11);
@@ -451,9 +451,9 @@ BOOST_AUTO_TEST_CASE(setComponentGroupBackgroundEstimationsTable1)
   TestData testData;
   testData.changeSampleType(SampleType::Blank);
   const map<string, vector<map<string, string>>> params;
-  Filenames filenames;
+  Filenames filenames_;
   EstimateFeatureBackgroundInterferences processor;
-  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
   SessionHandler session_handler;
   session_handler.setComponentGroupBackgroundEstimationsTable(testData.sequenceHandler);
   BOOST_CHECK_EQUAL(session_handler.comp_group_background_estimations_table_headers.size(), 24);
@@ -597,9 +597,9 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
 
   testData.changeSampleType(SampleType::QC);
   const map<string, vector<map<string, string>>> params;
-  Filenames filenames;
+  Filenames filenames_;
   EstimateFeatureRSDs estimateFeatureRSDs;
-  estimateFeatureRSDs.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  estimateFeatureRSDs.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
   session_handler.setComponentRSDEstimationsTable(testData.sequenceHandler);
   BOOST_CHECK_EQUAL(session_handler.getComponentRSDEstimationsTableFilters().size(), 10);
   BOOST_CHECK(!session_handler.getComponentRSDEstimationsTableFilters()(0));
@@ -611,7 +611,7 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
 
   testData.changeSampleType(SampleType::Blank);
   EstimateFeatureBackgroundInterferences estimateFeatureBackgroundInterferences;
-  estimateFeatureBackgroundInterferences.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames);
+  estimateFeatureBackgroundInterferences.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
   session_handler.setComponentBackgroundEstimationsTable(testData.sequenceHandler);
   BOOST_CHECK_EQUAL(session_handler.getComponentBackgroundEstimationsTableFilters().size(), 10);
   BOOST_CHECK(!session_handler.getComponentBackgroundEstimationsTableFilters()(0));

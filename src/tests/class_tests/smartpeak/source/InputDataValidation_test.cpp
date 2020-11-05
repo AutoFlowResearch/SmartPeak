@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(sampleNamesAreConsistent)
   Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames          = filenames;
+  cs.filenames_          = filenames_;
   cs.delimiter          = ",";
   cs.checkConsistency   = false;
   cs.process();
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(sampleNamesAreConsistent)
   filenames.sequence_csv_i = main_dir + "/sequence_missing.csv";
   sequenceHandler.clear();
 
-  cs.filenames = filenames;
+  cs.filenames_ = filenames_;
   cs.process();
 
   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE(componentNamesAreConsistent)
   Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames          = filenames;
+  cs.filenames_          = filenames_;
   cs.delimiter          = ",";
   cs.checkConsistency   = false;
   cs.process();
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(componentNameGroupsAreConsistent)
   Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames          = filenames;
+  cs.filenames_          = filenames_;
   cs.delimiter          = ",";
   cs.checkConsistency   = false;
   cs.process();
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE(heavyComponentsAreConsistent)
   Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames          = filenames;
+  cs.filenames_          = filenames_;
   cs.delimiter          = ",";
   cs.checkConsistency   = false;
   cs.process();

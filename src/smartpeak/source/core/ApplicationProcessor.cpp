@@ -193,27 +193,27 @@ namespace SmartPeak
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(raw_methods),
           [](const ApplicationHandler::Command& command){ return command.raw_data_method; });
         ProcessSequence ps(state.sequenceHandler_);
-        ps.filenames = cmd.dynamic_filenames;
-        ps.raw_data_processing_methods_I = raw_methods;
-        ps.injection_names = injection_names;
+        ps.filenames_ = cmd.dynamic_filenames;
+        ps.raw_data_processing_methods_ = raw_methods;
+        ps.injection_names_ = injection_names_;
         ps.process();
       } else if (cmd.type == ApplicationHandler::Command::SequenceSegmentMethod) {
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(seq_seg_methods),
           [](const ApplicationHandler::Command& command){ return command.seq_seg_method; });
         ProcessSequenceSegments pss(state.sequenceHandler_);
-        pss.filenames = cmd.dynamic_filenames;
-        pss.sequence_segment_processing_methods_I = seq_seg_methods;
-        pss.sequence_segment_names = sequence_segment_names;
+        pss.filenames_ = cmd.dynamic_filenames;
+        pss.sequence_segment_processing_methods_ = seq_seg_methods;
+        pss.sequence_segment_names_ = sequence_segment_names_;
         pss.process();
       } else if (cmd.type == ApplicationHandler::Command::SampleGroupMethod) {
         std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(sample_group_methods),
           [](const ApplicationHandler::Command& command) { return command.sample_group_method; });
         ProcessSampleGroups psg(state.sequenceHandler_);
-        psg.filenames = cmd.dynamic_filenames;
-        psg.sample_group_processing_methods_I = sample_group_methods;
-        psg.sample_group_names = sample_group_names;
+        psg.filenames_ = cmd.dynamic_filenames;
+        psg.sample_group_processing_methods_ = sample_group_methods;
+        psg.sample_group_names_ = sample_group_names_;
         psg.process();
       }
       else {
@@ -295,7 +295,7 @@ namespace SmartPeak
     if (pathnamesAreCorrect) {
       application_handler_.sequenceHandler_.clear();
       CreateSequence cs(application_handler_.sequenceHandler_);
-      cs.filenames        = application_handler_.static_filenames_;
+      cs.filenames_        = application_handler_.static_filenames_;
       cs.delimiter        = ",";
       cs.checkConsistency = false; // NOTE: Requires a lot of time on large sequences with a large number of components
       cs.process();

@@ -74,18 +74,18 @@ namespace SmartPeak
   void ProcessSequence::process() const
   {
     // Check that there are raw data processing methods
-    if (raw_data_processing_methods_I.empty()) {
+    if (raw_data_processing_methods_.empty()) {
       throw "no raw data processing methods given.\n";
     }
 
     // Get the specified injections to process
-    std::vector<InjectionHandler> injections = injection_names.empty()
+    std::vector<InjectionHandler> injections = injection_names_.empty()
       ? sequenceHandler_IO->getSequence()
-      : sequenceHandler_IO->getSamplesInSequence(injection_names);
+      : sequenceHandler_IO->getSamplesInSequence(injection_names_);
 
     // Check that the filenames is consistent with the number of injections
     if (filenames.size() < injections.size()) {
-      throw std::invalid_argument("The number of provided filenames locations is not correct.");
+      throw std::invalid_argument("The number of provided filenames_ locations is not correct.");
     }
 
     // Determine the number of threads to launch
@@ -109,7 +109,7 @@ namespace SmartPeak
     SequenceProcessorMultithread manager(
       injections,
       filenames,
-      raw_data_processing_methods_I
+      raw_data_processing_methods_
     );
     manager.spawn_workers(n_threads);
   }
@@ -118,33 +118,33 @@ namespace SmartPeak
   {
     std::vector<SequenceSegmentHandler> sequence_segments;
 
-    if (sequence_segment_names.empty()) { // select all
+    if (sequence_segment_names_.empty()) { // select all
       sequence_segments = sequenceHandler_IO->getSequenceSegments();
     } else { // select those with specific sequence segment names
       for (SequenceSegmentHandler& s : sequenceHandler_IO->getSequenceSegments()) {
-        if (sequence_segment_names.count(s.getSequenceSegmentName())) {
+        if (sequence_segment_names_.count(s.getSequenceSegmentName())) {
           sequence_segments.push_back(s);
         }
       }
     }
     if (filenames.size() < sequence_segments.size()) {
-      throw std::invalid_argument("The number of provided filenames locations is not correct.");
+      throw std::invalid_argument("The number of provided filenames_ locations is not correct.");
     }
 
     // process by sequence segment
     for (SequenceSegmentHandler& sequence_segment : sequence_segments) {
 
       // handle user-desired sequence_segment_processing_methods
-      if (!sequence_segment_processing_methods_I.size()) {
+      if (!sequence_segment_processing_methods_.size()) {
         throw "no sequence segment processing methods given.\n";
       }
 
-      const size_t n = sequence_segment_processing_methods_I.size();
+      const size_t n = sequence_segment_processing_methods_.size();
 
       // process the sequence segment
       for (size_t i = 0; i < n; ++i) {
         LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sequence segments";
-        sequence_segment_processing_methods_I[i]->process(
+        sequence_segment_processing_methods_[i]->process(
           sequence_segment,
           *sequenceHandler_IO,
           (*sequenceHandler_IO)
@@ -164,34 +164,34 @@ namespace SmartPeak
   {
     std::vector<SampleGroupHandler> sample_groups;
 
-    if (sample_group_names.empty()) { // select all
+    if (sample_group_names_.empty()) { // select all
       sample_groups = sequenceHandler_IO->getSampleGroups();
     }
     else { // select those with specific sample group names
       for (SampleGroupHandler& s : sequenceHandler_IO->getSampleGroups()) {
-        if (sample_group_names.count(s.getSampleGroupName())) {
+        if (sample_group_names_.count(s.getSampleGroupName())) {
           sample_groups.push_back(s);
         }
       }
     }
     if (filenames.size() < sample_groups.size()) {
-      throw std::invalid_argument("The number of provided filenames locations is not correct.");
+      throw std::invalid_argument("The number of provided filenames_ locations is not correct.");
     }
 
     // process by sample group
     for (SampleGroupHandler& sample_group : sample_groups) {
 
       // handle user-desired sample_group_processing_methods
-      if (!sample_group_processing_methods_I.size()) {
+      if (!sample_group_processing_methods_.size()) {
         throw "no sample group processing methods given.\n";
       }
 
-      const size_t n = sample_group_processing_methods_I.size();
+      const size_t n = sample_group_processing_methods_.size();
 
       // process the sample group
       for (size_t i = 0; i < n; ++i) {
         LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sample groups";
-        sample_group_processing_methods_I[i]->process(
+        sample_group_processing_methods_[i]->process(
           sample_group,
           *sequenceHandler_IO,
           (*sequenceHandler_IO)

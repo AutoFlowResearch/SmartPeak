@@ -91,7 +91,7 @@ namespace SmartPeak
     Create a new sequence from files or wizard
   */
   struct CreateSequence : SequenceProcessor {
-    Filenames        filenames;                    /// Pathnames to load
+    Filenames        filenames_;                    /// Pathnames to load
     std::string      delimiter          = ",";     /// String delimiter of the imported file
     bool             checkConsistency   = true;    /// Check consistency of data contained in files
 
@@ -104,9 +104,9 @@ namespace SmartPeak
     Apply a processing workflow to all injections in a sequence
   */
   struct ProcessSequence : SequenceProcessor {
-    std::map<std::string, Filenames>               filenames;                     /// Mapping from injection names to pathnames
-    std::set<std::string>                          injection_names;               /// Injections to select from the sequence (all if empty)
-    std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods_I; /// Events to process
+    std::map<std::string, Filenames>               filenames_;                     /// Mapping from injection names to pathnames
+    std::set<std::string>                          injection_names_;               /// Injections to select from the sequence (all if empty)
+    std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods_; /// Events to process
 
     ProcessSequence() = default;
     ProcessSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
@@ -117,9 +117,9 @@ namespace SmartPeak
     Apply a processing workflow to all injections in a sequence segment
   */
   struct ProcessSequenceSegments : SequenceProcessor {
-    std::map<std::string, Filenames>                       filenames;                             /// Mapping from sequence groups names to pathnames
-    std::set<std::string>                                  sequence_segment_names;                /// Sequence groups to select from the sequence (all if empty)
-    std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods_I; /// Events to process
+    std::map<std::string, Filenames>                       filenames_;                             /// Mapping from sequence groups names to pathnames
+    std::set<std::string>                                  sequence_segment_names_;                /// Sequence groups to select from the sequence (all if empty)
+    std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods_; /// Events to process
 
     ProcessSequenceSegments() = default;
     ProcessSequenceSegments(SequenceHandler& sh) : SequenceProcessor(sh) {}
@@ -130,9 +130,9 @@ namespace SmartPeak
     Apply a processing workflow to all injections in a sample group
   */
   struct ProcessSampleGroups : SequenceProcessor {
-    std::map<std::string, Filenames>                       filenames;                     /// Mapping from sample groups names to pathnames
-    std::set<std::string>                                  sample_group_names;            /// sample groups to select from the sequence (all if empty)
-    std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods_I; /// Events to process
+    std::map<std::string, Filenames>                       filenames_;                     /// Mapping from sample groups names to pathnames
+    std::set<std::string>                                  sample_group_names_;            /// sample groups to select from the sequence (all if empty)
+    std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods_; /// Events to process
 
     ProcessSampleGroups() = default;
     ProcessSampleGroups(SequenceHandler& sh) : SequenceProcessor(sh) {}

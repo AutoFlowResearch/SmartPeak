@@ -66,6 +66,11 @@ namespace SmartPeak
     ) const override;
 
     /** Extracts metadata from the chromatogram.
+    
+      NOTE:
+      - Not used in the current version of SmartPeak
+      - Would need to be refactored or carefully implemented so as not to conflict
+        with current injection, sample, and file naming patterns
     */
     static void extractMetaData(RawDataHandler& rawDataHandler_IO);
   };

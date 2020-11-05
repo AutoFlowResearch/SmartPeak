@@ -15,7 +15,7 @@ void example_LCMS_MRM_Standards(
   SequenceHandler sequenceHandler;
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames          = static_filenames;
+  cs.filenames_          = static_filenames;
   cs.delimiter          = delimiter_I;
   cs.checkConsistency   = true;
   cs.process();
@@ -46,8 +46,8 @@ void example_LCMS_MRM_Standards(
   }
 
   ProcessSequence ps(sequenceHandler);
-  ps.filenames                     = dynamic_filenames1;
-  ps.raw_data_processing_methods_I = raw_data_processing_methods;
+  ps.filenames_                     = dynamic_filenames1;
+  ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.process();
 
   const std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods = {
@@ -69,8 +69,8 @@ void example_LCMS_MRM_Standards(
   }
 
   ProcessSequenceSegments pss(sequenceHandler);
-  pss.filenames                             = dynamic_filenames2;
-  pss.sequence_segment_processing_methods_I = sequence_segment_processing_methods;
+  pss.filenames_                             = dynamic_filenames2;
+  pss.sequence_segment_processing_methods_ = sequence_segment_processing_methods;
   pss.process();
 
   raw_data_processing_methods = {
@@ -93,8 +93,8 @@ void example_LCMS_MRM_Standards(
     );
   }
 
-  ps.filenames                     = dynamic_filenames3;
-  ps.raw_data_processing_methods_I = raw_data_processing_methods;
+  ps.filenames_                     = dynamic_filenames3;
+  ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.process();
 
   SequenceParser::writeDataMatrixFromMetaValue(
