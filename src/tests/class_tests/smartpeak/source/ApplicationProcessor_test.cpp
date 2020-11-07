@@ -183,6 +183,13 @@ BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundQCComponentGroupsGetNam
   BOOST_CHECK_EQUAL(application_processor.getName(), "LoadSequenceSegmentFeatureBackgroundQCComponentGroups");
 }
 
+BOOST_AUTO_TEST_CASE(StoreSequenceFileAnalyst1)
+{
+  ApplicationHandler application_handler;
+  StoreSequenceFileAnalyst application_processor(application_handler);
+  BOOST_CHECK_EQUAL(application_processor.getName(), "StoreSequenceFileAnalyst");
+}
+
 BOOST_AUTO_TEST_CASE(SetRawDataPathnameGetName)
 {
   ApplicationHandler application_handler;

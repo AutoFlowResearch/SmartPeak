@@ -12,7 +12,7 @@ void example_FIAMS_FullScan_Unknowns(
   SequenceHandler sequenceHandler;
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames        = static_filenames;
+  cs.filenames_        = static_filenames;
   cs.delimiter        = delimiter_I;
   cs.checkConsistency = true;
   cs.process();
@@ -34,7 +34,8 @@ void example_FIAMS_FullScan_Unknowns(
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
-      injection.getMetaData().getSampleName(),
+      injection.getMetaData().getFilename(),
+      key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
@@ -42,7 +43,7 @@ void example_FIAMS_FullScan_Unknowns(
   }
 
   ProcessSequence ps(sequenceHandler);
-  ps.filenames                     = dynamic_filenames;
-  ps.raw_data_processing_methods_I = raw_data_processing_methods;
+  ps.filenames_                     = dynamic_filenames;
+  ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.process();
 }
