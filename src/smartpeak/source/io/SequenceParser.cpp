@@ -301,6 +301,69 @@ namespace SmartPeak
     LOGD << "END writeSequenceFileAnalyst";
   }
 
+  void SequenceParser::makeSequenceFileMasshunter(SequenceHandler& sequenceHandler, std::vector<std::vector<std::string>>& rows_out, std::vector<std::string>& headers_out)
+  {
+    // Headers expected by the Agilent Masshunter software
+    headers_out.clear();
+    headers_out = {
+      "Name","Vial","Method Path","Mathod File",
+      "Data Path","Data File","Type","Level","Dil.",
+      "Vol.","Tray Name","Comment" };
+
+    // Rows expected by the Agilent Masshunter software
+    rows_out.clear();
+    for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
+      std::vector<std::string> row;
+      const MetaDataHandler& mdh = sampleHandler.getMetaData();
+      row.push_back(mdh.getSampleName());
+      row.push_back(std::to_string(mdh.pos_number));
+      row.push_back("D:\\DATA\\TODO");
+      row.push_back(mdh.acq_method_name + ".M");
+      row.push_back("D:\\DATA\\TODO");
+      row.push_back(mdh.getAcquisitionDateAndTimeAsString() + "\\" + mdh.getFilename());
+      row.push_back(mdh.getSampleTypeAsString());
+      row.push_back("");
+      row.push_back(std::to_string(mdh.dilution_factor));
+      row.push_back(std::to_string(mdh.inj_volume));
+      row.push_back("Rack " + std::to_string(mdh.rack_number));
+      row.push_back("");
+      rows_out.push_back(row);
+    }
+  }
+
+  void SequenceParser::writeSequenceFileMasshunter(SequenceHandler& sequenceHandler, const std::string& filename, const std::string& delimiter)
+  {
+    LOGD << "START writeSequenceFileMasshunter";
+    LOGD << "Delimiter: " << delimiter;
+
+    LOGI << "Loading: " << filename;
+
+    if (filename.empty()) {
+      LOGE << "filename is empty";
+      LOGD << "END writeSequenceFileMasshunter";
+      return;
+    }
+
+    // Make the file
+    std::vector<std::vector<std::string>> rows;
+    std::vector<std::string> headers;
+    makeSequenceFileMasshunter(sequenceHandler, rows, headers);
+
+    // Write the output file
+    CSVWriter writer(filename, delimiter);
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      LOGD << "END writeSequenceFileMasshunter";
+    }
+
+    for (const std::vector<std::string>& line : rows) {
+      writer.writeDataInRow(line.cbegin(), line.cend());
+    }
+
+    LOGD << "END writeSequenceFileMasshunter";
+  }
+
   void SequenceParser::makeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     std::vector<std::vector<std::string>>& rows_out,
