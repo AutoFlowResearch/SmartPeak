@@ -317,9 +317,9 @@ namespace SmartPeak
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
       row.push_back(mdh.getSampleName());
       row.push_back(std::to_string(mdh.pos_number));
-      row.push_back("D:\DATA\TODO");
+      row.push_back("D:\\DATA\\TODO");
       row.push_back(mdh.acq_method_name + ".M");
-      row.push_back("D:\DATA\TODO");
+      row.push_back("D:\\DATA\\TODO");
       row.push_back(mdh.getAcquisitionDateAndTimeAsString() + "\\" + mdh.getFilename());
       row.push_back(mdh.getSampleTypeAsString());
       row.push_back("");

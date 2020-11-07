@@ -445,9 +445,9 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileMasshunter)
   BOOST_CHECK_EQUAL(data_out.size(), 6);
   BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(data_out.at(0).at(1), "1");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "D:\DATA\TODO");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "D:\\DATA\\TODO");
   BOOST_CHECK_EQUAL(data_out.at(0).at(3), "RapidRIP.M");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "D:\DATA\TODO");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "D:\\DATA\\TODO");
   BOOST_CHECK_EQUAL(data_out.at(0).at(5), "2020-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
   BOOST_CHECK_EQUAL(data_out.at(0).at(6), "Unknown");
   BOOST_CHECK_EQUAL(data_out.at(0).at(7), "");
