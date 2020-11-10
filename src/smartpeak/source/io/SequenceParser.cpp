@@ -184,11 +184,6 @@ namespace SmartPeak
       if (!is_valid)
         break;
 
-      if (t.original_filename.empty()) {
-        LOGW << "Warning: No value provided for the original filename. Will create a unique default filename.";
-        t.original_filename = t.getInjectionName();
-      }
-
       if (false == validateAndConvert(t_inj_number, t.inj_number)) {
         LOGW << "Warning: Empty cell in column '" << s_inj_number << "'. Skipping entire row";
         continue;
@@ -221,10 +216,15 @@ namespace SmartPeak
       std::tm& adt = t.acquisition_date_and_time;
       std::istringstream iss(t_date);
       iss.imbue(std::locale(""));
-      iss >> std::get_time(&adt, "%d/%m/%Y %H:%M:%S");
+      iss >> std::get_time(&adt, "%d-%m-%Y %H:%M:%S");
       if (adt.tm_mday < 1 || adt.tm_mday > 31) {
         LOGD << "Invalid value for std::tm::tm_mday: " << adt.tm_mday << ". Setting to 1.";
         adt.tm_mday = 1;
+      }
+
+      if (t.original_filename.empty()) {
+        LOGW << "Warning: No value provided for the original filename. Will create a unique default filename.";
+        t.original_filename = t.getInjectionName();
       }
 
       sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
