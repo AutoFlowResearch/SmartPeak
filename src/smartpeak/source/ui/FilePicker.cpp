@@ -71,7 +71,7 @@ namespace SmartPeak
     };
     
     static ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-        ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
+        ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable | ImGuiTableFlags_NoBordersInBody;
     
     ImVec2 size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 2);
     if (ImGui::BeginTable("Content", column_count, table_flags, size))
