@@ -364,6 +364,85 @@ namespace SmartPeak
     LOGD << "END writeSequenceFileMasshunter";
   }
 
+  void SequenceParser::makeSequenceFileXcalibur(SequenceHandler& sequenceHandler, std::vector<std::vector<std::string>>& rows_out, std::vector<std::string>& headers_out)
+  {
+    // Headers expected by the Thermo Xcalibur software
+    headers_out.clear();
+    headers_out = {
+      "Sample Type","File Name","Sample ID","Path",
+      "Instrument Method","Process Method","Calibration File",
+      "Position","Inj Vol","Level","Sample Wt","Sample Vol",
+      "ISTD Amt","Dil Factor","L1 Study","L2 Client","L3 Laboratory",
+      "L4 Company","L5 Phone","Comment","Sample Name" };
+
+    // Rows expected by the Thermo Xcalibur software
+    rows_out.clear();
+    for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
+      std::vector<std::string> row;
+      const MetaDataHandler& mdh = sampleHandler.getMetaData();
+      row.push_back(mdh.getSampleTypeAsString());
+      row.push_back(mdh.getAcquisitionDateAndTimeAsString() + "\\" + mdh.getFilename());
+      row.push_back(std::to_string(mdh.inj_number));
+      row.push_back("D:\\DATA\\TODO");
+      row.push_back(mdh.acq_method_name);
+      row.push_back("");
+      row.push_back("");
+      row.push_back("R:TODO" + std::to_string(mdh.pos_number));
+      row.push_back(std::to_string(mdh.inj_volume));
+      row.push_back("");
+      row.push_back("0");
+      row.push_back("0");
+      row.push_back("0");
+      row.push_back(std::to_string(mdh.dilution_factor));
+      row.push_back("");
+      row.push_back("");
+      row.push_back("");
+      row.push_back("");
+      row.push_back("");
+      row.push_back("");
+      row.push_back(mdh.getSampleName());
+      rows_out.push_back(row);
+    }
+  }
+
+  void SequenceParser::writeSequenceFileXcalibur(SequenceHandler& sequenceHandler, const std::string& filename, const std::string& delimiter)
+  {
+    LOGD << "START writeSequenceFileXcalibur";
+    LOGD << "Delimiter: " << delimiter;
+    LOGI << "Loading: " << filename;
+
+    if (filename.empty()) {
+      LOGE << "filename is empty";
+      LOGD << "END writeSequenceFileXcalibur";
+      return;
+    }
+
+    // Make the file
+    std::vector<std::vector<std::string>> rows;
+    std::vector<std::string> headers;
+    makeSequenceFileXcalibur(sequenceHandler, rows, headers);
+
+    // Write the output file
+    CSVWriter writer(filename, delimiter);
+    std::vector<std::string> pre_headers;
+    for (int i = 0; i < headers.size(); ++i) {
+      if (i == 0) pre_headers.push_back("Bracket Type=4");
+      else pre_headers.push_back("");
+    }
+    const size_t cnt0 = writer.writeDataInRow(pre_headers.cbegin(), pre_headers.cend());
+    const size_t cnt1 = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt0 < headers.size() || cnt1 < headers.size()) {
+      LOGD << "END writeSequenceFileXcalibur";
+    }
+
+    for (const std::vector<std::string>& line : rows) {
+      writer.writeDataInRow(line.cbegin(), line.cend());
+    }
+
+    LOGD << "END writeSequenceFileXcalibur";
+  }
+
   void SequenceParser::makeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
     std::vector<std::vector<std::string>>& rows_out,
