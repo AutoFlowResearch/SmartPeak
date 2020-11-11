@@ -197,6 +197,13 @@ BOOST_AUTO_TEST_CASE(StoreSequenceFileMasshunter1)
   BOOST_CHECK_EQUAL(application_processor.getName(), "StoreSequenceFileMasshunter");
 }
 
+BOOST_AUTO_TEST_CASE(StoreSequenceFileXcalibur1)
+{
+  ApplicationHandler application_handler;
+  StoreSequenceFileXcalibur application_processor(application_handler);
+  BOOST_CHECK_EQUAL(application_processor.getName(), "StoreSequenceFileXcalibur");
+}
+
 BOOST_AUTO_TEST_CASE(SetRawDataPathnameGetName)
 {
   ApplicationHandler application_handler;
