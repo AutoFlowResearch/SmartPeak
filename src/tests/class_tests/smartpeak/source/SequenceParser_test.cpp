@@ -363,8 +363,8 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
   SequenceParser::makeSequenceFileAnalyst(sequenceHandler, data_out, headers_out);
 
   BOOST_CHECK_EQUAL(data_out.size(), 6);
-  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "sample_group");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(data_out.at(0).at(2), "");
   BOOST_CHECK_EQUAL(data_out.at(0).at(3), "RapidRIP.dam");
   BOOST_CHECK_EQUAL(data_out.at(0).at(4), "none");
