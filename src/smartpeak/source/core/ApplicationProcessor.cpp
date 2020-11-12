@@ -614,6 +614,18 @@ namespace SmartPeak
     }
   }
 
+  bool StoreSequenceFileXcalibur::process()
+  {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      SequenceParser::writeSequenceFileXcalibur(application_handler_.sequenceHandler_, application_handler_.main_dir_ + "/SequenceFileXcalibur.tsv");
+      return true;
+    }
+    else {
+      LOGE << "Sequence file cannot be converted and stored without first loading the sequence.";
+      return false;
+    }
+  }
+
   bool BuildCommandsFromNames::process()
   {
     commands_.clear();
