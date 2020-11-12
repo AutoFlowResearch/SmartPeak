@@ -505,6 +505,11 @@ int main(int argc, char **argv)
             processor.process();
             // TODO: modal to allow for changing the filename and directory of where to write the file
           }
+          if (ImGui::MenuItem("Sequence Xcalibur")) {
+            static StoreSequenceFileXcalibur processor(application_handler_);
+            processor.process();
+            // TODO: modal to allow for changing the filename and directory of where to write the file
+          }
           ImGui::EndMenu();
         }
         ImGui::EndMenu();
