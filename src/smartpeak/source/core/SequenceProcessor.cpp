@@ -90,7 +90,7 @@ namespace SmartPeak
 
     // Determine the number of threads to launch
     const auto& params = injections.front().getRawData().getParameters();
-    int n_threads = 6;
+    int n_threads = 0;
     if (params.count("SequenceProcessor") && !params.at("SequenceProcessor").empty()) {
       for (const auto& p : params.at("SequenceProcessor")) {
         if (p.at("name") == "n_thread") {
@@ -219,7 +219,7 @@ namespace SmartPeak
     {
       SmartPeak::SequenceProcessorSemaphore task_limiter(std::thread::hardware_concurrency());
       std::vector<std::future<void>> sp_tasks;
-      for (int i = 0; i < n_workers; ++i) {
+      for (int i = 0; i < 20; ++i) {
         sp_tasks.emplace_back(std::async([i, &task_limiter, this] { std::printf("\n>> Entering critical section\n");
                                                                     SequenceProcessorCriticalSection _(task_limiter);
                                                                     std::printf(">> Starting sequence processor task %d\n", i);
