@@ -212,27 +212,55 @@ namespace SmartPeak
     // Refine the # of threads based on the hardware
     size_t n_workers = getNumWorkers(n_threads);
     LOGD << "Number of workers: " << n_workers;
+    
+    std::chrono::steady_clock::time_point time_point_begin = std::chrono::steady_clock::now();
 
-    // Spawn the workers
-    try {
-      std::list<std::future<void>> futures;
-      LOGD << "Spawning workers...";
-      for (size_t i = 0; i < injections_.size(); ++i) {
-        futures.emplace_back(std::async(std::launch::async, &SequenceProcessorMultithread::run_injection_processing, this));
+    try
+    {
+      SmartPeak::SequenceProcessorSemaphore task_limiter(std::thread::hardware_concurrency());
+      std::vector<std::future<void>> sp_tasks;
+      for (int i = 0; i < n_workers; ++i) {
+        sp_tasks.emplace_back(std::async([i, &task_limiter, this] { std::printf("\n>> Entering critical section\n");
+                                                                    SequenceProcessorCriticalSection _(task_limiter);
+                                                                    std::printf(">> Starting sequence processor task %d\n", i);
+                                                                    this->run_injection_processing();
+                                                                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                                                                    std::printf(">> Finishing sequence processor task %d\n", i);
+                                                                  }));
       }
-      LOGD << "Waiting for workers...";
-      for (std::future<void>& f : futures) {
-        f.wait();
-      }
-      LOGD << "Workers are done";
     }
-    catch (const std::exception& e) {
+    catch (const std::exception& e)
+    {
       LOGE << e.what();
     }
+    
+    
+    // Spawn the workers
+//    try {
+//      std::list<std::future<void>> futures;
+//      LOGD << "Spawning workers...";
+//      for (size_t i = 0; i < injections_.size(); ++i) {
+//        futures.emplace_back(std::async(std::launch::async, &SequenceProcessorMultithread::run_injection_processing, this));
+//      }
+//      LOGD << "Waiting for workers...";
+//      for (std::future<void>& f : futures) {
+//        f.wait();
+//      }
+//      LOGD << "Workers are done";
+//    }
+//    catch (const std::exception& e) {
+//      LOGE << e.what();
+//    }
+    
+    std::chrono::steady_clock::time_point time_point_end = std::chrono::steady_clock::now();
+    std::cout << ">>> SequenceProcessorMultithread::spawn_workers took = "
+              << std::chrono::duration_cast<std::chrono::microseconds>(time_point_end - time_point_begin).count()
+              << "[µs]\n" << std::endl;
   }
 
   void SequenceProcessorMultithread::run_injection_processing()
   {
+    std::chrono::steady_clock::time_point time_point_begin = std::chrono::steady_clock::now();
     while (true) {
       // fetch the atomic injection counter
       const size_t i = i_.fetch_add(1);
@@ -264,6 +292,11 @@ namespace SmartPeak
       }
     }
     LOGD << "Worker is done";
+    
+    std::chrono::steady_clock::time_point time_point_end = std::chrono::steady_clock::now();
+    std::cout << ">>> SequenceProcessorMultithread::run_injection_processing took = "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(time_point_end - time_point_begin).count()
+              << "[ms]\n" << std::endl;
   }
 
   size_t SequenceProcessorMultithread::getNumWorkers(unsigned int n_threads) const {

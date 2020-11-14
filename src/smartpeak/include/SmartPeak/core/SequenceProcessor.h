@@ -14,6 +14,11 @@
 #include <vector>
 #include <atomic>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <future>
+#include <cstdio>
+#include <chrono>
 
 namespace SmartPeak
 {
@@ -63,6 +68,35 @@ namespace SmartPeak
     std::vector<InjectionHandler>& injections_; ///< the injections to be processed
     const std::map<std::string, Filenames>& filenames_; ///< mapping from injections names to the associated filenames
     const std::vector<std::shared_ptr<RawDataProcessor>>& methods_; ///< methods to run on each injection
+  };
+
+  class SequenceProcessorSemaphore {
+  public:
+    SequenceProcessorSemaphore(uint n) : count_{n} {}
+    void notify() {
+      std::unique_lock<std::mutex> l(mutex_);
+      ++count_;
+      condition_variable_.notify_one();
+    }
+    
+    void wait() {
+      std::unique_lock<std::mutex> l(mutex_);
+      condition_variable_.wait(l, [this]{ return count_!=0; });
+      --count_;
+    }
+    
+  private:
+    std::mutex mutex_;
+    std::condition_variable condition_variable_;
+    uint count_;
+  };
+
+  class SequenceProcessorCriticalSection {
+  public:
+    SequenceProcessorCriticalSection(SequenceProcessorSemaphore &ss) : sequence_processor_semaphore_{ss} { sequence_processor_semaphore_.wait(); }
+    ~SequenceProcessorCriticalSection() { sequence_processor_semaphore_.notify(); }
+  private:
+    SequenceProcessorSemaphore &sequence_processor_semaphore_;
   };
 
   /**
