@@ -248,8 +248,8 @@ namespace SmartPeak
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       std::vector<std::string> row;
       const MetaDataHandler& mdh = sampleHandler.getMetaData();
+      row.push_back(mdh.getInjectionName());
       row.push_back(mdh.getSampleName());
-      row.push_back(mdh.getSampleGroupName());
       row.push_back("");
       row.push_back(mdh.acq_method_name + ".dam");
       row.push_back("none");
