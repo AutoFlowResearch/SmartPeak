@@ -1,0 +1,4 @@
+% header=SampleName	SampleID	Comments	AcqMethod	ProcMethod	RackCode	PlateCode	VialPos	SmplInjVol	DilutFact	WghtToVol	Type	RackPos	PlatePos	SetName	OutputFile
+170808_Jonathan_yeast_Sacc1_1x_1_BatchName_1900-01-01_000000	170808_Jonathan_yeast_Sacc1_1x		MethodName.dam	none	CStk1--1	MT96_or_VT54	-1	3.000000	1.000000	0	Unknown	-1	-1	1900-01-01_000000	1900-01-01_000000\170808_Jonathan_yeast_Sacc1_1x
+170808_Jonathan_yeast_Sacc2_1x_2_BatchName_1900-01-01_000000	170808_Jonathan_yeast_Sacc2_1x		MethodName.dam	none	CStk1--1	MT96_or_VT54	-1	3.000000	1.000000	0	Unknown	-1	-1	1900-01-01_000000	1900-01-01_000000\170808_Jonathan_yeast_Sacc2_1x
+170808_Jonathan_yeast_Sacc3_1x_3_BatchName_1900-01-01_000000	170808_Jonathan_yeast_Sacc3_1x		MethodName.dam	none	CStk1--1	MT96_or_VT54	-1	3.000000	1.000000	0	Unknown	-1	-1	1900-01-01_000000	1900-01-01_000000\170808_Jonathan_yeast_Sacc3_1x
