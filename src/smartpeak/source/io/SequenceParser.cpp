@@ -253,7 +253,8 @@ namespace SmartPeak
       row.push_back("");
       row.push_back(mdh.acq_method_name + ".dam");
       row.push_back("none");
-      row.push_back("CStk1-" + std::to_string(mdh.rack_number));
+      if (mdh.rack_number < 10) row.push_back("CStk1-0" + std::to_string(mdh.rack_number));
+      else row.push_back("CStk1-" + std::to_string(mdh.rack_number));
       row.push_back("MT96_or_VT54");
       row.push_back(std::to_string(mdh.pos_number));
       row.push_back(std::to_string(mdh.inj_volume));

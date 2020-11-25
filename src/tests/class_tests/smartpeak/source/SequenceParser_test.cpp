@@ -368,7 +368,7 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
   BOOST_CHECK_EQUAL(data_out.at(0).at(2), "");
   BOOST_CHECK_EQUAL(data_out.at(0).at(3), "RapidRIP.dam");
   BOOST_CHECK_EQUAL(data_out.at(0).at(4), "none");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(5), "CStk1-4");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(5), "CStk1-04");
   BOOST_CHECK_EQUAL(data_out.at(0).at(6), "MT96_or_VT54");
   BOOST_CHECK_EQUAL(data_out.at(0).at(7), "1");
   BOOST_CHECK_EQUAL(data_out.at(0).at(8), "7.000000");
