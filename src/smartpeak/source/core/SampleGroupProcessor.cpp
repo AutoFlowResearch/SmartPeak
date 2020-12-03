@@ -4,7 +4,7 @@
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/io/InputDataValidation.h>
-#include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
+#include <OpenMS/FORMAT/FeatureXMLFile.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
