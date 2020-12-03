@@ -140,7 +140,7 @@ jobs:
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
           $ProgressPreference = "SilentlyContinue"
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-          choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"'
+          choco install cmake --version=3.17.2 --installargs '"ADD_CMAKE_TO_PATH=System"'
           # choco install boost-msvc-14.1
           choco install doxygen.install
           choco install nsis.portable
