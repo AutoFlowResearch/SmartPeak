@@ -621,11 +621,15 @@ BOOST_AUTO_TEST_CASE(processLoadFeatures)
   Filenames filenames;
   filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_test_1_io_FileReaderOpenMS.featureXML");
   RawDataHandler rawDataHandler;
+  rawDataHandler.getMetaData().setFilename("filename");
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, {}, filenames);
 
   const OpenMS::FeatureMap& fm = rawDataHandler.getFeatureMap(); // Test feature_map
   BOOST_CHECK_EQUAL(fm.size(), 481);
+  OpenMS::StringList filename_test;
+  fm.getPrimaryMSRunPath(filename_test);
+  BOOST_CHECK_EQUAL(filename_test.at(0), "filename");
 
   BOOST_CHECK_CLOSE(static_cast<double>(fm[0].getSubordinates()[0].getMetaValue("peak_apex_int")), 266403.0, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(fm[0].getSubordinates()[0].getRT()), 15.8944563381195, 1e-6);
@@ -641,6 +645,8 @@ BOOST_AUTO_TEST_CASE(processLoadFeatures)
 
   const OpenMS::FeatureMap& fmh = rawDataHandler.getFeatureMapHistory(); // Test feature_map_history
   BOOST_CHECK_EQUAL(fmh.size(), 481);
+  fm.getPrimaryMSRunPath(filename_test);
+  BOOST_CHECK_EQUAL(filename_test.at(0), "filename");
 
   BOOST_CHECK_CLOSE(static_cast<double>(fmh[0].getSubordinates()[0].getMetaValue("peak_apex_int")), 266403.0, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(fmh[0].getSubordinates()[0].getRT()), 15.8944563381195, 1e-6);
