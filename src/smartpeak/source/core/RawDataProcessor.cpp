@@ -272,7 +272,10 @@ namespace SmartPeak
     try {
       OpenMS::FeatureXMLFile featurexml;
       featurexml.load(filenames.featureXML_i, rawDataHandler_IO.getFeatureMapHistory());
+      // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
+      rawDataHandler_IO.getFeatureMapHistory().setPrimaryMSRunPath({ rawDataHandler_IO.getMetaData().getFilename() });
       rawDataHandler_IO.makeFeatureMapFromHistory();
+      rawDataHandler_IO.getFeatureMap().setPrimaryMSRunPath({ rawDataHandler_IO.getMetaData().getFilename() });
     }
     catch (const std::exception& e) {
       LOGE << e.what();
