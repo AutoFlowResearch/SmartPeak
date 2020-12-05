@@ -1,0 +1,148 @@
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\A31C54760698B1E23C8451AE9E5DB05B\PLOG-MKDIR.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Source/plog
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Build/plog
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Install/plog
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/tmp/plog
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/plog/Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Download/plog
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/plog
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/plog/Debug/plog-mkdir
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\A31C54760698B1E23C8451AE9E5DB05B\PLOG-DOWNLOAD.RULE
+setlocal
+cd C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -P C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/tmp/plog/plog-gitclone.cmake
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/plog/Debug/plog-download
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\A31C54760698B1E23C8451AE9E5DB05B\PLOG-UPDATE.RULE
+setlocal
+cd C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/plog/Debug/plog-update
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\A31C54760698B1E23C8451AE9E5DB05B\PLOG-PATCH.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/plog/Debug/plog-patch
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\A31C54760698B1E23C8451AE9E5DB05B\PLOG-CONFIGURE.RULE
+setlocal
+cd C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Build\plog
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/plog/Debug/plog-configure
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\A31C54760698B1E23C8451AE9E5DB05B\PLOG-BUILD.RULE
+setlocal
+cd C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Build\plog
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/plog/Debug/plog-build
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\A31C54760698B1E23C8451AE9E5DB05B\PLOG-INSTALL.RULE
+setlocal
+cd C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Build\plog
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/plog/Debug/plog-install
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\D266AA6297F42A7B249BB7DC5047493B\PLOG-COMPLETE.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/CMakeFiles/Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/CMakeFiles/Debug/plog-complete
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/plog/Debug/plog-done
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\1989555ABD481100FAEC0EC58A9811AF\PLOG.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

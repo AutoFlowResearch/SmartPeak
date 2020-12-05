@@ -1,0 +1,212 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{16A99BA9-2CEA-3DFA-855A-6950151FB7B2}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/examples/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/examples/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.17\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindBoost.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfig.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfigVersion.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSTargets.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImGui.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImPlot.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindSDL2.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\executables.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\include\SmartPeak\test_config.h.in;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5Config.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5ModuleLocation.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigExtras.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigExtrasMkspecDir.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreMacros.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5NetworkConfig.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5NetworkConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5Network_QGenericEnginePlugin.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/examples/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/examples/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.17\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindBoost.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfig.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfigVersion.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSTargets.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImGui.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImPlot.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindSDL2.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\executables.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\include\SmartPeak\test_config.h.in;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5Config.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5ModuleLocation.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigExtras.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigExtrasMkspecDir.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreMacros.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5NetworkConfig.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5NetworkConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5Network_QGenericEnginePlugin.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/examples/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/examples/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.17\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindBoost.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfig.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfigVersion.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSTargets.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImGui.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImPlot.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindSDL2.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\executables.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\include\SmartPeak\test_config.h.in;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5Config.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5ModuleLocation.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigExtras.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigExtrasMkspecDir.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreMacros.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5NetworkConfig.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5NetworkConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5Network_QGenericEnginePlugin.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/examples/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/examples/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.17\Modules\CMakeParseArguments.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindBoost.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindOpenGL.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfig.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfigVersion.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSTargets.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImGui.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImPlot.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindSDL2.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\executables.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\include\SmartPeak\test_config.h.in;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5Config.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5ConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\Qt5ModuleLocation.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfig.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigExtras.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigExtrasMkspecDir.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\Qt5CoreMacros.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5NetworkConfig.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5NetworkConfigVersion.cmake;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\Qt5Network_QGenericEnginePlugin.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\ZERO_CHECK.vcxproj">
+      <Project>{3F67F999-41CF-363B-816A-F1452F9BBA3B}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\FIAMS_FullScan_Unknown_test.vcxproj">
+      <Project>{6C94C8E7-E1DA-398C-BF44-A8F4726B1054}</Project>
+      <Name>FIAMS_FullScan_Unknown_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\GCMS_FullScan_Unknown_test.vcxproj">
+      <Project>{5BB51DFB-E927-3DC5-B206-EA3CB0698D90}</Project>
+      <Name>GCMS_FullScan_Unknown_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\GCMS_SIM_Unknown_test.vcxproj">
+      <Project>{EA35064E-9958-3CE7-B85C-092A98327F00}</Project>
+      <Name>GCMS_SIM_Unknown_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\GUI.vcxproj">
+      <Project>{325C9FC8-7E1F-3043-A80C-88EDAFF4F73C}</Project>
+      <Name>GUI</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\HPLC_UV_Standards_test.vcxproj">
+      <Project>{BE81C045-BCA7-39A3-9271-ED4222F3B555}</Project>
+      <Name>HPLC_UV_Standards_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\HPLC_UV_Unknown_test.vcxproj">
+      <Project>{E2EA4E8B-4D4D-3378-861A-FF63F08B6134}</Project>
+      <Name>HPLC_UV_Unknown_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\LCMS_MRM_QCs_test.vcxproj">
+      <Project>{4C0AD149-4824-30BD-8E85-5F048506E410}</Project>
+      <Name>LCMS_MRM_QCs_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\LCMS_MRM_Standards_test.vcxproj">
+      <Project>{A8FA1BE8-BEC1-361F-9CE7-23F165260074}</Project>
+      <Name>LCMS_MRM_Standards_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\examples\LCMS_MRM_Unknown_test.vcxproj">
+      <Project>{678D8282-3785-3BBA-AF45-4F00D37BC640}</Project>
+      <Name>LCMS_MRM_Unknown_test</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

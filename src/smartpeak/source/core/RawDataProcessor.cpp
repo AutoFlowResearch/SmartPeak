@@ -1741,7 +1741,29 @@ namespace SmartPeak
       // Run the accurate mass search engine
       ams.init();
       ams.run(rawDataHandler_IO.getFeatureMap(), output);
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+    rawDataHandler_IO.setMzTab(output);
+    rawDataHandler_IO.updateFeatureMapHistory();
 
+    LOGI << "SearchAccurateMass output size: " << rawDataHandler_IO.getFeatureMap().size();
+    LOGD << "END SearchAccurateMass";
+  }
+
+  void MakeConsensusFeatures::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START MakeConsensusFeatures";
+    LOGI << "MakeConsensusFeatures input size: " << rawDataHandler_IO.getFeatureMap().size();
+
+    //if (params_I.count("AccurateMassSearchEngine") && params_I.at("AccurateMassSearchEngine").empty()) {
+    //  LOGE << "No parameters passed to AccurateMassSearchEngine. Not searching.";
+    //  LOGD << "END SearchAccurateMass";
+    //  return;
+    //}
+
+    try {
       // Remake the feature map replacing the peptide hits as features
       // and change the `Feature` to the `ConsensusFeature`
       // and move all adducts of the `Feature` into the `SubordinateFeatures`
@@ -1839,11 +1861,10 @@ namespace SmartPeak
     catch (const std::exception& e) {
       LOGE << e.what();
     }
-    rawDataHandler_IO.setMzTab(output);
     rawDataHandler_IO.updateFeatureMapHistory();
 
-    LOGI << "SearchAccurateMass output size: " << rawDataHandler_IO.getFeatureMap().size();
-    LOGD << "END SearchAccurateMass";
+    LOGI << "MakeConsensusFeatures output size: " << rawDataHandler_IO.getFeatureMap().size();
+    LOGD << "END MakeConsensusFeatures";
   }
 
   void ClearData::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const

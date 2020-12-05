@@ -1,0 +1,148 @@
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\AA12A2E131A77A746F4AA95779B7F05E\IMPLOT-MKDIR.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Source/implot
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Build/implot
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Install/implot
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/tmp/implot
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/implot/Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Download/implot
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/implot
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/implot/Debug/implot-mkdir
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\AA12A2E131A77A746F4AA95779B7F05E\IMPLOT-DOWNLOAD.RULE
+setlocal
+cd C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -P C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/tmp/implot/implot-gitclone.cmake
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/implot/Debug/implot-download
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\AA12A2E131A77A746F4AA95779B7F05E\IMPLOT-UPDATE.RULE
+setlocal
+cd C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/implot/Debug/implot-update
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\AA12A2E131A77A746F4AA95779B7F05E\IMPLOT-PATCH.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/implot/Debug/implot-patch
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\AA12A2E131A77A746F4AA95779B7F05E\IMPLOT-CONFIGURE.RULE
+setlocal
+cd C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Build\implot
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/implot/Debug/implot-configure
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\AA12A2E131A77A746F4AA95779B7F05E\IMPLOT-BUILD.RULE
+setlocal
+cd C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Build\implot
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/implot/Debug/implot-build
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\AA12A2E131A77A746F4AA95779B7F05E\IMPLOT-INSTALL.RULE
+setlocal
+cd C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Build\implot
+if %errorlevel% neq 0 goto :cmEnd
+C:
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E echo_append
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/implot/Debug/implot-install
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\D266AA6297F42A7B249BB7DC5047493B\IMPLOT-COMPLETE.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/CMakeFiles/Debug
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/CMakeFiles/Debug/implot-complete
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E touch C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/Dependencies/Stamp/implot/Debug/implot-done
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\SUPERBUILD\CMAKEFILES\1989555ABD481100FAEC0EC58A9811AF\IMPLOT.RULE
+setlocal
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+^C:\USERS\DMCCLOSKEY\DOCUMENTS\GITHUB\SMARTPEAK\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/superbuild/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

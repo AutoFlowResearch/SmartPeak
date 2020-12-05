@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\ApplicationProcessor.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\CastValue.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\FeatureMetadata.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\Filenames.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\Helloworld.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\MetaDataHandler.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\RawDataHandler.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\RawDataProcessor.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SampleGroupHandler.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SampleGroupProcessor.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\InjectionHandler.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SampleType.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SequenceHandler.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SequenceProcessor.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SequenceSegmentHandler.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SequenceSegmentProcessor.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SessionHandler.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SharedProcessors.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\Utilities.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\WorkflowManager.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\algorithm\MRMFeatureValidator.cpp">
+      <Filter>Source Files\algorithm</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\CSVWriter.cpp">
+      <Filter>Source Files\io</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\FileReader.cpp">
+      <Filter>Source Files\io</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\SequenceParser.cpp">
+      <Filter>Source Files\io</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\InputDataValidation.cpp">
+      <Filter>Source Files\io</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\FilePicker.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\GuiAppender.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\Report.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\Widget.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\WindowSizesAndPositions.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\Workflow.cpp">
+      <Filter>Source Files\ui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\ApplicationHandler.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\ApplicationProcessor.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\CastValue.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\Filenames.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\Helloworld.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\FeatureMetadata.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\MetaDataHandler.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\RawDataHandler.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\RawDataProcessor.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SampleGroupHandler.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SampleGroupProcessor.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\InjectionHandler.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SampleType.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SequenceHandler.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SequenceProcessor.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SequenceSegmentHandler.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SequenceSegmentProcessor.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SessionHandler.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SharedProcessors.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\Utilities.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\WorkflowManager.h">
+      <Filter>Header Files\SmartPeak\core</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\algorithm\MRMFeatureValidator.h">
+      <Filter>Header Files\SmartPeak\algorithm</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\csv.h">
+      <Filter>Header Files\SmartPeak\io</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\CSVWriter.h">
+      <Filter>Header Files\SmartPeak\io</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\FileReader.h">
+      <Filter>Header Files\SmartPeak\io</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\SequenceParser.h">
+      <Filter>Header Files\SmartPeak\io</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\InputDataValidation.h">
+      <Filter>Header Files\SmartPeak\io</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\FIAMS_FullScan_Unknown_example.h">
+      <Filter>Header Files\SmartPeak\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\GCMS_SIM_Unknown_example.h">
+      <Filter>Header Files\SmartPeak\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\HPLC_UV_Standards_example.h">
+      <Filter>Header Files\SmartPeak\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\HPLC_UV_Unknown_example.h">
+      <Filter>Header Files\SmartPeak\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\LCMS_MRM_Standards_example.h">
+      <Filter>Header Files\SmartPeak\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\LCMS_MRM_Unknown_example.h">
+      <Filter>Header Files\SmartPeak\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\LCMS_MRM_Validation_example.h">
+      <Filter>Header Files\SmartPeak\pipelines</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\FilePicker.h">
+      <Filter>Header Files\SmartPeak\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\GuiAppender.h">
+      <Filter>Header Files\SmartPeak\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\Report.h">
+      <Filter>Header Files\SmartPeak\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\Widget.h">
+      <Filter>Header Files\SmartPeak\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\WindowSizesAndPositions.h">
+      <Filter>Header Files\SmartPeak\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\Workflow.h">
+      <Filter>Header Files\SmartPeak\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include\SmartPeak\config.h">
+      <Filter>Header Files\SmartPeak</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include\SmartPeak\smartpeak_package_version.h">
+      <Filter>Header Files\SmartPeak</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include\SmartPeak\smartpeak_data_path.h">
+      <Filter>Header Files\SmartPeak</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{B5FBB23A-494F-3388-A0DD-78F11B4D9387}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SmartPeak">
+      <UniqueIdentifier>{1879A5FF-B62C-3065-8A04-C98CF2E74530}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SmartPeak\algorithm">
+      <UniqueIdentifier>{9629B0B4-9706-3038-9452-F71E048B5A68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SmartPeak\core">
+      <UniqueIdentifier>{F96877D3-674C-3B2E-B7E2-369593A17AAD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SmartPeak\io">
+      <UniqueIdentifier>{E6EC8E03-CD68-3154-8F5A-6170E51D2244}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SmartPeak\pipelines">
+      <UniqueIdentifier>{7A5B6EA3-99B7-340B-84E3-B05E71B6E046}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SmartPeak\ui">
+      <UniqueIdentifier>{C749A74D-4213-3465-8C99-260AB3E64A8D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{21C8F3B6-C322-3B5E-BEB9-986B3BA3A0FF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\algorithm">
+      <UniqueIdentifier>{C11415A8-EB6B-3331-B6B2-BBF59F92297A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{EDEA24E2-7340-391A-80BA-3689A07FC8D3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\io">
+      <UniqueIdentifier>{F1EB8A75-A7C4-3D47-8D40-699DB98B3736}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ui">
+      <UniqueIdentifier>{892BAA72-6365-3800-982D-8A85D014C2B5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

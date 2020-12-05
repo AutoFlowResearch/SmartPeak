@@ -1,0 +1,441 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AC73D057-F3A2-3188-958A-41FABD4A7F54}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>SmartPeak</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\lib\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SmartPeak.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SmartPeakd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\lib\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SmartPeak.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SmartPeak</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\lib\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">SmartPeak.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">SmartPeak</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\lib\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">SmartPeak.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">SmartPeak</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4275;4996;4661;4503;4068</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NOMINMAX;BOOST_ALL_NO_LIB;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;NOMINMAX;BOOST_ALL_NO_LIB;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\bin\$(ConfigurationName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/lib/Debug/SmartPeakd.lib C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\bin\$(ConfigurationName)\$(TargetFileName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\doc\doxygen\parameters\$(ConfigurationName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/lib/Debug/SmartPeakd.lib C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\doc\doxygen\parameters\$(ConfigurationName)\$(TargetFileName)
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4251;4275;4996;4661;4503;4068</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;NOMINMAX;BOOST_ALL_NO_LIB;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;NOMINMAX;BOOST_ALL_NO_LIB;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\bin\$(ConfigurationName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/lib/Release/SmartPeak.lib C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\bin\$(ConfigurationName)\$(TargetFileName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\doc\doxygen\parameters\$(ConfigurationName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/lib/Release/SmartPeak.lib C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\doc\doxygen\parameters\$(ConfigurationName)\$(TargetFileName)
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4251;4275;4996;4661;4503;4068</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;NOMINMAX;BOOST_ALL_NO_LIB;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;NOMINMAX;BOOST_ALL_NO_LIB;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\bin\$(ConfigurationName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/lib/MinSizeRel/SmartPeak.lib C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\bin\$(ConfigurationName)\$(TargetFileName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\doc\doxygen\parameters\$(ConfigurationName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/lib/MinSizeRel/SmartPeak.lib C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\doc\doxygen\parameters\$(ConfigurationName)\$(TargetFileName)
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4275;4996;4661;4503;4068</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <OpenMPSupport>true</OpenMPSupport>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;NOMINMAX;BOOST_ALL_NO_LIB;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;NOMINMAX;BOOST_ALL_NO_LIB;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openms\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\~\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openms\thirdparty\evergreen\src;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\sqlite;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\eigen3;C:\Users\dmccloskey\Documents\GitHub\OpenMS\contrib_build\include\WildMagic;C:\lib\boost\boost_1_73_0;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\src\openswathalgo\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\include;C:\Users\dmccloskey\Documents\GitHub\OpenMS\src\openswathalgo\thirdparty\MIToolbox\src;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtCore;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\.\mkspecs\win32-msvc;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\include\QtNetwork;C:\lib\sdl2\SDL2-2.0.12\include;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\imgui;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\implot;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\superbuild\Dependencies\Source\plog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <PostBuildEvent>
+      <Message></Message>
+      <Command>setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\bin\$(ConfigurationName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/lib/RelWithDebInfo/SmartPeak.lib C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\bin\$(ConfigurationName)\$(TargetFileName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E make_directory C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\doc\doxygen\parameters\$(ConfigurationName)
+if %errorlevel% neq 0 goto :cmEnd
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/lib/RelWithDebInfo/SmartPeak.lib C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\doc\doxygen\parameters\$(ConfigurationName)\$(TargetFileName)
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+    </PostBuildEvent>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/smartpeak/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/smartpeak/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.17\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.cxx.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFileCXX.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckTypeSize.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckTypeSize.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindBoost.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\GenerateExportHeader.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\TestBigEndian.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\TestEndianess.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\exportheader.cmake.in;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfig.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfigVersion.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSTargets.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindEigen3.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImGui.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImPlot.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindPlog.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindSDL2.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\check_string_stream_bug.cxx;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\CMAKE_SIZEOF_UNSIGNED_SHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT32.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT64.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_LONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_LONGLONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_SHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UCHAR.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT32.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT64.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT8.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_ULONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_ULONGLONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_USHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\cmake_findExternalLibs.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\configh.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\algorithm\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\config.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\smartpeak_data_path.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\smartpeak_package_version.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\includes.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\algorithm\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\sources.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/smartpeak/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/smartpeak/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.17\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.cxx.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFileCXX.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckTypeSize.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckTypeSize.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindBoost.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\GenerateExportHeader.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\TestBigEndian.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\TestEndianess.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\exportheader.cmake.in;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfig.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfigVersion.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSTargets.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindEigen3.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImGui.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImPlot.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindPlog.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindSDL2.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\check_string_stream_bug.cxx;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\CMAKE_SIZEOF_UNSIGNED_SHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT32.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT64.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_LONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_LONGLONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_SHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UCHAR.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT32.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT64.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT8.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_ULONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_ULONGLONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_USHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\cmake_findExternalLibs.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\configh.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\algorithm\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\config.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\smartpeak_data_path.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\smartpeak_package_version.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\includes.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\algorithm\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\sources.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/smartpeak/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/smartpeak/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.17\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.cxx.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFileCXX.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckTypeSize.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckTypeSize.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindBoost.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\GenerateExportHeader.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\TestBigEndian.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\TestEndianess.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\exportheader.cmake.in;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfig.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfigVersion.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSTargets.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindEigen3.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImGui.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImPlot.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindPlog.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindSDL2.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\check_string_stream_bug.cxx;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\CMAKE_SIZEOF_UNSIGNED_SHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT32.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT64.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_LONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_LONGLONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_SHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UCHAR.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT32.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT64.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT8.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_ULONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_ULONGLONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_USHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\cmake_findExternalLibs.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\configh.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\algorithm\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\config.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\smartpeak_data_path.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\smartpeak_package_version.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\includes.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\algorithm\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\sources.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/smartpeak/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/smartpeak/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.17\Modules\CheckCCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckCXXCompilerFlag.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckFunctionExists.c;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckFunctionExists.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFile.cxx.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckIncludeFileCXX.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckTypeSize.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\CheckTypeSize.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindBoost.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\GenerateExportHeader.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\TestBigEndian.cmake;C:\Program Files\CMake\share\cmake-3.17\Modules\TestEndianess.c.in;C:\Program Files\CMake\share\cmake-3.17\Modules\exportheader.cmake.in;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfig.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSConfigVersion.cmake;C:\Users\dmccloskey\Documents\GitHub\OpenMS\openms_build\OpenMSTargets.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindEigen3.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImGui.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindImPlot.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindPlog.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\FindSDL2.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\cmake\modules\check_string_stream_bug.cxx;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\CMAKE_SIZEOF_UNSIGNED_SHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT32.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_INT64.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_LONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_LONGLONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_SHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UCHAR.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT32.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT64.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_UINT8.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_ULONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_ULONGLONG.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\CMakeFiles\CheckTypeSize\SIZE_USHORT.c;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\cmake_findExternalLibs.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\configh.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\algorithm\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\config.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\smartpeak_data_path.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\smartpeak_package_version.h.in;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\includes.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\algorithm\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\sources.cmake;C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\sources.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\ApplicationProcessor.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\CastValue.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\FeatureMetadata.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\Filenames.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\Helloworld.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\MetaDataHandler.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\RawDataHandler.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\RawDataProcessor.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SampleGroupHandler.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SampleGroupProcessor.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\InjectionHandler.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SampleType.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SequenceHandler.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SequenceProcessor.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SequenceSegmentHandler.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SequenceSegmentProcessor.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SessionHandler.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\SharedProcessors.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\Utilities.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\core\WorkflowManager.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\algorithm\MRMFeatureValidator.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\CSVWriter.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\FileReader.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\SequenceParser.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\io\InputDataValidation.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\FilePicker.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\GuiAppender.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\Report.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\Widget.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\WindowSizesAndPositions.cpp" />
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\source\ui\Workflow.cpp" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\ApplicationHandler.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\ApplicationProcessor.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\CastValue.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\Filenames.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\Helloworld.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\FeatureMetadata.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\MetaDataHandler.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\RawDataHandler.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\RawDataProcessor.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SampleGroupHandler.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SampleGroupProcessor.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\InjectionHandler.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SampleType.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SequenceHandler.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SequenceProcessor.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SequenceSegmentHandler.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SequenceSegmentProcessor.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SessionHandler.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\SharedProcessors.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\Utilities.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\core\WorkflowManager.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\algorithm\MRMFeatureValidator.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\csv.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\CSVWriter.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\FileReader.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\SequenceParser.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\io\InputDataValidation.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\FIAMS_FullScan_Unknown_example.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\GCMS_SIM_Unknown_example.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\HPLC_UV_Standards_example.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\HPLC_UV_Unknown_example.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\LCMS_MRM_Standards_example.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\LCMS_MRM_Unknown_example.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\pipelines\LCMS_MRM_Validation_example.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\FilePicker.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\GuiAppender.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\Report.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\Widget.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\WindowSizesAndPositions.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\smartpeak\include\SmartPeak\ui\Workflow.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include\SmartPeak\config.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include\SmartPeak\smartpeak_package_version.h" />
+    <ClInclude Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\smartpeak\include\SmartPeak\smartpeak_data_path.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\ZERO_CHECK.vcxproj">
+      <Project>{3F67F999-41CF-363B-816A-F1452F9BBA3B}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

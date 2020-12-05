@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{16A99BA9-2CEA-3DFA-855A-6950151FB7B2}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\tests\class_tests\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/tests/class_tests/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/tests/class_tests/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/tests/class_tests/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/tests/class_tests/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/tests/class_tests/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/tests/class_tests/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/dmccloskey/Documents/GitHub/SmartPeak/src/tests/class_tests/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/dmccloskey/Documents/GitHub/SmartPeak -BC:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build --check-stamp-file C:/Users/dmccloskey/Documents/GitHub/SmartPeak/smartpeak_build/src/tests/class_tests/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\ZERO_CHECK.vcxproj">
+      <Project>{3F67F999-41CF-363B-816A-F1452F9BBA3B}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\ApplicationProcessor_test.vcxproj">
+      <Project>{9C03E592-48ED-3335-AC18-A4A494BC20A0}</Project>
+      <Name>ApplicationProcessor_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\CSVWriter_test.vcxproj">
+      <Project>{394A99B4-69F9-37DF-BAC7-EEF531D8C78A}</Project>
+      <Name>CSVWriter_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\CastValue_test.vcxproj">
+      <Project>{2B077644-A6B7-36F4-80BE-375AFC740B1E}</Project>
+      <Name>CastValue_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\FileReader_test.vcxproj">
+      <Project>{716429D2-D0ED-3BE6-A090-E3D9EFAD571C}</Project>
+      <Name>FileReader_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\Filenames_test.vcxproj">
+      <Project>{3E1A05A8-715A-32CD-9721-626B7A888A75}</Project>
+      <Name>Filenames_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\GuiAppender_test.vcxproj">
+      <Project>{564B6E54-93C7-38F4-8B35-B3BB07413AC1}</Project>
+      <Name>GuiAppender_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\Helloworld_test.vcxproj">
+      <Project>{D7578B4F-7F8A-392D-86F4-57DFC7516E6C}</Project>
+      <Name>Helloworld_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\InjectionHandler_test.vcxproj">
+      <Project>{AFCE7A71-7A2A-39B6-95AA-697D9A8F4DD4}</Project>
+      <Name>InjectionHandler_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\InputDataValidation_test.vcxproj">
+      <Project>{DDF6D429-6F12-3ACB-80B9-6F90D88A1ACD}</Project>
+      <Name>InputDataValidation_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\MRMFeatureValidator_test.vcxproj">
+      <Project>{051DAA31-BFD7-3355-94E7-19B4A00E1DF2}</Project>
+      <Name>MRMFeatureValidator_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\MetaDataHandler_test.vcxproj">
+      <Project>{9F3D4402-3456-3796-8E35-ED3B9ACD7500}</Project>
+      <Name>MetaDataHandler_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\RawDataHandler_test.vcxproj">
+      <Project>{872BB385-9B28-3B95-BAC9-32835BFD032A}</Project>
+      <Name>RawDataHandler_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\RawDataProcessor_test.vcxproj">
+      <Project>{06FA6C29-3E71-3401-90C3-1428F317A213}</Project>
+      <Name>RawDataProcessor_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\SampleGroupHandler_test.vcxproj">
+      <Project>{19331EB4-B840-3883-B6B5-57C9882C6789}</Project>
+      <Name>SampleGroupHandler_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\SampleGroupProcessor_test.vcxproj">
+      <Project>{179B973C-901E-3D6B-A019-9B0644D79AF9}</Project>
+      <Name>SampleGroupProcessor_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\SequenceHandler_test.vcxproj">
+      <Project>{5F426E40-E7B8-3FB3-B78C-9EE2414E2780}</Project>
+      <Name>SequenceHandler_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\SequenceParser_test.vcxproj">
+      <Project>{AF7DD593-3B6A-3D8C-B93A-F197EF3FB1A7}</Project>
+      <Name>SequenceParser_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\SequenceProcessor_test.vcxproj">
+      <Project>{8E5292C1-A571-3BBD-B170-E048E573A611}</Project>
+      <Name>SequenceProcessor_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\SequenceSegmentHandler_test.vcxproj">
+      <Project>{35F8EFE8-D010-3D3C-930E-8E245388C12A}</Project>
+      <Name>SequenceSegmentHandler_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\SequenceSegmentProcessor_test.vcxproj">
+      <Project>{04BCD47E-DB92-37C8-915D-2EC659224805}</Project>
+      <Name>SequenceSegmentProcessor_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\SessionHandler_test.vcxproj">
+      <Project>{ACAC93C6-D977-3AA1-921D-3FAFA65E8551}</Project>
+      <Name>SessionHandler_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\Utilities_test.vcxproj">
+      <Project>{8381967E-388A-3EFC-93BA-13CB33980719}</Project>
+      <Name>Utilities_test</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\smartpeak_build\src\tests\class_tests\smartpeak\WindowSizesAndPositions_test.vcxproj">
+      <Project>{B17BE6EB-62D3-3847-A3D2-F666E109D0AE}</Project>
+      <Name>WindowSizesAndPositions_test</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

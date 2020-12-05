@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\source\HPLC_UV_Standards_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\dmccloskey\Documents\GitHub\SmartPeak\src\examples\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{21C8F3B6-C322-3B5E-BEB9-986B3BA3A0FF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
