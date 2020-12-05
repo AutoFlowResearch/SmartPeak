@@ -1,3 +1,0 @@
-repository='https://github.com/epezent/implot.git'
-module=''
-tag='origin'

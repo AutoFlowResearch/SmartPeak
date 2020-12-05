@@ -1,3 +1,0 @@
-repository='https://github.com/SergiusTheBest/plog.git'
-module=''
-tag='origin'
