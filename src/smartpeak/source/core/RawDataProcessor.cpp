@@ -1793,21 +1793,18 @@ namespace SmartPeak
     LOGD << "END SearchAccurateMass";
   }
 
-  void MakeConsensusFeatures::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  void MergeFeatures::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
   {
-    LOGD << "START MakeConsensusFeatures";
-    LOGI << "MakeConsensusFeatures input size: " << rawDataHandler_IO.getFeatureMap().size();
+    LOGD << "START MergeFeatures";
+    LOGI << "MergeFeatures input size: " << rawDataHandler_IO.getFeatureMap().size();
 
-    //if (params_I.count("AccurateMassSearchEngine") && params_I.at("AccurateMassSearchEngine").empty()) {
-    //  LOGE << "No parameters passed to AccurateMassSearchEngine. Not searching.";
-    //  LOGD << "END SearchAccurateMass";
+    //if (params_I.count("MergeFeatures") && params_I.at("MergeFeatures").empty()) {
+    //  LOGE << "No parameters passed to MergeFeatures. Not searching.";
+    //  LOGD << "END MergeFeatures";
     //  return;
     //}
 
     try {
-      // change the `Feature` to the `ConsensusFeature`
-      // and move all adducts of the `Feature` into the `SubordinateFeatures`
-
       // Pass 1: organize into a map by combining features and subordinates with the same `identifier`
       OpenMS::FeatureMap fmap;
       std::map<std::string, std::vector<OpenMS::Feature>> fmapmap;
@@ -1882,8 +1879,8 @@ namespace SmartPeak
     }
     rawDataHandler_IO.updateFeatureMapHistory();
 
-    LOGI << "MakeConsensusFeatures output size: " << rawDataHandler_IO.getFeatureMap().size();
-    LOGD << "END MakeConsensusFeatures";
+    LOGI << "MergeFeatures output size: " << rawDataHandler_IO.getFeatureMap().size();
+    LOGD << "END MergeFeatures";
   }
 
   void ClearData::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const

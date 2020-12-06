@@ -270,13 +270,13 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct MakeConsensusFeatures : RawDataProcessor
+  struct MergeFeatures : RawDataProcessor
   {
       int getID() const override { return -1; }
-      std::string getName() const override { return "MAKE_CONSENSUS_FEATURES"; }
-      std::string getDescription() const override { return "Create consensus features from accurate mass search results."; }
+      std::string getName() const override { return "MERGE_FEATURES"; }
+      std::string getDescription() const override { return "Create merged features from accurate mass search results."; }
 
-      /** Create consensus features from accurate mass search results.
+      /** Create merged features from accurate mass search results.
       */
       void process(
           RawDataHandler& rawDataHandler_IO,

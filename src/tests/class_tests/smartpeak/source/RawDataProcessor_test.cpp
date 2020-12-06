@@ -1409,28 +1409,28 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
 }
 
 /**
-  MakeConsensusFeatures Tests
+  MergeFeatures Tests
 */
-BOOST_AUTO_TEST_CASE(constructorMakeConsensusFeatures)
+BOOST_AUTO_TEST_CASE(constructorMergeFeatures)
 {
-  MakeConsensusFeatures* ptrPickFeatures = nullptr;
-  MakeConsensusFeatures* nullPointerPickFeatures = nullptr;
+  MergeFeatures* ptrPickFeatures = nullptr;
+  MergeFeatures* nullPointerPickFeatures = nullptr;
   BOOST_CHECK_EQUAL(ptrPickFeatures, nullPointerPickFeatures);
 }
 
-BOOST_AUTO_TEST_CASE(destructorMakeConsensusFeatures)
+BOOST_AUTO_TEST_CASE(destructorMergeFeatures)
 {
-  MakeConsensusFeatures* ptrPickFeatures = nullptr;
-  ptrPickFeatures = new MakeConsensusFeatures();
+  MergeFeatures* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new MergeFeatures();
   delete ptrPickFeatures;
 }
 
-BOOST_AUTO_TEST_CASE(gettersMakeConsensusFeatures)
+BOOST_AUTO_TEST_CASE(gettersMergeFeatures)
 {
-  MakeConsensusFeatures processor;
+  MergeFeatures processor;
 
   BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "MAKE_CONSENSUS_FEATURES");
+  BOOST_CHECK_EQUAL(processor.getName(), "MERGE_FEATURES");
 }
 
 BOOST_AUTO_TEST_CASE(consensusFeatures)
@@ -1447,7 +1447,7 @@ BOOST_AUTO_TEST_CASE(consensusFeatures)
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
   // Test accurate mass search
-  MakeConsensusFeatures makeConsensusFeatures;
+  MergeFeatures makeConsensusFeatures;
   makeConsensusFeatures.process(rawDataHandler, params_1, filenames);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 4);
