@@ -1358,6 +1358,11 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   SearchAccurateMass searchAccurateMass;
   searchAccurateMass.process(rawDataHandler, params_1, filenames);
 
+  // DELETE ME
+  filenames.featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_serumTest_accurateMassSearch.featureXML");
+  StoreFeatures storeFeatures;
+  storeFeatures.process(rawDataHandler, params_1, filenames);
+
   BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().size(), 21);
   BOOST_CHECK_CLOSE(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().calc_mass_to_charge.get(), 109.9994567849957, 1e-6);
   BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().chemical_formula.get()), "C9H11NO6S");
@@ -1369,28 +1374,38 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 20);
 
   const auto& hits2 = rawDataHandler.getFeatureMap().at(19);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("peak_apex_int")), 4385.34716796875, 1e-6);
-  BOOST_CHECK_EQUAL(hits2.getMetaValue("scan_polarity"), "positive");
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getRT()), 0, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMZ()), 109.99971621401676, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getIntensity()), 4385.34716796875, 1e-6);
   BOOST_CHECK_EQUAL(hits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
-  BOOST_CHECK_EQUAL(static_cast<int>(hits2.getCharge()), 3);
 
-  BOOST_CHECK_EQUAL(hits2.getSubordinates().size(), 0);
+  BOOST_CHECK_EQUAL(hits2.getSubordinates().size(), 1);
+
+  const auto& hits2sub = hits2.getSubordinates().at(0);
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("identifier").toStringList().at(0), "HMDB:HMDB0062550");
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getMetaValue("peak_apex_int")), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("scan_polarity"), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getMZ()), 109.99971621401676, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getIntensity()), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("native_id").toString(), "C9H11NO6S;M+3Na;3+");
+  BOOST_CHECK_EQUAL(static_cast<int>(hits2sub.getCharge()), 3);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 71);
 
   const auto& hhits2 = rawDataHandler.getFeatureMapHistory().at(70);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("peak_apex_int")), 4385.34716796875, 1e-6);
-  BOOST_CHECK_EQUAL(hhits2.getMetaValue("scan_polarity"), "positive");
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getRT()), 0, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMZ()), 109.99971621401676, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getIntensity()), 4385.34716796875, 1e-6);
   BOOST_CHECK_EQUAL(hhits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
-  BOOST_CHECK_EQUAL(static_cast<int>(hhits2.getCharge()), 3);
 
-  BOOST_CHECK_EQUAL(hhits2.getSubordinates().size(), 0);
+  BOOST_CHECK_EQUAL(hhits2.getSubordinates().size(), 1);
+
+  const auto& hhits2sub = hhits2.getSubordinates().at(0);
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("identifier").toStringList().at(0), "HMDB:HMDB0062550");
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getMetaValue("peak_apex_int")), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("scan_polarity"), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getMZ()), 109.99971621401676, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getIntensity()), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("native_id").toString(), "C9H11NO6S;M+3Na;3+");
+  BOOST_CHECK_EQUAL(static_cast<int>(hhits2sub.getCharge()), 3);
 }
 
 /**

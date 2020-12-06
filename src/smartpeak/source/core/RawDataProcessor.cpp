@@ -1742,36 +1742,41 @@ namespace SmartPeak
       ams.init();
       ams.run(rawDataHandler_IO.getFeatureMap(), output);
 
-      // Remake the feature map replacing the peptide hits as features
+      // Remake the feature map replacing the peptide hits as features/sub-features
       OpenMS::FeatureMap fmap;
       for (const OpenMS::Feature& feature : rawDataHandler_IO.getFeatureMap()) {
         for (const auto& ident : feature.getPeptideIdentifications()) {
           for (const auto& hit : ident.getHits()) {
-            OpenMS::Feature f = feature;
+            OpenMS::Feature f;
+            OpenMS::Feature s = feature;
             f.setUniqueId();
             f.setMetaValue("PeptideRef", hit.getMetaValue("identifier").toStringList().at(0));
+            s.setUniqueId();
+            s.setMetaValue("PeptideRef", hit.getMetaValue("identifier").toStringList().at(0));
             std::string native_id = hit.getMetaValue("chemical_formula").toString() + ";" + hit.getMetaValue("modifications").toString();
-            f.setMetaValue("native_id", native_id);
-            f.setMetaValue("identifier", hit.getMetaValue("identifier"));
-            f.setMetaValue("description", hit.getMetaValue("description"));
-            f.setMetaValue("modifications", hit.getMetaValue("modifications"));
+            s.setMetaValue("native_id", native_id);
+            s.setMetaValue("identifier", hit.getMetaValue("identifier"));
+            s.setMetaValue("description", hit.getMetaValue("description"));
+            s.setMetaValue("modifications", hit.getMetaValue("modifications"));
             std::string adducts;
             try {
-              std::string s = hit.getMetaValue("modifications").toString();
+              std::string str = hit.getMetaValue("modifications").toString();
               std::string delimiter = ";";
-              adducts = s.substr(1, s.find(delimiter) - 1);
+              adducts = str.substr(1, str.find(delimiter) - 1);
             }
             catch (const std::exception& e) {
               LOGE << e.what();
             }
-            f.setMetaValue("adducts", adducts);
+            s.setMetaValue("adducts", adducts);
             OpenMS::EmpiricalFormula chemform(hit.getMetaValue("chemical_formula").toString());
-            double adduct_mass = f.getMZ() * std::abs(hit.getCharge()) + static_cast<double>(hit.getMetaValue("mz_error_Da")) - chemform.getMonoWeight();
-            f.setMetaValue("dc_charge_adduct_mass", adduct_mass);
-            f.setMetaValue("chemical_formula", hit.getMetaValue("chemical_formula"));
-            f.setMetaValue("mz_error_ppm", hit.getMetaValue("mz_error_ppm"));
-            f.setMetaValue("mz_error_Da", hit.getMetaValue("mz_error_Da"));
-            f.setCharge(hit.getCharge());
+            double adduct_mass = s.getMZ() * std::abs(hit.getCharge()) + static_cast<double>(hit.getMetaValue("mz_error_Da")) - chemform.getMonoWeight();
+            s.setMetaValue("dc_charge_adduct_mass", adduct_mass);
+            s.setMetaValue("chemical_formula", hit.getMetaValue("chemical_formula"));
+            s.setMetaValue("mz_error_ppm", hit.getMetaValue("mz_error_ppm"));
+            s.setMetaValue("mz_error_Da", hit.getMetaValue("mz_error_Da"));
+            s.setCharge(hit.getCharge());
+            std::vector<OpenMS::Feature> subs = { s };
+            f.setSubordinates(subs);
             fmap.push_back(f);
           }
         }
@@ -1803,14 +1808,22 @@ namespace SmartPeak
       // change the `Feature` to the `ConsensusFeature`
       // and move all adducts of the `Feature` into the `SubordinateFeatures`
 
-      // Pass 1: organize into a map
+      // Pass 1: organize into a map by combining features and subordinates with the same `identifier`
       OpenMS::FeatureMap fmap;
       std::map<std::string, std::vector<OpenMS::Feature>> fmapmap;
       for (const OpenMS::Feature& f : rawDataHandler_IO.getFeatureMap()) {
         if (f.metaValueExists("identifier")) {
-          auto found = fmapmap.emplace(f.getMetaValue("identifier").toStringList().at(0), std::vector<OpenMS::Feature>({ f }));
-          if (!found.second) {
+          auto found_f = fmapmap.emplace(f.getMetaValue("identifier").toStringList().at(0), std::vector<OpenMS::Feature>({ f }));
+          if (!found_f.second) {
             fmapmap.at(f.getMetaValue("identifier").toStringList().at(0)).push_back(f);
+          }
+        }
+        for (const OpenMS::Feature& s : f.getSubordinates()) {
+          if (s.metaValueExists("identifier")) {
+            auto found_s = fmapmap.emplace(s.getMetaValue("identifier").toStringList().at(0), std::vector<OpenMS::Feature>({ s }));
+            if (!found_s.second) {
+              fmapmap.at(s.getMetaValue("identifier").toStringList().at(0)).push_back(s);
+            }
           }
         }
       }

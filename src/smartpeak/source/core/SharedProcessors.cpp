@@ -31,6 +31,7 @@ namespace SmartPeak {
     {"MERGE_SPECTRA", std::make_shared<MergeSpectra>()},
     {"PICK_MS1_FEATURES", std::make_shared<PickMS1Features>()},
     {"SEARCH_ACCURATE_MASS", std::make_shared<SearchAccurateMass>()},
+    {"MAKE_CONSENSUS_FEATURES", std::make_shared<MakeConsensusFeatures>()},
     {"LOAD_ANNOTATIONS", std::make_shared<LoadAnnotations>()},
     {"STORE_ANNOTATIONS", std::make_shared<StoreAnnotations>()},
     {"CLEAR_DATA", std::make_shared<ClearData>()},
