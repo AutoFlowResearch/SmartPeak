@@ -1437,11 +1437,11 @@ BOOST_AUTO_TEST_CASE(consensusFeatures)
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 4);
   const auto& hits2 = rawDataHandler.getFeatureMap().at(3);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("peak_apex_int")), 4823.5292528163145, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("peak_apex_int")), 75014.837158203125, 1e-6);
   BOOST_CHECK_EQUAL(hits2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hits2.getRT()), 0, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMZ()), 398.96757845025354, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getIntensity()), 4823.529296875, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMZ()), 109.99967790230706, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getIntensity()), 75014.8359375, 1e-6);
   BOOST_CHECK_EQUAL(hits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
   BOOST_CHECK_EQUAL(static_cast<int>(hits2.getCharge()), 0);
 
@@ -1467,11 +1467,11 @@ BOOST_AUTO_TEST_CASE(consensusFeatures)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 75);
 
   const auto& hhits2 = rawDataHandler.getFeatureMapHistory().at(74);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("peak_apex_int")), 4823.5292528163145, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("peak_apex_int")), 75014.837158203125, 1e-6);
   BOOST_CHECK_EQUAL(hhits2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getRT()), 0, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMZ()), 398.96757845025354, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getIntensity()), 4823.529296875, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMZ()), 109.99967790230706, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getIntensity()), 75014.8359375, 1e-6);
   BOOST_CHECK_EQUAL(hhits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
   BOOST_CHECK_EQUAL(static_cast<int>(hhits2.getCharge()), 0);
 

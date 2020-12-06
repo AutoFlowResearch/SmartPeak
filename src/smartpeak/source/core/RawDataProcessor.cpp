@@ -1843,11 +1843,11 @@ namespace SmartPeak
             LOGW << "ConsensusFeature::computeDechargeConsensus() WARNING: Feature's charge is 0! This will lead to M=0!";
           //m += (f.getMZ() * std::abs(f.getCharge()) + (double)f.getMetaValue("dc_charge_adduct_mass")) * weighting_factor; // weighted mz
           m += f.getMZ() * weighting_factor;
-          //intensity += f.getIntensity() * weighting_factor; // weighted mz
+          //intensity += f.getIntensity() * weighting_factor; // weighted intensity
           intensity += f.getIntensity();
           if (f.metaValueExists("peak_apex_int")) 
-            //peak_apex_int += (double)f.getMetaValue("peak_apex_int") * weighting_factor; // weighted mz
-          peak_apex_int += (double)f.getMetaValue("peak_apex_int"); // weighted mz
+            //peak_apex_int += (double)f.getMetaValue("peak_apex_int") * weighting_factor; // weighted peak_apex_int
+          peak_apex_int += (double)f.getMetaValue("peak_apex_int");
         }
 
         // make the feature map and assign subordinates
