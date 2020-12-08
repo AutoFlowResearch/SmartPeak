@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
   sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
 
   BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
-  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 0);
+  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 1);
   const OpenMS::Feature& feat1 = sampleGroupHandler.getFeatureMap().at(0);
   BOOST_CHECK_EQUAL(feat1.getMetaValue("PeptideRef").toString(), "amp");
   BOOST_CHECK_CLOSE(static_cast<float>(feat1.getMetaValue("peak_apex_int")), 600238.125, 1e-4);
@@ -253,6 +253,13 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
   BOOST_CHECK_CLOSE(static_cast<float>(feat1.getMetaValue("calculated_concentration")), 0.458285719, 1e-4);
   BOOST_CHECK_CLOSE(static_cast<float>(feat1.getRT()), 0.458285719, 1e-4);
   BOOST_CHECK_CLOSE(static_cast<float>(feat1.getMZ()), 400, 1e-4);
+  const OpenMS::Feature& sub1 = sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0);
+  BOOST_CHECK_EQUAL(sub1.getMetaValue("native_id").toString(), "amp");
+  BOOST_CHECK_CLOSE(static_cast<float>(sub1.getMetaValue("peak_apex_int")), 600238.125, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sub1.getMetaValue("QC_transition_score")), 49636.1914, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sub1.getMetaValue("calculated_concentration")), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sub1.getRT()), 0.458285719, 1e-4);
+  BOOST_CHECK_CLOSE(static_cast<float>(sub1.getMZ()), 400, 1e-4);
 
   // Test merge injections on polarities with Max
   sequenceHandler.clear();
