@@ -34,7 +34,7 @@
 # Distribution / packaging
 build*/
 smartpeak_build/
-superbuild/
+smartpeak_superbuild/
 
 # VS
 .vscode/
