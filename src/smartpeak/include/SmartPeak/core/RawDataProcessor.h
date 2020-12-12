@@ -270,6 +270,21 @@ namespace SmartPeak
     ) const override;
   };
 
+  struct MergeFeatures : RawDataProcessor
+  {
+      int getID() const override { return -1; }
+      std::string getName() const override { return "MERGE_FEATURES"; }
+      std::string getDescription() const override { return "Create merged features from accurate mass search results."; }
+
+      /** Create merged features from accurate mass search results.
+      */
+      void process(
+          RawDataHandler& rawDataHandler_IO,
+          const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+          const Filenames& filenames
+      ) const override;
+  };
+
   struct FilterFeatures : RawDataProcessor
   {
     int getID() const override { return 4; }
