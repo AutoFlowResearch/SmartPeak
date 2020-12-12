@@ -1358,6 +1358,11 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   SearchAccurateMass searchAccurateMass;
   searchAccurateMass.process(rawDataHandler, params_1, filenames);
 
+  // DELETE ME
+  filenames.featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_serumTest_accurateMassSearch.featureXML");
+  StoreFeatures storeFeatures;
+  storeFeatures.process(rawDataHandler, params_1, filenames);
+
   BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().size(), 21);
   BOOST_CHECK_CLOSE(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().calc_mass_to_charge.get(), 109.9994567849957, 1e-6);
   BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().chemical_formula.get()), "C9H11NO6S");
@@ -1366,13 +1371,92 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().at(1).chemical_formula.get()), "C6H12O2S2");
   BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().at(1).identifier.get().at(0).get(), "HMDB:HMDB0033556");
 
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 20);
+
+  const auto& hits2 = rawDataHandler.getFeatureMap().at(19);
+  BOOST_CHECK_EQUAL(hits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+
+  BOOST_CHECK_EQUAL(hits2.getSubordinates().size(), 1);
+
+  const auto& hits2sub = hits2.getSubordinates().at(0);
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("identifier").toStringList().at(0), "HMDB:HMDB0062550");
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getMetaValue("peak_apex_int")), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("scan_polarity"), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getMZ()), 109.99971621401676, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getIntensity()), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("native_id").toString(), "C9H11NO6S;M+3Na;3+");
+  BOOST_CHECK_EQUAL(static_cast<int>(hits2sub.getCharge()), 3);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 71);
+
+  const auto& hhits2 = rawDataHandler.getFeatureMapHistory().at(70);
+  BOOST_CHECK_EQUAL(hhits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+
+  BOOST_CHECK_EQUAL(hhits2.getSubordinates().size(), 1);
+
+  const auto& hhits2sub = hhits2.getSubordinates().at(0);
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("identifier").toStringList().at(0), "HMDB:HMDB0062550");
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getMetaValue("peak_apex_int")), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("scan_polarity"), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getMZ()), 109.99971621401676, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getIntensity()), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("native_id").toString(), "C9H11NO6S;M+3Na;3+");
+  BOOST_CHECK_EQUAL(static_cast<int>(hhits2sub.getCharge()), 3);
+}
+
+/**
+  MergeFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorMergeFeatures)
+{
+  MergeFeatures* ptrPickFeatures = nullptr;
+  MergeFeatures* nullPointerPickFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrPickFeatures, nullPointerPickFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorMergeFeatures)
+{
+  MergeFeatures* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new MergeFeatures();
+  delete ptrPickFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersMergeFeatures)
+{
+  MergeFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "MERGE_FEATURES");
+}
+
+BOOST_AUTO_TEST_CASE(consensusFeatures)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  map<string, vector<map<string, string>>> params_1;
+  map<string, vector<map<string, string>>> params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_serumTest_accurateMassSearch.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+  // Test accurate mass search
+  MergeFeatures makeConsensusFeatures;
+  makeConsensusFeatures.process(rawDataHandler, params_1, filenames);
+
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 4);
   const auto& hits2 = rawDataHandler.getFeatureMap().at(3);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("peak_apex_int")), 4823.5292528163145, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("peak_apex_int")), 75014.837158203125, 1e-6);
   BOOST_CHECK_EQUAL(hits2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hits2.getRT()), 0, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMZ()), 398.96757845025354, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getIntensity()), 4823.529296875, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMZ()), 109.99967790230706, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getIntensity()), 75014.8359375, 1e-6);
   BOOST_CHECK_EQUAL(hits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
   BOOST_CHECK_EQUAL(static_cast<int>(hits2.getCharge()), 0);
 
@@ -1395,14 +1479,14 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   BOOST_CHECK_CLOSE(static_cast<double>(hits2_sub1.getMetaValue("mz_error_Da")), 4.942764675774924e-05, 1e-6);
   BOOST_CHECK_EQUAL(static_cast<int>(hits2_sub1.getCharge()), 3);
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 55);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 75);
 
-  const auto& hhits2 = rawDataHandler.getFeatureMapHistory().at(54);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("peak_apex_int")), 4823.5292528163145, 1e-6);
+  const auto& hhits2 = rawDataHandler.getFeatureMapHistory().at(74);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("peak_apex_int")), 75014.837158203125, 1e-6);
   BOOST_CHECK_EQUAL(hhits2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getRT()), 0, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMZ()), 398.96757845025354, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getIntensity()), 4823.529296875, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMZ()), 109.99967790230706, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getIntensity()), 75014.8359375, 1e-6);
   BOOST_CHECK_EQUAL(hhits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
   BOOST_CHECK_EQUAL(static_cast<int>(hhits2.getCharge()), 0);
 
