@@ -40,7 +40,7 @@ jobs:
       - run:
           command: |
             cd ~/SmartPeak
-            mkdir superbuild
+            #mkdir superbuild
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
             make -j4
@@ -99,7 +99,7 @@ jobs:
           make -j4 OpenMS
       - run: |
           cd ~/SmartPeak
-          mkdir superbuild
+          #mkdir superbuild
           mkdir smartpeak_debug_build
           cd superbuild
           cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug .. && make -j4
@@ -206,7 +206,7 @@ jobs:
               }
           }
           cd ~/SmartPeak
-          mkdir superbuild
+          #mkdir superbuild
           mkdir smartpeak_build
           cd ~/SmartPeak/superbuild
           cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
