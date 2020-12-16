@@ -222,10 +222,10 @@ jobs:
       - run:
           command: |
             cd ~/SmartPeak/smartpeak_build
-            git clone --branch main https://github.com/AutoFlowResearch/CodeSigning .
-            Import-Module CertCrypto.psm1
+            git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
+            Import-Module CodeSigning/CertCrypto
             $PFX_AES_SS = ConvertTo-SecureString -String $PFX_AES
-            Unprotect-Cert 'CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' $PFX_AES_SS -RemoveSource
+            Unprotect-Cert 'CodeSigningCodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' $PFX_AES_SS -RemoveSource
             signtool sign /f CodeSigning_DTU_AIT_KIT_DTUDOC.pfx /p $PFX_PSWD *.exe
       - run:
           command: |
