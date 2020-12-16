@@ -221,6 +221,13 @@ jobs:
           & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
       - run:
           command: |
+            cd ~/SmartPeak/smartpeak_build
+            git clone --branch main https://github.com/AutoFlowResearch/CodeSigning .
+            Import-Module CertCrypto.psm1
+            Unprotect-Cert 'CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' $PFX_AES -RemoveSource
+            signtool sign /f CodeSigning_DTU_AIT_KIT_DTUDOC.pfx /p $PFX_PSWD *.exe
+      - run:
+          command: |
             mkdir -p ~/artifacts
             cp ~/SmartPeak/smartpeak_build/*.exe ~/artifacts
       - store_artifacts:
