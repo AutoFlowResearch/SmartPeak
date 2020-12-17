@@ -224,7 +224,7 @@ jobs:
             cd ~/SmartPeak/smartpeak_build
             git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
             Import-Module .\CodeSigning\CertCrypto.psm1
-            $PFX_AES_SS = ConvertTo-SecureString -String $env:PFX_AES
+            $PFX_AES_SS = ConvertTo-SecureString -Force -AsPlainText $env:PFX_AES
             Unprotect-Cert 'CodeSigningCodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' $PFX_AES_SS -RemoveSource
             signtool.exe sign /f CodeSigning_DTU_AIT_KIT_DTUDOC.pfx /p $env:PFX_PSWD *.exe
       - run:
