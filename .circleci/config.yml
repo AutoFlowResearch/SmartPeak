@@ -224,8 +224,8 @@ jobs:
             cd ~/SmartPeak/smartpeak_build
             git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
             Import-Module .\CodeSigning\CertCrypto.psm1
-            Unprotect-Cert 'CodeSigningCodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
-            signtool.exe sign /f CodeSigning_DTU_AIT_KIT_DTUDOC.pfx /p $env:PFX_PSWD *.exe
+            Unprotect-Cert '.\CodeSigning\CodeSigningCodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
+            signtool.exe sign /f '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx' /p $env:PFX_PSWD *.exe
       - run:
           command: |
             mkdir -p ~/artifacts
