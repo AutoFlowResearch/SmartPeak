@@ -89,8 +89,7 @@ jobs:
           # brew install coin-or-tools/coinor/coin_data_sample coin-or-tools/coinor/coinutils coin-or-tools/coinor/osi || true
       - run: |
           cd ~ &&
-          # git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-          git clone --branch feat/aut509 --depth 1 https://github.com/ahmedskhalil/OpenMS.git
+          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
           cd OpenMS && mkdir contrib_build && cd contrib_build
           curl -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
           tar -xzf contrib_build.tar.gz
@@ -172,8 +171,7 @@ jobs:
           $boost_tmp | Remove-Item
       - run: |
           cd ~
-          # git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
-          git clone --branch feat/aut509 --depth 1 https://github.com/ahmedskhalil/OpenMS.git
+          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
           cd ~/OpenMS
       - run: |
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
