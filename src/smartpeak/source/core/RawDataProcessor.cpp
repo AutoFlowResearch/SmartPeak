@@ -1861,23 +1861,37 @@ namespace SmartPeak
 
     OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
     OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
-    //Utilities::updateParameters(parameters, params_I.at("calculateMDVs"));
     isotopelabelingmdvs.setParameters(parameters);
 
     try {
       OpenMS::FeatureMap normalized_featureMap;
       std::vector<std::map<std::string, std::string>> CalculateMDVs_params = params_I.find("CalculateMDVs")->second;
       
-      std::string mass_intensity_type, feature_name;
+      OpenMS::IsotopeLabelingMDVs::FeatureName feature_name;
+      OpenMS::IsotopeLabelingMDVs::MassIntensityType mass_intensity_type;
       for(auto& param : CalculateMDVs_params)
       {
         if (param.find("name")->second == "mass_intensity_type")
         {
-          mass_intensity_type = param.find("value")->second;
+          if (param.find("value")->second == "norm_sum")
+          {
+            mass_intensity_type = OpenMS::IsotopeLabelingMDVs::MassIntensityType::NORM_SUM;
+          }
+          else if (param.find("value")->second == "norm_max")
+          {
+            mass_intensity_type = OpenMS::IsotopeLabelingMDVs::MassIntensityType::NORM_MAX;
+          }
         }
         else if (param.find("name")->second == "feature_name")
         {
-          feature_name = param.find("value")->second;
+          if (param.find("value")->second == "intensity")
+          {
+            feature_name = OpenMS::IsotopeLabelingMDVs::FeatureName::INTENSITY;
+          }
+          else if (param.find("value")->second == "peak_apex_int")
+          {
+            feature_name = OpenMS::IsotopeLabelingMDVs::FeatureName::PEAK_APEX_INT;
+          }
         }
       }
       
@@ -1914,12 +1928,15 @@ namespace SmartPeak
       OpenMS::FeatureMap corrected_featureMap;
       std::vector<std::map<std::string, std::string>> IsotopicCorrections_params = params_I.find("IsotopicCorrections")->second;
       
-      std::string correction_matrix_agent;
+      OpenMS::IsotopeLabelingMDVs::DerivatizationAgent correction_matrix_agent;
       for(auto& param : IsotopicCorrections_params)
       {
         if (param.find("name")->second == "correction_matrix_agent")
         {
-          correction_matrix_agent = param.find("value")->second;
+          if (param.find("value")->second == "TBDMS")
+          {
+            correction_matrix_agent = OpenMS::IsotopeLabelingMDVs::DerivatizationAgent::TBDMS;
+          }
         }
       }
       
@@ -1967,7 +1984,7 @@ namespace SmartPeak
           std::sregex_iterator values_begin = std::sregex_iterator(experiment_data_s.begin(), experiment_data_s.end(), regex_double);
           std::sregex_iterator values_end = std::sregex_iterator();
           for (std::sregex_iterator it = values_begin; it != values_end; ++it)
-            experiment_data.push_back(std::strtof(it->str().c_str(), NULL));
+            experiment_data.push_back(std::stod(it->str()));
         }
         if (param.find("name")->second == "isotopic_purity_name" && !param.find("value")->second.empty())
         {
@@ -2008,39 +2025,41 @@ namespace SmartPeak
       OpenMS::FeatureMap featureMap_with_accuracy_info;
       std::vector<std::map<std::string, std::string>> CalculateMDVAccuracies_params = params_I.find("CalculateMDVAccuracies")->second;
       
-      std::vector<double> fragment_isotopomer_measured, fragment_isotopomer_theoretical;
+      std::vector<double> fragment_isotopomer_measured;
       
-      std::string fragment_isotopomer_measured_s, fragment_isotopomer_theoretical_s;
-      
+      std::string fragment_isotopomer_theoretical_formula, fragment_isotopomer_measured_s;
+      double tmp, tmp2;
       for(auto& param : CalculateMDVAccuracies_params)
       {
         if (param.find("name")->second == "fragment_isotopomer_measured")
         {
-          if (!param.find("comment_")->second.empty())
+          if (!param.find("value")->second.empty())
           {
-            fragment_isotopomer_measured_s = param.find("comment_")->second;
-            std::stringstream fragment_isotopomer_measured_ss(fragment_isotopomer_measured_s);
-            std::string fragment_isotopomer_measured_buf;
-            while (fragment_isotopomer_measured_ss >> fragment_isotopomer_measured_buf)
-              fragment_isotopomer_measured.push_back(std::stod(fragment_isotopomer_measured_buf));
+            fragment_isotopomer_measured_s = param.find("value")->second;
+            std::regex regex_double("[+-]?\\d+(?:\\.\\d+)?");
+            std::sregex_iterator values_begin = std::sregex_iterator(fragment_isotopomer_measured_s.begin(), fragment_isotopomer_measured_s.end(), regex_double);
+            std::sregex_iterator values_end = std::sregex_iterator();
+            for (std::sregex_iterator it = values_begin; it != values_end; ++it)
+              fragment_isotopomer_measured.push_back(std::stod(it->str()));
           }
-        }
-        if (param.find("name")->second == "fragment_isotopomer_theoretical")
-        {
-          if (!param.find("comment_")->second.empty())
+          
+          if (!param.find("description")->second.empty())
           {
-            fragment_isotopomer_theoretical_s = param.find("comment_")->second;
-            std::stringstream fragment_isotopomer_theoretical_ss(fragment_isotopomer_theoretical_s);
-            std::string fragment_isotopomer_theoretical_buf;
-            while (fragment_isotopomer_theoretical_ss >> fragment_isotopomer_theoretical_buf)
-              fragment_isotopomer_theoretical.push_back(std::stod(fragment_isotopomer_theoretical_buf));
+            std::string fragment_isotopomer_id =param.find("description")->second;
+            
+            for (auto& peptide : rawDataHandler_IO.getTargetedExperiment().getPeptides())
+            {
+              if (peptide.metaValueExists("SumFormula") && peptide.id == fragment_isotopomer_id)
+              {
+                fragment_isotopomer_theoretical_formula = (std::string)peptide.getMetaValue("SumFormula");
+              }
+            }
           }
         }
       }
       
-      
       isotopelabelingmdvs.calculateMDVAccuracies(rawDataHandler_IO.getFeatureMap(), featureMap_with_accuracy_info,
-                                                 fragment_isotopomer_measured, fragment_isotopomer_theoretical);
+                                                 fragment_isotopomer_measured, fragment_isotopomer_theoretical_formula);
       rawDataHandler_IO.setFeatureMap(featureMap_with_accuracy_info);
       rawDataHandler_IO.updateFeatureMapHistory();
     }

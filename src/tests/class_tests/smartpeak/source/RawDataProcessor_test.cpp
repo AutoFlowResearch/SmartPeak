@@ -5,6 +5,12 @@
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/DataAccessHelper.h>
+#include <OpenMS/FORMAT/MRMFeatureQCFile.h>  // load featureFilter and featureQC
+#include <OpenMS/ANALYSIS/OPENSWATH/TransitionTSVFile.h>  // load traML
+#include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
+#include <SmartPeak/io/InputDataValidation.h> // check filenames and headers
+#include <OpenMS/FORMAT/TraMLFile.h>
 
 #include <OpenMS/FORMAT/MzMLFile.h>
 
@@ -2354,7 +2360,6 @@ BOOST_AUTO_TEST_CASE(calculateMDVs)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("GCMS_SIM.featureXML");
   
   std::vector<OpenMS::Peak2D::IntensityType> L1_peak_apex_int {3.61e+08, 1.20e+04, 1.02e+05, 2.59e+04};
   std::vector<OpenMS::Peak2D::IntensityType> L2_peak_apex_int {2.77e+07, 5.45e+04, 6.26e+05, 7.46e+04, 2.75e+04};
@@ -2464,7 +2469,6 @@ BOOST_AUTO_TEST_CASE(isotopicCorrections)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("GCMS_SIM.featureXML");
   
   // case 1: validating corrected results (corrected peak_apex_int)
   IsotopicCorrections                   isotopicCorrections;
@@ -2519,7 +2523,6 @@ BOOST_AUTO_TEST_CASE(calculateIsotopicPurities)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("GCMS_SIM.featureXML");
 
   CalculateIsotopicPurities     calculateIsotopicPurities;
   OpenMS::Feature               lactate_1_normalized;
@@ -2563,7 +2566,9 @@ BOOST_AUTO_TEST_CASE(calculateMDVAccuracies)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("GCMS_SIM.featureXML");
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, {}, filenames);
   
   CalculateMDVAccuracies        calculateMDVAccuracies;
   OpenMS::Feature               lactate_1_normalized;
@@ -2594,7 +2599,7 @@ BOOST_AUTO_TEST_CASE(calculateMDVAccuracies)
    
   for (uint8_t i = 0; i < lactate_1_with_accuracy_info_featureMap.size(); ++i)
   {
-    BOOST_CHECK_CLOSE( (double)(lactate_1_with_accuracy_info_featureMap.at(i).getMetaValue("average_accuracy")), 0.0237455, 1e-3 );
+    BOOST_CHECK_CLOSE( (double)(lactate_1_with_accuracy_info_featureMap.at(i).getMetaValue("average_accuracy")), 0.0237455, 1e-2 );
   }
 }
 ///
