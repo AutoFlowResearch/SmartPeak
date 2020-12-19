@@ -112,8 +112,6 @@ MRMFeatureFilter.filter_MRMFeatures,report_tic,string,FALSE,FALSE,true; false,Em
 MRMFeatureFilter.filter_MRMFeatures.qc,flag_or_filter,string,flag,flag,filter; flag,"Flag or Filter (i.e., remove) Components or transitions that do not pass the QC.",TRUE
 MRMFeatureFilter.filter_MRMFeatures.qc,report_xic,string,FALSE,FALSE,true; false,Embed an image of the XIC in the QC report.,TRUE
 MRMFeatureFilter.filter_MRMFeatures.qc,report_tic,string,FALSE,FALSE,true; false,Embed an image of the TIC in the QC report.,TRUE
-FeaturePlotter,export_format,string,pdf,pdf,,The export format of the plot,TRUE
-FeaturePlotter,annotate_features,bool,TRUE,,,Annotate peaks with features,TRUE
 mzML,format,string,ChromeleonFile,Chromeleon,,An alternative format to load an experiment from,TRUE
 mzML,zero_baseline,bool,TRUE,FALSE,,Normalize the baseline so that the minimum intensity value is 0,TRUE
 SequenceSegmentPlotter,export_format,string,pdf,pdf,,The export format of the plot,TRUE
@@ -125,3 +123,4 @@ AbsoluteQuantitation,max_iters,int,100,100,,The maximum number of iterations to 
 AbsoluteQuantitation,outlier_detection_method,string,iter_jackknife,iter_jackknife,,Outlier detection method to find and remove bad calibration points.,TRUE
 AbsoluteQuantitation,use_chauvenet,string,FALSE,TRUE,,Whether to only remove outliers that fulfill Chauvenet's criterion for outliers (otherwise it will remove any outlier candidate regardless of the criterion).,TRUE
 AbsoluteQuantitation,optimization_method,string,iterative,iterative,,Calibrator optimization method to find the best set of calibration points for each method.,TRUE
+SequenceProcessor,n_thread,int,4,1,,Number of threads to use,TRUE

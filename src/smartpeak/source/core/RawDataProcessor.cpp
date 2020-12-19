@@ -79,6 +79,11 @@ namespace SmartPeak
           OpenMS::ChromeleonFile chfh;
           LOGI << "Loading: " << txt_name;
           chfh.load(txt_name, chromatograms);
+          // If the peak height is less than 1.0 (which is quite common in RI and UV detection), 
+          // the peak will not be picked, so we artificially scale the data by 1e3
+          for (auto& peak : chromatograms.getChromatograms().at(0)) {
+            peak.setIntensity(peak.getIntensity() * 1e3);
+          }
         }
         // Deal with .mzXML format
         else if (mzML_params.count("format") && mzML_params.at("format").s_ == "XML") {
@@ -267,7 +272,10 @@ namespace SmartPeak
     try {
       OpenMS::FeatureXMLFile featurexml;
       featurexml.load(filenames.featureXML_i, rawDataHandler_IO.getFeatureMapHistory());
+      // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
+      rawDataHandler_IO.getFeatureMapHistory().setPrimaryMSRunPath({ rawDataHandler_IO.getMetaData().getFilename() });
       rawDataHandler_IO.makeFeatureMapFromHistory();
+      rawDataHandler_IO.getFeatureMap().setPrimaryMSRunPath({ rawDataHandler_IO.getMetaData().getFilename() });
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -1728,58 +1736,93 @@ namespace SmartPeak
     Utilities::updateParameters(parameters, params_I.at("AccurateMassSearchEngine"));
     ams.setParameters(parameters);
 
-    OpenMS::MzTab output;
     try {
       // Run the accurate mass search engine
+      OpenMS::MzTab output;
       ams.init();
       ams.run(rawDataHandler_IO.getFeatureMap(), output);
 
-      // Remake the feature map replacing the peptide hits as features
-      // and change the `Feature` to the `ConsensusFeature`
-      // and move all adducts of the `Feature` into the `SubordinateFeatures`
-
-      // Pass 1: organize into a map
+      // Remake the feature map replacing the peptide hits as features/sub-features
       OpenMS::FeatureMap fmap;
-      std::map<std::string, std::vector<OpenMS::Feature>> fmapmap;
-      for (const OpenMS::Feature& f : rawDataHandler_IO.getFeatureMap()) {
-        bool is_not_hit = true;
-        for (const auto& ident : f.getPeptideIdentifications()) {
+      for (const OpenMS::Feature& feature : rawDataHandler_IO.getFeatureMap()) {
+        for (const auto& ident : feature.getPeptideIdentifications()) {
           for (const auto& hit : ident.getHits()) {
-            OpenMS::Feature f_updated = f;
-            f_updated.setUniqueId();
-            f_updated.setMetaValue("PeptideRef", hit.getMetaValue("identifier").toStringList().at(0));
+            OpenMS::Feature f;
+            OpenMS::Feature s = feature;
+            f.setUniqueId();
+            f.setMetaValue("PeptideRef", hit.getMetaValue("identifier").toStringList().at(0));
+            s.setUniqueId();
+            s.setMetaValue("PeptideRef", hit.getMetaValue("identifier").toStringList().at(0));
             std::string native_id = hit.getMetaValue("chemical_formula").toString() + ";" + hit.getMetaValue("modifications").toString();
-            f_updated.setMetaValue("native_id", native_id);
-            f_updated.setMetaValue("identifier", hit.getMetaValue("identifier"));
-            f_updated.setMetaValue("description", hit.getMetaValue("description"));
-            f_updated.setMetaValue("modifications", hit.getMetaValue("modifications"));
+            s.setMetaValue("native_id", native_id);
+            s.setMetaValue("identifier", hit.getMetaValue("identifier"));
+            s.setMetaValue("description", hit.getMetaValue("description"));
+            s.setMetaValue("modifications", hit.getMetaValue("modifications"));
             std::string adducts;
             try {
-              std::string s = hit.getMetaValue("modifications").toString();
+              std::string str = hit.getMetaValue("modifications").toString();
               std::string delimiter = ";";
-              adducts = s.substr(1, s.find(delimiter) - 1);
+              adducts = str.substr(1, str.find(delimiter) - 1);
             }
             catch (const std::exception& e) {
               LOGE << e.what();
             }
-            f_updated.setMetaValue("adducts", adducts);
+            s.setMetaValue("adducts", adducts);
             OpenMS::EmpiricalFormula chemform(hit.getMetaValue("chemical_formula").toString());
-            double adduct_mass = f.getMZ()*std::abs(hit.getCharge()) + static_cast<double>(hit.getMetaValue("mz_error_Da")) - chemform.getMonoWeight();
-            f_updated.setMetaValue("dc_charge_adduct_mass", adduct_mass);
-            f_updated.setMetaValue("chemical_formula", hit.getMetaValue("chemical_formula"));
-            f_updated.setMetaValue("mz_error_ppm", hit.getMetaValue("mz_error_ppm"));
-            f_updated.setMetaValue("mz_error_Da", hit.getMetaValue("mz_error_Da"));
-            f_updated.setCharge(hit.getCharge());
-            auto found = fmapmap.emplace(hit.getMetaValue("identifier").toStringList().at(0), std::vector<OpenMS::Feature>({ f_updated }));
-            if (!found.second) {
-              fmapmap.at(hit.getMetaValue("identifier").toStringList().at(0)).push_back(f_updated);
-            }
-            is_not_hit = false;
+            double adduct_mass = s.getMZ() * std::abs(hit.getCharge()) + static_cast<double>(hit.getMetaValue("mz_error_Da")) - chemform.getMonoWeight();
+            s.setMetaValue("dc_charge_adduct_mass", adduct_mass);
+            s.setMetaValue("chemical_formula", hit.getMetaValue("chemical_formula"));
+            s.setMetaValue("mz_error_ppm", hit.getMetaValue("mz_error_ppm"));
+            s.setMetaValue("mz_error_Da", hit.getMetaValue("mz_error_Da"));
+            s.setCharge(hit.getCharge());
+            std::vector<OpenMS::Feature> subs = { s };
+            f.setSubordinates(subs);
+            fmap.push_back(f);
           }
         }
-        // NOTE: This will keep the feature in the featureMapHistory but remove from the featureMap
-        //if (is_not_hit)
-        //  fmap.push_back(f);
+      }
+      rawDataHandler_IO.setFeatureMap(fmap);
+      rawDataHandler_IO.setMzTab(output);
+      rawDataHandler_IO.updateFeatureMapHistory();
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    LOGI << "SearchAccurateMass output size: " << rawDataHandler_IO.getFeatureMap().size();
+    LOGD << "END SearchAccurateMass";
+  }
+
+  void MergeFeatures::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START MergeFeatures";
+    LOGI << "MergeFeatures input size: " << rawDataHandler_IO.getFeatureMap().size();
+
+    //if (params_I.count("MergeFeatures") && params_I.at("MergeFeatures").empty()) {
+    //  LOGE << "No parameters passed to MergeFeatures. Not searching.";
+    //  LOGD << "END MergeFeatures";
+    //  return;
+    //}
+
+    try {
+      // Pass 1: organize into a map by combining features and subordinates with the same `identifier`
+      OpenMS::FeatureMap fmap;
+      std::map<std::string, std::vector<OpenMS::Feature>> fmapmap;
+      for (const OpenMS::Feature& f : rawDataHandler_IO.getFeatureMap()) {
+        if (f.metaValueExists("identifier")) {
+          auto found_f = fmapmap.emplace(f.getMetaValue("identifier").toStringList().at(0), std::vector<OpenMS::Feature>({ f }));
+          if (!found_f.second) {
+            fmapmap.at(f.getMetaValue("identifier").toStringList().at(0)).push_back(f);
+          }
+        }
+        for (const OpenMS::Feature& s : f.getSubordinates()) {
+          if (s.metaValueExists("identifier")) {
+            auto found_s = fmapmap.emplace(s.getMetaValue("identifier").toStringList().at(0), std::vector<OpenMS::Feature>({ s }));
+            if (!found_s.second) {
+              fmapmap.at(s.getMetaValue("identifier").toStringList().at(0)).push_back(s);
+            }
+          }
+        }
       }
 
       // Pass 2: compute the consensus manually
@@ -1808,10 +1851,13 @@ namespace SmartPeak
           rt += f.getRT() * weighting_factor;
           if (f.getCharge() == 0)
             LOGW << "ConsensusFeature::computeDechargeConsensus() WARNING: Feature's charge is 0! This will lead to M=0!";
-          m += (f.getMZ() * std::abs(f.getCharge()) + (double)f.getMetaValue("dc_charge_adduct_mass")) * weighting_factor;
-          intensity += f.getIntensity() * weighting_factor;
+          //m += (f.getMZ() * std::abs(f.getCharge()) + (double)f.getMetaValue("dc_charge_adduct_mass")) * weighting_factor; // weighted mz
+          m += f.getMZ() * weighting_factor;
+          //intensity += f.getIntensity() * weighting_factor; // weighted intensity
+          intensity += f.getIntensity();
           if (f.metaValueExists("peak_apex_int")) 
-            peak_apex_int += (double)f.getMetaValue("peak_apex_int") * weighting_factor;
+            //peak_apex_int += (double)f.getMetaValue("peak_apex_int") * weighting_factor; // weighted peak_apex_int
+          peak_apex_int += (double)f.getMetaValue("peak_apex_int");
         }
 
         // make the feature map and assign subordinates
@@ -1831,11 +1877,10 @@ namespace SmartPeak
     catch (const std::exception& e) {
       LOGE << e.what();
     }
-    rawDataHandler_IO.setMzTab(output);
     rawDataHandler_IO.updateFeatureMapHistory();
 
-    LOGI << "SearchAccurateMass output size: " << rawDataHandler_IO.getFeatureMap().size();
-    LOGD << "END SearchAccurateMass";
+    LOGI << "MergeFeatures output size: " << rawDataHandler_IO.getFeatureMap().size();
+    LOGD << "END MergeFeatures";
   }
 
   void ClearData::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const

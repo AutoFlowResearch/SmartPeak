@@ -69,6 +69,11 @@ namespace SmartPeak
     ) const override;
 
     /** Extracts metadata from the chromatogram.
+    
+      NOTE:
+      - Not used in the current version of SmartPeak
+      - Would need to be refactored or carefully implemented so as not to conflict
+        with current injection, sample, and file naming patterns
     */
     static void extractMetaData(RawDataHandler& rawDataHandler_IO);
   };
@@ -266,6 +271,21 @@ namespace SmartPeak
       const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
       const Filenames& filenames
     ) const override;
+  };
+
+  struct MergeFeatures : RawDataProcessor
+  {
+      int getID() const override { return -1; }
+      std::string getName() const override { return "MERGE_FEATURES"; }
+      std::string getDescription() const override { return "Create merged features from accurate mass search results."; }
+
+      /** Create merged features from accurate mass search results.
+      */
+      void process(
+          RawDataHandler& rawDataHandler_IO,
+          const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+          const Filenames& filenames
+      ) const override;
   };
 
   struct FilterFeatures : RawDataProcessor

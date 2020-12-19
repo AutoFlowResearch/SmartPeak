@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSequenceSegmentName(), "Group01");
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleType() == SampleType::Unknown, true);
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getFilename(), "170808_Jonathan_yeast_Yarr2_1x_5_FluxTest_2015-07-07_153300"); // No default provided
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().acq_method_name, "LCMS");
   BOOST_CHECK_CLOSE(sequence2[4].getMetaData().inj_volume, 10.0, 1e-3);
   BOOST_CHECK_EQUAL(sequence2[4].getMetaData().inj_volume_units, "uL");
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSequenceSegmentName(), "Group01");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleType() == SampleType::Unknown, true);
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getFilename(), "170808_Jonathan_yeast_Yarr2_1x_5_FluxTest_2015-07-07_153300"); // No default provided
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().acq_method_name, "LCMS");
   BOOST_CHECK_CLOSE(sequence3[4].getMetaData().inj_volume, 10.0, 1e-3);
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().inj_volume_units, "uL");
@@ -316,6 +316,248 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
   // write sequence to output
   // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataMatrixFromMetaValue.csv");
   // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
+}
+
+BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
+{
+  SequenceHandler sequenceHandler;
+
+  const vector<string> sample_names = {
+    "170808_Jonathan_yeast_Sacc1_1x",
+    "170808_Jonathan_yeast_Sacc2_1x",
+    "170808_Jonathan_yeast_Sacc3_1x",
+    "170808_Jonathan_yeast_Yarr1_1x",
+    "170808_Jonathan_yeast_Yarr2_1x",
+    "170808_Jonathan_yeast_Yarr3_1x"
+  };
+
+  int inj_num = 0;
+  for (const string& sample_name : sample_names) {
+    ++inj_num;
+    MetaDataHandler metaDataHandler;
+    metaDataHandler.setSampleName(sample_name);
+    metaDataHandler.setSampleType(SampleType::Unknown);
+    metaDataHandler.setSampleGroupName("sample_group");
+    metaDataHandler.setSequenceSegmentName("sequence_segment");
+    metaDataHandler.plate_number = 3;
+    metaDataHandler.rack_number = 4;
+    metaDataHandler.pos_number = inj_num;
+    metaDataHandler.dilution_factor = 8.0;
+    metaDataHandler.setAcquisitionDateAndTimeFromString("01-01-2020 17:14:00", "%m-%d-%Y %H:%M:%S");
+    metaDataHandler.inj_number = inj_num;
+    metaDataHandler.acq_method_name = "RapidRIP";
+    metaDataHandler.inj_volume = 7.0;
+    metaDataHandler.inj_volume_units = "8";
+    metaDataHandler.batch_name = "FluxTest";
+    metaDataHandler.scan_polarity = "negative";
+    metaDataHandler.scan_mass_high = 2000;
+    metaDataHandler.scan_mass_low = 60;
+    metaDataHandler.setFilename(metaDataHandler.getInjectionName());
+
+    sequenceHandler.addSampleToSequence(metaDataHandler, OpenMS::FeatureMap());
+  }
+
+  vector<vector<string>> data_out;
+  vector<string> headers_out;
+
+  SequenceParser::makeSequenceFileAnalyst(sequenceHandler, data_out, headers_out);
+
+  BOOST_CHECK_EQUAL(data_out.size(), 6);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "RapidRIP.dam");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "none");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(5), "CStk1-04");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(6), "MT96_or_VT54");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(7), "1");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(8), "7.000000");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(9), "8.000000");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(10), "0");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(11), "Unknown");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(12), "4");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(13), "3");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(14), "2020-01-01_171400");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(15), "2020-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
+  BOOST_CHECK_EQUAL(headers_out.size(), 16);
+  BOOST_CHECK_EQUAL(headers_out.at(0), "% header=SampleName");
+  BOOST_CHECK_EQUAL(headers_out.at(1), "SampleID");
+  BOOST_CHECK_EQUAL(headers_out.at(2), "Comments");
+  BOOST_CHECK_EQUAL(headers_out.at(3), "AcqMethod");
+  BOOST_CHECK_EQUAL(headers_out.at(4), "ProcMethod");
+  BOOST_CHECK_EQUAL(headers_out.at(5), "RackCode");
+  BOOST_CHECK_EQUAL(headers_out.at(6), "PlateCode");
+  BOOST_CHECK_EQUAL(headers_out.at(7), "VialPos");
+  BOOST_CHECK_EQUAL(headers_out.at(8), "SmplInjVol");
+  BOOST_CHECK_EQUAL(headers_out.at(9), "DilutFact");
+  BOOST_CHECK_EQUAL(headers_out.at(10), "WghtToVol");
+  BOOST_CHECK_EQUAL(headers_out.at(11), "Type");
+  BOOST_CHECK_EQUAL(headers_out.at(12), "RackPos");
+  BOOST_CHECK_EQUAL(headers_out.at(13), "PlatePos");
+  BOOST_CHECK_EQUAL(headers_out.at(14), "SetName");
+  BOOST_CHECK_EQUAL(headers_out.at(15), "OutputFile");
+}
+
+BOOST_AUTO_TEST_CASE(makeSequenceFileMasshunter)
+{
+  SequenceHandler sequenceHandler;
+
+  const vector<string> sample_names = {
+    "170808_Jonathan_yeast_Sacc1_1x",
+    "170808_Jonathan_yeast_Sacc2_1x",
+    "170808_Jonathan_yeast_Sacc3_1x",
+    "170808_Jonathan_yeast_Yarr1_1x",
+    "170808_Jonathan_yeast_Yarr2_1x",
+    "170808_Jonathan_yeast_Yarr3_1x"
+  };
+
+  int inj_num = 0;
+  for (const string& sample_name : sample_names) {
+    ++inj_num;
+    MetaDataHandler metaDataHandler;
+    metaDataHandler.setSampleName(sample_name);
+    metaDataHandler.setSampleType(SampleType::Unknown);
+    metaDataHandler.setSampleGroupName("sample_group");
+    metaDataHandler.setSequenceSegmentName("sequence_segment");
+    metaDataHandler.plate_number = 3;
+    metaDataHandler.rack_number = 4;
+    metaDataHandler.pos_number = inj_num;
+    metaDataHandler.dilution_factor = 8.0;
+    metaDataHandler.setAcquisitionDateAndTimeFromString("01-01-2020 17:14:00", "%m-%d-%Y %H:%M:%S");
+    metaDataHandler.inj_number = inj_num;
+    metaDataHandler.acq_method_name = "RapidRIP";
+    metaDataHandler.inj_volume = 7.0;
+    metaDataHandler.inj_volume_units = "8";
+    metaDataHandler.batch_name = "FluxTest";
+    metaDataHandler.scan_polarity = "negative";
+    metaDataHandler.scan_mass_high = 2000;
+    metaDataHandler.scan_mass_low = 60;
+    metaDataHandler.setFilename(metaDataHandler.getInjectionName());
+
+    sequenceHandler.addSampleToSequence(metaDataHandler, OpenMS::FeatureMap());
+  }
+
+  vector<vector<string>> data_out;
+  vector<string> headers_out;
+
+  SequenceParser::makeSequenceFileMasshunter(sequenceHandler, data_out, headers_out);
+
+  BOOST_CHECK_EQUAL(data_out.size(), 6);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "1");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "D:\\DATA\\TODO");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "RapidRIP.M");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "D:\\DATA\\TODO");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(5), "2020-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(6), "Unknown");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(7), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(8), "8.000000");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(9), "7.000000");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(10), "Rack 4");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(11), "");
+  BOOST_CHECK_EQUAL(headers_out.size(), 12);
+  BOOST_CHECK_EQUAL(headers_out.at(0), "Name");
+  BOOST_CHECK_EQUAL(headers_out.at(1), "Vial");
+  BOOST_CHECK_EQUAL(headers_out.at(2), "Method Path");
+  BOOST_CHECK_EQUAL(headers_out.at(3), "Mathod File");
+  BOOST_CHECK_EQUAL(headers_out.at(4), "Data Path");
+  BOOST_CHECK_EQUAL(headers_out.at(5), "Data File");
+  BOOST_CHECK_EQUAL(headers_out.at(6), "Type");
+  BOOST_CHECK_EQUAL(headers_out.at(7), "Level");
+  BOOST_CHECK_EQUAL(headers_out.at(8), "Dil.");
+  BOOST_CHECK_EQUAL(headers_out.at(9), "Vol.");
+  BOOST_CHECK_EQUAL(headers_out.at(10), "Tray Name");
+  BOOST_CHECK_EQUAL(headers_out.at(11), "Comment");
+}
+
+BOOST_AUTO_TEST_CASE(makeSequenceFileXcalibur)
+{
+  SequenceHandler sequenceHandler;
+
+  const vector<string> sample_names = {
+    "170808_Jonathan_yeast_Sacc1_1x",
+    "170808_Jonathan_yeast_Sacc2_1x",
+    "170808_Jonathan_yeast_Sacc3_1x",
+    "170808_Jonathan_yeast_Yarr1_1x",
+    "170808_Jonathan_yeast_Yarr2_1x",
+    "170808_Jonathan_yeast_Yarr3_1x"
+  };
+
+  int inj_num = 0;
+  for (const string& sample_name : sample_names) {
+    ++inj_num;
+    MetaDataHandler metaDataHandler;
+    metaDataHandler.setSampleName(sample_name);
+    metaDataHandler.setSampleType(SampleType::Unknown);
+    metaDataHandler.setSampleGroupName("sample_group");
+    metaDataHandler.setSequenceSegmentName("sequence_segment");
+    metaDataHandler.plate_number = 3;
+    metaDataHandler.rack_number = 4;
+    metaDataHandler.pos_number = inj_num;
+    metaDataHandler.dilution_factor = 8.0;
+    metaDataHandler.setAcquisitionDateAndTimeFromString("01-01-2020 17:14:00", "%m-%d-%Y %H:%M:%S");
+    metaDataHandler.inj_number = inj_num;
+    metaDataHandler.acq_method_name = "RapidRIP";
+    metaDataHandler.inj_volume = 7.0;
+    metaDataHandler.inj_volume_units = "8";
+    metaDataHandler.batch_name = "FluxTest";
+    metaDataHandler.scan_polarity = "negative";
+    metaDataHandler.scan_mass_high = 2000;
+    metaDataHandler.scan_mass_low = 60;
+    metaDataHandler.setFilename(metaDataHandler.getInjectionName());
+
+    sequenceHandler.addSampleToSequence(metaDataHandler, OpenMS::FeatureMap());
+  }
+
+  vector<vector<string>> data_out;
+  vector<string> headers_out;
+
+  SequenceParser::makeSequenceFileXcalibur(sequenceHandler, data_out, headers_out);
+
+  BOOST_CHECK_EQUAL(data_out.size(), 6);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "Unknown");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "2020-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "1");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "D:\\DATA\\TODO");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "RapidRIP");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(5), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(6), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(7), "R:TODO1");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(8), "7.000000");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(9), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(10), "0");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(11), "0");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(12), "0");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(13), "8.000000");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(14), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(15), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(16), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(17), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(18), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(19), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(20), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(headers_out.size(), 21);
+  BOOST_CHECK_EQUAL(headers_out.at(0), "Sample Type");
+  BOOST_CHECK_EQUAL(headers_out.at(1), "File Name");
+  BOOST_CHECK_EQUAL(headers_out.at(2), "Sample ID");
+  BOOST_CHECK_EQUAL(headers_out.at(3), "Path");
+  BOOST_CHECK_EQUAL(headers_out.at(4), "Instrument Method");
+  BOOST_CHECK_EQUAL(headers_out.at(5), "Process Method");
+  BOOST_CHECK_EQUAL(headers_out.at(6), "Calibration File");
+  BOOST_CHECK_EQUAL(headers_out.at(7), "Position");
+  BOOST_CHECK_EQUAL(headers_out.at(8), "Inj Vol");
+  BOOST_CHECK_EQUAL(headers_out.at(9), "Level");
+  BOOST_CHECK_EQUAL(headers_out.at(10), "Sample Wt");
+  BOOST_CHECK_EQUAL(headers_out.at(11), "Sample Vol");
+  BOOST_CHECK_EQUAL(headers_out.at(12), "ISTD Amt");
+  BOOST_CHECK_EQUAL(headers_out.at(13), "Dil Factor");
+  BOOST_CHECK_EQUAL(headers_out.at(14), "L1 Study");
+  BOOST_CHECK_EQUAL(headers_out.at(15), "L2 Client");
+  BOOST_CHECK_EQUAL(headers_out.at(16), "L3 Laboratory");
+  BOOST_CHECK_EQUAL(headers_out.at(17), "L4 Company");
+  BOOST_CHECK_EQUAL(headers_out.at(18), "L5 Phone");
+  BOOST_CHECK_EQUAL(headers_out.at(19), "Comment");
+  BOOST_CHECK_EQUAL(headers_out.at(20), "Sample Name");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

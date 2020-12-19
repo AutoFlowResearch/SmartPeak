@@ -64,56 +64,65 @@ namespace SmartPeak
     static char selected_filename[256] = {0};
     // Folder content / Navigation
     ImGui::BeginChild("Content", ImVec2(1024, 400));
-    // Start of Columns - content_columns
-    ImGui::Columns(4, "content_columns");
-    ImGui::Separator();
-    ImGui::Text("Name"); ImGui::NextColumn();
-    ImGui::Text("Size"); ImGui::NextColumn();
-    ImGui::Text("Type"); ImGui::NextColumn();
-    ImGui::Text("Date Modified"); ImGui::NextColumn();
-    ImGui::Separator();
-
-    for (int i = 0; static_cast<size_t>(i) < pathname_content_[0].size(); ++i)
+    
+    const int column_count = 4;
+    const char* column_names[column_count] = { "Name", "Size", "Type", "Date Modified" };
+    static ImGuiTableColumnFlags column_flags[column_count] = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide
+    };
+    
+    static ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
+        ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable | ImGuiTableFlags_NoBordersInBody;
+    
+    ImVec2 size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 2);
+    if (ImGui::BeginTable("Content", column_count, table_flags, size))
     {
-      if (!filter.PassFilter(pathname_content_[0][i].c_str()))
-      {
-        continue; // continue if it does not pass the filter
+      for (int column = 0; column < column_count; column++){
+        ImGui::TableSetupColumn(column_names[column], column_flags[column]);
       }
+      ImGui::TableSetupScrollFreeze(column_count, 1);
+      ImGui::TableHeadersRow();
 
-      if (selected_extension > 0 &&
-          !Utilities::endsWith(pathname_content_[0][i], "." + std::string(extensions[selected_extension]), false))
+      const ImGuiWindowFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick;
+      for (int row = 0; row < pathname_content_[0].size(); row++)
       {
-        continue; // continue if the file type is not desired
-      }
-
-      const ImGuiWindowFlags flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick;
-
-      if (ImGui::Selectable(pathname_content_[0][i].c_str(), selected_entry == i, flags))
-      {
-        selected_entry = i;
-        sprintf(selected_filename, "%s", pathname_content_[0][selected_entry].c_str());
-        if (ImGui::IsMouseDoubleClicked(0) && pathname_content_[2][selected_entry] == "Directory") // TODO: error prone to rely on strings
+        if (!filter.PassFilter(pathname_content_[0][row].c_str()))
         {
-          if (current_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
+          continue; // continue if it does not pass the filter
+        }
+        
+        if (selected_extension > 0 && !Utilities::endsWith(pathname_content_[0][row], "." + std::string(extensions[selected_extension]), false))
+        {
+          continue; // continue if the file type is not desired
+        }
+                
+        ImGui::TableNextRow();
+        for (int column = 0; column < column_count; column++)
+        {
+          char buf[256];
+          sprintf(buf, "%s", pathname_content_[column][row].c_str());
+          const bool is_selected = (selected_entry == row);
+          ImGui::TableSetColumnIndex(column);
+          if(ImGui::Selectable(buf, is_selected, selectable_flags))
           {
-            current_pathname_.append("/");
+            selected_entry = row;
+            if (ImGui::IsMouseDoubleClicked(0) && pathname_content_[2][selected_entry] == "Directory") // TODO: error prone to rely on strings
+            {
+              if (current_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
+              {
+                current_pathname_.append("/");
+              }
+              current_pathname_.append(pathname_content_[0][selected_entry]);
+              pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+              filter.Clear();
+              selected_entry = -1;
+              selected_filename[0] = '\0';
+              break; // IMPORTANT: because the following lines in the loop assume accessing old/previous pathname_content_'s data
+            }
           }
-          current_pathname_.append(pathname_content_[0][selected_entry]);
-          pathname_content_ = Utilities::getPathnameContent(current_pathname_);
-          filter.Clear();
-          selected_entry = -1;
-          selected_filename[0] = '\0';
-          break; // IMPORTANT: because the following lines in the loop assume accessing old/previous pathname_content_'s data
         }
       }
-
-      ImGui::NextColumn();
-      ImGui::Text("%s", pathname_content_[1][i].c_str()); ImGui::NextColumn();
-      ImGui::Text("%s", pathname_content_[2][i].c_str()); ImGui::NextColumn();
-      ImGui::Text("%s", pathname_content_[3][i].c_str()); ImGui::NextColumn();
+      ImGui::EndTable();
     }
-    ImGui::Columns(1);
-    // End of Columns - content_columns
     ImGui::EndChild();
 
     ImGui::Separator();

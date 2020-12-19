@@ -183,6 +183,27 @@ BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundQCComponentGroupsGetNam
   BOOST_CHECK_EQUAL(application_processor.getName(), "LoadSequenceSegmentFeatureBackgroundQCComponentGroups");
 }
 
+BOOST_AUTO_TEST_CASE(StoreSequenceFileAnalyst1)
+{
+  ApplicationHandler application_handler;
+  StoreSequenceFileAnalyst application_processor(application_handler);
+  BOOST_CHECK_EQUAL(application_processor.getName(), "StoreSequenceFileAnalyst");
+}
+
+BOOST_AUTO_TEST_CASE(StoreSequenceFileMasshunter1)
+{
+  ApplicationHandler application_handler;
+  StoreSequenceFileMasshunter application_processor(application_handler);
+  BOOST_CHECK_EQUAL(application_processor.getName(), "StoreSequenceFileMasshunter");
+}
+
+BOOST_AUTO_TEST_CASE(StoreSequenceFileXcalibur1)
+{
+  ApplicationHandler application_handler;
+  StoreSequenceFileXcalibur application_processor(application_handler);
+  BOOST_CHECK_EQUAL(application_processor.getName(), "StoreSequenceFileXcalibur");
+}
+
 BOOST_AUTO_TEST_CASE(SetRawDataPathnameGetName)
 {
   ApplicationHandler application_handler;

@@ -164,6 +164,24 @@ namespace SmartPeak
     const std::string getName() const override { return "LoadSequenceSegmentFeatureBackgroundQCComponentGroups"; };
   };
 
+  struct StoreSequenceFileAnalyst : ApplicationProcessor {
+    StoreSequenceFileAnalyst(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+    bool process() override;
+    const std::string getName() const override { return "StoreSequenceFileAnalyst"; };
+  };
+
+  struct StoreSequenceFileMasshunter : ApplicationProcessor {
+    StoreSequenceFileMasshunter(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+    bool process() override;
+    const std::string getName() const override { return "StoreSequenceFileMasshunter"; };
+  };
+
+  struct StoreSequenceFileXcalibur : ApplicationProcessor {
+    StoreSequenceFileXcalibur(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+    bool process() override;
+    const std::string getName() const override { return "StoreSequenceFileXcalibur"; };
+  };
+
   struct SetRawDataPathname : FilePickerProcessor {
     SetRawDataPathname(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
     bool process() override;

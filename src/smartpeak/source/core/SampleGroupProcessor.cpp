@@ -4,7 +4,7 @@
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/io/InputDataValidation.h>
-#include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
+#include <OpenMS/FORMAT/FeatureXMLFile.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
@@ -376,6 +376,13 @@ namespace SmartPeak
           f.setSubordinates(subs);
           subs.clear();
         }
+        else {
+          s = f; // Ensure all features have a subordinate for downstream filtering and quantitation
+          s.setMetaValue("native_id", f.getMetaValue("PeptideRef"));
+          subs.push_back(s);
+          f.setSubordinates(subs);
+          subs.clear();
+        }
         feature_map.push_back(f);
         f = OpenMS::Feature();
         f.setUniqueId();
@@ -426,8 +433,7 @@ namespace SmartPeak
           else {
             s.setMetaValue(feature_to_injection_to_value.first, value);
           }
-        }
-             
+        }             
       }
     }
 

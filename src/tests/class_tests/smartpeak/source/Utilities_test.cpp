@@ -402,9 +402,15 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
  #endif
   BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
 
+<<<<<<< HEAD
   BOOST_CHECK_EQUAL(c[0][43], "SequenceProcessor_sequence.csv");
   BOOST_CHECK_EQUAL(c[1][43], "1392"); // number of items within the folder
   BOOST_CHECK_EQUAL(c[2][43], ".csv");
+=======
+  BOOST_CHECK_EQUAL(c[0][44], "workflow_csv_files");
+  BOOST_CHECK_EQUAL(c[1][44], "22"); // number of items within the folder
+  BOOST_CHECK_EQUAL(c[2][44], "Directory");
+>>>>>>> develop
 }
 
 BOOST_AUTO_TEST_CASE(getParentPathname)
