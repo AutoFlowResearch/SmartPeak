@@ -8,6 +8,63 @@
 
 namespace SmartPeak
 {
+  enum ContentColumnID
+  {
+    ContentColumnID_Name,
+    ContentColumnID_Size,
+    ContentColumnID_Type,
+    ContentColumnID_DateModified
+  };
+
+  struct Content
+  {
+    const char* Name;
+    const char* Size;
+    const char* Type;
+    const char* DateModified;
+    
+      // We have a problem which is affecting _only this demo_ and should not affect your code:
+      // As we don't rely on std:: or other third-party library to compile dear imgui, we only have reliable access to qsort(),
+      // however qsort doesn't allow passing user data to comparing function.
+      // As a workaround, we are storing the sort specs in a static/global for the comparing function to access.
+      // In your own use case you would probably pass the sort specs to your sorting/comparing functions directly and not use a global.
+      // We could technically call ImGui::TableGetSortSpecs() in CompareWithSortSpecs(), but considering that this function is called
+      // very often by the sorting algorithm it would be a little wasteful.
+      static const ImGuiTableSortSpecs* s_current_sort_specs;
+
+      // Compare function to be used by qsort()
+      static int IMGUI_CDECL CompareWithSortSpecs(const void* lhs, const void* rhs)
+      {
+          const Content* a = (const Content*)lhs;
+          const Content* b = (const Content*)rhs;
+          for (int n = 0; n < s_current_sort_specs->SpecsCount; n++)
+          {
+              // Here we identify columns using the ColumnUserID value that we ourselves passed to TableSetupColumn()
+              // We could also choose to identify columns based on their index (sort_spec->ColumnIndex), which is simpler!
+              const ImGuiTableSortSpecsColumn* sort_spec = &s_current_sort_specs->Specs[n];
+              int delta = 0;
+              switch (sort_spec->ColumnUserID)
+              {
+              case ContentColumnID_Name:          delta = (strcmp(a->Name, b->Name));                 break;
+              case ContentColumnID_Size:          delta = (strcmp(a->Size, b->Size));                 break;
+              case ContentColumnID_Type:          delta = (strcmp(a->Type, b->Type));                 break;
+              case ContentColumnID_DateModified:  delta = (strcmp(a->DateModified, b->DateModified)); break;
+              default: IM_ASSERT(0); break;
+              }
+              if (delta > 0)
+                  return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? +1 : -1;
+              if (delta < 0)
+                  return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? -1 : +1;
+          }
+
+          // qsort() is instable so always return a way to differenciate items.
+          // Your own compare function may want to avoid fallback on implicit sort specs e.g. a Name compare if it wasn't already part of the sort specs.
+          return (strcmp(a->Name, b->Name));
+      }
+  };
+
+  const ImGuiTableSortSpecs* Content::s_current_sort_specs = NULL;
+
   void FilePicker::draw()
   {
     if (!ImGui::BeginPopupModal("Pick a pathname", NULL, ImGuiWindowFlags_NoResize)) {
@@ -69,18 +126,40 @@ namespace SmartPeak
     const char* column_names[column_count] = { "Name", "Size", "Type", "Date Modified" };
     static ImGuiTableColumnFlags column_flags[column_count] = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide
     };
+    static ContentColumnID content_column_ID[column_count] = { ContentColumnID_Name, ContentColumnID_Size, ContentColumnID_Type, ContentColumnID_DateModified };
     
     static ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
         ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable | ImGuiTableFlags_NoBordersInBody;
+    
+    static ImVector<Content> content_items;
+    content_items.resize(pathname_content_[0].size());
+    for (int row = 0; row < pathname_content_[0].size(); row++)
+    {
+      Content& content = content_items[row];
+      
+      content.Name          = pathname_content_[0][row].c_str();
+      content.Size          = pathname_content_[1][row].c_str();
+      content.Type          = pathname_content_[2][row].c_str();
+      content.DateModified  = pathname_content_[3][row].c_str();
+    }
     
     ImVec2 size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 2);
     if (ImGui::BeginTable("Content", column_count, table_flags, size))
     {
       for (int column = 0; column < column_count; column++){
-        ImGui::TableSetupColumn(column_names[column], column_flags[column]);
+        ImGui::TableSetupColumn(column_names[column], column_flags[column], -1.0f, content_column_ID[column]);
       }
       ImGui::TableSetupScrollFreeze(column_count, 1);
       ImGui::TableHeadersRow();
+      
+      if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
+      {
+        if (sorts_specs->SpecsDirty)
+        {
+          Content::s_current_sort_specs = sorts_specs;
+          //
+        }
+      }
 
       const ImGuiWindowFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick;
       for (int row = 0; row < pathname_content_[0].size(); row++)
