@@ -18,7 +18,7 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/SampleGroupHandler.h>
