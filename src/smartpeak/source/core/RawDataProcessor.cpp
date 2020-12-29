@@ -2084,6 +2084,12 @@ namespace SmartPeak
       }
       normalized_featureMap = rawDataHandler_IO.getFeatureMap();
       isotopelabelingmdvs.calculateIsotopicPurities(normalized_featureMap, experiment_data_mat, isotopic_purity_names);
+      
+      std::vector<OpenMS::String> keys;
+      normalized_featureMap.at(0).getKeys(keys);
+      for (auto key : keys)
+        std::cout << ">>>>>>>>>>>>>>>>>>>> RawDataProcessor - keys in featuremap[0] :" << key << "\n";
+      
       rawDataHandler_IO.setFeatureMap(normalized_featureMap);
       rawDataHandler_IO.updateFeatureMapHistory();
     }
