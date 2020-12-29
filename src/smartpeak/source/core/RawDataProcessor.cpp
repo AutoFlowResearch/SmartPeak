@@ -2078,12 +2078,18 @@ namespace SmartPeak
           for (std::sregex_iterator it = names_begin; it != std::sregex_iterator(); ++it)
           {
             isotopic_purity_names.push_back(it->str());
-            std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - isotopic_purity_names : " << it->str() << "\n";
           }
         }
       }
       normalized_featureMap = rawDataHandler_IO.getFeatureMap();
       isotopelabelingmdvs.calculateIsotopicPurities(normalized_featureMap, experiment_data_mat, isotopic_purity_names);
+      
+      for (auto& name :isotopic_purity_names)
+        std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - isotopic_purity_names : " << name << "\n";
+      
+      for (auto& vecs :experiment_data_mat)
+        for (auto& vec : vecs)
+          std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - experiment_data_mat : " << vec << "  ";
       
       std::vector<OpenMS::String> keys;
       normalized_featureMap.at(0).getKeys(keys);
