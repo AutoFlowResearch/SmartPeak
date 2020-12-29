@@ -2078,6 +2078,7 @@ namespace SmartPeak
           for (std::sregex_iterator it = names_begin; it != std::sregex_iterator(); ++it)
           {
             isotopic_purity_names.push_back(it->str());
+            std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - isotopic_purity_names : " << it->str() << "\n";
           }
         }
       }
