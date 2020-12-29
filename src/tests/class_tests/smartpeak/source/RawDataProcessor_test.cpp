@@ -2677,41 +2677,51 @@ BOOST_AUTO_TEST_CASE(calculateMDVAccuracies)
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
+  // for peptide SumFormula
   Filenames filenames;
   filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, {}, filenames);
   
-  CalculateMDVAccuracies        calculateMDVAccuracies;
-  OpenMS::Feature               lactate_1_normalized;
-  OpenMS::Feature               lactate_1_with_accuracy_info;
-  OpenMS::FeatureMap            lactate_1_featureMap;
-  OpenMS::FeatureMap            lactate_1_with_accuracy_info_featureMap;
-  std::vector<double>           L1_norm_max {1.00e+00, 3.324e-05, 2.825e-04, 7.174e-05};
-  std::vector<OpenMS::Feature>  L1_subordinates_normmax;
+  CalculateMDVAccuracies            calculateMDVAccuracies;
+  OpenMS::Feature                   feature_1;
+  OpenMS::FeatureMap                featureMap_1;
   
-  lactate_1_normalized.setMetaValue("PeptideRef", "Lactate1");
-  for (uint16_t i = 0; i < L1_norm_max.size(); ++i)
+  std::vector<double>               accoa_C23H37N7O17P3S_MRM_measured_13    {0.627, 0.253, 0.096, 0.02, 0.004, 0.001};
+  std::vector<double>               accoa_C23H37N7O17P3S_abs_diff           {0.0632108, 0.0505238, 0.0119821, 0.0014131614, 3.15669022e-05, 0.000323269283};
+  std::vector<double>               Average_accuracy_groundtruth            {0.02374, 0.03451}; // [accoa_13, fad_48]
+
+  std::map<std::string,std::string> theoretical_formulas                    {{"accoa","C23H37N7O17P3S"},{"fad","C27H32N9O15P2"}};
+
+  std::vector<OpenMS::Feature>      L1_subordinates, L2_subordinates;
+  
+  feature_1.setMetaValue("peptideRef", "accoa");
+  for (uint16_t i = 0; i < accoa_C23H37N7O17P3S_MRM_measured_13.size(); ++i)
   {
     OpenMS::Feature sub;
     sub.setMetaValue("native_id", "Lactate1_"+std::to_string(117+i));
-    sub.setMetaValue("peak_apex_int", L1_norm_max[i]);
-    L1_subordinates_normmax.push_back(sub);
+    sub.setMetaValue("peak_apex_int", accoa_C23H37N7O17P3S_MRM_measured_13[i]);
+    L1_subordinates.push_back(sub);
   }
-  lactate_1_normalized.setSubordinates(L1_subordinates_normmax);
+  feature_1.setSubordinates(L1_subordinates);
 
   for (uint8_t i = 0; i < 3; ++i)
   {
-    lactate_1_featureMap.push_back(lactate_1_normalized);
+    featureMap_1.push_back(feature_1);
   }
 
-  rawDataHandler.setFeatureMap(lactate_1_featureMap);
+  rawDataHandler.setFeatureMap(featureMap_1);
   calculateMDVAccuracies.process(rawDataHandler, params_1, filenames);
-  lactate_1_with_accuracy_info_featureMap = rawDataHandler.getFeatureMap();
-   
-  for (uint8_t i = 0; i < lactate_1_with_accuracy_info_featureMap.size(); ++i)
+  featureMap_1 = rawDataHandler.getFeatureMap();
+
+  for (size_t i = 0; i < featureMap_1.size(); ++i)
   {
-    BOOST_CHECK_CLOSE( (double)(lactate_1_with_accuracy_info_featureMap.at(i).getMetaValue("average_accuracy")), 0.0237455, 1e-2 );
+    BOOST_CHECK_CLOSE( (float)featureMap_1.at(i).getMetaValue("average_accuracy"), Average_accuracy_groundtruth[0], 1e-1 );
+
+    for (size_t feature_subordinate = 0; feature_subordinate < featureMap_1.at(i).getSubordinates().size(); ++feature_subordinate)
+    {
+      BOOST_CHECK_CLOSE( (float)featureMap_1.at(i).getSubordinates().at(feature_subordinate).getMetaValue("absolute_difference"), accoa_C23H37N7O17P3S_abs_diff[feature_subordinate], 1e-3 );
+    }
   }
 }
 ///

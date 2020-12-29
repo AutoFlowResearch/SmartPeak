@@ -1933,7 +1933,7 @@ namespace SmartPeak
       OpenMS::FeatureMap normalized_featureMap;
       std::vector<std::map<std::string, std::string>> CalculateMDVs_params = params_I.find("CalculateMDVs")->second;
       
-      OpenMS::IsotopeLabelingMDVs::FeatureName feature_name;
+      std::string feature_name;
       OpenMS::IsotopeLabelingMDVs::MassIntensityType mass_intensity_type;
       for(auto& param : CalculateMDVs_params)
       {
@@ -1950,14 +1950,7 @@ namespace SmartPeak
         }
         else if (param.find("name")->second == "feature_name")
         {
-          if (param.find("value")->second == "intensity")
-          {
-            feature_name = OpenMS::IsotopeLabelingMDVs::FeatureName::INTENSITY;
-          }
-          else if (param.find("value")->second == "peak_apex_int")
-          {
-            feature_name = OpenMS::IsotopeLabelingMDVs::FeatureName::PEAK_APEX_INT;
-          }
+          feature_name = param.find("name")->second;
         }
       }
       
@@ -1972,7 +1965,7 @@ namespace SmartPeak
     LOGD << "END calculateMDVs";
   }
 
-  void IsotopicCorrections::process( // TODO:captitalise
+  void IsotopicCorrections::process(
     RawDataHandler& rawDataHandler_IO,
     const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
     const Filenames& filenames
@@ -2039,25 +2032,57 @@ namespace SmartPeak
       OpenMS::FeatureMap normalized_featureMap;
       std::vector<std::map<std::string, std::string>> CalculateIsotopicPurities_params = params_I.find("CalculateIsotopicPurities")->second;
       
-      std::string experiment_data_s, isotopic_purity_name;
-      std::vector<double> experiment_data;
+      std::vector<std::string> isotopic_purity_names;
+      std::vector<std::vector<double>> experiment_data_mat;
       for(auto& param : CalculateIsotopicPurities_params)
       {
         if (param.find("name")->second == "isotopic_purity_values" && !param.find("value")->second.empty())
         {
+          std::string experiment_data_s;
+          std::vector<double> experiment_data;
           experiment_data_s = param.find("value")->second;
           std::regex regex_double("[+-]?\\d+(?:\\.\\d+)?");
+          std::regex regex_list("[([^]]+)]");
+          auto lists_begin = std::sregex_iterator(experiment_data_s.begin(), experiment_data_s.end(), regex_list);
+          size_t num_lists = std::distance(lists_begin, std::sregex_iterator());
+          experiment_data_mat.resize(num_lists);
           std::sregex_iterator values_begin = std::sregex_iterator(experiment_data_s.begin(), experiment_data_s.end(), regex_double);
           std::sregex_iterator values_end = std::sregex_iterator();
+          auto num_values = std::distance(values_begin , values_end);
           for (std::sregex_iterator it = values_begin; it != values_end; ++it)
+          {
             experiment_data.push_back(std::stod(it->str()));
+          }
+          
+          size_t element_idx = 0;
+          size_t list_idx = 0;
+          do
+          {
+            do
+            {
+              experiment_data_mat.at(list_idx).push_back(experiment_data.at(element_idx));
+              element_idx++;
+                
+              if (element_idx > 0 && element_idx % (num_values / num_lists) == 0) list_idx++;
+            }
+            while ((element_idx > 0 && element_idx % (num_values / num_lists) != 0));
+          }
+          while (list_idx < num_lists);
         }
         if (param.find("name")->second == "isotopic_purity_name" && !param.find("value")->second.empty())
         {
-          isotopic_purity_name = param.find("value")->second;
+          std::string isotopic_purity_name_s;
+          isotopic_purity_name_s = param.find("value")->second;
+          std::regex regex_string_list{R"([<\[" ]?([^<>\[\]'," =\x0a\x0d]+)[>\[" ]?)"};
+          std::sregex_iterator names_begin = std::sregex_iterator(isotopic_purity_name_s.begin(), isotopic_purity_name_s.end(), regex_string_list);
+          for (std::sregex_iterator it = names_begin; it != std::sregex_iterator(); ++it)
+          {
+            isotopic_purity_names.push_back(it->str());
+          }
         }
       }
-      isotopelabelingmdvs.calculateIsotopicPurities(rawDataHandler_IO.getFeatureMap(), normalized_featureMap, experiment_data, isotopic_purity_name);
+      normalized_featureMap = rawDataHandler_IO.getFeatureMap();
+      isotopelabelingmdvs.calculateIsotopicPurities(normalized_featureMap, experiment_data_mat, isotopic_purity_names);
       rawDataHandler_IO.setFeatureMap(normalized_featureMap);
       rawDataHandler_IO.updateFeatureMapHistory();
     }
@@ -2092,40 +2117,31 @@ namespace SmartPeak
       std::vector<std::map<std::string, std::string>> CalculateMDVAccuracies_params = params_I.find("CalculateMDVAccuracies")->second;
       
       std::vector<double> fragment_isotopomer_measured;
+      std::string fragment_isotopomer_theoretical_formula, fragment_isotopomer_measured_s, feature_name;
+      std::map<std::string, std::string> proteinName_to_SumFormula ;
       
-      std::string fragment_isotopomer_theoretical_formula, fragment_isotopomer_measured_s;
-      double tmp, tmp2;
+      for (auto& peptide : rawDataHandler_IO.getTargetedExperiment().getPeptides())
+      {
+        if (peptide.metaValueExists("SumFormula") && !peptide.id.empty()
+            && proteinName_to_SumFormula.find((std::string)(peptide.id)) == proteinName_to_SumFormula.end())
+        {
+          proteinName_to_SumFormula.insert(std::make_pair((std::string)(peptide.id), (std::string)peptide.getMetaValue("SumFormula")));
+        }
+      }
+      
       for(auto& param : CalculateMDVAccuracies_params)
       {
-        if (param.find("name")->second == "fragment_isotopomer_measured")
+        if (param.find("name")->second == "feature_name")
         {
           if (!param.find("value")->second.empty())
           {
-            fragment_isotopomer_measured_s = param.find("value")->second;
-            std::regex regex_double("[+-]?\\d+(?:\\.\\d+)?");
-            std::sregex_iterator values_begin = std::sregex_iterator(fragment_isotopomer_measured_s.begin(), fragment_isotopomer_measured_s.end(), regex_double);
-            std::sregex_iterator values_end = std::sregex_iterator();
-            for (std::sregex_iterator it = values_begin; it != values_end; ++it)
-              fragment_isotopomer_measured.push_back(std::stod(it->str()));
-          }
-          
-          if (!param.find("description")->second.empty())
-          {
-            std::string fragment_isotopomer_id =param.find("description")->second;
-            
-            for (auto& peptide : rawDataHandler_IO.getTargetedExperiment().getPeptides())
-            {
-              if (peptide.metaValueExists("SumFormula") && peptide.id == fragment_isotopomer_id)
-              {
-                fragment_isotopomer_theoretical_formula = (std::string)peptide.getMetaValue("SumFormula");
-              }
-            }
+            feature_name =  param.find("value")->second;
           }
         }
       }
       
-      isotopelabelingmdvs.calculateMDVAccuracies(rawDataHandler_IO.getFeatureMap(), featureMap_with_accuracy_info,
-                                                 fragment_isotopomer_measured, fragment_isotopomer_theoretical_formula);
+      featureMap_with_accuracy_info = rawDataHandler_IO.getFeatureMap();
+      isotopelabelingmdvs.calculateMDVAccuracies(featureMap_with_accuracy_info, feature_name, proteinName_to_SumFormula);
       rawDataHandler_IO.setFeatureMap(featureMap_with_accuracy_info);
       rawDataHandler_IO.updateFeatureMapHistory();
     }
