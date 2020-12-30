@@ -2068,6 +2068,11 @@ namespace SmartPeak
             while ((element_idx > 0 && element_idx % (num_values / num_lists) != 0));
           }
           while (list_idx < num_lists);
+          
+          for (auto& vecs :experiment_data_mat)
+            for (auto& vec : vecs)
+              std::cout << "params>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - experiment_data_mat : " << vec << "  ";
+          
         }
         if (param.find("name")->second == "isotopic_purity_name" && !param.find("value")->second.empty())
         {
