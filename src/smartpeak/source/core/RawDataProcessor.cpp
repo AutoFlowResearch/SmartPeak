@@ -2073,7 +2073,8 @@ namespace SmartPeak
         {
           std::string isotopic_purity_name_s;
           isotopic_purity_name_s = param.find("value")->second;
-          std::regex regex_string_list{R"([<\[" ]?([^<>\[\]'," =\x0a\x0d]+)[>\[" ]?)"};
+//          std::regex regex_string_list{R"([<\[" ]?([^<>\[\]'," =\x0a\x0d]+)[>\[" ]?)"};
+          std::regex regex_string_list("[^\"\',\[]+(?=')");
           std::sregex_iterator names_begin = std::sregex_iterator(isotopic_purity_name_s.begin(), isotopic_purity_name_s.end(), regex_string_list);
           for (std::sregex_iterator it = names_begin; it != std::sregex_iterator(); ++it)
           {
