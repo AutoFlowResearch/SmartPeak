@@ -2043,9 +2043,10 @@ namespace SmartPeak
           experiment_data_s = param.find("value")->second;
           std::regex regex_double("[+-]?\\d+(?:\\.\\d+)?");
 //          std::regex regex_list("[([^]]+)]");
-          std::regex regex_list{R"([([^]]+)])"};
-          auto lists_begin = std::sregex_iterator(experiment_data_s.begin(), experiment_data_s.end(), regex_list);
-          size_t num_lists = std::distance(lists_begin, std::sregex_iterator());
+//          std::regex regex_list{R"([([^]]+)])"};
+//          auto lists_begin = std::sregex_iterator(experiment_data_s.begin(), experiment_data_s.end(), regex_list);
+//          size_t num_lists = std::distance(lists_begin, std::sregex_iterator());
+          size_t num_lists = std::count(experiment_data_s.begin(), experiment_data_s.end(), '[') == std::count(experiment_data_s.begin(), experiment_data_s.end(), ']') ? std::count(experiment_data_s.begin(), experiment_data_s.end(), '[') : 0;
           
           std::cout << "params>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - num_lists : " << num_lists << "  \n";
           
