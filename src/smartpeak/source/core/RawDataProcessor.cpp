@@ -2043,7 +2043,7 @@ namespace SmartPeak
           experiment_data_s = param.find("value")->second;
           std::regex regex_double("[+-]?\\d+(?:\\.\\d+)?");
 //          std::regex regex_list("[([^]]+)]");
-          std::regex regex_list("\[([^]]+)\]");
+          std::regex regex_list{R"([([^]]+)])"};
           auto lists_begin = std::sregex_iterator(experiment_data_s.begin(), experiment_data_s.end(), regex_list);
           size_t num_lists = std::distance(lists_begin, std::sregex_iterator());
           
