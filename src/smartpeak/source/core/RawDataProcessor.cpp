@@ -2042,25 +2042,13 @@ namespace SmartPeak
           std::vector<double> experiment_data;
           experiment_data_s = param.find("value")->second;
           std::regex regex_double("[+-]?\\d+(?:\\.\\d+)?");
-//          std::regex regex_list("[([^]]+)]");
-//          std::regex regex_list{R"([([^]]+)])"};
-//          auto lists_begin = std::sregex_iterator(experiment_data_s.begin(), experiment_data_s.end(), regex_list);
-//          size_t num_lists = std::distance(lists_begin, std::sregex_iterator());
           size_t num_lists = std::count(experiment_data_s.begin(), experiment_data_s.end(), '[') == std::count(experiment_data_s.begin(), experiment_data_s.end(), ']') ? std::count(experiment_data_s.begin(), experiment_data_s.end(), '[') : 0;
-          
-          std::cout << "params>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - num_lists : " << num_lists << "  \n";
-          
           experiment_data_mat.resize(num_lists);
           std::sregex_iterator values_begin = std::sregex_iterator(experiment_data_s.begin(), experiment_data_s.end(), regex_double);
           std::sregex_iterator values_end = std::sregex_iterator();
           auto num_values = std::distance(values_begin , values_end);
           for (std::sregex_iterator it = values_begin; it != values_end; ++it)
-          {
             experiment_data.push_back(std::stod(it->str()));
-          }
-          
-          for (auto& val : experiment_data)
-            std::cout << "params>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - experiment_data : " << num_lists << "  - ";
           
           size_t element_idx = 0;
           size_t list_idx = 0;
@@ -2076,41 +2064,19 @@ namespace SmartPeak
             while ((element_idx > 0 && element_idx % (num_values / num_lists) != 0));
           }
           while (list_idx < num_lists);
-          
-          for (auto& vecs :experiment_data_mat)
-            for (auto& vec : vecs)
-              std::cout << "params>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - experiment_data_mat : " << vec << "  ";
-          
         }
         if (param.find("name")->second == "isotopic_purity_name" && !param.find("value")->second.empty())
         {
           std::string isotopic_purity_name_s;
           isotopic_purity_name_s = param.find("value")->second;
-//          std::regex regex_string_list{R"([<\[" ]?([^<>\[\]'," =\x0a\x0d]+)[>\[" ]?)"};
           std::regex regex_string_list("[^\"\',\[]+(?=')");
           std::sregex_iterator names_begin = std::sregex_iterator(isotopic_purity_name_s.begin(), isotopic_purity_name_s.end(), regex_string_list);
           for (std::sregex_iterator it = names_begin; it != std::sregex_iterator(); ++it)
-          {
-            std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - isotopic_purity_names.push_back(it->str()) : " << it->str() << "\n";
             isotopic_purity_names.push_back(it->str());
-          }
         }
       }
       normalized_featureMap = rawDataHandler_IO.getFeatureMap();
       isotopelabelingmdvs.calculateIsotopicPurities(normalized_featureMap, experiment_data_mat, isotopic_purity_names);
-      
-      for (auto& name :isotopic_purity_names)
-        std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - isotopic_purity_names : " << name << "\n";
-      
-      for (auto& vecs :experiment_data_mat)
-        for (auto& vec : vecs)
-          std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> RawDataProcessor - experiment_data_mat : " << vec << "  ";
-      
-      std::vector<OpenMS::String> keys;
-      normalized_featureMap.at(0).getKeys(keys);
-      for (auto key : keys)
-        std::cout << ">>>>>>>>>>>>>>>>>>>> RawDataProcessor - keys in featuremap[0] :" << key << "\n";
-      
       rawDataHandler_IO.setFeatureMap(normalized_featureMap);
       rawDataHandler_IO.updateFeatureMapHistory();
     }

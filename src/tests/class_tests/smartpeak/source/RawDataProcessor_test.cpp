@@ -2663,8 +2663,6 @@ BOOST_AUTO_TEST_CASE(calculateIsotopicPurities)
   lactate_1_with_isotopic_purity_featureMap = rawDataHandler.getFeatureMap();
   std::vector<OpenMS::String> keys;
   lactate_1_with_isotopic_purity_featureMap.at(0).getKeys(keys);
-  for (auto key : keys)
-    std::cout << ">>>>>>>>>>>>>>>>>>>> keys in featuremap[0] :" << key << "\n";
 
   for(uint8_t i = 0; i < lactate_1_with_isotopic_purity_featureMap.size(); ++i)
   {
