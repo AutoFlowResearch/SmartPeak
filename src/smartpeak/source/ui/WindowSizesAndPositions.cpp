@@ -12,6 +12,12 @@ namespace SmartPeak
     right_window_x_perc_ = right_window_x_perc;
     // TODO: check that the percentages equal 1
   }
+  void WindowSizesAndPositions::setLeftWindowXSize(const float& left_window_x_size) {
+    left_window_x_perc_ = left_window_x_size / x_size_;
+  }
+  void WindowSizesAndPositions::setTopWindowYSize(const float& top_window_y_size) {
+    bottom_window_y_perc_ = 1 - (top_window_y_size / y_size_);
+  }
   void WindowSizesAndPositions::setWindowSizesAndPositions_(const float& bottom_window_y_perc, const float& left_window_x_perc, const float& right_window_x_perc) {
     // Absolute sizes
     bottom_window_y_size_ = bottom_window_y_perc * y_size_;
