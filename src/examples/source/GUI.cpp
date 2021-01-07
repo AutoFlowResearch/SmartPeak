@@ -645,7 +645,6 @@ int main(int argc, char **argv)
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags left_window_flags =
         ImGuiWindowFlags_NoTitleBar |
-        ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoFocusOnAppearing;
@@ -692,6 +691,8 @@ int main(int argc, char **argv)
         }
         ImGui::EndTabBar();
       }
+      win_size_and_pos.setLeftWindowXSize(ImGui::GetWindowWidth());
+      win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
       ImGui::End();
       ImGui::PopStyleVar();
     }
@@ -704,7 +705,6 @@ int main(int argc, char **argv)
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags top_window_flags =
         ImGuiWindowFlags_NoTitleBar |
-        ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoFocusOnAppearing;
@@ -999,6 +999,9 @@ int main(int argc, char **argv)
         }
         ImGui::EndTabBar();
       }
+      win_size_and_pos.setTopWindowYSize(ImGui::GetWindowHeight());
+      win_size_and_pos.setLeftWindowXSize(ImGui::GetWindowPos().x);
+      win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
       ImGui::End();
       ImGui::PopStyleVar();
     }
