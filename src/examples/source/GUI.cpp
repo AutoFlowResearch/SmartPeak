@@ -101,12 +101,14 @@ int main(int argc, char **argv)
   bool show_chromatogram_legend = true;
   float chromatogram_slider_min = 0.0f;
   float chromatogram_slider_max = 0.0f;
+  bool chromatogram_compact_view = true;
 
   // Spectra display option
   bool spectra_initialized = false;
   bool show_spectra_legend = true;
   float spectra_slider_min = 0.0f;
   float spectra_slider_max = 0.0f;
+  bool spectra_compact_view = true;
 
   // Popup modals
   bool popup_about_ = false;
@@ -967,7 +969,7 @@ int main(int argc, char **argv)
             session_handler_.chrom_x_axis_title, session_handler_.chrom_y_axis_title,
             session_handler_.chrom_time_range.first, session_handler_.chrom_time_range.second, session_handler_.chrom_intensity_min, session_handler_.chrom_intensity_max,
             win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_,
-            "Chromatograms Main Window", show_chromatogram_legend, chromatogram_slider_min, chromatogram_slider_max);
+            "Chromatograms Main Window", show_chromatogram_legend, chromatogram_slider_min, chromatogram_slider_max, chromatogram_compact_view);
           plot2d.draw();
           ImGui::EndTabItem();
         }
@@ -1000,7 +1002,7 @@ int main(int argc, char **argv)
             session_handler_.spec_x_axis_title, session_handler_.spec_y_axis_title,
             session_handler_.spec_mz_range.first, session_handler_.spec_mz_range.second, session_handler_.spec_intensity_min, session_handler_.spec_intensity_max,
             win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, 
-            "Spectra Main Window", show_spectra_legend, spectra_slider_min, spectra_slider_max);
+            "Spectra Main Window", show_spectra_legend, spectra_slider_min, spectra_slider_max, spectra_compact_view);
           plot2d.draw();
           ImGui::EndTabItem();
         }
