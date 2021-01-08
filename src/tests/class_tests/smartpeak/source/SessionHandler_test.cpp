@@ -655,6 +655,14 @@ BOOST_AUTO_TEST_CASE(setFeatureMatrix1)
   session_handler.setFeatureMatrix(testData.sequenceHandler);
 }
 
+BOOST_AUTO_TEST_CASE(resetChromatogramRange1)
+{
+  SessionHandler session_handler;
+  session_handler.resetChromatogramRange();
+  BOOST_CHECK_CLOSE(session_handler.chrom_time_range.first, 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(session_handler.chrom_time_range.second, 1800.0, 1e-3);
+}
+
 BOOST_AUTO_TEST_CASE(setChromatogramScatterPlot1)
 {
   TestData testData;
@@ -662,6 +670,13 @@ BOOST_AUTO_TEST_CASE(setChromatogramScatterPlot1)
   session_handler.setChromatogramScatterPlot(testData.sequenceHandler);
 }
 
+BOOST_AUTO_TEST_CASE(resetSpectrumRange1)
+{
+  SessionHandler session_handler;
+  session_handler.resetSpectrumRange();
+  BOOST_CHECK_CLOSE(session_handler.spec_mz_range.first, 0.0, 1e-3);
+  BOOST_CHECK_CLOSE(session_handler.spec_mz_range.second, 2000.0, 1e-3);
+}
 
 BOOST_AUTO_TEST_CASE(setSpectrumScatterPlot1)
 {
