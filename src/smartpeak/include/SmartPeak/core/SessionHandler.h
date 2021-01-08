@@ -69,6 +69,10 @@ namespace SmartPeak
     */
     bool setChromatogramScatterPlot(const SequenceHandler& sequence_handler);
     /*
+    @brief reset range to large enough value in order to parse the chromatogram entirely
+    */
+    void resetChromatogramRange();
+    /*
     @brief Sets the spectrum data
 
     @param[in] sequence_handler
@@ -76,6 +80,10 @@ namespace SmartPeak
     @returns true if all points were added and false if points were omitted due to performance
     */
     bool setSpectrumScatterPlot(const SequenceHandler& sequence_handler);
+    /*
+    @brief reset range to large enough value in order to parse the spectrogram entirely
+    */
+    void resetSpectrumRange();
     void setFeatureLinePlot();
     void setFeatureHeatMap();
     /*
@@ -235,16 +243,20 @@ namespace SmartPeak
     std::vector<std::string> chrom_series_hull_names,chrom_series_raw_names;
     std::string chrom_x_axis_title;
     std::string chrom_y_axis_title;
-    float chrom_time_min, chrom_time_max, chrom_intensity_min, chrom_intensity_max;
-    std::pair<float, float> chrom_time_range = std::make_pair(0, 1800);
+    float chrom_time_min = 0.0f;
+    float chrom_time_max = 0.0f;
+    float chrom_intensity_min, chrom_intensity_max;
+    std::pair<float, float> chrom_time_range;
     // data for the spectrum scatter plot
     std::vector<std::vector<float>> spec_mz_hull_data, spec_intensity_hull_data;
     std::vector<std::vector<float>> spec_mz_raw_data, spec_intensity_raw_data;
     std::vector<std::string> spec_series_hull_names, spec_series_raw_names;
     std::string spec_x_axis_title;
     std::string spec_y_axis_title;
-    float spec_mz_min, spec_mz_max, spec_intensity_min, spec_intensity_max;
-    std::pair<float, float> spec_mz_range = std::make_pair(0, 2000);
+    float spec_mz_min = 0.0f;
+    float spec_mz_max = 0.0f;
+    float spec_intensity_min, spec_intensity_max;
+    std::pair<float, float> spec_mz_range;
     // data for the feature line plot
     Eigen::Tensor<float, 2> feat_sample_data, feat_value_data;
     Eigen::Tensor<std::string, 1> feat_line_series_names;

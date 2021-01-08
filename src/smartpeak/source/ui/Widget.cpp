@@ -217,18 +217,38 @@ namespace SmartPeak
 
   void ChromatogramPlotWidget::draw()
   {
+    // Widget's controls - that ImGui does not support natively
+    const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_AlwaysClamp;
+    float controls_pos_start_y = ImGui::GetCursorPosY();
+    ImGui::SliderFloat((std::string("min ") + x_axis_title_).c_str(), &x_min_, range_min_, x_max_, "%.4f", slider_flags);
+    ImGui::SliderFloat((std::string("max ") + x_axis_title_).c_str(), &x_max_, x_min_, range_max_, "%.4f", slider_flags);
+    ImGui::SameLine();
+    ImGui::Checkbox("Legend", &show_legend_);
+    float controls_pos_end_y = ImGui::GetCursorPosY();
     // Main graphic
+    float graphic_height = plot_height_ - (controls_pos_end_y - controls_pos_start_y);
     ImPlot::SetNextPlotLimits(x_min_, x_max_, y_min_, y_max_, ImGuiCond_Always);
-    if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(plot_width_ - 25, plot_height_ - 40))) {
-      for (int i = 0; i < x_data_scatter_.size(); ++i) {
+    ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
+    if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(plot_width_ - 25, graphic_height - 40), plotFlags)) {
+      int i = 0;
+      for (const auto& serie_name_scatter : series_names_scatter_)
+      {
         assert(x_data_scatter_.at(i).size() == y_data_scatter_.at(i).size());
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_None);
-        ImPlot::PlotLine(series_names_scatter_.at(i).c_str(), x_data_scatter_.at(i).data(), y_data_scatter_.at(i).data(), x_data_scatter_.at(i).size());
-      }
-      for (int i = 0; i < x_data_area_.size(); ++i) {
-        assert(x_data_area_.at(i).size() == y_data_area_.at(i).size());
-        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotScatter(series_names_area_.at(i).c_str(), x_data_area_.at(i).data(), y_data_area_.at(i).data(), x_data_area_.at(i).size());
+        ImPlot::PlotLine(serie_name_scatter.c_str(), x_data_scatter_.at(i).data(), y_data_scatter_.at(i).data(), x_data_scatter_.at(i).size());
+        ImPlotMarker plot_marker = ImPlotMarker_Circle;
+        for (int  j = 0; j < x_data_area_.size(); ++j) {
+          // Corresponding serie names are supposed to start with same name as the scatter name
+          if (series_names_area_.at(j).rfind(serie_name_scatter) == 0)
+          {
+            assert(x_data_area_.at(j).size() == y_data_area_.at(j).size());
+            ImPlot::PushStyleVar(ImPlotStyleVar_Marker, plot_marker);
+            ImPlot::PlotScatter(serie_name_scatter.c_str(), x_data_area_.at(j).data(), y_data_area_.at(j).data(), x_data_area_.at(j).size());
+            plot_marker <<= 1;
+            if (plot_marker > ImPlotMarker_Asterisk) plot_marker = ImPlotMarker_Circle;
+          }
+        }
+        ++i;
       }
       ImPlot::EndPlot();
     }

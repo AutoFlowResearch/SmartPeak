@@ -179,12 +179,15 @@ namespace SmartPeak
   public:
     ChromatogramPlotWidget(const std::vector<std::vector<float>>&x_data_scatter, const std::vector<std::vector<float>>&y_data_scatter, const std::vector<std::string>&series_names_scatter,
       const std::vector<std::vector<float>>&x_data_area, const std::vector<std::vector<float>>&y_data_area, const std::vector<std::string>&series_names_area,
-      const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
-      const float& plot_width, const float& plot_height, const std::string& plot_title) :
+      const std::string& x_axis_title, const std::string& y_axis_title, float& x_min, float& x_max, const float& y_min, const float& y_max,
+      const float& plot_width, const float& plot_height, const std::string& plot_title, bool& show_legend, 
+      float& range_min, float& range_max) :
       x_data_scatter_(x_data_scatter), y_data_scatter_(y_data_scatter), series_names_scatter_(series_names_scatter),
       x_data_area_(x_data_area), y_data_area_(y_data_area), series_names_area_(series_names_area),
       x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
-      x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title) {};
+      x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title),
+      show_legend_(show_legend), 
+      range_min_(range_min), range_max_(range_max) {};
     void draw() override;
     const std::vector<std::vector<float>>& x_data_scatter_;
     const std::vector<std::vector<float>>& y_data_scatter_;
@@ -194,13 +197,16 @@ namespace SmartPeak
     const std::vector<std::string>& series_names_area_;
     const std::string& x_axis_title_;
     const std::string& y_axis_title_;
-    const float& x_min_;
-    const float& x_max_;
+    float& x_min_;
+    float& x_max_;
     const float& y_min_;
     const float& y_max_;
     const float& plot_width_;
     const float& plot_height_;
     const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
+    bool& show_legend_;
+    const float& range_min_; // range for the sliders
+    const float& range_max_;
   };
 
   /**

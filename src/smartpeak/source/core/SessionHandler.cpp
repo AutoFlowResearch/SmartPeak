@@ -1609,6 +1609,10 @@ namespace SmartPeak
       }
     }
   }
+  void SessionHandler::resetChromatogramRange()
+  {
+    chrom_time_range = std::make_pair(0, 1800);
+  }
   bool SessionHandler::setChromatogramScatterPlot(const SequenceHandler & sequence_handler)
   {
     const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
@@ -1727,6 +1731,10 @@ namespace SmartPeak
     }
     if (n_points < MAX_POINTS) return true;
     else return false;
+  }
+  void SessionHandler::resetSpectrumRange()
+  {
+    spec_mz_range = std::make_pair(0, 2000);
   }
   bool SessionHandler::setSpectrumScatterPlot(const SequenceHandler& sequence_handler)
   {
