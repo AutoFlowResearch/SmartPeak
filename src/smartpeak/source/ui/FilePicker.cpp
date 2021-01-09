@@ -10,60 +10,99 @@ namespace SmartPeak
 {
   enum ContentColumnID
   {
+    ContentColumnID_ID,
     ContentColumnID_Name,
     ContentColumnID_Size,
     ContentColumnID_Type,
     ContentColumnID_DateModified
   };
 
-  struct Content
+  struct ImDirectoryEntry
   {
+    int         ID;
     const char* Name;
     const char* Size;
     const char* Type;
     const char* DateModified;
     
-      // We have a problem which is affecting _only this demo_ and should not affect your code:
-      // As we don't rely on std:: or other third-party library to compile dear imgui, we only have reliable access to qsort(),
-      // however qsort doesn't allow passing user data to comparing function.
-      // As a workaround, we are storing the sort specs in a static/global for the comparing function to access.
-      // In your own use case you would probably pass the sort specs to your sorting/comparing functions directly and not use a global.
-      // We could technically call ImGui::TableGetSortSpecs() in CompareWithSortSpecs(), but considering that this function is called
-      // very often by the sorting algorithm it would be a little wasteful.
-      static const ImGuiTableSortSpecs* s_current_sort_specs;
+    static const ImGuiTableSortSpecs* s_current_sort_specs;
 
-      // Compare function to be used by qsort()
-      static int IMGUI_CDECL CompareWithSortSpecs(const void* lhs, const void* rhs)
+    static int IMGUI_CDECL CompareWithSortSpecs(const void* lhs, const void* rhs)
+    {
+      const ImDirectoryEntry* a = (const ImDirectoryEntry*)lhs;
+      const ImDirectoryEntry* b = (const ImDirectoryEntry*)rhs;
+      for (int n = 0; n < s_current_sort_specs->SpecsCount; n++)
       {
-          const Content* a = (const Content*)lhs;
-          const Content* b = (const Content*)rhs;
-          for (int n = 0; n < s_current_sort_specs->SpecsCount; n++)
-          {
-              // Here we identify columns using the ColumnUserID value that we ourselves passed to TableSetupColumn()
-              // We could also choose to identify columns based on their index (sort_spec->ColumnIndex), which is simpler!
-              const ImGuiTableSortSpecsColumn* sort_spec = &s_current_sort_specs->Specs[n];
-              int delta = 0;
-              switch (sort_spec->ColumnUserID)
-              {
-              case ContentColumnID_Name:          delta = (strcmp(a->Name, b->Name));                 break;
-              case ContentColumnID_Size:          delta = (strcmp(a->Size, b->Size));                 break;
-              case ContentColumnID_Type:          delta = (strcmp(a->Type, b->Type));                 break;
-              case ContentColumnID_DateModified:  delta = (strcmp(a->DateModified, b->DateModified)); break;
-              default: IM_ASSERT(0); break;
-              }
-              if (delta > 0)
-                  return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? +1 : -1;
-              if (delta < 0)
-                  return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? -1 : +1;
-          }
+        const ImGuiTableSortSpecsColumn* sort_spec = &s_current_sort_specs->Specs[n];
+        int delta = 0;
+        switch (sort_spec->ColumnUserID)
+        {
+          case ContentColumnID_ID:
+            delta = (a->ID - b->ID);
+            break;
+            
+          case ContentColumnID_Name:
+            {
+              std::string a_str, b_str;
+              a_str = a->Name;
+              b_str = b->Name;
+              std::string a_str_lowercased(a_str.length(),' ');
+              std::string b_str_lowercased(b_str.length(),' ');
+              std::transform(a_str.begin(), a_str.end(), a_str_lowercased.begin(), tolower);
+              std::transform(b_str.begin(), b_str.end(), b_str_lowercased.begin(), tolower);
 
-          // qsort() is instable so always return a way to differenciate items.
-          // Your own compare function may want to avoid fallback on implicit sort specs e.g. a Name compare if it wasn't already part of the sort specs.
-          return (strcmp(a->Name, b->Name));
+              if  (!a_str_lowercased.empty() && !b_str_lowercased.empty() && a_str_lowercased.front()==b_str_lowercased.front()) {
+                delta = a_str.compare(b_str);
+              }
+              else
+              {
+                // case-insensitive lexicographic sort
+                delta = a_str_lowercased.compare(b_str_lowercased);
+              }
+            }
+            break;
+            
+          case ContentColumnID_Size:
+            delta = ((std::stol(a->Size) - std::stol(b->Size)));
+            break;
+            
+          case ContentColumnID_Type:
+            delta = (strcmp(a->Type, b->Type));
+            break;
+            
+          case ContentColumnID_DateModified:
+            delta = (strcmp(a->DateModified, b->DateModified));
+            break;
+            
+          default: IM_ASSERT(0); break;
+        }
+        if (delta > 0)
+          return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? +1 : -1;
+        if (delta < 0)
+          return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? -1 : +1;
       }
+      return (strcmp(a->Name, b->Name));
+    }
   };
 
-  const ImGuiTableSortSpecs* Content::s_current_sort_specs = NULL;
+  const ImGuiTableSortSpecs* ImDirectoryEntry::s_current_sort_specs = NULL;
+
+  void FilePicker::update_contents(ImVector<ImDirectoryEntry>& Im_directory_entries)
+  {
+    if (!files_scanned)
+    {
+      Im_directory_entries.resize(pathname_content_[0].size());
+      for (int row = 0; row < pathname_content_[0].size(); row++)
+      {
+        ImDirectoryEntry& ImDirectoryEntry  = Im_directory_entries[row];
+        ImDirectoryEntry.Name               = pathname_content_[0][row].c_str();
+        ImDirectoryEntry.Size               = pathname_content_[1][row].c_str();
+        ImDirectoryEntry.Type               = pathname_content_[2][row].c_str();
+        ImDirectoryEntry.DateModified       = pathname_content_[3][row].c_str();
+      }
+      files_scanned = true;
+    }
+  }
 
   void FilePicker::draw()
   {
@@ -80,6 +119,7 @@ namespace SmartPeak
         current_pathname_ = parent;
       }
       pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+      files_scanned = false;
       selected_entry = -1;
     }
     ImGui::SameLine();
@@ -99,6 +139,7 @@ namespace SmartPeak
       {
         current_pathname_.assign(new_pathname);
         pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+        files_scanned = false;
         selected_entry = -1;
         ImGui::CloseCurrentPopup();
       }
@@ -119,11 +160,10 @@ namespace SmartPeak
     ImGui::Combo("File type", &selected_extension, extensions, IM_ARRAYSIZE(extensions));
 
     static char selected_filename[256] = {0};
-    // Folder content / Navigation
-    ImGui::BeginChild("Content", ImVec2(1024, 400));
+    ImGui::BeginChild("ImDirectoryEntry", ImVec2(1024, 400));
     
     const int column_count = 4;
-    const char* column_names[column_count] = { "Name", "Size", "Type", "Date Modified" };
+    const char* column_names[column_count] = { "Name", "Size [bytes]", "Type", "Date Modified" };
     static ImGuiTableColumnFlags column_flags[column_count] = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide
     };
     static ContentColumnID content_column_ID[column_count] = { ContentColumnID_Name, ContentColumnID_Size, ContentColumnID_Type, ContentColumnID_DateModified };
@@ -131,20 +171,12 @@ namespace SmartPeak
     static ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
         ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable | ImGuiTableFlags_NoBordersInBody;
     
-    static ImVector<Content> content_items;
-    content_items.resize(pathname_content_[0].size());
-    for (int row = 0; row < pathname_content_[0].size(); row++)
-    {
-      Content& content = content_items[row];
-      
-      content.Name          = pathname_content_[0][row].c_str();
-      content.Size          = pathname_content_[1][row].c_str();
-      content.Type          = pathname_content_[2][row].c_str();
-      content.DateModified  = pathname_content_[3][row].c_str();
-    }
+    static ImVector<ImDirectoryEntry> Im_directory_entries;
+    static ImVector<int> selection;
+    update_contents(Im_directory_entries);
     
     ImVec2 size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 2);
-    if (ImGui::BeginTable("Content", column_count, table_flags, size))
+    if (ImGui::BeginTable("ImDirectoryEntry", column_count, table_flags, size))
     {
       for (int column = 0; column < column_count; column++){
         ImGui::TableSetupColumn(column_names[column], column_flags[column], -1.0f, content_column_ID[column]);
@@ -156,12 +188,16 @@ namespace SmartPeak
       {
         if (sorts_specs->SpecsDirty)
         {
-          Content::s_current_sort_specs = sorts_specs;
-          //
+          ImDirectoryEntry::s_current_sort_specs = sorts_specs;
+          if (Im_directory_entries.Size > 1)
+              qsort(&Im_directory_entries[0], (size_t)Im_directory_entries.Size, sizeof(Im_directory_entries[0]), ImDirectoryEntry::CompareWithSortSpecs);
+          ImDirectoryEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
         }
       }
 
       const ImGuiWindowFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick;
+      
       for (int row = 0; row < pathname_content_[0].size(); row++)
       {
         if (!filter.PassFilter(pathname_content_[0][row].c_str()))
@@ -177,24 +213,45 @@ namespace SmartPeak
         ImGui::TableNextRow();
         for (int column = 0; column < column_count; column++)
         {
+          ImDirectoryEntry* item = &Im_directory_entries[row];
+          char text_buffer[256];
+          if (column == 0)
+          {
+            sprintf(text_buffer, "%s", item->Name);
+          }
+          else if (column == 1)
+          {
+            sprintf(text_buffer, "%s", item->Size);
+          }
+          else if (column == 2)
+          {
+            sprintf(text_buffer, "%s", item->Type);
+          }
+          else if (column == 3)
+          {
+            sprintf(text_buffer, "%s", item->DateModified);
+          }
+          
           char buf[256];
-          sprintf(buf, "%s", pathname_content_[column][row].c_str());
           const bool is_selected = (selected_entry == row);
           ImGui::TableSetColumnIndex(column);
-          if(ImGui::Selectable(buf, is_selected, selectable_flags))
+          if(ImGui::Selectable(text_buffer, is_selected, selectable_flags))
           {
             selected_entry = row;
-            if (ImGui::IsMouseDoubleClicked(0) && pathname_content_[2][selected_entry] == "Directory") // TODO: error prone to rely on strings
+            std::strcpy(selected_filename, Im_directory_entries[selected_entry].Name);
+            if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item->Type , "Directory") )
             {
               if (current_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
               {
                 current_pathname_.append("/");
               }
-              current_pathname_.append(pathname_content_[0][selected_entry]);
+              
+              current_pathname_.append(item->Name);
               pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+              files_scanned = false;
+              update_contents(Im_directory_entries);
               filter.Clear();
               selected_entry = -1;
-              selected_filename[0] = '\0';
               break; // IMPORTANT: because the following lines in the loop assume accessing old/previous pathname_content_'s data
             }
           }
@@ -203,11 +260,13 @@ namespace SmartPeak
       ImGui::EndTable();
     }
     ImGui::EndChild();
-
     ImGui::Separator();
 
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
-    ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    if (ImGui::IsMouseClicked(0))
+      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    else
+      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
     ImGui::PopItemWidth();
 
     ImGui::SameLine();

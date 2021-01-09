@@ -3,15 +3,18 @@
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/ui/Widget.h>
+#include <algorithm>
 #include <array>
 #include <string>
 #include <vector>
+#include <atomic>
 // #include <boost/filesystem.hpp>
 
 // namespace fs = boost::filesystem;
 
 namespace SmartPeak
 {
+  struct ImDirectoryEntry;
   class FilePicker final : public Widget
   {
     std::array<std::vector<std::string>, 4> pathname_content_;
@@ -22,6 +25,7 @@ namespace SmartPeak
     bool loading_is_done_ = true;
     bool file_was_loaded_ = true;
     bool error_loading_file_ = false;
+    std::atomic_bool files_scanned {false};
 
     void run_and_join(
       FilePickerProcessor* processor,
@@ -29,12 +33,15 @@ namespace SmartPeak
       bool& loading_is_done,
       bool& file_was_loaded
     );
+    
+    ///!  rescan pathname_content_ into content_items when needed
+    void update_contents(ImVector<ImDirectoryEntry>& content_items);
 
   public:
     FilePicker()
     {
       // current_pathname_ = fs::current_path().root_path().string();
-      pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+      // pathname_content_ = Utilities::getPathnameContent(current_pathname_);
     }
 
     void draw() override;
