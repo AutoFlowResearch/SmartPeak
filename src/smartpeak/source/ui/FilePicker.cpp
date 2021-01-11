@@ -91,6 +91,7 @@ namespace SmartPeak
   {
     if (!files_scanned)
     {
+      pathname_content_ = Utilities::getPathnameContent(current_pathname_);
       Im_directory_entries.resize(pathname_content_[0].size());
       for (int row = 0; row < pathname_content_[0].size(); row++)
       {
@@ -111,6 +112,7 @@ namespace SmartPeak
     }
 
     static int selected_entry = -1;
+    static char selected_filename[256] = {0};
 
     if (ImGui::Button("Up"))
     {
@@ -120,6 +122,7 @@ namespace SmartPeak
       }
       pathname_content_ = Utilities::getPathnameContent(current_pathname_);
       files_scanned = false;
+      memset(selected_filename, 0, sizeof selected_filename);
       selected_entry = -1;
     }
     ImGui::SameLine();
@@ -139,6 +142,7 @@ namespace SmartPeak
       {
         current_pathname_.assign(new_pathname);
         pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+        memset(selected_filename, 0, sizeof selected_filename);
         files_scanned = false;
         selected_entry = -1;
         ImGui::CloseCurrentPopup();
@@ -159,7 +163,6 @@ namespace SmartPeak
     static const char* extensions[] = { "All", "csv", "featureXML", "mzML" };
     ImGui::Combo("File type", &selected_extension, extensions, IM_ARRAYSIZE(extensions));
 
-    static char selected_filename[256] = {0};
     ImGui::BeginChild("ImDirectoryEntry", ImVec2(1024, 400));
     
     const int column_count = 4;
@@ -247,7 +250,7 @@ namespace SmartPeak
               }
               
               current_pathname_.append(item->Name);
-              pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+              memset(selected_filename, 0, sizeof selected_filename);
               files_scanned = false;
               update_contents(Im_directory_entries);
               filter.Clear();
