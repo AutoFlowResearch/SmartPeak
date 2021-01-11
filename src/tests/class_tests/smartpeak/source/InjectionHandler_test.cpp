@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(set_get_MetaData)
   BOOST_CHECK_EQUAL(injectionHandler.getMetaDataShared()->getSampleGroupName(), "2");
 
   // Quick sanity check of pointer relationships
-  std::shared_ptr<MetaDataHandler> mdh4(new MetaDataHandler(mdh1));
+  auto mdh4 = std::make_shared<MetaDataHandler>(mdh1);
 
   injectionHandler.setMetaData(mdh4);
   const MetaDataHandler& mdh5 = injectionHandler.getMetaData();
