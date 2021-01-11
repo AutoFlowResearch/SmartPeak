@@ -331,12 +331,12 @@ int main(int argc, char **argv)
     }
     if (popup_about_)
     {
-      ImGui::OpenPopup("About modal");
+      ImGui::OpenPopup("About");
       popup_about_ = false;
     }
-    if (ImGui::BeginPopupModal("About modal", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
-      ImGui::Text("About SmartPeak");
+      ImGui::Text("Fast, accurate, and automated processing of CE-, GC- and LC-MS(/MS) and HPLC data.");
       ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
       ImGui::Separator();
       ImGui::Text("By the hardworking SmartPeak developers.");
