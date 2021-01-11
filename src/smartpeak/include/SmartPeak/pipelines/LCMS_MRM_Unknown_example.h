@@ -21,15 +21,15 @@ void example_LCMS_MRM_Unknowns(
   cs.process();
 
   const std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
-    std::shared_ptr<RawDataProcessor>(new LoadRawData()),
-    std::shared_ptr<RawDataProcessor>(new MapChromatograms()),
-    std::shared_ptr<RawDataProcessor>(new PickMRMFeatures()),
-    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
-    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
-    std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
-    std::shared_ptr<RawDataProcessor>(new QuantifyFeatures()),
-    std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
-    std::shared_ptr<RawDataProcessor>(new StoreFeatures())
+    std::make_shared<LoadRawData>(),
+    std::make_shared<MapChromatograms>(),
+    std::make_shared<PickMRMFeatures>(),
+    std::make_shared<FilterFeatures>(),
+    std::make_shared<FilterFeatures>(),
+    std::make_shared<SelectFeatures>(),
+    std::make_shared<QuantifyFeatures>(),
+    std::make_shared<CheckFeatures>(),
+    std::make_shared<StoreFeatures>()
   };
 
   std::map<std::string, Filenames> dynamic_filenames;
