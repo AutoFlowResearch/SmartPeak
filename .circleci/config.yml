@@ -7,7 +7,7 @@ jobs:
   build_ubuntu:
     docker:
       - image: ubuntu:20.04
-    working_directory: ~/SmartPeak2
+    working_directory: ~/SmartPeak
     resource_class: large
     steps:
       - checkout
@@ -39,35 +39,35 @@ jobs:
           make -j4 OpenMS
       - run:
           command: |
-            cd ~/SmartPeak2
-            # mkdir superbuild
+            cd ~/SmartPeak
+            #mkdir superbuild
             cd superbuild
-            cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+            cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
             make -j4
       - run:
           command: |
-            mkdir ~/SmartPeak2_build
-            cd ~/SmartPeak2_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak2/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak2/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak2/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+            mkdir ~/SmartPeak_build
+            cd ~/SmartPeak_build
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
             make -j4
       - run:
           command: |
-            cd ~/SmartPeak2_build || exit 1
-            ls -l ~/SmartPeak2/src/tests/class_tests/smartpeak/data
+            cd ~/SmartPeak_build || exit 1
+            ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
             ctest -V
-            ls -l ~/SmartPeak2/src/tests/class_tests/smartpeak/data
+            ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
       - run:
           command: |
-            ~/SmartPeak2/.circleci/run_examples.sh ~/SmartPeak2_build/bin
+            ~/SmartPeak/.circleci/run_examples.sh ~/SmartPeak_build/bin
       - run:
           command: |
             set -o xtrace
-            cd ~/SmartPeak2_build
+            cd ~/SmartPeak_build
             cpack -V
-            ls -lh ~/SmartPeak2_build | grep -a .deb
-            dpkg -c ~/SmartPeak2_build/*.deb
+            ls -lh ~/SmartPeak_build | grep -a .deb
+            dpkg -c ~/SmartPeak_build/*.deb
             mkdir -p /tmp/packages
-            cp ~/SmartPeak2_build/*.deb /tmp/packages
+            cp ~/SmartPeak_build/*.deb /tmp/packages
       - store_artifacts:
           path: /tmp/packages
 
@@ -75,7 +75,7 @@ jobs:
     macos:
       xcode: "11.2.1"
     resource_class: medium
-    working_directory: ~/SmartPeak2
+    working_directory: ~/SmartPeak
     steps:
       - checkout
       - run: brew remove yarn node
@@ -98,21 +98,21 @@ jobs:
           cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
           make -j4 OpenMS
       - run: |
-          cd ~/SmartPeak2
-          # mkdir superbuild 
-          mkdir smartpeak2_debug_build
+          cd ~/SmartPeak
+          #mkdir superbuild
+          mkdir smartpeak_debug_build
           cd superbuild
           cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug .. && make -j4
-          cd ../smartpeak2_debug_build
-          cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak2/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak2/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak2/superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+          cd ../smartpeak_debug_build
+          cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
           make -j4
       - run: |
           set +o pipefail
-          cd ~/SmartPeak2/smartpeak2_debug_build
+          cd ~/SmartPeak/smartpeak_debug_build
           ctest -VV -F --timeout 1200 || true
       - run: | 
           set +e
-          cd ~/SmartPeak2/smartpeak2_debug_build
+          cd ~/SmartPeak/smartpeak_debug_build
           ls -alt bin
           cpack -G DragNDrop && ls -alth
           yes | hdiutil attach -noautoopen -noverify SmartPeak-*.dmg > /dev/null
@@ -124,13 +124,13 @@ jobs:
       - run:
           command: |
             mkdir -p /tmp/artifacts
-            cp ~/SmartPeak2/smartpeak2_debug_build/*.dmg /tmp/artifacts
+            cp ~/SmartPeak/smartpeak_debug_build/*.dmg /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
 
 
   build_windows:
-    working_directory: ~/SmartPeak2
+    working_directory: ~/SmartPeak
     executor: win/default
     steps:
       - checkout
@@ -140,7 +140,7 @@ jobs:
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
           $ProgressPreference = "SilentlyContinue"
           Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-          choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"'
+          choco install cmake --version=3.17.2 --installargs '"ADD_CMAKE_TO_PATH=System"'
           # choco install boost-msvc-14.1
           choco install doxygen.install
           choco install nsis.portable
@@ -205,14 +205,14 @@ jobs:
               Set-Content "env:\$($matches[1])" $matches[2]
               }
           }
-          cd ~/SmartPeak2
-          # mkdir superbuild 
-          mkdir smartpeak2_build
-          cd ~/SmartPeak2/superbuild
-          cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak2
+          cd ~/SmartPeak
+          #mkdir superbuild
+          mkdir smartpeak_build
+          cd ~/SmartPeak/superbuild
+          cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
           cmake --build .
-          cd ~/SmartPeak2/smartpeak2_build
-          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:\lib\boost\boost_1_73_0" -DBOOST_INCLUDE_DIR="C:\lib\boost\boost_1_73_0" -DBOOST_LIBRARYDIR="C:\lib\boost\boost_1_73_0\lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="~/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=~/SmartPeak2/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=~/SmartPeak2/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=~/SmartPeak2/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak2
+          cd ~/SmartPeak/smartpeak_build
+          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:\lib\boost\boost_1_73_0" -DBOOST_INCLUDE_DIR="C:\lib\boost\boost_1_73_0" -DBOOST_LIBRARYDIR="C:\lib\boost\boost_1_73_0\lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="~/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
           msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
           msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
           msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
@@ -221,8 +221,16 @@ jobs:
           & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
       - run:
           command: |
+            cd ~/SmartPeak/smartpeak_build
+            git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
+            Import-Module .\CodeSigning\CertCrypto.psm1
+            Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
+            certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
+            & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
+      - run:
+          command: |
             mkdir -p ~/artifacts
-            cp ~/SmartPeak2/smartpeak2_build/*.exe ~/artifacts
+            cp ~/SmartPeak/smartpeak_build/*.exe ~/artifacts
       - store_artifacts:
           path: ~/artifacts
             
