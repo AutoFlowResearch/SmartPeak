@@ -147,7 +147,7 @@ int main(int argc, char **argv)
   SDL_DisplayMode current;
   SDL_GetCurrentDisplayMode(0, &current);
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-  SDL_Window* window = SDL_CreateWindow("SmartPeak SDL2+OpenGL application", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+  SDL_Window* window = SDL_CreateWindow("SmartPeak", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
   SDL_GLContext gl_context = SDL_GL_CreateContext(window);
   SDL_GL_SetSwapInterval(1); // Enable vsync
 
@@ -531,8 +531,8 @@ int main(int argc, char **argv)
       if (ImGui::BeginMenu("View"))
       {
         ImGui::MenuItem("Explorer window", NULL, false, false);
-        if (ImGui::MenuItem("Injections", NULL, &show_injection_explorer)) {}
-        if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {}
+        if (ImGui::MenuItem("Injections", NULL, &show_injection_explorer)) {} // TODO: search field
+        if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {} // TODO: search field
         if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}
         if (ImGui::MenuItem("Scans", NULL, &show_spectrum_explorer)) {}
         ImGui::Separator(); // Primary input

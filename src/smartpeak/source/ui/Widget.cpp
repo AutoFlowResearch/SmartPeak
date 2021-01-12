@@ -18,22 +18,6 @@ namespace SmartPeak
     if (false == ImGui::BeginPopup(popuop_id))
       return;
 
-    //// Sorting
-    //if (ImGui::Button("Asc"))
-    //{
-    //  // TODO: will need to rethink how this function is called to implement sorting on the entire table
-    //  //std::sort(std::begin(column), std::end(column), [](std::string a, std::string b) {return a > b; });
-    //  //std::sort(std::begin(values_indices), std::end(values_indices), [](std::pair<std::string, std::vector<int>> a, std::pair<std::string, std::vector<int>> b) {return a.first > b.first; });
-    //}
-    //ImGui::SameLine();
-    //if (ImGui::Button("Desc"))
-    //{
-    //  // TODO: will need to rethink how this function is called to implement sorting on the entire table
-    //  //std::sort(std::begin(column), std::end(column), [](std::string a, std::string b) {return a < b; });
-    //  //std::sort(std::begin(values_indices), std::end(values_indices), [](std::pair<std::string, std::vector<int>> a, std::pair<std::string, std::vector<int>> b) {return a.first < b.first; });
-    //}
-    //ImGui::Separator();
-
     // Filtering and selecting
     filter.Draw();
 
@@ -160,6 +144,8 @@ namespace SmartPeak
       ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
 
+    static ImGuiTextFilter filter;
+    filter.Draw("Find");
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
@@ -175,6 +161,16 @@ namespace SmartPeak
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <=0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
+            if (table_id_ == "FeaturesExplorerWindow") {
+              if (!filter.PassFilter(columns_(row, 0).c_str())) {
+                continue;
+              }
+            }
+            if (table_id_ == "InjectionsExplorerWindow" || table_id_ == "TransitionsExplorerWindow") {
+              if (!filter.PassFilter(columns_(row, 1).c_str())) {
+                continue;
+              }
+            }
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col) {
               ImGui::TableSetColumnIndex(col);
