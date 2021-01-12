@@ -8,10 +8,12 @@
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureQC.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
 #include <OpenMS/ANALYSIS/MAPMATCHING/TransformationDescription.h>
+#include <OpenMS/DATASTRUCTURES/DefaultParamHandler.h>
 
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataHandler.h>
+#include <SmartPeak/core/Parameters.h>
 
 #include <map>
 #include <vector>
@@ -36,9 +38,11 @@ namespace SmartPeak
     */
     virtual void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const = 0;
+
+    virtual ParameterSet getParameterSchema() const;
 
   protected:
     // Forced to write this, because the other user-defined constructors inhibit
@@ -61,7 +65,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
 
@@ -85,7 +89,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -100,7 +104,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -111,11 +115,13 @@ namespace SmartPeak
     std::string getName() const override { return "MAP_CHROMATOGRAMS"; }
     std::string getDescription() const override { return "Map chromatograms to the loaded set of transitions."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Map chromatograms to the loaded set of transitions.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -130,7 +136,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -141,11 +147,13 @@ namespace SmartPeak
     std::string getName() const override { return "EXTRACT_SPECTRA_WINDOWS"; }
     std::string getDescription() const override { return "Extract out specified spectra windows based on the user parameters."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Extract out specified spectra windows from an MSExperiment using the range specified in the parameters
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -160,7 +168,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -175,7 +183,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -190,7 +198,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -205,7 +213,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -220,7 +228,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -231,11 +239,13 @@ namespace SmartPeak
     std::string getName() const override { return "PICK_MRM_FEATURES"; }
     std::string getDescription() const override { return "Run the peak picking algorithm for SRMs/MRMs."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Run the openSWATH pick peaking and scoring workflow for a single raw data file.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -246,11 +256,13 @@ namespace SmartPeak
     std::string getName() const override { return "PICK_MS1_FEATURES"; }
     std::string getDescription() const override { return "Run the peak picking algorithm for MS1 spectra."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Run the MS1 peak picking and scoring algorithm.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -261,11 +273,13 @@ namespace SmartPeak
     std::string getName() const override { return "SEARCH_ACCURATE_MASS"; }
     std::string getDescription() const override { return "Run the accurate mass search algorithm."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Run the accurate mass search algorithm.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -280,7 +294,7 @@ namespace SmartPeak
       */
       void process(
           RawDataHandler& rawDataHandler_IO,
-          const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+          const ParameterSet& params_I,
           const Filenames& filenames
       ) const override;
   };
@@ -291,11 +305,13 @@ namespace SmartPeak
     std::string getName() const override { return "FILTER_FEATURES"; }
     std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Filter features that do not pass the filter QCs.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -306,11 +322,13 @@ namespace SmartPeak
     std::string getName() const override { return "CHECK_FEATURES"; }
     std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Flag features that do not pass the filter QCs.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -325,7 +343,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -340,7 +358,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -351,11 +369,13 @@ namespace SmartPeak
     std::string getName() const override { return "QUANTIFY_FEATURES"; }
     std::string getDescription() const override { return "Apply a calibration model defined in quantitationMethods to each transition."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Quantify all unknown samples based on the quantitationMethod.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -370,7 +390,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -385,7 +405,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -400,7 +420,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -415,7 +435,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -430,7 +450,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -445,7 +465,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -460,7 +480,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -475,11 +495,11 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
     static void sanitizeParameters(
-      std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I
+      ParameterSet& params_I
     );
   };
 
@@ -489,11 +509,13 @@ namespace SmartPeak
     std::string getName() const override { return "FIT_FEATURES_EMG"; }
     std::string getDescription() const override { return "Reconstruct a peak from available data points."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Apply the EMG peak reconstruction technique to the data points.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
 
@@ -513,11 +535,13 @@ namespace SmartPeak
     std::string getName() const override { return "FILTER_FEATURES_RSDS"; }
     std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Filter features that do not pass the filter QCs.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -528,11 +552,13 @@ namespace SmartPeak
     std::string getName() const override { return "CHECK_FEATURES_RSDS"; }
     std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Flag features that do not pass the filter QCs.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -543,11 +569,13 @@ namespace SmartPeak
     std::string getName() const override { return "FILTER_FEATURES_BACKGROUND_INTERFERENCES"; }
     std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Filter features that do not pass the filter QCs.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -558,11 +586,13 @@ namespace SmartPeak
     std::string getName() const override { return "CHECK_FEATURES_BACKGROUND_INTERFERENCES"; }
     std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Flag features that do not pass the filter QCs.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -577,7 +607,7 @@ namespace SmartPeak
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };

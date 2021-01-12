@@ -4,7 +4,10 @@
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 #include <SmartPeak/io/SequenceParser.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <plog/Log.h>
+#include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/Parameters.h>
 
 namespace SmartPeak
 {
@@ -260,34 +263,71 @@ namespace SmartPeak
       }
     }
   }
-  void SessionHandler::setParametersTable(const SequenceHandler & sequence_handler)
+  void SessionHandler::setParametersTable(const SequenceHandler & sequence_handler, const std::vector<ApplicationHandler::Command>& commands)
   {
     if (sequence_handler.getSequence().size() > 0) {
       // Make the parameters table headers
       if (parameters_table_headers.size() <= 0) {
         LOGD << "Making parameters_table_headers";
-        parameters_table_headers.resize(4);
-        parameters_table_headers.setValues({ "function","name","type","value",/*"default","restrictions","description"*/ });
+        parameters_table_headers.resize(9);
+        parameters_table_headers.setValues({ "function","name","type","value","description","status","valid","restrictions","schema_type" });
       }
       const int n_cols = parameters_table_headers.size();
+
+      // Construct schema based on the current workflow's command list
+      ParameterSet schema_params;
+      for (const auto& command : commands)
+      {
+        schema_params.merge(command.getParameterSchema());
+      }
+      schema_params.merge(ApplicationProcessors::getParameterSchema()); // Application processor will be used also
+      schema_params.setAsSchema(true);
+
+      // Construct parameters merging schema and user defined
+      ParameterSet user_parameters = sequence_handler.getSequence().at(0).getRawData().getParameters();
+      user_parameters.merge(schema_params);
+
       // Make the parameters table body
       int n_rows = 0;
-      for (const auto& parameters : sequence_handler.getSequence().at(0).getRawData().getParameters()) {
-        n_rows += parameters.second.size();
+      for (const auto& function_parameter : user_parameters) {
+        n_rows += function_parameter.second.size();
       }
       if (parameters_table_body.dimension(0) != n_rows) {
         LOGD << "Making parameters_table_body";
         parameters_table_body.resize(n_rows, n_cols);
         int col = 0, row = 0;
-        for (const auto& parameters : sequence_handler.getSequence().at(0).getRawData().getParameters()) {
-          for (const auto& parameter : parameters.second) {
-            parameters_table_body(row, col) = parameters.first;
+        for (const auto& function_parameters : user_parameters) {
+          for (const auto& parameter : function_parameters.second) {
+            parameters_table_body(row, col) = function_parameters.second.getFunctionName();
             ++col;
-            parameters_table_body(row, col) = parameter.at("name");
+            parameters_table_body(row, col) = parameter.getName();
             ++col;
-            parameters_table_body(row, col) = parameter.at("type");
+            parameters_table_body(row, col) = parameter.getType();
             ++col;
-            parameters_table_body(row, col) = parameter.at("value");
+            parameters_table_body(row, col) = parameter.getValueAsString();
+            ++col;
+            parameters_table_body(row, col) = parameter.getDescription();
+            ++col;
+            std::string status;
+            if (parameter.getSchema())
+            {
+              status = "user_override";
+            }
+            else if (parameter.isSchema())
+            {
+              status = "default";
+            }
+            else
+            {
+              status = "unused";
+            }
+            parameters_table_body(row, col) = status;
+            ++col;
+            parameters_table_body(row, col) = parameter.isValid()? "true": "false";
+            ++col;
+            parameters_table_body(row, col) = parameter.getRestrictionsAsString();
+            ++col;
+            parameters_table_body(row, col) = parameter.getSchema() ? parameter.getSchema()->getType() : parameter.getType();
             col = 0;
             ++row;
           }

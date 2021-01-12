@@ -178,6 +178,14 @@ namespace SmartPeak
   }
 
   namespace ApplicationProcessors {
+
+  ParameterSet getParameterSchema()
+  {
+    ParameterSet parameter_set;
+    parameter_set.merge(ProcessSequence::getParameterSchema());
+    return parameter_set;
+  }
+
   void processCommands(ApplicationHandler& state, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names)
   {
     size_t i = 0;

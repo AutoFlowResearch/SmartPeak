@@ -6,12 +6,14 @@
 #endif
 #include <SmartPeak/io/csv.h>
 #include <SmartPeak/io/InputDataValidation.h>
+#include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/Parameters.h>
 
 namespace SmartPeak
 {
   void FileReader::parseOpenMSParams(
     const std::string& filename,
-    std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters
+    ParameterSet& parameters
   )
   {
     const std::string s_function {"function"};
@@ -66,20 +68,18 @@ namespace SmartPeak
       std::transform(used.begin(), used.end(), used.begin(), ::tolower);
       if (used == "false")
         continue;
-      std::map<std::string, std::string> m;
-      m.emplace(s_name, name);
-      m.emplace(s_value, value);
-      if (has_type)
-        m.emplace(s_type, type);
-      if (has_tags)
-        m.emplace(s_tags, tags);
-      if (has_description)
-        m.emplace(s_description, description);
-      if (has_comment)
-        m.emplace(s_comment, comment);
-      if (!parameters.count(function))
-        parameters.emplace(function, std::vector<std::map<std::string,std::string>>());
-      parameters[function].push_back(m);
+      std::map<std::string, std::string> properties =
+      {
+        {"name", name},
+        {"value", value},
+        {"used", used},
+        {"type", type},
+        {"tags", tags},
+        {"description", description},
+        {"comment", comment}
+      };
+      auto p = Parameter(properties);
+      parameters.addParameter(function, p);
     }
   }
 }

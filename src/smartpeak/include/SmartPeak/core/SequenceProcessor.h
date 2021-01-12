@@ -110,6 +110,7 @@ namespace SmartPeak
 
     ProcessSequence() = default;
     ProcessSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    static ParameterSet getParameterSchema();
     void process() const override;
   };
 

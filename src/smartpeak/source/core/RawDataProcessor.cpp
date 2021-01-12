@@ -51,9 +51,15 @@
 
 namespace SmartPeak
 {
+
+  ParameterSet RawDataProcessor::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void LoadRawData::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -64,10 +70,10 @@ namespace SmartPeak
       if (params_I.at("mzML").size()) {
         // # convert parameters
         std::map<std::string, CastValue> mzML_params;
-        for (const std::map<std::string, std::string>& param : params_I.at("mzML")) {
+        for (auto& param : params_I.at("mzML")) {
           CastValue c;
-          Utilities::castString(param.at("value"), param.at("type"), c);
-          mzML_params.emplace(param.at("name"), c);
+          Utilities::castString(param.getValueAsString(), param.getType(), c);
+          mzML_params.emplace(param.getName(), c);
         }
         // Deal with ChromeleonFile format
         if (mzML_params.count("format") && mzML_params.at("format").s_ == "ChromeleonFile") {
@@ -113,10 +119,10 @@ namespace SmartPeak
     if (params_I.at("ChromatogramExtractor").size()) {
       // # convert parameters
       std::map<std::string, CastValue> chromatogramExtractor_params;
-      for (const std::map<std::string, std::string>& param : params_I.at("ChromatogramExtractor")) {
+      for (auto& param : params_I.at("ChromatogramExtractor")) {
         CastValue c;
-        Utilities::castString(param.at("value"), param.at("type"), c);
-        chromatogramExtractor_params.emplace(param.at("name"), c);
+        Utilities::castString(param.getValueAsString(), param.getType(), c);
+        chromatogramExtractor_params.emplace(param.getName(), c);
       }
       // # exctract chromatograms
       OpenMS::MSExperiment chromatograms_copy = chromatograms;
@@ -219,7 +225,7 @@ namespace SmartPeak
 
   void StoreRawData::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -250,7 +256,7 @@ namespace SmartPeak
 
   void LoadFeatures::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -289,7 +295,7 @@ namespace SmartPeak
 
   void StoreFeatures::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -316,7 +322,7 @@ namespace SmartPeak
 
   void LoadAnnotations::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -351,7 +357,7 @@ namespace SmartPeak
 
   void StoreAnnotations::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -376,9 +382,15 @@ namespace SmartPeak
     LOGD << "END StoreAnnotations";
   }
 
+  ParameterSet PickMRMFeatures::getParameterSchema() const
+  {
+    OpenMS::MRMFeatureFinderScoring oms_params;
+    return ParameterSet({ oms_params });
+  }
+
   void PickMRMFeatures::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -422,9 +434,15 @@ namespace SmartPeak
     LOGD << "END PickMRMFeatures";
   }
 
+  ParameterSet FilterFeatures::getParameterSchema() const
+  {
+    OpenMS::MRMFeatureFilter oms_param;
+    return ParameterSet({ oms_param });
+  }
+
   void FilterFeatures::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -457,9 +475,15 @@ namespace SmartPeak
     LOGD << "END filterFeatures";
   }
 
+  ParameterSet CheckFeatures::getParameterSchema() const
+  {
+    OpenMS::MRMFeatureFilter oms_param;
+    return ParameterSet({ oms_param });
+  }
+
   void CheckFeatures::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -492,7 +516,7 @@ namespace SmartPeak
 
   void SelectFeatures::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -552,7 +576,7 @@ namespace SmartPeak
 
   void ValidateFeatures::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -574,7 +598,7 @@ namespace SmartPeak
       rawDataHandler_IO.getMetaData().getInjectionName(),
       mapped_features,
       validation_metrics,
-      std::stof(params_I.at("MRMFeatureValidator.validate_MRMFeatures").front().at("value"))
+      std::stof(params_I.at("MRMFeatureValidator.validate_MRMFeatures").front().getValueAsString())
       // TODO: While this probably works, it might be nice to add some check that the parameter passed is the desired one
     );
 
@@ -586,7 +610,7 @@ namespace SmartPeak
 
   void PlotFeatures::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -607,9 +631,15 @@ namespace SmartPeak
     LOGD << "END PlotFeatures (NOT IMPLEMENTED)";
   }
 
+  ParameterSet QuantifyFeatures::getParameterSchema() const
+  {
+    OpenMS::AbsoluteQuantitation oms_params;
+    return ParameterSet({ oms_params });
+  }
+
   void QuantifyFeatures::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -630,7 +660,7 @@ namespace SmartPeak
 
   void LoadTransitions::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -685,7 +715,7 @@ namespace SmartPeak
 
   void LoadFeatureFiltersRDP::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -736,7 +766,7 @@ namespace SmartPeak
 
   void LoadFeatureQCsRDP::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -787,7 +817,7 @@ namespace SmartPeak
 
   void StoreFeatureFiltersRDP::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -821,7 +851,7 @@ namespace SmartPeak
 
   void StoreFeatureQCsRDP::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -855,7 +885,7 @@ namespace SmartPeak
 
   void LoadValidationData::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -991,7 +1021,7 @@ namespace SmartPeak
 
   void LoadParameters::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1022,13 +1052,13 @@ namespace SmartPeak
   }
 
   void LoadParameters::sanitizeParameters(
-    std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I
+    ParameterSet& params_I
   )
   {
     LOGD << "START sanitizeRawDataProcessorParameters";
 
     // # check for workflow parameters integrity
-    const std::vector<std::string> required_parameters = {
+    const std::vector<std::string> required_function_parameter_names = {
       "SequenceSegmentPlotter",
       "FeaturePlotter",
       "AbsoluteQuantitation",
@@ -1053,12 +1083,10 @@ namespace SmartPeak
       "AccurateMassSearchEngine",
       "MergeInjections"
     };
-    for (const std::string& parameter : required_parameters) {
-      if (!params_I.count(parameter)) {
-        params_I.emplace(
-          parameter,
-          std::vector<std::map<std::string, std::string>>() // empty vector
-        );
+    for (const std::string& function_parameter_name : required_function_parameter_names) {
+      if (!params_I.count(function_parameter_name)) {
+        FunctionParameters function_parameter(function_parameter_name);
+        params_I.addFunctionParameters(function_parameter);
       }
     }
 
@@ -1067,7 +1095,7 @@ namespace SmartPeak
 
   void ZeroChromatogramBaseline::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames & filenames
   ) const
   {
@@ -1081,9 +1109,15 @@ namespace SmartPeak
     LOGD << "END ZeroChromatogramBaseline";
   }
 
+  ParameterSet MapChromatograms::getParameterSchema() const
+  {
+    OpenMS::MRMMapping oms_params;
+    return ParameterSet({ oms_params });
+  }
+
   void MapChromatograms::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1112,7 +1146,7 @@ namespace SmartPeak
 
   void ExtractChromatogramWindows::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1129,24 +1163,29 @@ namespace SmartPeak
     LOGD << "END ExtractChromatogramWindows";
   }
 
-  void ExtractSpectraWindows::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  ParameterSet ExtractSpectraWindows::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
+  void ExtractSpectraWindows::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START ExtractSpectraWindows";
 
     float start = 0, stop = 0;
     if (params_I.count("FIAMS") && params_I.at("FIAMS").size()){
       for (const auto& fia_params: params_I.at("FIAMS")){
-        if (fia_params.at("name") == "acquisition_start") {
+        if (fia_params.getName() == "acquisition_start") {
           try {
-            start = std::stof(fia_params.at("value"));
+            start = std::stof(fia_params.getValueAsString());
           }
           catch (const std::exception& e) {
             LOGE << e.what();
           }
         }
-        if (fia_params.at("name") == "acquisition_end") {
+        if (fia_params.getName() == "acquisition_end") {
           try {
-            stop = std::stof(fia_params.at("value"));
+            stop = std::stof(fia_params.getValueAsString());
           }
           catch (const std::exception& e) {
             LOGE << e.what();
@@ -1172,9 +1211,15 @@ namespace SmartPeak
     LOGD << "END ExtractSpectraWindows";
   }
 
+  ParameterSet FitFeaturesEMG::getParameterSchema() const
+  {
+    OpenMS::EmgGradientDescent oms_params;
+    return ParameterSet({ oms_params });
+  }
+
   void FitFeaturesEMG::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1318,9 +1363,15 @@ namespace SmartPeak
     }
   }
 
+  ParameterSet FilterFeaturesRSDs::getParameterSchema() const
+  {
+    OpenMS::MRMFeatureFilter oms_params;
+    return ParameterSet({ oms_params });
+  }
+
   void FilterFeaturesRSDs::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1353,9 +1404,15 @@ namespace SmartPeak
     LOGD << "END filterFeaturesRSDs";
   }
 
+  ParameterSet CheckFeaturesRSDs::getParameterSchema() const
+  {
+    OpenMS::MRMFeatureFilter oms_params;
+    return ParameterSet({ oms_params });
+  }
+
   void CheckFeaturesRSDs::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1386,9 +1443,15 @@ namespace SmartPeak
     LOGD << "END checkFeaturesRSDs";
   }
 
+  ParameterSet FilterFeaturesBackgroundInterferences::getParameterSchema() const
+  {
+    OpenMS::MRMFeatureFilter oms_params;
+    return ParameterSet({ oms_params });
+  }
+
   void FilterFeaturesBackgroundInterferences::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1421,9 +1484,15 @@ namespace SmartPeak
     LOGD << "END filterFeaturesBackgroundInterferences";
   }
 
+  ParameterSet CheckFeaturesBackgroundInterferences::getParameterSchema() const
+  {
+    OpenMS::MRMFeatureFilter oms_params;
+    return ParameterSet({ oms_params });
+  }
+
   void CheckFeaturesBackgroundInterferences::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1454,32 +1523,32 @@ namespace SmartPeak
     LOGD << "END checkFeaturesBackgroundInterferences";
   }
 
-  void MergeSpectra::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  void MergeSpectra::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START MergeSpectra";
 
     float resolution = 0, max_mz = 0, bin_step = 0;
     if (params_I.count("FIAMS") && params_I.at("FIAMS").size()) {
       for (const auto& fia_params : params_I.at("FIAMS")) {
-        if (fia_params.at("name") == "max_mz") {
+        if (fia_params.getName() == "max_mz") {
           try {
-            max_mz = std::stof(fia_params.at("value"));
+            max_mz = std::stof(fia_params.getValueAsString());
           }
           catch (const std::exception& e) {
             LOGE << e.what();
           }
         }
-        if (fia_params.at("name") == "bin_step") {
+        if (fia_params.getName() == "bin_step") {
           try {
-            bin_step = std::stof(fia_params.at("value"));
+            bin_step = std::stof(fia_params.getValueAsString());
           }
           catch (const std::exception& e) {
             LOGE << e.what();
           }
         }
-        if (fia_params.at("name") == "resolution") {
+        if (fia_params.getName() == "resolution") {
           try {
-            resolution = std::stof(fia_params.at("value"));
+            resolution = std::stof(fia_params.getValueAsString());
           }
           catch (const std::exception& e) {
             LOGE << e.what();
@@ -1546,7 +1615,15 @@ namespace SmartPeak
     LOGD << "END MergeSpectra";
   }
 
-  void PickMS1Features::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  ParameterSet PickMS1Features::getParameterSchema() const
+  {
+    OpenMS::SavitzkyGolayFilter sgfilter;
+    OpenMS::PeakPickerHiRes picker;
+    OpenMS::PeakIntegrator pi;
+    return ParameterSet({ sgfilter, picker, pi });
+  }
+
+  void PickMS1Features::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START PickMS1Features";
 
@@ -1561,17 +1638,17 @@ namespace SmartPeak
     float min_intensity = 0;
     bool write_convex_hull = false;
     for (const auto& pms1f_params : params_I.at("PickMS1Features")) {
-      if (pms1f_params.at("name") == "sne:window") {
+      if (pms1f_params.getName() == "sne:window") {
         try {
-          sn_window = std::stof(pms1f_params.at("value"));
+          sn_window = std::stof(pms1f_params.getValueAsString());
         }
         catch (const std::exception& e) {
           LOGE << e.what();
         }
       }
-      if (pms1f_params.at("name") == "write_convex_hull") {
+      if (pms1f_params.getName() == "write_convex_hull") {
         try {
-          std::string value = pms1f_params.at("value");
+          std::string value = pms1f_params.getValueAsString();
           std::transform(value.begin(), value.end(), value.begin(), ::tolower);
           write_convex_hull = (value == "true")?true:false;
         }
@@ -1579,9 +1656,9 @@ namespace SmartPeak
           LOGE << e.what();
         }
       }
-      if (pms1f_params.at("name") == "compute_peak_shape_metrics") {
+      if (pms1f_params.getName() == "compute_peak_shape_metrics") {
         try {
-          std::string value = pms1f_params.at("value");
+          std::string value = pms1f_params.getValueAsString();
           std::transform(value.begin(), value.end(), value.begin(), ::tolower);
           compute_peak_shape_metrics = (value == "true") ? true : false;
         }
@@ -1589,9 +1666,9 @@ namespace SmartPeak
           LOGE << e.what();
         }
       }
-      if (pms1f_params.at("name") == "min_intensity") {
+      if (pms1f_params.getName() == "min_intensity") {
         try {
-          min_intensity = std::stof(pms1f_params.at("value"));
+          min_intensity = std::stof(pms1f_params.getValueAsString());
         }
         catch (const std::exception& e) {
           LOGE << e.what();
@@ -1720,7 +1797,13 @@ namespace SmartPeak
     LOGD << "END PickMS1Features";
   }
 
-  void SearchAccurateMass::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  ParameterSet SearchAccurateMass::getParameterSchema() const
+  {
+    OpenMS::AccurateMassSearchEngine oms_params;
+    return ParameterSet({ oms_params });
+  }
+
+  void SearchAccurateMass::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START SearchAccurateMass";
     LOGI << "SearchAccurateMass input size: " << rawDataHandler_IO.getFeatureMap().size();
@@ -1793,7 +1876,7 @@ namespace SmartPeak
     LOGD << "END SearchAccurateMass";
   }
 
-  void MergeFeatures::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  void MergeFeatures::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START MergeFeatures";
     LOGI << "MergeFeatures input size: " << rawDataHandler_IO.getFeatureMap().size();
@@ -1883,7 +1966,7 @@ namespace SmartPeak
     LOGD << "END MergeFeatures";
   }
 
-  void ClearData::process(RawDataHandler& rawDataHandler_IO, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+  void ClearData::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START ClearData";
     rawDataHandler_IO.clearNonSharedData();

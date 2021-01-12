@@ -9,10 +9,15 @@
 
 namespace SmartPeak
 {
+  ParameterSet MergeInjections::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void MergeInjections::process(
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -34,42 +39,42 @@ namespace SmartPeak
     std::string dilution_series_merge_feature_name;
     bool merge_subordinates = true; // whether to merge at the feature level or at the subordinate level
     for (const auto& mi_params : params_I.at("MergeInjections")) {
-      if (mi_params.at("name") == "scan_polarity_merge_rule") {
-        if (mi_params.at("value") == "Sum" || mi_params.at("value") == "Min" || mi_params.at("value") == "Max" || mi_params.at("value") == "Mean" || mi_params.at("value") == "WeightedMean") {
-          scan_polarity_merge_rule = mi_params.at("value");
+      if (mi_params.getName() == "scan_polarity_merge_rule") {
+        if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
+          scan_polarity_merge_rule = mi_params.getValueAsString();
         }
         else {
           LOGD << "Incorrect value for 'scan_polarity_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
       }
-      if (mi_params.at("name") == "mass_range_merge_rule") {
-        if (mi_params.at("value") == "Sum" || mi_params.at("value") == "Min" || mi_params.at("value") == "Max" || mi_params.at("value") == "Mean" || mi_params.at("value") == "WeightedMean") {
-          mass_range_merge_rule = mi_params.at("value");
+      if (mi_params.getName() == "mass_range_merge_rule") {
+        if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
+          mass_range_merge_rule = mi_params.getValueAsString();
         }
         else {
           LOGD << "Incorrect value for 'mass_range_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
       }
-      if (mi_params.at("name") == "dilution_series_merge_rule") {
-        if (mi_params.at("value") == "Sum" || mi_params.at("value") == "Min" || mi_params.at("value") == "Max" || mi_params.at("value") == "Mean" || mi_params.at("value") == "WeightedMean") {
-          dilution_series_merge_rule = mi_params.at("value");
+      if (mi_params.getName() == "dilution_series_merge_rule") {
+        if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
+          dilution_series_merge_rule = mi_params.getValueAsString();
         }
         else {
           LOGD << "Incorrect value for 'dilution_series_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
       }
-      if (mi_params.at("name") == "scan_polarity_merge_feature_name") {
-        scan_polarity_merge_feature_name = mi_params.at("value");
+      if (mi_params.getName() == "scan_polarity_merge_feature_name") {
+        scan_polarity_merge_feature_name = mi_params.getValueAsString();
       }
-      if (mi_params.at("name") == "mass_range_merge_feature_name") {
-        mass_range_merge_feature_name = mi_params.at("value");
+      if (mi_params.getName() == "mass_range_merge_feature_name") {
+        mass_range_merge_feature_name = mi_params.getValueAsString();
       }
-      if (mi_params.at("name") == "dilution_series_merge_feature_name") {
-        dilution_series_merge_feature_name = mi_params.at("value");
+      if (mi_params.getName() == "dilution_series_merge_feature_name") {
+        dilution_series_merge_feature_name = mi_params.getValueAsString();
       }
-      if (mi_params.at("name") == "merge_subordinates") {
+      if (mi_params.getName() == "merge_subordinates") {
         try {
-          std::string value = mi_params.at("value");
+          std::string value = mi_params.getValueAsString();
           std::transform(value.begin(), value.end(), value.begin(), ::tolower);
           merge_subordinates = (value == "true") ? true : false;
         }
@@ -447,7 +452,14 @@ namespace SmartPeak
     // Remove the first feature
     feature_map.erase(feature_map.begin());
   }
-  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+
+
+  ParameterSet LoadFeaturesSampleGroup::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
+  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START LoadFeaturesSampleGroup";
     LOGI << "Loading: " << filenames.featureXMLSampleGroup_i;
@@ -476,7 +488,13 @@ namespace SmartPeak
 
     LOGD << "END LoadFeaturesSampleGroup";
   }
-  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+
+  ParameterSet StoreFeaturesSampleGroup::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
+  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START storeFeaturesSampleGroup";
     LOGI << "Storing: " << filenames.featureXMLSampleGroup_o;

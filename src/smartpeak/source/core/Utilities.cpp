@@ -2,6 +2,7 @@
 
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/CastValue.h>
+#include <SmartPeak/core/Parameters.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <algorithm>
 #include <iostream>
@@ -32,7 +33,7 @@ namespace SmartPeak
       cast = std::stoi(value);
     } else if (lowercase_type == "float") {
       cast = std::stof(value);
-    } else if ((lowercase_type == "bool" || lowercase_type == "string")
+    } else if ((lowercase_type == "bool" || lowercase_type == "boolean" || lowercase_type == "string")
                && (lowercase_value == "false" || lowercase_value == "true")) {
       cast = lowercase_value == "true";
     } else if (lowercase_type == "string") {
@@ -47,24 +48,20 @@ namespace SmartPeak
 
   void Utilities::updateParameters(
     OpenMS::Param& Param_IO,
-    const std::vector<std::map<std::string, std::string>>& parameters_I
+    const FunctionParameters& parameters_I
   )
   {
-    for (const std::map<std::string,std::string>& param : parameters_I) {
-      const std::string& name = param.at("name");
+    for (const auto& param : parameters_I) {
+      const std::string& name = param.getName();
       if (!Param_IO.exists(name)) {
         LOGW << "Parameter not found: " << name;
         continue;
       }
       // check supplied user parameters
-      CastValue c;
-      if (param.count("value")) {
-        if (param.count("type")) {
-          castString(param.at("value"), param.at("type"), c);
-        } else {
-          parseString(param.at("value"), c);
-        }
-      } else {
+      CastValue c = param.getValue();
+      if ((c.getTag() == CastValue::Type::UNINITIALIZED) ||
+          (c.getTag() == CastValue::Type::UNKNOWN))
+      {
         OpenMS::DataValue::DataType dt = Param_IO.getValue(name).valueType();
         switch (dt) {
           case OpenMS::DataValue::DOUBLE_VALUE:
@@ -129,27 +126,28 @@ namespace SmartPeak
         }
       }
 
-      std::string description;
-      if (param.count("description")) {
-        description = param.at("description");
-      } else {
+      std::string description = param.getDescription();
+      if (description.empty())
+      {
         try {
           description = Param_IO.getDescription(name);
-        } catch (const OpenMS::Exception::ElementNotFound&) {
+        }
+        catch (const OpenMS::Exception::ElementNotFound&) {
           // leave description as an empty string
         }
       }
 
       OpenMS::StringList tags;
-      if (param.count("tags")) {
-        const std::string& line = param.at("tags");
-        std::regex re_tag("[^'\",]+");
-        std::sregex_iterator matches_begin = std::sregex_iterator(line.begin(), line.end(), re_tag);
-        std::sregex_iterator matches_end = std::sregex_iterator();
-        for (std::sregex_iterator it = matches_begin; it != matches_end; ++it) {
-          tags.push_back(it->str());
+      const auto& params_tag = param.getTags();
+      if (!params_tag.empty())
+      {
+        for (const auto& tag : params_tag)
+        {
+          tags.push_back(tag);
         }
-      } else {
+      }
+      else
+      {
         tags = Param_IO.getTags(name);
       }
       // update the params
@@ -216,7 +214,7 @@ namespace SmartPeak
     std::regex re_integer_number("[+-]?\\d+");
     std::regex re_float_number("[+-]?\\d+(?:\\.\\d+)?"); // can match also integers: check for integer before checking for float
     std::regex re_bool("true|false", std::regex::icase);
-    std::regex re_s("\"([^,]+)\"");
+    std::regex re_s("[\"']([^,]+)[\"']");
     std::smatch m;
 
     const std::string not_of_set = " ";
@@ -337,8 +335,8 @@ namespace SmartPeak
   }
 
   std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> Utilities::extractSelectorParameters(
-    const std::vector<std::map<std::string, std::string>>& params,
-    const std::vector<std::map<std::string, std::string>>& score_weights
+    const FunctionParameters& params,
+    const FunctionParameters& score_weights
   )
   {
     // const std::vector<std::string> param_names = {
@@ -352,18 +350,18 @@ namespace SmartPeak
     //   "optimal_thresholds"
     // };
     std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> v;
-    // auto it = std::find_if(params.cbegin(), params.cend(), [](auto& m){ return m.at("name") == "segment_window_lengths"; });
+    // auto it = std::find_if(params.cbegin(), params.cend(), [](auto& m){ return m.getName() == "segment_window_lengths"; });
     // int n_elems = std::count(it->value.cbegin(), it->value.cend(), ',') + 1;
 
     std::map<std::string, std::vector<std::string>> params_map;
 
-    for (const std::map<std::string, std::string>& m : params) {
-      if (params_map.count(m.at("name"))) {
-        throw std::invalid_argument("Did not expect to see the same info (\"" + m.at("name") + "\") defined multiple times.");
+    for (const auto& m : params) {
+      if (params_map.count(m.getName())) {
+        throw std::invalid_argument("Did not expect to see the same info (\"" + m.getName() + "\") defined multiple times.");
       }
-      const std::string s = m.at("value");
+      const std::string s = m.getValueAsString();
       std::vector<std::string> values = splitString(s.substr(1, s.size() - 2), ',');
-      params_map.emplace(m.at("name"), values);
+      params_map.emplace(m.getName(), values);
     }
 
     /*
@@ -407,22 +405,22 @@ namespace SmartPeak
         }
       }
 
-      for (const std::map<std::string, std::string>& sw : score_weights) {
+      for (const auto& sw : score_weights) {
         OpenMS::MRMFeatureSelector::LambdaScore ls;
-        if (sw.at("value") == "lambda score: score*1.0") {
+        if (sw.getValueAsString() == "lambda score: score*1.0") {
           ls = OpenMS::MRMFeatureSelector::LambdaScore::LINEAR;
-        } else if (sw.at("value") == "lambda score: 1/score") {
+        } else if (sw.getValueAsString() == "lambda score: 1/score") {
           ls = OpenMS::MRMFeatureSelector::LambdaScore::INVERSE;
-        } else if (sw.at("value") == "lambda score: log(score)") {
+        } else if (sw.getValueAsString() == "lambda score: log(score)") {
           ls = OpenMS::MRMFeatureSelector::LambdaScore::LOG;
-        } else if (sw.at("value") == "lambda score: 1/log(score)") {
+        } else if (sw.getValueAsString() == "lambda score: 1/log(score)") {
           ls = OpenMS::MRMFeatureSelector::LambdaScore::INVERSE_LOG;
-        } else if (sw.at("value") == "lambda score: 1/log10(score)") {
+        } else if (sw.getValueAsString() == "lambda score: 1/log10(score)") {
           ls = OpenMS::MRMFeatureSelector::LambdaScore::INVERSE_LOG10;
         } else {
-          throw std::invalid_argument("lambda score not recognized: " + sw.at("value") + "\n");
+          throw std::invalid_argument("lambda score not recognized: " + sw.getValueAsString() + "\n");
         }
-        parameters.score_weights.emplace(sw.at("name"), ls);
+        parameters.score_weights.emplace(sw.getName(), ls);
       }
 
       v.emplace_back(parameters);

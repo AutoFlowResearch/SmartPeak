@@ -3,6 +3,7 @@
 #pragma once
 
 #include <SmartPeak/core/CastValue.h>
+#include <SmartPeak/core/Parameters.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 
@@ -58,7 +59,7 @@ public:
     */
     static void updateParameters(
       OpenMS::Param& Param_IO,
-      const std::vector<std::map<std::string, std::string>>& parameters_I
+      const FunctionParameters& parameters_I
     );
 
     /**
@@ -175,8 +176,8 @@ public:
     }
 
     static std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> extractSelectorParameters(
-      const std::vector<std::map<std::string, std::string>>& params,
-      const std::vector<std::map<std::string, std::string>>& score_weights
+      const FunctionParameters& params,
+      const FunctionParameters& score_weights
     );
 
     template<typename Iterator>

@@ -71,6 +71,21 @@ namespace SmartPeak
     LOGD << "END createSequence";
   }
 
+  ParameterSet ProcessSequence::getParameterSchema()
+  {
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"SequenceProcessor", {
+      {
+        {"name", "n_thread"},
+        {"type", "int"},
+        {"value", "6"},
+        {"description", "number of working threads"},
+        {"min", "1"}
+      }
+    }}});
+    return ParameterSet(param_struct);
+  }
+
   void ProcessSequence::process() const
   {
     // Check that there are raw data processing methods
@@ -93,9 +108,9 @@ namespace SmartPeak
     int n_threads = 6;
     if (params.count("SequenceProcessor") && !params.at("SequenceProcessor").empty()) {
       for (const auto& p : params.at("SequenceProcessor")) {
-        if (p.at("name") == "n_thread") {
+        if (p.getName() == "n_thread") {
           try {
-            n_threads = std::stoi(p.at("value"));
+            n_threads = std::stoi(p.getValueAsString());
             LOGI << "n_threads set to " << n_threads;
           }
           catch (const std::exception& e) {

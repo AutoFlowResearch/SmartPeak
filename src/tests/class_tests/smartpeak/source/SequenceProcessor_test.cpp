@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 23);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
   BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureFilter().component_qcs.size(), 324);
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleGroupName(), "Test02");
   BOOST_CHECK_EQUAL(injection5.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
   BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 23);
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
   BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureFilter().component_qcs.size(), 324);
@@ -113,9 +113,9 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
 
   // Test shared resources between all raw data handlers
-  injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name") = "modified";
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "modified");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "modified");
+  injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].setName("modified");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "modified");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "modified");
   auto transitions = injection0.getRawData().getTargetedExperiment().getTransitions();
   transitions[0].setPeptideRef("arg-L-mod");
   injection0.getRawData().getTargetedExperiment().setTransitions(transitions);
@@ -215,10 +215,10 @@ BOOST_AUTO_TEST_CASE(processSequence)
   BOOST_CHECK_EQUAL(n_chroms, 2040); // loaded all injections
 
   // Test multi threading parameters  
-  std::map<std::string, std::vector<std::map<std::string, std::string>>> const* params;
+  ParameterSet const* params;
   params = &rawDataHandler0.getParameters();
   BOOST_CHECK_EQUAL(params->count("SequenceProcessor"), 1);
-  unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].at("value"));
+  unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].getValueAsString());
   BOOST_CHECK_EQUAL(n_threads, 4);
   
   SmartPeak::SequenceProcessorMultithread spMT1(sequenceHandler.getSequence(),

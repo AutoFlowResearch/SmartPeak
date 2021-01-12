@@ -162,13 +162,16 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   //       Need to implement a method that re-organizes the sequence segments if the sequence segment name attribute is modified!
 
   // Test shared resources across all raw data handlers
-  std::map<std::string, std::string> param1; param1.emplace("name", "param1");  // Wow!... MSVC does not like list initializers...
-  std::vector<std::map<std::string, std::string>> params; params.push_back(param1);
-  std::map<std::string, std::vector<std::map<std::string, std::string>>> parameters; parameters.emplace("MRMFeatureFinderScoring", params);
+  auto param1 = Parameter("param1", 0);
+  param1.setName("param1");
+  FunctionParameters params("MRMFeatureFinderScoring");
+  params.addParameter(param1);
+  ParameterSet parameters;
+  parameters.addFunctionParameters(params);
   injection0.getRawData().getParameters() = parameters;
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "param1");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "param1");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "param1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "param1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "param1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "param1");
   OpenMS::ReactionMonitoringTransition srm;
   srm.setPeptideRef("arg-L");
   injection0.getRawData().getTargetedExperiment().setTransitions({srm});
