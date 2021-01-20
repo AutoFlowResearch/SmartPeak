@@ -139,19 +139,14 @@ namespace SmartPeak
       return "int";
     case CastValue::Type::LONG_INT:
       return "long";
-      break;
     case CastValue::Type::BOOL_LIST:
       return "bool_list";
-      break;
     case CastValue::Type::FLOAT_LIST:
       return "float_list";
-      break;
     case CastValue::Type::INT_LIST:
       return "int_list";
-      break;
     case CastValue::Type::STRING_LIST:
       return "string_list";
-      break;
     default:
       throw "Tag type not managed in getType(). Implement it.";
     }
