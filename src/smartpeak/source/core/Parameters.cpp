@@ -438,7 +438,7 @@ namespace SmartPeak
     parameters_.push_back(parameter);
   }
 
-  void FunctionParameters::merge(FunctionParameters& other)
+  void FunctionParameters::merge(const FunctionParameters& other)
   {
     for (auto& parameter : other)
     {
@@ -453,11 +453,7 @@ namespace SmartPeak
         // set it automatically as the schema of the other one.
         if ((parameter.isSchema()) && (!existing_parameter->isSchema()))
         {
-          existing_parameter->setSchema(&parameter);
-        }
-        else if ((existing_parameter->isSchema()) && (!parameter.isSchema()))
-        {
-          parameter.setSchema(existing_parameter);
+          existing_parameter->setSchema(parameter);
         }
         // Else: the existing parameter will not be replaced.
       }
@@ -503,7 +499,7 @@ namespace SmartPeak
     }
   }
 
-  void ParameterSet::merge(ParameterSet& other)
+  void ParameterSet::merge(const ParameterSet& other)
   {
     for (auto& function_parameter : other)
     {

@@ -24,10 +24,10 @@ namespace SmartPeak
 
     // non value
     Parameter(const std::string& name)
-      : value_(), name_(name) { };
+      : name_(name), value_() { };
     // from CastValue
     Parameter(const std::string& name, const CastValue& value)
-      : value_(value), name_(name) { };
+      : name_(name), value_(value) { };
     // from map structure
     Parameter(const std::map<std::string, std::string>& properties);
 
@@ -48,8 +48,8 @@ namespace SmartPeak
     void setDescription(const std::string& description) { description_ = description; };
     const std::string& getDescription(bool use_scheme=true) const { return (use_scheme && schema_) ? schema_->getDescription() : description_; };
 
-    void setSchema(const Parameter* scheme) { schema_ = scheme; }
-    const const Parameter* getSchema() const { return schema_; };
+    void setSchema(const Parameter& schema) { schema_ = std::make_shared<Parameter>(schema); }
+    const Parameter* getSchema() const { return schema_.get(); };
 
     void setTags(const std::vector<std::string>& tags) { tags_ = tags; };
     const std::vector<std::string>& getTags(bool use_scheme = true) const { return (use_scheme && schema_) ? schema_->getTags() : tags_; };
@@ -66,7 +66,7 @@ namespace SmartPeak
     std::string name_;
     CastValue value_;
     std::string description_;
-    const Parameter* schema_ = nullptr;
+    std::shared_ptr <Parameter> schema_;
     std::vector<std::string> tags_;
     std::shared_ptr<CastValue> constraints_min_;
     std::shared_ptr<CastValue> constraints_max_;
@@ -95,7 +95,7 @@ namespace SmartPeak
     Parameter* findParameter(const std::string& parameter);
     const std::string& getFunctionName() const { return function_name_; };
     void addParameter(Parameter& parameter);
-    void merge(FunctionParameters& other);
+    void merge(const FunctionParameters& other);
 
     // underlying vector accessors
     size_t size() const { return parameters_.size(); };
@@ -128,7 +128,7 @@ namespace SmartPeak
     /**
     Will merge with another ParameterSet
     */
-    void merge(ParameterSet& other);
+    void merge(const ParameterSet& other);
 
     /**
     Find a parameter accross the ParameterSet, given a name and a Parameter name
