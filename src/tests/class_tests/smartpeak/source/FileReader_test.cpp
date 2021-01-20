@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(parseopenmsparams)
 
   BOOST_REQUIRE(parameters.count(func1));
   auto function_parameters = parameters.at(func1);
-  BOOST_REQUIRE(function_parameters.size(), 3);
+  BOOST_REQUIRE(function_parameters.size() == 3);
   BOOST_CHECK_EQUAL(function_parameters[0].getName(), "param1");
   BOOST_CHECK_EQUAL(function_parameters[0].getType(), "int");
   BOOST_CHECK_EQUAL(function_parameters[0].getValueAsString(), "-1");
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(parseopenmsparams)
 
   BOOST_REQUIRE(parameters.count(func2));
   function_parameters = parameters.at(func2);
-  BOOST_REQUIRE(function_parameters.size(), 2);
+  BOOST_REQUIRE(function_parameters.size() == 2);
   BOOST_CHECK_EQUAL(function_parameters[0].getName(), "param1");
   BOOST_CHECK_EQUAL(function_parameters[0].getType(), "float");
   BOOST_CHECK_EQUAL(function_parameters[0].getValueAsString(), "0.5");
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(parseopenmsparams)
 
   BOOST_REQUIRE(parameters.count(func3));
   function_parameters = parameters.at(func3);
-  BOOST_REQUIRE(function_parameters.size(), 1);
+  BOOST_REQUIRE(function_parameters.size() == 1);
   BOOST_CHECK_EQUAL(function_parameters[0].getName(), "param1");
   BOOST_CHECK_EQUAL(function_parameters[0].getType(), "bool");
   BOOST_CHECK_EQUAL(function_parameters[0].getValueAsString(), "false");
