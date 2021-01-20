@@ -94,7 +94,7 @@ namespace SmartPeak
 
     Parameter* findParameter(const std::string& parameter);
     const std::string& getFunctionName() const { return function_name_; };
-    void addParameter(Parameter& parameter);
+    void addParameter(const Parameter& parameter);
     void merge(const FunctionParameters& other);
 
     // underlying vector accessors

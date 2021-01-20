@@ -196,7 +196,7 @@ namespace SmartPeak
         return ss.str();
       }
     }
-  };
+  }
 
   bool Parameter::isValid(const CastValue& value, bool use_schema) const
   {
@@ -244,19 +244,19 @@ namespace SmartPeak
       }
       return valid;
     }
-  };
+  }
 
   bool Parameter::isValid(bool use_scheme) const
   {
     return isValid(value_, use_scheme);
-  };
+  }
 
   FunctionParameters::FunctionParameters(const std::string& function_name, const std::vector<std::map<std::string, std::string>>& function_parameters) :
     function_name_(function_name)
   {
     for (const auto& parameter : function_parameters)
     {
-      addParameter(Parameter(parameter));
+      addParameter(parameter);
     }
   }
   
@@ -433,7 +433,7 @@ namespace SmartPeak
     }
   }
 
-  void FunctionParameters::addParameter(Parameter& parameter)
+  void FunctionParameters::addParameter(const Parameter& parameter)
   {
     parameters_.push_back(parameter);
   }
