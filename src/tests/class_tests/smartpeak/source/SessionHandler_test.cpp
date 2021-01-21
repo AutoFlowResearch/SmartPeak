@@ -675,7 +675,7 @@ BOOST_AUTO_TEST_CASE(setFeatureMatrix1)
   SessionHandler session_handler;
   session_handler.setFeatureMatrix(testData.sequenceHandler);
 }
-
+/*
 BOOST_AUTO_TEST_CASE(resetChromatogramRange1)
 {
   SessionHandler session_handler;
@@ -690,6 +690,7 @@ BOOST_AUTO_TEST_CASE(setChromatogramScatterPlot1)
   SessionHandler session_handler;
   session_handler.setChromatogramScatterPlot(testData.sequenceHandler);
 }
+*/
 
 BOOST_AUTO_TEST_CASE(resetSpectrumRange1)
 {

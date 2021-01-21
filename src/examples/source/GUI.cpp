@@ -98,10 +98,7 @@ int main(int argc, char **argv)
 
   // Chromatogram display option
   bool chromatogram_initialized = false;
-  bool show_chromatogram_legend = true;
-  float chromatogram_slider_min = 0.0f;
-  float chromatogram_slider_max = 0.0f;
-  bool chromatogram_compact_view = true;
+  std::unique_ptr<ChromatogramPlotWidget> chromatogram_plot_widget;
 
   // Spectra display option
   bool spectra_initialized = false;
@@ -943,6 +940,14 @@ int main(int argc, char **argv)
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
         {
           // Filter for the position
+          if (!chromatogram_plot_widget)
+          {
+            chromatogram_plot_widget = std::make_unique<ChromatogramPlotWidget>(
+              session_handler_, 
+              application_handler_.sequenceHandler_,
+              "Chromatograms Main Window");
+          }
+          chromatogram_plot_widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
           if (!workflow_is_done_)
           {
             chromatogram_initialized = false;
@@ -951,26 +956,12 @@ int main(int argc, char **argv)
           {
             if (!chromatogram_initialized)
             {
-              session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-              session_handler_.resetChromatogramRange();
-            }
-            exceeding_plot_points_ = !session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
-            if (!chromatogram_initialized)
-            {
-              // Get min and max for the sliders, adjust range to initial value
-              session_handler_.chrom_time_range.first = chromatogram_slider_min = session_handler_.chrom_time_min;
-              session_handler_.chrom_time_range.second = chromatogram_slider_max = session_handler_.chrom_time_max;
+              chromatogram_plot_widget->setRefreshNeeded();
               chromatogram_initialized = true;
             }
           }
           // The actual plot
-          ChromatogramPlotWidget plot2d(session_handler_.chrom_time_raw_data, session_handler_.chrom_intensity_raw_data, session_handler_.chrom_series_raw_names,
-            session_handler_.chrom_time_hull_data, session_handler_.chrom_intensity_hull_data, session_handler_.chrom_series_hull_names,
-            session_handler_.chrom_x_axis_title, session_handler_.chrom_y_axis_title,
-            session_handler_.chrom_time_range.first, session_handler_.chrom_time_range.second, session_handler_.chrom_intensity_min, session_handler_.chrom_intensity_max,
-            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_,
-            "Chromatograms Main Window", show_chromatogram_legend, chromatogram_slider_min, chromatogram_slider_max, chromatogram_compact_view);
-          plot2d.draw();
+          chromatogram_plot_widget->draw();
           ImGui::EndTabItem();
         }
         if (show_spectra_line_plot && ImGui::BeginTabItem("Spectra", &show_spectra_line_plot))
@@ -997,13 +988,16 @@ int main(int argc, char **argv)
             }
           }
           // The actual plot
+          /*
           ChromatogramPlotWidget plot2d(session_handler_.spec_mz_raw_data, session_handler_.spec_intensity_raw_data, session_handler_.spec_series_raw_names,
             session_handler_.spec_mz_hull_data, session_handler_.spec_intensity_hull_data, session_handler_.spec_series_hull_names,
             session_handler_.spec_x_axis_title, session_handler_.spec_y_axis_title,
             session_handler_.spec_mz_range.first, session_handler_.spec_mz_range.second, session_handler_.spec_intensity_min, session_handler_.spec_intensity_max,
             win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, 
             "Spectra Main Window", show_spectra_legend, spectra_slider_min, spectra_slider_max, spectra_compact_view);
+
           plot2d.draw();
+          */
           ImGui::EndTabItem();
         }
         if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))

@@ -31,6 +31,23 @@ namespace SmartPeak
 {
   class SessionHandler {
   public:
+
+    struct ChromatogramScatterPlot
+    {
+      std::vector<std::vector<float>> x_data_area_;
+      std::vector<std::vector<float>> y_data_area_;
+      std::vector<std::vector<float>> x_data_scatter_;
+      std::vector<std::vector<float>> y_data_scatter_;
+      std::vector<std::string> series_names_area_;
+      std::vector<std::string> series_names_scatter_;
+      std::string x_axis_title_;
+      std::string y_axis_title_;
+      float x_min_ = 0.0f;
+      float x_max_ = 0.0f;
+      float y_min_ = 0.0f;
+      float y_max_ = 0.0f;
+    };
+
     /*
     @brief Sets minimal amount of data needed for injection, transition, and feature filters.
       The method sets the SequenceTable, TransitionsTable, InjectionExplorer, TransitionExplorer, and FeatureExplorer
@@ -90,7 +107,11 @@ namespace SmartPeak
 
     @returns true if all points were added and false if points were omitted due to performance
     */
-    bool setChromatogramScatterPlot(const SequenceHandler& sequence_handler);
+    bool getChromatogramScatterPlot(const SequenceHandler& sequence_handler, 
+                                    ChromatogramScatterPlot& result,
+                                    const std::pair<float, float>& range,
+                                    const std::set<std::string>& sample_names,
+                                    const std::set<std::string>& component_names);
     /*
     @brief reset range to large enough value in order to parse the chromatogram entirely
     */
@@ -260,16 +281,6 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 1> feature_pivot_table_headers;
     Eigen::Tensor<std::string, 2> feature_pivot_table_rows;
     Eigen::Tensor<std::string, 2> feature_pivot_table_body;
-    // data for the chromatogram scatter plot
-    std::vector<std::vector<float>> chrom_time_hull_data, chrom_intensity_hull_data;
-    std::vector<std::vector<float>> chrom_time_raw_data, chrom_intensity_raw_data;
-    std::vector<std::string> chrom_series_hull_names,chrom_series_raw_names;
-    std::string chrom_x_axis_title;
-    std::string chrom_y_axis_title;
-    float chrom_time_min = 0.0f;
-    float chrom_time_max = 0.0f;
-    float chrom_intensity_min, chrom_intensity_max;
-    std::pair<float, float> chrom_time_range;
     // data for the spectrum scatter plot
     std::vector<std::vector<float>> spec_mz_hull_data, spec_intensity_hull_data;
     std::vector<std::vector<float>> spec_mz_raw_data, spec_intensity_raw_data;
@@ -299,7 +310,6 @@ namespace SmartPeak
     std::string calibrators_y_axis_title;
     float calibrators_conc_min , calibrators_conc_max, calibrators_feature_min, calibrators_feature_max;
   private:
-    std::set<std::string> chrom_series_hull_names_;
     std::set<std::string> spec_series_hull_names_;
     int feature_table_unique_samples_transitions_ = 0; // used to decide when to update the feature table data
     int feature_matrix_unique_transitions_ = 0; // used to decide when to update the feature matrix data

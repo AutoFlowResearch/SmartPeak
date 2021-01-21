@@ -1630,48 +1630,34 @@ namespace SmartPeak
       }
     }
   }
-  void SessionHandler::resetChromatogramRange()
-  {
-    chrom_time_range = std::make_pair(0, 1800);
-  }
-  bool SessionHandler::setChromatogramScatterPlot(const SequenceHandler & sequence_handler)
+  
+  bool SessionHandler::getChromatogramScatterPlot(const SequenceHandler & sequence_handler, 
+                                                  ChromatogramScatterPlot& result, 
+                                                  const std::pair<float, float>& chrom_time_range,
+                                                  const std::set<std::string>& sample_names,
+                                                  const std::set<std::string>& component_names)
   {
     const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
     int n_points = 0;
     if (sequence_handler.getSequence().size() > 0 &&
       (sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 ||
       sequence_handler.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0)) {
-      // get the selected sample names
-      Eigen::Tensor<std::string, 1> selected_sample_names = getSelectSampleNamesPlot();
-      std::set<std::string> sample_names;
-      for (int i = 0; i < selected_sample_names.size(); ++i) {
-        if (!selected_sample_names(i).empty())
-          sample_names.insert(selected_sample_names(i));
-      }
-      // get the selected transitions
-      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsPlot();
-      std::set<std::string> component_names;
-      for (int i = 0; i < selected_transitions.size(); ++i) {
-        if (!selected_transitions(i).empty())
-          component_names.insert(selected_transitions(i));
-      }
-      if ((sequence_handler.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0 && chrom_time_raw_data.size() != selected_sample_names.size() * component_names.size())
-        || (sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 && chrom_series_hull_names_.size() != selected_sample_names.size() * component_names.size())) {
+      if ((sequence_handler.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0)
+        || (sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)) {
         LOGD << "Making the chromatogram data for plotting";
         // Set the axes titles and min/max defaults
-        chrom_x_axis_title = "Time (sec)";
-        chrom_y_axis_title = "Intensity (au)";
-        chrom_time_min = 1e6;
-        chrom_time_max = 0;
-        chrom_intensity_min = 1e6;
-        chrom_intensity_max = 0;
-        chrom_time_hull_data.clear();
-        chrom_intensity_hull_data.clear();
-        chrom_series_hull_names_.clear();
-        chrom_series_hull_names.clear();
-        chrom_time_raw_data.clear();
-        chrom_intensity_raw_data.clear();
-        chrom_series_raw_names.clear();
+        result.x_axis_title_ = "Time (sec)";
+        result.y_axis_title_ = "Intensity (au)";
+        result.x_min_ = 1e6;
+        result.x_max_ = 0;
+        result.y_min_ = 1e6;
+        result.y_max_ = 0;
+        result.x_data_area_.clear();
+        result.y_data_area_.clear();
+        result.series_names_area_.clear();
+        result.x_data_scatter_.clear();
+        result.y_data_scatter_.clear();
+        result.series_names_scatter_.clear();
         for (const auto& injection : sequence_handler.getSequence()) {
           if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
           // Extract out the raw data for plotting
@@ -1682,16 +1668,16 @@ namespace SmartPeak
             for (auto point = chromatogram.PosBegin(chrom_time_range.first); point != chromatogram.PosEnd(chrom_time_range.second); ++point) {
               x_data.push_back(point->getRT());
               y_data.push_back(point->getIntensity());
-              chrom_time_min = std::min((float)point->getRT(), chrom_time_min);
-              chrom_intensity_min = std::min((float)point->getIntensity(), chrom_intensity_min);
-              chrom_time_max = std::max((float)point->getRT(), chrom_time_max);
-              chrom_intensity_max = std::max((float)point->getIntensity(), chrom_intensity_max);
+              result.x_min_ = std::min((float)point->getRT(), result.x_min_);
+              result.y_min_ = std::min((float)point->getIntensity(), result.y_min_);
+              result.x_max_ = std::max((float)point->getRT(), result.x_max_);
+              result.y_max_ = std::max((float)point->getIntensity(), result.y_max_);
             }
             n_points += x_data.size();
             if (n_points<MAX_POINTS) {
-              chrom_time_raw_data.push_back(x_data);
-              chrom_intensity_raw_data.push_back(y_data);
-              chrom_series_raw_names.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
+              result.x_data_scatter_.push_back(x_data);
+              result.y_data_scatter_.push_back(y_data);
+              result.series_names_scatter_.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
             }
             else {
               LOGD << "Stopped adding points to the chromatogram plot";
@@ -1727,18 +1713,17 @@ namespace SmartPeak
                   if (point.getX() < chrom_time_range.first || point.getX() > chrom_time_range.second) continue;
                   x_data.push_back(point.getX());
                   y_data.push_back(point.getY());
-                  chrom_time_min = std::min((float)point.getX(), chrom_time_min);
-                  chrom_intensity_min = std::min((float)point.getY(), chrom_intensity_min);
-                  chrom_time_max = std::max((float)point.getX(), chrom_time_max);
-                  chrom_intensity_max = std::max((float)point.getY(), chrom_intensity_max);
+                  result.x_min_ = std::min((float)point.getX(), result.x_min_);
+                  result.y_min_ = std::min((float)point.getY(), result.y_min_);
+                  result.x_max_ = std::max((float)point.getX(), result.x_max_);
+                  result.y_max_ = std::max((float)point.getY(), result.y_max_);
                 }
                 if (x_data.size() <= 0) continue;
                 n_points += x_data.size();
                 if (n_points < MAX_POINTS) {
-                  chrom_time_hull_data.push_back(x_data);
-                  chrom_intensity_hull_data.push_back(y_data);
-                  chrom_series_hull_names_.insert(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("native_id").toString());
-                  chrom_series_hull_names.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("native_id").toString() + "::" + subordinate.getMetaValue("timestamp_").toString());
+                  result.x_data_area_.push_back(x_data);
+                  result.y_data_area_.push_back(y_data);
+                  result.series_names_area_.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("native_id").toString() + "::" + subordinate.getMetaValue("timestamp_").toString());
                 }
                 else {
                   LOGD << "Stopped adding points to the chromatogram plot";
