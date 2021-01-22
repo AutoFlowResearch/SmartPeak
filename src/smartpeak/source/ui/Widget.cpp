@@ -238,38 +238,9 @@ namespace SmartPeak
     }
   }
 
-  void ChromatogramPlotWidget::draw()
+  void ScatterPlotWidget::draw()
   {
-    // get the selected sample names
-    Eigen::Tensor<std::string, 1> selected_sample_names = session_handler_.getSelectSampleNamesPlot();
-    std::set<std::string> sample_names;
-    for (int i = 0; i < selected_sample_names.size(); ++i) {
-      if (!selected_sample_names(i).empty())
-        sample_names.insert(selected_sample_names(i));
-    }
-    // get the selected transitions
-    Eigen::Tensor<std::string, 1> selected_transitions = session_handler_.getSelectTransitionsPlot();
-    std::set<std::string> component_names;
-    for (int i = 0; i < selected_transitions.size(); ++i) {
-      if (!selected_transitions(i).empty())
-        component_names.insert(selected_transitions(i));
-    }
-
-    if (refresh_needed_)
-    {
-      // get the whole graph area
-      current_range_ = std::make_pair(0, 1800); // TODO different for spectrum
-      session_handler_.getChromatogramScatterPlot(sequence_handler_, chrom_, current_range_, sample_names, component_names);
-      current_range_ = slider_min_max_ = input_range_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
-      refresh_needed_ = false;
-    }
-    if ((input_range_ != current_range_) || (input_component_names_ != component_names) || (input_sample_names_ != sample_names))
-    {
-      session_handler_.getChromatogramScatterPlot(sequence_handler_, chrom_, current_range_, sample_names, component_names);
-      input_range_ = current_range_;
-      input_sample_names_ = sample_names;
-      input_component_names_ = component_names;
-    }
+    updateScatterPlotData();
     // Widget's controls - that ImGui does not support natively
     const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_AlwaysClamp;
     float controls_pos_start_y = ImGui::GetCursorPosY();
@@ -316,40 +287,7 @@ namespace SmartPeak
       ImPlot::EndPlot();
     }
   }
-
-  void CalibratorsPlotWidget::draw()
-  {
-    // Main graphic
-    ImPlot::SetNextPlotLimits(x_min_, x_max_, y_min_, y_max_, ImGuiCond_Always);
-    if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(plot_width_ - 25, plot_height_ - 40))) {
-      for (int i = 0; i < x_raw_data_.size(); ++i) {
-        assert(x_raw_data_.at(i).size() == y_raw_data_.at(i).size());
-        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotScatter((series_names_.at(i) + "-pts").c_str(), x_raw_data_.at(i).data(), y_raw_data_.at(i).data(), x_raw_data_.at(i).size());
-      }
-      for (int i = 0; i < x_fit_data_.size(); ++i) {
-        assert(x_fit_data_.at(i).size() == y_fit_data_.at(i).size());
-        ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
-        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotLine((series_names_.at(i) + "-fit").c_str(), x_fit_data_.at(i).data(), y_fit_data_.at(i).data(), x_fit_data_.at(i).size());
-      }
-      ImPlot::EndPlot();
-    }
-  }
-
-  void Heatmap2DWidget::draw()
-  {
-    // Main graphic
-    if (rows_.size() > 1 || columns_.size() > 1) {
-      assert(data_.dimension(0) == rows_.size() && data_.dimension(1) == columns_.size());
-      const ImPlotFlags imPlotFlags = ImPlotFlags_MousePos | ImPlotFlags_Highlight | ImPlotFlags_BoxSelect | ImPlotFlags_ContextMenu;
-      if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(plot_width_ - 25, plot_height_ - 40), imPlotFlags)) {
-        ImPlot::PlotHeatmap(("##" + plot_title_).c_str(), data_.data(), rows_.size(), columns_.size(), data_min_, data_max_, NULL);
-        ImPlot::EndPlot();
-      }
-    }
-  }
-
+  
   void GenericTreeWidget::draw()
   {
     // left

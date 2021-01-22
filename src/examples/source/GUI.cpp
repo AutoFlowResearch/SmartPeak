@@ -10,6 +10,10 @@
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/ui/GuiAppender.h>
+#include <SmartPeak/ui/Heatmap2DWidget.h>
+#include <SmartPeak/ui/CalibratorsPlotWidget.h>
+#include <SmartPeak/ui/ChromatogramPlotWidget.h>
+#include <SmartPeak/ui/SpectraPlotWidget.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
@@ -102,10 +106,7 @@ int main(int argc, char **argv)
 
   // Spectra display option
   bool spectra_initialized = false;
-  bool show_spectra_legend = true;
-  float spectra_slider_min = 0.0f;
-  float spectra_slider_max = 0.0f;
-  bool spectra_compact_view = true;
+  std::unique_ptr<SpectraPlotWidget> spectra_plot_widget;
 
   // Popup modals
   bool popup_about_ = false;
@@ -939,7 +940,6 @@ int main(int argc, char **argv)
         }
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
         {
-          // Filter for the position
           if (!chromatogram_plot_widget)
           {
             chromatogram_plot_widget = std::make_unique<ChromatogramPlotWidget>(
@@ -966,7 +966,14 @@ int main(int argc, char **argv)
         }
         if (show_spectra_line_plot && ImGui::BeginTabItem("Spectra", &show_spectra_line_plot))
         {
-          // Filter for the position
+          if (!spectra_plot_widget)
+          {
+            spectra_plot_widget = std::make_unique<SpectraPlotWidget>(
+              session_handler_,
+              application_handler_.sequenceHandler_,
+              "Spectra Main Window");
+          }
+          spectra_plot_widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
           if (!workflow_is_done_)
           {
             spectra_initialized = false;
@@ -975,29 +982,12 @@ int main(int argc, char **argv)
           {
             if (!spectra_initialized)
             {
-              session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-              session_handler_.resetSpectrumRange();
-            }
-            exceeding_plot_points_ = !session_handler_.setSpectrumScatterPlot(application_handler_.sequenceHandler_);
-            if (!spectra_initialized)
-            {
-              // Get min and max for the sliders, adjust range to initial value
-              session_handler_.spec_mz_range.first =  spectra_slider_min = session_handler_.spec_mz_min;
-              session_handler_.spec_mz_range.second = spectra_slider_max = session_handler_.spec_mz_max;
+              spectra_plot_widget->setRefreshNeeded();
               spectra_initialized = true;
             }
           }
           // The actual plot
-          /*
-          ChromatogramPlotWidget plot2d(session_handler_.spec_mz_raw_data, session_handler_.spec_intensity_raw_data, session_handler_.spec_series_raw_names,
-            session_handler_.spec_mz_hull_data, session_handler_.spec_intensity_hull_data, session_handler_.spec_series_hull_names,
-            session_handler_.spec_x_axis_title, session_handler_.spec_y_axis_title,
-            session_handler_.spec_mz_range.first, session_handler_.spec_mz_range.second, session_handler_.spec_intensity_min, session_handler_.spec_intensity_max,
-            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, 
-            "Spectra Main Window", show_spectra_legend, spectra_slider_min, spectra_slider_max, spectra_compact_view);
-
-          plot2d.draw();
-          */
+          spectra_plot_widget->draw();
           ImGui::EndTabItem();
         }
         if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
