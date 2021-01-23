@@ -33,8 +33,8 @@ jobs:
           pip3 install exhale
       - run: |
           cd ~ &&
-          # git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-          git clone --branch feat/aut509 --depth 1 https://github.com/ahmedskhalil/OpenMS.git &&
+          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
+          # git clone --branch feat/aut509 --depth 1 https://github.com/ahmedskhalil/OpenMS.git &&
           cd OpenMS && git submodule update --init THIRDPARTY &&
           cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
           make -j4 OpenMS
@@ -90,8 +90,8 @@ jobs:
           # brew install coin-or-tools/coinor/coin_data_sample coin-or-tools/coinor/coinutils coin-or-tools/coinor/osi || true
       - run: |
           cd ~ &&
-          # git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-          git clone --branch feat/aut509 --depth 1 https://github.com/ahmedskhalil/OpenMS.git &&
+          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
+          # git clone --branch feat/aut509 --depth 1 https://github.com/ahmedskhalil/OpenMS.git &&
           cd OpenMS && mkdir contrib_build && cd contrib_build
           curl -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
           tar -xzf contrib_build.tar.gz
@@ -173,8 +173,8 @@ jobs:
           $boost_tmp | Remove-Item
       - run: |
           cd ~
-          # git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
-          git clone --branch feat/aut509 --depth 1 https://github.com/ahmedskhalil/OpenMS.git
+          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
+          # git clone --branch feat/aut509 --depth 1 https://github.com/ahmedskhalil/OpenMS.git
           cd ~/OpenMS
       - run: |
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
