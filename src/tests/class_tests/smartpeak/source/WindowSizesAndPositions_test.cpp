@@ -52,6 +52,46 @@ BOOST_AUTO_TEST_CASE(setXAndYSizes)
   BOOST_CHECK_CLOSE(win_size_and_pos.x_size_, 10, 1e-3);
 }
 
+BOOST_AUTO_TEST_CASE(setLeftWindowXSize)
+{
+  WindowSizesAndPositions win_size_and_pos;
+  win_size_and_pos.setXAndYSizes(100, 100);
+  win_size_and_pos.setLeftWindowXSize(10);
+  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
+  BOOST_CHECK_CLOSE(win_size_and_pos.bottom_window_y_size_, 20.5 , 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.top_window_y_size_, 61.5, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.bottom_and_top_window_x_size_, 90, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.left_and_right_window_y_size_, 82, 1e-3); //
+  BOOST_CHECK_CLOSE(win_size_and_pos.left_window_x_size_, 10, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.right_window_x_size_, 0, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.bottom_window_y_pos_, 79.5, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.top_window_y_pos_, 18, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.bottom_and_top_window_x_pos_, 10, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.left_and_right_window_y_pos_, 18, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.left_window_x_pos_, 0, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.right_window_x_pos_, 100, 1e-3);
+}
+
+BOOST_AUTO_TEST_CASE(setTopWindowYSize)
+{
+  WindowSizesAndPositions win_size_and_pos;
+  win_size_and_pos.setXAndYSizes(100, 100);
+  win_size_and_pos.setTopWindowYSize(10);
+  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
+  BOOST_CHECK_CLOSE(win_size_and_pos.bottom_window_y_size_, 72, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.top_window_y_size_, 10, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.bottom_and_top_window_x_size_, 75, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.left_and_right_window_y_size_, 82, 1e-3); //
+  BOOST_CHECK_CLOSE(win_size_and_pos.left_window_x_size_, 25, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.right_window_x_size_, 0, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.bottom_window_y_pos_, 28, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.top_window_y_pos_, 18, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.bottom_and_top_window_x_pos_, 25, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.left_and_right_window_y_pos_, 18, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.left_window_x_pos_, 0, 1e-3);
+  BOOST_CHECK_CLOSE(win_size_and_pos.right_window_x_pos_, 100, 1e-3);
+}
+
 BOOST_AUTO_TEST_CASE(setWindowPercentages)
 {
   WindowSizesAndPositions win_size_and_pos;
