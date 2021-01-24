@@ -179,7 +179,7 @@ namespace SmartPeak
     update_contents(Im_directory_entries);
     
     ImVec2 size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 2);
-    if (ImGui::BeginTable("ImDirectoryEntry", column_count, table_flags, size))
+    if (ImGui::BeginTable("FileBrowser", column_count, table_flags, size))
     {
       for (int column = 0; column < column_count; column++){
         ImGui::TableSetupColumn(column_names[column], column_flags[column], -1.0f, content_column_ID[column]);
@@ -235,7 +235,7 @@ namespace SmartPeak
             sprintf(text_buffer, "%s", item->DateModified);
           }
           
-          char buf[256];
+//          char buf[256];
           const bool is_selected = (selected_entry == row);
           ImGui::TableSetColumnIndex(column);
           if(ImGui::Selectable(text_buffer, is_selected, selectable_flags))
@@ -243,7 +243,7 @@ namespace SmartPeak
             selected_entry = row;
             std::strcpy(selected_filename, Im_directory_entries[selected_entry].Name);
             if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item->Type , "Directory") )
-            {
+            { // TODO:double-click to open file
               if (current_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
               {
                 current_pathname_.append("/");
@@ -283,7 +283,7 @@ namespace SmartPeak
         {
           picked_pathname_.append("/");
         }
-        picked_pathname_.append(pathname_content_[0][selected_entry]);
+        picked_pathname_.append(pathname_content_[0][selected_entry]); //TODO:sanity check
       }
       LOGI << "Picked pathname: " << picked_pathname_;
       runProcessor();

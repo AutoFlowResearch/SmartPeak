@@ -8,6 +8,7 @@
 
 namespace SmartPeak
 {
+  struct ImTableEntry;
   /**
     @brief Abstract base class for all panes, windows, and widgets
 

@@ -5,10 +5,175 @@
 #include <utility>
 #include <vector>
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <implot.h>
 
 namespace SmartPeak
 {
+  enum ContentColumnID
+  {
+    ContentColumnID_ID,
+    ContentColumnID_1,
+    ContentColumnID_2,
+    ContentColumnID_3,
+    ContentColumnID_4,
+    ContentColumnID_5,
+    ContentColumnID_6,
+    ContentColumnID_7
+  };
+
+  struct ImTableEntry
+  {
+    int         Header_ID;
+    const char* Header_1;
+    const char* Header_2;
+    const char* Header_3;
+    const char* Header_4;
+    const char* Header_5;
+    const char* Header_6;
+    const char* Header_7;
+    
+    static const ImGuiTableSortSpecs* s_current_sort_specs;
+    
+    static bool is_digit(const char ch)
+    {
+      return ch >= '0' && ch <= '9';
+    }
+    
+    static int lexicographical_sort(const char* lhs, const char* rhs)
+    {
+      enum SearchMode { STRING, NUMBER } search_mode = STRING;
+      while (*lhs && *rhs)
+      {
+        if (search_mode == STRING)
+        {
+          char lhs_char, rhs_char;
+          while ((lhs_char = *lhs) && (rhs_char = *rhs))
+          {
+            const bool lhs_digit = is_digit(lhs_char), rhs_digit = is_digit(rhs_char);
+            if(lhs_digit && rhs_digit)
+            {
+              search_mode = NUMBER;
+              break;
+            }
+  
+            if(lhs_digit)
+              return -1;
+  
+            if(rhs_digit)
+              return +1;
+            
+            const int char_diff = lhs_char - rhs_char;
+            if(char_diff != 0)
+              return char_diff;
+            
+            ++lhs;
+            ++rhs;
+          }
+        }
+        else if (search_mode == NUMBER)
+        {
+          unsigned long lhs_int = 0;
+          while (*lhs && is_digit(*lhs))
+          {
+            lhs_int = lhs_int*10 + *lhs-'0';
+            ++lhs;
+          }
+          unsigned long rhs_int = 0;
+          while (*rhs && is_digit(*rhs))
+          {
+            rhs_int = rhs_int*10 + *rhs-'0';
+            ++rhs;
+          }
+      
+          const long int_diff = lhs_int - rhs_int;
+          if(int_diff != 0)
+            return int_diff;
+
+          search_mode = STRING;
+        }
+      }
+      
+      std::string a_str, b_str;
+      a_str = lhs;
+      b_str = rhs;
+      std::string a_str_lowercased(a_str.length(),' ');
+      std::string b_str_lowercased(b_str.length(),' ');
+      std::transform(a_str.begin(), a_str.end(), a_str_lowercased.begin(), tolower);
+      std::transform(b_str.begin(), b_str.end(), b_str_lowercased.begin(), tolower);
+
+      if  (!a_str_lowercased.empty() && !b_str_lowercased.empty() && a_str_lowercased.front()
+           == b_str_lowercased.front()) {
+        return a_str.compare(b_str);
+      }
+      else
+      {
+        // case-insensitive lexicographic sort
+        return a_str_lowercased.compare(b_str_lowercased);
+      }
+    }
+
+    static int IMGUI_CDECL CompareWithSortSpecs(const void* lhs, const void* rhs)
+    {
+      const ImTableEntry* a = (const ImTableEntry*)lhs;
+      const ImTableEntry* b = (const ImTableEntry*)rhs;
+      for (int n = 0; n < s_current_sort_specs->SpecsCount; n++)
+      {
+        const ImGuiTableSortSpecsColumn* sort_spec = &s_current_sort_specs->Specs[n];
+        int delta = 0;
+        
+        auto column_id = sort_spec->ColumnUserID;
+        switch (column_id)
+        {
+          case ContentColumnID_ID:
+            delta = (a->Header_ID - b->Header_ID);
+            break;
+
+          case ContentColumnID_1:
+            delta = lexicographical_sort(a->Header_1, b->Header_1);
+            break;
+            
+          case ContentColumnID_2:
+            delta = lexicographical_sort(a->Header_2, b->Header_2);
+            break;
+            
+          case ContentColumnID_3:
+            delta = lexicographical_sort(a->Header_3, b->Header_3);
+            break;
+            
+          case ContentColumnID_4:
+            delta = lexicographical_sort(a->Header_4, b->Header_4);
+            break;
+            
+          case ContentColumnID_5:
+            delta = lexicographical_sort(a->Header_5, b->Header_5);
+            break;
+            
+          case ContentColumnID_6:
+            delta = lexicographical_sort(a->Header_6, b->Header_6);
+            break;
+            
+          case ContentColumnID_7:
+            delta = lexicographical_sort(a->Header_7, b->Header_7);
+            break;
+            
+          default: IM_ASSERT(0); break;
+        }
+        if (delta > 0)
+          return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? +1 : -1;
+        if (delta < 0)
+          return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? -1 : +1;
+      }
+      
+      if (a->Header_1 != nullptr && b->Header_1 != nullptr)
+        return (strcmp(a->Header_1, b->Header_1));
+      else
+        return (a->Header_ID - a->Header_ID);
+    }
+  };
+
+  const ImGuiTableSortSpecs* ImTableEntry::s_current_sort_specs = NULL;
+
   void Widget::FilterPopup(
     const char* popuop_id,
     ImGuiTextFilter& filter,
@@ -51,19 +216,6 @@ namespace SmartPeak
         checked[i] = checked[indexes.second.front()];
       }
     }
-
-    // NOTE: Appears to apply the filter immediately so this is not needed
-    // // Apply filters
-    // ImGui::Separator();
-    // if (ImGui::Button("Accept"))
-    // {
-    //   //TODO: apply filter and exit
-    // }
-    // ImGui::SameLine();
-    // if (ImGui::Button("Cancel"))
-    // {
-    //   //TODO: exit without applying filter
-    // }
 
     ImGui::EndPopup();
   }
@@ -143,19 +295,95 @@ namespace SmartPeak
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
       ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
+    
+    static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
+    static ImGuiTableColumnFlags column_any_flags = { ImGuiTableColumnFlags_NoHide };
 
     static ImGuiTextFilter filter;
     filter.Draw("Find");
+    static ImVector<ImTableEntry> injection_table_entries;
+    static ImVector<ImTableEntry> transition_table_entries;
+    static ImVector<ImTableEntry> feature_table_entries;
+    static bool injections_scanned  = false;
+    static bool transitions_scanned = false;
+    static bool features_scanned    = false;
+    static std::string current_tab;
+    
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "TransitionsExplorerWindow") {
+      transition_table_entries.resize(columns_.dimension(0));
+      if (!transition_table_entries.empty() && transitions_scanned == false) {
+        for (size_t row = 0; row < columns_.dimension(0); ++row) {
+          ImTableEntry& Im_table_entry = transition_table_entries[row];
+          Im_table_entry.Header_1 = columns_(row, 0).c_str();
+          Im_table_entry.Header_2 = columns_(row, 1).c_str();
+        }
+        transitions_scanned = true;
+      }
+    }
+    
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "InjectionsExplorerWindow") {
+      injection_table_entries.resize(columns_.dimension(0));
+      if (!injection_table_entries.empty() && injections_scanned == false) {
+        for (size_t row = 0; row < columns_.dimension(0); ++row) {
+          ImTableEntry& Im_table_entry = injection_table_entries[row];
+          Im_table_entry.Header_ID = std::stol(columns_(row, 0).c_str());
+          Im_table_entry.Header_1 = columns_(row, 1).c_str();
+        }
+        injections_scanned = true;
+      }
+    }
+    
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "FeaturesExplorerWindow") {
+      feature_table_entries.resize(columns_.dimension(0));
+      if (!feature_table_entries.empty() && features_scanned == false) {
+        for (size_t row = 0; row < columns_.dimension(0); ++row) {
+          ImTableEntry& Im_table_entry = feature_table_entries[row];
+          Im_table_entry.Header_1 = columns_(row, 0).c_str();
+        }
+        features_scanned = true;
+      }
+    }
+    
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
-        ImGui::TableSetupColumn(headers_(col).c_str());
+        ImGui::TableSetupColumn(headers_(col).c_str(), col == 0 ? column_0_flags : column_any_flags, -1.0f, col);
       }
       for (int col = 0; col < checkbox_headers_.size(); col++) {
         ImGui::TableSetupColumn(checkbox_headers_(col).c_str());
       }
+      
       ImGui::TableSetupScrollFreeze(headers_.size() + checkbox_headers_.size(), 1);
       ImGui::TableHeadersRow();
+      
+      if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
+      {
+        if (sorts_specs->SpecsDirty && (injections_scanned == true ) && table_id_ == "InjectionsExplorerWindow")
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (injection_table_entries.Size > 1)
+              qsort(&injection_table_entries[0], (size_t)injection_table_entries.Size, sizeof(injection_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+        if (sorts_specs->SpecsDirty && (transitions_scanned == true) && table_id_ == "TransitionsExplorerWindow")
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (transition_table_entries.Size > 1)
+              qsort(&transition_table_entries[0], (size_t)transition_table_entries.Size, sizeof(transition_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+        if (sorts_specs->SpecsDirty && (features_scanned == true) && table_id_ == "FeaturesExplorerWindow")
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (feature_table_entries.Size > 1)
+              qsort(&feature_table_entries[0], (size_t)feature_table_entries.Size, sizeof(feature_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+
+      }
       
       // Second row to end body
       if (columns_.size() > 0) {
@@ -173,9 +401,58 @@ namespace SmartPeak
             }
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col) {
+              char table_entry[256];
               ImGui::TableSetColumnIndex(col);
-              ImGui::Text("%s", columns_(row, col).c_str());
+              if (table_id_ == "InjectionsExplorerWindow" && injections_scanned==true && !injection_table_entries.empty() )
+              {
+                current_tab = "InjectionsExplorerWindow";
+                ImTableEntry* item = &injection_table_entries[row];
+                
+                if (col == 0)
+                {
+                  sprintf(table_entry, "%d", item->Header_ID);
+                }
+                else if (col == 1 )
+                {
+                  sprintf(table_entry, "%s", item->Header_1);
+                }
+
+                ImGui::Text("%s", table_entry);
+                memset(table_entry, 0, sizeof(table_entry));
+                  
+              }
+              else if (table_id_ == "TransitionsExplorerWindow" && transitions_scanned == true && !transition_table_entries.empty())
+              {
+                current_tab = "TransitionsExplorerWindow";
+                ImTableEntry* item = &transition_table_entries[row];
+                  
+                if (col == 0)
+                {
+                  sprintf(table_entry, "%s", item->Header_1);
+                }
+                else if (col == 1 )
+                {
+                  sprintf(table_entry, "%s", item->Header_2);
+                }
+
+                ImGui::Text("%s", table_entry);
+                memset(table_entry, 0, sizeof(table_entry));
+              }
+              else if (table_id_ == "FeaturesExplorerWindow" && features_scanned == true && !feature_table_entries.empty())
+              {
+                current_tab = "TransitionsExplorerWindow";
+                ImTableEntry* item = &feature_table_entries[row];
+                  
+                if (col == 0)
+                {
+                  sprintf(table_entry, "%s", item->Header_1);
+                }
+
+                ImGui::Text("%s", table_entry);
+                memset(table_entry, 0, sizeof(table_entry));
+              }
             }
+            
             for (size_t col = 0; col < checkbox_headers_.size(); ++col) {
               std::string id = table_id_ + std::to_string(col) + std::to_string(row*columns_.dimension(1));
               ImGui::TableSetColumnIndex(col + headers_.size());
