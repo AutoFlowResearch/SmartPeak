@@ -24,7 +24,8 @@ namespace SmartPeak
 
   struct ImTableEntry
   {
-    int         Header_ID;
+    //int         Header_ID;
+    const char* Header_ID;
     const char* Header_1;
     const char* Header_2;
     const char* Header_3;
@@ -38,6 +39,11 @@ namespace SmartPeak
     static bool is_digit(const char ch)
     {
       return ch >= '0' && ch <= '9';
+    }
+    
+    static bool is_number(const std::string& s)
+    {
+      return !s.empty() && std::find_if(s.begin(), s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
     }
     
     static int lexicographical_sort(const char* lhs, const char* rhs)
@@ -126,8 +132,18 @@ namespace SmartPeak
         switch (column_id)
         {
           case ContentColumnID_ID:
-            delta = (a->Header_ID - b->Header_ID);
+          {
+            if (a->Header_ID != nullptr && b->Header_ID != nullptr) {
+              if ( is_number(a->Header_ID) && is_number(b->Header_ID) ) {
+                delta = (std::stol(a->Header_ID) - std::stol(b->Header_ID));
+              }
+              else
+              {
+                delta = lexicographical_sort(a->Header_ID, b->Header_ID);
+              }
+            }
             break;
+          }
 
           case ContentColumnID_1:
             delta = lexicographical_sort(a->Header_1, b->Header_1);
@@ -304,13 +320,27 @@ namespace SmartPeak
     static ImVector<ImTableEntry> injection_table_entries;
     static ImVector<ImTableEntry> transition_table_entries;
     static ImVector<ImTableEntry> feature_table_entries;
-    static bool injections_scanned  = false;
-    static bool transitions_scanned = false;
-    static bool features_scanned    = false;
-    static std::string current_tab;
+    static bool injections_scanned;
+    static bool transitions_scanned;
+    static bool features_scanned;
+        
+    if (columns_.dimension(0) == injection_table_entries.size())
+      injections_scanned = true;
+    else
+      injections_scanned = false;
+    
+    if (columns_.dimension(0) == transition_table_entries.size())
+      transitions_scanned = true;
+    else
+      transitions_scanned = false;
+    
+    if (columns_.dimension(0) == feature_table_entries.size())
+      features_scanned = true;
+    else
+      features_scanned = false;
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "TransitionsExplorerWindow") {
-      transition_table_entries.resize(columns_.dimension(0));
+      transition_table_entries.resize(columns_.dimension(0), ImTableEntry());
       if (!transition_table_entries.empty() && transitions_scanned == false) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           ImTableEntry& Im_table_entry = transition_table_entries[row];
@@ -322,11 +352,12 @@ namespace SmartPeak
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "InjectionsExplorerWindow") {
-      injection_table_entries.resize(columns_.dimension(0));
+      injection_table_entries.resize(columns_.dimension(0), ImTableEntry());
       if (!injection_table_entries.empty() && injections_scanned == false) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           ImTableEntry& Im_table_entry = injection_table_entries[row];
-          Im_table_entry.Header_ID = std::stol(columns_(row, 0).c_str());
+//          Im_table_entry.Header_ID = std::stol(columns_(row, 0).c_str());
+          Im_table_entry.Header_ID = columns_(row, 0).c_str();
           Im_table_entry.Header_1 = columns_(row, 1).c_str();
         }
         injections_scanned = true;
@@ -334,11 +365,11 @@ namespace SmartPeak
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "FeaturesExplorerWindow") {
-      feature_table_entries.resize(columns_.dimension(0));
+      feature_table_entries.resize(columns_.dimension(0), ImTableEntry());
       if (!feature_table_entries.empty() && features_scanned == false) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           ImTableEntry& Im_table_entry = feature_table_entries[row];
-          Im_table_entry.Header_1 = columns_(row, 0).c_str();
+          Im_table_entry.Header_ID = columns_(row, 0).c_str();
         }
         features_scanned = true;
       }
@@ -355,36 +386,7 @@ namespace SmartPeak
       
       ImGui::TableSetupScrollFreeze(headers_.size() + checkbox_headers_.size(), 1);
       ImGui::TableHeadersRow();
-      
-      if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
-      {
-        if (sorts_specs->SpecsDirty && (injections_scanned == true ) && table_id_ == "InjectionsExplorerWindow")
-        {
-          ImTableEntry::s_current_sort_specs = sorts_specs;
-          if (injection_table_entries.Size > 1)
-              qsort(&injection_table_entries[0], (size_t)injection_table_entries.Size, sizeof(injection_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
-          ImTableEntry::s_current_sort_specs = NULL;
-          sorts_specs->SpecsDirty = false;
-        }
-        if (sorts_specs->SpecsDirty && (transitions_scanned == true) && table_id_ == "TransitionsExplorerWindow")
-        {
-          ImTableEntry::s_current_sort_specs = sorts_specs;
-          if (transition_table_entries.Size > 1)
-              qsort(&transition_table_entries[0], (size_t)transition_table_entries.Size, sizeof(transition_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
-          ImTableEntry::s_current_sort_specs = NULL;
-          sorts_specs->SpecsDirty = false;
-        }
-        if (sorts_specs->SpecsDirty && (features_scanned == true) && table_id_ == "FeaturesExplorerWindow")
-        {
-          ImTableEntry::s_current_sort_specs = sorts_specs;
-          if (feature_table_entries.Size > 1)
-              qsort(&feature_table_entries[0], (size_t)feature_table_entries.Size, sizeof(feature_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
-          ImTableEntry::s_current_sort_specs = NULL;
-          sorts_specs->SpecsDirty = false;
-        }
-
-      }
-      
+            
       // Second row to end body
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
@@ -401,55 +403,56 @@ namespace SmartPeak
             }
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col) {
-              char table_entry[256];
-              ImGui::TableSetColumnIndex(col);
               if (table_id_ == "InjectionsExplorerWindow" && injections_scanned==true && !injection_table_entries.empty() )
               {
-                current_tab = "InjectionsExplorerWindow";
+                char injection_text_buf[256];
                 ImTableEntry* item = &injection_table_entries[row];
                 
                 if (col == 0)
                 {
-                  sprintf(table_entry, "%d", item->Header_ID);
+                  sprintf(injection_text_buf, "%s", item->Header_ID);
                 }
                 else if (col == 1 )
                 {
-                  sprintf(table_entry, "%s", item->Header_1);
+                  sprintf(injection_text_buf, "%s", item->Header_1);
                 }
-
-                ImGui::Text("%s", table_entry);
-                memset(table_entry, 0, sizeof(table_entry));
+                
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", injection_text_buf);
+                memset(injection_text_buf, 0, sizeof(injection_text_buf));
                   
               }
               else if (table_id_ == "TransitionsExplorerWindow" && transitions_scanned == true && !transition_table_entries.empty())
               {
-                current_tab = "TransitionsExplorerWindow";
+                char transition_text_buf[2048];
                 ImTableEntry* item = &transition_table_entries[row];
                   
                 if (col == 0)
                 {
-                  sprintf(table_entry, "%s", item->Header_1);
+                  sprintf(transition_text_buf, "%s", item->Header_1);
                 }
                 else if (col == 1 )
                 {
-                  sprintf(table_entry, "%s", item->Header_2);
+                  sprintf(transition_text_buf, "%s", item->Header_2);
                 }
 
-                ImGui::Text("%s", table_entry);
-                memset(table_entry, 0, sizeof(table_entry));
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", transition_text_buf);
+                memset(transition_text_buf, 0, sizeof(transition_text_buf));
               }
               else if (table_id_ == "FeaturesExplorerWindow" && features_scanned == true && !feature_table_entries.empty())
               {
-                current_tab = "TransitionsExplorerWindow";
+                char feature_text_buf[256];
                 ImTableEntry* item = &feature_table_entries[row];
                   
                 if (col == 0)
                 {
-                  sprintf(table_entry, "%s", item->Header_1);
+                  sprintf(feature_text_buf, "%s", item->Header_ID);
                 }
 
-                ImGui::Text("%s", table_entry);
-                memset(table_entry, 0, sizeof(table_entry));
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", feature_text_buf);
+                memset(feature_text_buf, 0, sizeof(feature_text_buf));
               }
             }
             
@@ -461,6 +464,34 @@ namespace SmartPeak
               ImGui::PopStyleColor();
             }
           }
+        }
+      }
+
+      if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
+      {
+        if (sorts_specs->SpecsDirty && (injections_scanned == true ) && (table_id_ == "InjectionsExplorerWindow"))
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (injection_table_entries.Size > 1)
+              qsort(&injection_table_entries[0], (size_t)injection_table_entries.Size, sizeof(injection_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+        if (sorts_specs->SpecsDirty && (transitions_scanned == true) && (table_id_ == "TransitionsExplorerWindow"))
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (transition_table_entries.Size > 1)
+              qsort(&transition_table_entries[0], (size_t)transition_table_entries.Size, sizeof(transition_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+        if (sorts_specs->SpecsDirty && (features_scanned == true) && (table_id_ == "FeaturesExplorerWindow"))
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (feature_table_entries.Size > 1)
+              qsort(&feature_table_entries[0], (size_t)feature_table_entries.Size, sizeof(feature_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
         }
       }
       ImGui::EndTable();
