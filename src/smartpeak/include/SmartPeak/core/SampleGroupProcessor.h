@@ -29,10 +29,11 @@
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SampleGroupHandler.h>
 #include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/iface/IProcessorDescription.h>
 
 namespace SmartPeak
 {
-  struct SampleGroupProcessor
+  struct SampleGroupProcessor : IProcessorDescription
   {
     SampleGroupProcessor(const SampleGroupProcessor& other) = delete;
     SampleGroupProcessor& operator=(const SampleGroupProcessor& other) = delete;

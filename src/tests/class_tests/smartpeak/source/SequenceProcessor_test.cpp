@@ -184,6 +184,15 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 0);
 }
 
+BOOST_AUTO_TEST_CASE(gettersCreateSequence)
+{
+  SequenceHandler sequenceHandler;
+  CreateSequence cs(sequenceHandler);
+
+  BOOST_CHECK_EQUAL(cs.getID(), -1);
+  BOOST_CHECK_EQUAL(cs.getName(), "CREATE_SEQUENCE");
+}
+
 BOOST_AUTO_TEST_CASE(processSequence)
 {
   SequenceHandler sequenceHandler;
@@ -260,6 +269,15 @@ BOOST_AUTO_TEST_CASE(processSequence)
   }
 }
 
+BOOST_AUTO_TEST_CASE(gettersProcessSequence)
+{
+  SequenceHandler sequenceHandler;
+  ProcessSequence cs(sequenceHandler);
+
+  BOOST_CHECK_EQUAL(cs.getID(), -1);
+  BOOST_CHECK_EQUAL(cs.getName(), "PROCESS_SEQUENCE");
+}
+
 BOOST_AUTO_TEST_CASE(processSequenceSegments)
 {
   SequenceHandler sequenceHandler;
@@ -331,6 +349,15 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 0.8, 1e-6);
 
   // TODO: Selected sequence segment names
+}
+
+BOOST_AUTO_TEST_CASE(gettersProcessSequenceSegments)
+{
+  SequenceHandler sequenceHandler;
+  ProcessSequenceSegments cs(sequenceHandler);
+
+  BOOST_CHECK_EQUAL(cs.getID(), -1);
+  BOOST_CHECK_EQUAL(cs.getName(), "PROCESS_SEQUENCE_SEGMENTS");
 }
 
 BOOST_AUTO_TEST_CASE(processSampleGroups)
@@ -456,6 +483,15 @@ BOOST_AUTO_TEST_CASE(LoadWorkflow1)
   {
     BOOST_CHECK_EQUAL(expected_command_names[i], commands[i]);
   }
+}
+
+BOOST_AUTO_TEST_CASE(gettersProcessSampleGroups)
+{
+  SequenceHandler sequenceHandler;
+  ProcessSampleGroups cs(sequenceHandler);
+
+  BOOST_CHECK_EQUAL(cs.getID(), -1);
+  BOOST_CHECK_EQUAL(cs.getName(), "PROCESS_SAMPLE_GROUPS");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
