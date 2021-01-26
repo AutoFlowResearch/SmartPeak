@@ -24,7 +24,6 @@ namespace SmartPeak
 
   struct ImTableEntry
   {
-    //int         Header_ID;
     const char* Header_ID;
     const char* Header_1;
     const char* Header_2;
@@ -48,6 +47,14 @@ namespace SmartPeak
     
     static int lexicographical_sort(const char* lhs, const char* rhs)
     {
+      std::string lhs_str(lhs), rhs_str(rhs);
+      std::string lhs_str_lowercased(lhs_str.length(),' ');
+      std::string rhs_str_lowercased(rhs_str.length(),' ');
+      std::transform(lhs_str.begin(), lhs_str.end(), lhs_str_lowercased.begin(), tolower);
+      std::transform(rhs_str.begin(), rhs_str.end(), rhs_str_lowercased.begin(), tolower);
+      lhs = lhs_str_lowercased.c_str();
+      rhs = rhs_str_lowercased.c_str();
+      
       enum SearchMode { STRING, NUMBER } search_mode = STRING;
       while (*lhs && *rhs)
       {
@@ -98,24 +105,6 @@ namespace SmartPeak
 
           search_mode = STRING;
         }
-      }
-      
-      std::string a_str, b_str;
-      a_str = lhs;
-      b_str = rhs;
-      std::string a_str_lowercased(a_str.length(),' ');
-      std::string b_str_lowercased(b_str.length(),' ');
-      std::transform(a_str.begin(), a_str.end(), a_str_lowercased.begin(), tolower);
-      std::transform(b_str.begin(), b_str.end(), b_str_lowercased.begin(), tolower);
-
-      if  (!a_str_lowercased.empty() && !b_str_lowercased.empty() && a_str_lowercased.front()
-           == b_str_lowercased.front()) {
-        return a_str.compare(b_str);
-      }
-      else
-      {
-        // case-insensitive lexicographic sort
-        return a_str_lowercased.compare(b_str_lowercased);
       }
     }
 
@@ -340,36 +329,38 @@ namespace SmartPeak
       features_scanned = false;
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "TransitionsExplorerWindow") {
-      transition_table_entries.resize(columns_.dimension(0), ImTableEntry());
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      transition_table_entries.resize(columns__.dimension(0), ImTableEntry());
       if (!transition_table_entries.empty() && transitions_scanned == false) {
-        for (size_t row = 0; row < columns_.dimension(0); ++row) {
+        for (size_t row = 0; row < columns__.dimension(0); ++row) {
           ImTableEntry& Im_table_entry = transition_table_entries[row];
-          Im_table_entry.Header_1 = columns_(row, 0).c_str();
-          Im_table_entry.Header_2 = columns_(row, 1).c_str();
+          Im_table_entry.Header_ID = columns__(row, 0).c_str();
+          Im_table_entry.Header_1 = columns__(row, 1).c_str();
         }
         transitions_scanned = true;
       }
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "InjectionsExplorerWindow") {
-      injection_table_entries.resize(columns_.dimension(0), ImTableEntry());
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      injection_table_entries.resize(columns__.dimension(0), ImTableEntry());
       if (!injection_table_entries.empty() && injections_scanned == false) {
-        for (size_t row = 0; row < columns_.dimension(0); ++row) {
+        for (size_t row = 0; row < columns__.dimension(0); ++row) {
           ImTableEntry& Im_table_entry = injection_table_entries[row];
-//          Im_table_entry.Header_ID = std::stol(columns_(row, 0).c_str());
-          Im_table_entry.Header_ID = columns_(row, 0).c_str();
-          Im_table_entry.Header_1 = columns_(row, 1).c_str();
+          Im_table_entry.Header_ID = columns__(row, 0).c_str();
+          Im_table_entry.Header_1 = columns__(row, 1).c_str();
         }
         injections_scanned = true;
       }
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "FeaturesExplorerWindow") {
-      feature_table_entries.resize(columns_.dimension(0), ImTableEntry());
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      feature_table_entries.resize(columns__.dimension(0), ImTableEntry());
       if (!feature_table_entries.empty() && features_scanned == false) {
-        for (size_t row = 0; row < columns_.dimension(0); ++row) {
+        for (size_t row = 0; row < columns__.dimension(0); ++row) {
           ImTableEntry& Im_table_entry = feature_table_entries[row];
-          Im_table_entry.Header_ID = columns_(row, 0).c_str();
+          Im_table_entry.Header_ID = columns__(row, 0).c_str();
         }
         features_scanned = true;
       }
@@ -392,12 +383,17 @@ namespace SmartPeak
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <=0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
             if (table_id_ == "FeaturesExplorerWindow") {
-              if (!filter.PassFilter(columns_(row, 0).c_str())) {
+              if (!filter.PassFilter(feature_table_entries[row].Header_ID)) {
                 continue;
               }
             }
-            if (table_id_ == "InjectionsExplorerWindow" || table_id_ == "TransitionsExplorerWindow") {
-              if (!filter.PassFilter(columns_(row, 1).c_str())) {
+            if (table_id_ == "InjectionsExplorerWindow") {
+              if (!filter.PassFilter(injection_table_entries[row].Header_ID) && !filter.PassFilter(injection_table_entries[row].Header_1)) {
+                continue;
+              }
+            }
+            if (table_id_ == "TransitionsExplorerWindow") {
+              if (!filter.PassFilter(transition_table_entries[row].Header_ID) && !filter.PassFilter(transition_table_entries[row].Header_1) ) {
                 continue;
               }
             }
@@ -429,11 +425,11 @@ namespace SmartPeak
                   
                 if (col == 0)
                 {
-                  sprintf(transition_text_buf, "%s", item->Header_1);
+                  sprintf(transition_text_buf, "%s", item->Header_ID);
                 }
                 else if (col == 1 )
                 {
-                  sprintf(transition_text_buf, "%s", item->Header_2);
+                  sprintf(transition_text_buf, "%s", item->Header_1);
                 }
 
                 ImGui::TableSetColumnIndex(col);
