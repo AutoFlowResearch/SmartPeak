@@ -199,4 +199,20 @@ namespace SmartPeak
     bool process() override;
     const std::string getName() const override { return "SetOutputFeaturesPathname"; };
   };
+
+  struct LoadWorkflow : FilePickerProcessor {
+    LoadWorkflow(ApplicationHandler& application_handler) : 
+      FilePickerProcessor(application_handler) {}
+    bool process() override;
+    const std::string getName() const override { return "LoadWorkflow"; };
+    std::vector<ApplicationHandler::Command> commands_;
+  };
+
+  struct SaveWorkflow : FilePickerProcessor {
+    SaveWorkflow(ApplicationHandler& application_handler) :
+      FilePickerProcessor(application_handler) {}
+    bool process() override;
+    const std::string getName() const override { return "SaveWorkflow"; };
+    std::vector<ApplicationHandler::Command> commands_;
+  };
 }

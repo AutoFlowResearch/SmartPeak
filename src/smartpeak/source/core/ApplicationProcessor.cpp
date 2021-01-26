@@ -18,6 +18,8 @@
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <SmartPeak/core/SharedProcessors.h>
+#include <SmartPeak/io/CSVWriter.h>
+#include <SmartPeak/io/csv.h>
 
 namespace SmartPeak
 {
@@ -658,6 +660,66 @@ namespace SmartPeak
   bool SetOutputFeaturesPathname::process()
   {
     application_handler_.features_out_dir_ = pathname_;
+    return true;
+  }
+
+  bool LoadWorkflow::process()
+  {
+    application_handler_.features_out_dir_ = pathname_;
+    io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(pathname_);
+    const std::string s_command_name{ "command_name" };
+    in.read_header(
+      io::ignore_extra_column,
+      s_command_name
+    );
+    if (!in.has_column(s_command_name))
+    {
+      LOGE << "Unexpected header";
+      return false;
+    }
+    std::vector<ApplicationHandler::Command> res;
+    std::string command_name;
+    while (in.read_row(
+      command_name
+    )) {
+      CreateCommand createCommand(application_handler_);
+      createCommand.name_ = command_name;
+      const bool created = createCommand.process();
+      if (created) {
+        res.push_back(createCommand.cmd_);
+      }
+      else
+      {
+        LOGE << "Failed to create command " << command_name;
+        return false;
+      }
+    }
+    commands_ = res;
+    return true;
+  }
+
+  bool SaveWorkflow::process()
+  {
+    std::vector<std::string> headers = { "command_name" };
+    CSVWriter writer(pathname_, ",");
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      LOGD << "END writeDataTableFromMetaValue";
+      return false;
+    }
+
+    std::vector<std::vector<std::string>> rows;
+    for (const auto& command : commands_)
+    {
+      std::vector<std::string> row;
+      row.push_back(command.getName());
+      rows.push_back(row);
+    }
+
+    for (const std::vector<std::string>& line : rows) {
+      writer.writeDataInRow(line.cbegin(), line.cend());
+    }
     return true;
   }
 }

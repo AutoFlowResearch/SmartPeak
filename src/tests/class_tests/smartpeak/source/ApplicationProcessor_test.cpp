@@ -5,6 +5,7 @@
 #define BOOST_TEST_MODULE ApplicationProcessor test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/ApplicationProcessor.h>
+#include <boost/filesystem.hpp>
 
 using namespace SmartPeak;
 using namespace std;
@@ -223,6 +224,81 @@ BOOST_AUTO_TEST_CASE(SetOutputFeaturesPathnameGetName)
   ApplicationHandler application_handler;
   SetOutputFeaturesPathname application_processor(application_handler);
   BOOST_CHECK_EQUAL(application_processor.getName(), "SetOutputFeaturesPathname");
+}
+
+BOOST_AUTO_TEST_CASE(SaveWorkflow1)
+{
+  namespace fs = boost::filesystem;
+  ApplicationHandler application_handler;
+  std::vector<std::string> command_names = {
+  "LOAD_RAW_DATA",
+  "MAP_CHROMATOGRAMS",
+  "EXTRACT_CHROMATOGRAM_WINDOWS",
+  "ZERO_CHROMATOGRAM_BASELINE",
+  "PICK_MRM_FEATURES",
+  "QUANTIFY_FEATURES",
+  "CHECK_FEATURES",
+  "SELECT_FEATURES",
+  "STORE_FEATURES"
+  };
+  std::vector<ApplicationHandler::Command> commands;
+  for (const auto& command_name : command_names)
+  {
+    CreateCommand createCommand(application_handler);
+    createCommand.name_ = command_name;
+    BOOST_REQUIRE(createCommand.process());
+    commands.push_back(createCommand.cmd_);
+  }
+  SaveWorkflow application_processor(application_handler);
+  application_processor.commands_ = commands;
+  BOOST_CHECK_EQUAL(application_processor.getName(), "SaveWorkflow");
+  application_processor.pathname_ = (fs::temp_directory_path().append(fs::unique_path().string())).string();
+  BOOST_REQUIRE(application_processor.process());
+  // compare with reference file
+  const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
+  std::ifstream created_if(application_processor.pathname_);
+  std::ifstream reference_if(reference_filename);
+  std::istream_iterator<char> created_is(created_if), created_end;
+  std::istream_iterator<char> reference_is(reference_if), reference_end;
+  BOOST_CHECK_EQUAL_COLLECTIONS(created_is, created_end, reference_is, reference_end);
+}
+
+BOOST_AUTO_TEST_CASE(LoadWorkflow1)
+{
+  ApplicationHandler application_handler;
+  LoadWorkflow application_processor(application_handler);
+  BOOST_CHECK_EQUAL(application_processor.getName(), "LoadWorkflow");
+  application_processor.pathname_ = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
+  BOOST_REQUIRE(application_processor.process());
+  const auto& commands = application_processor.commands_;
+  std::vector<std::string> expected_command_names = {
+  "LOAD_RAW_DATA",
+  "MAP_CHROMATOGRAMS",
+  "EXTRACT_CHROMATOGRAM_WINDOWS",
+  "ZERO_CHROMATOGRAM_BASELINE",
+  "PICK_MRM_FEATURES",
+  "QUANTIFY_FEATURES",
+  "CHECK_FEATURES",
+  "SELECT_FEATURES",
+  "STORE_FEATURES"
+  };
+  BOOST_REQUIRE(commands.size() == expected_command_names.size());
+  for (auto i=0; i< expected_command_names.size(); ++i)
+  {
+    BOOST_CHECK_EQUAL(expected_command_names[i], commands[i].getName());
+  }
+}
+
+BOOST_AUTO_TEST_CASE(LoadWorkflow2)
+{
+  // error handling
+  ApplicationHandler application_handler;
+  // load file
+  LoadWorkflow application_processor(application_handler);
+  BOOST_CHECK_EQUAL(application_processor.getName(), "LoadWorkflow");
+  application_processor.pathname_ = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow_unknown_command.csv");
+  BOOST_CHECK_EQUAL(application_processor.process(), false);
+  BOOST_CHECK_EQUAL(application_processor.commands_.size(), 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

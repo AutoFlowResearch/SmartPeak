@@ -2,6 +2,7 @@
 
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/ui/FilePicker.h>
 #include <string>
 #include <vector>
 
@@ -20,5 +21,11 @@ namespace SmartPeak
     std::vector<ApplicationHandler::Command> getCommands() const;
 
     void setApplicationHandler(ApplicationHandler& application_handler);
+
+  protected:
+    FilePicker file_picker_;
+    bool popup_file_picker_ = false;
+    std::unique_ptr<LoadWorkflow> load_workflow_;
+    std::unique_ptr<SaveWorkflow> save_workflow_;
   };
 }

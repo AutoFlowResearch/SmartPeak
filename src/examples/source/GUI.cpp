@@ -751,7 +751,7 @@ int main(int argc, char **argv)
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
-          session_handler_.setWorkflowTable(workflow_.getCommands());
+          session_handler_.setWorkflowTable(application_handler_.commands_);
           GenericTableWidget Table(session_handler_.workflow_table_headers, session_handler_.workflow_table_body, Eigen::Tensor<bool, 1>(), "WorkflowMainWindow");
           Table.draw();
           ImGui::EndTabItem();

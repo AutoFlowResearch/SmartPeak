@@ -187,10 +187,42 @@ namespace SmartPeak
     }
 
     ImGui::SameLine();
+    if (ImGui::Button("Load"))
+    {
+      LOGI << "Load workflow";
+      load_workflow_ = std::make_unique<LoadWorkflow>(*application_handler_);
+      file_picker_.setProcessor(*load_workflow_);
+      ImGui::OpenPopup("Pick a pathname");
+    }
+    if (load_workflow_ && (!ImGui::IsPopupOpen("Pick a pathname")))
+    {
+      if (file_picker_.fileWasLoaded())
+      {
+        commands_ = load_workflow_->commands_;
+      }
+      load_workflow_.reset();
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button("Save"))
+    {
+      LOGI << "Save workflow";
+      save_workflow_ = std::make_unique<SaveWorkflow>(*application_handler_);
+      save_workflow_->commands_ = commands_;
+      file_picker_.setProcessor(*save_workflow_);
+      ImGui::OpenPopup("Pick a pathname");
+    }
+    if (save_workflow_ && (!ImGui::IsPopupOpen("Pick a pathname")))
+    {
+      save_workflow_.reset();
+    }
+
+    ImGui::SameLine();
     if (ImGui::Button("Reset"))
     {
       commands_.clear();
     }
+    file_picker_.draw();
 
     ImGui::EndPopup();
   }
