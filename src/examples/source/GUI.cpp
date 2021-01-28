@@ -669,7 +669,6 @@ int main(int argc, char **argv)
           Eigen::Tensor<std::string, 2> body = session_handler_.getTransitionExplorerBody();
           ExplorerWidget Explorer(headers, body,
             session_handler_.transition_explorer_checked_rows, "TransitionsExplorerWindow", session_handler_.transition_explorer_checkbox_headers, session_handler_.transition_explorer_checkbox_body);
-//          Explorer.update_cols();
           Explorer.draw();
           ImGui::EndTabItem();
         }
