@@ -164,6 +164,8 @@ namespace SmartPeak
     std::string getName() const override { return "MERGE_SPECTRA"; }
     std::string getDescription() const override { return "Merge all spectra along the time axis."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Merge all spectra along the time axis using a binning strategy that is resolution dependent
     */
     void process(

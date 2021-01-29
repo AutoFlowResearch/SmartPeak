@@ -54,7 +54,23 @@ namespace SmartPeak
 
   ParameterSet RawDataProcessor::getParameterSchema() const
   {
-    return ParameterSet();
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"mzML", {
+      {
+        {"name", "format"},
+        {"type", "string"},
+        {"value", "Chromeleon"},
+        {"description", ""},
+        {"valid_strings", "['Chromeleon','XML']"}
+      },
+      {
+        {"name", "zero_baseline"},
+        {"type", "bool"},
+        {"value", "false"},
+        {"description", ""},
+      },
+    }} });
+    return ParameterSet(param_struct);
   }
 
   void LoadRawData::process(
@@ -1163,9 +1179,50 @@ namespace SmartPeak
     LOGD << "END ExtractChromatogramWindows";
   }
 
+  // Parameters used by Spetra related processors
+  ParameterSet FIAMSParameters()
+  {
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"FIAMS", {
+      {
+        {"name", "acquisition_start"},
+        {"type", "float"},
+        {"value", "0"},
+        {"description", "The start time to use when extracting out the spectra windows from the MSExperiment"},
+        {"min", "0"}
+      },
+      {
+        {"name", "acquisition_end"},
+        {"type", "float"},
+        {"value", "30"},
+        {"description", "The end time to use when extracting out the spectra windows from the MSExperiment"},
+        {"min", "0"}
+      },
+      {
+        {"name", "resolution"},
+        {"type", "float"},
+        {"value", "12000"},
+        {"description", "The instrument settings: resolution"}
+      },
+      {
+        {"name", "max_mz"},
+        {"type", "float"},
+        {"value", "1500"},
+        {"description", "Maximum mz"}
+      },
+      {
+        {"name", "bin_step"},
+        {"type", "float"},
+        {"value", "20"},
+        {"description", "The size of the step to recalculated the bin size used for adding up spectra along the time axis"}
+      }
+    }} });
+    return ParameterSet(param_struct);
+  }
+
   ParameterSet ExtractSpectraWindows::getParameterSchema() const
   {
-    return ParameterSet();
+    return FIAMSParameters();
   }
 
   void ExtractSpectraWindows::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
@@ -1523,6 +1580,11 @@ namespace SmartPeak
     LOGD << "END checkFeaturesBackgroundInterferences";
   }
 
+  ParameterSet MergeSpectra::getParameterSchema() const
+  {
+    return FIAMSParameters();
+  }
+
   void MergeSpectra::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START MergeSpectra";
@@ -1620,7 +1682,60 @@ namespace SmartPeak
     OpenMS::SavitzkyGolayFilter sgfilter;
     OpenMS::PeakPickerHiRes picker;
     OpenMS::PeakIntegrator pi;
-    return ParameterSet({ sgfilter, picker, pi });
+    ParameterSet parameters({ sgfilter, picker, pi });
+
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"PickMS1Features", {
+    {
+      {"name", "frame_length"},
+      {"type", "int"},
+      {"value", "11"},
+      {"description", "SavitzkyGolayFilter parameter. The number of subsequent data points used for smoothing"},
+    },
+    {
+      {"name", "polynomial_order"},
+      {"type", "int"},
+      {"value", "4"},
+      {"description", "SavitzkyGolayFilter parameter. Order or the polynomial that is fitted"},
+    },
+    {
+      {"name", "sne:window"},
+      {"type", "float"},
+      {"value", "10"},
+      {"description", "SignalToNoiseEstimatorMedianRapid parameter. Signal-to-noise estimation window (in mz)"},
+    },
+    {
+      {"name", "write_convex_hull"},
+      {"type", "bool"},
+      {"value", "false"},
+      {"description", "Whether to write out all points of all features into the featureXML"},
+    },
+    {
+      {"name", "compute_peak_shape_metrics"},
+      {"type", "bool"},
+      {"value", "false"},
+      {"description", "Calulates various peak shape metrics (e.g., tailing) that can be used for downstream QC/QA."},
+    },
+    {
+      {"name", "min_intensity"},
+      {"type", "float"},
+      {"value", "86000"},
+      {"description", "All features below the minimum intensity will be discarded"},
+    },
+    {
+      {"name", "baseline_type"},
+      {"type", "string"},
+      {"value", "vertical_division"},
+    },
+    {
+      {"name", "integration_type"},
+      {"type", "string"},
+      {"value", "trapezoid"},
+    },
+    }} });
+    ParameterSet pick_ms1_feature_params(param_struct);
+    parameters.merge(pick_ms1_feature_params);
+    return parameters;
   }
 
   void PickMS1Features::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const

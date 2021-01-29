@@ -292,45 +292,43 @@ namespace SmartPeak
       for (const auto& function_parameter : user_parameters) {
         n_rows += function_parameter.second.size();
       }
-      if (parameters_table_body.dimension(0) != n_rows) {
-        LOGD << "Making parameters_table_body";
-        parameters_table_body.resize(n_rows, n_cols);
-        int col = 0, row = 0;
-        for (const auto& function_parameters : user_parameters) {
-          for (const auto& parameter : function_parameters.second) {
-            parameters_table_body(row, col) = function_parameters.second.getFunctionName();
-            ++col;
-            parameters_table_body(row, col) = parameter.getName();
-            ++col;
-            parameters_table_body(row, col) = parameter.getType();
-            ++col;
-            parameters_table_body(row, col) = parameter.getValueAsString();
-            ++col;
-            parameters_table_body(row, col) = parameter.getDescription();
-            ++col;
-            std::string status;
-            if (parameter.getSchema())
-            {
-              status = "user_override";
-            }
-            else if (parameter.isSchema())
-            {
-              status = "default";
-            }
-            else
-            {
-              status = "unused";
-            }
-            parameters_table_body(row, col) = status;
-            ++col;
-            parameters_table_body(row, col) = parameter.isValid()? "true": "false";
-            ++col;
-            parameters_table_body(row, col) = parameter.getRestrictionsAsString();
-            ++col;
-            parameters_table_body(row, col) = parameter.getSchema() ? parameter.getSchema()->getType() : parameter.getType();
-            col = 0;
-            ++row;
+      LOGD << "Making parameters_table_body";
+      parameters_table_body.resize(n_rows, n_cols);
+      int col = 0, row = 0;
+      for (const auto& function_parameters : user_parameters) {
+        for (const auto& parameter : function_parameters.second) {
+          parameters_table_body(row, col) = function_parameters.second.getFunctionName();
+          ++col;
+          parameters_table_body(row, col) = parameter.getName();
+          ++col;
+          parameters_table_body(row, col) = parameter.getType();
+          ++col;
+          parameters_table_body(row, col) = parameter.getValueAsString();
+          ++col;
+          parameters_table_body(row, col) = parameter.getDescription();
+          ++col;
+          std::string status;
+          if (parameter.getSchema())
+          {
+            status = "user_override";
           }
+          else if (parameter.isSchema())
+          {
+            status = "default";
+          }
+          else
+          {
+            status = "unused";
+          }
+          parameters_table_body(row, col) = status;
+          ++col;
+          parameters_table_body(row, col) = parameter.isValid()? "true": "false";
+          ++col;
+          parameters_table_body(row, col) = parameter.getRestrictionsAsString();
+          ++col;
+          parameters_table_body(row, col) = parameter.getSchema() ? parameter.getSchema()->getType() : parameter.getType();
+          col = 0;
+          ++row;
         }
       }
     }

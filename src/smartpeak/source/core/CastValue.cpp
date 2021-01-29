@@ -253,7 +253,7 @@ namespace SmartPeak
   {
     if (tag_ != other.tag_) {
       LOGE << "CastValue: Comparing data of different types";
-      return true;
+      return false;
     }
 
     switch (tag_) {

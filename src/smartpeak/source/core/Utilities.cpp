@@ -33,6 +33,8 @@ namespace SmartPeak
       cast = std::stoi(value);
     } else if (lowercase_type == "float") {
       cast = std::stof(value);
+    } else if (lowercase_type == "long") {
+      cast = std::stol(value);
     } else if ((lowercase_type == "bool" || lowercase_type == "boolean" || lowercase_type == "string")
                && (lowercase_value == "false" || lowercase_value == "true")) {
       cast = lowercase_value == "true";

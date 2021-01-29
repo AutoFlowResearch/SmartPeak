@@ -54,14 +54,22 @@ namespace SmartPeak
     void setTags(const std::vector<std::string>& tags) { tags_ = tags; };
     const std::vector<std::string>& getTags(bool use_scheme = true) const { return (use_scheme && schema_) ? schema_->getTags() : tags_; };
 
-    const CastValue& getValue() const { return value_; };
-    const CastValue& getDefaultValue() const { return schema_ ? schema_->getValue() : value_; };
-
     const std::string getRestrictionsAsString(bool use_scheme = true) const;
 
     void setAsSchema(bool is_schema) { is_schema_ = is_schema; };
     bool isSchema() const { return is_schema_; };
-  
+
+    const std::string getDefaultValueAsString() const { return schema_ ? schema_->getValueAsString() : getValueAsString(); };
+
+  protected:
+    friend class Utilities;
+    const CastValue& getValue() const { return value_; };
+
+  private:
+    // utility method to ease comparison between different types
+    // return false if it cannot be converted
+    bool getFloatValue(const CastValue& value, float& result) const;
+
   protected:
     std::string name_;
     CastValue value_;
@@ -94,7 +102,17 @@ namespace SmartPeak
 
     Parameter* findParameter(const std::string& parameter);
     const std::string& getFunctionName() const { return function_name_; };
+
+    /**
+    Add a parameter. Doesn't Replace if already exists
+    */
     void addParameter(const Parameter& parameter);
+
+    /**
+    Merge two FunctionsParameters.
+    - If one parameter already exists in the other, use it as Schema for the other parameter.
+    - If the parameter does not exists, just add.
+    */
     void merge(const FunctionParameters& other);
 
     // underlying vector accessors
@@ -140,7 +158,16 @@ namespace SmartPeak
     */
     void setAsSchema(bool is_schema);
 
+    /**
+    Add FunctionParameter to the ParameterSet. If the function already exists, it will be replaced
+    */
     void addFunctionParameters(FunctionParameters);
+
+    /**
+    Add a Parameter to a FunctionParameter. 
+    If the parameter already exists, it will be replaced.
+    If the FunctionParameter does not exists, it will be created.
+    */
     void addParameter(const std::string& function_name, Parameter& parameter);
 
     // underlying map accessors

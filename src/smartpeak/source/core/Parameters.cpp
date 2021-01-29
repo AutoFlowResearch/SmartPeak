@@ -198,6 +198,33 @@ namespace SmartPeak
     }
   }
 
+  bool Parameter::getFloatValue(const CastValue& value, float& result) const
+  {
+    switch (value.getTag())
+    {
+    case CastValue::Type::FLOAT:
+      result = static_cast<float>(value.f_);
+      return true;
+    case CastValue::Type::INT:
+      result = static_cast<float>(value.i_);
+      return true;
+    case CastValue::Type::LONG_INT:
+      result = static_cast<float>(value.li_);
+      return true;
+    case CastValue::Type::BOOL:
+    case CastValue::Type::UNKNOWN:
+    case CastValue::Type::STRING:
+    case CastValue::Type::UNINITIALIZED:
+    case CastValue::Type::BOOL_LIST:
+    case CastValue::Type::FLOAT_LIST:
+    case CastValue::Type::INT_LIST:
+    case CastValue::Type::STRING_LIST:
+      return false;
+    default:
+      throw "Tag type not managed in getFloatValue(). Implement it.";
+    }
+  }
+
   bool Parameter::isValid(const CastValue& value, bool use_schema) const
   {
     if (use_schema && schema_)
@@ -236,11 +263,27 @@ namespace SmartPeak
       bool valid = true;
       if (constraints_min_)
       {
-        valid &= value >= *constraints_min_;
+        if (value.getTag() == constraints_min_->getTag())
+        {
+          valid &= value >= *constraints_min_;
+        }
+        else
+        {
+          float l, r;
+          valid &= getFloatValue(value, l) && getFloatValue(*constraints_min_, r) && (l >= r);
+        }
       }
       if (constraints_max_)
       {
-        valid &= value <= *constraints_max_;
+        if (value.getTag() == constraints_min_->getTag())
+        {
+          valid &= value <= *constraints_max_;
+        }
+        else
+        {
+          float l, r;
+          valid &= getFloatValue(value, l) && getFloatValue(*constraints_max_, r) && (l <= r);
+        }
       }
       return valid;
     }
@@ -435,7 +478,11 @@ namespace SmartPeak
 
   void FunctionParameters::addParameter(const Parameter& parameter)
   {
-    parameters_.push_back(parameter);
+    auto existing_parameter = findParameter(parameter.getName());
+    if (!existing_parameter)
+    {
+      parameters_.push_back(parameter);
+    }
   }
 
   void FunctionParameters::merge(const FunctionParameters& other)

@@ -11,7 +11,55 @@ namespace SmartPeak
 {
   ParameterSet MergeInjections::getParameterSchema() const
   {
-    return ParameterSet();
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"MergeInjections", {
+      {
+        {"name", "scan_polarity_merge_rule"},
+        {"type", "string"},
+        {"value", "WeightedMean"},
+        {"description", ""},
+        {"valid_strings", "['Sum','Min','Max','Mean','WeightedMean']"}
+      },
+      {
+        {"name", "mass_range_merge_rule"},
+        {"type", "string"},
+        {"value", "Sum"},
+        {"description", ""},
+        {"valid_strings", "['Sum','Min','Max','Mean','WeightedMean']"}
+      },
+      {
+        {"name", "dilution_series_merge_rule"},
+        {"type", "string"},
+        {"value", "Max"},
+        {"description", ""},
+        {"valid_strings", "['Sum','Min','Max','Mean','WeightedMean']"}
+      },
+      {
+        {"name", "scan_polarity_merge_feature_name"},
+        {"type", "string"},
+        {"value", "peak_apex_int"},
+        {"description", ""}
+      },
+      {
+        {"name", "mass_range_merge_feature_name"},
+        {"type", "string"},
+        {"value", "peak_apex_int"},
+        {"description", ""}
+      },
+      {
+        {"name", "dilution_series_merge_feature_name"},
+        {"type", "string"},
+        {"value", "peak_apex_int"},
+        {"description", ""}
+      },
+      {
+        {"name", "merge_subordinates"},
+        {"type", "bool"},
+        {"value", "true"},
+        {"description", ""}
+      },
+    }} });
+    return ParameterSet(param_struct);
   }
 
   void MergeInjections::process(
@@ -456,7 +504,7 @@ namespace SmartPeak
 
   ParameterSet LoadFeaturesSampleGroup::getParameterSchema() const
   {
-    return ParameterSet();
+    return ParameterSet({});
   }
 
   void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
@@ -491,7 +539,7 @@ namespace SmartPeak
 
   ParameterSet StoreFeaturesSampleGroup::getParameterSchema() const
   {
-    return ParameterSet();
+    return ParameterSet({});
   }
 
   void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
