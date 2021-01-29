@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/test_config.h>
 
@@ -388,10 +409,10 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
   const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname);
 
   // number of items in the pathname, taking .gitignore into account
-  BOOST_CHECK_EQUAL(c[0].size(), 45);
-  BOOST_CHECK_EQUAL(c[1].size(), 45);
-  BOOST_CHECK_EQUAL(c[2].size(), 45);
-  BOOST_CHECK_EQUAL(c[3].size(), 45);
+  BOOST_CHECK_EQUAL(c[0].size(), 46);
+  BOOST_CHECK_EQUAL(c[1].size(), 46);
+  BOOST_CHECK_EQUAL(c[2].size(), 46);
+  BOOST_CHECK_EQUAL(c[3].size(), 46);
 
   BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_1900-01-01_000000.featureXML");
  #ifdef _WIN32
@@ -402,9 +423,9 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
  #endif
   BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
 
-  BOOST_CHECK_EQUAL(c[0][44], "workflow_csv_files");
-  BOOST_CHECK_EQUAL(c[1][44], "22"); // number of items within the folder
-  BOOST_CHECK_EQUAL(c[2][44], "Directory");
+  BOOST_CHECK_EQUAL(c[0][45], "workflow_csv_files");
+  BOOST_CHECK_EQUAL(c[1][45], "22"); // number of items within the folder
+  BOOST_CHECK_EQUAL(c[2][45], "Directory");
 }
 
 BOOST_AUTO_TEST_CASE(getParentPathname)
@@ -472,7 +493,7 @@ BOOST_AUTO_TEST_CASE(directorySize)
 {
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto& f = Utilities::directorySize;
-  BOOST_CHECK_EQUAL(f(path), 45);
+  BOOST_CHECK_EQUAL(f(path), 46);
   BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 22);
   BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
 }
