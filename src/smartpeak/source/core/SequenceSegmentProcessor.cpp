@@ -132,7 +132,7 @@ namespace SmartPeak
 
   ParameterSet LoadStandardsConcentrations::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void LoadStandardsConcentrations::process(
@@ -172,7 +172,7 @@ namespace SmartPeak
 
   ParameterSet LoadQuantitationMethods::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void LoadQuantitationMethods::process(
@@ -212,7 +212,7 @@ namespace SmartPeak
 
   ParameterSet StoreQuantitationMethods::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void StoreQuantitationMethods::process(
@@ -247,7 +247,7 @@ namespace SmartPeak
 
   ParameterSet LoadFeatureFilters::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void LoadFeatureFilters::process(
@@ -304,7 +304,7 @@ namespace SmartPeak
 
   ParameterSet LoadFeatureQCs::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void LoadFeatureQCs::process(
@@ -361,7 +361,7 @@ namespace SmartPeak
 
   ParameterSet StoreFeatureFilters::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void StoreFeatureFilters::process(
@@ -401,7 +401,7 @@ namespace SmartPeak
 
   ParameterSet StoreFeatureQCs::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void StoreFeatureQCs::process(
@@ -441,7 +441,7 @@ namespace SmartPeak
 
   ParameterSet LoadFeatureRSDFilters::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void LoadFeatureRSDFilters::process(
@@ -498,7 +498,7 @@ namespace SmartPeak
 
   ParameterSet LoadFeatureRSDQCs::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void LoadFeatureRSDQCs::process(
@@ -555,7 +555,7 @@ namespace SmartPeak
 
   ParameterSet StoreFeatureRSDFilters::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void StoreFeatureRSDFilters::process(
@@ -595,7 +595,7 @@ namespace SmartPeak
 
   ParameterSet StoreFeatureRSDQCs::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void StoreFeatureRSDQCs::process(
@@ -635,7 +635,7 @@ namespace SmartPeak
 
   ParameterSet LoadFeatureBackgroundFilters::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void LoadFeatureBackgroundFilters::process(
@@ -692,7 +692,7 @@ namespace SmartPeak
 
   ParameterSet LoadFeatureBackgroundQCs::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void LoadFeatureBackgroundQCs::process(
@@ -749,7 +749,7 @@ namespace SmartPeak
 
   ParameterSet StoreFeatureBackgroundFilters::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void StoreFeatureBackgroundFilters::process(
@@ -789,7 +789,7 @@ namespace SmartPeak
 
   ParameterSet StoreFeatureBackgroundQCs::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void StoreFeatureBackgroundQCs::process(
@@ -829,7 +829,7 @@ namespace SmartPeak
 
   ParameterSet EstimateFeatureFilterValues::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void EstimateFeatureFilterValues::process(
@@ -888,7 +888,7 @@ namespace SmartPeak
 
   ParameterSet EstimateFeatureQCValues::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void EstimateFeatureQCValues::process(
@@ -947,7 +947,7 @@ namespace SmartPeak
 
   ParameterSet TransferLOQToFeatureFilters::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void TransferLOQToFeatureFilters::process(
@@ -977,7 +977,7 @@ namespace SmartPeak
 
   ParameterSet TransferLOQToFeatureQCs::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void TransferLOQToFeatureQCs::process(
@@ -1007,7 +1007,7 @@ namespace SmartPeak
 
   ParameterSet EstimateFeatureRSDs::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void EstimateFeatureRSDs::process(
@@ -1054,7 +1054,7 @@ namespace SmartPeak
 
   ParameterSet EstimateFeatureBackgroundInterferences::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void EstimateFeatureBackgroundInterferences::process(
@@ -1103,7 +1103,7 @@ namespace SmartPeak
 
   ParameterSet LoadFeatureRSDEstimations::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void LoadFeatureRSDEstimations::process(
@@ -1160,7 +1160,7 @@ namespace SmartPeak
 
   ParameterSet StoreFeatureRSDEstimations::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void StoreFeatureRSDEstimations::process(
@@ -1200,7 +1200,7 @@ namespace SmartPeak
 
   ParameterSet LoadFeatureBackgroundEstimations::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void LoadFeatureBackgroundEstimations::process(
@@ -1257,7 +1257,7 @@ namespace SmartPeak
 
   ParameterSet StoreFeatureBackgroundEstimations::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void StoreFeatureBackgroundEstimations::process(

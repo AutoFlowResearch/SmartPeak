@@ -504,7 +504,7 @@ namespace SmartPeak
 
   ParameterSet LoadFeaturesSampleGroup::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
@@ -539,7 +539,7 @@ namespace SmartPeak
 
   ParameterSet StoreFeaturesSampleGroup::getParameterSchema() const
   {
-    return ParameterSet({});
+    return ParameterSet();
   }
 
   void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
