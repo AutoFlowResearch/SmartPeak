@@ -442,7 +442,7 @@ BOOST_AUTO_TEST_CASE(FunctionParameter_addParameter)
   Parameter new_param(param_struct2);
 
   function_parameter.addParameter(new_param);
-  BOOST_CHECK(function_parameter.size(), 2);
+  BOOST_CHECK_EQUAL(function_parameter.size(), 2);
   auto param = function_parameter.findParameter("parameter2");
   BOOST_REQUIRE(param);
   BOOST_CHECK_EQUAL(param->getName(), "parameter2");
@@ -453,7 +453,7 @@ BOOST_AUTO_TEST_CASE(FunctionParameter_addParameter)
     { {"name", "parameter2"}, { "type", "int" }, { "value", "42" } });
   Parameter new_param2(param_struct3);
   function_parameter.addParameter(new_param2);
-  BOOST_CHECK(function_parameter.size(), 2);
+  BOOST_CHECK_EQUAL(function_parameter.size(), 2);
   param = function_parameter.findParameter("parameter2");
   BOOST_REQUIRE(param);
   BOOST_CHECK_EQUAL(param->getName(), "parameter2");
@@ -477,7 +477,7 @@ BOOST_AUTO_TEST_CASE(FunctionParameter_merge)
 
   function_parameter1.merge(function_parameter2);
 
-  BOOST_CHECK(function_parameter1.size(), 2);
+  BOOST_CHECK_EQUAL(function_parameter1.size(), 2);
   
   auto param = function_parameter1.findParameter("parameter1");
   BOOST_REQUIRE(param);
@@ -512,7 +512,7 @@ BOOST_AUTO_TEST_CASE(FunctionParameter_setAsSchema)
 
   function_parameter1.merge(function_parameter2);
 
-  BOOST_CHECK(function_parameter1.size(), 2);
+  BOOST_CHECK_EQUAL(function_parameter1.size(), 2);
 
   auto param = function_parameter1.findParameter("parameter1");
   BOOST_REQUIRE(param);
