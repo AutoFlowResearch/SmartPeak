@@ -133,6 +133,11 @@ namespace SmartPeak
         LOGW << "Warning: '" << row.getComponentName() << "' cannot be analysed - division by zero\n";
         continue;
       }
+      catch (...)
+      {
+        LOGW << "Warning: '" << row.getComponentName() << "' cannot be analysed.\n";
+        continue;
+      }
       // find the optimal calibration curve for each component
 
       components_to_concentrations.erase(row.getComponentName());
