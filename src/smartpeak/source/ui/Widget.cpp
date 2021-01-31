@@ -26,6 +26,11 @@ namespace SmartPeak
       return !s.empty() && std::find_if(s.begin(), s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
     }
     
+    static bool has_identical_entries(const std::vector<const char*>& col_values)
+    {
+      return std::find(col_values.begin(), col_values.end(), col_values[0]) != col_values.end();
+    }
+    
     static int lexicographical_sort(const char* lhs, const char* rhs)
     {
       std::string lhs_str(lhs), rhs_str(rhs);
@@ -219,7 +224,168 @@ namespace SmartPeak
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
       ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
-
+    
+    static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
+    static ImGuiTableColumnFlags column_any_flags = { ImGuiTableColumnFlags_NoHide };
+    
+    static ImGuiTextFilter filter;
+    filter.Draw("Find");
+    
+    static ImVector<ImTableEntry> workflow_table_entries;
+    static ImVector<ImTableEntry> sequence_table_entries;
+    static ImVector<ImTableEntry> transition_table_entries;
+    static ImVector<ImTableEntry> concentration_table_entries;
+    static ImVector<ImTableEntry> parameter_table_entries;
+    static ImVector<ImTableEntry> spectrum_table_entries;
+    static ImVector<ImTableEntry> quantitation_method_table_entries;
+    static bool workflow_scanned;
+    static bool sequence_scanned;
+    static bool transitions_scanned;
+    static bool concentrations_scanned;
+    static bool parameters_scanned;
+    static bool spectrums_scanned;
+    static bool quantitation_methods_scanned;
+    
+    if (columns_.dimension(0) == workflow_table_entries.size())
+      workflow_scanned = true;
+    else
+      workflow_scanned = false;
+        
+    if (columns_.dimension(0) == sequence_table_entries.size())
+      sequence_scanned = true;
+    else
+      sequence_scanned = false;
+    
+    if (columns_.dimension(0) == transition_table_entries.size())
+      transitions_scanned = true;
+    else
+      transitions_scanned = false;
+    
+    if (columns_.dimension(0) == concentration_table_entries.size())
+      concentrations_scanned = true;
+    else
+      concentrations_scanned = false;
+    
+    if (columns_.dimension(0) == parameter_table_entries.size())
+      parameters_scanned = true;
+    else
+      parameters_scanned = false;
+    
+    if (columns_.dimension(0) == spectrum_table_entries.size())
+      spectrums_scanned = true;
+    else
+      spectrums_scanned = false;
+    
+    if (columns_.dimension(0) == quantitation_method_table_entries.size())
+      quantitation_methods_scanned = true;
+    else
+      quantitation_methods_scanned = false;
+    
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "WorkflowMainWindow") {
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      workflow_table_entries.resize(columns__.dimension(0), ImTableEntry());
+      if (!workflow_table_entries.empty() && workflow_scanned == false) {
+        for (size_t row = 0; row < columns__.dimension(0); ++row) {
+          ImTableEntry& Im_table_entry = workflow_table_entries[row];
+          Im_table_entry.Headers.resize(columns__.dimension(1));
+          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
+            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
+          }
+        }
+        workflow_scanned = true;
+      }
+    }
+    
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "SequenceMainWindow") {
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      sequence_table_entries.resize(columns__.dimension(0), ImTableEntry());
+      if (!sequence_table_entries.empty() && sequence_scanned == false) {
+        for (size_t row = 0; row < columns__.dimension(0); ++row) {
+          ImTableEntry& Im_table_entry = sequence_table_entries[row];
+          Im_table_entry.Headers.resize(columns__.dimension(1));
+          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
+            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
+          }
+        }
+        sequence_scanned = true;
+      }
+    }
+    
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "TransitionsMainWindow") {
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      transition_table_entries.resize(columns__.dimension(0), ImTableEntry());
+      if (!transition_table_entries.empty() && transitions_scanned == false) {
+        for (size_t row = 0; row < columns__.dimension(0); ++row) {
+          ImTableEntry& Im_table_entry = transition_table_entries[row];
+          Im_table_entry.Headers.resize(columns__.dimension(1));
+          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
+            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
+          }
+        }
+        transitions_scanned = true;
+      }
+    }
+    
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "StdsConcsMainWindow") {
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      concentration_table_entries.resize(columns__.dimension(0), ImTableEntry());
+      if (!concentration_table_entries.empty() && concentrations_scanned == false) {
+        for (size_t row = 0; row < columns__.dimension(0); ++row) {
+          ImTableEntry& Im_table_entry = concentration_table_entries[row];
+          Im_table_entry.Headers.resize(columns__.dimension(1));
+          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
+            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
+          }
+        }
+        concentrations_scanned = true;
+      }
+    }
+    
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "ParametersMainWindow") {
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      parameter_table_entries.resize(columns__.dimension(0), ImTableEntry());
+      if (!parameter_table_entries.empty() && parameters_scanned == false) {
+        for (size_t row = 0; row < columns__.dimension(0); ++row) {
+          ImTableEntry& Im_table_entry = parameter_table_entries[row];
+          Im_table_entry.Headers.resize(columns__.dimension(1));
+          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
+            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
+          }
+        }
+        parameters_scanned = true;
+      }
+    }
+    
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "SpectrumMainWindow") {
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      spectrum_table_entries.resize(columns__.dimension(0), ImTableEntry());
+      if (!spectrum_table_entries.empty() && spectrums_scanned == false) {
+        for (size_t row = 0; row < columns__.dimension(0); ++row) {
+          ImTableEntry& Im_table_entry = spectrum_table_entries[row];
+          Im_table_entry.Headers.resize(columns__.dimension(1));
+          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
+            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
+          }
+        }
+        spectrums_scanned = true;
+      }
+    }
+    
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "QuantMethodMainWindow") {
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      quantitation_method_table_entries.resize(columns__.dimension(0), ImTableEntry());
+      if (!quantitation_method_table_entries.empty() && quantitation_methods_scanned == false) {
+        for (size_t row = 0; row < columns__.dimension(0); ++row) {
+          ImTableEntry& Im_table_entry = quantitation_method_table_entries[row];
+          Im_table_entry.Headers.resize(columns__.dimension(1));
+          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
+            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
+          }
+        }
+        quantitation_methods_scanned = true;
+      }
+    }
+    
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
@@ -232,12 +398,194 @@ namespace SmartPeak
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
+            if (table_id_ == "WorkflowMainWindow")
+            {
+              if (!filter.PassFilter(workflow_table_entries[row].Headers[1]))
+              {
+                continue;
+              }
+            }
+            if (table_id_ == "SequenceMainWindow")
+            {
+              if (!filter.PassFilter(sequence_table_entries[row].Headers[0]) && !filter.PassFilter(sequence_table_entries[row].Headers[1]) &&
+                  !filter.PassFilter(sequence_table_entries[row].Headers[2]) && !filter.PassFilter(sequence_table_entries[row].Headers[3]) &&
+                  !filter.PassFilter(sequence_table_entries[row].Headers[4]) && !filter.PassFilter(sequence_table_entries[row].Headers[5]) &&
+                  !filter.PassFilter(sequence_table_entries[row].Headers[6]) && !filter.PassFilter(sequence_table_entries[row].Headers[8]) &&
+                  !filter.PassFilter(sequence_table_entries[row].Headers[9])
+                  )
+              {
+                continue;
+              }
+            }
+            if (table_id_ == "TransitionsMainWindow")
+            {
+              if (!filter.PassFilter(transition_table_entries[row].Headers[0]) && !filter.PassFilter(transition_table_entries[row].Headers[1]))
+              {
+                continue;
+              }
+            }
+            if (table_id_ == "StdsConcsMainWindow")
+            {
+              if (!filter.PassFilter(concentration_table_entries[row].Headers[0]) && !filter.PassFilter(concentration_table_entries[row].Headers[1]) &&
+                  !filter.PassFilter(concentration_table_entries[row].Headers[2]) && !filter.PassFilter(concentration_table_entries[row].Headers[5]))
+              {
+                continue;
+              }
+            }
+            if (table_id_ == "ParametersMainWindow")
+            {
+              if (!filter.PassFilter(parameter_table_entries[row].Headers[0]) && !filter.PassFilter(parameter_table_entries[row].Headers[1]) &&
+                  !filter.PassFilter(parameter_table_entries[row].Headers[2]) && !filter.PassFilter(parameter_table_entries[row].Headers[3])
+                  )
+              {
+                continue;
+              }
+            }
+            if (table_id_ == "SpectrumMainWindow") // not-loaded
+            {
+              if (!filter.PassFilter(spectrum_table_entries[row].Headers[0]) && !filter.PassFilter(spectrum_table_entries[row].Headers[1]))
+              {
+                continue;
+              }
+            }
+            if (table_id_ == "QuantMethodMainWindow")
+            {
+              if (!filter.PassFilter(quantitation_method_table_entries[row].Headers[0]) && !filter.PassFilter(quantitation_method_table_entries[row].Headers[1]) &&
+                  !filter.PassFilter(quantitation_method_table_entries[row].Headers[2]) && !filter.PassFilter(quantitation_method_table_entries[row].Headers[3]) &&
+                  !filter.PassFilter(quantitation_method_table_entries[row].Headers[5]) && !filter.PassFilter(quantitation_method_table_entries[row].Headers[11])
+                  )
+              {
+                continue;
+              }
+            }
+            
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col) {
-              ImGui::TableSetColumnIndex(col);
-              ImGui::Text("%s", columns_(row,col).c_str());
+              if (table_id_ == "WorkflowMainWindow" && workflow_scanned == true && !workflow_table_entries.empty())
+              {
+                char text_buf[256];
+                ImTableEntry* item = &workflow_table_entries[row];
+                sprintf(text_buf, "%s", item->Headers[col]);
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", text_buf);
+                memset(text_buf, 0, sizeof(text_buf));
+              }
+              else if (table_id_ == "SequenceMainWindow" && sequence_scanned == true && !sequence_table_entries.empty())
+              {
+                char text_buf[2048];
+                ImTableEntry* item = &sequence_table_entries[row];
+                sprintf(text_buf, "%s", item->Headers[col]);
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", text_buf);
+                memset(text_buf, 0, sizeof(text_buf));
+              }
+              else if (table_id_ == "TransitionsMainWindow" && transitions_scanned == true && !transition_table_entries.empty())
+              {
+                char text_buf[2048];
+                ImTableEntry* item = &transition_table_entries[row];
+                sprintf(text_buf, "%s", item->Headers[col]);
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", text_buf);
+                memset(text_buf, 0, sizeof(text_buf));
+              }
+              else if (table_id_ == "StdsConcsMainWindow" && concentrations_scanned == true && !concentration_table_entries.empty())
+              {
+                char text_buf[2048];
+                ImTableEntry* item = &concentration_table_entries[row];
+                sprintf(text_buf, "%s", item->Headers[col]);
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", text_buf);
+                memset(text_buf, 0, sizeof(text_buf));
+              }
+              else if (table_id_ == "ParametersMainWindow" && parameters_scanned == true && !parameter_table_entries.empty())
+              {
+                char text_buf[2048];
+                ImTableEntry* item = &parameter_table_entries[row];
+                sprintf(text_buf, "%s", item->Headers[col]);
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", text_buf);
+                memset(text_buf, 0, sizeof(text_buf));
+              }
+              else if (table_id_ == "SpectrumMainWindow" && spectrums_scanned == true && !spectrum_table_entries.empty())
+              {
+                char text_buf[2048];
+                ImTableEntry* item = &spectrum_table_entries[row];
+                sprintf(text_buf, "%s", item->Headers[col]);
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", text_buf);
+                memset(text_buf, 0, sizeof(text_buf));
+              }
+              else if (table_id_ == "QuantMethodMainWindow" && quantitation_methods_scanned == true && !quantitation_method_table_entries.empty())
+              {
+                char text_buf[2048];
+                ImTableEntry* item = &quantitation_method_table_entries[row];
+                sprintf(text_buf, "%s", item->Headers[col]);
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", text_buf);
+                memset(text_buf, 0, sizeof(text_buf));
+              }
             }
           }
+        }
+      }
+      
+      if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
+      {
+        if (sorts_specs->SpecsDirty && (workflow_scanned == true ) && (table_id_ == "WorkflowMainWindow"))
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (workflow_table_entries.Size > 1)
+              qsort(&workflow_table_entries[0], (size_t)workflow_table_entries.Size, sizeof(workflow_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+        if (sorts_specs->SpecsDirty && (sequence_scanned == true) && (table_id_ == "SequenceMainWindow"))
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (sequence_table_entries.Size > 1)
+              qsort(&sequence_table_entries[0], (size_t)sequence_table_entries.Size, sizeof(sequence_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+        if (sorts_specs->SpecsDirty && (transitions_scanned == true) && (table_id_ == "TransitionsMainWindow"))
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (transition_table_entries.Size > 1)
+              qsort(&transition_table_entries[0], (size_t)transition_table_entries.Size, sizeof(transition_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+        if (sorts_specs->SpecsDirty && (concentrations_scanned == true ) && (table_id_ == "StdsConcsMainWindow"))
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (concentration_table_entries.Size > 1)
+              qsort(&concentration_table_entries[0], (size_t)concentration_table_entries.Size, sizeof(concentration_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+        if (sorts_specs->SpecsDirty && (parameters_scanned == true ) && (table_id_ == "ParametersMainWindow"))
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (parameter_table_entries.Size > 1)
+              qsort(&parameter_table_entries[0], (size_t)parameter_table_entries.Size, sizeof(parameter_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+        if (sorts_specs->SpecsDirty && (spectrums_scanned == true) && (table_id_ == "SpectrumMainWindow"))
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (spectrum_table_entries.Size > 1)
+              qsort(&spectrum_table_entries[0], (size_t)spectrum_table_entries.Size, sizeof(spectrum_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+        if (sorts_specs->SpecsDirty && (quantitation_methods_scanned == true) && (table_id_ == "QuantMethodMainWindow"))
+        {
+          ImTableEntry::s_current_sort_specs = sorts_specs;
+          if (quantitation_method_table_entries.Size > 1)
+              qsort(&quantitation_method_table_entries[0], (size_t)quantitation_method_table_entries.Size, sizeof(quantitation_method_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+          ImTableEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
         }
       }
       ImGui::EndTable();
