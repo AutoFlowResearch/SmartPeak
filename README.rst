@@ -43,14 +43,17 @@ STEP 1: Build OpenMS dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Build OpenMS-contrib by following the OpenMS wiki instructions
 
-Download and install the pre-compiled Boost library binaries for windows
+Download and install the pre-compiled Boost library binaries for windows (i.e. SourceForge) and
+
+- The minimum required Boost version is 1.71.0
 - Ensure that these binaries are used both for OpenMS and SmartPeak
 - The only boost package required by SmartPeak is Unit Test for unit testing, however, the same version of boost must be used when compiling both OpenMS and SmartPeak
 
 Download and install QT5 using the offline installer for windows
+
 - NOTE: only install the 5.12.1 for the relevant version of visual studios
 - Add the "lib" folder in the newly created qt5 directory to the system path variable so that the .dll's will be found during run-time
-- or add e.g. :bash:`PATH=%PATH%;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib;C:/local/boost_1_67_0/lib64-msvc-14.1` to the environment
+- or add e.g. :bash:`PATH=%PATH%;C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib;C:/local/boost_1_73_0/lib64-msvc-14.2` to the environment
 
 STEP 2: Build OpenMS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,10 +61,10 @@ Build OpenMS following the OpenMS wiki instructions. Example cmake command on wi
 
 .. code-block:: bash
 
-    cmake -DBoost_NO_SYSTEM_PATHS=ON -BOOST_INCLUDEDIR="C:/local/boost_1_67_0/boost" -DBOOST_ROOT="C:/local/boost_1_67_0" ^
-    -DBOOST_LIBRARYDIR="C:/local/boost_1_67_0/lib64-msvc-14.1" -DBOOST_USE_STATIC=OFF -DWITH_GUI=OFF -DPYOPENMS=OFF ^
+    cmake -DBoost_NO_SYSTEM_PATHS=ON -BOOST_INCLUDEDIR="C:/local/boost_1_73_0" -DBOOST_ROOT="C:/local/boost_1_73_0" ^
+    -DBOOST_LIBRARYDIR="C:/local/boost_1_73_0/lib64-msvc-14.2" -DBOOST_USE_STATIC=OFF -DWITH_GUI=OFF -DPYOPENMS=OFF ^
     -DOPENMS_CONTRIB_LIBS="[OpenMS directory]/contrib/build" -DCMAKE_PREFIX_PATH="C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib/cmake" ^
-    -G "Visual Studio 15 2017 Win64" ..
+    -G "Visual Studio 16 2019" -A x64 ..
 
 
 - Open "OpenMS_host" in visual studios and build only the solution for "OpenSwathAlgo" and then for "OpenMS" IN THAT ORDER
@@ -71,13 +74,13 @@ Build OpenMS following the OpenMS wiki instructions. Example cmake command on wi
 .. code-block:: powershell
 
     setx path "%PATH%;[OpenMS directory]\openms-build\lib\debug;C:\qt\Qt5.12.1b\5.12.1\msvc2017_64\lib"
-    setx path "%PATH%;C:\local\boost_1_67_0\lib64-msvc-14.1;[SDL directory]\lib\x64"
+    setx path "%PATH%;C:\local\boost_1_73_0\lib64-msvc-14.2;[SDL directory]\lib\x64"
 
 STEP 3: Build SmartPeak dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Download the latest SDL2 libraries. Add the SDL2 folder to the path environmental variable. Compile using cmake and build for "external projects"
-Example cmake command to download all external projects assuming that you are in the location :code:`[home directory]/smartPeak/build_external`
-:bash:`cmake -G "Visual Studio 15 2017 Win64" -T host=x64 -DUSE_SUPERBUILD=ON ..`
+Example cmake command to download all external projects assuming that you are in the location :code:`[home directory]/smartPeak2/build_external`
+:bash:`cmake -G "Visual Studio 16 2019" -A x64 -T host=x64 -DUSE_SUPERBUILD=ON ..`
 However, many of the requirements overlap with OpenMS so for practical purposes the only libraries that will need to be download are "ImGui", "ImPlot", and "Plog"
 
 STEP 4: Build SmartPeak
@@ -87,12 +90,12 @@ Example cmake command on windows assuming that all external dependency libraries
 
 .. code-block:: bash
 
-    cmake -DEIGEN_USE_GPU=OFF -DBoost_NO_SYSTEM_PATHS=ON -BOOST_INCLUDEDIR="C:/local/boost_1_67_0/boost" -DBOOST_ROOT="C:/local/boost_1_67_0" ^
-    -DBOOST_LIBRARYDIR="C:/local/boost_1_67_0/lib64-msvc-14.1" -DBOOST_USE_STATIC=OFF -G "Visual Studio 15 2017 Win64" -T host=x64 -DUSE_SUPERBUILD=OFF ^
-    -DEIGEN3_INCLUDE_DIR=[home directory]/smartPeak/build_external/Dependencies/Source/eigen ^
-    -DPLOG_INCLUDE_DIR=[home directory]/smartPeak/build_external/Dependencies/Source/plog/include ^
-    -DIMGUI_DIR=[home directory]/smartPeak/build_external/Dependencies/Source/imgui ^
-    -DIMPLOT_DIR=[home directory]/smartPeak/build_external/Dependencies/Source/implot ^
+    cmake -DEIGEN_USE_GPU=OFF -DBoost_NO_SYSTEM_PATHS=ON -BOOST_INCLUDEDIR="C:/local/boost_1_73_0/boost" -DBOOST_ROOT="C:/local/boost_1_73_0" ^
+    -DBOOST_LIBRARYDIR="C:/local/boost_1_73_0/lib64-msvc-14.2" -DBOOST_USE_STATIC=OFF -G "Visual Studio 16 2019" -A x64 -T host=x64 -DUSE_SUPERBUILD=OFF ^
+    -DEIGEN3_INCLUDE_DIR=[home directory]/smartPeak2/build_external/Dependencies/Source/eigen ^
+    -DPLOG_INCLUDE_DIR=[home directory]/smartPeak2/build_external/Dependencies/Source/plog/include ^
+    -DIMGUI_DIR=[home directory]/smartPeak2/build_external/Dependencies/Source/imgui ^
+    -DIMPLOT_DIR=[home directory]/smartPeak2/build_external/Dependencies/Source/implot ^
     -DCMAKE_PREFIX_PATH="[OpenMS directory]/openms-build";"C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib/cmake";"[SDL directory]/SDL"; ..
 
 Open "SmartPeak_host" in visual studios and build the project of choice. Projects can be built using Visual Studios in the IDE by opening :code:`msbuild [build_dir]/src/SmartPeak_host` and selecting the specific target to build in the GUI or on the command line by running e.g., `msbuild [build_dir]/src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount` which will build the main SmartPeak library and then running e.g., `msbuild [build_dir]/examples/SmartPeak_class_examples_smartpeak.sln -target:GUI /verbosity:normal /maxcpucount` which will build the SmartPeak GUI.
@@ -164,7 +167,7 @@ Some dependencies one might have to install:
 
 .. code-block:: bash
 
-    sudo apt install qt5-default libboost-dev libeigen3-dev libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-iostreams-dev libboost-date-time-dev libboost-math-dev libwildmagic-dev libsqlite3-dev libglpk-dev seqan-dev libhdf5-dev python3-pip
+    sudo apt install qt5-default libeigen3-dev libxerces-c-dev coinor-libcbc-dev libsvm-dev libboost-all-dev libwildmagic-dev libsqlite3-dev libglpk-dev seqan-dev libhdf5-dev python3-pip
 
 STEP 4: Build SmartPeak-Docs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -203,7 +206,7 @@ you can install it using the following command:
 
 .. code-block:: bash
 
-    brew install cmake qt5 sdl2 boost@1.60 glpk eigen sqlite hdf5 libsvm xerces-c
+    brew install cmake qt5 sdl2 boost glpk eigen sqlite hdf5 libsvm xerces-c
     brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib
     brew install coin-or-tools/coinor/coin_data_sample coin-or-tools/coinor/coinutils coin-or-tools/coinor/osi
 
@@ -221,7 +224,7 @@ OpemMS libs can be built wihtout GUI capabilities using the following set of com
     cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DBUILD_TYPE=ALL ../contrib
     cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build
     cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 \ 
-    -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost@1.60);$(brew --prefix)" \ 
+    -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost);$(brew --prefix)" \ 
     -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ \   
     -DSEQAN_INCLUDE_DIRS=~/OpenMS/contrib_build/include/seqan -DCOIN_INCLUDE_DIR=../contrib_build/include/ \
     -DWM5_INCLUDE_DIR=../contrib_build/include/WildMagic/ -DWM5_Wm5Core_LIBRARY=../contrib_build/lib/libWm5Core.a \
@@ -229,6 +232,16 @@ OpemMS libs can be built wihtout GUI capabilities using the following set of com
     -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug \
     -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
     make -j4 OpenMS
+
+The contrib libraries are also offered by the OpenMS Team precompiled for the recent versions of clang and can be installed as follows,
+make sure to nagivate and fetch the contrib builds based on your macOS and Xcode versions:
+
+.. code-block:: bash
+
+    cd OpenMS && mkdir contrib_build && cd contrib_build
+    curl -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
+    tar -xzf contrib_build.tar.gz
+    rm lib/libboost_* && rm -r include/boost && rm -r lib/cmake/Boost* && rm -r lib/cmake/boost*
 
 
 STEP 3: Building SmartPeak
@@ -249,11 +262,11 @@ This can be done using the following set of commands:
 
     cd ../smartpeak2_debug_build
     cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF \
-    -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;$(brew --prefix qt5);$(brew --prefix boost@1.60)" \
-    -DPLOG_INCLUDE_DIR=~/SmartPeak/smartpeak2_debug_superbuild/Dependencies/Source/plog/include \
-    -DIMGUI_DIR=~/SmartPeak/smartpeak2_debug_superbuild/Dependencies/Source/imgui \
-    -DIMPLOT_DIR=~/SmartPeak/smartpeak2_debug_superbuild/Dependencies/Source/implot \
-    -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
+    -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;$(brew --prefix qt5);$(brew --prefix boost)" \
+    -DPLOG_INCLUDE_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/plog/include \
+    -DIMGUI_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/imgui \
+    -DIMPLOT_DIR=~/SmartPeak2/smartpeak2_debug_superbuild/Dependencies/Source/implot \
+    -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
     make -j4
 
 STEP 4: Build SmartPeak-Docs
