@@ -84,29 +84,58 @@ namespace SmartPeak
     */
     void setFeatureMatrix(const SequenceHandler& sequence_handler);
     /*
-    @brief Sets the chromatogram data
+    @brief Scatter Plot structure, result of getChromatogramScatterPlot and getSpectrumScatterPlot
+    */
+    struct ScatterPlotData
+    {
+      std::vector<std::vector<float>> x_data_area_;
+      std::vector<std::vector<float>> y_data_area_;
+      std::vector<std::vector<float>> x_data_scatter_;
+      std::vector<std::vector<float>> y_data_scatter_;
+      std::vector<std::string> series_names_area_;
+      std::vector<std::string> series_names_scatter_;
+      std::string x_axis_title_;
+      std::string y_axis_title_;
+      float x_min_ = 0.0f;
+      float x_max_ = 0.0f;
+      float y_min_ = 0.0f;
+      float y_max_ = 0.0f;
+    };
+
+    /*
+    @brief Gets the chromatogram data
 
     @param[in] sequence_handler
+    @param[out] result
+    @param[in] range
+    @param[in] sample_names
+    @param[in] component_names
 
     @returns true if all points were added and false if points were omitted due to performance
     */
-    bool setChromatogramScatterPlot(const SequenceHandler& sequence_handler);
+    bool getChromatogramScatterPlot(const SequenceHandler& sequence_handler, 
+                                    ScatterPlotData& result,
+                                    const std::pair<float, float>& range,
+                                    const std::set<std::string>& sample_names,
+                                    const std::set<std::string>& component_names);
     /*
-    @brief reset range to large enough value in order to parse the chromatogram entirely
-    */
-    void resetChromatogramRange();
-    /*
-    @brief Sets the spectrum data
+    @brief Gets the spectrum data
 
     @param[in] sequence_handler
+    @param[in] result
+    @param[in] range
+    @param[in] sample_names
+    @param[in] scan_names
+    @param[in] component_group_names
 
     @returns true if all points were added and false if points were omitted due to performance
     */
-    bool setSpectrumScatterPlot(const SequenceHandler& sequence_handler);
-    /*
-    @brief reset range to large enough value in order to parse the spectrogram entirely
-    */
-    void resetSpectrumRange();
+    bool getSpectrumScatterPlot(const SequenceHandler& sequence_handler,
+                                ScatterPlotData& result,
+                                const std::pair<float, float>& range,
+                                const std::set<std::string>& sample_names,
+                                const std::set<std::string>& scan_names,
+                                const std::set<std::string>& component_group_names);
     void setFeatureLinePlot();
     void setFeatureHeatMap();
     /*
@@ -260,26 +289,6 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 1> feature_pivot_table_headers;
     Eigen::Tensor<std::string, 2> feature_pivot_table_rows;
     Eigen::Tensor<std::string, 2> feature_pivot_table_body;
-    // data for the chromatogram scatter plot
-    std::vector<std::vector<float>> chrom_time_hull_data, chrom_intensity_hull_data;
-    std::vector<std::vector<float>> chrom_time_raw_data, chrom_intensity_raw_data;
-    std::vector<std::string> chrom_series_hull_names,chrom_series_raw_names;
-    std::string chrom_x_axis_title;
-    std::string chrom_y_axis_title;
-    float chrom_time_min = 0.0f;
-    float chrom_time_max = 0.0f;
-    float chrom_intensity_min, chrom_intensity_max;
-    std::pair<float, float> chrom_time_range;
-    // data for the spectrum scatter plot
-    std::vector<std::vector<float>> spec_mz_hull_data, spec_intensity_hull_data;
-    std::vector<std::vector<float>> spec_mz_raw_data, spec_intensity_raw_data;
-    std::vector<std::string> spec_series_hull_names, spec_series_raw_names;
-    std::string spec_x_axis_title;
-    std::string spec_y_axis_title;
-    float spec_mz_min = 0.0f;
-    float spec_mz_max = 0.0f;
-    float spec_intensity_min, spec_intensity_max;
-    std::pair<float, float> spec_mz_range;
     // data for the feature line plot
     Eigen::Tensor<float, 2> feat_sample_data, feat_value_data;
     Eigen::Tensor<std::string, 1> feat_line_series_names;
@@ -299,8 +308,6 @@ namespace SmartPeak
     std::string calibrators_y_axis_title;
     float calibrators_conc_min , calibrators_conc_max, calibrators_feature_min, calibrators_feature_max;
   private:
-    std::set<std::string> chrom_series_hull_names_;
-    std::set<std::string> spec_series_hull_names_;
     int feature_table_unique_samples_transitions_ = 0; // used to decide when to update the feature table data
     int feature_matrix_unique_transitions_ = 0; // used to decide when to update the feature matrix data
   };
