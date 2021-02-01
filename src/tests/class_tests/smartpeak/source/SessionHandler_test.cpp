@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/test_config.h>
 #define BOOST_TEST_MODULE SessionHandler test suite
@@ -701,37 +722,27 @@ BOOST_AUTO_TEST_CASE(setFeatureMatrix1)
   SessionHandler session_handler;
   session_handler.setFeatureMatrix(testData.sequenceHandler);
 }
-
-BOOST_AUTO_TEST_CASE(resetChromatogramRange1)
-{
-  SessionHandler session_handler;
-  session_handler.resetChromatogramRange();
-  BOOST_CHECK_CLOSE(session_handler.chrom_time_range.first, 0.0, 1e-3);
-  BOOST_CHECK_CLOSE(session_handler.chrom_time_range.second, 1800.0, 1e-3);
-}
-
-BOOST_AUTO_TEST_CASE(setChromatogramScatterPlot1)
+BOOST_AUTO_TEST_CASE(getSpectrumScatterPlot1)
 {
   TestData testData;
   SessionHandler session_handler;
-  session_handler.setChromatogramScatterPlot(testData.sequenceHandler);
+  SessionHandler::ScatterPlotData result;
+  const std::pair<float, float> range = std::make_pair(0, 1800);
+  const std::set<std::string> sample_names;
+  const std::set<std::string> component_names;
+  BOOST_CHECK(session_handler.getChromatogramScatterPlot(testData.sequenceHandler, result, range, sample_names, component_names));
 }
-
-BOOST_AUTO_TEST_CASE(resetSpectrumRange1)
-{
-  SessionHandler session_handler;
-  session_handler.resetSpectrumRange();
-  BOOST_CHECK_CLOSE(session_handler.spec_mz_range.first, 0.0, 1e-3);
-  BOOST_CHECK_CLOSE(session_handler.spec_mz_range.second, 2000.0, 1e-3);
-}
-
 BOOST_AUTO_TEST_CASE(setSpectrumScatterPlot1)
 {
   TestData testData;
   SessionHandler session_handler;
-  session_handler.setSpectrumScatterPlot(testData.sequenceHandler);
+  SessionHandler::ScatterPlotData result;
+  const std::pair<float, float> range = std::make_pair(0, 2000);
+  const std::set<std::string> sample_names;
+  const std::set<std::string> scan_names;
+  const std::set<std::string> component_group_names;
+  BOOST_CHECK(session_handler.getSpectrumScatterPlot(testData.sequenceHandler, result, range, sample_names, scan_names, component_group_names));
 }
-
 BOOST_AUTO_TEST_CASE(setCalibratorsScatterLinePlot1)
 {
   TestData testData;

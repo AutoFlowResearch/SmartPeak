@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/Filenames.h>
@@ -2086,5 +2107,240 @@ namespace SmartPeak
     LOGD << "START ClearData";
     rawDataHandler_IO.clearNonSharedData();
     LOGD << "END ClearData";
+  }
+
+  void CalculateMDVs::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START CalculateMDVs";
+
+    if (params_I.count("CalculateMDVs") && params_I.at("CalculateMDVs").empty()) {
+      LOGE << "No parameters passed to CalculateMDVs.";
+      LOGD << "END CalculateMDVs";
+      return;
+    }
+
+    OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
+    OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
+    isotopelabelingmdvs.setParameters(parameters);
+
+    try {
+      OpenMS::FeatureMap normalized_featureMap;
+      std::vector<std::map<std::string, std::string>> CalculateMDVs_params = params_I.find("CalculateMDVs")->second;
+      
+      std::string feature_name;
+      OpenMS::IsotopeLabelingMDVs::MassIntensityType mass_intensity_type;
+      for(auto& param : CalculateMDVs_params)
+      {
+        if (param.find("name")->second == "mass_intensity_type")
+        {
+          if (param.find("value")->second == "norm_sum")
+          {
+            mass_intensity_type = OpenMS::IsotopeLabelingMDVs::MassIntensityType::NORM_SUM;
+          }
+          else if (param.find("value")->second == "norm_max")
+          {
+            mass_intensity_type = OpenMS::IsotopeLabelingMDVs::MassIntensityType::NORM_MAX;
+          }
+        }
+        else if (param.find("name")->second == "feature_name")
+        {
+          feature_name = param.find("name")->second;
+        }
+      }
+      
+      isotopelabelingmdvs.calculateMDVs(rawDataHandler_IO.getFeatureMap(), normalized_featureMap, mass_intensity_type, feature_name);
+      rawDataHandler_IO.setFeatureMap(normalized_featureMap);
+      rawDataHandler_IO.updateFeatureMapHistory();
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    LOGD << "END calculateMDVs";
+  }
+
+  void IsotopicCorrections::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START IsotopicCorrections";
+
+    if (params_I.count("IsotopicCorrections") && params_I.at("IsotopicCorrections").empty()) {
+      LOGE << "No parameters passed to IsotopicCorrections.";
+      LOGD << "END IsotopicCorrections";
+      return;
+    }
+
+    OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
+    OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
+    isotopelabelingmdvs.setParameters(parameters);
+
+    try {
+      OpenMS::FeatureMap corrected_featureMap;
+      std::vector<std::map<std::string, std::string>> IsotopicCorrections_params = params_I.find("IsotopicCorrections")->second;
+      
+      OpenMS::IsotopeLabelingMDVs::DerivatizationAgent correction_matrix_agent;
+      for(auto& param : IsotopicCorrections_params)
+      {
+        if (param.find("name")->second == "correction_matrix_agent")
+        {
+          if (param.find("value")->second == "TBDMS")
+          {
+            correction_matrix_agent = OpenMS::IsotopeLabelingMDVs::DerivatizationAgent::TBDMS;
+          }
+        }
+      }
+      
+      isotopelabelingmdvs.isotopicCorrections(rawDataHandler_IO.getFeatureMap(), corrected_featureMap, {}, correction_matrix_agent);
+      rawDataHandler_IO.setFeatureMap(corrected_featureMap);
+      rawDataHandler_IO.updateFeatureMapHistory();
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    LOGD << "END IsotopicCorrections";
+  }
+
+  void CalculateIsotopicPurities::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START calculateIsotopicPurities";
+
+    if (params_I.count("CalculateIsotopicPurities") && params_I.at("CalculateIsotopicPurities").empty()) {
+      LOGE << "No parameters passed to CalculateIsotopicPurities.";
+      LOGD << "END CalculateIsotopicPurities";
+      return;
+    }
+
+    OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
+    OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
+    isotopelabelingmdvs.setParameters(parameters);
+
+    try {
+      OpenMS::FeatureMap normalized_featureMap;
+      std::vector<std::map<std::string, std::string>> CalculateIsotopicPurities_params = params_I.find("CalculateIsotopicPurities")->second;
+      
+      std::vector<std::string> isotopic_purity_names;
+      std::vector<std::vector<double>> experiment_data_mat;
+      for(auto& param : CalculateIsotopicPurities_params)
+      {
+        if (param.find("name")->second == "isotopic_purity_values" && !param.find("value")->second.empty())
+        {
+          std::string experiment_data_s;
+          std::vector<double> experiment_data;
+          experiment_data_s = param.find("value")->second;
+          std::regex regex_double("[+-]?\\d+(?:\\.\\d+)?");
+          size_t num_lists = std::count(experiment_data_s.begin(), experiment_data_s.end(), '[') == std::count(experiment_data_s.begin(), experiment_data_s.end(), ']') ? std::count(experiment_data_s.begin(), experiment_data_s.end(), '[') : 0;
+          experiment_data_mat.resize(num_lists);
+          std::sregex_iterator values_begin = std::sregex_iterator(experiment_data_s.begin(), experiment_data_s.end(), regex_double);
+          std::sregex_iterator values_end = std::sregex_iterator();
+          auto num_values = std::distance(values_begin , values_end);
+          for (std::sregex_iterator it = values_begin; it != values_end; ++it)
+            experiment_data.push_back(std::stod(it->str()));
+          
+          size_t element_idx = 0;
+          size_t list_idx = 0;
+          do
+          {
+            do
+            {
+              experiment_data_mat.at(list_idx).push_back(experiment_data.at(element_idx));
+              element_idx++;
+                
+              if (element_idx > 0 && element_idx % (num_values / num_lists) == 0) list_idx++;
+            }
+            while ((element_idx > 0 && element_idx % (num_values / num_lists) != 0));
+          }
+          while (list_idx < num_lists);
+        }
+        if (param.find("name")->second == "isotopic_purity_name" && !param.find("value")->second.empty())
+        {
+          std::string isotopic_purity_name_s;
+          isotopic_purity_name_s = param.find("value")->second;
+          std::regex regex_string_list("[^\"\',\[]+(?=')");
+          std::sregex_iterator names_begin = std::sregex_iterator(isotopic_purity_name_s.begin(), isotopic_purity_name_s.end(), regex_string_list);
+          for (std::sregex_iterator it = names_begin; it != std::sregex_iterator(); ++it)
+            isotopic_purity_names.push_back(it->str());
+        }
+      }
+      normalized_featureMap = rawDataHandler_IO.getFeatureMap();
+      isotopelabelingmdvs.calculateIsotopicPurities(normalized_featureMap, experiment_data_mat, isotopic_purity_names);
+      rawDataHandler_IO.setFeatureMap(normalized_featureMap);
+      rawDataHandler_IO.updateFeatureMapHistory();
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    LOGD << "END CalculateIsotopicPurities";
+  }
+
+  void CalculateMDVAccuracies::process(
+    RawDataHandler& rawDataHandler_IO,
+    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START CalculateMDVAccuracies";
+
+    if (params_I.count("CalculateMDVAccuracies") && params_I.at("CalculateMDVAccuracies").empty()) {
+      LOGE << "No parameters passed to CalculateMDVAccuracies.";
+      LOGD << "END CalculateMDVAccuracies";
+      return;
+    }
+
+    // Set up CalculateMDVs and parse params
+    OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
+    OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
+    isotopelabelingmdvs.setParameters(parameters);
+
+    try {
+      OpenMS::FeatureMap featureMap_with_accuracy_info;
+      std::vector<std::map<std::string, std::string>> CalculateMDVAccuracies_params = params_I.find("CalculateMDVAccuracies")->second;
+      
+      std::vector<double> fragment_isotopomer_measured;
+      std::string fragment_isotopomer_theoretical_formula, fragment_isotopomer_measured_s, feature_name;
+      std::map<std::string, std::string> proteinName_to_SumFormula ;
+      
+      for (auto& peptide : rawDataHandler_IO.getTargetedExperiment().getPeptides())
+      {
+        if (peptide.metaValueExists("SumFormula") && !peptide.id.empty()
+            && proteinName_to_SumFormula.find((std::string)(peptide.id)) == proteinName_to_SumFormula.end())
+        {
+          proteinName_to_SumFormula.insert(std::make_pair((std::string)(peptide.id), (std::string)peptide.getMetaValue("SumFormula")));
+        }
+      }
+      
+      for(auto& param : CalculateMDVAccuracies_params)
+      {
+        if (param.find("name")->second == "feature_name")
+        {
+          if (!param.find("value")->second.empty())
+          {
+            feature_name =  param.find("value")->second;
+          }
+        }
+      }
+      
+      featureMap_with_accuracy_info = rawDataHandler_IO.getFeatureMap();
+      isotopelabelingmdvs.calculateMDVAccuracies(featureMap_with_accuracy_info, feature_name, proteinName_to_SumFormula);
+      rawDataHandler_IO.setFeatureMap(featureMap_with_accuracy_info);
+      rawDataHandler_IO.updateFeatureMapHistory();
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    LOGD << "END CalculateMDVAccuracies";
   }
 }

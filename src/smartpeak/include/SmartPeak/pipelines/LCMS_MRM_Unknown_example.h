@@ -1,3 +1,26 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
+
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
@@ -21,15 +44,15 @@ void example_LCMS_MRM_Unknowns(
   cs.process();
 
   const std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = {
-    std::shared_ptr<RawDataProcessor>(new LoadRawData()),
-    std::shared_ptr<RawDataProcessor>(new MapChromatograms()),
-    std::shared_ptr<RawDataProcessor>(new PickMRMFeatures()),
-    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
-    std::shared_ptr<RawDataProcessor>(new FilterFeatures()),
-    std::shared_ptr<RawDataProcessor>(new SelectFeatures()),
-    std::shared_ptr<RawDataProcessor>(new QuantifyFeatures()),
-    std::shared_ptr<RawDataProcessor>(new CheckFeatures()),
-    std::shared_ptr<RawDataProcessor>(new StoreFeatures())
+    std::make_shared<LoadRawData>(),
+    std::make_shared<MapChromatograms>(),
+    std::make_shared<PickMRMFeatures>(),
+    std::make_shared<FilterFeatures>(),
+    std::make_shared<FilterFeatures>(),
+    std::make_shared<SelectFeatures>(),
+    std::make_shared<QuantifyFeatures>(),
+    std::make_shared<CheckFeatures>(),
+    std::make_shared<StoreFeatures>()
   };
 
   std::map<std::string, Filenames> dynamic_filenames;

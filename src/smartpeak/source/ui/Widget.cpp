@@ -1,3 +1,26 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
+
 #include <SmartPeak/ui/Widget.h>
 #include <algorithm>
 #include <map>
@@ -318,44 +341,45 @@ namespace SmartPeak
     }
   }
 
-  void ChromatogramPlotWidget::draw()
+  void ScatterPlotWidget::draw()
   {
+    updateScatterPlotData();
     // Widget's controls - that ImGui does not support natively
     const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_AlwaysClamp;
     float controls_pos_start_y = ImGui::GetCursorPosY();
-    ImGui::SliderFloat((std::string("min ") + x_axis_title_).c_str(), &x_min_, range_min_, x_max_, "%.4f", slider_flags);
+    ImGui::SliderFloat((std::string("min ") + chrom_.x_axis_title_).c_str(), &current_range_.first, slider_min_max_.first, current_range_.second, "%.4f", slider_flags);
     ImGui::SameLine();
     ImGui::Checkbox("Compact View", &compact_view_);
-    ImGui::SliderFloat((std::string("max ") + x_axis_title_).c_str(), &x_max_, x_min_, range_max_, "%.4f", slider_flags);
+    ImGui::SliderFloat((std::string("max ") + chrom_.x_axis_title_).c_str(), &current_range_.second, current_range_.first, slider_min_max_.second, "%.4f", slider_flags);
     ImGui::SameLine();
     ImGui::Checkbox("Legend", &show_legend_);
     float controls_pos_end_y = ImGui::GetCursorPosY();
     // Main graphic
     float graphic_height = plot_height_ - (controls_pos_end_y - controls_pos_start_y);
-    ImPlot::SetNextPlotLimits(x_min_, x_max_, y_min_, y_max_, ImGuiCond_Always);
+    ImPlot::SetNextPlotLimits(current_range_.first, current_range_.second, chrom_.y_min_, chrom_.y_max_, ImGuiCond_Always);
     ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
     plotFlags |= ImPlotFlags_Crosshairs;
-    if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(plot_width_ - 25, graphic_height - 40), plotFlags)) {
+    if (ImPlot::BeginPlot(plot_title_.c_str(), chrom_.x_axis_title_.c_str(), chrom_.y_axis_title_.c_str(), ImVec2(plot_width_ - 25, graphic_height - 40), plotFlags)) {
       int i = 0;
-      for (const auto& serie_name_scatter : series_names_scatter_)
+      for (const auto& serie_name_scatter : chrom_.series_names_scatter_)
       {
-        assert(x_data_scatter_.at(i).size() == y_data_scatter_.at(i).size());
+        assert(chrom_.x_data_scatter_.at(i).size() == chrom_.y_data_scatter_.at(i).size());
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_None);
-        ImPlot::PlotLine(serie_name_scatter.c_str(), x_data_scatter_.at(i).data(), y_data_scatter_.at(i).data(), x_data_scatter_.at(i).size());
+        ImPlot::PlotLine(serie_name_scatter.c_str(), chrom_.x_data_scatter_.at(i).data(), chrom_.y_data_scatter_.at(i).data(), chrom_.x_data_scatter_.at(i).size());
         ImPlotMarker plot_marker = ImPlotMarker_Circle;
         int feature_index = 0;
-        for (int  j = 0; j < x_data_area_.size(); ++j) {
+        for (int  j = 0; j < chrom_.x_data_area_.size(); ++j) {
           // Corresponding serie names are supposed to start with same name as the scatter name
-          if (series_names_area_.at(j).rfind(serie_name_scatter) == 0)
+          if (chrom_.series_names_area_.at(j).rfind(serie_name_scatter) == 0)
           {
-            assert(x_data_area_.at(j).size() == y_data_area_.at(j).size());
+            assert(chrom_.x_data_area_.at(j).size() == chrom_.y_data_area_.at(j).size());
             ImPlot::PushStyleVar(ImPlotStyleVar_Marker, plot_marker);
             std::string legend_text = serie_name_scatter;
             if (!compact_view_)
             {
-              legend_text = series_names_area_.at(j) + "::" + std::to_string(feature_index);
+              legend_text = chrom_.series_names_area_.at(j) + "::" + std::to_string(feature_index);
             }
-            ImPlot::PlotScatter(legend_text.c_str(), x_data_area_.at(j).data(), y_data_area_.at(j).data(), x_data_area_.at(j).size());
+            ImPlot::PlotScatter(legend_text.c_str(), chrom_.x_data_area_.at(j).data(), chrom_.y_data_area_.at(j).data(), chrom_.x_data_area_.at(j).size());
             plot_marker <<= 1;
             if (plot_marker > ImPlotMarker_Asterisk) plot_marker = ImPlotMarker_Circle;
             ++feature_index;
@@ -366,40 +390,7 @@ namespace SmartPeak
       ImPlot::EndPlot();
     }
   }
-
-  void CalibratorsPlotWidget::draw()
-  {
-    // Main graphic
-    ImPlot::SetNextPlotLimits(x_min_, x_max_, y_min_, y_max_, ImGuiCond_Always);
-    if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(plot_width_ - 25, plot_height_ - 40))) {
-      for (int i = 0; i < x_raw_data_.size(); ++i) {
-        assert(x_raw_data_.at(i).size() == y_raw_data_.at(i).size());
-        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotScatter((series_names_.at(i) + "-pts").c_str(), x_raw_data_.at(i).data(), y_raw_data_.at(i).data(), x_raw_data_.at(i).size());
-      }
-      for (int i = 0; i < x_fit_data_.size(); ++i) {
-        assert(x_fit_data_.at(i).size() == y_fit_data_.at(i).size());
-        ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
-        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotLine((series_names_.at(i) + "-fit").c_str(), x_fit_data_.at(i).data(), y_fit_data_.at(i).data(), x_fit_data_.at(i).size());
-      }
-      ImPlot::EndPlot();
-    }
-  }
-
-  void Heatmap2DWidget::draw()
-  {
-    // Main graphic
-    if (rows_.size() > 1 || columns_.size() > 1) {
-      assert(data_.dimension(0) == rows_.size() && data_.dimension(1) == columns_.size());
-      const ImPlotFlags imPlotFlags = ImPlotFlags_MousePos | ImPlotFlags_Highlight | ImPlotFlags_BoxSelect | ImPlotFlags_ContextMenu;
-      if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(plot_width_ - 25, plot_height_ - 40), imPlotFlags)) {
-        ImPlot::PlotHeatmap(("##" + plot_title_).c_str(), data_.data(), rows_.size(), columns_.size(), data_min_, data_max_, NULL);
-        ImPlot::EndPlot();
-      }
-    }
-  }
-
+  
   void GenericTreeWidget::draw()
   {
     // left

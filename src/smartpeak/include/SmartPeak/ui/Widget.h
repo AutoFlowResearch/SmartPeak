@@ -1,10 +1,38 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
+
 #pragma once
 
 #include <string>
 #include <utility>
 #include <vector>
 #include <imgui.h>
+#include <SmartPeak/core/SessionHandler.h>
 #include <unsupported/Eigen/CXX11/Tensor>
+
+/**
+Generic and base classes for Widgets
+*/
 
 namespace SmartPeak
 {
@@ -194,96 +222,34 @@ namespace SmartPeak
   };
 
   /**
-    @brief Class for plotting 2D line plots
+  @brief Base class for ScatterPlot widgets
   */
-  class ChromatogramPlotWidget : public GenericGraphicWidget
+  class ScatterPlotWidget : public GenericGraphicWidget
   {
   public:
-    ChromatogramPlotWidget(const std::vector<std::vector<float>>&x_data_scatter, const std::vector<std::vector<float>>&y_data_scatter, const std::vector<std::string>&series_names_scatter,
-      const std::vector<std::vector<float>>&x_data_area, const std::vector<std::vector<float>>&y_data_area, const std::vector<std::string>&series_names_area,
-      const std::string& x_axis_title, const std::string& y_axis_title, float& x_min, float& x_max, const float& y_min, const float& y_max,
-      const float& plot_width, const float& plot_height, const std::string& plot_title, bool& show_legend, 
-      float& range_min, float& range_max, bool& compact_view) :
-      x_data_scatter_(x_data_scatter), y_data_scatter_(y_data_scatter), series_names_scatter_(series_names_scatter),
-      x_data_area_(x_data_area), y_data_area_(y_data_area), series_names_area_(series_names_area),
-      x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
-      x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title),
-      show_legend_(show_legend), 
-      range_min_(range_min), range_max_(range_max),
-      compact_view_(compact_view){};
+    ScatterPlotWidget(SessionHandler& session_handler,
+      SequenceHandler& sequence_handler,
+      const std::string& title) :
+      session_handler_(session_handler),
+      sequence_handler_(sequence_handler),
+      plot_title_(title) {};
+    void setWindowSize(float width, float height) { plot_width_ = width; plot_height_ = height; };
+    void setRefreshNeeded() { refresh_needed_ = true; };
     void draw() override;
-    const std::vector<std::vector<float>>& x_data_scatter_;
-    const std::vector<std::vector<float>>& y_data_scatter_;
-    const std::vector<std::string>& series_names_scatter_;
-    const std::vector<std::vector<float>>& x_data_area_;
-    const std::vector<std::vector<float>>& y_data_area_;
-    const std::vector<std::string>& series_names_area_;
-    const std::string& x_axis_title_;
-    const std::string& y_axis_title_;
-    float& x_min_;
-    float& x_max_;
-    const float& y_min_;
-    const float& y_max_;
-    const float& plot_width_;
-    const float& plot_height_;
+  protected:
+    virtual void updateScatterPlotData() = 0;
+  protected:
+    SessionHandler& session_handler_;
+    SequenceHandler& sequence_handler_;
+    float plot_width_ = 0.0f;
+    float plot_height_ = 0.0f;
     const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
-    bool& show_legend_;
-    const float& range_min_; // range for the sliders
-    const float& range_max_;
-    bool& compact_view_;
-  };
-
-  /**
-    @brief Class for plotting 2D line plots
-  */
-  class CalibratorsPlotWidget : public GenericGraphicWidget
-  {
-  public:
-    CalibratorsPlotWidget(const std::vector<std::vector<float>>&x_fit_data, const std::vector<std::vector<float>>&y_fit_data,
-      const std::vector<std::vector<float>>&x_raw_data, const std::vector<std::vector<float>>&y_raw_data, const std::vector<std::string>&series_names,
-      const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
-      const float& plot_width, const float& plot_height, const std::string& plot_title) :
-      x_fit_data_(x_fit_data), y_fit_data_(y_fit_data), x_raw_data_(x_raw_data), y_raw_data_(y_raw_data), series_names_(series_names), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
-      x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title) {};
-    void draw() override;
-    const std::vector<std::vector<float>>& x_fit_data_;
-    const std::vector<std::vector<float>>& y_fit_data_;
-    const std::vector<std::vector<float>>& x_raw_data_;
-    const std::vector<std::vector<float>>& y_raw_data_;
-    const std::vector<std::string>& series_names_;
-    const std::string& x_axis_title_;
-    const std::string& y_axis_title_;
-    const float& x_min_;
-    const float& x_max_;
-    const float& y_min_;
-    const float& y_max_;
-    const float& plot_width_;
-    const float& plot_height_;
-    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
-  };
-
-  /**
-    @brief Class for plotting heatmaps
-  */
-  class Heatmap2DWidget : public GenericGraphicWidget
-  {
-  public:
-    Heatmap2DWidget(const Eigen::Tensor<float, 2, Eigen::RowMajor>& data, const Eigen::Tensor<std::string, 1>& columns, const Eigen::Tensor<std::string, 1>& rows,
-      const std::string& x_axis_title, const std::string& y_axis_title, const float& data_min, const float& data_max,
-      const float& plot_width, const float& plot_height, const std::string& plot_title)
-      :data_(data), columns_(columns), rows_(rows), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title), data_min_(data_min), data_max_(data_max),
-      plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title){};
-    void draw() override;
-    const Eigen::Tensor<float, 2, Eigen::RowMajor>& data_; // Row major ordering
-    const Eigen::Tensor<std::string,1>& columns_;
-    const Eigen::Tensor<std::string,1>& rows_;
-    const std::string& x_axis_title_;
-    const std::string& y_axis_title_;
-    const float& data_min_;
-    const float& data_max_;
-    const float& plot_width_;
-    const float& plot_height_;
-    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
+    bool show_legend_ = true;
+    bool compact_view_ = true;
+    SessionHandler::ScatterPlotData chrom_;
+    bool refresh_needed_ = false;
+    std::pair<float, float> slider_min_max_ = { 0.0f, 0.0f };
+    std::pair<float, float> current_range_ = { 0.0f, 0.0f };
   };
 
   /**
