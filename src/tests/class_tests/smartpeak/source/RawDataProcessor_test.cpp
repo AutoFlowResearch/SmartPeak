@@ -2463,8 +2463,8 @@ BOOST_AUTO_TEST_CASE(emg_processor)
 BOOST_AUTO_TEST_CASE(calculateMDVs)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2572,8 +2572,8 @@ BOOST_AUTO_TEST_CASE(calculateMDVs)
 BOOST_AUTO_TEST_CASE(isotopicCorrections)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2626,8 +2626,8 @@ BOOST_AUTO_TEST_CASE(isotopicCorrections)
 BOOST_AUTO_TEST_CASE(calculateIsotopicPurities)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2671,8 +2671,8 @@ BOOST_AUTO_TEST_CASE(calculateIsotopicPurities)
 BOOST_AUTO_TEST_CASE(calculateMDVAccuracies)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 

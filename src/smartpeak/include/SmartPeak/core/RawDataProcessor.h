@@ -644,11 +644,13 @@ namespace SmartPeak
     std::string getName() const override { return "CALCULATE_MDVS"; }
     std::string getDescription() const override { return "Calculate MDVs."; }
     
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Calculate MDVs
      */
     void process(
                  RawDataHandler& rawDataHandler_IO,
-                 const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+                 const ParameterSet& params_I,
                  const Filenames& filenames
                  ) const override;
   };
@@ -659,11 +661,13 @@ namespace SmartPeak
     std::string getName() const override { return "ISOTOPIC_CORRECTIONS"; }
     std::string getDescription() const override { return "Perform Isotopic Corrections."; }
     
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Correct MDVs
      */
     void process(
                  RawDataHandler& rawDataHandler_IO,
-                 const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+                 const ParameterSet& params_I,
                  const Filenames& filenames
                  ) const override;
   };
@@ -674,11 +678,13 @@ namespace SmartPeak
     std::string getName() const override { return "CALCULATE_MDV_ISOTOPIC_PURITIES"; }
     std::string getDescription() const override { return "Calculate MDV Isotopic Purities."; }
     
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Calculate MDV Isotopic Purities
      */
     void process(
                  RawDataHandler& rawDataHandler_IO,
-                 const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+                 const ParameterSet& params_I,
                  const Filenames& filenames
                  ) const override;
   };
@@ -689,11 +695,13 @@ namespace SmartPeak
     std::string getName() const override { return "COMPARE_MDV_TO_THEORETICAL"; }
     std::string getDescription() const override { return "Compare MDVs to Theoretical"; }
     
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Compare MDVs to Theoretical
      */
     void process(
                  RawDataHandler& rawDataHandler_IO,
-                 const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+                 const ParameterSet& params_I,
                  const Filenames& filenames
                  ) const override;
   };

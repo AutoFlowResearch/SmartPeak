@@ -2109,9 +2109,30 @@ namespace SmartPeak
     LOGD << "END ClearData";
   }
 
+  ParameterSet CalculateMDVs::getParameterSchema() const
+  {
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"CalculateMDVs", {
+      {
+        {"name", "mass_intensity_type"},
+        {"type", "string"},
+        {"value", "norm_sum"},
+        {"description", ""},
+        {"valid_strings", "['norm_sum','norm_max']"}
+      },
+      {
+        {"name", "feature_name"},
+        {"type", "string"},
+        {"value", "peak_apex_int"},
+        {"description", ""},
+      }
+    }} });
+    return ParameterSet(param_struct);
+  }
+
   void CalculateMDVs::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -2129,26 +2150,26 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureMap normalized_featureMap;
-      std::vector<std::map<std::string, std::string>> CalculateMDVs_params = params_I.find("CalculateMDVs")->second;
+      auto& CalculateMDVs_params = params_I.at("CalculateMDVs");
       
       std::string feature_name;
       OpenMS::IsotopeLabelingMDVs::MassIntensityType mass_intensity_type;
       for(auto& param : CalculateMDVs_params)
       {
-        if (param.find("name")->second == "mass_intensity_type")
+        if (param.getName() == "mass_intensity_type")
         {
-          if (param.find("value")->second == "norm_sum")
+          if (param.getValueAsString() == "norm_sum")
           {
             mass_intensity_type = OpenMS::IsotopeLabelingMDVs::MassIntensityType::NORM_SUM;
           }
-          else if (param.find("value")->second == "norm_max")
+          else if (param.getValueAsString() == "norm_max")
           {
             mass_intensity_type = OpenMS::IsotopeLabelingMDVs::MassIntensityType::NORM_MAX;
           }
         }
-        else if (param.find("name")->second == "feature_name")
+        else if (param.getName() == "feature_name")
         {
-          feature_name = param.find("name")->second;
+          feature_name = param.getName();
         }
       }
       
@@ -2163,9 +2184,24 @@ namespace SmartPeak
     LOGD << "END calculateMDVs";
   }
 
+  ParameterSet IsotopicCorrections::getParameterSchema() const
+  {
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"IsotopicCorrections", {
+      {
+        {"name", "correction_matrix_agent"},
+        {"type", "string"},
+        {"value", "TBDMS"},
+        {"description", ""},
+        {"valid_strings", "['TBDMS','unspecified']"}
+      }
+    }} });
+    return ParameterSet(param_struct);
+  }
+
   void IsotopicCorrections::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -2183,14 +2219,14 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureMap corrected_featureMap;
-      std::vector<std::map<std::string, std::string>> IsotopicCorrections_params = params_I.find("IsotopicCorrections")->second;
+      auto& IsotopicCorrections_params = params_I.at("IsotopicCorrections");
       
       OpenMS::IsotopeLabelingMDVs::DerivatizationAgent correction_matrix_agent;
       for(auto& param : IsotopicCorrections_params)
       {
-        if (param.find("name")->second == "correction_matrix_agent")
+        if (param.getName() == "correction_matrix_agent")
         {
-          if (param.find("value")->second == "TBDMS")
+          if (param.getValueAsString() == "TBDMS")
           {
             correction_matrix_agent = OpenMS::IsotopeLabelingMDVs::DerivatizationAgent::TBDMS;
           }
@@ -2208,9 +2244,27 @@ namespace SmartPeak
     LOGD << "END IsotopicCorrections";
   }
 
+  ParameterSet CalculateIsotopicPurities::getParameterSchema() const
+  {
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"CalculateIsotopicPurities", {
+      {
+        {"name", "isotopic_purity_values"},
+        {"type", "string"},
+        {"value", ""},
+      },
+      {
+        {"name", "isotopic_purity_name"},
+        {"type", "list"},
+        {"value", "[]"},
+      }
+    }} });
+    return ParameterSet(param_struct);
+  }
+
   void CalculateIsotopicPurities::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -2228,17 +2282,17 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureMap normalized_featureMap;
-      std::vector<std::map<std::string, std::string>> CalculateIsotopicPurities_params = params_I.find("CalculateIsotopicPurities")->second;
+      auto& CalculateIsotopicPurities_params = params_I.at("CalculateIsotopicPurities");
       
       std::vector<std::string> isotopic_purity_names;
       std::vector<std::vector<double>> experiment_data_mat;
       for(auto& param : CalculateIsotopicPurities_params)
       {
-        if (param.find("name")->second == "isotopic_purity_values" && !param.find("value")->second.empty())
+        if (param.getName() == "isotopic_purity_values" && !param.getValueAsString().empty())
         {
           std::string experiment_data_s;
           std::vector<double> experiment_data;
-          experiment_data_s = param.find("value")->second;
+          experiment_data_s = param.getValueAsString();
           std::regex regex_double("[+-]?\\d+(?:\\.\\d+)?");
           size_t num_lists = std::count(experiment_data_s.begin(), experiment_data_s.end(), '[') == std::count(experiment_data_s.begin(), experiment_data_s.end(), ']') ? std::count(experiment_data_s.begin(), experiment_data_s.end(), '[') : 0;
           experiment_data_mat.resize(num_lists);
@@ -2263,10 +2317,10 @@ namespace SmartPeak
           }
           while (list_idx < num_lists);
         }
-        if (param.find("name")->second == "isotopic_purity_name" && !param.find("value")->second.empty())
+        if (param.getName() == "isotopic_purity_name" && !param.getValueAsString().empty())
         {
           std::string isotopic_purity_name_s;
-          isotopic_purity_name_s = param.find("value")->second;
+          isotopic_purity_name_s = param.getValueAsString();
           std::regex regex_string_list("[^\"\',\[]+(?=')");
           std::sregex_iterator names_begin = std::sregex_iterator(isotopic_purity_name_s.begin(), isotopic_purity_name_s.end(), regex_string_list);
           for (std::sregex_iterator it = names_begin; it != std::sregex_iterator(); ++it)
@@ -2285,9 +2339,22 @@ namespace SmartPeak
     LOGD << "END CalculateIsotopicPurities";
   }
 
+  ParameterSet CalculateMDVAccuracies::getParameterSchema() const
+  {
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"CalculateMDVAccuracies", {
+      {
+        {"name", "feature_name"},
+        {"type", "string"},
+        {"value", ""},
+      },
+    }} });
+    return ParameterSet(param_struct);
+  }
+
   void CalculateMDVAccuracies::process(
     RawDataHandler& rawDataHandler_IO,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -2306,7 +2373,7 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureMap featureMap_with_accuracy_info;
-      std::vector<std::map<std::string, std::string>> CalculateMDVAccuracies_params = params_I.find("CalculateMDVAccuracies")->second;
+      auto& CalculateMDVAccuracies_params = params_I.at("CalculateMDVAccuracies");
       
       std::vector<double> fragment_isotopomer_measured;
       std::string fragment_isotopomer_theoretical_formula, fragment_isotopomer_measured_s, feature_name;
@@ -2323,11 +2390,11 @@ namespace SmartPeak
       
       for(auto& param : CalculateMDVAccuracies_params)
       {
-        if (param.find("name")->second == "feature_name")
+        if (param.getName() == "feature_name")
         {
-          if (!param.find("value")->second.empty())
+          if (!param.getValueAsString().empty())
           {
-            feature_name =  param.find("value")->second;
+            feature_name =  param.getValueAsString();
           }
         }
       }
