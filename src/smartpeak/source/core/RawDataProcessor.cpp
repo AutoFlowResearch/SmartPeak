@@ -2123,7 +2123,7 @@ namespace SmartPeak
       {
         {"name", "feature_name"},
         {"type", "string"},
-        {"value", "peak_apex_int"},
+        {"value", "intensity"},
         {"description", ""},
       }
     }} });
@@ -2193,7 +2193,7 @@ namespace SmartPeak
         {"type", "string"},
         {"value", "TBDMS"},
         {"description", ""},
-        {"valid_strings", "['TBDMS','unspecified']"}
+        {"valid_strings", "['TBDMS']"} // only "TBDMS" is supported for now.
       }
     }} });
     return ParameterSet(param_struct);
