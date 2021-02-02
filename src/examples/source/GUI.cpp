@@ -319,31 +319,36 @@ int main(int argc, char **argv)
           fs::create_directories(fs::path(pathname));
         }
         std::vector<ApplicationHandler::Command> commands;
+        bool commands_created = true;
         CreateCommand createCommand(application_handler_);
-        for (const auto& command_name : application_handler_.sequenceHandler_.getWorkflow())
-        {
+        for (const auto& command_name : application_handler_.sequenceHandler_.getWorkflow()) {
           createCommand.name_ = command_name;
-          const bool created = createCommand.process();
-          if (created) {
+          commands_created &= createCommand.process();
+          if (commands_created) {
             commands.push_back(createCommand.cmd_);
           }
         }
-        for (auto& cmd : commands)
-        {
-          for (auto& p : cmd.dynamic_filenames)
+        if (!commands_created) {
+          LOGE << "Failed to create Commands, aborting.";
+        } 
+        else {
+          for (auto& cmd : commands)
           {
-            Filenames::updateDefaultDynamicFilenames(
-              application_handler_.mzML_dir_,
-              application_handler_.features_in_dir_,
-              application_handler_.features_out_dir_,
-              p.second
-            );
+            for (auto& p : cmd.dynamic_filenames)
+            {
+              Filenames::updateDefaultDynamicFilenames(
+                application_handler_.mzML_dir_,
+                application_handler_.features_in_dir_,
+                application_handler_.features_out_dir_,
+                p.second
+              );
+            }
           }
+          const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
+          const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
+          const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
+          manager_.addWorkflow(application_handler_, injection_names, sequence_segment_names, sample_group_names, commands);
         }
-        const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
-        const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
-        const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
-        manager_.addWorkflow(application_handler_, injection_names, sequence_segment_names, sample_group_names);
         ImGui::CloseCurrentPopup();
       }
       ImGui::SameLine();
