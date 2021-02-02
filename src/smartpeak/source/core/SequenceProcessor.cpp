@@ -319,10 +319,8 @@ namespace SmartPeak
   void LoadWorkflow::process() const
   {
     // TODO: move to parameters at some point
-    std::string format = "csv";
     LOGD << "START LoadWorkflow";
     LOGI << "Loading " << filename_;
-    LOGI << "Format: " << format;
 
     if (filename_.empty()) {
       LOGE << "Filename is empty";
@@ -338,27 +336,22 @@ namespace SmartPeak
 
     std::vector<std::string> res;
     try {
-      if (format == "csv") {
-        io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(filename_);
-        const std::string s_command_name{ "command_name" };
-        in.read_header(
-          io::ignore_extra_column,
-          s_command_name
-        );
-        if (!in.has_column(s_command_name))
-        {
-          LOGE << "Unexpected header";
-          return;
-        }
-        std::string command_name;
-        while (in.read_row(
-          command_name
-        )) {
-          res.push_back(command_name);
-        }
+      io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(filename_);
+      const std::string s_command_name{ "command_name" };
+      in.read_header(
+        io::ignore_extra_column,
+        s_command_name
+      );
+      if (!in.has_column(s_command_name))
+      {
+        LOGE << "Unexpected header";
+        return;
       }
-      else {
-        LOGE << "Format must be 'csv'";
+      std::string command_name;
+      while (in.read_row(
+        command_name
+      )) {
+        res.push_back(command_name);
       }
     }
     catch (const std::exception& e) {
