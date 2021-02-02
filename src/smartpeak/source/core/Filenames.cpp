@@ -13,6 +13,7 @@ namespace SmartPeak
     Filenames static_filenames;
     static_filenames.sequence_csv_i = dir + "/sequence.csv";
     static_filenames.parameters_csv_i = dir + "/parameters.csv";
+    static_filenames.workflow_csv_i = dir + "/workflow.csv";
     static_filenames.traML_csv_i = dir + "/traML.csv";
     static_filenames.featureFilterComponents_csv_i = dir + "/featureFilterComponents.csv";
     static_filenames.featureFilterComponentGroups_csv_i = dir + "/featureFilterComponentGroups.csv";
@@ -145,6 +146,7 @@ namespace SmartPeak
   {
     sequence_csv_i.clear();
     parameters_csv_i.clear();
+    workflow_csv_i.clear();
     traML_csv_i.clear();
     featureFilterComponents_csv_i.clear();
     featureFilterComponentGroups_csv_i.clear();

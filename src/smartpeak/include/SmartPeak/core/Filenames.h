@@ -11,6 +11,7 @@ namespace SmartPeak
 public:
     std::string sequence_csv_i;
     std::string parameters_csv_i;
+    std::string workflow_csv_i;
     std::string traML_csv_i;
     std::string featureFilterComponents_csv_i;
     std::string featureFilterComponentGroups_csv_i;

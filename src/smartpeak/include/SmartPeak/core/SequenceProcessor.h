@@ -91,7 +91,7 @@ namespace SmartPeak
     Create a new sequence from files or wizard
   */
   struct CreateSequence : SequenceProcessor {
-    Filenames        filenames_;                    /// Pathnames to load
+    Filenames        filenames_;                   /// Pathnames to load
     std::string      delimiter          = ",";     /// String delimiter of the imported file
     bool             checkConsistency   = true;    /// Check consistency of data contained in files
 
@@ -138,4 +138,19 @@ namespace SmartPeak
     ProcessSampleGroups(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() const override;
   };
+
+  struct LoadWorkflow : SequenceProcessor {
+    LoadWorkflow() = default;
+    LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
+    void process() const override;
+    std::string filename_;
+  };
+
+  struct StoreWorkflow : SequenceProcessor {
+    StoreWorkflow() = default;
+    StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    void process() const override;
+    std::string filename_;
+  };
+
 }

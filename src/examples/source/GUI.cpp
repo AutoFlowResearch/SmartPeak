@@ -318,9 +318,19 @@ int main(int argc, char **argv)
         for (const std::string& pathname : {application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_}) {
           fs::create_directories(fs::path(pathname));
         }
-        for (ApplicationHandler::Command& cmd : application_handler_.commands_)
+        std::vector<ApplicationHandler::Command> commands;
+        CreateCommand createCommand(application_handler_);
+        for (const auto& command_name : application_handler_.sequenceHandler_.getWorkflow())
         {
-          for (std::pair<const std::string, Filenames>& p : cmd.dynamic_filenames)
+          createCommand.name_ = command_name;
+          const bool created = createCommand.process();
+          if (created) {
+            commands.push_back(createCommand.cmd_);
+          }
+        }
+        for (auto& cmd : commands)
+        {
+          for (auto& p : cmd.dynamic_filenames)
           {
             Filenames::updateDefaultDynamicFilenames(
               application_handler_.mzML_dir_,
@@ -365,10 +375,6 @@ int main(int argc, char **argv)
     {
       report_.draw();
     }
-    if (workflow_.draw_)
-    {
-      workflow_.draw();
-    }
     if (ImGui::BeginMainMenuBar())
     {
       if (ImGui::BeginMenu("File"))
@@ -407,6 +413,12 @@ int main(int argc, char **argv)
           }
           if (ImGui::MenuItem("Parameters")) {
             static LoadSequenceParameters processor(application_handler_);
+            file_picker_.setProcessor(processor);
+            popup_file_picker_ = true;
+            update_session_cache_ = true;
+          }
+          if (ImGui::MenuItem("Workflow")) {
+            static LoadSequenceWorkflow processor(application_handler_);
             file_picker_.setProcessor(processor);
             popup_file_picker_ = true;
             update_session_cache_ = true;
@@ -509,6 +521,11 @@ int main(int argc, char **argv)
           //if (ImGui::MenuItem("Transitions")) {} // TODO: updated transitions file
           //if (ImGui::MenuItem("Parameters")) {} // TODO: updated parameters file
           //if (ImGui::MenuItem("Standards Conc")) {} // TODO: updated standards concentration file
+          if (ImGui::MenuItem("Workflow")) {
+            static StoreSequenceWorkflow processor(application_handler_);
+            file_picker_.setProcessor(processor);
+            popup_file_picker_ = true;
+          }
           if (ImGui::MenuItem("Sequence Analyst")) {
             static StoreSequenceFileAnalyst processor(application_handler_);
             processor.process();
@@ -535,11 +552,6 @@ int main(int argc, char **argv)
         if (ImGui::MenuItem("Plots", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Explorer", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Parameters", NULL, false, false)) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_))
-        {
-          initializeDataDirs(application_handler_);
-          workflow_.draw_ = true;
-        }
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("View"))
@@ -596,7 +608,7 @@ int main(int argc, char **argv)
       {
         if (ImGui::MenuItem("Run workflow"))
         {
-          if (application_handler_.commands_.empty())
+          if (application_handler_.sequenceHandler_.getWorkflow().empty())
           {
             LOGW << "Workflow has no steps to run. Please set the workflow's steps.";
           }
@@ -751,9 +763,7 @@ int main(int argc, char **argv)
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
-          session_handler_.setWorkflowTable(application_handler_.commands_);
-          GenericTableWidget Table(session_handler_.workflow_table_headers, session_handler_.workflow_table_body, Eigen::Tensor<bool, 1>(), "WorkflowMainWindow");
-          Table.draw();
+          workflow_.draw();
           ImGui::EndTabItem();
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))

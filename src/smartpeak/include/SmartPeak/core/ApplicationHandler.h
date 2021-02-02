@@ -71,7 +71,6 @@ namespace SmartPeak
     std::string                           mzML_dir_;
     std::string                           features_in_dir_;
     std::string                           features_out_dir_;
-    std::vector<Command>                  commands_;
     Filenames                             static_filenames_;
     SequenceHandler                       sequenceHandler_;
   };
