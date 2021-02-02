@@ -27,12 +27,17 @@ namespace SmartPeak {
   void WorkflowManager::run_and_join(ApplicationHandler& application_handler, bool& done, ApplicationHandler& source_app_handler, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names)
   {
     // run workflow asynchronously
+    // making local copies
+    const std::set<std::string> injection_names_(injection_names);
+    const std::set<std::string> sequence_segment_names_(sequence_segment_names);
+    const std::set<std::string> sample_group_names_(sample_group_names);
+    std::printf(">>> Started WorkflowManager::run_and_join \n");
     std::future<void> f = std::async(
       std::launch::async,
       ApplicationProcessors::processCommands,
       std::ref(application_handler),
       application_handler.commands_,
-      injection_names, sequence_segment_names, sample_group_names
+      injection_names_, sequence_segment_names_, sample_group_names_
     );
 
     LOGD << "Waiting on async operation...";
