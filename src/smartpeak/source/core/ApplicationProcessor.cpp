@@ -655,19 +655,18 @@ namespace SmartPeak
 
   bool BuildCommandsFromNames::process()
   {
+    bool success = true;
     commands_.clear();
-
-    std::istringstream iss {names_};
-
-    for (std::string n; iss >> n;) {
-      CreateCommand createCommand(application_handler_);
-      createCommand.name_ = n;
-      const bool created = createCommand.process();
-      if (created) {
+    CreateCommand createCommand(application_handler_);
+    for (const auto& command_name : names_) {
+      createCommand.name_ = command_name;
+      bool commands_created = createCommand.process();
+      success &= commands_created;
+      if (commands_created) {
         commands_.push_back(createCommand.cmd_);
-      }
+      } // if not, no need to log. createCommand already logs an error.
     }
-    return true;
+    return success;
   }
 
   bool SetRawDataPathname::process()

@@ -53,7 +53,7 @@ public:
       const OpenMS::FeatureMap& featureMap_I
     );
 
-    void setWorkflow(std::vector<std::string>& commands);
+    void setWorkflow(const std::vector<std::string>& commands);
     std::vector<std::string>& getWorkflow();
     const std::vector<std::string>& getWorkflow() const;
 

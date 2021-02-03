@@ -316,21 +316,13 @@ int main(int argc, char **argv)
         for (const std::string& pathname : {application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_}) {
           fs::create_directories(fs::path(pathname));
         }
-        std::vector<ApplicationHandler::Command> commands;
-        bool commands_created = true;
-        CreateCommand createCommand(application_handler_);
-        for (const auto& command_name : application_handler_.sequenceHandler_.getWorkflow()) {
-          createCommand.name_ = command_name;
-          commands_created &= createCommand.process();
-          if (commands_created) {
-            commands.push_back(createCommand.cmd_);
-          }
-        }
-        if (!commands_created) {
+        BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+        buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
+        if (!buildCommandsFromNames.process()) {
           LOGE << "Failed to create Commands, aborting.";
         } 
         else {
-          for (auto& cmd : commands)
+          for (auto& cmd : buildCommandsFromNames.commands_)
           {
             for (auto& p : cmd.dynamic_filenames)
             {
@@ -345,7 +337,7 @@ int main(int argc, char **argv)
           const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
           const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
           const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
-          manager_.addWorkflow(application_handler_, injection_names, sequence_segment_names, sample_group_names, commands);
+          manager_.addWorkflow(application_handler_, injection_names, sequence_segment_names, sample_group_names, buildCommandsFromNames.commands_);
         }
         ImGui::CloseCurrentPopup();
       }
