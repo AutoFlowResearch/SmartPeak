@@ -99,6 +99,7 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultDynamicFilenames)
     "sampleOut");
   BOOST_CHECK_EQUAL(filenames.sequence_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.parameters_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.workflow_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.traML_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_i, "");

@@ -62,7 +62,7 @@ namespace SmartPeak
   struct BuildCommandsFromNames : ApplicationProcessor {
     BuildCommandsFromNames(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
     bool process() override;
-    std::string names_;
+    std::vector<std::string> names_;
     std::vector<ApplicationHandler::Command> commands_;
     const std::string getName() const override { return "BuildCommandsFromNames"; };
   };
@@ -221,5 +221,19 @@ namespace SmartPeak
     SetOutputFeaturesPathname(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
     bool process() override;
     const std::string getName() const override { return "SetOutputFeaturesPathname"; };
+  };
+
+  struct LoadSequenceWorkflow : FilePickerProcessor {
+    LoadSequenceWorkflow(ApplicationHandler& application_handler) : 
+      FilePickerProcessor(application_handler) {}
+    bool process() override;
+    const std::string getName() const override { return "LoadSequenceWorkflow"; };
+  };
+
+  struct StoreSequenceWorkflow : FilePickerProcessor {
+    StoreSequenceWorkflow(ApplicationHandler& application_handler) :
+      FilePickerProcessor(application_handler) {}
+    bool process() override;
+    const std::string getName() const override { return "StoreSequenceWorkflow"; };
   };
 }

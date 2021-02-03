@@ -32,15 +32,10 @@ namespace SmartPeak
 {
   class Workflow final : public Widget
   {
-    std::vector<ApplicationHandler::Command> commands_;
     ApplicationHandler* application_handler_ = nullptr;
 
   public:
-    bool draw_ = false;
-
     void draw() override;
-
-    std::vector<ApplicationHandler::Command> getCommands() const;
 
     void setApplicationHandler(ApplicationHandler& application_handler);
   };

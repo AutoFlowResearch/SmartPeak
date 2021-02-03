@@ -83,6 +83,21 @@ namespace SmartPeak
     return sample_groups_;
   }
 
+  void SequenceHandler::setWorkflow(const std::vector<std::string>& commands)
+  {
+    command_names_ = commands;
+  }
+
+  std::vector<std::string>& SequenceHandler::SequenceHandler::getWorkflow()
+  {
+    return command_names_;
+  }
+
+  const std::vector<std::string>& SequenceHandler::getWorkflow() const
+  {
+    return command_names_;
+  }
+
   void SequenceHandler::addSampleToSequence(
     const MetaDataHandler& meta_data_I,
     const OpenMS::FeatureMap& featureMap_I

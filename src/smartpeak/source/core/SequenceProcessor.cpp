@@ -30,6 +30,7 @@
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/io/SequenceParser.h>
+#include <SmartPeak/io/CSVWriter.h>
 #include <plog/Log.h>
 #include <atomic>
 #include <future>
@@ -47,6 +48,12 @@ namespace SmartPeak
       LOGD << "END createSequence";
       return;
     }
+
+    // load workflow
+    LoadWorkflow loadWorkflow(*sequenceHandler_IO);
+    loadWorkflow.filename_ = filenames_.workflow_csv_i;
+    loadWorkflow.process();
+
     // TODO: Given that the raw data is shared between all injections, it could
     // be beneficial to move it somewhere else (i.e. in SequenceHandler) and adapt
     // the algorithms to the change
@@ -328,5 +335,81 @@ namespace SmartPeak
         filenames
       );
     }
+  }
+
+  void LoadWorkflow::process() const
+  {
+    // TODO: move to parameters at some point
+    LOGD << "START LoadWorkflow";
+    LOGI << "Loading " << filename_;
+
+    if (filename_.empty()) {
+      LOGE << "Filename is empty";
+      LOGD << "END LoadWorkflow";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(filename_)) {
+      LOGE << "File not found";
+      LOGD << "END LoadWorkflow";
+      return;
+    }
+
+    std::vector<std::string> res;
+    try {
+      io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(filename_);
+      const std::string s_command_name{ "command_name" };
+      in.read_header(
+        io::ignore_extra_column,
+        s_command_name
+      );
+      if (!in.has_column(s_command_name))
+      {
+        LOGE << "Unexpected header";
+        return;
+      }
+      std::string command_name;
+      while (in.read_row(
+        command_name
+      )) {
+        res.push_back(command_name);
+      }
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+      LOGI << "workflow clear";
+      res.clear();
+    }
+    sequenceHandler_IO->setWorkflow(res);
+    LOGD << "END LoadWorkflow";
+  }
+
+  void StoreWorkflow::process() const
+  {
+    LOGD << "START StoreWorkflow";
+    LOGI << "Storing " << filename_;
+
+    std::vector<std::string> headers = { "command_name" };
+    CSVWriter writer(filename_, ",");
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      LOGD << "END writeDataTableFromMetaValue";
+      return;
+    }
+
+    std::vector<std::vector<std::string>> rows;
+    for (const auto& command : sequenceHandler_IO->getWorkflow())
+    {
+      std::vector<std::string> row;
+      row.push_back(command);
+      rows.push_back(row);
+    }
+
+    for (const std::vector<std::string>& line : rows) {
+      writer.writeDataInRow(line.cbegin(), line.cend());
+    }
+
+    LOGD << "END StoreWorkflow";
   }
 }

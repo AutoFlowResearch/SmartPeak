@@ -53,6 +53,10 @@ public:
       const OpenMS::FeatureMap& featureMap_I
     );
 
+    void setWorkflow(const std::vector<std::string>& commands);
+    std::vector<std::string>& getWorkflow();
+    const std::vector<std::string>& getWorkflow() const;
+
     std::vector<InjectionHandler> getSamplesInSequence(
       const std::set<std::string>& injection_names
     ) const;
@@ -73,5 +77,6 @@ private:
     std::vector<InjectionHandler> sequence_;
     std::vector<SequenceSegmentHandler> sequence_segments_;
     std::vector<SampleGroupHandler> sample_groups_;
+    std::vector<std::string> command_names_;
   };
 }

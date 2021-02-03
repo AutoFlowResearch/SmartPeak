@@ -316,22 +316,29 @@ int main(int argc, char **argv)
         for (const std::string& pathname : {application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_}) {
           fs::create_directories(fs::path(pathname));
         }
-        for (ApplicationHandler::Command& cmd : application_handler_.commands_)
-        {
-          for (std::pair<const std::string, Filenames>& p : cmd.dynamic_filenames)
+        BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+        buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
+        if (!buildCommandsFromNames.process()) {
+          LOGE << "Failed to create Commands, aborting.";
+        } 
+        else {
+          for (auto& cmd : buildCommandsFromNames.commands_)
           {
-            Filenames::updateDefaultDynamicFilenames(
-              application_handler_.mzML_dir_,
-              application_handler_.features_in_dir_,
-              application_handler_.features_out_dir_,
-              p.second
-            );
+            for (auto& p : cmd.dynamic_filenames)
+            {
+              Filenames::updateDefaultDynamicFilenames(
+                application_handler_.mzML_dir_,
+                application_handler_.features_in_dir_,
+                application_handler_.features_out_dir_,
+                p.second
+              );
+            }
           }
+          const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
+          const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
+          const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
+          manager_.addWorkflow(application_handler_, injection_names, sequence_segment_names, sample_group_names, buildCommandsFromNames.commands_);
         }
-        const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
-        const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
-        const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
-        manager_.addWorkflow(application_handler_, injection_names, sequence_segment_names, sample_group_names);
         ImGui::CloseCurrentPopup();
       }
       ImGui::SameLine();
@@ -362,10 +369,6 @@ int main(int argc, char **argv)
     if (report_.draw_)
     {
       report_.draw();
-    }
-    if (workflow_.draw_)
-    {
-      workflow_.draw();
     }
     if (ImGui::BeginMainMenuBar())
     {
@@ -405,6 +408,12 @@ int main(int argc, char **argv)
           }
           if (ImGui::MenuItem("Parameters")) {
             static LoadSequenceParameters processor(application_handler_);
+            file_picker_.setProcessor(processor);
+            popup_file_picker_ = true;
+            update_session_cache_ = true;
+          }
+          if (ImGui::MenuItem("Workflow")) {
+            static LoadSequenceWorkflow processor(application_handler_);
             file_picker_.setProcessor(processor);
             popup_file_picker_ = true;
             update_session_cache_ = true;
@@ -507,6 +516,11 @@ int main(int argc, char **argv)
           //if (ImGui::MenuItem("Transitions")) {} // TODO: updated transitions file
           //if (ImGui::MenuItem("Parameters")) {} // TODO: updated parameters file
           //if (ImGui::MenuItem("Standards Conc")) {} // TODO: updated standards concentration file
+          if (ImGui::MenuItem("Workflow")) {
+            static StoreSequenceWorkflow processor(application_handler_);
+            file_picker_.setProcessor(processor);
+            popup_file_picker_ = true;
+          }
           if (ImGui::MenuItem("Sequence Analyst")) {
             static StoreSequenceFileAnalyst processor(application_handler_);
             processor.process();
@@ -533,11 +547,6 @@ int main(int argc, char **argv)
         if (ImGui::MenuItem("Plots", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Explorer", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Parameters", NULL, false, false)) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_))
-        {
-          initializeDataDirs(application_handler_);
-          workflow_.draw_ = true;
-        }
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("View"))
@@ -594,7 +603,7 @@ int main(int argc, char **argv)
       {
         if (ImGui::MenuItem("Run workflow"))
         {
-          if (application_handler_.commands_.empty())
+          if (application_handler_.sequenceHandler_.getWorkflow().empty())
           {
             LOGW << "Workflow has no steps to run. Please set the workflow's steps.";
           }
@@ -749,9 +758,7 @@ int main(int argc, char **argv)
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
-          session_handler_.setWorkflowTable(workflow_.getCommands());
-          GenericTableWidget Table(session_handler_.workflow_table_headers, session_handler_.workflow_table_body, Eigen::Tensor<bool, 1>(), "WorkflowMainWindow");
-          Table.draw();
+          workflow_.draw();
           ImGui::EndTabItem();
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))

@@ -27,6 +27,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Filenames.h>
+#include <boost/filesystem.hpp>
 
 using namespace SmartPeak;
 using namespace std;
@@ -402,6 +403,59 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
   BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 170, 1e-4);
 
   // TODO: Selected sample group names
+}
+
+BOOST_AUTO_TEST_CASE(StoreWorkflow1)
+{
+  SequenceHandler sequenceHandler;
+  namespace fs = boost::filesystem;
+  std::vector<std::string> command_names = {
+    "LOAD_RAW_DATA",
+    "MAP_CHROMATOGRAMS",
+    "EXTRACT_CHROMATOGRAM_WINDOWS",
+    "ZERO_CHROMATOGRAM_BASELINE",
+    "PICK_MRM_FEATURES",
+    "QUANTIFY_FEATURES",
+    "CHECK_FEATURES",
+    "SELECT_FEATURES",
+    "STORE_FEATURES"
+  };
+  sequenceHandler.setWorkflow(command_names);
+  StoreWorkflow processor(sequenceHandler);
+  processor.filename_ = (fs::temp_directory_path().append(fs::unique_path().string())).string();
+  processor.process();
+  // compare with reference file
+  const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
+  std::ifstream created_if(processor.filename_);
+  std::ifstream reference_if(reference_filename);
+  std::istream_iterator<char> created_is(created_if), created_end;
+  std::istream_iterator<char> reference_is(reference_if), reference_end;
+  BOOST_CHECK_EQUAL_COLLECTIONS(created_is, created_end, reference_is, reference_end);
+}
+
+BOOST_AUTO_TEST_CASE(LoadWorkflow1)
+{
+  SequenceHandler sequenceHandler;
+  LoadWorkflow processor(sequenceHandler);
+  processor.filename_ = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
+  processor.process();
+  const auto& commands = sequenceHandler.getWorkflow();
+  std::vector<std::string> expected_command_names = {
+    "LOAD_RAW_DATA",
+    "MAP_CHROMATOGRAMS",
+    "EXTRACT_CHROMATOGRAM_WINDOWS",
+    "ZERO_CHROMATOGRAM_BASELINE",
+    "PICK_MRM_FEATURES",
+    "QUANTIFY_FEATURES",
+    "CHECK_FEATURES",
+    "SELECT_FEATURES",
+    "STORE_FEATURES"
+  };
+  BOOST_REQUIRE(commands.size() == expected_command_names.size());
+  for (auto i = 0; i < expected_command_names.size(); ++i)
+  {
+    BOOST_CHECK_EQUAL(expected_command_names[i], commands[i]);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
