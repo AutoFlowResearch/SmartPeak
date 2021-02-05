@@ -82,7 +82,7 @@ namespace SmartPeak
         {"type", "string"},
         {"value", "XML"},
         {"description", "XML files are those with the ending .mzML or .mzXML. Chromeleon files are text files generating from the Thermo family of HPLCs using the Chromeleon software."},
-        {"valid_strings", "['Chromeleon','XML']"}
+        {"valid_strings", "['ChromeleonFile','XML']"}
       },
       {
         {"name", "zero_baseline"},
