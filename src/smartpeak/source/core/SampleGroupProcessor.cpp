@@ -38,46 +38,46 @@ namespace SmartPeak
         {"name", "scan_polarity_merge_rule"},
         {"type", "string"},
         {"value", "WeightedMean"},
-        {"description", ""},
+        {"description", "The method used to merge the different feature values. Options include Sum (the sum of all feature values), Min (the smallest feature value), Max (the largest feature value), Mean (the mean of all feature values), and WeightedMean (the weight average of all feature values)."},
         {"valid_strings", "['Sum','Min','Max','Mean','WeightedMean']"}
       },
       {
         {"name", "mass_range_merge_rule"},
         {"type", "string"},
         {"value", "Sum"},
-        {"description", ""},
+        {"description", "The method used to merge the different feature values. Options include Sum (the sum of all feature values), Min (the smallest feature value), Max (the largest feature value), Mean (the mean of all feature values), and WeightedMean (the weight average of all feature values)."},
         {"valid_strings", "['Sum','Min','Max','Mean','WeightedMean']"}
       },
       {
         {"name", "dilution_series_merge_rule"},
         {"type", "string"},
         {"value", "Max"},
-        {"description", ""},
+        {"description", "The method used to merge the different feature values. Options include Sum (the sum of all feature values), Min (the smallest feature value), Max (the largest feature value), Mean (the mean of all feature values), and WeightedMean (the weight average of all feature values)."},
         {"valid_strings", "['Sum','Min','Max','Mean','WeightedMean']"}
       },
       {
         {"name", "scan_polarity_merge_feature_name"},
         {"type", "string"},
         {"value", "peak_apex_int"},
-        {"description", ""}
+        {"description", "The name of the FeatureMap attribute to use. Examples include peak_apex_int, peak_area, and intensity."}
       },
       {
         {"name", "mass_range_merge_feature_name"},
         {"type", "string"},
         {"value", "peak_apex_int"},
-        {"description", ""}
+        {"description", "The name of the FeatureMap attribute to use. Examples include peak_apex_int, peak_area, and intensity."}
       },
       {
         {"name", "dilution_series_merge_feature_name"},
         {"type", "string"},
         {"value", "peak_apex_int"},
-        {"description", ""}
+        {"description", "The name of the FeatureMap attribute to use. Examples include peak_apex_int, peak_area, and intensity."}
       },
       {
         {"name", "merge_subordinates"},
         {"type", "bool"},
         {"value", "true"},
-        {"description", ""}
+        {"description", "Merge subordinates"}
       },
     }} });
     return ParameterSet(param_struct);

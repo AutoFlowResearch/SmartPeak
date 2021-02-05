@@ -80,15 +80,15 @@ namespace SmartPeak
       {
         {"name", "format"},
         {"type", "string"},
-        {"value", "Chromeleon"},
-        {"description", ""},
+        {"value", "XML"},
+        {"description", "XML files are those with the ending .mzML or .mzXML. Chromeleon files are text files generating from the Thermo family of HPLCs using the Chromeleon software."},
         {"valid_strings", "['Chromeleon','XML']"}
       },
       {
         {"name", "zero_baseline"},
         {"type", "bool"},
         {"value", "false"},
-        {"description", ""},
+        {"description", "Zeros the baseline of the chromatogram by adjusting all points so that the minimum point is 0."},
       },
     }} });
     return ParameterSet(param_struct);
@@ -1742,17 +1742,7 @@ namespace SmartPeak
       {"type", "float"},
       {"value", "86000"},
       {"description", "All features below the minimum intensity will be discarded"},
-    },
-    {
-      {"name", "baseline_type"},
-      {"type", "string"},
-      {"value", "vertical_division"},
-    },
-    {
-      {"name", "integration_type"},
-      {"type", "string"},
-      {"value", "trapezoid"},
-    },
+    }
     }} });
     ParameterSet pick_ms1_feature_params(param_struct);
     parameters.merge(pick_ms1_feature_params);
@@ -2117,14 +2107,14 @@ namespace SmartPeak
         {"name", "mass_intensity_type"},
         {"type", "string"},
         {"value", "norm_sum"},
-        {"description", ""},
+        {"description", "Type of intensity"},
         {"valid_strings", "['norm_sum','norm_max']"}
       },
       {
         {"name", "feature_name"},
         {"type", "string"},
         {"value", "intensity"},
-        {"description", ""},
+        {"description", "The name of the FeatureMap attribute to use. Examples include peak_apex_int, peak_area, and intensity."},
       }
     }} });
     return ParameterSet(param_struct);
@@ -2192,7 +2182,7 @@ namespace SmartPeak
         {"name", "correction_matrix_agent"},
         {"type", "string"},
         {"value", "TBDMS"},
-        {"description", ""},
+        {"description", "The correction matrix corresponding to the derivatization agent used when processing the samples for LC-MS/MS or GC-MS"},
         {"valid_strings", "['TBDMS']"} // only "TBDMS" is supported for now.
       }
     }} });
@@ -2252,11 +2242,13 @@ namespace SmartPeak
         {"name", "isotopic_purity_values"},
         {"type", "string"},
         {"value", ""},
+        {"description", "The isotropic purity values"},
       },
       {
         {"name", "isotopic_purity_name"},
         {"type", "list"},
         {"value", "[]"},
+        {"description", "The isotropic purity names"},
       }
     }} });
     return ParameterSet(param_struct);
@@ -2347,6 +2339,7 @@ namespace SmartPeak
         {"name", "feature_name"},
         {"type", "string"},
         {"value", ""},
+        {"description", "The name of the FeatureMap attribute to use. Examples include peak_apex_int, peak_area, and intensity."},
       },
     }} });
     return ParameterSet(param_struct);
