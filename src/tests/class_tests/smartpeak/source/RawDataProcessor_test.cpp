@@ -40,8 +40,8 @@ using namespace SmartPeak;
 using namespace std;
 
 void load_data(
-  std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_1,
-  std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_2
+  ParameterSet& params_1,
+  ParameterSet& params_2
 )
 {
   Filenames filenames1, filenames2;
@@ -86,8 +86,8 @@ BOOST_AUTO_TEST_CASE(gettersClearData)
 BOOST_AUTO_TEST_CASE(processorClearData)
 {
   // Load all of the raw and processed data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -143,17 +143,15 @@ BOOST_AUTO_TEST_CASE(processorLoadRawData)
 
   // TEST CASE 1:  mzML with out baseline correction
   RawDataHandler rawDataHandler;
-  std::map<std::string, std::string> params_tmp = { // Must be initialized step by step due to Compiler Error C2665 on Windows...
+  std::vector<std::map<std::string, std::string>> params_tmp = { {
     {"name", "zero_baseline"},
     {"type", "bool"},
     {"value", "false"}
-  };
-  std::vector<std::map<std::string, std::string>> mzML_params;
-  mzML_params.push_back(params_tmp);
-  std::map<std::string, std::vector<std::map<std::string, std::string>>> params_I;
-  params_I.emplace("mzML", mzML_params);
-  params_I.emplace("ChromatogramExtractor", std::vector<std::map<std::string, std::string>>());
-  params_I.emplace("MRMMapping", std::vector<std::map<std::string, std::string>>());
+    } };
+  ParameterSet params_I;
+  params_I.addFunctionParameters(FunctionParameters("mzML", params_tmp));
+  params_I.addFunctionParameters(FunctionParameters("ChromatogramExtractor"));
+  params_I.addFunctionParameters(FunctionParameters("MRMMapping"));
 
   Filenames filenames;
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_baseline_correction.mzML");
@@ -176,14 +174,16 @@ BOOST_AUTO_TEST_CASE(processorLoadRawData)
   BOOST_CHECK_CLOSE(chromatograms1[1][4].getIntensity(), 1.0, 1e-3);
 
   // TEST CASE 2:  Chromeleon file format
-  params_I.at("mzML")[0].at("value") = "false";
-  params_I.at("mzML").push_back(
+  params_I.at("mzML")[0].setValueFromString("false");
+  std::map<std::string, std::string> param_struct = 
     {
       {"name", "format"},
       {"type", "string"},
       {"value", "ChromeleonFile"}
-    }
-  );
+    };
+  auto param = Parameter(param_struct);
+  params_I.at("mzML").addParameter(param);
+  
   rawDataHandler.clear();
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_ChromeleonFile_10ug.txt");
   processor.process(rawDataHandler, params_I, filenames);
@@ -204,8 +204,8 @@ BOOST_AUTO_TEST_CASE(processorLoadRawData)
 BOOST_AUTO_TEST_CASE(extractMetaData)
 {
   // Pre-requisites: load the parameters
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   BOOST_CHECK_EQUAL(params_1.size(), 27);
   BOOST_CHECK_EQUAL(params_2.size(), 24);
@@ -301,8 +301,8 @@ BOOST_AUTO_TEST_CASE(gettersMapChromatograms)
 BOOST_AUTO_TEST_CASE(processorMapChromatograms)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -362,16 +362,15 @@ BOOST_AUTO_TEST_CASE(processorZeroChromatogramBaseline)
 {
   // TEST CASE 1:  mzML with baseline correction
   RawDataHandler rawDataHandler;
-  std::map<std::string, std::string> params_tmp = { // Must be initialized step by step due to Compiler Error C2665 on Windows...
+  std::vector<std::map<std::string, std::string>> params_tmp = { { // Must be initialized step by step due to Compiler Error C2665 on Windows...
     {"name", "zero_baseline"},
     {"type", "bool"},
     {"value", "true"}
-  };
-  std::vector<std::map<std::string, std::string>> mzML_params;
-  mzML_params.push_back(params_tmp);
-  std::map<std::string, std::vector<std::map<std::string, std::string>>> params_I;
-  params_I.emplace("mzML", mzML_params);
-  params_I.emplace("ChromatogramExtractor", std::vector<std::map<std::string, std::string>>());
+    } };
+  FunctionParameters mzML_params("mzML", params_tmp);
+  ParameterSet params_I;
+  params_I.addFunctionParameters(mzML_params);
+  params_I.addFunctionParameters(FunctionParameters("ChromatogramExtractor"));
 
   Filenames filenames;
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_baseline_correction.mzML");
@@ -395,13 +394,12 @@ BOOST_AUTO_TEST_CASE(processorZeroChromatogramBaseline)
   BOOST_CHECK_CLOSE(chromatograms2[1][4].getIntensity(), 9.0, 1e-3);
 
   // TEST CASE 2:  Chromeleon file format with baseline correction
-  params_I.at("mzML").push_back(
-    {
+  std::vector<std::map<std::string, std::string>> params = { {
       {"name", "format"},
       {"type", "string"},
       {"value", "ChromeleonFile"}
-    }
-  );
+  }};
+  params_I.addFunctionParameters(FunctionParameters("mzML", params));
   rawDataHandler.clear();
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_ChromeleonFile_10ug.txt");
   processor.process(rawDataHandler, params_I, filenames);
@@ -447,8 +445,8 @@ BOOST_AUTO_TEST_CASE(gettersExtractChromatogramWindows)
 BOOST_AUTO_TEST_CASE(processorExtractChromatogramWindows)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -534,8 +532,8 @@ BOOST_AUTO_TEST_CASE(gettersExtractSpectraWindows)
 BOOST_AUTO_TEST_CASE(processorExtractSpectraWindows)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -589,8 +587,8 @@ BOOST_AUTO_TEST_CASE(gettersMergeSpectra)
 BOOST_AUTO_TEST_CASE(processorMergeSpectra)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1112,17 +1110,23 @@ BOOST_AUTO_TEST_CASE(processLoadParameters)
 BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
 {
   RawDataHandler rawDataHandler;
-  std::map<std::string, std::vector<std::map<std::string, std::string>>> params;
 
-  params.emplace("SequenceSegmentPlotter", vector<map<string, string>> {
+  vector<map<string, string>> function_params = {
     {
-      {"map1_elem1", "value1"},
-      { "map1_elem2", "value2" }
+      {"name", "elem1"},
+      {"value", "value1"}
     },
     {
-      {"map2_elem1", "value3"}
+      {"name", "elem2"},
+      {"value", "value2"}
+    },
+    {
+      {"name", "elem3"},
+      {"value", "value3"}
     }
-  });
+  };
+  ParameterSet params;
+  params.addFunctionParameters(FunctionParameters("SequenceSegmentPlotter", function_params));
 
   LoadParameters loadParameters;
   loadParameters.sanitizeParameters(params);
@@ -1146,10 +1150,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.count("PickMS1Features"), 1);
   BOOST_CHECK_EQUAL(params.count("AccurateMassSearchEngine"), 1);
   BOOST_CHECK_EQUAL(params.count("MergeInjections"), 1);
-  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter").size(), 2);
-  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem1"), "value1");
-  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem2"), "value2");
-  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[1].at("map2_elem1"), "value3");
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter").size(), 3);
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeatures.qc").size(), 0);
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences").size(), 0);
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc").size(), 0);
@@ -1190,8 +1191,8 @@ BOOST_AUTO_TEST_CASE(gettersPickMRMFeatures)
 BOOST_AUTO_TEST_CASE(pickFeaturesMRM)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1269,8 +1270,8 @@ BOOST_AUTO_TEST_CASE(gettersPickMS1Features)
 BOOST_AUTO_TEST_CASE(pickMS1Features)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1372,8 +1373,8 @@ BOOST_AUTO_TEST_CASE(gettersSearchAccurateMass)
 BOOST_AUTO_TEST_CASE(searchAccurateMass)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1464,8 +1465,8 @@ BOOST_AUTO_TEST_CASE(gettersMergeFeatures)
 BOOST_AUTO_TEST_CASE(consensusFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1566,8 +1567,8 @@ BOOST_AUTO_TEST_CASE(gettersFilterFeatures)
 BOOST_AUTO_TEST_CASE(filterFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1658,8 +1659,8 @@ BOOST_AUTO_TEST_CASE(gettersSelectFeatures)
 BOOST_AUTO_TEST_CASE(selectFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1745,8 +1746,8 @@ BOOST_AUTO_TEST_CASE(gettersValidateFeatures)
 BOOST_AUTO_TEST_CASE(validateFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1897,8 +1898,8 @@ BOOST_AUTO_TEST_CASE(gettersCheckFeatures)
 BOOST_AUTO_TEST_CASE(checkFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1966,8 +1967,8 @@ BOOST_AUTO_TEST_CASE(gettersFilterFeaturesRSDs)
 BOOST_AUTO_TEST_CASE(filterFeaturesRSDs)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2065,8 +2066,8 @@ BOOST_AUTO_TEST_CASE(gettersFilterFeaturesBackgroundInterferences)
 BOOST_AUTO_TEST_CASE(filterFeaturesBackgroundInterferences)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2159,8 +2160,8 @@ BOOST_AUTO_TEST_CASE(gettersCheckFeaturesBackgroundInterferences)
 BOOST_AUTO_TEST_CASE(checkFeaturesBackgroundInterferences)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2235,8 +2236,8 @@ BOOST_AUTO_TEST_CASE(gettersCheckFeaturesRSDs)
 BOOST_AUTO_TEST_CASE(checkFeaturesRSDs)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2285,8 +2286,8 @@ BOOST_AUTO_TEST_CASE(checkFeaturesRSDs)
 BOOST_AUTO_TEST_CASE(process)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2310,11 +2311,7 @@ BOOST_AUTO_TEST_CASE(process)
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
-  map<string, vector<map<string, string>>>::iterator it = params_1.find("ChromatogramExtractor");
-  if (it != params_1.end()) {
-    params_1.erase(it);
-  }
-  params_1.emplace("ChromatogramExtractor", vector<map<string, string>>());
+  params_1.addFunctionParameters(FunctionParameters("ChromatogramExtractor"));
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params_1, filenames);
   loadRawData.extractMetaData(rawDataHandler);
@@ -2383,8 +2380,8 @@ BOOST_AUTO_TEST_CASE(process)
 BOOST_AUTO_TEST_CASE(emg_processor)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2466,8 +2463,8 @@ BOOST_AUTO_TEST_CASE(emg_processor)
 BOOST_AUTO_TEST_CASE(calculateMDVs)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2575,8 +2572,8 @@ BOOST_AUTO_TEST_CASE(calculateMDVs)
 BOOST_AUTO_TEST_CASE(isotopicCorrections)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2629,8 +2626,8 @@ BOOST_AUTO_TEST_CASE(isotopicCorrections)
 BOOST_AUTO_TEST_CASE(calculateIsotopicPurities)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2674,8 +2671,8 @@ BOOST_AUTO_TEST_CASE(calculateIsotopicPurities)
 BOOST_AUTO_TEST_CASE(calculateMDVAccuracies)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 

@@ -10,6 +10,7 @@ set(sources_list_h
 	Helloworld.h
 	FeatureMetadata.h
 	MetaDataHandler.h
+	Parameters.h
 	RawDataHandler.h
 	RawDataProcessor.h
 	SampleGroupHandler.h

@@ -15,6 +15,7 @@ set(core_executables_list
 	SequenceSegmentProcessor_test
 	SessionHandler_test
 	Utilities_test
+	Parameters_test
 )
 
 set(io_executables_list

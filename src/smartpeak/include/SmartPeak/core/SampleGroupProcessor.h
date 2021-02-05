@@ -28,6 +28,7 @@
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SampleGroupHandler.h>
+#include <SmartPeak/core/Parameters.h>
 
 namespace SmartPeak
 {
@@ -40,6 +41,7 @@ namespace SmartPeak
     virtual int getID() const = 0; /// get the sample group processor struct ID
     virtual std::string getName() const = 0; /// get the sample group processor struct name
     virtual std::string getDescription() const = 0; /// get the sample group processor struct description
+    virtual ParameterSet getParameterSchema() const = 0;
 
     /**
       Interface to all sample group processing methods.
@@ -52,7 +54,7 @@ namespace SmartPeak
     virtual void process(
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const = 0;
 
@@ -65,6 +67,7 @@ namespace SmartPeak
     int getID() const override { return -1; }
     std::string getName() const override { return "MERGE_INJECTIONS"; }
     std::string getDescription() const override { return "Merge multiple injections of the same sample."; }
+    virtual ParameterSet getParameterSchema() const override;
 
     /**
       Merge multiple injections of the same sample.
@@ -72,7 +75,7 @@ namespace SmartPeak
     void process(
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
 
@@ -107,6 +110,7 @@ namespace SmartPeak
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURES_SAMPLE_GROUP"; }
     std::string getDescription() const override { return "Load the features for the sample group."; }
+    virtual ParameterSet getParameterSchema() const override;
 
     /**
       Load the features for the sample group.
@@ -114,7 +118,7 @@ namespace SmartPeak
     void process(
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -124,6 +128,7 @@ namespace SmartPeak
     int getID() const override { return -1; }
     std::string getName() const override { return "STORE_FEATURES_SAMPLE_GROUP"; }
     std::string getDescription() const override { return "Store the features for the sample group."; }
+    virtual ParameterSet getParameterSchema() const override;
 
     /**
       Store the features for the sample group.
@@ -131,7 +136,7 @@ namespace SmartPeak
     void process(
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };

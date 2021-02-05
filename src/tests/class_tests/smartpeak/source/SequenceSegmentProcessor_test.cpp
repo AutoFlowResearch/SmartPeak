@@ -1531,7 +1531,7 @@ BOOST_AUTO_TEST_CASE(processEstimateFeatureFilterValues)
   sequenceHandler.getSequenceSegments().front().setFeatureFilter(feature_filter_template);
 
   // Make other constructs
-  const map<string, vector<map<string, string>>> params;
+  const ParameterSet params;
   Filenames filenames;
 
   // Process
@@ -1749,7 +1749,7 @@ BOOST_AUTO_TEST_CASE(processEstimateFeatureQCValues)
   sequenceHandler.getSequenceSegments().front().setFeatureQC(feature_filter_template);
 
   // Make other constructs
-  const map<string, vector<map<string, string>>> params;
+  const ParameterSet params;
   Filenames filenames;
 
   // Process
@@ -1944,7 +1944,7 @@ BOOST_AUTO_TEST_CASE(processTransferLOQToFeatureFilters)
   sequenceHandler.getSequenceSegments().front().setQuantitationMethods(quant_methods);
 
   // Make other constructs
-  const map<string, vector<map<string, string>>> params;
+  const ParameterSet params;
   Filenames filenames;
 
   // Process
@@ -2052,7 +2052,7 @@ BOOST_AUTO_TEST_CASE(processTransferLOQToFeatureQCs)
   sequenceHandler.getSequenceSegments().front().setQuantitationMethods(quant_methods);
 
   // Make other constructs
-  const map<string, vector<map<string, string>>> params;
+  const ParameterSet params;
   Filenames filenames;
 
   // Process
@@ -2183,7 +2183,7 @@ BOOST_AUTO_TEST_CASE(processEstimateFeatureRSDs)
   sequenceHandler.getSequenceSegments().front().setFeatureRSDFilter(feature_filter_template);
 
   // Make other constructs
-  const map<string, vector<map<string, string>>> params;
+  const ParameterSet params;
   Filenames filenames;
 
   // Process
@@ -2396,7 +2396,7 @@ BOOST_AUTO_TEST_CASE(processEstimateFeatureBackgroundInterferences)
   sequenceHandler.getSequenceSegments().front().setFeatureBackgroundFilter(feature_filter_template);
 
   // Make other constructs
-  const map<string, vector<map<string, string>>> params;
+  const ParameterSet params;
   Filenames filenames;
 
   // Process

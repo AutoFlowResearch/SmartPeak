@@ -28,6 +28,7 @@
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
+#include <SmartPeak/core/Parameters.h>
 
 namespace SmartPeak
 {
@@ -40,6 +41,7 @@ namespace SmartPeak
     virtual int getID() const = 0; /// get the raw data processor struct ID
     virtual std::string getName() const = 0; /// get the raw data processor struct name
     virtual std::string getDescription() const = 0; /// get the raw data processor struct description
+    virtual ParameterSet getParameterSchema() const = 0;
 
     /**
       Interface to all  sequence segment processing methods.
@@ -52,7 +54,7 @@ namespace SmartPeak
     virtual void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const = 0;
 
@@ -85,13 +87,15 @@ namespace SmartPeak
     std::string getName() const { return "CALCULATE_CALIBRATION"; }
     std::string getDescription() const { return "Determine the optimal relationship between known sample concentration and measured intensity."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /**
       Optimize the calibration curve for all components.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -102,13 +106,15 @@ namespace SmartPeak
     std::string getName() const { return "LOAD_STANDARDS_CONCENTRATIONS"; }
     std::string getDescription() const { return "Load the standards concentrations file that gives the relationship between injection, component, and known concentration from disk."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /**
       Load the standards concentration file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -119,13 +125,15 @@ namespace SmartPeak
     std::string getName() const { return "LOAD_QUANTITATION_METHODS"; }
     std::string getDescription() const { return "Load each transitions calibration model defined in quantitationMethods from disk."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /**
       Load the quantitation methods file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -136,13 +144,15 @@ namespace SmartPeak
     std::string getName() const { return "STORE_QUANTITATION_METHODS"; }
     std::string getDescription() const { return "Write each transitions calibration model to disk for later use."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /**
       Write the quantitation methods to disk.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -153,12 +163,14 @@ namespace SmartPeak
     std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
     std::string getDescription() const override { return "Load the component and component group filters from file."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Load the component and component group filters from file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -169,12 +181,14 @@ namespace SmartPeak
     std::string getName() const override { return "LOAD_FEATURE_QCS"; }
     std::string getDescription() const override { return "Load the component and component group QCs from file."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Load the component and component group QCs from file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -185,12 +199,14 @@ namespace SmartPeak
     std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
     std::string getDescription() const override { return "Store the component and component group filters to disk."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Store the component and component group filters to disk.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -201,12 +217,14 @@ namespace SmartPeak
     std::string getName() const override { return "STORE_FEATURE_QCS"; }
     std::string getDescription() const override { return "Store the component and component group QCs to disk."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Store the component and component group QCs to disk.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -217,12 +235,14 @@ namespace SmartPeak
     std::string getName() const override { return "LOAD_FEATURE_RSD_FILTERS"; }
     std::string getDescription() const override { return "Load the component and component group percent RSD filters from file."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Load the component and component group percent RSD filters from file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -233,12 +253,14 @@ namespace SmartPeak
     std::string getName() const override { return "LOAD_FEATURE_RSD_QCS"; }
     std::string getDescription() const override { return "Load the component and component group percent RSD QCs from file."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Load the component and component group percent RSD QCs from file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -249,12 +271,14 @@ namespace SmartPeak
     std::string getName() const override { return "STORE_FEATURE_RSD_FILTERS"; }
     std::string getDescription() const override { return "Store the component and component group percent RSD filters to disk."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Store the component and component group percent RSD filters to disk.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -265,12 +289,14 @@ namespace SmartPeak
     std::string getName() const override { return "STORE_FEATURE_RSD_QCS"; }
     std::string getDescription() const override { return "Store the component and component group percent RSD QCs to disk."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Store the component and component group percent RSD QCs to disk.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -281,12 +307,14 @@ namespace SmartPeak
     std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_FILTERS"; }
     std::string getDescription() const override { return "Load the component and component group percent Background Interference filters from file."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Load the component and component group percent Background Interference filters from file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -297,12 +325,14 @@ namespace SmartPeak
     std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_QCS"; }
     std::string getDescription() const override { return "Load the component and component group percent Background Interference QCs from file."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Load the component and component group percent Background Interference QCs from file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -313,12 +343,14 @@ namespace SmartPeak
     std::string getName() const override { return "STORE_FEATURE_BACKGROUND_FILTERS"; }
     std::string getDescription() const override { return "Store the component and component group percent Background Interference filters to disk."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Store the component and component group percent Background Interference filters to disk.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -329,12 +361,14 @@ namespace SmartPeak
     std::string getName() const override { return "STORE_FEATURE_BACKGROUND_QCS"; }
     std::string getDescription() const override { return "Store the component and component group percent Background Interference QCs to disk."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Store the component and component group percent Background Interference QCs to disk.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -345,6 +379,8 @@ namespace SmartPeak
     std::string getName() const { return "ESTIMATE_FEATURE_FILTER_VALUES"; }
     std::string getDescription() const { return "Estimate default FeatureQC parameter values for the feature filters from Standard and QC samples."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /**
       @brief Estimate default FeatureQC parameter values from Standard and QC samples.
         The Standard samples should span the LLOQ and ULOQ. The `setComponentsToConcentrations`
@@ -353,7 +389,7 @@ namespace SmartPeak
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -364,6 +400,8 @@ namespace SmartPeak
     std::string getName() const { return "ESTIMATE_FEATURE_QC_VALUES"; }
     std::string getDescription() const { return "Estimate default FeatureQC parameter values for the feature QCs from Standard and QC samples."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /**
       @brief Estimate default FeatureQC parameter values from Standard and QC samples.
         The Standard samples should span the LLOQ and ULOQ. The `setComponentsToConcentrations`
@@ -372,7 +410,7 @@ namespace SmartPeak
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -383,13 +421,15 @@ namespace SmartPeak
     std::string getName() const { return "TRANSFER_LOQ_TO_FEATURE_FILTERS"; }
     std::string getDescription() const { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /**
       Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -400,13 +440,15 @@ namespace SmartPeak
     std::string getName() const { return "TRANSFER_LOQ_TO_FEATURE_QCS"; }
     std::string getDescription() const { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /**
       Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature QCs
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -417,6 +459,8 @@ namespace SmartPeak
     std::string getName() const { return "ESTIMATE_FEATURE_RSDS"; }
     std::string getDescription() const { return "Estimate the %RSD for component and component group feature filter attributes from pooled QC samples."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /**
       Estimate the %RSD for component and component group feature filter attributes from pooled QC samples
 
@@ -425,7 +469,7 @@ namespace SmartPeak
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -436,13 +480,15 @@ namespace SmartPeak
     std::string getName() const { return "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES"; }
     std::string getDescription() const { return "Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /**
       Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -454,12 +500,14 @@ namespace SmartPeak
     std::string getName() const override { return "LOAD_FEATURE_RSD_ESTIMATIONS"; }
     std::string getDescription() const override { return "Load the component and component group percent RSD estimations from file."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Load the component and component group percent RSD estimations from file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -470,12 +518,14 @@ namespace SmartPeak
     std::string getName() const override { return "STORE_FEATURE_RSD_ESTIMATIONS"; }
     std::string getDescription() const override { return "Store the component and component group percent RSD estimations to disk."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Store the component and component group percent RSD estimations to disk.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -486,12 +536,14 @@ namespace SmartPeak
     std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_ESTIMATIONS"; }
     std::string getDescription() const override { return "Load the component and component group percent Background Interference estimations from file."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Load the component and component group percent Background Interference estimations from file.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };
@@ -502,12 +554,14 @@ namespace SmartPeak
     std::string getName() const override { return "STORE_FEATURE_BACKGROUND_ESTIMATIONS"; }
     std::string getDescription() const override { return "Store the component and component group percent Background Interference estimations to disk."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Store the component and component group percent Background Interference estimations to disk.
     */
     void process(
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+      const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
   };

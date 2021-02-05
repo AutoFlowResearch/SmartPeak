@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <SmartPeak/core/Parameters.h>
+
 #include <map>
 #include <string>
 #include <vector>
@@ -91,7 +93,7 @@ public:
     */
     static void parseOpenMSParams(
       const std::string& filename,
-      std::map<std::string,std::vector<std::map<std::string,std::string>>>& parameters
+      ParameterSet& parameters
     );
   };
 }

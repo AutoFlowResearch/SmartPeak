@@ -82,6 +82,16 @@ namespace SmartPeak
           return sample_group_method->getName();
       }
 
+      ParameterSet getParameterSchema() const
+      {
+        if (type == RawDataMethod)
+          return raw_data_method->getParameterSchema();
+        else if (type == SequenceSegmentMethod)
+          return seq_seg_method->getParameterSchema();
+        else
+          return sample_group_method->getParameterSchema();
+      }
+
       std::shared_ptr<RawDataProcessor> raw_data_method;
       std::shared_ptr<SequenceSegmentProcessor> seq_seg_method;
       std::shared_ptr<SampleGroupProcessor> sample_group_method;

@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
   const string featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_test_1_algorithm_MRMFeatureValidator.featureXML");
   const string filename_params = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_test_pyTOPP_MRMFeatureValidator_params.csv");
 
-  std::map<std::string,std::vector<std::map<std::string,std::string>>> params;
+  ParameterSet params;
   FileReader::parseOpenMSParams(filename_params, params); // it is assumed "," as delimiter
   BOOST_CHECK_EQUAL(params.size(), 1);
   BOOST_CHECK_EQUAL(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
 
   OpenMS::FeatureMap output_validated;
   std::map<std::string, float> validation_metrics;
-  const float Tr_window = std::stof(params.at("MRMFeatureValidator.validate_MRMFeatures").at(0).at("value"));
+  const float Tr_window = std::stof(params.at("MRMFeatureValidator.validate_MRMFeatures")[0].getValueAsString());
 
   MetaDataHandler mdh;
   mdh.sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file

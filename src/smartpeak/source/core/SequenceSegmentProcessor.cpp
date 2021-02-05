@@ -53,10 +53,16 @@ namespace SmartPeak
     }
   }
 
+  ParameterSet CalculateCalibration::getParameterSchema() const
+  {
+    OpenMS::AbsoluteQuantitation oms_params;
+    return ParameterSet({ oms_params });
+  }
+
   void CalculateCalibration::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -150,10 +156,15 @@ namespace SmartPeak
     LOGD << "END optimizeCalibrationCurves";
   }
 
+  ParameterSet LoadStandardsConcentrations::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void LoadStandardsConcentrations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -185,10 +196,15 @@ namespace SmartPeak
     LOGD << "END loadStandardsConcentrations";
   }
 
+  ParameterSet LoadQuantitationMethods::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void LoadQuantitationMethods::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -220,10 +236,15 @@ namespace SmartPeak
     LOGD << "END loadQuantitationMethods";
   }
 
+  ParameterSet StoreQuantitationMethods::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void StoreQuantitationMethods::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -250,10 +271,15 @@ namespace SmartPeak
     LOGD << "END storeQuantitationMethods";
   }
 
+  ParameterSet LoadFeatureFilters::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void LoadFeatureFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -302,10 +328,15 @@ namespace SmartPeak
     LOGD << "END loadFeatureFilter";
   }
 
+  ParameterSet LoadFeatureQCs::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void LoadFeatureQCs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -354,10 +385,15 @@ namespace SmartPeak
     LOGD << "END loadFeatureQC";
   }
 
+  ParameterSet StoreFeatureFilters::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void StoreFeatureFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -389,10 +425,15 @@ namespace SmartPeak
     LOGD << "END storeFeatureFilter";
   }
 
+  ParameterSet StoreFeatureQCs::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void StoreFeatureQCs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -424,10 +465,15 @@ namespace SmartPeak
     LOGD << "END storeFeatureQC";
   }
 
+  ParameterSet LoadFeatureRSDFilters::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void LoadFeatureRSDFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -476,10 +522,15 @@ namespace SmartPeak
     LOGD << "END loadFeatureRSDFilter";
   }
 
+  ParameterSet LoadFeatureRSDQCs::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void LoadFeatureRSDQCs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -528,10 +579,15 @@ namespace SmartPeak
     LOGD << "END loadFeatureRSDQC";
   }
 
+  ParameterSet StoreFeatureRSDFilters::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void StoreFeatureRSDFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -563,10 +619,15 @@ namespace SmartPeak
     LOGD << "END storeFeatureRSDFilter";
   }
 
+  ParameterSet StoreFeatureRSDQCs::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void StoreFeatureRSDQCs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -598,10 +659,15 @@ namespace SmartPeak
     LOGD << "END storeFeatureRSDQC";
   }
 
+  ParameterSet LoadFeatureBackgroundFilters::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void LoadFeatureBackgroundFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -650,10 +716,15 @@ namespace SmartPeak
     LOGD << "END loadFeatureBackgroundFilter";
   }
 
+  ParameterSet LoadFeatureBackgroundQCs::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void LoadFeatureBackgroundQCs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -702,10 +773,15 @@ namespace SmartPeak
     LOGD << "END loadFeatureBackgroundQC";
   }
 
+  ParameterSet StoreFeatureBackgroundFilters::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void StoreFeatureBackgroundFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -737,10 +813,15 @@ namespace SmartPeak
     LOGD << "END storeFeatureBackgroundFilter";
   }
 
+  ParameterSet StoreFeatureBackgroundQCs::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void StoreFeatureBackgroundQCs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -772,10 +853,15 @@ namespace SmartPeak
     LOGD << "END storeFeatureBackgroundQC";
   }
 
+  ParameterSet EstimateFeatureFilterValues::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void EstimateFeatureFilterValues::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -826,10 +912,15 @@ namespace SmartPeak
     LOGD << "END estimateFeatureFilterValues";
   }
 
+  ParameterSet EstimateFeatureQCValues::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void EstimateFeatureQCValues::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -880,10 +971,15 @@ namespace SmartPeak
     LOGD << "END estimateFeatureQCValues";
   }
 
+  ParameterSet TransferLOQToFeatureFilters::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void TransferLOQToFeatureFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -905,10 +1001,15 @@ namespace SmartPeak
     LOGD << "END TransferLOQToFeatureFilters";
   }
 
+  ParameterSet TransferLOQToFeatureQCs::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void TransferLOQToFeatureQCs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -929,10 +1030,16 @@ namespace SmartPeak
 
     LOGD << "END TransferLOQToFeatureQCs";
   }
+
+  ParameterSet EstimateFeatureRSDs::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void EstimateFeatureRSDs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -971,10 +1078,15 @@ namespace SmartPeak
     LOGD << "END EstimateFeatureRSDs";
   }
 
+  ParameterSet EstimateFeatureBackgroundInterferences::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void EstimateFeatureBackgroundInterferences::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1015,10 +1127,15 @@ namespace SmartPeak
     LOGD << "END EstimateFeatureBackgroundInterferences";
   }
 
+  ParameterSet LoadFeatureRSDEstimations::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void LoadFeatureRSDEstimations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1067,11 +1184,15 @@ namespace SmartPeak
     LOGD << "END loadFeatureRSDEstimation";
   }
 
+  ParameterSet StoreFeatureRSDEstimations::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
 
   void StoreFeatureRSDEstimations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1103,10 +1224,15 @@ namespace SmartPeak
     LOGD << "END storeFeatureRSDEstimation";
   }
 
+  ParameterSet LoadFeatureBackgroundEstimations::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void LoadFeatureBackgroundEstimations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -1155,10 +1281,15 @@ namespace SmartPeak
     LOGD << "END loadFeatureBackgroundEstimation";
   }
 
+  ParameterSet StoreFeatureBackgroundEstimations::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
   void StoreFeatureBackgroundEstimations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {

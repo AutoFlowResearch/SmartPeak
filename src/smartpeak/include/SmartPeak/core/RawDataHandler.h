@@ -33,6 +33,7 @@
 
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/CastValue.h>
+#include <SmartPeak/core/Parameters.h>
 
 #include <map>
 #include <vector>
@@ -55,13 +56,11 @@ public:
     const MetaDataHandler& getMetaData() const;
     std::shared_ptr<MetaDataHandler>& getMetaDataShared();
 
-    void setParameters(
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters);
-    void setParameters(
-      std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& parameters);
-    std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters();
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters() const;
-    std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& getParametersShared();
+    void setParameters(const ParameterSet& parameters);
+    void setParameters(std::shared_ptr<ParameterSet>& parameters);
+    ParameterSet& getParameters();
+    const ParameterSet& getParameters() const;
+    std::shared_ptr<ParameterSet>& getParametersShared();
 
     void setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_exp);
     void setTargetedExperiment(std::shared_ptr<OpenMS::TargetedExperiment>& targeted_exp);
@@ -192,7 +191,7 @@ private:
     OpenMS::MzTab mz_tab_;
 
     // input (reused between RawDataHandlers)
-    std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>> parameters_ = nullptr;  ///< algorithm parameters; shared between all raw data handlers in the sequence
+    std::shared_ptr<ParameterSet> parameters_ = nullptr;  ///< algorithm parameters; shared between all raw data handlers in the sequence
     std::shared_ptr<OpenMS::TargetedExperiment> targeted_exp_ = nullptr;  ///< transitions for the SRM experiments; shared between all raw data handlers in the sequence
     std::shared_ptr<std::vector<std::map<std::string, CastValue>>> reference_data_ = nullptr;  ///< Reference data to compare algorithm accuracy; shared between all raw data handlers in the sequence
     std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> quantitation_methods_ = nullptr;  ///< Transition quantitation methods; shared between all raw data handlers in the sequence segment

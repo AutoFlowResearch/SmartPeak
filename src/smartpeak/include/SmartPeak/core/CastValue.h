@@ -65,6 +65,11 @@ namespace SmartPeak
     CastValue(const float f) : f_(f), tag_(Type::FLOAT), is_clear_(true) {}
     CastValue(const int i) : i_(i), tag_(Type::INT), is_clear_(true) {}
     CastValue(const long int li) : li_(li), tag_(Type::LONG_INT), is_clear_(true) {}
+    CastValue(const bool b) : b_(b), tag_(Type::BOOL), is_clear_(true) {}
+    CastValue(const std::vector<bool>& bl) : bl_(bl), tag_(Type::BOOL_LIST), is_clear_(false) {}
+    CastValue(const std::vector<float>& fl) : fl_(fl), tag_(Type::FLOAT_LIST), is_clear_(false) {}
+    CastValue(const std::vector<int>& il) : il_(il), tag_(Type::INT_LIST), is_clear_(false) {}
+    CastValue(const std::vector<std::string>& sl) : sl_(sl), tag_(Type::STRING_LIST), is_clear_(false) {}
 
     CastValue(const CastValue& other) : b_(false), tag_(Type::UNINITIALIZED), is_clear_(true)
     {
@@ -94,6 +99,16 @@ namespace SmartPeak
     CastValue& operator=(const std::vector<int>& data);
     CastValue& operator=(const std::vector<std::string>& data);
 
+    /**
+     * Comparison operator will use case sensitive, use dedicated
+     * methods (is_less_than, is_greater_than) for non case sensitive.
+     */
+    bool operator<(const CastValue& other) const;
+    bool operator>(const CastValue& other) const;
+    bool operator==(const CastValue& other) const;
+    bool operator>=(const CastValue& other) const;
+    bool operator<=(const CastValue& other) const;
+
     operator std::string() const
     {
       std::ostringstream oss;
@@ -104,7 +119,9 @@ namespace SmartPeak
     // TODO: rename to deallocate() or similar
     void clear();
 
-    bool is_less_than(const CastValue& other, const bool case_sensitive = true);
+    bool is_less_than(const CastValue& other, const bool case_sensitive = true) const;
+    bool is_greater_than(const CastValue& other, const bool case_sensitive = true) const;
+    bool is_equal_to(const CastValue& other, const bool case_sensitive = true) const;
 
     CastValue::Type getTag() const;
 
@@ -126,7 +143,7 @@ namespace SmartPeak
           break;
         case CastValue::Type::UNINITIALIZED:
         case CastValue::Type::BOOL:
-          os << cv.b_;
+          os << std::boolalpha << cv.b_;
           break;
         case CastValue::Type::FLOAT:
           os << cv.f_;
@@ -136,6 +153,54 @@ namespace SmartPeak
           break;
         case CastValue::Type::LONG_INT:
           os << cv.li_;
+          break;
+        case CastValue::Type::BOOL_LIST:
+          {
+            os << "[";
+            std::string sep = "";
+            for (const auto& v : cv.bl_)
+            {
+              os << sep << std::boolalpha << v;
+              sep = ",";
+            }
+            os << "]";
+          }
+          break;
+        case CastValue::Type::FLOAT_LIST:
+          {
+            os << "[";
+            std::string sep = "";
+            for (const auto& v : cv.fl_)
+            {
+              os << sep << v;
+              sep = ",";
+            }
+            os << "]";
+          }
+          break;
+        case CastValue::Type::INT_LIST:
+          {
+            os << "[";
+            std::string sep = "";
+            for (const auto& v : cv.il_)
+            {
+              os << sep << v;
+              sep = ",";
+            }
+            os << "]";
+          }
+          break;
+        case CastValue::Type::STRING_LIST:
+          {
+            os << "[";
+            std::string sep = "";
+            for (const auto& v : cv.sl_)
+            {
+              os << sep << "'" << v << "'";
+              sep = ",";
+            }
+            os << "]";
+          }
           break;
         default:
           throw "Tag type not managed in operator<<. Implement it.";

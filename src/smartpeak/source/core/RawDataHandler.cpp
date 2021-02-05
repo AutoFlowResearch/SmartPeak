@@ -29,7 +29,7 @@ namespace SmartPeak
 {
   RawDataHandler::RawDataHandler() :
     meta_data_(std::make_shared<MetaDataHandler>(MetaDataHandler())),
-    parameters_(std::make_shared<std::map<std::string, std::vector<std::map<std::string, std::string>>>>(std::map<std::string, std::vector<std::map<std::string, std::string>>>())),
+    parameters_(std::make_shared<ParameterSet>(ParameterSet())),
     targeted_exp_(std::make_shared<OpenMS::TargetedExperiment>(OpenMS::TargetedExperiment())),
     reference_data_(std::make_shared<std::vector<std::map<std::string, CastValue>>>(std::vector<std::map<std::string, CastValue>>())),
     quantitation_methods_(std::make_shared<std::vector<OpenMS::AbsoluteQuantitationMethod>>(std::vector<OpenMS::AbsoluteQuantitationMethod>())),
@@ -85,27 +85,27 @@ namespace SmartPeak
   }
 
   void RawDataHandler::setParameters(
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters)
+    const ParameterSet& parameters)
   {
-    parameters_.reset(new std::map<std::string, std::vector<std::map<std::string, std::string>>>(parameters));
+    parameters_.reset(new ParameterSet(parameters));
   }
 
-  void RawDataHandler::setParameters(std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& parameters)
+  void RawDataHandler::setParameters(std::shared_ptr<ParameterSet>& parameters)
   {
     parameters_ = parameters;
   }
 
-  std::map<std::string, std::vector<std::map<std::string, std::string>>>& RawDataHandler::getParameters()
+  ParameterSet& RawDataHandler::getParameters()
   {
     return *(parameters_.get());
   }
 
-  const std::map<std::string, std::vector<std::map<std::string, std::string>>>& RawDataHandler::getParameters() const
+  const ParameterSet& RawDataHandler::getParameters() const
   {
     return *(parameters_.get());
   }
 
-  std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& RawDataHandler::getParametersShared()
+  std::shared_ptr<ParameterSet>& RawDataHandler::getParametersShared()
   {
     return parameters_;
   }

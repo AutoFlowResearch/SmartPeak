@@ -122,6 +122,7 @@ BOOST_AUTO_TEST_CASE(updateParameters)
       {"tags", "tag5"}
     }
   });
+  FunctionParameters function_parameters("test", parameters);
 
   OpenMS::Param param;
   param.setValue("param1", 10);
@@ -138,7 +139,7 @@ BOOST_AUTO_TEST_CASE(updateParameters)
   param.setValue("param12", "false");
   param.setValue("param13", 44);
 
-  Utilities::updateParameters(param, parameters);
+  Utilities::updateParameters(param, function_parameters);
   BOOST_CHECK_EQUAL(static_cast<int>(param.getValue("param1")), 23);
   BOOST_CHECK_EQUAL(param.getDescription("param1"), "param1 description");
   BOOST_CHECK_EQUAL(param.hasTag("param1", "tag1"), true);
@@ -321,7 +322,7 @@ BOOST_AUTO_TEST_CASE(trimString)
 
 BOOST_AUTO_TEST_CASE(extractSelectorParameters)
 {
-  const std::vector<std::map<std::string, std::string>> params = {
+  FunctionParameters params("params", {
     { {"name", "nn_thresholds"}, {"type", "list"}, {"value", "[4,4]"} },
     { {"name", "locality_weights"}, {"type", "list"}, {"value", "[False,False,False,True]"} },
     { {"name", "select_transition_groups"}, {"type", "list"}, {"value", "[True,True,True,True]"} },
@@ -330,12 +331,12 @@ BOOST_AUTO_TEST_CASE(extractSelectorParameters)
     // { {"name", "select_highest_counts"}, {"type", "list"}, {"value", "[False,False,False,False]"} },
     { {"name", "variable_types"}, {"type", "list"}, {"value", "['integer','integer','integer','integer']"} },
     { {"name", "optimal_thresholds"}, {"type", "list"}, {"value", "[0.5,0.5,0.5,0.5]"} }
-  };
+  });
 
-  const std::vector<std::map<std::string, std::string>> score_weights = {
+  FunctionParameters score_weights("score_weights", {
     { {"name", "var_log_sn_score"}, {"type", "string"}, {"value", "lambda score: 1/score"} },
     { {"name", "peak_apices_sum"}, {"type", "string"}, {"value", "lambda score: 1/log10(score)"} }
-  };
+  });
 
   std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> v =
     Utilities::extractSelectorParameters(params, score_weights);

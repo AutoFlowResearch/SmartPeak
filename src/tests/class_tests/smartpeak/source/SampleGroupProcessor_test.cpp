@@ -211,7 +211,7 @@ BOOST_AUTO_TEST_CASE(gettersMergeInjections)
 BOOST_AUTO_TEST_CASE(processMergeInjections)
 {
   // setup the parameters
-  map<string, vector<map<string, string>>> mergeinjs_params = {{"MergeInjections", {
+  ParameterSet mergeinjs_params({{"MergeInjections", {
     {
       {"name", "scan_polarity_merge_rule"},
       {"value", "WeightedMean"}
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
       {"name", "merge_subordinates"},
       {"value", "true"}
     }
-  }}};
+  }}});
 
   // setup the sequence
   SequenceHandler sequenceHandler;
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
   BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 400, 1e-4);
 
   // test merge injections on all with out subordinates
-  mergeinjs_params.at("MergeInjections").at(6).at("value") = std::string("false");
+  mergeinjs_params.at("MergeInjections").at(6).setValueFromString("false");
   sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
 
   BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
@@ -286,8 +286,8 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
   sequenceHandler.clear();
   makeSequence(sequenceHandler, true);
   sampleGroupHandler = sequenceHandler.getSampleGroups().front();
-  mergeinjs_params.at("MergeInjections").at(0).at("value") = std::string("Max");
-  mergeinjs_params.at("MergeInjections").at(6).at("value") = std::string("true");
+  mergeinjs_params.at("MergeInjections").at(0).setValueFromString("Max");
+  mergeinjs_params.at("MergeInjections").at(6).setValueFromString("true");
   sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
 
   BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
@@ -304,7 +304,7 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
   sequenceHandler.clear();
   makeSequence(sequenceHandler, true);
   sampleGroupHandler = sequenceHandler.getSampleGroups().front();
-  mergeinjs_params.at("MergeInjections").at(0).at("value") = std::string("Min");
+  mergeinjs_params.at("MergeInjections").at(0).setValueFromString("Min");
   sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
 
   BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
@@ -321,7 +321,7 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
   sequenceHandler.clear();
   makeSequence(sequenceHandler, true);
   sampleGroupHandler = sequenceHandler.getSampleGroups().front();
-  mergeinjs_params.at("MergeInjections").at(0).at("value") = std::string("Sum");
+  mergeinjs_params.at("MergeInjections").at(0).setValueFromString("Sum");
   sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
 
   BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
@@ -338,7 +338,7 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
   sequenceHandler.clear();
   makeSequence(sequenceHandler, true);
   sampleGroupHandler = sequenceHandler.getSampleGroups().front();
-  mergeinjs_params.at("MergeInjections").at(0).at("value") = std::string("Mean");
+  mergeinjs_params.at("MergeInjections").at(0).setValueFromString("Mean");
   sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
 
   BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
@@ -355,7 +355,7 @@ BOOST_AUTO_TEST_CASE(processMergeInjections)
   sequenceHandler.clear();
   makeSequence(sequenceHandler, true);
   sampleGroupHandler = sequenceHandler.getSampleGroups().front();
-  mergeinjs_params.at("MergeInjections").at(0).at("value") = std::string("WeightedMean");
+  mergeinjs_params.at("MergeInjections").at(0).setValueFromString("WeightedMean");
   sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
 
   BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 3);
