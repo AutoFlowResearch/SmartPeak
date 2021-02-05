@@ -139,7 +139,7 @@ namespace SmartPeak
           else if (s_string == "FIAMS Unknowns")
             ids = { "LOAD_RAW_DATA",
                     "EXTRACT_SPECTRA_WINDOWS",
-                    "MERGE_SPECTRA"
+                    "MERGE_SPECTRA",
                     "PICK_MS1_FEATURES",
                     "SEARCH_ACCURATE_MASS",
                     "STORE_ANNOTATIONS",
