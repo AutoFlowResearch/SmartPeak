@@ -763,7 +763,10 @@ int main(int argc, char **argv)
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
         {
-          session_handler_.setParametersTable(application_handler_.sequenceHandler_, workflow_.getCommands());
+          BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+          buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
+          buildCommandsFromNames.process();
+          session_handler_.setParametersTable(application_handler_.sequenceHandler_, buildCommandsFromNames.commands_);
           ParametersTableWidget Table(session_handler_.parameters_table_headers, session_handler_.parameters_table_body, Eigen::Tensor<bool, 1>(), "ParametersMainWindow");
           Table.draw();
           ImGui::EndTabItem();
