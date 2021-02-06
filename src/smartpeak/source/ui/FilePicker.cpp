@@ -38,6 +38,7 @@ namespace SmartPeak
     }
 
     static int selected_entry = -1;
+    static char selected_filename[256] = {0};
 
     if (ImGui::Button("Up"))
     {
@@ -46,6 +47,7 @@ namespace SmartPeak
         current_pathname_ = parent;
       }
       pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+      memset(selected_filename, 0, sizeof selected_filename);
       selected_entry = -1;
     }
     ImGui::SameLine();
@@ -65,6 +67,7 @@ namespace SmartPeak
       {
         current_pathname_.assign(new_pathname);
         pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+        memset(selected_filename, 0, sizeof selected_filename);
         selected_entry = -1;
         ImGui::CloseCurrentPopup();
       }
@@ -84,7 +87,6 @@ namespace SmartPeak
     static const char* extensions[] = { "All", "csv", "featureXML", "mzML" };
     ImGui::Combo("File type", &selected_extension, extensions, IM_ARRAYSIZE(extensions));
 
-    static char selected_filename[256] = {0};
     // Folder content / Navigation
     ImGui::BeginChild("Content", ImVec2(1024, 400));
     
@@ -128,6 +130,7 @@ namespace SmartPeak
           if(ImGui::Selectable(buf, is_selected, selectable_flags))
           {
             selected_entry = row;
+            std::strcpy(selected_filename, pathname_content_[0][selected_entry].c_str());
             if (ImGui::IsMouseDoubleClicked(0) && pathname_content_[2][selected_entry] == "Directory") // TODO: error prone to rely on strings
             {
               if (current_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
@@ -135,11 +138,28 @@ namespace SmartPeak
                 current_pathname_.append("/");
               }
               current_pathname_.append(pathname_content_[0][selected_entry]);
+              memset(selected_filename, 0, sizeof selected_filename);
               pathname_content_ = Utilities::getPathnameContent(current_pathname_);
               filter.Clear();
               selected_entry = -1;
-              selected_filename[0] = '\0';
+//              selected_filename[0] = '\0';
               break; // IMPORTANT: because the following lines in the loop assume accessing old/previous pathname_content_'s data
+            }
+            else if (ImGui::IsMouseDoubleClicked(0))
+            {
+              picked_pathname_ = current_pathname_;
+              if (selected_entry >= 0)
+              {
+                if (picked_pathname_.back() != '/')
+                {
+                  picked_pathname_.append("/");
+                }
+                picked_pathname_.append(pathname_content_[0][selected_entry]);
+              }
+              filter.Clear();
+              selected_entry = -1;
+              LOGI << "Picked pathname: " << picked_pathname_;
+              ImGui::CloseCurrentPopup();
             }
           }
         }
@@ -151,7 +171,10 @@ namespace SmartPeak
     ImGui::Separator();
 
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
-    ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    if (ImGui::IsMouseClicked(0))
+      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    else
+      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
