@@ -1284,6 +1284,10 @@ namespace SmartPeak
         output.push_back(spec);
       }
     }
+
+    if (output.empty()) {
+      LOGW << "No spectra was extracted.  Check that the specified start and stop retention times in the parameters are compatible with the acquired spectra.";
+    }
     rawDataHandler_IO.getExperiment().setSpectra(output);
 
     LOGD << "END ExtractSpectraWindows";
@@ -1686,13 +1690,19 @@ namespace SmartPeak
 
     // Update the metavalue and members
     output.setNativeID("MergeSpectra");
-    output.setMSLevel(rawDataHandler_IO.getExperiment().getSpectra().front().getMSLevel());
-    output.setType(rawDataHandler_IO.getExperiment().getSpectra().front().getType());
+    if (rawDataHandler_IO.getExperiment().getSpectra().size()) {
+      output.setMSLevel(rawDataHandler_IO.getExperiment().getSpectra().front().getMSLevel());
+      output.setType(rawDataHandler_IO.getExperiment().getSpectra().front().getType());
+      output.setMetaValue("lowest observed m/z", rawDataHandler_IO.getExperiment().getSpectra().front().front().getMZ());
+      output.setMetaValue("highest observed m/z", rawDataHandler_IO.getExperiment().getSpectra().back().back().getMZ());
+    }
+    else {
+      output.setMetaValue("lowest observed m/z", 0.0);
+      output.setMetaValue("highest observed m/z", 0.0);
+    }
     output.setMetaValue("base peak m/z", 0.0);
     output.setMetaValue("base peak intensity", 0.0);
     output.setMetaValue("total ion current", 0.0);
-    output.setMetaValue("lowest observed m/z", rawDataHandler_IO.getExperiment().getSpectra().front().front().getMZ());
-    output.setMetaValue("highest observed m/z", rawDataHandler_IO.getExperiment().getSpectra().back().back().getMZ());
     rawDataHandler_IO.getExperiment().setSpectra({ output });
 
     LOGD << "END MergeSpectra";
