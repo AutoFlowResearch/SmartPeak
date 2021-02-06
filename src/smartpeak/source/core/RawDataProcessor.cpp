@@ -1285,7 +1285,7 @@ namespace SmartPeak
       }
     }
 
-    if (output.size() == 0) {
+    if (output.empty()) {
       LOGW << "No spectra was extracted.  Check that the specified start and stop retention times in the parameters are compatible with the acquired spectra.";
     }
     rawDataHandler_IO.getExperiment().setSpectra(output);
