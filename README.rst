@@ -319,6 +319,17 @@ The collection of examples is located at ``src/example/data`` directory of the S
 
 .. begin_gui
 
+Set logging path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Default locations of logs:
+
+- Windows: `C:\\Users\\<user>\\AppData\\Local\\SmartPeak`
+- Linux and MacOS: `~/.SmartPeak`
+
+User can change default location and specify directory where the logs are stored by setting `SMARTPEAK_LOGS` env variable. 
+If directory specified by the path doesn't exist, SmartPeak will create specified directories.
+
+
 Using GUI
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

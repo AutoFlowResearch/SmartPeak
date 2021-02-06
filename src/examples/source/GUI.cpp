@@ -8,6 +8,7 @@
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/SessionHandler.h>
+#include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/ui/GuiAppender.h>
 #include <SmartPeak/ui/Heatmap2DWidget.h>
@@ -41,8 +42,8 @@ void initializeDataDir(
   const std::string& default_dir
 );
 
-int main(int argc, char **argv)
-  // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
+int main(int argc, char** argv)
+// `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
   bool show_top_window_ = false;
   bool show_bottom_window_ = false;
@@ -125,13 +126,29 @@ int main(int argc, char **argv)
   Workflow   workflow_;
   report_.setApplicationHandler(application_handler_);
   workflow_.setApplicationHandler(application_handler_);
+
+  // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   char filename[128];
   strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
 
+  auto logfilepath = std::string{};
+  auto logdirpath = std::string{};
+  auto logdir_created = false;
+  auto error_msg = std::string{};
+  try
+  {
+    std::tie(logfilepath, logdir_created) = Utilities::getLogFilepath(filename);
+    logdirpath = fs::path(logfilepath).parent_path().string();
+  }
+  catch (const std::runtime_error& re)
+  {
+    error_msg = re.what();
+  }
+
   // Add .csv appender: 32 MiB per file, max. 100 log files
   plog::RollingFileAppender<plog::CsvFormatter>
-    fileAppender(filename, 1024 * 1024 * 32, 100);
+    fileAppender(logfilepath.c_str(), 1024 * 1024 * 32, 100);
 
   // Add console appender, instead of only the file one
   plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
@@ -141,7 +158,16 @@ int main(int argc, char **argv)
     .addAppender(&consoleAppender)
     .addAppender(&appender_);
 
-  LOGN << "Log file at: " << filename;
+  if (error_msg.empty())
+  {
+    if (logdir_created) LOG_DEBUG << "Log directory created: " << logdirpath;
+    LOG_INFO << "Log file at: " << logfilepath;
+  }
+  else
+  {
+    // In this case it will only use console appender
+    LOG_WARNING << error_msg;
+  }
 
   // Setup SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)

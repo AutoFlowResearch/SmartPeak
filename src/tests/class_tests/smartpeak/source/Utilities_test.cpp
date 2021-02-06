@@ -25,10 +25,13 @@
 
 #define BOOST_TEST_MODULE Utilities test suite
 #include <boost/test/included/unit_test.hpp>
+#include <boost/filesystem.hpp>
+#include <sys/stat.h>
 #include <SmartPeak/core/Utilities.h>
 
 using namespace SmartPeak;
 using namespace std;
+namespace fs = boost::filesystem;
 
 BOOST_AUTO_TEST_SUITE(utilities)
 
@@ -497,6 +500,78 @@ BOOST_AUTO_TEST_CASE(directorySize)
   BOOST_CHECK_EQUAL(f(path), 48);
   BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 22);
   BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
+}
+
+void set_env_var_(const std::string& name, const std::string& value)
+{
+#ifdef _WIN32
+  if (value.empty())
+    _putenv((name + "=").c_str());
+  else
+    _putenv((name + "=" + value).c_str());
+#else
+  if (value.empty())
+    unsetenv(name.c_str());
+  else
+    setenv(name.c_str(), value.c_str(), 1);
+#endif
+}
+
+BOOST_AUTO_TEST_CASE(getLogFilepath)
+{
+  auto& f = Utilities::getLogFilepath;
+  // Test default behaviour
+  // Test doesn't assume that any env variable is set
+  {
+    auto dirpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("logs") };
+    auto filepath = std::string{};
+    auto dir_created = false;
+    
+    // Only HOME is set
+    set_env_var_("SMARTPEAK_LOGS", "");
+    set_env_var_("LOCALAPPDATA", "");
+    set_env_var_("HOME", dirpath);
+    std::tie(filepath, dir_created) = f("file");
+    BOOST_CHECK(fs::exists(filepath));
+    BOOST_CHECK(fs::exists(dirpath));
+    BOOST_CHECK_MESSAGE(dir_created, "Log directory with path '" << dirpath << "' is not created");
+    fs::remove_all(dirpath);
+
+    // Only LOCALAPPDATA is set
+    set_env_var_("SMARTPEAK_LOGS", "");
+    set_env_var_("LOCALAPPDATA", dirpath);
+    set_env_var_("HOME", "");
+    std::tie(filepath, dir_created) = f("file");
+    BOOST_CHECK(fs::exists(filepath));
+    BOOST_CHECK(fs::exists(dirpath));
+    BOOST_CHECK_MESSAGE(dir_created, "Log directory with path '" << dirpath << "' is not created");
+    fs::remove_all(dirpath);
+  }
+  // All env variables unset
+  {
+    set_env_var_("SMARTPEAK_LOGS", "");
+    set_env_var_("LOCALAPPDATA", "");
+    set_env_var_("HOME", "");
+    BOOST_CHECK_THROW(f("filename"), std::runtime_error);
+  }
+  // SMARTPEAK_LOGS has higher priority
+  {
+    auto logpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("logs") };
+    auto otherpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("otherlogs") };
+    auto filepath = std::string{};
+    auto dir_created = false;
+
+    set_env_var_("SMARTPEAK_LOGS", logpath);
+    set_env_var_("LOCALAPPDATA", otherpath);
+    set_env_var_("HOME", otherpath);
+
+    std::tie(filepath, dir_created) = f("file");
+    BOOST_CHECK(fs::exists(filepath));
+    BOOST_CHECK(fs::exists(logpath));
+    BOOST_CHECK(!fs::exists(otherpath));
+    BOOST_CHECK_MESSAGE(dir_created, "Log directory with path '" << logpath << "' is not created");
+    fs::remove_all(logpath);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
