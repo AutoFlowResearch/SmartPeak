@@ -309,5 +309,19 @@ public:
       @returns The numbers of elements found
     */
     static size_t directorySize(const std::string& pathname);
+
+    /**
+    * @brief Constructs an absolute filepath to an application logs.
+    * 
+    * Default locations of logs:
+    *   - Windows: C:\Users\<user>\AppData\Local\SmartPeak
+    *   - Linux and MacOS: ~/.SmartPeak
+    * User can change default location and specify directory where the logs are stored by
+    * setting SMARTPEAK_LOGS env variable. If directory specified by the path doesn't exist, the function will create one.
+    * 
+    * @param[in] filename Log filename
+    * @returns The absolute path to log file and boolean flag whether the path to directory was created
+    */
+    static std::pair<std::string, bool> getLogFilepath(const std::string& filename);
   };
 }

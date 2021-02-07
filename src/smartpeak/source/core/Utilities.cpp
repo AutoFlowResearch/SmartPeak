@@ -29,6 +29,7 @@
 #include <iostream>
 #include <numeric>
 #include <regex>
+#include <sstream>
 #include <unordered_set>
 #include <plog/Log.h>
 #include <boost/filesystem.hpp>
@@ -625,5 +626,57 @@ namespace SmartPeak
     }
 
     return n;
+  }
+
+  std::pair<std::string, bool> Utilities::getLogFilepath(const std::string& filename)
+  {
+    std::string path = "";
+    bool flag = false;
+    char const* logs = getenv("SMARTPEAK_LOGS");
+    char const* appdata = getenv("LOCALAPPDATA");
+    char const* home = getenv("HOME");
+    if (logs || appdata || home)
+    {
+      auto logdir = fs::path{};
+      if (logs)
+        logdir = fs::path{ logs };
+      else if (appdata)
+        logdir = fs::path{ appdata } / "SmartPeak";
+      else if (home)
+        logdir = fs::path{ home } / ".SmartPeak";
+
+      try
+      {
+        // Creates directory tree if doesn't exist:
+        flag = fs::create_directories(logdir);
+      }
+      catch (fs::filesystem_error& fe)
+      {
+        if (fe.code() == boost::system::errc::permission_denied)
+          throw std::runtime_error(static_cast<std::ostringstream&&>(
+            std::ostringstream() 
+              << "Unable to construct path to log file, permission denied while creating directory '" << logdir.string() << "'").str());
+        else
+          throw std::runtime_error(static_cast<std::ostringstream&&>(
+            std::ostringstream()
+              << "Unable to construct path to log file, failure while creating directory '" << logdir.string() << "'").str());
+      }
+      path = (logdir / filename).string();
+      // Test if file writeable:
+      fs::ofstream file(path);
+      if (!file)
+        throw std::runtime_error(static_cast<std::ostringstream&&>(
+          std::ostringstream()
+            << "Unable to create log file '" << path << "', please verify permissions to directory").str());
+      else
+        file.close();
+    }
+    else
+    {
+      throw std::runtime_error(
+        "Unable to construct path to log file. Make sure that either \
+          HOME, LOCALAPPDATA or SMARTPEAK_LOGS env variable is set. For details refer to user documentation");
+    }
+    return std::make_pair(path, flag);
   }
 }
