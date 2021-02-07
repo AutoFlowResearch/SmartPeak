@@ -158,6 +158,8 @@ namespace SmartPeak
               }
               filter.Clear();
               selected_entry = -1;
+              runProcessor();
+              clearProcessor();
               LOGI << "Picked pathname: " << picked_pathname_;
               ImGui::CloseCurrentPopup();
             }
@@ -171,10 +173,7 @@ namespace SmartPeak
     ImGui::Separator();
 
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
-    if (ImGui::IsMouseClicked(0))
-      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
-    else
-      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
@@ -182,14 +181,11 @@ namespace SmartPeak
     if (ImGui::Button("Open"))
     {
       picked_pathname_ = current_pathname_;
-      if (selected_entry >= 0)
+      if (picked_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
       {
-        if (picked_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
-        {
-          picked_pathname_.append("/");
-        }
-        picked_pathname_.append(pathname_content_[0][selected_entry]);
+        picked_pathname_.append("/");
       }
+      picked_pathname_.append(selected_filename);
       LOGI << "Picked pathname: " << picked_pathname_;
       runProcessor();
       clearProcessor();
