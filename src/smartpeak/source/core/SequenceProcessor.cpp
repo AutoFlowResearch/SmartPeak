@@ -301,7 +301,7 @@ namespace SmartPeak
     const std::string inj_name { injection.getMetaData().getInjectionName() };
     for (const std::shared_ptr<RawDataProcessor>& p : methods) {
       LOGI << "[" << (i_step++) << "/" << n_steps << "] method on injection: " << inj_name;
-      p->process(
+      p->process( //TODO: (SIGABRT)
         injection.getRawData(),
         injection.getRawData().getParameters(),
         filenames

@@ -3,6 +3,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <functional>
 #include <imgui.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 

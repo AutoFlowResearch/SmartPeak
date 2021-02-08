@@ -105,7 +105,7 @@ namespace SmartPeak
       else {
         OpenMS::FileHandler fh;
         LOGI << "Loading: " << filenames.mzML_i;
-        fh.loadExperiment(filenames.mzML_i, chromatograms);
+        fh.loadExperiment(filenames.mzML_i, chromatograms); //TODO:try-catch (SIGABRT)
       }
     }
 

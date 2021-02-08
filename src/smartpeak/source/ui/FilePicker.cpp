@@ -235,7 +235,6 @@ namespace SmartPeak
             sprintf(text_buffer, "%s", item->DateModified);
           }
           
-//          char buf[256];
           const bool is_selected = (selected_entry == row);
           ImGui::TableSetColumnIndex(column);
           if(ImGui::Selectable(text_buffer, is_selected, selectable_flags))
