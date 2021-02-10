@@ -1102,7 +1102,9 @@ namespace SmartPeak
     // # check for workflow parameters integrity
     const std::vector<std::string> required_function_parameter_names = {
       "SequenceSegmentPlotter",
+      "ElutionPeakDetection",
       "FeaturePlotter",
+      "FeatureFindingMetabo",
       "AbsoluteQuantitation",
       "mzML",
       "MassTraceDetection",
@@ -1123,9 +1125,11 @@ namespace SmartPeak
       "SequenceProcessor",
       "FIAMS",
       "PickMS1Features",
+      "PickMS2Features",
       "AccurateMassSearchEngine",
       "MergeInjections"
     };
+
     for (const std::string& function_parameter_name : required_function_parameter_names) {
       if (!params_I.count(function_parameter_name)) {
         FunctionParameters function_parameter(function_parameter_name);
@@ -2460,12 +2464,6 @@ namespace SmartPeak
   {
     LOGD << "START PickMS2Features";
 
-    if (params_I.count("PickMS2Features") && params_I.at("PickMS2Features").empty()) {
-      LOGE << "No parameters passed to PickMS2Features.";
-      LOGD << "END PickMS2Features";
-      return;
-    }
-
     //-------------------------------------------------------------
     // set parameters
     //-------------------------------------------------------------
@@ -2475,23 +2473,18 @@ namespace SmartPeak
       pick_ms2_feature_params = params_I.at("PickMS2Features");
     }
 
-    FunctionParameters mtd_param;
-    if (params_I.count("MassTraceDetection"))
-    {
-      mtd_param = params_I.at("MassTraceDetection");
-    }
+    OpenMS::MassTraceDetection mtdet;
+    OpenMS::Param mtdet_parameters = mtdet.getParameters();
+    mtdet_parameters.remove("chrom_fwhm");
+    Utilities::updateParameters(mtdet_parameters, params_I.at("MassTraceDetection"));
 
-    FunctionParameters epd_param;
-    if (params_I.count("ElutionPeakDetection"))
-    {
-      epd_param = params_I.at("ElutionPeakDetection");
-    }
+    OpenMS::ElutionPeakDetection epdet;
+    OpenMS::Param epdet_parameters = epdet.getParameters();
+    Utilities::updateParameters(epdet_parameters, params_I.at("ElutionPeakDetection"));
 
-    FunctionParameters ffm_param;
-    if (params_I.count("FeatureFindingMetabo"))
-    {
-      ffm_param = params_I.at("FeatureFindingMetabo");
-    }
+    OpenMS::FeatureFindingMetabo ffmet;
+    OpenMS::Param ffmet_parameters = ffmet.getParameters();
+    Utilities::updateParameters(ffmet_parameters, params_I.at("MRMFeatureFinderScoring"));
 
     //-------------------------------------------------------------
     // Setting input
@@ -2533,11 +2526,7 @@ namespace SmartPeak
     // configure and run mass trace detection
     //-------------------------------------------------------------
 
-    OpenMS::MassTraceDetection mtdet;
-    OpenMS::Param parameters = mtdet.getParameters();
-    parameters.remove("chrom_fwhm");
-    Utilities::updateParameters(parameters, params_I.at("MassTraceDetection"));
-    mtdet.setParameters(parameters);
+    mtdet.setParameters(mtdet_parameters);
     int max_traces = 0;
     Parameter* max_traces_param = pick_ms2_feature_params.findParameter("max_traces");
     if (max_traces_param)
@@ -2562,10 +2551,7 @@ namespace SmartPeak
     if (enable_elution && enable_elution->getValueAsString() == "true")
     {
       std::vector<OpenMS::MassTrace> splitted_mtraces;
-      OpenMS::ElutionPeakDetection epdet;
-      OpenMS::Param parameters = epdet.getParameters();
-      Utilities::updateParameters(parameters, epd_param);
-      epdet.setParameters(parameters);
+      epdet.setParameters(epdet_parameters);
       // fill mass traces with smoothed data as well .. bad design..
       epdet.detectPeaks(m_traces, splitted_mtraces);
       if (epdet.getParameters().getValue("width_filtering") == "auto")
@@ -2591,11 +2577,10 @@ namespace SmartPeak
         LOGE << e.what();
         return;
       }
-      Parameter* use_smoothed_intensities = epd_param.findParameter("use_smoothed_intensities");
-      if (use_smoothed_intensities && use_smoothed_intensities->getValueAsString() == "true")
+      if (ffmet_parameters.getValue("use_smoothed_intensities").toBool())
       {
         LOGW << "Without EPD, smoothing is not supported. Setting 'use_smoothed_intensities' to false!";
-        use_smoothed_intensities->setValueFromString("false");
+        ffmet_parameters.setValue("use_smoothed_intensities", "false");
       }
     }
 
@@ -2605,10 +2590,7 @@ namespace SmartPeak
 
     OpenMS::FeatureMap feat_map;
     std::vector< std::vector< OpenMS::MSChromatogram > > feat_chromatograms;
-    OpenMS::FeatureFindingMetabo ffmet;
-    parameters = ffmet.getParameters();
-    Utilities::updateParameters(parameters, epd_param);
-    ffmet.setParameters(parameters);
+    ffmet.setParameters(ffmet_parameters);
     ffmet.run(m_traces_final, feat_map, feat_chromatograms);
 
     size_t trace_count(0);
@@ -2623,8 +2605,7 @@ namespace SmartPeak
     }
     if (trace_count != m_traces_final.size())
     {
-      Parameter* remove_single_traces = ffm_param.findParameter("remove_single_traces");
-      if (remove_single_traces && remove_single_traces->getValueAsString() == "true")
+      if (!ffmet_parameters.getValue("remove_single_traces").toBool())
       {
         LOGE << "FF-Metabo: Internal error. Not all mass traces have been assembled to features! Aborting.";
         return;
@@ -2642,23 +2623,6 @@ namespace SmartPeak
     // filter features with zero intensity (this can happen if the FWHM is zero (bc of overly skewed shape) and no peaks end up being summed up)
     auto intensity_zero = [&](OpenMS::Feature& f) { return f.getIntensity() == 0; };
     feat_map.erase(remove_if(feat_map.begin(), feat_map.end(), intensity_zero), feat_map.end());
-
-    // chromatograms
-    if (feat_chromatograms.size() == feat_map.size())
-    {
-      for (const auto& vect_feat_chromatogram: feat_chromatograms)
-      {
-        for (const auto& feat_chromatogram : vect_feat_chromatogram)
-        {
-          rawDataHandler_IO.getExperiment().addChromatogram(feat_chromatogram);
-        }
-      }
-    }
-    else
-    {
-//      LOGE << "FF-Metabo: Internal error. The number of features (" << feat_chromatograms.size() << ") and chromatograms (" << feat_map.size() << ") are different! Aborting.";
-//      return;
-    }
 
     // store ionization mode of spectra (useful for post-processing by AccurateMassSearch tool)
     if (!feat_map.empty())

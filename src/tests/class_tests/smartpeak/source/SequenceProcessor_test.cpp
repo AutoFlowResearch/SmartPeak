@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 23);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 27);
   BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleGroupName(), "Test02");
   BOOST_CHECK_EQUAL(injection5.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 23);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 27);
   BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");

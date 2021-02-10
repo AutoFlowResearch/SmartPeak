@@ -293,6 +293,23 @@ namespace SmartPeak
     ) const override;
   };
 
+  struct PickMS2Features : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "PICK_MS2_FEATURES"; }
+    std::string getDescription() const override { return "Pick MS2 Features"; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** PickMS2Features
+     */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
   struct SearchAccurateMass : RawDataProcessor
   {
     int getID() const override { return -1; }
@@ -706,20 +723,4 @@ namespace SmartPeak
                  ) const override;
   };
 
-  struct PickMS2Features : RawDataProcessor
-  {
-    int getID() const override { return 0; }
-    std::string getName() const override { return "PICK_MS2_FEATURES"; }
-    std::string getDescription() const override { return "Pick MS2 Features"; }
-
-    virtual ParameterSet getParameterSchema() const override;
-
-    /** PickMS2Features
-     */
-    void process(
-      RawDataHandler& rawDataHandler_IO,
-      const ParameterSet& params_I,
-      const Filenames& filenames
-    ) const override;
-  };
 }
