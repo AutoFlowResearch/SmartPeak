@@ -1,5 +1,7 @@
 function,name,type,value,default,restrictions,description,used_,comment_,comparator
-PickMS2Features,enable_elution,boolean,TRUE,TRUE,true; false,,TRUE,,
+PickMS2Features,enable_elution,boolean,TRUE,TRUE,true; false,"To enforce processing of the data when Profile data is provided but spectra is not centroided",TRUE,,
+PickMS2Features,max_traces,int,1000,0,true; false,"Max traces to use for MassTraceDetection. 0 means all traces.",TRUE,,
+PickMS2Features,force_processing,boolean,FALSE,FALSE,true; false,"To enforce processing of the data when Profile data is provided but spectra is not centroided",TRUE,,
 AccurateMassSearchEngine,mass_error_value,float,2,5,,Tolerance allowed for accurate mass search.,TRUE,,
 AccurateMassSearchEngine,mass_error_unit,string,ppm,ppm,ppm; Da,Unit of mass error (ppm or Da),TRUE,,
 AccurateMassSearchEngine,ionization_mode,string,auto,,positive; negative; auto,"Positive or negative ionization mode? If 'auto' is used, the first feature of the input map must contain the meta-value 'scan_polarity'. If its missing, the tool will exit with error.",TRUE,,

@@ -2433,6 +2433,18 @@ namespace SmartPeak
       {"type", "bool"},
       {"value", "true"},
       {"description", "Enable elution peak detection"},
+    },
+    {
+      {"name", "force_processing"},
+      {"type", "bool"},
+      {"value", "false"},
+      {"description", "To enforce processing of the data when Profile data is provided but spectra is not centroided"},
+    },
+    {
+      {"name", "max_traces"},
+      {"type", "int"},
+      {"value", "0"},
+      {"description", "Max traces to use for MassTraceDetection. 0 means all traces."},
     }
     }} });
     ParameterSet pick_ms2_feature_params(param_struct);
@@ -2453,42 +2465,6 @@ namespace SmartPeak
       LOGD << "END PickMS2Features";
       return;
     }
-
-    //-------------------------------------------------------------
-    // Setting input
-    //-------------------------------------------------------------
-    OpenMS::PeakMap ms_peakmap;
-    std::vector<int> ms_level(1, 1);
-    for (OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
-      ms_peakmap.addSpectrum(spec);
-    }
-    for (OpenMS::Chromatogram& chromatogram : rawDataHandler_IO.getExperiment().getChromatograms()) {
-      ms_peakmap.addChromatogram(chromatogram);
-    }
-    if (ms_peakmap.empty())
-    {
-      LOGW << "The given file does not contain any conventional peak data, but might"
-        " contain chromatograms. This tool currently cannot handle them, sorry.";
-      return;
-    }
-
-    // determine type of spectral data (profile or centroided)
-    OpenMS::SpectrumSettings::SpectrumType spectrum_type = ms_peakmap[0].getType();
-
-    if (spectrum_type == OpenMS::SpectrumSettings::PROFILE)
-    {
-      //if (!getFlag_("force"))
-      if (false)
-      {
-        LOGE << "Error: Profile data provided but centroided spectra expected. To enforce processing of the data set the -force flag.";
-        return;
-      }
-    }
-
-    // make sure the spectra are sorted by m/z
-    ms_peakmap.sortSpectra(true);
-
-    std::vector<OpenMS::MassTrace> m_traces;
 
     //-------------------------------------------------------------
     // set parameters
@@ -2518,16 +2494,65 @@ namespace SmartPeak
     }
 
     //-------------------------------------------------------------
+    // Setting input
+    //-------------------------------------------------------------
+    OpenMS::PeakMap ms_peakmap;
+    std::vector<int> ms_level(1, 1);
+    for (OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
+      ms_peakmap.addSpectrum(spec);
+    }
+    for (OpenMS::Chromatogram& chromatogram : rawDataHandler_IO.getExperiment().getChromatograms()) {
+      ms_peakmap.addChromatogram(chromatogram);
+    }
+    if (ms_peakmap.empty())
+    {
+      LOGW << "The given file does not contain any conventional peak data, but might"
+        " contain chromatograms. This tool currently cannot handle them, sorry.";
+      return;
+    }
+
+    // determine type of spectral data (profile or centroided)
+    OpenMS::SpectrumSettings::SpectrumType spectrum_type = ms_peakmap[0].getType();
+
+    if (spectrum_type == OpenMS::SpectrumSettings::PROFILE)
+    {
+      Parameter* force_processing = pick_ms2_feature_params.findParameter("force_processing");
+      if (!force_processing || force_processing->getValueAsString() == "false")
+      {
+        LOGE << "Error: Profile data provided but centroided spectra expected. To enforce processing of the data set the force_processing parameter.";
+        return;
+      }
+    }
+
+    // make sure the spectra are sorted by m/z
+    ms_peakmap.sortSpectra(true);
+
+    std::vector<OpenMS::MassTrace> m_traces;
+
+    //-------------------------------------------------------------
     // configure and run mass trace detection
     //-------------------------------------------------------------
 
     OpenMS::MassTraceDetection mtdet;
-    //mtd_param.insert("", common_param);
     OpenMS::Param parameters = mtdet.getParameters();
     parameters.remove("chrom_fwhm");
     Utilities::updateParameters(parameters, params_I.at("MassTraceDetection"));
     mtdet.setParameters(parameters);
-    mtdet.run(ms_peakmap, m_traces, 1000); // TODO parameter
+    int max_traces = 0;
+    Parameter* max_traces_param = pick_ms2_feature_params.findParameter("max_traces");
+    if (max_traces_param)
+    {
+      try {
+        max_traces = std::stoi(max_traces_param->getValueAsString());
+      }
+      catch (const std::exception& e)
+      {
+        LOGE << e.what();
+        // keep it to 0
+      }
+    }
+
+    mtdet.run(ms_peakmap, m_traces, max_traces);
 
     //-------------------------------------------------------------
     // configure and run elution peak detection
@@ -2557,9 +2582,9 @@ namespace SmartPeak
     {
       m_traces_final = m_traces;    
       try {
-        for (size_t i = 0; i < m_traces_final.size(); ++i) // estimate FWHM, so .getIntensity() can be called later
+        for (auto & trace: m_traces_final) // estimate FWHM, so .getIntensity() can be called later
         {
-          m_traces_final[i].estimateFWHM(false);
+          trace.estimateFWHM(false);
         }
       }
       catch (const std::exception& e) {
@@ -2587,14 +2612,14 @@ namespace SmartPeak
     ffmet.run(m_traces_final, feat_map, feat_chromatograms);
 
     size_t trace_count(0);
-    for (size_t i = 0; i < feat_map.size(); ++i)
+    for (const auto& feat : feat_map)
     {
-      if (!feat_map[i].metaValueExists("num_of_masstraces"))
+      if (!feat.metaValueExists("num_of_masstraces"))
       {
         LOGE << "MetaValue 'num_of_masstraces' missing from FFMetabo output!";
         return;
       }
-      trace_count += (size_t)feat_map[i].getMetaValue("num_of_masstraces");
+      trace_count += (size_t)feat.getMetaValue("num_of_masstraces");
     }
     if (trace_count != m_traces_final.size())
     {
@@ -2621,11 +2646,11 @@ namespace SmartPeak
     // chromatograms
     if (feat_chromatograms.size() == feat_map.size())
     {
-      for (size_t i = 0; i < feat_chromatograms.size(); ++i)
+      for (const auto& vect_feat_chromatogram: feat_chromatograms)
       {
-        for (size_t j = 0; j < feat_chromatograms[i].size(); ++j)
+        for (const auto& feat_chromatogram : vect_feat_chromatogram)
         {
-          rawDataHandler_IO.getExperiment().addChromatogram(feat_chromatograms[i][j]);
+          rawDataHandler_IO.getExperiment().addChromatogram(feat_chromatogram);
         }
       }
     }
@@ -2639,15 +2664,15 @@ namespace SmartPeak
     if (!feat_map.empty())
     {
       std::set<OpenMS::IonSource::Polarity> pols;
-      for (size_t i = 0; i < ms_peakmap.size(); ++i)
+      for (const auto &peakmap: ms_peakmap)
       {
-        pols.insert(ms_peakmap[i].getInstrumentSettings().getPolarity());
+        pols.insert(peakmap.getInstrumentSettings().getPolarity());
       }
       // concat to single string
       OpenMS::StringList sl_pols;
-      for (std::set<OpenMS::IonSource::Polarity>::const_iterator it = pols.begin(); it != pols.end(); ++it)
+      for (const auto& pol : pols)
       {
-        sl_pols.push_back(OpenMS::String(OpenMS::IonSource::NamesOfPolarity[*it]));
+        sl_pols.push_back(OpenMS::String(OpenMS::IonSource::NamesOfPolarity[pol]));
       }
       feat_map[0].setMetaValue("scan_polarity", OpenMS::ListUtils::concatenate(sl_pols, ";"));
     }
