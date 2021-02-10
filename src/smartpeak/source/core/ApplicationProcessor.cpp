@@ -1,3 +1,26 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
+
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
@@ -18,6 +41,8 @@
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <SmartPeak/core/SharedProcessors.h>
+#include <SmartPeak/io/CSVWriter.h>
+#include <SmartPeak/io/csv.h>
 
 namespace SmartPeak
 {
@@ -31,17 +56,17 @@ namespace SmartPeak
 
     LOGN << "\n\n"
       "The following list of file was searched for:\n";
-    std::vector<InputDataValidation::FilenameInfo> is_valid(10);
-    is_valid[0] = InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence");
-    is_valid[1] = InputDataValidation::isValidFilename(f.parameters_csv_i, "parameters");
-    is_valid[2] = InputDataValidation::isValidFilename(f.traML_csv_i, "traml");
-    is_valid[3] = InputDataValidation::isValidFilename(f.featureFilterComponents_csv_i, "featureFilter");
-    is_valid[4] = InputDataValidation::isValidFilename(f.featureFilterComponentGroups_csv_i, "featureFilterGroups");
-    is_valid[5] = InputDataValidation::isValidFilename(f.featureQCComponents_csv_i, "featureQC");
-    is_valid[6] = InputDataValidation::isValidFilename(f.featureQCComponentGroups_csv_i, "featureQCGroups");
-    is_valid[7] = InputDataValidation::isValidFilename(f.quantitationMethods_csv_i, "quantitationMethods");
-    is_valid[8] = InputDataValidation::isValidFilename(f.standardsConcentrations_csv_i, "standardsConcentrations");
-    is_valid[9] = InputDataValidation::isValidFilename(f.referenceData_csv_i, "referenceData");
+    std::vector<InputDataValidation::FilenameInfo> is_valid;
+    is_valid.push_back(InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.parameters_csv_i, "parameters"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.traML_csv_i, "traml"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponents_csv_i, "featureFilter"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponentGroups_csv_i, "featureFilterGroups"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponents_csv_i, "featureQC"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponentGroups_csv_i, "featureQCGroups"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.quantitationMethods_csv_i, "quantitationMethods"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.standardsConcentrations_csv_i, "standardsConcentrations"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.referenceData_csv_i, "referenceData"));
 
     std::cout << "\n\n";
 
@@ -170,6 +195,8 @@ namespace SmartPeak
         f.standardsConcentrations_csv_i = value;
       } else if (label == "referenceData") {
         f.referenceData_csv_i = value;
+      } else if (label == "workflow") {
+        f.workflow_csv_i = value;
       } else {
         LOGE << "\n\nLabel is not valid: " << label << "\n";
         std::exit(EXIT_FAILURE);
@@ -178,6 +205,14 @@ namespace SmartPeak
   }
 
   namespace ApplicationProcessors {
+
+  ParameterSet getParameterSchema()
+  {
+    ParameterSet parameter_set;
+    parameter_set.merge(ProcessSequence::getParameterSchema());
+    return parameter_set;
+  }
+
   void processCommands(ApplicationHandler& state, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names)
   {
     size_t i = 0;
@@ -628,19 +663,18 @@ namespace SmartPeak
 
   bool BuildCommandsFromNames::process()
   {
+    bool success = true;
     commands_.clear();
-
-    std::istringstream iss {names_};
-
-    for (std::string n; iss >> n;) {
-      CreateCommand createCommand(application_handler_);
-      createCommand.name_ = n;
-      const bool created = createCommand.process();
-      if (created) {
+    CreateCommand createCommand(application_handler_);
+    for (const auto& command_name : names_) {
+      createCommand.name_ = command_name;
+      bool commands_created = createCommand.process();
+      success &= commands_created;
+      if (commands_created) {
         commands_.push_back(createCommand.cmd_);
-      }
+      } // if not, no need to log. createCommand already logs an error.
     }
-    return true;
+    return success;
   }
 
   bool SetRawDataPathname::process()
@@ -658,6 +692,22 @@ namespace SmartPeak
   bool SetOutputFeaturesPathname::process()
   {
     application_handler_.features_out_dir_ = pathname_;
+    return true;
+  }
+
+  bool LoadSequenceWorkflow::process()
+  {
+    LoadWorkflow load_workflow(application_handler_.sequenceHandler_);
+    load_workflow.filename_ = pathname_;
+    load_workflow.process();
+    return true;
+  }
+
+  bool StoreSequenceWorkflow::process()
+  {
+    StoreWorkflow store_workflow(application_handler_.sequenceHandler_);
+    store_workflow.filename_ = pathname_;
+    store_workflow.process();
     return true;
   }
 }

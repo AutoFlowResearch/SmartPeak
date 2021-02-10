@@ -1,3 +1,26 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
+
 #pragma once
 
 #include <SmartPeak/core/SequenceHandler.h>
@@ -25,7 +48,7 @@ namespace SmartPeak
     void setTransitionsTable(const SequenceHandler& sequence_handler); ///< set the TransitionsTable-specific data
     void setSpectrumTable(const SequenceHandler& sequence_handler); ///< set the SpectrumTable-specific data
     void setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands); ///< set the WorkflowTable-specific data
-    void setParametersTable(const SequenceHandler& sequence_handler); ///< set the ParametersTable-specific data
+    void setParametersTable(const SequenceHandler& sequence_handler, const std::vector<ApplicationHandler::Command>& commands); ///< set the ParametersTable-specific data
     void setQuantMethodTable(const SequenceHandler& sequence_handler); ///< set the QuantMethodTable-specific data
     void setStdsConcsTable(const SequenceHandler& sequence_handler); ///< set the StdsConcsTable-specific data
     void setComponentFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentFiltersTable-specific data
@@ -61,21 +84,58 @@ namespace SmartPeak
     */
     void setFeatureMatrix(const SequenceHandler& sequence_handler);
     /*
-    @brief Sets the chromatogram data
-
-    @param[in] sequence_handler
-
-    @returns true if all points were added and false if points were omitted due to performance
+    @brief Scatter Plot structure, result of getChromatogramScatterPlot and getSpectrumScatterPlot
     */
-    bool setChromatogramScatterPlot(const SequenceHandler& sequence_handler);
+    struct ScatterPlotData
+    {
+      std::vector<std::vector<float>> x_data_area_;
+      std::vector<std::vector<float>> y_data_area_;
+      std::vector<std::vector<float>> x_data_scatter_;
+      std::vector<std::vector<float>> y_data_scatter_;
+      std::vector<std::string> series_names_area_;
+      std::vector<std::string> series_names_scatter_;
+      std::string x_axis_title_;
+      std::string y_axis_title_;
+      float x_min_ = 0.0f;
+      float x_max_ = 0.0f;
+      float y_min_ = 0.0f;
+      float y_max_ = 0.0f;
+    };
+
     /*
-    @brief Sets the spectrum data
+    @brief Gets the chromatogram data
 
     @param[in] sequence_handler
+    @param[out] result
+    @param[in] range
+    @param[in] sample_names
+    @param[in] component_names
 
     @returns true if all points were added and false if points were omitted due to performance
     */
-    bool setSpectrumScatterPlot(const SequenceHandler& sequence_handler);
+    bool getChromatogramScatterPlot(const SequenceHandler& sequence_handler, 
+                                    ScatterPlotData& result,
+                                    const std::pair<float, float>& range,
+                                    const std::set<std::string>& sample_names,
+                                    const std::set<std::string>& component_names);
+    /*
+    @brief Gets the spectrum data
+
+    @param[in] sequence_handler
+    @param[in] result
+    @param[in] range
+    @param[in] sample_names
+    @param[in] scan_names
+    @param[in] component_group_names
+
+    @returns true if all points were added and false if points were omitted due to performance
+    */
+    bool getSpectrumScatterPlot(const SequenceHandler& sequence_handler,
+                                ScatterPlotData& result,
+                                const std::pair<float, float>& range,
+                                const std::set<std::string>& sample_names,
+                                const std::set<std::string>& scan_names,
+                                const std::set<std::string>& component_group_names);
     void setFeatureLinePlot();
     void setFeatureHeatMap();
     /*
@@ -229,22 +289,6 @@ namespace SmartPeak
     Eigen::Tensor<std::string, 1> feature_pivot_table_headers;
     Eigen::Tensor<std::string, 2> feature_pivot_table_rows;
     Eigen::Tensor<std::string, 2> feature_pivot_table_body;
-    // data for the chromatogram scatter plot
-    std::vector<std::vector<float>> chrom_time_hull_data, chrom_intensity_hull_data;
-    std::vector<std::vector<float>> chrom_time_raw_data, chrom_intensity_raw_data;
-    std::vector<std::string> chrom_series_hull_names,chrom_series_raw_names;
-    std::string chrom_x_axis_title;
-    std::string chrom_y_axis_title;
-    float chrom_time_min, chrom_time_max, chrom_intensity_min, chrom_intensity_max;
-    std::pair<float, float> chrom_time_range = std::make_pair(0, 1800);
-    // data for the spectrum scatter plot
-    std::vector<std::vector<float>> spec_mz_hull_data, spec_intensity_hull_data;
-    std::vector<std::vector<float>> spec_mz_raw_data, spec_intensity_raw_data;
-    std::vector<std::string> spec_series_hull_names, spec_series_raw_names;
-    std::string spec_x_axis_title;
-    std::string spec_y_axis_title;
-    float spec_mz_min, spec_mz_max, spec_intensity_min, spec_intensity_max;
-    std::pair<float, float> spec_mz_range = std::make_pair(0, 2000);
     // data for the feature line plot
     Eigen::Tensor<float, 2> feat_sample_data, feat_value_data;
     Eigen::Tensor<std::string, 1> feat_line_series_names;
@@ -264,8 +308,6 @@ namespace SmartPeak
     std::string calibrators_y_axis_title;
     float calibrators_conc_min , calibrators_conc_max, calibrators_feature_min, calibrators_feature_max;
   private:
-    std::set<std::string> chrom_series_hull_names_;
-    std::set<std::string> spec_series_hull_names_;
     int feature_table_unique_samples_transitions_ = 0; // used to decide when to update the feature table data
     int feature_matrix_unique_transitions_ = 0; // used to decide when to update the feature matrix data
   };

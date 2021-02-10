@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/test_config.h>
 #define BOOST_TEST_MODULE SessionHandler test suite
@@ -42,9 +63,9 @@ struct TestData {
     }
     // Load the raw data
     if (load_raw_data) {
-      std::map<std::string, std::vector<std::map<std::string, std::string>>> params;
-      params.emplace("mzML", std::vector<std::map<std::string, std::string>>());
-      params.emplace("ChromatogramExtractor", std::vector<std::map<std::string, std::string>>());
+      ParameterSet params;
+      params.addFunctionParameters(FunctionParameters("mzML"));
+      params.addFunctionParameters(FunctionParameters("ChromatogramExtractor"));
       LoadRawData loadRawData;
       for (auto& injection : sequenceHandler.getSequence()) {
         Filenames filenames_ = Filenames::getDefaultDynamicFilenames(
@@ -171,14 +192,61 @@ BOOST_AUTO_TEST_CASE(setParametersTable1)
 {
   TestData testData;
   SessionHandler session_handler; 
-  session_handler.setParametersTable(testData.sequenceHandler);
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers.size(), 4);
+  session_handler.setParametersTable(testData.sequenceHandler, {});
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers.size(), 9);
   BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(0), "function");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(session_handler.parameters_table_headers.size() - 1), "value");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body.dimension(0), 106);
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body.dimension(1), 4);
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(1), "name");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(2), "type");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(3), "value");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(4), "description");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(5), "status");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(6), "valid");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(7), "restrictions");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(8), "schema_type");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body.dimension(0), 107);
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body.dimension(1), 9);
   BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 0), "AbsoluteQuantitation");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(session_handler.parameters_table_body.dimension(0) - 1, session_handler.parameters_table_body.dimension(1) - 1), "TRUE");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 1), "min_points");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 2), "int");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 3), "4");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 4), "The minimum number of calibrator points.");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 5), "unused");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 6), "true");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 7), "");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 8), "int");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 0), "SequenceProcessor");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 1), "n_thread");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 2), "int");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 3), "6");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 4), "number of working threads");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 5), "default");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 6), "true");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 7), "min:1");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 8), "int");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(session_handler.parameters_table_body.dimension(0) - 1, 3), "true");
+}
+
+BOOST_AUTO_TEST_CASE(setParametersTable2)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  ParameterSet& user_param = testData.sequenceHandler.getSequence().at(0).getRawData().getParameters();
+  std::map<std::string, std::string> param_struct =
+    {
+      {"name", "n_thread"},
+      {"type", "int"},
+    };
+  auto param = Parameter(param_struct);
+  user_param.at("SequenceProcessor").addParameter(param);
+  auto modified_param = user_param.findParameter("SequenceProcessor", "n_thread");
+  modified_param->setValueFromString("-1");
+  session_handler.setParametersTable(testData.sequenceHandler, {});
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 0), "SequenceProcessor");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 1), "n_thread");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 3), "-1");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 5), "user_override");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 6), "false");
+  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 7), "min:1");
 }
 
 BOOST_AUTO_TEST_CASE(setQuantMethodTable1)
@@ -392,7 +460,7 @@ BOOST_AUTO_TEST_CASE(setComponentRSDEstimationsTable1)
 {
   TestData testData;
   testData.changeSampleType(SampleType::QC);
-  const map<string, vector<map<string, string>>> params;
+  const ParameterSet params;
   Filenames filenames_;
   EstimateFeatureRSDs processor;
   processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
@@ -412,7 +480,7 @@ BOOST_AUTO_TEST_CASE(setComponentGroupRSDEstimationsTable1)
 {
   TestData testData;
   testData.changeSampleType(SampleType::QC);
-  const map<string, vector<map<string, string>>> params;
+  const ParameterSet params;
   Filenames filenames_;
   EstimateFeatureRSDs processor;
   processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
@@ -432,7 +500,7 @@ BOOST_AUTO_TEST_CASE(setComponentBackgroundEstimationsTable1)
 {
   TestData testData;
   testData.changeSampleType(SampleType::Blank);
-  const map<string, vector<map<string, string>>> params;
+  const ParameterSet params;
   Filenames filenames_;
   EstimateFeatureBackgroundInterferences processor;
   processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
@@ -452,7 +520,7 @@ BOOST_AUTO_TEST_CASE(setComponentGroupBackgroundEstimationsTable1)
 {
   TestData testData;
   testData.changeSampleType(SampleType::Blank);
-  const map<string, vector<map<string, string>>> params;
+  const ParameterSet params;
   Filenames filenames_;
   EstimateFeatureBackgroundInterferences processor;
   processor.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
@@ -598,7 +666,7 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK(!session_handler.getComponentGroupBackgroundQCsTableFilters()(session_handler.getComponentGroupBackgroundQCsTableFilters().dimension(0) - 1));
 
   testData.changeSampleType(SampleType::QC);
-  const map<string, vector<map<string, string>>> params;
+  const ParameterSet params;
   Filenames filenames_;
   EstimateFeatureRSDs estimateFeatureRSDs;
   estimateFeatureRSDs.process(testData.sequenceHandler.getSequenceSegments().front(), testData.sequenceHandler, params, filenames_);
@@ -654,22 +722,27 @@ BOOST_AUTO_TEST_CASE(setFeatureMatrix1)
   SessionHandler session_handler;
   session_handler.setFeatureMatrix(testData.sequenceHandler);
 }
-
-BOOST_AUTO_TEST_CASE(setChromatogramScatterPlot1)
+BOOST_AUTO_TEST_CASE(getSpectrumScatterPlot1)
 {
   TestData testData;
   SessionHandler session_handler;
-  session_handler.setChromatogramScatterPlot(testData.sequenceHandler);
+  SessionHandler::ScatterPlotData result;
+  const std::pair<float, float> range = std::make_pair(0, 1800);
+  const std::set<std::string> sample_names;
+  const std::set<std::string> component_names;
+  BOOST_CHECK(session_handler.getChromatogramScatterPlot(testData.sequenceHandler, result, range, sample_names, component_names));
 }
-
-
 BOOST_AUTO_TEST_CASE(setSpectrumScatterPlot1)
 {
   TestData testData;
   SessionHandler session_handler;
-  session_handler.setSpectrumScatterPlot(testData.sequenceHandler);
+  SessionHandler::ScatterPlotData result;
+  const std::pair<float, float> range = std::make_pair(0, 2000);
+  const std::set<std::string> sample_names;
+  const std::set<std::string> scan_names;
+  const std::set<std::string> component_group_names;
+  BOOST_CHECK(session_handler.getSpectrumScatterPlot(testData.sequenceHandler, result, range, sample_names, scan_names, component_group_names));
 }
-
 BOOST_AUTO_TEST_CASE(setCalibratorsScatterLinePlot1)
 {
   TestData testData;

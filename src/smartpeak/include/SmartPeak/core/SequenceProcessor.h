@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
 
 #pragma once
 
@@ -91,7 +112,7 @@ namespace SmartPeak
     Create a new sequence from files or wizard
   */
   struct CreateSequence : SequenceProcessor {
-    Filenames        filenames_;                    /// Pathnames to load
+    Filenames        filenames_;                   /// Pathnames to load
     std::string      delimiter          = ",";     /// String delimiter of the imported file
     bool             checkConsistency   = true;    /// Check consistency of data contained in files
 
@@ -110,6 +131,7 @@ namespace SmartPeak
 
     ProcessSequence() = default;
     ProcessSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    static ParameterSet getParameterSchema();
     void process() const override;
   };
 
@@ -138,4 +160,19 @@ namespace SmartPeak
     ProcessSampleGroups(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() const override;
   };
+
+  struct LoadWorkflow : SequenceProcessor {
+    LoadWorkflow() = default;
+    LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
+    void process() const override;
+    std::string filename_;
+  };
+
+  struct StoreWorkflow : SequenceProcessor {
+    StoreWorkflow() = default;
+    StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    void process() const override;
+    std::string filename_;
+  };
+
 }

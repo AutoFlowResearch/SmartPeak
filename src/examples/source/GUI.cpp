@@ -8,8 +8,13 @@
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/SessionHandler.h>
+#include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/ui/GuiAppender.h>
+#include <SmartPeak/ui/Heatmap2DWidget.h>
+#include <SmartPeak/ui/CalibratorsPlotWidget.h>
+#include <SmartPeak/ui/ChromatogramPlotWidget.h>
+#include <SmartPeak/ui/SpectraPlotWidget.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
@@ -37,8 +42,8 @@ void initializeDataDir(
   const std::string& default_dir
 );
 
-int main(int argc, char **argv)
-  // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
+int main(int argc, char** argv)
+// `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
   bool show_top_window_ = false;
   bool show_bottom_window_ = false;
@@ -96,6 +101,14 @@ int main(int argc, char **argv)
   bool show_feature_heatmap_plot = false; // injection vs. feature for a particular metavalue
   bool show_calibrators_line_plot = false; // peak area/height ratio vs. concentration ratio
 
+  // Chromatogram display option
+  bool chromatogram_initialized = false;
+  std::unique_ptr<ChromatogramPlotWidget> chromatogram_plot_widget;
+
+  // Spectra display option
+  bool spectra_initialized = false;
+  std::unique_ptr<SpectraPlotWidget> spectra_plot_widget;
+
   // Popup modals
   bool popup_about_ = false;
   bool popup_run_workflow_ = false;
@@ -113,13 +126,29 @@ int main(int argc, char **argv)
   Workflow   workflow_;
   report_.setApplicationHandler(application_handler_);
   workflow_.setApplicationHandler(application_handler_);
+
+  // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   char filename[128];
   strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
 
+  auto logfilepath = std::string{};
+  auto logdirpath = std::string{};
+  auto logdir_created = false;
+  auto error_msg = std::string{};
+  try
+  {
+    std::tie(logfilepath, logdir_created) = Utilities::getLogFilepath(filename);
+    logdirpath = fs::path(logfilepath).parent_path().string();
+  }
+  catch (const std::runtime_error& re)
+  {
+    error_msg = re.what();
+  }
+
   // Add .csv appender: 32 MiB per file, max. 100 log files
   plog::RollingFileAppender<plog::CsvFormatter>
-    fileAppender(filename, 1024 * 1024 * 32, 100);
+    fileAppender(logfilepath.c_str(), 1024 * 1024 * 32, 100);
 
   // Add console appender, instead of only the file one
   plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
@@ -129,7 +158,16 @@ int main(int argc, char **argv)
     .addAppender(&consoleAppender)
     .addAppender(&appender_);
 
-  LOGN << "Log file at: " << filename;
+  if (error_msg.empty())
+  {
+    if (logdir_created) LOG_DEBUG << "Log directory created: " << logdirpath;
+    LOG_INFO << "Log file at: " << logfilepath;
+  }
+  else
+  {
+    // In this case it will only use console appender
+    LOG_WARNING << error_msg;
+  }
 
   // Setup SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0)
@@ -304,22 +342,29 @@ int main(int argc, char **argv)
         for (const std::string& pathname : {application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_}) {
           fs::create_directories(fs::path(pathname));
         }
-        for (ApplicationHandler::Command& cmd : application_handler_.commands_)
-        {
-          for (std::pair<const std::string, Filenames>& p : cmd.dynamic_filenames)
+        BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+        buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
+        if (!buildCommandsFromNames.process()) {
+          LOGE << "Failed to create Commands, aborting.";
+        } 
+        else {
+          for (auto& cmd : buildCommandsFromNames.commands_)
           {
-            Filenames::updateDefaultDynamicFilenames(
-              application_handler_.mzML_dir_,
-              application_handler_.features_in_dir_,
-              application_handler_.features_out_dir_,
-              p.second
-            );
+            for (auto& p : cmd.dynamic_filenames)
+            {
+              Filenames::updateDefaultDynamicFilenames(
+                application_handler_.mzML_dir_,
+                application_handler_.features_in_dir_,
+                application_handler_.features_out_dir_,
+                p.second
+              );
+            }
           }
+          const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
+          const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
+          const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
+          manager_.addWorkflow(application_handler_, injection_names, sequence_segment_names, sample_group_names, buildCommandsFromNames.commands_);
         }
-        const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
-        const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
-        const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
-        manager_.addWorkflow(application_handler_, injection_names, sequence_segment_names, sample_group_names);
         ImGui::CloseCurrentPopup();
       }
       ImGui::SameLine();
@@ -350,10 +395,6 @@ int main(int argc, char **argv)
     if (report_.draw_)
     {
       report_.draw();
-    }
-    if (workflow_.draw_)
-    {
-      workflow_.draw();
     }
     if (ImGui::BeginMainMenuBar())
     {
@@ -393,6 +434,12 @@ int main(int argc, char **argv)
           }
           if (ImGui::MenuItem("Parameters")) {
             static LoadSequenceParameters processor(application_handler_);
+            file_picker_.setProcessor(processor);
+            popup_file_picker_ = true;
+            update_session_cache_ = true;
+          }
+          if (ImGui::MenuItem("Workflow")) {
+            static LoadSequenceWorkflow processor(application_handler_);
             file_picker_.setProcessor(processor);
             popup_file_picker_ = true;
             update_session_cache_ = true;
@@ -495,6 +542,11 @@ int main(int argc, char **argv)
           //if (ImGui::MenuItem("Transitions")) {} // TODO: updated transitions file
           //if (ImGui::MenuItem("Parameters")) {} // TODO: updated parameters file
           //if (ImGui::MenuItem("Standards Conc")) {} // TODO: updated standards concentration file
+          if (ImGui::MenuItem("Workflow")) {
+            static StoreSequenceWorkflow processor(application_handler_);
+            file_picker_.setProcessor(processor);
+            popup_file_picker_ = true;
+          }
           if (ImGui::MenuItem("Sequence Analyst")) {
             static StoreSequenceFileAnalyst processor(application_handler_);
             processor.process();
@@ -521,11 +573,6 @@ int main(int argc, char **argv)
         if (ImGui::MenuItem("Plots", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Explorer", NULL, false, false)) {} // TODO: modal of settings
         if (ImGui::MenuItem("Parameters", NULL, false, false)) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_))
-        {
-          initializeDataDirs(application_handler_);
-          workflow_.draw_ = true;
-        }
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("View"))
@@ -582,7 +629,7 @@ int main(int argc, char **argv)
       {
         if (ImGui::MenuItem("Run workflow"))
         {
-          if (application_handler_.commands_.empty())
+          if (application_handler_.sequenceHandler_.getWorkflow().empty())
           {
             LOGW << "Workflow has no steps to run. Please set the workflow's steps.";
           }
@@ -645,7 +692,6 @@ int main(int argc, char **argv)
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags left_window_flags =
         ImGuiWindowFlags_NoTitleBar |
-        ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoFocusOnAppearing;
@@ -692,6 +738,8 @@ int main(int argc, char **argv)
         }
         ImGui::EndTabBar();
       }
+      win_size_and_pos.setLeftWindowXSize(ImGui::GetWindowWidth());
+      win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
       ImGui::End();
       ImGui::PopStyleVar();
     }
@@ -704,7 +752,6 @@ int main(int argc, char **argv)
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       const ImGuiWindowFlags top_window_flags =
         ImGuiWindowFlags_NoTitleBar |
-        ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoCollapse |
         ImGuiWindowFlags_NoFocusOnAppearing;
@@ -737,15 +784,16 @@ int main(int argc, char **argv)
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
-          session_handler_.setWorkflowTable(workflow_.getCommands());
-          GenericTableWidget Table(session_handler_.workflow_table_headers, session_handler_.workflow_table_body, Eigen::Tensor<bool, 1>(), "WorkflowMainWindow");
-          Table.draw();
+          workflow_.draw();
           ImGui::EndTabItem();
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
         {
-          session_handler_.setParametersTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.parameters_table_headers, session_handler_.parameters_table_body, Eigen::Tensor<bool, 1>(), "ParametersMainWindow");
+          BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+          buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
+          buildCommandsFromNames.process();
+          session_handler_.setParametersTable(application_handler_.sequenceHandler_, buildCommandsFromNames.commands_);
+          ParametersTableWidget Table(session_handler_.parameters_table_headers, session_handler_.parameters_table_body, Eigen::Tensor<bool, 1>(), "ParametersMainWindow");
           Table.draw();
           ImGui::EndTabItem();
         }
@@ -928,38 +976,54 @@ int main(int argc, char **argv)
         }
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
         {
-          // Filter for the position
-          const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_Logarithmic;
-          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          ImGui::SliderFloat("min time (sec)", &session_handler_.chrom_time_range.first, 0.0f, session_handler_.chrom_time_range.second, "%.4f", slider_flags);
-          ImGui::SliderFloat("max time (sec)", &session_handler_.chrom_time_range.second, session_handler_.chrom_time_range.first, 2000.0f, "%.4f", slider_flags);
-
+          if (!chromatogram_plot_widget)
+          {
+            chromatogram_plot_widget = std::make_unique<ChromatogramPlotWidget>(
+              session_handler_, 
+              application_handler_.sequenceHandler_,
+              "Chromatograms Main Window");
+          }
+          chromatogram_plot_widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
+          if (!workflow_is_done_)
+          {
+            chromatogram_initialized = false;
+          }
+          else // workflow_is_done_
+          {
+            if (!chromatogram_initialized)
+            {
+              chromatogram_plot_widget->setRefreshNeeded();
+              chromatogram_initialized = true;
+            }
+          }
           // The actual plot
-          exceeding_plot_points_ = !session_handler_.setChromatogramScatterPlot(application_handler_.sequenceHandler_);
-          ChromatogramPlotWidget plot2d(session_handler_.chrom_time_raw_data, session_handler_.chrom_intensity_raw_data, session_handler_.chrom_series_raw_names,
-            session_handler_.chrom_time_hull_data, session_handler_.chrom_intensity_hull_data, session_handler_.chrom_series_hull_names,
-            session_handler_.chrom_x_axis_title, session_handler_.chrom_y_axis_title,
-            session_handler_.chrom_time_min, session_handler_.chrom_time_max, session_handler_.chrom_intensity_min, session_handler_.chrom_intensity_max,
-            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_ - 20, "Chromatograms Main Window");
-          plot2d.draw();
+          chromatogram_plot_widget->draw();
           ImGui::EndTabItem();
         }
         if (show_spectra_line_plot && ImGui::BeginTabItem("Spectra", &show_spectra_line_plot))
         {
-          // Filter for the position
-          const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_Logarithmic;
-          session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          ImGui::SliderFloat("min m/z (Da)", &session_handler_.spec_mz_range.first, 0.0f, session_handler_.spec_mz_range.second, "%.4f", slider_flags);
-          ImGui::SliderFloat("max m/z (Da)", &session_handler_.spec_mz_range.second, session_handler_.spec_mz_range.first, 2000.0f, "%.4f", slider_flags);
-
+          if (!spectra_plot_widget)
+          {
+            spectra_plot_widget = std::make_unique<SpectraPlotWidget>(
+              session_handler_,
+              application_handler_.sequenceHandler_,
+              "Spectra Main Window");
+          }
+          spectra_plot_widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
+          if (!workflow_is_done_)
+          {
+            spectra_initialized = false;
+          }
+          else // workflow_is_done_
+          {
+            if (!spectra_initialized)
+            {
+              spectra_plot_widget->setRefreshNeeded();
+              spectra_initialized = true;
+            }
+          }
           // The actual plot
-          exceeding_plot_points_ = !session_handler_.setSpectrumScatterPlot(application_handler_.sequenceHandler_);
-          ChromatogramPlotWidget plot2d(session_handler_.spec_mz_raw_data, session_handler_.spec_intensity_raw_data, session_handler_.spec_series_raw_names,
-            session_handler_.spec_mz_hull_data, session_handler_.spec_intensity_hull_data, session_handler_.spec_series_hull_names,
-            session_handler_.spec_x_axis_title, session_handler_.spec_y_axis_title,
-            session_handler_.spec_mz_min, session_handler_.spec_mz_max, session_handler_.spec_intensity_min, session_handler_.spec_intensity_max,
-            win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_ - 20, "Spectra Main Window");
-          plot2d.draw();
+          spectra_plot_widget->draw();
           ImGui::EndTabItem();
         }
         if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
@@ -999,6 +1063,9 @@ int main(int argc, char **argv)
         }
         ImGui::EndTabBar();
       }
+      win_size_and_pos.setTopWindowYSize(ImGui::GetWindowHeight());
+      win_size_and_pos.setLeftWindowXSize(ImGui::GetWindowPos().x);
+      win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
       ImGui::End();
       ImGui::PopStyleVar();
     }

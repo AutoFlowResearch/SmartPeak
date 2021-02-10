@@ -1,3 +1,26 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
+
 #pragma once
 
 #include <SmartPeak/core/ApplicationHandler.h>
@@ -25,6 +48,7 @@ namespace SmartPeak
   };
 
   namespace ApplicationProcessors {
+    ParameterSet getParameterSchema();
     void processCommands(ApplicationHandler& application_handler, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names);
   }
 
@@ -39,7 +63,7 @@ namespace SmartPeak
   struct BuildCommandsFromNames : ApplicationProcessor {
     BuildCommandsFromNames(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
     bool process() override;
-    std::string names_;
+    std::vector<std::string> names_;
     std::vector<ApplicationHandler::Command> commands_;
     const std::string getName() const override { return "BuildCommandsFromNames"; };
   };
@@ -198,5 +222,19 @@ namespace SmartPeak
     SetOutputFeaturesPathname(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
     bool process() override;
     const std::string getName() const override { return "SetOutputFeaturesPathname"; };
+  };
+
+  struct LoadSequenceWorkflow : FilePickerProcessor {
+    LoadSequenceWorkflow(ApplicationHandler& application_handler) : 
+      FilePickerProcessor(application_handler) {}
+    bool process() override;
+    const std::string getName() const override { return "LoadSequenceWorkflow"; };
+  };
+
+  struct StoreSequenceWorkflow : FilePickerProcessor {
+    StoreSequenceWorkflow(ApplicationHandler& application_handler) :
+      FilePickerProcessor(application_handler) {}
+    bool process() override;
+    const std::string getName() const override { return "StoreSequenceWorkflow"; };
   };
 }

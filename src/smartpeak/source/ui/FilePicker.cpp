@@ -1,3 +1,26 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
+
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/Utilities.h>
@@ -163,7 +186,7 @@ namespace SmartPeak
     static const char* extensions[] = { "All", "csv", "featureXML", "mzML" };
     ImGui::Combo("File type", &selected_extension, extensions, IM_ARRAYSIZE(extensions));
 
-    ImGui::BeginChild("ImDirectoryEntry", ImVec2(1024, 400));
+    ImGui::BeginChild("Content", ImVec2(1024, 400));
     
     const int column_count = 4;
     const char* column_names[column_count] = { "Name", "Size [bytes]", "Type", "Date Modified" };
@@ -242,7 +265,7 @@ namespace SmartPeak
             selected_entry = row;
             std::strcpy(selected_filename, Im_directory_entries[selected_entry].Name);
             if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item->Type , "Directory") )
-            { // TODO:double-click to open file
+            {
               if (current_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
               {
                 current_pathname_.append("/");
@@ -255,6 +278,24 @@ namespace SmartPeak
               filter.Clear();
               selected_entry = -1;
               break; // IMPORTANT: because the following lines in the loop assume accessing old/previous pathname_content_'s data
+            }
+            else if (ImGui::IsMouseDoubleClicked(0))
+            {
+              picked_pathname_ = current_pathname_;
+              if (selected_entry >= 0)
+              {
+                if (picked_pathname_.back() != '/')
+                {
+                  picked_pathname_.append("/");
+                }
+                picked_pathname_.append(pathname_content_[0][selected_entry]);
+              }
+              filter.Clear();
+              selected_entry = -1;
+              runProcessor();
+              clearProcessor();
+              LOGI << "Picked pathname: " << picked_pathname_;
+              ImGui::CloseCurrentPopup();
             }
           }
         }
@@ -284,6 +325,7 @@ namespace SmartPeak
         }
         picked_pathname_.append(pathname_content_[0][selected_entry]); //TODO:sanity check
       }
+      picked_pathname_.append(selected_filename);
       LOGI << "Picked pathname: " << picked_pathname_;
       runProcessor();
       clearProcessor();

@@ -1,5 +1,27 @@
-#include <SmartPeak/core/SharedProcessors.h>
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
 
+#include <SmartPeak/core/SharedProcessors.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/core/SampleGroupProcessor.h>
@@ -26,15 +48,20 @@ namespace SmartPeak {
     {"FILTER_FEATURES_RSDS", std::make_shared<FilterFeaturesRSDs>()},
     {"CHECK_FEATURES_RSDS", std::make_shared<CheckFeaturesRSDs>()},
     {"FILTER_FEATURES_BACKGROUND_INTERFERENCES", std::make_shared<FilterFeaturesBackgroundInterferences>()},
-    {"FILTER_FEATURES_BACKGROUND_INTERFERENCES", std::make_shared<CheckFeaturesBackgroundInterferences>()},
+    {"CHECK_FEATURES_BACKGROUND_INTERFERENCES", std::make_shared<CheckFeaturesBackgroundInterferences>()},
     {"EXTRACT_SPECTRA_WINDOWS", std::make_shared<ExtractSpectraWindows>()},
     {"MERGE_SPECTRA", std::make_shared<MergeSpectra>()},
     {"PICK_MS1_FEATURES", std::make_shared<PickMS1Features>()},
     {"SEARCH_ACCURATE_MASS", std::make_shared<SearchAccurateMass>()},
+    {"MERGE_FEATURES", std::make_shared<MergeFeatures>()},
     {"LOAD_ANNOTATIONS", std::make_shared<LoadAnnotations>()},
     {"STORE_ANNOTATIONS", std::make_shared<StoreAnnotations>()},
     {"CLEAR_DATA", std::make_shared<ClearData>()},
-    {"STORE_RAW_DATA", std::make_shared<StoreRawData>()}
+    {"STORE_RAW_DATA", std::make_shared<StoreRawData>()},
+    {"CALCULATE_MDVS", std::make_shared<CalculateMDVs>()},
+    {"ISOTOPIC_CORRECTIONS", std::make_shared<IsotopicCorrections>()},
+    {"CALCULATE_MDV_ISOTOPIC_PURITIES", std::make_shared<CalculateIsotopicPurities>()},
+    {"CALCULATE_MDV_ACCURACIES", std::make_shared<CalculateMDVAccuracies>()}
   };
   const std::map<std::string, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
     {"CALCULATE_CALIBRATION", std::make_shared<CalculateCalibration>()},

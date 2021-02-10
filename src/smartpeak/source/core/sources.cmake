@@ -9,6 +9,7 @@ set(sources_list
 	Filenames.cpp
 	Helloworld.cpp
 	MetaDataHandler.cpp
+	Parameters.cpp
 	RawDataHandler.cpp
 	RawDataProcessor.cpp
 	SampleGroupHandler.cpp

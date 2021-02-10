@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/test_config.h>
 
@@ -6,6 +27,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Filenames.h>
+#include <boost/filesystem.hpp>
 
 using namespace SmartPeak;
 using namespace std;
@@ -52,7 +74,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 23);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
   BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureFilter().component_qcs.size(), 324);
@@ -74,7 +96,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleGroupName(), "Test02");
   BOOST_CHECK_EQUAL(injection5.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
   BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 23);
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
   BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureFilter().component_qcs.size(), 324);
@@ -113,9 +135,9 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
 
   // Test shared resources between all raw data handlers
-  injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name") = "modified";
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "modified");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "modified");
+  injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].setName("modified");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "modified");
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "modified");
   auto transitions = injection0.getRawData().getTargetedExperiment().getTransitions();
   transitions[0].setPeptideRef("arg-L-mod");
   injection0.getRawData().getTargetedExperiment().setTransitions(transitions);
@@ -171,7 +193,7 @@ BOOST_AUTO_TEST_CASE(processSequence)
   cs.checkConsistency = false;
   cs.process();
 
-  const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::shared_ptr<RawDataProcessor>(new LoadRawData()) };
+  const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadRawData>() };
   const RawDataHandler& rawDataHandler0 = sequenceHandler.getSequence()[0].getRawData();
   BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
 
@@ -215,10 +237,10 @@ BOOST_AUTO_TEST_CASE(processSequence)
   BOOST_CHECK_EQUAL(n_chroms, 2040); // loaded all injections
 
   // Test multi threading parameters  
-  std::map<std::string, std::vector<std::map<std::string, std::string>>> const* params;
+  ParameterSet const* params;
   params = &rawDataHandler0.getParameters();
   BOOST_CHECK_EQUAL(params->count("SequenceProcessor"), 1);
-  unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].at("value"));
+  unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].getValueAsString());
   BOOST_CHECK_EQUAL(n_threads, 4);
   
   SmartPeak::SequenceProcessorMultithread spMT1(sequenceHandler.getSequence(),
@@ -248,7 +270,7 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
   cs.process();
 
   const vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods =
-    { std::shared_ptr<SequenceSegmentProcessor>(new CalculateCalibration()) };
+    { std::make_shared<CalculateCalibration>() };
 
   std::map<std::string, Filenames> dynamic_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
@@ -381,6 +403,59 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
   BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 170, 1e-4);
 
   // TODO: Selected sample group names
+}
+
+BOOST_AUTO_TEST_CASE(StoreWorkflow1)
+{
+  SequenceHandler sequenceHandler;
+  namespace fs = boost::filesystem;
+  std::vector<std::string> command_names = {
+    "LOAD_RAW_DATA",
+    "MAP_CHROMATOGRAMS",
+    "EXTRACT_CHROMATOGRAM_WINDOWS",
+    "ZERO_CHROMATOGRAM_BASELINE",
+    "PICK_MRM_FEATURES",
+    "QUANTIFY_FEATURES",
+    "CHECK_FEATURES",
+    "SELECT_FEATURES",
+    "STORE_FEATURES"
+  };
+  sequenceHandler.setWorkflow(command_names);
+  StoreWorkflow processor(sequenceHandler);
+  processor.filename_ = (fs::temp_directory_path().append(fs::unique_path().string())).string();
+  processor.process();
+  // compare with reference file
+  const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
+  std::ifstream created_if(processor.filename_);
+  std::ifstream reference_if(reference_filename);
+  std::istream_iterator<char> created_is(created_if), created_end;
+  std::istream_iterator<char> reference_is(reference_if), reference_end;
+  BOOST_CHECK_EQUAL_COLLECTIONS(created_is, created_end, reference_is, reference_end);
+}
+
+BOOST_AUTO_TEST_CASE(LoadWorkflow1)
+{
+  SequenceHandler sequenceHandler;
+  LoadWorkflow processor(sequenceHandler);
+  processor.filename_ = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
+  processor.process();
+  const auto& commands = sequenceHandler.getWorkflow();
+  std::vector<std::string> expected_command_names = {
+    "LOAD_RAW_DATA",
+    "MAP_CHROMATOGRAMS",
+    "EXTRACT_CHROMATOGRAM_WINDOWS",
+    "ZERO_CHROMATOGRAM_BASELINE",
+    "PICK_MRM_FEATURES",
+    "QUANTIFY_FEATURES",
+    "CHECK_FEATURES",
+    "SELECT_FEATURES",
+    "STORE_FEATURES"
+  };
+  BOOST_REQUIRE(commands.size() == expected_command_names.size());
+  for (auto i = 0; i < expected_command_names.size(); ++i)
+  {
+    BOOST_CHECK_EQUAL(expected_command_names[i], commands[i]);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

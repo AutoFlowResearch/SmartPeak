@@ -36,14 +36,14 @@ void test_main_LCMS_MRM_Unknown()
   filenames.parameters_csv_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/parameters.csv");
   loadParameters.process(rawDataHandler,{}, filenames);
   
-  std::map<std::string, std::vector<std::map<std::string, std::string>>>* params;
+  ParameterSet* params;
   params = &rawDataHandler.getParameters();
   assert(params->count("SequenceProcessor")==1 && "None or more 'SequenceProcessor' found");
 
   SequenceHandler sequenceHandler;
   const std::vector<std::shared_ptr<RawDataProcessor>> methods;
   SmartPeak::SequenceProcessorMultithread spMT(sequenceHandler.getSequence(), {}, methods);
-  unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].at("value"));
+  unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].getValueAsString());
   assert(spMT.getNumWorkers(n_threads)== 3 && "Defined n_threads parameter isn't 4");
 
 cout << "fm1 size: " << fm1.size() << endl;

@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/core/CastValue.h>
 
@@ -154,7 +175,32 @@ namespace SmartPeak
     return *this;
   }
 
-  bool CastValue::is_less_than(const CastValue& other, const bool case_sensitive)
+  bool CastValue::operator<(const CastValue& other) const
+  {
+    return is_less_than(other, true);
+  }
+
+  bool CastValue::operator>(const CastValue& other) const
+  {
+    return is_greater_than(other, true);
+  }
+
+  bool CastValue::operator==(const CastValue& other) const
+  {
+    return is_equal_to(other, true);
+  }
+
+  bool CastValue::operator<=(const CastValue& other) const
+  {
+    return is_less_than(other, true) || is_equal_to(other, true);
+  }
+
+  bool CastValue::operator>=(const CastValue& other) const
+  {
+    return is_greater_than(other, true) || is_equal_to(other, true);
+  }
+
+  bool CastValue::is_less_than(const CastValue& other, const bool case_sensitive) const
   {
     if (tag_ != other.tag_) {
       LOGE << "CastValue: Comparing data of different types";
@@ -183,6 +229,76 @@ namespace SmartPeak
       return i_ < other.i_;
     case Type::LONG_INT:
       return li_ < other.li_;
+    default:
+      LOGE << "Tag type cannot be compared";
+      return true;
+    }
+  }
+
+  bool CastValue::is_greater_than(const CastValue& other, const bool case_sensitive) const
+  {
+    if (tag_ != other.tag_) {
+      LOGE << "CastValue: Comparing data of different types";
+      return true;
+    }
+
+    switch (tag_) {
+    case Type::STRING:
+    {
+      if (!case_sensitive) {
+        std::string a_lowercase, b_lowercase;
+        a_lowercase.resize(s_.size());
+        b_lowercase.resize(other.s_.size());
+        std::transform(s_.begin(), s_.end(), a_lowercase.begin(), ::tolower);
+        std::transform(other.s_.begin(), other.s_.end(), b_lowercase.begin(), ::tolower);
+        return a_lowercase.compare(b_lowercase) > 0;
+      }
+      return s_.compare(other.s_) > 0;
+    }
+    case Type::UNINITIALIZED:
+    case Type::BOOL:
+      return b_ > other.b_;
+    case Type::FLOAT:
+      return f_ > other.f_;
+    case Type::INT:
+      return i_ > other.i_;
+    case Type::LONG_INT:
+      return li_ > other.li_;
+    default:
+      LOGE << "Tag type cannot be compared";
+      return true;
+    }
+  }
+
+  bool CastValue::is_equal_to(const CastValue& other, const bool case_sensitive) const
+  {
+    if (tag_ != other.tag_) {
+      LOGE << "CastValue: Comparing data of different types";
+      return false;
+    }
+
+    switch (tag_) {
+    case Type::STRING:
+    {
+      if (!case_sensitive) {
+        std::string a_lowercase, b_lowercase;
+        a_lowercase.resize(s_.size());
+        b_lowercase.resize(other.s_.size());
+        std::transform(s_.begin(), s_.end(), a_lowercase.begin(), ::tolower);
+        std::transform(other.s_.begin(), other.s_.end(), b_lowercase.begin(), ::tolower);
+        return a_lowercase.compare(b_lowercase) == 0;
+      }
+      return s_.compare(other.s_) == 0;
+    }
+    case Type::UNINITIALIZED:
+    case Type::BOOL:
+      return b_ == other.b_;
+    case Type::FLOAT:
+      return f_ == other.f_;
+    case Type::INT:
+      return i_ == other.i_;
+    case Type::LONG_INT:
+      return li_ == other.li_;
     default:
       LOGE << "Tag type cannot be compared";
       return true;

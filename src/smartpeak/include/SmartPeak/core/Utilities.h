@@ -1,8 +1,30 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
 
 #pragma once
 
 #include <SmartPeak/core/CastValue.h>
+#include <SmartPeak/core/Parameters.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 
@@ -58,7 +80,7 @@ public:
     */
     static void updateParameters(
       OpenMS::Param& Param_IO,
-      const std::vector<std::map<std::string, std::string>>& parameters_I
+      const FunctionParameters& parameters_I
     );
 
     /**
@@ -175,8 +197,8 @@ public:
     }
 
     static std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> extractSelectorParameters(
-      const std::vector<std::map<std::string, std::string>>& params,
-      const std::vector<std::map<std::string, std::string>>& score_weights
+      const FunctionParameters& params,
+      const FunctionParameters& score_weights
     );
 
     template<typename Iterator>
@@ -287,5 +309,19 @@ public:
       @returns The numbers of elements found
     */
     static size_t directorySize(const std::string& pathname);
+
+    /**
+    * @brief Constructs an absolute filepath to an application logs.
+    * 
+    * Default locations of logs:
+    *   - Windows: C:\Users\<user>\AppData\Local\SmartPeak
+    *   - Linux and MacOS: ~/.SmartPeak
+    * User can change default location and specify directory where the logs are stored by
+    * setting SMARTPEAK_LOGS env variable. If directory specified by the path doesn't exist, the function will create one.
+    * 
+    * @param[in] filename Log filename
+    * @returns The absolute path to log file and boolean flag whether the path to directory was created
+    */
+    static std::pair<std::string, bool> getLogFilepath(const std::string& filename);
   };
 }

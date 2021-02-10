@@ -1,13 +1,37 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/test_config.h>
 
 #define BOOST_TEST_MODULE Utilities test suite
 #include <boost/test/included/unit_test.hpp>
+#include <boost/filesystem.hpp>
+#include <sys/stat.h>
 #include <SmartPeak/core/Utilities.h>
 
 using namespace SmartPeak;
 using namespace std;
+namespace fs = boost::filesystem;
 
 BOOST_AUTO_TEST_SUITE(utilities)
 
@@ -101,6 +125,7 @@ BOOST_AUTO_TEST_CASE(updateParameters)
       {"tags", "tag5"}
     }
   });
+  FunctionParameters function_parameters("test", parameters);
 
   OpenMS::Param param;
   param.setValue("param1", 10);
@@ -117,7 +142,7 @@ BOOST_AUTO_TEST_CASE(updateParameters)
   param.setValue("param12", "false");
   param.setValue("param13", 44);
 
-  Utilities::updateParameters(param, parameters);
+  Utilities::updateParameters(param, function_parameters);
   BOOST_CHECK_EQUAL(static_cast<int>(param.getValue("param1")), 23);
   BOOST_CHECK_EQUAL(param.getDescription("param1"), "param1 description");
   BOOST_CHECK_EQUAL(param.hasTag("param1", "tag1"), true);
@@ -300,7 +325,7 @@ BOOST_AUTO_TEST_CASE(trimString)
 
 BOOST_AUTO_TEST_CASE(extractSelectorParameters)
 {
-  const std::vector<std::map<std::string, std::string>> params = {
+  FunctionParameters params("params", {
     { {"name", "nn_thresholds"}, {"type", "list"}, {"value", "[4,4]"} },
     { {"name", "locality_weights"}, {"type", "list"}, {"value", "[False,False,False,True]"} },
     { {"name", "select_transition_groups"}, {"type", "list"}, {"value", "[True,True,True,True]"} },
@@ -309,12 +334,12 @@ BOOST_AUTO_TEST_CASE(extractSelectorParameters)
     // { {"name", "select_highest_counts"}, {"type", "list"}, {"value", "[False,False,False,False]"} },
     { {"name", "variable_types"}, {"type", "list"}, {"value", "['integer','integer','integer','integer']"} },
     { {"name", "optimal_thresholds"}, {"type", "list"}, {"value", "[0.5,0.5,0.5,0.5]"} }
-  };
+  });
 
-  const std::vector<std::map<std::string, std::string>> score_weights = {
+  FunctionParameters score_weights("score_weights", {
     { {"name", "var_log_sn_score"}, {"type", "string"}, {"value", "lambda score: 1/score"} },
     { {"name", "peak_apices_sum"}, {"type", "string"}, {"value", "lambda score: 1/log10(score)"} }
-  };
+  });
 
   std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> v =
     Utilities::extractSelectorParameters(params, score_weights);
@@ -388,10 +413,10 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
   const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname);
 
   // number of items in the pathname, taking .gitignore into account
-  BOOST_CHECK_EQUAL(c[0].size(), 44);
-  BOOST_CHECK_EQUAL(c[1].size(), 44);
-  BOOST_CHECK_EQUAL(c[2].size(), 44);
-  BOOST_CHECK_EQUAL(c[3].size(), 44);
+  BOOST_CHECK_EQUAL(c[0].size(), 48);
+  BOOST_CHECK_EQUAL(c[1].size(), 48);
+  BOOST_CHECK_EQUAL(c[2].size(), 48);
+  BOOST_CHECK_EQUAL(c[3].size(), 48);
 
   BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_1900-01-01_000000.featureXML");
  #ifdef _WIN32
@@ -402,9 +427,9 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
  #endif
   BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
 
-  BOOST_CHECK_EQUAL(c[0][43], "workflow_csv_files");
-  BOOST_CHECK_EQUAL(c[1][43], "22"); // number of items within the folder
-  BOOST_CHECK_EQUAL(c[2][43], "Directory");
+  BOOST_CHECK_EQUAL(c[0][47], "workflow_csv_files");
+  BOOST_CHECK_EQUAL(c[1][47], "22"); // number of items within the folder
+  BOOST_CHECK_EQUAL(c[2][47], "Directory");
 }
 
 BOOST_AUTO_TEST_CASE(getParentPathname)
@@ -472,9 +497,81 @@ BOOST_AUTO_TEST_CASE(directorySize)
 {
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto& f = Utilities::directorySize;
-  BOOST_CHECK_EQUAL(f(path), 44);
+  BOOST_CHECK_EQUAL(f(path), 48);
   BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 22);
   BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
+}
+
+void set_env_var_(const std::string& name, const std::string& value)
+{
+#ifdef _WIN32
+  if (value.empty())
+    _putenv((name + "=").c_str());
+  else
+    _putenv((name + "=" + value).c_str());
+#else
+  if (value.empty())
+    unsetenv(name.c_str());
+  else
+    setenv(name.c_str(), value.c_str(), 1);
+#endif
+}
+
+BOOST_AUTO_TEST_CASE(getLogFilepath)
+{
+  auto& f = Utilities::getLogFilepath;
+  // Test default behaviour
+  // Test doesn't assume that any env variable is set
+  {
+    auto dirpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("logs") };
+    auto filepath = std::string{};
+    auto dir_created = false;
+    
+    // Only HOME is set
+    set_env_var_("SMARTPEAK_LOGS", "");
+    set_env_var_("LOCALAPPDATA", "");
+    set_env_var_("HOME", dirpath);
+    std::tie(filepath, dir_created) = f("file");
+    BOOST_CHECK(fs::exists(filepath));
+    BOOST_CHECK(fs::exists(dirpath));
+    BOOST_CHECK_MESSAGE(dir_created, "Log directory with path '" << dirpath << "' is not created");
+    fs::remove_all(dirpath);
+
+    // Only LOCALAPPDATA is set
+    set_env_var_("SMARTPEAK_LOGS", "");
+    set_env_var_("LOCALAPPDATA", dirpath);
+    set_env_var_("HOME", "");
+    std::tie(filepath, dir_created) = f("file");
+    BOOST_CHECK(fs::exists(filepath));
+    BOOST_CHECK(fs::exists(dirpath));
+    BOOST_CHECK_MESSAGE(dir_created, "Log directory with path '" << dirpath << "' is not created");
+    fs::remove_all(dirpath);
+  }
+  // All env variables unset
+  {
+    set_env_var_("SMARTPEAK_LOGS", "");
+    set_env_var_("LOCALAPPDATA", "");
+    set_env_var_("HOME", "");
+    BOOST_CHECK_THROW(f("filename"), std::runtime_error);
+  }
+  // SMARTPEAK_LOGS has higher priority
+  {
+    auto logpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("logs") };
+    auto otherpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("otherlogs") };
+    auto filepath = std::string{};
+    auto dir_created = false;
+
+    set_env_var_("SMARTPEAK_LOGS", logpath);
+    set_env_var_("LOCALAPPDATA", otherpath);
+    set_env_var_("HOME", otherpath);
+
+    std::tie(filepath, dir_created) = f("file");
+    BOOST_CHECK(fs::exists(filepath));
+    BOOST_CHECK(fs::exists(logpath));
+    BOOST_CHECK(!fs::exists(otherpath));
+    BOOST_CHECK_MESSAGE(dir_created, "Log directory with path '" << logpath << "' is not created");
+    fs::remove_all(logpath);
+  }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
