@@ -18,7 +18,7 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Ahmed Khalil, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/Widget.h>
@@ -266,7 +266,6 @@ namespace SmartPeak
     
     ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size() );
     
-    static ImVector<ImTableEntry> workflow_table_entries;
     static ImVector<ImTableEntry> sequence_table_entries;
     static ImVector<ImTableEntry> transition_table_entries;
     static ImVector<ImTableEntry> concentration_table_entries;
@@ -292,7 +291,6 @@ namespace SmartPeak
     static ImVector<ImTableEntry> component_group_background_estimations_table_entries;
     static ImVector<ImTableEntry> feature_matrix_entries;
     
-    static bool workflow_scanned;
     static bool sequence_scanned;
     static bool transitions_scanned;
     static bool concentrations_scanned;
@@ -317,11 +315,6 @@ namespace SmartPeak
     static bool component_background_estimations_scanned;
     static bool component_group_background_estimations_scanned;
     static bool feature_matrix_scanned;
-    
-    if (columns_.dimension(0) == workflow_table_entries.size())
-      workflow_scanned = true;
-    else
-      workflow_scanned = false;
         
     if (columns_.dimension(0) == sequence_table_entries.size())
       sequence_scanned = true;
@@ -442,21 +435,6 @@ namespace SmartPeak
       feature_matrix_scanned = true;
     else
       feature_matrix_scanned = false;
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "WorkflowMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      workflow_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!workflow_table_entries.empty() && workflow_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = workflow_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        workflow_scanned = true;
-      }
-    }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "SequenceMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
@@ -830,27 +808,6 @@ namespace SmartPeak
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
-            
-            if (table_id_ == "WorkflowMainWindow")
-            {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(workflow_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(workflow_table_entries[row].Headers.begin(),
-                                           workflow_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
-                continue;
-              }
-            }
-            
             if (table_id_ == "SequenceMainWindow")
             {
               bool is_to_filter;
@@ -1333,12 +1290,7 @@ namespace SmartPeak
             
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col) {
-              if (table_id_ == "WorkflowMainWindow" && workflow_scanned == true && !workflow_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", workflow_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "SequenceMainWindow" && sequence_scanned == true && !sequence_table_entries.empty())
+              if (table_id_ == "SequenceMainWindow" && sequence_scanned == true && !sequence_table_entries.empty())
               {
                 ImGui::TableSetColumnIndex(col);
                 ImGui::Text("%s", sequence_table_entries[row].Headers[col]);
@@ -1475,16 +1427,6 @@ namespace SmartPeak
       {
         const unsigned int col_idx = static_cast<unsigned int>(sorts_specs->Specs->ColumnIndex);
         
-        if (sorts_specs->SpecsDirty && workflow_scanned == true && table_id_ == "WorkflowMainWindow" &&
-            !std::all_of(workflow_table_entries.begin(), workflow_table_entries.end(),
-                         [&col_idx](ImTableEntry& entry){ return !std::strcmp(entry.Headers[col_idx], workflow_table_entries.begin()->Headers[col_idx]); }))
-        {
-          ImTableEntry::s_current_sort_specs = sorts_specs;
-          if (workflow_table_entries.Size > 1)
-              qsort(&workflow_table_entries[0], (size_t)workflow_table_entries.Size, sizeof(workflow_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
-          ImTableEntry::s_current_sort_specs = NULL;
-          sorts_specs->SpecsDirty = false;
-        }
         if (sorts_specs->SpecsDirty && sequence_scanned == true && table_id_ == "SequenceMainWindow" &&
             !std::all_of(sequence_table_entries.begin(), sequence_table_entries.end(),
                          [&col_idx](ImTableEntry& entry){ return !std::strcmp(entry.Headers[col_idx], sequence_table_entries.begin()->Headers[col_idx]); }))
