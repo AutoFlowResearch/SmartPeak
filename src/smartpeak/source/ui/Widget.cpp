@@ -228,7 +228,8 @@ namespace SmartPeak
     
     // drop-down list for search field(s)
     static int selected_col = 0;
-    const char* cols[headers_.size() + 1];
+    static std::vector<const char*> cols;
+    cols.resize(headers_.size() + 1);
     for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
       if (header_name == 0)
       {
@@ -240,7 +241,7 @@ namespace SmartPeak
       }
     }
     
-    ImGui::Combo("In Column(s)", &selected_col, cols, IM_ARRAYSIZE(cols));
+    ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size() );
     
     static ImVector<ImTableEntry> workflow_table_entries;
     static ImVector<ImTableEntry> sequence_table_entries;
@@ -249,33 +250,24 @@ namespace SmartPeak
     static ImVector<ImTableEntry> parameter_table_entries;
     static ImVector<ImTableEntry> spectrum_table_entries;
     static ImVector<ImTableEntry> quantitation_method_table_entries;
-    
     static ImVector<ImTableEntry> component_filters_table_entries;
     static ImVector<ImTableEntry> component_group_filters_table_entries;
     static ImVector<ImTableEntry> component_qcs_table_entries;
     static ImVector<ImTableEntry> component_group_qcs_table_entries;
-    
     static ImVector<ImTableEntry> features_table_entries;
-    
     static ImVector<ImTableEntry> component_rsd_filters_table_entries;
     static ImVector<ImTableEntry> component_group_rsd_filter_table_entries;
-    
     static ImVector<ImTableEntry> component_rsd_qcs_table_entries;
     static ImVector<ImTableEntry> component_group_rsd_qcs_table_entries;
-    
     static ImVector<ImTableEntry> component_background_filter_table_entries;
     static ImVector<ImTableEntry> component_group_background_filter_table_entries;
-    
     static ImVector<ImTableEntry> component_background_qcs_table_entries;
     static ImVector<ImTableEntry> component_group_background_qcs_table_entries;
-    
     static ImVector<ImTableEntry> component_rsd_estimations_table_entries;
     static ImVector<ImTableEntry> component_group_rsd_estimations_table_entries;
     static ImVector<ImTableEntry> component_background_estimations_table_entries;
     static ImVector<ImTableEntry> component_group_background_estimations_table_entries;
-    
     static ImVector<ImTableEntry> feature_matrix_entries;
-    
     
     static bool workflow_scanned;
     static bool sequence_scanned;
@@ -284,35 +276,24 @@ namespace SmartPeak
     static bool parameters_scanned;
     static bool spectrums_scanned;
     static bool quantitation_methods_scanned;
-    
     static bool component_filters_scanned;
     static bool component_group_filters_scanned;
     static bool component_qcs_scanned;
     static bool component_group_qcs_scanned;
-    
     static bool features_scanned;
-    
     static bool component_rsd_filters_scanned;
     static bool component_group_rsd_filter_scanned;
-    
     static bool component_rsd_qcs_scanned;
     static bool component_group_rsd_qcs_scanned;
-    
     static bool component_background_filter_scanned;
     static bool component_group_background_filter_scanned;
-    
     static bool component_background_qcs_scanned;
     static bool component_group_background_qcs_scanned;
-    
     static bool component_rsd_estimations_scanned;
     static bool component_group_rsd_estimations_scanned;
     static bool component_background_estimations_scanned;
     static bool component_group_background_estimations_scanned;
-    
     static bool feature_matrix_scanned;
-    
-    
-    
     
     if (columns_.dimension(0) == workflow_table_entries.size())
       workflow_scanned = true;
@@ -438,13 +419,6 @@ namespace SmartPeak
       feature_matrix_scanned = true;
     else
       feature_matrix_scanned = false;
-    
-    
-    
-    
-    
-    
-    
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "WorkflowMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
@@ -1776,7 +1750,8 @@ namespace SmartPeak
     
     // drop-down list for search field(s)
     static int selected_col = 0;
-    const char* cols[headers_.size() + 1];
+    static std::vector<const char*> cols;
+    cols.resize(headers_.size() + 1);
     for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
       if (header_name == 0)
       {
@@ -1788,7 +1763,7 @@ namespace SmartPeak
       }
     }
     
-    ImGui::Combo("In Column(s)", &selected_col, cols, IM_ARRAYSIZE(cols));
+    ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
     
     static ImVector<ImTableEntry> injection_table_entries;
     static ImVector<ImTableEntry> transition_table_entries;
