@@ -116,9 +116,6 @@ namespace SmartPeak
       return oss.str();
     }
 
-    // TODO: rename to deallocate() or similar
-    void clear();
-
     bool is_less_than(const CastValue& other, const bool case_sensitive = true) const;
     bool is_greater_than(const CastValue& other, const bool case_sensitive = true) const;
     bool is_equal_to(const CastValue& other, const bool case_sensitive = true) const;
@@ -209,10 +206,14 @@ namespace SmartPeak
     }
 
   private:
+    // TODO: rename to deallocate() or similar
+    void clear();
+
     void setData(const bool data);
     void setData(const float data);
     void setData(const int data);
     void setData(const long int data);
+    void setData(const char* data);
     void setData(const std::string& data);
     void setData(const std::vector<bool>& data);
     void setData(const std::vector<float>& data);
