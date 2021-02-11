@@ -1712,9 +1712,56 @@ namespace SmartPeak
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
       ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
-
+    
+    static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
+    static ImGuiTableColumnFlags column_any_flags = { ImGuiTableColumnFlags_NoHide };
+    
     // Columns we want to show up
-    std::vector<int> cols_to_show = { 0, 1, 2, 3, 7 };
+    static const std::vector<int> cols_to_show = { 0, 1, 2, 3, 7 };
+    
+    static ImGuiTextFilter filter;
+    filter.Draw("Find");
+
+    // drop-down list for search field(s)
+    static int selected_col = 0;
+    static std::vector<const char*> cols;
+    cols.resize(cols_to_show.size() + 1);
+    for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
+      if (header_name == 0)
+      {
+        cols[header_name] = "All";
+      }
+      else if (header_name > 0  && header_name < cols_to_show.size() + 1)
+      {
+        cols[header_name] = headers_(cols_to_show[header_name - 1]).c_str();
+      }
+    }
+    
+    ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
+    
+    static ImVector<ImTableEntry> parameter_table_entries;
+    static bool parameters_scanned;
+    
+    if (columns_.dimension(0) == parameter_table_entries.size())
+      parameters_scanned = true;
+    else
+      parameters_scanned = false;
+
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "ParametersMainWindow") {
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      parameter_table_entries.resize(columns__.dimension(0), ImTableEntry());
+      if (!parameter_table_entries.empty() && parameters_scanned == false) {
+        for (size_t row = 0; row < columns__.dimension(0); ++row) {
+          ImTableEntry& Im_table_entry = parameter_table_entries[row];
+          Im_table_entry.Headers.resize(columns__.dimension(1));
+          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
+            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
+          }
+        }
+        parameters_scanned = true;
+      }
+    }
+
 
     if (ImGui::BeginTable(table_id_.c_str(), cols_to_show.size(), table_flags)) {
 
@@ -1729,6 +1776,24 @@ namespace SmartPeak
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
+            
+            bool is_to_filter;
+            if (selected_col > 0)
+            {
+              is_to_filter = !filter.PassFilter(parameter_table_entries[row].Headers[selected_col - 1]);
+            }
+            else if (selected_col == 0) //ALL
+            {
+              is_to_filter = std::all_of(parameter_table_entries[row].Headers.begin(),
+                                         parameter_table_entries[row].Headers.end(),
+                                         [](const char* entry){return !filter.PassFilter(entry);});
+            }
+            
+            if (is_to_filter)
+            {
+              continue;
+            }
+            
             const std::string& status = columns_(row, 5);
             const std::string& valid = columns_(row, 6);
             if ((status == "user_override") || (show_unused && (status == "unused")) || (show_default && (status == "default")))
@@ -1760,10 +1825,10 @@ namespace SmartPeak
                       if (!constraints.empty())
                       {
                         ImGui::Text("Expected values:");
-                        ImGui::Text(constraints.c_str());
+                        ImGui::Text("%s", constraints.c_str());
                       }
                       ImGui::Text("Expected type:");
-                      ImGui::Text(expected_type.c_str());
+                      ImGui::Text("%s", expected_type.c_str());
                       ImGui::EndTooltip();
                     }
                   }
@@ -1786,7 +1851,7 @@ namespace SmartPeak
                   {
                     const std::string& description = columns_(row, 4);
                     ImGui::BeginTooltip();
-                    ImGui::Text(description.c_str());
+                    ImGui::Text("%s", description.c_str());
                     ImGui::EndTooltip();
                   }
                 }
