@@ -1920,57 +1920,84 @@ namespace SmartPeak
     else
       features_scanned = false;
     
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "TransitionsExplorerWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      const static Eigen::Tensor<bool,2> checkbox_columns__(checkbox_columns_);
-      transition_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!transition_table_entries.empty() && transitions_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = transition_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1) + checkbox_columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx) {
-            if (header_idx < columns__.dimension(1))
-              Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-            else if (header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1))
-              Im_table_entry.Headers[header_idx] = checkbox_columns__(row,header_idx) == true ? "true" : "false";
-          }
-        }
-        transitions_scanned = true;
-      }
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "InjectionsExplorerWindow") {
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "InjectionsExplorerWindow")
+    {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
       const static Eigen::Tensor<bool,2> checkbox_columns__(checkbox_columns_);
       injection_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!injection_table_entries.empty() && injections_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
+      if (!injection_table_entries.empty() && injections_scanned == false)
+      {
+        for (size_t row = 0; row < columns__.dimension(0); ++row)
+        {
           ImTableEntry& Im_table_entry = injection_table_entries[row];
           Im_table_entry.Headers.resize(columns__.dimension(1) + checkbox_columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx) {
+          for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx)
+          {
             if (header_idx < columns__.dimension(1))
+            {
               Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
+            }
             else if (header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1))
-              Im_table_entry.Headers[header_idx] = checkbox_columns__(row,header_idx) == true ? "true" : "false";
+            {
+              const std::size_t checkbox_idx = header_idx - static_cast<std::size_t>( checkbox_columns__.dimension(1) ) + 1;
+              Im_table_entry.Headers[header_idx] = checkbox_columns__(row, checkbox_idx) == true ? "true" : "false";
+            }
           }
         }
         injections_scanned = true;
       }
     }
     
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "FeaturesExplorerWindow") {
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "TransitionsExplorerWindow")
+    {
+      const static Eigen::Tensor<std::string,2> columns__(columns_);
+      const static Eigen::Tensor<bool,2> checkbox_columns__(checkbox_columns_);
+      transition_table_entries.resize(columns__.dimension(0), ImTableEntry());
+      if (!transition_table_entries.empty() && transitions_scanned == false)
+      {
+        for (size_t row = 0; row < columns__.dimension(0); ++row)
+        {
+          ImTableEntry& Im_table_entry = transition_table_entries[row];
+          Im_table_entry.Headers.resize(columns__.dimension(1) + checkbox_columns__.dimension(1));
+          for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx)
+          {
+            if (header_idx < columns__.dimension(1))
+            {
+              Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
+            }
+            else if (header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1))
+            {
+              const std::size_t checkbox_idx = header_idx - static_cast<std::size_t>( checkbox_columns__.dimension(1) ) ;
+              Im_table_entry.Headers[header_idx] = checkbox_columns__(row, checkbox_idx) == true ? "true" : "false";
+            }
+          }
+        }
+        transitions_scanned = true;
+      }
+    }
+    
+    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "FeaturesExplorerWindow")
+    {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
       const static Eigen::Tensor<bool,2> checkbox_columns__(checkbox_columns_);
       feature_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!feature_table_entries.empty() && features_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
+      if (!feature_table_entries.empty() && features_scanned == false)
+      {
+        for (size_t row = 0; row < columns__.dimension(0); ++row)
+        {
           ImTableEntry& Im_table_entry = feature_table_entries[row];
           Im_table_entry.Headers.resize(columns__.dimension(1) + checkbox_columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx) {
+          for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx)
+          {
             if (header_idx < columns__.dimension(1))
+            {
               Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
+            }
             else if (header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1))
-              Im_table_entry.Headers[header_idx] = checkbox_columns__(row,header_idx) == true ? "true" : "false";
+            {
+              const std::size_t checkbox_idx = header_idx - static_cast<std::size_t>( checkbox_columns__.dimension(1) ) + 1;
+              Im_table_entry.Headers[header_idx] = checkbox_columns__(row, checkbox_idx) == true ? "true" : "false";
+            }
           }
         }
         features_scanned = true;
@@ -2082,15 +2109,15 @@ namespace SmartPeak
                   is_checked = false;
                 ImGui::Checkbox(id.c_str(), &is_checked);
                 
-                if (is_checked == true && std::strcmp(injection_table_entries[row].Headers[checkbox_idx], "true"))
+                if (is_checked == true && !std::strcmp(injection_table_entries[row].Headers[checkbox_idx], "false"))
                 {
                   injection_table_entries[row].Headers[checkbox_idx] = "true";
-                  checkbox_columns_(row, checkbox_idx) = true;
+                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = true;
                 }
-                else if (is_checked == false && std::strcmp(injection_table_entries[row].Headers[checkbox_idx], "false"))
+                else if (is_checked == false && !std::strcmp(injection_table_entries[row].Headers[checkbox_idx], "true"))
                 {
                   injection_table_entries[row].Headers[checkbox_idx] = "false";
-                  checkbox_columns_(row, checkbox_idx) = false;
+                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = false;
                 }
               }
               else if (table_id_ == "TransitionsExplorerWindow" && transitions_scanned == true && !transition_table_entries.empty())
@@ -2103,15 +2130,15 @@ namespace SmartPeak
                   is_checked = false;
                 ImGui::Checkbox(id.c_str(), &is_checked);
                 
-                if (is_checked == true && std::strcmp(transition_table_entries[row].Headers[checkbox_idx], "true"))
+                if (is_checked == true && !std::strcmp(transition_table_entries[row].Headers[checkbox_idx], "false"))
                 {
                   transition_table_entries[row].Headers[checkbox_idx] = "true";
-                  checkbox_columns_(row, checkbox_idx) = true;
+                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) ) = true;
                 }
-                else if (is_checked == false && std::strcmp(transition_table_entries[row].Headers[checkbox_idx], "false"))
+                else if (is_checked == false && !std::strcmp(transition_table_entries[row].Headers[checkbox_idx], "true"))
                 {
                   transition_table_entries[row].Headers[checkbox_idx] = "false";
-                  checkbox_columns_(row, checkbox_idx) = false;
+                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) ) = false;
                 }
               }
               else if (table_id_ == "FeaturesExplorerWindow" && features_scanned == true && !feature_table_entries.empty())
@@ -2124,15 +2151,15 @@ namespace SmartPeak
                   is_checked = false;
                 ImGui::Checkbox(id.c_str(), &is_checked);
                 
-                if (is_checked == true && std::strcmp(feature_table_entries[row].Headers[checkbox_idx], "true"))
+                if (is_checked == true && !std::strcmp(feature_table_entries[row].Headers[checkbox_idx], "false"))
                 {
                   feature_table_entries[row].Headers[checkbox_idx] = "true";
-                  checkbox_columns_(row, checkbox_idx) = true;
+                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = true;
                 }
-                else if (is_checked == false && std::strcmp(feature_table_entries[row].Headers[checkbox_idx], "false"))
+                else if (is_checked == false && !std::strcmp(feature_table_entries[row].Headers[checkbox_idx], "true"))
                 {
                   feature_table_entries[row].Headers[checkbox_idx] = "false";
-                  checkbox_columns_(row, checkbox_idx) = false;
+                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = false;
                 }
               }
               ImGui::PopStyleColor();
