@@ -109,6 +109,9 @@ int main(int argc, char** argv)
   bool spectra_initialized = false;
   std::unique_ptr<SpectraPlotWidget> spectra_plot_widget;
 
+  // Parameters table
+  std::unique_ptr<ParametersTableWidget> parameters_table_widget;
+
   // Popup modals
   bool popup_about_ = false;
   bool popup_run_workflow_ = false;
@@ -789,12 +792,14 @@ int main(int argc, char** argv)
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
         {
-          BuildCommandsFromNames buildCommandsFromNames(application_handler_);
-          buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
-          buildCommandsFromNames.process();
-          session_handler_.setParametersTable(application_handler_.sequenceHandler_, buildCommandsFromNames.commands_);
-          ParametersTableWidget Table(session_handler_.parameters_table_headers, session_handler_.parameters_table_body, Eigen::Tensor<bool, 1>(), "ParametersMainWindow");
-          Table.draw();
+          if (!parameters_table_widget)
+          {
+            parameters_table_widget = std::make_unique<ParametersTableWidget>(
+              session_handler_,
+              application_handler_,
+              "ParametersMainWindow");
+          }
+          parameters_table_widget->draw();
           ImGui::EndTabItem();
         }
         if (show_quant_method_table && ImGui::BeginTabItem("Quantitation Method", &show_quant_method_table))

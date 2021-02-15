@@ -115,20 +115,18 @@ namespace SmartPeak
   class ParametersTableWidget : public Widget
   {
   public:
-    ParametersTableWidget(const Eigen::Tensor<std::string, 1>& headers, const Eigen::Tensor<std::string, 2>& columns, const Eigen::Tensor<bool, 1>& checked_rows, const std::string& table_id)
-      : headers_(headers), columns_(columns), checked_rows_(checked_rows), table_id_(table_id) {};
-    /*
-    @brief Show the table
-
-    @param[in] headers Column header names
-    @param[in,out] columns Table body or matrix
-    @param[in,out] checked_rows What rows are checked/filtered
-    */
+    ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id)
+      : session_handler_(session_handler), application_handler_(application_handler), table_id_(table_id) {};
     void draw() override;
-    const Eigen::Tensor<std::string, 1>& headers_; // keep these `const` and references so that the data is not copied on each call!
-    const Eigen::Tensor<std::string, 2>& columns_;
-    const Eigen::Tensor<bool, 1>& checked_rows_;
-    const std::string table_id_; // keep this `const` and non-reference so that the table is not built de-novo on each call!
+  protected:
+    Eigen::Tensor<std::string, 1> headers_;
+    Eigen::Tensor<std::string, 2> body_;
+    const std::string table_id_;
+  protected:
+    SessionHandler& session_handler_;
+    ApplicationHandler& application_handler_;
+    std::vector<std::string> input_command_names_;
+    ParameterSet input_user_parameters_;
   };
 
   /**

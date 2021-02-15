@@ -345,6 +345,35 @@ BOOST_AUTO_TEST_CASE(ParameterSet_addFunctionParameters)
   BOOST_CHECK(param->getType() == "string");
 }
 
+BOOST_AUTO_TEST_CASE(ParameterSet_equal)
+{
+  map<std::string, vector<map<string, string>>> param_struct1({
+  {"one_function", {
+    { {"name", "one_parameter"}, {"type", "string"}, {"value", "valid_string1"} },
+    { {"name", "another_parameter"}, {"type", "string"}, {"value", "valid_string1"} },
+  }} });
+  ParameterSet parameter_set1(param_struct1);
+
+  map<std::string, vector<map<string, string>>> param_struct2({
+  {"one_function", {
+    { {"name", "one_parameter"}, {"type", "string"}, {"value", "valid_string1"} },
+    { {"name", "another_parameter"}, {"type", "string"}, {"value", "valid_string1"} },
+  }} });
+  ParameterSet parameter_set2(param_struct2);
+
+  BOOST_CHECK_EQUAL(parameter_set1 == parameter_set2, true);
+
+  map<std::string, vector<map<string, string>>> param_struct3({
+  {"one_function", {
+    { {"name", "one_parameter"}, {"type", "string"}, {"value", "valid_string1"} },
+    { {"name", "another_parameter"}, {"type", "string"}, {"value", "valid_string1"} },
+    { {"name", "and_another_parameter"}, {"type", "string"}, {"value", "valid_string1"} },
+  }} });
+  ParameterSet parameter_set3(param_struct3);
+
+  BOOST_CHECK_EQUAL(parameter_set1 == parameter_set3, false);
+}
+
 BOOST_AUTO_TEST_CASE(ParameterSet_accessors)
 {
   map<std::string, vector<map<string, string>>> param_struct1({
@@ -513,6 +542,34 @@ BOOST_AUTO_TEST_CASE(FunctionParameter_merge)
   BOOST_CHECK_EQUAL(param->getValueAsString(), "merge_valid_string2");
   BOOST_REQUIRE(!param->getSchema());
   BOOST_REQUIRE_EQUAL(param->getDefaultValueAsString(), "merge_valid_string2");
+}
+
+BOOST_AUTO_TEST_CASE(FunctionParameter_equal)
+{
+  vector<map<string, string>> param_struct1({
+  {
+    { {"name", "parameter1"}, {"type", "string"}, {"value", "string1"} },
+    { {"name", "parameter2"}, {"type", "string"}, {"value", "string2"} },
+  } });
+  FunctionParameters function_parameter1("function", param_struct1);
+
+  vector<map<string, string>> param_struct2({
+  {
+    { {"name", "parameter1"}, {"type", "string"}, {"value", "string1"} },
+    { {"name", "parameter2"}, {"type", "string"}, {"value", "string2"} },
+  } });
+  FunctionParameters function_parameter2("function", param_struct2);
+  
+  BOOST_CHECK_EQUAL(function_parameter1 == function_parameter2, true);
+
+  vector<map<string, string>> param_struct3({
+  {
+    { {"name", "parameter1"}, {"type", "string"}, {"value", "string1"} },
+    { {"name", "parameter3"}, {"type", "string"}, {"value", "string3"} },
+  } });
+  FunctionParameters function_parameter3("function", param_struct3);
+
+  BOOST_CHECK_EQUAL(function_parameter1 == function_parameter3, false);
 }
 
 BOOST_AUTO_TEST_CASE(FunctionParameter_setAsSchema)
@@ -964,6 +1021,41 @@ BOOST_AUTO_TEST_CASE(Parameter_defaultvalue)
   schema_param_int.setAsSchema(true);
   param_int.setSchema(schema_param_int);
   BOOST_CHECK_EQUAL(param_int.getDefaultValueAsString(), "50");
+}
+
+
+BOOST_AUTO_TEST_CASE(Parameter_equal)
+{
+  Parameter param_int_1("param_int", 10);
+  Parameter param_int_2("param_int", 10);
+  BOOST_CHECK_EQUAL(param_int_1 == param_int_2, true);
+  Parameter param_int_3("param_int", 42);
+  BOOST_CHECK_EQUAL(param_int_1 == param_int_3, false);
+  Parameter param_int_4("param_different_name", 10);
+  BOOST_CHECK_EQUAL(param_int_1 == param_int_4, false);
+  Parameter param_int_5("param_int", 10);
+  param_int_5.setTags({ "tag1","tag2" });
+  BOOST_CHECK_EQUAL(param_int_1 == param_int_5, false);
+  param_int_1.setDescription("description");
+  BOOST_CHECK_EQUAL(param_int_1 == param_int_2, false);
+  param_int_2.setDescription("description");
+  BOOST_CHECK_EQUAL(param_int_1 == param_int_2, true);
+  auto c_min = std::make_shared<CastValue>(5);
+  auto c_max = std::make_shared<CastValue>(25);
+  param_int_1.setConstraintsMinMax(c_min, c_max);
+  BOOST_CHECK_EQUAL(param_int_1 == param_int_2, false);
+  param_int_2.setConstraintsMinMax(c_min, c_max);
+  BOOST_CHECK_EQUAL(param_int_1 == param_int_2, true);
+
+  std::vector<int> list_int_1{ 1, 2, 3 };
+  Parameter param_list_int_1("param_list_int_1", list_int_1);
+  std::vector<int> list_int_2{ 1, 2, 3 };
+  Parameter param_list_int_2("param_list_int_1", list_int_2);
+  BOOST_CHECK_EQUAL(param_list_int_1 == param_list_int_2, true);
+  std::vector<int> list_int_3{ 1, 2, 3 };
+  Parameter param_list_int_3("param_list_int_1", list_int_3);
+  BOOST_CHECK_EQUAL(param_list_int_1 == param_list_int_3, true);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

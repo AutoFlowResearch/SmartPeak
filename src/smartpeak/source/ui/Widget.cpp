@@ -22,6 +22,7 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/core/ApplicationProcessor.h> // Parameter table needs to build commands, to get Schema
 #include <algorithm>
 #include <map>
 #include <string>
@@ -175,9 +176,20 @@ namespace SmartPeak
 
   void ParametersTableWidget::draw()
   {
-    if (headers_.size() <= 0)
+    if (application_handler_.sequenceHandler_.getSequence().size() == 0) {
       return;
-
+    }
+    std::vector<std::string> command_names = application_handler_.sequenceHandler_.getWorkflow();
+    ParameterSet user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+    if ((command_names != input_command_names_) || (user_parameters != input_user_parameters_))
+    {
+      BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+      buildCommandsFromNames.names_ = command_names;
+      buildCommandsFromNames.process(); 
+      session_handler_.getParametersTable(user_parameters, buildCommandsFromNames.commands_, headers_, body_);
+      input_command_names_ = command_names;
+      input_user_parameters_ = user_parameters;
+    }
     static bool show_default = true;
     static bool show_unused = true;
     ImGui::Checkbox("Show default", &show_default);
@@ -202,72 +214,70 @@ namespace SmartPeak
       ImGui::TableHeadersRow();
 
       // Second row to end body
-      if (columns_.size() > 0) {
-        for (size_t row = 0; row < columns_.dimension(0); ++row) {
-          if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
-            const std::string& status = columns_(row, 5);
-            const std::string& valid = columns_(row, 6);
-            if ((status == "user_override") || (show_unused && (status == "unused")) || (show_default && (status == "default")))
-            {
-              ImGui::TableNextRow();
-              int col_index = 0;
-              for (auto col : cols_to_show) {
-                ImGui::TableSetColumnIndex(col_index);
-                if (status == "user_override")
+      if (body_.size() > 0) {
+        for (size_t row = 0; row < body_.dimension(0); ++row) {
+          const std::string& status = body_(row, 5);
+          const std::string& valid = body_(row, 6);
+          if ((status == "user_override") || (show_unused && (status == "unused")) || (show_default && (status == "default")))
+          {
+            ImGui::TableNextRow();
+            int col_index = 0;
+            for (auto col : cols_to_show) {
+              ImGui::TableSetColumnIndex(col_index);
+              if (status == "user_override")
+              {
+                if ((col == 3) && (valid == "false"))
                 {
-                  if ((col == 3) && (valid == "false"))
-                  {
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-                  }
-                  else
-                  {
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_Text]);
-                  }
-                  ImGui::Text("%s", columns_(row, col).c_str());
-                  ImGui::PopStyleColor();
-                  if ((col == 3) && (valid == "false"))
-                  {
-                    if (ImGui::IsItemHovered())
-                    {
-                      ImGui::BeginTooltip();
-                      const std::string& constraints = columns_(row, 7);
-                      const std::string& expected_type = columns_(row, 8);
-                      ImGui::Text("Out of range value.");
-                      if (!constraints.empty())
-                      {
-                        ImGui::Text("Expected values:");
-                        ImGui::Text(constraints.c_str());
-                      }
-                      ImGui::Text("Expected type:");
-                      ImGui::Text(expected_type.c_str());
-                      ImGui::EndTooltip();
-                    }
-                  }
+                  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
                 }
-                else if (status == "unused")
+                else
                 {
-                  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TabActive]);
-                  ImGui::Text("%s", columns_(row, col).c_str());
-                  ImGui::PopStyleColor();
+                  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_Text]);
                 }
-                else if (status == "default")
-                {
-                  ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
-                  ImGui::Text("%s", columns_(row, col).c_str());
-                  ImGui::PopStyleColor();
-                }
-                if (col == 1)
+                ImGui::Text("%s", body_(row, col).c_str());
+                ImGui::PopStyleColor();
+                if ((col == 3) && (valid == "false"))
                 {
                   if (ImGui::IsItemHovered())
                   {
-                    const std::string& description = columns_(row, 4);
                     ImGui::BeginTooltip();
-                    ImGui::Text(description.c_str());
+                    const std::string& constraints = body_(row, 7);
+                    const std::string& expected_type = body_(row, 8);
+                    ImGui::Text("Out of range value.");
+                    if (!constraints.empty())
+                    {
+                      ImGui::Text("Expected values:");
+                      ImGui::Text(constraints.c_str());
+                    }
+                    ImGui::Text("Expected type:");
+                    ImGui::Text(expected_type.c_str());
                     ImGui::EndTooltip();
                   }
                 }
-                col_index++;
               }
+              else if (status == "unused")
+              {
+                ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TabActive]);
+                ImGui::Text("%s", body_(row, col).c_str());
+                ImGui::PopStyleColor();
+              }
+              else if (status == "default")
+              {
+                ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+                ImGui::Text("%s", body_(row, col).c_str());
+                ImGui::PopStyleColor();
+              }
+              if (col == 1)
+              {
+                if (ImGui::IsItemHovered())
+                {
+                  const std::string& description = body_(row, 4);
+                  ImGui::BeginTooltip();
+                  ImGui::Text(description.c_str());
+                  ImGui::EndTooltip();
+                }
+              }
+              col_index++;
             }
           }
         }
@@ -300,7 +310,7 @@ namespace SmartPeak
       // Second row to end body
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
-          if (checked_rows_.size() <=0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
+//          if (checked_rows_.size() <=0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col) {
               ImGui::TableSetColumnIndex(col);
@@ -313,7 +323,7 @@ namespace SmartPeak
               ImGui::Checkbox(id.c_str(), &checkbox_columns_(row,col));
               ImGui::PopStyleColor();
             }
-          }
+//          }
         }
       }
       ImGui::EndTable();
