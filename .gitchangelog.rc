@@ -82,19 +82,18 @@ ignore_regexps = [
 ## whenever you are tweaking this variable.
 ##
 section_regexps = [
-    ('New', [
-        r'^[nN]ew\s*:\s*((dev|use?r|pkg|test|doc)\s*:\s*)?([^\n]*)$',
+    ('Features', [
+        r'^\[?([nN][eE][wW]|[fF][eE][aA][tT])(/([^\n]*))?\]?\s*:?\s*((dev|use?r|pkg|test|doc)\s*:\s*)?([^\n]*)$',
      ]),
     ('Changes', [
-        r'^[cC]hg\s*:\s*((dev|use?r|pkg|test|doc)\s*:\s*)?([^\n]*)$',
+        r'^\[?[cC][hH][gG](/([^\n]*))?\]?\s*:?\s*((dev|use?r|pkg|test|doc)\s*:\s*)?([^\n]*)$',
      ]),
     ('Fix', [
-        r'^[fF]ix\s*:\s*((dev|use?r|pkg|test|doc)\s*:\s*)?([^\n]*)$',
+        r'^\[?[fF][iI][xX](/([^\n]*))?\]?\s*:?\s*((dev|use?r|pkg|test|doc)\s*:\s*)?([^\n]*)$',
      ]),
 
     ('Other', None ## Match all lines
      ),
-
 ]
 
 
