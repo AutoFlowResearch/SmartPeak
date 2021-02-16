@@ -13,6 +13,7 @@ set(sources_list
 	Widget.cpp
 	WindowSizesAndPositions.cpp
 	Workflow.cpp
+	WorkflowStepWidget.cpp
 )
 
 ### add path to the filenames
