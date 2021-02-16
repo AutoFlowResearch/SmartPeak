@@ -28,6 +28,7 @@
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/core/SampleGroupProcessor.h>
+#include <SmartPeak/iface/IProcessorDescription.h>
 #include <map>
 #include <memory> // shared_ptr
 #include <set>
@@ -99,7 +100,7 @@ namespace SmartPeak
     const std::vector<std::shared_ptr<RawDataProcessor>>& methods
   );
 
-  struct SequenceProcessor {
+  struct SequenceProcessor : IProcessorDescription {
     SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}
     virtual ~SequenceProcessor() = default;
 
@@ -119,6 +120,11 @@ namespace SmartPeak
     CreateSequence() = default;
     CreateSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() const override;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "CREATE_SEQUENCE"; }
+    std::string getDescription() const override { return "Create a new sequence from file or wizard"; }
   };
 
   /**
@@ -133,6 +139,11 @@ namespace SmartPeak
     ProcessSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
     static ParameterSet getParameterSchema();
     void process() const override;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "PROCESS_SEQUENCE"; }
+    std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence"; }
   };
 
   /**
@@ -146,6 +157,11 @@ namespace SmartPeak
     ProcessSequenceSegments() = default;
     ProcessSequenceSegments(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() const override;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "PROCESS_SEQUENCE_SEGMENTS"; }
+    std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence segment"; }
   };
 
   /**
@@ -159,6 +175,11 @@ namespace SmartPeak
     ProcessSampleGroups() = default;
     ProcessSampleGroups(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() const override;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "PROCESS_SAMPLE_GROUPS"; }
+    std::string getDescription() const override { return "Apply a processing workflow to all injections in a sample group"; }
   };
 
   struct LoadWorkflow : SequenceProcessor {
@@ -166,6 +187,11 @@ namespace SmartPeak
     LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
     void process() const override;
     std::string filename_;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_WORKFLOW"; }
+    std::string getDescription() const override { return "Load a workflow from file"; }
   };
 
   struct StoreWorkflow : SequenceProcessor {
@@ -173,6 +199,11 @@ namespace SmartPeak
     StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() const override;
     std::string filename_;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_WORKFLOW"; }
+    std::string getDescription() const override { return "Store a workflow to file"; }
   };
 
 }
