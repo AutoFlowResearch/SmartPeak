@@ -77,7 +77,7 @@ namespace SmartPeak
       ParameterSet getParameterSchema() const
       {
         const auto description = getIProcessorDescription();
-        return (description ? description->getParameterSchema() : ParameterSet({}));
+        return (description ? description->getParameterSchema() : ParameterSet());
       }
 
       std::string getDescription() const

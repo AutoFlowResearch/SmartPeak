@@ -43,7 +43,7 @@ namespace SmartPeak
     /* IProcessorDescription */
     int getID() const override { return -1; }
     std::string getDescription() const override { return ""; }
-    ParameterSet getParameterSchema() const override { return {}; };
+    ParameterSet getParameterSchema() const override { return ParameterSet(); };
 
     ApplicationHandler& application_handler_;
 

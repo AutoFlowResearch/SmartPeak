@@ -107,7 +107,7 @@ namespace SmartPeak
     virtual void process() const = 0;
     
     /* IProcessorDescription */
-    ParameterSet getParameterSchema() const override { return {}; };
+    ParameterSet getParameterSchema() const override { return ParameterSet(); };
 
     SequenceHandler* sequenceHandler_IO = nullptr; /// Sequence handler, used by all SequenceProcessor derived classes
   };
@@ -140,13 +140,14 @@ namespace SmartPeak
 
     ProcessSequence() = default;
     ProcessSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
-    static ParameterSet getParameterSchema();
+    static ParameterSet getParameterSchemaStatic();
     void process() const override;
 
     /* IProcessorDescription */
     int getID() const override { return -1; }
     std::string getName() const override { return "PROCESS_SEQUENCE"; }
     std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence"; }
+    ParameterSet getParameterSchema() const override;
   };
 
   /**
