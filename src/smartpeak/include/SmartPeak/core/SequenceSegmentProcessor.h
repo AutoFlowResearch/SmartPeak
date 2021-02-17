@@ -28,11 +28,12 @@
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
+#include <SmartPeak/iface/IProcessorDescription.h>
 #include <SmartPeak/core/Parameters.h>
 
 namespace SmartPeak
 {
-  struct SequenceSegmentProcessor
+  struct SequenceSegmentProcessor : IProcessorDescription
   {
     SequenceSegmentProcessor(const SequenceSegmentProcessor& other) = delete;
     SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor& other) = delete;
@@ -83,9 +84,9 @@ namespace SmartPeak
 
   struct CalculateCalibration : SequenceSegmentProcessor
   {
-    int getID() const { return 15; }
-    std::string getName() const { return "CALCULATE_CALIBRATION"; }
-    std::string getDescription() const { return "Determine the optimal relationship between known sample concentration and measured intensity."; }
+    int getID() const override { return 15; }
+    std::string getName() const override { return "CALCULATE_CALIBRATION"; }
+    std::string getDescription() const override { return "Determine the optimal relationship between known sample concentration and measured intensity."; }
 
     virtual ParameterSet getParameterSchema() const override;
 
@@ -102,9 +103,9 @@ namespace SmartPeak
 
   struct LoadStandardsConcentrations : SequenceSegmentProcessor
   {
-    int getID() const { return -1; }
-    std::string getName() const { return "LOAD_STANDARDS_CONCENTRATIONS"; }
-    std::string getDescription() const { return "Load the standards concentrations file that gives the relationship between injection, component, and known concentration from disk."; }
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_STANDARDS_CONCENTRATIONS"; }
+    std::string getDescription() const override { return "Load the standards concentrations file that gives the relationship between injection, component, and known concentration from disk."; }
 
     virtual ParameterSet getParameterSchema() const override;
 
@@ -121,9 +122,9 @@ namespace SmartPeak
 
   struct LoadQuantitationMethods : SequenceSegmentProcessor
   {
-    int getID() const { return 17; }
-    std::string getName() const { return "LOAD_QUANTITATION_METHODS"; }
-    std::string getDescription() const { return "Load each transitions calibration model defined in quantitationMethods from disk."; }
+    int getID() const override { return 17; }
+    std::string getName() const override { return "LOAD_QUANTITATION_METHODS"; }
+    std::string getDescription() const override { return "Load each transitions calibration model defined in quantitationMethods from disk."; }
 
     virtual ParameterSet getParameterSchema() const override;
 
@@ -140,9 +141,9 @@ namespace SmartPeak
 
   struct StoreQuantitationMethods : SequenceSegmentProcessor
   {
-    int getID() const { return 16; }
-    std::string getName() const { return "STORE_QUANTITATION_METHODS"; }
-    std::string getDescription() const { return "Write each transitions calibration model to disk for later use."; }
+    int getID() const override { return 16; }
+    std::string getName() const override { return "STORE_QUANTITATION_METHODS"; }
+    std::string getDescription() const override { return "Write each transitions calibration model to disk for later use."; }
 
     virtual ParameterSet getParameterSchema() const override;
 
@@ -375,9 +376,9 @@ namespace SmartPeak
 
   struct EstimateFeatureFilterValues : SequenceSegmentProcessor
   {
-    int getID() const { return -1; }
-    std::string getName() const { return "ESTIMATE_FEATURE_FILTER_VALUES"; }
-    std::string getDescription() const { return "Estimate default FeatureQC parameter values for the feature filters from Standard and QC samples."; }
+    int getID() const override { return -1; }
+    std::string getName() const override { return "ESTIMATE_FEATURE_FILTER_VALUES"; }
+    std::string getDescription() const override { return "Estimate default FeatureQC parameter values for the feature filters from Standard and QC samples."; }
 
     virtual ParameterSet getParameterSchema() const override;
 
@@ -396,9 +397,9 @@ namespace SmartPeak
 
   struct EstimateFeatureQCValues : SequenceSegmentProcessor
   {
-    int getID() const { return -1; }
-    std::string getName() const { return "ESTIMATE_FEATURE_QC_VALUES"; }
-    std::string getDescription() const { return "Estimate default FeatureQC parameter values for the feature QCs from Standard and QC samples."; }
+    int getID() const override { return -1; }
+    std::string getName() const override { return "ESTIMATE_FEATURE_QC_VALUES"; }
+    std::string getDescription() const override { return "Estimate default FeatureQC parameter values for the feature QCs from Standard and QC samples."; }
 
     virtual ParameterSet getParameterSchema() const override;
 
@@ -417,9 +418,9 @@ namespace SmartPeak
 
   struct TransferLOQToFeatureFilters : SequenceSegmentProcessor
   {
-    int getID() const { return -1; }
-    std::string getName() const { return "TRANSFER_LOQ_TO_FEATURE_FILTERS"; }
-    std::string getDescription() const { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
+    int getID() const override { return -1; }
+    std::string getName() const override { return "TRANSFER_LOQ_TO_FEATURE_FILTERS"; }
+    std::string getDescription() const override { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
 
     virtual ParameterSet getParameterSchema() const override;
 
@@ -436,9 +437,9 @@ namespace SmartPeak
 
   struct TransferLOQToFeatureQCs : SequenceSegmentProcessor
   {
-    int getID() const { return -1; }
-    std::string getName() const { return "TRANSFER_LOQ_TO_FEATURE_QCS"; }
-    std::string getDescription() const { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
+    int getID() const override { return -1; }
+    std::string getName() const override { return "TRANSFER_LOQ_TO_FEATURE_QCS"; }
+    std::string getDescription() const override { return "Transfer the upper (u)/lower (l) limits of quantitation (LOQ) values from the quantitation methods to the calculated concentration bounds of the feature filters."; }
 
     virtual ParameterSet getParameterSchema() const override;
 
@@ -455,9 +456,9 @@ namespace SmartPeak
 
   struct EstimateFeatureRSDs : SequenceSegmentProcessor
   {
-    int getID() const { return -1; }
-    std::string getName() const { return "ESTIMATE_FEATURE_RSDS"; }
-    std::string getDescription() const { return "Estimate the %RSD for component and component group feature filter attributes from pooled QC samples."; }
+    int getID() const override { return -1; }
+    std::string getName() const override { return "ESTIMATE_FEATURE_RSDS"; }
+    std::string getDescription() const override { return "Estimate the %RSD for component and component group feature filter attributes from pooled QC samples."; }
 
     virtual ParameterSet getParameterSchema() const override;
 
@@ -476,9 +477,9 @@ namespace SmartPeak
 
   struct EstimateFeatureBackgroundInterferences : SequenceSegmentProcessor
   {
-    int getID() const { return -1; }
-    std::string getName() const { return "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES"; }
-    std::string getDescription() const { return "Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples."; }
+    int getID() const override { return -1; }
+    std::string getName() const override { return "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES"; }
+    std::string getDescription() const override { return "Estimate the %BackgroundInterferences for component and component group feature filter ion intensity attributes from Blank samples."; }
 
     virtual ParameterSet getParameterSchema() const override;
 
