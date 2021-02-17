@@ -40,7 +40,10 @@ namespace SmartPeak
 
     void setApplicationHandler(ApplicationHandler& application_handler);
 
+    void setEditable(bool editable) { editable_ = editable; };
+
   protected:
     WorkflowStepWidget workflow_step_widget_;
+    bool editable_ = true;
   };
 }

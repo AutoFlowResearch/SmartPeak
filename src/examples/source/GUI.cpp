@@ -227,6 +227,10 @@ int main(int argc, char** argv)
     // Intialize the window sizes
       win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
 
+      if ((!workflow_is_done_) && manager_.isWorkflowDone())
+      {
+        manager_.updateApplicationHandler(application_handler_);
+      }
       workflow_is_done_ = manager_.isWorkflowDone();
       file_loading_is_done_ = file_picker_.fileLoadingIsDone();
 
@@ -438,7 +442,7 @@ int main(int argc, char** argv)
             popup_file_picker_ = true;
             update_session_cache_ = true;
           }
-          if (ImGui::MenuItem("Workflow")) {
+          if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_)) {
             static LoadSequenceWorkflow processor(application_handler_);
             file_picker_.setProcessor(processor);
             popup_file_picker_ = true;
@@ -784,6 +788,7 @@ int main(int argc, char** argv)
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
+          workflow_.setEditable(workflow_is_done_);
           workflow_.draw();
           ImGui::EndTabItem();
         }

@@ -40,7 +40,7 @@ namespace SmartPeak
     }
 
     workflow_step_widget_.draw();
-    if (ImGui::BeginCombo("Presets", NULL))
+    if (editable_ && ImGui::BeginCombo("Presets", NULL))
     {
       const char* presets[] = {
         "LCMS MRM Unknowns",
@@ -157,14 +157,17 @@ namespace SmartPeak
       }
       ImGui::EndCombo();
     }
-    if (ImGui::Button("Add step"))
+    if (editable_)
     {
-      ImGui::OpenPopup("Add workflow step");
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Reset"))
-    {
-      application_handler_->sequenceHandler_.getWorkflow().clear();
+      if (ImGui::Button("Add step"))
+      {
+        ImGui::OpenPopup("Add workflow step");
+      }
+      ImGui::SameLine();
+      if (ImGui::Button("Reset"))
+      {
+        application_handler_->sequenceHandler_.getWorkflow().clear();
+      }
     }
 
     ImGui::Separator();
@@ -189,7 +192,7 @@ namespace SmartPeak
           std::ostringstream os;
           os << "[" << (i + 1) << "] " << command.getName().c_str();
           ImGui::Button(os.str().c_str());
-          if (ImGui::BeginDragDropSource())
+          if (editable_ && ImGui::BeginDragDropSource())
           {
             ImGui::SetDragDropPayload("DND_STEP", &i, sizeof(int));
             ImGui::Text("Moving %s", application_handler_->sequenceHandler_.getWorkflow().at(i).c_str());
@@ -201,7 +204,7 @@ namespace SmartPeak
             ImGui::Text(command.getDescription().c_str());
             ImGui::EndTooltip();
           }
-          if (ImGui::BeginDragDropTarget())
+          if (editable_ && ImGui::BeginDragDropTarget())
           {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_STEP"))
             {
@@ -213,8 +216,11 @@ namespace SmartPeak
             }
             ImGui::EndDragDropTarget();
           }
-          ImGui::SameLine();
-          if (ImGui::Button("x")) {
+          if (editable_)
+          {
+            ImGui::SameLine();
+          }
+          if (editable_ && ImGui::Button("x")) {
             application_handler_->sequenceHandler_.getWorkflow().erase(application_handler_->sequenceHandler_.getWorkflow().cbegin() + i);
           }
           else {
@@ -234,4 +240,5 @@ namespace SmartPeak
     application_handler_ = &state;
     workflow_step_widget_.setApplicationHandler(state);
   }
+
 }
