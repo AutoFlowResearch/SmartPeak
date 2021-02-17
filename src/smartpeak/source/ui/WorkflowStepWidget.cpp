@@ -102,13 +102,23 @@ namespace SmartPeak
 
     ImGui::Separator();
 
+    bool command_success = false;
     ImGui::BeginChild("Description", ImVec2(popup_width, description_box_height));
-    BuildCommandsFromNames buildCommandsFromNames(*application_handler_);
-    buildCommandsFromNames.names_ = { selected_method_ };
-    if (buildCommandsFromNames.process() && buildCommandsFromNames.commands_.size()>0)
+    if (!selected_method_.empty())
     {
       ImGui::PushTextWrapPos();
-      ImGui::Text(buildCommandsFromNames.commands_[0].getDescription().c_str());
+      BuildCommandsFromNames buildCommandsFromNames(*application_handler_);
+      buildCommandsFromNames.names_ = { selected_method_ };
+      if (buildCommandsFromNames.process() && buildCommandsFromNames.commands_.size() > 0)
+      {
+        ImGui::Text(buildCommandsFromNames.commands_[0].getDescription().c_str());
+        command_success = true;
+      }
+      else
+      {
+        ImGui::Text("An error occurred getting information about this command.");
+        command_success = false;
+      }
       ImGui::PopTextWrapPos();
     }
     ImGui::EndChild();
@@ -117,7 +127,7 @@ namespace SmartPeak
 
     if (ImGui::Button("Ok"))
     {
-      if (!selected_method_.empty())
+      if (!selected_method_.empty() && command_success)
       {
         application_handler_->sequenceHandler_.getWorkflow().push_back(selected_method_);
       }

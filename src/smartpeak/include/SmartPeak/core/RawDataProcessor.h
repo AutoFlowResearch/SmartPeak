@@ -689,7 +689,7 @@ namespace SmartPeak
   struct CalculateMDVAccuracies : RawDataProcessor
   {
     int getID() const override { return 0; }
-    std::string getName() const override { return "COMPARE_MDV_TO_THEORETICAL"; }
+    std::string getName() const override { return "CALCULATE_MDV_ACCURACIES"; }
     std::string getDescription() const override { return "Compare MDVs to Theoretical"; }
     
     virtual ParameterSet getParameterSchema() const override;
