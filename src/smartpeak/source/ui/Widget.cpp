@@ -35,6 +35,7 @@ namespace SmartPeak
 {
   struct ImTableEntry
   {
+    int ID;
     std::vector<const char*> Headers;
     
     static const ImGuiTableSortSpecs* s_current_sort_specs;
@@ -804,7 +805,6 @@ namespace SmartPeak
       ImGui::TableSetupScrollFreeze(headers_.size(), 1);
       ImGui::TableHeadersRow();
       
-      // Second row to end body
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
@@ -1931,6 +1931,7 @@ namespace SmartPeak
         {
           ImTableEntry& Im_table_entry = injection_table_entries[row];
           Im_table_entry.Headers.resize(columns__.dimension(1) + checkbox_columns__.dimension(1));
+          Im_table_entry.ID = row;
           for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx)
           {
             if (header_idx < columns__.dimension(1))
@@ -1959,6 +1960,7 @@ namespace SmartPeak
         {
           ImTableEntry& Im_table_entry = transition_table_entries[row];
           Im_table_entry.Headers.resize(columns__.dimension(1) + checkbox_columns__.dimension(1));
+          Im_table_entry.ID = row;
           for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx)
           {
             if (header_idx < columns__.dimension(1))
@@ -1987,6 +1989,7 @@ namespace SmartPeak
         {
           ImTableEntry& Im_table_entry = feature_table_entries[row];
           Im_table_entry.Headers.resize(columns__.dimension(1) + checkbox_columns__.dimension(1));
+          Im_table_entry.ID = row;
           for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx)
           {
             if (header_idx < columns__.dimension(1))
@@ -2112,12 +2115,12 @@ namespace SmartPeak
                 if (is_checked == true && !std::strcmp(injection_table_entries[row].Headers[checkbox_idx], "false"))
                 {
                   injection_table_entries[row].Headers[checkbox_idx] = "true";
-                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = true;
+                  checkbox_columns_(injection_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = true;
                 }
                 else if (is_checked == false && !std::strcmp(injection_table_entries[row].Headers[checkbox_idx], "true"))
                 {
                   injection_table_entries[row].Headers[checkbox_idx] = "false";
-                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = false;
+                  checkbox_columns_(injection_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = false;
                 }
               }
               else if (table_id_ == "TransitionsExplorerWindow" && transitions_scanned == true && !transition_table_entries.empty())
@@ -2133,12 +2136,12 @@ namespace SmartPeak
                 if (is_checked == true && !std::strcmp(transition_table_entries[row].Headers[checkbox_idx], "false"))
                 {
                   transition_table_entries[row].Headers[checkbox_idx] = "true";
-                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) ) = true;
+                  checkbox_columns_(transition_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) ) = true;
                 }
                 else if (is_checked == false && !std::strcmp(transition_table_entries[row].Headers[checkbox_idx], "true"))
                 {
                   transition_table_entries[row].Headers[checkbox_idx] = "false";
-                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) ) = false;
+                  checkbox_columns_(transition_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) ) = false;
                 }
               }
               else if (table_id_ == "FeaturesExplorerWindow" && features_scanned == true && !feature_table_entries.empty())
@@ -2154,12 +2157,12 @@ namespace SmartPeak
                 if (is_checked == true && !std::strcmp(feature_table_entries[row].Headers[checkbox_idx], "false"))
                 {
                   feature_table_entries[row].Headers[checkbox_idx] = "true";
-                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = true;
+                  checkbox_columns_(feature_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = true;
                 }
                 else if (is_checked == false && !std::strcmp(feature_table_entries[row].Headers[checkbox_idx], "true"))
                 {
                   feature_table_entries[row].Headers[checkbox_idx] = "false";
-                  checkbox_columns_(row, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = false;
+                  checkbox_columns_(feature_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = false;
                 }
               }
               ImGui::PopStyleColor();

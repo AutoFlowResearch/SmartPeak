@@ -119,6 +119,7 @@ namespace SmartPeak
       for (int row = 0; row < pathname_content_[0].size(); row++)
       {
         ImDirectoryEntry& ImDirectoryEntry  = Im_directory_entries[row];
+        ImDirectoryEntry.ID                 = row;
         ImDirectoryEntry.Name               = pathname_content_[0][row].c_str();
         ImDirectoryEntry.Size               = pathname_content_[1][row].c_str();
         ImDirectoryEntry.Type               = pathname_content_[2][row].c_str();
@@ -219,6 +220,8 @@ namespace SmartPeak
               qsort(&Im_directory_entries[0], (size_t)Im_directory_entries.Size, sizeof(Im_directory_entries[0]), ImDirectoryEntry::CompareWithSortSpecs);
           ImDirectoryEntry::s_current_sort_specs = NULL;
           sorts_specs->SpecsDirty = false;
+          memset(selected_filename, 0, sizeof selected_filename);
+          selected_entry = -1;
         }
       }
 
@@ -266,7 +269,7 @@ namespace SmartPeak
             std::strcpy(selected_filename, Im_directory_entries[selected_entry].Name);
             if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item->Type , "Directory") )
             {
-              if (current_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
+              if (current_pathname_.back() != '/')
               {
                 current_pathname_.append("/");
               }
@@ -277,7 +280,7 @@ namespace SmartPeak
               update_contents(Im_directory_entries);
               filter.Clear();
               selected_entry = -1;
-              break; // IMPORTANT: because the following lines in the loop assume accessing old/previous pathname_content_'s data
+              break;
             }
             else if (ImGui::IsMouseDoubleClicked(0))
             {
@@ -288,13 +291,13 @@ namespace SmartPeak
                 {
                   picked_pathname_.append("/");
                 }
-                picked_pathname_.append(pathname_content_[0][selected_entry]);
+                picked_pathname_.append(item->Name);
               }
               filter.Clear();
               selected_entry = -1;
               runProcessor();
               clearProcessor();
-              LOGI << "Picked pathname: " << picked_pathname_;
+              LOGI << "Picked file : " << picked_pathname_;
               ImGui::CloseCurrentPopup();
             }
           }
