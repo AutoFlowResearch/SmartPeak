@@ -39,11 +39,6 @@ namespace SmartPeak
     SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor& other) = delete;
     virtual ~SequenceSegmentProcessor() = default;
 
-    virtual int getID() const = 0; /// get the raw data processor struct ID
-    virtual std::string getName() const = 0; /// get the raw data processor struct name
-    virtual std::string getDescription() const = 0; /// get the raw data processor struct description
-    virtual ParameterSet getParameterSchema() const = 0;
-
     /**
       Interface to all  sequence segment processing methods.
 

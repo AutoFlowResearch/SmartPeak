@@ -105,6 +105,9 @@ namespace SmartPeak
     virtual ~SequenceProcessor() = default;
 
     virtual void process() const = 0;
+    
+    /* IProcessorDescription */
+    ParameterSet getParameterSchema() const override { return {}; };
 
     SequenceHandler* sequenceHandler_IO = nullptr; /// Sequence handler, used by all SequenceProcessor derived classes
   };
