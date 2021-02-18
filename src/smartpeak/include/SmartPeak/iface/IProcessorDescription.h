@@ -20,6 +20,11 @@ namespace SmartPeak
     */
     virtual std::string getDescription() const = 0;
 
+    /**
+      Get the Schema (possible, default parameters) of the processor.
+    */
+    virtual ParameterSet getParameterSchema() const = 0;
+
     virtual ~IProcessorDescription() = default;
   };
 }

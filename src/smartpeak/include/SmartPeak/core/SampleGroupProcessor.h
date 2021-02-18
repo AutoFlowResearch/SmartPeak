@@ -39,11 +39,6 @@ namespace SmartPeak
     SampleGroupProcessor& operator=(const SampleGroupProcessor& other) = delete;
     virtual ~SampleGroupProcessor() = default;
 
-    virtual int getID() const = 0; /// get the sample group processor struct ID
-    virtual std::string getName() const = 0; /// get the sample group processor struct name
-    virtual std::string getDescription() const = 0; /// get the sample group processor struct description
-    virtual ParameterSet getParameterSchema() const = 0;
-
     /**
       Interface to all sample group processing methods.
 
