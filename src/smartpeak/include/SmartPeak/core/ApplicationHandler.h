@@ -66,32 +66,26 @@ namespace SmartPeak
 
       int getID() const
       {
-        if (type == RawDataMethod)
-          return raw_data_method->getID();
-        else if (type == SequenceSegmentMethod)
-          return seq_seg_method->getID();
-        else
-          return sample_group_method->getID();
+        const auto description = getIProcessorDescription();
+        return (description ? description->getID() : 0);
       }
 
       std::string getName() const
       {
-        if (type == RawDataMethod)
-          return raw_data_method->getName();
-        else if (type == SequenceSegmentMethod)
-          return seq_seg_method->getName();
-        else
-          return sample_group_method->getName();
+        const auto description = getIProcessorDescription();
+        return (description ? description->getName() : "");
       }
 
       ParameterSet getParameterSchema() const
       {
-        if (type == RawDataMethod)
-          return raw_data_method->getParameterSchema();
-        else if (type == SequenceSegmentMethod)
-          return seq_seg_method->getParameterSchema();
-        else
-          return sample_group_method->getParameterSchema();
+        const auto description = getIProcessorDescription();
+        return (description ? description->getParameterSchema() : ParameterSet());
+      }
+
+      std::string getDescription() const
+      {
+        const auto description = getIProcessorDescription();
+        return (description ? description->getDescription() : "");
       }
 
       std::shared_ptr<RawDataProcessor> raw_data_method;
@@ -99,6 +93,22 @@ namespace SmartPeak
       std::shared_ptr<SampleGroupProcessor> sample_group_method;
 
       std::map<std::string, Filenames> dynamic_filenames;
+
+    private:
+      const IProcessorDescription* getIProcessorDescription() const
+      {
+        switch (type)
+        {
+        case RawDataMethod:
+          return raw_data_method.get();
+        case SequenceSegmentMethod:
+          return seq_seg_method.get();
+        case SampleGroupMethod:
+          return sample_group_method.get();
+        default:
+          throw "Unsupported CommandType in ApplicationHandler::Command::getIProcessorDescription()";
+        }
+      }
     };
 
     std::string                           sequence_pathname_;

@@ -20,30 +20,24 @@
 // $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
-
 #pragma once
 
 #include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/WorkflowStepWidget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <string>
 #include <vector>
 
 namespace SmartPeak
 {
-  class Workflow final : public Widget
+  class WorkflowStepWidget final : public Widget
   {
     ApplicationHandler* application_handler_ = nullptr;
 
   public:
     void draw() override;
-
     void setApplicationHandler(ApplicationHandler& application_handler);
-
-    void setEditable(bool editable) { editable_ = editable; };
-
   protected:
-    WorkflowStepWidget workflow_step_widget_;
-    bool editable_ = true;
+    std::string selected_method_type_;
+    std::string selected_method_;
   };
 }
