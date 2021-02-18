@@ -36,6 +36,7 @@
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/iface/IProcessorDescription.h>
 
 #include <map>
 #include <vector>
@@ -44,15 +45,11 @@
 
 namespace SmartPeak
 {
-  struct RawDataProcessor
+  struct RawDataProcessor : IProcessorDescription
   {
     RawDataProcessor(const RawDataProcessor& other) = delete;
     RawDataProcessor& operator=(const RawDataProcessor& other) = delete;
     virtual ~RawDataProcessor() = default;
-
-    virtual int getID() const = 0; /// get the raw data processor struct ID
-    virtual std::string getName() const = 0; /// get the raw data processor struct name
-    virtual std::string getDescription() const = 0; /// get the raw data processor struct description
 
     /** Interface to all raw data processing methods.
 
