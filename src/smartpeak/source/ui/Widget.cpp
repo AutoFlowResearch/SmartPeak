@@ -174,6 +174,16 @@ namespace SmartPeak
     }
   }
 
+  void ParametersTableWidget::parametersUpdated()
+  {
+    refresh_needed_ = true;
+  }
+
+  void ParametersTableWidget::workflowUpdated()
+  {
+    refresh_needed_ = true;
+  }
+
   void ParametersTableWidget::draw()
   {
     if (application_handler_.sequenceHandler_.getSequence().size() == 0) {
@@ -181,14 +191,13 @@ namespace SmartPeak
     }
     std::vector<std::string> command_names = application_handler_.sequenceHandler_.getWorkflow();
     ParameterSet user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
-    if ((command_names != input_command_names_) || (user_parameters != input_user_parameters_))
+    if (refresh_needed_)
     {
       BuildCommandsFromNames buildCommandsFromNames(application_handler_);
       buildCommandsFromNames.names_ = command_names;
       buildCommandsFromNames.process(); 
       session_handler_.getParametersTable(user_parameters, buildCommandsFromNames.commands_, headers_, body_);
-      input_command_names_ = command_names;
-      input_user_parameters_ = user_parameters;
+      refresh_needed_ = false;
     }
     static bool show_default = true;
     static bool show_unused = true;

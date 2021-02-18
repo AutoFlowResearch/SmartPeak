@@ -1080,6 +1080,7 @@ namespace SmartPeak
     try {
       FileReader::parseOpenMSParams(filenames.parameters_csv_i, rawDataHandler_IO.getParameters());
       sanitizeParameters(rawDataHandler_IO.getParameters());
+      if (parameters_observable_) parameters_observable_->notifyParametersObservers();
     }
     catch (const std::exception& e) {
       LOGE << e.what();
