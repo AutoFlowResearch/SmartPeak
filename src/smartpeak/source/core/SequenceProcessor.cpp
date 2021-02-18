@@ -403,7 +403,7 @@ namespace SmartPeak
       res.clear();
     }
     sequenceHandler_IO->setWorkflow(res);
-    if (workflow_observable_) workflow_observable_->notifyWorkflowObservers();
+    if (workflow_observable_) workflow_observable_->notifyWorkflowChanged();
     LOGD << "END LoadWorkflow";
   }
 

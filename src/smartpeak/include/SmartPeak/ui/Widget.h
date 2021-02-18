@@ -28,8 +28,6 @@
 #include <vector>
 #include <imgui.h>
 #include <SmartPeak/core/SessionHandler.h>
-#include <SmartPeak/iface/IParametersObserver.h>
-#include <SmartPeak/iface/IWorkflowObserver.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 /**
@@ -109,39 +107,6 @@ namespace SmartPeak
   public:
     void draw() override;
     std::vector<std::string> text_lines;
-  };
-
-  /**
-    @brief Base Parameters table
-  */
-  class ParametersTableWidget : public Widget, public IParametersObserver, public IWorkflowObserver
-  {
-  public:
-    ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id)
-      : session_handler_(session_handler), application_handler_(application_handler), table_id_(table_id) 
-    {
-      application_handler.addParametersObserver(this);
-      application_handler.addWorkflowObserver(this);
-      // TODO: remove
-    };
-    void draw() override;
-  public:
-    /**
-     IParametersObserver
-    */
-    virtual void parametersUpdated() override;
-    /**
-     IWorkflowObserver
-    */
-    virtual void workflowUpdated() override;
-  protected:
-    Eigen::Tensor<std::string, 1> headers_;
-    Eigen::Tensor<std::string, 2> body_;
-    const std::string table_id_;
-  protected:
-    SessionHandler& session_handler_;
-    ApplicationHandler& application_handler_;
-    bool refresh_needed_ = true;
   };
 
   /**

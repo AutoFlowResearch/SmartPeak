@@ -10,7 +10,7 @@ namespace SmartPeak
   public:
     virtual void addParametersObserver(IParametersObserver* observer) { observers_.push_back(observer); };
     virtual void removeParametersObserver(IParametersObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
-    void notifyParametersObservers()
+    void notifyParametersChanged()
     {
       for (auto& observer : observers_)
       {

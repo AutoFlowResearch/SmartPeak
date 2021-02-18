@@ -10,7 +10,7 @@ namespace SmartPeak
   public:
     virtual void addWorkflowObserver(IWorkflowObserver* observer) { observers_.push_back(observer); };
     virtual void removeWorkflowObserver(IWorkflowObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
-    void notifyWorkflowObservers()
+    void notifyWorkflowChanged()
     {
       for (auto& observer : observers_)
       {

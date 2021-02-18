@@ -15,6 +15,7 @@
 #include <SmartPeak/ui/CalibratorsPlotWidget.h>
 #include <SmartPeak/ui/ChromatogramPlotWidget.h>
 #include <SmartPeak/ui/SpectraPlotWidget.h>
+#include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
