@@ -18,7 +18,7 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Ahmed Khalil, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/ApplicationProcessor.h>
@@ -326,9 +326,8 @@ namespace SmartPeak
         {
           picked_pathname_.append("/");
         }
-        picked_pathname_.append(pathname_content_[0][selected_entry]); //TODO:sanity check
+        picked_pathname_.append(selected_filename);
       }
-      picked_pathname_.append(selected_filename);
       LOGI << "Picked pathname: " << picked_pathname_;
       runProcessor();
       clearProcessor();
