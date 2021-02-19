@@ -154,6 +154,7 @@ namespace SmartPeak
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
+    bool searcher(const ImVector<ImTableEntry>& Im_table_entries, const int& selected_entry, const ImGuiTextFilter& filter, const size_t row) const;
     const Eigen::Tensor<std::string,1>& headers_; // keep these `const` and references so that the data is not copied on each call!
     const Eigen::Tensor<std::string,2>& columns_;
     const Eigen::Tensor<bool, 1>& checked_rows_;

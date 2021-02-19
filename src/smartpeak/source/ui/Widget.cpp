@@ -234,12 +234,28 @@ namespace SmartPeak
     }
   }
 
+  bool GenericTableWidget::searcher(const ImVector<ImTableEntry> &Im_table_entries, const int &selected_entry,
+                                    const ImGuiTextFilter& filter, const size_t row) const
+  {
+    bool is_to_filter;
+    if (selected_entry > 0)
+    {
+      is_to_filter = !filter.PassFilter(Im_table_entries[row].Headers[selected_entry - 1]);
+    }
+    else if (selected_entry == 0) //ALL
+    {
+      is_to_filter = std::all_of(Im_table_entries[row].Headers.begin(),
+                                 Im_table_entries[row].Headers.end(),
+                                 [&filter](const char* entry){return !filter.PassFilter(entry);});
+    }
+    return is_to_filter;
+  }
+
   void GenericTableWidget::draw()
   {
     if (headers_.size()<=0)
       return;
 
-    // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
       ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
@@ -808,484 +824,126 @@ namespace SmartPeak
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
+            
             if (table_id_ == "SequenceMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(sequence_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(sequence_table_entries[row].Headers.begin(),
-                                           sequence_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(sequence_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "TransitionsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(transition_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(transition_table_entries[row].Headers.begin(),
-                                           transition_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(transition_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "StdsConcsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(concentration_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(concentration_table_entries[row].Headers.begin(),
-                                           concentration_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(concentration_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "ParametersMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(parameter_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(parameter_table_entries[row].Headers.begin(),
-                                           parameter_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(parameter_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
-            if (table_id_ == "SpectrumMainWindow") // not-loaded
+            if (table_id_ == "SpectrumMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(spectrum_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(spectrum_table_entries[row].Headers.begin(),
-                                           spectrum_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(spectrum_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "QuantMethodMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(quantitation_method_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(quantitation_method_table_entries[row].Headers.begin(),
-                                           quantitation_method_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(quantitation_method_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompFiltersMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_filters_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_filters_table_entries[row].Headers.begin(),
-                                           component_filters_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_filters_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
-            
             if (table_id_ == "CompGroupFiltersMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_group_filters_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_group_filters_table_entries[row].Headers.begin(),
-                                           component_group_filters_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_group_filters_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompQCsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_qcs_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_qcs_table_entries[row].Headers.begin(),
-                                           component_qcs_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_qcs_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompGroupQCsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_group_qcs_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_group_qcs_table_entries[row].Headers.begin(),
-                                           component_group_qcs_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_group_qcs_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "featuresTableMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(features_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(features_table_entries[row].Headers.begin(),
-                                           features_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(features_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompRSDFiltersMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_rsd_filters_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_rsd_filters_table_entries[row].Headers.begin(),
-                                           component_rsd_filters_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_rsd_filters_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompGroupRSDFiltersMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_group_rsd_filter_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_group_rsd_filter_table_entries[row].Headers.begin(),
-                                           component_group_rsd_filter_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_group_rsd_filter_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompRSDQCsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_rsd_qcs_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_rsd_qcs_table_entries[row].Headers.begin(),
-                                           component_rsd_qcs_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_rsd_qcs_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompGroupRSDQCsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_group_rsd_qcs_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_group_rsd_qcs_table_entries[row].Headers.begin(),
-                                           component_group_rsd_qcs_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_group_rsd_qcs_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompBackgroundFiltersMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_background_filter_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_background_filter_table_entries[row].Headers.begin(),
-                                           component_background_filter_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_background_filter_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompGroupBackgroundFiltersMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_group_background_filter_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_group_background_filter_table_entries[row].Headers.begin(),
-                                           component_group_background_filter_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_group_background_filter_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompBackgroundQCsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_background_qcs_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_background_qcs_table_entries[row].Headers.begin(),
-                                           component_background_qcs_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_background_qcs_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompGroupBackgroundQCsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_group_background_qcs_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_group_background_qcs_table_entries[row].Headers.begin(),
-                                           component_group_background_qcs_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_group_background_qcs_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompRSDEstimationsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_rsd_estimations_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_rsd_estimations_table_entries[row].Headers.begin(),
-                                           component_rsd_estimations_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_rsd_estimations_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompGroupRSDEstimationsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_group_rsd_estimations_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_group_rsd_estimations_table_entries[row].Headers.begin(),
-                                           component_group_rsd_estimations_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_group_rsd_estimations_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompBackgroundEstimationsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_background_estimations_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_background_estimations_table_entries[row].Headers.begin(),
-                                           component_background_estimations_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_background_estimations_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "CompGroupBackgroundEstimationsMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(component_group_background_estimations_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(component_group_background_estimations_table_entries[row].Headers.begin(),
-                                           component_group_background_estimations_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(component_group_background_estimations_table_entries, selected_col, filter, row))
                 continue;
-              }
             }
-            
             if (table_id_ == "featureMatrixMainWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(feature_matrix_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(feature_matrix_entries[row].Headers.begin(), feature_matrix_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(feature_matrix_entries, selected_col, filter, row))
                 continue;
-              }
             }
             
             ImGui::TableNextRow();
@@ -2018,66 +1676,27 @@ namespace SmartPeak
       
       ImGui::TableSetupScrollFreeze(headers_.size() + checkbox_headers_.size(), 1);
       ImGui::TableHeadersRow();
-            
-      // Second row to end body
+      
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <=0 || (checked_rows_.size() > 0 && checked_rows_(row)))
           {
-            if (table_id_ == "FeaturesExplorerWindow")
-            {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(feature_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(feature_table_entries[row].Headers.begin(), feature_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
-                continue;
-              }
-            }
             if (table_id_ == "InjectionsExplorerWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(injection_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(injection_table_entries[row].Headers.begin(), injection_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
+              if (searcher(injection_table_entries, selected_col, filter, row))
                 continue;
-              }
+            }
+            if (table_id_ == "FeaturesExplorerWindow")
+            {
+              if (searcher(feature_table_entries, selected_col, filter, row))
+                continue;
             }
             if (table_id_ == "TransitionsExplorerWindow")
             {
-              bool is_to_filter;
-              if (selected_col > 0)
-              {
-                is_to_filter = !filter.PassFilter(transition_table_entries[row].Headers[selected_col - 1]);
-              }
-              else if (selected_col == 0) //ALL
-              {
-                is_to_filter = std::all_of(transition_table_entries[row].Headers.begin(), transition_table_entries[row].Headers.end(),
-                                           [](const char* entry){return !filter.PassFilter(entry);});
-              }
-              
-              if (is_to_filter)
-              {
-                continue;
-              }
+              if (searcher(transition_table_entries, selected_col, filter, row))
+              continue;
             }
+            
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col)
             {
