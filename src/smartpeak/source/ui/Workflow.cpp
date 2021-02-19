@@ -39,7 +39,8 @@ namespace SmartPeak
       return;
     }
 
-    if (ImGui::BeginCombo("Presets", NULL))
+    workflow_step_widget_.draw();
+    if (editable_ && ImGui::BeginCombo("Presets", NULL))
     {
       const char* presets[] = {
         "LCMS MRM Unknowns",
@@ -156,46 +157,17 @@ namespace SmartPeak
       }
       ImGui::EndCombo();
     }
-
-    if (ImGui::BeginCombo("Add Raw data method", NULL))
+    if (editable_)
     {
-      for (const auto& p : n_to_raw_data_method_)
+      if (ImGui::Button("Add step"))
       {
-        if (ImGui::Selectable(p.second->getName().c_str()))
-        {
-          application_handler_->sequenceHandler_.getWorkflow().push_back(p.second->getName());
-        }
+        ImGui::OpenPopup("Add workflow step");
       }
-      ImGui::EndCombo();
-    }
-
-    if (ImGui::BeginCombo("Add Sequence Segment method", NULL))
-    {
-      for (const auto& p : n_to_seq_seg_method_)
+      ImGui::SameLine();
+      if (ImGui::Button("Reset"))
       {
-        if (ImGui::Selectable(p.second->getName().c_str()))
-        {
-          application_handler_->sequenceHandler_.getWorkflow().push_back(p.second->getName());
-        }
+        application_handler_->sequenceHandler_.getWorkflow().clear();
       }
-      ImGui::EndCombo();
-    }
-
-    if (ImGui::BeginCombo("Add Sample Group method", NULL))
-    {
-      for (const auto& p : n_to_sample_group_method_)
-      {
-        if (ImGui::Selectable(p.second->getName().c_str()))
-        {
-            application_handler_->sequenceHandler_.getWorkflow().push_back(p.second->getName());
-        }
-      }
-      ImGui::EndCombo();
-    }
-
-    if (ImGui::Button("Reset"))
-    {
-      application_handler_->sequenceHandler_.getWorkflow().clear();
     }
 
     ImGui::Separator();
@@ -205,38 +177,58 @@ namespace SmartPeak
     ImGui::BeginChild("Workflow Steps");
 
     if (application_handler_->sequenceHandler_.getWorkflow().empty())
+    {
       ImGui::Text("No steps set. Please select a preset and/or add a single method step.");
-
-    for (int i = 0; static_cast<size_t>(i) < application_handler_->sequenceHandler_.getWorkflow().size(); ) {
-      ImGui::PushID(i + 1); // avoid hashing an id := 0, not sure it's necessary
-      char step_label[256];
-      sprintf(step_label, "[%02d] %s", i + 1, application_handler_->sequenceHandler_.getWorkflow().at(i).c_str());
-      ImGui::Button(step_label);
-      if (ImGui::BeginDragDropSource())
+    }
+    else
+    {
+      BuildCommandsFromNames buildCommandsFromNames(*application_handler_);
+      buildCommandsFromNames.names_ = application_handler_->sequenceHandler_.getWorkflow();
+      if (buildCommandsFromNames.process()) 
       {
-        ImGui::SetDragDropPayload("DND_STEP", &i, sizeof(int));
-        ImGui::Text("Moving %s", application_handler_->sequenceHandler_.getWorkflow().at(i).c_str());
-        ImGui::EndDragDropSource();
-      }
-      if (ImGui::BeginDragDropTarget())
-      {
-        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_STEP"))
-        {
-          IM_ASSERT(payload->DataSize == sizeof(int));
-          int source_n = *(const int*)payload->Data;
-          const auto tmp = application_handler_->sequenceHandler_.getWorkflow().at(source_n);
-          application_handler_->sequenceHandler_.getWorkflow().erase(application_handler_->sequenceHandler_.getWorkflow().cbegin() + source_n);
-          application_handler_->sequenceHandler_.getWorkflow().insert(application_handler_->sequenceHandler_.getWorkflow().cbegin() + i, tmp);
+        int i = 0;
+        for (const auto& command: buildCommandsFromNames.commands_) {
+          ImGui::PushID(i + 1 ); // avoid hashing an id := 0, not sure it's necessary
+          std::ostringstream os;
+          os << "[" << (i + 1) << "] " << command.getName().c_str();
+          ImGui::Button(os.str().c_str());
+          if (editable_ && ImGui::BeginDragDropSource())
+          {
+            ImGui::SetDragDropPayload("DND_STEP", &i, sizeof(int));
+            ImGui::Text("Moving %s", application_handler_->sequenceHandler_.getWorkflow().at(i).c_str());
+            ImGui::EndDragDropSource();
+          }
+          else if (ImGui::IsItemHovered())
+          {
+            ImGui::BeginTooltip();
+            ImGui::Text(command.getDescription().c_str());
+            ImGui::EndTooltip();
+          }
+          if (editable_ && ImGui::BeginDragDropTarget())
+          {
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_STEP"))
+            {
+              IM_ASSERT(payload->DataSize == sizeof(int));
+              int source_n = *(const int*)payload->Data;
+              const auto tmp = application_handler_->sequenceHandler_.getWorkflow().at(source_n);
+              application_handler_->sequenceHandler_.getWorkflow().erase(application_handler_->sequenceHandler_.getWorkflow().cbegin() + source_n);
+              application_handler_->sequenceHandler_.getWorkflow().insert(application_handler_->sequenceHandler_.getWorkflow().cbegin() + i, tmp);
+            }
+            ImGui::EndDragDropTarget();
+          }
+          if (editable_)
+          {
+            ImGui::SameLine();
+          }
+          if (editable_ && ImGui::Button("x")) {
+            application_handler_->sequenceHandler_.getWorkflow().erase(application_handler_->sequenceHandler_.getWorkflow().cbegin() + i);
+          }
+          else {
+            ++i;
+          }
+          ImGui::PopID();
         }
-        ImGui::EndDragDropTarget();
       }
-      ImGui::SameLine();
-      if (ImGui::Button("x")) {
-        application_handler_->sequenceHandler_.getWorkflow().erase(application_handler_->sequenceHandler_.getWorkflow().cbegin() + i);
-      } else {
-        ++i;
-      }
-      ImGui::PopID();
     }
 
     ImGui::EndChild();
@@ -246,5 +238,7 @@ namespace SmartPeak
   {
     LOGD << "Setting state: " << (&state);
     application_handler_ = &state;
+    workflow_step_widget_.setApplicationHandler(state);
   }
+
 }

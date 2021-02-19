@@ -99,7 +99,7 @@ namespace SmartPeak
     LOGD << "END createSequence";
   }
 
-  ParameterSet ProcessSequence::getParameterSchema()
+  ParameterSet ProcessSequence::getParameterSchemaStatic()
   {
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
     {"SequenceProcessor", {
@@ -110,8 +110,13 @@ namespace SmartPeak
         {"description", "number of working threads"},
         {"min", "1"}
       }
-    }}});
+    }} });
     return ParameterSet(param_struct);
+  }
+
+  ParameterSet ProcessSequence::getParameterSchema() const
+  {
+    return ProcessSequence::getParameterSchemaStatic();
   }
 
   void ProcessSequence::process() const
