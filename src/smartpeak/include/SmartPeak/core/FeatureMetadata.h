@@ -55,7 +55,9 @@ namespace SmartPeak {
     mz,
     charge,
     mz_error_ppm,
-    mz_error_Da/*,
+    mz_error_Da,
+    average_accuracy,
+    absolute_difference/*,
     accuracy,
     n_features,
     validation*/
