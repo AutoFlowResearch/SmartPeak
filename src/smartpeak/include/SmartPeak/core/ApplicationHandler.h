@@ -29,15 +29,13 @@
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/core/SampleGroupProcessor.h>
 #include <SmartPeak/io/InputDataValidation.h>
-#include <SmartPeak/core/WorkflowObservable.h>
-#include <SmartPeak/core/ParametersObservable.h>
 #include <map>
 #include <string>
 #include <vector>
 
 namespace SmartPeak
 {
-  struct ApplicationHandler final : public ParametersObservable, public WorkflowObservable {
+  struct ApplicationHandler final {
     class Command {
     public:
       enum CommandType {

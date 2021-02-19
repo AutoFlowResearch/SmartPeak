@@ -36,14 +36,14 @@ namespace SmartPeak
   ParametersTableWidget::ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id)
     : session_handler_(session_handler), application_handler_(application_handler), table_id_(table_id)
   {
-    application_handler_.addParametersObserver(this);
-    application_handler_.addWorkflowObserver(this);
+    application_handler_.sequenceHandler_.addParametersObserver(this);
+    application_handler_.sequenceHandler_.addWorkflowObserver(this);
   };
 
   ParametersTableWidget::~ParametersTableWidget()
   {
-    application_handler_.removeParametersObserver(this);
-    application_handler_.removeWorkflowObserver(this);
+    application_handler_.sequenceHandler_.removeParametersObserver(this);
+    application_handler_.sequenceHandler_.removeWorkflowObserver(this);
   }
 
   void ParametersTableWidget::parametersUpdated()

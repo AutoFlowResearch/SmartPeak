@@ -152,7 +152,7 @@ namespace SmartPeak
                     "MERGE_INJECTIONS",
                     "STORE_FEATURES_SAMPLE_GROUP" };
           application_handler_->sequenceHandler_.setWorkflow(ids);
-          application_handler_->notifyWorkflowChanged();
+          application_handler_->sequenceHandler_.notifyWorkflowChanged();
           LOGI << "Local workflow has been replaced";
         }
       }
@@ -223,7 +223,7 @@ namespace SmartPeak
           }
           if (editable_ && ImGui::Button("x")) {
             application_handler_->sequenceHandler_.getWorkflow().erase(application_handler_->sequenceHandler_.getWorkflow().cbegin() + i);
-            application_handler_->notifyWorkflowChanged();
+            application_handler_->sequenceHandler_.notifyWorkflowChanged();
           }
           else {
             ++i;

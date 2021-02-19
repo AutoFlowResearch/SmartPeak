@@ -110,9 +110,6 @@ int main(int argc, char** argv)
   bool spectra_initialized = false;
   std::unique_ptr<SpectraPlotWidget> spectra_plot_widget;
 
-  // Parameters table
-  std::unique_ptr<ParametersTableWidget> parameters_table_widget;
-
   // Popup modals
   bool popup_about_ = false;
   bool popup_run_workflow_ = false;
@@ -128,6 +125,7 @@ int main(int argc, char** argv)
   FilePicker file_picker_;
   Report     report_;
   Workflow   workflow_;
+  std::unique_ptr<ParametersTableWidget> parameters_table_widget;
   report_.setApplicationHandler(application_handler_);
   workflow_.setApplicationHandler(application_handler_);
 
