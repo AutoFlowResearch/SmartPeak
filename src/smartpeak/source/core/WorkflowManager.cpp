@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -43,7 +43,7 @@ namespace SmartPeak {
     const std::set<std::string> sample_group_names_(sample_group_names);
     const std::vector<ApplicationHandler::Command> commands_(commands);
 
-    std::thread t(run_and_join, std::ref(application_handler_), std::ref(done_), std::ref(source_app_handler), injection_names_, sequence_segment_names_, sample_group_names_, commands_);
+    std::thread t(run_and_join, std::ref(application_handler_), std::ref(done_), injection_names_, sequence_segment_names_, sample_group_names_, commands_);
     LOGD << "Created thread (to be detached): " << t.get_id();
     t.detach();
     LOGD << "Thread has been detached";
@@ -54,14 +54,9 @@ namespace SmartPeak {
     return done_;
   }
 
-  void WorkflowManager::run_and_join(ApplicationHandler& application_handler, bool& done, ApplicationHandler& source_app_handler, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands)
+  void WorkflowManager::run_and_join(ApplicationHandler& application_handler, bool& done, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands)
   {
     // run workflow asynchronously
-    // making local copies
-    const std::set<std::string> injection_names_(injection_names);
-    const std::set<std::string> sequence_segment_names_(sequence_segment_names);
-    const std::set<std::string> sample_group_names_(sample_group_names);
-    std::printf(">>> Started WorkflowManager::run_and_join \n");
     std::future<void> f = std::async(
       std::launch::async,
       ApplicationProcessors::processCommands,
@@ -80,9 +75,13 @@ namespace SmartPeak {
       LOGE << e.what();
     }
 
-    // update the status for this workflow, to be used in the gui
-    source_app_handler = std::move(application_handler);
     done = true;
     LOGI << "State updated with workflow's results";
+  }
+
+  void WorkflowManager::updateApplicationHandler(ApplicationHandler& source_app_handler)
+  {
+    // update the status for this workflow, to be used in the gui
+    source_app_handler = std::move(application_handler_);
   }
 }

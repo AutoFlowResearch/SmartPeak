@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -50,6 +50,12 @@ namespace SmartPeak {
     */
     bool isWorkflowDone() const;
 
+    /**
+      Update the application handler with the resulting application handler
+      must be called from the main thread.
+    */
+    void updateApplicationHandler(ApplicationHandler& source_app_handler);
+
   private:
     /**
       Spawns a thread that runs the workflow, and waits for it to finish. The
@@ -64,7 +70,7 @@ namespace SmartPeak {
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
     */
-    static void run_and_join(ApplicationHandler& application_handler, bool& done, ApplicationHandler& source_app_handler, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands);
+    static void run_and_join(ApplicationHandler& application_handler, bool& done, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands);
 
     ApplicationHandler application_handler_; ///< The workflow is run on this copy
     bool done_ = true;

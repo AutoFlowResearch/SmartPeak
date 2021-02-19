@@ -63,8 +63,6 @@ namespace SmartPeak
   public:
     FilePicker()
     {
-      // current_pathname_ = fs::current_path().root_path().string();
-      // pathname_content_ = Utilities::getPathnameContent(current_pathname_);
     }
 
     void draw() override;
