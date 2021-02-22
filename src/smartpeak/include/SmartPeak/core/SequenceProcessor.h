@@ -119,8 +119,6 @@ namespace SmartPeak
     Filenames        filenames_;                            /// Pathnames to load
     std::string      delimiter          = ",";              /// String delimiter of the imported file
     bool             checkConsistency   = true;             /// Check consistency of data contained in files
-    ParametersObservable* parameters_observable_ = nullptr; /// Observable to notify changes
-    WorkflowObservable* workflow_observable_ = nullptr;     /// Observable to notify changes
 
     CreateSequence() = default;
     CreateSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
@@ -193,7 +191,6 @@ namespace SmartPeak
     LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
     void process() const override;
     std::string filename_;
-    WorkflowObservable* workflow_observable_ = nullptr;
 
     /* IProcessorDescription */
     int getID() const override { return -1; }

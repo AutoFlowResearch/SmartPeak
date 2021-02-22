@@ -52,7 +52,6 @@ namespace SmartPeak
     // load workflow
     LoadWorkflow loadWorkflow(*sequenceHandler_IO);
     loadWorkflow.filename_ = filenames_.workflow_csv_i;
-    loadWorkflow.workflow_observable_ = workflow_observable_;
     loadWorkflow.process();
 
     // TODO: Given that the raw data is shared between all injections, it could
@@ -62,7 +61,7 @@ namespace SmartPeak
 
     // load rawDataHandler files (applies to the whole session)
     LoadParameters loadParameters;
-    loadParameters.parameters_observable_ = parameters_observable_;
+    loadParameters.parameters_observable_ = sequenceHandler_IO;
     loadParameters.process(rawDataHandler, {}, filenames_);
     LoadTransitions loadTransitions;
     loadTransitions.process(rawDataHandler, {}, filenames_);
@@ -403,7 +402,7 @@ namespace SmartPeak
       res.clear();
     }
     sequenceHandler_IO->setWorkflow(res);
-    if (workflow_observable_) workflow_observable_->notifyWorkflowChanged();
+    sequenceHandler_IO->notifyWorkflowChanged();
     LOGD << "END LoadWorkflow";
   }
 

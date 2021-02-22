@@ -336,8 +336,6 @@ namespace SmartPeak
       cs.filenames_        = application_handler_.static_filenames_;
       cs.delimiter        = ",";
       cs.checkConsistency = false; // NOTE: Requires a lot of time on large sequences with a large number of components
-      cs.parameters_observable_ = &application_handler_.sequenceHandler_;
-      cs.workflow_observable_ = &application_handler_.sequenceHandler_;
       cs.process();
       return true;
     } else {
