@@ -2,6 +2,7 @@
 #include <SmartPeak/iface/IWorkflowObserver.h>
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 namespace SmartPeak 
 {
