@@ -1388,14 +1388,29 @@ BOOST_AUTO_TEST_CASE(pickMS2Features)
 
   // Test pick features
   PickMS2Features pickFeatures;
+  map<std::string, vector<map<string, string>>> feat_params_struct({
+  {"FeatureFindingMetabo", {
+    { {"name", "report_chromatograms"}, {"type", "bool"}, {"value", "true"} },
+    { {"name", "report_convex_hulls"}, {"type", "bool"}, {"value", "true"} },
+  }}
+  });
+  ParameterSet feat_params(feat_params_struct);
+  params_1.merge(feat_params);
+
   pickFeatures.process(rawDataHandler, params_1, filenames);
 
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 2258);
+  BOOST_CHECK_EQUAL(rawDataHandler.getExperiment().getChromatograms().size(), 2258);
 
   const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
   BOOST_CHECK_EQUAL(feature1.getMetaValue("label"), "T165.2");
   BOOST_CHECK_EQUAL(feature1.getMetaValue("num_of_masstraces").toString(), "1");
   BOOST_CHECK_EQUAL(feature1.getMetaValue("scan_polarity"), "positive");
+  BOOST_REQUIRE(feature1.getConvexHulls().size() == 1);
+  BOOST_CHECK_CLOSE(feature1.getConvexHull().getBoundingBox().minX(), 381.298f, 1e-3);
+  BOOST_CHECK_CLOSE(feature1.getConvexHull().getBoundingBox().minY(), 79.021f, 1e-3);
+  BOOST_CHECK_CLOSE(feature1.getConvexHull().getBoundingBox().maxX(), 540.557f, 1e-3);
+  BOOST_CHECK_CLOSE(feature1.getConvexHull().getBoundingBox().maxY(), 79.023f, 1e-3);
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getRT()), 453.462, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMZ()), 79.022321098842482, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getIntensity()), 7978.17578125, 1e-6);
@@ -1403,6 +1418,11 @@ BOOST_AUTO_TEST_CASE(pickMS2Features)
   const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
   BOOST_CHECK_EQUAL(feature2.getMetaValue("label"), "T971.1");
   BOOST_CHECK_EQUAL(feature2.getMetaValue("num_of_masstraces").toString(), "1");
+  BOOST_REQUIRE(feature2.getConvexHulls().size() == 1);
+  BOOST_CHECK_CLOSE(feature2.getConvexHull().getBoundingBox().minX(), 547.524f, 1e-3);
+  BOOST_CHECK_CLOSE(feature2.getConvexHull().getBoundingBox().minY(), 848.610f, 1e-3);
+  BOOST_CHECK_CLOSE(feature2.getConvexHull().getBoundingBox().maxX(), 592.812f, 1e-3);
+  BOOST_CHECK_CLOSE(feature2.getConvexHull().getBoundingBox().maxY(), 848.641f, 1e-3);
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getRT()), 568.428, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMZ()), 848.63375701405562, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(feature2.getIntensity()), 46520.29296875, 1e-6);

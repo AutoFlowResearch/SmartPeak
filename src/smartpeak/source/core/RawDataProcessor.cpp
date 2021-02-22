@@ -2484,18 +2484,14 @@ namespace SmartPeak
 
     OpenMS::FeatureFindingMetabo ffmet;
     OpenMS::Param ffmet_parameters = ffmet.getParameters();
-    Utilities::updateParameters(ffmet_parameters, params_I.at("MRMFeatureFinderScoring"));
+    Utilities::updateParameters(ffmet_parameters, params_I.at("FeatureFindingMetabo"));
 
     //-------------------------------------------------------------
     // Setting input
     //-------------------------------------------------------------
     OpenMS::PeakMap ms_peakmap;
-    std::vector<int> ms_level(1, 1);
     for (OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
       ms_peakmap.addSpectrum(spec);
-    }
-    for (OpenMS::Chromatogram& chromatogram : rawDataHandler_IO.getExperiment().getChromatograms()) {
-      ms_peakmap.addChromatogram(chromatogram);
     }
     if (ms_peakmap.empty())
     {
@@ -2620,9 +2616,41 @@ namespace SmartPeak
       << "Input traces:    " << m_traces_final.size() << "\n"
       << "Output features: " << feat_map.size() << " (total trace count: " << trace_count << ")";
 
+    // merge chromatograms: convert vector of vector of chromatograms to vector of chromatograms;
+    std::vector<OpenMS::Chromatogram> merged_chromatograms;
+    for (auto& chromatogram_list : feat_chromatograms)
+    {
+      OpenMS::Chromatogram c = chromatogram_list[0];
+      for (auto chromatogram_it = chromatogram_list.begin() + 1; chromatogram_it != chromatogram_list.end(); ++chromatogram_it)
+      {
+        for (OpenMS::ChromatogramPeak& peak : (*chromatogram_it))
+        {
+          c.push_back(peak);
+        }
+      }
+      merged_chromatograms.push_back(c);
+    }
+
     // filter features with zero intensity (this can happen if the FWHM is zero (bc of overly skewed shape) and no peaks end up being summed up)
+    std::vector<bool> to_filter;
     auto intensity_zero = [&](OpenMS::Feature& f) { return f.getIntensity() == 0; };
-    feat_map.erase(remove_if(feat_map.begin(), feat_map.end(), intensity_zero), feat_map.end());
+    auto remove_it = remove_if(feat_map.begin(), feat_map.end(), intensity_zero);
+    // clear corresponding chromatograms as well
+    for (auto feat_map_it = remove_it; feat_map_it != feat_map.end(); ++feat_map_it)
+    {
+      auto chromatogram_id_match = [&](OpenMS::Chromatogram& c) {
+        // extract feature_id from chromatogram native_id which is feature_id underscore index
+        auto chromatogram_id = c.getNativeID();
+        auto pos = chromatogram_id.find("_");
+        if (pos != std::string::npos)
+        {
+          chromatogram_id = chromatogram_id.substr(0, pos);
+        }
+        return (chromatogram_id == OpenMS::String((*feat_map_it).getUniqueId()));
+      };
+      merged_chromatograms.erase(remove_if(merged_chromatograms.begin(), merged_chromatograms.end(), chromatogram_id_match), merged_chromatograms.end());
+    }
+    feat_map.erase(remove_it, feat_map.end());
 
     // store ionization mode of spectra (useful for post-processing by AccurateMassSearch tool)
     if (!feat_map.empty())
@@ -2646,6 +2674,9 @@ namespace SmartPeak
 
     rawDataHandler_IO.setFeatureMap(feat_map);
     rawDataHandler_IO.updateFeatureMapHistory();
+    for (auto& chromatogram : merged_chromatograms) {
+        rawDataHandler_IO.getExperiment().getChromatograms().push_back(chromatogram);
+    }
 
     LOGD << "END PickMS2Features";
   }
