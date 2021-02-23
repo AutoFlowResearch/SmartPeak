@@ -1,0 +1,15 @@
+#!/usr/bin/python
+import os, sys, re
+import smartpeak.utils as utils
+
+
+def main(argc, argv):
+    latest = utils.get_latest_commit_message()
+    type, value = utils.is_release_command_present(latest)
+    if type and value:
+        print(type + ' ' + value, end='')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main(len(sys.argv), sys.argv))
