@@ -86,6 +86,7 @@ jobs:
             brew remove yarn node
             brew install cmake qt5 sdl2
             brew install boost
+            curl -C - -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
       - restore_cache:
           key: contrib_build-cache-{{ checksum "contrib_build.tar.gz" }}
       - run:
@@ -94,7 +95,8 @@ jobs:
             cd ~ &&
             git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
             cd OpenMS && mkdir contrib_build && cd contrib_build
-            curl -C - -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
+            # curl -C - -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
+            cp ~/SmartPeak/contrib_build.tar.gz .
             tar -xzf contrib_build.tar.gz
             rm lib/libboost_* && rm -r include/boost && rm -r lib/cmake/Boost* && rm -r lib/cmake/boost*
             sed -i '' 's/std::auto_ptr/std::unique_ptr/g' include/seqan/basic/test_system.h
@@ -104,7 +106,7 @@ jobs:
       - save_cache:
           key: contrib_build-cache-{{ checksum "contrib_build.tar.gz" }}
           paths: 
-            - ~/OpenMS/contrib_build
+            - ~/SmartPeak
       - run:
           name: Building SmartPeak (Including SuperBuild)
           command: |
