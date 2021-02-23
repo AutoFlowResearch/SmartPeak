@@ -104,7 +104,8 @@ jobs:
       - save_cache:
           name: Caching OpenMS::contrib_build
           key: contrib_build-cache-{{ checksum "contrib_build.tar.gz" }}
-          path: ~/OpenMS/contrib_build
+          path: 
+            - ~/OpenMS/contrib_build
       - run:
           name: Building SmartPeak (Including SuperBuild)
           command: |
