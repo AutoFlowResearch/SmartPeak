@@ -46,30 +46,30 @@ jobs:
       - run:
           name: Building SmartPeak's All Targets
           command: |
-            mkdir ~/SmartPeak_build
-            cd ~/SmartPeak_build
+            mkdir ~/smartpeak_release_build
+            cd ~/smartpeak_release_build
             cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
           command: |
-            cd ~/SmartPeak_build || exit 1
+            cd ~/smartpeak_release_build || exit 1
             ctest -V
             ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
       - run:
           name: Running SmartPeak Examples
           command: |
-            ~/SmartPeak/.circleci/run_examples.sh ~/SmartPeak_build/bin
+            ~/SmartPeak/.circleci/run_examples.sh ~/smartpeak_release_build/bin
       - run:
           name: Packing SmartPeak
           command: |
             set -o xtrace
-            cd ~/SmartPeak_build
+            cd ~/smartpeak_release_build
             cpack -V
-            ls -lh ~/SmartPeak_build | grep -a .deb
-            dpkg -c ~/SmartPeak_build/*.deb
+            ls -lh ~/smartpeak_release_build | grep -a .deb
+            dpkg -c ~/smartpeak_release_build/*.deb
             mkdir -p /tmp/packages
-            cp ~/SmartPeak_build/*.deb /tmp/packages
+            cp ~/smartpeak_release_build/*.deb /tmp/packages
       - store_artifacts:
           path: /tmp/packages
 
@@ -95,6 +95,7 @@ jobs:
             curl -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
             tar -xzf contrib_build.tar.gz
             rm lib/libboost_* && rm -r include/boost && rm -r lib/cmake/Boost* && rm -r lib/cmake/boost*
+            sed -i '' 's/std::auto_ptr/std::unique_ptr/g' include/seqan/basic/test_system.h
             cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
             cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
             make -j4 OpenMS
@@ -103,23 +104,23 @@ jobs:
           command: |
             cd ~/SmartPeak
             #mkdir superbuild
-            mkdir smartpeak_debug_build
+            mkdir smartpeak_release_build
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
-            cd ../smartpeak_debug_build
+            cd ../smartpeak_release_build
             cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
           command: |
             set +o pipefail
-            cd ~/SmartPeak/smartpeak_debug_build
+            cd ~/SmartPeak/smartpeak_release_build
             ctest -VV -F --timeout 1200 || true
       - run:
           name: Packing SmartPeak
           command: |
             set +e
-            cd ~/SmartPeak/smartpeak_debug_build
+            cd ~/SmartPeak/smartpeak_release_build
             ls -alt bin
             cpack -G DragNDrop && ls -alth
             yes | hdiutil attach -noautoopen -noverify SmartPeak-*.dmg > /dev/null
@@ -132,7 +133,7 @@ jobs:
           name: Moving Package to artifacts folder
           command: |
             mkdir -p /tmp/artifacts
-            cp ~/SmartPeak/smartpeak_debug_build/*.dmg /tmp/artifacts
+            cp ~/SmartPeak/smartpeak_release_build/*.dmg /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
 
@@ -228,11 +229,11 @@ jobs:
             }
             cd ~/SmartPeak
             #mkdir superbuild
-            mkdir smartpeak_build
+            mkdir smartpeak_release_build
             cd ~/SmartPeak/superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             cmake --build .
-            cd ~/SmartPeak/smartpeak_build
+            cd ~/SmartPeak/smartpeak_release_build
             cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:\lib\boost\boost_1_73_0" -DBOOST_INCLUDE_DIR="C:\lib\boost\boost_1_73_0" -DBOOST_LIBRARYDIR="C:\lib\boost\boost_1_73_0\lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="C:/Users/circleci/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
@@ -244,7 +245,7 @@ jobs:
           name: Preparing Artifact
           command: |
             mkdir -p ~/artifacts
-            cp ~/SmartPeak/smartpeak_build/*.exe ~/artifacts
+            cp ~/SmartPeak/smartpeak_release_build/*.exe ~/artifacts
       - store_artifacts:
           path: ~/artifacts
             
