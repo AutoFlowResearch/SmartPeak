@@ -102,9 +102,8 @@ jobs:
             cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
             make -j4 OpenMS
       - save_cache:
-          name: Caching OpenMS::contrib_build
           key: contrib_build-cache-{{ checksum "contrib_build.tar.gz" }}
-          path: 
+          paths: 
             - ~/OpenMS/contrib_build
       - run:
           name: Building SmartPeak (Including SuperBuild)
