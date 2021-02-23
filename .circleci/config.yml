@@ -87,7 +87,6 @@ jobs:
             brew install cmake qt5 sdl2
             brew install boost
       - restore_cache:
-          name: Retrieving OpenMS::contrib_build
           key: contrib_build-cache-{{ checksum "contrib_build.tar.gz" }}
       - run:
           name: Cloning and building OpenMS
