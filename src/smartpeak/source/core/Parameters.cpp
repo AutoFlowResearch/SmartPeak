@@ -315,6 +315,21 @@ namespace SmartPeak
     return isValid(value_, use_scheme);
   }
 
+  bool Parameter::operator==(const Parameter& other) const
+  {
+    return ((value_ == other.value_) && 
+            (name_ == other.name_) &&
+            (description_ == other.description_) &&
+            (tags_ == other.tags_) &&
+            ((!constraints_min_ && !other.constraints_min_) 
+            || ((constraints_min_ && other.constraints_min_) && (*constraints_min_ == *other.constraints_min_))) && 
+            ((!constraints_max_ && !other.constraints_max_) 
+            || ((constraints_max_ && other.constraints_max_) && (*constraints_max_ == *other.constraints_max_))) &&
+            ((!constraints_list_ && !other.constraints_list_)
+            || ((constraints_list_ && other.constraints_list_) && (*constraints_list_ == *other.constraints_list_)))
+      );
+  }
+
   FunctionParameters::FunctionParameters(const std::string& function_name, const std::vector<std::map<std::string, std::string>>& function_parameters) :
     function_name_(function_name)
   {
@@ -548,6 +563,11 @@ namespace SmartPeak
       return nullptr;
   }
 
+  bool FunctionParameters::operator==(const FunctionParameters& other) const
+  {
+    return ((function_name_ == other.function_name_) && (parameters_ == other.parameters_));
+  }
+
   ParameterSet::ParameterSet(const std::map<std::string, std::vector<std::map<std::string, std::string>>>& functions_map)
   {
     for (const auto& function : functions_map)
@@ -623,6 +643,11 @@ namespace SmartPeak
     for (auto& function_parameters : function_parameters_) {
       function_parameters.second.setAsSchema(is_schema);
     }
+  }
+
+  bool ParameterSet::operator==(const ParameterSet& other) const
+  {
+    return function_parameters_ == other.function_parameters_;
   }
 
 }

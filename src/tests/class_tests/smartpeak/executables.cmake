@@ -16,6 +16,8 @@ set(core_executables_list
 	SessionHandler_test
 	Utilities_test
 	Parameters_test
+	ParametersObservable_test
+	WorkflowObservable_test
 )
 
 set(io_executables_list

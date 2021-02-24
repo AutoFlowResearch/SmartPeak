@@ -37,6 +37,8 @@
 #include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/iface/IProcessorDescription.h>
+#include <SmartPeak/core/WorkflowObservable.h>
+#include <SmartPeak/core/ParametersObservable.h>
 
 #include <map>
 #include <vector>
@@ -524,6 +526,8 @@ namespace SmartPeak
     static void sanitizeParameters(
       ParameterSet& params_I
     );
+
+    ParametersObservable* parameters_observable_ = nullptr;
   };
 
   struct FitFeaturesEMG : RawDataProcessor

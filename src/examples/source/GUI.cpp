@@ -15,6 +15,7 @@
 #include <SmartPeak/ui/CalibratorsPlotWidget.h>
 #include <SmartPeak/ui/ChromatogramPlotWidget.h>
 #include <SmartPeak/ui/SpectraPlotWidget.h>
+#include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
@@ -124,6 +125,7 @@ int main(int argc, char** argv)
   FilePicker file_picker_;
   Report     report_;
   Workflow   workflow_;
+  std::unique_ptr<ParametersTableWidget> parameters_table_widget;
   report_.setApplicationHandler(application_handler_);
   workflow_.setApplicationHandler(application_handler_);
 
@@ -800,12 +802,14 @@ int main(int argc, char** argv)
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
         {
-          BuildCommandsFromNames buildCommandsFromNames(application_handler_);
-          buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
-          buildCommandsFromNames.process();
-          session_handler_.setParametersTable(application_handler_.sequenceHandler_, buildCommandsFromNames.commands_);
-          ParametersTableWidget Table(session_handler_.parameters_table_headers, session_handler_.parameters_table_body, Eigen::Tensor<bool, 1>(), "ParametersMainWindow");
-          Table.draw();
+          if (!parameters_table_widget)
+          {
+            parameters_table_widget = std::make_unique<ParametersTableWidget>(
+              session_handler_,
+              application_handler_,
+              "ParametersMainWindow");
+          }
+          parameters_table_widget->draw();
           ImGui::EndTabItem();
         }
         if (show_quant_method_table && ImGui::BeginTabItem("Quantitation Method", &show_quant_method_table))
