@@ -357,6 +357,12 @@ namespace SmartPeak
     li_ = data;
   }
 
+  void CastValue::setData(const char* data)
+  {
+    new (&s_) std::string(data);
+    is_clear_ = false;
+  }
+
   void CastValue::setData(const std::string& data)
   {
     new (&s_) std::string(data);

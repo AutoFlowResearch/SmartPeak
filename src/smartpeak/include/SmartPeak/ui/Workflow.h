@@ -24,6 +24,7 @@
 #pragma once
 
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/WorkflowStepWidget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <string>
 #include <vector>
@@ -38,5 +39,11 @@ namespace SmartPeak
     void draw() override;
 
     void setApplicationHandler(ApplicationHandler& application_handler);
+
+    void setEditable(bool editable) { editable_ = editable; };
+
+  protected:
+    WorkflowStepWidget workflow_step_widget_;
+    bool editable_ = true;
   };
 }

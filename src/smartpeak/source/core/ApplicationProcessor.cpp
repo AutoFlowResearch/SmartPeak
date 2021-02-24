@@ -209,7 +209,7 @@ namespace SmartPeak
   ParameterSet getParameterSchema()
   {
     ParameterSet parameter_set;
-    parameter_set.merge(ProcessSequence::getParameterSchema());
+    parameter_set.merge(ProcessSequence::getParameterSchemaStatic());
     return parameter_set;
   }
 

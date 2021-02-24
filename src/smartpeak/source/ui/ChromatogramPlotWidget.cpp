@@ -19,20 +19,26 @@ namespace SmartPeak
         component_names.insert(selected_transitions(i));
     }
 
-    if (refresh_needed_)
+    if ((refresh_needed_) || // data changed
+       ((input_component_names_ != component_names) || (input_sample_names_ != sample_names))) // user select different items
     {
-      // get the whole graph area
-      current_range_ = std::make_pair(0, 1800);
-      session_handler_.getChromatogramScatterPlot(sequence_handler_, chrom_, current_range_, sample_names, component_names);
-      current_range_ = slider_min_max_ = input_range_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
+      // we may recompute the RT window, get the whole graph area
+      session_handler_.getChromatogramScatterPlot(sequence_handler_, chrom_, std::make_pair(0, 1800), sample_names, component_names);
+      if ((std::abs(slider_min_max_.first - chrom_.x_min_) > std::numeric_limits<double>::epsilon()) ||
+          (std::abs(slider_min_max_.second - chrom_.x_max_) > std::numeric_limits<double>::epsilon()))
+      {
+        // min max changed, reset the sliders and current range
+        current_range_ = slider_min_max_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
+      }
+      input_range_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
+      input_sample_names_ = sample_names;
+      input_component_names_ = component_names;
       refresh_needed_ = false;
     }
-    if ((input_range_ != current_range_) || (input_component_names_ != component_names) || (input_sample_names_ != sample_names))
+    else if (input_range_ != current_range_) // user zoom in/out
     {
       session_handler_.getChromatogramScatterPlot(sequence_handler_, chrom_, current_range_, sample_names, component_names);
       input_range_ = current_range_;
-      input_sample_names_ = sample_names;
-      input_component_names_ = component_names;
     }
   };
 

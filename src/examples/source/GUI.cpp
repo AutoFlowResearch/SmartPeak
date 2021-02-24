@@ -158,6 +158,9 @@ int main(int argc, char** argv)
     .addAppender(&consoleAppender)
     .addAppender(&appender_);
 
+  // Log SmartPeak launch initiated:
+  LOG_INFO << "Start SmartPeak version " << Utilities::getSmartPeakVersion();
+
   if (error_msg.empty())
   {
     if (logdir_created) LOG_DEBUG << "Log directory created: " << logdirpath;
@@ -177,6 +180,8 @@ int main(int argc, char** argv)
   }
 
   // Setup window
+  auto smartpeak_window_title = static_cast<std::ostringstream&&>(
+    std::ostringstream() << "SmartPeak v" << Utilities::getSmartPeakVersion()).str();
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
@@ -185,7 +190,7 @@ int main(int argc, char** argv)
   SDL_DisplayMode current;
   SDL_GetCurrentDisplayMode(0, &current);
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-  SDL_Window* window = SDL_CreateWindow("SmartPeak SDL2+OpenGL application", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+  SDL_Window* window = SDL_CreateWindow(smartpeak_window_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
   SDL_GLContext gl_context = SDL_GL_CreateContext(window);
   SDL_GL_SetSwapInterval(1); // Enable vsync
 
@@ -227,6 +232,10 @@ int main(int argc, char** argv)
     // Intialize the window sizes
       win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
 
+      if ((!workflow_is_done_) && manager_.isWorkflowDone())
+      {
+        manager_.updateApplicationHandler(application_handler_);
+      }
       workflow_is_done_ = manager_.isWorkflowDone();
       file_loading_is_done_ = file_picker_.fileLoadingIsDone();
 
@@ -381,8 +390,9 @@ int main(int argc, char** argv)
     }
     if (ImGui::BeginPopupModal("About modal", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
+      // TODO: read text from file and print in the window
       ImGui::Text("About SmartPeak");
-      ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
+      ImGui::Text("SmartPeak %s", Utilities::getSmartPeakVersion().c_str());
       ImGui::Separator();
       ImGui::Text("By the hardworking SmartPeak developers.");
       ImGui::Separator();
@@ -438,7 +448,7 @@ int main(int argc, char** argv)
             popup_file_picker_ = true;
             update_session_cache_ = true;
           }
-          if (ImGui::MenuItem("Workflow")) {
+          if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_)) {
             static LoadSequenceWorkflow processor(application_handler_);
             file_picker_.setProcessor(processor);
             popup_file_picker_ = true;
@@ -784,6 +794,7 @@ int main(int argc, char** argv)
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
         {
+          workflow_.setEditable(workflow_is_done_);
           workflow_.draw();
           ImGui::EndTabItem();
         }
