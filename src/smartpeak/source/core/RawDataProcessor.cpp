@@ -2674,9 +2674,7 @@ namespace SmartPeak
 
     rawDataHandler_IO.setFeatureMap(feat_map);
     rawDataHandler_IO.updateFeatureMapHistory();
-    for (auto& chromatogram : merged_chromatograms) {
-        rawDataHandler_IO.getExperiment().getChromatograms().push_back(chromatogram);
-    }
+    rawDataHandler_IO.getExperiment().setChromatograms(merged_chromatograms);
 
     LOGD << "END PickMS2Features";
   }

@@ -1403,7 +1403,6 @@ BOOST_AUTO_TEST_CASE(pickMS2Features)
   BOOST_CHECK_EQUAL(rawDataHandler.getExperiment().getChromatograms().size(), 2258);
 
   const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
-  BOOST_CHECK_EQUAL(feature1.getMetaValue("label"), "T165.2");
   BOOST_CHECK_EQUAL(feature1.getMetaValue("num_of_masstraces").toString(), "1");
   BOOST_CHECK_EQUAL(feature1.getMetaValue("scan_polarity"), "positive");
   BOOST_REQUIRE(feature1.getConvexHulls().size() == 1);
@@ -1416,7 +1415,6 @@ BOOST_AUTO_TEST_CASE(pickMS2Features)
   BOOST_CHECK_CLOSE(static_cast<double>(feature1.getIntensity()), 7978.17578125, 1e-6);
 
   const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
-  BOOST_CHECK_EQUAL(feature2.getMetaValue("label"), "T971.1");
   BOOST_CHECK_EQUAL(feature2.getMetaValue("num_of_masstraces").toString(), "1");
   BOOST_REQUIRE(feature2.getConvexHulls().size() == 1);
   BOOST_CHECK_CLOSE(feature2.getConvexHull().getBoundingBox().minX(), 547.524f, 1e-3);
@@ -1430,7 +1428,6 @@ BOOST_AUTO_TEST_CASE(pickMS2Features)
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 2258);
 
   const OpenMS::Feature& hfeature1 = rawDataHandler.getFeatureMapHistory().at(0); // feature_map_history_
-  BOOST_CHECK_EQUAL(hfeature1.getMetaValue("label"), "T165.2");
   BOOST_CHECK_EQUAL(hfeature1.getMetaValue("num_of_masstraces").toString(), "1");
   BOOST_CHECK_EQUAL(hfeature1.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getRT()), 453.462, 1e-6);
@@ -1438,7 +1435,6 @@ BOOST_AUTO_TEST_CASE(pickMS2Features)
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getIntensity()), 7978.17578125, 1e-6);
 
   const OpenMS::Feature& hfeature2 = rawDataHandler.getFeatureMapHistory().back();
-  BOOST_CHECK_EQUAL(hfeature2.getMetaValue("label"), "T971.1");
   BOOST_CHECK_EQUAL(hfeature2.getMetaValue("num_of_masstraces").toString(), "1");
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getRT()), 568.428, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMZ()), 848.63375701405562, 1e-6);
