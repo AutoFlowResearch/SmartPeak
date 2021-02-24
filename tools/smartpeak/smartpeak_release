@@ -1,0 +1,210 @@
+#!/bin/bash
+################################################
+##                  Settings                  ##
+################################################
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+remote='origin'
+
+echo -e "\nWelcome to the SmartPeak release script\n\n"
+################################################
+##                Prerequisites               ##
+################################################
+## Verify smartpeak commands:
+which smartpeak_version &> /dev/null
+if [ $? -ne 0 ]; then
+    echo -e "${RED}'smartpeak_version' not found, make sure that PATH env variable includes path to smartpeak tools.${NC}"
+    exit 2
+fi
+which smartpeak_prepare_release &> /dev/null
+if [ $? -ne 0 ]; then
+    echo -e "${RED}'smartpeak_prepare_release' not found, make sure that PATH env variable includes path to smartpeak tools.${NC}"
+    exit 2
+fi
+which smartpeak_version_bumped &> /dev/null
+if [ $? -ne 0 ]; then
+    echo -e "${RED}'smartpeak_version_bumped' not found, make sure that PATH env variable includes path to smartpeak tools.${NC}"
+    exit 2
+fi
+# TODO: check PYTHONPATH is set to smartpeak package...
+## Check if git is available:
+which git &> /dev/null
+if [ $? -ne 0 ]; then
+    echo -e "${RED}'git' not found, install to continue${NC}"
+    exit 2
+fi
+## Check if gitchangelog is available:
+which gitchangelog &> /dev/null
+if [ $? -ne 0 ]; then
+    echo -e "${YELLOW}WARNING: 'gitchangelog' not found, enter 'pip install --user gitchangelog' to continue${NC}"
+    exit 2
+fi
+echo -e "${YELLOW}Pull develop branch to ensure release consistance.${NC}"
+# make sure develop is fresh
+if git rev-parse --verify develop &> /dev/null; then
+    git checkout develop
+    git pull $remote develop
+else
+    echo -e "${RED}Your local repository does not have 'develop' branch${NC}"
+    exit 2
+fi
+################################################
+##          Validate input arguments          ##
+################################################
+usage="Usage: smartpeak_release [--set-version VERSION] | [--bump major|minor|patch]\n
+VERSION must be formatted properly, i.e. MAJOR.MINOR.PATCH, each component must be a valid number."
+cmd=$1
+value=$2
+version=''
+package_version=`smartpeak_version`
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Unable to read current version of SmartPeak.${NC}"
+    exit 1
+fi
+echo -e "${GREEN}Current version of SmartPeak is $package_version${NC}"
+## check if version or bump is valid:
+if [ "$cmd" = "--set-version" ]; then
+    echo $value | grep -E -q '^([0-9]|[1-9][0-9]+)\.([0-9]|[1-9][0-9]+)\.([0-9]|[1-9][0-9]+)$'
+    version=$value
+    if [ $? -ne 0 ]; then
+        echo $usage
+        exit 1
+    fi
+elif [ "$cmd" = "--bump" ]; then
+    echo $value | grep -E -q '^(major|minor|patch)$'
+    if [ $? -ne 0 ]; then
+        echo $usage
+        exit 1
+    fi
+    version=`smartpeak_version_bumped --bump $value`
+else
+    echo -e $usage
+    exit 1
+fi
+echo -e "${YELLOW}Target release version is $version${NC}"
+################################################
+##            Fetch latest changes            ##
+################################################
+# Get package and repo name:
+repo_name=$(basename -s .git `git config --get remote.${remote}.url`)
+package_name='SmartPeak'
+echo -e "${GREEN}Processing: '${package_name}:${repo_name}'${NC}"
+# First check if target branch already exists on remote repo:
+echo -e "${YELLOW}Checkout to 'release/${version}' branch.${NC}"
+remote_exists=`git ls-remote --heads $remote release/${version} | wc -l`
+if [ $remote_exists -eq 0 ]; then
+    # if does not exists
+    if git rev-parse --verify develop &> /dev/null; then
+        git checkout develop
+        git pull $remote develop
+    else
+        echo -e "${RED}Your local repository does not have 'develop' branch${NC}"
+        exit 2
+    fi
+    if git rev-parse --verify release/${version} &> /dev/null; then
+        # Remove existing local branch - prevents from wrong updates of changelog
+        git branch -D release/${version}
+    fi
+    # Create new release local branch
+    # Branch off from develop:
+    git checkout -b release/${version}
+else
+    # otherwise if does exist
+    if git rev-parse --verify release/${version} &> /dev/null; then
+        # checkout to existing local branch and pull remote
+        git checkout release/${version}
+        git pull $remote release/${version}
+    else
+        # fetch remote branch and checkout:
+        git fetch $remote release/${version}
+        git checkout release/${version}
+    fi
+fi
+################################################
+##               Version Check                ##
+################################################
+## check if $version >= $package_version
+## the condition $version == $package_version is in case when release will fail after 
+tmp=$IFS
+IFS=. VER=(${version##*-})
+IFS=. PVER=(${package_version##*-})
+IFS=$tmp 
+### Convert to number:
+for i in {0..2}; do
+    VER[i]=$((${VER[i]} + 0))
+    PVER[i]=$((${PVER[i]} + 0))
+done
+### Check order:
+p=0
+q=0
+r=0
+if [ ${VER[0]} -eq ${PVER[0]} ] && [ ${VER[1]} -eq ${PVER[1]} ] && [ ${VER[2]} -ge ${PVER[2]} ]; then
+    p=1
+fi
+if [ ${VER[0]} -eq ${PVER[0]} ] && [ ${VER[1]} -gt ${PVER[1]} ]; then
+    q=1
+fi
+if [ ${VER[0]} -gt ${PVER[0]} ]; then
+    r=1
+fi
+s=$(($p + $q + $r))
+if [ $s -eq 0 ]; then
+    echo -e "${RED}Target version ($version) must be higher than current package version ($package_version).${NC}"
+    exit 2
+fi
+################################################
+##              Changelog Update              ##
+################################################
+# Update the changelog:
+echo -n "Do you want to modify changelog (press 'n' if changelog is ready for this version) [Y/n]:"
+read do_update
+if [ "$do_update" = "Y" ] || [ "$do_update" = "y" ]; then
+    ## Generate changelog or update existing one:
+    echo -e "${YELLOW}Generate or update the changelog${NC}"
+    echo -n "Do you want to include most recent commits (helps to identify all changes) [Y/n]:"
+    read do_include
+    if [ "$do_include" = "Y" ] || [ "$do_include" = "y" ]; then
+        gitchangelog 
+    fi
+    ## Open changelog for modification:
+    ### If user has Visual Code, then open the file with it:
+    ### otherwise open with nano:
+    echo -e "${YELLOW}Open CHANGELOG.rst for custom modifications...${NC}"
+    echo "Note: Close tab/editor to continue"
+    if which code &> /dev/null; then
+        code --wait CHANGELOG.rst
+    else
+        nano CHANGELOG.rst
+    fi
+    echo "Finished editing CHANGELOG.rst"
+fi
+################################################
+##              Commit and Push               ##
+################################################
+sleep 1
+echo "Following modifications will be added:"
+git add CHANGELOG.rst
+git commit -m "Release update ($version)"
+git diff develop..release/${version}
+echo
+echo -n "Do you want to continue with SmartPeak v${version} release? [Y/n]:"
+read do_continue
+if [ "$do_continue" = "Y" ] || [ "$do_continue" = "y" ]; then
+    echo -e "${YELLOW}Push 'release/${version}' branch to git repository${NC}"
+    git push $remote release/$version
+
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}Successfully initiated release.${NC}"
+        echo "Good Bye!"
+        exit 0
+    else
+        echo -e "${RED}Error occurred while pushing local changes.${NC}"
+        exit 1
+    fi
+else
+    echo "Release not finished."
+    echo "Good Bye!"
+fi
