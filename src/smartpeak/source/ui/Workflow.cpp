@@ -78,7 +78,7 @@ namespace SmartPeak
                     "QUANTIFY_FEATURES",
                     "STORE_FEATURES" };
           else if (s_string == "HPLC UV Unknowns")
-            ids = { "LOAD_RAW_DATA"
+            ids = { "LOAD_RAW_DATA",
                     "MAP_CHROMATOGRAMS",
                     "EXTRACT_CHROMATOGRAM_WINDOWS",
                     "ZERO_CHROMATOGRAM_BASELINE",
