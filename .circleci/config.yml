@@ -242,6 +242,15 @@ jobs:
             & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
       - run:
+          name: Signing SmartPeak with trusted certificate
+          command: |
+            cd ~/SmartPeak/smartpeak_build
+            git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
+            Import-Module .\CodeSigning\CertCrypto.psm1
+            Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
+            certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
+            & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
+      - run:
           name: Preparing Artifact
           command: |
             mkdir -p ~/artifacts
