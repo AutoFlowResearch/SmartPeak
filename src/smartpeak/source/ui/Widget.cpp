@@ -35,7 +35,7 @@ namespace SmartPeak
 {
   struct ImTableEntry
   {
-    int ID;
+    std::size_t ID;
     std::vector<const char*> Headers;
     
     static const ImGuiTableSortSpecs* s_current_sort_specs;
@@ -238,17 +238,39 @@ namespace SmartPeak
                                     const ImGuiTextFilter& filter, const size_t row) const
   {
     bool is_to_filter;
-    if (selected_entry > 0)
-    {
+    if (selected_entry > 0) {
       is_to_filter = !filter.PassFilter(Im_table_entries[row].Headers[selected_entry - 1]);
     }
-    else if (selected_entry == 0) //ALL
-    {
+    else if (selected_entry == 0) { //ALL
       is_to_filter = std::all_of(Im_table_entries[row].Headers.begin(),
                                  Im_table_entries[row].Headers.end(),
                                  [&filter](const char* entry){return !filter.PassFilter(entry);});
     }
     return is_to_filter;
+  }
+
+  void GenericTableWidget::updateTableContents(ImVector<ImTableEntry>& Im_table_entries, bool& is_scanned,
+                                               const Eigen::Tensor<std::string,2>& columns,
+                                               const Eigen::Tensor<bool,2>& checkbox_columns)
+  {
+    Im_table_entries.resize(columns.dimension(0), ImTableEntry());
+    if (!Im_table_entries.empty() && is_scanned == false) {
+      for (size_t row = 0; row < columns.dimension(0); ++row) {
+        ImTableEntry& Im_table_entry = Im_table_entries[row];
+        Im_table_entry.Headers.resize(columns.dimension(1) + checkbox_columns.dimension(1));
+        Im_table_entry.ID = row;
+        for (size_t header_idx = 0; header_idx < columns.dimension(1) + checkbox_columns.dimension(1); ++header_idx) {
+          if (header_idx < columns.dimension(1)) {
+            Im_table_entry.Headers[header_idx] = columns(row, header_idx).c_str();
+          }
+          else if (header_idx < columns.dimension(1) + checkbox_columns.dimension(1)) {
+            const std::size_t checkbox_idx = header_idx - static_cast<std::size_t>(columns.dimension(1));
+            Im_table_entry.Headers[header_idx] = checkbox_columns(row, checkbox_idx) == true ? "true" : "false";
+          }
+        }
+      }
+      is_scanned = true;
+    }
   }
 
   void GenericTableWidget::draw()
@@ -455,362 +477,145 @@ namespace SmartPeak
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "SequenceMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      sequence_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!sequence_table_entries.empty() && sequence_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = sequence_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        sequence_scanned = true;
-      }
+      updateTableContents(sequence_table_entries, sequence_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "TransitionsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      transition_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!transition_table_entries.empty() && transitions_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = transition_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        transitions_scanned = true;
-      }
+      updateTableContents(transition_table_entries, transitions_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "StdsConcsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      concentration_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!concentration_table_entries.empty() && concentrations_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = concentration_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        concentrations_scanned = true;
-      }
+      updateTableContents(concentration_table_entries, concentrations_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "ParametersMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      parameter_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!parameter_table_entries.empty() && parameters_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = parameter_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        parameters_scanned = true;
-      }
+      updateTableContents(parameter_table_entries, parameters_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "SpectrumMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      spectrum_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!spectrum_table_entries.empty() && spectrums_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = spectrum_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        spectrums_scanned = true;
-      }
+      updateTableContents(spectrum_table_entries, spectrums_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "QuantMethodMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      quantitation_method_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!quantitation_method_table_entries.empty() && quantitation_methods_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = quantitation_method_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        quantitation_methods_scanned = true;
-      }
+      updateTableContents(quantitation_method_table_entries, quantitation_methods_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompFiltersMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_filters_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_filters_table_entries.empty() && component_filters_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_filters_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_filters_scanned = true;
-      }
+      updateTableContents(component_filters_table_entries, component_filters_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupFiltersMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_group_filters_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_group_filters_table_entries.empty() && component_group_filters_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_group_filters_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_group_filters_scanned = true;
-      }
+      updateTableContents(component_group_filters_table_entries, component_group_filters_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompQCsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_qcs_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_qcs_table_entries.empty() && component_qcs_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_qcs_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_qcs_scanned = true;
-      }
+      updateTableContents(component_qcs_table_entries, component_qcs_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
+
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupQCsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_group_qcs_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_group_qcs_table_entries.empty() && component_group_qcs_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_group_qcs_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_group_qcs_scanned = true;
-      }
+      updateTableContents(component_group_qcs_table_entries, component_group_qcs_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "featuresTableMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      features_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!features_table_entries.empty() && features_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = features_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        features_scanned = true;
-      }
+      updateTableContents(features_table_entries, features_scanned, columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompRSDFiltersMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_rsd_filters_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_rsd_filters_table_entries.empty() && component_rsd_filters_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_rsd_filters_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_rsd_filters_scanned = true;
-      }
+      updateTableContents(component_rsd_filters_table_entries, component_rsd_filters_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupRSDFiltersMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_group_rsd_filter_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_group_rsd_filter_table_entries.empty() && component_group_rsd_filter_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_group_rsd_filter_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_group_rsd_filter_scanned = true;
-      }
+      updateTableContents(component_group_rsd_filter_table_entries, component_group_rsd_filter_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompRSDQCsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_rsd_qcs_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_rsd_qcs_table_entries.empty() && component_rsd_qcs_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_rsd_qcs_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_rsd_qcs_scanned = true;
-      }
+      updateTableContents(component_rsd_qcs_table_entries, component_rsd_qcs_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupRSDQCsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_group_rsd_qcs_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_group_rsd_qcs_table_entries.empty() && component_group_rsd_qcs_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_group_rsd_qcs_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_group_rsd_qcs_scanned = true;
-      }
+      updateTableContents(component_group_rsd_qcs_table_entries, component_group_rsd_qcs_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompBackgroundFiltersMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_background_filter_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_background_filter_table_entries.empty() && component_background_filter_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_background_filter_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_background_filter_scanned = true;
-      }
+      updateTableContents(component_background_filter_table_entries, component_background_filter_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupBackgroundFiltersMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_group_background_filter_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_group_background_filter_table_entries.empty() && component_group_background_filter_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_group_background_filter_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_group_background_filter_scanned = true;
-      }
+      updateTableContents(component_group_background_filter_table_entries, component_group_background_filter_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompBackgroundQCsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_background_qcs_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_background_qcs_table_entries.empty() && component_background_qcs_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_background_qcs_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_background_qcs_scanned = true;
-      }
+      updateTableContents(component_background_qcs_table_entries, component_background_qcs_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupBackgroundQCsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_group_background_qcs_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_group_background_qcs_table_entries.empty() && component_group_background_qcs_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_group_background_qcs_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_group_background_qcs_scanned = true;
-      }
+      updateTableContents(component_group_background_qcs_table_entries, component_group_background_qcs_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompRSDEstimationsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_rsd_estimations_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_rsd_estimations_table_entries.empty() && component_rsd_estimations_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_rsd_estimations_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_rsd_estimations_scanned = true;
-      }
+      updateTableContents(component_rsd_estimations_table_entries, component_rsd_estimations_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupRSDEstimationsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_group_rsd_estimations_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_group_rsd_estimations_table_entries.empty() && component_group_rsd_estimations_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_group_rsd_estimations_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_group_rsd_estimations_scanned = true;
-      }
+      updateTableContents(component_group_rsd_estimations_table_entries, component_group_rsd_estimations_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompBackgroundEstimationsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_background_estimations_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_background_estimations_table_entries.empty() && component_background_estimations_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_background_estimations_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_background_estimations_scanned = true;
-      }
+      updateTableContents(component_background_estimations_table_entries, component_background_estimations_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupBackgroundEstimationsMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      component_group_background_estimations_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!component_group_background_estimations_table_entries.empty() && component_group_background_estimations_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = component_group_background_estimations_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        component_group_background_estimations_scanned = true;
-      }
+      updateTableContents(component_group_background_estimations_table_entries, component_group_background_estimations_scanned,
+                          columns__, Eigen::Tensor<bool,2>());
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "featureMatrixMainWindow") {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
-      feature_matrix_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!feature_matrix_entries.empty() && feature_matrix_scanned == false) {
-        for (size_t row = 0; row < columns__.dimension(0); ++row) {
-          ImTableEntry& Im_table_entry = feature_matrix_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1));
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1); ++header_idx) {
-            Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-          }
-        }
-        feature_matrix_scanned = true;
-      }
+      updateTableContents(feature_matrix_entries, feature_matrix_scanned, columns__, Eigen::Tensor<bool,2>());
     }
     
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
@@ -1582,87 +1387,21 @@ namespace SmartPeak
     {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
       const static Eigen::Tensor<bool,2> checkbox_columns__(checkbox_columns_);
-      injection_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!injection_table_entries.empty() && injections_scanned == false)
-      {
-        for (size_t row = 0; row < columns__.dimension(0); ++row)
-        {
-          ImTableEntry& Im_table_entry = injection_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1) + checkbox_columns__.dimension(1));
-          Im_table_entry.ID = row;
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx)
-          {
-            if (header_idx < columns__.dimension(1))
-            {
-              Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-            }
-            else if (header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1))
-            {
-              const std::size_t checkbox_idx = header_idx - static_cast<std::size_t>( checkbox_columns__.dimension(1) ) + 1;
-              Im_table_entry.Headers[header_idx] = checkbox_columns__(row, checkbox_idx) == true ? "true" : "false";
-            }
-          }
-        }
-        injections_scanned = true;
-      }
+      updateTableContents(injection_table_entries, injections_scanned, columns__, checkbox_columns__);
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "TransitionsExplorerWindow")
     {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
       const static Eigen::Tensor<bool,2> checkbox_columns__(checkbox_columns_);
-      transition_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!transition_table_entries.empty() && transitions_scanned == false)
-      {
-        for (size_t row = 0; row < columns__.dimension(0); ++row)
-        {
-          ImTableEntry& Im_table_entry = transition_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1) + checkbox_columns__.dimension(1));
-          Im_table_entry.ID = row;
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx)
-          {
-            if (header_idx < columns__.dimension(1))
-            {
-              Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-            }
-            else if (header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1))
-            {
-              const std::size_t checkbox_idx = header_idx - static_cast<std::size_t>( checkbox_columns__.dimension(1) ) ;
-              Im_table_entry.Headers[header_idx] = checkbox_columns__(row, checkbox_idx) == true ? "true" : "false";
-            }
-          }
-        }
-        transitions_scanned = true;
-      }
+      updateTableContents(transition_table_entries, transitions_scanned, columns__, checkbox_columns__);
     }
     
     if (columns_.dimensions().TotalSize() > 0 && table_id_ == "FeaturesExplorerWindow")
     {
       const static Eigen::Tensor<std::string,2> columns__(columns_);
       const static Eigen::Tensor<bool,2> checkbox_columns__(checkbox_columns_);
-      feature_table_entries.resize(columns__.dimension(0), ImTableEntry());
-      if (!feature_table_entries.empty() && features_scanned == false)
-      {
-        for (size_t row = 0; row < columns__.dimension(0); ++row)
-        {
-          ImTableEntry& Im_table_entry = feature_table_entries[row];
-          Im_table_entry.Headers.resize(columns__.dimension(1) + checkbox_columns__.dimension(1));
-          Im_table_entry.ID = row;
-          for (size_t header_idx = 0; header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1); ++header_idx)
-          {
-            if (header_idx < columns__.dimension(1))
-            {
-              Im_table_entry.Headers[header_idx] = columns__(row, header_idx).c_str();
-            }
-            else if (header_idx < columns__.dimension(1) + checkbox_columns__.dimension(1))
-            {
-              const std::size_t checkbox_idx = header_idx - static_cast<std::size_t>( checkbox_columns__.dimension(1) ) + 1;
-              Im_table_entry.Headers[header_idx] = checkbox_columns__(row, checkbox_idx) == true ? "true" : "false";
-            }
-          }
-        }
-        features_scanned = true;
-      }
+      updateTableContents(feature_table_entries, features_scanned, columns__, checkbox_columns__);
     }
     
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
@@ -1694,7 +1433,7 @@ namespace SmartPeak
             if (table_id_ == "TransitionsExplorerWindow")
             {
               if (searcher(transition_table_entries, selected_col, filter, row))
-              continue;
+                continue;
             }
             
             ImGui::TableNextRow();

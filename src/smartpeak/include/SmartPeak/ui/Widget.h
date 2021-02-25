@@ -154,7 +154,30 @@ namespace SmartPeak
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
-    bool searcher(const ImVector<ImTableEntry>& Im_table_entries, const int& selected_entry, const ImGuiTextFilter& filter, const size_t row) const;
+    
+    /*
+    @brief Search across table entries
+
+    @param[in] Im_table_entries ImVector of ImTableEntry
+    @param[in] selected_entry Index of the column to search in starting from 1 as 0 is reserved for `All`
+    @param[in] filter Filter of type `ImGuiTextFilter`
+    @param[in] row Current row index
+    @param[out] returns true if entry is found (to be used in conjuction with continue)
+    */
+    bool searcher(const ImVector<ImTableEntry>& Im_table_entries, const int& selected_entry,
+                  const ImGuiTextFilter& filter, const size_t row) const;
+    
+    /*
+    @brief Update table contents with text table entries and checkboxes
+
+    @param[in,out] Im_table_entries ImVector of ImTableEntry
+    @param[in] is_scanned true if `columns_` and `checkbox_columns_` are in sync with `Im_table_entries`
+    @param[in] columns columns' entries
+    @param[in] checkbox_columns checkboxes' entries
+    */
+    void updateTableContents(ImVector<ImTableEntry>& Im_table_entries, bool& is_scanned,
+                             const Eigen::Tensor<std::string,2>& columns, const Eigen::Tensor<bool,2>& checkbox_columns);
+    
     const Eigen::Tensor<std::string,1>& headers_; // keep these `const` and references so that the data is not copied on each call!
     const Eigen::Tensor<std::string,2>& columns_;
     const Eigen::Tensor<bool, 1>& checked_rows_;
