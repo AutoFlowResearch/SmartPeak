@@ -2169,7 +2169,7 @@ namespace SmartPeak
         }
         else if (param.getName() == "feature_name")
         {
-          feature_name = param.getName();
+          feature_name = param.getValueAsString();
         }
       }
       
