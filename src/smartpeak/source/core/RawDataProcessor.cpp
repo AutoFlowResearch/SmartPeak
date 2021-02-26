@@ -2491,7 +2491,11 @@ namespace SmartPeak
     //-------------------------------------------------------------
     OpenMS::PeakMap ms_peakmap;
     for (OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
-      ms_peakmap.addSpectrum(spec);
+      // we want only MS1 specrtra
+      if (spec.getMSLevel() == 1)
+      {
+        ms_peakmap.addSpectrum(spec);
+      }
     }
     if (ms_peakmap.empty())
     {
