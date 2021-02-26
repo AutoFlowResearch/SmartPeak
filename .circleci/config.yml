@@ -244,7 +244,8 @@ jobs:
       - run:
           name: Signing SmartPeak with trusted certificate
           command: |
-            cd ~/SmartPeak/smartpeak_build
+            $ErrorActionPreference = "Stop"
+            cd ~/SmartPeak/smartpeak_release_build
             git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
             Import-Module .\CodeSigning\CertCrypto.psm1
             Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
