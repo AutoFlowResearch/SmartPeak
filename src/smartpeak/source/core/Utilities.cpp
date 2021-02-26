@@ -24,6 +24,7 @@
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/smartpeak_package_version.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <algorithm>
 #include <iostream>
@@ -678,5 +679,15 @@ namespace SmartPeak
           HOME, LOCALAPPDATA or SMARTPEAK_LOGS env variable is set. For details refer to user documentation");
     }
     return std::make_pair(path, flag);
+  }
+
+  std::string Utilities::getSmartPeakVersion()
+  {
+#if defined(SMARTPEAK_PACKAGE_VERSION)
+    return static_cast<std::ostringstream&&>(std::ostringstream()
+      << SMARTPEAK_PACKAGE_VERSION).str();
+#else
+    return "Unknown";
+#endif
   }
 }

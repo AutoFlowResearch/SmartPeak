@@ -18,58 +18,51 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
 #pragma once
 
-#include <map>
 #include <string>
-#include <type_traits>
+#include <utility>
+#include <vector>
+#include <imgui.h>
+#include <SmartPeak/core/SessionHandler.h>
+#include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/iface/IParametersObserver.h>
+#include <SmartPeak/iface/IWorkflowObserver.h>
+#include <unsupported/Eigen/CXX11/Tensor>
 
-namespace SmartPeak {
-  enum class FeatureMetadata {
-    asymmetry_factor = 1,
-    baseline_delta_to_height,
-    calculated_concentration,
-    log_signal_to_noise,
-    peak_apex_intensity,
-    peak_area,
-    points_across_baseline,
-    points_across_half_height,
-    qc_transition_pass,
-    qc_transition_message,
-    qc_transition_score,
-    qc_transition_group_pass,
-    qc_transition_group_message,
-    qc_transition_group_score,
-    tailing_factor,
-    total_width,
-    width_at_50_peak_height,
-    retention_time,
-    integration_left_boundary,
-    integration_right_boundary,
-    scan_polarity,
-    description,
-    modifications, 
-    chemical_formula,
-    mz,
-    charge,
-    mz_error_ppm,
-    mz_error_Da,
-    average_accuracy,
-    absolute_difference,
-    SIZE_OF_FeatureMetadata/*,
-    accuracy,
-    n_features,
-    validation*/
+namespace SmartPeak
+{
+
+  /**
+    @brief Base Parameters table
+  */
+  class ParametersTableWidget : public Widget, public IParametersObserver, public IWorkflowObserver
+  {
+  public:
+    ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id);
+    ~ParametersTableWidget();
+
+    void draw() override;
+  public:
+    /**
+     IParametersObserver
+    */
+    virtual void parametersUpdated() override;
+    /**
+     IWorkflowObserver
+    */
+    virtual void workflowUpdated() override;
+  protected:
+    Eigen::Tensor<std::string, 1> headers_;
+    Eigen::Tensor<std::string, 2> body_;
+    const std::string table_id_;
+  protected:
+    SessionHandler& session_handler_;
+    ApplicationHandler& application_handler_;
+    bool refresh_needed_ = true;
   };
 
-  // Returns the string representation that a FeatureMetadata would have in OpenMS
-  extern const std::map<FeatureMetadata, std::string> metadataToString;
-  extern const std::map<FeatureMetadata, std::string> metadatafloatToString;
-
-  constexpr size_t FeatureMetadataSize {
-    static_cast<std::underlying_type_t<FeatureMetadata>>(FeatureMetadata::SIZE_OF_FeatureMetadata) - 1
-  };
 }

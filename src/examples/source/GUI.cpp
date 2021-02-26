@@ -15,6 +15,7 @@
 #include <SmartPeak/ui/CalibratorsPlotWidget.h>
 #include <SmartPeak/ui/ChromatogramPlotWidget.h>
 #include <SmartPeak/ui/SpectraPlotWidget.h>
+#include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
@@ -124,6 +125,7 @@ int main(int argc, char** argv)
   FilePicker file_picker_;
   Report     report_;
   Workflow   workflow_;
+  std::unique_ptr<ParametersTableWidget> parameters_table_widget;
   report_.setApplicationHandler(application_handler_);
   workflow_.setApplicationHandler(application_handler_);
 
@@ -158,6 +160,9 @@ int main(int argc, char** argv)
     .addAppender(&consoleAppender)
     .addAppender(&appender_);
 
+  // Log SmartPeak launch initiated:
+  LOG_INFO << "Start SmartPeak version " << Utilities::getSmartPeakVersion();
+
   if (error_msg.empty())
   {
     if (logdir_created) LOG_DEBUG << "Log directory created: " << logdirpath;
@@ -177,6 +182,8 @@ int main(int argc, char** argv)
   }
 
   // Setup window
+  auto smartpeak_window_title = static_cast<std::ostringstream&&>(
+    std::ostringstream() << "SmartPeak v" << Utilities::getSmartPeakVersion()).str();
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
@@ -185,7 +192,7 @@ int main(int argc, char** argv)
   SDL_DisplayMode current;
   SDL_GetCurrentDisplayMode(0, &current);
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-  SDL_Window* window = SDL_CreateWindow("SmartPeak SDL2+OpenGL application", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
+  SDL_Window* window = SDL_CreateWindow(smartpeak_window_title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
   SDL_GLContext gl_context = SDL_GL_CreateContext(window);
   SDL_GL_SetSwapInterval(1); // Enable vsync
 
@@ -385,8 +392,9 @@ int main(int argc, char** argv)
     }
     if (ImGui::BeginPopupModal("About modal", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
+      // TODO: read text from file and print in the window
       ImGui::Text("About SmartPeak");
-      ImGui::Text("SmartPeak %s", "1.0"); //TODO: define version function
+      ImGui::Text("SmartPeak %s", Utilities::getSmartPeakVersion().c_str());
       ImGui::Separator();
       ImGui::Text("By the hardworking SmartPeak developers.");
       ImGui::Separator();
@@ -794,12 +802,14 @@ int main(int argc, char** argv)
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
         {
-          BuildCommandsFromNames buildCommandsFromNames(application_handler_);
-          buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
-          buildCommandsFromNames.process();
-          session_handler_.setParametersTable(application_handler_.sequenceHandler_, buildCommandsFromNames.commands_);
-          ParametersTableWidget Table(session_handler_.parameters_table_headers, session_handler_.parameters_table_body, Eigen::Tensor<bool, 1>(), "ParametersMainWindow");
-          Table.draw();
+          if (!parameters_table_widget)
+          {
+            parameters_table_widget = std::make_unique<ParametersTableWidget>(
+              session_handler_,
+              application_handler_,
+              "ParametersMainWindow");
+          }
+          parameters_table_widget->draw();
           ImGui::EndTabItem();
         }
         if (show_quant_method_table && ImGui::BeginTabItem("Quantitation Method", &show_quant_method_table))

@@ -284,73 +284,73 @@ namespace SmartPeak
       }
     }
   }
-  void SessionHandler::setParametersTable(const SequenceHandler & sequence_handler, const std::vector<ApplicationHandler::Command>& commands)
+  void SessionHandler::getParametersTable(ParameterSet user_parameters,
+                                          const std::vector<ApplicationHandler::Command>& commands,
+                                          Eigen::Tensor<std::string, 1>& headers_,
+                                          Eigen::Tensor<std::string, 2>& body_)
   {
-    if (sequence_handler.getSequence().size() > 0) {
-      // Make the parameters table headers
-      if (parameters_table_headers.size() <= 0) {
-        LOGD << "Making parameters_table_headers";
-        parameters_table_headers.resize(9);
-        parameters_table_headers.setValues({ "function","name","type","value","description","status","valid","restrictions","schema_type" });
-      }
-      const int n_cols = parameters_table_headers.size();
+    // Make the parameters table headers
+    if (headers_.size() <= 0) {
+      LOGD << "Making parameters_table_headers";
+      headers_.resize(9);
+      headers_.setValues({ "function","name","type","value","description","status","valid","restrictions","schema_type" });
+    }
+    const int n_cols = headers_.size();
 
-      // Construct schema based on the current workflow's command list
-      ParameterSet schema_params;
-      for (const auto& command : commands)
-      {
-        schema_params.merge(command.getParameterSchema());
-      }
-      schema_params.merge(ApplicationProcessors::getParameterSchema()); // Application processor will be used also
-      schema_params.setAsSchema(true);
+    // Construct schema based on the current workflow's command list
+    ParameterSet schema_params;
+    for (const auto& command : commands)
+    {
+      schema_params.merge(command.getParameterSchema());
+    }
+    schema_params.merge(ApplicationProcessors::getParameterSchema()); // Application processor will be used also
+    schema_params.setAsSchema(true);
 
-      // Construct parameters merging schema and user defined
-      ParameterSet user_parameters = sequence_handler.getSequence().at(0).getRawData().getParameters();
-      user_parameters.merge(schema_params);
+    // Construct parameters merging schema and user defined
+    user_parameters.merge(schema_params);
 
-      // Make the parameters table body
-      int n_rows = 0;
-      for (const auto& function_parameter : user_parameters) {
-        n_rows += function_parameter.second.size();
-      }
-      LOGD << "Making parameters_table_body";
-      parameters_table_body.resize(n_rows, n_cols);
-      int col = 0, row = 0;
-      for (const auto& function_parameters : user_parameters) {
-        for (const auto& parameter : function_parameters.second) {
-          parameters_table_body(row, col) = function_parameters.second.getFunctionName();
-          ++col;
-          parameters_table_body(row, col) = parameter.getName();
-          ++col;
-          parameters_table_body(row, col) = parameter.getType();
-          ++col;
-          parameters_table_body(row, col) = parameter.getValueAsString();
-          ++col;
-          parameters_table_body(row, col) = parameter.getDescription();
-          ++col;
-          std::string status;
-          if (parameter.getSchema())
-          {
-            status = "user_override";
-          }
-          else if (parameter.isSchema())
-          {
-            status = "default";
-          }
-          else
-          {
-            status = "unused";
-          }
-          parameters_table_body(row, col) = status;
-          ++col;
-          parameters_table_body(row, col) = parameter.isValid()? "true": "false";
-          ++col;
-          parameters_table_body(row, col) = parameter.getRestrictionsAsString();
-          ++col;
-          parameters_table_body(row, col) = parameter.getSchema() ? parameter.getSchema()->getType() : parameter.getType();
-          col = 0;
-          ++row;
+    // Make the parameters table body
+    int n_rows = 0;
+    for (const auto& function_parameter : user_parameters) {
+      n_rows += function_parameter.second.size();
+    }
+    LOGD << "Making parameters_table_body";
+    body_.resize(n_rows, n_cols);
+    int col = 0, row = 0;
+    for (const auto& function_parameters : user_parameters) {
+      for (const auto& parameter : function_parameters.second) {
+        body_(row, col) = function_parameters.second.getFunctionName();
+        ++col;
+        body_(row, col) = parameter.getName();
+        ++col;
+        body_(row, col) = parameter.getType();
+        ++col;
+        body_(row, col) = parameter.getValueAsString();
+        ++col;
+        body_(row, col) = parameter.getDescription();
+        ++col;
+        std::string status;
+        if (parameter.getSchema())
+        {
+          status = "user_override";
         }
+        else if (parameter.isSchema())
+        {
+          status = "default";
+        }
+        else
+        {
+          status = "unused";
+        }
+        body_(row, col) = status;
+        ++col;
+        body_(row, col) = parameter.isValid()? "true": "false";
+        ++col;
+        body_(row, col) = parameter.getRestrictionsAsString();
+        ++col;
+        body_(row, col) = parameter.getSchema() ? parameter.getSchema()->getType() : parameter.getType();
+        col = 0;
+        ++row;
       }
     }
   }

@@ -463,6 +463,15 @@ BOOST_AUTO_TEST_CASE(StoreWorkflow1)
 BOOST_AUTO_TEST_CASE(LoadWorkflow1)
 {
   SequenceHandler sequenceHandler;
+  struct WorkflowObserverTest : public IWorkflowObserver
+  {
+    virtual void workflowUpdated() override
+    {
+      nb_notifications_++;
+    }
+    int nb_notifications_ = 0;
+  } workflow_observer;
+  sequenceHandler.addWorkflowObserver(&workflow_observer);
   LoadWorkflow processor(sequenceHandler);
   processor.filename_ = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
   processor.process();
@@ -483,6 +492,7 @@ BOOST_AUTO_TEST_CASE(LoadWorkflow1)
   {
     BOOST_CHECK_EQUAL(expected_command_names[i], commands[i]);
   }
+  BOOST_CHECK_EQUAL(workflow_observer.nb_notifications_, 1);
 }
 
 BOOST_AUTO_TEST_CASE(gettersProcessSampleGroups)
