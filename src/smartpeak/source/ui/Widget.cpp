@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -146,8 +146,8 @@ namespace SmartPeak
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
-      ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedSame| ImGuiTableFlags_NoSavedSettings |
+      ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti;
 
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
       // First row headers
@@ -180,8 +180,8 @@ namespace SmartPeak
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
-      ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedSame| ImGuiTableFlags_NoSavedSettings |
+      ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti;
 
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
       // First row headers

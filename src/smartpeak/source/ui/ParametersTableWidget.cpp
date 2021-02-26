@@ -79,8 +79,8 @@ namespace SmartPeak
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
-      ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedSame | ImGuiTableFlags_NoSavedSettings |
+      ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti;
 
     // Columns we want to show up
     std::vector<int> cols_to_show = { 0, 1, 2, 3, 7 };
