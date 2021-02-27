@@ -178,6 +178,17 @@ namespace SmartPeak
     void updateTableContents(ImVector<ImTableEntry>& Im_table_entries, bool& is_scanned,
                              const Eigen::Tensor<std::string,2>& columns, const Eigen::Tensor<bool,2>& checkbox_columns);
     
+    /*
+    @brief Perform sorting on a given `ImVector` of `ImTableEntry` elements
+
+    @param[in,out] Im_table_entries ImVector of ImTableEntry
+    @param[in] sorts_specs with sort specs of current table
+    @param[in] is_scanned true if `columns_` and `checkbox_columns_` are in sync with `Im_table_entries`
+    @param[in] col_idx column index of the column which needs to be sorted
+    */
+    void sorter(ImVector<ImTableEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs,
+                const bool& is_scanned, const unsigned int col_idx);
+    
     const Eigen::Tensor<std::string,1>& headers_; // keep these `const` and references so that the data is not copied on each call!
     const Eigen::Tensor<std::string,2>& columns_;
     const Eigen::Tensor<bool, 1>& checked_rows_;
