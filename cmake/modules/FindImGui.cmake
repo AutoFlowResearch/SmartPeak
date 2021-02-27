@@ -132,7 +132,7 @@ foreach(_component IN LISTS ImGui_FIND_COMPONENTS)
             set(ImGui_Sources_FOUND TRUE)
             set(ImGui_SOURCES )
 
-            foreach(_file imgui imgui_widgets imgui_draw imgui_demo imgui_tables)
+            foreach(_file imgui imgui_widgets imgui_draw  imgui_tables)
                 # Disable the find root path here, it overrides the
                 # CMAKE_FIND_ROOT_PATH_MODE_INCLUDE setting potentially set in
                 # toolchains.

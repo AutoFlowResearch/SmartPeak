@@ -149,7 +149,7 @@ foreach(_examples ${EXAMPLE_executables})
 
   elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux) 
 
-    if (${_examples} STREQUAL "SmartPeak")
+    if (${_examples} STREQUAL "SmartPeakGUI")
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
           OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
@@ -176,7 +176,7 @@ foreach(_examples ${EXAMPLE_executables})
   else() # Win
 
     add_executable(${_examples} source/${_examples})
-    if(NOT ${_examples} STREQUAL "SmartPeak")
+    if(NOT ${_examples} STREQUAL "SmartPeakGUI")
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
     else()
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
