@@ -39,7 +39,7 @@ jobs:
           name: Installing SmartPeak SuperBuild
           command: |
             cd ~/SmartPeak
-            mkdir superbuild
+            mkdir -p superbuild
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
