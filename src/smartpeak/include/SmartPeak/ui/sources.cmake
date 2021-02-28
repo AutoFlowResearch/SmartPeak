@@ -3,12 +3,18 @@ set(directory include/SmartPeak/ui)
 
 ### list all header files of the directory here
 set(sources_list_h
+	CalibratorsPlotWidget.h
+	ChromatogramPlotWidget.h
 	FilePicker.h
 	GuiAppender.h
+	Heatmap2DWidget.h
+	ParametersTableWidget.h
 	Report.h
+	SpectraPlotWidget.h
 	Widget.h
 	WindowSizesAndPositions.h
 	Workflow.h
+	WorkflowStepWidget.h
 )
 
 ### add path to the filenames

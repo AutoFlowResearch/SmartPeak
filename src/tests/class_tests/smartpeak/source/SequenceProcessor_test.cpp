@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 23);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 27);
   BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
   BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleGroupName(), "Test02");
   BOOST_CHECK_EQUAL(injection5.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 23);
+  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 27);
   BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions().size(), 324);
   BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
@@ -184,6 +184,15 @@ BOOST_AUTO_TEST_CASE(createSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 0);
 }
 
+BOOST_AUTO_TEST_CASE(gettersCreateSequence)
+{
+  SequenceHandler sequenceHandler;
+  CreateSequence cs(sequenceHandler);
+
+  BOOST_CHECK_EQUAL(cs.getID(), -1);
+  BOOST_CHECK_EQUAL(cs.getName(), "CREATE_SEQUENCE");
+}
+
 BOOST_AUTO_TEST_CASE(processSequence)
 {
   SequenceHandler sequenceHandler;
@@ -260,6 +269,15 @@ BOOST_AUTO_TEST_CASE(processSequence)
   }
 }
 
+BOOST_AUTO_TEST_CASE(gettersProcessSequence)
+{
+  SequenceHandler sequenceHandler;
+  ProcessSequence cs(sequenceHandler);
+
+  BOOST_CHECK_EQUAL(cs.getID(), -1);
+  BOOST_CHECK_EQUAL(cs.getName(), "PROCESS_SEQUENCE");
+}
+
 BOOST_AUTO_TEST_CASE(processSequenceSegments)
 {
   SequenceHandler sequenceHandler;
@@ -331,6 +349,15 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
   BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 0.8, 1e-6);
 
   // TODO: Selected sequence segment names
+}
+
+BOOST_AUTO_TEST_CASE(gettersProcessSequenceSegments)
+{
+  SequenceHandler sequenceHandler;
+  ProcessSequenceSegments cs(sequenceHandler);
+
+  BOOST_CHECK_EQUAL(cs.getID(), -1);
+  BOOST_CHECK_EQUAL(cs.getName(), "PROCESS_SEQUENCE_SEGMENTS");
 }
 
 BOOST_AUTO_TEST_CASE(processSampleGroups)
@@ -436,6 +463,15 @@ BOOST_AUTO_TEST_CASE(StoreWorkflow1)
 BOOST_AUTO_TEST_CASE(LoadWorkflow1)
 {
   SequenceHandler sequenceHandler;
+  struct WorkflowObserverTest : public IWorkflowObserver
+  {
+    virtual void workflowUpdated() override
+    {
+      nb_notifications_++;
+    }
+    int nb_notifications_ = 0;
+  } workflow_observer;
+  sequenceHandler.addWorkflowObserver(&workflow_observer);
   LoadWorkflow processor(sequenceHandler);
   processor.filename_ = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
   processor.process();
@@ -456,6 +492,16 @@ BOOST_AUTO_TEST_CASE(LoadWorkflow1)
   {
     BOOST_CHECK_EQUAL(expected_command_names[i], commands[i]);
   }
+  BOOST_CHECK_EQUAL(workflow_observer.nb_notifications_, 1);
+}
+
+BOOST_AUTO_TEST_CASE(gettersProcessSampleGroups)
+{
+  SequenceHandler sequenceHandler;
+  ProcessSampleGroups cs(sequenceHandler);
+
+  BOOST_CHECK_EQUAL(cs.getID(), -1);
+  BOOST_CHECK_EQUAL(cs.getName(), "PROCESS_SAMPLE_GROUPS");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

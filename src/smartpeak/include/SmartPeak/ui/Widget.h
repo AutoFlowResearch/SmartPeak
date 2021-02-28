@@ -112,28 +112,6 @@ namespace SmartPeak
   };
 
   /**
-    @brief Base Parameters table
-  */
-  class ParametersTableWidget : public Widget
-  {
-  public:
-    ParametersTableWidget(const Eigen::Tensor<std::string, 1>& headers, const Eigen::Tensor<std::string, 2>& columns, const Eigen::Tensor<bool, 1>& checked_rows, const std::string& table_id)
-      : headers_(headers), columns_(columns), checked_rows_(checked_rows), table_id_(table_id) {};
-    /*
-    @brief Show the table
-
-    @param[in] headers Column header names
-    @param[in,out] columns Table body or matrix
-    @param[in,out] checked_rows What rows are checked/filtered
-    */
-    void draw() override;
-    const Eigen::Tensor<std::string, 1>& headers_; // keep these `const` and references so that the data is not copied on each call!
-    const Eigen::Tensor<std::string, 2>& columns_;
-    const Eigen::Tensor<bool, 1>& checked_rows_;
-    const std::string table_id_; // keep this `const` and non-reference so that the table is not built de-novo on each call!
-  };
-
-  /**
     @brief Base class for default tables
 
     TODO: features

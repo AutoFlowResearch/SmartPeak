@@ -209,7 +209,7 @@ namespace SmartPeak
   ParameterSet getParameterSchema()
   {
     ParameterSet parameter_set;
-    parameter_set.merge(ProcessSequence::getParameterSchema());
+    parameter_set.merge(ProcessSequence::getParameterSchemaStatic());
     return parameter_set;
   }
 
@@ -351,6 +351,7 @@ namespace SmartPeak
       LoadParameters loadParameters;
       Filenames filenames = application_handler_.static_filenames_;
       filenames.parameters_csv_i = pathname_;
+      loadParameters.parameters_observable_ = &application_handler_.sequenceHandler_;
       loadParameters.process(rawDataHandler, {}, filenames);
       return true;
     }

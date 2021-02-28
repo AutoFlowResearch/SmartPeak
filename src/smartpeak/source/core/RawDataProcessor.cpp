@@ -67,6 +67,11 @@
 #include <OpenMS/FILTERING/NOISEESTIMATION/SignalToNoiseEstimatorMedianRapid.h> // PickMS1Features
 #include <OpenMS/ANALYSIS/ID/AccurateMassSearchEngine.h>
 
+// PickMS2Features
+#include <OpenMS/FILTERING/DATAREDUCTION/MassTraceDetection.h>
+#include <OpenMS/FILTERING/DATAREDUCTION/ElutionPeakDetection.h>
+#include <OpenMS/FILTERING/DATAREDUCTION/FeatureFindingMetabo.h>
+
 #include <algorithm>
 #include <exception>
 
@@ -1080,6 +1085,7 @@ namespace SmartPeak
     try {
       FileReader::parseOpenMSParams(filenames.parameters_csv_i, rawDataHandler_IO.getParameters());
       sanitizeParameters(rawDataHandler_IO.getParameters());
+      if (parameters_observable_) parameters_observable_->notifyParametersChanged();
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -1097,9 +1103,12 @@ namespace SmartPeak
     // # check for workflow parameters integrity
     const std::vector<std::string> required_function_parameter_names = {
       "SequenceSegmentPlotter",
+      "ElutionPeakDetection",
       "FeaturePlotter",
+      "FeatureFindingMetabo",
       "AbsoluteQuantitation",
       "mzML",
+      "MassTraceDetection",
       "MRMMapping",
       "ChromatogramExtractor",
       "MRMFeatureFinderScoring",
@@ -1117,9 +1126,11 @@ namespace SmartPeak
       "SequenceProcessor",
       "FIAMS",
       "PickMS1Features",
+      "PickMS2Features",
       "AccurateMassSearchEngine",
       "MergeInjections"
     };
+
     for (const std::string& function_parameter_name : required_function_parameter_names) {
       if (!params_I.count(function_parameter_name)) {
         FunctionParameters function_parameter(function_parameter_name);
@@ -2413,4 +2424,264 @@ namespace SmartPeak
 
     LOGD << "END CalculateMDVAccuracies";
   }
+
+  ParameterSet PickMS2Features::getParameterSchema() const
+  {
+    OpenMS::MassTraceDetection mass_trace_detection;
+    OpenMS::ElutionPeakDetection elution_peak_detection;
+    OpenMS::FeatureFindingMetabo feature_finding_metabo;
+    ParameterSet parameters({ mass_trace_detection, elution_peak_detection, feature_finding_metabo });
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"PickMS2Features", {
+    {
+      {"name", "enable_elution"},
+      {"type", "bool"},
+      {"value", "true"},
+      {"description", "Enable elution peak detection"},
+    },
+    {
+      {"name", "force_processing"},
+      {"type", "bool"},
+      {"value", "false"},
+      {"description", "To enforce processing of the data when Profile data is provided but spectra is not centroided"},
+    },
+    {
+      {"name", "max_traces"},
+      {"type", "int"},
+      {"value", "0"},
+      {"description", "Max traces to use for MassTraceDetection. 0 means all traces."},
+    }
+    }} });
+    ParameterSet pick_ms2_feature_params(param_struct);
+    parameters.merge(pick_ms2_feature_params);
+    return parameters;
+  }
+
+  void PickMS2Features::process(
+    RawDataHandler& rawDataHandler_IO,
+    const ParameterSet& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START PickMS2Features";
+
+    //-------------------------------------------------------------
+    // set parameters
+    //-------------------------------------------------------------
+    FunctionParameters pick_ms2_feature_params;
+    if (params_I.count("PickMS2Features"))
+    {
+      pick_ms2_feature_params = params_I.at("PickMS2Features");
+    }
+
+    OpenMS::MassTraceDetection mtdet;
+    OpenMS::Param mtdet_parameters = mtdet.getParameters();
+    mtdet_parameters.remove("chrom_fwhm");
+    Utilities::updateParameters(mtdet_parameters, params_I.at("MassTraceDetection"));
+
+    OpenMS::ElutionPeakDetection epdet;
+    OpenMS::Param epdet_parameters = epdet.getParameters();
+    Utilities::updateParameters(epdet_parameters, params_I.at("ElutionPeakDetection"));
+
+    OpenMS::FeatureFindingMetabo ffmet;
+    OpenMS::Param ffmet_parameters = ffmet.getParameters();
+    Utilities::updateParameters(ffmet_parameters, params_I.at("FeatureFindingMetabo"));
+
+    //-------------------------------------------------------------
+    // Setting input
+    //-------------------------------------------------------------
+    OpenMS::PeakMap ms_peakmap;
+    for (OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
+      // we want only MS1 specrtra
+      if (spec.getMSLevel() == 1)
+      {
+        ms_peakmap.addSpectrum(spec);
+      }
+    }
+    if (ms_peakmap.empty())
+    {
+      LOGW << "The given file does not contain any conventional peak data, but might"
+        " contain chromatograms. This tool currently cannot handle them, sorry.";
+      return;
+    }
+
+    // determine type of spectral data (profile or centroided)
+    OpenMS::SpectrumSettings::SpectrumType spectrum_type = ms_peakmap[0].getType();
+
+    if (spectrum_type == OpenMS::SpectrumSettings::PROFILE)
+    {
+      Parameter* force_processing = pick_ms2_feature_params.findParameter("force_processing");
+      if (!force_processing || force_processing->getValueAsString() == "false")
+      {
+        LOGE << "Error: Profile data provided but centroided spectra expected. To enforce processing of the data set the force_processing parameter.";
+        return;
+      }
+    }
+
+    // make sure the spectra are sorted by m/z
+    ms_peakmap.sortSpectra(true);
+
+    std::vector<OpenMS::MassTrace> m_traces;
+
+    //-------------------------------------------------------------
+    // configure and run mass trace detection
+    //-------------------------------------------------------------
+
+    mtdet.setParameters(mtdet_parameters);
+    int max_traces = 0;
+    Parameter* max_traces_param = pick_ms2_feature_params.findParameter("max_traces");
+    if (max_traces_param)
+    {
+      try {
+        max_traces = std::stoi(max_traces_param->getValueAsString());
+      }
+      catch (const std::exception& e)
+      {
+        LOGE << e.what();
+        // keep it to 0
+      }
+    }
+
+    mtdet.run(ms_peakmap, m_traces, max_traces);
+
+    //-------------------------------------------------------------
+    // configure and run elution peak detection
+    //-------------------------------------------------------------
+    std::vector<OpenMS::MassTrace> m_traces_final;
+    Parameter* enable_elution = pick_ms2_feature_params.findParameter("enable_elution");
+    if (enable_elution && enable_elution->getValueAsString() == "true")
+    {
+      std::vector<OpenMS::MassTrace> splitted_mtraces;
+      epdet.setParameters(epdet_parameters);
+      // fill mass traces with smoothed data as well .. bad design..
+      epdet.detectPeaks(m_traces, splitted_mtraces);
+      if (epdet.getParameters().getValue("width_filtering") == "auto")
+      {
+        m_traces_final.clear();
+        epdet.filterByPeakWidth(splitted_mtraces, m_traces_final);
+      }
+      else
+      {
+        m_traces_final = splitted_mtraces;
+      }
+    }
+    else // no elution peak detection
+    {
+      m_traces_final = m_traces;    
+      try {
+        for (auto & trace: m_traces_final) // estimate FWHM, so .getIntensity() can be called later
+        {
+          trace.estimateFWHM(false);
+        }
+      }
+      catch (const std::exception& e) {
+        LOGE << e.what();
+        return;
+      }
+      if (ffmet_parameters.getValue("use_smoothed_intensities").toBool())
+      {
+        LOGW << "Without EPD, smoothing is not supported. Setting 'use_smoothed_intensities' to false!";
+        ffmet_parameters.setValue("use_smoothed_intensities", "false");
+      }
+    }
+
+    //-------------------------------------------------------------
+    // configure and run feature finding
+    //-------------------------------------------------------------
+
+    OpenMS::FeatureMap feat_map;
+    std::vector< std::vector< OpenMS::MSChromatogram > > feat_chromatograms;
+    ffmet.setParameters(ffmet_parameters);
+    ffmet.run(m_traces_final, feat_map, feat_chromatograms);
+
+    size_t trace_count(0);
+    for (const auto& feat : feat_map)
+    {
+      if (!feat.metaValueExists("num_of_masstraces"))
+      {
+        LOGE << "MetaValue 'num_of_masstraces' missing from FFMetabo output!";
+        return;
+      }
+      trace_count += (size_t)feat.getMetaValue("num_of_masstraces");
+    }
+    if (trace_count != m_traces_final.size())
+    {
+      if (!ffmet_parameters.getValue("remove_single_traces").toBool())
+      {
+        LOGE << "FF-Metabo: Internal error. Not all mass traces have been assembled to features! Aborting.";
+        return;
+      }
+      else
+      {
+        LOGI << "FF-Metabo: " << (m_traces_final.size() - trace_count) << " unassembled traces have been removed.";
+      }
+    }
+
+    LOGI << "-- FF-Metabo stats --\n"
+      << "Input traces:    " << m_traces_final.size() << "\n"
+      << "Output features: " << feat_map.size() << " (total trace count: " << trace_count << ")";
+
+    // merge chromatograms: convert vector of vector of chromatograms to vector of chromatograms;
+    std::vector<OpenMS::Chromatogram> merged_chromatograms;
+    for (auto& chromatogram_list : feat_chromatograms)
+    {
+      OpenMS::Chromatogram c = chromatogram_list[0];
+      for (auto chromatogram_it = chromatogram_list.begin() + 1; chromatogram_it != chromatogram_list.end(); ++chromatogram_it)
+      {
+        for (OpenMS::ChromatogramPeak& peak : (*chromatogram_it))
+        {
+          c.push_back(peak);
+        }
+      }
+      merged_chromatograms.push_back(c);
+    }
+
+    // filter features with zero intensity (this can happen if the FWHM is zero (bc of overly skewed shape) and no peaks end up being summed up)
+    std::vector<bool> to_filter;
+    auto intensity_zero = [&](OpenMS::Feature& f) { return f.getIntensity() == 0; };
+    auto remove_it = remove_if(feat_map.begin(), feat_map.end(), intensity_zero);
+    // clear corresponding chromatograms as well
+    for (auto feat_map_it = remove_it; feat_map_it != feat_map.end(); ++feat_map_it)
+    {
+      auto chromatogram_id_match = [&](OpenMS::Chromatogram& c) {
+        // extract feature_id from chromatogram native_id which is feature_id underscore index
+        auto chromatogram_id = c.getNativeID();
+        auto pos = chromatogram_id.find("_");
+        if (pos != std::string::npos)
+        {
+          chromatogram_id = chromatogram_id.substr(0, pos);
+        }
+        return (chromatogram_id == OpenMS::String((*feat_map_it).getUniqueId()));
+      };
+      merged_chromatograms.erase(remove_if(merged_chromatograms.begin(), merged_chromatograms.end(), chromatogram_id_match), merged_chromatograms.end());
+    }
+    feat_map.erase(remove_it, feat_map.end());
+
+    // store ionization mode of spectra (useful for post-processing by AccurateMassSearch tool)
+    if (!feat_map.empty())
+    {
+      std::set<OpenMS::IonSource::Polarity> pols;
+      for (const auto &peakmap: ms_peakmap)
+      {
+        pols.insert(peakmap.getInstrumentSettings().getPolarity());
+      }
+      // concat to single string
+      OpenMS::StringList sl_pols;
+      for (const auto& pol : pols)
+      {
+        sl_pols.push_back(OpenMS::String(OpenMS::IonSource::NamesOfPolarity[pol]));
+      }
+      feat_map[0].setMetaValue("scan_polarity", OpenMS::ListUtils::concatenate(sl_pols, ";"));
+    }
+
+    feat_map.setPrimaryMSRunPath({ rawDataHandler_IO.getMetaData().getFilename() });
+    LOGD << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename();
+
+    rawDataHandler_IO.setFeatureMap(feat_map);
+    rawDataHandler_IO.updateFeatureMapHistory();
+    rawDataHandler_IO.getExperiment().setChromatograms(merged_chromatograms);
+
+    LOGD << "END PickMS2Features";
+  }
+
 }

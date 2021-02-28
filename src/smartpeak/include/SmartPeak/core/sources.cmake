@@ -11,6 +11,7 @@ set(sources_list_h
 	FeatureMetadata.h
 	MetaDataHandler.h
 	Parameters.h
+	ParametersObservable.h
 	RawDataHandler.h
 	RawDataProcessor.h
 	SampleGroupHandler.h
@@ -25,6 +26,7 @@ set(sources_list_h
 	SharedProcessors.h
 	Utilities.h
 	WorkflowManager.h
+	WorkflowObservable.h
 )
 
 ### add path to the filenames

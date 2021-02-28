@@ -61,6 +61,7 @@ namespace SmartPeak
 
     // load rawDataHandler files (applies to the whole session)
     LoadParameters loadParameters;
+    loadParameters.parameters_observable_ = sequenceHandler_IO;
     loadParameters.process(rawDataHandler, {}, filenames_);
     LoadTransitions loadTransitions;
     loadTransitions.process(rawDataHandler, {}, filenames_);
@@ -99,7 +100,7 @@ namespace SmartPeak
     LOGD << "END createSequence";
   }
 
-  ParameterSet ProcessSequence::getParameterSchema()
+  ParameterSet ProcessSequence::getParameterSchemaStatic()
   {
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
     {"SequenceProcessor", {
@@ -110,8 +111,13 @@ namespace SmartPeak
         {"description", "number of working threads"},
         {"min", "1"}
       }
-    }}});
+    }} });
     return ParameterSet(param_struct);
+  }
+
+  ParameterSet ProcessSequence::getParameterSchema() const
+  {
+    return ProcessSequence::getParameterSchemaStatic();
   }
 
   void ProcessSequence::process() const
@@ -396,6 +402,7 @@ namespace SmartPeak
       res.clear();
     }
     sequenceHandler_IO->setWorkflow(res);
+    sequenceHandler_IO->notifyWorkflowChanged();
     LOGD << "END LoadWorkflow";
   }
 

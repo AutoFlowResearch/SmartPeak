@@ -299,6 +299,24 @@ namespace SmartPeak
       return i_ == other.i_;
     case Type::LONG_INT:
       return li_ == other.li_;
+    case Type::BOOL_LIST:
+      return bl_ == other.bl_;
+    case Type::INT_LIST:
+      return il_ == other.il_;
+    case Type::FLOAT_LIST:
+      return fl_ == other.fl_;
+    case Type::STRING_LIST:
+      return std::equal(sl_.begin(), sl_.end(), other.sl_.begin(), [case_sensitive](const std::string& l, const std::string& r) {
+        if (!case_sensitive) {
+          std::string a_lowercase, b_lowercase;
+          a_lowercase.resize(l.size());
+          b_lowercase.resize(r.size());
+          std::transform(l.begin(), l.end(), a_lowercase.begin(), ::tolower);
+          std::transform(r.begin(), r.end(), b_lowercase.begin(), ::tolower);
+          return a_lowercase.compare(b_lowercase) == 0;
+        }
+        return l.compare(r) == 0;
+      });
     default:
       LOGE << "Tag type cannot be compared";
       return true;
@@ -355,6 +373,12 @@ namespace SmartPeak
   void CastValue::setData(const long int data)
   {
     li_ = data;
+  }
+
+  void CastValue::setData(const char* data)
+  {
+    new (&s_) std::string(data);
+    is_clear_ = false;
   }
 
   void CastValue::setData(const std::string& data)
