@@ -48,7 +48,7 @@ namespace SmartPeak
     bool loading_is_done_ = true;
     bool file_was_loaded_ = true;
     bool error_loading_file_ = false;
-    std::atomic_bool files_scanned {false};
+    std::atomic_bool files_scanned_ {false};
 
     void run_and_join(
       FilePickerProcessor* processor,
@@ -58,7 +58,7 @@ namespace SmartPeak
     );
     
     ///!  rescan pathname_content_ into content_items when needed
-    void update_contents(ImVector<ImDirectoryEntry>& content_items);
+    void updateContents(ImVector<ImDirectoryEntry>& content_items);
 
   public:
     FilePicker()

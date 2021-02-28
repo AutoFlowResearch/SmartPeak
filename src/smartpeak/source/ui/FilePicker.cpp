@@ -110,9 +110,9 @@ namespace SmartPeak
 
   const ImGuiTableSortSpecs* ImDirectoryEntry::s_current_sort_specs = NULL;
 
-  void FilePicker::update_contents(ImVector<ImDirectoryEntry>& Im_directory_entries)
+  void FilePicker::updateContents(ImVector<ImDirectoryEntry>& Im_directory_entries)
   {
-    if (!files_scanned)
+    if (!files_scanned_)
     {
       pathname_content_ = Utilities::getPathnameContent(current_pathname_);
       Im_directory_entries.resize(pathname_content_[0].size());
@@ -125,7 +125,7 @@ namespace SmartPeak
         ImDirectoryEntry.Type               = pathname_content_[2][row].c_str();
         ImDirectoryEntry.DateModified       = pathname_content_[3][row].c_str();
       }
-      files_scanned = true;
+      files_scanned_ = true;
     }
   }
 
@@ -145,7 +145,7 @@ namespace SmartPeak
         current_pathname_ = parent;
       }
       pathname_content_ = Utilities::getPathnameContent(current_pathname_);
-      files_scanned = false;
+      files_scanned_ = false;
       memset(selected_filename, 0, sizeof selected_filename);
       selected_entry = -1;
     }
@@ -167,7 +167,7 @@ namespace SmartPeak
         current_pathname_.assign(new_pathname);
         pathname_content_ = Utilities::getPathnameContent(current_pathname_);
         memset(selected_filename, 0, sizeof selected_filename);
-        files_scanned = false;
+        files_scanned_ = false;
         selected_entry = -1;
         ImGui::CloseCurrentPopup();
       }
@@ -200,7 +200,7 @@ namespace SmartPeak
     
     static ImVector<ImDirectoryEntry> Im_directory_entries;
     static ImVector<int> selection;
-    update_contents(Im_directory_entries);
+    updateContents(Im_directory_entries);
     
     ImVec2 size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 2);
     if (ImGui::BeginTable("FileBrowser", column_count, table_flags, size))
@@ -276,8 +276,8 @@ namespace SmartPeak
               
               current_pathname_.append(item->Name);
               memset(selected_filename, 0, sizeof selected_filename);
-              files_scanned = false;
-              update_contents(Im_directory_entries);
+              files_scanned_ = false;
+              updateContents(Im_directory_entries);
               filter.Clear();
               selected_entry = -1;
               break;
