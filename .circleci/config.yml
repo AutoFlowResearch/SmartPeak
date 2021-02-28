@@ -39,7 +39,7 @@ jobs:
           name: Installing SmartPeak SuperBuild
           command: |
             cd ~/SmartPeak
-            #mkdir superbuild
+            mkdir -p superbuild
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
@@ -103,7 +103,7 @@ jobs:
           name: Building SmartPeak (Including SuperBuild)
           command: |
             cd ~/SmartPeak
-            #mkdir superbuild
+            mkdir superbuild
             mkdir smartpeak_release_build
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
@@ -124,11 +124,11 @@ jobs:
             ls -alt bin
             cpack -G DragNDrop && ls -alth
             yes | hdiutil attach -noautoopen -noverify SmartPeak-*.dmg > /dev/null
-            otool -l /Volumes/SmartPeak-1.0.0-Darwin/GUI.app/Contents/MacOS/GUI | grep -a name
-            cp -r /Volumes/SmartPeak-*-Darwin/GUI.app /Volumes/SmartPeak-*-Darwin/share .
-            xattr -l GUI.app/*
-            sudo xattr -dr com.apple.quarantine GUI.app
-            # open GUI.app
+            otool -l /Volumes/SmartPeak-1.0.0-Darwin/SmartPeakGUI.app/Contents/MacOS/SmartPeakGUI | grep -a name
+            cp -r /Volumes/SmartPeak-*-Darwin/SmartPeakGUI.app /Volumes/SmartPeak-*-Darwin/share .
+            xattr -l SmartPeakGUI.app/*
+            sudo xattr -dr com.apple.quarantine SmartPeakGUI.app
+            # open SmartPeakGUI.app
       - run:
           name: Moving Package to artifacts folder
           command: |
@@ -228,13 +228,13 @@ jobs:
                 }
             }
             cd ~/SmartPeak
-            #mkdir superbuild
+            mkdir superbuild
             mkdir smartpeak_release_build
             cd ~/SmartPeak/superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             cmake --build .
             cd ~/SmartPeak/smartpeak_release_build
-            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/lib/boost/boost_1_73_0" -DBOOST_INCLUDE_DIR="C:/lib/boost/boost_1_73_0" -DBOOST_LIBRARYDIR="C:/lib/boost/boost_1_73_0\lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="C:/Users/circleci/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/lib/boost/boost_1_73_0" -DBOOST_INCLUDE_DIR="C:/lib/boost/boost_1_73_0" -DBOOST_LIBRARYDIR="C:/lib/boost/boost_1_73_0/lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="C:/Users/circleci/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
