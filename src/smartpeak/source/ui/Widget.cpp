@@ -234,7 +234,7 @@ namespace SmartPeak
     }
   }
 
-  bool GenericTableWidget::searcher(const ImVector<ImTableEntry> &Im_table_entries, const int &selected_entry,
+  bool GenericTableWidget::searcher(const std::vector<ImTableEntry>& Im_table_entries, const int &selected_entry,
                                     const ImGuiTextFilter& filter, const size_t row) const
   {
     bool is_to_filter;
@@ -249,7 +249,7 @@ namespace SmartPeak
     return is_to_filter;
   }
 
-  void GenericTableWidget::updateTableContents(ImVector<ImTableEntry>& Im_table_entries, bool& is_scanned,
+  void GenericTableWidget::updateTableContents(std::vector<ImTableEntry>& Im_table_entries, bool& is_scanned,
                                                const Eigen::Tensor<std::string,2>& columns,
                                                const Eigen::Tensor<bool,2>& checkbox_columns)
   {
@@ -257,7 +257,7 @@ namespace SmartPeak
     if (!Im_table_entries.empty() && is_scanned == false) {
       for (size_t row = 0; row < columns.dimension(0); ++row) {
         ImTableEntry& Im_table_entry = Im_table_entries[row];
-        Im_table_entry.Headers.resize(columns.dimension(1) + checkbox_columns.dimension(1));
+        Im_table_entry.Headers.resize(columns.dimension(1) + checkbox_columns.dimension(1), nullptr);
         Im_table_entry.ID = row;
         for (size_t header_idx = 0; header_idx < columns.dimension(1) + checkbox_columns.dimension(1); ++header_idx) {
           if (header_idx < columns.dimension(1)) {
@@ -273,7 +273,7 @@ namespace SmartPeak
     }
   }
 
-  void GenericTableWidget::sorter(ImVector<ImTableEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs,
+  void GenericTableWidget::sorter(std::vector<ImTableEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs,
                                   const bool& is_scanned, const unsigned int col_idx)
   {
     if (sorts_specs->SpecsDirty && is_scanned &&
@@ -282,8 +282,8 @@ namespace SmartPeak
                      (ImTableEntry& entry){ return !std::strcmp(entry.Headers[col_idx], Im_table_entries.begin()->Headers[col_idx]); }))
     {
       ImTableEntry::s_current_sort_specs = sorts_specs;
-      if (Im_table_entries.Size > 1)
-        qsort(&Im_table_entries[0], (size_t)Im_table_entries.Size, sizeof(Im_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
+      if (Im_table_entries.size() > 1)
+        qsort(&Im_table_entries[0], (size_t)Im_table_entries.size(), sizeof(Im_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
       ImTableEntry::s_current_sort_specs = NULL;
       sorts_specs->SpecsDirty = false;
     }
@@ -321,30 +321,30 @@ namespace SmartPeak
     
     ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size() );
     
-    static ImVector<ImTableEntry> sequence_table_entries;
-    static ImVector<ImTableEntry> transition_table_entries;
-    static ImVector<ImTableEntry> concentration_table_entries;
-    static ImVector<ImTableEntry> parameter_table_entries;
-    static ImVector<ImTableEntry> spectrum_table_entries;
-    static ImVector<ImTableEntry> quantitation_method_table_entries;
-    static ImVector<ImTableEntry> component_filters_table_entries;
-    static ImVector<ImTableEntry> component_group_filters_table_entries;
-    static ImVector<ImTableEntry> component_qcs_table_entries;
-    static ImVector<ImTableEntry> component_group_qcs_table_entries;
-    static ImVector<ImTableEntry> features_table_entries;
-    static ImVector<ImTableEntry> component_rsd_filters_table_entries;
-    static ImVector<ImTableEntry> component_group_rsd_filter_table_entries;
-    static ImVector<ImTableEntry> component_rsd_qcs_table_entries;
-    static ImVector<ImTableEntry> component_group_rsd_qcs_table_entries;
-    static ImVector<ImTableEntry> component_background_filter_table_entries;
-    static ImVector<ImTableEntry> component_group_background_filter_table_entries;
-    static ImVector<ImTableEntry> component_background_qcs_table_entries;
-    static ImVector<ImTableEntry> component_group_background_qcs_table_entries;
-    static ImVector<ImTableEntry> component_rsd_estimations_table_entries;
-    static ImVector<ImTableEntry> component_group_rsd_estimations_table_entries;
-    static ImVector<ImTableEntry> component_background_estimations_table_entries;
-    static ImVector<ImTableEntry> component_group_background_estimations_table_entries;
-    static ImVector<ImTableEntry> feature_matrix_entries;
+    static std::vector<ImTableEntry> sequence_table_entries;
+    static std::vector<ImTableEntry> transition_table_entries;
+    static std::vector<ImTableEntry> concentration_table_entries;
+    static std::vector<ImTableEntry> parameter_table_entries;
+    static std::vector<ImTableEntry> spectrum_table_entries;
+    static std::vector<ImTableEntry> quantitation_method_table_entries;
+    static std::vector<ImTableEntry> component_filters_table_entries;
+    static std::vector<ImTableEntry> component_group_filters_table_entries;
+    static std::vector<ImTableEntry> component_qcs_table_entries;
+    static std::vector<ImTableEntry> component_group_qcs_table_entries;
+    static std::vector<ImTableEntry> features_table_entries;
+    static std::vector<ImTableEntry> component_rsd_filters_table_entries;
+    static std::vector<ImTableEntry> component_group_rsd_filter_table_entries;
+    static std::vector<ImTableEntry> component_rsd_qcs_table_entries;
+    static std::vector<ImTableEntry> component_group_rsd_qcs_table_entries;
+    static std::vector<ImTableEntry> component_background_filter_table_entries;
+    static std::vector<ImTableEntry> component_group_background_filter_table_entries;
+    static std::vector<ImTableEntry> component_background_qcs_table_entries;
+    static std::vector<ImTableEntry> component_group_background_qcs_table_entries;
+    static std::vector<ImTableEntry> component_rsd_estimations_table_entries;
+    static std::vector<ImTableEntry> component_group_rsd_estimations_table_entries;
+    static std::vector<ImTableEntry> component_background_estimations_table_entries;
+    static std::vector<ImTableEntry> component_group_background_estimations_table_entries;
+    static std::vector<ImTableEntry> feature_matrix_entries;
     
     static bool sequence_scanned;
     static bool transitions_scanned;
@@ -1015,9 +1015,9 @@ namespace SmartPeak
     
     ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
     
-    static ImVector<ImTableEntry> injection_table_entries;
-    static ImVector<ImTableEntry> transition_table_entries;
-    static ImVector<ImTableEntry> feature_table_entries;
+    static std::vector<ImTableEntry> injection_table_entries;
+    static std::vector<ImTableEntry> transition_table_entries;
+    static std::vector<ImTableEntry> feature_table_entries;
     static bool injections_scanned;
     static bool transitions_scanned;
     static bool features_scanned;
