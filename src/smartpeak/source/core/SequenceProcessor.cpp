@@ -61,6 +61,7 @@ namespace SmartPeak
 
     // load rawDataHandler files (applies to the whole session)
     LoadParameters loadParameters;
+    loadParameters.parameters_observable_ = sequenceHandler_IO;
     loadParameters.process(rawDataHandler, {}, filenames_);
     LoadTransitions loadTransitions;
     loadTransitions.process(rawDataHandler, {}, filenames_);
@@ -401,6 +402,7 @@ namespace SmartPeak
       res.clear();
     }
     sequenceHandler_IO->setWorkflow(res);
+    sequenceHandler_IO->notifyWorkflowChanged();
     LOGD << "END LoadWorkflow";
   }
 

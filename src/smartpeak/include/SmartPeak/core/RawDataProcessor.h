@@ -37,6 +37,8 @@
 #include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/iface/IProcessorDescription.h>
+#include <SmartPeak/core/WorkflowObservable.h>
+#include <SmartPeak/core/ParametersObservable.h>
 
 #include <map>
 #include <vector>
@@ -290,6 +292,23 @@ namespace SmartPeak
     ) const override;
   };
 
+  struct PickMS2Features : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "PICK_MS2_FEATURES"; }
+    std::string getDescription() const override { return "Pick MS2 Features"; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** PickMS2Features
+     */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
   struct SearchAccurateMass : RawDataProcessor
   {
     int getID() const override { return -1; }
@@ -524,6 +543,8 @@ namespace SmartPeak
     static void sanitizeParameters(
       ParameterSet& params_I
     );
+
+    ParametersObservable* parameters_observable_ = nullptr;
   };
 
   struct FitFeaturesEMG : RawDataProcessor
@@ -702,4 +723,5 @@ namespace SmartPeak
                  const Filenames& filenames
                  ) const override;
   };
+
 }

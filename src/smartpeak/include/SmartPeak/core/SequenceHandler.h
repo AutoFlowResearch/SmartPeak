@@ -23,6 +23,8 @@
 
 #pragma once
 
+#include <SmartPeak/core/WorkflowObservable.h>
+#include <SmartPeak/core/ParametersObservable.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SampleGroupHandler.h>
 #include <SmartPeak/core/InjectionHandler.h>
@@ -31,7 +33,9 @@
 
 namespace SmartPeak
 {
-  class SequenceHandler
+  class SequenceHandler : 
+    public ParametersObservable, 
+    public WorkflowObservable
   {
 public:
     void clear();

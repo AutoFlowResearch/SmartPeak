@@ -351,6 +351,7 @@ namespace SmartPeak
       LoadParameters loadParameters;
       Filenames filenames = application_handler_.static_filenames_;
       filenames.parameters_csv_i = pathname_;
+      loadParameters.parameters_observable_ = &application_handler_.sequenceHandler_;
       loadParameters.process(rawDataHandler, {}, filenames);
       return true;
     }

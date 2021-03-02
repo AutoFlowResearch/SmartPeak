@@ -11,7 +11,7 @@ set(pipeline_executables_list
 
 set(interactive_executables_list
   #CLI // TODO: refactor according to AUT-322
-  GUI
+  SmartPeakGUI
 )
 
 ### collect example executables

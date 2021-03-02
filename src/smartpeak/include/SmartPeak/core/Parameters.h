@@ -183,6 +183,9 @@ namespace SmartPeak
     */
     const std::string getDefaultValueAsString() const { return schema_ ? schema_->getValueAsString() : getValueAsString(); };
 
+    bool operator==(const Parameter & other) const;
+    inline bool operator!=(const Parameter& other) const { return !operator==(other); };
+
   protected:
     friend class Utilities;
     const CastValue& getValue() const { return value_; };
@@ -260,6 +263,9 @@ namespace SmartPeak
     */
     void merge(const FunctionParameters& other);
 
+    bool operator==(const FunctionParameters& other) const;
+    inline bool operator!=(const FunctionParameters& other) const { return !operator==(other); };
+
     // underlying vector accessors
     size_t size() const { return parameters_.size(); };
     std::vector<Parameter>::iterator begin() { return parameters_.begin(); };
@@ -333,6 +339,9 @@ namespace SmartPeak
     @param[in] parameter the parameter to add
     */
     void addParameter(const std::string& function_name, Parameter& parameter);
+
+    bool operator==(const ParameterSet& other) const;
+    inline bool operator!=(const ParameterSet& other) const { return !operator==(other); };
 
     // underlying map accessors
     void clear();

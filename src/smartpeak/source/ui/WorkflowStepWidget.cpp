@@ -130,6 +130,7 @@ namespace SmartPeak
       if (!selected_method_.empty() && command_success)
       {
         application_handler_->sequenceHandler_.getWorkflow().push_back(selected_method_);
+        application_handler_->sequenceHandler_.notifyWorkflowChanged();
       }
       ImGui::CloseCurrentPopup();
     }
