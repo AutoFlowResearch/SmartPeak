@@ -28,6 +28,7 @@
 #include <boost/filesystem.hpp>
 #include <sys/stat.h>
 #include <SmartPeak/core/Utilities.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -56,6 +57,44 @@ BOOST_AUTO_TEST_CASE(castString)
   Utilities::castString(string("35.35"), string("float"), c);
   BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::FLOAT, true);
   BOOST_CHECK_CLOSE(c.f_, (float)35.35, 1e-6);
+}
+
+BOOST_AUTO_TEST_CASE(setUserParameters)
+{
+  OpenMS::MRMFeatureFinderScoring feature;
+  auto param = feature.getParameters();
+  // default value is 1 for add_up_spectra
+  BOOST_CHECK_EQUAL(int(param.getValue("add_up_spectra")), 1);
+  
+  // user set parameter
+  map<std::string, vector<map<string, string>>> feat_params_struct1({
+  {"MRMFeatureFinderScoring", {
+    { {"name", "add_up_spectra"}, {"type", "int"}, {"value", "42"} },
+  }}
+  });
+  ParameterSet feat_params1(feat_params_struct1);
+  Utilities::setUserParameters(feature, feat_params1);
+  BOOST_CHECK_EQUAL(int(feature.getParameters().getValue("add_up_spectra")), 42);
+
+  // user set parameter - alias name
+  map<std::string, vector<map<string, string>>> feat_params_struct2({
+  {"AliasName", {
+    { {"name", "add_up_spectra"}, {"type", "int"}, {"value", "43"} },
+  }}
+  });
+  ParameterSet feat_params2(feat_params_struct2);
+  Utilities::setUserParameters(feature, feat_params2, "AliasName");
+  BOOST_CHECK_EQUAL(int(feature.getParameters().getValue("add_up_spectra")), 43);
+
+  // not matching parameter
+  map<std::string, vector<map<string, string>>> feat_params_struct3({
+  {"NotMatching", {
+    { {"name", "add_up_spectra"}, {"type", "int"}, {"value", "43"} },
+  }}
+  });
+  ParameterSet feat_params3(feat_params_struct3);
+  Utilities::setUserParameters(feature, feat_params3);
+  BOOST_CHECK_EQUAL(int(feature.getParameters().getValue("add_up_spectra")), 43);
 }
 
 BOOST_AUTO_TEST_CASE(updateParameters)

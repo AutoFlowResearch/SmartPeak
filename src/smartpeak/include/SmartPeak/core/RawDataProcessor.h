@@ -53,6 +53,8 @@ namespace SmartPeak
     RawDataProcessor& operator=(const RawDataProcessor& other) = delete;
     virtual ~RawDataProcessor() = default;
 
+    virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
+
     /** Interface to all raw data processing methods.
 
       @param[in,out] rawDataHandler_IO Raw data file struct
@@ -64,8 +66,6 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const = 0;
-
-    virtual ParameterSet getParameterSchema() const;
 
   protected:
     // Forced to write this, because the other user-defined constructors inhibit
@@ -80,6 +80,8 @@ namespace SmartPeak
     int getID() const override { return 1; }
     std::string getName() const override { return "LOAD_RAW_DATA"; }
     std::string getDescription() const override { return "Read in raw data mzML file from disk."; }
+
+    virtual ParameterSet getParameterSchema() const;
 
     /** Read in raw data mzML file from disk.
 
@@ -395,6 +397,8 @@ namespace SmartPeak
     int getID() const override { return 6; }
     std::string getName() const override { return "VALIDATE_FEATURES"; }
     std::string getDescription() const override { return "Compare selected features to a reference data set."; }
+
+    virtual ParameterSet getParameterSchema() const override;
 
     /** Validate the selected peaks against reference data.
     */

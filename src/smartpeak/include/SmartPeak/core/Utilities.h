@@ -69,6 +69,19 @@ public:
     );
 
     /**
+      Update a OpenMS' DefaultParamHandler object with user parameters.
+
+      @param[in,out] Param_handler_IO OpenMS' DefaultParamHandler object to update
+      @param[in] parameters_I user parameters
+      @param[in] param_handler_name set if user parameter have different name entry.
+    */
+    static void setUserParameters(
+      OpenMS::DefaultParamHandler& Param_handler_IO,
+      const ParameterSet& user_parameters_I,
+      const std::string param_handler_name_I = ""
+    );
+
+    /**
       Update a Param object.
 
       The type check is case insensitive.

@@ -89,17 +89,9 @@ namespace SmartPeak
       standards_featureMaps.push_back(sequenceHandler_I.getSequence().at(index).getRawData().getFeatureMap());
     }
 
-    if (params_I.at("AbsoluteQuantitation").empty()) {
-      LOGE << "Parameters not found for AbsoluteQuantitation. Returning";
-      LOGD << "END optimizeCalibrationCurves";
-      return;
-    }
-
     // add in the method parameters
     OpenMS::AbsoluteQuantitation absoluteQuantitation;
-    OpenMS::Param parameters = absoluteQuantitation.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("AbsoluteQuantitation"));
-    absoluteQuantitation.setParameters(parameters);
+    Utilities::setUserParameters(absoluteQuantitation, params_I);
 
     absoluteQuantitation.setQuantMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
     std::map<std::string, std::vector<OpenMS::AbsoluteQuantitationStandards::featureConcentration>> components_to_concentrations;
