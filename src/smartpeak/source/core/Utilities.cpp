@@ -71,6 +71,21 @@ namespace SmartPeak
     }
   }
 
+  void Utilities::setUserParameters(
+    OpenMS::DefaultParamHandler& Param_handler_IO,
+    const ParameterSet& user_parameters_I,
+    const std::string param_handler_name
+  )
+  {
+    std::string function_parameters_name = (param_handler_name.empty() ? Param_handler_IO.getName() : param_handler_name);
+    if (user_parameters_I.count(function_parameters_name))
+    {
+      OpenMS::Param parameters = Param_handler_IO.getParameters();
+      Utilities::updateParameters(parameters, user_parameters_I.at(function_parameters_name));
+      Param_handler_IO.setParameters(parameters);
+    }
+  }
+
   void Utilities::updateParameters(
     OpenMS::Param& Param_IO,
     const FunctionParameters& parameters_I
