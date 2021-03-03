@@ -33,126 +33,119 @@
 
 namespace SmartPeak
 {
-  struct ImTableEntry
+    
+  bool ImTableEntry::is_digit(const char ch)
   {
-    std::size_t ID;
-    std::vector<const char*> Headers;
+    return ch >= '0' && ch <= '9';
+  }
     
-    static const ImGuiTableSortSpecs* s_current_sort_specs;
+  bool ImTableEntry::is_number(const std::string& s)
+  {
+    return !s.empty() && std::find_if(s.begin(), s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
+  }
     
-    static bool is_digit(const char ch)
-    {
-      return ch >= '0' && ch <= '9';
-    }
-    
-    static bool is_number(const std::string& s)
-    {
-      return !s.empty() && std::find_if(s.begin(), s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
-    }
-    
-    static int lexicographical_sort(const char* lhs, const char* rhs)
-    {
-      std::string lhs_str(lhs), rhs_str(rhs);
-      std::string lhs_str_lowercased(lhs_str.length(),' ');
-      std::string rhs_str_lowercased(rhs_str.length(),' ');
-      std::transform(lhs_str.begin(), lhs_str.end(), lhs_str_lowercased.begin(), tolower);
-      std::transform(rhs_str.begin(), rhs_str.end(), rhs_str_lowercased.begin(), tolower);
-      lhs = lhs_str_lowercased.c_str();
-      rhs = rhs_str_lowercased.c_str();
+  int ImTableEntry::lexicographical_sort(const char* lhs, const char* rhs)
+  {
+    std::string lhs_str(lhs), rhs_str(rhs);
+    std::string lhs_str_lowercased(lhs_str.length(),' ');
+    std::string rhs_str_lowercased(rhs_str.length(),' ');
+    std::transform(lhs_str.begin(), lhs_str.end(), lhs_str_lowercased.begin(), tolower);
+    std::transform(rhs_str.begin(), rhs_str.end(), rhs_str_lowercased.begin(), tolower);
+    lhs = lhs_str_lowercased.c_str();
+    rhs = rhs_str_lowercased.c_str();
       
-      enum SearchMode { STRING, NUMBER } search_mode = STRING;
-      while (*lhs && *rhs)
+    enum SearchMode { STRING, NUMBER } search_mode = STRING;
+    while (*lhs && *rhs)
+    {
+      if (search_mode == STRING)
       {
-        if (search_mode == STRING)
+        char lhs_char, rhs_char;
+        while ((lhs_char = *lhs) && (rhs_char = *rhs))
         {
-          char lhs_char, rhs_char;
-          while ((lhs_char = *lhs) && (rhs_char = *rhs))
+          const bool lhs_digit = is_digit(lhs_char), rhs_digit = is_digit(rhs_char);
+          if(lhs_digit && rhs_digit)
           {
-            const bool lhs_digit = is_digit(lhs_char), rhs_digit = is_digit(rhs_char);
-            if(lhs_digit && rhs_digit)
-            {
-              search_mode = NUMBER;
-              break;
-            }
+            search_mode = NUMBER;
+            break;
+          }
   
-            if(lhs_digit)
-              return -1;
+          if(lhs_digit)
+            return -1;
   
-            if(rhs_digit)
-              return +1;
+          if(rhs_digit)
+            return +1;
             
-            const int char_diff = lhs_char - rhs_char;
-            if(char_diff != 0)
-              return char_diff;
+          const int char_diff = lhs_char - rhs_char;
+          if(char_diff != 0)
+            return char_diff;
             
-            ++lhs;
-            ++rhs;
-          }
-        }
-        else if (search_mode == NUMBER)
-        {
-          unsigned long lhs_int = 0;
-          while (*lhs && is_digit(*lhs))
-          {
-            lhs_int = lhs_int*10 + *lhs-'0';
-            ++lhs;
-          }
-          unsigned long rhs_int = 0;
-          while (*rhs && is_digit(*rhs))
-          {
-            rhs_int = rhs_int*10 + *rhs-'0';
-            ++rhs;
-          }
-      
-          const long int_diff = lhs_int - rhs_int;
-          if(int_diff != 0)
-            return int_diff;
-
-          search_mode = STRING;
+          ++lhs;
+          ++rhs;
         }
       }
-    }
-
-    static int IMGUI_CDECL CompareWithSortSpecs(const void* lhs, const void* rhs)
-    {
-      const ImTableEntry* a = (const ImTableEntry*)lhs;
-      const ImTableEntry* b = (const ImTableEntry*)rhs;
-      for (int n = 0; n < s_current_sort_specs->SpecsCount; n++)
+      else if (search_mode == NUMBER)
       {
-        const ImGuiTableSortSpecsColumn* sort_spec = &s_current_sort_specs->Specs[n];
-        int delta = 0;
-        size_t column_id = sort_spec->ColumnIndex;
-        if (column_id == 0 && !a->Headers.empty() && !b->Headers.empty())
+        unsigned long lhs_int = 0;
+        while (*lhs && is_digit(*lhs))
         {
-          if (a->Headers[0] != nullptr && b->Headers[0] != nullptr)
+          lhs_int = lhs_int*10 + *lhs-'0';
+          ++lhs;
+        }
+        unsigned long rhs_int = 0;
+        while (*rhs && is_digit(*rhs))
+        {
+          rhs_int = rhs_int*10 + *rhs-'0';
+          ++rhs;
+        }
+      
+        const long int_diff = lhs_int - rhs_int;
+        if(int_diff != 0)
+          return int_diff;
+
+        search_mode = STRING;
+      }
+    }
+  }
+
+  int IMGUI_CDECL ImTableEntry::CompareWithSortSpecs(const void* lhs, const void* rhs)
+  {
+    const ImTableEntry* a = (const ImTableEntry*)lhs;
+    const ImTableEntry* b = (const ImTableEntry*)rhs;
+    for (int n = 0; n < s_current_sort_specs->SpecsCount; n++)
+    {
+      const ImGuiTableSortSpecsColumn* sort_spec = &s_current_sort_specs->Specs[n];
+      int delta = 0;
+      size_t column_id = sort_spec->ColumnIndex;
+      if (column_id == 0 && !a->Headers.empty() && !b->Headers.empty())
+      {
+        if (a->Headers[0] != nullptr && b->Headers[0] != nullptr)
+        {
+          if ( is_number(a->Headers[0]) && is_number(b->Headers[0]))
           {
-            if ( is_number(a->Headers[0]) && is_number(b->Headers[0]))
-            {
-              delta = (std::stol(a->Headers[0]) - std::stol(b->Headers[0]));
-            }
-            else
-            {
-              delta = lexicographical_sort(a->Headers[0], b->Headers[0]);
-            }
+            delta = (std::stol(a->Headers[0]) - std::stol(b->Headers[0]));
+          }
+          else
+          {
+            delta = lexicographical_sort(a->Headers[0], b->Headers[0]);
           }
         }
-        else if (column_id > 0 && !a->Headers.empty() && !b->Headers.empty())
-        {
-          delta = lexicographical_sort(a->Headers[column_id], b->Headers[column_id]);
-        }
-
-        if (delta > 0)
-          return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? +1 : -1;
-        if (delta < 0)
-          return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? -1 : +1;
       }
-      
-      if (a->Headers[1] != nullptr && b->Headers[1] != nullptr)
-        return (std::strcmp(a->Headers[1], b->Headers[1]));
-      else
-        return (a->Headers[0] - a->Headers[0]);
+      else if (column_id > 0 && !a->Headers.empty() && !b->Headers.empty())
+      {
+        delta = lexicographical_sort(a->Headers[column_id], b->Headers[column_id]);
+      }
+
+      if (delta > 0)
+        return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? +1 : -1;
+      if (delta < 0)
+        return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? -1 : +1;
     }
-  };
+      
+    if (a->Headers[1] != nullptr && b->Headers[1] != nullptr)
+      return (std::strcmp(a->Headers[1], b->Headers[1]));
+    else
+      return (a->Headers[0] - a->Headers[0]);
+  }
 
   const ImGuiTableSortSpecs* ImTableEntry::s_current_sort_specs = NULL;
 
@@ -234,8 +227,9 @@ namespace SmartPeak
     }
   }
 
-  bool GenericTableWidget::searcher(const std::vector<ImTableEntry>& Im_table_entries, const int &selected_entry,
-                                    const ImGuiTextFilter& filter, const size_t row) const
+
+  bool GenericTableWidget::searcher(const std::vector<ImTableEntry>& Im_table_entries, const int& selected_entry,
+    const ImGuiTextFilter& filter, const size_t row) const
   {
     bool is_to_filter;
     if (selected_entry > 0) {
@@ -243,18 +237,18 @@ namespace SmartPeak
     }
     else if (selected_entry == 0) { //ALL
       is_to_filter = std::all_of(Im_table_entries[row].Headers.begin(),
-                                 Im_table_entries[row].Headers.end(),
-                                 [&filter](const char* entry){return !filter.PassFilter(entry);});
+        Im_table_entries[row].Headers.end(),
+        [&filter](const char* entry) {return !filter.PassFilter(entry); });
     }
     return is_to_filter;
   }
 
   void GenericTableWidget::updateTableContents(std::vector<ImTableEntry>& Im_table_entries, bool& is_scanned,
-                                               const Eigen::Tensor<std::string,2>& columns,
-                                               const Eigen::Tensor<bool,2>& checkbox_columns)
+    const Eigen::Tensor<std::string, 2>& columns,
+    const Eigen::Tensor<bool, 2>& checkbox_columns)
   {
     Im_table_entries.resize(columns.dimension(0), ImTableEntry());
-    if (!Im_table_entries.empty() && is_scanned == false) {
+    if (!Im_table_entries.empty()/* && is_scanned == false*/) {
       for (size_t row = 0; row < columns.dimension(0); ++row) {
         ImTableEntry& Im_table_entry = Im_table_entries[row];
         Im_table_entry.Headers.resize(columns.dimension(1) + checkbox_columns.dimension(1), nullptr);
@@ -274,12 +268,12 @@ namespace SmartPeak
   }
 
   void GenericTableWidget::sorter(std::vector<ImTableEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs,
-                                  const bool& is_scanned, const unsigned int col_idx)
+    const bool& is_scanned, const unsigned int col_idx)
   {
     if (sorts_specs->SpecsDirty && is_scanned &&
-        !std::all_of(Im_table_entries.begin(), Im_table_entries.end(),
-                     [&, col_idx, Im_table_entries]
-                     (ImTableEntry& entry){ return !std::strcmp(entry.Headers[col_idx], Im_table_entries.begin()->Headers[col_idx]); }))
+      !std::all_of(Im_table_entries.begin(), Im_table_entries.end(),
+        [&, col_idx, Im_table_entries]
+    (ImTableEntry& entry) { return !std::strcmp(entry.Headers[col_idx], Im_table_entries.begin()->Headers[col_idx]); }))
     {
       ImTableEntry::s_current_sort_specs = sorts_specs;
       if (Im_table_entries.size() > 1)
@@ -291,22 +285,22 @@ namespace SmartPeak
 
   void GenericTableWidget::draw()
   {
-    if (headers_.size()<=0)
+    if (headers_.size() <= 0)
       return;
 
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
       ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
-    
+
     static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
     static ImGuiTableColumnFlags column_any_flags = { ImGuiTableColumnFlags_NoHide };
-    
+
     static ImGuiTextFilter filter;
     filter.Draw("Find");
-    
+
     // drop-down list for search field(s)
-    static int selected_col = 0;
-    static std::vector<const char*> cols;
+    //static int selected_col = 0;
+    //static std::vector<const char*> cols;
     cols.resize(headers_.size() + 1);
     for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
       if (header_name == 0)
@@ -318,322 +312,19 @@ namespace SmartPeak
         cols[header_name] = headers_(header_name - 1).c_str();
       }
     }
-    
-    ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size() );
-    
-    static std::vector<ImTableEntry> sequence_table_entries;
-    static std::vector<ImTableEntry> transition_table_entries;
-    static std::vector<ImTableEntry> concentration_table_entries;
-    static std::vector<ImTableEntry> parameter_table_entries;
-    static std::vector<ImTableEntry> spectrum_table_entries;
-    static std::vector<ImTableEntry> quantitation_method_table_entries;
-    static std::vector<ImTableEntry> component_filters_table_entries;
-    static std::vector<ImTableEntry> component_group_filters_table_entries;
-    static std::vector<ImTableEntry> component_qcs_table_entries;
-    static std::vector<ImTableEntry> component_group_qcs_table_entries;
-    static std::vector<ImTableEntry> features_table_entries;
-    static std::vector<ImTableEntry> component_rsd_filters_table_entries;
-    static std::vector<ImTableEntry> component_group_rsd_filter_table_entries;
-    static std::vector<ImTableEntry> component_rsd_qcs_table_entries;
-    static std::vector<ImTableEntry> component_group_rsd_qcs_table_entries;
-    static std::vector<ImTableEntry> component_background_filter_table_entries;
-    static std::vector<ImTableEntry> component_group_background_filter_table_entries;
-    static std::vector<ImTableEntry> component_background_qcs_table_entries;
-    static std::vector<ImTableEntry> component_group_background_qcs_table_entries;
-    static std::vector<ImTableEntry> component_rsd_estimations_table_entries;
-    static std::vector<ImTableEntry> component_group_rsd_estimations_table_entries;
-    static std::vector<ImTableEntry> component_background_estimations_table_entries;
-    static std::vector<ImTableEntry> component_group_background_estimations_table_entries;
-    static std::vector<ImTableEntry> feature_matrix_entries;
-    
-    static bool sequence_scanned;
-    static bool transitions_scanned;
-    static bool concentrations_scanned;
-    static bool parameters_scanned;
-    static bool spectrums_scanned;
-    static bool quantitation_methods_scanned;
-    static bool component_filters_scanned;
-    static bool component_group_filters_scanned;
-    static bool component_qcs_scanned;
-    static bool component_group_qcs_scanned;
-    static bool features_scanned;
-    static bool component_rsd_filters_scanned;
-    static bool component_group_rsd_filter_scanned;
-    static bool component_rsd_qcs_scanned;
-    static bool component_group_rsd_qcs_scanned;
-    static bool component_background_filter_scanned;
-    static bool component_group_background_filter_scanned;
-    static bool component_background_qcs_scanned;
-    static bool component_group_background_qcs_scanned;
-    static bool component_rsd_estimations_scanned;
-    static bool component_group_rsd_estimations_scanned;
-    static bool component_background_estimations_scanned;
-    static bool component_group_background_estimations_scanned;
-    static bool feature_matrix_scanned;
-        
-    if (columns_.dimension(0) == sequence_table_entries.size())
-      sequence_scanned = true;
-    else
-      sequence_scanned = false;
-    
-    if (columns_.dimension(0) == transition_table_entries.size())
-      transitions_scanned = true;
-    else
-      transitions_scanned = false;
-    
-    if (columns_.dimension(0) == concentration_table_entries.size())
-      concentrations_scanned = true;
-    else
-      concentrations_scanned = false;
-    
-    if (columns_.dimension(0) == parameter_table_entries.size())
-      parameters_scanned = true;
-    else
-      parameters_scanned = false;
-    
-    if (columns_.dimension(0) == spectrum_table_entries.size())
-      spectrums_scanned = true;
-    else
-      spectrums_scanned = false;
-    
-    if (columns_.dimension(0) == quantitation_method_table_entries.size())
-      quantitation_methods_scanned = true;
-    else
-      quantitation_methods_scanned = false;
-    
-    if (columns_.dimension(0) == component_filters_table_entries.size())
-      component_filters_scanned = true;
-    else
-      component_filters_scanned = false;
-    
-    if (columns_.dimension(0) == component_group_filters_table_entries.size())
-      component_group_filters_scanned = true;
-    else
-      component_group_filters_scanned = false;
-    
-    if (columns_.dimension(0) == component_qcs_table_entries.size())
-      component_qcs_scanned = true;
-    else
-      component_qcs_scanned = false;
-    
-    if (columns_.dimension(0) == component_group_qcs_table_entries.size())
-      component_group_qcs_scanned = true;
-    else
-      component_group_qcs_scanned = false;
-    
-    if (columns_.dimension(0) == features_table_entries.size())
-      features_scanned = true;
-    else
-      features_scanned = false;
-    
-    if (columns_.dimension(0) == component_rsd_filters_table_entries.size())
-      component_rsd_filters_scanned = true;
-    else
-      component_rsd_filters_scanned = false;
-    
-    if (columns_.dimension(0) == component_group_rsd_filter_table_entries.size())
-      component_group_rsd_filter_scanned = true;
-    else
-      component_group_rsd_filter_scanned = false;
-    
-    if (columns_.dimension(0) == component_rsd_qcs_table_entries.size())
-      component_rsd_qcs_scanned = true;
-    else
-      component_rsd_qcs_scanned = false;
-    
-    if (columns_.dimension(0) == component_group_rsd_qcs_table_entries.size())
-      component_group_rsd_qcs_scanned = true;
-    else
-      component_group_rsd_qcs_scanned = false;
-    
-    if (columns_.dimension(0) == component_background_filter_table_entries.size())
-      component_background_filter_scanned = true;
-    else
-      component_background_filter_scanned = false;
-    
-    if (columns_.dimension(0) == component_group_background_filter_table_entries.size())
-      component_group_background_filter_scanned = true;
-    else
-      component_group_background_filter_scanned = false;
-    
-    if (columns_.dimension(0) == component_background_qcs_table_entries.size())
-      component_background_qcs_scanned = true;
-    else
-      component_background_qcs_scanned = false;
-    
-    if (columns_.dimension(0) == component_group_background_qcs_table_entries.size())
-      component_group_background_qcs_scanned = true;
-    else
-      component_group_background_qcs_scanned = false;
-    
-    if (columns_.dimension(0) == component_rsd_estimations_table_entries.size())
-      component_rsd_estimations_scanned = true;
-    else
-      component_rsd_estimations_scanned = false;
-    
-    if (columns_.dimension(0) == component_group_rsd_estimations_table_entries.size())
-      component_group_rsd_estimations_scanned = true;
-    else
-      component_group_rsd_estimations_scanned = false;
-    
-    if (columns_.dimension(0) == component_background_estimations_table_entries.size())
-      component_background_estimations_scanned = true;
-    else
-      component_background_estimations_scanned = false;
-    
-    if (columns_.dimension(0) == component_group_background_estimations_table_entries.size())
-      component_group_background_estimations_scanned = true;
-    else
-      component_group_background_estimations_scanned = false;
-    
-    if (columns_.dimension(0) == feature_matrix_entries.size())
-      feature_matrix_scanned = true;
-    else
-      feature_matrix_scanned = false;
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "SequenceMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(sequence_table_entries, sequence_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "TransitionsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(transition_table_entries, transitions_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "StdsConcsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(concentration_table_entries, concentrations_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "ParametersMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(parameter_table_entries, parameters_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "SpectrumMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(spectrum_table_entries, spectrums_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "QuantMethodMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(quantitation_method_table_entries, quantitation_methods_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompFiltersMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_filters_table_entries, component_filters_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupFiltersMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_group_filters_table_entries, component_group_filters_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompQCsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_qcs_table_entries, component_qcs_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
 
+    ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
+
+    if (columns_.dimension(0) == table_entries_.size())
+      table_scanned_ = true;
+    else
+      table_scanned_ = false;
+
+    if (columns_.dimensions().TotalSize() > 0) {
+      updateTableContents(table_entries_, table_scanned_,
+        columns_, Eigen::Tensor<bool, 2>());
     }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupQCsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_group_qcs_table_entries, component_group_qcs_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "featuresTableMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(features_table_entries, features_scanned, columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompRSDFiltersMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_rsd_filters_table_entries, component_rsd_filters_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupRSDFiltersMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_group_rsd_filter_table_entries, component_group_rsd_filter_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompRSDQCsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_rsd_qcs_table_entries, component_rsd_qcs_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupRSDQCsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_group_rsd_qcs_table_entries, component_group_rsd_qcs_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompBackgroundFiltersMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_background_filter_table_entries, component_background_filter_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupBackgroundFiltersMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_group_background_filter_table_entries, component_group_background_filter_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompBackgroundQCsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_background_qcs_table_entries, component_background_qcs_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupBackgroundQCsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_group_background_qcs_table_entries, component_group_background_qcs_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompRSDEstimationsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_rsd_estimations_table_entries, component_rsd_estimations_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupRSDEstimationsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_group_rsd_estimations_table_entries, component_group_rsd_estimations_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompBackgroundEstimationsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_background_estimations_table_entries, component_background_estimations_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "CompGroupBackgroundEstimationsMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(component_group_background_estimations_table_entries, component_group_background_estimations_scanned,
-                          columns__, Eigen::Tensor<bool,2>());
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "featureMatrixMainWindow") {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      updateTableContents(feature_matrix_entries, feature_matrix_scanned, columns__, Eigen::Tensor<bool,2>());
-    }
-    
+
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
@@ -641,366 +332,54 @@ namespace SmartPeak
       }
       ImGui::TableSetupScrollFreeze(headers_.size(), 1);
       ImGui::TableHeadersRow();
-      
+
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
-            
-            if (table_id_ == "SequenceMainWindow")
-            {
-              if (searcher(sequence_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "TransitionsMainWindow")
-            {
-              if (searcher(transition_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "StdsConcsMainWindow")
-            {
-              if (searcher(concentration_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "ParametersMainWindow")
-            {
-              if (searcher(parameter_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "SpectrumMainWindow")
-            {
-              if (searcher(spectrum_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "QuantMethodMainWindow")
-            {
-              if (searcher(quantitation_method_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompFiltersMainWindow")
-            {
-              if (searcher(component_filters_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompGroupFiltersMainWindow")
-            {
-              if (searcher(component_group_filters_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompQCsMainWindow")
-            {
-              if (searcher(component_qcs_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompGroupQCsMainWindow")
-            {
-              if (searcher(component_group_qcs_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "featuresTableMainWindow")
-            {
-              if (searcher(features_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompRSDFiltersMainWindow")
-            {
-              if (searcher(component_rsd_filters_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompGroupRSDFiltersMainWindow")
-            {
-              if (searcher(component_group_rsd_filter_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompRSDQCsMainWindow")
-            {
-              if (searcher(component_rsd_qcs_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompGroupRSDQCsMainWindow")
-            {
-              if (searcher(component_group_rsd_qcs_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompBackgroundFiltersMainWindow")
-            {
-              if (searcher(component_background_filter_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompGroupBackgroundFiltersMainWindow")
-            {
-              if (searcher(component_group_background_filter_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompBackgroundQCsMainWindow")
-            {
-              if (searcher(component_background_qcs_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompGroupBackgroundQCsMainWindow")
-            {
-              if (searcher(component_group_background_qcs_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompRSDEstimationsMainWindow")
-            {
-              if (searcher(component_rsd_estimations_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompGroupRSDEstimationsMainWindow")
-            {
-              if (searcher(component_group_rsd_estimations_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompBackgroundEstimationsMainWindow")
-            {
-              if (searcher(component_background_estimations_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "CompGroupBackgroundEstimationsMainWindow")
-            {
-              if (searcher(component_group_background_estimations_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "featureMatrixMainWindow")
-            {
-              if (searcher(feature_matrix_entries, selected_col, filter, row))
-                continue;
-            }
-            
+
+            if (searcher(table_entries_, selected_col, filter, row))
+              continue;
+
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col) {
-              if (table_id_ == "SequenceMainWindow" && sequence_scanned == true && !sequence_table_entries.empty())
+              if (table_scanned_ == true && !table_entries_.empty())
               {
                 ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", sequence_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "TransitionsMainWindow" && transitions_scanned == true && !transition_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", transition_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "StdsConcsMainWindow" && concentrations_scanned == true && !concentration_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", concentration_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "ParametersMainWindow" && parameters_scanned == true && !parameter_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", parameter_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "SpectrumMainWindow" && spectrums_scanned == true && !spectrum_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", spectrum_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompFiltersMainWindow" && component_filters_scanned == true && !component_filters_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_filters_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompGroupFiltersMainWindow" && component_group_filters_scanned == true &&
-                       !component_group_filters_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_group_filters_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompQCsMainWindow" && component_qcs_scanned == true && !component_qcs_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_qcs_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompGroupQCsMainWindow" && component_group_qcs_scanned == true &&
-                       !component_group_qcs_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_group_qcs_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "featuresTableMainWindow" && features_scanned == true && !features_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", features_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompRSDFiltersMainWindow" && component_rsd_filters_scanned == true &&
-                       !component_rsd_filters_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_rsd_filters_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompGroupRSDFiltersMainWindow" && component_group_rsd_filter_scanned == true &&
-                       !component_group_rsd_filter_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_group_rsd_filter_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompRSDQCsMainWindow" && component_rsd_qcs_scanned == true &&
-                       !component_rsd_qcs_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_rsd_qcs_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompGroupRSDQCsMainWindow" && component_group_rsd_qcs_scanned == true &&
-                       !component_group_rsd_qcs_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_group_rsd_qcs_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompBackgroundFiltersMainWindow" && component_background_filter_scanned == true &&
-                       !component_background_filter_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_background_filter_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompGroupBackgroundFiltersMainWindow" && component_group_background_filter_scanned == true &&
-                       !component_group_background_filter_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_group_background_filter_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompBackgroundQCsMainWindow" && component_background_qcs_scanned == true &&
-                       !component_background_qcs_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_background_qcs_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompGroupBackgroundQCsMainWindow" && component_group_background_qcs_scanned == true &&
-                       !component_group_background_qcs_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_group_background_qcs_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompRSDEstimationsMainWindow" && component_rsd_estimations_scanned == true &&
-                       !component_rsd_estimations_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_rsd_estimations_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompGroupRSDEstimationsMainWindow" && component_group_rsd_estimations_scanned == true &&
-                       !component_group_rsd_estimations_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_group_rsd_estimations_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompBackgroundEstimationsMainWindow" && component_background_estimations_scanned == true &&
-                       !component_background_estimations_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_background_estimations_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "CompGroupBackgroundEstimationsMainWindow" && component_group_background_estimations_scanned == true && !component_group_background_estimations_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", component_group_background_estimations_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "featureMatrixMainWindow" && feature_matrix_scanned == true && !feature_matrix_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", feature_matrix_entries[row].Headers[col]);
+                ImGui::Text("%s", table_entries_[row].Headers[col]);
               }
             }
           }
         }
       }
-      
+
       if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
       {
         const unsigned int col_idx = static_cast<unsigned int>(sorts_specs->Specs->ColumnIndex);
-        
-        if (table_id_ == "SequenceMainWindow")
-          sorter(sequence_table_entries, sorts_specs, sequence_scanned, col_idx);
-                
-        if (table_id_ == "TransitionsMainWindow")
-          sorter(transition_table_entries, sorts_specs, transitions_scanned, col_idx);
-        
-        if (table_id_ == "StdsConcsMainWindow")
-          sorter(concentration_table_entries, sorts_specs, concentrations_scanned, col_idx);
-        
-        if (table_id_ == "ParametersMainWindow")
-          sorter(parameter_table_entries, sorts_specs, parameters_scanned, col_idx);
-        
-        if (table_id_ == "SpectrumMainWindow")
-          sorter(spectrum_table_entries, sorts_specs, spectrums_scanned, col_idx);
-        
-        if (table_id_ == "QuantMethodMainWindow")
-          sorter(quantitation_method_table_entries, sorts_specs, quantitation_methods_scanned, col_idx);
-
-        if (table_id_ == "CompFiltersMainWindow")
-          sorter(component_filters_table_entries, sorts_specs, component_filters_scanned, col_idx);
-        
-        if (table_id_ == "CompGroupFiltersMainWindow")
-          sorter(quantitation_method_table_entries, sorts_specs, component_group_filters_scanned, col_idx);
-        
-        if (table_id_ == "CompQCsMainWindow")
-          sorter(component_qcs_table_entries, sorts_specs, component_qcs_scanned, col_idx);
-        
-        if (table_id_ == "CompGroupQCsMainWindow")
-          sorter(component_group_qcs_table_entries, sorts_specs, component_group_qcs_scanned, col_idx);
-
-        if (table_id_ == "featuresTableMainWindow")
-          sorter(features_table_entries, sorts_specs, features_scanned, col_idx);
-        
-        if (table_id_ == "CompRSDFiltersMainWindow")
-          sorter(component_rsd_filters_table_entries, sorts_specs, component_rsd_filters_scanned, col_idx);
-        
-        if (table_id_ == "CompGroupRSDFiltersMainWindow")
-          sorter(component_group_rsd_filter_table_entries, sorts_specs, component_group_rsd_filter_scanned, col_idx);
-        
-        if (table_id_ == "CompRSDQCsMainWindow")
-          sorter(component_rsd_qcs_table_entries, sorts_specs, component_rsd_qcs_scanned, col_idx);
-        
-        if (table_id_ == "CompGroupRSDQCsMainWindow")
-          sorter(component_group_rsd_qcs_table_entries, sorts_specs, component_group_rsd_qcs_scanned, col_idx);
-        
-        if (table_id_ == "CompBackgroundFiltersMainWindow")
-          sorter(component_background_filter_table_entries, sorts_specs, component_background_filter_scanned, col_idx);
-
-        if (table_id_ == "CompGroupBackgroundFiltersMainWindow")
-          sorter(component_group_background_filter_table_entries, sorts_specs, component_group_background_filter_scanned, col_idx);
-        
-        if (table_id_ == "CompBackgroundQCsMainWindow")
-          sorter(component_background_qcs_table_entries, sorts_specs, component_background_qcs_scanned, col_idx);
-        
-        if (table_id_ == "CompGroupBackgroundQCsMainWindow")
-          sorter(component_group_background_qcs_table_entries, sorts_specs, component_group_background_qcs_scanned, col_idx);
-        
-        if (table_id_ == "CompRSDEstimationsMainWindow")
-          sorter(component_rsd_estimations_table_entries, sorts_specs, component_rsd_estimations_scanned, col_idx);
-        
-        if (table_id_ == "CompGroupRSDEstimationsMainWindow")
-          sorter(component_group_rsd_estimations_table_entries, sorts_specs, component_group_rsd_estimations_scanned, col_idx);
-        
-        if (table_id_ == "CompBackgroundEstimationsMainWindow")
-          sorter(component_background_estimations_table_entries, sorts_specs, component_background_estimations_scanned, col_idx);
-        
-        if (table_id_ == "CompGroupBackgroundEstimationsMainWindow")
-          sorter(component_group_background_estimations_table_entries, sorts_specs, component_group_background_estimations_scanned, col_idx);
-        
-        if (table_id_ == "featureMatrixMainWindow")
-          sorter(feature_matrix_entries, sorts_specs, feature_matrix_scanned, col_idx);
+        sorter(table_entries_, sorts_specs, table_scanned_, col_idx);
       }
       ImGui::EndTable();
     }
   }
-  
+
   void ExplorerWidget::draw()
   {
-    if (headers_.size()<=0)
+    if (headers_.size() <= 0)
       return;
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
       ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
-    
+
     static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
     static ImGuiTableColumnFlags column_any_flags = { ImGuiTableColumnFlags_NoHide };
 
     static ImGuiTextFilter filter;
     filter.Draw("Find");
-    
+
     // drop-down list for search field(s)
-    static int selected_col = 0;
-    static std::vector<const char*> cols;
+    //static int selected_col = 0;
+    //static std::vector<const char*> cols;
     cols.resize(headers_.size() + 1);
     for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
       if (header_name == 0)
@@ -1012,52 +391,21 @@ namespace SmartPeak
         cols[header_name] = headers_(header_name - 1).c_str();
       }
     }
-    
+
     ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
-    
-    static std::vector<ImTableEntry> injection_table_entries;
-    static std::vector<ImTableEntry> transition_table_entries;
-    static std::vector<ImTableEntry> feature_table_entries;
-    static bool injections_scanned;
-    static bool transitions_scanned;
-    static bool features_scanned;
-        
-    if (columns_.dimension(0) == injection_table_entries.size())
-      injections_scanned = true;
+
+    if (columns_.dimension(0) == table_entries_.size())
+      table_scanned_ = true;
     else
-      injections_scanned = false;
-    
-    if (columns_.dimension(0) == transition_table_entries.size())
-      transitions_scanned = true;
-    else
-      transitions_scanned = false;
-    
-    if (columns_.dimension(0) == feature_table_entries.size())
-      features_scanned = true;
-    else
-      features_scanned = false;
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "InjectionsExplorerWindow")
+      table_scanned_ = false;
+
+    if (columns_.dimensions().TotalSize() > 0)
     {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      const static Eigen::Tensor<bool,2> checkbox_columns__(checkbox_columns_);
-      updateTableContents(injection_table_entries, injections_scanned, columns__, checkbox_columns__);
+      //Eigen::Tensor<std::string, 2> columns__(columns_);
+      //Eigen::Tensor<bool, 2> checkbox_columns__(checkbox_columns_);
+      updateTableContents(table_entries_, table_scanned_, columns_, checkbox_columns_);
     }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "TransitionsExplorerWindow")
-    {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      const static Eigen::Tensor<bool,2> checkbox_columns__(checkbox_columns_);
-      updateTableContents(transition_table_entries, transitions_scanned, columns__, checkbox_columns__);
-    }
-    
-    if (columns_.dimensions().TotalSize() > 0 && table_id_ == "FeaturesExplorerWindow")
-    {
-      const static Eigen::Tensor<std::string,2> columns__(columns_);
-      const static Eigen::Tensor<bool,2> checkbox_columns__(checkbox_columns_);
-      updateTableContents(feature_table_entries, features_scanned, columns__, checkbox_columns__);
-    }
-    
+
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
@@ -1066,115 +414,50 @@ namespace SmartPeak
       for (int col = 0; col < checkbox_headers_.size(); col++) {
         ImGui::TableSetupColumn(checkbox_headers_(col).c_str());
       }
-      
+
       ImGui::TableSetupScrollFreeze(headers_.size() + checkbox_headers_.size(), 1);
       ImGui::TableHeadersRow();
-      
+
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
-          if (checked_rows_.size() <=0 || (checked_rows_.size() > 0 && checked_rows_(row)))
+          if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row)))
           {
-            if (table_id_ == "InjectionsExplorerWindow")
-            {
-              if (searcher(injection_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "FeaturesExplorerWindow")
-            {
-              if (searcher(feature_table_entries, selected_col, filter, row))
-                continue;
-            }
-            if (table_id_ == "TransitionsExplorerWindow")
-            {
-              if (searcher(transition_table_entries, selected_col, filter, row))
-                continue;
-            }
-            
+            if (searcher(table_entries_, selected_col, filter, row))
+              continue;
+
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col)
             {
-              if (table_id_ == "InjectionsExplorerWindow" && injections_scanned == true && !injection_table_entries.empty())
+              if (table_scanned_ == true && !table_entries_.empty())
               {
                 ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", injection_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "TransitionsExplorerWindow" && transitions_scanned == true && !transition_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", transition_table_entries[row].Headers[col]);
-              }
-              else if (table_id_ == "FeaturesExplorerWindow" && features_scanned == true && !feature_table_entries.empty())
-              {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", feature_table_entries[row].Headers[col]);
+                ImGui::Text("%s", table_entries_[row].Headers[col]);
               }
             }
-            
+
             for (size_t col = 0; col < checkbox_headers_.size(); ++col) {
-              std::string id = table_id_ + std::to_string(col) + std::to_string(row*columns_.dimension(1));
+              std::string id = table_id_ + std::to_string(col) + std::to_string(row * columns_.dimension(1));
               ImGui::TableSetColumnIndex(col + headers_.size());
               ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-              if (table_id_ == "InjectionsExplorerWindow" && injections_scanned == true && !injection_table_entries.empty())
+              if (table_scanned_ == true && !table_entries_.empty())
               {
                 size_t checkbox_idx = col + headers_.size();
                 bool is_checked;
-                if (!std::strcmp(injection_table_entries[row].Headers[checkbox_idx], "true"))
+                if (!std::strcmp(table_entries_[row].Headers[checkbox_idx], "true"))
                   is_checked = true;
                 else
                   is_checked = false;
                 ImGui::Checkbox(id.c_str(), &is_checked);
-                
-                if (is_checked == true && !std::strcmp(injection_table_entries[row].Headers[checkbox_idx], "false"))
+
+                if (is_checked == true && !std::strcmp(table_entries_[row].Headers[checkbox_idx], "false"))
                 {
-                  injection_table_entries[row].Headers[checkbox_idx] = "true";
-                  checkbox_columns_(injection_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = true;
+                  table_entries_[row].Headers[checkbox_idx] = "true";
+                  checkbox_columns_(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = true;
                 }
-                else if (is_checked == false && !std::strcmp(injection_table_entries[row].Headers[checkbox_idx], "true"))
+                else if (is_checked == false && !std::strcmp(table_entries_[row].Headers[checkbox_idx], "true"))
                 {
-                  injection_table_entries[row].Headers[checkbox_idx] = "false";
-                  checkbox_columns_(injection_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = false;
-                }
-              }
-              else if (table_id_ == "TransitionsExplorerWindow" && transitions_scanned == true && !transition_table_entries.empty())
-              {
-                size_t checkbox_idx = col + headers_.size();
-                bool is_checked;
-                if (!std::strcmp(transition_table_entries[row].Headers[checkbox_idx], "true"))
-                  is_checked = true;
-                else
-                  is_checked = false;
-                ImGui::Checkbox(id.c_str(), &is_checked);
-                
-                if (is_checked == true && !std::strcmp(transition_table_entries[row].Headers[checkbox_idx], "false"))
-                {
-                  transition_table_entries[row].Headers[checkbox_idx] = "true";
-                  checkbox_columns_(transition_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) ) = true;
-                }
-                else if (is_checked == false && !std::strcmp(transition_table_entries[row].Headers[checkbox_idx], "true"))
-                {
-                  transition_table_entries[row].Headers[checkbox_idx] = "false";
-                  checkbox_columns_(transition_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) ) = false;
-                }
-              }
-              else if (table_id_ == "FeaturesExplorerWindow" && features_scanned == true && !feature_table_entries.empty())
-              {
-                size_t checkbox_idx = col + headers_.size();
-                bool is_checked;
-                if (!std::strcmp(feature_table_entries[row].Headers[checkbox_idx], "true"))
-                  is_checked = true;
-                else
-                  is_checked = false;
-                ImGui::Checkbox(id.c_str(), &is_checked);
-                
-                if (is_checked == true && !std::strcmp(feature_table_entries[row].Headers[checkbox_idx], "false"))
-                {
-                  feature_table_entries[row].Headers[checkbox_idx] = "true";
-                  checkbox_columns_(feature_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = true;
-                }
-                else if (is_checked == false && !std::strcmp(feature_table_entries[row].Headers[checkbox_idx], "true"))
-                {
-                  feature_table_entries[row].Headers[checkbox_idx] = "false";
-                  checkbox_columns_(feature_table_entries[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = false;
+                  table_entries_[row].Headers[checkbox_idx] = "false";
+                  checkbox_columns_(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = false;
                 }
               }
               ImGui::PopStyleColor();
@@ -1186,19 +469,12 @@ namespace SmartPeak
       if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
       {
         const unsigned int col_idx = static_cast<unsigned int>(sorts_specs->Specs->ColumnIndex);
-        
-        if ( table_id_ == "InjectionsExplorerWindow")
-          sorter(injection_table_entries, sorts_specs, injections_scanned, col_idx);
-        
-        if ( table_id_ == "TransitionsExplorerWindow")
-          sorter(transition_table_entries, sorts_specs, transitions_scanned, col_idx);
-        
-        if ( table_id_ == "FeaturesExplorerWindow")
-          sorter(feature_table_entries, sorts_specs, features_scanned, col_idx);
+        sorter(table_entries_, sorts_specs, table_scanned_, col_idx);
       }
       ImGui::EndTable();
     }
   }
+
 
   void GenericGraphicWidget::draw()
   {
