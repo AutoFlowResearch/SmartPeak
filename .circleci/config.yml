@@ -56,6 +56,7 @@ jobs:
             cd ~/smartpeak_release_build || exit 1
             ctest -V
             ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
+            cd ~/SmartPeak
             python3 -m unittest discover -s .\tools\smartpeak\
       - run:
           name: Running SmartPeak Examples
@@ -117,6 +118,7 @@ jobs:
             set +o pipefail
             cd ~/SmartPeak/smartpeak_release_build
             ctest -VV -F --timeout 1200 || true
+            cd ~/SmartPeak
             python3 -m unittest discover -s .\tools\smartpeak\
       - run:
           name: Packing SmartPeak
@@ -241,9 +243,10 @@ jobs:
             msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
             refreshenv
-            python3 -m unittest discover -s .\tools\smartpeak\
             & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
+            cd ~/SmartPeak
+            python -m unittest discover -s .\tools\smartpeak\
       - run:
           name: Signing SmartPeak with trusted certificate
           command: |
