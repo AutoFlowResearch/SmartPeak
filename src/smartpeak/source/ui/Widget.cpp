@@ -118,7 +118,7 @@ namespace SmartPeak
       size_t column_id = sort_spec->ColumnIndex;
       if (column_id == 0 && !a->Headers.empty() && !b->Headers.empty())
       {
-        if (a->Headers[0] != nullptr && b->Headers[0] != nullptr)
+        if (a->Headers[0].c_str() != nullptr && b->Headers[0].c_str() != nullptr)
         {
           if ( is_number(a->Headers[0]) && is_number(b->Headers[0]))
           {
@@ -126,13 +126,13 @@ namespace SmartPeak
           }
           else
           {
-            delta = lexicographical_sort(a->Headers[0], b->Headers[0]);
+            delta = lexicographical_sort(a->Headers[0].c_str(), b->Headers[0].c_str());
           }
         }
       }
       else if (column_id > 0 && !a->Headers.empty() && !b->Headers.empty())
       {
-        delta = lexicographical_sort(a->Headers[column_id], b->Headers[column_id]);
+        delta = lexicographical_sort(a->Headers[column_id].c_str(), b->Headers[column_id].c_str());
       }
 
       if (delta > 0)
@@ -141,10 +141,10 @@ namespace SmartPeak
         return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? -1 : +1;
     }
       
-    if (a->Headers[1] != nullptr && b->Headers[1] != nullptr)
-      return (std::strcmp(a->Headers[1], b->Headers[1]));
+    if (a->Headers[1].c_str() != nullptr && b->Headers[1].c_str() != nullptr)
+      return (std::strcmp(a->Headers[1].c_str(), b->Headers[1].c_str()));
     else
-      return (a->Headers[0] - a->Headers[0]);
+      return (a->Headers[0].c_str() - a->Headers[0].c_str());
   }
 
   const ImGuiTableSortSpecs* ImTableEntry::s_current_sort_specs = NULL;
@@ -233,29 +233,30 @@ namespace SmartPeak
   {
     bool is_to_filter;
     if (selected_entry > 0) {
-      is_to_filter = !filter.PassFilter(Im_table_entries[row].Headers[selected_entry - 1]);
+      is_to_filter = !filter.PassFilter(Im_table_entries[row].Headers[selected_entry - 1].c_str());
     }
     else if (selected_entry == 0) { //ALL
       is_to_filter = std::all_of(Im_table_entries[row].Headers.begin(),
         Im_table_entries[row].Headers.end(),
-        [&filter](const char* entry) {return !filter.PassFilter(entry); });
+        [&filter](auto entry) {return !filter.PassFilter(entry.c_str()); });
     }
     return is_to_filter;
   }
 
-  void GenericTableWidget::updateTableContents(std::vector<ImTableEntry>& Im_table_entries, bool& is_scanned,
+  void GenericTableWidget::updateTableContents(std::vector<ImTableEntry>& Im_table_entries, 
+    bool& is_scanned,
     const Eigen::Tensor<std::string, 2>& columns,
     const Eigen::Tensor<bool, 2>& checkbox_columns)
   {
     Im_table_entries.resize(columns.dimension(0), ImTableEntry());
-    if (!Im_table_entries.empty()/* && is_scanned == false*/) {
+    if (!Im_table_entries.empty() && is_scanned == false) {
       for (size_t row = 0; row < columns.dimension(0); ++row) {
         ImTableEntry& Im_table_entry = Im_table_entries[row];
-        Im_table_entry.Headers.resize(columns.dimension(1) + checkbox_columns.dimension(1), nullptr);
+        Im_table_entry.Headers.resize(columns.dimension(1) + checkbox_columns.dimension(1), "");
         Im_table_entry.ID = row;
         for (size_t header_idx = 0; header_idx < columns.dimension(1) + checkbox_columns.dimension(1); ++header_idx) {
           if (header_idx < columns.dimension(1)) {
-            Im_table_entry.Headers[header_idx] = columns(row, header_idx).c_str();
+            Im_table_entry.Headers[header_idx] = columns(row, header_idx);
           }
           else if (header_idx < columns.dimension(1) + checkbox_columns.dimension(1)) {
             const std::size_t checkbox_idx = header_idx - static_cast<std::size_t>(columns.dimension(1));
@@ -273,7 +274,7 @@ namespace SmartPeak
     if (sorts_specs->SpecsDirty && is_scanned &&
       !std::all_of(Im_table_entries.begin(), Im_table_entries.end(),
         [&, col_idx, Im_table_entries]
-    (ImTableEntry& entry) { return !std::strcmp(entry.Headers[col_idx], Im_table_entries.begin()->Headers[col_idx]); }))
+    (ImTableEntry& entry) { return !std::strcmp(entry.Headers[col_idx].c_str(), Im_table_entries.begin()->Headers[col_idx].c_str()); }))
     {
       ImTableEntry::s_current_sort_specs = sorts_specs;
       if (Im_table_entries.size() > 1)
@@ -431,7 +432,7 @@ namespace SmartPeak
               if (table_scanned_ == true && !table_entries_.empty())
               {
                 ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", table_entries_[row].Headers[col]);
+                ImGui::Text("%s", table_entries_[row].Headers[col].c_str());
               }
             }
 
@@ -443,18 +444,18 @@ namespace SmartPeak
               {
                 size_t checkbox_idx = col + headers_.size();
                 bool is_checked;
-                if (!std::strcmp(table_entries_[row].Headers[checkbox_idx], "true"))
+                if (!std::strcmp(table_entries_[row].Headers[checkbox_idx].c_str(), "true"))
                   is_checked = true;
                 else
                   is_checked = false;
                 ImGui::Checkbox(id.c_str(), &is_checked);
 
-                if (is_checked == true && !std::strcmp(table_entries_[row].Headers[checkbox_idx], "false"))
+                if (is_checked == true && !std::strcmp(table_entries_[row].Headers[checkbox_idx].c_str(), "false"))
                 {
                   table_entries_[row].Headers[checkbox_idx] = "true";
                   checkbox_columns_(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = true;
                 }
-                else if (is_checked == false && !std::strcmp(table_entries_[row].Headers[checkbox_idx], "true"))
+                else if (is_checked == false && !std::strcmp(table_entries_[row].Headers[checkbox_idx].c_str(), "true"))
                 {
                   table_entries_[row].Headers[checkbox_idx] = "false";
                   checkbox_columns_(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = false;

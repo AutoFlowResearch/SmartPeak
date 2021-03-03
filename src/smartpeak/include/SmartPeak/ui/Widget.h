@@ -40,7 +40,7 @@ namespace SmartPeak
   struct ImTableEntry
   {
     std::size_t ID;
-    std::vector<const char*> Headers;
+    std::vector<std::string> Headers;
     static const ImGuiTableSortSpecs* s_current_sort_specs;
     static bool is_digit(const char ch);
     static bool is_number(const std::string& s);
