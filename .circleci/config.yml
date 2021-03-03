@@ -57,7 +57,7 @@ jobs:
             ctest -V
             ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
             cd ~/SmartPeak
-            export PYTHONPATH="~/SmartPeak/tools"
+            export PYTHONPATH="${PWD}/tools"
             python3 -m unittest discover -s ./tools/smartpeak
       - run:
           name: Running SmartPeak Examples
@@ -120,7 +120,7 @@ jobs:
             cd ~/SmartPeak/smartpeak_release_build
             ctest -VV -F --timeout 1200 || true
             cd ~/SmartPeak
-            export PYTHONPATH="~/SmartPeak/tools"
+            export PYTHONPATH="${PWD}/tools"
             python3 -m unittest discover -s ./tools/smartpeak
       - run:
           name: Packing SmartPeak
@@ -248,7 +248,7 @@ jobs:
             & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
             cd ~/SmartPeak
-            $env:PYTHONPATH = "~\SmartPeak\tools"
+            $env:PYTHONPATH = $PWD.Path + "\tools"
             python -m unittest discover -s .\tools\smartpeak\
       - run:
           name: Signing SmartPeak with trusted certificate
