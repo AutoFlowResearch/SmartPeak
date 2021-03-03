@@ -14,7 +14,7 @@ class UtilsTest(unittest.TestCase):
     def test_get_version(self):
         filename = 'ExampleCMakeLists.txt'
         major, minor, patch = utils.get_version(
-            os.path.join(utils.get_project_path(), 'tools', 'smartpeak', 'tests', filename))
+            os.path.join(utils.get_project_path(), 'tools', 'smartpeak', 'test', 'data', filename))
         self.assertEqual((major, minor, patch), (1, 4, 3))
 
     def test_compare_version(self):
@@ -29,7 +29,7 @@ class UtilsTest(unittest.TestCase):
 
     def test_update_version(self):
         dirpath = os.path.join(utils.get_project_path(),
-            'tools', 'smartpeak', 'tests')
+            'tools', 'smartpeak', 'test', 'data')
         # First copy file:
         org_filepath = os.path.join(dirpath, 'ExampleCMakeLists.txt')
         dest_filepath = os.path.join(dirpath, 'ExampleCMakeLists1.txt')
@@ -82,7 +82,7 @@ class UtilsTest(unittest.TestCase):
 
     def test_read_changes(self):
         dirpath = os.path.join(utils.get_project_path(),
-            'tools', 'smartpeak', 'tests')
+            'tools', 'smartpeak', 'test', 'data')
         filepath = os.path.join(dirpath, 'CHANGELOG.rst')
 
         self.assertEqual(utils.read_changes(filepath, 'v1.3.0'), None)
