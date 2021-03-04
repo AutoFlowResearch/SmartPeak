@@ -453,12 +453,12 @@ namespace SmartPeak
                 if (is_checked == true && !std::strcmp(table_entries_[row].Headers[checkbox_idx].c_str(), "false"))
                 {
                   table_entries_[row].Headers[checkbox_idx] = "true";
-                  (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_->dimension(1)) + 1) = true;
+                  (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(columns_.dimension(1))) = true;
                 }
                 else if (is_checked == false && !std::strcmp(table_entries_[row].Headers[checkbox_idx].c_str(), "true"))
                 {
                   table_entries_[row].Headers[checkbox_idx] = "false";
-                  (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_->dimension(1)) + 1) = false;
+                  (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(columns_.dimension(1))) = false;
                 }
               }
               ImGui::PopStyleColor();
