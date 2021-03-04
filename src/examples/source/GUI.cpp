@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey, Ahmed Khalil, Bertrand Boudaud $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
 
 #include <stdio.h>
 #include <chrono>
@@ -42,6 +63,33 @@ void initializeDataDir(
   std::string& data_dir_member,
   const std::string& default_dir
 );
+
+std::shared_ptr<ExplorerWidget>& getExplorerWidget(std::map<std::string, std::shared_ptr<ExplorerWidget>>& explorer_widgets, const std::string& id)
+{
+  if (explorer_widgets.count(id))
+  {
+    return explorer_widgets.at(id);
+  }
+  else
+  {
+    explorer_widgets[id] = std::make_shared<ExplorerWidget>(id);
+    return explorer_widgets[id];
+  }
+};
+
+std::shared_ptr<GenericTableWidget>& getGenericTableWidget(std::map<std::string, std::shared_ptr<GenericTableWidget>>& generic_table_widgets, const std::string& id)
+{
+  if (generic_table_widgets.count(id))
+  {
+    return generic_table_widgets.at(id);
+  }
+  else
+  {
+    generic_table_widgets[id] = std::make_shared<GenericTableWidget>(id);
+    return generic_table_widgets[id];
+  }
+};
+
 
 int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
@@ -105,6 +153,9 @@ int main(int argc, char** argv)
   // Chromatogram display option
   bool chromatogram_initialized = false;
   std::unique_ptr<ChromatogramPlotWidget> chromatogram_plot_widget;
+
+  std::map<std::string, std::shared_ptr<ExplorerWidget>> explorer_widgets;
+  std::map<std::string, std::shared_ptr<GenericTableWidget>> generic_table_widgets;
 
   // Spectra display option
   bool spectra_initialized = false;
@@ -357,7 +408,7 @@ int main(int argc, char** argv)
         buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
         if (!buildCommandsFromNames.process()) {
           LOGE << "Failed to create Commands, aborting.";
-        } 
+        }
         else {
           for (auto& cmd : buildCommandsFromNames.commands_)
           {
@@ -685,7 +736,7 @@ int main(int argc, char** argv)
     }
 
     show_top_window_ = show_sequence_table || show_transitions_table || show_spectrum_table || show_workflow_table || show_parameters_table
-      || show_quant_method_table || show_stds_concs_table 
+      || show_quant_method_table || show_stds_concs_table
       || show_comp_filters_table || show_comp_group_filters_table || show_comp_qcs_table || show_comp_group_qcs_table
       || show_comp_rsd_filters_table || show_comp_group_rsd_filters_table || show_comp_rsd_qcs_table || show_comp_group_rsd_qcs_table
       || show_comp_background_filters_table || show_comp_group_background_filters_table || show_comp_background_qcs_table || show_comp_group_background_qcs_table
@@ -712,39 +763,51 @@ int main(int argc, char** argv)
         if (show_injection_explorer && ImGui::BeginTabItem("Injections", &show_injection_explorer))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          Eigen::Tensor<std::string, 1> headers = session_handler_.getInjectionExplorerHeader();
-          Eigen::Tensor<std::string, 2> body = session_handler_.getInjectionExplorerBody();
-          ExplorerWidget Explorer(headers, body,
-            session_handler_.injection_explorer_checked_rows, "InjectionsExplorerWindow", session_handler_.injection_explorer_checkbox_headers, session_handler_.injection_explorer_checkbox_body);
-          Explorer.draw();
+          auto widget = getExplorerWidget(explorer_widgets, "InjectionsExplorerWindow");
+          /* these calls can be replaced by one method call, or, the widget uses session handler to get the data */
+          /* to be more clean, the checkbox should be actually not be in session handlers but in the widget */
+          widget->headers_ = session_handler_.getInjectionExplorerHeader();
+          widget->columns_ = session_handler_.getInjectionExplorerBody();
+          widget->checked_rows_ = session_handler_.injection_explorer_checked_rows;
+          widget->checkbox_headers_ = session_handler_.injection_explorer_checkbox_headers;
+          widget->checkbox_columns_ = &session_handler_.injection_explorer_checkbox_body;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_transitions_explorer && ImGui::BeginTabItem("Transitions", &show_transitions_explorer))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          Eigen::Tensor<std::string, 1> headers = session_handler_.getTransitionExplorerHeader();
-          Eigen::Tensor<std::string, 2> body = session_handler_.getTransitionExplorerBody();
-          ExplorerWidget Explorer(headers, body,
-            session_handler_.transition_explorer_checked_rows, "TransitionsExplorerWindow", session_handler_.transition_explorer_checkbox_headers, session_handler_.transition_explorer_checkbox_body);
-          Explorer.draw();
+          auto widget = getExplorerWidget(explorer_widgets, "TransitionsExplorerWindow");
+          widget->headers_ = session_handler_.getTransitionExplorerHeader();
+          widget->columns_ = session_handler_.getTransitionExplorerBody();
+          widget->checked_rows_ = session_handler_.transition_explorer_checked_rows;
+          widget->checkbox_headers_ = session_handler_.transition_explorer_checkbox_headers;
+          widget->checkbox_columns_ = &session_handler_.transition_explorer_checkbox_body;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_features_explorer && ImGui::BeginTabItem("Features", &show_features_explorer))
         {
           session_handler_.setFeatureExplorer();
-          ExplorerWidget Explorer(session_handler_.feature_explorer_headers, session_handler_.feature_explorer_body,
-            session_handler_.feature_explorer_checked_rows, "FeaturesExplorerWindow", session_handler_.feature_explorer_checkbox_headers, session_handler_.feature_explorer_checkbox_body);
-          Explorer.draw();
+          auto widget = getExplorerWidget(explorer_widgets, "FeaturesExplorerWindow");
+          widget->headers_ = session_handler_.feature_explorer_headers;
+          widget->columns_ = session_handler_.feature_explorer_body;
+          widget->checked_rows_ = session_handler_.feature_explorer_checked_rows;
+          widget->checkbox_headers_ = session_handler_.feature_explorer_checkbox_headers;
+          widget->checkbox_columns_ = &session_handler_.feature_explorer_checkbox_body;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_spectrum_explorer && ImGui::BeginTabItem("Spectrum", &show_spectrum_explorer))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-          Eigen::Tensor<std::string, 1> headers = session_handler_.getSpectrumExplorerHeader();
-          Eigen::Tensor<std::string, 2> body = session_handler_.getSpectrumExplorerBody();
-          ExplorerWidget Explorer(headers, body,
-            session_handler_.spectrum_explorer_checked_rows, "SpectrumExplorerWindow", session_handler_.spectrum_explorer_checkbox_headers, session_handler_.spectrum_explorer_checkbox_body);
-          Explorer.draw();
+          auto widget = getExplorerWidget(explorer_widgets, "SpectrumExplorerWindow");
+          widget->headers_ = session_handler_.getSpectrumExplorerHeader();
+          widget->columns_ = session_handler_.getSpectrumExplorerBody();
+          widget->checked_rows_ = session_handler_.spectrum_explorer_checked_rows;
+          widget->checkbox_headers_ = session_handler_.spectrum_explorer_checkbox_headers;
+          widget->checkbox_columns_ = &session_handler_.spectrum_explorer_checkbox_body;
+          widget->draw();
           ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
@@ -773,24 +836,33 @@ int main(int argc, char** argv)
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getSequenceTableFilters();
-          GenericTableWidget Table(session_handler_.sequence_table_headers, session_handler_.sequence_table_body, table_filters, "SequenceMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "SequenceMainWindow");
+          widget->headers_ = session_handler_.sequence_table_headers;
+          widget->columns_ = session_handler_.sequence_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getTransitionsTableFilters();
-          GenericTableWidget Table(session_handler_.transitions_table_headers, session_handler_.transitions_table_body, table_filters, "TransitionsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "TransitionsMainWindow");
+          widget->headers_ = session_handler_.transitions_table_headers;
+          widget->columns_ = session_handler_.transitions_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_spectrum_table && ImGui::BeginTabItem("Spectrum", &show_spectrum_table))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getSpectrumTableFilters();
-          GenericTableWidget Table(session_handler_.spectrum_table_headers, session_handler_.spectrum_table_body, table_filters, "SpectrumMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "SpectrumMainWindow");
+          widget->headers_ = session_handler_.spectrum_table_headers;
+          widget->columns_ = session_handler_.spectrum_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
@@ -816,16 +888,22 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setQuantMethodTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getQuantMethodsTableFilters();
-          GenericTableWidget Table(session_handler_.quant_method_table_headers, session_handler_.quant_method_table_body, table_filters, "QuantMethodMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "QuantMethodMainWindow");
+          widget->headers_ = session_handler_.quant_method_table_headers;
+          widget->columns_ = session_handler_.quant_method_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_stds_concs_table && ImGui::BeginTabItem("Standards Concentrations", &show_stds_concs_table))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setStdsConcsTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.stds_concs_table_headers, session_handler_.stds_concs_table_body, Eigen::Tensor<bool, 1>(), "StdsConcsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "StdsConcsMainWindow");
+          widget->headers_ = session_handler_.stds_concs_table_headers;
+          widget->columns_ = session_handler_.stds_concs_table_body;
+          widget->checked_rows_ = Eigen::Tensor<bool, 1>();
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_filters_table && ImGui::BeginTabItem("Component Filters", &show_comp_filters_table))
@@ -833,8 +911,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentFiltersTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentFiltersTableFilters();
-          GenericTableWidget Table(session_handler_.comp_filters_table_headers, session_handler_.comp_filters_table_body, table_filters, "CompFiltersMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompFiltersMainWindow");
+          widget->headers_ = session_handler_.comp_filters_table_headers;
+          widget->columns_ = session_handler_.comp_filters_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_filters_table && ImGui::BeginTabItem("Component Group Filters", &show_comp_group_filters_table))
@@ -842,8 +923,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupFiltersTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupFiltersTableFilters();
-          GenericTableWidget Table(session_handler_.comp_group_filters_table_headers, session_handler_.comp_group_filters_table_body, table_filters, "CompGroupFiltersMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompGroupFiltersMainWindow");
+          widget->headers_ = session_handler_.comp_group_filters_table_headers;
+          widget->columns_ = session_handler_.comp_group_filters_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_qcs_table && ImGui::BeginTabItem("Component QCs", &show_comp_qcs_table))
@@ -851,8 +935,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentQCsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentQCsTableFilters();
-          GenericTableWidget Table(session_handler_.comp_qcs_table_headers, session_handler_.comp_qcs_table_body, table_filters, "CompQCsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompQCsMainWindow");
+          widget->headers_ = session_handler_.comp_qcs_table_headers;
+          widget->columns_ = session_handler_.comp_qcs_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_qcs_table && ImGui::BeginTabItem("Component Group QCs", &show_comp_group_qcs_table))
@@ -860,16 +947,22 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupQCsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupQCsTableFilters();
-          GenericTableWidget Table(session_handler_.comp_group_qcs_table_headers, session_handler_.comp_group_qcs_table_body, table_filters, "CompGroupQCsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompGroupQCsMainWindow");
+          widget->headers_ = session_handler_.comp_group_qcs_table_headers;
+          widget->columns_ = session_handler_.comp_group_qcs_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_feature_table && ImGui::BeginTabItem("Features table", &show_feature_table))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.feature_table_headers, session_handler_.feature_table_body, Eigen::Tensor<bool, 1>(), "featuresTableMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "featuresTableMainWindow");
+          widget->headers_ = session_handler_.feature_table_headers;
+          widget->columns_ = session_handler_.feature_table_body;
+          widget->checked_rows_ = Eigen::Tensor<bool, 1>();
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_rsd_filters_table && ImGui::BeginTabItem("Component RSD Filters", &show_comp_rsd_filters_table))
@@ -877,8 +970,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentRSDFiltersTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentRSDFiltersTableFilters();
-          GenericTableWidget Table(session_handler_.comp_rsd_filters_table_headers, session_handler_.comp_rsd_filters_table_body, table_filters, "CompRSDFiltersMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompRSDFiltersMainWindow");
+          widget->headers_ = session_handler_.comp_rsd_filters_table_headers;
+          widget->columns_ = session_handler_.comp_rsd_filters_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_rsd_filters_table && ImGui::BeginTabItem("Component Group RSD Filters", &show_comp_group_rsd_filters_table))
@@ -886,8 +982,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupRSDFiltersTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupRSDFiltersTableFilters();
-          GenericTableWidget Table(session_handler_.comp_group_rsd_filters_table_headers, session_handler_.comp_group_rsd_filters_table_body, table_filters, "CompGroupRSDFiltersMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompGroupRSDFiltersMainWindow");
+          widget->headers_ = session_handler_.comp_group_rsd_filters_table_headers;
+          widget->columns_ = session_handler_.comp_group_rsd_filters_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_rsd_qcs_table && ImGui::BeginTabItem("Component RSD QCs", &show_comp_rsd_qcs_table))
@@ -895,8 +994,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentRSDQCsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentRSDQCsTableFilters();
-          GenericTableWidget Table(session_handler_.comp_rsd_qcs_table_headers, session_handler_.comp_rsd_qcs_table_body, table_filters, "CompRSDQCsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompRSDQCsMainWindow");
+          widget->headers_ = session_handler_.comp_rsd_qcs_table_headers;
+          widget->columns_ = session_handler_.comp_rsd_qcs_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_rsd_qcs_table && ImGui::BeginTabItem("Component Group RSD QCs", &show_comp_group_rsd_qcs_table))
@@ -904,8 +1006,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupRSDQCsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupRSDQCsTableFilters();
-          GenericTableWidget Table(session_handler_.comp_group_rsd_qcs_table_headers, session_handler_.comp_group_rsd_qcs_table_body, table_filters, "CompGroupRSDQCsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompGroupRSDQCsMainWindow");
+          widget->headers_ = session_handler_.comp_group_rsd_qcs_table_headers;
+          widget->columns_ = session_handler_.comp_group_rsd_qcs_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_background_filters_table && ImGui::BeginTabItem("Component Background Filters", &show_comp_background_filters_table))
@@ -913,8 +1018,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentBackgroundFiltersTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentBackgroundFiltersTableFilters();
-          GenericTableWidget Table(session_handler_.comp_background_filters_table_headers, session_handler_.comp_background_filters_table_body, table_filters, "CompBackgroundFiltersMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompBackgroundFiltersMainWindow");
+          widget->headers_ = session_handler_.comp_background_filters_table_headers;
+          widget->columns_ = session_handler_.comp_background_filters_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_background_filters_table && ImGui::BeginTabItem("Component Group Background Filters", &show_comp_group_background_filters_table))
@@ -922,8 +1030,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupBackgroundFiltersTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupBackgroundFiltersTableFilters();
-          GenericTableWidget Table(session_handler_.comp_group_background_filters_table_headers, session_handler_.comp_group_background_filters_table_body, table_filters, "CompGroupBackgroundFiltersMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundFiltersMainWindow");
+          widget->headers_ = session_handler_.comp_group_background_filters_table_headers;
+          widget->columns_ = session_handler_.comp_group_background_filters_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_background_qcs_table && ImGui::BeginTabItem("Component Background QCs", &show_comp_background_qcs_table))
@@ -931,8 +1042,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentBackgroundQCsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentBackgroundQCsTableFilters();
-          GenericTableWidget Table(session_handler_.comp_background_qcs_table_headers, session_handler_.comp_background_qcs_table_body, table_filters, "CompBackgroundQCsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompBackgroundQCsMainWindow");
+          widget->headers_ = session_handler_.comp_background_qcs_table_headers;
+          widget->columns_ = session_handler_.comp_background_qcs_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_background_qcs_table && ImGui::BeginTabItem("Component Group Background QCs", &show_comp_group_background_qcs_table))
@@ -940,8 +1054,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupBackgroundQCsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getComponentGroupBackgroundQCsTableFilters();
-          GenericTableWidget Table(session_handler_.comp_group_background_qcs_table_headers, session_handler_.comp_group_background_qcs_table_body, table_filters, "CompGroupBackgroundQCsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundQCsMainWindow");
+          widget->headers_ = session_handler_.comp_group_background_qcs_table_headers;
+          widget->columns_ = session_handler_.comp_group_background_qcs_table_body;
+          widget->checked_rows_ = table_filters;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_rsd_estimations_table && ImGui::BeginTabItem("Component RSD Filters", &show_comp_rsd_estimations_table))
@@ -949,8 +1066,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentRSDEstimationsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_estimations = session_handler_.getComponentRSDEstimationsTableFilters();
-          GenericTableWidget Table(session_handler_.comp_rsd_estimations_table_headers, session_handler_.comp_rsd_estimations_table_body, table_estimations, "CompRSDEstimationsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompRSDEstimationsMainWindow");
+          widget->headers_ = session_handler_.comp_rsd_estimations_table_headers;
+          widget->columns_ = session_handler_.comp_rsd_estimations_table_body;
+          widget->checked_rows_ = table_estimations;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_rsd_estimations_table && ImGui::BeginTabItem("Component Group RSD Filters", &show_comp_group_rsd_estimations_table))
@@ -958,8 +1078,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupRSDEstimationsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_estimations = session_handler_.getComponentGroupRSDEstimationsTableFilters();
-          GenericTableWidget Table(session_handler_.comp_group_rsd_estimations_table_headers, session_handler_.comp_group_rsd_estimations_table_body, table_estimations, "CompGroupRSDEstimationsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompGroupRSDEstimationsMainWindow");
+          widget->headers_ = session_handler_.comp_group_rsd_estimations_table_headers;
+          widget->columns_ = session_handler_.comp_group_rsd_estimations_table_body;
+          widget->checked_rows_ = table_estimations;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_background_estimations_table && ImGui::BeginTabItem("Component Background Filters", &show_comp_background_estimations_table))
@@ -967,8 +1090,11 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentBackgroundEstimationsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_estimations = session_handler_.getComponentBackgroundEstimationsTableFilters();
-          GenericTableWidget Table(session_handler_.comp_background_estimations_table_headers, session_handler_.comp_background_estimations_table_body, table_estimations, "CompBackgroundEstimationsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompBackgroundEstimationsMainWindow");
+          widget->headers_ = session_handler_.comp_background_estimations_table_headers;
+          widget->columns_ = session_handler_.comp_background_estimations_table_body;
+          widget->checked_rows_ = table_estimations;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_comp_group_background_estimations_table && ImGui::BeginTabItem("Component Group Background Filters", &show_comp_group_background_estimations_table))
@@ -976,16 +1102,22 @@ int main(int argc, char** argv)
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupBackgroundEstimationsTable(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_estimations = session_handler_.getComponentGroupBackgroundEstimationsTableFilters();
-          GenericTableWidget Table(session_handler_.comp_group_background_estimations_table_headers, session_handler_.comp_group_background_estimations_table_body, table_estimations, "CompGroupBackgroundEstimationsMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundEstimationsMainWindow");
+          widget->headers_ = session_handler_.comp_group_background_estimations_table_headers;
+          widget->columns_ = session_handler_.comp_group_background_estimations_table_body;
+          widget->checked_rows_ = table_estimations;
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_feature_pivot_table && ImGui::BeginTabItem("Features matrix", &show_feature_pivot_table))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
-          GenericTableWidget Table(session_handler_.feature_pivot_table_headers, session_handler_.feature_pivot_table_body, Eigen::Tensor<bool, 1>(), "featureMatrixMainWindow");
-          Table.draw();
+          auto widget = getGenericTableWidget(generic_table_widgets, "featureMatrixMainWindow");
+          widget->headers_ = session_handler_.feature_pivot_table_headers;
+          widget->columns_ = session_handler_.feature_pivot_table_body;
+          widget->checked_rows_ = Eigen::Tensor<bool, 1>();
+          widget->draw();
           ImGui::EndTabItem();
         }
         if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
@@ -993,7 +1125,7 @@ int main(int argc, char** argv)
           if (!chromatogram_plot_widget)
           {
             chromatogram_plot_widget = std::make_unique<ChromatogramPlotWidget>(
-              session_handler_, 
+              session_handler_,
               application_handler_.sequenceHandler_,
               "Chromatograms Main Window");
           }
