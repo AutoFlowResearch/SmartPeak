@@ -346,7 +346,7 @@ namespace SmartPeak
               if (table_scanned_ == true && !table_entries_.empty())
               {
                 ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", table_entries_[row].Headers[col]);
+                ImGui::Text("%s", table_entries_[row].Headers[col].c_str());
               }
             }
           }
