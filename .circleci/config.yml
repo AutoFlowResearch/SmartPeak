@@ -246,7 +246,7 @@ jobs:
       - run:
           name: Signing SmartPeak with trusted certificate
           command: |
-            $ErrorActionPreference = "Stop"
+            # $ErrorActionPreference = "Stop"
             cd ~/SmartPeak/smartpeak_release_build
             git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
             Import-Module .\CodeSigning\CertCrypto.psm1
