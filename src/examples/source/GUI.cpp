@@ -749,7 +749,7 @@ int main(int argc, char** argv)
           widget->columns_ = session_handler_.getInjectionExplorerBody();
           widget->checked_rows_ = session_handler_.injection_explorer_checked_rows;
           widget->checkbox_headers_ = session_handler_.injection_explorer_checkbox_headers;
-          widget->checkbox_columns_ = session_handler_.injection_explorer_checkbox_body;
+          widget->checkbox_columns_ = &session_handler_.injection_explorer_checkbox_body;
           widget->draw();
           ImGui::EndTabItem();
         }
@@ -761,7 +761,7 @@ int main(int argc, char** argv)
           widget->columns_ = session_handler_.getTransitionExplorerBody();
           widget->checked_rows_ = session_handler_.transition_explorer_checked_rows;
           widget->checkbox_headers_ = session_handler_.transition_explorer_checkbox_headers;
-          widget->checkbox_columns_ = session_handler_.transition_explorer_checkbox_body;
+          widget->checkbox_columns_ = &session_handler_.transition_explorer_checkbox_body;
           widget->draw();
           ImGui::EndTabItem();
         }
@@ -773,7 +773,7 @@ int main(int argc, char** argv)
           widget->columns_ = session_handler_.feature_explorer_body;
           widget->checked_rows_ = session_handler_.feature_explorer_checked_rows;
           widget->checkbox_headers_ = session_handler_.feature_explorer_checkbox_headers;
-          widget->checkbox_columns_ = session_handler_.feature_explorer_checkbox_body;
+          widget->checkbox_columns_ = &session_handler_.feature_explorer_checkbox_body;
           widget->draw();
           ImGui::EndTabItem();
         }
@@ -785,7 +785,7 @@ int main(int argc, char** argv)
           widget->columns_ = session_handler_.getSpectrumExplorerBody();
           widget->checked_rows_ = session_handler_.spectrum_explorer_checked_rows;
           widget->checkbox_headers_ = session_handler_.spectrum_explorer_checkbox_headers;
-          widget->checkbox_columns_ = session_handler_.spectrum_explorer_checkbox_body;
+          widget->checkbox_columns_ = &session_handler_.spectrum_explorer_checkbox_body;
           widget->draw();
           ImGui::EndTabItem();
         }

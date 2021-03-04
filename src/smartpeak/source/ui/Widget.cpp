@@ -404,7 +404,7 @@ namespace SmartPeak
     {
       //Eigen::Tensor<std::string, 2> columns__(columns_);
       //Eigen::Tensor<bool, 2> checkbox_columns__(checkbox_columns_);
-      updateTableContents(table_entries_, table_scanned_, columns_, checkbox_columns_);
+      updateTableContents(table_entries_, table_scanned_, columns_, *checkbox_columns_);
     }
 
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
@@ -453,12 +453,12 @@ namespace SmartPeak
                 if (is_checked == true && !std::strcmp(table_entries_[row].Headers[checkbox_idx].c_str(), "false"))
                 {
                   table_entries_[row].Headers[checkbox_idx] = "true";
-                  checkbox_columns_(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = true;
+                  (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_->dimension(1)) + 1) = true;
                 }
                 else if (is_checked == false && !std::strcmp(table_entries_[row].Headers[checkbox_idx].c_str(), "true"))
                 {
                   table_entries_[row].Headers[checkbox_idx] = "false";
-                  checkbox_columns_(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_.dimension(1)) + 1) = false;
+                  (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(checkbox_columns_->dimension(1)) + 1) = false;
                 }
               }
               ImGui::PopStyleColor();
