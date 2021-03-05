@@ -42,7 +42,6 @@ namespace SmartPeak
     @brief Abstract base class for all panes, windows, and widgets
 
     TODO: potential refactors
-    - Add unit tests for `makeCheckedRows`
   */
   class Widget
   {
@@ -57,48 +56,6 @@ namespace SmartPeak
       NOTE: free to override in inherited implmementations
     */
     virtual void draw() = 0;
-
-//    /**
-//      Method to make a filter and search popup
-//
-//      @param[in] popup_id Sequence handler
-//      @param[in] filter Text filters
-//      @param[in] colum Column of text items to filter
-//      @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
-//      @param[in] values_indices Map containing unique row entries and their duplicate indices
-//    */
-//    static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const Eigen::Tensor<std::string,1>& column, bool* checked,
-//      const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices);
-
-//    /**
-//      Method to make a sort button
-//
-//      @param[in] button_id button ID
-//      @param[in] headers Table headers
-//      @param[in, out] columns Table columns
-//      @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
-//      @param[in, out] columns_indices A vector of maps containing unique row entries and their duplicate indices
-//      @param[in] sort_asc Whether to sort in ascending order or descending order
-//    */
-//    static void SortButton(const char* button_id, const Eigen::Tensor<std::string,1>& headers,
-//      Eigen::Tensor<std::string,2>& columns,
-//      const int n_col,
-//      bool* checked,
-//      std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
-//      bool sort_asc = true);
-
-//    /**
-//      Helper method to make the filters and value_indices needed for `FilterPopup`
-//
-//      @param[in] headers Table headers
-//      @param[in] columns Table columns
-//      @param[out] columns_indices A vector of maps containing unique row entries and their duplicate indices
-//      @param[out] filter Vector of ImGuiTextFilters
-//    */
-//    static void makeFilters(const Eigen::Tensor<std::string,1>& headers,
-//      const Eigen::Tensor<std::string,2>& columns,
-//      std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
-//      std::vector<ImGuiTextFilter>& filter);
   };
 
   class GenericTextWidget : public Widget
@@ -164,10 +121,10 @@ namespace SmartPeak
     void sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs,
       const bool& is_scanned, const unsigned int col_idx);
 
-    Eigen::Tensor<std::string, 1> headers_; // keep these `const` and references so that the data is not copied on each call!
+    Eigen::Tensor<std::string, 1> headers_;
     Eigen::Tensor<std::string, 2> columns_;
     Eigen::Tensor<bool, 1> checked_rows_;
-    const std::string table_id_; // keep this `const` and non-reference so that the table is not built de-novo on each call!
+    const std::string table_id_;
     std::vector<ImEntry> table_entries_;
     bool table_scanned_;
     int selected_col = 0;
