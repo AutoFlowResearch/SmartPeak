@@ -12,7 +12,7 @@ set(sources_list
 	Report.cpp
 	SpectraPlotWidget.cpp
 	Widget.cpp
-  ImTableEntry.cpp
+  ImEntry.cpp
 	WindowSizesAndPositions.cpp
 	Workflow.cpp
 	WorkflowStepWidget.cpp

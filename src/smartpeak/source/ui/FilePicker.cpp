@@ -31,99 +31,20 @@
 
 namespace SmartPeak
 {
-  enum ContentColumnID
-  {
-    ContentColumnID_ID,
-    ContentColumnID_Name,
-    ContentColumnID_Size,
-    ContentColumnID_Type,
-    ContentColumnID_DateModified
-  };
-
-  struct ImDirectoryEntry
-  {
-    int         ID;
-    const char* Name;
-    const char* Size;
-    const char* Type;
-    const char* DateModified;
-    
-    static const ImGuiTableSortSpecs* s_current_sort_specs;
-
-    static int IMGUI_CDECL CompareWithSortSpecs(const void* lhs, const void* rhs)
-    {
-      const ImDirectoryEntry* a = (const ImDirectoryEntry*)lhs;
-      const ImDirectoryEntry* b = (const ImDirectoryEntry*)rhs;
-      for (int n = 0; n < s_current_sort_specs->SpecsCount; n++)
-      {
-        const ImGuiTableSortSpecsColumn* sort_spec = &s_current_sort_specs->Specs[n];
-        int delta = 0;
-        switch (sort_spec->ColumnUserID)
-        {
-          case ContentColumnID_ID:
-            delta = (a->ID - b->ID);
-            break;
-            
-          case ContentColumnID_Name:
-            {
-              std::string a_str, b_str;
-              a_str = a->Name;
-              b_str = b->Name;
-              std::string a_str_lowercased(a_str.length(),' ');
-              std::string b_str_lowercased(b_str.length(),' ');
-              std::transform(a_str.begin(), a_str.end(), a_str_lowercased.begin(), tolower);
-              std::transform(b_str.begin(), b_str.end(), b_str_lowercased.begin(), tolower);
-
-              if  (!a_str_lowercased.empty() && !b_str_lowercased.empty() && a_str_lowercased.front()==b_str_lowercased.front()) {
-                delta = a_str.compare(b_str);
-              }
-              else
-              {
-                // case-insensitive lexicographic sort
-                delta = a_str_lowercased.compare(b_str_lowercased);
-              }
-            }
-            break;
-            
-          case ContentColumnID_Size:
-            delta = ((std::stol(a->Size) - std::stol(b->Size)));
-            break;
-            
-          case ContentColumnID_Type:
-            delta = (strcmp(a->Type, b->Type));
-            break;
-            
-          case ContentColumnID_DateModified:
-            delta = (strcmp(a->DateModified, b->DateModified));
-            break;
-            
-          default: IM_ASSERT(0); break;
-        }
-        if (delta > 0)
-          return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? +1 : -1;
-        if (delta < 0)
-          return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? -1 : +1;
-      }
-      return (strcmp(a->Name, b->Name));
-    }
-  };
-
-  const ImGuiTableSortSpecs* ImDirectoryEntry::s_current_sort_specs = NULL;
-
-  void FilePicker::updateContents(ImVector<ImDirectoryEntry>& Im_directory_entries)
+  void FilePicker::updateContents(std::vector<ImEntry>& Im_directory_entries)
   {
     if (!files_scanned_)
     {
       pathname_content_ = Utilities::getPathnameContent(current_pathname_);
-      Im_directory_entries.resize(pathname_content_[0].size());
+      Im_directory_entries.resize(pathname_content_[0].size(), ImEntry());
       for (int row = 0; row < pathname_content_[0].size(); row++)
       {
-        ImDirectoryEntry& ImDirectoryEntry  = Im_directory_entries[row];
-        ImDirectoryEntry.ID                 = row;
-        ImDirectoryEntry.Name               = pathname_content_[0][row].c_str();
-        ImDirectoryEntry.Size               = pathname_content_[1][row].c_str();
-        ImDirectoryEntry.Type               = pathname_content_[2][row].c_str();
-        ImDirectoryEntry.DateModified       = pathname_content_[3][row].c_str();
+        Im_directory_entries[row].entry_contents.resize(4, "");
+        Im_directory_entries[row].ID = row;
+        for (int col = 0; col < 4; col++)
+        {
+          Im_directory_entries[row].entry_contents[col] = pathname_content_[col][row].c_str();
+        }
       }
       files_scanned_ = true;
     }
@@ -193,12 +114,11 @@ namespace SmartPeak
     const char* column_names[column_count] = { "Name", "Size [bytes]", "Type", "Date Modified" };
     static ImGuiTableColumnFlags column_flags[column_count] = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide
     };
-    static ContentColumnID content_column_ID[column_count] = { ContentColumnID_Name, ContentColumnID_Size, ContentColumnID_Type, ContentColumnID_DateModified };
     
     static ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-        ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable | ImGuiTableFlags_NoBordersInBody;
+        ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti | ImGuiTableFlags_NoBordersInBody;
     
-    static ImVector<ImDirectoryEntry> Im_directory_entries;
+    static std::vector<ImEntry> Im_directory_entries;
     static ImVector<int> selection;
     updateContents(Im_directory_entries);
     
@@ -206,7 +126,7 @@ namespace SmartPeak
     if (ImGui::BeginTable("FileBrowser", column_count, table_flags, size))
     {
       for (int column = 0; column < column_count; column++){
-        ImGui::TableSetupColumn(column_names[column], column_flags[column], -1.0f, content_column_ID[column]);
+        ImGui::TableSetupColumn(column_names[column], column_flags[column], -1.0f);
       }
       ImGui::TableSetupScrollFreeze(column_count, 1);
       ImGui::TableHeadersRow();
@@ -215,10 +135,10 @@ namespace SmartPeak
       {
         if (sorts_specs->SpecsDirty)
         {
-          ImDirectoryEntry::s_current_sort_specs = sorts_specs;
-          if (Im_directory_entries.Size > 1)
-              qsort(&Im_directory_entries[0], (size_t)Im_directory_entries.Size, sizeof(Im_directory_entries[0]), ImDirectoryEntry::CompareWithSortSpecs);
-          ImDirectoryEntry::s_current_sort_specs = NULL;
+          ImEntry::s_current_sort_specs = sorts_specs;
+          if (Im_directory_entries.size() > 1)
+              qsort(&Im_directory_entries[0], (size_t)Im_directory_entries.size(), sizeof(Im_directory_entries[0]), ImEntry::CompareWithSortSpecs);
+          ImEntry::s_current_sort_specs = NULL;
           sorts_specs->SpecsDirty = false;
           memset(selected_filename, 0, sizeof selected_filename);
           selected_entry = -1;
@@ -242,39 +162,24 @@ namespace SmartPeak
         ImGui::TableNextRow();
         for (int column = 0; column < column_count; column++)
         {
-          ImDirectoryEntry* item = &Im_directory_entries[row];
+          ImEntry* item = &Im_directory_entries[row];
           char text_buffer[256];
-          if (column == 0)
-          {
-            sprintf(text_buffer, "%s", item->Name);
-          }
-          else if (column == 1)
-          {
-            sprintf(text_buffer, "%s", item->Size);
-          }
-          else if (column == 2)
-          {
-            sprintf(text_buffer, "%s", item->Type);
-          }
-          else if (column == 3)
-          {
-            sprintf(text_buffer, "%s", item->DateModified);
-          }
+          sprintf(text_buffer, "%s", item->entry_contents[column].c_str());
           
           const bool is_selected = (selected_entry == row);
           ImGui::TableSetColumnIndex(column);
           if(ImGui::Selectable(text_buffer, is_selected, selectable_flags))
           {
             selected_entry = row;
-            std::strcpy(selected_filename, Im_directory_entries[selected_entry].Name);
-            if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item->Type , "Directory") )
+            std::strcpy(selected_filename, Im_directory_entries[selected_entry].entry_contents[0].c_str());
+            if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item->entry_contents[2].c_str() , "Directory") )
             {
               if (current_pathname_.back() != '/')
               {
                 current_pathname_.append("/");
               }
               
-              current_pathname_.append(item->Name);
+              current_pathname_.append(item->entry_contents[0].c_str());
               memset(selected_filename, 0, sizeof selected_filename);
               files_scanned_ = false;
               updateContents(Im_directory_entries);
@@ -291,7 +196,7 @@ namespace SmartPeak
                 {
                   picked_pathname_.append("/");
                 }
-                picked_pathname_.append(item->Name);
+                picked_pathname_.append(item->entry_contents[0].c_str());
               }
               filter.Clear();
               selected_entry = -1;

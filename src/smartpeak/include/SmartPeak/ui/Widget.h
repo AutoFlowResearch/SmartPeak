@@ -29,7 +29,7 @@
 #include <functional>
 #include <imgui.h>
 #include <SmartPeak/core/SessionHandler.h>
-#include <SmartPeak/ui/ImTableEntry.h>
+#include <SmartPeak/ui/ImEntry.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 /**
@@ -58,47 +58,47 @@ namespace SmartPeak
     */
     virtual void draw() = 0;
 
-    /**
-      Method to make a filter and search popup
+//    /**
+//      Method to make a filter and search popup
+//
+//      @param[in] popup_id Sequence handler
+//      @param[in] filter Text filters
+//      @param[in] colum Column of text items to filter
+//      @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
+//      @param[in] values_indices Map containing unique row entries and their duplicate indices
+//    */
+//    static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const Eigen::Tensor<std::string,1>& column, bool* checked,
+//      const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices);
 
-      @param[in] popup_id Sequence handler
-      @param[in] filter Text filters
-      @param[in] colum Column of text items to filter
-      @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
-      @param[in] values_indices Map containing unique row entries and their duplicate indices
-    */
-    static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const Eigen::Tensor<std::string,1>& column, bool* checked,
-      const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices);
+//    /**
+//      Method to make a sort button
+//
+//      @param[in] button_id button ID
+//      @param[in] headers Table headers
+//      @param[in, out] columns Table columns
+//      @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
+//      @param[in, out] columns_indices A vector of maps containing unique row entries and their duplicate indices
+//      @param[in] sort_asc Whether to sort in ascending order or descending order
+//    */
+//    static void SortButton(const char* button_id, const Eigen::Tensor<std::string,1>& headers,
+//      Eigen::Tensor<std::string,2>& columns,
+//      const int n_col,
+//      bool* checked,
+//      std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
+//      bool sort_asc = true);
 
-    /**
-      Method to make a sort button
-
-      @param[in] button_id button ID
-      @param[in] headers Table headers
-      @param[in, out] columns Table columns
-      @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
-      @param[in, out] columns_indices A vector of maps containing unique row entries and their duplicate indices
-      @param[in] sort_asc Whether to sort in ascending order or descending order
-    */
-    static void SortButton(const char* button_id, const Eigen::Tensor<std::string,1>& headers,
-      Eigen::Tensor<std::string,2>& columns,
-      const int n_col,
-      bool* checked,
-      std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
-      bool sort_asc = true);
-
-    /**
-      Helper method to make the filters and value_indices needed for `FilterPopup`
-
-      @param[in] headers Table headers
-      @param[in] columns Table columns
-      @param[out] columns_indices A vector of maps containing unique row entries and their duplicate indices
-      @param[out] filter Vector of ImGuiTextFilters
-    */
-    static void makeFilters(const Eigen::Tensor<std::string,1>& headers,
-      const Eigen::Tensor<std::string,2>& columns,
-      std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
-      std::vector<ImGuiTextFilter>& filter);
+//    /**
+//      Helper method to make the filters and value_indices needed for `FilterPopup`
+//
+//      @param[in] headers Table headers
+//      @param[in] columns Table columns
+//      @param[out] columns_indices A vector of maps containing unique row entries and their duplicate indices
+//      @param[out] filter Vector of ImGuiTextFilters
+//    */
+//    static void makeFilters(const Eigen::Tensor<std::string,1>& headers,
+//      const Eigen::Tensor<std::string,2>& columns,
+//      std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
+//      std::vector<ImGuiTextFilter>& filter);
   };
 
   class GenericTextWidget : public Widget
@@ -139,7 +139,7 @@ namespace SmartPeak
     @param[in] row Current row index
     @param[out] returns true if entry is found (to be used in conjuction with continue)
     */
-    bool searcher(const std::vector<ImTableEntry>& Im_table_entries, const int& selected_entry,
+    bool searcher(const std::vector<ImEntry>& Im_table_entries, const int& selected_entry,
       const ImGuiTextFilter& filter, const size_t row) const;
 
     /*
@@ -150,7 +150,7 @@ namespace SmartPeak
     @param[in] columns columns' entries
     @param[in] checkbox_columns checkboxes' entries
     */
-    void updateTableContents(std::vector<ImTableEntry>& Im_table_entries, bool& is_scanned,
+    void updateTableContents(std::vector<ImEntry>& Im_table_entries, bool& is_scanned,
       const Eigen::Tensor<std::string, 2>& columns, const Eigen::Tensor<bool, 2>& checkbox_columns);
 
     /*
@@ -161,14 +161,14 @@ namespace SmartPeak
     @param[in] is_scanned true if `columns_` and `checkbox_columns_` are in sync with `Im_table_entries`
     @param[in] col_idx column index of the column which needs to be sorted
     */
-    void sorter(std::vector<ImTableEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs,
+    void sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs,
       const bool& is_scanned, const unsigned int col_idx);
 
     Eigen::Tensor<std::string, 1> headers_; // keep these `const` and references so that the data is not copied on each call!
     Eigen::Tensor<std::string, 2> columns_;
     Eigen::Tensor<bool, 1> checked_rows_;
     const std::string table_id_; // keep this `const` and non-reference so that the table is not built de-novo on each call!
-    std::vector<ImTableEntry> table_entries_;
+    std::vector<ImEntry> table_entries_;
     bool table_scanned_;
     int selected_col = 0;
     std::vector<const char*> cols;
@@ -183,7 +183,7 @@ namespace SmartPeak
     - searching
     - color coding of rows by status
   */
-  class ExplorerWidget : public GenericTableWidget
+  class ExplorerWidget final : public GenericTableWidget
   {
   public:
     ExplorerWidget(const std::string& table_id)

@@ -17,27 +17,27 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
 #pragma once
-
-#include <SmartPeak/core/ApplicationProcessor.h>
-#include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/ui/Widget.h>
 #include <algorithm>
 #include <array>
 #include <string>
 #include <vector>
 #include <atomic>
+#include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ImEntry.h>
+
 // #include <boost/filesystem.hpp>
 
 // namespace fs = boost::filesystem;
 
 namespace SmartPeak
 {
-  struct ImDirectoryEntry;
   class FilePicker final : public Widget
   {
     std::array<std::vector<std::string>, 4> pathname_content_;
@@ -49,6 +49,7 @@ namespace SmartPeak
     bool file_was_loaded_ = true;
     bool error_loading_file_ = false;
     std::atomic_bool files_scanned_ {false};
+    const ImGuiTableSortSpecs* s_current_sort_specs = NULL;
 
     void run_and_join(
       FilePickerProcessor* processor,
@@ -58,7 +59,7 @@ namespace SmartPeak
     );
     
     ///!  rescan pathname_content_ into content_items when needed
-    void updateContents(ImVector<ImDirectoryEntry>& content_items);
+    void updateContents(std::vector<ImEntry>& content_items);
 
   public:
     FilePicker()

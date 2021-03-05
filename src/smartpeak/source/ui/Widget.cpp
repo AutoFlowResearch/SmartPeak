@@ -17,8 +17,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Ahmed Khalil, Pasquale Domenico Colaianni $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil, Bertrand Boudaud $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/Widget.h>
@@ -33,234 +33,120 @@
 
 namespace SmartPeak
 {
-    
-  bool ImTableEntry::is_digit(const char ch)
-  {
-    return ch >= '0' && ch <= '9';
-  }
-    
-  bool ImTableEntry::is_number(const std::string& s)
-  {
-    return !s.empty() && std::find_if(s.begin(), s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
-  }
-    
-  int ImTableEntry::lexicographical_sort(const char* lhs, const char* rhs)
-  {
-    std::string lhs_str(lhs), rhs_str(rhs);
-    std::string lhs_str_lowercased(lhs_str.length(),' ');
-    std::string rhs_str_lowercased(rhs_str.length(),' ');
-    std::transform(lhs_str.begin(), lhs_str.end(), lhs_str_lowercased.begin(), tolower);
-    std::transform(rhs_str.begin(), rhs_str.end(), rhs_str_lowercased.begin(), tolower);
-    lhs = lhs_str_lowercased.c_str();
-    rhs = rhs_str_lowercased.c_str();
-      
-    enum SearchMode { STRING, NUMBER } search_mode = STRING;
-    while (*lhs && *rhs)
-    {
-      if (search_mode == STRING)
-      {
-        char lhs_char, rhs_char;
-        while ((lhs_char = *lhs) && (rhs_char = *rhs))
-        {
-          const bool lhs_digit = is_digit(lhs_char), rhs_digit = is_digit(rhs_char);
-          if(lhs_digit && rhs_digit)
-          {
-            search_mode = NUMBER;
-            break;
-          }
-  
-          if(lhs_digit)
-            return -1;
-  
-          if(rhs_digit)
-            return +1;
-            
-          const int char_diff = lhs_char - rhs_char;
-          if(char_diff != 0)
-            return char_diff;
-            
-          ++lhs;
-          ++rhs;
-        }
-      }
-      else if (search_mode == NUMBER)
-      {
-        unsigned long lhs_int = 0;
-        while (*lhs && is_digit(*lhs))
-        {
-          lhs_int = lhs_int*10 + *lhs-'0';
-          ++lhs;
-        }
-        unsigned long rhs_int = 0;
-        while (*rhs && is_digit(*rhs))
-        {
-          rhs_int = rhs_int*10 + *rhs-'0';
-          ++rhs;
-        }
-      
-        const long int_diff = lhs_int - rhs_int;
-        if(int_diff != 0)
-          return int_diff;
+  const ImGuiTableSortSpecs* ImEntry::s_current_sort_specs = NULL;
 
-        search_mode = STRING;
-      }
-    }
-  }
+//  void Widget::FilterPopup(
+//    const char* popuop_id,
+//    ImGuiTextFilter& filter,
+//    const Eigen::Tensor<std::string, 1>& column,
+//    bool* checked,
+//    const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices) {
+//    if (false == ImGui::BeginPopup(popuop_id))
+//      return;
+//
+//    // Filtering and selecting
+//    filter.Draw();
+//
+//    if (ImGui::Button("check all")) {
+//      for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
+//        for (const size_t i: indexes.second) {
+//          checked[i] = 1;
+//        }
+//      }
+//    }
+//
+//    ImGui::SameLine();
+//
+//    if (ImGui::Button("uncheck all")) {
+//      for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
+//        for (const size_t i : indexes.second) {
+//          checked[i] = 0;
+//        }
+//      }
+//    }
+//
+//    for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
+//      if (filter.PassFilter(indexes.first.c_str())) {
+//        ImGui::Checkbox(indexes.first.c_str(), &checked[indexes.second.front()]);
+//      }
+//    }
+//
+//    // Update checked rows not explicitly shown
+//    for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
+//      for (const size_t i : indexes.second) {
+//        checked[i] = checked[indexes.second.front()];
+//      }
+//    }
+//
+//    ImGui::EndPopup();
+//  }
 
-  int IMGUI_CDECL ImTableEntry::CompareWithSortSpecs(const void* lhs, const void* rhs)
-  {
-    const ImTableEntry* a = (const ImTableEntry*)lhs;
-    const ImTableEntry* b = (const ImTableEntry*)rhs;
-    for (int n = 0; n < s_current_sort_specs->SpecsCount; n++)
-    {
-      const ImGuiTableSortSpecsColumn* sort_spec = &s_current_sort_specs->Specs[n];
-      int delta = 0;
-      size_t column_id = sort_spec->ColumnIndex;
-      if (column_id == 0 && !a->Headers.empty() && !b->Headers.empty())
-      {
-        if (a->Headers[0].c_str() != nullptr && b->Headers[0].c_str() != nullptr)
-        {
-          if ( is_number(a->Headers[0]) && is_number(b->Headers[0]))
-          {
-            delta = (std::stol(a->Headers[0]) - std::stol(b->Headers[0]));
-          }
-          else
-          {
-            delta = lexicographical_sort(a->Headers[0].c_str(), b->Headers[0].c_str());
-          }
-        }
-      }
-      else if (column_id > 0 && !a->Headers.empty() && !b->Headers.empty())
-      {
-        delta = lexicographical_sort(a->Headers[column_id].c_str(), b->Headers[column_id].c_str());
-      }
-
-      if (delta > 0)
-        return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? +1 : -1;
-      if (delta < 0)
-        return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? -1 : +1;
-    }
-      
-    if (a->Headers[1].c_str() != nullptr && b->Headers[1].c_str() != nullptr)
-      return (std::strcmp(a->Headers[1].c_str(), b->Headers[1].c_str()));
-    else
-      return (a->Headers[0].c_str() - a->Headers[0].c_str());
-  }
-
-  const ImGuiTableSortSpecs* ImTableEntry::s_current_sort_specs = NULL;
-
-  void Widget::FilterPopup(
-    const char* popuop_id,
-    ImGuiTextFilter& filter,
-    const Eigen::Tensor<std::string, 1>& column,
-    bool* checked,
-    const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices) {
-    if (false == ImGui::BeginPopup(popuop_id))
-      return;
-
-    // Filtering and selecting
-    filter.Draw();
-
-    if (ImGui::Button("check all")) {
-      for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
-        for (const size_t i: indexes.second) {
-          checked[i] = 1;
-        }
-      }
-    }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("uncheck all")) {
-      for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
-        for (const size_t i : indexes.second) {
-          checked[i] = 0;
-        }
-      }
-    }
-
-    for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
-      if (filter.PassFilter(indexes.first.c_str())) {
-        ImGui::Checkbox(indexes.first.c_str(), &checked[indexes.second.front()]);
-      }
-    }
-
-    // Update checked rows not explicitly shown
-    for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
-      for (const size_t i : indexes.second) {
-        checked[i] = checked[indexes.second.front()];
-      }
-    }
-
-    ImGui::EndPopup();
-  }
-
-  void Widget::makeFilters(
-    const Eigen::Tensor<std::string, 1>& headers,
-    const Eigen::Tensor<std::string,2>& columns,
-    std::vector<std::vector<std::pair<std::string, std::vector<std::size_t>>>>& columns_indices,
-    std::vector<ImGuiTextFilter>& filter) {
-    for (std::size_t col = 0; col < headers.size(); ++col)
-    {
-      // Extract out unique columns and replicate indices
-      std::map<std::string, std::vector<std::size_t>> value_indices;
-      for (std::size_t row = 0; row < columns.dimension(0); ++row) {
-        std::vector<std::size_t> index = { row };
-        auto found = value_indices.emplace(columns(col,row), index);
-        if (!found.second) {
-          value_indices.at(columns(col,row)).push_back(row);
-        }
-      }
-
-      // Copy into a vector of pairs (used for downstream sorting)
-      std::vector<std::pair<std::string, std::vector<std::size_t>>> value_indices_v;
-      std::copy(
-        value_indices.begin(),
-        value_indices.end(),
-        std::back_inserter(value_indices_v)
-      );
-      columns_indices.push_back(value_indices_v);
-
-      // Initialize the filters
-      static ImGuiTextFilter filter0;
-      filter.push_back(filter0);
-    }
-  }
+//  void Widget::makeFilters(
+//    const Eigen::Tensor<std::string, 1>& headers,
+//    const Eigen::Tensor<std::string,2>& columns,
+//    std::vector<std::vector<std::pair<std::string, std::vector<std::size_t>>>>& columns_indices,
+//    std::vector<ImGuiTextFilter>& filter) {
+//    for (std::size_t col = 0; col < headers.size(); ++col)
+//    {
+//      // Extract out unique columns and replicate indices
+//      std::map<std::string, std::vector<std::size_t>> value_indices;
+//      for (std::size_t row = 0; row < columns.dimension(0); ++row) {
+//        std::vector<std::size_t> index = { row };
+//        auto found = value_indices.emplace(columns(col,row), index);
+//        if (!found.second) {
+//          value_indices.at(columns(col,row)).push_back(row);
+//        }
+//      }
+//
+//      // Copy into a vector of pairs (used for downstream sorting)
+//      std::vector<std::pair<std::string, std::vector<std::size_t>>> value_indices_v;
+//      std::copy(
+//        value_indices.begin(),
+//        value_indices.end(),
+//        std::back_inserter(value_indices_v)
+//      );
+//      columns_indices.push_back(value_indices_v);
+//
+//      // Initialize the filters
+//      static ImGuiTextFilter filter0;
+//      filter.push_back(filter0);
+//    }
+//  }
 
 
-  bool GenericTableWidget::searcher(const std::vector<ImTableEntry>& Im_table_entries, const int& selected_entry,
+  bool GenericTableWidget::searcher(const std::vector<ImEntry>& Im_table_entries, const int& selected_entry,
     const ImGuiTextFilter& filter, const size_t row) const
   {
     bool is_to_filter;
     if (selected_entry > 0) {
-      is_to_filter = !filter.PassFilter(Im_table_entries[row].Headers[selected_entry - 1].c_str());
+      is_to_filter = !filter.PassFilter(Im_table_entries[row].entry_contents[selected_entry - 1].c_str());
     }
     else if (selected_entry == 0) { //ALL
-      is_to_filter = std::all_of(Im_table_entries[row].Headers.begin(),
-        Im_table_entries[row].Headers.end(),
+      is_to_filter = std::all_of(Im_table_entries[row].entry_contents.begin(),
+        Im_table_entries[row].entry_contents.end(),
         [&filter](auto entry) {return !filter.PassFilter(entry.c_str()); });
     }
     return is_to_filter;
   }
 
-  void GenericTableWidget::updateTableContents(std::vector<ImTableEntry>& Im_table_entries,
+  void GenericTableWidget::updateTableContents(std::vector<ImEntry>& Im_table_entries,
     bool& is_scanned,
     const Eigen::Tensor<std::string, 2>& columns,
     const Eigen::Tensor<bool, 2>& checkbox_columns)
   {
-    Im_table_entries.resize(columns.dimension(0), ImTableEntry());
+    Im_table_entries.resize(columns.dimension(0), ImEntry());
     if (!Im_table_entries.empty() && is_scanned == false) {
       for (size_t row = 0; row < columns.dimension(0); ++row) {
-        ImTableEntry& Im_table_entry = Im_table_entries[row];
-        Im_table_entry.Headers.resize(columns.dimension(1) + checkbox_columns.dimension(1), "");
+        ImEntry& Im_table_entry = Im_table_entries[row];
+        Im_table_entry.entry_contents.resize(columns.dimension(1) + checkbox_columns.dimension(1), "");
         Im_table_entry.ID = row;
         for (size_t header_idx = 0; header_idx < columns.dimension(1) + checkbox_columns.dimension(1); ++header_idx) {
           if (header_idx < columns.dimension(1)) {
-            Im_table_entry.Headers[header_idx] = columns(row, header_idx);
+            Im_table_entry.entry_contents[header_idx] = columns(row, header_idx);
           }
           else if (header_idx < columns.dimension(1) + checkbox_columns.dimension(1)) {
             const std::size_t checkbox_idx = header_idx - static_cast<std::size_t>(columns.dimension(1));
-            Im_table_entry.Headers[header_idx] = checkbox_columns(row, checkbox_idx) == true ? "true" : "false";
+            Im_table_entry.entry_contents[header_idx] = checkbox_columns(row, checkbox_idx) == true ? "true" : "false";
           }
         }
       }
@@ -268,18 +154,18 @@ namespace SmartPeak
     }
   }
 
-  void GenericTableWidget::sorter(std::vector<ImTableEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs,
+  void GenericTableWidget::sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs,
     const bool& is_scanned, const unsigned int col_idx)
   {
     if (sorts_specs->SpecsDirty && is_scanned &&
       !std::all_of(Im_table_entries.begin(), Im_table_entries.end(),
         [&, col_idx, Im_table_entries]
-    (ImTableEntry& entry) { return !std::strcmp(entry.Headers[col_idx].c_str(), Im_table_entries.begin()->Headers[col_idx].c_str()); }))
+    (ImEntry& entry) { return !std::strcmp(entry.entry_contents[col_idx].c_str(), Im_table_entries.begin()->entry_contents[col_idx].c_str()); }))
     {
-      ImTableEntry::s_current_sort_specs = sorts_specs;
+      ImEntry::s_current_sort_specs = sorts_specs;
       if (Im_table_entries.size() > 1)
-        qsort(&Im_table_entries[0], (size_t)Im_table_entries.size(), sizeof(Im_table_entries[0]), ImTableEntry::CompareWithSortSpecs);
-      ImTableEntry::s_current_sort_specs = NULL;
+        qsort(&Im_table_entries[0], (size_t)Im_table_entries.size(), sizeof(Im_table_entries[0]), ImEntry::CompareWithSortSpecs);
+      ImEntry::s_current_sort_specs = NULL;
       sorts_specs->SpecsDirty = false;
     }
   }
@@ -290,8 +176,8 @@ namespace SmartPeak
       return;
 
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
-      ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedSame| ImGuiTableFlags_NoSavedSettings |
+      ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti;
 
     static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
     static ImGuiTableColumnFlags column_any_flags = { ImGuiTableColumnFlags_NoHide };
@@ -300,8 +186,6 @@ namespace SmartPeak
     filter.Draw("Find");
 
     // drop-down list for search field(s)
-    //static int selected_col = 0;
-    //static std::vector<const char*> cols;
     cols.resize(headers_.size() + 1);
     for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
       if (header_name == 0)
@@ -327,7 +211,7 @@ namespace SmartPeak
     }
 
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
-      // First row headers
+      // First row entry_contents
       for (int col = 0; col < headers_.size(); col++) {
         ImGui::TableSetupColumn(headers_(col).c_str());
       }
@@ -346,7 +230,7 @@ namespace SmartPeak
               if (table_scanned_ == true && !table_entries_.empty())
               {
                 ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", table_entries_[row].Headers[col].c_str());
+                ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());
               }
             }
           }
@@ -369,8 +253,8 @@ namespace SmartPeak
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_Scroll | ImGuiTableFlags_SizingPolicyFixedX | ImGuiTableFlags_NoSavedSettings |
-      ImGuiTableFlags_Sortable | ImGuiTableFlags_MultiSortable;
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedSame| ImGuiTableFlags_NoSavedSettings |
+      ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti;
 
     static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
     static ImGuiTableColumnFlags column_any_flags = { ImGuiTableColumnFlags_NoHide };
@@ -428,7 +312,7 @@ namespace SmartPeak
               if (table_scanned_ == true && !table_entries_.empty())
               {
                 ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", table_entries_[row].Headers[col].c_str());
+                ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());
               }
             }
 
@@ -440,20 +324,20 @@ namespace SmartPeak
               {
                 size_t checkbox_idx = col + headers_.size();
                 bool is_checked;
-                if (!std::strcmp(table_entries_[row].Headers[checkbox_idx].c_str(), "true"))
+                if (!std::strcmp(table_entries_[row].entry_contents[checkbox_idx].c_str(), "true"))
                   is_checked = true;
                 else
                   is_checked = false;
                 ImGui::Checkbox(id.c_str(), &is_checked);
 
-                if (is_checked == true && !std::strcmp(table_entries_[row].Headers[checkbox_idx].c_str(), "false"))
+                if (is_checked == true && !std::strcmp(table_entries_[row].entry_contents[checkbox_idx].c_str(), "false"))
                 {
-                  table_entries_[row].Headers[checkbox_idx] = "true";
+                  table_entries_[row].entry_contents[checkbox_idx] = "true";
                   (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(columns_.dimension(1))) = true;
                 }
-                else if (is_checked == false && !std::strcmp(table_entries_[row].Headers[checkbox_idx].c_str(), "true"))
+                else if (is_checked == false && !std::strcmp(table_entries_[row].entry_contents[checkbox_idx].c_str(), "true"))
                 {
-                  table_entries_[row].Headers[checkbox_idx] = "false";
+                  table_entries_[row].entry_contents[checkbox_idx] = "false";
                   (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(columns_.dimension(1))) = false;
                 }
               }
