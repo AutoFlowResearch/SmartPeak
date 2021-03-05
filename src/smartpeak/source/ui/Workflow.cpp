@@ -78,7 +78,7 @@ namespace SmartPeak
                     "QUANTIFY_FEATURES",
                     "STORE_FEATURES" };
           else if (s_string == "HPLC UV Unknowns")
-            ids = { "LOAD_RAW_DATA"
+            ids = { "LOAD_RAW_DATA",
                     "MAP_CHROMATOGRAMS",
                     "EXTRACT_CHROMATOGRAM_WINDOWS",
                     "ZERO_CHROMATOGRAM_BASELINE",
@@ -152,6 +152,7 @@ namespace SmartPeak
                     "MERGE_INJECTIONS",
                     "STORE_FEATURES_SAMPLE_GROUP" };
           application_handler_->sequenceHandler_.setWorkflow(ids);
+          application_handler_->sequenceHandler_.notifyWorkflowChanged();
           LOGI << "Local workflow has been replaced";
         }
       }
@@ -222,6 +223,7 @@ namespace SmartPeak
           }
           if (editable_ && ImGui::Button("x")) {
             application_handler_->sequenceHandler_.getWorkflow().erase(application_handler_->sequenceHandler_.getWorkflow().cbegin() + i);
+            application_handler_->sequenceHandler_.notifyWorkflowChanged();
           }
           else {
             ++i;

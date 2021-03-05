@@ -144,14 +144,14 @@ BOOST_AUTO_TEST_CASE(setFeatureExplorer1)
   session_handler.setFeatureExplorer();
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_headers.size(), 1);
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_headers(0), "name");
-  BOOST_CHECK_EQUAL(session_handler.feature_explorer_body.dimension(0), 20);
+  BOOST_CHECK_EQUAL(session_handler.feature_explorer_body.dimension(0), 22);
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_body.dimension(1), 1);
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_body(0, 0), "asymmetry_factor");
-  BOOST_CHECK_EQUAL(session_handler.feature_explorer_body(session_handler.feature_explorer_body.dimension(0) - 1, session_handler.feature_explorer_body.dimension(1) - 1), "mz_error_Da");
+  BOOST_CHECK_EQUAL(session_handler.feature_explorer_body(session_handler.feature_explorer_body.dimension(0) - 1, session_handler.feature_explorer_body.dimension(1) - 1), "absolute_difference");
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_headers.size(), 2);
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_headers(0), "plot");
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_headers(session_handler.feature_explorer_checkbox_headers.size() - 1), "table");
-  BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_body.dimension(0), 20);
+  BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_body.dimension(0), 22);
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_checkbox_body.dimension(1), 2);
   BOOST_CHECK(!session_handler.feature_explorer_checkbox_body(0, 0));
   BOOST_CHECK(session_handler.feature_explorer_checkbox_body(2, 0));
@@ -188,42 +188,45 @@ BOOST_AUTO_TEST_CASE(setWorkflowTable1)
   //SessionHandler session_handler; session_handler.setWorkflowTable();
 }
 
-BOOST_AUTO_TEST_CASE(setParametersTable1)
+BOOST_AUTO_TEST_CASE(getParametersTable1)
 {
   TestData testData;
-  SessionHandler session_handler; 
-  session_handler.setParametersTable(testData.sequenceHandler, {});
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers.size(), 9);
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(0), "function");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(1), "name");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(2), "type");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(3), "value");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(4), "description");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(5), "status");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(6), "valid");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(7), "restrictions");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_headers(8), "schema_type");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body.dimension(0), 107);
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body.dimension(1), 9);
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 0), "AbsoluteQuantitation");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 1), "min_points");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 2), "int");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 3), "4");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 4), "The minimum number of calibrator points.");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 5), "unused");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 6), "true");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 7), "");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(0, 8), "int");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 0), "SequenceProcessor");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 1), "n_thread");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 2), "int");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 3), "6");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 4), "number of working threads");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 5), "default");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 6), "true");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 7), "min:1");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 8), "int");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(session_handler.parameters_table_body.dimension(0) - 1, 3), "true");
+  SessionHandler session_handler;
+  Eigen::Tensor<std::string, 1> headers;
+  Eigen::Tensor<std::string, 2> body;
+  ParameterSet user_parameters = testData.sequenceHandler.getSequence().at(0).getRawData().getParameters();
+  session_handler.getParametersTable(user_parameters, {}, headers, body);
+  BOOST_CHECK_EQUAL(headers.size(), 9);
+  BOOST_CHECK_EQUAL(headers(0), "function");
+  BOOST_CHECK_EQUAL(headers(1), "name");
+  BOOST_CHECK_EQUAL(headers(2), "type");
+  BOOST_CHECK_EQUAL(headers(3), "value");
+  BOOST_CHECK_EQUAL(headers(4), "description");
+  BOOST_CHECK_EQUAL(headers(5), "status");
+  BOOST_CHECK_EQUAL(headers(6), "valid");
+  BOOST_CHECK_EQUAL(headers(7), "restrictions");
+  BOOST_CHECK_EQUAL(headers(8), "schema_type");
+  BOOST_CHECK_EQUAL(body.dimension(0), 107);
+  BOOST_CHECK_EQUAL(body.dimension(1), 9);
+  BOOST_CHECK_EQUAL(body(0, 0), "AbsoluteQuantitation");
+  BOOST_CHECK_EQUAL(body(0, 1), "min_points");
+  BOOST_CHECK_EQUAL(body(0, 2), "int");
+  BOOST_CHECK_EQUAL(body(0, 3), "4");
+  BOOST_CHECK_EQUAL(body(0, 4), "The minimum number of calibrator points.");
+  BOOST_CHECK_EQUAL(body(0, 5), "unused");
+  BOOST_CHECK_EQUAL(body(0, 6), "true");
+  BOOST_CHECK_EQUAL(body(0, 7), "");
+  BOOST_CHECK_EQUAL(body(0, 8), "int");
+  BOOST_CHECK_EQUAL(body(104, 0), "SequenceProcessor");
+  BOOST_CHECK_EQUAL(body(104, 1), "n_thread");
+  BOOST_CHECK_EQUAL(body(104, 2), "int");
+  BOOST_CHECK_EQUAL(body(104, 3), "6");
+  BOOST_CHECK_EQUAL(body(104, 4), "number of working threads");
+  BOOST_CHECK_EQUAL(body(104, 5), "default");
+  BOOST_CHECK_EQUAL(body(104, 6), "true");
+  BOOST_CHECK_EQUAL(body(104, 7), "min:1");
+  BOOST_CHECK_EQUAL(body(104, 8), "int");
+  BOOST_CHECK_EQUAL(body(body.dimension(0) - 1, 3), "true");
 }
 
 BOOST_AUTO_TEST_CASE(setParametersTable2)
@@ -240,13 +243,15 @@ BOOST_AUTO_TEST_CASE(setParametersTable2)
   user_param.at("SequenceProcessor").addParameter(param);
   auto modified_param = user_param.findParameter("SequenceProcessor", "n_thread");
   modified_param->setValueFromString("-1");
-  session_handler.setParametersTable(testData.sequenceHandler, {});
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 0), "SequenceProcessor");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 1), "n_thread");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 3), "-1");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 5), "user_override");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 6), "false");
-  BOOST_CHECK_EQUAL(session_handler.parameters_table_body(104, 7), "min:1");
+  Eigen::Tensor<std::string, 1> headers;
+  Eigen::Tensor<std::string, 2> body;
+  session_handler.getParametersTable(user_param, {}, headers, body);
+  BOOST_CHECK_EQUAL(body(104, 0), "SequenceProcessor");
+  BOOST_CHECK_EQUAL(body(104, 1), "n_thread");
+  BOOST_CHECK_EQUAL(body(104, 3), "-1");
+  BOOST_CHECK_EQUAL(body(104, 5), "user_override");
+  BOOST_CHECK_EQUAL(body(104, 6), "false");
+  BOOST_CHECK_EQUAL(body(104, 7), "min:1");
 }
 
 BOOST_AUTO_TEST_CASE(setQuantMethodTable1)
@@ -568,7 +573,7 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getNSelectedSampleNamesPlot(), 1);
   BOOST_CHECK_EQUAL(session_handler.getNSelectedTransitionsTable(), 6);
   BOOST_CHECK_EQUAL(session_handler.getNSelectedTransitionsPlot(), 1);
-  BOOST_CHECK_EQUAL(session_handler.getNSelectedFeatureMetaValuesTable(), 20);
+  BOOST_CHECK_EQUAL(session_handler.getNSelectedFeatureMetaValuesTable(), 22);
   BOOST_CHECK_EQUAL(session_handler.getNSelectedFeatureMetaValuesPlot(), 1);
   // Selected string values
   BOOST_CHECK(session_handler.getSelectInjectionNamesWorkflow(testData.sequenceHandler) == std::set<std::string>({"150516_CM1_Level10_2_BatchName_1900-01-01_000000", "150516_CM1_Level1_1_BatchName_1900-01-01_000000"}));
@@ -592,10 +597,10 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot().size(), 6);
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot()(0), "arg-L");
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot()(session_handler.getSelectTransitionsPlot().dimension(0) - 1), "");
-  BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable().size(), 20);
+  BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable().size(), 22);
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable()(0), "asymmetry_factor");
-  BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable()(session_handler.getSelectFeatureMetaValuesTable().dimension(0) - 1), "mz_error_Da");
-  BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesPlot().size(), 20);
+  BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable()(session_handler.getSelectFeatureMetaValuesTable().dimension(0) - 1), "absolute_difference");
+  BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesPlot().size(), 22);
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesPlot()(0), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesPlot()(session_handler.getSelectFeatureMetaValuesPlot().dimension(0) - 1), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectSpectrumPlot().size(), 1);

@@ -69,6 +69,19 @@ public:
     );
 
     /**
+      Update a OpenMS' DefaultParamHandler object with user parameters.
+
+      @param[in,out] Param_handler_IO OpenMS' DefaultParamHandler object to update
+      @param[in] parameters_I user parameters
+      @param[in] param_handler_name set if user parameter have different name entry.
+    */
+    static void setUserParameters(
+      OpenMS::DefaultParamHandler& Param_handler_IO,
+      const ParameterSet& user_parameters_I,
+      const std::string param_handler_name_I = ""
+    );
+
+    /**
       Update a Param object.
 
       The type check is case insensitive.
@@ -323,5 +336,10 @@ public:
     * @returns The absolute path to log file and boolean flag whether the path to directory was created
     */
     static std::pair<std::string, bool> getLogFilepath(const std::string& filename);
+
+    /**
+    * @brief Returns the build version of SmartPeak package if available.
+    */
+    static std::string getSmartPeakVersion();
   };
 }

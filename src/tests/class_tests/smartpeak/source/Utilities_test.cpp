@@ -28,6 +28,7 @@
 #include <boost/filesystem.hpp>
 #include <sys/stat.h>
 #include <SmartPeak/core/Utilities.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>
 
 using namespace SmartPeak;
 using namespace std;
@@ -56,6 +57,44 @@ BOOST_AUTO_TEST_CASE(castString)
   Utilities::castString(string("35.35"), string("float"), c);
   BOOST_CHECK_EQUAL(c.getTag() == CastValue::Type::FLOAT, true);
   BOOST_CHECK_CLOSE(c.f_, (float)35.35, 1e-6);
+}
+
+BOOST_AUTO_TEST_CASE(setUserParameters)
+{
+  OpenMS::MRMFeatureFinderScoring feature;
+  auto param = feature.getParameters();
+  // default value is 1 for add_up_spectra
+  BOOST_CHECK_EQUAL(int(param.getValue("add_up_spectra")), 1);
+  
+  // user set parameter
+  map<std::string, vector<map<string, string>>> feat_params_struct1({
+  {"MRMFeatureFinderScoring", {
+    { {"name", "add_up_spectra"}, {"type", "int"}, {"value", "42"} },
+  }}
+  });
+  ParameterSet feat_params1(feat_params_struct1);
+  Utilities::setUserParameters(feature, feat_params1);
+  BOOST_CHECK_EQUAL(int(feature.getParameters().getValue("add_up_spectra")), 42);
+
+  // user set parameter - alias name
+  map<std::string, vector<map<string, string>>> feat_params_struct2({
+  {"AliasName", {
+    { {"name", "add_up_spectra"}, {"type", "int"}, {"value", "43"} },
+  }}
+  });
+  ParameterSet feat_params2(feat_params_struct2);
+  Utilities::setUserParameters(feature, feat_params2, "AliasName");
+  BOOST_CHECK_EQUAL(int(feature.getParameters().getValue("add_up_spectra")), 43);
+
+  // not matching parameter
+  map<std::string, vector<map<string, string>>> feat_params_struct3({
+  {"NotMatching", {
+    { {"name", "add_up_spectra"}, {"type", "int"}, {"value", "43"} },
+  }}
+  });
+  ParameterSet feat_params3(feat_params_struct3);
+  Utilities::setUserParameters(feature, feat_params3);
+  BOOST_CHECK_EQUAL(int(feature.getParameters().getValue("add_up_spectra")), 43);
 }
 
 BOOST_AUTO_TEST_CASE(updateParameters)
@@ -413,10 +452,10 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
   const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname);
 
   // number of items in the pathname, taking .gitignore into account
-  BOOST_CHECK_EQUAL(c[0].size(), 48);
-  BOOST_CHECK_EQUAL(c[1].size(), 48);
-  BOOST_CHECK_EQUAL(c[2].size(), 48);
-  BOOST_CHECK_EQUAL(c[3].size(), 48);
+  BOOST_CHECK_EQUAL(c[0].size(), 49);
+  BOOST_CHECK_EQUAL(c[1].size(), 49);
+  BOOST_CHECK_EQUAL(c[2].size(), 49);
+  BOOST_CHECK_EQUAL(c[3].size(), 49);
 
   BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_1900-01-01_000000.featureXML");
  #ifdef _WIN32
@@ -427,9 +466,9 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
  #endif
   BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
 
-  BOOST_CHECK_EQUAL(c[0][47], "workflow_csv_files");
-  BOOST_CHECK_EQUAL(c[1][47], "22"); // number of items within the folder
-  BOOST_CHECK_EQUAL(c[2][47], "Directory");
+  BOOST_CHECK_EQUAL(c[0][48], "workflow_csv_files");
+  BOOST_CHECK_EQUAL(c[1][48], "22"); // number of items within the folder
+  BOOST_CHECK_EQUAL(c[2][48], "Directory");
 }
 
 BOOST_AUTO_TEST_CASE(getParentPathname)
@@ -497,7 +536,7 @@ BOOST_AUTO_TEST_CASE(directorySize)
 {
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto& f = Utilities::directorySize;
-  BOOST_CHECK_EQUAL(f(path), 48);
+  BOOST_CHECK_EQUAL(f(path), 49);
   BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 22);
   BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
 }

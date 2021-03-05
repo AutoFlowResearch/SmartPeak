@@ -8,6 +8,7 @@ set(sources_list
 	FilePicker.cpp
 	GuiAppender.cpp
 	Heatmap2DWidget.cpp
+	ParametersTableWidget.cpp
 	Report.cpp
 	SpectraPlotWidget.cpp
 	Widget.cpp

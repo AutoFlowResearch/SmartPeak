@@ -25,6 +25,7 @@
 
 #include <map>
 #include <string>
+#include <type_traits>
 
 namespace SmartPeak {
   enum class FeatureMetadata {
@@ -55,7 +56,10 @@ namespace SmartPeak {
     mz,
     charge,
     mz_error_ppm,
-    mz_error_Da/*,
+    mz_error_Da,
+    average_accuracy,
+    absolute_difference,
+    SIZE_OF_FeatureMetadata/*,
     accuracy,
     n_features,
     validation*/
@@ -65,5 +69,7 @@ namespace SmartPeak {
   extern const std::map<FeatureMetadata, std::string> metadataToString;
   extern const std::map<FeatureMetadata, std::string> metadatafloatToString;
 
-  constexpr size_t FeatureMetadataSize { 28 }; // was 31 with accuracy, n_features, and validation
+  constexpr size_t FeatureMetadataSize {
+    static_cast<std::underlying_type_t<FeatureMetadata>>(FeatureMetadata::SIZE_OF_FeatureMetadata) - 1
+  };
 }

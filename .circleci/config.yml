@@ -13,61 +13,63 @@ jobs:
       - checkout
       - run: |
           apt-get update
-      - run: |
-          export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
-          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
-          dpkg-reconfigure --frontend noninteractive tzdata &&
-          apt-get install -y git cmake qt5-default libeigen3-dev
-      - run: |
-          apt-get install -y libboost-all-dev &&
-          apt-get install -y libxerces-c-dev coinor-libcbc-dev libsvm-dev &&
-          apt-get install -y libwildmagic-dev libsqlite3-dev &&
-          apt-get install -y libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
-      - run: |
-          apt-get install -y graphviz doxygen python3-pip &&
-          export DEBIAN_FRONTEND=noninteractive &&
-          apt-get install -y tzdata &&
-          ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
-          dpkg-reconfigure --frontend noninteractive tzdata &&
-          apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
-          pip3 install exhale
-      - run: |
-          cd ~ &&
-          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-          cd OpenMS && git submodule update --init THIRDPARTY &&
-          cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
-          make -j4 OpenMS
       - run:
+          name: Installing required libraries
+          command: |
+            export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
+            ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
+            dpkg-reconfigure --frontend noninteractive tzdata &&
+            apt-get install -y git cmake qt5-default libeigen3-dev &&
+            apt-get install -y libboost-all-dev &&
+            apt-get install -y libxerces-c-dev coinor-libcbc-dev libsvm-dev &&
+            apt-get install -y libwildmagic-dev libsqlite3-dev &&
+            apt-get install -y libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
+            apt-get install -y graphviz doxygen python3-pip &&
+            apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
+            pip3 install exhale
+      - run:
+          name: Cloning and building OpenMS
+          command: |
+            cd ~ &&
+            git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
+            cd OpenMS && git submodule update --init THIRDPARTY &&
+            cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
+            make -j4 OpenMS
+      - run:
+          name: Installing SmartPeak SuperBuild
           command: |
             cd ~/SmartPeak
-            #mkdir superbuild
+            mkdir -p superbuild
             cd superbuild
-            cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
+            cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
       - run:
+          name: Building SmartPeak's All Targets
           command: |
-            mkdir ~/SmartPeak_build
-            cd ~/SmartPeak_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
+            mkdir ~/smartpeak_release_build
+            cd ~/smartpeak_release_build
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
       - run:
+          name: Running SmartPeak Class Tests
           command: |
-            cd ~/SmartPeak_build || exit 1
-            ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
+            cd ~/smartpeak_release_build || exit 1
             ctest -V
             ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
       - run:
+          name: Running SmartPeak Examples
           command: |
-            ~/SmartPeak/.circleci/run_examples.sh ~/SmartPeak_build/bin
+            ~/SmartPeak/.circleci/run_examples.sh ~/smartpeak_release_build/bin
       - run:
+          name: Packing SmartPeak
           command: |
             set -o xtrace
-            cd ~/SmartPeak_build
+            cd ~/smartpeak_release_build
             cpack -V
-            ls -lh ~/SmartPeak_build | grep -a .deb
-            dpkg -c ~/SmartPeak_build/*.deb
+            ls -lh ~/smartpeak_release_build | grep -a .deb
+            dpkg -c ~/smartpeak_release_build/*.deb
             mkdir -p /tmp/packages
-            cp ~/SmartPeak_build/*.deb /tmp/packages
+            cp ~/smartpeak_release_build/*.deb /tmp/packages
       - store_artifacts:
           path: /tmp/packages
 
@@ -78,53 +80,60 @@ jobs:
     working_directory: ~/SmartPeak
     steps:
       - checkout
-      - run: brew remove yarn node
-      - run: brew install cmake qt5 sdl2
-      - run: brew install boost
-      - run: |
-          set +o pipefail
-          # brew install coin-or-tools/coinor/cbc coin-or-tools/coinor/cgl coin-or-tools/coinor/clp coin-or-tools/coinor/coin_data_netlib || true
-      - run: |
-          set -o pipefail
-          # brew install coin-or-tools/coinor/coin_data_sample coin-or-tools/coinor/coinutils coin-or-tools/coinor/osi || true
-      - run: |
-          cd ~ &&
-          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-          cd OpenMS && mkdir contrib_build && cd contrib_build
-          curl -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
-          tar -xzf contrib_build.tar.gz
-          rm lib/libboost_* && rm -r include/boost && rm -r lib/cmake/Boost* && rm -r lib/cmake/boost*
-          cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
-          cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Debug -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
-          make -j4 OpenMS
-      - run: |
-          cd ~/SmartPeak
-          #mkdir superbuild
-          mkdir smartpeak_debug_build
-          cd superbuild
-          cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug .. && make -j4
-          cd ../smartpeak_debug_build
-          cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
-          make -j4
-      - run: |
-          set +o pipefail
-          cd ~/SmartPeak/smartpeak_debug_build
-          ctest -VV -F --timeout 1200 || true
-      - run: | 
-          set +e
-          cd ~/SmartPeak/smartpeak_debug_build
-          ls -alt bin
-          cpack -G DragNDrop && ls -alth
-          yes | hdiutil attach -noautoopen -noverify SmartPeak-*.dmg > /dev/null
-          otool -l /Volumes/SmartPeak-1.0.0-Darwin/GUI.app/Contents/MacOS/GUI | grep -a name
-          cp -r /Volumes/SmartPeak-*-Darwin/GUI.app /Volumes/SmartPeak-*-Darwin/share .
-          xattr -l GUI.app/*
-          sudo xattr -dr com.apple.quarantine GUI.app
-          # open GUI.app
       - run:
+          name: Installing required libraries
+          command: |
+            brew remove yarn node
+            brew install cmake qt5 sdl2
+            brew install boost
+      - run:
+          name: Cloning and building OpenMS
+          command: |
+            cd ~ &&
+            git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
+            cd OpenMS && mkdir contrib_build && cd contrib_build
+            curl -C - -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
+            tar -xzf contrib_build.tar.gz
+            rm lib/libboost_* && rm -r include/boost && rm -r lib/cmake/Boost* && rm -r lib/cmake/boost*
+            sed -i '' 's/std::auto_ptr/std::unique_ptr/g' include/seqan/basic/test_system.h
+            cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
+            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
+            make -j4 OpenMS
+      - run:
+          name: Building SmartPeak (Including SuperBuild)
+          command: |
+            cd ~/SmartPeak
+            mkdir superbuild
+            mkdir smartpeak_release_build
+            cd superbuild
+            cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
+            cd ../smartpeak_release_build
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            make -j4
+      - run:
+          name: Running SmartPeak Class Tests
+          command: |
+            set +o pipefail
+            cd ~/SmartPeak/smartpeak_release_build
+            ctest -VV -F --timeout 1200 || true
+      - run:
+          name: Packing SmartPeak
+          command: |
+            set +e
+            cd ~/SmartPeak/smartpeak_release_build
+            ls -alt bin
+            cpack -G DragNDrop && ls -alth
+            yes | hdiutil attach -noautoopen -noverify SmartPeak-*.dmg > /dev/null
+            otool -l /Volumes/SmartPeak-1.0.0-Darwin/SmartPeakGUI.app/Contents/MacOS/SmartPeakGUI | grep -a name
+            cp -r /Volumes/SmartPeak-*-Darwin/SmartPeakGUI.app /Volumes/SmartPeak-*-Darwin/share .
+            xattr -l SmartPeakGUI.app/*
+            sudo xattr -dr com.apple.quarantine SmartPeakGUI.app
+            # open SmartPeakGUI.app
+      - run:
+          name: Moving Package to artifacts folder
           command: |
             mkdir -p /tmp/artifacts
-            cp ~/SmartPeak/smartpeak_debug_build/*.dmg /tmp/artifacts
+            cp ~/SmartPeak/smartpeak_release_build/*.dmg /tmp/artifacts
       - store_artifacts:
           path: /tmp/artifacts
 
@@ -135,94 +144,118 @@ jobs:
     steps:
       - checkout
       - run: systeminfo
-      - run: |
-          cd ~
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          $ProgressPreference = "SilentlyContinue"
-          Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-          choco install cmake --version=3.17.2 --installargs '"ADD_CMAKE_TO_PATH=System"'
-          # choco install boost-msvc-14.1
-          choco install doxygen.install
-          choco install nsis.portable
-          refreshenv
-          $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
-          $sdl2_url = 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
-          $boost_url = 'https://github.com/ahmedskhalil/Boost-1.73-Prebuilts/releases/download/0.0.1/boost_1_73_0.7z'
-          $qt_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'qt_tmp$', '7z' } –PassThru
-          Invoke-WebRequest $qt_url -OutFile $qt_tmp 
-          7z x $qt_tmp -o'C:\lib\Qt'
-          cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\Qt5Core.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\
-          cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\Qt5Network.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\
-          cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\libcrypto-1_1-x64.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\
-          cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\libssl-1_1-x64.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\
-          $Qt_DIR = 'C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64'
-          $qt_tmp | Remove-Item
-          $sdl2_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'sdl2_tmp$', 'zip' } –PassThru
-          Invoke-WebRequest $sdl2_url -OutFile $sdl2_tmp 
-          7z x $sdl2_tmp -o'C:\lib\sdl2'
-          $SDL_DIR = 'C:\lib\sdl2\SDL2-2.0.12'
-          $sdl2_tmp | Remove-Item
-          $boost_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'boost_tmp$', '7z' } –PassThru
-          Invoke-WebRequest $boost_url -OutFile $boost_tmp 
-          7z x $boost_tmp -o'C:\lib\boost'
-          ls C:\lib\boost\boost_1_73_0
-          ls C:\lib\boost\
-          $BOOST_DIR = 'C:\lib\boost\boost_1_73_0'
-          $boost_tmp | Remove-Item
-      - run: |
-          cd ~
-          git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
-          cd ~/OpenMS
-      - run: |
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-          $ProgressPreference = "SilentlyContinue"
-          cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars64.txt"
-          Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
-          if ($_ -match "^(.*?)=(.*)$") {
-              Set-Content "env:\$($matches[1])" $matches[2]
-              }
-          }
-          cd ~/OpenMS
-          mkdir contrib_build; cd contrib_build
-          $url_contrib = 'https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/windows/x64/msvc-14.2/contrib_build.tar.gz'
-          $contrib_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'contrib_tmp$', 'tar.gz' } –PassThru
-          Invoke-WebRequest $url_contrib -OutFile $contrib_tmp
-          7z x $contrib_tmp -o'.'
-          7z x $contrib_tmp.BaseName -o'.'
-          rm  .\lib\libboost_*
-          rm  -r .\include\boost
-          cd ~/OpenMS; mkdir openms_build; cd openms_build
-          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:\lib\boost\boost_1_73_0" -DBOOST_INCLUDE_DIR="C:\lib\boost\boost_1_73_0" -DBOOST_LIBRARYDIR="C:\lib\boost\boost_1_73_0\lib64-msvc-14.2" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
-          msbuild src\openswathalgo\OpenSWATHAlgo.sln /maxcpucount /p:Configuration=Release
-          msbuild src\openms\OpenMS.sln /maxcpucount /p:Configuration=Release
-      - run: |
-          Start-Process powershell -Verb runas
-          [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Users\circleci\OpenMS\openms_build\bin\Release;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin", [EnvironmentVariableTarget]::Machine)
-          refreshenv
-      - run: |
-          Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
-          if ($_ -match "^(.*?)=(.*)$") {
-              Set-Content "env:\$($matches[1])" $matches[2]
-              }
-          }
-          cd ~/SmartPeak
-          #mkdir superbuild
-          mkdir smartpeak_build
-          cd ~/SmartPeak/superbuild
-          cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
-          cmake --build .
-          cd ~/SmartPeak/smartpeak_build
-          cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:\lib\boost\boost_1_73_0" -DBOOST_INCLUDE_DIR="C:\lib\boost\boost_1_73_0" -DBOOST_LIBRARYDIR="C:\lib\boost\boost_1_73_0\lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="C:/Users/circleci/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
-          msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
-          msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
-          msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
-          refreshenv
-          & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
-          & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
       - run:
+          name: Fetching Dependencies
+          command: |
+            $ErrorActionPreference = "Stop"
+            cd ~
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            $ProgressPreference = "SilentlyContinue"
+            Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+            choco install cmake --version=3.17.2 --installargs '"ADD_CMAKE_TO_PATH=System"'
+            # choco install boost-msvc-14.1
+            choco install doxygen.install
+            choco install nsis.portable
+            refreshenv
+            $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
+            $sdl2_url = 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
+            $boost_url = 'https://github.com/ahmedskhalil/Boost-1.73-Prebuilts/releases/download/0.0.1/boost_1_73_0.7z'
+            $qt_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'qt_tmp$', '7z' } –PassThru
+            Invoke-WebRequest $qt_url -OutFile $qt_tmp 
+            7z x $qt_tmp -o'C:\lib\Qt'
+            cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\Qt5Core.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Core\
+            cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\Qt5Network.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5Network\
+            cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\libcrypto-1_1-x64.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\
+            cp C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin\libssl-1_1-x64.dll C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\lib\cmake\Qt5\
+            $Qt_DIR = 'C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64'
+            $qt_tmp | Remove-Item
+            $sdl2_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'sdl2_tmp$', 'zip' } –PassThru
+            Invoke-WebRequest $sdl2_url -OutFile $sdl2_tmp 
+            7z x $sdl2_tmp -o'C:\lib\sdl2'
+            $SDL_DIR = 'C:\lib\sdl2\SDL2-2.0.12'
+            $sdl2_tmp | Remove-Item
+            $boost_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'boost_tmp$', '7z' } –PassThru
+            Invoke-WebRequest $boost_url -OutFile $boost_tmp 
+            7z x $boost_tmp -o'C:\lib\boost'
+            ls C:\lib\boost\boost_1_73_0
+            ls C:\lib\boost\
+            $BOOST_DIR = 'C:\lib\boost\boost_1_73_0'
+            $boost_tmp | Remove-Item
+      - run:
+          name: Cloning OpenMS - develop
+          command: |
+            cd ~
+            git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git
+            cd ~/OpenMS
+      - run:
+          name: Building OpenMS
+          command: |
+            $ErrorActionPreference = "Stop"
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            $ProgressPreference = "SilentlyContinue"
+            cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars64.txt"
+            Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
+            if ($_ -match "^(.*?)=(.*)$") {
+                Set-Content "env:\$($matches[1])" $matches[2]
+                }
+            }
+            cd ~/OpenMS
+            mkdir contrib_build; cd contrib_build
+            $url_contrib = 'https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/windows/x64/msvc-14.2/contrib_build.tar.gz'
+            $contrib_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'contrib_tmp$', 'tar.gz' } –PassThru
+            Invoke-WebRequest $url_contrib -OutFile $contrib_tmp
+            7z x $contrib_tmp -o'.'
+            7z x $contrib_tmp.BaseName -o'.'
+            rm  .\lib\libboost_*
+            rm  -r .\include\boost
+            cd ~/OpenMS; mkdir openms_build; cd openms_build
+            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/lib/boost/boost_1_73_0" -DBOOST_INCLUDE_DIR="C:/lib/boost/boost_1_73_0" -DBOOST_LIBRARYDIR="C:/lib/boost/boost_1_73_0/lib64-msvc-14.2" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
+            msbuild src\openswathalgo\OpenSWATHAlgo.sln /maxcpucount /p:Configuration=Release
+            msbuild src\openms\OpenMS.sln /maxcpucount /p:Configuration=Release
+      - run:
+          name: Update PATH with OpenMS and Qt Binaries
+          command: |
+            Start-Process powershell -Verb runas
+            [Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Users\circleci\OpenMS\openms_build\bin\Release;C:\lib\Qt\qt-5.12.9-dynamic-msvc2019-x86_64\bin", [EnvironmentVariableTarget]::Machine)
+            refreshenv
+      - run:
+          name: Building SmartPeak, running Class Tests and Packaging
+          command: |
+            $ErrorActionPreference = "Stop"
+            Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
+            if ($_ -match "^(.*?)=(.*)$") {
+                Set-Content "env:\$($matches[1])" $matches[2]
+                }
+            }
+            cd ~/SmartPeak
+            mkdir superbuild
+            mkdir smartpeak_release_build
+            cd ~/SmartPeak/superbuild
+            cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            cmake --build .
+            cd ~/SmartPeak/smartpeak_release_build
+            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/lib/boost/boost_1_73_0" -DBOOST_INCLUDE_DIR="C:/lib/boost/boost_1_73_0" -DBOOST_LIBRARYDIR="C:/lib/boost/boost_1_73_0/lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="C:/Users/circleci/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
+            msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
+            msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
+            refreshenv
+            & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
+            & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
+      - run:
+          name: Signing SmartPeak with trusted certificate
+          command: |
+            $ErrorActionPreference = "Stop"
+            cd ~/SmartPeak/smartpeak_release_build
+            git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
+            Import-Module .\CodeSigning\CertCrypto.psm1
+            Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
+            certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
+            & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
+      - run:
+          name: Preparing Artifact
           command: |
             mkdir -p ~/artifacts
-            cp ~/SmartPeak/smartpeak_build/*.exe ~/artifacts
+            cp ~/SmartPeak/smartpeak_release_build/*.exe ~/artifacts
       - store_artifacts:
           path: ~/artifacts
             

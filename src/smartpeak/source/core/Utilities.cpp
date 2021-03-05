@@ -24,6 +24,7 @@
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/smartpeak_package_version.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <algorithm>
 #include <iostream>
@@ -67,6 +68,21 @@ namespace SmartPeak
     } else {
       LOGW << "Type not supported: " << type;
       cast.setTagAndData(CastValue::Type::UNKNOWN, value);
+    }
+  }
+
+  void Utilities::setUserParameters(
+    OpenMS::DefaultParamHandler& Param_handler_IO,
+    const ParameterSet& user_parameters_I,
+    const std::string param_handler_name
+  )
+  {
+    std::string function_parameters_name = (param_handler_name.empty() ? Param_handler_IO.getName() : param_handler_name);
+    if (user_parameters_I.count(function_parameters_name))
+    {
+      OpenMS::Param parameters = Param_handler_IO.getParameters();
+      Utilities::updateParameters(parameters, user_parameters_I.at(function_parameters_name));
+      Param_handler_IO.setParameters(parameters);
     }
   }
 
@@ -678,5 +694,15 @@ namespace SmartPeak
           HOME, LOCALAPPDATA or SMARTPEAK_LOGS env variable is set. For details refer to user documentation");
     }
     return std::make_pair(path, flag);
+  }
+
+  std::string Utilities::getSmartPeakVersion()
+  {
+#if defined(SMARTPEAK_PACKAGE_VERSION)
+    return static_cast<std::ostringstream&&>(std::ostringstream()
+      << SMARTPEAK_PACKAGE_VERSION).str();
+#else
+    return "Unknown";
+#endif
   }
 }
