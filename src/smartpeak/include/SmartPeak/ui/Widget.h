@@ -116,10 +116,8 @@ namespace SmartPeak
     @param[in,out] Im_table_entries vector of ImTableEntry
     @param[in] sorts_specs with sort specs of current table
     @param[in] is_scanned true if `columns_` and `checkbox_columns_` are in sync with `Im_table_entries`
-    @param[in] col_idx column index of the column which needs to be sorted
     */
-    void sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs,
-      const bool& is_scanned, const unsigned int col_idx);
+    void sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs, const bool& is_scanned);
 
     Eigen::Tensor<std::string, 1> headers_;
     Eigen::Tensor<std::string, 2> columns_;

@@ -75,9 +75,10 @@ namespace SmartPeak
     }
   }
 
-  void GenericTableWidget::sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs,
-    const bool& is_scanned, const unsigned int col_idx)
+  void GenericTableWidget::sorter(std::vector<ImEntry>& Im_table_entries,
+                                  ImGuiTableSortSpecs* sorts_specs, const bool& is_scanned)
   {
+    const unsigned int col_idx = static_cast<unsigned int>(sorts_specs->Specs->ColumnIndex);
     if (sorts_specs->SpecsDirty && is_scanned &&
       !std::all_of(Im_table_entries.begin(), Im_table_entries.end(),
         [&, col_idx, Im_table_entries]
@@ -160,8 +161,7 @@ namespace SmartPeak
 
       if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
       {
-        const unsigned int col_idx = static_cast<unsigned int>(sorts_specs->Specs->ColumnIndex);
-        sorter(table_entries_, sorts_specs, table_scanned_, col_idx);
+        sorter(table_entries_, sorts_specs, table_scanned_);
       }
       ImGui::EndTable();
     }
@@ -270,8 +270,7 @@ namespace SmartPeak
 
       if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
       {
-        const unsigned int col_idx = static_cast<unsigned int>(sorts_specs->Specs->ColumnIndex);
-        sorter(table_entries_, sorts_specs, table_scanned_, col_idx);
+        sorter(table_entries_, sorts_specs, table_scanned_);
       }
       ImGui::EndTable();
     }

@@ -15,13 +15,13 @@ configure_file(${PROJECT_SOURCE_DIR}/include/SmartPeak/test_config.h.in ${CONFIG
 find_package(Boost COMPONENTS filesystem unit_test_framework)
 
 if(Boost_FOUND)
-  message(STATUS "Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}" )
+  message(STATUS "[class_tests] : Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}" )
   set(CF_SMARTPEAK_BOOST_VERSION_MAJOR ${Boost_MAJOR_VERSION})
 	set(CF_SMARTPEAK_BOOST_VERSION_MINOR ${Boost_MINOR_VERSION})
   set(CF_SMARTPEAK_BOOST_VERSION_SUBMINOR ${Boost_SUBMINOR_VERSION})
 	set(CF_SMARTPEAK_BOOST_VERSION ${Boost_VERSION})
 else()
-  message(FATAL_ERROR "Boost or one of its components not found!")
+  message(FATAL_ERROR "[class_tests] : Boost or one of its components not found!")
 endif()
 
 #------------------------------------------------------------------------------
@@ -58,12 +58,12 @@ endif(OpenMS_FOUND)
 find_package(Qt5 COMPONENTS Core Network REQUIRED)
 
 if (NOT Qt5Network_FOUND)
-  message(STATUS "QtNetwork module not found!")
+  message(STATUS "[class_tests] : QtNetwork module not found!")
   message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
 endif()
 
 if (NOT Qt5Core_FOUND)
-  message(STATUS "QtCore module not found!")
+  message(STATUS "[class_tests] : QtCore module not found!")
   message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
 endif()
 
@@ -94,13 +94,20 @@ include_directories(${OPENGL_INCLUDE_DIR})
 #------------------------------------------------------------------------------
 # ImGUI
 #------------------------------------------------------------------------------
-find_package(ImGui COMPONENTS Sources Examples REQUIRED)
+find_package(ImGui COMPONENTS Sources Examples SourcesMiscCpp REQUIRED)
 include_directories(${ImGui_INCLUDE_DIR})
 if (ImGui_Examples_FOUND)
-  message(STATUS "ImGui_Examples_FOUND has been set and found")
+  message(STATUS "[class_tests] : ImGui_Examples_FOUND has been set and found")
 else()
-  message(STATUS "imgui has not been found")
+  message(STATUS "[class_tests] : ImGui has not been found")
 endif()
+
+#------------------------------------------------------------------------------
+# IMPLOT
+#------------------------------------------------------------------------------
+find_package(ImPlot COMPONENTS Sources REQUIRED)
+include_directories(${IMPLOT_INCLUDE_DIR})
+#------------------------------------------------------------------------------
 
 #------------------------------------------------------------------------------
 # core
@@ -124,10 +131,11 @@ add_dependencies(ALGORITHM_TEST ${algorithm_executables_list})
 foreach(_class_test ${TEST_executables})
   add_executable(${_class_test} source/${_class_test})
   # message(STATUS "${_class_test}")
-  if(NOT (${_class_test} STREQUAL "GuiAppender_test" OR ${_class_test} STREQUAL "AppWindow_test"))
+  if(NOT (${_class_test} STREQUAL "GuiAppender_test" OR ${_class_test} STREQUAL "AppWindow_test" OR ${_class_test} STREQUAL "Widget_test"))
     target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} ${Boost_LIBRARIES} OpenMS)
   else()
-    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} ${Boost_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui PRIVATE ImGui::Sources ImGui::Examples)
+    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} ${Boost_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
+                            PRIVATE ImGui::Sources ImPlot::Sources ImGui::Examples ImGui::SourcesMiscCpp)
   endif()
   add_test(${_class_test} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_class_test})
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
