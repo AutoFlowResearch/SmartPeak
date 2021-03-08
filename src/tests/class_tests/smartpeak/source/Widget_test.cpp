@@ -138,7 +138,10 @@ BOOST_AUTO_TEST_CASE(GenericTableWidget_sorter)
   sorts_specs.SpecsDirty      = true;
   sorts_specs.SpecsCount      = 3;
   
-  //TestTable1.sorter(Im_table_entries, &sorts_specs, is_scanned);
+  TestTable1.sorter(Im_table_entries, &sorts_specs, is_scanned);
+  
+  std::cout << ">>>Im_table_entries[0].entry_contents[0] : " << Im_table_entries[0].entry_contents[0] << std::endl;
+  std::cout << ">>>Im_table_entries[0].entry_contents[1] : " << Im_table_entries[0].entry_contents[1] << std::endl;
   
   // post-sorting assertion
   // 1st row
