@@ -138,17 +138,20 @@ namespace SmartPeak
     }
 
     // Determine the number of threads to launch
-    const auto& params = injections.front().getRawData().getParameters();
     int n_threads = 6;
-    if (params.count("SequenceProcessor") && !params.at("SequenceProcessor").empty()) {
-      for (const auto& p : params.at("SequenceProcessor")) {
-        if (p.getName() == "n_thread") {
-          try {
-            n_threads = std::stoi(p.getValueAsString());
-            LOGI << "n_threads set to " << n_threads;
-          }
-          catch (const std::exception& e) {
-            LOGE << e.what();
+    if (injections.size())
+    {
+      const auto& params = injections.front().getRawData().getParameters();
+      if (params.count("SequenceProcessor") && !params.at("SequenceProcessor").empty()) {
+        for (const auto& p : params.at("SequenceProcessor")) {
+          if (p.getName() == "n_thread") {
+            try {
+              n_threads = std::stoi(p.getValueAsString());
+              LOGI << "n_threads set to " << n_threads;
+            }
+            catch (const std::exception& e) {
+              LOGE << e.what();
+            }
           }
         }
       }
