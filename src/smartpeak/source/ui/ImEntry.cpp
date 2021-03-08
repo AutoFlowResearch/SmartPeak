@@ -133,7 +133,7 @@ namespace SmartPeak
     }
       
     if (a->entry_contents[1].c_str() != nullptr && b->entry_contents[1].c_str() != nullptr)
-      return (std::strcmp(a->entry_contents[1].c_str(), b->entry_contents[1].c_str()));
+      return (strcmp(a->entry_contents[1].c_str(), b->entry_contents[1].c_str()));
     else
       return (a->entry_contents[0].c_str() - a->entry_contents[0].c_str());
   }
