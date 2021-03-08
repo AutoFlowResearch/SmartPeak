@@ -127,18 +127,18 @@ BOOST_AUTO_TEST_CASE(GenericTableWidget_sorter)
   BOOST_CHECK_EQUAL(Im_table_entries[last_row_idx].entry_contents[1], "xan");
   
   // sorting
-  //ImGuiTableSortSpecs           sorts_specs;
-  //ImGuiTableColumnSortSpecs     descending_1;
-  //descending_1.ColumnUserID   = (ImGuiID)0;
-  //descending_1.SortDirection  = 2;
-  //descending_1.ColumnIndex    = (ImS16)0;
-  //descending_1.SortOrder      = 2;
+  ImGuiTableSortSpecs           sorts_specs;
+  ImGuiTableColumnSortSpecs     descending_1;
+  descending_1.ColumnUserID   = (ImGuiID)0;
+  descending_1.SortDirection  = 2;
+  descending_1.ColumnIndex    = (ImS16)0;
+  descending_1.SortOrder      = 2;
     
-  //sorts_specs.Specs           = &descending_1;
-  //sorts_specs.SpecsDirty      = true;
-  //sorts_specs.SpecsCount      = 3;
+  sorts_specs.Specs           = &descending_1;
+  sorts_specs.SpecsDirty      = true;
+  sorts_specs.SpecsCount      = 3;
   
-  //TestTable1.sorter(Im_table_entries, &sorts_specs, is_scanned);
+  TestTable1.sorter(Im_table_entries, &sorts_specs, is_scanned);
   
   // post-sorting assertion
   // 1st row
