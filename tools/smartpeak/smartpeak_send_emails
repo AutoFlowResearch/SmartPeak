@@ -127,7 +127,7 @@ def main(argc, argv):
       msgHtml = '''\
 <h1>SmartPeak v{version} is released!</h1>
 <i>We are constantly working to improve your SmartPeak experience, below a summary of what has changed in the new release.</i><br>
-You can download new version: <a href="https://github.com/ChristopherAbram/SmartPeak/releases/tag/v{version}">https://github.com/ChristopherAbram/SmartPeak/releases/tag/v{version}</a><br><br>
+You can download new version: <a href="https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version}">https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version}</a><br><br>
 <div style="background: #eee; padding: 20px;">
 {changes}
 </div>
@@ -140,7 +140,7 @@ SmartPeak Team
       msgPlain = '''\
 SmartPeak v{version} is released!\n
 We are constantly working to improve your SmartPeak experience, below a summary of what has changed in the new release.\n
-You can download new version: https://github.com/ChristopherAbram/SmartPeak/releases/tag/v{version} \n\n
+You can download new version: https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version} \n\n
 {changes}
 \n\n
 Best wishes,\n
