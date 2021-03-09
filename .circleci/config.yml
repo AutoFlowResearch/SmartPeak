@@ -418,6 +418,20 @@ jobs:
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
             RELEASE_BODY=$(smartpeak_changes)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c develop -b "${RELEASE_BODY}" -delete "v${VERSION}" arts
+      - run:
+          name: "Notify users"
+          command: |
+            pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib markdown
+            BRANCH=(${CIRCLE_BRANCH//// })
+            VERSION=${BRANCH[1]}
+            export PATH="$PATH:$PWD/tools/smartpeak"
+            export PYTHONPATH="$PYTHONPATH:$PWD/tools"
+
+            # Prepare authentication with Gmail API
+            echo $GMAIL_TOKEN_PICKLE | base64 --decode > token.pickle
+
+            # Send emails:
+            smartpeak_send_emails --version=${VERSION}
             
   trigger_release:
     # The job is responsible for triggering a release from last commit message, if release string present.
