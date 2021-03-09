@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import sys, os, argparse
+
+import smartpeak.utils as utils
+
+
+def parse_args(argc, argv):
+  parser = argparse.ArgumentParser(
+    description='Returns changelog information for specified tag.')
+  parser.add_argument('--version', 
+    default='latest',
+    help='The version tag')
+  return parser.parse_args()
+
+
+def main(argc, argv):
+  args = parse_args(argc, argv)
+
+  # Read current version:
+  changelog_file = os.path.join(utils.get_project_path(), 'CHANGELOG.rst')
+  content = utils.read_changes(changelog_file, args.version)
+
+  # Retrieve new version:
+  if content is None:
+    return 1
+
+  # Preprocess the content:
+  content = utils.preprocess_changes(content)
+  
+  print(content)
+  return 0
+
+
+if __name__ == '__main__':
+  sys.exit(main(len(sys.argv), sys.argv))

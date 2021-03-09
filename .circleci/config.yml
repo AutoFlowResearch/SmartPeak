@@ -26,7 +26,7 @@ jobs:
             apt-get install -y libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
             apt-get install -y graphviz doxygen python3-pip &&
             apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
-            pip3 install exhale
+            pip3 install exhale gitpython
       - run:
           name: Cloning and building OpenMS
           command: |
@@ -56,6 +56,9 @@ jobs:
             cd ~/smartpeak_release_build || exit 1
             ctest -V
             ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
+            cd ~/SmartPeak
+            export PYTHONPATH="${PWD}/tools"
+            python3 -m unittest discover -s ./tools/smartpeak
       - run:
           name: Running SmartPeak Examples
           command: |
@@ -86,6 +89,7 @@ jobs:
             brew remove yarn node
             brew install cmake qt5 sdl2
             brew install boost
+            pip3 install gitpython
       - run:
           name: Cloning and building OpenMS
           command: |
@@ -116,6 +120,9 @@ jobs:
             set +o pipefail
             cd ~/SmartPeak/smartpeak_release_build
             ctest -VV -F --timeout 1200 || true
+            cd ~/SmartPeak
+            export PYTHONPATH="${PWD}/tools"
+            python3 -m unittest discover -s ./tools/smartpeak
       - run:
           name: Packing SmartPeak
           command: |
@@ -156,6 +163,7 @@ jobs:
             # choco install boost-msvc-14.1
             choco install doxygen.install
             choco install nsis.portable
+            pip install gitpython
             refreshenv
             $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
             $sdl2_url = 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
@@ -241,6 +249,9 @@ jobs:
             refreshenv
             & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
+            cd ~/SmartPeak
+            $env:PYTHONPATH = $PWD.Path + "\tools"
+            python -m unittest discover -s .\tools\smartpeak\
       - run:
           name: Signing SmartPeak with trusted certificate
           command: |
