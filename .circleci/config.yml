@@ -295,7 +295,7 @@ jobs:
 
   prepare_release:
     # This job is responsible for updating a package version stored in a configuration.
-    # The update is done autmatically and changes are pushed back to release branch.
+    # The update is done automatically and changes are pushed back to release branch.
     working_directory: ~/SmartPeak
     docker:
       - image: python:3.7.0
