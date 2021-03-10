@@ -93,15 +93,11 @@ BOOST_AUTO_TEST_SUITE(Widget)
 BOOST_AUTO_TEST_CASE(widget_constructors)
 {
   SmartPeak::GenericTableWidget* generictablewidget_ptr = nullptr;
-  SmartPeak::GenericTableWidget* generictablewidget_nullPointer = nullptr;
-  generictablewidget_ptr = new SmartPeak::GenericTableWidget("empty_generic_table");
-  BOOST_CHECK_NE(generictablewidget_ptr, generictablewidget_nullPointer);
+  BOOST_CHECK_NO_THROW(generictablewidget_ptr = new SmartPeak::GenericTableWidget("empty_generic_table"));
   delete generictablewidget_ptr;
   
   SmartPeak::ExplorerWidget* explorerwidget_ptr = nullptr;
-  SmartPeak::ExplorerWidget* explorerwidget_nullPointer = nullptr;
-  explorerwidget_ptr = new SmartPeak::ExplorerWidget("empty_explorer_table");
-  BOOST_CHECK_NE(explorerwidget_ptr, explorerwidget_nullPointer);
+  BOOST_CHECK_NO_THROW(explorerwidget_ptr = new SmartPeak::ExplorerWidget("empty_explorer_table"));
   delete explorerwidget_ptr;
 }
 
@@ -116,6 +112,9 @@ BOOST_AUTO_TEST_CASE(GenericTableWidget_sorter)
   SmartPeak::GenericTableWidget TestTable1("TestTable1");
   TestTable1.updateTableContents(Im_table_entries, is_scanned, rows_out, checkbox_columns);
   BOOST_CHECK_EQUAL(is_scanned, true);  // updateTableContents is successful
+  
+  BOOST_REQUIRE(Im_table_entries.size() > 0);
+  BOOST_REQUIRE(Im_table_entries[0].entry_contents.size() > 0);
   
   // pre-sorting assertion
   // 1st row
