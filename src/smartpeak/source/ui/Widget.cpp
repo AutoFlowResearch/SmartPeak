@@ -98,7 +98,7 @@ namespace SmartPeak
       return;
 
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedSame| ImGuiTableFlags_NoSavedSettings |
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti;
 
     static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
@@ -130,6 +130,12 @@ namespace SmartPeak
     if (columns_.dimensions().TotalSize() > 0) {
       updateTableContents(table_entries_, table_scanned_,
         columns_, Eigen::Tensor<bool, 2>());
+    }
+    
+    if (table_scanned_ && table_entries_.size() > 0) {
+      if (headers_.size() != table_entries_[0].entry_contents.size()) {
+        table_scanned_ = false;
+      }
     }
 
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
@@ -174,7 +180,7 @@ namespace SmartPeak
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedSame| ImGuiTableFlags_NoSavedSettings |
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti;
 
     static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
@@ -203,9 +209,15 @@ namespace SmartPeak
     else
       table_scanned_ = false;
 
-    if (columns_.dimensions().TotalSize() > 0)
-    {
-      updateTableContents(table_entries_, table_scanned_, columns_, *checkbox_columns_);
+    if (columns_.dimensions().TotalSize() > 0) {
+      updateTableContents(table_entries_, table_scanned_,
+        columns_, *checkbox_columns_);
+    }
+    
+    if (table_scanned_ && table_entries_.size() > 0) {
+      if (headers_.size()+checkbox_headers_.size() != table_entries_[0].entry_contents.size()) {
+        table_scanned_ = false;
+      }
     }
 
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
@@ -228,41 +240,42 @@ namespace SmartPeak
               continue;
 
             ImGui::TableNextRow();
-            for (size_t col = 0; col < headers_.size(); ++col)
+            
+            for (size_t header_idx = 0; header_idx < columns_.dimension(1) + checkbox_columns_->dimension(1); ++header_idx)
             {
               if (table_scanned_ == true && !table_entries_.empty())
               {
-                ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());
-              }
-            }
-
-            for (size_t col = 0; col < checkbox_headers_.size(); ++col) {
-              std::string id = table_id_ + std::to_string(col) + std::to_string(row * columns_.dimension(1));
-              ImGui::TableSetColumnIndex(col + headers_.size());
-              ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-              if (table_scanned_ == true && !table_entries_.empty())
-              {
-                size_t checkbox_idx = col + headers_.size();
-                bool is_checked;
-                if (!std::strcmp(table_entries_[row].entry_contents[checkbox_idx].c_str(), "true"))
+                if (header_idx < columns_.dimension(1)) {
+                  ImGui::TableSetColumnIndex(header_idx);
+                  ImGui::Text("%s", table_entries_[row].entry_contents[header_idx].c_str());
+                }
+                else if (header_idx < columns_.dimension(1) + checkbox_columns_->dimension(1))
+                {
+                  std::string id = table_id_ + std::to_string(header_idx) + std::to_string(row * columns_.dimension(1));
+                  ImGui::TableSetColumnIndex(header_idx);
+                  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+                  
+                  std::size_t checkbox_idx = header_idx - static_cast<std::size_t>(columns_.dimension(1));
+                  bool is_checked;
+                  if (!std::strcmp(table_entries_[row].entry_contents[header_idx].c_str(), "true"))
                   is_checked = true;
-                else
+                  else
                   is_checked = false;
-                ImGui::Checkbox(id.c_str(), &is_checked);
+                  ImGui::Checkbox(id.c_str(), &is_checked);
 
-                if (is_checked == true && !std::strcmp(table_entries_[row].entry_contents[checkbox_idx].c_str(), "false"))
-                {
-                  table_entries_[row].entry_contents[checkbox_idx] = "true";
-                  (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(columns_.dimension(1))) = true;
-                }
-                else if (is_checked == false && !std::strcmp(table_entries_[row].entry_contents[checkbox_idx].c_str(), "true"))
-                {
-                  table_entries_[row].entry_contents[checkbox_idx] = "false";
-                  (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx - static_cast<std::size_t>(columns_.dimension(1))) = false;
+                  if (is_checked == true && !std::strcmp(table_entries_[row].entry_contents[header_idx].c_str(), "false"))
+                  {
+                    table_entries_[row].entry_contents[header_idx] = "true";
+                    (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx) = true;
+                  }
+                  else if (is_checked == false && !std::strcmp(table_entries_[row].entry_contents[header_idx].c_str(), "true"))
+                  {
+                    table_entries_[row].entry_contents[header_idx] = "false";
+                    (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx) = false;
+                  }
+                  ImGui::PopStyleColor();
                 }
               }
-              ImGui::PopStyleColor();
             }
           }
         }
