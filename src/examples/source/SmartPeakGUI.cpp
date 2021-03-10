@@ -39,6 +39,7 @@
 #include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
+#include <SmartPeak/ui/DashboardWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -146,9 +147,12 @@ int main(int argc, char** argv)
   FilePicker file_picker_;
   Report     report_;
   Workflow   workflow_;
+  Dashboard  dashboard_;
+
   std::unique_ptr<ParametersTableWidget> parameters_table_widget;
   report_.setApplicationHandler(application_handler_);
   workflow_.setApplicationHandler(application_handler_);
+  dashboard_.setApplicationHandler(application_handler_);
 
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -819,6 +823,26 @@ int main(int argc, char** argv)
         {
           workflow_.setEditable(workflow_is_done_);
           workflow_.draw();
+          ImGui::EndTabItem();
+        }
+        bool show_dashboard = true;
+        static bool dashboard_initialized = false;
+        if (show_dashboard && ImGui::BeginTabItem("Dashboard", &show_workflow_table))
+        {
+          if (!workflow_is_done_)
+          {
+            dashboard_initialized = false;
+          }
+          else // workflow_is_done_
+          {
+            if (!dashboard_initialized)
+            {
+              dashboard_.setRefreshNeeded();
+              dashboard_initialized = true;
+            }
+          }
+          dashboard_.transitions = &session_handler_.transitions_table_body;
+          dashboard_.draw();
           ImGui::EndTabItem();
         }
         if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
