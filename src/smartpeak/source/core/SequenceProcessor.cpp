@@ -304,11 +304,11 @@ namespace SmartPeak
           f.get(); // check for exceptions
         }
         catch (const std::exception& e) {
-          LOGE << "Injection [" << i << "]: " << e.what();
+          LOGE << "Injection [" << i << "]: " << typeid(e).name() << " : " << e.what();
         }
       }
       catch (const std::exception& e) {
-        LOGE << "Injection [" << i << "]: " << e.what();
+        LOGE << "Injection [" << i << "]: " << typeid(e).name() << " : " << e.what();
       }
     }
     LOGD << "Worker is done";
