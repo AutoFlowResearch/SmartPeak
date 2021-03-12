@@ -262,6 +262,7 @@ int main(int argc, char** argv)
       if ((!workflow_is_done_) && manager_.isWorkflowDone())
       {
         manager_.updateApplicationHandler(application_handler_);
+        dashboard_.last_run_time_ = manager_.getLastRunTime();
       }
       workflow_is_done_ = manager_.isWorkflowDone();
       file_loading_is_done_ = file_picker_.fileLoadingIsDone();

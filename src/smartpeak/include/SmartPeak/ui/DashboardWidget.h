@@ -27,6 +27,7 @@
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <string>
 #include <vector>
+#include <chrono>
 
 namespace SmartPeak
 {
@@ -42,6 +43,7 @@ namespace SmartPeak
     void setRefreshNeeded() { refresh_needed_ = true; };
 
     const Eigen::Tensor<std::string, 2>* transitions = nullptr;
+    std::chrono::steady_clock::duration last_run_time_ = std::chrono::steady_clock::duration::zero();
 
   protected:
     struct DashboardChartData

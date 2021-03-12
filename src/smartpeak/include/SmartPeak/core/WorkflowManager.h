@@ -24,6 +24,7 @@
 #pragma once
 
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <chrono>
 
 namespace SmartPeak {
   class WorkflowManager {
@@ -56,6 +57,11 @@ namespace SmartPeak {
     */
     void updateApplicationHandler(ApplicationHandler& source_app_handler);
 
+    /**
+      returns the last run time.
+    */
+    std::chrono::steady_clock::duration getLastRunTime() const { return last_run_time_; };
+
   private:
     /**
       Spawns a thread that runs the workflow, and waits for it to finish. The
@@ -64,15 +70,17 @@ namespace SmartPeak {
 
       @param[in,out] application_handler Points to the class' application_handler member
       @param[in,out] done Points to the class' done member
+      @param[in,out] run_time time taken to run the workflow
       @param[out] source_app_handler The modified application_handler is copied back here
       @param[in] injection_names Injection names to use for Sequence Processing
       @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
     */
-    static void run_and_join(ApplicationHandler& application_handler, bool& done, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands);
+    static void run_and_join(ApplicationHandler& application_handler, bool& done, std::chrono::steady_clock::duration& run_time, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands);
 
     ApplicationHandler application_handler_; ///< The workflow is run on this copy
     bool done_ = true;
+    std::chrono::steady_clock::duration last_run_time_;
   };
 }

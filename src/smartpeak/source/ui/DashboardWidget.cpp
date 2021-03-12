@@ -167,6 +167,24 @@ namespace SmartPeak
     os << "Number of spectrums: " << number_of_spectrums;
     ImGui::Text(os.str().c_str());
 
+    ImGui::Separator();
+
+    // if (last_run_time_ != std::chrono::steady_clock::duration::zero())
+    {
+      os.str("");
+      os.clear();
+      auto ns = last_run_time_;
+      os << "Last time workflow execution: ";
+      auto h = std::chrono::duration_cast<std::chrono::hours>(ns);
+      ns -= h;
+      auto m = std::chrono::duration_cast<std::chrono::minutes>(ns);
+      ns -= m;
+      auto s = std::chrono::duration_cast<std::chrono::seconds>(ns);
+      os << std::setfill('0') << std::setw(2) << h.count() << "h:"
+         << std::setw(2) << m.count() << "m:"
+         << std::setw(2) << s.count() << 's';
+      ImGui::Text(os.str().c_str());
+    }
     refresh_needed_ = false;
   }
 
