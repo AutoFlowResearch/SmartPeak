@@ -335,7 +335,7 @@ jobs:
             git config --global user.email "smartpeak.ci@gmail.com"
             git config --global user.name "smartpeak-ci"
             git status
-            git commit -am "Release update (${VERSION}) [skip ci]"
+            git diff-index --quiet HEAD || git commit -am "Release update (${VERSION}) [skip ci]"
             git push origin ${CIRCLE_BRANCH}
             
   publish_release:
