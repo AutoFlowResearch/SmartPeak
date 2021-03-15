@@ -37,7 +37,6 @@ jobs:
             if [[ << pipeline.git.branch >> =~ ^release\/.* ]]; then
                 git checkout << pipeline.git.branch >>
                 git pull origin << pipeline.git.branch >>
-                git log -1 --oneline
             else
               echo "Skip this run step"
             fi
@@ -110,7 +109,6 @@ jobs:
             if [[ << pipeline.git.branch >> =~ ^release\/.* ]]; then
                 git checkout << pipeline.git.branch >>
                 git pull origin << pipeline.git.branch >>
-                git log -1 --oneline
             else
               echo "Skip this run step"
             fi
@@ -180,7 +178,6 @@ jobs:
             if ("<< pipeline.git.branch >>" -match '^release/.*$') {
               git checkout << pipeline.git.branch >>
               git pull origin << pipeline.git.branch >>
-              git log -1 --oneline
             } else {
               Write-Output "Skip this run step"
             }
