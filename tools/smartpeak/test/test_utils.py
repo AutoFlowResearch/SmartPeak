@@ -95,12 +95,12 @@ class UtilsTest(unittest.TestCase):
 
     def test_preprocess_changes(self):
         content = 'Features\n~~~~~~~~\n- New feature\n\n\n'
-        self.assertEqual(utils.preprocess_changes(content), '# Features\n- New feature')
+        self.assertEqual(utils.preprocess_changes(content), '<ul class="simple">\n<li>New feature</li>\n</ul>\n')
         content = 'Features\n~~~~~~~~\n- New feature\n\nFix\n~~~\n-Fix'
-        self.assertEqual(utils.preprocess_changes(content), '# Features\n- New feature\n\n# Fix\n-Fix')
+        self.assertEqual(utils.preprocess_changes(content), '<div class="section" id="features">\n<h1>Features</h1>\n<ul class="simple">\n<li>New feature</li>\n</ul>\n</div>\n<div class="section" id="fix">\n<h1>Fix</h1>\n<p>-Fix</p>\n</div>\n')
         content = 'Features\n~~~~~~~~\n- New feature\n\nFix\n~~~\n-Fix\n\nChanges\n~~~~~~~\n- New change'
         self.assertEqual(utils.preprocess_changes(content), 
-            '# Features\n- New feature\n\n# Fix\n-Fix\n\n# Changes\n- New change')
+            '<div class="section" id="features">\n<h1>Features</h1>\n<ul class="simple">\n<li>New feature</li>\n</ul>\n</div>\n<div class="section" id="fix">\n<h1>Fix</h1>\n<p>-Fix</p>\n</div>\n<div class="section" id="changes">\n<h1>Changes</h1>\n<ul class="simple">\n<li>New change</li>\n</ul>\n</div>\n')
         
 
 if __name__ == "__main__":

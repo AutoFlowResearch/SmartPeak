@@ -8,7 +8,6 @@ from google.auth.transport.requests import Request
 import base64, argparse
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import markdown
 
 import smartpeak.utils as utils
 
@@ -117,8 +116,8 @@ def main(argc, argv):
       changes = "Opsss! No content available..."
       changes_pre = changes
     else:
-      changes_pre = utils.preprocess_changes(changes)
-      changes = markdown.markdown(changes_pre)
+      changes_pre = changes
+      changes = utils.preprocess_changes(changes)
 
     for to in recipients:
       sender = "smartpeak.ci@gmail.com"
