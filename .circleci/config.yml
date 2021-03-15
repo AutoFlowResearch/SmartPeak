@@ -37,7 +37,6 @@ jobs:
             if [[ << pipeline.git.branch >> =~ ^release\/.* ]]; then
                 git checkout << pipeline.git.branch >>
                 git pull origin << pipeline.git.branch >>
-                git log -1 --oneline
             else
               echo "Skip this run step"
             fi
@@ -110,7 +109,6 @@ jobs:
             if [[ << pipeline.git.branch >> =~ ^release\/.* ]]; then
                 git checkout << pipeline.git.branch >>
                 git pull origin << pipeline.git.branch >>
-                git log -1 --oneline
             else
               echo "Skip this run step"
             fi
@@ -180,7 +178,6 @@ jobs:
             if ("<< pipeline.git.branch >>" -match '^release/.*$') {
               git checkout << pipeline.git.branch >>
               git pull origin << pipeline.git.branch >>
-              git log -1 --oneline
             } else {
               Write-Output "Skip this run step"
             }
@@ -338,7 +335,7 @@ jobs:
             git config --global user.email "smartpeak.ci@gmail.com"
             git config --global user.name "smartpeak-ci"
             git status
-            git commit -am "Release update (${VERSION}) [skip ci]"
+            git diff-index --quiet HEAD || git commit -am "Release update (${VERSION}) [skip ci]"
             git push origin ${CIRCLE_BRANCH}
             
   publish_release:
@@ -357,6 +354,11 @@ jobs:
           name: "Install prerequisites"
           command: |
             apt-get update
+            apt-get install -y software-properties-common apt-transport-https
+            apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+            apt-add-repository https://cli.github.com/packages
+            apt-get update
+            apt-get install -y gh
             apt-get install -y curl wget jq
             pip install gitpython
             GHR_VERSION=0.13.0
@@ -405,20 +407,15 @@ jobs:
               fi
               echo 
             done
-      - add_ssh_keys:
-          fingerprints:
-            - "e8:9a:a0:0b:75:00:75:1c:04:71:9c:7d:07:af:a2:0d"
       - run:
-          name: "Auto-merge release branch"
+          name: "Auto PR"
           command: |
-            git config --global user.email "smartpeak.ci@gmail.com"
-            git config --global user.name "smartpeak-ci"
+            BRANCH=(${CIRCLE_BRANCH//// })
+            VERSION=${BRANCH[1]}
             git checkout ${CIRCLE_BRANCH}
             git pull origin ${CIRCLE_BRANCH}
-            git checkout develop
-            git branch
-            git merge ${CIRCLE_BRANCH} --no-edit
-            git push origin develop
+            echo ${SMARTPEAK_GITHUB_TOKEN} | gh auth login --with-token
+            gh pr create --title "Release v${VERSION}" --body " " --base develop --head ${CIRCLE_BRANCH} --repo AutoFlowResearch/SmartPeak
       - run:
           name: "Publish release to github"
           command: |
@@ -428,7 +425,7 @@ jobs:
             export PATH="$PATH:$PWD/tools/smartpeak"
             export PYTHONPATH="$PYTHONPATH:$PWD/tools"
             RELEASE_BODY=$(smartpeak_changes)
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c develop -b "${RELEASE_BODY}" -delete "v${VERSION}" arts
+            ghr -t ${SMARTPEAK_GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_BRANCH} -b "${RELEASE_BODY}" -delete "v${VERSION}" arts
       - run:
           name: "Notify users"
           command: |
