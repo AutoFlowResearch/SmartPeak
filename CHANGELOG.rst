@@ -187,6 +187,7 @@ Features
 - Implement Info tab functionality, related to QuickInfo menu.
 - Add widget Report to store a csv file with FeatureSummary or SequenceSummary.
 
+
 Changes
 ~~~~~~~
 - Update FIAMS parameters and TraML templates.
