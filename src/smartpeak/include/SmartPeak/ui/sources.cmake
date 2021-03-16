@@ -8,6 +8,7 @@ set(sources_list_h
 	FilePicker.h
 	GuiAppender.h
 	Heatmap2DWidget.h
+	ParameterEditorWidget.h
 	ParametersTableWidget.h
 	Report.h
 	SpectraPlotWidget.h

@@ -116,8 +116,11 @@ namespace SmartPeak
 
     /**
       @brief set value of the parameter, from a string representation.
+
+      @param[in] value_as_string the value, as string
+      @param[in] allow_change_type if true, change also the type if the value suggest it. if false, a cast may be tried.
     */
-    void setValueFromString(const std::string& value_as_string);
+    void setValueFromString(const std::string& value_as_string, bool allow_change_type = true);
 
     /**
       @brief return value of the parameter.
@@ -161,6 +164,18 @@ namespace SmartPeak
     const std::vector<std::string>& getTags(bool use_scheme = true) const { return (use_scheme && schema_) ? schema_->getTags() : tags_; };
 
     /**
+      @brief set restrictions of the parameter, from a string representation
+
+      values can be, for example:
+      "min:42 max:100"
+      "min:42"
+      "["string 1","string 2","string 3"]"
+
+      @param[in] restriction_as_string string representation of the restriction.
+    */
+    void setRestrictionsFromString(const std::string& restriction_as_string);
+
+    /**
       @brief get restrictions of the parameter, as a string representation.
 
       @param[in] use_scheme if set, and if a schema is assigned to this parameter, returns the restriction of the schema.
@@ -177,11 +192,15 @@ namespace SmartPeak
     */
     bool isSchema() const { return is_schema_; };
 
-
     /**
       @brief return default value of the parameter (if schema is assigned).
     */
     const std::string getDefaultValueAsString() const { return schema_ ? schema_->getValueAsString() : getValueAsString(); };
+
+    /**
+      @brief return valid strings
+    */
+    const std::vector<CastValue> getValidStrings() const { return constraints_list_ ? *constraints_list_ : std::vector<CastValue>(); };
 
     bool operator==(const Parameter & other) const;
     inline bool operator!=(const Parameter& other) const { return !operator==(other); };
@@ -253,6 +272,13 @@ namespace SmartPeak
     @param[in] parameter the parameter to add
     */
     void addParameter(const Parameter& parameter);
+
+    /**
+    @brieg Remove a parameter.
+
+    @param[in] parameter_name the parameter name
+    */
+    void removeParameter(const std::string& parameter_name);
 
     /**
     @brief Merge two FunctionsParameters.

@@ -292,8 +292,8 @@ namespace SmartPeak
     // Make the parameters table headers
     if (headers_.size() <= 0) {
       LOGD << "Making parameters_table_headers";
-      headers_.resize(9);
-      headers_.setValues({ "function","name","type","value","description","status","valid","restrictions","schema_type" });
+      headers_.resize(10);
+      headers_.setValues({ "function","name","type","value","description","status","valid","restrictions","schema_type","default" });
     }
     const int n_cols = headers_.size();
 
@@ -349,6 +349,8 @@ namespace SmartPeak
         body_(row, col) = parameter.getRestrictionsAsString();
         ++col;
         body_(row, col) = parameter.getSchema() ? parameter.getSchema()->getType() : parameter.getType();
+        ++col;
+        body_(row, col) = parameter.getDefaultValueAsString();
         col = 0;
         ++row;
       }

@@ -173,11 +173,72 @@ namespace SmartPeak
     }
   }
 
-  void Parameter::setValueFromString(const std::string& value_as_string)
+  void Parameter::setValueFromString(const std::string& value_as_string, bool allow_change_type)
   {
     CastValue c;
     Utilities::parseString(value_as_string, c);
-    value_ = c;
+    if (allow_change_type || c.getTag() == value_.getTag())
+    {
+      value_ = c;
+    }
+    else
+    {
+      // try some cast
+      if ((c.getTag() == CastValue::Type::INT) && (value_.getTag() == CastValue::Type::FLOAT))
+      {
+        value_ = static_cast<float>(c.i_);
+      }
+      else if ((c.getTag() != CastValue::Type::STRING) && (value_.getTag() == CastValue::Type::STRING))
+      {
+        value_.s_ = value_as_string;
+      }
+    }
+  }
+
+  void Parameter::setRestrictionsFromString(const std::string& restriction_as_string)
+  {
+    if (restriction_as_string.empty())
+      return;
+    if ((restriction_as_string[0] == '[') && (restriction_as_string[restriction_as_string.size() - 1] == ']'))
+    {
+      const std::regex re("[^[,\\s\\]][^\\,\\]]*");
+      std::sregex_iterator names_begin = std::sregex_iterator(restriction_as_string.begin(), restriction_as_string.end(), re);
+      if (names_begin != std::sregex_iterator())
+      {
+        constraints_list_ = std::make_shared<std::vector<CastValue>>();
+        for (auto& valid_string = names_begin; valid_string != std::sregex_iterator(); ++valid_string)
+        {
+          constraints_list_->push_back(valid_string->str());
+        }
+      }
+    }
+    else
+    {
+      std::shared_ptr<CastValue> cast_min;
+      std::shared_ptr<CastValue> cast_max;
+      const std::regex re_min("min:([+-]?([0-9]*[.])?[0-9]+)");
+      std::smatch m_min;
+      bool matched = std::regex_match(restriction_as_string, m_min, re_min);
+      if (matched && m_min.size() > 0)
+      {
+        auto c = std::make_shared<CastValue>();
+        Utilities::parseString(m_min[1], *c);
+        cast_min = c;
+      }
+      const std::regex re_max("max:([+-]?([0-9]*[.])?[0-9]+)");
+      std::smatch m_max;
+      matched = std::regex_match(restriction_as_string, m_max, re_max);
+      if (matched && m_max.size() > 0)
+      {
+        auto c = std::make_shared<CastValue>();
+        Utilities::parseString(m_max[1], *c);
+        cast_max = c;
+      }
+      if (cast_min || cast_max)
+      {
+        setConstraintsMinMax(cast_min, cast_max);
+      }
+    }
   }
 
   const std::string Parameter::getRestrictionsAsString(bool use_schema) const
@@ -519,6 +580,14 @@ namespace SmartPeak
     {
       parameters_.push_back(parameter);
     }
+  }
+
+  void FunctionParameters::removeParameter(const std::string& parameter_name)
+  {
+    parameters_.erase(std::remove_if(parameters_.begin(), 
+                                     parameters_.end(), 
+                                     [parameter_name](const Parameter& p) { return p.getName() == parameter_name; }),
+                                     parameters_.end());
   }
 
   void FunctionParameters::merge(const FunctionParameters& other)

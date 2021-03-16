@@ -34,7 +34,10 @@ namespace SmartPeak
 {
 
   ParametersTableWidget::ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id)
-    : session_handler_(session_handler), application_handler_(application_handler), table_id_(table_id)
+    : session_handler_(session_handler), 
+      application_handler_(application_handler), 
+      table_id_(table_id),
+      parameter_editor_widget_(application_handler)
   {
     application_handler_.sequenceHandler_.addParametersObserver(this);
     application_handler_.sequenceHandler_.addWorkflowObserver(this);
@@ -61,6 +64,7 @@ namespace SmartPeak
     if (application_handler_.sequenceHandler_.getSequence().size() == 0) {
       return;
     }
+    parameter_editor_widget_.draw();
     std::vector<std::string> command_names = application_handler_.sequenceHandler_.getWorkflow();
     ParameterSet user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
     if (refresh_needed_)
@@ -73,9 +77,13 @@ namespace SmartPeak
     }
     static bool show_default = true;
     static bool show_unused = true;
-    ImGui::Checkbox("Show default", &show_default);
+    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+    ImGui::Checkbox("Show default, not set by user", &show_default);
+    ImGui::PopStyleColor();
     ImGui::SameLine();
-    ImGui::Checkbox("Show unused", &show_unused);
+    ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TabActive]);
+    ImGui::Checkbox("Show unused by the workflow", &show_unused);
+    ImGui::PopStyleColor();
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
@@ -85,6 +93,10 @@ namespace SmartPeak
     // Columns we want to show up
     std::vector<int> cols_to_show = { 0, 1, 2, 3, 7 };
 
+    // Edit Parameter widget needs to be open outside the table construction.
+    bool edit_parameter = false;
+    int  param_to_edit_row;
+    
     if (ImGui::BeginTable(table_id_.c_str(), cols_to_show.size(), table_flags)) {
 
       // First row headers
@@ -117,9 +129,9 @@ namespace SmartPeak
                 }
                 ImGui::Text("%s", body_(row, col).c_str());
                 ImGui::PopStyleColor();
-                if ((col == 3) && (valid == "false"))
+                if (col == 3)
                 {
-                  if (ImGui::IsItemHovered())
+                  if (ImGui::IsItemHovered() && (valid == "false"))
                   {
                     ImGui::BeginTooltip();
                     const std::string& constraints = body_(row, 7);
@@ -148,6 +160,11 @@ namespace SmartPeak
                 ImGui::Text("%s", body_(row, col).c_str());
                 ImGui::PopStyleColor();
               }
+              if ((col == 3) && ImGui::IsItemClicked())
+              {
+                  param_to_edit_row = row;
+                  edit_parameter = true;
+              }
               if (col == 1)
               {
                 if (ImGui::IsItemHovered())
@@ -164,6 +181,20 @@ namespace SmartPeak
         }
       }
       ImGui::EndTable();
+      if (edit_parameter)
+      {
+        // we rebuild the Parameter object from the selected row
+        std::map<std::string, std::string> param_struc = {
+          { "name" , body_(param_to_edit_row, 1)},
+          { "type" , body_(param_to_edit_row, 2)},
+          { "value" , body_(param_to_edit_row, 3)},
+          { "description" , body_(param_to_edit_row, 4)},
+        };
+        Parameter param(param_struc);
+        param.setRestrictionsFromString(body_(param_to_edit_row, 7));
+        parameter_editor_widget_.setParameter(body_(param_to_edit_row, 0), param, body_(param_to_edit_row, 9));
+        ImGui::OpenPopup("Edit Parameter");
+      }
     }
   }
 
