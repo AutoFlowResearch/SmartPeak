@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 

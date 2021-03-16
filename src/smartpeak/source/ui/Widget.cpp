@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Ahmed Khalil $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil, Bertrand Boudaud $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -28,146 +28,146 @@
 #include <utility>
 #include <vector>
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <implot.h>
 
 namespace SmartPeak
 {
-  void Widget::FilterPopup(
-    const char* popuop_id,
-    ImGuiTextFilter& filter,
-    const Eigen::Tensor<std::string, 1>& column,
-    bool* checked,
-    const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices) {
-    if (false == ImGui::BeginPopup(popuop_id))
-      return;
+  const ImGuiTableSortSpecs* ImEntry::s_current_sort_specs = NULL;
 
-    //// Sorting
-    //if (ImGui::Button("Asc"))
-    //{
-    //  // TODO: will need to rethink how this function is called to implement sorting on the entire table
-    //  //std::sort(std::begin(column), std::end(column), [](std::string a, std::string b) {return a > b; });
-    //  //std::sort(std::begin(values_indices), std::end(values_indices), [](std::pair<std::string, std::vector<int>> a, std::pair<std::string, std::vector<int>> b) {return a.first > b.first; });
-    //}
-    //ImGui::SameLine();
-    //if (ImGui::Button("Desc"))
-    //{
-    //  // TODO: will need to rethink how this function is called to implement sorting on the entire table
-    //  //std::sort(std::begin(column), std::end(column), [](std::string a, std::string b) {return a < b; });
-    //  //std::sort(std::begin(values_indices), std::end(values_indices), [](std::pair<std::string, std::vector<int>> a, std::pair<std::string, std::vector<int>> b) {return a.first < b.first; });
-    //}
-    //ImGui::Separator();
-
-    // Filtering and selecting
-    filter.Draw();
-
-    if (ImGui::Button("check all")) {
-      for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
-        for (const size_t i: indexes.second) {
-          checked[i] = 1;
-        }
-      }
+  bool GenericTableWidget::searcher(const std::vector<ImEntry>& Im_table_entries, const int& selected_entry,
+    const ImGuiTextFilter& filter, const size_t row) const
+  {
+    bool is_to_filter;
+    if (selected_entry > 0) {
+      is_to_filter = !filter.PassFilter(Im_table_entries[row].entry_contents[selected_entry - 1].c_str());
     }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("uncheck all")) {
-      for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
-        for (const size_t i : indexes.second) {
-          checked[i] = 0;
-        }
-      }
+    else if (selected_entry == 0) { //ALL
+      is_to_filter = std::all_of(Im_table_entries[row].entry_contents.begin(),
+        Im_table_entries[row].entry_contents.end(),
+        [&filter](auto entry) {return !filter.PassFilter(entry.c_str()); });
     }
-
-    for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
-      if (filter.PassFilter(indexes.first.c_str())) {
-        ImGui::Checkbox(indexes.first.c_str(), &checked[indexes.second.front()]);
-      }
-    }
-
-    // Update checked rows not explicitly shown
-    for (const std::pair<std::string, std::vector<size_t>>& indexes : values_indices) {
-      for (const size_t i : indexes.second) {
-        checked[i] = checked[indexes.second.front()];
-      }
-    }
-
-    // NOTE: Appears to apply the filter immediately so this is not needed
-    // // Apply filters
-    // ImGui::Separator();
-    // if (ImGui::Button("Accept"))
-    // {
-    //   //TODO: apply filter and exit
-    // }
-    // ImGui::SameLine();
-    // if (ImGui::Button("Cancel"))
-    // {
-    //   //TODO: exit without applying filter
-    // }
-
-    ImGui::EndPopup();
+    return is_to_filter;
   }
 
-  void Widget::makeFilters(
-    const Eigen::Tensor<std::string, 1>& headers,
-    const Eigen::Tensor<std::string,2>& columns,
-    std::vector<std::vector<std::pair<std::string, std::vector<std::size_t>>>>& columns_indices,
-    std::vector<ImGuiTextFilter>& filter) {
-    for (std::size_t col = 0; col < headers.size(); ++col)
-    {
-      // Extract out unique columns and replicate indices
-      std::map<std::string, std::vector<std::size_t>> value_indices;
-      for (std::size_t row = 0; row < columns.dimension(0); ++row) {
-        std::vector<std::size_t> index = { row };
-        auto found = value_indices.emplace(columns(col,row), index);
-        if (!found.second) {
-          value_indices.at(columns(col,row)).push_back(row);
+  void GenericTableWidget::updateTableContents(std::vector<ImEntry>& Im_table_entries,
+    bool& is_scanned,
+    const Eigen::Tensor<std::string, 2>& columns,
+    const Eigen::Tensor<bool, 2>& checkbox_columns)
+  {
+    Im_table_entries.resize(columns.dimension(0), ImEntry());
+    if (!Im_table_entries.empty() && is_scanned == false) {
+      for (size_t row = 0; row < columns.dimension(0); ++row) {
+        ImEntry& Im_table_entry = Im_table_entries[row];
+        Im_table_entry.entry_contents.resize(columns.dimension(1) + checkbox_columns.dimension(1), "");
+        Im_table_entry.ID = row;
+        for (size_t header_idx = 0; header_idx < columns.dimension(1) + checkbox_columns.dimension(1); ++header_idx) {
+          if (header_idx < columns.dimension(1)) {
+            Im_table_entry.entry_contents[header_idx] = columns(row, header_idx);
+          }
+          else if (header_idx < columns.dimension(1) + checkbox_columns.dimension(1)) {
+            const std::size_t checkbox_idx = header_idx - static_cast<std::size_t>(columns.dimension(1));
+            Im_table_entry.entry_contents[header_idx] = checkbox_columns(row, checkbox_idx) == true ? "true" : "false";
+          }
         }
       }
+      is_scanned = true;
+    }
+  }
 
-      // Copy into a vector of pairs (used for downstream sorting)
-      std::vector<std::pair<std::string, std::vector<std::size_t>>> value_indices_v;
-      std::copy(
-        value_indices.begin(),
-        value_indices.end(),
-        std::back_inserter(value_indices_v)
-      );
-      columns_indices.push_back(value_indices_v);
-
-      // Initialize the filters
-      static ImGuiTextFilter filter0;
-      filter.push_back(filter0);
+  void GenericTableWidget::sorter(std::vector<ImEntry>& Im_table_entries,
+                                  ImGuiTableSortSpecs* sorts_specs, const bool& is_scanned)
+  {
+    const unsigned int col_idx = static_cast<unsigned int>(sorts_specs->Specs->ColumnIndex);
+    if (sorts_specs->SpecsDirty && is_scanned &&
+      !std::all_of(Im_table_entries.begin(), Im_table_entries.end(),
+        [&, col_idx, Im_table_entries]
+    (ImEntry& entry) { return !std::strcmp(entry.entry_contents[col_idx].c_str(), Im_table_entries.begin()->entry_contents[col_idx].c_str()); }))
+    {
+      ImEntry::s_current_sort_specs = sorts_specs;
+      if (Im_table_entries.size() > 1)
+        qsort(&Im_table_entries[0], (size_t)Im_table_entries.size(), sizeof(Im_table_entries[0]), ImEntry::CompareWithSortSpecs);
+      ImEntry::s_current_sort_specs = NULL;
+      sorts_specs->SpecsDirty = false;
     }
   }
 
   void GenericTableWidget::draw()
   {
-    if (headers_.size()<=0)
+    if (headers_.size() <= 0)
       return;
 
-    // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedSame| ImGuiTableFlags_NoSavedSettings |
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti;
 
+    static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
+    static ImGuiTableColumnFlags column_any_flags = { ImGuiTableColumnFlags_NoHide };
+
+    static ImGuiTextFilter filter;
+    filter.Draw("Find");
+
+    // drop-down list for search field(s)
+    cols.resize(headers_.size() + 1);
+    for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
+      if (header_name == 0)
+      {
+        cols[header_name] = "All";
+      }
+      else if (header_name > 0)
+      {
+        cols[header_name] = headers_(header_name - 1).c_str();
+      }
+    }
+
+    ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
+
+    if (columns_.dimension(0) == table_entries_.size())
+      table_scanned_ = true;
+    else
+      table_scanned_ = false;
+
+    if (columns_.dimensions().TotalSize() > 0) {
+      updateTableContents(table_entries_, table_scanned_,
+        columns_, Eigen::Tensor<bool, 2>());
+    }
+    
+    if (table_scanned_ && table_entries_.size() > 0) {
+      if (headers_.size() != table_entries_[0].entry_contents.size()) {
+        table_scanned_ = false;
+      }
+    }
+
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
-      // First row headers
+      // First row entry_contents
       for (int col = 0; col < headers_.size(); col++) {
         ImGui::TableSetupColumn(headers_(col).c_str());
       }
       ImGui::TableSetupScrollFreeze(headers_.size(), 1);
       ImGui::TableHeadersRow();
-      
-      // Second row to end body
+
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
+
+            if (searcher(table_entries_, selected_col, filter, row))
+              continue;
+
             ImGui::TableNextRow();
             for (size_t col = 0; col < headers_.size(); ++col) {
-              ImGui::TableSetColumnIndex(col);
-              ImGui::Text("%s", columns_(row,col).c_str());
+              if (table_scanned_ == true && !table_entries_.empty())
+              {
+                ImGui::TableSetColumnIndex(col);
+                ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());
+              }
             }
           }
         }
+      }
+
+      if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
+      {
+        sorter(table_entries_, sorts_specs, table_scanned_);
       }
       ImGui::EndTable();
     }
@@ -175,47 +175,120 @@ namespace SmartPeak
 
   void ExplorerWidget::draw()
   {
-    if (headers_.size()<=0)
+    if (headers_.size() <= 0)
       return;
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_SizingFixedSame| ImGuiTableFlags_NoSavedSettings |
+      ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti;
+
+    static ImGuiTableColumnFlags column_0_flags = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide };
+    static ImGuiTableColumnFlags column_any_flags = { ImGuiTableColumnFlags_NoHide };
+
+    static ImGuiTextFilter filter;
+    filter.Draw("Find");
+
+    // drop-down list for search field(s)
+    cols.resize(headers_.size() + 1);
+    for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
+      if (header_name == 0)
+      {
+        cols[header_name] = "All";
+      }
+      else if (header_name > 0)
+      {
+        cols[header_name] = headers_(header_name - 1).c_str();
+      }
+    }
+
+    ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
+
+    if (columns_.dimension(0) == table_entries_.size())
+      table_scanned_ = true;
+    else
+      table_scanned_ = false;
+
+    if (columns_.dimensions().TotalSize() > 0) {
+      updateTableContents(table_entries_, table_scanned_,
+        columns_, *checkbox_columns_);
+    }
+    
+    if (table_scanned_ && table_entries_.size() > 0) {
+      if (headers_.size()+checkbox_headers_.size() != table_entries_[0].entry_contents.size()) {
+        table_scanned_ = false;
+      }
+    }
 
     if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < headers_.size(); col++) {
-        ImGui::TableSetupColumn(headers_(col).c_str());
+        ImGui::TableSetupColumn(headers_(col).c_str(), col == 0 ? column_0_flags : column_any_flags, -1.0f, col);
       }
       for (int col = 0; col < checkbox_headers_.size(); col++) {
         ImGui::TableSetupColumn(checkbox_headers_(col).c_str());
       }
+
       ImGui::TableSetupScrollFreeze(headers_.size() + checkbox_headers_.size(), 1);
       ImGui::TableHeadersRow();
-      
-      // Second row to end body
+
       if (columns_.size() > 0) {
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
-          if (checked_rows_.size() <=0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
+          if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row)))
+          {
+            if (searcher(table_entries_, selected_col, filter, row))
+              continue;
+
             ImGui::TableNextRow();
-            for (size_t col = 0; col < headers_.size(); ++col) {
-              ImGui::TableSetColumnIndex(col);
-              ImGui::Text("%s", columns_(row, col).c_str());
-            }
-            for (size_t col = 0; col < checkbox_headers_.size(); ++col) {
-              std::string id = table_id_ + std::to_string(col) + std::to_string(row*columns_.dimension(1));
-              ImGui::TableSetColumnIndex(col + headers_.size());
-              ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
-              ImGui::Checkbox(id.c_str(), &checkbox_columns_(row,col));
-              ImGui::PopStyleColor();
+            
+            for (size_t header_idx = 0; header_idx < columns_.dimension(1) + checkbox_columns_->dimension(1); ++header_idx)
+            {
+              if (table_scanned_ == true && !table_entries_.empty())
+              {
+                if (header_idx < columns_.dimension(1)) {
+                  ImGui::TableSetColumnIndex(header_idx);
+                  ImGui::Text("%s", table_entries_[row].entry_contents[header_idx].c_str());
+                }
+                else if (header_idx < columns_.dimension(1) + checkbox_columns_->dimension(1))
+                {
+                  std::string id = table_id_ + std::to_string(header_idx) + std::to_string(row * columns_.dimension(1));
+                  ImGui::TableSetColumnIndex(header_idx);
+                  ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
+                  
+                  std::size_t checkbox_idx = header_idx - static_cast<std::size_t>(columns_.dimension(1));
+                  bool is_checked;
+                  if (!std::strcmp(table_entries_[row].entry_contents[header_idx].c_str(), "true"))
+                  is_checked = true;
+                  else
+                  is_checked = false;
+                  ImGui::Checkbox(id.c_str(), &is_checked);
+
+                  if (is_checked == true && !std::strcmp(table_entries_[row].entry_contents[header_idx].c_str(), "false"))
+                  {
+                    table_entries_[row].entry_contents[header_idx] = "true";
+                    (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx) = true;
+                  }
+                  else if (is_checked == false && !std::strcmp(table_entries_[row].entry_contents[header_idx].c_str(), "true"))
+                  {
+                    table_entries_[row].entry_contents[header_idx] = "false";
+                    (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx) = false;
+                  }
+                  ImGui::PopStyleColor();
+                }
+              }
             }
           }
         }
       }
+
+      if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
+      {
+        sorter(table_entries_, sorts_specs, table_scanned_);
+      }
       ImGui::EndTable();
     }
   }
+
 
   void GenericGraphicWidget::draw()
   {
