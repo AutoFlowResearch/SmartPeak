@@ -195,7 +195,6 @@ jobs:
             # choco install boost-msvc-14.1
             choco install doxygen.install
             choco install nsis.portable
-            pip install -r .\tools\smartpeak\requirements.txt
             refreshenv
             $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
             $sdl2_url = 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
@@ -221,6 +220,8 @@ jobs:
             ls C:\lib\boost\
             $BOOST_DIR = 'C:\lib\boost\boost_1_73_0'
             $boost_tmp | Remove-Item
+            cd ~/SmartPeak
+            pip install -r .\tools\smartpeak\requirements.txt
       - run:
           name: Cloning OpenMS - develop
           command: |
