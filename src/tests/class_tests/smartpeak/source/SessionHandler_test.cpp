@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE(getParametersTable1)
   Eigen::Tensor<std::string, 2> body;
   ParameterSet user_parameters = testData.sequenceHandler.getSequence().at(0).getRawData().getParameters();
   session_handler.getParametersTable(user_parameters, {}, headers, body);
-  BOOST_CHECK_EQUAL(headers.size(), 9);
+  BOOST_CHECK_EQUAL(headers.size(), 10);
   BOOST_CHECK_EQUAL(headers(0), "function");
   BOOST_CHECK_EQUAL(headers(1), "name");
   BOOST_CHECK_EQUAL(headers(2), "type");
@@ -206,8 +206,9 @@ BOOST_AUTO_TEST_CASE(getParametersTable1)
   BOOST_CHECK_EQUAL(headers(6), "valid");
   BOOST_CHECK_EQUAL(headers(7), "restrictions");
   BOOST_CHECK_EQUAL(headers(8), "schema_type");
+  BOOST_CHECK_EQUAL(headers(9), "default");
   BOOST_CHECK_EQUAL(body.dimension(0), 107);
-  BOOST_CHECK_EQUAL(body.dimension(1), 9);
+  BOOST_CHECK_EQUAL(body.dimension(1), 10);
   BOOST_CHECK_EQUAL(body(0, 0), "AbsoluteQuantitation");
   BOOST_CHECK_EQUAL(body(0, 1), "min_points");
   BOOST_CHECK_EQUAL(body(0, 2), "int");
@@ -217,6 +218,7 @@ BOOST_AUTO_TEST_CASE(getParametersTable1)
   BOOST_CHECK_EQUAL(body(0, 6), "true");
   BOOST_CHECK_EQUAL(body(0, 7), "");
   BOOST_CHECK_EQUAL(body(0, 8), "int");
+  BOOST_CHECK_EQUAL(body(0, 9), "4");
   BOOST_CHECK_EQUAL(body(104, 0), "SequenceProcessor");
   BOOST_CHECK_EQUAL(body(104, 1), "n_thread");
   BOOST_CHECK_EQUAL(body(104, 2), "int");
@@ -226,6 +228,7 @@ BOOST_AUTO_TEST_CASE(getParametersTable1)
   BOOST_CHECK_EQUAL(body(104, 6), "true");
   BOOST_CHECK_EQUAL(body(104, 7), "min:1");
   BOOST_CHECK_EQUAL(body(104, 8), "int");
+  BOOST_CHECK_EQUAL(body(104, 9), "6");
   BOOST_CHECK_EQUAL(body(body.dimension(0) - 1, 3), "true");
 }
 

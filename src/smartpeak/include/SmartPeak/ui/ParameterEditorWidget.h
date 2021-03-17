@@ -34,7 +34,7 @@ namespace SmartPeak
   public:
     ParameterEditorWidget(ApplicationHandler& application_handler) :
       application_handler_(application_handler),
-      parameter_("todo"),
+      parameter_("parameter"), // dummy name
       input_text_field_()
     {
     };

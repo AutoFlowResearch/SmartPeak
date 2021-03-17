@@ -31,19 +31,22 @@ namespace SmartPeak
 {
   void ParameterEditorWidget::draw()
   {
-    float popup_width = 800;
+    float popup_width = 400;
 
     if (!ImGui::BeginPopupModal("Edit Parameter", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
       return;
     }
 
+    // one documented way to set popup width
+    const auto cursor_pos = ImGui::GetCursorPosX();
+    ImGui::SetCursorPosX(popup_width);
+    ImGui::SetCursorPosX(cursor_pos);
+
     ImGui::Text(title_.c_str());
     ImGui::Separator();
-    ImGui::PushItemWidth(popup_width);
     ImGui::PushTextWrapPos();
     ImGui::Text(parameter_.getDescription().c_str());
     ImGui::PopTextWrapPos();
-    ImGui::PopItemWidth();
 
     if (!valid_string_.empty() && ImGui::BeginCombo("Value", input_text_field_.data()))
     {

@@ -164,12 +164,13 @@ namespace SmartPeak
     const std::vector<std::string>& getTags(bool use_scheme = true) const { return (use_scheme && schema_) ? schema_->getTags() : tags_; };
 
     /**
-      @brief set restrictions of the parameter, from a string representation
+      @brief set restrictions of the parameter, from a string representation.
 
+      the string representation must be the same as the one returned by getRestrictionsAsString()
       values can be, for example:
       "min:42 max:100"
       "min:42"
-      "["string 1","string 2","string 3"]"
+      "[string 1,string 2,string 3]"
 
       @param[in] restriction_as_string string representation of the restriction.
     */

@@ -510,6 +510,36 @@ BOOST_AUTO_TEST_CASE(FunctionParameter_addParameter)
   BOOST_CHECK_EQUAL(param->getValueAsString(), "valid_string2");
 }
 
+BOOST_AUTO_TEST_CASE(FunctionParameter_removeParameter)
+{
+  vector<map<string, string>> param_struct1({
+  {
+    { {"name", "parameter1"}, {"type", "string"}, {"value", "valid_string1"} },
+    { {"name", "parameter2"}, {"type", "string"}, {"value", "valid_string2"} },
+    { {"name", "parameter3"}, {"type", "string"}, {"value", "valid_string3"} },
+  } });
+  FunctionParameters function_parameter("function", param_struct1);
+
+  BOOST_CHECK_EQUAL(function_parameter.size(), 3);
+
+  function_parameter.removeParameter("parameter2");
+  BOOST_CHECK_EQUAL(function_parameter.size(), 2);
+  auto param = function_parameter.findParameter("parameter1");
+  BOOST_REQUIRE(param);
+  BOOST_CHECK_EQUAL(param->getName(), "parameter1");
+  BOOST_CHECK_EQUAL(param->getValueAsString(), "valid_string1");
+  param = function_parameter.findParameter("parameter2");
+  BOOST_CHECK_EQUAL(param, nullptr);
+  param = function_parameter.findParameter("parameter3");
+  BOOST_REQUIRE(param);
+  BOOST_CHECK_EQUAL(param->getName(), "parameter3");
+  BOOST_CHECK_EQUAL(param->getValueAsString(), "valid_string3");
+  param = function_parameter.findParameter("parameter3");
+
+  function_parameter.removeParameter("non_existing_parameter");
+  BOOST_CHECK_EQUAL(function_parameter.size(), 2);
+}
+
 BOOST_AUTO_TEST_CASE(FunctionParameter_merge)
 {
   vector<map<string, string>> param_struct1({
@@ -895,6 +925,46 @@ BOOST_AUTO_TEST_CASE(Parameter_isValid)
   BOOST_CHECK(!param_string.isValid());
 }
 
+BOOST_AUTO_TEST_CASE(Parameter_getValidStrings)
+{
+  Parameter param_string("param_string", "one");
+  auto list_string = std::make_shared<std::vector<CastValue>>();
+  list_string->push_back("one");
+  list_string->push_back("two");
+  list_string->push_back("three");
+  param_string.setConstraintsList(list_string);
+  std::vector<std::string> read_tags;
+  for (const auto& cast_value : param_string.getValidStrings())
+  {
+    read_tags.push_back(cast_value);
+  }
+  std::vector<std::string> expected{ "one", "two", "three" };
+  BOOST_CHECK_EQUAL_COLLECTIONS(read_tags.begin(), read_tags.end(), expected.begin(), expected.end());
+}
+
+BOOST_AUTO_TEST_CASE(Parameter_setRestrictionsFromString)
+{
+  Parameter param_int("param_int", 10);
+
+  BOOST_CHECK(param_int.isValid());
+  param_int.setRestrictionsFromString("min:0 max:50");
+  BOOST_CHECK(param_int.isValid());
+  param_int.setValueFromString("100");
+  BOOST_CHECK(!param_int.isValid());
+
+  param_int.setValueFromString("10");
+  param_int.setRestrictionsFromString("min:0.0 max:50.0");
+  BOOST_CHECK(param_int.isValid());
+  param_int.setValueFromString("100");
+  BOOST_CHECK(!param_int.isValid());
+
+  Parameter param_string("param_string", "one");
+  param_string.setRestrictionsFromString("[one,two,three]");
+  BOOST_CHECK(param_string.isValid());
+  param_string.setValueFromString("four");
+  BOOST_CHECK(!param_string.isValid());
+}
+
 BOOST_AUTO_TEST_CASE(Parameter_name)
 {
   Parameter param_int("param_int", 10);
@@ -963,6 +1033,37 @@ BOOST_AUTO_TEST_CASE(Parameter_setValueFromString)
   param.setValueFromString(" non_bracket_string1, non_bracket_string2, non_bracket_string3  ");
   BOOST_CHECK_EQUAL(param.getValueAsString(), "non_bracket_string1, non_bracket_string2, non_bracket_string3");
   BOOST_CHECK_EQUAL(param.getType(), "string");
+
+  // disable automatic type change when setting the value
+  param.setValueFromString("3.14");
+  BOOST_CHECK_EQUAL(param.getType(), "float");
+  param.setValueFromString("42", false);
+  BOOST_CHECK_EQUAL(param.getValueAsString(), "42");
+  BOOST_CHECK_EQUAL(param.getType(), "float");
+
+  param.setValueFromString("test");
+  BOOST_CHECK_EQUAL(param.getType(), "string");
+  param.setValueFromString("42", false);
+  BOOST_CHECK_EQUAL(param.getValueAsString(), "42");
+  BOOST_CHECK_EQUAL(param.getType(), "string");
+
+  param.setValueFromString("test");
+  BOOST_CHECK_EQUAL(param.getType(), "string");
+  param.setValueFromString("false", false);
+  BOOST_CHECK_EQUAL(param.getValueAsString(), "false");
+  BOOST_CHECK_EQUAL(param.getType(), "string");
+
+  param.setValueFromString("test");
+  BOOST_CHECK_EQUAL(param.getType(), "string");
+  param.setValueFromString("[1, 2, 3]", false);
+  BOOST_CHECK_EQUAL(param.getValueAsString(), "[1, 2, 3]");
+  BOOST_CHECK_EQUAL(param.getType(), "string");
+
+  param.setValueFromString("42");
+  BOOST_CHECK_EQUAL(param.getType(), "int");
+  param.setValueFromString("3.14", false);
+  BOOST_CHECK_EQUAL(param.getValueAsString(), "42");
+  BOOST_CHECK_EQUAL(param.getType(), "int");
 }
 
 BOOST_AUTO_TEST_CASE(Parameter_description)

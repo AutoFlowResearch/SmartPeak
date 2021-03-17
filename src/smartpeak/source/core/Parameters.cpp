@@ -216,7 +216,7 @@ namespace SmartPeak
     {
       std::shared_ptr<CastValue> cast_min;
       std::shared_ptr<CastValue> cast_max;
-      const std::regex re_min("min:([+-]?([0-9]*[.])?[0-9]+)");
+      const std::regex re_min("min:([+-]?([0-9]*[.])?[0-9]+)(.*)");
       std::smatch m_min;
       bool matched = std::regex_match(restriction_as_string, m_min, re_min);
       if (matched && m_min.size() > 0)
@@ -225,13 +225,13 @@ namespace SmartPeak
         Utilities::parseString(m_min[1], *c);
         cast_min = c;
       }
-      const std::regex re_max("max:([+-]?([0-9]*[.])?[0-9]+)");
+      const std::regex re_max("(.*)max:([+-]?([0-9]*[.])?[0-9]+)(.*)");
       std::smatch m_max;
       matched = std::regex_match(restriction_as_string, m_max, re_max);
-      if (matched && m_max.size() > 0)
+      if (matched && m_max.size() > 1)
       {
         auto c = std::make_shared<CastValue>();
-        Utilities::parseString(m_max[1], *c);
+        Utilities::parseString(m_max[2], *c);
         cast_max = c;
       }
       if (cast_min || cast_max)
