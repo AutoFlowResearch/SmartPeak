@@ -57,13 +57,13 @@ endif(OpenMS_FOUND)
 find_boost(filesystem)
 
 if(Boost_FOUND)
-  message(STATUS "[examples] : Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}" )
+  message(STATUS "Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}" )
   set(CF_OPENMS_BOOST_VERSION_MAJOR ${Boost_MAJOR_VERSION})
 	set(CF_OPENMS_BOOST_VERSION_MINOR ${Boost_MINOR_VERSION})
   set(CF_OPENMS_BOOST_VERSION_SUBMINOR ${Boost_SUBMINOR_VERSION})
 	set(CF_OPENMS_BOOST_VERSION ${Boost_VERSION})
 else()
-  message(FATAL_ERROR "[examples] : Boost or one of its components not found!")
+  message(FATAL_ERROR "Boost or one of its components not found!")
 endif()
 
 #------------------------------------------------------------------------------
@@ -72,12 +72,12 @@ endif()
 find_package(Qt5 COMPONENTS Core Network REQUIRED)
 
 if (NOT Qt5Network_FOUND)
-  message(STATUS "[examples] : QtNetwork module not found!")
+  message(STATUS "QtNetwork module not found!")
   message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
 endif()
 
 if (NOT Qt5Core_FOUND)
-  message(STATUS "[examples] : QtCore module not found!")
+  message(STATUS "QtCore module not found!")
   message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
 endif()
 
@@ -107,9 +107,9 @@ endif()
 find_package(ImGui COMPONENTS Sources Examples SourcesMiscCpp REQUIRED)
 include_directories(${ImGui_INCLUDE_DIR})
 if (ImGui_Examples_FOUND)
-  message(STATUS "[examples] : ImGui_Examples_FOUND has been set and found")
+  message(STATUS "ImGui_Examples_FOUND has been set and found")
 else()
-  message(STATUS "[examples] : ImGui has not been found")
+  message(STATUS "imgui has not been found")
 endif()
 
 #------------------------------------------------------------------------------
@@ -175,10 +175,11 @@ foreach(_examples ${EXAMPLE_executables})
 
   else() # Win
 
-    add_executable(${_examples} source/${_examples})
     if(NOT ${_examples} STREQUAL "SmartPeakGUI")
+      add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
     else()
+      add_executable(${_examples} source/${_examples} ${CMAKE_SOURCE_DIR}/cmake/Windows/SmartPeakGUI.rc)
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
           OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
           PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
