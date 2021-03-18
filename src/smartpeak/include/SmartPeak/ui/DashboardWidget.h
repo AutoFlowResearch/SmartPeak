@@ -25,15 +25,22 @@
 
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/iface/ISequenceObserver.h>
 #include <string>
 #include <vector>
 #include <chrono>
 
 namespace SmartPeak
 {
-  class Dashboard final : public Widget
+  class Dashboard final : public Widget, public ISequenceObserver
   {
     ApplicationHandler* application_handler_ = nullptr;
+
+  public:
+    /**
+     ISequenceObserver
+    */
+    virtual void sequenceUpdated() override;
 
   public:
     void draw() override;
@@ -58,11 +65,17 @@ namespace SmartPeak
         label_char_ptr_.clear();
         values_.clear();
         positions_.clear();
+        total_value_ = 0.0;
       };
+      int selected_value_index = -1;
+      std::string selected_value_name;
+      std::vector<double> unselected_values_;
+      std::vector<double> selected_values_;
+      double total_value_;
     };
     DashboardChartData samples_chart_;
     DashboardChartData transitions_chart_;
-    void drawChart(const DashboardChartData& chart_data, const char* title, const char* x_label, const char* y_label) const;
+    void drawChart(DashboardChartData& chart_data, const char* title, const char* x_label, const char* y_label) const;
     int number_of_samples_ = 0;
     int number_of_transitions_ = 0;
     bool refresh_needed_ = true;

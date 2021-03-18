@@ -5,6 +5,7 @@ set(directory include/SmartPeak/iface)
 set(sources_list_h
   IProcessorDescription.h
   IParametersObserver.h
+  ISequenceObserver.h
   IWorkflowObserver.h
 )
 
