@@ -578,7 +578,7 @@ namespace SmartPeak
 
       char buff[128];
       const std::time_t t(fs::last_write_time(entry));
-      std::strftime(buff, sizeof buff, "%Y-%m-%d %H:%M:%S", std::localtime(&t)); // ISO 8601 date format
+      std::strftime(buff, sizeof buff, "%F %T", std::localtime(&t));
 
       content[0].push_back(filename);
       content[1].push_back(std::to_string(filesize));
@@ -704,5 +704,83 @@ namespace SmartPeak
 #else
     return "Unknown";
 #endif
+  }
+
+  void Utilities::makeHumanReadable(ImEntry& directory_entry)
+  {
+    // prettify size [1]
+    std::string entry_size_string = directory_entry.entry_contents[1];
+    if (directory_entry.entry_contents[2] != "Directory" && !directory_entry.entry_contents[1].empty()
+        && entry_size_string.find("Bytes") == std::string::npos
+        && entry_size_string.find("KB") == std::string::npos
+        && entry_size_string.find("MB") == std::string::npos
+        && entry_size_string.find("GB") == std::string::npos
+        && entry_size_string.find("TB") == std::string::npos
+        )
+    {
+      double entry_size = std::stod(entry_size_string);
+      std::string size_human_readable = "";
+      std::stringstream size_human_readable_stream;
+      
+      if (entry_size >= 0 && entry_size < 1e3)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << entry_size;
+        size_human_readable = size_human_readable_stream.str() + " Bytes";
+      }
+      if (entry_size >= 1e3 && entry_size < 1e6)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e3);
+        size_human_readable = size_human_readable_stream.str() + " KB";
+      }
+      else if (entry_size >= 1e6 && entry_size < 1e9)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e6);
+        size_human_readable = size_human_readable_stream.str() + " MB";
+      }
+      else if (entry_size >= 1e9 && entry_size < 1e12)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e9);
+        size_human_readable = size_human_readable_stream.str() + " GB";
+      }
+      else if (entry_size >= 1e12 && entry_size < 1e18)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e12);
+        size_human_readable = size_human_readable_stream.str() + " TB";
+      }
+    
+      directory_entry.entry_contents[1] = size_human_readable;
+    }
+    
+    // prettify extension [2]
+    std::string* extension = &directory_entry.entry_contents[2];
+    extension->erase(std::remove_if(extension->begin(), extension->end(),
+                                   [](unsigned char c){ return std::ispunct(c); }), extension->end());
+    
+    // prettify date [3]
+    time_t current_time;
+    struct tm * current_time_tm;
+    char date_time_buffer [80];
+    struct tm entry_date_tm;
+
+    time (&current_time);
+    current_time_tm = localtime (&current_time);
+    
+    std::string date = directory_entry.entry_contents[3];
+    current_time = (std::time_t)std::atoll(date.c_str());
+    strptime(date.c_str(), "%F %T", &entry_date_tm);
+    time_t entry_date_time = mktime(&entry_date_tm);
+    
+    if (entry_date_tm.tm_mday == current_time_tm->tm_mday
+        && entry_date_tm.tm_mon == current_time_tm->tm_mon
+        && entry_date_tm.tm_year == current_time_tm->tm_year)
+    {
+      std::strftime(date_time_buffer, sizeof date_time_buffer, "%R", std::localtime(&entry_date_time));
+      directory_entry.entry_contents[3] = "Today at " + std::string(date_time_buffer);
+    }
+    else
+    {
+      std::strftime(date_time_buffer, sizeof date_time_buffer, "%c", std::localtime(&entry_date_time));
+      directory_entry.entry_contents[3] = date_time_buffer;
+    }
   }
 }
