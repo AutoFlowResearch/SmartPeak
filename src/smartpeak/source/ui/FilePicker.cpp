@@ -18,7 +18,7 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Ahmed Khalil, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/core/ApplicationProcessor.h>
@@ -31,6 +31,25 @@
 
 namespace SmartPeak
 {
+  void FilePicker::updateContents(std::vector<ImEntry>& Im_directory_entries)
+  {
+    if (!files_scanned_)
+    {
+      pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+      Im_directory_entries.resize(pathname_content_[0].size(), ImEntry());
+      for (int row = 0; row < pathname_content_[0].size(); row++)
+      {
+        Im_directory_entries[row].entry_contents.resize(4, "");
+        Im_directory_entries[row].ID = row;
+        for (int col = 0; col < 4; col++)
+        {
+          Im_directory_entries[row].entry_contents[col] = pathname_content_[col][row].c_str();
+        }
+      }
+      files_scanned_ = true;
+    }
+  }
+
   void FilePicker::draw()
   {
     if (!ImGui::BeginPopupModal("Pick a pathname", NULL, ImGuiWindowFlags_NoResize)) {
@@ -47,6 +66,7 @@ namespace SmartPeak
         current_pathname_ = parent;
       }
       pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+      files_scanned_ = false;
       memset(selected_filename, 0, sizeof selected_filename);
       selected_entry = -1;
     }
@@ -68,6 +88,7 @@ namespace SmartPeak
         current_pathname_.assign(new_pathname);
         pathname_content_ = Utilities::getPathnameContent(current_pathname_);
         memset(selected_filename, 0, sizeof selected_filename);
+        files_scanned_ = false;
         selected_entry = -1;
         ImGui::CloseCurrentPopup();
       }
@@ -87,27 +108,45 @@ namespace SmartPeak
     static const char* extensions[] = { "All", "csv", "featureXML", "mzML" };
     ImGui::Combo("File type", &selected_extension, extensions, IM_ARRAYSIZE(extensions));
 
-    // Folder content / Navigation
     ImGui::BeginChild("Content", ImVec2(1024, 400));
     
     const int column_count = 4;
-    const char* column_names[column_count] = { "Name", "Size", "Type", "Date Modified" };
+    const char* column_names[column_count] = { "Name", "Size [bytes]", "Type", "Date Modified" };
     static ImGuiTableColumnFlags column_flags[column_count] = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide
     };
     
     static ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
         ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti | ImGuiTableFlags_NoBordersInBody;
     
+    static std::vector<ImEntry> Im_directory_entries;
+    static ImVector<int> selection;
+    updateContents(Im_directory_entries);
+    
     ImVec2 size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 2);
-    if (ImGui::BeginTable("Content", column_count, table_flags, size))
+    if (ImGui::BeginTable("FileBrowser", column_count, table_flags, size))
     {
       for (int column = 0; column < column_count; column++){
-        ImGui::TableSetupColumn(column_names[column], column_flags[column]);
+        ImGui::TableSetupColumn(column_names[column], column_flags[column], -1.0f);
       }
       ImGui::TableSetupScrollFreeze(column_count, 1);
       ImGui::TableHeadersRow();
+      
+      if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
+      {
+        if (sorts_specs->SpecsDirty)
+        {
+          ImEntry::s_current_sort_specs = sorts_specs;
+          if (Im_directory_entries.size() > 1)
+              qsort(&Im_directory_entries[0], (size_t)Im_directory_entries.size(), sizeof(Im_directory_entries[0]), ImEntry::CompareWithSortSpecs);
+          ImEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+          memset(selected_filename, 0, sizeof selected_filename);
+          selected_entry = -1;
+        }
+      }
 
       const ImGuiWindowFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick;
+      
       for (int row = 0; row < pathname_content_[0].size(); row++)
       {
         if (!filter.PassFilter(pathname_content_[0][row].c_str()))
@@ -123,27 +162,30 @@ namespace SmartPeak
         ImGui::TableNextRow();
         for (int column = 0; column < column_count; column++)
         {
-          char buf[256];
-          sprintf(buf, "%s", pathname_content_[column][row].c_str());
+          ImEntry* item = &Im_directory_entries[row];
+          char text_buffer[256];
+          sprintf(text_buffer, "%s", item->entry_contents[column].c_str());
+          
           const bool is_selected = (selected_entry == row);
           ImGui::TableSetColumnIndex(column);
-          if(ImGui::Selectable(buf, is_selected, selectable_flags))
+          if(ImGui::Selectable(text_buffer, is_selected, selectable_flags))
           {
             selected_entry = row;
-            std::strcpy(selected_filename, pathname_content_[0][selected_entry].c_str());
-            if (ImGui::IsMouseDoubleClicked(0) && pathname_content_[2][selected_entry] == "Directory") // TODO: error prone to rely on strings
+            std::strcpy(selected_filename, Im_directory_entries[selected_entry].entry_contents[0].c_str());
+            if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item->entry_contents[2].c_str() , "Directory") )
             {
-              if (current_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
+              if (current_pathname_.back() != '/')
               {
                 current_pathname_.append("/");
               }
-              current_pathname_.append(pathname_content_[0][selected_entry]);
+              
+              current_pathname_.append(item->entry_contents[0].c_str());
               memset(selected_filename, 0, sizeof selected_filename);
-              pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+              files_scanned_ = false;
+              updateContents(Im_directory_entries);
               filter.Clear();
               selected_entry = -1;
-//              selected_filename[0] = '\0';
-              break; // IMPORTANT: because the following lines in the loop assume accessing old/previous pathname_content_'s data
+              break;
             }
             else if (ImGui::IsMouseDoubleClicked(0))
             {
@@ -154,13 +196,13 @@ namespace SmartPeak
                 {
                   picked_pathname_.append("/");
                 }
-                picked_pathname_.append(pathname_content_[0][selected_entry]);
+                picked_pathname_.append(item->entry_contents[0].c_str());
               }
               filter.Clear();
               selected_entry = -1;
               runProcessor();
               clearProcessor();
-              LOGI << "Picked pathname: " << picked_pathname_;
+              LOGI << "Picked file : " << picked_pathname_;
               ImGui::CloseCurrentPopup();
             }
           }
@@ -169,11 +211,13 @@ namespace SmartPeak
       ImGui::EndTable();
     }
     ImGui::EndChild();
-
     ImGui::Separator();
 
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
-    ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    if (ImGui::IsMouseClicked(0))
+      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    else
+      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
@@ -181,11 +225,14 @@ namespace SmartPeak
     if (ImGui::Button("Open"))
     {
       picked_pathname_ = current_pathname_;
-      if (picked_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
+      if (selected_entry >= 0)
       {
-        picked_pathname_.append("/");
+        if (picked_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
+        {
+          picked_pathname_.append("/");
+        }
+        picked_pathname_.append(selected_filename);
       }
-      picked_pathname_.append(selected_filename);
       LOGI << "Picked pathname: " << picked_pathname_;
       runProcessor();
       clearProcessor();

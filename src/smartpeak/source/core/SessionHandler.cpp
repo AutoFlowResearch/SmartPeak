@@ -519,7 +519,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentGroupFiltersTable(const SequenceHandler & sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureFilter().component_group_qcs.size() > 0) {
       // Make the comp_group_filters table headers
       if (comp_group_filters_table_headers.size() <= 0) {
         LOGD << "Making comp_group_filters_table_headers";
@@ -603,7 +603,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentQCsTable(const SequenceHandler & sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureQC().component_qcs.size() > 0) {
       // Make the comp_qcs table headers
       if (comp_qcs_table_headers.size() <= 0) {
         LOGD << "Making comp_qcs_table_headers";
@@ -652,7 +652,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentGroupQCsTable(const SequenceHandler & sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureQC().component_group_qcs.size() > 0) {
       // Make the comp_group_qcs table headers
       if (comp_group_qcs_table_headers.size() <= 0) {
         LOGD << "Making comp_group_qcs_table_headers";
@@ -736,7 +736,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentRSDFiltersTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_qcs.size() > 0) {
       // Make the comp_rsd_filters table headers
       if (comp_rsd_filters_table_headers.size() <= 0) {
         LOGD << "Making comp_rsd_filters_table_headers";
@@ -785,7 +785,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentGroupRSDFiltersTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_group_qcs.size() > 0) {
       // Make the comp_group_rsd_filters table headers
       if (comp_group_rsd_filters_table_headers.size() <= 0) {
         LOGD << "Making comp_group_rsd_filters_table_headers";
@@ -869,7 +869,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentRSDQCsTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_qcs.size() > 0) {
       // Make the comp_rsd_qcs table headers
       if (comp_rsd_qcs_table_headers.size() <= 0) {
         LOGD << "Making comp_rsd_qcs_table_headers";
@@ -918,7 +918,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentGroupRSDQCsTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_group_qcs.size() > 0) {
       // Make the comp_group_rsd_qcs table headers
       if (comp_group_rsd_qcs_table_headers.size() <= 0) {
         LOGD << "Making comp_group_rsd_qcs_table_headers";
@@ -1002,7 +1002,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentBackgroundFiltersTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_qcs.size() > 0) {
       // Make the comp_background_filters table headers
       if (comp_background_filters_table_headers.size() <= 0) {
         LOGD << "Making comp_background_filters_table_headers";
@@ -1051,7 +1051,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentGroupBackgroundFiltersTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_group_qcs.size() > 0) {
       // Make the comp_group_background_filters table headers
       if (comp_group_background_filters_table_headers.size() <= 0) {
         LOGD << "Making comp_group_background_filters_table_headers";
@@ -1135,7 +1135,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentBackgroundQCsTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.size() > 0) {
       // Make the comp_background_qcs table headers
       if (comp_background_qcs_table_headers.size() <= 0) {
         LOGD << "Making comp_background_qcs_table_headers";
@@ -1184,7 +1184,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentGroupBackgroundQCsTable(const SequenceHandler& sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.size() > 0) {
       // Make the comp_group_background_qcs table headers
       if (comp_group_background_qcs_table_headers.size() <= 0) {
         LOGD << "Making comp_group_background_qcs_table_headers";

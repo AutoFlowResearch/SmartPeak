@@ -17,18 +17,21 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
 #pragma once
-
-#include <SmartPeak/core/ApplicationProcessor.h>
-#include <SmartPeak/core/Utilities.h>
-#include <SmartPeak/ui/Widget.h>
+#include <algorithm>
 #include <array>
 #include <string>
 #include <vector>
+#include <atomic>
+#include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ImEntry.h>
+
 // #include <boost/filesystem.hpp>
 
 // namespace fs = boost::filesystem;
@@ -45,6 +48,8 @@ namespace SmartPeak
     bool loading_is_done_ = true;
     bool file_was_loaded_ = true;
     bool error_loading_file_ = false;
+    std::atomic_bool files_scanned_ {false};
+    const ImGuiTableSortSpecs* s_current_sort_specs = NULL;
 
     void run_and_join(
       FilePickerProcessor* processor,
@@ -52,12 +57,13 @@ namespace SmartPeak
       bool& loading_is_done,
       bool& file_was_loaded
     );
+    
+    ///!  rescan pathname_content_ into content_items when needed
+    void updateContents(std::vector<ImEntry>& content_items);
 
   public:
     FilePicker()
     {
-      // current_pathname_ = fs::current_path().root_path().string();
-      pathname_content_ = Utilities::getPathnameContent(current_pathname_);
     }
 
     void draw() override;

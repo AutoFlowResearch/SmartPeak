@@ -13,6 +13,7 @@ set(sources_list_h
 	Report.h
 	SpectraPlotWidget.h
 	Widget.h
+  ImEntry.h
 	WindowSizesAndPositions.h
 	Workflow.h
 	WorkflowStepWidget.h

@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil, Bertrand Boudaud $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
@@ -26,8 +26,10 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <functional>
 #include <imgui.h>
 #include <SmartPeak/core/SessionHandler.h>
+#include <SmartPeak/ui/ImEntry.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 /**
@@ -40,7 +42,6 @@ namespace SmartPeak
     @brief Abstract base class for all panes, windows, and widgets
 
     TODO: potential refactors
-    - Add unit tests for `makeCheckedRows`
   */
   class Widget
   {
@@ -55,53 +56,8 @@ namespace SmartPeak
       NOTE: free to override in inherited implmementations
     */
     virtual void draw() = 0;
-
-    /**
-      Method to make a filter and search popup
-
-      @param[in] popup_id Sequence handler
-      @param[in] filter Text filters
-      @param[in] colum Column of text items to filter
-      @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
-      @param[in] values_indices Map containing unique row entries and their duplicate indices
-    */
-    static void FilterPopup(const char* popuop_id, ImGuiTextFilter& filter, const Eigen::Tensor<std::string,1>& column, bool* checked,
-      const std::vector<std::pair<std::string, std::vector<size_t>>>& values_indices);
-
-    /**
-      Method to make a sort button
-
-      @param[in] button_id button ID
-      @param[in] headers Table headers
-      @param[in, out] columns Table columns
-      @param[in, out] checked Vector of boolean values indicating if the column is filtered or not
-      @param[in, out] columns_indices A vector of maps containing unique row entries and their duplicate indices
-      @param[in] sort_asc Whether to sort in ascending order or descending order
-    */
-    static void SortButton(const char* button_id, const Eigen::Tensor<std::string,1>& headers, 
-      Eigen::Tensor<std::string,2>& columns,
-      const int n_col,
-      bool* checked,
-      std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
-      bool sort_asc = true);
-
-    /**
-      Helper method to make the filters and value_indices needed for `FilterPopup`
-
-      @param[in] headers Table headers
-      @param[in] columns Table columns
-      @param[out] columns_indices A vector of maps containing unique row entries and their duplicate indices
-      @param[out] filter Vector of ImGuiTextFilters
-    */
-    static void makeFilters(const Eigen::Tensor<std::string,1>& headers,
-      const Eigen::Tensor<std::string,2>& columns, 
-      std::vector<std::vector<std::pair<std::string, std::vector<size_t>>>>& columns_indices,
-      std::vector<ImGuiTextFilter>& filter);
   };
 
-  /**
-    @brief Base class for all text output boxes
-  */
   class GenericTextWidget : public Widget
   {
   public:
@@ -120,8 +76,8 @@ namespace SmartPeak
   class GenericTableWidget : public Widget
   {
   public:
-    GenericTableWidget(const Eigen::Tensor<std::string, 1>&headers, const Eigen::Tensor<std::string, 2>&columns, const Eigen::Tensor<bool, 1>&checked_rows, const std::string&table_id)
-      : headers_(headers), columns_(columns), checked_rows_(checked_rows), table_id_(table_id) {};
+    GenericTableWidget(const std::string& table_id)
+      : table_id_(table_id) {};
     /*
     @brief Show the table
 
@@ -130,11 +86,49 @@ namespace SmartPeak
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
-    const Eigen::Tensor<std::string,1>& headers_; // keep these `const` and references so that the data is not copied on each call!
-    const Eigen::Tensor<std::string,2>& columns_;
-    const Eigen::Tensor<bool, 1>& checked_rows_;
-    const std::string table_id_; // keep this `const` and non-reference so that the table is not built de-novo on each call!
+
+    /*
+    @brief Search across table entries
+
+    @param[in] Im_table_entries vector of ImTableEntry
+    @param[in] selected_entry Index of the column to search in starting from 1 as 0 is reserved for `All`
+    @param[in] filter Filter of type `ImGuiTextFilter`
+    @param[in] row Current row index
+    @param[out] returns true if entry is found (to be used in conjuction with continue)
+    */
+    bool searcher(const std::vector<ImEntry>& Im_table_entries, const int& selected_entry,
+      const ImGuiTextFilter& filter, const size_t row) const;
+
+    /*
+    @brief Update table contents with text table entries and checkboxes
+
+    @param[in,out] Im_table_entries vector of ImTableEntry
+    @param[in] is_scanned true if `columns_` and `checkbox_columns_` are in sync with `Im_table_entries`
+    @param[in] columns columns' entries
+    @param[in] checkbox_columns checkboxes' entries
+    */
+    void updateTableContents(std::vector<ImEntry>& Im_table_entries, bool& is_scanned,
+      const Eigen::Tensor<std::string, 2>& columns, const Eigen::Tensor<bool, 2>& checkbox_columns);
+
+    /*
+    @brief Perform sorting on a given `vector` of `ImTableEntry` elements
+
+    @param[in,out] Im_table_entries vector of ImTableEntry
+    @param[in] sorts_specs with sort specs of current table
+    @param[in] is_scanned true if `columns_` and `checkbox_columns_` are in sync with `Im_table_entries`
+    */
+    void sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs, const bool& is_scanned);
+
+    Eigen::Tensor<std::string, 1> headers_;
+    Eigen::Tensor<std::string, 2> columns_;
+    Eigen::Tensor<bool, 1> checked_rows_;
+    const std::string table_id_;
+    std::vector<ImEntry> table_entries_;
+    bool table_scanned_;
+    int selected_col = 0;
+    std::vector<const char*> cols;
   };
+
 
   /**
     @brief Base class for all tables
@@ -144,11 +138,11 @@ namespace SmartPeak
     - searching
     - color coding of rows by status
   */
-  class ExplorerWidget : public GenericTableWidget
+  class ExplorerWidget final : public GenericTableWidget
   {
   public:
-    ExplorerWidget(const Eigen::Tensor<std::string, 1>&headers, const Eigen::Tensor<std::string, 2>&columns, const Eigen::Tensor<bool, 1>&checked_rows, const std::string&table_id, const Eigen::Tensor<std::string, 1>&checkbox_headers, Eigen::Tensor<bool, 2>&checkbox_columns)
-      :GenericTableWidget(headers, columns, checked_rows, table_id), checkbox_headers_(checkbox_headers), checkbox_columns_(checkbox_columns) {};
+    ExplorerWidget(const std::string& table_id)
+      :GenericTableWidget(table_id) {};
     /*
     @brief Show the explorer
 
@@ -157,8 +151,8 @@ namespace SmartPeak
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
-    const Eigen::Tensor<std::string, 1>& checkbox_headers_;
-    Eigen::Tensor<bool,2>& checkbox_columns_;
+    Eigen::Tensor<std::string, 1> checkbox_headers_;
+    Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;
   };
 
   /**

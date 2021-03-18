@@ -34,6 +34,7 @@ set(algorithm_executables_list
 set(ui_executables_list
 	GuiAppender_test
 	WindowSizesAndPositions_test
+  Widget_test
 )
 
 ### collect test executables
