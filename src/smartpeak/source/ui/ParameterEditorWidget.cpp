@@ -54,11 +54,7 @@ namespace SmartPeak
       {
         if (ImGui::Selectable(valid_string.c_str()))
         {
-          std::fill(input_text_field_.begin(), input_text_field_.end(), 0);
-          if (valid_string.size() < input_text_field_.size())
-          {
-            std::copy(valid_string.begin(), valid_string.end(), input_text_field_.data());
-          } // else we are in trouble, abnormal long value parameter, do not display.
+          setInputTextField(valid_string);
         }
       }
       ImGui::EndCombo();
@@ -91,21 +87,29 @@ namespace SmartPeak
     bool valid = parameter_.isValid(validity_test_cast);
 
     if (!valid) ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-    if (ImGui::Button("Set") && valid)
+    if (ImGui::Button("Set"))
     {
-      ParameterSet& user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
-      Parameter* existing_parameter = user_parameters.findParameter(function_parameter_, parameter_.getName());
-      if (existing_parameter)
+      if (valid)
       {
-        existing_parameter->setValueFromString(std::string(input_text_field_.data()), false);
+        ParameterSet& user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+        Parameter* existing_parameter = user_parameters.findParameter(function_parameter_, parameter_.getName());
+        if (existing_parameter)
+        {
+          existing_parameter->setValueFromString(std::string(input_text_field_.data()), false);
+        }
+        else
+        {
+          parameter_.setValueFromString(std::string(input_text_field_.data()), false);
+          user_parameters.addParameter(function_parameter_, parameter_);
+        }
+        application_handler_.sequenceHandler_.notifyParametersChanged();
+        ImGui::CloseCurrentPopup();
       }
       else
       {
-        parameter_.setValueFromString(std::string(input_text_field_.data()), false);
-        user_parameters.addParameter(function_parameter_, parameter_);
+        LOGE << "ParameterEditorWidget : Parameter value for " << parameter_.getName() << ", " << input_text_field_.data();
+        LOGE << "is invalid. Check constraints and type. Expected " << parameter_.getType() << " " << parameter_.getRestrictionsAsString();
       }
-      application_handler_.sequenceHandler_.notifyParametersChanged();
-      ImGui::CloseCurrentPopup();
     }
     if (!valid) ImGui::PopStyleVar();
 
@@ -137,12 +141,7 @@ namespace SmartPeak
     default_value_stream << "Default value: " << default_value;
     default_value_ = default_value_stream.str();
     parameter_ = parameter;
-    std::string value = parameter.getValueAsString();
-    std::fill(input_text_field_.begin(), input_text_field_.end(), 0);
-    if (value.size() < input_text_field_.size())
-    {
-      std::copy(value.begin(), value.end(), input_text_field_.data());
-    } // else we are in trouble, abnormal long value parameter, do not display.
+    setInputTextField(parameter.getValueAsString());
     if (parameter_.getType() == "bool")
     {
       valid_string_ = {
@@ -162,5 +161,21 @@ namespace SmartPeak
     title_stream << parameter_.getName() << " (" << parameter.getType() << ")";
     title_ = title_stream.str();
   };
+
+  void ParameterEditorWidget::setInputTextField(const std::string& value)
+  {
+    std::fill(input_text_field_.begin(), input_text_field_.end(), 0);
+    if (value.size() < input_text_field_.size())
+    {
+      std::copy(value.begin(), value.end(), input_text_field_.data());
+    }
+    else
+    {
+      // else we are in trouble, abnormal long value parameter, do not display.
+      LOGE << "ParameterEditorWidget : Parameter value for " << parameter_.getName() << " is too long to display. (" << value.size() << ")";
+      std::string long_value_placeholder("# unable to display");
+      std::copy(long_value_placeholder.begin(), long_value_placeholder.end(), input_text_field_.data());
+    };
+  }
 
 }

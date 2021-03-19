@@ -48,5 +48,7 @@ namespace SmartPeak
     std::string default_value_;
     std::array<char, 256> input_text_field_ = { 0 };
     std::vector<std::string> valid_string_;
+  private:
+    void setInputTextField(const std::string& value);
   };
 }
