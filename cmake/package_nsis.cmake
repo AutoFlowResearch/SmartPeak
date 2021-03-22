@@ -65,7 +65,7 @@ endif()
 ## Plus an additional entry in the nsis template (see CPack-NSIS docu)
 
 set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-set(CPACK_NSIS_MODIFY_PATH ON)
+set(CPACK_NSIS_MODIFY_PATH OFF)
 set(CPACK_NSIS_MUI_FINISHPAGE_RUN "SmartPeakGUI.exe")
 set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\SmartPeakGUI.exe")
 
@@ -83,8 +83,8 @@ set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/cmake/SmartPeak.ico")
 # Source: https://crascit.com/2015/08/07/cmake_cpack_nsis_shortcuts_with_parameters/
 macro(prepare_nsis_link linkName appName params)
 	#prepare start menu links
-	LIST(APPEND CPACK_NSIS_CREATE_ICONS_EXTRA "  CreateShortCut '$SMPROGRAMS\\\\${linkName}.lnk' '$INSTDIR\\\\bin\\\\${appName}.exe' '${params}'")
-	LIST(APPEND CPACK_NSIS_DELETE_ICONS_EXTRA "  Delete '$SMPROGRAMS\\\\${linkName}.lnk'")
+	LIST(APPEND CPACK_NSIS_CREATE_ICONS_EXTRA "  CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\${linkName}.lnk' '$INSTDIR\\\\bin\\\\${appName}.exe' '${params}'")
+	LIST(APPEND CPACK_NSIS_DELETE_ICONS_EXTRA "  Delete '$SMPROGRAMS\\\\$START_MENU\\\\${linkName}.lnk'")
 	#prepare desktop links
 	LIST(APPEND CPACK_NSIS_CREATE_ICONS_EXTRA  "  CreateShortCut '$DESKTOP\\\\${linkName}.lnk' '$INSTDIR\\\\bin\\\\${appName}.exe' '${params}'")
 	LIST(APPEND CPACK_NSIS_DELETE_ICONS_EXTRA  "  Delete '$DESKTOP\\\\${linkName}.lnk'")
