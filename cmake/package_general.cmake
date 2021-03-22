@@ -55,6 +55,18 @@ elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
   set(CPACK_DEBIAN_PACKAGE_SECTION      "science")
   set(CPACK_MONOLITHIC_INSTALL          ON)
 
+elseif (WIN32)
+
+  set(CPACK_GENERATOR                   "NSIS64")
+
+  ## Remove the next three lines if you use the NSIS autogeneration feature at some point!
+  ## For now it makes sure everything is merged into the usual folders bin/share/include
+  set(CPACK_MONOLITHIC_INSTALL          ON)
+  set(CPACK_COMPONENT_ALL_IN_ONE        ON)
+  set(CPACK_COMPONENTS_ALL_GROUPS_IN_ONE_PACKAGE ON)
+
+  include(cmake/package_nsis.cmake)
+
 endif()
 
 
