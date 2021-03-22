@@ -21,7 +21,7 @@
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/ui/DashboardWidget.h>
+#include <SmartPeak/ui/StatisticsWidget.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -31,8 +31,9 @@
 
 namespace SmartPeak
 {
-  void Dashboard::draw()
+  void StatisticsWidget::draw()
   {
+
     // number of items from which the basic graph 
     // will be replaced by simplified graph to support large number of data
     static const int max_samples = 50;
@@ -41,8 +42,6 @@ namespace SmartPeak
     if (!application_handler_)
       return;
 
-    std::ostringstream os;
-    
     // Number of samples
     if (refresh_needed_)
     {
@@ -51,67 +50,63 @@ namespace SmartPeak
       {
         number_of_samples_ = application_handler_->sequenceHandler_.getSequence().size();
       }
-    }
-    os << "Number of samples: " << number_of_samples_;
-    ImGui::Text(os.str().c_str());
-
-    // Chart number of features/sample
+    }    // Chart number of features/sample
     if (number_of_samples_ < max_samples)
     {
       if (refresh_needed_)
       {
         samples_chart_.clear();
         int samples_counter = 0;
+        int sample_index = 0;
         for (const auto& sequence : application_handler_->sequenceHandler_.getSequence())
         {
-          samples_chart_.label_strings_.push_back(sequence.getMetaData().getSampleName());
-          samples_chart_.positions_.push_back(static_cast<double>(samples_counter++));
-          //samples_chart_values_.push_back(sequence.getRawData().getFeatureMap().size());
-          samples_chart_.values_.push_back(sequence.getRawData().getFeatureMapHistory().size());
-          samples_chart_.total_value_ += sequence.getRawData().getFeatureMapHistory().size();
+          if ((injections_checkbox_)(sample_index, 1))
+          {
+            samples_chart_.label_strings_.push_back(sequence.getMetaData().getSampleName());
+            samples_chart_.positions_.push_back(static_cast<double>(samples_counter++));
+            samples_chart_.values_.push_back(sequence.getRawData().getFeatureMapHistory().size());
+            samples_chart_.total_value_ += sequence.getRawData().getFeatureMapHistory().size();
+          }
+          sample_index++;
         }
         for (const auto& name : samples_chart_.label_strings_)
         {
           samples_chart_.label_char_ptr_.push_back(name.c_str());
         }
       }
-      if (samples_chart_.total_value_ > 0)
-      {
-        drawChart(samples_chart_, "#Features/Sample", "Samples", "#Features");
-      }
     }
     else
     {
-      // Too much transitions to display
+      samples_chart_.clear();
+      samples_chart_.error_message_ = "Too much points to draw. Try to filter data.";
     }
+    drawChart(samples_chart_, "#Features/Sample", "Samples", "#Features");
+
+    ImGui::SameLine();
 
     // Number of transitions
-    os.str("");
-    os.clear();
     if (refresh_needed_)
     {
       number_of_transitions_ = 0;
       if (application_handler_)
       {
-        number_of_transitions_ = transitions->dimension(0);
+        number_of_transitions_ = transitions_->dimension(0);
       }
     }
-    os << "Number of transitions: " << number_of_transitions_;
-    ImGui::Text(os.str().c_str());
-
     // Chart number of features/transition
     if (number_of_transitions_ < max_transitions)
     {
       if (refresh_needed_)
       {
         std::map<std::string, int> feature_counter;
-        for (size_t row = 0; row < transitions->dimension(0); ++row)
+        for (size_t row = 0; row < transitions_->dimension(0); ++row)
         {
-          const auto& transition_name = (*transitions)(row, 1);
+          const auto& transition_name = (*transitions_)(row, 1);
           feature_counter[transition_name] = 0;
         }
         transitions_chart_.clear();
         int transitions_counter = 0;
+        int transitions_index = 0;
         for (const auto& sequence : application_handler_->sequenceHandler_.getSequence())
         {
           for (const auto& feature : sequence.getRawData().getFeatureMapHistory())
@@ -126,82 +121,41 @@ namespace SmartPeak
             }
           }
         }
-        for (size_t row = 0; row < transitions->dimension(0); ++row)
+        for (size_t row = 0; row < transitions_->dimension(0); ++row)
         {
-          const auto& transition_name = (*transitions)(row, 1);
-          transitions_chart_.label_strings_.push_back(transition_name);
-          transitions_chart_.positions_.push_back(static_cast<double>(transitions_counter++));
-          transitions_chart_.values_.push_back(feature_counter[transition_name]);
-          transitions_chart_.total_value_ += feature_counter[transition_name];
+          if ((transitions_checkbox_)(transitions_index, 0))
+          {
+            const auto& transition_name = (*transitions_)(row, 1);
+            transitions_chart_.label_strings_.push_back(transition_name);
+            transitions_chart_.positions_.push_back(static_cast<double>(transitions_counter++));
+            transitions_chart_.values_.push_back(feature_counter[transition_name]);
+            transitions_chart_.total_value_ += feature_counter[transition_name];
+          }
+          transitions_index++;
         }
         for (const auto& name : transitions_chart_.label_strings_)
         {
           transitions_chart_.label_char_ptr_.push_back(name.c_str());
         }
       }
-      if (transitions_chart_.total_value_ > 0)
-      {
-        drawChart(transitions_chart_, "#Features/Transition", "Transitions", "#Features");
-      }
     }
     else
     {
-      // Too much transitions to display
+      transitions_chart_.clear();
+      transitions_chart_.error_message_ = "Too much points to draw. Try to filter data.";
     }
+    drawChart(transitions_chart_, "#Features/Transition", "Transitions", "#Features");
 
-    ImGui::Separator();
-
-    // Numbers of chromatograms
-    os.str("");
-    os.clear();
-    int number_of_chromatograms = 0;
-    if ((application_handler_) && (application_handler_->sequenceHandler_.getSequence().size() > 0))
-    {
-      number_of_chromatograms = application_handler_->sequenceHandler_.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size();
-    }
-    os << "Number of chromatograms: " << number_of_chromatograms;
-    ImGui::Text(os.str().c_str());
-
-    // Numbers of spectrums
-    os.str("");
-    os.clear();
-    int number_of_spectrums = 0;
-    if ((application_handler_) && (application_handler_->sequenceHandler_.getSequence().size() > 0))
-    {
-      number_of_spectrums = application_handler_->sequenceHandler_.getSequence().at(0).getRawData().getExperiment().getSpectra().size();
-    }
-    os << "Number of spectrums: " << number_of_spectrums;
-    ImGui::Text(os.str().c_str());
-
-    ImGui::Separator();
-
-    if (last_run_time_ != std::chrono::steady_clock::duration::zero())
-    {
-      os.str("");
-      os.clear();
-      auto ns = last_run_time_;
-      os << "Last time workflow execution: ";
-      auto h = std::chrono::duration_cast<std::chrono::hours>(ns);
-      ns -= h;
-      auto m = std::chrono::duration_cast<std::chrono::minutes>(ns);
-      ns -= m;
-      auto s = std::chrono::duration_cast<std::chrono::seconds>(ns);
-      os << std::setfill('0') << std::setw(2) << h.count() << "h:"
-         << std::setw(2) << m.count() << "m:"
-         << std::setw(2) << s.count() << 's';
-      ImGui::Text(os.str().c_str());
-    }
-    refresh_needed_ = false;
   }
 
-  void Dashboard::setApplicationHandler(ApplicationHandler& state)
+  void StatisticsWidget::setApplicationHandler(ApplicationHandler& state)
   {
     LOGD << "Setting state: " << (&state);
     application_handler_ = &state;
     application_handler_->sequenceHandler_.addSequenceObserver(this);
   }
 
-  void Dashboard::drawChart(DashboardChartData& chart_data, const char* title, const char* x_label, const char* y_label) const
+  void StatisticsWidget::drawChart(DashboardChartData& chart_data, const char* title, const char* x_label, const char* y_label) const
   {
     
     chart_data.selected_values_.clear();
@@ -214,19 +168,29 @@ namespace SmartPeak
 
     bool is_hovered = false;
     ImPlotPoint plot_point;
-    ImPlot::SetNextPlotLimits(-0.5,
-      static_cast<double>(chart_data.values_.size() - 1) + 0.5,
-      0,
-      *std::max_element(std::begin(chart_data.values_), std::end(chart_data.values_)),
-      ImGuiCond_Always);
-    ImPlot::SetNextPlotTicksX(&chart_data.positions_.front(), chart_data.values_.size()/*, &chart_data.label_char_ptr_.front()*/);
-    if (ImPlot::BeginPlot(title, x_label, y_label, ImVec2(0, 0), ImPlotFlags_Default & ~ImPlotFlags_Legend & ~ImPlotFlags_MousePos, ImPlotAxisFlags_GridLines | ImPlotAxisFlags_TickMarks)) {
-      ImPlot::PlotBars("Unselected", &chart_data.unselected_values_.front(), chart_data.unselected_values_.size());
-      ImPlot::PlotBars("Selected", &chart_data.selected_values_.front(), chart_data.selected_values_.size());
-      is_hovered = ImPlot::IsPlotHovered();
-      if (is_hovered)
+    if (chart_data.values_.size() > 0)
+    {
+      ImPlot::SetNextPlotLimits(-0.5,
+        static_cast<double>(chart_data.values_.size() - 1) + 0.5,
+        0,
+        *std::max_element(std::begin(chart_data.values_), std::end(chart_data.values_)),
+        ImGuiCond_Always);
+      ImPlot::SetNextPlotTicksX(&chart_data.positions_.front(), chart_data.values_.size());
+    }
+    if (ImPlot::BeginPlot(title, x_label, y_label, ImVec2((width_/2.0f) - 10, height_ - 40), ImPlotFlags_Default & ~ImPlotFlags_Legend & ~ImPlotFlags_MousePos, ImPlotAxisFlags_GridLines | ImPlotAxisFlags_TickMarks)) {
+      if (chart_data.values_.size() > 0)
       {
-        plot_point = ImPlot::GetPlotMousePos();
+        ImPlot::PlotBars("Unselected", &chart_data.unselected_values_.front(), chart_data.unselected_values_.size());
+        ImPlot::PlotBars("Selected", &chart_data.selected_values_.front(), chart_data.selected_values_.size());
+        is_hovered = ImPlot::IsPlotHovered();
+        if (is_hovered)
+        {
+          plot_point = ImPlot::GetPlotMousePos();
+        }
+      }
+      if (!chart_data.error_message_.empty())
+      {
+        ImPlot::PlotText(chart_data.error_message_.c_str(), 0.0f, 0.0f, false, { 5, -20 });
       }
       ImPlot::EndPlot();
     }
@@ -238,6 +202,9 @@ namespace SmartPeak
         chart_data.selected_value_name = chart_data.label_strings_.at(index_item);
         ImGui::BeginTooltip();
         ImGui::Text(chart_data.selected_value_name.c_str());
+        std::ostringstream os;
+        os << chart_data.values_[index_item] << " Features";
+        ImGui::Text(os.str().c_str());
         ImGui::EndTooltip();
         chart_data.selected_value_index = index_item;
       }
@@ -248,7 +215,7 @@ namespace SmartPeak
     }
   }
 
-  void Dashboard::sequenceUpdated()
+  void StatisticsWidget::sequenceUpdated()
   {
     refresh_needed_ = true;
   }

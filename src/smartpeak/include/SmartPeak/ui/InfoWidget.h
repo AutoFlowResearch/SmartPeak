@@ -17,8 +17,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
@@ -32,9 +32,8 @@
 
 namespace SmartPeak
 {
-  class Dashboard final : public Widget, public ISequenceObserver
+  class InfoWidget final : public Widget, public ISequenceObserver
   {
-    ApplicationHandler* application_handler_ = nullptr;
 
   public:
     /**
@@ -44,40 +43,39 @@ namespace SmartPeak
 
   public:
     void draw() override;
-
-    void setApplicationHandler(ApplicationHandler& application_handler);
-
     void setRefreshNeeded() { refresh_needed_ = true; };
 
-    const Eigen::Tensor<std::string, 2>* transitions = nullptr;
-    std::chrono::steady_clock::duration last_run_time_ = std::chrono::steady_clock::duration::zero();
+    void setApplicationHandler(ApplicationHandler& application_handler);
+    void setTransitions(const Eigen::Tensor<std::string, 2>* transitions) { transitions = transitions_; };
+
+    void setWorkflowDone(bool done) { workflow_is_done_ = done; };
+    void setFileLoadingDone(bool done, bool load_error)  { file_loading_is_done_ = done; file_load_error_ = load_error;};
+    void clearErrorMessages() { error_messages_.clear(); };
+    void addErrorMessage(const std::string& error_message) { error_messages_.push_back(error_message); };
+    void setLastRunTime(const std::chrono::steady_clock::duration& last_run_time) { last_run_time_ = last_run_time; };
+
+  private:
+    void drawWorkflowStatus();
+    void drawFileloadingStatus();
+    void drawErrorMessages();
+    void drawChromatograms();
+    void drawSpectrums();
+    void drawSamples();
+    void drawTransition();
+    void drawLastRunTime();
 
   protected:
-    struct DashboardChartData
-    {
-      std::vector<std::string> label_strings_;
-      std::vector<const char*> label_char_ptr_;
-      std::vector<double> values_;
-      std::vector<double> positions_;
-      void clear()
-      {
-        label_strings_.clear();
-        label_char_ptr_.clear();
-        values_.clear();
-        positions_.clear();
-        total_value_ = 0.0;
-      };
-      int selected_value_index = -1;
-      std::string selected_value_name;
-      std::vector<double> unselected_values_;
-      std::vector<double> selected_values_;
-      double total_value_;
-    };
-    DashboardChartData samples_chart_;
-    DashboardChartData transitions_chart_;
-    void drawChart(DashboardChartData& chart_data, const char* title, const char* x_label, const char* y_label) const;
+    ApplicationHandler* application_handler_ = nullptr;
+    const Eigen::Tensor<std::string, 2>* transitions_ = nullptr;
+    std::chrono::steady_clock::duration last_run_time_ = std::chrono::steady_clock::duration::zero();
+    int number_of_chromatograms_ = 0;
+    int number_of_spectrums_ = 0;
     int number_of_samples_ = 0;
     int number_of_transitions_ = 0;
+    bool workflow_is_done_ = true;
+    bool file_loading_is_done_ = true;
+    bool file_load_error_ = false;
     bool refresh_needed_ = true;
+    std::vector<std::string> error_messages_;
   };
 }
