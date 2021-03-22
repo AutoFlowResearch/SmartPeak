@@ -933,36 +933,39 @@ BOOST_AUTO_TEST_CASE(Parameter_getValidStrings)
   list_string->push_back("two");
   list_string->push_back("three");
   param_string.setConstraintsList(list_string);
-  std::vector<std::string> read_tags;
+  std::vector<std::string> read_strings;
   for (const auto& cast_value : param_string.getValidStrings())
   {
-    read_tags.push_back(cast_value);
+    read_strings.push_back(cast_value);
   }
   std::vector<std::string> expected{ "one", "two", "three" };
-  BOOST_CHECK_EQUAL_COLLECTIONS(read_tags.begin(), read_tags.end(), expected.begin(), expected.end());
-}
+  BOOST_CHECK_EQUAL_COLLECTIONS(read_strings.begin(), read_strings.end(), expected.begin(), expected.end());
 
-BOOST_AUTO_TEST_CASE(Parameter_setRestrictionsFromString)
-{
-  Parameter param_int("param_int", 10);
+  // tests using schema
+  Parameter param_string_schema("param_string", "four");
+  auto list_string_schema = std::make_shared<std::vector<CastValue>>();
+  list_string_schema->push_back("four");
+  list_string_schema->push_back("five");
+  list_string_schema->push_back("six");
+  param_string_schema.setConstraintsList(list_string_schema);
+  param_string_schema.setAsSchema(true);
 
-  BOOST_CHECK(param_int.isValid());
-  param_int.setRestrictionsFromString("min:0 max:50");
-  BOOST_CHECK(param_int.isValid());
-  param_int.setValueFromString("100");
-  BOOST_CHECK(!param_int.isValid());
+  read_strings.clear();
+  param_string.setSchema(param_string_schema);
+  for (const auto& cast_value : param_string.getValidStrings(false))
+  {
+    read_strings.push_back(cast_value);
+  }
+  BOOST_CHECK_EQUAL_COLLECTIONS(read_strings.begin(), read_strings.end(), expected.begin(), expected.end());
 
-  param_int.setValueFromString("10");
-  param_int.setRestrictionsFromString("min:0.0 max:50.0");
-  BOOST_CHECK(param_int.isValid());
-  param_int.setValueFromString("100");
-  BOOST_CHECK(!param_int.isValid());
-
-  Parameter param_string("param_string", "one");
-  param_string.setRestrictionsFromString("[one,two,three]");
-  BOOST_CHECK(param_string.isValid());
-  param_string.setValueFromString("four");
-  BOOST_CHECK(!param_string.isValid());
+  read_strings.clear();
+  param_string.setSchema(param_string_schema);
+  for (const auto& cast_value : param_string.getValidStrings(true))
+  {
+    read_strings.push_back(cast_value);
+  }
+  std::vector<std::string> expected_schema{ "four", "five", "six" };
+  BOOST_CHECK_EQUAL_COLLECTIONS(read_strings.begin(), read_strings.end(), expected_schema.begin(), expected_schema.end());
 }
 
 BOOST_AUTO_TEST_CASE(Parameter_name)

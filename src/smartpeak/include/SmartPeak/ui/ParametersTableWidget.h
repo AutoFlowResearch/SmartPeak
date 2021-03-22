@@ -56,6 +56,8 @@ namespace SmartPeak
      IWorkflowObserver
     */
     virtual void workflowUpdated() override;
+  private:
+    void updateParametersTable();
   protected:
     Eigen::Tensor<std::string, 1> headers_;
     Eigen::Tensor<std::string, 2> body_;
@@ -65,6 +67,9 @@ namespace SmartPeak
     ApplicationHandler& application_handler_;
     bool refresh_needed_ = true;
     ParameterEditorWidget parameter_editor_widget_;
+    ParameterSet parameters_; // Parameter to list on the table
+    bool show_default_ = true;
+    bool show_unused_ = true;
   };
 
 }

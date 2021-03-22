@@ -100,6 +100,7 @@ namespace SmartPeak
         else
         {
           parameter_.setValueFromString(std::string(input_text_field_.data()), false);
+          parameter_.setAsSchema(false);
           user_parameters.addParameter(function_parameter_, parameter_);
         }
         application_handler_.sequenceHandler_.notifyParametersChanged();
@@ -134,11 +135,11 @@ namespace SmartPeak
     ImGui::EndPopup();
   }
 
-  void ParameterEditorWidget::setParameter(const std::string& function_parameter, const Parameter& parameter, const std::string& default_value)
+  void ParameterEditorWidget::setParameter(const std::string& function_parameter, const Parameter& parameter)
   { 
     function_parameter_ = function_parameter;
     std::ostringstream default_value_stream;
-    default_value_stream << "Default value: " << default_value;
+    default_value_stream << "Default value: " << parameter.getDefaultValueAsString();
     default_value_ = default_value_stream.str();
     parameter_ = parameter;
     setInputTextField(parameter.getValueAsString());

@@ -39,7 +39,7 @@ namespace SmartPeak
     {
     };
     void draw() override;
-    void setParameter(const std::string& function_parameter, const Parameter& parameter, const std::string& default_value);
+    void setParameter(const std::string& function_parameter, const Parameter& parameter);
   protected:
     ApplicationHandler& application_handler_;
     std::string function_parameter_;
