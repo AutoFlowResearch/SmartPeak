@@ -771,9 +771,7 @@ namespace SmartPeak
     std::istringstream entry_date_ss(directory_entry.entry_contents[3]);
     entry_date_ss >> std::get_time(&entry_date_tm, "%F %T");
     
-    entry_date_tm.tm_isdst = current_time_tm->tm_isdst;
-    entry_date_tm.tm_gmtoff = current_time_tm->tm_gmtoff;
-    
+    entry_date_tm.tm_isdst = current_time_tm->tm_isdst;    
     time_t entry_date_time = std::mktime(&entry_date_tm);
         
     if (entry_date_tm.tm_mday == current_time_tm->tm_mday
