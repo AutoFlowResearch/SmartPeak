@@ -761,18 +761,20 @@ namespace SmartPeak
                                    [](unsigned char c){ return std::ispunct(c); }), extension->end());
     
     // prettify date [3]
-    time_t current_time;
-    struct tm * current_time_tm, entry_date_tm;
+    std::tm * current_time_tm, entry_date_tm;
     char date_time_buffer [80];
-
-    time (&current_time);
+    std::string date_time_buf;
+    
+    std::time_t current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     current_time_tm = std::localtime(&current_time);
     
-    std::string date = directory_entry.entry_contents[3];
+    std::istringstream entry_date_ss(directory_entry.entry_contents[3]);
+    entry_date_ss >> std::get_time(&entry_date_tm, "%F %T");
+    
     entry_date_tm.tm_isdst = current_time_tm->tm_isdst;
     entry_date_tm.tm_gmtoff = current_time_tm->tm_gmtoff;
-    strptime(date.c_str(), "%F %T", &entry_date_tm);
-    time_t entry_date_time = mktime(&entry_date_tm);
+    
+    time_t entry_date_time = std::mktime(&entry_date_tm);
         
     if (entry_date_tm.tm_mday == current_time_tm->tm_mday
         && entry_date_tm.tm_mon == current_time_tm->tm_mon
