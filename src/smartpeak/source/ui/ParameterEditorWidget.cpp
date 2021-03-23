@@ -115,7 +115,13 @@ namespace SmartPeak
     if (!valid) ImGui::PopStyleVar();
 
     ImGui::SameLine();
-    if (ImGui::Button("Unset"))
+    if (ImGui::Button("Set to defaults"))
+    {
+      setInputTextField(parameter_.getDefaultValueAsString());
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button("Remove"))
     {
       ParameterSet& user_parameters = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
       if (user_parameters.count(function_parameter_) == 1)

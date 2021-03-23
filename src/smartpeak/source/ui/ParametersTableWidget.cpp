@@ -102,6 +102,14 @@ namespace SmartPeak
     ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TabActive]);
     ImGui::Checkbox("Show unused by the workflow", &show_unused_);
     ImGui::PopStyleColor();
+    ImGui::SameLine();
+    int parameters_count = 0;
+    for (const auto& parameter_function : parameters_)
+      for (const auto& parameter : parameter_function.second)
+        parameters_count++;
+    std::ostringstream os;
+    os << " | " << parameters_count << " parameters.";
+    ImGui::Text("%s", os.str().c_str());
 
     // headers
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
