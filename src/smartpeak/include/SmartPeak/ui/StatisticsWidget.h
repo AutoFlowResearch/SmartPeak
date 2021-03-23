@@ -44,13 +44,13 @@ namespace SmartPeak
 
     void setWindowSize(float width, float height) { width_ = width; height_ = height; };
 
-    void setTransitions(const Eigen::Tensor<std::string, 2>* transitions, Eigen::Tensor<bool, 2> transitions_checkbox, Eigen::Tensor<std::string, 2> transitions_columns)
+    void setTransitions(const Eigen::Tensor<std::string, 2>* transitions, const Eigen::Tensor<bool, 2>& transitions_checkbox, const Eigen::Tensor<std::string, 2>& transitions_columns)
     { 
       transitions_ = transitions;
       transitions_checkbox_ = transitions_checkbox;
       transitions_columns_ = transitions_columns;
     };
-    void setInjections(const Eigen::Tensor<bool, 2>& injections_checkbox, Eigen::Tensor<std::string, 2>& injections_columns)
+    void setInjections(const Eigen::Tensor<bool, 2>& injections_checkbox, const Eigen::Tensor<std::string, 2>& injections_columns)
     {
       injections_checkbox_ = injections_checkbox;
       injections_columns_ = injections_columns;
