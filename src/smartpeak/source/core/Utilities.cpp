@@ -750,6 +750,10 @@ namespace SmartPeak
     
       directory_entry.entry_contents[1] = size_human_readable;
     }
+    else if (directory_entry.entry_contents[2] == "Directory")
+    {
+      directory_entry.entry_contents[1] = entry_size_string + " Item(s)";
+    }
     
     // prettify extension [2]
     std::string* extension = &directory_entry.entry_contents[2];
@@ -758,18 +762,18 @@ namespace SmartPeak
     
     // prettify date [3]
     time_t current_time;
-    struct tm * current_time_tm;
+    struct tm * current_time_tm, entry_date_tm;
     char date_time_buffer [80];
-    struct tm entry_date_tm;
 
     time (&current_time);
-    current_time_tm = localtime (&current_time);
+    current_time_tm = std::localtime(&current_time);
     
     std::string date = directory_entry.entry_contents[3];
-    current_time = (std::time_t)std::atoll(date.c_str());
+    entry_date_tm.tm_isdst = current_time_tm->tm_isdst;
+    entry_date_tm.tm_gmtoff = current_time_tm->tm_gmtoff;
     strptime(date.c_str(), "%F %T", &entry_date_tm);
     time_t entry_date_time = mktime(&entry_date_tm);
-    
+        
     if (entry_date_tm.tm_mday == current_time_tm->tm_mday
         && entry_date_tm.tm_mon == current_time_tm->tm_mon
         && entry_date_tm.tm_year == current_time_tm->tm_year)
