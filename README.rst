@@ -98,7 +98,7 @@ Example cmake command on windows assuming that all external dependency libraries
     -DIMPLOT_DIR=[home directory]/smartPeak2/build_external/Dependencies/Source/implot ^
     -DCMAKE_PREFIX_PATH="[OpenMS directory]/openms-build";"C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib/cmake";"[SDL directory]/SDL"; ..
 
-Open "SmartPeak_host" in visual studios and build the project of choice. Projects can be built using Visual Studios in the IDE by opening :code:`msbuild [build_dir]/src/SmartPeak_host` and selecting the specific target to build in the GUI or on the command line by running e.g., `msbuild [build_dir]/src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount` which will build the main SmartPeak library and then running e.g., `msbuild [build_dir]/examples/SmartPeak_class_examples_smartpeak.sln -target:GUI /verbosity:normal /maxcpucount` which will build the SmartPeak GUI.
+Open "SmartPeak_host" in visual studios and build the project of choice. Projects can be built using Visual Studios in the IDE by opening :code:`msbuild [build_dir]/src/SmartPeak_host` and selecting the specific target to build in the SmartPeakGUI or on the command line by running e.g., `msbuild [build_dir]/src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount` which will build the main SmartPeak library and then running e.g., `msbuild [build_dir]/examples/SmartPeak_class_examples_smartpeak.sln -target:SmartPeakGUI /verbosity:normal /maxcpucount` which will build the SmartPeak GUI.
 
 STEP 5: Build SmartPeak-Docs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -249,7 +249,7 @@ STEP 3: Building SmartPeak
 Building SmartPeak is done in 2 steps:
 
 - Fetching required libraries for SmartPeak (SuperBuild)
-- Building SmartPeak library, examples and GUI
+- Building SmartPeak library, examples and SmartPeak GUI
 
 This can be done using the following set of commands:
 
@@ -330,10 +330,10 @@ User can change default location and specify directory where the logs are stored
 If directory specified by the path doesn't exist, SmartPeak will create specified directories.
 
 
-Using GUI
+Using SmartPeak GUI
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- To start the GUI, from the build directory run :bash:`./bin/GUI` for Mac and Linux, or :bash:`./bin/[Debug or Release]/GUI` for Windows. Or double-click ``GUI`` executable in the file browser of your OS.
+- To start the SmartPeak GUI, from the build directory run :bash:`./bin/SmartPeakGUI` for Mac and Linux, or :bash:`./bin/[Debug or Release]/SmartPeakGUI` for Windows. Or double-click ``SmartPeakGUI`` executable in the file browser of your OS.
 - Start the session with ``File | Load session from sequence``
 - Choose the corresponding directory with ``Change dir``. The path to example folder can be shortened to f.e. ``/data/GCMS_SIM_Unknowns`` 
 - Select the sequence file

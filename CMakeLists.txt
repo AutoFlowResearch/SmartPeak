@@ -17,7 +17,7 @@ option (USE_SUPERBUILD "Whether or not a superbuild should be invoked" ON)
 if (USE_SUPERBUILD)
   project ("SuperBuild" NONE)
   include(external/plog.cmake)
-  #include(external/imgui.cmake)
+  include(external/imgui.cmake)
   include(external/implot.cmake)
   if (MSVC)
     include(external/eigen.cmake)
@@ -78,9 +78,9 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Windows")
 #------------------------------------------------------------------------------
 # SmartPeak Version Information
 #------------------------------------------------------------------------------
-set (SMARTPEAK_PACKAGE_VERSION_MAJOR 1)
-set (SMARTPEAK_PACKAGE_VERSION_MINOR 0)
-set (SMARTPEAK_PACKAGE_VERSION_PATCH 0)
+set(SMARTPEAK_PACKAGE_VERSION_MAJOR 1)
+set(SMARTPEAK_PACKAGE_VERSION_MINOR 1)
+set(SMARTPEAK_PACKAGE_VERSION_PATCH 0)
 
 #------------------------------------------------------------------------------
 # retrieve detailed informations on the working copy (git)

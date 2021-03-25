@@ -295,8 +295,11 @@ BOOST_AUTO_TEST_CASE(castValue_comparison_operator)
   CastValue c_bool_list1(bool_list1);
   std::vector<bool> bool_list2 = { false, true, false };
   CastValue c_bool_list2(bool_list2);
+  BOOST_CHECK_EQUAL(c_bool_list1 == c_bool_list2, false);
+  std::vector<bool> bool_list3 = { true, false, true };
+  CastValue c_bool_list3(bool_list3);
+  BOOST_CHECK_EQUAL(c_bool_list1 == c_bool_list3, true);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_bool_list1 == c_bool_list2, true);
   BOOST_CHECK_EQUAL(c_bool_list1 >= c_bool_list2, true);
   BOOST_CHECK_EQUAL(c_bool_list1 > c_bool_list2, true);
   BOOST_CHECK_EQUAL(c_bool_list1 <= c_bool_list2, true);
@@ -306,8 +309,11 @@ BOOST_AUTO_TEST_CASE(castValue_comparison_operator)
   CastValue c_float_list1(float_list1);
   std::vector<float> float_list2 = { 4.4f, 5.5f, 6.6f };
   CastValue c_float_list2(float_list2);
+  BOOST_CHECK_EQUAL(c_float_list1 == c_float_list2, false);
+  std::vector<float> float_list3 = { 1.1f, 2.2f, 3.3f };
+  CastValue c_float_list3(float_list3);
+  BOOST_CHECK_EQUAL(c_float_list1 == c_float_list3, true);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_float_list1 == c_float_list2, true);
   BOOST_CHECK_EQUAL(c_float_list1 >= c_float_list2, true);
   BOOST_CHECK_EQUAL(c_float_list1 > c_float_list2, true);
   BOOST_CHECK_EQUAL(c_float_list1 <= c_float_list2, true);
@@ -317,8 +323,11 @@ BOOST_AUTO_TEST_CASE(castValue_comparison_operator)
   CastValue c_int_list1(int_list1);
   std::vector<int> int_list2 = { 4, 5, 6 };
   CastValue c_int_list2(int_list2);
+  BOOST_CHECK_EQUAL(c_int_list1 == c_int_list2, false);
+  std::vector<int> int_list3 = { 1, 2, 3 };
+  CastValue c_int_list3(int_list3);
+  BOOST_CHECK_EQUAL(c_int_list1 == c_int_list3, true);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_int_list1 == c_int_list2, true);
   BOOST_CHECK_EQUAL(c_int_list1 >= c_int_list2, true);
   BOOST_CHECK_EQUAL(c_int_list1 > c_int_list2, true);
   BOOST_CHECK_EQUAL(c_int_list1 <= c_int_list2, true);
@@ -328,8 +337,11 @@ BOOST_AUTO_TEST_CASE(castValue_comparison_operator)
   CastValue c_string_list1(string_list1);
   std::vector<std::string> string_list2 = { "four", "five", "six" };
   CastValue c_string_list2(string_list2);
+  BOOST_CHECK_EQUAL(c_string_list1 == c_string_list2, false);
+  std::vector<std::string> string_list3 = { "one", "two", "three" };
+  CastValue c_string_list3(string_list3);
+  BOOST_CHECK_EQUAL(c_string_list1 == c_string_list3, true);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_string_list1 == c_string_list2, true);
   BOOST_CHECK_EQUAL(c_string_list1 >= c_string_list2, true);
   BOOST_CHECK_EQUAL(c_string_list1 > c_string_list2, true);
   BOOST_CHECK_EQUAL(c_string_list1 <= c_string_list2, true);
@@ -383,29 +395,29 @@ BOOST_AUTO_TEST_CASE(castValue_comparison_operator)
   BOOST_CHECK_EQUAL(c_bool1 <= true, true);
   BOOST_CHECK_EQUAL(c_bool1 < true, false);
 
+  BOOST_CHECK_EQUAL(c_bool_list1 == bool_list2, false);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_bool_list1 == bool_list2, true);
   BOOST_CHECK_EQUAL(c_bool_list1 >= bool_list2, true);
   BOOST_CHECK_EQUAL(c_bool_list1 > bool_list2, true);
   BOOST_CHECK_EQUAL(c_bool_list1 <= bool_list2, true);
   BOOST_CHECK_EQUAL(c_bool_list1 < bool_list2, true);
 
+  BOOST_CHECK_EQUAL(c_float_list1 == float_list2, false);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_float_list1 == float_list2, true);
   BOOST_CHECK_EQUAL(c_float_list1 >= float_list2, true);
   BOOST_CHECK_EQUAL(c_float_list1 > float_list2, true);
   BOOST_CHECK_EQUAL(c_float_list1 <= float_list2, true);
   BOOST_CHECK_EQUAL(c_float_list1 < float_list2, true);
 
+  BOOST_CHECK_EQUAL(c_int_list1 == int_list2, false);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_int_list1 == int_list2, true);
   BOOST_CHECK_EQUAL(c_int_list1 >= int_list2, true);
   BOOST_CHECK_EQUAL(c_int_list1 > int_list2, true);
   BOOST_CHECK_EQUAL(c_int_list1 <= int_list2, true);
   BOOST_CHECK_EQUAL(c_int_list1 < int_list2, true);
 
+  BOOST_CHECK_EQUAL(c_string_list1 == string_list2, false);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_string_list1 == string_list2, true);
   BOOST_CHECK_EQUAL(c_string_list1 >= string_list2, true);
   BOOST_CHECK_EQUAL(c_string_list1 > string_list2, true);
   BOOST_CHECK_EQUAL(c_string_list1 <= string_list2, true);
@@ -489,8 +501,11 @@ BOOST_AUTO_TEST_CASE(castValue_comparison_methods)
   CastValue c_bool_list1(bool_list1);
   std::vector<bool> bool_list2 = { false, true, false };
   CastValue c_bool_list2(bool_list2);
+  BOOST_CHECK_EQUAL(c_bool_list1.is_equal_to(c_bool_list2), false);
+  std::vector<bool> bool_list3 = { true, false, true };
+  CastValue c_bool_list3(bool_list3);
+  BOOST_CHECK_EQUAL(c_bool_list1.is_equal_to(c_bool_list3), true);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_bool_list1.is_equal_to(c_bool_list2), true);
   BOOST_CHECK_EQUAL(c_bool_list1.is_greater_than(c_bool_list2), true);
   BOOST_CHECK_EQUAL(c_bool_list1.is_less_than(c_bool_list2), true);
 
@@ -498,8 +513,11 @@ BOOST_AUTO_TEST_CASE(castValue_comparison_methods)
   CastValue c_float_list1(float_list1);
   std::vector<float> float_list2 = { 4.4f, 5.5f, 6.6f };
   CastValue c_float_list2(float_list2);
+  BOOST_CHECK_EQUAL(c_float_list1.is_equal_to(c_float_list2), false);
+  std::vector<float> float_list3 = { 1.1f, 2.2f, 3.3f };
+  CastValue c_float_list3(float_list3);
+  BOOST_CHECK_EQUAL(c_float_list1.is_equal_to(c_float_list3), true);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_float_list1.is_equal_to(c_float_list2), true);
   BOOST_CHECK_EQUAL(c_float_list1.is_greater_than(c_float_list2), true);
   BOOST_CHECK_EQUAL(c_float_list1.is_less_than(c_float_list2), true);
 
@@ -507,8 +525,11 @@ BOOST_AUTO_TEST_CASE(castValue_comparison_methods)
   CastValue c_int_list1(int_list1);
   std::vector<int> int_list2 = { 4, 5, 6 };
   CastValue c_int_list2(int_list2);
+  BOOST_CHECK_EQUAL(c_int_list1.is_equal_to(c_int_list2), false);
+  std::vector<int> int_list3 = { 1, 2, 3 };
+  CastValue c_int_list3(int_list3);
+  BOOST_CHECK_EQUAL(c_int_list1.is_equal_to(c_int_list3), true);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_int_list1.is_equal_to(c_int_list2), true);
   BOOST_CHECK_EQUAL(c_int_list1.is_greater_than(c_int_list2), true);
   BOOST_CHECK_EQUAL(c_int_list1.is_less_than(c_int_list2), true);
 
@@ -516,8 +537,15 @@ BOOST_AUTO_TEST_CASE(castValue_comparison_methods)
   CastValue c_string_list1(string_list1);
   std::vector<std::string> string_list2 = { "four", "five", "six" };
   CastValue c_string_list2(string_list2);
+  BOOST_CHECK_EQUAL(c_string_list1.is_equal_to(c_string_list2), false);
+  std::vector<std::string> string_list3 = { "one", "two", "three" };
+  CastValue c_string_list3(string_list3);
+  BOOST_CHECK_EQUAL(c_string_list1.is_equal_to(c_string_list3), true);
+  std::vector<std::string> string_list4 = { "One", "tWo", "THREE" };
+  CastValue c_string_list4(string_list4);
+  BOOST_CHECK_EQUAL(c_string_list1.is_equal_to(c_string_list4, true), false);
+  BOOST_CHECK_EQUAL(c_string_list1.is_equal_to(c_string_list4, false), true);
   // not supported always return true
-  BOOST_CHECK_EQUAL(c_string_list1.is_equal_to(c_string_list2), true);
   BOOST_CHECK_EQUAL(c_string_list1.is_greater_than(c_string_list2), true);
   BOOST_CHECK_EQUAL(c_string_list1.is_less_than(c_string_list2), true);
 

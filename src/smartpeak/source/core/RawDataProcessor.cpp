@@ -67,13 +67,18 @@
 #include <OpenMS/FILTERING/NOISEESTIMATION/SignalToNoiseEstimatorMedianRapid.h> // PickMS1Features
 #include <OpenMS/ANALYSIS/ID/AccurateMassSearchEngine.h>
 
+// PickMS2Features
+#include <OpenMS/FILTERING/DATAREDUCTION/MassTraceDetection.h>
+#include <OpenMS/FILTERING/DATAREDUCTION/ElutionPeakDetection.h>
+#include <OpenMS/FILTERING/DATAREDUCTION/FeatureFindingMetabo.h>
+
 #include <algorithm>
 #include <exception>
 
 namespace SmartPeak
 {
 
-  ParameterSet RawDataProcessor::getParameterSchema() const
+  ParameterSet LoadRawData::getParameterSchema() const
   {
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
     {"mzML", {
@@ -90,7 +95,40 @@ namespace SmartPeak
         {"value", "false"},
         {"description", "Zeros the baseline of the chromatogram by adjusting all points so that the minimum point is 0."},
       },
-    }} });
+    }},
+    {"ChromatogramExtractor", {
+      {
+        {"name", "extract_window"},
+        {"type", "float"},
+        {"value", "0.5"},
+        {"description", "Extract window."},
+      },
+      {
+        {"name", "ppm"},
+        {"type", "bool"},
+        {"value", "false"},
+        {"description", "ppm"},
+      },
+      {
+        {"name", "rt_extraction_window"},
+        {"type", "float"},
+        {"value", "-1"},
+        {"description", "rt extraction window"},
+      },
+      {
+        {"name", "filter"},
+        {"type", "string"},
+        {"value", "tophat"},
+        {"description", "Filter"},
+      },
+      {
+        {"name", "extract_precursors"},
+        {"type", "bool"},
+        {"value", "true"},
+        {"description", "Extract precursors"},
+      },
+    }},
+    });
     return ParameterSet(param_struct);
   }
 
@@ -101,6 +139,12 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START loadMSExperiment";
+
+    // Note: unlike other processors,
+    // we don't want to complete user parameters with schema
+    // as mZML parameter, if empty (not user defined), will means to use default behavior.
+    // same for ChromatogramExtractor parameter
+
     // # load chromatograms
     OpenMS::MSExperiment chromatograms;
     if (filenames.mzML_i.size()) {
@@ -433,16 +477,8 @@ namespace SmartPeak
   {
     LOGD << "START PickMRMFeatures";
 
-    if (params_I.count("MRMFeatureFinderScoring") && params_I.at("MRMFeatureFinderScoring").empty()) {
-      LOGE << "No parameters passed to PickMRMFeatures. Not picking";
-      LOGD << "END pickFeatures";
-      return;
-    }
-
     OpenMS::MRMFeatureFinderScoring featureFinder;
-    OpenMS::Param parameters = featureFinder.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFinderScoring"));
-    featureFinder.setParameters(parameters);
+    Utilities::setUserParameters(featureFinder, params_I);
 
     OpenMS::FeatureMap featureMap;
 
@@ -486,17 +522,8 @@ namespace SmartPeak
     LOGD << "START filterFeatures";
     LOGI << "Feature Filter input size: " << rawDataHandler_IO.getFeatureMap().size();
 
-    if (params_I.count("MRMFeatureFilter.filter_MRMFeatures") &&
-        params_I.at("MRMFeatureFilter.filter_MRMFeatures").empty()) {
-      LOGE << "No parameters passed to filterFeatures. Not filtering";
-      LOGD << "END filterFeatures";
-      return;
-    }
-
     OpenMS::MRMFeatureFilter featureFilter;
-    OpenMS::Param parameters = featureFilter.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeatures"));
-    featureFilter.setParameters(parameters);
+    Utilities::setUserParameters(featureFilter, params_I, "MRMFeatureFilter.filter_MRMFeatures");
 
     OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
 
@@ -527,17 +554,8 @@ namespace SmartPeak
     LOGD << "START checkFeatures";
     LOGI << "Feature Checker input size: " << rawDataHandler_IO.getFeatureMap().size();
 
-    if (params_I.count("MRMFeatureFilter.filter_MRMFeatures.qc") &&
-        params_I.at("MRMFeatureFilter.filter_MRMFeatures.qc").empty()) {
-      LOGE << "No parameters passed to checkFeatures. Not checking";
-      LOGD << "END checkFeatures";
-      return;
-    }
-
     OpenMS::MRMFeatureFilter featureFilter;
-    OpenMS::Param parameters = featureFilter.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeatures.qc"));
-    featureFilter.setParameters(parameters);
+    Utilities::setUserParameters(featureFilter, params_I, "MRMFeatureFilter.filter_MRMFeatures.qc");
 
     featureFilter.FilterFeatureMap(
       rawDataHandler_IO.getFeatureMap(),
@@ -611,6 +629,21 @@ namespace SmartPeak
     LOGD << "END selectFeatures";
   }
 
+  ParameterSet ValidateFeatures::getParameterSchema() const
+  {
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"MRMFeatureValidator.validate_MRMFeatures", {
+      {
+        {"name", "Tr_window"},
+        {"type", "float"},
+        {"value", "1"},
+        {"description", "retention time difference threshold"},
+      },
+    }},
+    });
+    return ParameterSet(param_struct);
+  }
+
   void ValidateFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
@@ -619,12 +652,9 @@ namespace SmartPeak
   {
     LOGD << "START validateFeatures";
 
-    if (params_I.count("MRMFeatureValidator.validate_MRMFeatures") &&
-        params_I.at("MRMFeatureValidator.validate_MRMFeatures").empty()) {
-      LOGE << "No parameters passed to validateFeatures. Not validating";
-      LOGD << "END validateFeatures";
-      return;
-    }
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
 
     OpenMS::FeatureMap mapped_features;
     std::map<std::string, float> validation_metrics; // keys: accuracy, recall, precision
@@ -635,7 +665,7 @@ namespace SmartPeak
       rawDataHandler_IO.getMetaData().getInjectionName(),
       mapped_features,
       validation_metrics,
-      std::stof(params_I.at("MRMFeatureValidator.validate_MRMFeatures").front().getValueAsString())
+      std::stof(params.at("MRMFeatureValidator.validate_MRMFeatures").front().getValueAsString())
       // TODO: While this probably works, it might be nice to add some check that the parameter passed is the desired one
     );
 
@@ -1080,6 +1110,7 @@ namespace SmartPeak
     try {
       FileReader::parseOpenMSParams(filenames.parameters_csv_i, rawDataHandler_IO.getParameters());
       sanitizeParameters(rawDataHandler_IO.getParameters());
+      if (parameters_observable_) parameters_observable_->notifyParametersChanged();
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -1097,9 +1128,12 @@ namespace SmartPeak
     // # check for workflow parameters integrity
     const std::vector<std::string> required_function_parameter_names = {
       "SequenceSegmentPlotter",
+      "ElutionPeakDetection",
       "FeaturePlotter",
+      "FeatureFindingMetabo",
       "AbsoluteQuantitation",
       "mzML",
+      "MassTraceDetection",
       "MRMMapping",
       "ChromatogramExtractor",
       "MRMFeatureFinderScoring",
@@ -1117,9 +1151,11 @@ namespace SmartPeak
       "SequenceProcessor",
       "FIAMS",
       "PickMS1Features",
+      "PickMS2Features",
       "AccurateMassSearchEngine",
       "MergeInjections"
     };
+
     for (const std::string& function_parameter_name : required_function_parameter_names) {
       if (!params_I.count(function_parameter_name)) {
         FunctionParameters function_parameter(function_parameter_name);
@@ -1160,17 +1196,9 @@ namespace SmartPeak
   {
     LOGD << "START MapChromatograms";
 
-    if (params_I.count("MRMMapping") && params_I.at("MRMMapping").empty()) {
-      LOGE << "No parameters passed to MRMMapping. No transition mapping will be done";
-      LOGD << "END MapChromatograms";
-      return;
-    }
-
     // Set up MRMMapping and parse the MRMMapping params
     OpenMS::MRMMapping mrmmapper;
-    OpenMS::Param parameters = mrmmapper.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("MRMMapping"));
-    mrmmapper.setParameters(parameters);
+    Utilities::setUserParameters(mrmmapper, params_I);
 
     mrmmapper.mapExperiment(
       rawDataHandler_IO.getExperiment(),
@@ -1250,9 +1278,13 @@ namespace SmartPeak
   {
     LOGD << "START ExtractSpectraWindows";
 
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+
     float start = 0, stop = 0;
-    if (params_I.count("FIAMS") && params_I.at("FIAMS").size()){
-      for (const auto& fia_params: params_I.at("FIAMS")){
+    if (params.count("FIAMS") && params.at("FIAMS").size()){
+      for (const auto& fia_params: params.at("FIAMS")){
         if (fia_params.getName() == "acquisition_start") {
           try {
             start = std::stof(fia_params.getValueAsString());
@@ -1308,18 +1340,7 @@ namespace SmartPeak
     LOGD << "START FitFeaturesEMG";
 
     OpenMS::EmgGradientDescent emg;
-
-    if (params_I.count("EmgGradientDescent") && params_I.at("EmgGradientDescent").size()) {
-      OpenMS::Param parameters = emg.getParameters();
-      Utilities::updateParameters(parameters, params_I.at("EmgGradientDescent"));
-      emg.setParameters(parameters);
-    }
-
-    // TODO: Remove these lines after testing/debugging is done
-    OpenMS::Param parameters = emg.getParameters();
-    parameters.setValue("print_debug", 1);
-    parameters.setValue("max_gd_iter", 10000u);
-    emg.setParameters(parameters);
+    Utilities::setUserParameters(emg, params_I);
 
     OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
 
@@ -1460,17 +1481,8 @@ namespace SmartPeak
     LOGD << "START filterFeaturesRSDs";
     LOGI << "Feature Filter input size: " << rawDataHandler_IO.getFeatureMap().size();
 
-    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesRSDs") &&
-      params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs").empty()) {
-      LOGE << "No parameters passed to filterFeatures. Not filtering";
-      LOGD << "END filterFeaturesRSDs";
-      return;
-    }
-
     OpenMS::MRMFeatureFilter featureFilter;
-    OpenMS::Param parameters = featureFilter.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs"));
-    featureFilter.setParameters(parameters);
+    Utilities::setUserParameters(featureFilter, params_I, "MRMFeatureFilter.filter_MRMFeaturesRSDs");
 
     OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
 
@@ -1501,17 +1513,8 @@ namespace SmartPeak
     LOGD << "START checkFeaturesRSDs";
     LOGI << "Feature Checker input size: " << rawDataHandler_IO.getFeatureMap().size();
 
-    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc") &&
-      params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc").empty()) {
-      LOGE << "No parameters passed to checkFeatures. Not checking";
-      LOGD << "END checkFeaturesRSDs";
-      return;
-    }
-
     OpenMS::MRMFeatureFilter featureFilter;
-    OpenMS::Param parameters = featureFilter.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesRSDs.qc"));
-    featureFilter.setParameters(parameters);
+    Utilities::setUserParameters(featureFilter, params_I, "MRMFeatureFilter.filter_MRMFeaturesRSDs.qc");
 
     featureFilter.FilterFeatureMapPercRSD(
       rawDataHandler_IO.getFeatureMap(),
@@ -1540,17 +1543,8 @@ namespace SmartPeak
     LOGD << "START filterFeaturesBackgroundInterferences";
     LOGI << "Feature Filter input size: " << rawDataHandler_IO.getFeatureMap().size();
 
-    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences") &&
-      params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences").empty()) {
-      LOGE << "No parameters passed to filterFeatures. Not filtering";
-      LOGD << "END filterFeaturesBackgroundInterferences";
-      return;
-    }
-
     OpenMS::MRMFeatureFilter featureFilter;
-    OpenMS::Param parameters = featureFilter.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences"));
-    featureFilter.setParameters(parameters);
+    Utilities::setUserParameters(featureFilter, params_I, "MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences");
 
     OpenMS::FeatureMap& featureMap = rawDataHandler_IO.getFeatureMap();
 
@@ -1581,17 +1575,8 @@ namespace SmartPeak
     LOGD << "START checkFeaturesBackgroundInterferences";
     LOGI << "Feature Checker input size: " << rawDataHandler_IO.getFeatureMap().size();
 
-    if (params_I.count("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc") &&
-      params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc").empty()) {
-      LOGE << "No parameters passed to checkFeatures. Not checking";
-      LOGD << "END checkFeaturesBackgroundInterferences";
-      return;
-    }
-
     OpenMS::MRMFeatureFilter featureFilter;
-    OpenMS::Param parameters = featureFilter.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc"));
-    featureFilter.setParameters(parameters);
+    Utilities::setUserParameters(featureFilter, params_I, "MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc");
 
     featureFilter.FilterFeatureMapBackgroundInterference(
       rawDataHandler_IO.getFeatureMap(),
@@ -1614,9 +1599,13 @@ namespace SmartPeak
   {
     LOGD << "START MergeSpectra";
 
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+
     float resolution = 0, max_mz = 0, bin_step = 0;
-    if (params_I.count("FIAMS") && params_I.at("FIAMS").size()) {
-      for (const auto& fia_params : params_I.at("FIAMS")) {
+    if (params.count("FIAMS") && params.at("FIAMS").size()) {
+      for (const auto& fia_params : params.at("FIAMS")) {
         if (fia_params.getName() == "max_mz") {
           try {
             max_mz = std::stof(fia_params.getValueAsString());
@@ -1763,17 +1752,15 @@ namespace SmartPeak
   {
     LOGD << "START PickMS1Features";
 
-    if (params_I.count("PickMS1Features") && params_I.at("PickMS1Features").empty()) {
-      LOGE << "No parameters passed to PickMS1Features. Not picking";
-      LOGD << "END PickMS1Features";
-      return;
-    }
-
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+    
     float sn_window = 0;
     bool compute_peak_shape_metrics = false;
     float min_intensity = 0;
     bool write_convex_hull = false;
-    for (const auto& pms1f_params : params_I.at("PickMS1Features")) {
+    for (const auto& pms1f_params : params.at("PickMS1Features")) {
       if (pms1f_params.getName() == "sne:window") {
         try {
           sn_window = std::stof(pms1f_params.getValueAsString());
@@ -1816,21 +1803,15 @@ namespace SmartPeak
       LOGD << "END PickMS1Features";
       return;
     }
-
+    
     OpenMS::SavitzkyGolayFilter sgfilter;
-    OpenMS::Param parameters = sgfilter.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("PickMS1Features"));
-    sgfilter.setParameters(parameters);
+    Utilities::setUserParameters(sgfilter, params_I, "PickMS1Features");
 
     OpenMS::PeakPickerHiRes picker;
-    parameters = picker.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("PickMS1Features"));
-    picker.setParameters(parameters);
+    Utilities::setUserParameters(picker, params_I, "PickMS1Features");
 
     OpenMS::PeakIntegrator pi;
-    parameters = pi.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("PickMS1Features"));
-    pi.setParameters(parameters);
+    Utilities::setUserParameters(pi, params_I, "PickMS1Features");
 
     OpenMS::FeatureMap featureMap;
     try {
@@ -1944,16 +1925,8 @@ namespace SmartPeak
     LOGD << "START SearchAccurateMass";
     LOGI << "SearchAccurateMass input size: " << rawDataHandler_IO.getFeatureMap().size();
 
-    if (params_I.count("AccurateMassSearchEngine") && params_I.at("AccurateMassSearchEngine").empty()) {
-      LOGE << "No parameters passed to AccurateMassSearchEngine. Not searching.";
-      LOGD << "END SearchAccurateMass";
-      return;
-    }
-
     OpenMS::AccurateMassSearchEngine ams;
-    OpenMS::Param parameters = ams.getParameters();
-    Utilities::updateParameters(parameters, params_I.at("AccurateMassSearchEngine"));
-    ams.setParameters(parameters);
+    Utilities::setUserParameters(ams, params_I);
 
     try {
       // Run the accurate mass search engine
@@ -2016,12 +1989,6 @@ namespace SmartPeak
   {
     LOGD << "START MergeFeatures";
     LOGI << "MergeFeatures input size: " << rawDataHandler_IO.getFeatureMap().size();
-
-    //if (params_I.count("MergeFeatures") && params_I.at("MergeFeatures").empty()) {
-    //  LOGE << "No parameters passed to MergeFeatures. Not searching.";
-    //  LOGD << "END MergeFeatures";
-    //  return;
-    //}
 
     try {
       // Pass 1: organize into a map by combining features and subordinates with the same `identifier`
@@ -2138,11 +2105,9 @@ namespace SmartPeak
   {
     LOGD << "START CalculateMDVs";
 
-    if (params_I.count("CalculateMDVs") && params_I.at("CalculateMDVs").empty()) {
-      LOGE << "No parameters passed to CalculateMDVs.";
-      LOGD << "END CalculateMDVs";
-      return;
-    }
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
 
     OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
     OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
@@ -2150,7 +2115,7 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureMap normalized_featureMap;
-      auto& CalculateMDVs_params = params_I.at("CalculateMDVs");
+      auto& CalculateMDVs_params = params.at("CalculateMDVs");
       
       std::string feature_name;
       OpenMS::IsotopeLabelingMDVs::MassIntensityType mass_intensity_type;
@@ -2207,11 +2172,9 @@ namespace SmartPeak
   {
     LOGD << "START IsotopicCorrections";
 
-    if (params_I.count("IsotopicCorrections") && params_I.at("IsotopicCorrections").empty()) {
-      LOGE << "No parameters passed to IsotopicCorrections.";
-      LOGD << "END IsotopicCorrections";
-      return;
-    }
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
 
     OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
     OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
@@ -2219,7 +2182,7 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureMap corrected_featureMap;
-      auto& IsotopicCorrections_params = params_I.at("IsotopicCorrections");
+      auto& IsotopicCorrections_params = params.at("IsotopicCorrections");
       
       OpenMS::IsotopeLabelingMDVs::DerivatizationAgent correction_matrix_agent;
       for(auto& param : IsotopicCorrections_params)
@@ -2272,11 +2235,9 @@ namespace SmartPeak
   {
     LOGD << "START calculateIsotopicPurities";
 
-    if (params_I.count("CalculateIsotopicPurities") && params_I.at("CalculateIsotopicPurities").empty()) {
-      LOGE << "No parameters passed to CalculateIsotopicPurities.";
-      LOGD << "END CalculateIsotopicPurities";
-      return;
-    }
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
 
     OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
     OpenMS::Param parameters = isotopelabelingmdvs.getParameters();
@@ -2284,7 +2245,7 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureMap normalized_featureMap;
-      auto& CalculateIsotopicPurities_params = params_I.at("CalculateIsotopicPurities");
+      auto& CalculateIsotopicPurities_params = params.at("CalculateIsotopicPurities");
       
       std::vector<std::string> isotopic_purity_names;
       std::vector<std::vector<double>> experiment_data_mat;
@@ -2363,11 +2324,9 @@ namespace SmartPeak
   {
     LOGD << "START CalculateMDVAccuracies";
 
-    if (params_I.count("CalculateMDVAccuracies") && params_I.at("CalculateMDVAccuracies").empty()) {
-      LOGE << "No parameters passed to CalculateMDVAccuracies.";
-      LOGD << "END CalculateMDVAccuracies";
-      return;
-    }
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
 
     // Set up CalculateMDVs and parse params
     OpenMS::IsotopeLabelingMDVs isotopelabelingmdvs;
@@ -2376,7 +2335,7 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureMap featureMap_with_accuracy_info;
-      auto& CalculateMDVAccuracies_params = params_I.at("CalculateMDVAccuracies");
+      auto& CalculateMDVAccuracies_params = params.at("CalculateMDVAccuracies");
       
       //std::vector<double> fragment_isotopomer_measured;
       std::string fragment_isotopomer_theoretical_formula, fragment_isotopomer_measured_s, feature_name;
@@ -2417,4 +2376,258 @@ namespace SmartPeak
 
     LOGD << "END CalculateMDVAccuracies";
   }
+
+  ParameterSet PickMS2Features::getParameterSchema() const
+  {
+    OpenMS::MassTraceDetection mass_trace_detection;
+    OpenMS::ElutionPeakDetection elution_peak_detection;
+    OpenMS::FeatureFindingMetabo feature_finding_metabo;
+    ParameterSet parameters({ mass_trace_detection, elution_peak_detection, feature_finding_metabo });
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"PickMS2Features", {
+    {
+      {"name", "enable_elution"},
+      {"type", "bool"},
+      {"value", "true"},
+      {"description", "Enable elution peak detection"},
+    },
+    {
+      {"name", "force_processing"},
+      {"type", "bool"},
+      {"value", "false"},
+      {"description", "To enforce processing of the data when Profile data is provided but spectra is not centroided"},
+    },
+    {
+      {"name", "max_traces"},
+      {"type", "int"},
+      {"value", "0"},
+      {"description", "Max traces to use for MassTraceDetection. 0 means all traces."},
+    }
+    }} });
+    ParameterSet pick_ms2_feature_params(param_struct);
+    parameters.merge(pick_ms2_feature_params);
+    return parameters;
+  }
+
+  void PickMS2Features::process(
+    RawDataHandler& rawDataHandler_IO,
+    const ParameterSet& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START PickMS2Features";
+
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+
+    //-------------------------------------------------------------
+    // set parameters
+    //-------------------------------------------------------------
+    FunctionParameters pick_ms2_feature_params = params.at("PickMS2Features");
+
+    OpenMS::MassTraceDetection mtdet;
+    Utilities::setUserParameters(mtdet, params_I);
+
+    OpenMS::ElutionPeakDetection epdet;
+    Utilities::setUserParameters(epdet, params_I);
+
+    OpenMS::FeatureFindingMetabo ffmet;
+    Utilities::setUserParameters(ffmet, params_I);
+    auto ffmet_parameters = ffmet.getParameters();
+
+    //-------------------------------------------------------------
+    // Setting input
+    //-------------------------------------------------------------
+    OpenMS::PeakMap ms_peakmap;
+    for (OpenMS::MSSpectrum& spec : rawDataHandler_IO.getExperiment().getSpectra()) {
+      // we want only MS1 specrtra
+      if (spec.getMSLevel() == 1)
+      {
+        ms_peakmap.addSpectrum(spec);
+      }
+    }
+    if (ms_peakmap.empty())
+    {
+      LOGW << "The given file does not contain any conventional peak data, but might"
+        " contain chromatograms. This tool currently cannot handle them, sorry.";
+      return;
+    }
+
+    // determine type of spectral data (profile or centroided)
+    OpenMS::SpectrumSettings::SpectrumType spectrum_type = ms_peakmap[0].getType();
+
+    if (spectrum_type == OpenMS::SpectrumSettings::PROFILE)
+    {
+      Parameter* force_processing = pick_ms2_feature_params.findParameter("force_processing");
+      if (!force_processing || force_processing->getValueAsString() == "false")
+      {
+        LOGE << "Error: Profile data provided but centroided spectra expected. To enforce processing of the data set the force_processing parameter.";
+        return;
+      }
+    }
+
+    // make sure the spectra are sorted by m/z
+    ms_peakmap.sortSpectra(true);
+
+    std::vector<OpenMS::MassTrace> m_traces;
+
+    //-------------------------------------------------------------
+    // configure and run mass trace detection
+    //-------------------------------------------------------------
+
+    int max_traces = 0;
+    Parameter* max_traces_param = pick_ms2_feature_params.findParameter("max_traces");
+    if (max_traces_param)
+    {
+      try {
+        max_traces = std::stoi(max_traces_param->getValueAsString());
+      }
+      catch (const std::exception& e)
+      {
+        LOGE << e.what();
+        // keep it to 0
+      }
+    }
+
+    mtdet.run(ms_peakmap, m_traces, max_traces);
+
+    //-------------------------------------------------------------
+    // configure and run elution peak detection
+    //-------------------------------------------------------------
+    std::vector<OpenMS::MassTrace> m_traces_final;
+    Parameter* enable_elution = pick_ms2_feature_params.findParameter("enable_elution");
+    if (enable_elution && enable_elution->getValueAsString() == "true")
+    {
+      std::vector<OpenMS::MassTrace> splitted_mtraces;
+      // fill mass traces with smoothed data as well .. bad design..
+      epdet.detectPeaks(m_traces, splitted_mtraces);
+      if (epdet.getParameters().getValue("width_filtering") == "auto")
+      {
+        m_traces_final.clear();
+        epdet.filterByPeakWidth(splitted_mtraces, m_traces_final);
+      }
+      else
+      {
+        m_traces_final = splitted_mtraces;
+      }
+    }
+    else // no elution peak detection
+    {
+      m_traces_final = m_traces;    
+      try {
+        for (auto & trace: m_traces_final) // estimate FWHM, so .getIntensity() can be called later
+        {
+          trace.estimateFWHM(false);
+        }
+      }
+      catch (const std::exception& e) {
+        LOGE << e.what();
+        return;
+      }
+      if (ffmet_parameters.getValue("use_smoothed_intensities").toBool())
+      {
+        LOGW << "Without EPD, smoothing is not supported. Setting 'use_smoothed_intensities' to false!";
+        ffmet_parameters.setValue("use_smoothed_intensities", "false");
+      }
+    }
+
+    //-------------------------------------------------------------
+    // configure and run feature finding
+    //-------------------------------------------------------------
+
+    OpenMS::FeatureMap feat_map;
+    std::vector< std::vector< OpenMS::MSChromatogram > > feat_chromatograms;
+    ffmet.run(m_traces_final, feat_map, feat_chromatograms);
+
+    size_t trace_count(0);
+    for (const auto& feat : feat_map)
+    {
+      if (!feat.metaValueExists("num_of_masstraces"))
+      {
+        LOGE << "MetaValue 'num_of_masstraces' missing from FFMetabo output!";
+        return;
+      }
+      trace_count += (size_t)feat.getMetaValue("num_of_masstraces");
+    }
+    if (trace_count != m_traces_final.size())
+    {
+      if (!ffmet_parameters.getValue("remove_single_traces").toBool())
+      {
+        LOGE << "FF-Metabo: Internal error. Not all mass traces have been assembled to features! Aborting.";
+        return;
+      }
+      else
+      {
+        LOGI << "FF-Metabo: " << (m_traces_final.size() - trace_count) << " unassembled traces have been removed.";
+      }
+    }
+
+    LOGI << "-- FF-Metabo stats --\n"
+      << "Input traces:    " << m_traces_final.size() << "\n"
+      << "Output features: " << feat_map.size() << " (total trace count: " << trace_count << ")";
+
+    // merge chromatograms: convert vector of vector of chromatograms to vector of chromatograms;
+    std::vector<OpenMS::Chromatogram> merged_chromatograms;
+    for (auto& chromatogram_list : feat_chromatograms)
+    {
+      OpenMS::Chromatogram c = chromatogram_list[0];
+      for (auto chromatogram_it = chromatogram_list.begin() + 1; chromatogram_it != chromatogram_list.end(); ++chromatogram_it)
+      {
+        for (OpenMS::ChromatogramPeak& peak : (*chromatogram_it))
+        {
+          c.push_back(peak);
+        }
+      }
+      merged_chromatograms.push_back(c);
+    }
+
+    // filter features with zero intensity (this can happen if the FWHM is zero (bc of overly skewed shape) and no peaks end up being summed up)
+    std::vector<bool> to_filter;
+    auto intensity_zero = [&](OpenMS::Feature& f) { return f.getIntensity() == 0; };
+    auto remove_it = remove_if(feat_map.begin(), feat_map.end(), intensity_zero);
+    // clear corresponding chromatograms as well
+    for (auto feat_map_it = remove_it; feat_map_it != feat_map.end(); ++feat_map_it)
+    {
+      auto chromatogram_id_match = [&](OpenMS::Chromatogram& c) {
+        // extract feature_id from chromatogram native_id which is feature_id underscore index
+        auto chromatogram_id = c.getNativeID();
+        auto pos = chromatogram_id.find("_");
+        if (pos != std::string::npos)
+        {
+          chromatogram_id = chromatogram_id.substr(0, pos);
+        }
+        return (chromatogram_id == OpenMS::String((*feat_map_it).getUniqueId()));
+      };
+      merged_chromatograms.erase(remove_if(merged_chromatograms.begin(), merged_chromatograms.end(), chromatogram_id_match), merged_chromatograms.end());
+    }
+    feat_map.erase(remove_it, feat_map.end());
+
+    // store ionization mode of spectra (useful for post-processing by AccurateMassSearch tool)
+    if (!feat_map.empty())
+    {
+      std::set<OpenMS::IonSource::Polarity> pols;
+      for (const auto &peakmap: ms_peakmap)
+      {
+        pols.insert(peakmap.getInstrumentSettings().getPolarity());
+      }
+      // concat to single string
+      OpenMS::StringList sl_pols;
+      for (const auto& pol : pols)
+      {
+        sl_pols.push_back(OpenMS::String(OpenMS::IonSource::NamesOfPolarity[pol]));
+      }
+      feat_map[0].setMetaValue("scan_polarity", OpenMS::ListUtils::concatenate(sl_pols, ";"));
+    }
+
+    feat_map.setPrimaryMSRunPath({ rawDataHandler_IO.getMetaData().getFilename() });
+    LOGD << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename();
+
+    rawDataHandler_IO.setFeatureMap(feat_map);
+    rawDataHandler_IO.updateFeatureMapHistory();
+    rawDataHandler_IO.getExperiment().setChromatograms(merged_chromatograms);
+
+    LOGD << "END PickMS2Features";
+  }
+
 }

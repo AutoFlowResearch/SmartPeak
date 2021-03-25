@@ -26,7 +26,21 @@ jobs:
             apt-get install -y libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
             apt-get install -y graphviz doxygen python3-pip &&
             apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
-            pip3 install exhale
+            pip3 install exhale gitpython
+      - run:
+          # CircleCI doesn't support regex for conditional steps unfortunately...
+          # During the release workflow, the previous job will push version update commit to release branch.
+          # Because workflow run against fixed commit, the built-in checkout command won't fetch version update.
+          # This step has an effect only when running on release.
+          name: "Pull latest (only release)"
+          command: |
+            if [[ << pipeline.git.branch >> =~ ^release\/.* ]]; then
+                git checkout << pipeline.git.branch >>
+                git pull origin << pipeline.git.branch >>
+                git log -1 --oneline
+            else
+              echo "Skip this run step"
+            fi
       - run:
           name: Cloning and building OpenMS
           command: |
@@ -39,7 +53,7 @@ jobs:
           name: Installing SmartPeak SuperBuild
           command: |
             cd ~/SmartPeak
-            #mkdir superbuild
+            mkdir -p superbuild
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
@@ -56,6 +70,9 @@ jobs:
             cd ~/smartpeak_release_build || exit 1
             ctest -V
             ls -l ~/SmartPeak/src/tests/class_tests/smartpeak/data
+            cd ~/SmartPeak
+            export PYTHONPATH="${PWD}/tools"
+            python3 -m unittest discover -s ./tools/smartpeak
       - run:
           name: Running SmartPeak Examples
           command: |
@@ -86,6 +103,17 @@ jobs:
             brew remove yarn node
             brew install cmake qt5 sdl2
             brew install boost
+            pip3 install gitpython
+      - run:
+          name: "Pull latest (only release)"
+          command: |
+            if [[ << pipeline.git.branch >> =~ ^release\/.* ]]; then
+                git checkout << pipeline.git.branch >>
+                git pull origin << pipeline.git.branch >>
+                git log -1 --oneline
+            else
+              echo "Skip this run step"
+            fi
       - run:
           name: Cloning and building OpenMS
           command: |
@@ -104,7 +132,7 @@ jobs:
           name: Building SmartPeak (Including SuperBuild)
           command: |
             cd ~/SmartPeak
-            #mkdir superbuild
+            mkdir superbuild
             mkdir smartpeak_release_build
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
@@ -117,6 +145,9 @@ jobs:
             set +o pipefail
             cd ~/SmartPeak/smartpeak_release_build
             ctest -VV -F --timeout 1200 || true
+            cd ~/SmartPeak
+            export PYTHONPATH="${PWD}/tools"
+            python3 -m unittest discover -s ./tools/smartpeak
       - run:
           name: Packing SmartPeak
           command: |
@@ -125,11 +156,11 @@ jobs:
             ls -alt bin
             cpack -G DragNDrop && ls -alth
             yes | hdiutil attach -noautoopen -noverify SmartPeak-*.dmg > /dev/null
-            otool -l /Volumes/SmartPeak-1.0.0-Darwin/GUI.app/Contents/MacOS/GUI | grep -a name
-            cp -r /Volumes/SmartPeak-*-Darwin/GUI.app /Volumes/SmartPeak-*-Darwin/share .
-            xattr -l GUI.app/*
-            sudo xattr -dr com.apple.quarantine GUI.app
-            # open GUI.app
+            otool -l /Volumes/SmartPeak-1.0.0-Darwin/SmartPeakGUI.app/Contents/MacOS/SmartPeakGUI | grep -a name
+            cp -r /Volumes/SmartPeak-*-Darwin/SmartPeakGUI.app /Volumes/SmartPeak-*-Darwin/share .
+            xattr -l SmartPeakGUI.app/*
+            sudo xattr -dr com.apple.quarantine SmartPeakGUI.app
+            # open SmartPeakGUI.app
       - run:
           name: Moving Package to artifacts folder
           command: |
@@ -144,6 +175,16 @@ jobs:
     executor: win/default
     steps:
       - checkout
+      - run:
+          name: "Pull latest (only release)"
+          command: |
+            if ("<< pipeline.git.branch >>" -match '^release/.*$') {
+              git checkout << pipeline.git.branch >>
+              git pull origin << pipeline.git.branch >>
+              git log -1 --oneline
+            } else {
+              Write-Output "Skip this run step"
+            }
       - run: systeminfo
       - run:
           name: Fetching Dependencies
@@ -157,6 +198,7 @@ jobs:
             # choco install boost-msvc-14.1
             choco install doxygen.install
             choco install nsis.portable
+            pip install gitpython
             refreshenv
             $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
             $sdl2_url = 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
@@ -230,7 +272,7 @@ jobs:
                 }
             }
             cd ~/SmartPeak
-            #mkdir superbuild
+            mkdir superbuild
             mkdir smartpeak_release_build
             cd ~/SmartPeak/superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
@@ -243,6 +285,19 @@ jobs:
             refreshenv
             & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
+            cd ~/SmartPeak
+            $env:PYTHONPATH = $PWD.Path + "\tools"
+            python -m unittest discover -s .\tools\smartpeak\
+      - run:
+          name: Signing SmartPeak with trusted certificate
+          command: |
+            $ErrorActionPreference = "Stop"
+            cd ~/SmartPeak/smartpeak_release_build
+            git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
+            Import-Module .\CodeSigning\CertCrypto.psm1
+            Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
+            certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
+            & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
       - run:
           name: Signing SmartPeak with trusted certificate
           command: |
@@ -260,12 +315,225 @@ jobs:
             cp ~/SmartPeak/smartpeak_release_build/*.exe ~/artifacts
       - store_artifacts:
           path: ~/artifacts
+
+  prepare_release:
+    # This job is responsible for updating a package version stored in a configuration.
+    # The update is done automatically and changes are pushed back to release branch.
+    working_directory: ~/SmartPeak
+    docker:
+      - image: python:3.7.0
+    steps:
+      - checkout
+      - run:
+          name: "Check prerequisites"
+          command: |
+            python --version
+            pip install gitpython
+      - run:
+          name: "Update SmartPeak version"
+          command: |
+            echo "Branch name: ${CIRCLE_BRANCH}"
+            BRANCH=(${CIRCLE_BRANCH//// })
+            VERSION=${BRANCH[1]}
+            echo "Release tag: ${VERSION}"
+            export PATH="$PATH:$PWD/tools/smartpeak"
+            export PYTHONPATH="$PYTHONPATH:$PWD/tools"
+            smartpeak_prepare_release --set-version=${VERSION}
+      - add_ssh_keys:
+          fingerprints:
+            - "e8:9a:a0:0b:75:00:75:1c:04:71:9c:7d:07:af:a2:0d"
+      - run:
+          name: "Push release branch"
+          command: |
+            BRANCH=(${CIRCLE_BRANCH//// })
+            VERSION=${BRANCH[1]}
+            git config --global user.email "smartpeak.ci@gmail.com"
+            git config --global user.name "smartpeak-ci"
+            git status
+            git commit -am "Release update (${VERSION}) [skip ci]"
+            git push origin ${CIRCLE_BRANCH}
             
+  publish_release:
+    # This job is responsible for publishing the release to the github repository.
+    # The job first merges release branch to develop and directly pushes the changes (only one commit).
+    # The release tag will be created (on develop) with a text body retrieved from 
+    # the changelog description, corresponding to the version being released.
+    # All artifacts in current workflow from other jobs will be fetched and 
+    # used as artifacts visible in github releases.
+    working_directory: ~/SmartPeak
+    docker:
+      - image: python:3.7.0
+    steps:
+      - checkout
+      - run:
+          name: "Install prerequisites"
+          command: |
+            apt-get update
+            apt-get install -y curl wget jq
+            pip install gitpython
+            GHR_VERSION=0.13.0
+            GHR_URL=https://github.com/tcnksm/ghr/releases/download/v${GHR_VERSION}/ghr_v${GHR_VERSION}_linux_amd64.tar.gz
+            wget "$GHR_URL" && \
+              tar xzf ghr_v${GHR_VERSION}_linux_amd64.tar.gz && \
+              mv ghr_v${GHR_VERSION}_linux_amd64/ghr /usr/bin/ghr && \
+              rm -r ghr_v${GHR_VERSION}_linux_amd64.tar.gz ghr_v${GHR_VERSION}_linux_amd64/
+      - run:
+          name: "Retrieve artifacts"
+          command: |
+            mkdir arts
+
+            # Get all job numbers for this workflow: 
+            JOB_NUMBERS_CONTENT=$(curl --request GET \
+              --url "https://circleci.com/api/v2/workflow/${CIRCLE_WORKFLOW_ID}/job" \
+              --header "Circle-Token: ${CIRCLE_TOKEN}" \
+              --header 'content-type: application/json')
+            JOB_NUMBERS=$(echo $JOB_NUMBERS_CONTENT | jq -r '.items[] | select (.type? == "build") | .job_number')
+            echo $JOB_NUMBERS | tr " " "\n" > job_num.txt
+            echo "Found job IDs in current workflow"
+            cat job_num.txt
+
+            # Get artifacts per each job:
+            echo "Current job: ${CIRCLE_BUILD_NUM}"
+            echo "Searching for Artifacts .........."
+            for x in $JOB_NUMBERS ; do 
+              if [[ "$x" == "$CIRCLE_BUILD_NUM" ]]; then
+                continue
+              fi
+              echo "Get artifacts for job ${x}"
+              ART_CONTENT=$(curl --request GET \
+                --url "https://circleci.com/api/v2/project/gh/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/$x/artifacts" \
+                --header "Circle-Token: ${CIRCLE_TOKEN}" \
+                --header 'content-type: application/json') 
+              echo $ART_CONTENT
+              echo 
+              ARTS=$(echo $ART_CONTENT | jq -r '.items[] | .url')
+              # echo "*** Artifacts For Job Number $x ***"
+              echo "Detected following url: $ARTS"
+              if [ ! -z "$ARTS" ]; then 
+                echo "Download from url: ${ARTS}"
+                wget -P arts --verbose --header "Circle-Token: ${CIRCLE_TOKEN}" $ARTS
+              else
+                echo "Skip download for #${x}"
+              fi
+              echo 
+            done
+      - add_ssh_keys:
+          fingerprints:
+            - "e8:9a:a0:0b:75:00:75:1c:04:71:9c:7d:07:af:a2:0d"
+      - run:
+          name: "Auto-merge release branch"
+          command: |
+            git config --global user.email "smartpeak.ci@gmail.com"
+            git config --global user.name "smartpeak-ci"
+            git checkout ${CIRCLE_BRANCH}
+            git pull origin ${CIRCLE_BRANCH}
+            git checkout develop
+            git branch
+            git merge ${CIRCLE_BRANCH} --no-edit
+            git push origin develop
+      - run:
+          name: "Publish release to github"
+          command: |
+            BRANCH=(${CIRCLE_BRANCH//// })
+            VERSION=${BRANCH[1]}
+            echo "export SMARTPEAK_VERSION=$VERSION" >> $BASH_ENV
+            export PATH="$PATH:$PWD/tools/smartpeak"
+            export PYTHONPATH="$PYTHONPATH:$PWD/tools"
+            RELEASE_BODY=$(smartpeak_changes)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c develop -b "${RELEASE_BODY}" -delete "v${VERSION}" arts
+      - run:
+          name: "Notify users"
+          command: |
+            pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib markdown
+            BRANCH=(${CIRCLE_BRANCH//// })
+            VERSION=${BRANCH[1]}
+            export PATH="$PATH:$PWD/tools/smartpeak"
+            export PYTHONPATH="$PYTHONPATH:$PWD/tools"
+
+            # Prepare authentication with Gmail API
+            echo $GMAIL_TOKEN_PICKLE | base64 --decode > token.pickle
+
+            # Send emails:
+            smartpeak_send_emails --version=${VERSION}
+            
+  trigger_release:
+    # The job is responsible for triggering a release from last commit message, if release string present.
+    # Each commit on develop has to be verified, if there is release string included in the last commit message, 
+    # the job will push release branch, otherwise nothing will happen.
+    working_directory: ~/SmartPeak
+    docker:
+      - image: python:3.7.0
+    steps:
+      - checkout
+      - run:
+          name: "Install prerequisites"
+          command: |
+            apt-get update
+            pip install gitpython
+      - add_ssh_keys:
+          fingerprints:
+            - "e8:9a:a0:0b:75:00:75:1c:04:71:9c:7d:07:af:a2:0d"
+      - run:
+          name: "Verify commit"
+          command: |
+            # Parse latest commit message:
+            export PATH="$PATH:$PWD/tools/smartpeak"
+            export PYTHONPATH="$PYTHONPATH:$PWD/tools"
+            RELEASE_AVAILABLE=$(smartpeak_git_release_available)
+            # If smartpeak_git_release_available outputs anything, then there is a valid release string included
+            if [ ! -z "${RELEASE_AVAILABLE}" ]; then
+              # Retrieve version:  
+              split=(${RELEASE_AVAILABLE})
+              VERSION=${split[2]}
+              # Push release branch:
+              git config --global user.email "smartpeak.ci@gmail.com"
+              git config --global user.name "smartpeak-ci"
+              git checkout -b release/${VERSION}
+              git push origin release/${VERSION}
+              echo "The new branch release/${VERSION} pushed!"
+            else
+              echo "No release command detected. Exit."
+            fi
 
 workflows:
   version: 2.1
-  build:
+  ci:
     jobs:
-      - build_ubuntu
-      - build_macos
-      - build_windows
+      - build_ubuntu:
+          filters:
+            branches:
+              ignore: /^release\/.*$/
+      - build_macos:
+          filters:
+            branches:
+              ignore: /^release\/.*$/
+      - build_windows:
+          filters:
+            branches:
+              ignore: /^release\/.*$/
+  release_check:
+    jobs:
+      - trigger_release:
+          filters:
+            branches:
+              only: develop
+  release:
+    jobs:
+      - prepare_release:
+          filters:
+            branches:
+              only: /^release\/.*$/
+      - build_ubuntu:
+          requires:
+            - prepare_release
+      - build_macos:
+          requires:
+            - prepare_release
+      - build_windows:
+          requires:
+            - prepare_release
+      - publish_release:
+          requires:
+            - build_ubuntu
+            - build_macos
+            - build_windows

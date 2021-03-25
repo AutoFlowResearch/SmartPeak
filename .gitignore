@@ -54,3 +54,7 @@ src/examples/data/GCMS_FullScan_Unknowns/
 
 # MacOS
 *.DS_Store
+
+# Python
+*.py[cod]
+__pycache__

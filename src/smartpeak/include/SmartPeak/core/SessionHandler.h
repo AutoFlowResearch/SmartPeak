@@ -48,7 +48,10 @@ namespace SmartPeak
     void setTransitionsTable(const SequenceHandler& sequence_handler); ///< set the TransitionsTable-specific data
     void setSpectrumTable(const SequenceHandler& sequence_handler); ///< set the SpectrumTable-specific data
     void setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands); ///< set the WorkflowTable-specific data
-    void setParametersTable(const SequenceHandler& sequence_handler, const std::vector<ApplicationHandler::Command>& commands); ///< set the ParametersTable-specific data
+    void getParametersTable(ParameterSet user_parameters,
+                            const std::vector<ApplicationHandler::Command>& commands,
+                            Eigen::Tensor<std::string, 1>& headers_,
+                            Eigen::Tensor<std::string, 2>& body_);
     void setQuantMethodTable(const SequenceHandler& sequence_handler); ///< set the QuantMethodTable-specific data
     void setStdsConcsTable(const SequenceHandler& sequence_handler); ///< set the StdsConcsTable-specific data
     void setComponentFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentFiltersTable-specific data
@@ -225,9 +228,6 @@ namespace SmartPeak
     // data for the workflow table
     Eigen::Tensor<std::string, 1> workflow_table_headers;
     Eigen::Tensor<std::string, 2> workflow_table_body;
-    // data for the parameters table
-    Eigen::Tensor<std::string, 1> parameters_table_headers;
-    Eigen::Tensor<std::string, 2> parameters_table_body;
     // data for the quant_method table
     Eigen::Tensor<std::string, 1> quant_method_table_headers;
     Eigen::Tensor<std::string, 2> quant_method_table_body;

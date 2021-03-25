@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import sys, os, re, argparse
+
+import smartpeak.utils as utils
+
+
+def parse_args(argc, argv):
+  parser = argparse.ArgumentParser(
+    description='Bump the package version.')
+  parser.add_argument('--set-version', 
+    default='None',
+    help='Specify the version tag in form of v{MAJOR}.{MINOR}.{PATCH}, this option overrides bump.')
+  parser.add_argument('--bump', 
+    choices=('major', 'minor', 'patch'), 
+    default='patch', 
+    help='Which part of the version number to bump? Works if set-version is not specified (default: %(default)s)')
+  return parser.parse_args()
+
+
+def main(argc, argv):
+  args = parse_args(argc, argv)
+
+  # Read current version:
+  config_file = os.path.join(utils.get_project_path(), 'CMakeLists.txt')
+  major, minor, patch = utils.get_version(config_file)
+
+  # Retrieve new version:
+  success, (n_major, n_minor, n_patch) = utils.get_new_version(
+    args.set_version, args.bump, (major, minor, patch))
+  if not success:
+    return 1
+      
+  # Update config:
+  success = utils.update_version(config_file, version=(n_major, n_minor, n_patch))
+  if not success:
+    return 1
+  return 0
+
+
+if __name__ == '__main__':
+  sys.exit(main(len(sys.argv), sys.argv))
