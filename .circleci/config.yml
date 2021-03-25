@@ -46,7 +46,7 @@ jobs:
           command: |
             cd ~ &&
             git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-            cd OpenMS && git submodule update --init THIRDPARTY &&
+            cd OpenMS && git fetch --unshallow && git checkout b486f77a3bdfc4d5d1f1efc528c47b687acd6f07 && git submodule update --init THIRDPARTY &&
             cmake -DBOOST_USE_STATIC=OFF -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS &&
             make -j4 OpenMS
       - run:
