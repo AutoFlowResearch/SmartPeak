@@ -343,6 +343,11 @@ public:
     */
     static std::string getSmartPeakVersion();
     
+    /**
+     @brief Modify ImEntry to a human readable format.
+     
+     @param[in,out] directory_entry directory entry on which the modification is done.
+    */
     static void makeHumanReadable(ImEntry& directory_entry);
   };
 }
