@@ -97,6 +97,7 @@ namespace SmartPeak
       InputDataValidation::heavyComponentsAreConsistent(*sequenceHandler_IO);
     }
 
+    sequenceHandler_IO->notifySequenceChanged();
     LOGD << "END createSequence";
   }
 

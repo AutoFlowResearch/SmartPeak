@@ -8,12 +8,14 @@ set(sources_list_h
 	FilePicker.h
 	GuiAppender.h
 	Heatmap2DWidget.h
+	InfoWidget.h
 	ParameterEditorWidget.h
 	ParametersTableWidget.h
 	Report.h
 	SpectraPlotWidget.h
+	StatisticsWidget.h
 	Widget.h
-  ImEntry.h
+	ImEntry.h
 	WindowSizesAndPositions.h
 	Workflow.h
 	WorkflowStepWidget.h

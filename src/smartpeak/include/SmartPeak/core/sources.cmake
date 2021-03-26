@@ -19,6 +19,7 @@ set(sources_list_h
 	InjectionHandler.h
 	SampleType.h
 	SequenceHandler.h
+	SequenceObservable.h
 	SequenceProcessor.h
 	SequenceSegmentHandler.h
 	SequenceSegmentProcessor.h

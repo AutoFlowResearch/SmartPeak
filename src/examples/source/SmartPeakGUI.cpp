@@ -39,6 +39,8 @@
 #include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
+#include <SmartPeak/ui/StatisticsWidget.h>
+#include <SmartPeak/ui/InfoWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -149,6 +151,7 @@ int main(int argc, char** argv)
   bool show_feature_line_plot = false; // injection vs. metavalue for n selected features
   bool show_feature_heatmap_plot = false; // injection vs. feature for a particular metavalue
   bool show_calibrators_line_plot = false; // peak area/height ratio vs. concentration ratio
+  bool show_satistics_widget = false;
 
   // Chromatogram display option
   bool chromatogram_initialized = false;
@@ -172,13 +175,17 @@ int main(int argc, char** argv)
   GuiAppender appender_;
 
   // widgets
-  GenericTextWidget quickInfoText_;
+  InfoWidget quickInfoText_;
   FilePicker file_picker_;
   Report     report_;
   Workflow   workflow_;
+  StatisticsWidget  statistics_;
+
   std::unique_ptr<ParametersTableWidget> parameters_table_widget;
   report_.setApplicationHandler(application_handler_);
   workflow_.setApplicationHandler(application_handler_);
+  statistics_.setApplicationHandler(application_handler_);
+  quickInfoText_.setApplicationHandler(application_handler_);
 
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -282,25 +289,25 @@ int main(int argc, char** argv)
     ImGui::NewFrame();
 
     { // keeping this block to easily collapse/expand the bulk of the loop
-    // Intialize the window sizes
+      // Intialize the window sizes
       win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
 
       if ((!workflow_is_done_) && manager_.isWorkflowDone())
       {
         manager_.updateApplicationHandler(application_handler_);
+        quickInfoText_.setLastRunTime(manager_.getLastRunTime());
       }
       workflow_is_done_ = manager_.isWorkflowDone();
       file_loading_is_done_ = file_picker_.fileLoadingIsDone();
 
       // Make the quick info text
-      quickInfoText_.text_lines.clear();
-      quickInfoText_.text_lines.push_back(workflow_is_done_ ? "Workflow status: done" : "Workflow status: running...");
-      quickInfoText_.text_lines.push_back(file_loading_is_done_ ? "File loading status: done" : "File loading status: running...");
-      if (file_picker_.errorLoadingFile()) quickInfoText_.text_lines.push_back("File loading failed.  Check the `Information` log.");
-      if (exceeding_plot_points_) quickInfoText_.text_lines.push_back("Plot rendering limit reached.  Not plotting all selected data.");
-      if (exceeding_table_size_) quickInfoText_.text_lines.push_back("Table rendering limit reached.  Not showing all selected data.");
-      if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_.text_lines.push_back("Integrity check failed.  Check the `Information` log.");
-      if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_.text_lines.push_back("Integrity check passed.");
+      quickInfoText_.setWorkflowDone(workflow_is_done_);
+      quickInfoText_.setFileLoadingDone(file_loading_is_done_, file_picker_.errorLoadingFile());
+      quickInfoText_.clearErrorMessages();
+      if (exceeding_plot_points_) quickInfoText_.addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
+      if (exceeding_table_size_) quickInfoText_.addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
+      if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_.addErrorMessage("Integrity check failed.  Check the `Information` log.");
+      if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_.addErrorMessage("Integrity check passed.");
 
       // Session cache updates from e.g., single file imports
       if (file_loading_is_done_ && file_picker_.fileWasLoaded() && update_session_cache_) {
@@ -682,6 +689,7 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Features (line)", NULL, &show_feature_line_plot)) {}
         if (ImGui::MenuItem("Features (heatmap)", NULL, &show_feature_heatmap_plot)) {}
         if (ImGui::MenuItem("Calibrators", NULL, &show_calibrators_line_plot)) {}
+        if (ImGui::MenuItem("Statistics", NULL, &show_satistics_widget)) {}
         ImGui::MenuItem("Info window", NULL, false, false);
         if (ImGui::MenuItem("Info", NULL, &show_info_)) {}
         if (ImGui::MenuItem("Log", NULL, &show_log_)) {}
@@ -1207,6 +1215,27 @@ int main(int argc, char** argv)
 
           ImGui::EndTabItem();
         }
+        if (show_satistics_widget && ImGui::BeginTabItem("Statistics", &show_satistics_widget))
+        {
+          static bool statistics_initialized = false;
+          if (!workflow_is_done_)
+          {
+            statistics_initialized = false;
+          }
+          else // workflow_is_done_
+          {
+            if (!statistics_initialized)
+            {
+              statistics_.setRefreshNeeded();
+              statistics_initialized = true;
+            }
+          }
+          statistics_.setInjections(session_handler_.injection_explorer_checkbox_body, session_handler_.getInjectionExplorerBody());
+          statistics_.setTransitions(&session_handler_.transitions_table_body, session_handler_.transition_explorer_checkbox_body, session_handler_.getTransitionExplorerBody());
+          statistics_.setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
+          statistics_.draw();
+          ImGui::EndTabItem();
+        }
         ImGui::EndTabBar();
       }
       win_size_and_pos.setTopWindowYSize(ImGui::GetWindowHeight());
@@ -1234,6 +1263,7 @@ int main(int argc, char** argv)
         if (show_info_ && ImGui::BeginTabItem("Info", &show_info_))
         {
           ImGui::BeginChild("Info child");
+          quickInfoText_.setTransitions(&session_handler_.transitions_table_body);
           quickInfoText_.draw();
           ImGui::EndChild();
           ImGui::EndTabItem();
