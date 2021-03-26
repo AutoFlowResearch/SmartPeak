@@ -17,59 +17,38 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
-
 #pragma once
 
-#include <string>
-#include <utility>
-#include <vector>
-#include <imgui.h>
-#include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/ParameterEditorWidget.h>
-#include <SmartPeak/iface/IParametersObserver.h>
-#include <SmartPeak/iface/IWorkflowObserver.h>
-#include <unsupported/Eigen/CXX11/Tensor>
+#include <SmartPeak/core/Parameters.h>
+#include <string>
+#include <vector>
 
 namespace SmartPeak
 {
-
-  /**
-    @brief Base Parameters table
-  */
-  class ParametersTableWidget : public Widget, public IParametersObserver, public IWorkflowObserver
+  class ParameterEditorWidget final : public Widget
   {
   public:
-    ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id);
-    ~ParametersTableWidget();
-
+    ParameterEditorWidget(ApplicationHandler& application_handler) :
+      application_handler_(application_handler),
+      parameter_("parameter"), // dummy name
+      input_text_field_()
+    {
+    };
     void draw() override;
-  public:
-    /**
-     IParametersObserver
-    */
-    virtual void parametersUpdated() override;
-    /**
-     IWorkflowObserver
-    */
-    virtual void workflowUpdated() override;
-  private:
-    void updateParametersTable();
+    void setParameter(const std::string& function_parameter, const Parameter& parameter);
   protected:
-    Eigen::Tensor<std::string, 1> headers_;
-    Eigen::Tensor<std::string, 2> body_;
-    const std::string table_id_;
-  protected:
-    SessionHandler& session_handler_;
     ApplicationHandler& application_handler_;
-    bool refresh_needed_ = true;
-    ParameterEditorWidget parameter_editor_widget_;
-    ParameterSet parameters_; // Parameter to list on the table
-    bool show_default_ = true;
-    bool show_unused_ = true;
+    std::string function_parameter_;
+    Parameter parameter_;
+    std::string title_;
+    std::string default_value_;
+    std::array<char, 256> input_text_field_ = { 0 };
+    std::vector<std::string> valid_string_;
+  private:
+    void setInputTextField(const std::string& value);
   };
-
 }

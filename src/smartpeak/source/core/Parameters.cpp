@@ -173,11 +173,26 @@ namespace SmartPeak
     }
   }
 
-  void Parameter::setValueFromString(const std::string& value_as_string)
+  void Parameter::setValueFromString(const std::string& value_as_string, bool allow_change_type)
   {
     CastValue c;
     Utilities::parseString(value_as_string, c);
-    value_ = c;
+    if (allow_change_type || c.getTag() == value_.getTag())
+    {
+      value_ = c;
+    }
+    else
+    {
+      // try some cast
+      if ((c.getTag() == CastValue::Type::INT) && (value_.getTag() == CastValue::Type::FLOAT))
+      {
+        value_ = static_cast<float>(c.i_);
+      }
+      else if ((c.getTag() != CastValue::Type::STRING) && (value_.getTag() == CastValue::Type::STRING))
+      {
+        value_.s_ = value_as_string;
+      }
+    }
   }
 
   const std::string Parameter::getRestrictionsAsString(bool use_schema) const
@@ -216,6 +231,18 @@ namespace SmartPeak
         }
         return ss.str();
       }
+    }
+  }
+
+  const std::vector<CastValue> Parameter::getValidStrings(bool use_schema) const
+  {
+    if (use_schema && schema_)
+    {
+      return schema_->getValidStrings();
+    }
+    else
+    {
+      return constraints_list_ ? *constraints_list_ : std::vector<CastValue>();
     }
   }
 
@@ -519,6 +546,14 @@ namespace SmartPeak
     {
       parameters_.push_back(parameter);
     }
+  }
+
+  void FunctionParameters::removeParameter(const std::string& parameter_name)
+  {
+    parameters_.erase(std::remove_if(parameters_.begin(), 
+                                     parameters_.end(), 
+                                     [parameter_name](const Parameter& p) { return p.getName() == parameter_name; }),
+                                     parameters_.end());
   }
 
   void FunctionParameters::merge(const FunctionParameters& other)
