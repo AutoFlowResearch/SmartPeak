@@ -74,11 +74,6 @@ jobs:
             export PYTHONPATH="${PWD}/tools"
             python3 -m unittest discover -s ./tools/smartpeak
       - run:
-          name : Running static Code Analysis
-          command : |
-            cd ~/SmartPeak/smartpeak_release_build
-            cmake --build . --target all_cppcheck
-      - run:
           name: Running SmartPeak Examples
           command: |
             ~/SmartPeak/.circleci/run_examples.sh ~/smartpeak_release_build/bin
@@ -151,11 +146,6 @@ jobs:
             cd ~/SmartPeak
             export PYTHONPATH="${PWD}/tools"
             python3 -m unittest discover -s ./tools/smartpeak
-      - run:
-          name : Running static Code Analysis
-          command : |
-            cd ~/SmartPeak/smartpeak_release_build
-            cmake --build . --target all_cppcheck
       - run:
           name: Packing SmartPeak
           command: |

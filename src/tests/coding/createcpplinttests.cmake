@@ -48,6 +48,8 @@ macro(add_cpplint_tests _directory)
         "${PYTHON_EXECUTABLE}"
         "${PROJECT_SOURCE_DIR}/cpplint.py"
         "--verbose=5"
+        "--linelength=120"
+        "--counting=total"
         "--filter=-readability/namespace,-build/namespaces,-whitespace/empty_loop_body,-build/c++11"
         "${SMARTPEAK_HOST_DIRECTORY}/src/${_directory}/${_file_to_test}")
 
