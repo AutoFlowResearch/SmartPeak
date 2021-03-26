@@ -272,8 +272,5 @@ install_export_targets()
 
 if(NOT "${PACKAGE_TYPE}" STREQUAL "none")
   include(cmake/package_general.cmake)
-  if("${PACKAGE_TYPE}" STREQUAL "nsis") # .. Windows nsis
-    include(cmake/package_nsis.cmake)
-  endif()
   include(CPack)
 endif()

@@ -432,6 +432,18 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
   // TODO: Selected sample group names
 }
 
+BOOST_AUTO_TEST_CASE(processSampleGroups_no_injections)
+{
+  // Try to launch ProcessSequence while no injections is set.
+  SequenceHandler sequenceHandler;
+  CreateSequence cs(sequenceHandler);
+  ProcessSequence ps(sequenceHandler);
+  const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };
+  ps.raw_data_processing_methods_ = raw_data_processing_methods;
+  ps.process();
+  // we actually just expect it will not crash (no BOOST_CHECK)
+}
+
 BOOST_AUTO_TEST_CASE(StoreWorkflow1)
 {
   SequenceHandler sequenceHandler;

@@ -175,10 +175,11 @@ foreach(_examples ${EXAMPLE_executables})
 
   else() # Win
 
-    add_executable(${_examples} source/${_examples})
     if(NOT ${_examples} STREQUAL "SmartPeakGUI")
+      add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
     else()
+      add_executable(${_examples} source/${_examples} ${CMAKE_SOURCE_DIR}/cmake/Windows/SmartPeakGUI.rc)
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
           OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
           PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)

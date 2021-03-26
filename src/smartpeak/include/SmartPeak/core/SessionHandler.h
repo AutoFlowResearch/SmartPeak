@@ -48,10 +48,6 @@ namespace SmartPeak
     void setTransitionsTable(const SequenceHandler& sequence_handler); ///< set the TransitionsTable-specific data
     void setSpectrumTable(const SequenceHandler& sequence_handler); ///< set the SpectrumTable-specific data
     void setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands); ///< set the WorkflowTable-specific data
-    void getParametersTable(ParameterSet user_parameters,
-                            const std::vector<ApplicationHandler::Command>& commands,
-                            Eigen::Tensor<std::string, 1>& headers_,
-                            Eigen::Tensor<std::string, 2>& body_);
     void setQuantMethodTable(const SequenceHandler& sequence_handler); ///< set the QuantMethodTable-specific data
     void setStdsConcsTable(const SequenceHandler& sequence_handler); ///< set the StdsConcsTable-specific data
     void setComponentFiltersTable(const SequenceHandler& sequence_handler); ///< set the ComponentFiltersTable-specific data
