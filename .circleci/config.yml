@@ -142,7 +142,7 @@ jobs:
           command: |
             set +o pipefail
             cd ~/SmartPeak/smartpeak_release_build
-            ctest -VV -F --timeout 1200 || true
+            ctest -VV -F --timeout 1200
             cd ~/SmartPeak
             export PYTHONPATH="${PWD}/tools"
             python3 -m unittest discover -s ./tools/smartpeak

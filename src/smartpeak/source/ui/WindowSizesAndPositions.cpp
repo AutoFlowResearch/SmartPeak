@@ -58,49 +58,64 @@ namespace SmartPeak
     right_window_x_pos_ = left_window_x_size_ + bottom_and_top_window_x_size_;
   }
   void WindowSizesAndPositions::setWindowSizesAndPositions(const bool& show_top_window, const bool& show_bottom_window, const bool& show_left_window, const bool& show_right_window) {
-    if (show_top_window && show_bottom_window && show_left_window && show_right_window) {
+    if (show_top_window && show_bottom_window && show_left_window && show_right_window) 
+    {
       setWindowSizesAndPositions_(bottom_window_y_perc_, left_window_x_perc_, right_window_x_perc_);
     }
-    else if (show_top_window && show_bottom_window && show_left_window) {
+    else if (show_top_window && show_bottom_window && show_left_window) 
+    {
       setWindowSizesAndPositions_(bottom_window_y_perc_, left_window_x_perc_, 0);
     }
-    else if (show_top_window && show_bottom_window && show_right_window) {
+    else if (show_top_window && show_bottom_window && show_right_window) 
+    {
       setWindowSizesAndPositions_(bottom_window_y_perc_, 0, right_window_x_perc_);
     }
-    else if (show_top_window && show_left_window && show_right_window) {
+    else if (show_top_window && show_left_window && show_right_window) 
+    {
       setWindowSizesAndPositions_(0, left_window_x_perc_, right_window_x_perc_);
     }
-    else if (show_bottom_window && show_left_window && show_right_window) {
+    else if (show_bottom_window && show_left_window && show_right_window) 
+    {
       setWindowSizesAndPositions_(1, left_window_x_perc_, right_window_x_perc_);
     }
-    else if (show_left_window && show_right_window) {
+    else if (show_left_window && show_right_window) 
+    {
       setWindowSizesAndPositions_(bottom_window_y_perc_, left_window_x_perc_, right_window_x_perc_);
     }
-    else if (show_top_window && show_bottom_window) {
+    else if (show_top_window && show_bottom_window) 
+    {
       setWindowSizesAndPositions_(bottom_window_y_perc_, 0, 0);
     }
-    else if (show_top_window && show_left_window) {
+    else if (show_top_window && show_left_window) 
+    {
       setWindowSizesAndPositions_(0, left_window_x_perc_, 0);
     }
-    else if (show_top_window && show_right_window) {
+    else if (show_top_window && show_right_window) 
+    {
       setWindowSizesAndPositions_(0, 0, right_window_x_perc_);
     }
-    else if (show_bottom_window && show_left_window) {
+    else if (show_bottom_window && show_left_window) 
+    {
       setWindowSizesAndPositions_(1, left_window_x_perc_, 0);
     }
-    else if (show_bottom_window && show_right_window) {
+    else if (show_bottom_window && show_right_window) 
+    {
       setWindowSizesAndPositions_(1, 0, right_window_x_perc_);
     }
-    else if (show_top_window) {
+    else if (show_top_window) 
+    {
       setWindowSizesAndPositions_(0, 0, 0);
     }
-    else if (show_bottom_window) {
+    else if (show_bottom_window) 
+    {
       setWindowSizesAndPositions_(1, 0, 0);
     }
-    else if (show_left_window || show_right_window) {
+    else if (show_left_window || show_right_window) 
+    {
       setWindowSizesAndPositions_(bottom_window_y_perc_, left_window_x_perc_, right_window_x_perc_);
     }
-    else {
+    else 
+    {
       // TODO: logging...
     }
   }

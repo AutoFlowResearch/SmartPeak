@@ -361,7 +361,7 @@ namespace SmartPeak
     size_t l, r;
 
     for (l = 0; l < s.size() && characters.count(s[l]); ++l)
-      ;
+      {;}
 
     if (l == s.size()) {
       return std::string();
@@ -369,7 +369,7 @@ namespace SmartPeak
 
     // reaching here implies that s contains at least one non-whitespace character
     for (r = s.size() - 1; r > l && characters.count(s[r]); --r)
-      ;
+      {;}
 
     return s.substr(l, r - l + 1);
   }
@@ -420,7 +420,7 @@ namespace SmartPeak
       OpenMS::MRMFeatureSelector::SelectorParameters parameters;
       for (const std::pair<std::string, std::vector<std::string>>& p : params_map) {
         const std::string& param_name = p.first;
-        if (param_name == "nn_thresholds" ) {
+        if (param_name == "nn_thresholds") {
           parameters.nn_threshold = std::stoi(p.second[i]);
         } else if (param_name == "locality_weights") {
           parameters.locality_weight = p.second[i].front() == 'T' || p.second[i].front() == 't';
@@ -655,11 +655,11 @@ namespace SmartPeak
     {
       auto logdir = fs::path{};
       if (logs)
-        logdir = fs::path{ logs };
+        logdir = fs::path(logs);
       else if (appdata)
-        logdir = fs::path{ appdata } / "SmartPeak";
+        logdir = fs::path(appdata) / "SmartPeak";
       else if (home)
-        logdir = fs::path{ home } / ".SmartPeak";
+        logdir = fs::path(home) / ".SmartPeak";
 
       try
       {
@@ -690,8 +690,8 @@ namespace SmartPeak
     else
     {
       throw std::runtime_error(
-        "Unable to construct path to log file. Make sure that either \
-          HOME, LOCALAPPDATA or SMARTPEAK_LOGS env variable is set. For details refer to user documentation");
+        "Unable to construct path to log file. Make sure that either "
+        "HOME, LOCALAPPDATA or SMARTPEAK_LOGS env variable is set. For details refer to user documentation");
     }
     return std::make_pair(path, flag);
   }

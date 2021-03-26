@@ -42,7 +42,8 @@ namespace SmartPeak
     if (selected_entry > 0) {
       is_to_filter = !filter.PassFilter(Im_table_entries[row].entry_contents[selected_entry - 1].c_str());
     }
-    else if (selected_entry == 0) { //ALL
+    else if (selected_entry == 0) 
+    { //ALL
       is_to_filter = std::all_of(Im_table_entries[row].entry_contents.begin(),
         Im_table_entries[row].entry_contents.end(),
         [&filter](auto entry) {return !filter.PassFilter(entry.c_str()); });
@@ -65,7 +66,8 @@ namespace SmartPeak
           if (header_idx < columns.dimension(1)) {
             Im_table_entry.entry_contents[header_idx] = columns(row, header_idx);
           }
-          else if (header_idx < columns.dimension(1) + checkbox_columns.dimension(1)) {
+          else if (header_idx < columns.dimension(1) + checkbox_columns.dimension(1)) 
+          {
             const std::size_t checkbox_idx = header_idx - static_cast<std::size_t>(columns.dimension(1));
             Im_table_entry.entry_contents[header_idx] = checkbox_columns(row, checkbox_idx) == true ? "true" : "false";
           }
@@ -379,7 +381,7 @@ namespace SmartPeak
       // - fail = red
       // add progress bar to indicate completed
       char label[128];
-      sprintf(label, "MyObject %d", i); // TODO: update for use with sequence list
+      std::snprintf(label, sizeof label, "MyObject %d", i); // TODO: update for use with sequence list
       if (ImGui::Selectable(label, selected == i))
         selected = i;
     }

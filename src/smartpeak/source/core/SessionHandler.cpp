@@ -48,7 +48,7 @@ namespace SmartPeak
     setSpectrumExplorer();
     //LOGD << "END setMinimalDataAndFilters";
   }
-  void SessionHandler::setInjectionExplorer(){
+  void SessionHandler::setInjectionExplorer() {
     // Make the injection explorer headers
     if (injection_explorer_checkbox_headers.size() <= 0) {
       LOGD << "Making injection_explorer_checkbox_headers";
@@ -131,7 +131,7 @@ namespace SmartPeak
       spectrum_explorer_checked_rows.setConstant(true);
     }
   }
-  void SessionHandler::setSequenceTable(const SequenceHandler & sequence_handler){
+  void SessionHandler::setSequenceTable(const SequenceHandler & sequence_handler) {
     // Make the sequence table headers
     if (sequence_table_headers.size() <= 0) {
       LOGD << "Making sequence_table_headers";
@@ -1646,7 +1646,8 @@ namespace SmartPeak
             result.y_data_scatter_.push_back(y_data);
             result.series_names_scatter_.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
           }
-          else {
+          else 
+          {
             LOGD << "Stopped adding points to the chromatogram plot";
             return false;
           }
@@ -1692,7 +1693,8 @@ namespace SmartPeak
                 result.y_data_area_.push_back(y_data);
                 result.series_names_area_.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("native_id").toString() + "::" + subordinate.getMetaValue("timestamp_").toString());
               }
-              else {
+              else 
+              {
                 LOGD << "Stopped adding points to the chromatogram plot";
                 return false;
               }
@@ -1752,7 +1754,8 @@ namespace SmartPeak
             result.y_data_scatter_.push_back(y_data);
             result.series_names_scatter_.push_back(injection.getMetaData().getSampleName() + "::" + spectra.getNativeID());
           }
-          else {
+          else 
+          {
             LOGD << "Stopped adding points to the spectra plot";
             return false;
           }
@@ -1802,7 +1805,8 @@ namespace SmartPeak
                 result.y_data_area_.push_back(y_data);
                 result.series_names_area_.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("chemical_formula").toString() + ":" + subordinate.getMetaValue("modifications").toString());
               }
-              else {
+              else 
+              {
                 LOGD << "Stopped adding points to the spectra plot";
                 return false;
               }
@@ -1921,7 +1925,8 @@ namespace SmartPeak
                 calibrators_conc_fit_data.push_back(stand_concs_map.at(quant_method.getComponentName()).first);
                 calibrators_feature_fit_data.push_back(y_fit_data);
               }
-              else {
+              else 
+              {
                 LOGD << "Stopped adding points to calibrators plot";
                 return false;
               }
@@ -1941,7 +1946,8 @@ namespace SmartPeak
                 calibrators_feature_raw_data.push_back(y_raw_data);
                 calibrators_series_names.push_back(quant_method.getComponentName());
               }
-              else {
+              else 
+              {
                 LOGD << "Stopped adding points to calibrators plot";
                 return false;
               }

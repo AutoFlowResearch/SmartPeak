@@ -41,7 +41,8 @@ namespace SmartPeak
         if (attributes.count("type")) {
           Utilities::castString(attributes.at("value"), attributes.at("type"), value_);
         }
-        else {
+        else 
+        {
           Utilities::parseString(attributes.at("value"), value_);
         }
       }
@@ -54,7 +55,7 @@ namespace SmartPeak
       std::shared_ptr<CastValue> cast_max;
       if (attributes.count("min"))
       {
-        auto c = std::make_shared<CastValue>() ;
+        auto c = std::make_shared<CastValue>();
         Utilities::parseString(attributes.at("min"), *c);
         if ((c->getTag() == CastValue::Type::INT) || (c->getTag() == CastValue::Type::FLOAT))
         {

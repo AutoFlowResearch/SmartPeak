@@ -558,7 +558,8 @@ namespace SmartPeak
     }
 
     // Case 2: "Remove" filtered/non-selected features and "Add" new features via "used_" and "timestamp_" feature metadata attributes
-    else {
+    else 
+    {
       std::vector<OpenMS::Feature> new_features;
       std::set<OpenMS::UInt64> unique_ids_feat_history, unique_ids_feat_select; // Get all feature IDs
       for (const OpenMS::Feature& feature_copy : feature_map_history_) {
@@ -693,12 +694,14 @@ namespace SmartPeak
         copy_feature = true;
       }
       // Case 1b: No subordinates and missing "used_"
-      else if (!feature_new.metaValueExists("used_") && feature_new.getSubordinates().size() <= 0) {
+      else if (!feature_new.metaValueExists("used_") && feature_new.getSubordinates().size() <= 0) 
+      {
         feature_new.setMetaValue("used_", "true");
         feature_new.setMetaValue("timestamp_", timestamp);
         copy_feature = true;
       }
-      else {
+      else 
+      {
         // Case 2a: Subordinates
         for (OpenMS::Feature& subordinate_new : feature_new.getSubordinates()) {
           if (subordinate_new.metaValueExists("used_") && subordinate_new.getMetaValue("used_").toString() == "true") {
@@ -706,7 +709,8 @@ namespace SmartPeak
             copy_feature = true;
           }
           // Case 2b: Subordinates and missing "used_
-          else if (!subordinate_new.metaValueExists("used_")) {
+          else if (!subordinate_new.metaValueExists("used_")) 
+          {
             subordinate_new.setMetaValue("used_", "true");
             subordinate_new.setMetaValue("timestamp_", timestamp);
             subs.push_back(subordinate_new);
