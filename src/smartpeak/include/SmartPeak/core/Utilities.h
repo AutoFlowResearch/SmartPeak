@@ -25,6 +25,7 @@
 
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/ui/ImEntry.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 
@@ -341,5 +342,12 @@ public:
     * @brief Returns the build version of SmartPeak package if available.
     */
     static std::string getSmartPeakVersion();
+    
+    /**
+     @brief Modify ImEntry to a human readable format.
+     
+     @param[in,out] directory_entry directory entry on which the modification is done.
+    */
+    static void makeHumanReadable(ImEntry& directory_entry);
   };
 }
