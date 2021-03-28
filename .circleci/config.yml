@@ -135,7 +135,7 @@ jobs:
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
             cd ../smartpeak_release_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=RelWithDebInfo ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests

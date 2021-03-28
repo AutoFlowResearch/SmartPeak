@@ -25,11 +25,11 @@
 
 namespace SmartPeak 
 {
-  struct IParametersObserver
+  struct ISequenceObserver
   {
     /**
-      Parameters have been updated
+      Sequence has been updated
     */
-    virtual void parametersUpdated() = 0;
+    virtual void sequenceUpdated() = 0;
   };
 }

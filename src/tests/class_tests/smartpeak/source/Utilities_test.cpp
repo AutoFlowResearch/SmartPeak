@@ -613,4 +613,21 @@ BOOST_AUTO_TEST_CASE(getLogFilepath)
   }
 }
 
+BOOST_AUTO_TEST_CASE(makeHumanReadable)
+{
+  SmartPeak::ImEntry dir_entry_1;
+  dir_entry_1.ID = 0;
+  dir_entry_1.entry_contents.resize(4, "");
+  dir_entry_1.entry_contents[0] = "testfile.csv";
+  dir_entry_1.entry_contents[1] = "1325000000";
+  dir_entry_1.entry_contents[2] = ".csv";
+  dir_entry_1.entry_contents[3] = "2021-03-22 06:59:29";
+  
+  Utilities::makeHumanReadable(dir_entry_1);
+  BOOST_CHECK_EQUAL(dir_entry_1.entry_contents[0], "testfile.csv");
+  BOOST_CHECK_EQUAL(dir_entry_1.entry_contents[1], "1.32 GB");
+  BOOST_CHECK_EQUAL(dir_entry_1.entry_contents[2], "csv");
+  BOOST_CHECK_EQUAL(dir_entry_1.entry_contents[3], "Mon Mar 22 06:59:29 2021");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

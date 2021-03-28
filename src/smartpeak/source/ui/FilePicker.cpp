@@ -111,7 +111,7 @@ namespace SmartPeak
     ImGui::BeginChild("Content", ImVec2(1024, 400));
     
     const int column_count = 4;
-    const char* column_names[column_count] = { "Name", "Size [bytes]", "Type", "Date Modified" };
+    const char* column_names[column_count] = { "Name", "Size", "Type", "Date Modified" };
     static ImGuiTableColumnFlags column_flags[column_count] = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide
     };
     
@@ -162,7 +162,8 @@ namespace SmartPeak
         ImGui::TableNextRow();
         for (int column = 0; column < column_count; column++)
         {
-          ImEntry* item = &Im_directory_entries[row];
+          ImEntry item = Im_directory_entries[row];
+          Utilities::makeHumanReadable(item);
           char text_buffer[256];
           std::snprintf(text_buffer, sizeof text_buffer, "%s", item->entry_contents[column].c_str());
           
@@ -172,14 +173,14 @@ namespace SmartPeak
           {
             selected_entry = row;
             std::strcpy(selected_filename, Im_directory_entries[selected_entry].entry_contents[0].c_str());
-            if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item->entry_contents[2].c_str() , "Directory") )
+            if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item.entry_contents[2].c_str() , "Directory") )
             {
               if (current_pathname_.back() != '/')
               {
                 current_pathname_.append("/");
               }
               
-              current_pathname_.append(item->entry_contents[0].c_str());
+              current_pathname_.append(item.entry_contents[0].c_str());
               memset(selected_filename, 0, sizeof selected_filename);
               files_scanned_ = false;
               updateContents(Im_directory_entries);
@@ -196,7 +197,7 @@ namespace SmartPeak
                 {
                   picked_pathname_.append("/");
                 }
-                picked_pathname_.append(item->entry_contents[0].c_str());
+                picked_pathname_.append(item.entry_contents[0].c_str());
               }
               filter.Clear();
               selected_entry = -1;
