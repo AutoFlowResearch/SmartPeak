@@ -165,7 +165,7 @@ namespace SmartPeak
           ImEntry item = Im_directory_entries[row];
           Utilities::makeHumanReadable(item);
           char text_buffer[256];
-          std::snprintf(text_buffer, sizeof text_buffer, "%s", item->entry_contents[column].c_str());
+          std::snprintf(text_buffer, sizeof text_buffer, "%s", item.entry_contents[column].c_str());
           
           const bool is_selected = (selected_entry == row);
           ImGui::TableSetColumnIndex(column);
