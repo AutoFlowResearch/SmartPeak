@@ -317,23 +317,28 @@ The collection of examples is located at ``src/example/data`` directory of the S
 
 .. end_runningexamples
 
-.. begin_gui
+.. begin_logging
 
-Set logging path
+Log path
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Default locations of logs:
 
-- Windows: `C:\\Users\\<user>\\AppData\\Local\\SmartPeak`
-- Linux and MacOS: `~/.SmartPeak`
+- Windows: ``C:\\Users\\<user>\\AppData\\Local\\SmartPeak``
+- Linux and MacOS: ``~/.SmartPeak``
 
-User can change default location and specify directory where the logs are stored by setting `SMARTPEAK_LOGS` env variable. 
-If directory specified by the path doesn't exist, SmartPeak will create specified directories.
+User can change default location and specify directory where the logs are stored by setting ``SMARTPEAK_LOGS`` env variable. 
+If directory specified by the path doesn't exist, SmartPeak will create it.
+
+.. end_logging
+
+.. begin_gui
 
 
 Using SmartPeak GUI
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
-- To start the SmartPeak GUI, from the build directory run :bash:`./bin/SmartPeakGUI` for Mac and Linux, or :bash:`./bin/[Debug or Release]/SmartPeakGUI` for Windows. Or double-click ``SmartPeakGUI`` executable in the file browser of your OS.
+- After successful installation of SmartPeak, on Windows open menu start and browse for relevant icon, you can also find the shortcut on desktop.
+- If built SmartPeak from the source code, from the build directory run :bash:`./bin/SmartPeakGUI` for Mac and Linux, or :bash:`./bin/[Debug or Release]/SmartPeakGUI` for Windows. Or double-click ``SmartPeakGUI`` executable in the file browser of your OS.
 - Start the session with ``File | Load session from sequence``
 - Choose the corresponding directory with ``Change dir``. The path to example folder can be shortened to f.e. ``/data/GCMS_SIM_Unknowns`` 
 - Select the sequence file
