@@ -184,6 +184,10 @@ namespace SmartPeak
       @brief return default value of the parameter (if schema is assigned).
     */
     const std::string getDefaultValueAsString() const { return schema_ ? schema_->getValueAsString() : getValueAsString(); };
+    
+    
+    const std::vector<std::string> getAllValues() const {
+      return {this->getName(), this->getType(), this->getValueAsString(), this->getRestrictionsAsString()}; };
 
     /**
       @brief return valid strings

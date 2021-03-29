@@ -17,7 +17,7 @@ jobs:
           name: Installing required libraries
           command: |
             export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
-            ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
+            ln -fs /usr/share/zoneinfo/Etc/GMT-1 /etc/localtime &&
             dpkg-reconfigure --frontend noninteractive tzdata &&
             apt-get install -y git cmake qt5-default libeigen3-dev &&
             apt-get install -y libboost-all-dev &&
