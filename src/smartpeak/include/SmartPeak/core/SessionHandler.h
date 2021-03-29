@@ -136,7 +136,21 @@ namespace SmartPeak
                                 const std::set<std::string>& scan_names,
                                 const std::set<std::string>& component_group_names);
     void setFeatureLinePlot();
-    void setFeatureHeatMap();
+
+    struct HeatMapData
+    {
+      Eigen::Tensor<float, 2, Eigen::RowMajor> feat_heatmap_data; // same as feat_value_data but rowMajor
+      Eigen::Tensor<std::string, 1> feat_heatmap_row_labels, feat_heatmap_col_labels;
+      std::string feat_heatmap_x_axis_title;
+      std::string feat_heatmap_y_axis_title;
+      float feat_value_min_;
+      float feat_value_max_;
+      std::string selected_feature_;
+      Eigen::Tensor<std::string, 1> selected_sample_names_;
+      Eigen::Tensor<std::string, 1> selected_transitions_;
+      Eigen::Tensor<std::string, 1> selected_transition_groups_;
+    };
+    void getHeatMap(const SequenceHandler& sequence_handler, HeatMapData& result, const std::string& feature_name);
     /*
     @brief Sets the data used for rendering the calibrators
 
@@ -291,11 +305,7 @@ namespace SmartPeak
     std::string feat_line_x_axis_title;
     std::string feat_line_y_axis_title;
     float feat_line_sample_min, feat_line_sample_max, feat_value_min, feat_value_max;
-    // data for the feature heatmap (rows/colum labels are derived from feature pivot table)
-    Eigen::Tensor<float, 2, Eigen::RowMajor> feat_heatmap_data; // same as feat_value_data but rowMajor
-    Eigen::Tensor<std::string, 1> feat_heatmap_row_labels, feat_heatmap_col_labels;
-    std::string feat_heatmap_x_axis_title;
-    std::string feat_heatmap_y_axis_title;
+    Eigen::Tensor<std::string, 1> feat_row_labels, feat_col_labels;
     // data for the calibrators scatter/line plot
     std::vector<std::vector<float>> calibrators_conc_raw_data, calibrators_feature_raw_data;
     std::vector<std::vector<float>> calibrators_conc_fit_data, calibrators_feature_fit_data;
