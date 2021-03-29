@@ -108,19 +108,19 @@ namespace SmartPeak
     filter.Draw("Find");
 
     // drop-down list for search field(s)
-    cols.resize(headers_.size() + 1);
+    cols_.resize(headers_.size() + 1);
     for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
       if (header_name == 0)
       {
-        cols[header_name] = "All";
+        cols_[header_name] = "All";
       }
       else if (header_name > 0)
       {
-        cols[header_name] = headers_(header_name - 1).c_str();
+        cols_[header_name] = headers_(header_name - 1).c_str();
       }
     }
 
-    ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
+    ImGui::Combo("In Column(s)", &selected_col_, cols_.data(), cols_.size());
 
     if (columns_.dimension(0) == table_entries_.size())
       table_scanned_ = true;
@@ -150,7 +150,7 @@ namespace SmartPeak
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
 
-            if (searcher(table_entries_, selected_col, filter, row))
+            if (searcher(table_entries_, selected_col_, filter, row))
               continue;
 
             ImGui::TableNextRow();
@@ -190,19 +190,19 @@ namespace SmartPeak
     filter.Draw("Find");
 
     // drop-down list for search field(s)
-    cols.resize(headers_.size() + 1);
+    cols_.resize(headers_.size() + 1);
     for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
       if (header_name == 0)
       {
-        cols[header_name] = "All";
+        cols_[header_name] = "All";
       }
       else if (header_name > 0)
       {
-        cols[header_name] = headers_(header_name - 1).c_str();
+        cols_[header_name] = headers_(header_name - 1).c_str();
       }
     }
 
-    ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
+    ImGui::Combo("In Column(s)", &selected_col_, cols_.data(), cols_.size());
 
     if (columns_.dimension(0) == table_entries_.size())
       table_scanned_ = true;
@@ -236,7 +236,7 @@ namespace SmartPeak
         for (size_t row = 0; row < columns_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row)))
           {
-            if (searcher(table_entries_, selected_col, filter, row))
+            if (searcher(table_entries_, selected_col_, filter, row))
               continue;
 
             ImGui::TableNextRow();

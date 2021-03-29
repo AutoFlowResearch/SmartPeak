@@ -125,8 +125,8 @@ namespace SmartPeak
     const std::string table_id_;
     std::vector<ImEntry> table_entries_;
     bool table_scanned_;
-    int selected_col = 0;
-    std::vector<const char*> cols;
+    int selected_col_ = 0;
+    std::vector<const char*> cols_;
   };
 
 

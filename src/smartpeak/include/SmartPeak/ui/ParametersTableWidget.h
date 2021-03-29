@@ -70,6 +70,7 @@ namespace SmartPeak
     ParameterSet parameters_; // Parameter to list on the table
     bool show_default_ = true;
     bool show_unused_ = true;
+    int selected_col_ = 0;
   };
 
 }
