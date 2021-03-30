@@ -122,7 +122,7 @@ namespace SmartPeak
             if (is_hovered)
             {
               const size_t index_item_x = (size_t)((plot_point.x*(float)heatmap_data_.feat_heatmap_col_labels.size()));
-              const size_t index_item_y = (size_t)((plot_point.y*(float)heatmap_data_.feat_heatmap_row_labels.size()));
+              const size_t index_item_y = (size_t)(((1.0-plot_point.y)*(float)heatmap_data_.feat_heatmap_row_labels.size()));
               if ((index_item_x < heatmap_data_.feat_heatmap_col_labels.size()) &&
                   (index_item_y < heatmap_data_.feat_heatmap_row_labels.size()))
               {
@@ -138,7 +138,7 @@ namespace SmartPeak
                 ImGui::Text(os.str().c_str());
                 os.str("");
                 os.clear();
-                os << "Value: " << heatmap_data_.feat_heatmap_data.data()[index_item_y* heatmap_data_.feat_heatmap_col_labels.size() + index_item_x];
+                os << "Value: " << heatmap_data_.feat_heatmap_data.data()[index_item_y * heatmap_data_.feat_heatmap_col_labels.size() + index_item_x];
                 ImGui::Text(os.str().c_str());
                 ImGui::EndTooltip();
               }

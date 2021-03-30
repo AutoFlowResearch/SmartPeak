@@ -137,6 +137,9 @@ namespace SmartPeak
                                 const std::set<std::string>& component_group_names);
     void setFeatureLinePlot();
 
+    /*
+    @brief Heatmap data structure, result of call to getHeatMap
+    */
     struct HeatMapData
     {
       Eigen::Tensor<float, 2, Eigen::RowMajor> feat_heatmap_data; // same as feat_value_data but rowMajor
@@ -150,7 +153,12 @@ namespace SmartPeak
       Eigen::Tensor<std::string, 1> selected_transitions_;
       Eigen::Tensor<std::string, 1> selected_transition_groups_;
     };
+    
+    /*
+    @brief fill the HeatMapData structure, given a feature name
+    */
     void getHeatMap(const SequenceHandler& sequence_handler, HeatMapData& result, const std::string& feature_name);
+    
     /*
     @brief Sets the data used for rendering the calibrators
 

@@ -688,5 +688,14 @@ BOOST_AUTO_TEST_CASE(setCalibratorsScatterLinePlot1)
   SessionHandler session_handler;
   session_handler.setCalibratorsScatterLinePlot(testData.sequenceHandler);
 }
+BOOST_AUTO_TEST_CASE(getHeatMap)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  SessionHandler::HeatMapData result;
+  std::string feature_name = "calculated_concentration";
+  session_handler.getHeatMap(testData.sequenceHandler, result, feature_name);
+}
+
 
 BOOST_AUTO_TEST_SUITE_END()
