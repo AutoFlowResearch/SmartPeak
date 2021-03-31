@@ -1579,11 +1579,11 @@ namespace SmartPeak
         const int n_cols = feature_pivot_table_headers.size();
         const int n_rows = feat_value_data.dimension(0);
         // allocate space for the pivot table body and heatmap row labels
-        feature_pivot_table_body.resize(n_rows, n_cols);
+        feat_row_labels.resize(n_rows);        feature_pivot_table_body.resize(n_rows, n_cols);
         // assign the pivot table body data and heatmap row labels
         int col = 0;
         for (int row = 0; row < n_rows; ++row) {
-          for (int j = 0; j < rows_out.dimension(1); ++j) {
+          feat_row_labels(row) = rows_out(row, 0) + "::" + rows_out(row, 2);          for (int j = 0; j < rows_out.dimension(1); ++j) {
             feature_pivot_table_body(row, col) = rows_out(row, j);
             ++col;
           }
