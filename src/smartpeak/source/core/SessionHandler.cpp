@@ -1531,6 +1531,8 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature_pivot table headers and body
+      auto test1 = feat_value_data.dimension(1);
+      auto test2 = getNSelectedSampleNamesPlot();
       if (feat_value_data.dimension(1) != getNSelectedSampleNamesPlot() || feature_matrix_unique_transitions_ != getNSelectedTransitionsPlot() * getNSelectedFeatureMetaValuesPlot()) {
         LOGD << "Making feature matrix, line plot, and data tables";
         // get the selected feature names
@@ -1824,8 +1826,9 @@ namespace SmartPeak
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)
     {
       Eigen::Tensor<std::string, 2> rows_out;
+      Eigen::Tensor<float, 2> heatmap_value_data;
       SequenceParser::makeDataMatrixFromMetaValue(sequence_handler,
-                                                  feat_value_data,
+                                                  heatmap_value_data,
                                                   result.feat_heatmap_col_labels,
                                                   rows_out,
                                                   feature_names,
@@ -1833,7 +1836,7 @@ namespace SmartPeak
                                                   sample_names,
                                                   component_group_names,
                                                   component_names);
-      const int n_rows = feat_value_data.dimension(0);
+      const int n_rows = heatmap_value_data.dimension(0);
       // allocate space for the pivot table body and heatmap row labels
       result.feat_heatmap_row_labels.resize(n_rows);
       for (int row = 0; row < n_rows; ++row) {
@@ -1843,11 +1846,11 @@ namespace SmartPeak
       result.feat_heatmap_x_axis_title = "Injections";
       result.feat_heatmap_y_axis_title = "Transitions";
       // assign the heatmap data
-      result.feat_heatmap_data.resize(feat_value_data.dimensions());
-      result.feat_heatmap_data = feat_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
-      const Eigen::Tensor<float, 0> feat_value_data_maximum = feat_value_data.maximum();
+      result.feat_heatmap_data.resize(heatmap_value_data.dimensions());
+      result.feat_heatmap_data = heatmap_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+      const Eigen::Tensor<float, 0> feat_value_data_maximum = heatmap_value_data.maximum();
       result.feat_value_max_ = feat_value_data_maximum(0);
-      const Eigen::Tensor<float, 0> feat_value_data_minimum = feat_value_data.minimum();
+      const Eigen::Tensor<float, 0> feat_value_data_minimum = heatmap_value_data.minimum();
       result.feat_value_min_ = feat_value_data_minimum(0);
     }
     else
