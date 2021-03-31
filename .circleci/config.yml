@@ -140,7 +140,7 @@ jobs:
           name: Running SmartPeak Class Tests
           no_output_timeout: 15m
           command: |
-            set +o pipefail
+            set -e -o pipefail
             cd ~/SmartPeak/smartpeak_release_build
             ctest -VV -F --timeout 1200
             cd ~/SmartPeak
@@ -262,6 +262,7 @@ jobs:
           name: Building SmartPeak, running Class Tests and Packaging
           command: |
             $ErrorActionPreference = "Stop"
+            function ThrowOnFailure($Msg) { if (-not $?) { throw $Msg } }
             Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
             if ($_ -match "^(.*?)=(.*)$") {
                 Set-Content "env:\$($matches[1])" $matches[2]
@@ -280,10 +281,13 @@ jobs:
             msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
             refreshenv
             & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
+            ThrowOnFailure "CTest failed!"
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
+            ThrowOnFailure "CPack failed!"
             cd ~/SmartPeak
             $env:PYTHONPATH = $PWD.Path + "\tools"
             python -m unittest discover -s .\tools\smartpeak\
+            ThrowOnFailure "Python tests failed!"
       - run:
           name: Signing SmartPeak with trusted certificate
           command: |
