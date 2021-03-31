@@ -298,16 +298,69 @@ namespace SmartPeak
   {
     // Main graphic
     assert(x_data_.dimensions() == y_data_.dimensions());
-    ImPlot::SetNextPlotLimits(x_min_, x_max_, y_min_, y_max_, ImGuiCond_Always);
-    if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(plot_width_-25, plot_height_-40))) {
+    // add some padding left, right and top (10%)
+    float border_padding = (x_max_ - x_min_) * 0.1f;
+    ImPlot::SetNextPlotLimits(x_min_- border_padding, x_max_+ border_padding, y_min_, y_max_*1.1f, ImGuiCond_Always);
+    const ImPlotFlags imPlotFlags = ImPlotFlags_Default;
+    const ImPlotAxisFlags imPlotAxisFlagsX = ImPlotAxisFlags_GridLines;
+    std::vector<double> ticks_values;
+    for (int i = 0; i < x_data_.size(); ++i)
+    {
+      ticks_values.push_back(static_cast<float>(i));
+    }
+    ImPlot::SetNextPlotTicksX(ticks_values.data(), x_data_.size());
+    bool is_hovered = false;
+    ImPlotPoint plot_point;
+    ImPlotPoint plot_threshold;
+    if (ImPlot::BeginPlot(plot_title_.c_str(),
+                          x_axis_title_.c_str(),
+                          y_axis_title_.c_str(),
+                          ImVec2(plot_width_ - 25, plot_height_ - 40),
+                          imPlotFlags,
+                          imPlotAxisFlagsX)) {
       for (int i = 0; i < x_data_.dimension(1); ++i) {
-        ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
         Eigen::Tensor<float, 1> x_data = x_data_.chip(i, 1);
         Eigen::Tensor<float, 1> y_data = y_data_.chip(i, 1);
         ImPlot::PlotLine(series_names_(i).c_str(), x_data.data(), y_data.data(), x_data_.dimension(0));
       }
+      is_hovered = ImPlot::IsPlotHovered();
+      if (is_hovered)
+      {
+        plot_point = ImPlot::GetPlotMousePos();
+        // compute hover area
+        ImVec2 plot_threshold_pix_zero = {0,0};
+        ImPlotPoint plot_threshold_zero = ImPlot::PixelsToPlot(plot_threshold_pix_zero);
+        ImVec2 plot_threshold_pix_ref = { 5,5 };
+        ImPlotPoint plot_threshold_ref = ImPlot::PixelsToPlot(plot_threshold_pix_ref);
+        plot_threshold.x = plot_threshold_ref.x - plot_threshold_zero.x;
+        plot_threshold.y = plot_threshold_zero.y - plot_threshold_ref.y;
+      }
       ImPlot::EndPlot();
+      auto injection_number = std::round(plot_point.x);
+      if (is_hovered)
+      {
+        if (injection_number > 0 && injection_number < x_data_.size())
+        {
+          // see if we are hovering one point
+          for (int i = 0; i < x_data_.dimension(1); ++i) {
+            Eigen::Tensor<float, 1> y_data = y_data_.chip(i, 1);
+            if ((plot_point.y < y_data(injection_number) + plot_threshold.y) && (plot_point.y > y_data(injection_number) - plot_threshold.y) &&
+              (plot_point.x < static_cast<float>(injection_number) + plot_threshold.x) && (plot_point.x > static_cast<float>(injection_number) - plot_threshold.x))
+            {
+              ImGui::BeginTooltip();
+              std::ostringstream os;
+              os << series_names_(i);
+              ImGui::Text(os.str().c_str());
+              os.str("");
+              os.clear();
+              os << "Value: " << y_data(injection_number);
+              ImGui::Text(os.str().c_str());
+              ImGui::EndTooltip();
+            }
+          }
+        }
+      }
     }
   }
 

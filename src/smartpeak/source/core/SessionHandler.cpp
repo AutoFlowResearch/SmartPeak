@@ -1772,8 +1772,8 @@ namespace SmartPeak
   void SessionHandler::setFeatureLinePlot()
   {
     // Set the axes titles and min/max defaults
-    feat_line_x_axis_title = "Inj#";
-    std::string feat_line_y_axis_title = "metadata (au)";
+    feat_line_x_axis_title = "Injection::Feature";
+    std::string feat_line_y_axis_title = "Value";
     feat_line_sample_min = 1e6; 
     feat_line_sample_max = 0; 
     feat_value_min = 1e6; 
