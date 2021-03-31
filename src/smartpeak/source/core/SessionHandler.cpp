@@ -1790,7 +1790,7 @@ namespace SmartPeak
   }
   void SessionHandler::getHeatMap(const SequenceHandler& sequence_handler, HeatMapData& result, const std::string& feature_name)
   {
-    LOGD << "Making feature matrix, line plot, and heatmap data tables";
+    LOGD << "Getting Heatmap data";
     std::vector<std::string> feature_names;
     feature_names.push_back(feature_name);
     // get the selected sample types
@@ -1840,8 +1840,8 @@ namespace SmartPeak
         result.feat_heatmap_row_labels(row) = rows_out(row, 0);
       }
       // Set the axes titles
-      result.feat_heatmap_x_axis_title = "Sample";
-      result.feat_heatmap_y_axis_title = "Component";
+      result.feat_heatmap_x_axis_title = "Injections";
+      result.feat_heatmap_y_axis_title = "Transitions";
       // assign the heatmap data
       result.feat_heatmap_data.resize(feat_value_data.dimensions());
       result.feat_heatmap_data = feat_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));

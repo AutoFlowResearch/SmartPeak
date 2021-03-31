@@ -130,11 +130,11 @@ namespace SmartPeak
                 std::string selected_transition = heatmap_data_.feat_heatmap_row_labels(index_item_y);
                 ImGui::BeginTooltip();
                 std::ostringstream os;
-                os << "Sample: " << selected_sample;
+                os << "Injection: " << selected_sample;
                 ImGui::Text(os.str().c_str());
                 os.str("");
                 os.clear();
-                os << "Component: " << selected_transition;
+                os << "Transition: " << selected_transition;
                 ImGui::Text(os.str().c_str());
                 os.str("");
                 os.clear();
