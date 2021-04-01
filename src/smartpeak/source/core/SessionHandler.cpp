@@ -1531,8 +1531,6 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature_pivot table headers and body
-      auto test1 = feat_value_data.dimension(1);
-      auto test2 = getNSelectedSampleNamesPlot();
       if (feat_value_data.dimension(1) != getNSelectedSampleNamesPlot() || feature_matrix_unique_transitions_ != getNSelectedTransitionsPlot() * getNSelectedFeatureMetaValuesPlot()) {
         LOGD << "Making feature matrix, line plot, and data tables";
         // get the selected feature names
@@ -1581,11 +1579,13 @@ namespace SmartPeak
         const int n_cols = feature_pivot_table_headers.size();
         const int n_rows = feat_value_data.dimension(0);
         // allocate space for the pivot table body and heatmap row labels
-        feat_row_labels.resize(n_rows);        feature_pivot_table_body.resize(n_rows, n_cols);
+        feat_row_labels.resize(n_rows);
+        feature_pivot_table_body.resize(n_rows, n_cols);
         // assign the pivot table body data and heatmap row labels
         int col = 0;
         for (int row = 0; row < n_rows; ++row) {
-          feat_row_labels(row) = rows_out(row, 0) + "::" + rows_out(row, 2);          for (int j = 0; j < rows_out.dimension(1); ++j) {
+          feat_row_labels(row) = rows_out(row, 0) + "::" + rows_out(row, 2);
+          for (int j = 0; j < rows_out.dimension(1); ++j) {
             feature_pivot_table_body(row, col) = rows_out(row, j);
             ++col;
           }
@@ -1772,7 +1772,7 @@ namespace SmartPeak
   void SessionHandler::setFeatureLinePlot()
   {
     // Set the axes titles and min/max defaults
-    feat_line_x_axis_title = "Injection::Feature";
+    feat_line_x_axis_title = "Injections";
     std::string feat_line_y_axis_title = "Value";
     feat_line_sample_min = 1e6; 
     feat_line_sample_max = 0; 

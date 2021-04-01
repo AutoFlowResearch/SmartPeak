@@ -298,10 +298,11 @@ namespace SmartPeak
   {
     // Main graphic
     assert(x_data_.dimensions() == y_data_.dimensions());
-    // add some padding left, right and top (10%)
-    float border_padding = (x_max_ - x_min_) * 0.1f;
-    ImPlot::SetNextPlotLimits(x_min_- border_padding, x_max_+ border_padding, y_min_, y_max_*1.1f, ImGuiCond_Always);
-    const ImPlotFlags imPlotFlags = ImPlotFlags_Default;
+    // add some padding
+    float border_padding_x = (x_max_ - x_min_) * 0.05f;
+    float border_padding_y = (y_max_ - y_min_) * 0.01f;
+    ImPlot::SetNextPlotLimits(x_min_- border_padding_x, x_max_+ border_padding_x, y_min_ - border_padding_y, y_max_*1.1f, ImGuiCond_Always);
+    const ImPlotFlags imPlotFlags = ImPlotFlags_Legend | ImPlotFlags_Highlight | ImPlotFlags_BoxSelect | ImPlotFlags_ContextMenu;
     const ImPlotAxisFlags imPlotAxisFlagsX = ImPlotAxisFlags_GridLines;
     std::vector<double> ticks_values;
     for (int i = 0; i < x_data_.size(); ++i)
@@ -340,7 +341,8 @@ namespace SmartPeak
       auto injection_number = std::round(plot_point.x);
       if (is_hovered)
       {
-        if (injection_number > 0 && injection_number < x_data_.size())
+        bool tooltip_exists = false;
+        if (injection_number >= 0 && injection_number < x_data_.size())
         {
           // see if we are hovering one point
           for (int i = 0; i < x_data_.dimension(1); ++i) {
@@ -349,14 +351,24 @@ namespace SmartPeak
               (plot_point.x < static_cast<float>(injection_number) + plot_threshold.x) && (plot_point.x > static_cast<float>(injection_number) - plot_threshold.x))
             {
               ImGui::BeginTooltip();
+              // in case we are hovering multiple points
+              if (tooltip_exists)
+              {
+                ImGui::Separator();
+              }
               std::ostringstream os;
-              os << series_names_(i);
+              os << "Injection: " << x_labels_(injection_number);
+              ImGui::Text(os.str().c_str());
+              os.str("");
+              os.clear();
+              os << "Serie: " << series_names_(i);
               ImGui::Text(os.str().c_str());
               os.str("");
               os.clear();
               os << "Value: " << y_data(injection_number);
               ImGui::Text(os.str().c_str());
               ImGui::EndTooltip();
+              tooltip_exists = true;
             }
           }
         }

@@ -697,5 +697,4 @@ BOOST_AUTO_TEST_CASE(getHeatMap)
   session_handler.getHeatMap(testData.sequenceHandler, result, feature_name);
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
