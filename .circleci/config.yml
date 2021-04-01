@@ -17,7 +17,7 @@ jobs:
           name: Installing required libraries
           command: |
             export DEBIAN_FRONTEND=noninteractive && apt-get install -y tzdata &&  
-            ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime &&
+            ln -fs /usr/share/zoneinfo/UTC /etc/localtime &&
             dpkg-reconfigure --frontend noninteractive tzdata &&
             apt-get install -y git cmake qt5-default libeigen3-dev &&
             apt-get install -y libboost-all-dev &&
@@ -138,10 +138,11 @@ jobs:
             make -j4
       - run:
           name: Running SmartPeak Class Tests
+          no_output_timeout: 15m
           command: |
-            set +o pipefail
+            set -e -o pipefail
             cd ~/SmartPeak/smartpeak_release_build
-            ctest -VV -F --timeout 1200 || true
+            ctest -VV -F --timeout 1200
             cd ~/SmartPeak
             export PYTHONPATH="${PWD}/tools"
             python3 -m unittest discover -s ./tools/smartpeak
@@ -261,6 +262,7 @@ jobs:
           name: Building SmartPeak, running Class Tests and Packaging
           command: |
             $ErrorActionPreference = "Stop"
+            function ThrowOnFailure($Msg) { if (-not $?) { throw $Msg } }
             Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
             if ($_ -match "^(.*?)=(.*)$") {
                 Set-Content "env:\$($matches[1])" $matches[2]
@@ -279,10 +281,13 @@ jobs:
             msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
             refreshenv
             & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
+            ThrowOnFailure "CTest failed!"
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
+            ThrowOnFailure "CPack failed!"
             cd ~/SmartPeak
             $env:PYTHONPATH = $PWD.Path + "\tools"
             python -m unittest discover -s .\tools\smartpeak\
+            ThrowOnFailure "Python tests failed!"
       - run:
           name: Signing SmartPeak with trusted certificate
           command: |
@@ -293,6 +298,16 @@ jobs:
             Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
             certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
             & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
+      - run:
+          name: Signing SmartPeak with trusted certificate
+          command: |
+            # $ErrorActionPreference = "Stop"
+            # cd ~/SmartPeak/smartpeak_release_build
+            # git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
+            # Import-Module .\CodeSigning\CertCrypto.psm1
+            # Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
+            # certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
+            # & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
       - run:
           name: Preparing Artifact
           command: |
