@@ -338,7 +338,7 @@ namespace SmartPeak
         plot_threshold.y = plot_threshold_zero.y - plot_threshold_ref.y;
       }
       ImPlot::EndPlot();
-      auto injection_number = std::round(plot_point.x);
+      size_t injection_number = static_cast<size_t>(std::round(plot_point.x));
       if (is_hovered)
       {
         bool tooltip_exists = false;
@@ -347,7 +347,7 @@ namespace SmartPeak
           // see if we are hovering one point
           for (int i = 0; i < x_data_.dimension(1); ++i) {
             Eigen::Tensor<float, 1> y_data = y_data_.chip(i, 1);
-            if ((plot_point.y < y_data(injection_number) + plot_threshold.y) && (plot_point.y > y_data(injection_number) - plot_threshold.y) &&
+            if ((plot_point.y < y_data.data()[injection_number] + plot_threshold.y) && (plot_point.y > y_data.data()[injection_number] - plot_threshold.y) &&
               (plot_point.x < static_cast<float>(injection_number) + plot_threshold.x) && (plot_point.x > static_cast<float>(injection_number) - plot_threshold.x))
             {
               ImGui::BeginTooltip();
