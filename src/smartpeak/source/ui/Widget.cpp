@@ -361,7 +361,7 @@ namespace SmartPeak
               ImGui::Text(os.str().c_str());
               os.str("");
               os.clear();
-              os << "Serie: " << series_names_(i);
+              os << "Series: " << series_names_(i);
               ImGui::Text(os.str().c_str());
               os.str("");
               os.clear();
