@@ -162,6 +162,11 @@ namespace SmartPeak
   {
   public:
     void draw() override;
+
+    /**
+     @brief some data may have unexpected too much high value - or even infinite. data higher than this constant may be not be displayed.
+    */
+    static const double high_value_threeshold_;
   };
 
   /**

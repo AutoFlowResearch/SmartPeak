@@ -60,7 +60,7 @@ namespace SmartPeak
           for (int j = 0; j < heatmap_data_.feat_heatmap_col_labels.size(); ++j)
           {
             int index = i * heatmap_data_.feat_heatmap_row_labels.size() + j;
-            if (heatmap_data_.feat_heatmap_data.data()[index] > 1e20)
+            if (heatmap_data_.feat_heatmap_data.data()[index] > high_value_threeshold_)
             {
               LOGE << selected_feature_ << heatmap_data_.feat_heatmap_col_labels(j) << " / " << heatmap_data_.feat_heatmap_row_labels(i)
                                         << " contains unexpected high values (" << heatmap_data_.feat_heatmap_data.data()[index] << "), cannot display Heatmap";
