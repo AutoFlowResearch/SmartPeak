@@ -1842,9 +1842,6 @@ namespace SmartPeak
       for (int row = 0; row < n_rows; ++row) {
         result.feat_heatmap_row_labels(row) = rows_out(row, 0);
       }
-      // Set the axes titles
-      result.feat_heatmap_x_axis_title = "Injections";
-      result.feat_heatmap_y_axis_title = "Transitions";
       // assign the heatmap data
       result.feat_heatmap_data.resize(heatmap_value_data.dimensions());
       result.feat_heatmap_data = heatmap_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
@@ -1856,7 +1853,12 @@ namespace SmartPeak
     else
     {
       result.feat_heatmap_data.setZero();
+      result.feat_value_max_ = std::numeric_limits<float>::min();
+      result.feat_value_min_ = std::numeric_limits<float>::max();
     }
+    // Set the axes titles
+    result.feat_heatmap_x_axis_title = "Injections";
+    result.feat_heatmap_y_axis_title = "Transitions";
     result.selected_feature_ = feature_name;
     result.selected_sample_names_ = selected_sample_names;
     result.selected_transitions_ = selected_transitions;
