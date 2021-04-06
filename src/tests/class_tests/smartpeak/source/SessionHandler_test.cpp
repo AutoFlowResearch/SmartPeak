@@ -688,5 +688,24 @@ BOOST_AUTO_TEST_CASE(setCalibratorsScatterLinePlot1)
   SessionHandler session_handler;
   session_handler.setCalibratorsScatterLinePlot(testData.sequenceHandler);
 }
+BOOST_AUTO_TEST_CASE(getHeatMap)
+{
+  TestData testData;
+  SessionHandler session_handler;
+  SessionHandler::HeatMapData result;
+  std::string feature_name = "calculated_concentration";
+  session_handler.getHeatMap(testData.sequenceHandler, result, feature_name);
+  BOOST_CHECK_EQUAL(result.feat_heatmap_col_labels.size(), 0);
+  BOOST_CHECK_EQUAL(result.feat_heatmap_data.size(), 0);
+  BOOST_CHECK_EQUAL(result.feat_heatmap_row_labels.size(), 0);
+  BOOST_CHECK_EQUAL(result.feat_heatmap_x_axis_title, "Injections");
+  BOOST_CHECK_EQUAL(result.feat_heatmap_y_axis_title, "Transitions");
+  BOOST_CHECK_CLOSE(result.feat_value_max_, std::numeric_limits<float>::min(), 1e-6);
+  BOOST_CHECK_CLOSE(result.feat_value_min_, std::numeric_limits<float>::max(), 1e-6);
+  BOOST_CHECK_EQUAL(result.selected_feature_, "calculated_concentration");
+  BOOST_CHECK_EQUAL(result.selected_sample_names_.size(), 0);
+  BOOST_CHECK_EQUAL(result.selected_transitions_.size(), 0);
+  BOOST_CHECK_EQUAL(result.selected_transition_groups_.size(), 0);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
