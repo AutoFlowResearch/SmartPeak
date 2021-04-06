@@ -69,6 +69,12 @@ namespace SmartPeak
             }
           }
         }
+        data_mismatch_ = (heatmap_data_.feat_heatmap_data.dimension(0) != heatmap_data_.feat_heatmap_row_labels.size()
+                            || heatmap_data_.feat_heatmap_data.dimension(1) != heatmap_data_.feat_heatmap_col_labels.size());
+        if (data_mismatch_)
+        {
+          LOGE << "Labels and Data mismatch. Cannot display Heatmap.";
+        }
         refresh_needed_ = false;
       }
       
@@ -76,12 +82,14 @@ namespace SmartPeak
       {
         ImGui::Text("Some data for this feature seem to be Invalid (unexpected high), cannot display Heatmap");
       }
+      else if (data_mismatch_)
+      {
+        ImGui::Text("Data mismatch, cannot display Heatmap");
+      }
       else
       {
         if (heatmap_data_.feat_heatmap_row_labels.size() > 0 && heatmap_data_.feat_heatmap_col_labels.size() > 0)
         {
-          assert(heatmap_data_.feat_heatmap_data.dimension(0) == heatmap_data_.feat_heatmap_row_labels.size()
-            && heatmap_data_.feat_heatmap_data.dimension(1) == heatmap_data_.feat_heatmap_col_labels.size());
           if (heatmap_data_.feat_value_min_ == heatmap_data_.feat_value_max_)
           {
             // ImPlot will fail displaying this exceptional case where min and max are equal

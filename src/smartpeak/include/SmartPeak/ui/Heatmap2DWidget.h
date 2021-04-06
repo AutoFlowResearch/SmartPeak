@@ -36,6 +36,7 @@ namespace SmartPeak
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     std::string selected_feature_;
     bool invalid_data_;
+    bool data_mismatch_;
     bool refresh_needed_ = false;
   };
 
