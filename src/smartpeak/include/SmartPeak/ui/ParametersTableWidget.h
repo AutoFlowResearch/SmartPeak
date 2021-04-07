@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
@@ -29,6 +29,7 @@
 #include <imgui.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ImEntry.h>
 #include <SmartPeak/ui/ParameterEditorWidget.h>
 #include <SmartPeak/iface/IParametersObserver.h>
 #include <SmartPeak/iface/IWorkflowObserver.h>

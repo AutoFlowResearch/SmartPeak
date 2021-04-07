@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -33,7 +33,8 @@
 namespace SmartPeak
 {
 
-  ParametersTableWidget::ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id)
+  ParametersTableWidget::ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler,
+                                               const std::string& table_id)
     : session_handler_(session_handler),
     application_handler_(application_handler),
     table_id_(table_id),
@@ -104,6 +105,7 @@ namespace SmartPeak
     ImGui::PopStyleColor();
     ImGui::SameLine();
     int parameters_count = 0;
+    static bool is_scanned = false;
     for (const auto& parameter_function : parameters_)
       for (const auto& parameter : parameter_function.second)
         parameters_count++;
@@ -156,15 +158,40 @@ namespace SmartPeak
       }
       ImGui::TableSetupScrollFreeze(headers.size(), 1);
       ImGui::TableHeadersRow();
+      
+      // ParameterSet to vec<ImEntry>
+      static std::vector<ImEntry> table_entries;
+      if (parameters_.size() > 0 && is_scanned == false ) {
+        table_entries.resize(parameters_count, ImEntry());
+        size_t sub_param_idx = 0;
+        for (auto it = parameters_.begin(); it != parameters_.end(); it++) {
+          auto params =it->second.getParameters();
+          for (size_t param_val_idx = 0; param_val_idx < params.size(); ++param_val_idx) {
+            ImEntry& param_entry = table_entries[sub_param_idx];
+            param_entry.entry_contents.resize(headers.size(), "");
+            param_entry.ID = sub_param_idx;
+            param_entry.entry_contents[0] = it->first;
+            std::vector<std::string> parameter_row_vals { params[param_val_idx].getAllValues() };
+            for (int i = 0; i < parameter_row_vals.size(); i++)
+            {
+              param_entry.entry_contents[i+1] = parameter_row_vals[i];
+            }
+            sub_param_idx++;
+          }
+        }
+        is_scanned = true;
+      }
 
       // Second row to end body
-      if (parameters_.size() > 0)
+      if (table_entries.size() > 0)
       {
-        for (const auto& parameter_function : parameters_)
+        for (auto param_idx = 0; param_idx < table_entries.size(); param_idx++)
         {
-          const std::string function_parameter_name = parameter_function.first;
-          for (const auto& parameter : parameter_function.second)
           {
+            const std::string function_parameter_name = table_entries[param_idx].entry_contents[0];
+            const std::string parameter_name = table_entries[param_idx].entry_contents[1];
+            auto parameter = parameters_.findParameter(function_parameter_name, parameter_name);
+            
             // compute status
             enum
             {
@@ -173,20 +200,20 @@ namespace SmartPeak
               EUnused
             } OverrideStatus;
             int status = EUnused;
-            if (parameter.getSchema())
+            if (parameter->getSchema())
             {
               status = EUserOverride;
             }
-            else if (parameter.isSchema())
+            else if (parameter->isSchema())
             {
               status = EDefault;
             }
-            const bool valid = parameter.isValid();
+            const bool valid = parameter->isValid();
             if ((status == EUserOverride) || (show_unused_ && (status == EUnused)) || (show_default_ && (status == EDefault)))
             {
-              std::vector<std::string> parameter_row_vals {parameter.getAllValues()};
+              std::vector<std::string> parameter_row_vals {parameter->getAllValues()};
               parameter_row_vals.insert(parameter_row_vals.begin(), function_parameter_name);
-              
+
               if (selected_col_ > 0)
               {
                 if (!filter.PassFilter(parameter_row_vals[selected_col_-1].c_str()))
@@ -223,27 +250,7 @@ namespace SmartPeak
                   ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
                 }
                 // text
-                switch (col)
-                {
-                case EFunctionColumn:
-                  ImGui::Text("%s", function_parameter_name.c_str());
-                  break;
-                case ENameColumn:
-                  ImGui::Text("%s", parameter.getName().c_str());
-                  break;
-                case ETypeColumn:
-                  ImGui::Text("%s", parameter.getType().c_str());
-                  break;
-                case EValueColumn:
-                  ImGui::Text("%s", parameter.getValueAsString().c_str());
-                  break;
-                case ERestrictionColumn:
-                  ImGui::Text("%s", parameter.getRestrictionsAsString().c_str());
-                  break;
-                default:
-                  // other will not be displayed
-                  break;
-                }
+                ImGui::Text("%s", table_entries[param_idx].entry_contents[col].c_str() );
                 ImGui::PopStyleColor();
                 // edit value
                 if (col == EValueColumn)
@@ -251,8 +258,8 @@ namespace SmartPeak
                   if (ImGui::IsItemHovered() && (!valid))
                   {
                     ImGui::BeginTooltip();
-                    const std::string constraints = parameter.getRestrictionsAsString();
-                    const std::string expected_type = parameter.getType();
+                    const std::string constraints = parameter->getRestrictionsAsString();
+                    const std::string expected_type = parameter->getType();
                     ImGui::Text("Out of range value.");
                     if (!constraints.empty())
                     {
@@ -266,7 +273,7 @@ namespace SmartPeak
                 }
                 if ((col == EValueColumn) && ImGui::IsItemClicked())
                 {
-                  param_to_edit = &parameter;
+                  param_to_edit = parameter;
                   parameter_to_edit_function = function_parameter_name;
                 }
                 // tooltip
@@ -274,7 +281,7 @@ namespace SmartPeak
                 {
                   if (ImGui::IsItemHovered())
                   {
-                    const std::string& description = parameter.getDescription();
+                    const std::string& description = parameter->getDescription();
                     ImGui::BeginTooltip();
                     ImGui::Text("%s", description.c_str());
                     ImGui::EndTooltip();
@@ -285,7 +292,20 @@ namespace SmartPeak
           }
         }
       }
+      
+      if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
+      {
+        if (sorts_specs->SpecsDirty && is_scanned)
+        {
+          ImEntry::s_current_sort_specs = sorts_specs;
+          if (table_entries.size() > 1)
+            qsort(&table_entries[0], (size_t)table_entries.size(), sizeof(table_entries[0]), ImEntry::CompareWithSortSpecs);
+          ImEntry::s_current_sort_specs = NULL;
+          sorts_specs->SpecsDirty = false;
+        }
+      }
     }
+    
     ImGui::EndTable();
     if (param_to_edit)
     {

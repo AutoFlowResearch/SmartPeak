@@ -25,6 +25,7 @@
 
 
 #include <SmartPeak/core/CastValue.h>
+#include <SmartPeak/ui/ImEntry.h>
 #include <OpenMS/DATASTRUCTURES/DefaultParamHandler.h>
 #include <map>
 #include <vector>
@@ -185,7 +186,9 @@ namespace SmartPeak
     */
     const std::string getDefaultValueAsString() const { return schema_ ? schema_->getValueAsString() : getValueAsString(); };
     
-    
+    /**
+      @brief return current parameter values in the same order as the columns : headers = { "name", "type", "value", "restrictions" }
+    */
     const std::vector<std::string> getAllValues() const {
       return {this->getName(), this->getType(), this->getValueAsString(), this->getRestrictionsAsString()}; };
 
@@ -259,6 +262,11 @@ namespace SmartPeak
 
     Parameter* findParameter(const std::string& parameter);
     const std::string& getFunctionName() const { return function_name_; };
+    
+    /**
+      @brief return a vector of the currently loaded parameters
+    */
+    std::vector<Parameter> getParameters() const { return parameters_; };
 
     /**
     @brieg Add a parameter. Doesn't Replace if already exists
