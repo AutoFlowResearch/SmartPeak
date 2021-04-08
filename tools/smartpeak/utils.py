@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os, sys, re
 import git
+import docutils.core
 
 
 def get_project_path():
@@ -231,7 +232,7 @@ def read_changes(filepath, version):
   return None
 
 def preprocess_changes(content):
-  """Changes reStructuredText format to markdown (for github releases formatting).
+  """Changes reStructuredText format to html (for github releases formatting).
 
   Parameters
   ----------
@@ -241,12 +242,9 @@ def preprocess_changes(content):
   Returns
   -------
   str
-    The same text formatted with markdown.
+    The same text formatted in html.
   """
-  lines = content.rstrip("\n").split('\n')
-  for i, line in enumerate(lines):
-    f = re.findall(r'~~+(?:\n|\r\n|\r)?', lines[i])
-    if f:
-      lines[i - 1] = '# ' + lines[i - 1]
-      del lines[i]
-  return '\n'.join(lines)
+  html = docutils.core.publish_parts(
+    source=content, writer_name='html', 
+    settings_overrides={'output_encoding': 'unicode'})
+  return html['body']
