@@ -268,7 +268,7 @@ namespace SmartPeak
       catch (const std::exception& e)
       {
         LOGE << "Error reading " << pathname << " in line " << line_number << ", column '" << current_validating_column << "'";
-        throw e;
+        throw;
       }
     }
 
