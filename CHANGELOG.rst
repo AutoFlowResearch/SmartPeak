@@ -25,17 +25,18 @@ Features
 - Enhancing FilePicker entries to be displayed in human readable format `(#339) <https://github.com/AutoFlowResearch/SmartPeak/pull/339>`_
 - Added Statistics and more informations in the info panel `(#341) <https://github.com/AutoFlowResearch/SmartPeak/pull/341>`_
 - Added SmartPeak documentation
-- Adding working examples for calculating MDVs (#326) <https://github.com/AutoFlowResearch/SmartPeak/pull/326>`_  
+- Adding working examples for calculating MDVs `(#326) <https://github.com/AutoFlowResearch/SmartPeak/pull/326>`_  
 
 Changes
 ~~~~~~~
-- Refactor of Feature line and heatmap plots (#349) <https://github.com/AutoFlowResearch/SmartPeak/pull/349>`_  
+- Refactor of Feature line and heatmap plots `(#349) <https://github.com/AutoFlowResearch/SmartPeak/pull/349>`_  
   
 Fix
 ~~~
-- Fix formatting of changelog for emails and github releases (#340) <https://github.com/AutoFlowResearch/SmartPeak/pull/340>`_  
+- Fix formatting of changelog for emails and github releases `(#340) <https://github.com/AutoFlowResearch/SmartPeak/pull/340>`_
 - Fixed crash when launching workflow with no injection `(#332) <https://github.com/AutoFlowResearch/SmartPeak/pull/332>`_
 - Fixed Windows SmartPeak install: executable is not available from start menu `(#338) <https://github.com/AutoFlowResearch/SmartPeak/pull/338>`_
+  
   * Add cmake nsis configuration for creating application links
   * Add icon to executable on windows
   * Update cmake nsis config to include icon to installer and launch the application when installation complete
