@@ -2,6 +2,46 @@ SmartPeak Changelog
 ===================
 
 
+v1.3.0 (2020-04-09)
+-------------------
+
+Features
+~~~~~~~~
+- Advanced Explorer Views 1 `(#324) <https://github.com/AutoFlowResearch/SmartPeak/pull/324>`_
+
+  * Advanced Explorer Views - adding sorting functionality and viewing of File Name
+  * Updated about popup [skip ci]
+  * Adding searching functionality
+  * Sorting and searching for injection/transition/feature tables
+  * Selective searching for tables with dropdown menu
+  * Disallow sorting for all-checked/all-unchecked columns
+  * Sorting and searching for various tables in main window
+  * Final enhancements to FilePicker, ExplorerTables and MainTables
+  * Preventing filenames from being appended twice when opening via button click
+  * Adding reusable table functions for searching/sorting
+  * Adding unittest for Widget
+
+- Make parameters editable `(#337) <https://github.com/AutoFlowResearch/SmartPeak/pull/337>`_  
+- Enhancing FilePicker entries to be displayed in human readable format `(#339) <https://github.com/AutoFlowResearch/SmartPeak/pull/339>`_
+- Added Statistics and more informations in the info panel `(#341) <https://github.com/AutoFlowResearch/SmartPeak/pull/341>`_
+- Added SmartPeak documentation
+- Adding working examples for calculating MDVs `(#326) <https://github.com/AutoFlowResearch/SmartPeak/pull/326>`_  
+
+Changes
+~~~~~~~
+- Refactor of Feature line and heatmap plots `(#349) <https://github.com/AutoFlowResearch/SmartPeak/pull/349>`_  
+  
+Fix
+~~~
+- Fix formatting of changelog for emails and github releases `(#340) <https://github.com/AutoFlowResearch/SmartPeak/pull/340>`_
+- Fixed crash when launching workflow with no injection `(#332) <https://github.com/AutoFlowResearch/SmartPeak/pull/332>`_
+- Fixed Windows SmartPeak install: executable is not available from start menu `(#338) <https://github.com/AutoFlowResearch/SmartPeak/pull/338>`_
+  
+  * Add cmake nsis configuration for creating application links
+  * Add icon to executable on windows
+  * Update cmake nsis config to include icon to installer and launch the application when installation complete
+  * Configure default CPACK_GENERATOR for windows
+
 v1.2.0 (2020-03-15)
 -------------------
 
