@@ -468,7 +468,7 @@ jobs:
           name: "Install prerequisites"
           command: |
             apt-get update
-            pip install gitpython
+            pip install -r tools/smartpeak/requirements.txt
       - add_ssh_keys:
           fingerprints:
             - "e8:9a:a0:0b:75:00:75:1c:04:71:9c:7d:07:af:a2:0d"
