@@ -223,7 +223,7 @@ int main(int argc, char** argv)
 
   if (error_msg.empty())
   {
-    if (logdir_created) LOG_DEBUG << "Log directory created: " << logdirpath;
+    if (logdir_created) { LOG_DEBUG << "Log directory created: " << logdirpath; }
     LOG_INFO << "Log file at: " << logfilepath;
   }
   else
@@ -779,6 +779,7 @@ int main(int argc, char** argv)
           widget->checked_rows_ = session_handler_.injection_explorer_checked_rows;
           widget->checkbox_headers_ = session_handler_.injection_explorer_checkbox_headers;
           widget->checkbox_columns_ = &session_handler_.injection_explorer_checkbox_body;
+          //show_chromatogram_line_plot ? widget->active_plot_ = "Chromatograms" : widget->active_plot_ = "";
           widget->draw();
           ImGui::EndTabItem();
         }
@@ -791,6 +792,7 @@ int main(int argc, char** argv)
           widget->checked_rows_ = session_handler_.transition_explorer_checked_rows;
           widget->checkbox_headers_ = session_handler_.transition_explorer_checkbox_headers;
           widget->checkbox_columns_ = &session_handler_.transition_explorer_checkbox_body;
+          //show_feature_line_plot ? widget->active_plot_ = "Features (line)" : widget->active_plot_ = "";
           widget->draw();
           ImGui::EndTabItem();
         }
