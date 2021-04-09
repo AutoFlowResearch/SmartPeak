@@ -162,6 +162,11 @@ namespace SmartPeak
   {
   public:
     void draw() override;
+
+    /**
+     @brief some data may have unexpected too much high value - or even infinite. data higher than this constant may be not be displayed.
+    */
+    static const double high_value_threeshold_;
   };
 
   /**
@@ -173,14 +178,15 @@ namespace SmartPeak
   class LinePlot2DWidget : public GenericGraphicWidget
   {
   public:
-    LinePlot2DWidget(const Eigen::Tensor<float, 2>&x_data, const Eigen::Tensor<float, 2>&y_data, const Eigen::Tensor<std::string, 1>&series_names,
+    LinePlot2DWidget(const Eigen::Tensor<float, 2>&x_data, const Eigen::Tensor<float, 2>&y_data, const Eigen::Tensor<std::string, 1>& x_labels, const Eigen::Tensor<std::string, 1>&series_names,
       const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
       const float& plot_width, const float& plot_height, const std::string& plot_title) :
-      x_data_(x_data), y_data_(y_data), series_names_(series_names), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
+      x_data_(x_data), y_data_(y_data), x_labels_(x_labels), series_names_(series_names), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
       x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title) {};
     void draw() override;
     const Eigen::Tensor<float, 2>& x_data_;
     const Eigen::Tensor<float, 2>& y_data_;
+    const Eigen::Tensor<std::string, 1>& x_labels_;
     const Eigen::Tensor<std::string, 1>& series_names_;
     const std::string& x_axis_title_;
     const std::string& y_axis_title_;

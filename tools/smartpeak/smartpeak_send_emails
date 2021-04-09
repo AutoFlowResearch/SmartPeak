@@ -3,12 +3,9 @@ from __future__ import print_function
 import pickle
 import os.path, os, sys
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 import base64, argparse
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import markdown
 
 import smartpeak.utils as utils
 
@@ -117,8 +114,8 @@ def main(argc, argv):
       changes = "Opsss! No content available..."
       changes_pre = changes
     else:
-      changes_pre = utils.preprocess_changes(changes)
-      changes = markdown.markdown(changes_pre)
+      changes_pre = changes
+      changes = utils.preprocess_changes(changes)
 
     for to in recipients:
       sender = "smartpeak.ci@gmail.com"
@@ -127,7 +124,8 @@ def main(argc, argv):
       msgHtml = '''\
 <h1>SmartPeak v{version} is released!</h1>
 <i>We are constantly working to improve your SmartPeak experience, below a summary of what has changed in the new release.</i><br>
-You can download new version: <a href="https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version}">https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version}</a><br><br>
+You can download the new version: <a href="https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version}">https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version}</a><br>
+Read the documentation for more details: <a href="https://smartpeak.readthedocs.io">https://smartpeak.readthedocs.io</a><br><br>
 <div style="background: #eee; padding: 20px;">
 {changes}
 </div>
@@ -140,7 +138,8 @@ SmartPeak Team
       msgPlain = '''\
 SmartPeak v{version} is released!\n
 We are constantly working to improve your SmartPeak experience, below a summary of what has changed in the new release.\n
-You can download new version: https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version} \n\n
+You can download the new version: https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version} \n
+Read the documentation for more details: https://smartpeak.readthedocs.io \n\n
 {changes}
 \n\n
 Best wishes,\n
