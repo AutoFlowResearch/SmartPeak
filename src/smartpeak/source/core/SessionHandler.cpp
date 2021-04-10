@@ -1532,7 +1532,7 @@ namespace SmartPeak
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature_pivot table headers and body
       if (feat_value_data.dimension(1) != getNSelectedSampleNamesPlot() || feature_matrix_unique_transitions_ != getNSelectedTransitionsPlot() * getNSelectedFeatureMetaValuesPlot()) {
-        LOGD << "Making feature matrix, line plot, and heatmap data tables";
+        LOGD << "Making feature matrix, line plot, and data tables";
         // get the selected feature names
         Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureMetaValuesPlot();
         std::vector<std::string> feature_names;
@@ -1564,28 +1564,27 @@ namespace SmartPeak
           if (!selected_transition_groups(i).empty())
             component_group_names.insert(selected_transition_groups(i));
         }
-        // Update teh unique transitions
+        // Update the unique transitions
         feature_matrix_unique_transitions_ = getNSelectedTransitionsPlot() * getNSelectedFeatureMetaValuesPlot();
         // get the matrix of data
         Eigen::Tensor<std::string, 2> rows_out;
-        SequenceParser::makeDataMatrixFromMetaValue(sequence_handler, feat_value_data, feat_heatmap_col_labels, rows_out, feature_names, sample_types, sample_names, component_group_names, component_names);
+        SequenceParser::makeDataMatrixFromMetaValue(sequence_handler, feat_value_data, feat_col_labels, rows_out, feature_names, sample_types, sample_names, component_group_names, component_names);
         setFeatureLinePlot();
-        setFeatureHeatMap();
         // update the pivot table headers with the columns for the pivot table/heatmap rows
-        feature_pivot_table_headers.resize((int)feat_heatmap_col_labels.size() + 3);
+        feature_pivot_table_headers.resize((int)feat_col_labels.size() + 3);
         feature_pivot_table_headers(0) = "feature_name";
         feature_pivot_table_headers(1) = "component_group_name";
         feature_pivot_table_headers(2) = "component_name";
-        feature_pivot_table_headers.slice(Eigen::array<Eigen::Index, 1>({ 3 }), Eigen::array<Eigen::Index, 1>({ feat_heatmap_col_labels.size() })) = feat_heatmap_col_labels;
+        feature_pivot_table_headers.slice(Eigen::array<Eigen::Index, 1>({ 3 }), Eigen::array<Eigen::Index, 1>({ feat_col_labels.size() })) = feat_col_labels;
         const int n_cols = feature_pivot_table_headers.size();
         const int n_rows = feat_value_data.dimension(0);
         // allocate space for the pivot table body and heatmap row labels
-        feat_heatmap_row_labels.resize(n_rows);
+        feat_row_labels.resize(n_rows);
         feature_pivot_table_body.resize(n_rows, n_cols);
         // assign the pivot table body data and heatmap row labels
         int col = 0;
         for (int row = 0; row < n_rows; ++row) {
-          feat_heatmap_row_labels(row) = rows_out(row, 0) + "::" + rows_out(row, 2);
+          feat_row_labels(row) = rows_out(row, 0) + "::" + rows_out(row, 2);
           for (int j = 0; j < rows_out.dimension(1); ++j) {
             feature_pivot_table_body(row, col) = rows_out(row, j);
             ++col;
@@ -1652,26 +1651,6 @@ namespace SmartPeak
             return false;
           }
         }
-        //// Extract out the best left/right for plotting
-        //for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
-        //  for (const auto& subordinate : feature.getSubordinates()) {
-        //    if (subordinate.getMetaValue("used_") == "true" && component_names.count(subordinate.getMetaValue("native_id").toString())) {
-        //      if (subordinate.metaValueExists("leftWidth") && subordinate.metaValueExists("rightWidth")) {
-        //        std::vector<float> x_data, y_data;
-        //        x_data.push_back(subordinate.getMetaValue("leftWidth"));
-        //        y_data.push_back(0); // TODO: extract out chrom peak intensity
-        //        x_data.push_back(subordinate.getMetaValue("rightWidth"));
-        //        y_data.push_back(0); // TODO: extract out chrom peak intensity
-        //        n_points += x_data.size();
-        //        if (n_points < MAX_POINTS) {
-        //          chrom_time_data.push_back(x_data);
-        //          chrom_intensity_data.push_back(y_data);
-        //          chrom_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
-        //        }
-        //      }
-        //    }
-        //  }
-        //}
         // Extract out the smoothed points for plotting
         for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
           for (const auto& subordinate : feature.getSubordinates()) {
@@ -1760,30 +1739,6 @@ namespace SmartPeak
             return false;
           }
         }
-        //// Extract out the best left/right for plotting
-        //for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
-        //  for (const auto& subordinate : feature.getSubordinates()) {
-        //    if (subordinate.getMetaValue("used_") == "true" && scan_names.count(subordinate.getMetaValue("native_id").toString())) { // TODO
-        //      if (subordinate.metaValueExists("leftWidth") && subordinate.metaValueExists("rightWidth")) {
-        //        std::vector<float> x_data, y_data;
-        //        x_data.push_back(subordinate.getMetaValue("leftWidth"));
-        //        y_data.push_back(0); // TODO: extract out spec peak intensity
-        //        x_data.push_back(subordinate.getMetaValue("rightWidth"));
-        //        y_data.push_back(0); // TODO: extract out spec peak intensity
-        //        n_points += x_data.size();
-        //        if (n_points < MAX_POINTS) {
-        //          spec_mz_data.push_back(x_data);
-        //          spec_intensity_data.push_back(y_data);
-        //          spec_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
-        //        }
-        //        else {
-        //          LOGD << "Stopped adding points to the spectra plot";
-        //          return false;
-        //        }
-        //      }
-        //    }
-        //  }
-        //}
         // Extract out the smoothed points for plotting
         for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
           for (const auto& subordinate : feature.getSubordinates()) {
@@ -1821,14 +1776,14 @@ namespace SmartPeak
   void SessionHandler::setFeatureLinePlot()
   {
     // Set the axes titles and min/max defaults
-    feat_line_x_axis_title = "Inj#";
-    std::string feat_line_y_axis_title = "metadata (au)";
+    feat_line_x_axis_title = "Injections";
+    std::string feat_line_y_axis_title = "Value";
     feat_line_sample_min = 1e6; 
     feat_line_sample_max = 0; 
     feat_value_min = 1e6; 
     feat_value_max = 0;
     // make the injection index for the line plot
-    const int n_samples = feat_heatmap_col_labels.size();
+    const int n_samples = feat_col_labels.size();
     const int n_rows = feat_value_data.dimension(0);
     feat_sample_data.resize(n_rows, n_samples);
     for (float i = 0; i < n_samples; i += 1) feat_sample_data.chip(i, 1) = feat_sample_data.chip(i, 1).constant(i);
@@ -1839,14 +1794,79 @@ namespace SmartPeak
     const Eigen::Tensor<float, 0> feat_value_data_minimum = feat_value_data.minimum();
     feat_value_min = feat_value_data_minimum(0);
   }
-  void SessionHandler::setFeatureHeatMap()
+  void SessionHandler::getHeatMap(const SequenceHandler& sequence_handler, HeatMapData& result, const std::string& feature_name)
   {
+    LOGD << "Getting Heatmap data";
+    std::vector<std::string> feature_names;
+    feature_names.push_back(feature_name);
+    // get the selected sample types
+    std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
+    for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
+    // get the selected sample names
+    Eigen::Tensor<std::string, 1> selected_sample_names = getSelectSampleNamesPlot();
+    std::set<std::string> sample_names;
+    for (int i = 0; i < selected_sample_names.size(); ++i) {
+      if (!selected_sample_names(i).empty())
+        sample_names.insert(selected_sample_names(i));
+    }
+    // get the selected transitions
+    Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsPlot();
+    std::set<std::string> component_names;
+    for (int i = 0; i < selected_transitions.size(); ++i) {
+      if (!selected_transitions(i).empty())
+        component_names.insert(selected_transitions(i));
+    }
+    // get the selected transition groups
+    Eigen::Tensor<std::string, 1> selected_transition_groups = getSelectTransitionGroupsPlot();
+    std::set<std::string> component_group_names;
+    for (int i = 0; i < selected_transition_groups.size(); ++i) {
+      if (!selected_transition_groups(i).empty())
+        component_group_names.insert(selected_transition_groups(i));
+    }
+    // Update the unique transitions
+    feature_matrix_unique_transitions_ = getNSelectedTransitionsPlot() * getNSelectedFeatureMetaValuesPlot();
+    // get the matrix of data
+    if (sequence_handler.getSequence().size() > 0 &&
+      sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)
+    {
+      Eigen::Tensor<std::string, 2> rows_out;
+      Eigen::Tensor<float, 2> heatmap_value_data;
+      SequenceParser::makeDataMatrixFromMetaValue(sequence_handler,
+                                                  heatmap_value_data,
+                                                  result.feat_heatmap_col_labels,
+                                                  rows_out,
+                                                  feature_names,
+                                                  sample_types,
+                                                  sample_names,
+                                                  component_group_names,
+                                                  component_names);
+      const int n_rows = heatmap_value_data.dimension(0);
+      // allocate space for the pivot table body and heatmap row labels
+      result.feat_heatmap_row_labels.resize(n_rows);
+      for (int row = 0; row < n_rows; ++row) {
+        result.feat_heatmap_row_labels(row) = rows_out(row, 0);
+      }
+      // assign the heatmap data
+      result.feat_heatmap_data.resize(heatmap_value_data.dimensions());
+      result.feat_heatmap_data = heatmap_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+      const Eigen::Tensor<float, 0> feat_value_data_maximum = heatmap_value_data.maximum();
+      result.feat_value_max_ = feat_value_data_maximum(0);
+      const Eigen::Tensor<float, 0> feat_value_data_minimum = heatmap_value_data.minimum();
+      result.feat_value_min_ = feat_value_data_minimum(0);
+    }
+    else
+    {
+      result.feat_heatmap_data.setZero();
+      result.feat_value_max_ = std::numeric_limits<float>::min();
+      result.feat_value_min_ = std::numeric_limits<float>::max();
+    }
     // Set the axes titles
-    feat_heatmap_x_axis_title = "Sample name";
-    feat_heatmap_y_axis_title = "Component name";
-    // assign the heatmap data
-    feat_heatmap_data.resize(feat_value_data.dimensions());
-    feat_heatmap_data = feat_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+    result.feat_heatmap_x_axis_title = "Injections";
+    result.feat_heatmap_y_axis_title = "Transitions";
+    result.selected_feature_ = feature_name;
+    result.selected_sample_names_ = selected_sample_names;
+    result.selected_transitions_ = selected_transitions;
+    result.selected_transition_groups_ = selected_transition_groups;
   }
   bool SessionHandler::setCalibratorsScatterLinePlot(const SequenceHandler & sequence_handler)
   {
