@@ -763,7 +763,7 @@ namespace SmartPeak
     
     // prettify date [3]
     std::tm * current_time_tm, entry_date_tm;
-    char date_time_buffer [80];
+    char date_time_buffer[80];
     std::string date_time_buf;
     
     std::time_t current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
