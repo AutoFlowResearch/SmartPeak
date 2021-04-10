@@ -2134,7 +2134,7 @@ namespace SmartPeak
         }
         else if (param.getName() == "feature_name")
         {
-          feature_name = param.getName();
+          feature_name = param.getValueAsString();
         }
       }
       
@@ -2143,7 +2143,7 @@ namespace SmartPeak
       rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
-      LOGE << e.what();
+      LOGE << "calculateMDVs : " << typeid(e).name() << " : " << e.what();
     }
 
     LOGD << "END calculateMDVs";
@@ -2201,7 +2201,7 @@ namespace SmartPeak
       rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
-      LOGE << e.what();
+      LOGE << "IsotopicCorrections : " << typeid(e).name() << " : " << e.what();
     }
 
     LOGD << "END IsotopicCorrections";
@@ -2296,7 +2296,7 @@ namespace SmartPeak
       rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
-      LOGE << e.what();
+      LOGE << "CalculateIsotopicPurities : " << typeid(e).name() << " : " << e.what();
     }
 
     LOGD << "END CalculateIsotopicPurities";
@@ -2337,7 +2337,7 @@ namespace SmartPeak
       OpenMS::FeatureMap featureMap_with_accuracy_info;
       auto& CalculateMDVAccuracies_params = params.at("CalculateMDVAccuracies");
       
-      std::vector<double> fragment_isotopomer_measured;
+      //std::vector<double> fragment_isotopomer_measured;
       std::string fragment_isotopomer_theoretical_formula, fragment_isotopomer_measured_s, feature_name;
       std::map<std::string, std::string> proteinName_to_SumFormula ;
       
@@ -2346,7 +2346,11 @@ namespace SmartPeak
         if (peptide.metaValueExists("SumFormula") && !peptide.id.empty()
             && proteinName_to_SumFormula.find((std::string)(peptide.id)) == proteinName_to_SumFormula.end())
         {
-          proteinName_to_SumFormula.insert(std::make_pair((std::string)(peptide.id), (std::string)peptide.getMetaValue("SumFormula")));
+          std::string sum_formula = (std::string)peptide.getMetaValue("SumFormula");
+          std::string peptide_id = (std::string)(peptide.id);
+          sum_formula.erase(std::remove_if(sum_formula.begin(), sum_formula.end(), [](unsigned char c){return std::isspace(c);}), sum_formula.end());
+          peptide_id.erase(std::remove_if(peptide_id.begin(), peptide_id.end(), [](unsigned char c){return std::isspace(c);}), peptide_id.end());
+          proteinName_to_SumFormula.insert(std::make_pair(peptide_id, sum_formula));
         }
       }
       
@@ -2367,7 +2371,7 @@ namespace SmartPeak
       rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
-      LOGE << e.what();
+      LOGE << "CalculateMDVAccuracies : " << typeid(e).name() << " : " << e.what();
     }
 
     LOGD << "END CalculateMDVAccuracies";

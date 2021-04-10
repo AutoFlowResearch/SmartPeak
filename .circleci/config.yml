@@ -26,7 +26,8 @@ jobs:
             apt-get install -y libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
             apt-get install -y graphviz doxygen python3-pip &&
             apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
-            pip3 install exhale gitpython
+            pip3 install exhale && 
+            pip3 install -r tools/smartpeak/requirements.txt
       - run:
           # CircleCI doesn't support regex for conditional steps unfortunately...
           # During the release workflow, the previous job will push version update commit to release branch.
@@ -102,7 +103,7 @@ jobs:
             brew remove yarn node
             brew install cmake qt5 sdl2
             brew install boost
-            pip3 install gitpython
+            pip3 install -r tools/smartpeak/requirements.txt
       - run:
           name: "Pull latest (only release)"
           command: |
@@ -138,10 +139,11 @@ jobs:
             make -j4
       - run:
           name: Running SmartPeak Class Tests
+          no_output_timeout: 15m
           command: |
-            set +o pipefail
+            set -e -o pipefail
             cd ~/SmartPeak/smartpeak_release_build
-            ctest -VV -F --timeout 1200 || true
+            ctest -VV -F --timeout 1200
             cd ~/SmartPeak
             export PYTHONPATH="${PWD}/tools"
             python3 -m unittest discover -s ./tools/smartpeak
@@ -194,7 +196,6 @@ jobs:
             # choco install boost-msvc-14.1
             choco install doxygen.install
             choco install nsis.portable
-            pip install gitpython
             refreshenv
             $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
             $sdl2_url = 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
@@ -220,6 +221,8 @@ jobs:
             ls C:\lib\boost\
             $BOOST_DIR = 'C:\lib\boost\boost_1_73_0'
             $boost_tmp | Remove-Item
+            cd ~/SmartPeak
+            pip install -r .\tools\smartpeak\requirements.txt
       - run:
           name: Cloning OpenMS - develop
           command: |
@@ -261,6 +264,7 @@ jobs:
           name: Building SmartPeak, running Class Tests and Packaging
           command: |
             $ErrorActionPreference = "Stop"
+            function ThrowOnFailure($Msg) { if (-not $?) { throw $Msg } }
             Get-Content "$env:temp\vcvars64.txt" | Foreach-Object {
             if ($_ -match "^(.*?)=(.*)$") {
                 Set-Content "env:\$($matches[1])" $matches[2]
@@ -279,10 +283,13 @@ jobs:
             msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
             refreshenv
             & 'C:\Program Files\cmake\bin\ctest.exe' -VV -F
+            ThrowOnFailure "CTest failed!"
             & 'C:\Program Files\cmake\bin\cpack.exe' -G NSIS64
+            ThrowOnFailure "CPack failed!"
             cd ~/SmartPeak
             $env:PYTHONPATH = $PWD.Path + "\tools"
             python -m unittest discover -s .\tools\smartpeak\
+            ThrowOnFailure "Python tests failed!"
       - run:
           name: Signing SmartPeak with trusted certificate
           command: |
@@ -293,6 +300,16 @@ jobs:
             Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
             certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
             & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
+      - run:
+          name: Signing SmartPeak with trusted certificate
+          command: |
+            # $ErrorActionPreference = "Stop"
+            # cd ~/SmartPeak/smartpeak_release_build
+            # git clone --branch main https://github.com/AutoFlowResearch/CodeSigning
+            # Import-Module .\CodeSigning\CertCrypto.psm1
+            # Unprotect-Cert '.\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx.AES' -KeyAsPlainText $env:PFX_AES -RemoveSource
+            # certutil -p $env:PFX_PSWD -importpfx .\CodeSigning\CodeSigning_DTU_AIT_KIT_DTUDOC.pfx
+            # & 'C:\Program Files (x86)\windows kits\10\bin\x64\signtool.exe' sign /v /sm /s My /n "DTU-AIT-DTUDOC client Plugin"  *.exe
       - run:
           name: Preparing Artifact
           command: |
@@ -312,8 +329,7 @@ jobs:
       - run:
           name: "Check prerequisites"
           command: |
-            python --version
-            pip install gitpython
+            pip install -r tools/smartpeak/requirements.txt
       - run:
           name: "Update SmartPeak version"
           command: |
@@ -358,9 +374,8 @@ jobs:
             apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
             apt-add-repository https://cli.github.com/packages
             apt-get update
-            apt-get install -y gh
-            apt-get install -y curl wget jq
-            pip install gitpython
+            apt-get install -y gh curl wget jq
+            pip install -r tools/smartpeak/requirements.txt
             GHR_VERSION=0.13.0
             GHR_URL=https://github.com/tcnksm/ghr/releases/download/v${GHR_VERSION}/ghr_v${GHR_VERSION}_linux_amd64.tar.gz
             wget "$GHR_URL" && \
@@ -429,7 +444,6 @@ jobs:
       - run:
           name: "Notify users"
           command: |
-            pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib markdown
             BRANCH=(${CIRCLE_BRANCH//// })
             VERSION=${BRANCH[1]}
             export PATH="$PATH:$PWD/tools/smartpeak"
@@ -454,7 +468,7 @@ jobs:
           name: "Install prerequisites"
           command: |
             apt-get update
-            pip install gitpython
+            pip install -r tools/smartpeak/requirements.txt
       - add_ssh_keys:
           fingerprints:
             - "e8:9a:a0:0b:75:00:75:1c:04:71:9c:7d:07:af:a2:0d"
