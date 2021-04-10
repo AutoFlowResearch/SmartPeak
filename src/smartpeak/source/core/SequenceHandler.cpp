@@ -163,7 +163,8 @@ namespace SmartPeak
         rdh.setFeatureRSDEstimations(feature_rsd_estimations_ptr);
         rdh.setFeatureBackgroundEstimations(feature_background_estimations_ptr);
       }
-      else {  // New sequence segment
+      else 
+      {  // New sequence segment
         // initialize the sequence segment
         SequenceSegmentHandler sequenceSegmentHandler;
         sequenceSegmentHandler.setSampleIndices({ sequence_.size() }); // index = the size of the sequence
@@ -201,7 +202,8 @@ namespace SmartPeak
       if (found_sample_group) {
         // Nothing yet...
       }
-      else {  // New sample group
+      else 
+      {  // New sample group
         // initialize the sample group
         SampleGroupHandler sampleGroupHandler;
         sampleGroupHandler.setSampleIndices({ sequence_.size() }); // index = the size of the sequence
@@ -209,7 +211,8 @@ namespace SmartPeak
         sample_groups_.push_back(sampleGroupHandler);
       }
     }
-    else {
+    else 
+    {
       // initialize the sequence segment
       SequenceSegmentHandler sequenceSegmentHandler;
       auto absQuantMethods_ptr = std::make_shared<std::vector<OpenMS::AbsoluteQuantitationMethod>>(std::vector<OpenMS::AbsoluteQuantitationMethod>());

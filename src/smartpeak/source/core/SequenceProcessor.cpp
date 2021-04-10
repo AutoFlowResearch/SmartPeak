@@ -220,7 +220,8 @@ namespace SmartPeak
     if (sample_group_names_.empty()) { // select all
       sample_groups = sequenceHandler_IO->getSampleGroups();
     }
-    else { // select those with specific sample group names
+    else 
+    { // select those with specific sample group names
       for (SampleGroupHandler& s : sequenceHandler_IO->getSampleGroups()) {
         if (sample_group_names_.count(s.getSampleGroupName())) {
           sample_groups.push_back(s);
@@ -327,16 +328,19 @@ namespace SmartPeak
       if (n_threads > max_threads) {
         n_workers = max_threads - 1;
       }
-      else if (n_threads <= max_threads && n_threads > 1) {
+      else if (n_threads <= max_threads && n_threads > 1) 
+      {
         n_workers = n_threads - 1;
       }
-      else if (n_threads >= 0) {
+      else if (n_threads >= 0) 
+      {
         LOGD << "Max available threads: " << max_threads;
         LOGD << "but using just 1 thread.";
         n_workers = 1;
       }
     }
-    else {
+    else 
+    {
       LOGD << "Couldn't determine # of threads, using just 1 thread!";
       n_workers = 1;
     }

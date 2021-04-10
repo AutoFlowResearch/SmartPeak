@@ -125,7 +125,7 @@ namespace SmartPeak
     ImVec2 size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 2);
     if (ImGui::BeginTable("FileBrowser", column_count, table_flags, size))
     {
-      for (int column = 0; column < column_count; column++){
+      for (int column = 0; column < column_count; column++) {
         ImGui::TableSetupColumn(column_names[column], column_flags[column], -1.0f);
       }
       ImGui::TableSetupScrollFreeze(column_count, 1);
@@ -165,11 +165,11 @@ namespace SmartPeak
           ImEntry item = Im_directory_entries[row];
           Utilities::makeHumanReadable(item);
           char text_buffer[256];
-          sprintf(text_buffer, "%s", item.entry_contents[column].c_str());
+          std::snprintf(text_buffer, sizeof text_buffer, "%s", item.entry_contents[column].c_str());
           
           const bool is_selected = (selected_entry == row);
           ImGui::TableSetColumnIndex(column);
-          if(ImGui::Selectable(text_buffer, is_selected, selectable_flags))
+          if (ImGui::Selectable(text_buffer, is_selected, selectable_flags))
           {
             selected_entry = row;
             std::strcpy(selected_filename, Im_directory_entries[selected_entry].entry_contents[0].c_str());
@@ -305,7 +305,8 @@ namespace SmartPeak
       if (file_was_loaded) {
         LOGN << "File has been loaded.";
       }
-      else {
+      else 
+      {
         error_loading_file_ = true;
         LOGN << "File has not been loaded.";
       }
