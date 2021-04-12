@@ -4,6 +4,7 @@ set(directory include/SmartPeak/io)
 ### list all header files of the directory here
 set(sources_list_h
 	csv.h
+	cmdparser.h
 	CSVWriter.h
 	FileReader.h
 	SequenceParser.h
