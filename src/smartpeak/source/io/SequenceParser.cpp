@@ -184,7 +184,8 @@ namespace SmartPeak
         std::string t_scan_mass_high;
         bool is_valid = false;
 
-        if (delimiter == s_comma) {
+        if (delimiter == s_comma) 
+        {
           is_valid = in_comma.read_row(t.sample_name, t.sample_group_name,
             t.sequence_segment_name, t_sample_type, t.original_filename,
             t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
@@ -192,7 +193,8 @@ namespace SmartPeak
             t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
             t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
         }
-        else if (delimiter == s_semicolon) {
+        else if (delimiter == s_semicolon)
+        {
           is_valid = in_semicolon.read_row(t.sample_name, t.sample_group_name,
             t.sequence_segment_name, t_sample_type, t.original_filename,
             t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
@@ -200,7 +202,8 @@ namespace SmartPeak
             t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
             t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
         }
-        else if (delimiter == s_tab) {
+        else if (delimiter == s_tab)
+        {
           is_valid = in_tab.read_row(t.sample_name, t.sample_group_name,
             t.sequence_segment_name, t_sample_type, t.original_filename,
             t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
@@ -245,7 +248,8 @@ namespace SmartPeak
         if (stringToSampleType.count(t_sample_type)) {
           t.sample_type = stringToSampleType.at(t_sample_type);
         }
-        else {
+        else 
+        {
           t.sample_type = SampleType::Unrecognized;
         }
 
