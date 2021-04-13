@@ -123,8 +123,6 @@ int main(int argc, char** argv)
   bool show_sequence_table = false;
   bool show_transitions_table = false;
   bool show_spectrum_table = false;
-  bool show_workflow_table = true;
-  bool show_parameters_table = false;
   bool show_quant_method_table = false;
   bool show_stds_concs_table = false;
   bool show_comp_filters_table = false;
@@ -145,26 +143,14 @@ int main(int argc, char** argv)
   bool show_comp_group_background_estimations_table = false;
   bool show_feature_table = false; // table of all injections, features, and metavalues
   bool show_feature_pivot_table = false; // injection vs. feature for a particular metavalue
-  bool show_chromatogram_line_plot = false; // time vs. intensity for the raw data and annotated feature
   bool show_spectra_line_plot = false; // time vs. intensity for the raw data and annotated feature
   bool show_feature_line_plot = false; // injection vs. metavalue for n selected features
-  bool show_feature_heatmap_plot = false; // injection vs. feature for a particular metavalue
   bool show_calibrators_line_plot = false; // peak area/height ratio vs. concentration ratio
   
-  // Heatmap display option
+  // 
   bool heatmap_initialized = false;
-  std::unique_ptr<Heatmap2DWidget> heatmap_plot_widget;
-
-  // Chromatogram display option
   bool chromatogram_initialized = false;
-  std::unique_ptr<ChromatogramPlotWidget> chromatogram_plot_widget;
-
-  std::map<std::string, std::shared_ptr<ExplorerWidget>> explorer_widgets;
-  std::map<std::string, std::shared_ptr<GenericTableWidget>> generic_table_widgets;
-
-  // Spectra display option
   bool spectra_initialized = false;
-  std::unique_ptr<SpectraPlotWidget> spectra_plot_widget;
 
   ApplicationHandler application_handler_;
   SessionHandler session_handler_;
@@ -180,13 +166,22 @@ int main(int argc, char** argv)
   RunWorkflowWidget run_workflow_widget_;
   AboutWidget about_widget_;
   LogWidget log_widget(appender_);
-  
-  std::unique_ptr<ParametersTableWidget> parameters_table_widget;
-  quickInfoText_.visible_ = true; // visible on start
+  ParametersTableWidget parameters_table_widget(session_handler_, application_handler_, "ParametersMainWindow");
+  ChromatogramPlotWidget chromatogram_plot_widget(session_handler_, application_handler_.sequenceHandler_, "Chromatograms Main Window");
+  Heatmap2DWidget heatmap_plot_widget(session_handler_, application_handler_.sequenceHandler_, "Heatmap Main Window");
+  SpectraPlotWidget spectra_plot_widget(session_handler_, application_handler_.sequenceHandler_, "Spectra Main Window");
+  std::map<std::string, std::shared_ptr<ExplorerWidget>> explorer_widgets;
+  std::map<std::string, std::shared_ptr<GenericTableWidget>> generic_table_widgets;
+
   report_.setApplicationHandler(application_handler_);
   workflow_.setApplicationHandler(application_handler_);
   statistics_.setApplicationHandler(application_handler_);
   quickInfoText_.setApplicationHandler(application_handler_);
+
+  // visible on start
+  workflow_.visible_ = true;
+  quickInfoText_.visible_ = true; // visible on start
+
 
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -561,10 +556,10 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Sequence", NULL, &show_sequence_table)) {}
         if (ImGui::MenuItem("Transitions", NULL, &show_transitions_table)) {}
         if (ImGui::MenuItem("Scans", NULL, &show_spectrum_table)) {}
-        if (ImGui::MenuItem("Workflow", NULL, &show_workflow_table)) {}
+        if (ImGui::MenuItem("Workflow", NULL, &workflow_.visible_)) {}
         if (ImGui::BeginMenu("Workflow settings"))
         {
-          if (ImGui::MenuItem("Parameters", NULL, &show_parameters_table)) {}
+          if (ImGui::MenuItem("Parameters", NULL, &parameters_table_widget.visible_)) {}
           if (ImGui::MenuItem("Quant Method", NULL, &show_quant_method_table)) {}
           if (ImGui::MenuItem("Standards Conc", NULL, &show_stds_concs_table)) {}
           if (ImGui::MenuItem("Comp Filters", NULL, &show_comp_filters_table)) {}
@@ -589,10 +584,10 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Features (table)", NULL, &show_feature_table)) {}
         if (ImGui::MenuItem("Features (matrix)", NULL, &show_feature_pivot_table)) {}
         ImGui::MenuItem("Main window (Plots)", NULL, false, false);
-        if (ImGui::MenuItem("Chromatogram", NULL, &show_chromatogram_line_plot)) {}
+        if (ImGui::MenuItem("Chromatogram", NULL, &chromatogram_plot_widget.visible_)) {}
         if (ImGui::MenuItem("Spectra", NULL, &show_spectra_line_plot)) {}
         if (ImGui::MenuItem("Features (line)", NULL, &show_feature_line_plot)) {}
-        if (ImGui::MenuItem("Features (heatmap)", NULL, &show_feature_heatmap_plot)) {}
+        if (ImGui::MenuItem("Features (heatmap)", NULL, &heatmap_plot_widget.visible_)) {}
         if (ImGui::MenuItem("Calibrators", NULL, &show_calibrators_line_plot)) {}
         if (ImGui::MenuItem("Statistics", NULL, &statistics_.visible_)) {}
         ImGui::MenuItem("Info window", NULL, false, false);
@@ -647,14 +642,14 @@ int main(int argc, char** argv)
       ImGui::EndMainMenuBar();
     }
 
-    show_top_window_ = show_sequence_table || show_transitions_table || show_spectrum_table || show_workflow_table || show_parameters_table
+    show_top_window_ = show_sequence_table || show_transitions_table || show_spectrum_table || workflow_.visible_ || parameters_table_widget.visible_
       || show_quant_method_table || show_stds_concs_table
       || show_comp_filters_table || show_comp_group_filters_table || show_comp_qcs_table || show_comp_group_qcs_table
       || show_comp_rsd_filters_table || show_comp_group_rsd_filters_table || show_comp_rsd_qcs_table || show_comp_group_rsd_qcs_table
       || show_comp_background_filters_table || show_comp_group_background_filters_table || show_comp_background_qcs_table || show_comp_group_background_qcs_table
       || show_comp_rsd_estimations_table || show_comp_group_rsd_estimations_table || show_comp_background_estimations_table || show_comp_group_background_estimations_table
       || show_feature_table || show_feature_pivot_table
-      || show_chromatogram_line_plot || show_spectra_line_plot || show_feature_line_plot || show_feature_heatmap_plot || show_calibrators_line_plot;
+      || chromatogram_plot_widget.visible_ || show_spectra_line_plot || show_feature_line_plot || heatmap_plot_widget.visible_ || show_calibrators_line_plot;
     show_bottom_window_ = quickInfoText_.visible_ || log_widget.visible_;
     show_left_window_ = show_injection_explorer || show_transitions_explorer || show_features_explorer || show_spectrum_explorer;
     win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
@@ -777,22 +772,15 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_workflow_table && ImGui::BeginTabItem("Workflow", &show_workflow_table))
+        if (ImGui::BeginTabItem("Workflow", &workflow_.visible_))
         {
           workflow_.setEditable(workflow_is_done_);
           workflow_.draw();
           ImGui::EndTabItem();
         }
-        if (show_parameters_table && ImGui::BeginTabItem("Parameters", &show_parameters_table))
+        if (ImGui::BeginTabItem("Parameters", &parameters_table_widget.visible_))
         {
-          if (!parameters_table_widget)
-          {
-            parameters_table_widget = std::make_unique<ParametersTableWidget>(
-              session_handler_,
-              application_handler_,
-              "ParametersMainWindow");
-          }
-          parameters_table_widget->draw();
+          parameters_table_widget.draw();
           ImGui::EndTabItem();
         }
         if (show_quant_method_table && ImGui::BeginTabItem("Quantitation Method", &show_quant_method_table))
@@ -1032,16 +1020,9 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_chromatogram_line_plot && ImGui::BeginTabItem("Chromatograms", &show_chromatogram_line_plot))
+        if (ImGui::BeginTabItem("Chromatograms", &chromatogram_plot_widget.visible_))
         {
-          if (!chromatogram_plot_widget)
-          {
-            chromatogram_plot_widget = std::make_unique<ChromatogramPlotWidget>(
-              session_handler_,
-              application_handler_.sequenceHandler_,
-              "Chromatograms Main Window");
-          }
-          chromatogram_plot_widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
+          chromatogram_plot_widget.setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
           if (!workflow_is_done_)
           {
             chromatogram_initialized = false;
@@ -1050,24 +1031,17 @@ int main(int argc, char** argv)
           {
             if (!chromatogram_initialized)
             {
-              chromatogram_plot_widget->setRefreshNeeded();
+              chromatogram_plot_widget.setRefreshNeeded();
               chromatogram_initialized = true;
             }
           }
           // The actual plot
-          chromatogram_plot_widget->draw();
+          chromatogram_plot_widget.draw();
           ImGui::EndTabItem();
         }
-        if (show_spectra_line_plot && ImGui::BeginTabItem("Spectra", &show_spectra_line_plot))
+        if (ImGui::BeginTabItem("Spectra", &spectra_plot_widget.visible_))
         {
-          if (!spectra_plot_widget)
-          {
-            spectra_plot_widget = std::make_unique<SpectraPlotWidget>(
-              session_handler_,
-              application_handler_.sequenceHandler_,
-              "Spectra Main Window");
-          }
-          spectra_plot_widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
+          spectra_plot_widget.setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
           if (!workflow_is_done_)
           {
             spectra_initialized = false;
@@ -1076,12 +1050,12 @@ int main(int argc, char** argv)
           {
             if (!spectra_initialized)
             {
-              spectra_plot_widget->setRefreshNeeded();
+              spectra_plot_widget.setRefreshNeeded();
               spectra_initialized = true;
             }
           }
           // The actual plot
-          spectra_plot_widget->draw();
+          spectra_plot_widget.draw();
           ImGui::EndTabItem();
         }
         if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
@@ -1096,15 +1070,8 @@ int main(int argc, char** argv)
           plot2d.draw();
           ImGui::EndTabItem();
         }
-        if (show_feature_heatmap_plot && ImGui::BeginTabItem("Features (heatmap)", &show_feature_heatmap_plot))
+        if (ImGui::BeginTabItem("Features (heatmap)", &heatmap_plot_widget.visible_))
         {
-          if (!heatmap_plot_widget)
-          {
-            heatmap_plot_widget = std::make_unique<Heatmap2DWidget>(
-              session_handler_,
-              application_handler_.sequenceHandler_,
-              "Heatmap Main Window");
-          }
           // To be replace when we have implement events
           static bool heatmap_initialized = false;
           if (!workflow_is_done_)
@@ -1115,12 +1082,12 @@ int main(int argc, char** argv)
           {
             if (!heatmap_initialized)
             {
-              heatmap_plot_widget->setRefreshNeeded();
+              heatmap_plot_widget.setRefreshNeeded();
               heatmap_initialized = true;
             }
           }
-          heatmap_plot_widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
-          heatmap_plot_widget->draw();
+          heatmap_plot_widget.setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
+          heatmap_plot_widget.draw();
           ImGui::EndTabItem();
         }
         if (show_calibrators_line_plot && ImGui::BeginTabItem("Calibrators", &show_calibrators_line_plot))
