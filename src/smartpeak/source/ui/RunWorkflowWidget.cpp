@@ -1,0 +1,163 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
+// --------------------------------------------------------------------------
+
+#include <SmartPeak/ui/RunWorkflowWidget.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
+#include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
+#include <plog/Log.h>
+#include <SmartPeak/core/SharedProcessors.h>
+#include <boost/filesystem.hpp>
+
+namespace SmartPeak
+{
+  namespace fs = boost::filesystem;
+
+  void RunWorkflowWidget::draw()
+  {
+    if (!application_handler_)
+    {
+      LOGE << "Workflow widget has no ApplicationHandler object associated with it";
+      return;
+    }
+
+    if (!session_handler_)
+    {
+      LOGE << "Workflow widget has no SessionHandler object associated with it";
+      return;
+    }
+
+    if (!workflow_manager_)
+    {
+      LOGE << "Workflow widget has no WorkflowManager object associated with it";
+      return;
+    }
+
+    if (ImGui::BeginPopupModal("Run workflow modal", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+      ImGui::Text("mzML folder");
+      ImGui::PushID(1);
+      ImGui::InputTextWithHint("", application_handler_->mzML_dir_.c_str(), &(application_handler_->mzML_dir_));
+      ImGui::PopID();
+      ImGui::SameLine();
+      ImGui::PushID(11);
+      if (ImGui::Button("Select"))
+      {
+        static SetRawDataPathname processor(*application_handler_);
+        file_picker_.setProcessor(processor);
+        popup_file_picker_ = true;
+      }
+      ImGui::PopID();
+
+      ImGui::Text("Input features folder");
+      ImGui::PushID(2);
+      ImGui::InputTextWithHint("", application_handler_->features_in_dir_.c_str(), &(application_handler_->features_in_dir_));
+      ImGui::PopID();
+      ImGui::SameLine();
+      ImGui::PushID(22);
+      if (ImGui::Button("Select"))
+      {
+        static SetInputFeaturesPathname processor(*application_handler_);
+        file_picker_.setProcessor(processor);
+        popup_file_picker_ = true;
+      }
+      ImGui::PopID();
+
+      ImGui::Text("Output features folder");
+      ImGui::PushID(3);
+      ImGui::InputTextWithHint("", application_handler_->features_out_dir_.c_str(), &(application_handler_->features_out_dir_));
+      ImGui::PopID();
+
+      ImGui::SameLine();
+      ImGui::PushID(33);
+      if (ImGui::Button("Select"))
+      {
+        static SetOutputFeaturesPathname processor(*application_handler_);
+        file_picker_.setProcessor(processor);
+        popup_file_picker_ = true;
+      }
+      ImGui::PopID();
+
+      if (popup_file_picker_)
+      {
+        ImGui::OpenPopup("Pick a pathname");
+        popup_file_picker_ = false;
+      }
+
+      file_picker_.draw();
+
+      ImGui::Separator();
+      if (ImGui::Button("Run workflow"))
+      {
+        for (const std::string& pathname : { application_handler_->mzML_dir_, application_handler_->features_in_dir_, application_handler_->features_out_dir_ }) {
+          fs::create_directories(fs::path(pathname));
+        }
+        BuildCommandsFromNames buildCommandsFromNames(*application_handler_);
+        buildCommandsFromNames.names_ = application_handler_->sequenceHandler_.getWorkflow();
+        if (!buildCommandsFromNames.process()) {
+          LOGE << "Failed to create Commands, aborting.";
+        }
+        else {
+          for (auto& cmd : buildCommandsFromNames.commands_)
+          {
+            for (auto& p : cmd.dynamic_filenames)
+            {
+              Filenames::updateDefaultDynamicFilenames(
+                application_handler_->mzML_dir_,
+                application_handler_->features_in_dir_,
+                application_handler_->features_out_dir_,
+                p.second
+              );
+            }
+          }
+          const std::set<std::string> injection_names = session_handler_->getSelectInjectionNamesWorkflow(application_handler_->sequenceHandler_);
+          const std::set<std::string> sequence_segment_names = session_handler_->getSelectSequenceSegmentNamesWorkflow(application_handler_->sequenceHandler_);
+          const std::set<std::string> sample_group_names = session_handler_->getSelectSampleGroupNamesWorkflow(application_handler_->sequenceHandler_);
+          workflow_manager_->addWorkflow(*application_handler_, injection_names, sequence_segment_names, sample_group_names, buildCommandsFromNames.commands_);
+        }
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::SameLine();
+      if (ImGui::Button("Close"))
+      {
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
+  }
+
+  void RunWorkflowWidget::setApplicationHandler(ApplicationHandler& application_handler)
+  {
+    application_handler_ = &application_handler;
+  }
+
+  void RunWorkflowWidget::setSessionHandler(SessionHandler& session_handler)
+  {
+    session_handler_ = &session_handler;
+  }
+
+  void RunWorkflowWidget::setWorkflowManager(WorkflowManager& workflow_manager)
+  {
+    workflow_manager_ = &workflow_manager;
+  }
+}

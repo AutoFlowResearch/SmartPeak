@@ -41,6 +41,7 @@
 #include <SmartPeak/ui/Workflow.h>
 #include <SmartPeak/ui/StatisticsWidget.h>
 #include <SmartPeak/ui/InfoWidget.h>
+#include <SmartPeak/ui/RunWorkflowWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -184,7 +185,8 @@ int main(int argc, char** argv)
   Report     report_;
   Workflow   workflow_;
   StatisticsWidget  statistics_;
-
+  RunWorkflowWidget run_workflow_widget_;
+  
   std::unique_ptr<ParametersTableWidget> parameters_table_widget;
   report_.setApplicationHandler(application_handler_);
   workflow_.setApplicationHandler(application_handler_);
@@ -359,94 +361,13 @@ int main(int argc, char** argv)
     file_picker_.draw();
     if (popup_run_workflow_)
     {
+      run_workflow_widget_.setApplicationHandler(application_handler_);
+      run_workflow_widget_.setSessionHandler(session_handler_);
+      run_workflow_widget_.setWorkflowManager(manager_);
       ImGui::OpenPopup("Run workflow modal");
       popup_run_workflow_ = false;
     }
-    if (ImGui::BeginPopupModal("Run workflow modal", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-      ImGui::Text("mzML folder");
-      ImGui::PushID(1);
-      ImGui::InputTextWithHint("", application_handler_.mzML_dir_.c_str(), &application_handler_.mzML_dir_);
-      ImGui::PopID();
-      ImGui::SameLine();
-      ImGui::PushID(11);
-      if (ImGui::Button("Select"))
-      {
-        static SetRawDataPathname processor(application_handler_);
-        file_picker_.setProcessor(processor);
-        popup_file_picker_ = true;
-      }
-      ImGui::PopID();
-      ImGui::Text("Input features folder");
-      ImGui::PushID(2);
-      ImGui::InputTextWithHint("", application_handler_.features_in_dir_.c_str(), &application_handler_.features_in_dir_);
-      ImGui::PopID();
-      ImGui::SameLine();
-      ImGui::PushID(22);
-      if (ImGui::Button("Select"))
-      {
-        static SetInputFeaturesPathname processor(application_handler_);
-        file_picker_.setProcessor(processor);
-        popup_file_picker_ = true;
-      }
-      ImGui::PopID();
-      ImGui::Text("Output features folder");
-      ImGui::PushID(3);
-      ImGui::InputTextWithHint("", application_handler_.features_out_dir_.c_str(), &application_handler_.features_out_dir_);
-      ImGui::PopID();
-      ImGui::SameLine();
-      ImGui::PushID(33);
-      if (ImGui::Button("Select"))
-      {
-        static SetOutputFeaturesPathname processor(application_handler_);
-        file_picker_.setProcessor(processor);
-        popup_file_picker_ = true;
-      }
-      ImGui::PopID();
-      if (popup_file_picker_)
-      {
-        ImGui::OpenPopup("Pick a pathname");
-        popup_file_picker_ = false;
-      }
-      file_picker_.draw();
-      ImGui::Separator();
-      if (ImGui::Button("Run workflow"))
-      {
-        for (const std::string& pathname : {application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_}) {
-          fs::create_directories(fs::path(pathname));
-        }
-        BuildCommandsFromNames buildCommandsFromNames(application_handler_);
-        buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
-        if (!buildCommandsFromNames.process()) {
-          LOGE << "Failed to create Commands, aborting.";
-        }
-        else {
-          for (auto& cmd : buildCommandsFromNames.commands_)
-          {
-            for (auto& p : cmd.dynamic_filenames)
-            {
-              Filenames::updateDefaultDynamicFilenames(
-                application_handler_.mzML_dir_,
-                application_handler_.features_in_dir_,
-                application_handler_.features_out_dir_,
-                p.second
-              );
-            }
-          }
-          const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
-          const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
-          const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
-          manager_.addWorkflow(application_handler_, injection_names, sequence_segment_names, sample_group_names, buildCommandsFromNames.commands_);
-        }
-        ImGui::CloseCurrentPopup();
-      }
-      ImGui::SameLine();
-      if (ImGui::Button("Close"))
-      {
-        ImGui::CloseCurrentPopup();
-      }
-      ImGui::EndPopup();
-    }
+    run_workflow_widget_.draw();
     if (popup_about_)
     {
       ImGui::OpenPopup("About");

@@ -12,6 +12,7 @@ set(sources_list_h
 	ParameterEditorWidget.h
 	ParametersTableWidget.h
 	Report.h
+	RunWorkflowWidget.h
 	SpectraPlotWidget.h
 	StatisticsWidget.h
 	Widget.h

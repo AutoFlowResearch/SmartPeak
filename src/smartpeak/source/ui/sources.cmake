@@ -12,6 +12,7 @@ set(sources_list
 	ParameterEditorWidget.cpp
 	ParametersTableWidget.cpp
 	Report.cpp
+	RunWorkflowWidget.cpp
 	SpectraPlotWidget.cpp
 	StatisticsWidget.cpp
 	Widget.cpp
