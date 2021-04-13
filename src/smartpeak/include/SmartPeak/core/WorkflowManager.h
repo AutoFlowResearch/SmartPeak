@@ -38,8 +38,15 @@ namespace SmartPeak {
       @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
+      @param[in] blocking If true the operation runs synchronously, otherwise returns immediately
     */
-    void addWorkflow(ApplicationHandler& source_state, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands);
+    void addWorkflow(
+      ApplicationHandler& source_state, 
+      const std::set<std::string>& injection_names, 
+      const std::set<std::string>& sequence_segment_names, 
+      const std::set<std::string>& sample_group_names, 
+      const std::vector<ApplicationHandler::Command>& commands,
+      bool blocking=false);
 
     /**
       If this returns false, new workflows can't run and the following menu items
@@ -77,7 +84,14 @@ namespace SmartPeak {
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
     */
-    static void run_and_join(ApplicationHandler& application_handler, bool& done, std::chrono::steady_clock::duration& run_time, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands);
+    static void run_and_join(
+      ApplicationHandler& application_handler, 
+      bool& done, 
+      std::chrono::steady_clock::duration& run_time, 
+      const std::set<std::string>& injection_names, 
+      const std::set<std::string>& sequence_segment_names, 
+      const std::set<std::string>& sample_group_names, 
+      const std::vector<ApplicationHandler::Command>& commands);
 
     ApplicationHandler application_handler_; ///< The workflow is run on this copy
     bool done_ = true;
