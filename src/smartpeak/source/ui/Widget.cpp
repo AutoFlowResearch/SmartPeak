@@ -219,6 +219,7 @@ namespace SmartPeak
     ImGui::PushButtonRepeat(true);
     
     if (ImGui::ArrowButton("##left_arrow_plotter", ImGuiDir_Left) && plot_idx_ > 0) {
+      plot_switch_ = "stepper";
       plot_idx_--;
       if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "false")
           && table_scanned_ && plot_idx_ < table_entries_.size()) {
@@ -249,6 +250,7 @@ namespace SmartPeak
     }
     ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
     if (ImGui::ArrowButton("##right_arrow_plotter", ImGuiDir_Right) && plot_idx_ < table_entries_.size() - 1) { // >>
+      plot_switch_ = "stepper";
       plot_idx_++;
       if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "false")
           && table_scanned_ && plot_idx_ > 0) {
@@ -280,6 +282,26 @@ namespace SmartPeak
     ImGui::PopButtonRepeat();
     ImGui::SameLine();
     ImGui::Text("Plot-Stepper");
+    
+    ImGui::SameLine();
+    ImGui::Checkbox("Plot/Unplot All", &plot_all_);
+    if (plot_all_) { plot_switch_ = "plotunplotall"; plot_idx_ = 0; }
+    if (table_scanned_ && checkbox_columns_->size() > 0 && plot_switch_ != "stepper") {
+      if (plot_all_) {
+        std::for_each(table_entries_.begin(), table_entries_.end(),
+                      [&](ImEntry& entry) {
+                          entry.entry_contents[table_entries_plot_col_] = "true";
+                          (*checkbox_columns_)(entry.ID, checkbox_columns_plot_col_) = true;
+         });
+      }
+      else if (!plot_all_) {
+        std::for_each(table_entries_.begin(), table_entries_.end(),
+                      [&](ImEntry& entry) {
+                          entry.entry_contents[table_entries_plot_col_] = "false";
+                          (*checkbox_columns_)(entry.ID, checkbox_columns_plot_col_) = false;
+         });
+      }
+    }
 
     if (columns_.dimension(0) == table_entries_.size())
       table_scanned_ = true;
