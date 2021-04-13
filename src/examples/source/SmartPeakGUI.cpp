@@ -109,10 +109,6 @@ int main(int argc, char** argv)
   bool integrity_check_failed_ = false;
   bool update_session_cache_ = false;
 
-  // View: Top window
-  bool show_feature_line_plot = false; // injection vs. metavalue for n selected features
-  bool show_calibrators_line_plot = false; // peak area/height ratio vs. concentration ratio
-  
   // 
   bool heatmap_initialized = false;
   bool chromatogram_initialized = false;
@@ -138,6 +134,8 @@ int main(int argc, char** argv)
   SpectraPlotWidget spectra_plot_widget(session_handler_, application_handler_.sequenceHandler_, "Spectra Main Window");
   std::map<std::string, std::shared_ptr<ExplorerWidget>> explorer_widgets;
   std::map<std::string, std::shared_ptr<GenericTableWidget>> generic_table_widgets;
+  LinePlot2DWidget feature_line_plot_;
+  CalibratorsPlotWidget calibrators_line_plot_;
 
   report_.setApplicationHandler(application_handler_);
   workflow_.setApplicationHandler(application_handler_);
@@ -539,24 +537,26 @@ int main(int argc, char** argv)
           if (ImGui::MenuItem("Comp Group RSD QCs", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupRSDQCsMainWindow")->visible_)) {}
           if (ImGui::MenuItem("Comp Background Filters", NULL, &getGenericTableWidget(generic_table_widgets, "CompBackgroundFiltersMainWindow")->visible_)) {}
           if (ImGui::MenuItem("Comp Group Background Filters", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundFiltersMainWindow")->visible_)) {}
-          if (ImGui::MenuItem("Comp Background QCs", NULL, &getGenericTableWidget(generic_table_widgets, "CompBackgroundQCsMainWindow"))) {}
-          if (ImGui::MenuItem("Comp Group Background QCs", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundQCsMainWindow"))) {}
-          if (ImGui::MenuItem("Comp RSD Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompRSDEstimationsMainWindow"))) {}
-          if (ImGui::MenuItem("Comp Group RSD Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupRSDEstimationsMainWindow"))) {}
-          if (ImGui::MenuItem("Comp Background Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompBackgroundEstimationsMainWindow"))) {}
-          if (ImGui::MenuItem("Comp Group Background Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundEstimationsMainWindow"))) {}
+          if (ImGui::MenuItem("Comp Background QCs", NULL, &getGenericTableWidget(generic_table_widgets, "CompBackgroundQCsMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Group Background QCs", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundQCsMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp RSD Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompRSDEstimationsMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Group RSD Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupRSDEstimationsMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Background Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompBackgroundEstimationsMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Group Background Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundEstimationsMainWindow")->visible_)) {}
           // TODO: missing workflow setting tables...
           ImGui::EndMenu();
         }
         if (ImGui::MenuItem("Features (table)", NULL, &getGenericTableWidget(generic_table_widgets, "featuresTableMainWindow")->visible_)) {}
         if (ImGui::MenuItem("Features (matrix)", NULL, &getGenericTableWidget(generic_table_widgets, "featureMatrixMainWindow"))) {}
+        ImGui::Separator();
         ImGui::MenuItem("Main window (Plots)", NULL, false, false);
         if (ImGui::MenuItem("Chromatogram", NULL, &chromatogram_plot_widget.visible_)) {}
         if (ImGui::MenuItem("Spectra", NULL, &spectra_plot_widget.visible_)) {}
-        if (ImGui::MenuItem("Features (line)", NULL, &show_feature_line_plot)) {}
+        if (ImGui::MenuItem("Features (line)", NULL, &feature_line_plot_.visible_)) {}
         if (ImGui::MenuItem("Features (heatmap)", NULL, &heatmap_plot_widget.visible_)) {}
-        if (ImGui::MenuItem("Calibrators", NULL, &show_calibrators_line_plot)) {}
+        if (ImGui::MenuItem("Calibrators", NULL, &calibrators_line_plot_.visible_)) {}
         if (ImGui::MenuItem("Statistics", NULL, &statistics_.visible_)) {}
+        ImGui::Separator(); 
         ImGui::MenuItem("Info window", NULL, false, false);
         if (ImGui::MenuItem("Info", NULL, &quickInfoText_.visible_)) {}
         if (ImGui::MenuItem("Log", NULL, &log_widget.visible_)) {}
@@ -616,7 +616,7 @@ int main(int argc, char** argv)
       || getGenericTableWidget(generic_table_widgets, "CompBackgroundFiltersMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundFiltersMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "CompBackgroundQCsMainWindow") || getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundQCsMainWindow")
       || getGenericTableWidget(generic_table_widgets, "CompRSDEstimationsMainWindow") || getGenericTableWidget(generic_table_widgets, "CompGroupRSDEstimationsMainWindow") || getGenericTableWidget(generic_table_widgets, "CompBackgroundEstimationsMainWindow") || getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundEstimationsMainWindow")
       || getGenericTableWidget(generic_table_widgets, "featuresTableMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "featureMatrixMainWindow")
-      || chromatogram_plot_widget.visible_ || spectra_plot_widget.visible_ || show_feature_line_plot || heatmap_plot_widget.visible_ || show_calibrators_line_plot;
+      || chromatogram_plot_widget.visible_ || spectra_plot_widget.visible_ || feature_line_plot_.visible_ || heatmap_plot_widget.visible_ || calibrators_line_plot_.visible_;
     bool show_bottom_window_ = quickInfoText_.visible_ || log_widget.visible_;
     bool show_left_window_ =   getExplorerWidget(explorer_widgets, "InjectionsExplorerWindow")->visible_ 
                        || getExplorerWidget(explorer_widgets, "TransitionsExplorerWindow")->visible_ 
@@ -1029,16 +1029,16 @@ int main(int argc, char** argv)
           spectra_plot_widget.draw();
           ImGui::EndTabItem();
         }
-        if (show_feature_line_plot && ImGui::BeginTabItem("Features (line)", &show_feature_line_plot))
+        if (ImGui::BeginTabItem("Features (line)", &feature_line_plot_.visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
           Eigen::Tensor<float, 2> x_data = session_handler_.feat_sample_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
           Eigen::Tensor<float, 2> y_data = session_handler_.feat_value_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
-          LinePlot2DWidget plot2d(x_data, y_data, session_handler_.feat_col_labels, session_handler_.feat_row_labels, session_handler_.feat_line_x_axis_title, session_handler_.feat_line_y_axis_title,
+          feature_line_plot_.setValues(&x_data, &y_data, &session_handler_.feat_col_labels, &session_handler_.feat_row_labels, session_handler_.feat_line_x_axis_title, session_handler_.feat_line_y_axis_title,
             session_handler_.feat_line_sample_min, session_handler_.feat_line_sample_max, session_handler_.feat_value_min, session_handler_.feat_value_max,
             win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "FeaturesLineMainWindow");
-          plot2d.draw();
+          feature_line_plot_.draw();
           ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Features (heatmap)", &heatmap_plot_widget.visible_))
@@ -1061,16 +1061,16 @@ int main(int argc, char** argv)
           heatmap_plot_widget.draw();
           ImGui::EndTabItem();
         }
-        if (show_calibrators_line_plot && ImGui::BeginTabItem("Calibrators", &show_calibrators_line_plot))
+        if (ImGui::BeginTabItem("Calibrators", &calibrators_line_plot_.visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           exceeding_plot_points_ = !session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
-          CalibratorsPlotWidget plot2d(session_handler_.calibrators_conc_fit_data, session_handler_.calibrators_feature_fit_data,
-            session_handler_.calibrators_conc_raw_data, session_handler_.calibrators_feature_raw_data, session_handler_.calibrators_series_names,
+          calibrators_line_plot_.setValues(&session_handler_.calibrators_conc_fit_data, &session_handler_.calibrators_feature_fit_data,
+            &session_handler_.calibrators_conc_raw_data, &session_handler_.calibrators_feature_raw_data, &session_handler_.calibrators_series_names,
             session_handler_.calibrators_x_axis_title, session_handler_.calibrators_y_axis_title, session_handler_.calibrators_conc_min, session_handler_.calibrators_conc_max,
             session_handler_.calibrators_feature_min, session_handler_.calibrators_feature_max, win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_,
             "CalibratorsMainWindow");
-          plot2d.draw();
+          calibrators_line_plot_.draw();
 
           ImGui::EndTabItem();
         }

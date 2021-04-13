@@ -300,7 +300,7 @@ namespace SmartPeak
   void LinePlot2DWidget::draw()
   {
     // Main graphic
-    assert(x_data_.dimensions() == y_data_.dimensions());
+    assert(x_data_->dimensions() == y_data_->dimensions());
     // add some padding
     float border_padding_x = (x_max_ - x_min_) * 0.05f;
     float border_padding_y = (y_max_ - y_min_) * 0.01f;
@@ -308,11 +308,11 @@ namespace SmartPeak
     const ImPlotFlags imPlotFlags = ImPlotFlags_Legend | ImPlotFlags_Highlight | ImPlotFlags_BoxSelect | ImPlotFlags_ContextMenu;
     const ImPlotAxisFlags imPlotAxisFlagsX = ImPlotAxisFlags_GridLines;
     std::vector<double> ticks_values;
-    for (int i = 0; i < x_data_.size(); ++i)
+    for (int i = 0; i < x_data_->size(); ++i)
     {
       ticks_values.push_back(static_cast<float>(i));
     }
-    ImPlot::SetNextPlotTicksX(ticks_values.data(), x_data_.size());
+    ImPlot::SetNextPlotTicksX(ticks_values.data(), x_data_->size());
     bool is_hovered = false;
     ImPlotPoint plot_point;
     ImPlotPoint plot_threshold;
@@ -322,11 +322,11 @@ namespace SmartPeak
                           ImVec2(plot_width_ - 25, plot_height_ - 40),
                           imPlotFlags,
                           imPlotAxisFlagsX)) {
-      for (int i = 0; i < x_data_.dimension(1); ++i) {
+      for (int i = 0; i < x_data_->dimension(1); ++i) {
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        Eigen::Tensor<float, 1> x_data = x_data_.chip(i, 1);
-        Eigen::Tensor<float, 1> y_data = y_data_.chip(i, 1);
-        ImPlot::PlotLine(series_names_(i).c_str(), x_data.data(), y_data.data(), x_data_.dimension(0));
+        Eigen::Tensor<float, 1> x_data = x_data_->chip(i, 1);
+        Eigen::Tensor<float, 1> y_data = y_data_->chip(i, 1);
+        ImPlot::PlotLine((*series_names_)(i).c_str(), x_data.data(), y_data.data(), x_data_->dimension(0));
       }
       is_hovered = ImPlot::IsPlotHovered();
       if (is_hovered)
@@ -345,11 +345,11 @@ namespace SmartPeak
       if (is_hovered)
       {
         bool tooltip_exists = false;
-        if (injection_number >= 0 && injection_number < x_data_.size())
+        if (injection_number >= 0 && injection_number < x_data_->size())
         {
           // see if we are hovering one point
-          for (int i = 0; i < x_data_.dimension(1); ++i) {
-            Eigen::Tensor<float, 1> y_data = y_data_.chip(i, 1);
+          for (int i = 0; i < x_data_->dimension(1); ++i) {
+            Eigen::Tensor<float, 1> y_data = y_data_->chip(i, 1);
             if ((plot_point.y < y_data.data()[injection_number] + plot_threshold.y) && (plot_point.y > y_data.data()[injection_number] - plot_threshold.y) &&
               (plot_point.x < static_cast<float>(injection_number) + plot_threshold.x) && (plot_point.x > static_cast<float>(injection_number) - plot_threshold.x))
             {
@@ -360,11 +360,11 @@ namespace SmartPeak
                 ImGui::Separator();
               }
               std::ostringstream os;
-              os << "Injection: " << x_labels_(injection_number);
+              os << "Injection: " << (*x_labels_)(injection_number);
               ImGui::Text(os.str().c_str());
               os.str("");
               os.clear();
-              os << "Series: " << series_names_(i);
+              os << "Series: " << (*series_names_)(i);
               ImGui::Text(os.str().c_str());
               os.str("");
               os.clear();
