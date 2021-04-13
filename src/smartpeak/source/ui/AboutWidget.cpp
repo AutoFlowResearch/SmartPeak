@@ -40,9 +40,9 @@ namespace SmartPeak
       if (ImGui::Button("Close"))
       {
         ImGui::CloseCurrentPopup();
+        visible_ = false;
       }
       ImGui::EndPopup();
     }
   }
-
 }

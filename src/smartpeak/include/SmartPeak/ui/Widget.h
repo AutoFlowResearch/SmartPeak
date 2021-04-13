@@ -56,6 +56,8 @@ namespace SmartPeak
       NOTE: free to override in inherited implmementations
     */
     virtual void draw() = 0;
+
+    bool visible_ = false;
   };
 
   class GenericTextWidget : public Widget

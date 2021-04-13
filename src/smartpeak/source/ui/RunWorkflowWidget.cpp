@@ -135,11 +135,13 @@ namespace SmartPeak
           const std::set<std::string> sample_group_names = session_handler_->getSelectSampleGroupNamesWorkflow(application_handler_->sequenceHandler_);
           workflow_manager_->addWorkflow(*application_handler_, injection_names, sequence_segment_names, sample_group_names, buildCommandsFromNames.commands_);
         }
+        visible_ = false;
         ImGui::CloseCurrentPopup();
       }
       ImGui::SameLine();
       if (ImGui::Button("Close"))
       {
+        visible_ = false;
         ImGui::CloseCurrentPopup();
       }
       ImGui::EndPopup();

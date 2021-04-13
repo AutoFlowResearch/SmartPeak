@@ -113,7 +113,6 @@ int main(int argc, char** argv)
   bool update_session_cache_ = false;
 
   // View: Bottom window
-  bool show_info_ = true;
   bool show_log_ = false;
 
   // View: left or right windows (i.e., Explorer pane)
@@ -171,8 +170,6 @@ int main(int argc, char** argv)
   std::unique_ptr<SpectraPlotWidget> spectra_plot_widget;
 
   // Popup modals
-  bool popup_about_ = false;
-  bool popup_run_workflow_ = false;
   bool popup_file_picker_ = false;
 
   ApplicationHandler application_handler_;
@@ -182,6 +179,7 @@ int main(int argc, char** argv)
 
   // widgets
   InfoWidget quickInfoText_;
+  quickInfoText_.visible_ = true; // visible on start
   FilePicker file_picker_;
   Report     report_;
   Workflow   workflow_;
@@ -355,27 +353,24 @@ int main(int argc, char** argv)
       }
 
     // Pop-ups
-    if (popup_file_picker_)
+    if (file_picker_.visible_)
     {
       ImGui::OpenPopup("Pick a pathname");
-      popup_file_picker_ = false;
     }
     file_picker_.draw();
-    if (popup_run_workflow_)
+    if (run_workflow_widget_.visible_)
     {
       run_workflow_widget_.setApplicationHandler(application_handler_);
       run_workflow_widget_.setSessionHandler(session_handler_);
       run_workflow_widget_.setWorkflowManager(manager_);
       ImGui::OpenPopup("Run workflow modal");
-      popup_run_workflow_ = false;
+      run_workflow_widget_.draw();
     }
-    run_workflow_widget_.draw();
-    if (popup_about_)
+    if (about_widget_.visible_)
     {
       ImGui::OpenPopup("About");
-      popup_about_ = false;
+      about_widget_.draw();
     }
-    about_widget_.draw();
     if (report_.draw_)
     {
       report_.draw();
@@ -396,7 +391,7 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Load session from sequence", NULL, false, workflow_is_done_ && file_loading_is_done_)) {
           static LoadSessionFromSequence processor(application_handler_);
           file_picker_.setProcessor(processor);
-          popup_file_picker_ = true;
+          file_picker_.visible_ = true;
         }
         //if (ImGui::MenuItem("Save Session", NULL, false, false))
         //{
@@ -413,109 +408,109 @@ int main(int argc, char** argv)
           if (ImGui::MenuItem("Transitions")) {
             static LoadSequenceTransitions processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Parameters")) {
             static LoadSequenceParameters processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_)) {
             static LoadSequenceWorkflow processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Reference data")) {
             static LoadSequenceValidationData processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Quant Method")) {
             static LoadSequenceSegmentQuantitationMethods processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Standards Conc")) {
             static LoadSequenceSegmentStandardsConcentrations processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Filters")) {
             static LoadSequenceSegmentFeatureFilterComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group Filters")) {
             static LoadSequenceSegmentFeatureFilterComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp QCs")) {
             static LoadSequenceSegmentFeatureQCComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group QCs")) {
             static LoadSequenceSegmentFeatureQCComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp %RSD Filters")) {
             static LoadSequenceSegmentFeatureRSDFilterComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group %RSD Filters")) {
             static LoadSequenceSegmentFeatureRSDFilterComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp %RSD QCs")) {
             static LoadSequenceSegmentFeatureRSDQCComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group %RSD QCs")) {
             static LoadSequenceSegmentFeatureRSDQCComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp %Background Filters")) {
             static LoadSequenceSegmentFeatureBackgroundFilterComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group %Background Filters")) {
             static LoadSequenceSegmentFeatureBackgroundFilterComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp %Background QCs")) {
             static LoadSequenceSegmentFeatureBackgroundQCComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group %Background QCs")) {
             static LoadSequenceSegmentFeatureBackgroundQCComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
             update_session_cache_ = true;
           }
           ImGui::EndMenu();
@@ -529,7 +524,7 @@ int main(int argc, char** argv)
           if (ImGui::MenuItem("Workflow")) {
             static StoreSequenceWorkflow processor(application_handler_);
             file_picker_.setProcessor(processor);
-            popup_file_picker_ = true;
+            file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence Analyst")) {
             static StoreSequenceFileAnalyst processor(application_handler_);
@@ -606,20 +601,19 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Calibrators", NULL, &show_calibrators_line_plot)) {}
         if (ImGui::MenuItem("Statistics", NULL, &show_satistics_widget)) {}
         ImGui::MenuItem("Info window", NULL, false, false);
-        if (ImGui::MenuItem("Info", NULL, &show_info_)) {}
+        if (ImGui::MenuItem("Info", NULL, &quickInfoText_.visible_)) {}
         if (ImGui::MenuItem("Log", NULL, &show_log_)) {}
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Actions"))
       {
-        if (ImGui::MenuItem("Run workflow"))
+        if (ImGui::MenuItem("Run workflow", NULL, &run_workflow_widget_.visible_))
         {
           if (application_handler_.sequenceHandler_.getWorkflow().empty())
           {
             LOGW << "Workflow has no steps to run. Please set the workflow's steps.";
           }
           initializeDataDirs(application_handler_);
-          popup_run_workflow_ = true;
         }
         if (ImGui::BeginMenu("Integrity checks"))
         {
@@ -649,7 +643,7 @@ int main(int argc, char** argv)
       }
       if (ImGui::BeginMenu("Help"))
       {
-        ImGui::MenuItem("About", NULL, &popup_about_);
+        ImGui::MenuItem("About", NULL, &about_widget_.visible_);
         if (ImGui::MenuItem("Documentation")) {
           // TODO: Render the SmartPeak documentation (See AUT-178)
         }
@@ -666,7 +660,7 @@ int main(int argc, char** argv)
       || show_comp_rsd_estimations_table || show_comp_group_rsd_estimations_table || show_comp_background_estimations_table || show_comp_group_background_estimations_table
       || show_feature_table || show_feature_pivot_table
       || show_chromatogram_line_plot || show_spectra_line_plot || show_feature_line_plot || show_feature_heatmap_plot || show_calibrators_line_plot;
-    show_bottom_window_ = show_info_ || show_log_;
+    show_bottom_window_ = quickInfoText_.visible_ || show_log_;
     show_left_window_ = show_injection_explorer || show_transitions_explorer || show_features_explorer || show_spectrum_explorer;
     win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
 
@@ -1192,7 +1186,7 @@ int main(int argc, char** argv)
       ImGui::Begin("Bottom window", NULL, bottom_window_flags);
       if (ImGui::BeginTabBar("Bottom window tab bar", ImGuiTabBarFlags_Reorderable))
       {
-        if (show_info_ && ImGui::BeginTabItem("Info", &show_info_))
+        if (quickInfoText_.visible_ && ImGui::BeginTabItem("Info", &quickInfoText_.visible_))
         {
           ImGui::BeginChild("Info child");
           quickInfoText_.setTransitions(&session_handler_.transitions_table_body);
