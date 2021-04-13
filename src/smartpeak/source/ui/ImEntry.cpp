@@ -54,20 +54,20 @@ namespace SmartPeak
         while ((lhs_char = *lhs) && (rhs_char = *rhs))
         {
           const bool lhs_digit = is_digit(lhs_char), rhs_digit = is_digit(rhs_char);
-          if(lhs_digit && rhs_digit)
+          if (lhs_digit && rhs_digit)
           {
             search_mode = NUMBER;
             break;
           }
   
-          if(lhs_digit)
+          if (lhs_digit)
             return -1;
   
-          if(rhs_digit)
+          if (rhs_digit)
             return +1;
             
           const int char_diff = lhs_char - rhs_char;
-          if(char_diff != 0)
+          if (char_diff != 0)
             return char_diff;
             
           ++lhs;
@@ -90,7 +90,7 @@ namespace SmartPeak
         }
       
         const long int_diff = lhs_int - rhs_int;
-        if(int_diff != 0)
+        if (int_diff != 0)
           return int_diff;
 
         search_mode = STRING;

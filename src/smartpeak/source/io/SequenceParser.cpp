@@ -184,7 +184,8 @@ namespace SmartPeak
         std::string t_scan_mass_high;
         bool is_valid = false;
 
-        if (delimiter == s_comma) {
+        if (delimiter == s_comma) 
+        {
           is_valid = in_comma.read_row(t.sample_name, t.sample_group_name,
             t.sequence_segment_name, t_sample_type, t.original_filename,
             t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
@@ -192,7 +193,8 @@ namespace SmartPeak
             t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
             t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
         }
-        else if (delimiter == s_semicolon) {
+        else if (delimiter == s_semicolon)
+        {
           is_valid = in_semicolon.read_row(t.sample_name, t.sample_group_name,
             t.sequence_segment_name, t_sample_type, t.original_filename,
             t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
@@ -200,7 +202,8 @@ namespace SmartPeak
             t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
             t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
         }
-        else if (delimiter == s_tab) {
+        else if (delimiter == s_tab)
+        {
           is_valid = in_tab.read_row(t.sample_name, t.sample_group_name,
             t.sequence_segment_name, t_sample_type, t.original_filename,
             t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
@@ -245,7 +248,8 @@ namespace SmartPeak
         if (stringToSampleType.count(t_sample_type)) {
           t.sample_type = stringToSampleType.at(t_sample_type);
         }
-        else {
+        else 
+        {
           t.sample_type = SampleType::Unrecognized;
         }
 
@@ -564,13 +568,15 @@ namespace SmartPeak
                 Utilities::join(messages.begin(), messages.end(), delimiter)
               );
             }
-            else {
+            else 
+            {
               CastValue datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
               if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
                 // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
                 row.push_back(std::to_string(datum.f_));
               }
-              else {
+              else 
+              {
                 row.push_back("");
               }
             }
@@ -619,18 +625,22 @@ namespace SmartPeak
                 Utilities::join(messages.begin(), messages.end(), delimiter)
               );
             }
-            else if (feature.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_group_message") {
+            else if (feature.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_group_message") 
+            {
               OpenMS::StringList messages = feature.getMetaValue(meta_value_name).toStringList();
               row.push_back(
                 Utilities::join(messages.begin(), messages.end(), delimiter)
               );
             }
-            else {
+            else 
+            {
               CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
               if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
                 // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
                 row.push_back(std::to_string(datum.f_));
-              } else {
+              } 
+              else 
+              {
                 row.push_back("");
               }
             }
@@ -722,7 +732,8 @@ namespace SmartPeak
             if (meta_value_name == "accuracy" || meta_value_name == "n_features") {
               datum = validation_metrics.at(meta_value_name);
             }
-            else {
+            else 
+            {
               datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
             }
             if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0 && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
@@ -750,7 +761,8 @@ namespace SmartPeak
             if (meta_value_name == "accuracy" || meta_value_name == "n_features") {
               datum = validation_metrics.at(meta_value_name);
             }
-            else {
+            else 
+            {
               datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
             }
             if (meta_value_name == "validation") {

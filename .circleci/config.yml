@@ -25,6 +25,7 @@ jobs:
             apt-get install -y libwildmagic-dev libsqlite3-dev &&
             apt-get install -y libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
             apt-get install -y graphviz doxygen python3-pip &&
+            apt-get install -y cppcheck &&
             apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
             pip3 install exhale && 
             pip3 install -r tools/smartpeak/requirements.txt
@@ -100,9 +101,10 @@ jobs:
       - run:
           name: Installing required libraries
           command: |
+            brew update
             brew remove yarn node
             brew install cmake qt5 sdl2
-            brew install boost
+            brew install boost cppcheck
             pip3 install -r tools/smartpeak/requirements.txt
       - run:
           name: "Pull latest (only release)"
