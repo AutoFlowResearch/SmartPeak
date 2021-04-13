@@ -225,7 +225,8 @@ namespace SmartPeak
             application_handler_->sequenceHandler_.getWorkflow().erase(application_handler_->sequenceHandler_.getWorkflow().cbegin() + i);
             application_handler_->sequenceHandler_.notifyWorkflowChanged();
           }
-          else {
+          else 
+          {
             ++i;
           }
           ImGui::PopID();

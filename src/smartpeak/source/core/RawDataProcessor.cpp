@@ -173,7 +173,8 @@ namespace SmartPeak
           }
         }
         // Deal with .mzXML format
-        else if (mzML_params.count("format") && mzML_params.at("format").s_ == "XML") {
+        else if (mzML_params.count("format") && mzML_params.at("format").s_ == "XML") 
+        {
           const size_t pos = filenames.mzML_i.rfind(".");
           std::string txt_name = filenames.mzML_i;
           if (pos != std::string::npos) {
@@ -183,13 +184,15 @@ namespace SmartPeak
           LOGI << "Loading: " << txt_name;
           fh.loadExperiment(txt_name, chromatograms, OpenMS::FileTypes::MZXML);
         }
-        else {
+        else 
+        {
           OpenMS::FileHandler fh;
           LOGI << "Loading: " << filenames.mzML_i;
           fh.loadExperiment(filenames.mzML_i, chromatograms);
         }
       }
-      else {
+      else 
+      {
         OpenMS::FileHandler fh;
         LOGI << "Loading: " << filenames.mzML_i;
         fh.loadExperiment(filenames.mzML_i, chromatograms); //TODO:try-catch (SIGABRT)
@@ -259,7 +262,8 @@ namespace SmartPeak
       if (pos != std::string::npos)
         samplename = samplename.substr(pos + 1);
     }
-    else {
+    else 
+    {
       samplename = filename;
     }
 
@@ -324,7 +328,8 @@ namespace SmartPeak
       if (rawDataHandler_IO.getChromatogramMap().size()) {
         mzmlfile.store(filenames.mzML_i, rawDataHandler_IO.getChromatogramMap());
       }
-      else {
+      else 
+      {
         mzmlfile.store(filenames.mzML_i, rawDataHandler_IO.getExperiment());
       }
     }
@@ -601,13 +606,15 @@ namespace SmartPeak
           Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_qmip"), params_I.at("MRMFeatureSelector.select_MRMFeatures_qmip"));
         OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesQMIP(rawDataHandler_IO.getFeatureMap(), output, p);
       }
-      else if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_score")) {
+      else if (params_I.count("MRMFeatureSelector.schedule_MRMFeatures_score")) 
+      {
         LOGD << "Using MRMFeatures_score";
         std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> p =
           Utilities::extractSelectorParameters(params_I.at("MRMFeatureSelector.schedule_MRMFeatures_score"), params_I.at("MRMFeatureSelector.select_MRMFeatures_score"));
         OpenMS::MRMBatchFeatureSelector::batchMRMFeaturesScore(rawDataHandler_IO.getFeatureMap(), output, p);
       }
-      else {
+      else 
+      {
         LOGE << "Both arguments 'select params' and 'schedule params' are empty";
         LOGD << "END selectFeatures";
         // TODO: replace throw with return?
@@ -761,13 +768,15 @@ namespace SmartPeak
           rawDataHandler_IO.getTargetedExperiment()
         );
       }
-      else if (format == "traML") {
+      else if (format == "traML") 
+      {
         // Transitions are appended to the existing experiment in OpenMS
         rawDataHandler_IO.getTargetedExperiment().clear(true);
         OpenMS::TraMLFile tramlfile;
         tramlfile.load(filenames.traML_csv_i, rawDataHandler_IO.getTargetedExperiment());
       }
-      else {
+      else 
+      {
         LOGE << "Format must either be 'csv' or 'traML'";
       }
     }
@@ -1283,9 +1292,11 @@ namespace SmartPeak
     params.merge(getParameterSchema());
 
     float start = 0, stop = 0;
-    if (params.count("FIAMS") && params.at("FIAMS").size()){
-      for (const auto& fia_params: params.at("FIAMS")){
-        if (fia_params.getName() == "acquisition_start") {
+    if (params.count("FIAMS") && params.at("FIAMS").size())
+    {
+      for (const auto& fia_params: params.at("FIAMS")) {
+        if (fia_params.getName() == "acquisition_start") 
+        {
           try {
             start = std::stof(fia_params.getValueAsString());
           }
@@ -1293,7 +1304,8 @@ namespace SmartPeak
             LOGE << e.what();
           }
         }
-        if (fia_params.getName() == "acquisition_end") {
+        if (fia_params.getName() == "acquisition_end") 
+        {
           try {
             stop = std::stof(fia_params.getValueAsString());
           }
@@ -1685,7 +1697,8 @@ namespace SmartPeak
       output.setMetaValue("lowest observed m/z", rawDataHandler_IO.getExperiment().getSpectra().front().front().getMZ());
       output.setMetaValue("highest observed m/z", rawDataHandler_IO.getExperiment().getSpectra().back().back().getMZ());
     }
-    else {
+    else 
+    {
       output.setMetaValue("lowest observed m/z", 0.0);
       output.setMetaValue("highest observed m/z", 0.0);
     }
@@ -2119,7 +2132,7 @@ namespace SmartPeak
       
       std::string feature_name;
       OpenMS::IsotopeLabelingMDVs::MassIntensityType mass_intensity_type;
-      for(auto& param : CalculateMDVs_params)
+      for (auto& param : CalculateMDVs_params)
       {
         if (param.getName() == "mass_intensity_type")
         {
@@ -2134,7 +2147,7 @@ namespace SmartPeak
         }
         else if (param.getName() == "feature_name")
         {
-          feature_name = param.getName();
+          feature_name = param.getValueAsString();
         }
       }
       
@@ -2143,7 +2156,7 @@ namespace SmartPeak
       rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
-      LOGE << e.what();
+      LOGE << "calculateMDVs : " << typeid(e).name() << " : " << e.what();
     }
 
     LOGD << "END calculateMDVs";
@@ -2185,7 +2198,7 @@ namespace SmartPeak
       auto& IsotopicCorrections_params = params.at("IsotopicCorrections");
       
       OpenMS::IsotopeLabelingMDVs::DerivatizationAgent correction_matrix_agent;
-      for(auto& param : IsotopicCorrections_params)
+      for (auto& param : IsotopicCorrections_params)
       {
         if (param.getName() == "correction_matrix_agent")
         {
@@ -2201,7 +2214,7 @@ namespace SmartPeak
       rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
-      LOGE << e.what();
+      LOGE << "IsotopicCorrections : " << typeid(e).name() << " : " << e.what();
     }
 
     LOGD << "END IsotopicCorrections";
@@ -2249,7 +2262,7 @@ namespace SmartPeak
       
       std::vector<std::string> isotopic_purity_names;
       std::vector<std::vector<double>> experiment_data_mat;
-      for(auto& param : CalculateIsotopicPurities_params)
+      for (auto& param : CalculateIsotopicPurities_params)
       {
         if (param.getName() == "isotopic_purity_values" && !param.getValueAsString().empty())
         {
@@ -2296,7 +2309,7 @@ namespace SmartPeak
       rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
-      LOGE << e.what();
+      LOGE << "CalculateIsotopicPurities : " << typeid(e).name() << " : " << e.what();
     }
 
     LOGD << "END CalculateIsotopicPurities";
@@ -2337,20 +2350,24 @@ namespace SmartPeak
       OpenMS::FeatureMap featureMap_with_accuracy_info;
       auto& CalculateMDVAccuracies_params = params.at("CalculateMDVAccuracies");
       
-      std::vector<double> fragment_isotopomer_measured;
+      //std::vector<double> fragment_isotopomer_measured;
       std::string fragment_isotopomer_theoretical_formula, fragment_isotopomer_measured_s, feature_name;
-      std::map<std::string, std::string> proteinName_to_SumFormula ;
+      std::map<std::string, std::string> proteinName_to_SumFormula;
       
       for (auto& peptide : rawDataHandler_IO.getTargetedExperiment().getPeptides())
       {
         if (peptide.metaValueExists("SumFormula") && !peptide.id.empty()
             && proteinName_to_SumFormula.find((std::string)(peptide.id)) == proteinName_to_SumFormula.end())
         {
-          proteinName_to_SumFormula.insert(std::make_pair((std::string)(peptide.id), (std::string)peptide.getMetaValue("SumFormula")));
+          std::string sum_formula = (std::string)peptide.getMetaValue("SumFormula");
+          std::string peptide_id = (std::string)(peptide.id);
+          sum_formula.erase(std::remove_if(sum_formula.begin(), sum_formula.end(), [](unsigned char c){return std::isspace(c);}), sum_formula.end());
+          peptide_id.erase(std::remove_if(peptide_id.begin(), peptide_id.end(), [](unsigned char c){return std::isspace(c);}), peptide_id.end());
+          proteinName_to_SumFormula.insert(std::make_pair(peptide_id, sum_formula));
         }
       }
       
-      for(auto& param : CalculateMDVAccuracies_params)
+      for (auto& param : CalculateMDVAccuracies_params)
       {
         if (param.getName() == "feature_name")
         {
@@ -2367,7 +2384,7 @@ namespace SmartPeak
       rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
-      LOGE << e.what();
+      LOGE << "CalculateMDVAccuracies : " << typeid(e).name() << " : " << e.what();
     }
 
     LOGD << "END CalculateMDVAccuracies";

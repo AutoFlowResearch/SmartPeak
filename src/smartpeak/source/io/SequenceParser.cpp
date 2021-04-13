@@ -165,90 +165,115 @@ namespace SmartPeak
       throw std::invalid_argument("Delimiter \"" + delimiter + "\" is not supported.");
     }
 
+    unsigned int line_number = 0;
     while (true) {
-      MetaDataHandler t; // as in temporary
-      std::string t_date;
-      std::string t_sample_type;
-      std::string t_rack_number;
-      std::string t_plate_number;
-      std::string t_pos_number;
-      std::string t_inj_number;
-      std::string t_dilution_factor;
-      std::string t_inj_volume;
-      std::string t_scan_mass_low;
-      std::string t_scan_mass_high;
-      bool is_valid = false;
+      line_number++;
+      std::string current_validating_column;
+      try
+      {
+        MetaDataHandler t; // as in temporary
+        std::string t_date;
+        std::string t_sample_type;
+        std::string t_rack_number;
+        std::string t_plate_number;
+        std::string t_pos_number;
+        std::string t_inj_number;
+        std::string t_dilution_factor;
+        std::string t_inj_volume;
+        std::string t_scan_mass_low;
+        std::string t_scan_mass_high;
+        bool is_valid = false;
 
-      if (delimiter == s_comma) {
-        is_valid = in_comma.read_row(t.sample_name, t.sample_group_name,
-          t.sequence_segment_name, t_sample_type, t.original_filename,
-          t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
-          t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
-          t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
-      } else if (delimiter == s_semicolon) {
-        is_valid = in_semicolon.read_row(t.sample_name, t.sample_group_name,
-          t.sequence_segment_name, t_sample_type, t.original_filename,
-          t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
-          t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
-          t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
-      } else if (delimiter == s_tab) {
-        is_valid = in_tab.read_row(t.sample_name, t.sample_group_name,
-          t.sequence_segment_name, t_sample_type, t.original_filename,
-          t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
-          t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-          t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
-          t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
+        if (delimiter == s_comma) 
+        {
+          is_valid = in_comma.read_row(t.sample_name, t.sample_group_name,
+            t.sequence_segment_name, t_sample_type, t.original_filename,
+            t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
+            t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
+            t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
+            t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
+        }
+        else if (delimiter == s_semicolon)
+        {
+          is_valid = in_semicolon.read_row(t.sample_name, t.sample_group_name,
+            t.sequence_segment_name, t_sample_type, t.original_filename,
+            t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
+            t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
+            t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
+            t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
+        }
+        else if (delimiter == s_tab)
+        {
+          is_valid = in_tab.read_row(t.sample_name, t.sample_group_name,
+            t.sequence_segment_name, t_sample_type, t.original_filename,
+            t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
+            t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
+            t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
+            t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
+        }
+
+        if (!is_valid)
+          break;
+
+        if (false == validateAndConvert(t_inj_number, t.inj_number)) {
+          LOGW << "Warning: Empty cell in line " << line_number << ", column '" << s_inj_number << "'. Skipping entire row";
+          continue;
+        }
+
+        if (t.inj_number <= 0) {
+          LOGW << "Warning: Value '" << t.inj_number << "' is not valid in line " << line_number << ", column '" << s_inj_number << "'. Skipping entire row";
+          continue;
+        }
+
+        if (!(t.scan_polarity == "positive" || t.scan_polarity == "negative" || t.scan_polarity == "")) {
+          LOGW << "Warning: Value '" << t.scan_polarity << "' is not valid for in line " << line_number << ", column '" << s_scan_polarity << "'. Only 'positive' and 'negative' are allowed.  Skipping entire row";
+          continue;
+        }
+
+        current_validating_column = s_rack_number;
+        validateAndConvert(t_rack_number, t.rack_number);
+        current_validating_column = s_plate_number;
+        validateAndConvert(t_plate_number, t.plate_number);
+        current_validating_column = s_pos_number;
+        validateAndConvert(t_pos_number, t.pos_number);
+        current_validating_column = s_dilution_factor;
+        validateAndConvert(t_dilution_factor, t.dilution_factor);
+        current_validating_column = s_inj_volume;
+        validateAndConvert(t_inj_volume, t.inj_volume);
+        current_validating_column = s_scan_mass_low;
+        validateAndConvert(t_scan_mass_low, t.scan_mass_low);
+        current_validating_column = s_scan_mass_high;
+        validateAndConvert(t_scan_mass_high, t.scan_mass_high);
+
+        if (stringToSampleType.count(t_sample_type)) {
+          t.sample_type = stringToSampleType.at(t_sample_type);
+        }
+        else 
+        {
+          t.sample_type = SampleType::Unrecognized;
+        }
+
+        std::tm& adt = t.acquisition_date_and_time;
+        std::istringstream iss(t_date);
+        iss.imbue(std::locale(""));
+        iss >> std::get_time(&adt, "%d-%m-%Y %H:%M:%S");
+        if (adt.tm_mday < 1 || adt.tm_mday > 31) {
+          LOGD << "Invalid value for std::tm::tm_mday: " << adt.tm_mday << ". Setting to 1.";
+          adt.tm_mday = 1;
+        }
+
+        if (t.original_filename.empty()) {
+          LOGW << "Warning: No value provided for the original filename. Will create a unique default filename.";
+          t.original_filename = t.getInjectionName();
+        }
+
+        sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
       }
-
-      if (!is_valid)
-        break;
-
-      if (false == validateAndConvert(t_inj_number, t.inj_number)) {
-        LOGW << "Warning: Empty cell in column '" << s_inj_number << "'. Skipping entire row";
-        continue;
+      catch (const std::exception& e)
+      {
+        LOGE << "Error reading " << pathname << " in line " << line_number << ", column '" << current_validating_column << "'";
+        throw;
       }
-
-      if (t.inj_number <= 0) {
-        LOGW << "Warning: Value '" << t.inj_number << "' is not valid for column '" << s_inj_number << "'. Skipping entire row";
-        continue;
-      }
-
-      if (!(t.scan_polarity == "positive" || t.scan_polarity == "negative" || t.scan_polarity == "")) {
-        LOGW << "Warning: Value '" << t.scan_polarity << "' is not valid for column '" << s_scan_polarity << "'. Only 'positive' and 'negative' are allowed.  Skipping entire row";
-        continue;
-      }
-
-      validateAndConvert(t_rack_number,     t.rack_number);
-      validateAndConvert(t_plate_number,    t.plate_number);
-      validateAndConvert(t_pos_number,      t.pos_number);
-      validateAndConvert(t_dilution_factor, t.dilution_factor);
-      validateAndConvert(t_inj_volume,      t.inj_volume);
-      validateAndConvert(t_scan_mass_low,   t.scan_mass_low);
-      validateAndConvert(t_scan_mass_high,  t.scan_mass_high);
-
-      if (stringToSampleType.count(t_sample_type)) {
-        t.sample_type = stringToSampleType.at(t_sample_type);
-      } else {
-        t.sample_type = SampleType::Unrecognized;
-      }
-
-      std::tm& adt = t.acquisition_date_and_time;
-      std::istringstream iss(t_date);
-      iss.imbue(std::locale(""));
-      iss >> std::get_time(&adt, "%d-%m-%Y %H:%M:%S");
-      if (adt.tm_mday < 1 || adt.tm_mday > 31) {
-        LOGD << "Invalid value for std::tm::tm_mday: " << adt.tm_mday << ". Setting to 1.";
-        adt.tm_mday = 1;
-      }
-
-      if (t.original_filename.empty()) {
-        LOGW << "Warning: No value provided for the original filename. Will create a unique default filename.";
-        t.original_filename = t.getInjectionName();
-      }
-
-      sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
     }
 
     LOGD << "END readSequenceFile";
@@ -543,13 +568,15 @@ namespace SmartPeak
                 Utilities::join(messages.begin(), messages.end(), delimiter)
               );
             }
-            else {
+            else 
+            {
               CastValue datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
               if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
                 // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
                 row.push_back(std::to_string(datum.f_));
               }
-              else {
+              else 
+              {
                 row.push_back("");
               }
             }
@@ -598,18 +625,22 @@ namespace SmartPeak
                 Utilities::join(messages.begin(), messages.end(), delimiter)
               );
             }
-            else if (feature.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_group_message") {
+            else if (feature.metaValueExists(meta_value_name) && meta_value_name == "QC_transition_group_message") 
+            {
               OpenMS::StringList messages = feature.getMetaValue(meta_value_name).toStringList();
               row.push_back(
                 Utilities::join(messages.begin(), messages.end(), delimiter)
               );
             }
-            else {
+            else 
+            {
               CastValue datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
               if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0) {
                 // NOTE: to_string() rounds at 1e-6. Therefore, some precision might be lost.
                 row.push_back(std::to_string(datum.f_));
-              } else {
+              } 
+              else 
+              {
                 row.push_back("");
               }
             }
@@ -701,7 +732,8 @@ namespace SmartPeak
             if (meta_value_name == "accuracy" || meta_value_name == "n_features") {
               datum = validation_metrics.at(meta_value_name);
             }
-            else {
+            else 
+            {
               datum = SequenceHandler::getMetaValue(feature, feature, meta_value_name);
             }
             if (datum.getTag() == CastValue::Type::FLOAT && datum.f_ != 0.0 && !std::isnan(datum.f_)) { // Skip NAN (replaced by 0 later)
@@ -729,7 +761,8 @@ namespace SmartPeak
             if (meta_value_name == "accuracy" || meta_value_name == "n_features") {
               datum = validation_metrics.at(meta_value_name);
             }
-            else {
+            else 
+            {
               datum = SequenceHandler::getMetaValue(feature, subordinate, meta_value_name);
             }
             if (meta_value_name == "validation") {

@@ -251,7 +251,8 @@ namespace SmartPeak
         psg.sample_group_names_ = sample_group_names;
         psg.process();
       }
-      else {
+      else 
+      {
         LOGW << "Skipping a command: " << cmd.type << "\n";
       }
       i = j;
@@ -259,7 +260,7 @@ namespace SmartPeak
   }
   }
 
-  bool CreateCommand::process(){
+  bool CreateCommand::process() {
     // Enumerate the valid command keys
     std::vector<std::string> valid_commands_raw_data_processor;
     for (const auto& it: n_to_raw_data_method_) { valid_commands_raw_data_processor.push_back(it.first); }
@@ -315,7 +316,8 @@ namespace SmartPeak
         );
       }
     }
-    else {
+    else 
+    {
       LOGE << "\nNo command for selection name " << name_;
       return false;
     }
@@ -338,7 +340,9 @@ namespace SmartPeak
       cs.checkConsistency = false; // NOTE: Requires a lot of time on large sequences with a large number of components
       cs.process();
       return true;
-    } else {
+    } 
+    else 
+    {
       LOGE << "Provided and/or inferred pathnames are not correct."
         "The sequence has not been modified.";
       return false;
@@ -355,7 +359,8 @@ namespace SmartPeak
       loadParameters.process(rawDataHandler, {}, filenames);
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Parameters file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -370,7 +375,8 @@ namespace SmartPeak
       loadTransitions.process(rawDataHandler, {}, filenames);
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Transitions file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -385,7 +391,8 @@ namespace SmartPeak
       loadValidationData.process(rawDataHandler, {}, filenames);
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Reference data file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -401,7 +408,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Quantitation Methods file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -417,7 +425,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Standards concentrations file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -434,7 +443,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature filters file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -451,7 +461,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature filters file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -468,7 +479,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -485,7 +497,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -502,7 +515,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature filter RSD file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -519,7 +533,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature filter RSD file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -536,7 +551,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature RSD QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -553,7 +569,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature RSD QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -570,7 +587,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature background filters file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -587,7 +605,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature background filters file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -604,7 +623,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature background QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -621,7 +641,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature background QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -632,7 +653,8 @@ namespace SmartPeak
       SequenceParser::writeSequenceFileAnalyst(application_handler_.sequenceHandler_, application_handler_.main_dir_ + "/SequenceFileAnalyst.txt");
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Sequence file cannot be converted and stored without first loading the sequence.";
       return false;
     }
@@ -644,7 +666,8 @@ namespace SmartPeak
       SequenceParser::writeSequenceFileMasshunter(application_handler_.sequenceHandler_, application_handler_.main_dir_ + "/SequenceFileMasshunter.tsv");
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Sequence file cannot be converted and stored without first loading the sequence.";
       return false;
     }
@@ -656,7 +679,8 @@ namespace SmartPeak
       SequenceParser::writeSequenceFileXcalibur(application_handler_.sequenceHandler_, application_handler_.main_dir_ + "/SequenceFileXcalibur.tsv");
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Sequence file cannot be converted and stored without first loading the sequence.";
       return false;
     }
