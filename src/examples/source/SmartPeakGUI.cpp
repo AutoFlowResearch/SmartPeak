@@ -43,6 +43,7 @@
 #include <SmartPeak/ui/InfoWidget.h>
 #include <SmartPeak/ui/RunWorkflowWidget.h>
 #include <SmartPeak/ui/AboutWidget.h>
+#include <SmartPeak/ui/LogWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -112,9 +113,6 @@ int main(int argc, char** argv)
   bool integrity_check_failed_ = false;
   bool update_session_cache_ = false;
 
-  // View: Bottom window
-  bool show_log_ = false;
-
   // View: left or right windows (i.e., Explorer pane)
   bool show_injection_explorer = true; // list of injection names with advanced options for filtering
   bool show_transitions_explorer = true; // list of transition names (e.g., subset of the features for non-targeted case) with advanced options for filtering
@@ -169,9 +167,6 @@ int main(int argc, char** argv)
   bool spectra_initialized = false;
   std::unique_ptr<SpectraPlotWidget> spectra_plot_widget;
 
-  // Popup modals
-  bool popup_file_picker_ = false;
-
   ApplicationHandler application_handler_;
   SessionHandler session_handler_;
   WorkflowManager manager_;
@@ -186,6 +181,7 @@ int main(int argc, char** argv)
   StatisticsWidget  statistics_;
   RunWorkflowWidget run_workflow_widget_;
   AboutWidget about_widget_;
+  LogWidget log_widget(appender_);
   
   std::unique_ptr<ParametersTableWidget> parameters_table_widget;
   report_.setApplicationHandler(application_handler_);
@@ -602,7 +598,7 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Statistics", NULL, &show_satistics_widget)) {}
         ImGui::MenuItem("Info window", NULL, false, false);
         if (ImGui::MenuItem("Info", NULL, &quickInfoText_.visible_)) {}
-        if (ImGui::MenuItem("Log", NULL, &show_log_)) {}
+        if (ImGui::MenuItem("Log", NULL, &log_widget.visible_)) {}
         ImGui::EndMenu();
       }
       if (ImGui::BeginMenu("Actions"))
@@ -660,7 +656,7 @@ int main(int argc, char** argv)
       || show_comp_rsd_estimations_table || show_comp_group_rsd_estimations_table || show_comp_background_estimations_table || show_comp_group_background_estimations_table
       || show_feature_table || show_feature_pivot_table
       || show_chromatogram_line_plot || show_spectra_line_plot || show_feature_line_plot || show_feature_heatmap_plot || show_calibrators_line_plot;
-    show_bottom_window_ = quickInfoText_.visible_ || show_log_;
+    show_bottom_window_ = quickInfoText_.visible_ || log_widget.visible_;
     show_left_window_ = show_injection_explorer || show_transitions_explorer || show_features_explorer || show_spectrum_explorer;
     win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
 
@@ -1186,7 +1182,7 @@ int main(int argc, char** argv)
       ImGui::Begin("Bottom window", NULL, bottom_window_flags);
       if (ImGui::BeginTabBar("Bottom window tab bar", ImGuiTabBarFlags_Reorderable))
       {
-        if (quickInfoText_.visible_ && ImGui::BeginTabItem("Info", &quickInfoText_.visible_))
+        if (ImGui::BeginTabItem("Info", &quickInfoText_.visible_))
         {
           ImGui::BeginChild("Info child");
           quickInfoText_.setTransitions(&session_handler_.transitions_table_body);
@@ -1194,27 +1190,9 @@ int main(int argc, char** argv)
           ImGui::EndChild();
           ImGui::EndTabItem();
         }
-        if (show_log_ && ImGui::BeginTabItem("Log", &show_log_))
+        if (ImGui::BeginTabItem("Log", &log_widget.visible_))
         {
-          const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
-          static int selected_severity = 4;
-          static plog::Severity severity = plog::Severity::info;
-
-          if (ImGui::Combo("Level", &selected_severity, items, IM_ARRAYSIZE(items)))
-          {
-            severity = plog::severityFromString(items[selected_severity]);
-          }
-
-          ImGui::Separator();
-          ImGui::BeginChild("Log child");
-          const std::vector<plog::util::nstring> message_list = appender_.getMessageList(severity);
-          int message_list_start = (message_list.size() > 500) ? message_list.size() - 500 : 0;
-          for (int i= message_list_start;i< message_list.size();++i)
-          {
-            std::string str(message_list.at(i).data(), message_list.at(i).data() + message_list.at(i).size());
-            ImGui::Text("%s", str.c_str());
-          }
-          ImGui::EndChild();
+          log_widget.draw();
           ImGui::EndTabItem();
         }
         ImGui::EndTabBar();

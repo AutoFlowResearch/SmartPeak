@@ -10,6 +10,7 @@ set(sources_list_h
 	GuiAppender.h
 	Heatmap2DWidget.h
 	InfoWidget.h
+	LogWidget.h
 	ParameterEditorWidget.h
 	ParametersTableWidget.h
 	Report.h

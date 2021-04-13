@@ -10,6 +10,7 @@ set(sources_list
 	GuiAppender.cpp
 	Heatmap2DWidget.cpp
 	InfoWidget.cpp
+	LogWidget.cpp
 	ParameterEditorWidget.cpp
 	ParametersTableWidget.cpp
 	Report.cpp
