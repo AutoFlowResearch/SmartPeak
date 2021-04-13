@@ -101,6 +101,7 @@ jobs:
       - run:
           name: Installing required libraries
           command: |
+            brew update
             brew remove yarn node
             brew install cmake qt5 sdl2
             brew install boost cppcheck
