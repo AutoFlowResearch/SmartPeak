@@ -42,6 +42,7 @@
 #include <SmartPeak/ui/StatisticsWidget.h>
 #include <SmartPeak/ui/InfoWidget.h>
 #include <SmartPeak/ui/RunWorkflowWidget.h>
+#include <SmartPeak/ui/AboutWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -186,6 +187,7 @@ int main(int argc, char** argv)
   Workflow   workflow_;
   StatisticsWidget  statistics_;
   RunWorkflowWidget run_workflow_widget_;
+  AboutWidget about_widget_;
   
   std::unique_ptr<ParametersTableWidget> parameters_table_widget;
   report_.setApplicationHandler(application_handler_);
@@ -373,19 +375,7 @@ int main(int argc, char** argv)
       ImGui::OpenPopup("About");
       popup_about_ = false;
     }
-    if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-    {
-      ImGui::Text("Fast, accurate, and automated processing of CE-, GC- and LC-MS(/MS) and HPLC data.");
-      ImGui::Text("SmartPeak %s", Utilities::getSmartPeakVersion().c_str());
-      ImGui::Separator();
-      ImGui::Text("By the hardworking SmartPeak developers.");
-      ImGui::Separator();
-      if (ImGui::Button("Close"))
-      {
-        ImGui::CloseCurrentPopup();
-      }
-      ImGui::EndPopup();
-    }
+    about_widget_.draw();
     if (report_.draw_)
     {
       report_.draw();

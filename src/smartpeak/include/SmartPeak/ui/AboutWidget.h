@@ -18,25 +18,17 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 #pragma once
 
 #include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/core/ApplicationHandler.h>
-#include <string>
-#include <vector>
 
 namespace SmartPeak
 {
-  class WorkflowStepWidget final : public Widget
+  class AboutWidget final : public Widget
   {
   public:
     void draw() override;
-    void setApplicationHandler(ApplicationHandler& application_handler);
-  protected:
-    ApplicationHandler* application_handler_ = nullptr;
-    std::string selected_method_type_;
-    std::string selected_method_;
   };
 }
