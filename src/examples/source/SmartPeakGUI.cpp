@@ -113,12 +113,6 @@ int main(int argc, char** argv)
   bool integrity_check_failed_ = false;
   bool update_session_cache_ = false;
 
-  // View: left or right windows (i.e., Explorer pane)
-  bool show_injection_explorer = true; // list of injection names with advanced options for filtering
-  bool show_transitions_explorer = true; // list of transition names (e.g., subset of the features for non-targeted case) with advanced options for filtering
-  bool show_features_explorer = false; // list of features with advanced options for filtering
-  bool show_spectrum_explorer = false; // list of spectrum with advanced options for filtering
-
   // View: Top window
   bool show_sequence_table = false;
   bool show_transitions_table = false;
@@ -182,6 +176,8 @@ int main(int argc, char** argv)
   workflow_.visible_ = true;
   quickInfoText_.visible_ = true; // visible on start
 
+  getExplorerWidget(explorer_widgets, "InjectionsExplorerWindow")->visible_ = true;
+  getExplorerWidget(explorer_widgets, "TransitionsExplorerWindow")->visible_ = true;
 
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
@@ -547,10 +543,10 @@ int main(int argc, char** argv)
       if (ImGui::BeginMenu("View"))
       {
         ImGui::MenuItem("Explorer window", NULL, false, false);
-        if (ImGui::MenuItem("Injections", NULL, &show_injection_explorer)) {} // TODO: search field
-        if (ImGui::MenuItem("Transitions", NULL, &show_transitions_explorer)) {} // TODO: search field
-        if (ImGui::MenuItem("Features", NULL, &show_features_explorer)) {}
-        if (ImGui::MenuItem("Scans", NULL, &show_spectrum_explorer)) {}
+        if (ImGui::MenuItem("Injections", NULL, &getExplorerWidget(explorer_widgets, "InjectionsExplorerWindow")->visible_)) {} // TODO: search field
+        if (ImGui::MenuItem("Transitions", NULL, &getExplorerWidget(explorer_widgets, "TransitionsExplorerWindow")->visible_)) {} // TODO: search field
+        if (ImGui::MenuItem("Features", NULL, &getExplorerWidget(explorer_widgets, "FeaturesExplorerWindow")->visible_)) {}
+        if (ImGui::MenuItem("Scans", NULL, &getExplorerWidget(explorer_widgets, "SpectrumExplorerWindow")->visible_)) {}
         ImGui::Separator(); // Primary input
         ImGui::MenuItem("Main window (Tables)", NULL, false, false);
         if (ImGui::MenuItem("Sequence", NULL, &show_sequence_table)) {}
@@ -651,7 +647,10 @@ int main(int argc, char** argv)
       || show_feature_table || show_feature_pivot_table
       || chromatogram_plot_widget.visible_ || show_spectra_line_plot || show_feature_line_plot || heatmap_plot_widget.visible_ || show_calibrators_line_plot;
     show_bottom_window_ = quickInfoText_.visible_ || log_widget.visible_;
-    show_left_window_ = show_injection_explorer || show_transitions_explorer || show_features_explorer || show_spectrum_explorer;
+    show_left_window_ =   getExplorerWidget(explorer_widgets, "InjectionsExplorerWindow")->visible_ 
+                       || getExplorerWidget(explorer_widgets, "TransitionsExplorerWindow")->visible_ 
+                       || getExplorerWidget(explorer_widgets, "FeaturesExplorerWindow")->visible_ 
+                       || getExplorerWidget(explorer_widgets, "SpectrumExplorerWindow")->visible_;
     win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
 
     // Left window
@@ -667,7 +666,7 @@ int main(int argc, char** argv)
       ImGui::Begin("Left window", NULL, left_window_flags);
       if (ImGui::BeginTabBar("Left window tab bar", ImGuiTabBarFlags_Reorderable))
       {
-        if (show_injection_explorer && ImGui::BeginTabItem("Injections", &show_injection_explorer))
+        if (ImGui::BeginTabItem("Injections", &getExplorerWidget(explorer_widgets, "InjectionsExplorerWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           auto widget = getExplorerWidget(explorer_widgets, "InjectionsExplorerWindow");
@@ -681,7 +680,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_transitions_explorer && ImGui::BeginTabItem("Transitions", &show_transitions_explorer))
+        if (ImGui::BeginTabItem("Transitions", &getExplorerWidget(explorer_widgets, "TransitionsExplorerWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           auto widget = getExplorerWidget(explorer_widgets, "TransitionsExplorerWindow");
@@ -693,7 +692,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_features_explorer && ImGui::BeginTabItem("Features", &show_features_explorer))
+        if (ImGui::BeginTabItem("Features", &getExplorerWidget(explorer_widgets, "FeaturesExplorerWindow")->visible_))
         {
           session_handler_.setFeatureExplorer();
           auto widget = getExplorerWidget(explorer_widgets, "FeaturesExplorerWindow");
@@ -705,7 +704,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_spectrum_explorer && ImGui::BeginTabItem("Spectrum", &show_spectrum_explorer))
+        if (ImGui::BeginTabItem("Spectrum", &getExplorerWidget(explorer_widgets, "SpectrumExplorerWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           auto widget = getExplorerWidget(explorer_widgets, "SpectrumExplorerWindow");
