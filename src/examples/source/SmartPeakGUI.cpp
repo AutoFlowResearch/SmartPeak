@@ -150,8 +150,7 @@ int main(int argc, char** argv)
   bool show_feature_line_plot = false; // injection vs. metavalue for n selected features
   bool show_feature_heatmap_plot = false; // injection vs. feature for a particular metavalue
   bool show_calibrators_line_plot = false; // peak area/height ratio vs. concentration ratio
-  bool show_satistics_widget = false;
-
+  
   // Heatmap display option
   bool heatmap_initialized = false;
   std::unique_ptr<Heatmap2DWidget> heatmap_plot_widget;
@@ -174,7 +173,6 @@ int main(int argc, char** argv)
 
   // widgets
   InfoWidget quickInfoText_;
-  quickInfoText_.visible_ = true; // visible on start
   FilePicker file_picker_;
   Report     report_;
   Workflow   workflow_;
@@ -184,6 +182,7 @@ int main(int argc, char** argv)
   LogWidget log_widget(appender_);
   
   std::unique_ptr<ParametersTableWidget> parameters_table_widget;
+  quickInfoText_.visible_ = true; // visible on start
   report_.setApplicationHandler(application_handler_);
   workflow_.setApplicationHandler(application_handler_);
   statistics_.setApplicationHandler(application_handler_);
@@ -595,7 +594,7 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Features (line)", NULL, &show_feature_line_plot)) {}
         if (ImGui::MenuItem("Features (heatmap)", NULL, &show_feature_heatmap_plot)) {}
         if (ImGui::MenuItem("Calibrators", NULL, &show_calibrators_line_plot)) {}
-        if (ImGui::MenuItem("Statistics", NULL, &show_satistics_widget)) {}
+        if (ImGui::MenuItem("Statistics", NULL, &statistics_.visible_)) {}
         ImGui::MenuItem("Info window", NULL, false, false);
         if (ImGui::MenuItem("Info", NULL, &quickInfoText_.visible_)) {}
         if (ImGui::MenuItem("Log", NULL, &log_widget.visible_)) {}
@@ -1137,7 +1136,7 @@ int main(int argc, char** argv)
 
           ImGui::EndTabItem();
         }
-        if (show_satistics_widget && ImGui::BeginTabItem("Statistics", &show_satistics_widget))
+        if (ImGui::BeginTabItem("Statistics", &statistics_.visible_))
         {
           static bool statistics_initialized = false;
           if (!workflow_is_done_)
