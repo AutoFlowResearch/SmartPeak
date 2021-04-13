@@ -99,10 +99,6 @@ std::shared_ptr<GenericTableWidget>& getGenericTableWidget(std::map<std::string,
 int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
-  bool show_top_window_ = false;
-  bool show_bottom_window_ = false;
-  bool show_left_window_ = false;
-  bool show_right_window_ = false;
 
   // to disable buttons, display info, and update the session cache
   bool workflow_is_done_ = true;
@@ -114,30 +110,6 @@ int main(int argc, char** argv)
   bool update_session_cache_ = false;
 
   // View: Top window
-  bool show_sequence_table = false;
-  bool show_transitions_table = false;
-  bool show_spectrum_table = false;
-  bool show_quant_method_table = false;
-  bool show_stds_concs_table = false;
-  bool show_comp_filters_table = false;
-  bool show_comp_group_filters_table = false;
-  bool show_comp_qcs_table = false;
-  bool show_comp_group_qcs_table = false;
-  bool show_comp_rsd_filters_table = false;
-  bool show_comp_group_rsd_filters_table = false;
-  bool show_comp_rsd_qcs_table = false;
-  bool show_comp_group_rsd_qcs_table = false;
-  bool show_comp_background_filters_table = false;
-  bool show_comp_group_background_filters_table = false;
-  bool show_comp_background_qcs_table = false;
-  bool show_comp_group_background_qcs_table = false;
-  bool show_comp_rsd_estimations_table = false;
-  bool show_comp_group_rsd_estimations_table = false;
-  bool show_comp_background_estimations_table = false;
-  bool show_comp_group_background_estimations_table = false;
-  bool show_feature_table = false; // table of all injections, features, and metavalues
-  bool show_feature_pivot_table = false; // injection vs. feature for a particular metavalue
-  bool show_spectra_line_plot = false; // time vs. intensity for the raw data and annotated feature
   bool show_feature_line_plot = false; // injection vs. metavalue for n selected features
   bool show_calibrators_line_plot = false; // peak area/height ratio vs. concentration ratio
   
@@ -174,8 +146,7 @@ int main(int argc, char** argv)
 
   // visible on start
   workflow_.visible_ = true;
-  quickInfoText_.visible_ = true; // visible on start
-
+  quickInfoText_.visible_ = true;
   getExplorerWidget(explorer_widgets, "InjectionsExplorerWindow")->visible_ = true;
   getExplorerWidget(explorer_widgets, "TransitionsExplorerWindow")->visible_ = true;
 
@@ -549,39 +520,39 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Scans", NULL, &getExplorerWidget(explorer_widgets, "SpectrumExplorerWindow")->visible_)) {}
         ImGui::Separator(); // Primary input
         ImGui::MenuItem("Main window (Tables)", NULL, false, false);
-        if (ImGui::MenuItem("Sequence", NULL, &show_sequence_table)) {}
-        if (ImGui::MenuItem("Transitions", NULL, &show_transitions_table)) {}
-        if (ImGui::MenuItem("Scans", NULL, &show_spectrum_table)) {}
+        if (ImGui::MenuItem("Sequence", NULL, &getGenericTableWidget(generic_table_widgets, "SequenceMainWindow")->visible_)) {}
+        if (ImGui::MenuItem("Transitions", NULL, &getGenericTableWidget(generic_table_widgets, "TransitionsMainWindow")->visible_)) {}
+        if (ImGui::MenuItem("Scans", NULL, &getGenericTableWidget(generic_table_widgets, "SpectrumMainWindow")->visible_)) {}
         if (ImGui::MenuItem("Workflow", NULL, &workflow_.visible_)) {}
         if (ImGui::BeginMenu("Workflow settings"))
         {
           if (ImGui::MenuItem("Parameters", NULL, &parameters_table_widget.visible_)) {}
-          if (ImGui::MenuItem("Quant Method", NULL, &show_quant_method_table)) {}
-          if (ImGui::MenuItem("Standards Conc", NULL, &show_stds_concs_table)) {}
-          if (ImGui::MenuItem("Comp Filters", NULL, &show_comp_filters_table)) {}
-          if (ImGui::MenuItem("Comp Group Filters", NULL, &show_comp_group_filters_table)) {}
-          if (ImGui::MenuItem("Comp QCs", NULL, &show_comp_qcs_table)) {}
-          if (ImGui::MenuItem("Comp Group QCs", NULL, &show_comp_group_qcs_table)) {}
-          if (ImGui::MenuItem("Comp RSD Filters", NULL, &show_comp_rsd_filters_table)) {}
-          if (ImGui::MenuItem("Comp Group RSD Filters", NULL, &show_comp_group_rsd_filters_table)) {}
-          if (ImGui::MenuItem("Comp RSD QCs", NULL, &show_comp_rsd_qcs_table)) {}
-          if (ImGui::MenuItem("Comp Group RSD QCs", NULL, &show_comp_group_rsd_qcs_table)) {}
-          if (ImGui::MenuItem("Comp Background Filters", NULL, &show_comp_background_filters_table)) {}
-          if (ImGui::MenuItem("Comp Group Background Filters", NULL, &show_comp_group_background_filters_table)) {}
-          if (ImGui::MenuItem("Comp Background QCs", NULL, &show_comp_background_qcs_table)) {}
-          if (ImGui::MenuItem("Comp Group Background QCs", NULL, &show_comp_group_background_qcs_table)) {}
-          if (ImGui::MenuItem("Comp RSD Estimations", NULL, &show_comp_rsd_estimations_table)) {}
-          if (ImGui::MenuItem("Comp Group RSD Estimations", NULL, &show_comp_group_rsd_estimations_table)) {}
-          if (ImGui::MenuItem("Comp Background Estimations", NULL, &show_comp_background_estimations_table)) {}
-          if (ImGui::MenuItem("Comp Group Background Estimations", NULL, &show_comp_group_background_estimations_table)) {}
+          if (ImGui::MenuItem("Quant Method", NULL, &getGenericTableWidget(generic_table_widgets, "QuantMethodMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Standards Conc", NULL, &getGenericTableWidget(generic_table_widgets, "StdsConcsMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Filters", NULL, &getGenericTableWidget(generic_table_widgets, "CompFiltersMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Group Filters", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupFiltersMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp QCs", NULL, &getGenericTableWidget(generic_table_widgets, "CompQCsMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Group QCs", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupQCsMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp RSD Filters", NULL, &getGenericTableWidget(generic_table_widgets, "CompRSDFiltersMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Group RSD Filters", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupRSDFiltersMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp RSD QCs", NULL, &getGenericTableWidget(generic_table_widgets, "CompRSDQCsMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Group RSD QCs", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupRSDQCsMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Background Filters", NULL, &getGenericTableWidget(generic_table_widgets, "CompBackgroundFiltersMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Group Background Filters", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundFiltersMainWindow")->visible_)) {}
+          if (ImGui::MenuItem("Comp Background QCs", NULL, &getGenericTableWidget(generic_table_widgets, "CompBackgroundQCsMainWindow"))) {}
+          if (ImGui::MenuItem("Comp Group Background QCs", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundQCsMainWindow"))) {}
+          if (ImGui::MenuItem("Comp RSD Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompRSDEstimationsMainWindow"))) {}
+          if (ImGui::MenuItem("Comp Group RSD Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupRSDEstimationsMainWindow"))) {}
+          if (ImGui::MenuItem("Comp Background Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompBackgroundEstimationsMainWindow"))) {}
+          if (ImGui::MenuItem("Comp Group Background Estimations", NULL, &getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundEstimationsMainWindow"))) {}
           // TODO: missing workflow setting tables...
           ImGui::EndMenu();
         }
-        if (ImGui::MenuItem("Features (table)", NULL, &show_feature_table)) {}
-        if (ImGui::MenuItem("Features (matrix)", NULL, &show_feature_pivot_table)) {}
+        if (ImGui::MenuItem("Features (table)", NULL, &getGenericTableWidget(generic_table_widgets, "featuresTableMainWindow")->visible_)) {}
+        if (ImGui::MenuItem("Features (matrix)", NULL, &getGenericTableWidget(generic_table_widgets, "featureMatrixMainWindow"))) {}
         ImGui::MenuItem("Main window (Plots)", NULL, false, false);
         if (ImGui::MenuItem("Chromatogram", NULL, &chromatogram_plot_widget.visible_)) {}
-        if (ImGui::MenuItem("Spectra", NULL, &show_spectra_line_plot)) {}
+        if (ImGui::MenuItem("Spectra", NULL, &spectra_plot_widget.visible_)) {}
         if (ImGui::MenuItem("Features (line)", NULL, &show_feature_line_plot)) {}
         if (ImGui::MenuItem("Features (heatmap)", NULL, &heatmap_plot_widget.visible_)) {}
         if (ImGui::MenuItem("Calibrators", NULL, &show_calibrators_line_plot)) {}
@@ -638,19 +609,20 @@ int main(int argc, char** argv)
       ImGui::EndMainMenuBar();
     }
 
-    show_top_window_ = show_sequence_table || show_transitions_table || show_spectrum_table || workflow_.visible_ || parameters_table_widget.visible_
-      || show_quant_method_table || show_stds_concs_table
-      || show_comp_filters_table || show_comp_group_filters_table || show_comp_qcs_table || show_comp_group_qcs_table
-      || show_comp_rsd_filters_table || show_comp_group_rsd_filters_table || show_comp_rsd_qcs_table || show_comp_group_rsd_qcs_table
-      || show_comp_background_filters_table || show_comp_group_background_filters_table || show_comp_background_qcs_table || show_comp_group_background_qcs_table
-      || show_comp_rsd_estimations_table || show_comp_group_rsd_estimations_table || show_comp_background_estimations_table || show_comp_group_background_estimations_table
-      || show_feature_table || show_feature_pivot_table
-      || chromatogram_plot_widget.visible_ || show_spectra_line_plot || show_feature_line_plot || heatmap_plot_widget.visible_ || show_calibrators_line_plot;
-    show_bottom_window_ = quickInfoText_.visible_ || log_widget.visible_;
-    show_left_window_ =   getExplorerWidget(explorer_widgets, "InjectionsExplorerWindow")->visible_ 
+    bool show_top_window_ = getGenericTableWidget(generic_table_widgets, "SequenceMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "TransitionsMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "SpectrumMainWindow")->visible_ || workflow_.visible_ || parameters_table_widget.visible_
+      || getGenericTableWidget(generic_table_widgets, "QuantMethodMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "StdsConcsMainWindow")->visible_
+      || getGenericTableWidget(generic_table_widgets, "CompFiltersMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "CompGroupFiltersMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "CompQCsMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "CompGroupQCsMainWindow")->visible_
+      || getGenericTableWidget(generic_table_widgets, "CompRSDFiltersMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "CompGroupRSDFiltersMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "CompRSDQCsMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "CompGroupRSDQCsMainWindow")->visible_
+      || getGenericTableWidget(generic_table_widgets, "CompBackgroundFiltersMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundFiltersMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "CompBackgroundQCsMainWindow") || getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundQCsMainWindow")
+      || getGenericTableWidget(generic_table_widgets, "CompRSDEstimationsMainWindow") || getGenericTableWidget(generic_table_widgets, "CompGroupRSDEstimationsMainWindow") || getGenericTableWidget(generic_table_widgets, "CompBackgroundEstimationsMainWindow") || getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundEstimationsMainWindow")
+      || getGenericTableWidget(generic_table_widgets, "featuresTableMainWindow")->visible_ || getGenericTableWidget(generic_table_widgets, "featureMatrixMainWindow")
+      || chromatogram_plot_widget.visible_ || spectra_plot_widget.visible_ || show_feature_line_plot || heatmap_plot_widget.visible_ || show_calibrators_line_plot;
+    bool show_bottom_window_ = quickInfoText_.visible_ || log_widget.visible_;
+    bool show_left_window_ =   getExplorerWidget(explorer_widgets, "InjectionsExplorerWindow")->visible_ 
                        || getExplorerWidget(explorer_widgets, "TransitionsExplorerWindow")->visible_ 
                        || getExplorerWidget(explorer_widgets, "FeaturesExplorerWindow")->visible_ 
                        || getExplorerWidget(explorer_widgets, "SpectrumExplorerWindow")->visible_;
+    bool show_right_window_ = false;
     win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
 
     // Left window
@@ -738,7 +710,7 @@ int main(int argc, char** argv)
       ImGui::Begin("Top window", NULL, top_window_flags);
       if (ImGui::BeginTabBar("Top window tab bar", ImGuiTabBarFlags_Reorderable))
       {
-        if (show_sequence_table && ImGui::BeginTabItem("Sequence", &show_sequence_table))
+        if (ImGui::BeginTabItem("Sequence", &getGenericTableWidget(generic_table_widgets, "SequenceMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getSequenceTableFilters();
@@ -749,7 +721,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_transitions_table && ImGui::BeginTabItem("Transitions", &show_transitions_table))
+        if (ImGui::BeginTabItem("Transitions", &getGenericTableWidget(generic_table_widgets, "TransitionsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getTransitionsTableFilters();
@@ -760,7 +732,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_spectrum_table && ImGui::BeginTabItem("Spectrum", &show_spectrum_table))
+        if (ImGui::BeginTabItem("Spectrum", &getGenericTableWidget(generic_table_widgets, "SpectrumMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           Eigen::Tensor<bool, 1> table_filters = session_handler_.getSpectrumTableFilters();
@@ -782,7 +754,7 @@ int main(int argc, char** argv)
           parameters_table_widget.draw();
           ImGui::EndTabItem();
         }
-        if (show_quant_method_table && ImGui::BeginTabItem("Quantitation Method", &show_quant_method_table))
+        if (ImGui::BeginTabItem("Quantitation Method", &getGenericTableWidget(generic_table_widgets, "QuantMethodMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setQuantMethodTable(application_handler_.sequenceHandler_);
@@ -794,7 +766,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_stds_concs_table && ImGui::BeginTabItem("Standards Concentrations", &show_stds_concs_table))
+        if (ImGui::BeginTabItem("Standards Concentrations", &getGenericTableWidget(generic_table_widgets, "StdsConcsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setStdsConcsTable(application_handler_.sequenceHandler_);
@@ -805,7 +777,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_filters_table && ImGui::BeginTabItem("Component Filters", &show_comp_filters_table))
+        if (ImGui::BeginTabItem("Component Filters", &getGenericTableWidget(generic_table_widgets, "CompFiltersMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentFiltersTable(application_handler_.sequenceHandler_);
@@ -817,7 +789,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_group_filters_table && ImGui::BeginTabItem("Component Group Filters", &show_comp_group_filters_table))
+        if (ImGui::BeginTabItem("Component Group Filters", &getGenericTableWidget(generic_table_widgets, "CompGroupFiltersMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupFiltersTable(application_handler_.sequenceHandler_);
@@ -829,7 +801,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_qcs_table && ImGui::BeginTabItem("Component QCs", &show_comp_qcs_table))
+        if (ImGui::BeginTabItem("Component QCs", &getGenericTableWidget(generic_table_widgets, "CompQCsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentQCsTable(application_handler_.sequenceHandler_);
@@ -841,7 +813,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_group_qcs_table && ImGui::BeginTabItem("Component Group QCs", &show_comp_group_qcs_table))
+        if (ImGui::BeginTabItem("Component Group QCs", &getGenericTableWidget(generic_table_widgets, "CompGroupQCsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupQCsTable(application_handler_.sequenceHandler_);
@@ -853,7 +825,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_feature_table && ImGui::BeginTabItem("Features table", &show_feature_table))
+        if (ImGui::BeginTabItem("Features table", &getGenericTableWidget(generic_table_widgets, "featuresTableMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_);
@@ -864,7 +836,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_rsd_filters_table && ImGui::BeginTabItem("Component RSD Filters", &show_comp_rsd_filters_table))
+        if (ImGui::BeginTabItem("Component RSD Filters", &getGenericTableWidget(generic_table_widgets, "CompRSDFiltersMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentRSDFiltersTable(application_handler_.sequenceHandler_);
@@ -876,7 +848,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_group_rsd_filters_table && ImGui::BeginTabItem("Component Group RSD Filters", &show_comp_group_rsd_filters_table))
+        if (ImGui::BeginTabItem("Component Group RSD Filters", &getGenericTableWidget(generic_table_widgets, "CompGroupRSDFiltersMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupRSDFiltersTable(application_handler_.sequenceHandler_);
@@ -888,7 +860,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_rsd_qcs_table && ImGui::BeginTabItem("Component RSD QCs", &show_comp_rsd_qcs_table))
+        if (ImGui::BeginTabItem("Component RSD QCs", &getGenericTableWidget(generic_table_widgets, "CompRSDQCsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentRSDQCsTable(application_handler_.sequenceHandler_);
@@ -900,7 +872,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_group_rsd_qcs_table && ImGui::BeginTabItem("Component Group RSD QCs", &show_comp_group_rsd_qcs_table))
+        if (ImGui::BeginTabItem("Component Group RSD QCs", &getGenericTableWidget(generic_table_widgets, "CompGroupRSDQCsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupRSDQCsTable(application_handler_.sequenceHandler_);
@@ -912,7 +884,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_background_filters_table && ImGui::BeginTabItem("Component Background Filters", &show_comp_background_filters_table))
+        if (ImGui::BeginTabItem("Component Background Filters", &getGenericTableWidget(generic_table_widgets, "CompBackgroundFiltersMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentBackgroundFiltersTable(application_handler_.sequenceHandler_);
@@ -924,7 +896,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_group_background_filters_table && ImGui::BeginTabItem("Component Group Background Filters", &show_comp_group_background_filters_table))
+        if (ImGui::BeginTabItem("Component Group Background Filters", &getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundFiltersMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupBackgroundFiltersTable(application_handler_.sequenceHandler_);
@@ -936,7 +908,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_background_qcs_table && ImGui::BeginTabItem("Component Background QCs", &show_comp_background_qcs_table))
+        if (ImGui::BeginTabItem("Component Background QCs", &getGenericTableWidget(generic_table_widgets, "CompBackgroundQCsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentBackgroundQCsTable(application_handler_.sequenceHandler_);
@@ -948,7 +920,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_group_background_qcs_table && ImGui::BeginTabItem("Component Group Background QCs", &show_comp_group_background_qcs_table))
+        if (ImGui::BeginTabItem("Component Group Background QCs", &getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundQCsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupBackgroundQCsTable(application_handler_.sequenceHandler_);
@@ -960,7 +932,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_rsd_estimations_table && ImGui::BeginTabItem("Component RSD Filters", &show_comp_rsd_estimations_table))
+        if (ImGui::BeginTabItem("Component RSD Filters", &getGenericTableWidget(generic_table_widgets, "CompRSDEstimationsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentRSDEstimationsTable(application_handler_.sequenceHandler_);
@@ -972,7 +944,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_group_rsd_estimations_table && ImGui::BeginTabItem("Component Group RSD Filters", &show_comp_group_rsd_estimations_table))
+        if (ImGui::BeginTabItem("Component Group RSD Filters", &getGenericTableWidget(generic_table_widgets, "CompGroupRSDEstimationsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupRSDEstimationsTable(application_handler_.sequenceHandler_);
@@ -984,7 +956,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_background_estimations_table && ImGui::BeginTabItem("Component Background Filters", &show_comp_background_estimations_table))
+        if (ImGui::BeginTabItem("Component Background Filters", &getGenericTableWidget(generic_table_widgets, "CompBackgroundEstimationsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentBackgroundEstimationsTable(application_handler_.sequenceHandler_);
@@ -996,7 +968,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_comp_group_background_estimations_table && ImGui::BeginTabItem("Component Group Background Filters", &show_comp_group_background_estimations_table))
+        if (ImGui::BeginTabItem("Component Group Background Filters", &getGenericTableWidget(generic_table_widgets, "CompGroupBackgroundEstimationsMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setComponentGroupBackgroundEstimationsTable(application_handler_.sequenceHandler_);
@@ -1008,7 +980,7 @@ int main(int argc, char** argv)
           widget->draw();
           ImGui::EndTabItem();
         }
-        if (show_feature_pivot_table && ImGui::BeginTabItem("Features matrix", &show_feature_pivot_table))
+        if (ImGui::BeginTabItem("Features matrix", &getGenericTableWidget(generic_table_widgets, "featureMatrixMainWindow")->visible_))
         {
           session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
           session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
