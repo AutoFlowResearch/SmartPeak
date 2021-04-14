@@ -161,7 +161,7 @@ namespace SmartPeak
       
       // ParameterSet to vec<ImEntry>
       static std::vector<ImEntry> table_entries;
-      if (parameters_.size() > 0 && is_scanned == false ) {
+      if (parameters_.size() > 0 && is_scanned == false) {
         table_entries.resize(parameters_count, ImEntry());
         size_t sub_param_idx = 0;
         for (auto it = parameters_.begin(); it != parameters_.end(); it++) {

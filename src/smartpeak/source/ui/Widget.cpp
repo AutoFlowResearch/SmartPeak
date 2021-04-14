@@ -210,8 +210,7 @@ namespace SmartPeak
     if (table_id_ == "InjectionsExplorerWindow" /*&& active_plot_ == "Chromatograms"*/) {
       table_entries_plot_col_ = 3;
       checkbox_columns_plot_col_ = 1;
-    }
-    else if (table_id_ == "TransitionsExplorerWindow" /*&& active_plot_ == "Features (line)"*/) {
+    } else if (table_id_ == "TransitionsExplorerWindow" /*&& active_plot_ == "Features (line)"*/) {
       table_entries_plot_col_ = 2;
       checkbox_columns_plot_col_ = 0;
     }
@@ -233,8 +232,7 @@ namespace SmartPeak
           table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_] = "false";
           (*checkbox_columns_)(table_entries_[plot_idx_+1].ID, checkbox_columns_plot_col_) = false;
         }
-      }
-      else if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "true")
+      } else if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "true")
                && table_scanned_ && plot_idx_ < table_entries_.size()) {
         table_entries_[plot_idx_].entry_contents[table_entries_plot_col_] = "false";
         (*checkbox_columns_)(table_entries_[plot_idx_].ID, checkbox_columns_plot_col_) = false;
@@ -264,8 +262,7 @@ namespace SmartPeak
           table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_] = "false";
           (*checkbox_columns_)(table_entries_[plot_idx_-1].ID, checkbox_columns_plot_col_) = false;
         }
-      }
-      else if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "true")
+      } else if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "true")
                && table_scanned_ && plot_idx_ > 0) {
         table_entries_[plot_idx_].entry_contents[table_entries_plot_col_] = "false";
         (*checkbox_columns_)(table_entries_[plot_idx_].ID, checkbox_columns_plot_col_) = false;
@@ -293,8 +290,7 @@ namespace SmartPeak
                           entry.entry_contents[table_entries_plot_col_] = "true";
                           (*checkbox_columns_)(entry.ID, checkbox_columns_plot_col_) = true;
          });
-      }
-      else if (!plot_all_) {
+      } else if (!plot_all_) {
         std::for_each(table_entries_.begin(), table_entries_.end(),
                       [&](ImEntry& entry) {
                           entry.entry_contents[table_entries_plot_col_] = "false";
