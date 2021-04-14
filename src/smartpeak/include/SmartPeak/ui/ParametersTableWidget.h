@@ -43,7 +43,7 @@ namespace SmartPeak
   class ParametersTableWidget : public Widget, public IParametersObserver, public IWorkflowObserver
   {
   public:
-    ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id);
+    ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id, const std::string title = "");
     ~ParametersTableWidget();
 
     void draw() override;

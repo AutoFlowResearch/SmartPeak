@@ -30,7 +30,8 @@ namespace SmartPeak
   class LogWidget final : public Widget
   {
   public:
-    LogWidget(const GuiAppender& appender) :
+    LogWidget(const GuiAppender& appender, const std::string title = "") :
+      Widget(title),
       appender_(appender) {};
 
     void draw() override;

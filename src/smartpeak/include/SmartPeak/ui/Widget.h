@@ -46,7 +46,9 @@ namespace SmartPeak
   class Widget
   {
   public:
-    Widget() = default;
+    Widget(const std::string title = ""):
+      title_(title)
+    {};
     virtual ~Widget() = default;
     Widget(const Widget &&) = delete;
 
@@ -58,6 +60,7 @@ namespace SmartPeak
     virtual void draw() = 0;
 
     bool visible_ = false;
+    std::string title_;
   };
 
   class GenericTextWidget : public Widget
@@ -78,8 +81,22 @@ namespace SmartPeak
   class GenericTableWidget : public Widget
   {
   public:
-    GenericTableWidget(const std::string& table_id)
-      : table_id_(table_id) {};
+    typedef void(SessionHandler::* DataGeterMethod)(const SequenceHandler& sequence_handler, SessionHandler::GenericTableData& generic_table_data);
+    typedef Eigen::Tensor<bool, 1>(SessionHandler::* DataFilterMethod)(const Eigen::Tensor<std::string, 2>& to_filter) const;
+
+    GenericTableWidget(const std::string& table_id,
+      const std::string title = "",
+      SessionHandler* session_handler = nullptr,
+      SequenceHandler* sequence_handler = nullptr,
+      DataGeterMethod data_getter = nullptr,
+      DataFilterMethod data_filter = nullptr)
+      : Widget(title),
+        table_id_(table_id),
+        session_handler_(session_handler),
+        sequence_handler_(sequence_handler),
+        data_getter_(data_getter),
+        data_filter_(data_filter)
+    {};
     /*
     @brief Show the table
 
@@ -121,14 +138,20 @@ namespace SmartPeak
     */
     void sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs, const bool& is_scanned);
 
-    Eigen::Tensor<std::string, 1> headers_;
-    Eigen::Tensor<std::string, 2> columns_;
+
+    SessionHandler::GenericTableData table_data_;
+    
     Eigen::Tensor<bool, 1> checked_rows_;
     const std::string table_id_;
+    SessionHandler* session_handler_ = nullptr;
+    SequenceHandler* sequence_handler_ = nullptr;
+    DataGeterMethod data_getter_ = nullptr;
+    DataFilterMethod data_filter_ = nullptr;
     std::vector<ImEntry> table_entries_;
     bool table_scanned_;
     int selected_col = 0;
     std::vector<const char*> cols;
+    
   };
 
 
@@ -143,8 +166,8 @@ namespace SmartPeak
   class ExplorerWidget final : public GenericTableWidget
   {
   public:
-    ExplorerWidget(const std::string& table_id)
-      :GenericTableWidget(table_id) {};
+    ExplorerWidget(const std::string& table_id, const std::string title ="")
+      :GenericTableWidget(table_id, title) {};
     /*
     @brief Show the explorer
 
@@ -163,6 +186,10 @@ namespace SmartPeak
   class GenericGraphicWidget : public Widget
   {
   public:
+    GenericGraphicWidget(const std::string title = "")
+      : Widget(title)
+    {};
+
     void draw() override;
 
     /**
@@ -180,7 +207,7 @@ namespace SmartPeak
   class LinePlot2DWidget : public GenericGraphicWidget
   {
   public:
-    LinePlot2DWidget() {};
+    LinePlot2DWidget(const std::string title = "") : GenericGraphicWidget(title)  {};
     void setValues(const Eigen::Tensor<float, 2>* x_data,
       const Eigen::Tensor<float, 2>* y_data,
       const Eigen::Tensor<std::string, 1>* x_labels,
@@ -235,6 +262,7 @@ namespace SmartPeak
     ScatterPlotWidget(SessionHandler& session_handler,
       SequenceHandler& sequence_handler,
       const std::string& title) :
+      GenericGraphicWidget(title),
       session_handler_(session_handler),
       sequence_handler_(sequence_handler),
       plot_title_(title) {};

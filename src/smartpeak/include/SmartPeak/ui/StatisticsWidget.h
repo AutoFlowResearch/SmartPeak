@@ -36,6 +36,10 @@ namespace SmartPeak
   {
 
   public:
+    StatisticsWidget(const std::string title = "")
+      : Widget(title)
+    {};
+
     void draw() override;
 
     void setApplicationHandler(ApplicationHandler& application_handler);

@@ -15,7 +15,7 @@ namespace SmartPeak
   class CalibratorsPlotWidget : public GenericGraphicWidget
   {
   public:
-    CalibratorsPlotWidget() {};
+    CalibratorsPlotWidget(const std::string title = ""): GenericGraphicWidget(title) {};
     void setValues(
       const std::vector<std::vector<float>>* x_fit_data, const std::vector<std::vector<float>>* y_fit_data,
       const std::vector<std::vector<float>>* x_raw_data, const std::vector<std::vector<float>>* y_raw_data, const std::vector<std::string>* series_names,

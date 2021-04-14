@@ -36,6 +36,11 @@ namespace SmartPeak
     ApplicationHandler* application_handler_ = nullptr;
 
   public:
+
+    Workflow(const std::string title = "")
+      : Widget(title)
+    {};
+
     void draw() override;
 
     void setApplicationHandler(ApplicationHandler& application_handler);

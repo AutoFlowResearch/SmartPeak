@@ -36,6 +36,10 @@ namespace SmartPeak
   {
 
   public:
+    InfoWidget(const std::string title = "")
+      : Widget(title)
+    {};
+
     /**
      ISequenceObserver
     */
