@@ -33,7 +33,7 @@ MRMFeatureFinderScoring,TransitionGroupPicker:PeakPickerMRM:write_sn_log_message
 MRMFeatureFinderScoring,TransitionGroupPicker:PeakPickerMRM:remove_overlapping_peaks,string,FALSE,FALSE,false; true,Try to remove overlapping peaks during peak picking,TRUE,,
 MRMFeatureFinderScoring,TransitionGroupPicker:PeakPickerMRM:method,string,corrected,legacy,legacy; corrected; crawdad,Which method to choose for chromatographic peak-picking (OpenSWATH legacy; corrected picking or Crawdad).,TRUE,,
 MRMFeatureFinderScoring,TransitionGroupPicker:PeakIntegrator:baseline_type,string,vertical_division,,,,TRUE,,
-MRMFeatureFinderScoring,TransitionGroupPicker:PeakIntegrator:integration_type,string,simpson,,,,TRUE,,
+MRMFeatureFinderScoring,TransitionGroupPicker:PeakIntegrator:integration_type,string,trapezoid,,,,TRUE,,
 MRMFeatureFinderScoring,DIAScoring:dia_extraction_window,float,0.05,0.05,min: 0,DIA extraction window in Th.,TRUE,,
 MRMFeatureFinderScoring,DIAScoring:dia_centroided,string,FALSE,FALSE,true; false,Use centroded DIA data.,TRUE,,
 MRMFeatureFinderScoring,DIAScoring:dia_byseries_intensity_min,float,300,300,min: 0,DIA b/y series minimum intensity to consider.,TRUE,,

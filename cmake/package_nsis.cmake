@@ -40,15 +40,8 @@ install(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
        DESTINATION bin
        COMPONENT library)
 
-set(CPACK_GENERATOR NSIS)
-## Remove the next three lines if you use the NSIS autogeneration feature at some point!
-## For now it makes sure everything is merged into the usual folders bin/share/include
-set(CPACK_COMPONENT_ALL_IN_ONE 1)
-set(CPACK_COMPONENTS_ALL_GROUPS_IN_ONE_PACKAGE 1)
-set(CPACK_MONOLITHIC_INSTALL 1)
-
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${SMARTPEAK_PACKAGE_VERSION_MAJOR}.${SMARTPEAK_PACKAGE_VERSION_MINOR}.${SMARTPEAK_PACKAGE_VERSION_PATCH}-Win${PLATFORM}")
-#set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/cmake/Windows/SmartPeak.ico")
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-Win${PLATFORM}")
+# set(CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/cmake/Windows/SmartPeak.ico")
 
 ## Create own target because you cannot "depend" on the internal target 'package'
 add_custom_target(dist
@@ -71,13 +64,34 @@ endif()
 ## the following to let CMake generate snippets for the NSIS script
 ## Plus an additional entry in the nsis template (see CPack-NSIS docu)
 
-# set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/cmake/Windows/SmartPeak.ico")
-# set(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/cmake/Windows/SmartPeak.ico")
+set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+set(CPACK_NSIS_MODIFY_PATH OFF)
+set(CPACK_NSIS_MUI_FINISHPAGE_RUN "SmartPeakGUI.exe")
+set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\SmartPeakGUI.exe")
+
+set(CPACK_NSIS_MUI_ICON "${PROJECT_SOURCE_DIR}/cmake/SmartPeak.ico")
+# set(CPACK_NSIS_MUI_UNIICON "${PROJECT_SOURCE_DIR}/cmake/SmartPeak.ico")
+
 # set(CPACK_NSIS_HELP_LINK "https://www.SmartPeak.com/getting-started")
 # set(CPACK_NSIS_URL_INFO_ABOUT "https://www.SmartPeak.com")
 # set(CPACK_NSIS_CONTACT "smartpeak-general@lists.sourceforge.net")
 # set(CPACK_NSIS_MENU_LINKS
 #     "https://www.SmartPeak.com" "SmartPeak Web Site")
 
+# Helper macro to set shortcuts for the application.
+# Creates link with name linkName to the application both on desktop and start menu.
+# Source: https://crascit.com/2015/08/07/cmake_cpack_nsis_shortcuts_with_parameters/
+macro(prepare_nsis_link linkName appName params)
+	#prepare start menu links
+	LIST(APPEND CPACK_NSIS_CREATE_ICONS_EXTRA "  CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\${linkName}.lnk' '$INSTDIR\\\\bin\\\\${appName}.exe' '${params}'")
+	LIST(APPEND CPACK_NSIS_DELETE_ICONS_EXTRA "  Delete '$SMPROGRAMS\\\\$START_MENU\\\\${linkName}.lnk'")
+	#prepare desktop links
+	LIST(APPEND CPACK_NSIS_CREATE_ICONS_EXTRA  "  CreateShortCut '$DESKTOP\\\\${linkName}.lnk' '$INSTDIR\\\\bin\\\\${appName}.exe' '${params}'")
+	LIST(APPEND CPACK_NSIS_DELETE_ICONS_EXTRA  "  Delete '$DESKTOP\\\\${linkName}.lnk'")
+endmacro()
 
+prepare_nsis_link(${CPACK_PACKAGE_NAME} "SmartPeakGUI" " ")
 
+# Replace semicolons with new lines:
+string (REPLACE ";" "\n" CPACK_NSIS_CREATE_ICONS_EXTRA "${CPACK_NSIS_CREATE_ICONS_EXTRA}")
+string (REPLACE ";" "\n" CPACK_NSIS_DELETE_ICONS_EXTRA "${CPACK_NSIS_DELETE_ICONS_EXTRA}")

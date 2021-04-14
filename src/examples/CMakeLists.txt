@@ -57,12 +57,12 @@ endif(OpenMS_FOUND)
 find_package(Qt5 COMPONENTS Core Network REQUIRED)
 
 if (NOT Qt5Network_FOUND)
-  message(STATUS "QtNetwork module not found!")
+  message(STATUS "[examples] : QtNetwork module not found!")
   message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
 endif()
 
 if (NOT Qt5Core_FOUND)
-  message(STATUS "QtCore module not found!")
+  message(STATUS "[examples] : QtCore module not found!")
   message(FATAL_ERROR "To find a custom Qt installation use: cmake <..more options..> -D QT_QMAKE_EXECUTABLE='<path_to_qmake(.exe)' <src-dir>")
 endif()
 
@@ -79,14 +79,22 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
+# CoreFoundation & ApplicationServices
+#------------------------------------------------------------------------------
+if(APPLE)
+  find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+  find_library(APPLICATIONSERVICES_LIBRARY ApplicationServices)
+endif()
+
+#------------------------------------------------------------------------------
 # ImGui
 #------------------------------------------------------------------------------
 find_package(ImGui COMPONENTS Sources Examples SourcesMiscCpp REQUIRED)
 include_directories(${ImGui_INCLUDE_DIR})
 if (ImGui_Examples_FOUND)
-  message(STATUS "ImGui_Examples_FOUND has been set and found")
+  message(STATUS "[examples] : ImGui_Examples_FOUND has been set and found")
 else()
-  message(STATUS "imgui has not been found")
+  message(STATUS "[examples] : ImGui has not been found")
 endif()
 
 #------------------------------------------------------------------------------
@@ -110,12 +118,13 @@ add_dependencies(INTERACTIVE_EXAMPLES ${interactive_executables_list})
 foreach(_examples ${EXAMPLE_executables})
   if (APPLE)
 
-    if (${_examples} STREQUAL "GUI")
+    if (${_examples} STREQUAL "SmartPeakGUI")
       set(ASSETS ${PROJECT_SOURCE_DIR}/../../cmake/MacOSX/sp.icns)
       set_source_files_properties(${ASSETS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
       add_executable(${_examples} MACOSX_BUNDLE source/${_examples} ${ASSETS})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
             OpenMS ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
+            ${COREFOUNDATION_LIBRARY} ${APPLICATIONSERVICES_LIBRARY}
             PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
       install(TARGETS ${_examples}  BUNDLE DESTINATION .  COMPONENT Applications)
     else()
@@ -125,7 +134,7 @@ foreach(_examples ${EXAMPLE_executables})
 
   elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux) 
 
-    if (${_examples} STREQUAL "GUI")
+    if (${_examples} STREQUAL "SmartPeakGUI")
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
           OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
@@ -151,10 +160,11 @@ foreach(_examples ${EXAMPLE_executables})
 
   else() # Win
 
-    add_executable(${_examples} source/${_examples})
-    if(NOT ${_examples} STREQUAL "GUI")
+    if(NOT ${_examples} STREQUAL "SmartPeakGUI")
+      add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
     else()
+      add_executable(${_examples} source/${_examples} ${CMAKE_SOURCE_DIR}/cmake/Windows/SmartPeakGUI.rc)
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
           OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
           PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)

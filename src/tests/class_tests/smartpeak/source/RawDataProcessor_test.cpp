@@ -1,10 +1,38 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
+
 #include <SmartPeak/test_config.h>
 
 #define BOOST_TEST_MODULE RawDataProcessor test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/DATAACCESS/DataAccessHelper.h>
+#include <OpenMS/FORMAT/MRMFeatureQCFile.h>  // load featureFilter and featureQC
+#include <OpenMS/ANALYSIS/OPENSWATH/TransitionTSVFile.h>  // load traML
+#include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
+#include <SmartPeak/io/InputDataValidation.h> // check filenames and headers
+#include <OpenMS/FORMAT/TraMLFile.h>
 
 #include <OpenMS/FORMAT/MzMLFile.h>
 
@@ -12,8 +40,8 @@ using namespace SmartPeak;
 using namespace std;
 
 void load_data(
-  std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_1,
-  std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_2
+  ParameterSet& params_1,
+  ParameterSet& params_2
 )
 {
   Filenames filenames1, filenames2;
@@ -58,8 +86,8 @@ BOOST_AUTO_TEST_CASE(gettersClearData)
 BOOST_AUTO_TEST_CASE(processorClearData)
 {
   // Load all of the raw and processed data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -115,17 +143,15 @@ BOOST_AUTO_TEST_CASE(processorLoadRawData)
 
   // TEST CASE 1:  mzML with out baseline correction
   RawDataHandler rawDataHandler;
-  std::map<std::string, std::string> params_tmp = { // Must be initialized step by step due to Compiler Error C2665 on Windows...
+  std::vector<std::map<std::string, std::string>> params_tmp = { {
     {"name", "zero_baseline"},
     {"type", "bool"},
     {"value", "false"}
-  };
-  std::vector<std::map<std::string, std::string>> mzML_params;
-  mzML_params.push_back(params_tmp);
-  std::map<std::string, std::vector<std::map<std::string, std::string>>> params_I;
-  params_I.emplace("mzML", mzML_params);
-  params_I.emplace("ChromatogramExtractor", std::vector<std::map<std::string, std::string>>());
-  params_I.emplace("MRMMapping", std::vector<std::map<std::string, std::string>>());
+    } };
+  ParameterSet params_I;
+  params_I.addFunctionParameters(FunctionParameters("mzML", params_tmp));
+  params_I.addFunctionParameters(FunctionParameters("ChromatogramExtractor"));
+  params_I.addFunctionParameters(FunctionParameters("MRMMapping"));
 
   Filenames filenames;
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_baseline_correction.mzML");
@@ -148,14 +174,16 @@ BOOST_AUTO_TEST_CASE(processorLoadRawData)
   BOOST_CHECK_CLOSE(chromatograms1[1][4].getIntensity(), 1.0, 1e-3);
 
   // TEST CASE 2:  Chromeleon file format
-  params_I.at("mzML")[0].at("value") = "false";
-  params_I.at("mzML").push_back(
+  params_I.at("mzML")[0].setValueFromString("false");
+  std::map<std::string, std::string> param_struct = 
     {
       {"name", "format"},
       {"type", "string"},
       {"value", "ChromeleonFile"}
-    }
-  );
+    };
+  auto param = Parameter(param_struct);
+  params_I.at("mzML").addParameter(param);
+  
   rawDataHandler.clear();
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_ChromeleonFile_10ug.txt");
   processor.process(rawDataHandler, params_I, filenames);
@@ -166,21 +194,21 @@ BOOST_AUTO_TEST_CASE(processorLoadRawData)
   BOOST_CHECK_EQUAL(chromatograms3[0].size(), 3301);
 
   BOOST_CHECK_CLOSE(chromatograms3[0][0].getIntensity(), 0.0, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms3[0][600].getIntensity(), -0.503815, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms3[0][1200].getIntensity(), -0.666694, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms3[0][1800].getIntensity(), -0.232843, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms3[0][2400].getIntensity(), -0.223644, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms3[0][3300].getIntensity(), 0.126958, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][600].getIntensity(), -503.815, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][1200].getIntensity(), -666.694, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][1800].getIntensity(), -232.843, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][2400].getIntensity(), -223.644, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms3[0][3300].getIntensity(), 126.958, 1e-3);
 }
 
 BOOST_AUTO_TEST_CASE(extractMetaData)
 {
   // Pre-requisites: load the parameters
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
-  BOOST_CHECK_EQUAL(params_1.size(), 23);
-  BOOST_CHECK_EQUAL(params_2.size(), 24);
+  BOOST_CHECK_EQUAL(params_1.size(), 31);
+  BOOST_CHECK_EQUAL(params_2.size(), 28);
   RawDataHandler rawDataHandler;
 
   // Pre-requisites: load the transitions and raw data
@@ -273,8 +301,8 @@ BOOST_AUTO_TEST_CASE(gettersMapChromatograms)
 BOOST_AUTO_TEST_CASE(processorMapChromatograms)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -334,16 +362,15 @@ BOOST_AUTO_TEST_CASE(processorZeroChromatogramBaseline)
 {
   // TEST CASE 1:  mzML with baseline correction
   RawDataHandler rawDataHandler;
-  std::map<std::string, std::string> params_tmp = { // Must be initialized step by step due to Compiler Error C2665 on Windows...
+  std::vector<std::map<std::string, std::string>> params_tmp = { { // Must be initialized step by step due to Compiler Error C2665 on Windows...
     {"name", "zero_baseline"},
     {"type", "bool"},
     {"value", "true"}
-  };
-  std::vector<std::map<std::string, std::string>> mzML_params;
-  mzML_params.push_back(params_tmp);
-  std::map<std::string, std::vector<std::map<std::string, std::string>>> params_I;
-  params_I.emplace("mzML", mzML_params);
-  params_I.emplace("ChromatogramExtractor", std::vector<std::map<std::string, std::string>>());
+    } };
+  FunctionParameters mzML_params("mzML", params_tmp);
+  ParameterSet params_I;
+  params_I.addFunctionParameters(mzML_params);
+  params_I.addFunctionParameters(FunctionParameters("ChromatogramExtractor"));
 
   Filenames filenames;
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_baseline_correction.mzML");
@@ -367,13 +394,12 @@ BOOST_AUTO_TEST_CASE(processorZeroChromatogramBaseline)
   BOOST_CHECK_CLOSE(chromatograms2[1][4].getIntensity(), 9.0, 1e-3);
 
   // TEST CASE 2:  Chromeleon file format with baseline correction
-  params_I.at("mzML").push_back(
-    {
+  std::vector<std::map<std::string, std::string>> params = { {
       {"name", "format"},
       {"type", "string"},
       {"value", "ChromeleonFile"}
-    }
-  );
+  }};
+  params_I.addFunctionParameters(FunctionParameters("mzML", params));
   rawDataHandler.clear();
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_ChromeleonFile_10ug.txt");
   processor.process(rawDataHandler, params_I, filenames);
@@ -383,12 +409,12 @@ BOOST_AUTO_TEST_CASE(processorZeroChromatogramBaseline)
   const vector<OpenMS::MSChromatogram>& chromatograms4 = rawDataHandler.getChromatogramMap().getChromatograms();
   BOOST_CHECK_EQUAL(chromatograms4.size(), 1);
   BOOST_CHECK_EQUAL(chromatograms4[0].size(), 3301);
-  BOOST_CHECK_CLOSE(chromatograms4[0][0].getIntensity(), 1.004634, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][600].getIntensity(), 0.500819, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][1200].getIntensity(), 0.33794, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][1800].getIntensity(), 0.771791, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][2400].getIntensity(), 0.78099, 1e-3);
-  BOOST_CHECK_CLOSE(chromatograms4[0][3300].getIntensity(), 1.131592, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][0].getIntensity(), 1004.634, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][600].getIntensity(), 500.819, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][1200].getIntensity(), 337.94, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][1800].getIntensity(), 771.791, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][2400].getIntensity(), 780.99, 1e-3);
+  BOOST_CHECK_CLOSE(chromatograms4[0][3300].getIntensity(), 1131.592, 1e-3);
 }
 
 /**
@@ -419,8 +445,8 @@ BOOST_AUTO_TEST_CASE(gettersExtractChromatogramWindows)
 BOOST_AUTO_TEST_CASE(processorExtractChromatogramWindows)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -506,8 +532,8 @@ BOOST_AUTO_TEST_CASE(gettersExtractSpectraWindows)
 BOOST_AUTO_TEST_CASE(processorExtractSpectraWindows)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -561,8 +587,8 @@ BOOST_AUTO_TEST_CASE(gettersMergeSpectra)
 BOOST_AUTO_TEST_CASE(processorMergeSpectra)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -621,11 +647,15 @@ BOOST_AUTO_TEST_CASE(processLoadFeatures)
   Filenames filenames;
   filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_test_1_io_FileReaderOpenMS.featureXML");
   RawDataHandler rawDataHandler;
+  rawDataHandler.getMetaData().setFilename("filename");
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, {}, filenames);
 
   const OpenMS::FeatureMap& fm = rawDataHandler.getFeatureMap(); // Test feature_map
   BOOST_CHECK_EQUAL(fm.size(), 481);
+  OpenMS::StringList filename_test;
+  fm.getPrimaryMSRunPath(filename_test);
+  BOOST_CHECK_EQUAL(filename_test.at(0), "filename");
 
   BOOST_CHECK_CLOSE(static_cast<double>(fm[0].getSubordinates()[0].getMetaValue("peak_apex_int")), 266403.0, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(fm[0].getSubordinates()[0].getRT()), 15.8944563381195, 1e-6);
@@ -641,6 +671,8 @@ BOOST_AUTO_TEST_CASE(processLoadFeatures)
 
   const OpenMS::FeatureMap& fmh = rawDataHandler.getFeatureMapHistory(); // Test feature_map_history
   BOOST_CHECK_EQUAL(fmh.size(), 481);
+  fm.getPrimaryMSRunPath(filename_test);
+  BOOST_CHECK_EQUAL(filename_test.at(0), "filename");
 
   BOOST_CHECK_CLOSE(static_cast<double>(fmh[0].getSubordinates()[0].getMetaValue("peak_apex_int")), 266403.0, 1e-6);
   BOOST_CHECK_CLOSE(static_cast<double>(fmh[0].getSubordinates()[0].getRT()), 15.8944563381195, 1e-6);
@@ -1078,21 +1110,27 @@ BOOST_AUTO_TEST_CASE(processLoadParameters)
 BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
 {
   RawDataHandler rawDataHandler;
-  std::map<std::string, std::vector<std::map<std::string, std::string>>> params;
 
-  params.emplace("SequenceSegmentPlotter", vector<map<string, string>> {
+  vector<map<string, string>> function_params = {
     {
-      {"map1_elem1", "value1"},
-      { "map1_elem2", "value2" }
+      {"name", "elem1"},
+      {"value", "value1"}
     },
     {
-      {"map2_elem1", "value3"}
+      {"name", "elem2"},
+      {"value", "value2"}
+    },
+    {
+      {"name", "elem3"},
+      {"value", "value3"}
     }
-  });
+  };
+  ParameterSet params;
+  params.addFunctionParameters(FunctionParameters("SequenceSegmentPlotter", function_params));
 
   LoadParameters loadParameters;
   loadParameters.sanitizeParameters(params);
-  BOOST_CHECK_EQUAL(params.size(), 22);
+  BOOST_CHECK_EQUAL(params.size(), 26);
   BOOST_CHECK_EQUAL(params.count("SequenceSegmentPlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("FeaturePlotter"), 1);
   BOOST_CHECK_EQUAL(params.count("AbsoluteQuantitation"), 1);
@@ -1110,12 +1148,10 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.count("SequenceProcessor"), 1);
   BOOST_CHECK_EQUAL(params.count("FIAMS"), 1);
   BOOST_CHECK_EQUAL(params.count("PickMS1Features"), 1);
+  BOOST_CHECK_EQUAL(params.count("PickMS2Features"), 1);
   BOOST_CHECK_EQUAL(params.count("AccurateMassSearchEngine"), 1);
   BOOST_CHECK_EQUAL(params.count("MergeInjections"), 1);
-  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter").size(), 2);
-  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem1"), "value1");
-  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[0].at("map1_elem2"), "value2");
-  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter")[1].at("map2_elem1"), "value3");
+  BOOST_CHECK_EQUAL(params.at("SequenceSegmentPlotter").size(), 3);
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeatures.qc").size(), 0);
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences").size(), 0);
   BOOST_CHECK_EQUAL(params.at("MRMFeatureFilter.filter_MRMFeaturesBackgroundInterferences.qc").size(), 0);
@@ -1124,6 +1160,7 @@ BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
   BOOST_CHECK_EQUAL(params.at("SequenceProcessor").size(), 0);
   BOOST_CHECK_EQUAL(params.at("FIAMS").size(), 0);
   BOOST_CHECK_EQUAL(params.at("PickMS1Features").size(), 0);
+  BOOST_CHECK_EQUAL(params.at("PickMS2Features").size(), 0);
   BOOST_CHECK_EQUAL(params.at("AccurateMassSearchEngine").size(), 0);
   BOOST_CHECK_EQUAL(params.at("MergeInjections").size(), 0);
 }
@@ -1156,8 +1193,8 @@ BOOST_AUTO_TEST_CASE(gettersPickMRMFeatures)
 BOOST_AUTO_TEST_CASE(pickFeaturesMRM)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1235,8 +1272,8 @@ BOOST_AUTO_TEST_CASE(gettersPickMS1Features)
 BOOST_AUTO_TEST_CASE(pickMS1Features)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1311,6 +1348,100 @@ BOOST_AUTO_TEST_CASE(pickMS1Features)
 }
 
 /**
+  PickMS2Features Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorPickMS2Features)
+{
+  PickMS2Features* ptrPickFeatures = nullptr;
+  PickMS2Features* nullPointerPickFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrPickFeatures, nullPointerPickFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorPickMS2Features)
+{
+  PickMS2Features* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new PickMS2Features();
+  delete ptrPickFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersPickMS2Features)
+{
+  PickMS2Features processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "PICK_MS2_FEATURES");
+}
+
+BOOST_AUTO_TEST_CASE(pickMS2Features)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_germicidin.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  // Test pick features
+  PickMS2Features pickFeatures;
+  map<std::string, vector<map<string, string>>> feat_params_struct({
+  {"FeatureFindingMetabo", {
+    { {"name", "report_chromatograms"}, {"type", "bool"}, {"value", "true"} },
+    { {"name", "report_convex_hulls"}, {"type", "bool"}, {"value", "true"} },
+  }}
+  });
+  ParameterSet feat_params(feat_params_struct);
+  params_1.merge(feat_params);
+
+  pickFeatures.process(rawDataHandler, params_1, filenames);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 2258);
+  BOOST_CHECK_EQUAL(rawDataHandler.getExperiment().getChromatograms().size(), 2258);
+
+  const OpenMS::Feature& feature1 = rawDataHandler.getFeatureMap().at(0); // feature_map_
+  BOOST_CHECK_EQUAL(feature1.getMetaValue("num_of_masstraces").toString(), "1");
+  BOOST_CHECK_EQUAL(feature1.getMetaValue("scan_polarity"), "positive");
+  BOOST_REQUIRE(feature1.getConvexHulls().size() == 1);
+  BOOST_CHECK_CLOSE(feature1.getConvexHull().getBoundingBox().minX(), 381.298f, 1e-3);
+  BOOST_CHECK_CLOSE(feature1.getConvexHull().getBoundingBox().minY(), 79.021f, 1e-3);
+  BOOST_CHECK_CLOSE(feature1.getConvexHull().getBoundingBox().maxX(), 540.557f, 1e-3);
+  BOOST_CHECK_CLOSE(feature1.getConvexHull().getBoundingBox().maxY(), 79.023f, 1e-3);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getRT()), 453.462, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getMZ()), 79.022321098842482, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature1.getIntensity()), 7978.17578125, 1e-6);
+
+  const OpenMS::Feature& feature2 = rawDataHandler.getFeatureMap().back();
+  BOOST_CHECK_EQUAL(feature2.getMetaValue("num_of_masstraces").toString(), "1");
+  BOOST_REQUIRE(feature2.getConvexHulls().size() == 1);
+  BOOST_CHECK_CLOSE(feature2.getConvexHull().getBoundingBox().minX(), 547.524f, 1e-3);
+  BOOST_CHECK_CLOSE(feature2.getConvexHull().getBoundingBox().minY(), 848.610f, 1e-3);
+  BOOST_CHECK_CLOSE(feature2.getConvexHull().getBoundingBox().maxX(), 592.812f, 1e-3);
+  BOOST_CHECK_CLOSE(feature2.getConvexHull().getBoundingBox().maxY(), 848.641f, 1e-3);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getRT()), 568.428, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getMZ()), 848.63375701405562, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(feature2.getIntensity()), 46520.29296875, 1e-6);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 2258);
+
+  const OpenMS::Feature& hfeature1 = rawDataHandler.getFeatureMapHistory().at(0); // feature_map_history_
+  BOOST_CHECK_EQUAL(hfeature1.getMetaValue("num_of_masstraces").toString(), "1");
+  BOOST_CHECK_EQUAL(hfeature1.getMetaValue("scan_polarity"), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getRT()), 453.462, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getMZ()), 79.022321098842482, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature1.getIntensity()), 7978.17578125, 1e-6);
+
+  const OpenMS::Feature& hfeature2 = rawDataHandler.getFeatureMapHistory().back();
+  BOOST_CHECK_EQUAL(hfeature2.getMetaValue("num_of_masstraces").toString(), "1");
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getRT()), 568.428, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getMZ()), 848.63375701405562, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hfeature2.getIntensity()), 46520.29296875, 1e-6);
+}
+
+/**
   SearchAccurateMass Tests
 */
 BOOST_AUTO_TEST_CASE(constructorSearchAccurateMass)
@@ -1338,8 +1469,8 @@ BOOST_AUTO_TEST_CASE(gettersSearchAccurateMass)
 BOOST_AUTO_TEST_CASE(searchAccurateMass)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1352,6 +1483,11 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   SearchAccurateMass searchAccurateMass;
   searchAccurateMass.process(rawDataHandler, params_1, filenames);
 
+  // DELETE ME
+  filenames.featureXML_o = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_serumTest_accurateMassSearch.featureXML");
+  StoreFeatures storeFeatures;
+  storeFeatures.process(rawDataHandler, params_1, filenames);
+
   BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().size(), 21);
   BOOST_CHECK_CLOSE(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().calc_mass_to_charge.get(), 109.9994567849957, 1e-6);
   BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().chemical_formula.get()), "C9H11NO6S");
@@ -1360,13 +1496,92 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   BOOST_CHECK_EQUAL(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().at(1).chemical_formula.get()), "C6H12O2S2");
   BOOST_CHECK_EQUAL(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().at(1).identifier.get().at(0).get(), "HMDB:HMDB0033556");
 
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 20);
+
+  const auto& hits2 = rawDataHandler.getFeatureMap().at(19);
+  BOOST_CHECK_EQUAL(hits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+
+  BOOST_CHECK_EQUAL(hits2.getSubordinates().size(), 1);
+
+  const auto& hits2sub = hits2.getSubordinates().at(0);
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("identifier").toStringList().at(0), "HMDB:HMDB0062550");
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getMetaValue("peak_apex_int")), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("scan_polarity"), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getMZ()), 109.99971621401676, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2sub.getIntensity()), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+  BOOST_CHECK_EQUAL(hits2sub.getMetaValue("native_id").toString(), "C9H11NO6S;M+3Na;3+");
+  BOOST_CHECK_EQUAL(static_cast<int>(hits2sub.getCharge()), 3);
+
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 71);
+
+  const auto& hhits2 = rawDataHandler.getFeatureMapHistory().at(70);
+  BOOST_CHECK_EQUAL(hhits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+
+  BOOST_CHECK_EQUAL(hhits2.getSubordinates().size(), 1);
+
+  const auto& hhits2sub = hhits2.getSubordinates().at(0);
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("identifier").toStringList().at(0), "HMDB:HMDB0062550");
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getMetaValue("peak_apex_int")), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("scan_polarity"), "positive");
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getRT()), 0, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getMZ()), 109.99971621401676, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2sub.getIntensity()), 4385.34716796875, 1e-6);
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
+  BOOST_CHECK_EQUAL(hhits2sub.getMetaValue("native_id").toString(), "C9H11NO6S;M+3Na;3+");
+  BOOST_CHECK_EQUAL(static_cast<int>(hhits2sub.getCharge()), 3);
+}
+
+/**
+  MergeFeatures Tests
+*/
+BOOST_AUTO_TEST_CASE(constructorMergeFeatures)
+{
+  MergeFeatures* ptrPickFeatures = nullptr;
+  MergeFeatures* nullPointerPickFeatures = nullptr;
+  BOOST_CHECK_EQUAL(ptrPickFeatures, nullPointerPickFeatures);
+}
+
+BOOST_AUTO_TEST_CASE(destructorMergeFeatures)
+{
+  MergeFeatures* ptrPickFeatures = nullptr;
+  ptrPickFeatures = new MergeFeatures();
+  delete ptrPickFeatures;
+}
+
+BOOST_AUTO_TEST_CASE(gettersMergeFeatures)
+{
+  MergeFeatures processor;
+
+  BOOST_CHECK_EQUAL(processor.getID(), -1);
+  BOOST_CHECK_EQUAL(processor.getName(), "MERGE_FEATURES");
+}
+
+BOOST_AUTO_TEST_CASE(consensusFeatures)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_serumTest_accurateMassSearch.featureXML");
+  LoadFeatures loadFeatures;
+  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+  // Test accurate mass search
+  MergeFeatures makeConsensusFeatures;
+  makeConsensusFeatures.process(rawDataHandler, params_1, filenames);
+
   BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMap().size(), 4);
   const auto& hits2 = rawDataHandler.getFeatureMap().at(3);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("peak_apex_int")), 4823.5292528163145, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMetaValue("peak_apex_int")), 75014.837158203125, 1e-6);
   BOOST_CHECK_EQUAL(hits2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hits2.getRT()), 0, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMZ()), 398.96757845025354, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getIntensity()), 4823.529296875, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getMZ()), 109.99967790230706, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hits2.getIntensity()), 75014.8359375, 1e-6);
   BOOST_CHECK_EQUAL(hits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
   BOOST_CHECK_EQUAL(static_cast<int>(hits2.getCharge()), 0);
 
@@ -1389,14 +1604,14 @@ BOOST_AUTO_TEST_CASE(searchAccurateMass)
   BOOST_CHECK_CLOSE(static_cast<double>(hits2_sub1.getMetaValue("mz_error_Da")), 4.942764675774924e-05, 1e-6);
   BOOST_CHECK_EQUAL(static_cast<int>(hits2_sub1.getCharge()), 3);
 
-  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 55);
+  BOOST_CHECK_EQUAL(rawDataHandler.getFeatureMapHistory().size(), 75);
 
-  const auto& hhits2 = rawDataHandler.getFeatureMapHistory().at(54);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("peak_apex_int")), 4823.5292528163145, 1e-6);
+  const auto& hhits2 = rawDataHandler.getFeatureMapHistory().at(74);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMetaValue("peak_apex_int")), 75014.837158203125, 1e-6);
   BOOST_CHECK_EQUAL(hhits2.getMetaValue("scan_polarity"), "positive");
   BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getRT()), 0, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMZ()), 398.96757845025354, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getIntensity()), 4823.529296875, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getMZ()), 109.99967790230706, 1e-6);
+  BOOST_CHECK_CLOSE(static_cast<double>(hhits2.getIntensity()), 75014.8359375, 1e-6);
   BOOST_CHECK_EQUAL(hhits2.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0062550");
   BOOST_CHECK_EQUAL(static_cast<int>(hhits2.getCharge()), 0);
 
@@ -1448,8 +1663,8 @@ BOOST_AUTO_TEST_CASE(gettersFilterFeatures)
 BOOST_AUTO_TEST_CASE(filterFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1540,8 +1755,8 @@ BOOST_AUTO_TEST_CASE(gettersSelectFeatures)
 BOOST_AUTO_TEST_CASE(selectFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1627,8 +1842,8 @@ BOOST_AUTO_TEST_CASE(gettersValidateFeatures)
 BOOST_AUTO_TEST_CASE(validateFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1779,8 +1994,8 @@ BOOST_AUTO_TEST_CASE(gettersCheckFeatures)
 BOOST_AUTO_TEST_CASE(checkFeatures)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1848,8 +2063,8 @@ BOOST_AUTO_TEST_CASE(gettersFilterFeaturesRSDs)
 BOOST_AUTO_TEST_CASE(filterFeaturesRSDs)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -1947,8 +2162,8 @@ BOOST_AUTO_TEST_CASE(gettersFilterFeaturesBackgroundInterferences)
 BOOST_AUTO_TEST_CASE(filterFeaturesBackgroundInterferences)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2041,8 +2256,8 @@ BOOST_AUTO_TEST_CASE(gettersCheckFeaturesBackgroundInterferences)
 BOOST_AUTO_TEST_CASE(checkFeaturesBackgroundInterferences)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2117,8 +2332,8 @@ BOOST_AUTO_TEST_CASE(gettersCheckFeaturesRSDs)
 BOOST_AUTO_TEST_CASE(checkFeaturesRSDs)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2167,8 +2382,8 @@ BOOST_AUTO_TEST_CASE(checkFeaturesRSDs)
 BOOST_AUTO_TEST_CASE(process)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2192,11 +2407,7 @@ BOOST_AUTO_TEST_CASE(process)
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
   filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML");
-  map<string, vector<map<string, string>>>::iterator it = params_1.find("ChromatogramExtractor");
-  if (it != params_1.end()) {
-    params_1.erase(it);
-  }
-  params_1.emplace("ChromatogramExtractor", vector<map<string, string>>());
+  params_1.addFunctionParameters(FunctionParameters("ChromatogramExtractor"));
   LoadRawData loadRawData;
   loadRawData.process(rawDataHandler, params_1, filenames);
   loadRawData.extractMetaData(rawDataHandler);
@@ -2265,8 +2476,8 @@ BOOST_AUTO_TEST_CASE(process)
 BOOST_AUTO_TEST_CASE(emg_processor)
 {
   // Pre-requisites: load the parameters and associated raw data
-  map<string, vector<map<string, string>>> params_1;
-  map<string, vector<map<string, string>>> params_2;
+  ParameterSet params_1;
+  ParameterSet params_2;
   load_data(params_1, params_2);
   RawDataHandler rawDataHandler;
 
@@ -2344,5 +2555,274 @@ BOOST_AUTO_TEST_CASE(emg_processor)
 
   std::remove(SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.featureXML"));
 }
+
+BOOST_AUTO_TEST_CASE(calculateMDVs)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  
+  std::vector<OpenMS::Peak2D::IntensityType> L1_peak_apex_int {3.61e+08, 1.20e+04, 1.02e+05, 2.59e+04};
+  std::vector<OpenMS::Peak2D::IntensityType> L2_peak_apex_int {2.77e+07, 5.45e+04, 6.26e+05, 7.46e+04, 2.75e+04};
+
+  std::vector<OpenMS::Peak2D::IntensityType> L1_norm_max {1.00e+00, 3.324e-05, 2.825e-04, 7.174e-05};
+  std::vector<OpenMS::Peak2D::IntensityType> L1_norm_sum {9.9961e-01, 3.3228e-05, 2.8243e-04, 7.1717e-05};
+
+  std::vector<OpenMS::Peak2D::IntensityType> L2_norm_max {1.00e+00, 1.967e-03, 2.259e-02, 2.693e-03, 9.927e-04};
+  std::vector<OpenMS::Peak2D::IntensityType> L2_norm_sum {9.7252e-01, 1.9134e-03, 2.1978e-02, 2.6191e-03, 9.655e-04};
+
+  // Lactate1 & Lactate2 - peak_apex_int - norm_max
+  OpenMS::Feature               lactate_1_normmax;
+  OpenMS::Feature               lactate_1_normalized_normmax;
+  std::vector<OpenMS::Feature>  L1_subordinates_normmax;
+
+  lactate_1_normmax.setMetaValue("PeptideRef", "Lactate1");
+  for (uint16_t i = 0; i < L1_peak_apex_int.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate1_"+std::to_string(117+i));
+    sub.setMetaValue("peak_apex_int", L1_peak_apex_int[i]);
+    L1_subordinates_normmax.push_back(sub);
+  }
+  lactate_1_normmax.setSubordinates(L1_subordinates_normmax);
+  
+  OpenMS::Feature               lactate_2_normmax;
+  OpenMS::Feature               lactate_2_normalized_normmax;
+  std::vector<OpenMS::Feature>  L2_subordinates_normmax;
+
+  lactate_2_normmax.setMetaValue("PeptideRef", "Lactate2");
+  for (uint16_t i = 0; i < L2_peak_apex_int.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate2_"+std::to_string(219+i));
+    sub.setMetaValue("peak_apex_int", L2_peak_apex_int[i]);
+    L2_subordinates_normmax.push_back(sub);
+  }
+  lactate_2_normmax.setSubordinates(L2_subordinates_normmax);
+  
+  OpenMS::Feature               lactate_1_normsum;
+  OpenMS::Feature               lactate_1_normalized_normsum;
+  std::vector<OpenMS::Feature>  L1_subordinates_normsum;
+
+  lactate_1_normsum.setMetaValue("PeptideRef", "Lactate1");
+  for (uint16_t i = 0; i < L1_peak_apex_int.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate1_"+std::to_string(117+i));
+    sub.setMetaValue("peak_apex_int", L1_peak_apex_int[i]);
+    L1_subordinates_normsum.push_back(sub);
+  }
+  lactate_1_normsum.setSubordinates(L1_subordinates_normsum);
+  
+  OpenMS::Feature lactate_2_normsum; OpenMS::Feature lactate_2_normalized_normsum;
+  std::vector<OpenMS::Feature> L2_subordinates_normsum;
+
+  lactate_2_normsum.setMetaValue("PeptideRef", "Lactate2");
+  for (uint16_t i = 0; i < L2_peak_apex_int.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate2_"+std::to_string(219+i));
+    sub.setMetaValue("peak_apex_int", L2_peak_apex_int[i]);
+    L2_subordinates_normsum.push_back(sub);
+  }
+  lactate_2_normsum.setSubordinates(L2_subordinates_normsum);
+  
+  OpenMS::FeatureMap  lactate_normmax;
+  OpenMS::FeatureMap  lactate_normsum;
+  OpenMS::FeatureMap  lactate_normalized_normmax;
+  OpenMS::FeatureMap  lactate_normalized_normsum;
+
+  lactate_normmax.push_back(lactate_1_normmax);
+  lactate_normmax.push_back(lactate_2_normmax);
+
+  lactate_normsum.push_back(lactate_1_normsum);
+  lactate_normsum.push_back(lactate_2_normsum);
+
+  rawDataHandler.setFeatureMap(lactate_normmax);
+
+  CalculateMDVs calculateMDVs;
+  calculateMDVs.process(rawDataHandler, params_1, filenames);
+  
+  lactate_normalized_normsum = rawDataHandler.getFeatureMap();
+  
+  for(size_t i = 0; i < lactate_normalized_normsum.size(); ++i)
+  {
+    for(size_t j = 0; j < lactate_1_normalized_normsum.getSubordinates().size(); ++j)
+    {
+      if (i == 0) // lactate_1
+      {
+        BOOST_CHECK_CLOSE((float)lactate_normalized_normsum.at(i).getSubordinates().at(j).getMetaValue("peak_apex_int"),
+                          L1_norm_sum.at(j), 1e-6);
+      }
+      else if (i == 1) // lactate_2
+      {
+        BOOST_CHECK_CLOSE((float)lactate_normalized_normsum.at(i).getSubordinates().at(j).getMetaValue("peak_apex_int"),
+                          L2_norm_sum.at(j), 1e-6);
+      }
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(isotopicCorrections)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  
+  // case 1: validating corrected results (corrected peak_apex_int)
+  IsotopicCorrections                   isotopicCorrections;
+  OpenMS::Feature                       lactate_1_normalized;
+  OpenMS::Feature                       lactate_1_corrected;
+  OpenMS::FeatureMap                    lactate_1_featureMap;
+  OpenMS::FeatureMap                    lactate_1_corrected_featureMap;
+  std::vector<std::vector<double>>      correction_matrix_inversed(4, std::vector<double>(4,0));
+
+  // L1_norm_max, L1_peak_apex_int From CHO_190316_Flux.xlsx provided by Douglas McCloskey
+  // L1_corrected self calculated
+  std::vector<double>                         L1_norm_max       {1.00e+00, 3.324e-05, 2.825e-04, 7.174e-05};
+  std::vector<double>                         L1_corrected      {-12.7699, 140.7289, -45.3788, -47.2081};
+  std::vector<OpenMS::Peak2D::IntensityType>  L1_peak_apex_int  {3.61e+08, 1.20e+04, 1.02e+05, 2.59e+04};
+  std::vector<OpenMS::Feature>                L1_subordinates_normmax;
+
+  
+  lactate_1_normalized.setMetaValue("PeptideRef", "Lactate1");
+  for (uint16_t i = 0; i < L1_norm_max.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate1_"+std::to_string(117+i));
+    sub.setMetaValue("peak_apex_int", L1_norm_max[i]);
+    L1_subordinates_normmax.push_back(sub);
+  }
+  lactate_1_normalized.setSubordinates(L1_subordinates_normmax);
+
+  for(uint8_t i = 0; i < 3; ++i)
+  {
+    lactate_1_featureMap.push_back(lactate_1_normalized);
+  }
+ 
+  rawDataHandler.setFeatureMap(lactate_1_featureMap);
+  isotopicCorrections.process(rawDataHandler, params_1, filenames);
+  lactate_1_corrected_featureMap = rawDataHandler.getFeatureMap();
+  
+  for(uint8_t i = 0; i < lactate_1_corrected_featureMap.size(); ++i)
+  {
+    for(uint8_t j = 0; j < lactate_1_corrected_featureMap.at(i).getSubordinates().size(); ++j)
+    {
+      BOOST_CHECK_CLOSE((double)lactate_1_corrected_featureMap.at(i).getSubordinates().at(j).getMetaValue("peak_apex_int"),
+                        L1_corrected[j], 1e-3);
+    }
+  }
+}
+
+BOOST_AUTO_TEST_CASE(calculateIsotopicPurities)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+
+  CalculateIsotopicPurities     calculateIsotopicPurities;
+  OpenMS::Feature               lactate_1_normalized;
+  OpenMS::FeatureMap            lactate_1_featureMap;
+  OpenMS::FeatureMap            lactate_1_with_isotopic_purity_featureMap;
+  std::vector<double>           L1_norm_max {1.00e+00, 3.324e-05, 2.825e-04, 7.174e-05};
+  std::vector<OpenMS::Feature>  L1_subordinates_normmax;
+  
+  lactate_1_normalized.setMetaValue("PeptideRef", "Lactate1");
+  for (uint16_t i = 0; i < L1_norm_max.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate1_"+std::to_string(117+i));
+    sub.setMetaValue("peak_apex_int", L1_norm_max[i]);
+    L1_subordinates_normmax.push_back(sub);
+  }
+  lactate_1_normalized.setSubordinates(L1_subordinates_normmax);
+
+  for(uint8_t i = 0; i < 3; ++i)
+  {
+    lactate_1_featureMap.push_back(lactate_1_normalized);
+  }
+  
+  rawDataHandler.setFeatureMap(lactate_1_featureMap);
+  calculateIsotopicPurities.process(rawDataHandler, params_1, filenames);
+  lactate_1_with_isotopic_purity_featureMap = rawDataHandler.getFeatureMap();
+  std::vector<OpenMS::String> keys;
+  lactate_1_with_isotopic_purity_featureMap.at(0).getKeys(keys);
+
+  for(uint8_t i = 0; i < lactate_1_with_isotopic_purity_featureMap.size(); ++i)
+  {
+    BOOST_CHECK_CLOSE((double)(lactate_1_with_isotopic_purity_featureMap.at(i).getMetaValue("1_2-13C_glucose_experiment")) * 100,
+                      99.6469, 1e-4);
+  }
+}
+
+BOOST_AUTO_TEST_CASE(calculateMDVAccuracies)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  // for peptide SumFormula
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, {}, filenames);
+  
+  CalculateMDVAccuracies calculateMDVAccuracies;
+  OpenMS::Feature        feature_1;
+  OpenMS::FeatureMap     featureMap_1;
+  
+  std::vector<double>    accoa_C23H37N7O17P3S_MRM_measured_13    {0.627, 0.253, 0.096, 0.02, 0.004, 0.001};
+  std::vector<double>    accoa_C23H37N7O17P3S_abs_diff           {0.0632108, 0.0505238, 0.0119821, 0.0014131614, 3.15664365e-05, 0.000323269283};
+  std::vector<double>    Average_accuracy_groundtruth            {0.02374, 0.03451}; // [accoa_13, fad_48]
+
+  std::map<std::string,std::string> theoretical_formulas                    {{"accoa","C23H37N7O17P3S"},{"fad","C27H32N9O15P2"}};
+
+  std::vector<OpenMS::Feature>      L1_subordinates, L2_subordinates;
+  
+  feature_1.setMetaValue("PeptideRef", "accoa");
+  for (uint16_t i = 0; i < accoa_C23H37N7O17P3S_MRM_measured_13.size(); ++i)
+  {
+    OpenMS::Feature sub;
+    sub.setMetaValue("native_id", "Lactate1_"+std::to_string(117+i));
+    sub.setMetaValue("peak_apex_int", accoa_C23H37N7O17P3S_MRM_measured_13[i]);
+    L1_subordinates.push_back(sub);
+  }
+  feature_1.setSubordinates(L1_subordinates);
+
+  for (uint8_t i = 0; i < 3; ++i)
+  {
+    featureMap_1.push_back(feature_1);
+  }
+
+  rawDataHandler.setFeatureMap(featureMap_1);
+  calculateMDVAccuracies.process(rawDataHandler, params_1, filenames);
+  featureMap_1 = rawDataHandler.getFeatureMap();
+
+  for (size_t i = 0; i < featureMap_1.size(); ++i)
+  {
+    BOOST_CHECK_CLOSE( (float)featureMap_1.at(i).getMetaValue("average_accuracy"), Average_accuracy_groundtruth[0], 1e-1 );
+
+    for (size_t feature_subordinate = 0; feature_subordinate < featureMap_1.at(i).getSubordinates().size(); ++feature_subordinate)
+    {
+      BOOST_CHECK_CLOSE( (float)featureMap_1.at(i).getSubordinates().at(feature_subordinate).getMetaValue("absolute_difference"),
+                          accoa_C23H37N7O17P3S_abs_diff[feature_subordinate], 1e-2 );
+    }
+  }
+}
+///
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import sys, os, argparse
+import smartpeak.utils as utils
+
+
+def main(argc, argv):
+  parser = argparse.ArgumentParser(
+  description='Returns current package version.')
+  args = parser.parse_args()
+
+  major, minor, patch = utils.get_version(os.path.join(utils.get_project_path(), 'CMakeLists.txt'))
+  print("{}.{}.{}".format(major, minor, patch), end='')
+  return 0
+
+
+if __name__ == '__main__':
+  sys.exit(main(len(sys.argv), sys.argv))

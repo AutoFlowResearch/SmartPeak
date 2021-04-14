@@ -1,4 +1,25 @@
-/**TODO:  Add copyright*/
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
 
 #pragma once
 
@@ -12,6 +33,7 @@
 
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/CastValue.h>
+#include <SmartPeak/core/Parameters.h>
 
 #include <map>
 #include <vector>
@@ -34,13 +56,11 @@ public:
     const MetaDataHandler& getMetaData() const;
     std::shared_ptr<MetaDataHandler>& getMetaDataShared();
 
-    void setParameters(
-      const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters);
-    void setParameters(
-      std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& parameters);
-    std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters();
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& getParameters() const;
-    std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& getParametersShared();
+    void setParameters(const ParameterSet& parameters);
+    void setParameters(std::shared_ptr<ParameterSet>& parameters);
+    ParameterSet& getParameters();
+    const ParameterSet& getParameters() const;
+    std::shared_ptr<ParameterSet>& getParametersShared();
 
     void setTargetedExperiment(const OpenMS::TargetedExperiment& targeted_exp);
     void setTargetedExperiment(std::shared_ptr<OpenMS::TargetedExperiment>& targeted_exp);
@@ -171,7 +191,7 @@ private:
     OpenMS::MzTab mz_tab_;
 
     // input (reused between RawDataHandlers)
-    std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>> parameters_ = nullptr;  ///< algorithm parameters; shared between all raw data handlers in the sequence
+    std::shared_ptr<ParameterSet> parameters_ = nullptr;  ///< algorithm parameters; shared between all raw data handlers in the sequence
     std::shared_ptr<OpenMS::TargetedExperiment> targeted_exp_ = nullptr;  ///< transitions for the SRM experiments; shared between all raw data handlers in the sequence
     std::shared_ptr<std::vector<std::map<std::string, CastValue>>> reference_data_ = nullptr;  ///< Reference data to compare algorithm accuracy; shared between all raw data handlers in the sequence
     std::shared_ptr<std::vector<OpenMS::AbsoluteQuantitationMethod>> quantitation_methods_ = nullptr;  ///< Transition quantitation methods; shared between all raw data handlers in the sequence segment

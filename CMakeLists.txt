@@ -79,9 +79,9 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Windows")
 #------------------------------------------------------------------------------
 # SmartPeak Version Information
 #------------------------------------------------------------------------------
-set (SMARTPEAK_PACKAGE_VERSION_MAJOR 1)
-set (SMARTPEAK_PACKAGE_VERSION_MINOR 0)
-set (SMARTPEAK_PACKAGE_VERSION_PATCH 0)
+set(SMARTPEAK_PACKAGE_VERSION_MAJOR 1)
+set(SMARTPEAK_PACKAGE_VERSION_MINOR 3)
+set(SMARTPEAK_PACKAGE_VERSION_PATCH 0)
 
 #------------------------------------------------------------------------------
 # retrieve detailed informations on the working copy (git)
@@ -273,8 +273,5 @@ install_export_targets()
 
 if(NOT "${PACKAGE_TYPE}" STREQUAL "none")
   include(cmake/package_general.cmake)
-  if("${PACKAGE_TYPE}" STREQUAL "nsis") # .. Windows nsis
-    include(cmake/package_nsis.cmake)
-  endif()
   include(CPack)
 endif()

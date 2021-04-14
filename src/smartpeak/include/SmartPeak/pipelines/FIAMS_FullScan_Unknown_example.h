@@ -1,3 +1,26 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
+
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 
@@ -12,7 +35,7 @@ void example_FIAMS_FullScan_Unknowns(
   SequenceHandler sequenceHandler;
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames        = static_filenames;
+  cs.filenames_        = static_filenames;
   cs.delimiter        = delimiter_I;
   cs.checkConsistency = true;
   cs.process();
@@ -34,7 +57,8 @@ void example_FIAMS_FullScan_Unknowns(
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
-      injection.getMetaData().getSampleName(),
+      injection.getMetaData().getFilename(),
+      key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
@@ -42,7 +66,7 @@ void example_FIAMS_FullScan_Unknowns(
   }
 
   ProcessSequence ps(sequenceHandler);
-  ps.filenames                     = dynamic_filenames;
-  ps.raw_data_processing_methods_I = raw_data_processing_methods;
+  ps.filenames_                     = dynamic_filenames;
+  ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.process();
 }

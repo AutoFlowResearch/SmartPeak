@@ -15,6 +15,9 @@ set(core_executables_list
 	SequenceSegmentProcessor_test
 	SessionHandler_test
 	Utilities_test
+	Parameters_test
+	ParametersObservable_test
+	WorkflowObservable_test
 )
 
 set(io_executables_list
@@ -31,6 +34,7 @@ set(algorithm_executables_list
 set(ui_executables_list
 	GuiAppender_test
 	WindowSizesAndPositions_test
+  Widget_test
 )
 
 ### collect test executables

@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni, Svetlana Kutuzova, Ahmed Khalil $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/core/RawDataHandler.h>
 #include <ctime> // time format
@@ -8,7 +29,7 @@ namespace SmartPeak
 {
   RawDataHandler::RawDataHandler() :
     meta_data_(std::make_shared<MetaDataHandler>(MetaDataHandler())),
-    parameters_(std::make_shared<std::map<std::string, std::vector<std::map<std::string, std::string>>>>(std::map<std::string, std::vector<std::map<std::string, std::string>>>())),
+    parameters_(std::make_shared<ParameterSet>(ParameterSet())),
     targeted_exp_(std::make_shared<OpenMS::TargetedExperiment>(OpenMS::TargetedExperiment())),
     reference_data_(std::make_shared<std::vector<std::map<std::string, CastValue>>>(std::vector<std::map<std::string, CastValue>>())),
     quantitation_methods_(std::make_shared<std::vector<OpenMS::AbsoluteQuantitationMethod>>(std::vector<OpenMS::AbsoluteQuantitationMethod>())),
@@ -64,27 +85,27 @@ namespace SmartPeak
   }
 
   void RawDataHandler::setParameters(
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& parameters)
+    const ParameterSet& parameters)
   {
-    parameters_.reset(new std::map<std::string, std::vector<std::map<std::string, std::string>>>(parameters));
+    parameters_.reset(new ParameterSet(parameters));
   }
 
-  void RawDataHandler::setParameters(std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& parameters)
+  void RawDataHandler::setParameters(std::shared_ptr<ParameterSet>& parameters)
   {
     parameters_ = parameters;
   }
 
-  std::map<std::string, std::vector<std::map<std::string, std::string>>>& RawDataHandler::getParameters()
+  ParameterSet& RawDataHandler::getParameters()
   {
     return *(parameters_.get());
   }
 
-  const std::map<std::string, std::vector<std::map<std::string, std::string>>>& RawDataHandler::getParameters() const
+  const ParameterSet& RawDataHandler::getParameters() const
   {
     return *(parameters_.get());
   }
 
-  std::shared_ptr<std::map<std::string, std::vector<std::map<std::string, std::string>>>>& RawDataHandler::getParametersShared()
+  std::shared_ptr<ParameterSet>& RawDataHandler::getParametersShared()
   {
     return parameters_;
   }
@@ -537,7 +558,8 @@ namespace SmartPeak
     }
 
     // Case 2: "Remove" filtered/non-selected features and "Add" new features via "used_" and "timestamp_" feature metadata attributes
-    else {
+    else 
+    {
       std::vector<OpenMS::Feature> new_features;
       std::set<OpenMS::UInt64> unique_ids_feat_history, unique_ids_feat_select; // Get all feature IDs
       for (const OpenMS::Feature& feature_copy : feature_map_history_) {
@@ -672,12 +694,14 @@ namespace SmartPeak
         copy_feature = true;
       }
       // Case 1b: No subordinates and missing "used_"
-      else if (!feature_new.metaValueExists("used_") && feature_new.getSubordinates().size() <= 0) {
+      else if (!feature_new.metaValueExists("used_") && feature_new.getSubordinates().size() <= 0) 
+      {
         feature_new.setMetaValue("used_", "true");
         feature_new.setMetaValue("timestamp_", timestamp);
         copy_feature = true;
       }
-      else {
+      else 
+      {
         // Case 2a: Subordinates
         for (OpenMS::Feature& subordinate_new : feature_new.getSubordinates()) {
           if (subordinate_new.metaValueExists("used_") && subordinate_new.getMetaValue("used_").toString() == "true") {
@@ -685,7 +709,8 @@ namespace SmartPeak
             copy_feature = true;
           }
           // Case 2b: Subordinates and missing "used_
-          else if (!subordinate_new.metaValueExists("used_")) {
+          else if (!subordinate_new.metaValueExists("used_")) 
+          {
             subordinate_new.setMetaValue("used_", "true");
             subordinate_new.setMetaValue("timestamp_", timestamp);
             subs.push_back(subordinate_new);

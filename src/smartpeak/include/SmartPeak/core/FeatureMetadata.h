@@ -1,7 +1,31 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
+
 #pragma once
 
 #include <map>
 #include <string>
+#include <type_traits>
 
 namespace SmartPeak {
   enum class FeatureMetadata {
@@ -32,7 +56,10 @@ namespace SmartPeak {
     mz,
     charge,
     mz_error_ppm,
-    mz_error_Da/*,
+    mz_error_Da,
+    average_accuracy,
+    absolute_difference,
+    SIZE_OF_FeatureMetadata/*,
     accuracy,
     n_features,
     validation*/
@@ -42,5 +69,7 @@ namespace SmartPeak {
   extern const std::map<FeatureMetadata, std::string> metadataToString;
   extern const std::map<FeatureMetadata, std::string> metadatafloatToString;
 
-  constexpr size_t FeatureMetadataSize { 28 }; // was 31 with accuracy, n_features, and validation
+  constexpr size_t FeatureMetadataSize {
+    static_cast<std::underlying_type_t<FeatureMetadata>>(FeatureMetadata::SIZE_OF_FeatureMetadata) - 1
+  };
 }

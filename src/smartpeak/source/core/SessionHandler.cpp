@@ -1,10 +1,34 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 #include <SmartPeak/io/SequenceParser.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <plog/Log.h>
+#include <SmartPeak/core/RawDataProcessor.h>
+#include <SmartPeak/core/Parameters.h>
 
 namespace SmartPeak
 {
@@ -24,7 +48,7 @@ namespace SmartPeak
     setSpectrumExplorer();
     //LOGD << "END setMinimalDataAndFilters";
   }
-  void SessionHandler::setInjectionExplorer(){
+  void SessionHandler::setInjectionExplorer() {
     // Make the injection explorer headers
     if (injection_explorer_checkbox_headers.size() <= 0) {
       LOGD << "Making injection_explorer_checkbox_headers";
@@ -107,7 +131,7 @@ namespace SmartPeak
       spectrum_explorer_checked_rows.setConstant(true);
     }
   }
-  void SessionHandler::setSequenceTable(const SequenceHandler & sequence_handler){
+  void SessionHandler::setSequenceTable(const SequenceHandler & sequence_handler) {
     // Make the sequence table headers
     if (sequence_table_headers.size() <= 0) {
       LOGD << "Making sequence_table_headers";
@@ -260,41 +284,7 @@ namespace SmartPeak
       }
     }
   }
-  void SessionHandler::setParametersTable(const SequenceHandler & sequence_handler)
-  {
-    if (sequence_handler.getSequence().size() > 0) {
-      // Make the parameters table headers
-      if (parameters_table_headers.size() <= 0) {
-        LOGD << "Making parameters_table_headers";
-        parameters_table_headers.resize(4);
-        parameters_table_headers.setValues({ "function","name","type","value",/*"default","restrictions","description"*/ });
-      }
-      const int n_cols = parameters_table_headers.size();
-      // Make the parameters table body
-      int n_rows = 0;
-      for (const auto& parameters : sequence_handler.getSequence().at(0).getRawData().getParameters()) {
-        n_rows += parameters.second.size();
-      }
-      if (parameters_table_body.dimension(0) != n_rows) {
-        LOGD << "Making parameters_table_body";
-        parameters_table_body.resize(n_rows, n_cols);
-        int col = 0, row = 0;
-        for (const auto& parameters : sequence_handler.getSequence().at(0).getRawData().getParameters()) {
-          for (const auto& parameter : parameters.second) {
-            parameters_table_body(row, col) = parameters.first;
-            ++col;
-            parameters_table_body(row, col) = parameter.at("name");
-            ++col;
-            parameters_table_body(row, col) = parameter.at("type");
-            ++col;
-            parameters_table_body(row, col) = parameter.at("value");
-            col = 0;
-            ++row;
-          }
-        }
-      }
-    }
-  }
+
   void SessionHandler::setQuantMethodTable(const SequenceHandler & sequence_handler)
   {
     if (sequence_handler.getSequenceSegments().size() > 0) {
@@ -460,7 +450,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentGroupFiltersTable(const SequenceHandler & sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureFilter().component_group_qcs.size() > 0) {
       // Make the comp_group_filters table headers
       if (comp_group_filters_table_headers.size() <= 0) {
         LOGD << "Making comp_group_filters_table_headers";
@@ -544,7 +534,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentQCsTable(const SequenceHandler & sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureQC().component_qcs.size() > 0) {
       // Make the comp_qcs table headers
       if (comp_qcs_table_headers.size() <= 0) {
         LOGD << "Making comp_qcs_table_headers";
@@ -593,7 +583,7 @@ namespace SmartPeak
   }
   void SessionHandler::setComponentGroupQCsTable(const SequenceHandler & sequence_handler)
   {
-    if (sequence_handler.getSequenceSegments().size() > 0) {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureQC().component_group_qcs.size() > 0) {
       // Make the comp_group_qcs table headers
       if (comp_group_qcs_table_headers.size() <= 0) {
         LOGD << "Making comp_group_qcs_table_headers";
@@ -675,6 +665,803 @@ namespace SmartPeak
       }
     }
   }
+  void SessionHandler::setComponentRSDFiltersTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_qcs.size() > 0) {
+      // Make the comp_rsd_filters table headers
+      if (comp_rsd_filters_table_headers.size() <= 0) {
+        LOGD << "Making comp_rsd_filters_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_rsd_filters_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_rsd_filters_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_rsd_filters_table_headers.size();
+
+      // Make the comp_rsd_filters table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_qcs.size();
+      if (comp_rsd_filters_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_rsd_filters_table_body";
+        comp_rsd_filters_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_qcs) {
+          comp_rsd_filters_table_body(row, col) = comp_rsd_qcs.component_name;
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_l);
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_u);
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_l);
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_u);
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_rsd_filters_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_rsd_qcs.meta_value_qc) {
+            comp_rsd_filters_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_rsd_filters_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupRSDFiltersTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_group_qcs.size() > 0) {
+      // Make the comp_group_rsd_filters table headers
+      if (comp_group_rsd_filters_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_rsd_filters_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_rsd_filters_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_rsd_filters_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_rsd_filters_table_headers.size();
+      // Make the comp_group_rsd_filters table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_group_qcs.size();
+      if (comp_group_rsd_filters_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_rsd_filters_table_body";
+        comp_group_rsd_filters_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_group_qcs) {
+          comp_group_rsd_filters_table_body(row, col) = comp_group_rsd_qcs.component_group_name;
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_l);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_u);
+          ++col;
+          comp_group_rsd_filters_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_rsd_qcs.meta_value_qc) {
+            comp_group_rsd_filters_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_rsd_filters_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentRSDQCsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_qcs.size() > 0) {
+      // Make the comp_rsd_qcs table headers
+      if (comp_rsd_qcs_table_headers.size() <= 0) {
+        LOGD << "Making comp_rsd_qcs_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_rsd_qcs_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_rsd_qcs_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_rsd_qcs_table_headers.size();
+
+      // Make the comp_rsd_qcs table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_qcs.size();
+      if (comp_rsd_qcs_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_rsd_qcs_table_body";
+        comp_rsd_qcs_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_qcs) {
+          comp_rsd_qcs_table_body(row, col) = comp_rsd_qcs.component_name;
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_l);
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_u);
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_l);
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_u);
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_rsd_qcs_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_rsd_qcs.meta_value_qc) {
+            comp_rsd_qcs_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_rsd_qcs_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupRSDQCsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_group_qcs.size() > 0) {
+      // Make the comp_group_rsd_qcs table headers
+      if (comp_group_rsd_qcs_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_rsd_qcs_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_rsd_qcs_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_rsd_qcs_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_rsd_qcs_table_headers.size();
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_group_qcs.size();
+      // Make the comp_group_rsd_qcs table body
+      if (comp_group_rsd_qcs_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_rsd_qcs_table_body";
+        comp_group_rsd_qcs_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_group_qcs) {
+          comp_group_rsd_qcs_table_body(row, col) = comp_group_rsd_qcs.component_group_name;
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_l);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_u);
+          ++col;
+          comp_group_rsd_qcs_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_rsd_qcs.meta_value_qc) {
+            comp_group_rsd_qcs_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_rsd_qcs_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentBackgroundFiltersTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_qcs.size() > 0) {
+      // Make the comp_background_filters table headers
+      if (comp_background_filters_table_headers.size() <= 0) {
+        LOGD << "Making comp_background_filters_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_background_filters_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_background_filters_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_background_filters_table_headers.size();
+
+      // Make the comp_background_filters table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_qcs.size();
+      if (comp_background_filters_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_background_filters_table_body";
+        comp_background_filters_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_qcs) {
+          comp_background_filters_table_body(row, col) = comp_background_qcs.component_name;
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_l);
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_u);
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.intensity_l);
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.intensity_u);
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_l);
+          ++col;
+          comp_background_filters_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_background_qcs.meta_value_qc) {
+            comp_background_filters_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_background_filters_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupBackgroundFiltersTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_group_qcs.size() > 0) {
+      // Make the comp_group_background_filters table headers
+      if (comp_group_background_filters_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_background_filters_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_background_filters_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_background_filters_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_background_filters_table_headers.size();
+      // Make the comp_group_background_filters table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_group_qcs.size();
+      if (comp_group_background_filters_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_background_filters_table_body";
+        comp_group_background_filters_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_group_qcs) {
+          comp_group_background_filters_table_body(row, col) = comp_group_background_qcs.component_group_name;
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_background_filters_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_l);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_u);
+          ++col;
+          comp_group_background_filters_table_body(row, col) = comp_group_background_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_background_qcs.meta_value_qc) {
+            comp_group_background_filters_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_background_filters_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentBackgroundQCsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.size() > 0) {
+      // Make the comp_background_qcs table headers
+      if (comp_background_qcs_table_headers.size() <= 0) {
+        LOGD << "Making comp_background_qcs_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_background_qcs_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_background_qcs_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_background_qcs_table_headers.size();
+
+      // Make the comp_background_qcs table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.size();
+      if (comp_background_qcs_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_background_qcs_table_body";
+        comp_background_qcs_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs) {
+          comp_background_qcs_table_body(row, col) = comp_background_qcs.component_name;
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_l);
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_u);
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.intensity_l);
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.intensity_u);
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_l);
+          ++col;
+          comp_background_qcs_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_background_qcs.meta_value_qc) {
+            comp_background_qcs_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_background_qcs_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupBackgroundQCsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.size() > 0) {
+      // Make the comp_group_background_qcs table headers
+      if (comp_group_background_qcs_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_background_qcs_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_background_qcs_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_background_qcs_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_background_qcs_table_headers.size();
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_group_qcs.size();
+      // Make the comp_group_background_qcs table body
+      if (comp_group_background_qcs_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_background_qcs_table_body";
+        comp_group_background_qcs_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_group_qcs) {
+          comp_group_background_qcs_table_body(row, col) = comp_group_background_qcs.component_group_name;
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_l);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_u);
+          ++col;
+          comp_group_background_qcs_table_body(row, col) = comp_group_background_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_background_qcs.meta_value_qc) {
+            comp_group_background_qcs_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_background_qcs_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }  void SessionHandler::setComponentRSDEstimationsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_qcs.size() > 0) {
+      // Make the comp_rsd_estimations table headers
+      if (comp_rsd_estimations_table_headers.size() <= 0) {
+        LOGD << "Making comp_rsd_estimations_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_rsd_estimations_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_rsd_estimations_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_rsd_estimations_table_headers.size();
+
+      // Make the comp_rsd_estimations table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_qcs.size();
+      if (comp_rsd_estimations_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_rsd_estimations_table_body";
+        comp_rsd_estimations_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_qcs) {
+          comp_rsd_estimations_table_body(row, col) = comp_rsd_qcs.component_name;
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_l);
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.retention_time_u);
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_l);
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.intensity_u);
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_rsd_estimations_table_body(row, col) = std::to_string(comp_rsd_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_rsd_qcs.meta_value_qc) {
+            comp_rsd_estimations_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_rsd_estimations_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupRSDEstimationsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_group_qcs.size() > 0) {
+      // Make the comp_group_rsd_estimations table headers
+      if (comp_group_rsd_estimations_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_rsd_estimations_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_rsd_estimations_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_rsd_estimations_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_rsd_estimations_table_headers.size();
+      // Make the comp_group_rsd_estimations table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_group_qcs.size();
+      if (comp_group_rsd_estimations_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_rsd_estimations_table_body";
+        comp_group_rsd_estimations_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_rsd_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_group_qcs) {
+          comp_group_rsd_estimations_table_body(row, col) = comp_group_rsd_qcs.component_group_name;
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.retention_time_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.intensity_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.overall_quality_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_heavy_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_light_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_detecting_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_quantifying_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_identifying_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.n_transitions_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_l);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = std::to_string(comp_group_rsd_qcs.ion_ratio_u);
+          ++col;
+          comp_group_rsd_estimations_table_body(row, col) = comp_group_rsd_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_rsd_qcs.meta_value_qc) {
+            comp_group_rsd_estimations_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_rsd_estimations_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentBackgroundEstimationsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_qcs.size() > 0) {
+      // Make the comp_background_estimations table headers
+      if (comp_background_estimations_table_headers.size() <= 0) {
+        LOGD << "Making comp_background_estimations_table_headers";
+        std::vector<std::string> tmp = { "component_name","retention_time_l","retention_time_u","intensity_l","intensity_u","overall_quality_l","overall_quality_u" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_background_estimations_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_background_estimations_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_background_estimations_table_headers.size();
+
+      // Make the comp_background_estimations table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_qcs.size();
+      if (comp_background_estimations_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_background_estimations_table_body";
+        comp_background_estimations_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_qcs) {
+          comp_background_estimations_table_body(row, col) = comp_background_qcs.component_name;
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_l);
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.retention_time_u);
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.intensity_l);
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.intensity_u);
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_l);
+          ++col;
+          comp_background_estimations_table_body(row, col) = std::to_string(comp_background_qcs.overall_quality_u);
+          ++col;
+          for (const auto& meta_data : comp_background_qcs.meta_value_qc) {
+            comp_background_estimations_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_background_estimations_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
+  void SessionHandler::setComponentGroupBackgroundEstimationsTable(const SequenceHandler& sequence_handler)
+  {
+    if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_group_qcs.size() > 0) {
+      // Make the comp_group_background_estimations table headers
+      if (comp_group_background_estimations_table_headers.size() <= 0) {
+        LOGD << "Making comp_group_background_estimations_table_headers";
+        std::vector<std::string> tmp = { "component_group_name", "retention_time_l", "retention_time_u", "intensity_l", "intensity_u", "overall_quality_l", "overall_quality_u",
+          "n_heavy_l", "n_heavy_u", "n_light_l", "n_light_u", "n_detecting_l", "n_detecting_u", "n_quantifying_l", "n_quantifying_u", "n_identifying_l", "n_identifying_u", "n_transitions_l", "n_transitions_u",
+          "ion_ratio_pair_name_1", "ion_ratio_pair_name_2", "ion_ratio_l", "ion_ratio_u", "ion_ratio_feature_name" };
+        for (const auto& meta_data : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_group_qcs.at(0).meta_value_qc) {
+          tmp.push_back("metaValue_" + meta_data.first + "_l");
+          tmp.push_back("metaValue_" + meta_data.first + "_u");
+        }
+        comp_group_background_estimations_table_headers.resize((int)tmp.size());
+        for (int i = 0; i < tmp.size(); ++i) comp_group_background_estimations_table_headers(i) = tmp.at(i);
+      }
+      const int n_cols = comp_group_background_estimations_table_headers.size();
+      // Make the comp_group_background_estimations table body
+      const int n_rows = sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_group_qcs.size();
+      if (comp_group_background_estimations_table_body.dimension(0) != n_rows) {
+        LOGD << "Making comp_group_background_estimations_table_body";
+        comp_group_background_estimations_table_body.resize(n_rows, n_cols);
+        int col = 0, row = 0;
+        for (const auto& comp_group_background_qcs : sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_group_qcs) {
+          comp_group_background_estimations_table_body(row, col) = comp_group_background_qcs.component_group_name;
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.retention_time_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.intensity_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.overall_quality_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_heavy_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_light_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_detecting_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_quantifying_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_identifying_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.n_transitions_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_1;
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = comp_group_background_qcs.ion_ratio_pair_name_2;
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_l);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = std::to_string(comp_group_background_qcs.ion_ratio_u);
+          ++col;
+          comp_group_background_estimations_table_body(row, col) = comp_group_background_qcs.ion_ratio_feature_name;
+          ++col;
+          for (const auto& meta_data : comp_group_background_qcs.meta_value_qc) {
+            comp_group_background_estimations_table_body(row, col) = std::to_string(meta_data.second.first);
+            ++col;
+            comp_group_background_estimations_table_body(row, col) = std::to_string(meta_data.second.second);
+            ++col;
+          }
+          col = 0;
+          ++row;
+        }
+      }
+    }
+  }
   bool SessionHandler::setFeatureTable(const SequenceHandler & sequence_handler)
   {
     int MAX_SIZE = 5000;
@@ -745,7 +1532,7 @@ namespace SmartPeak
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature_pivot table headers and body
       if (feat_value_data.dimension(1) != getNSelectedSampleNamesPlot() || feature_matrix_unique_transitions_ != getNSelectedTransitionsPlot() * getNSelectedFeatureMetaValuesPlot()) {
-        LOGD << "Making feature matrix, line plot, and heatmap data tables";
+        LOGD << "Making feature matrix, line plot, and data tables";
         // get the selected feature names
         Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureMetaValuesPlot();
         std::vector<std::string> feature_names;
@@ -777,28 +1564,27 @@ namespace SmartPeak
           if (!selected_transition_groups(i).empty())
             component_group_names.insert(selected_transition_groups(i));
         }
-        // Update teh unique transitions
+        // Update the unique transitions
         feature_matrix_unique_transitions_ = getNSelectedTransitionsPlot() * getNSelectedFeatureMetaValuesPlot();
         // get the matrix of data
         Eigen::Tensor<std::string, 2> rows_out;
-        SequenceParser::makeDataMatrixFromMetaValue(sequence_handler, feat_value_data, feat_heatmap_col_labels, rows_out, feature_names, sample_types, sample_names, component_group_names, component_names);
+        SequenceParser::makeDataMatrixFromMetaValue(sequence_handler, feat_value_data, feat_col_labels, rows_out, feature_names, sample_types, sample_names, component_group_names, component_names);
         setFeatureLinePlot();
-        setFeatureHeatMap();
         // update the pivot table headers with the columns for the pivot table/heatmap rows
-        feature_pivot_table_headers.resize((int)feat_heatmap_col_labels.size() + 3);
+        feature_pivot_table_headers.resize((int)feat_col_labels.size() + 3);
         feature_pivot_table_headers(0) = "feature_name";
         feature_pivot_table_headers(1) = "component_group_name";
         feature_pivot_table_headers(2) = "component_name";
-        feature_pivot_table_headers.slice(Eigen::array<Eigen::Index, 1>({ 3 }), Eigen::array<Eigen::Index, 1>({ feat_heatmap_col_labels.size() })) = feat_heatmap_col_labels;
+        feature_pivot_table_headers.slice(Eigen::array<Eigen::Index, 1>({ 3 }), Eigen::array<Eigen::Index, 1>({ feat_col_labels.size() })) = feat_col_labels;
         const int n_cols = feature_pivot_table_headers.size();
         const int n_rows = feat_value_data.dimension(0);
         // allocate space for the pivot table body and heatmap row labels
-        feat_heatmap_row_labels.resize(n_rows);
+        feat_row_labels.resize(n_rows);
         feature_pivot_table_body.resize(n_rows, n_cols);
         // assign the pivot table body data and heatmap row labels
         int col = 0;
         for (int row = 0; row < n_rows; ++row) {
-          feat_heatmap_row_labels(row) = rows_out(row, 0) + "::" + rows_out(row, 2);
+          feat_row_labels(row) = rows_out(row, 0) + "::" + rows_out(row, 2);
           for (int j = 0; j < rows_out.dimension(1); ++j) {
             feature_pivot_table_body(row, col) = rows_out(row, j);
             ++col;
@@ -812,116 +1598,84 @@ namespace SmartPeak
       }
     }
   }
-  bool SessionHandler::setChromatogramScatterPlot(const SequenceHandler & sequence_handler)
+  
+  bool SessionHandler::getChromatogramScatterPlot(const SequenceHandler & sequence_handler, 
+                                                  ScatterPlotData& result, 
+                                                  const std::pair<float, float>& chrom_time_range,
+                                                  const std::set<std::string>& sample_names,
+                                                  const std::set<std::string>& component_names)
   {
     const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
     int n_points = 0;
     if (sequence_handler.getSequence().size() > 0 &&
       (sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 ||
       sequence_handler.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0)) {
-      // get the selected sample names
-      Eigen::Tensor<std::string, 1> selected_sample_names = getSelectSampleNamesPlot();
-      std::set<std::string> sample_names;
-      for (int i = 0; i < selected_sample_names.size(); ++i) {
-        if (!selected_sample_names(i).empty())
-          sample_names.insert(selected_sample_names(i));
-      }
-      // get the selected transitions
-      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsPlot();
-      std::set<std::string> component_names;
-      for (int i = 0; i < selected_transitions.size(); ++i) {
-        if (!selected_transitions(i).empty())
-          component_names.insert(selected_transitions(i));
-      }
-      if ((sequence_handler.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0 && chrom_time_raw_data.size() != selected_sample_names.size() * component_names.size())
-        || (sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 && chrom_series_hull_names_.size() != selected_sample_names.size() * component_names.size())) {
-        LOGD << "Making the chromatogram data for plotting";
-        // Set the axes titles and min/max defaults
-        chrom_x_axis_title = "Time (sec)";
-        chrom_y_axis_title = "Intensity (au)";
-        chrom_time_min = 1e6;
-        chrom_time_max = 0;
-        chrom_intensity_min = 1e6;
-        chrom_intensity_max = 0;
-        chrom_time_hull_data.clear();
-        chrom_intensity_hull_data.clear();
-        chrom_series_hull_names_.clear();
-        chrom_series_hull_names.clear();
-        chrom_time_raw_data.clear();
-        chrom_intensity_raw_data.clear();
-        chrom_series_raw_names.clear();
-        for (const auto& injection : sequence_handler.getSequence()) {
-          if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
-          // Extract out the raw data for plotting
-          for (const auto& chromatogram : injection.getRawData().getChromatogramMap().getChromatograms()) {
-            if (component_names.count(chromatogram.getNativeID()) == 0) continue;
-            std::vector<float> x_data, y_data;
-            //for (const auto& point : chromatogram) {
-            for (auto point = chromatogram.PosBegin(chrom_time_range.first); point != chromatogram.PosEnd(chrom_time_range.second); ++point) {
-              x_data.push_back(point->getRT());
-              y_data.push_back(point->getIntensity());
-              chrom_time_min = std::min((float)point->getRT(), chrom_time_min);
-              chrom_intensity_min = std::min((float)point->getIntensity(), chrom_intensity_min);
-              chrom_time_max = std::max((float)point->getRT(), chrom_time_max);
-              chrom_intensity_max = std::max((float)point->getIntensity(), chrom_intensity_max);
-            }
-            n_points += x_data.size();
-            if (n_points<MAX_POINTS) {
-              chrom_time_raw_data.push_back(x_data);
-              chrom_intensity_raw_data.push_back(y_data);
-              chrom_series_raw_names.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
-            }
-            else {
-              LOGD << "Stopped adding points to the chromatogram plot";
-              return false;
-            }
+      LOGD << "Making the chromatogram data for plotting";
+      // Set the axes titles and min/max defaults
+      result.x_axis_title_ = "Time (sec)";
+      result.y_axis_title_ = "Intensity (au)";
+      result.x_min_ = 1e6;
+      result.x_max_ = 0;
+      result.y_min_ = 1e6;
+      result.y_max_ = 0;
+      result.x_data_area_.clear();
+      result.y_data_area_.clear();
+      result.series_names_area_.clear();
+      result.x_data_scatter_.clear();
+      result.y_data_scatter_.clear();
+      result.series_names_scatter_.clear();
+      for (const auto& injection : sequence_handler.getSequence()) {
+        if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
+        // Extract out the raw data for plotting
+        for (const auto& chromatogram : injection.getRawData().getChromatogramMap().getChromatograms()) {
+          if (component_names.count(chromatogram.getNativeID()) == 0) continue;
+          std::vector<float> x_data, y_data;
+          //for (const auto& point : chromatogram) {
+          for (auto point = chromatogram.PosBegin(chrom_time_range.first); point != chromatogram.PosEnd(chrom_time_range.second); ++point) {
+            x_data.push_back(point->getRT());
+            y_data.push_back(point->getIntensity());
+            result.x_min_ = std::min((float)point->getRT(), result.x_min_);
+            result.y_min_ = std::min((float)point->getIntensity(), result.y_min_);
+            result.x_max_ = std::max((float)point->getRT(), result.x_max_);
+            result.y_max_ = std::max((float)point->getIntensity(), result.y_max_);
           }
-          //// Extract out the best left/right for plotting
-          //for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
-          //  for (const auto& subordinate : feature.getSubordinates()) {
-          //    if (subordinate.getMetaValue("used_") == "true" && component_names.count(subordinate.getMetaValue("native_id").toString())) {
-          //      if (subordinate.metaValueExists("leftWidth") && subordinate.metaValueExists("rightWidth")) {
-          //        std::vector<float> x_data, y_data;
-          //        x_data.push_back(subordinate.getMetaValue("leftWidth"));
-          //        y_data.push_back(0); // TODO: extract out chrom peak intensity
-          //        x_data.push_back(subordinate.getMetaValue("rightWidth"));
-          //        y_data.push_back(0); // TODO: extract out chrom peak intensity
-          //        n_points += x_data.size();
-          //        if (n_points < MAX_POINTS) {
-          //          chrom_time_data.push_back(x_data);
-          //          chrom_intensity_data.push_back(y_data);
-          //          chrom_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
-          //        }
-          //      }
-          //    }
-          //  }
-          //}
-          // Extract out the smoothed points for plotting
-          for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
-            for (const auto& subordinate : feature.getSubordinates()) {
-              if (subordinate.getMetaValue("used_") == "true" && component_names.count(subordinate.getMetaValue("native_id").toString())) {
-                std::vector<float> x_data, y_data;
-                for (const auto& point : subordinate.getConvexHull().getHullPoints()) {
-                  if (point.getX() < chrom_time_range.first || point.getX() > chrom_time_range.second) continue;
-                  x_data.push_back(point.getX());
-                  y_data.push_back(point.getY());
-                  chrom_time_min = std::min((float)point.getX(), chrom_time_min);
-                  chrom_intensity_min = std::min((float)point.getY(), chrom_intensity_min);
-                  chrom_time_max = std::max((float)point.getX(), chrom_time_max);
-                  chrom_intensity_max = std::max((float)point.getY(), chrom_intensity_max);
-                }
-                if (x_data.size() <= 0) continue;
-                n_points += x_data.size();
-                if (n_points < MAX_POINTS) {
-                  chrom_time_hull_data.push_back(x_data);
-                  chrom_intensity_hull_data.push_back(y_data);
-                  chrom_series_hull_names_.insert(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("native_id").toString());
-                  chrom_series_hull_names.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("native_id").toString() + "::" + subordinate.getMetaValue("timestamp_").toString());
-                }
-                else {
-                  LOGD << "Stopped adding points to the chromatogram plot";
-                  return false;
-                }
+          n_points += x_data.size();
+          if (n_points<MAX_POINTS) {
+            result.x_data_scatter_.push_back(x_data);
+            result.y_data_scatter_.push_back(y_data);
+            result.series_names_scatter_.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
+          }
+          else 
+          {
+            LOGD << "Stopped adding points to the chromatogram plot";
+            return false;
+          }
+        }
+        // Extract out the smoothed points for plotting
+        for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
+          for (const auto& subordinate : feature.getSubordinates()) {
+            if (subordinate.getMetaValue("used_") == "true" && component_names.count(subordinate.getMetaValue("native_id").toString())) {
+              std::vector<float> x_data, y_data;
+              for (const auto& point : subordinate.getConvexHull().getHullPoints()) {
+                if (point.getX() < chrom_time_range.first || point.getX() > chrom_time_range.second) continue;
+                x_data.push_back(point.getX());
+                y_data.push_back(point.getY());
+                result.x_min_ = std::min((float)point.getX(), result.x_min_);
+                result.y_min_ = std::min((float)point.getY(), result.y_min_);
+                result.x_max_ = std::max((float)point.getX(), result.x_max_);
+                result.y_max_ = std::max((float)point.getY(), result.y_max_);
+              }
+              if (x_data.size() <= 0) continue;
+              n_points += x_data.size();
+              if (n_points < MAX_POINTS) {
+                result.x_data_area_.push_back(x_data);
+                result.y_data_area_.push_back(y_data);
+                result.series_names_area_.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("native_id").toString() + "::" + subordinate.getMetaValue("timestamp_").toString());
+              }
+              else 
+              {
+                LOGD << "Stopped adding points to the chromatogram plot";
+                return false;
               }
             }
           }
@@ -931,127 +1685,85 @@ namespace SmartPeak
     if (n_points < MAX_POINTS) return true;
     else return false;
   }
-  bool SessionHandler::setSpectrumScatterPlot(const SequenceHandler& sequence_handler)
+
+  bool SessionHandler::getSpectrumScatterPlot(const SequenceHandler& sequence_handler,
+    ScatterPlotData& result,
+    const std::pair<float, float>& range,
+    const std::set<std::string>& sample_names,
+    const std::set<std::string>& scan_names,
+    const std::set<std::string>& component_group_names)
   {
     // Notes: native_id matches the spec NativeID (i.e., scan_names), PeptideRef matches the first annotation identifier
     const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
     int n_points = 0;
     if (sequence_handler.getSequence().size() > 0 &&
-      (sequence_handler.getSequence().at(0).getRawData().getExperiment().getSpectra().size() > 0 ||
-      sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)) {
-      // get the selected sample names
-      Eigen::Tensor<std::string, 1> selected_sample_names = getSelectSampleNamesPlot();
-      std::set<std::string> sample_names;
-      for (int i = 0; i < selected_sample_names.size(); ++i) {
-        if (!selected_sample_names(i).empty())
-          sample_names.insert(selected_sample_names(i));
-      }
-      // get the selected scans
-      Eigen::Tensor<std::string, 1> selected_scans = getSelectSpectrumPlot();
-      std::set<std::string> scan_names;
-      for (int i = 0; i < selected_scans.size(); ++i) {
-        if (!selected_scans(i).empty())
-          scan_names.insert(selected_scans(i));
-      }
-      // get the selected transitions
-      Eigen::Tensor<std::string, 1> selected_transition_groups = getSelectTransitionGroupsPlot();
-      std::set<std::string> component_group_names;
-      for (int i = 0; i < selected_transition_groups.size(); ++i) {
-        if (!selected_transition_groups(i).empty())
-          component_group_names.insert(selected_transition_groups(i));
-      }
-      if ((sequence_handler.getSequence().at(0).getRawData().getExperiment().getSpectra().size() > 0 && spec_mz_raw_data.size() != sample_names.size() * scan_names.size())
-        || (sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 && spec_series_hull_names_.size() != sample_names.size() * component_group_names.size())) {
-        LOGD << "Making the spectra data for plotting";
-        // Set the axes titles and min/max defaults
-        spec_x_axis_title = "m/z (Da)";
-        spec_y_axis_title = "Intensity (au)";
-        spec_mz_min = 1e6;
-        spec_mz_max = 0;
-        spec_intensity_min = 1e6;
-        spec_intensity_max = 0;
-        spec_mz_hull_data.clear();
-        spec_intensity_hull_data.clear();
-        spec_series_hull_names_.clear();
-        spec_series_hull_names.clear();
-        spec_mz_raw_data.clear();
-        spec_intensity_raw_data.clear();
-        spec_series_raw_names.clear();
-        for (const auto& injection : sequence_handler.getSequence()) {
-          if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
-          // Extract out the raw data for plotting
-          for (const auto& spectra : injection.getRawData().getExperiment().getSpectra()) {
-            if (scan_names.count(spectra.getNativeID()) == 0) continue;
-            std::vector<float> x_data, y_data;
-            for (auto point = spectra.PosBegin(spec_mz_range.first); point != spectra.PosEnd(spec_mz_range.second); ++point) {
-              x_data.push_back(point->getMZ());
-              y_data.push_back(point->getIntensity());
-              spec_mz_min = std::min((float)point->getMZ(), spec_mz_min);
-              spec_intensity_min = std::min((float)point->getIntensity(), spec_intensity_min);
-              spec_mz_max = std::max((float)point->getMZ(), spec_mz_max);
-              spec_intensity_max = std::max((float)point->getIntensity(), spec_intensity_max);
-            }
-            n_points += x_data.size();
-            if (n_points < MAX_POINTS) {
-              spec_mz_raw_data.push_back(x_data);
-              spec_intensity_raw_data.push_back(y_data);
-              spec_series_raw_names.push_back(injection.getMetaData().getSampleName() + "::" + spectra.getNativeID());
-            }
-            else {
-              LOGD << "Stopped adding points to the spectra plot";
-              return false;
-            }
+       (sequence_handler.getSequence().at(0).getRawData().getExperiment().getSpectra().size() > 0 ||
+       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)) {
+      LOGD << "Making the spectra data for plotting";
+      // Set the axes titles and min/max defaults
+      result.x_axis_title_ = "m/z (Da)";
+      result.y_axis_title_ = "Intensity (au)";
+      result.x_min_ = 1e6;
+      result.x_max_ = 0;
+      result.y_min_ = 1e6;
+      result.y_max_ = 0;
+      result.x_data_area_.clear();
+      result.y_data_area_.clear();
+      result.series_names_area_.clear();
+      result.x_data_scatter_.clear();
+      result.y_data_scatter_.clear();
+      result.series_names_scatter_.clear();
+      for (const auto& injection : sequence_handler.getSequence()) {
+        if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
+        // Extract out the raw data for plotting
+        for (const auto& spectra : injection.getRawData().getExperiment().getSpectra()) {
+          if (scan_names.count(spectra.getNativeID()) == 0) continue;
+          std::vector<float> x_data, y_data;
+          for (auto point = spectra.PosBegin(range.first); point != spectra.PosEnd(range.second); ++point) {
+            x_data.push_back(point->getMZ());
+            y_data.push_back(point->getIntensity());
+            result.x_min_ = std::min((float)point->getMZ(), result.x_min_);
+            result.y_min_ = std::min((float)point->getIntensity(), result.y_min_);
+            result.x_max_ = std::max((float)point->getMZ(), result.x_max_);
+            result.y_max_ = std::max((float)point->getIntensity(), result.y_max_);
           }
-          //// Extract out the best left/right for plotting
-          //for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
-          //  for (const auto& subordinate : feature.getSubordinates()) {
-          //    if (subordinate.getMetaValue("used_") == "true" && scan_names.count(subordinate.getMetaValue("native_id").toString())) { // TODO
-          //      if (subordinate.metaValueExists("leftWidth") && subordinate.metaValueExists("rightWidth")) {
-          //        std::vector<float> x_data, y_data;
-          //        x_data.push_back(subordinate.getMetaValue("leftWidth"));
-          //        y_data.push_back(0); // TODO: extract out spec peak intensity
-          //        x_data.push_back(subordinate.getMetaValue("rightWidth"));
-          //        y_data.push_back(0); // TODO: extract out spec peak intensity
-          //        n_points += x_data.size();
-          //        if (n_points < MAX_POINTS) {
-          //          spec_mz_data.push_back(x_data);
-          //          spec_intensity_data.push_back(y_data);
-          //          spec_series_names.push_back(injection.getMetaData().getSampleName() + "::" + (std::string)subordinate.getMetaValue("native_id") + "::" + (std::string)subordinate.getMetaValue("timestamp_"));
-          //        }
-          //        else {
-          //          LOGD << "Stopped adding points to the spectra plot";
-          //          return false;
-          //        }
-          //      }
-          //    }
-          //  }
-          //}
-          // Extract out the smoothed points for plotting
-          for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
-            for (const auto& subordinate : feature.getSubordinates()) {
-              if (subordinate.getMetaValue("used_") == "true" && component_group_names.count(subordinate.getMetaValue("PeptideRef").toString())) {
-                std::vector<float> x_data, y_data;
-                for (const auto& point : subordinate.getConvexHull().getHullPoints()) {
-                  if (point.getX() < spec_mz_range.first || point.getX() > spec_mz_range.second) continue;
-                  x_data.push_back(point.getX());
-                  y_data.push_back(point.getY());
-                  spec_mz_min = std::min((float)point.getX(), spec_mz_min);
-                  spec_intensity_min = std::min((float)point.getY(), spec_intensity_min);
-                  spec_mz_max = std::max((float)point.getX(), spec_mz_max);
-                  spec_intensity_max = std::max((float)point.getY(), spec_intensity_max);
-                }
-                if (x_data.size() <= 0) continue;
-                n_points += x_data.size();
-                if (n_points < MAX_POINTS) {
-                  spec_mz_hull_data.push_back(x_data);
-                  spec_intensity_hull_data.push_back(y_data);
-                  spec_series_hull_names_.insert(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("PeptideRef").toString());
-                  spec_series_hull_names.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("chemical_formula").toString() + ":" + subordinate.getMetaValue("modifications").toString());
-                }
-                else {
-                  LOGD << "Stopped adding points to the spectra plot";
-                  return false;
-                }
+          n_points += x_data.size();
+          if (n_points < MAX_POINTS) {
+            result.x_data_scatter_.push_back(x_data);
+            result.y_data_scatter_.push_back(y_data);
+            result.series_names_scatter_.push_back(injection.getMetaData().getSampleName() + "::" + spectra.getNativeID());
+          }
+          else 
+          {
+            LOGD << "Stopped adding points to the spectra plot";
+            return false;
+          }
+        }
+        // Extract out the smoothed points for plotting
+        for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
+          for (const auto& subordinate : feature.getSubordinates()) {
+            if (subordinate.getMetaValue("used_") == "true" && component_group_names.count(subordinate.getMetaValue("PeptideRef").toString())) {
+              std::vector<float> x_data, y_data;
+              for (const auto& point : subordinate.getConvexHull().getHullPoints()) {
+                if (point.getX() < range.first || point.getX() > range.first) continue;
+                x_data.push_back(point.getX());
+                y_data.push_back(point.getY());
+                result.x_min_ = std::min((float)point.getX(), result.x_min_);
+                result.y_min_ = std::min((float)point.getY(), result.y_min_);
+                result.x_max_ = std::max((float)point.getX(), result.x_max_);
+                result.y_max_ = std::max((float)point.getY(), result.y_max_);
+              }
+              if (x_data.size() <= 0) continue;
+              n_points += x_data.size();
+              if (n_points < MAX_POINTS) {
+                result.x_data_area_.push_back(x_data);
+                result.y_data_area_.push_back(y_data);
+                result.series_names_area_.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("chemical_formula").toString() + ":" + subordinate.getMetaValue("modifications").toString());
+              }
+              else 
+              {
+                LOGD << "Stopped adding points to the spectra plot";
+                return false;
               }
             }
           }
@@ -1064,14 +1776,14 @@ namespace SmartPeak
   void SessionHandler::setFeatureLinePlot()
   {
     // Set the axes titles and min/max defaults
-    feat_line_x_axis_title = "Inj#";
-    std::string feat_line_y_axis_title = "metadata (au)";
+    feat_line_x_axis_title = "Injections";
+    std::string feat_line_y_axis_title = "Value";
     feat_line_sample_min = 1e6; 
     feat_line_sample_max = 0; 
     feat_value_min = 1e6; 
     feat_value_max = 0;
     // make the injection index for the line plot
-    const int n_samples = feat_heatmap_col_labels.size();
+    const int n_samples = feat_col_labels.size();
     const int n_rows = feat_value_data.dimension(0);
     feat_sample_data.resize(n_rows, n_samples);
     for (float i = 0; i < n_samples; i += 1) feat_sample_data.chip(i, 1) = feat_sample_data.chip(i, 1).constant(i);
@@ -1082,14 +1794,79 @@ namespace SmartPeak
     const Eigen::Tensor<float, 0> feat_value_data_minimum = feat_value_data.minimum();
     feat_value_min = feat_value_data_minimum(0);
   }
-  void SessionHandler::setFeatureHeatMap()
+  void SessionHandler::getHeatMap(const SequenceHandler& sequence_handler, HeatMapData& result, const std::string& feature_name)
   {
+    LOGD << "Getting Heatmap data";
+    std::vector<std::string> feature_names;
+    feature_names.push_back(feature_name);
+    // get the selected sample types
+    std::set<SampleType> sample_types; // TODO: options for the user to select what sample_types
+    for (const std::pair<SampleType, std::string>& p : sampleTypeToString) sample_types.insert(p.first);
+    // get the selected sample names
+    Eigen::Tensor<std::string, 1> selected_sample_names = getSelectSampleNamesPlot();
+    std::set<std::string> sample_names;
+    for (int i = 0; i < selected_sample_names.size(); ++i) {
+      if (!selected_sample_names(i).empty())
+        sample_names.insert(selected_sample_names(i));
+    }
+    // get the selected transitions
+    Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsPlot();
+    std::set<std::string> component_names;
+    for (int i = 0; i < selected_transitions.size(); ++i) {
+      if (!selected_transitions(i).empty())
+        component_names.insert(selected_transitions(i));
+    }
+    // get the selected transition groups
+    Eigen::Tensor<std::string, 1> selected_transition_groups = getSelectTransitionGroupsPlot();
+    std::set<std::string> component_group_names;
+    for (int i = 0; i < selected_transition_groups.size(); ++i) {
+      if (!selected_transition_groups(i).empty())
+        component_group_names.insert(selected_transition_groups(i));
+    }
+    // Update the unique transitions
+    feature_matrix_unique_transitions_ = getNSelectedTransitionsPlot() * getNSelectedFeatureMetaValuesPlot();
+    // get the matrix of data
+    if (sequence_handler.getSequence().size() > 0 &&
+      sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)
+    {
+      Eigen::Tensor<std::string, 2> rows_out;
+      Eigen::Tensor<float, 2> heatmap_value_data;
+      SequenceParser::makeDataMatrixFromMetaValue(sequence_handler,
+                                                  heatmap_value_data,
+                                                  result.feat_heatmap_col_labels,
+                                                  rows_out,
+                                                  feature_names,
+                                                  sample_types,
+                                                  sample_names,
+                                                  component_group_names,
+                                                  component_names);
+      const int n_rows = heatmap_value_data.dimension(0);
+      // allocate space for the pivot table body and heatmap row labels
+      result.feat_heatmap_row_labels.resize(n_rows);
+      for (int row = 0; row < n_rows; ++row) {
+        result.feat_heatmap_row_labels(row) = rows_out(row, 0);
+      }
+      // assign the heatmap data
+      result.feat_heatmap_data.resize(heatmap_value_data.dimensions());
+      result.feat_heatmap_data = heatmap_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+      const Eigen::Tensor<float, 0> feat_value_data_maximum = heatmap_value_data.maximum();
+      result.feat_value_max_ = feat_value_data_maximum(0);
+      const Eigen::Tensor<float, 0> feat_value_data_minimum = heatmap_value_data.minimum();
+      result.feat_value_min_ = feat_value_data_minimum(0);
+    }
+    else
+    {
+      result.feat_heatmap_data.setZero();
+      result.feat_value_max_ = std::numeric_limits<float>::min();
+      result.feat_value_min_ = std::numeric_limits<float>::max();
+    }
     // Set the axes titles
-    feat_heatmap_x_axis_title = "Sample name";
-    feat_heatmap_y_axis_title = "Component name";
-    // assign the heatmap data
-    feat_heatmap_data.resize(feat_value_data.dimensions());
-    feat_heatmap_data = feat_value_data.swap_layout().shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
+    result.feat_heatmap_x_axis_title = "Injections";
+    result.feat_heatmap_y_axis_title = "Transitions";
+    result.selected_feature_ = feature_name;
+    result.selected_sample_names_ = selected_sample_names;
+    result.selected_transitions_ = selected_transitions;
+    result.selected_transition_groups_ = selected_transition_groups;
   }
   bool SessionHandler::setCalibratorsScatterLinePlot(const SequenceHandler & sequence_handler)
   {
@@ -1168,7 +1945,8 @@ namespace SmartPeak
                 calibrators_conc_fit_data.push_back(stand_concs_map.at(quant_method.getComponentName()).first);
                 calibrators_feature_fit_data.push_back(y_fit_data);
               }
-              else {
+              else 
+              {
                 LOGD << "Stopped adding points to calibrators plot";
                 return false;
               }
@@ -1188,7 +1966,8 @@ namespace SmartPeak
                 calibrators_feature_raw_data.push_back(y_raw_data);
                 calibrators_series_names.push_back(quant_method.getComponentName());
               }
-              else {
+              else 
+              {
                 LOGD << "Stopped adding points to calibrators plot";
                 return false;
               }
@@ -1339,6 +2118,198 @@ namespace SmartPeak
           table_filters(row) = false;
       }
       return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentRSDFiltersTableFilters()
+  {
+    if (comp_rsd_filters_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_rsd_filters_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_rsd_filters_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_rsd_filters_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentRSDQCsTableFilters()
+  {
+    if (comp_rsd_qcs_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_rsd_qcs_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_rsd_qcs_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_rsd_qcs_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupRSDFiltersTableFilters()
+  {
+    if (comp_group_rsd_filters_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_rsd_filters_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_group_rsd_filters_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_group_rsd_filters_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupRSDQCsTableFilters()
+  {
+    if (comp_group_rsd_qcs_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_rsd_qcs_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_group_rsd_qcs_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_group_rsd_qcs_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentBackgroundFiltersTableFilters()
+  {
+    if (comp_background_filters_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_background_filters_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_background_filters_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_background_filters_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentBackgroundQCsTableFilters()
+  {
+    if (comp_background_qcs_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_background_qcs_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_background_qcs_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_background_qcs_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupBackgroundFiltersTableFilters()
+  {
+    if (comp_group_background_filters_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_background_filters_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_group_background_filters_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_group_background_filters_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupBackgroundQCsTableFilters()
+  {
+    if (comp_group_background_qcs_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_background_qcs_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_filters(comp_group_background_qcs_table_body.dimension(0));
+      table_filters.setConstant(true);
+      for (int row = 0; row < comp_group_background_qcs_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_filters(row) = false;
+      }
+      return table_filters;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentRSDEstimationsTableFilters()
+  {
+    if (comp_rsd_estimations_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_rsd_estimations_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_estimations(comp_rsd_estimations_table_body.dimension(0));
+      table_estimations.setConstant(true);
+      for (int row = 0; row < comp_rsd_estimations_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_estimations(row) = false;
+      }
+      return table_estimations;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupRSDEstimationsTableFilters()
+  {
+    if (comp_group_rsd_estimations_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_rsd_estimations_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_estimations(comp_group_rsd_estimations_table_body.dimension(0));
+      table_estimations.setConstant(true);
+      for (int row = 0; row < comp_group_rsd_estimations_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_estimations(row) = false;
+      }
+      return table_estimations;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentBackgroundEstimationsTableFilters()
+  {
+    if (comp_background_estimations_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_background_estimations_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_estimations(comp_background_estimations_table_body.dimension(0));
+      table_estimations.setConstant(true);
+      for (int row = 0; row < comp_background_estimations_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_estimations(row) = false;
+      }
+      return table_estimations;
+    }
+    else
+      return Eigen::Tensor<bool, 1>();
+  }
+  Eigen::Tensor<bool, 1> SessionHandler::getComponentGroupBackgroundEstimationsTableFilters()
+  {
+    if (comp_group_background_estimations_table_body.size() && transition_explorer_checkbox_body.size()) {
+      Eigen::Tensor<std::string, 1> selected_transitions = getSelectTransitionGroupsTable();
+      Eigen::Tensor<std::string, 1> table_transitions = comp_group_background_estimations_table_body.chip(0, 1);
+      Eigen::Tensor<bool, 1> table_estimations(comp_group_background_estimations_table_body.dimension(0));
+      table_estimations.setConstant(true);
+      for (int row = 0; row < comp_group_background_estimations_table_body.dimension(0); ++row) {
+        if (std::count(selected_transitions.data(), selected_transitions.data() + selected_transitions.size(), table_transitions(row)) == 0)
+          table_estimations(row) = false;
+      }
+      return table_estimations;
     }
     else
       return Eigen::Tensor<bool, 1>();

@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/test_config.h>
 
@@ -29,6 +50,10 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultStaticFilenames)
   BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_i, "/home/user/featureBackgroundFilterComponentGroups.csv");
   BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_i, "/home/user/featureBackgroundQCComponents.csv");
   BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_i, "/home/user/featureBackgroundQCComponentGroups.csv");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_i, "/home/user/featureRSDEstimationComponents.csv");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_i, "/home/user/featureRSDEstimationComponentGroups.csv");
+  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_i, "/home/user/featureRSDQCComponents.csv");
+  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_i, "/home/user/featureRSDQCComponentGroups.csv");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_i, "/home/user/quantitationMethods.csv");
   BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "/home/user/standardsConcentrations.csv");
   BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "/home/user/referenceData.csv");
@@ -37,10 +62,8 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultStaticFilenames)
   BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
-  BOOST_CHECK_EQUAL(filenames.feature_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "");
-  BOOST_CHECK_EQUAL(filenames.features_pdf_o, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "");
@@ -53,6 +76,10 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultStaticFilenames)
   BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "/home/user/PivotTable.csv");
@@ -65,12 +92,14 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultDynamicFilenames)
     "/home/user/mzML",
     "/home/user/featuresIn", 
     "/home/user/featuresOut", 
+    "mzMLIn",
     "injIn",
     "injOut",
     "sampleIn",
     "sampleOut");
   BOOST_CHECK_EQUAL(filenames.sequence_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.parameters_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.workflow_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.traML_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_i, "");
@@ -84,18 +113,20 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultDynamicFilenames)
   BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.mzML_i, "/home/user/mzML/injIn.mzML");
+  BOOST_CHECK_EQUAL(filenames.mzML_i, "/home/user/mzML/mzMLIn.mzML");
   BOOST_CHECK_EQUAL(filenames.mzTab_o, "/home/user/featuresOut/injOut.mzTab");
-  BOOST_CHECK_EQUAL(filenames.mzTab_i, "/home/user/featuresIn/injOut.mzTab");
+  BOOST_CHECK_EQUAL(filenames.mzTab_i, "/home/user/featuresIn/injIn.mzTab");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "/home/user/featuresOut/injOut.featureXML");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "/home/user/featuresOut/sampleOut.featureXML");
-  BOOST_CHECK_EQUAL(filenames.feature_csv_o, "/home/user/featuresOut/injOut.csv");
-  BOOST_CHECK_EQUAL(filenames.featureXML_i, "/home/user/featuresIn/injOut.featureXML");
+  BOOST_CHECK_EQUAL(filenames.featureXML_i, "/home/user/featuresIn/injIn.featureXML");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "/home/user/featuresIn/sampleIn.featureXML");
-  BOOST_CHECK_EQUAL(filenames.features_pdf_o, "/home/user/featuresOut/injOut");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "/home/user/featuresOut/injOut_featureFilterComponents.csv");
   BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureFilterComponentGroups.csv");
   BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "/home/user/featuresOut/injOut_featureQCComponents.csv");
@@ -108,6 +139,10 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultDynamicFilenames)
   BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureBackgroundFilterComponentGroups.csv");
   BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_o, "/home/user/featuresOut/injOut_featureBackgroundQCComponents.csv");
   BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureBackgroundQCComponentGroups.csv");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_o, "/home/user/featuresOut/injOut_featureRSDEstimationComponents.csv");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureRSDEstimationComponentGroups.csv");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_o, "/home/user/featuresOut/injOut_featureBackgroundEstimationComponents.csv");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureBackgroundEstimationComponentGroups.csv");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "/home/user/featuresOut/injOut_quantitationMethods.csv");
   BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "/home/user/featuresOut/injOut_componentsToConcentrations.csv");
   BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "");
@@ -125,6 +160,18 @@ BOOST_AUTO_TEST_CASE(clear1)
   BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "");
@@ -133,10 +180,24 @@ BOOST_AUTO_TEST_CASE(clear1)
   BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
-  BOOST_CHECK_EQUAL(filenames.feature_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "");
-  BOOST_CHECK_EQUAL(filenames.features_pdf_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "");
@@ -149,6 +210,7 @@ BOOST_AUTO_TEST_CASE(clear2)
     "/home/user/mzML",
     "/home/user/featuresIn",
     "/home/user/featuresOut",
+    "mzMLIn",
     "injIn",
     "injOut",
     "sampleIn",
@@ -161,6 +223,16 @@ BOOST_AUTO_TEST_CASE(clear2)
   BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_i, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "");
   BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "");
@@ -169,10 +241,22 @@ BOOST_AUTO_TEST_CASE(clear2)
   BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
-  BOOST_CHECK_EQUAL(filenames.feature_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "");
-  BOOST_CHECK_EQUAL(filenames.features_pdf_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_o, "");
+  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "");
   BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "");

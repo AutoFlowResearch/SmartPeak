@@ -1,18 +1,92 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/core/SampleGroupProcessor.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/io/InputDataValidation.h>
-#include <OpenMS/FORMAT/FeatureXMLFile.h>  // load/store featureXML
+#include <OpenMS/FORMAT/FeatureXMLFile.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
 {
+  ParameterSet MergeInjections::getParameterSchema() const
+  {
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"MergeInjections", {
+      {
+        {"name", "scan_polarity_merge_rule"},
+        {"type", "string"},
+        {"value", "WeightedMean"},
+        {"description", "The method used to merge the different feature values. Options include Sum (the sum of all feature values), Min (the smallest feature value), Max (the largest feature value), Mean (the mean of all feature values), and WeightedMean (the weight average of all feature values)."},
+        {"valid_strings", "['Sum','Min','Max','Mean','WeightedMean']"}
+      },
+      {
+        {"name", "mass_range_merge_rule"},
+        {"type", "string"},
+        {"value", "Sum"},
+        {"description", "The method used to merge the different feature values. Options include Sum (the sum of all feature values), Min (the smallest feature value), Max (the largest feature value), Mean (the mean of all feature values), and WeightedMean (the weight average of all feature values)."},
+        {"valid_strings", "['Sum','Min','Max','Mean','WeightedMean']"}
+      },
+      {
+        {"name", "dilution_series_merge_rule"},
+        {"type", "string"},
+        {"value", "Max"},
+        {"description", "The method used to merge the different feature values. Options include Sum (the sum of all feature values), Min (the smallest feature value), Max (the largest feature value), Mean (the mean of all feature values), and WeightedMean (the weight average of all feature values)."},
+        {"valid_strings", "['Sum','Min','Max','Mean','WeightedMean']"}
+      },
+      {
+        {"name", "scan_polarity_merge_feature_name"},
+        {"type", "string"},
+        {"value", "peak_apex_int"},
+        {"description", "The name of the FeatureMap attribute to use. Examples include peak_apex_int, peak_area, and intensity."}
+      },
+      {
+        {"name", "mass_range_merge_feature_name"},
+        {"type", "string"},
+        {"value", "peak_apex_int"},
+        {"description", "The name of the FeatureMap attribute to use. Examples include peak_apex_int, peak_area, and intensity."}
+      },
+      {
+        {"name", "dilution_series_merge_feature_name"},
+        {"type", "string"},
+        {"value", "peak_apex_int"},
+        {"description", "The name of the FeatureMap attribute to use. Examples include peak_apex_int, peak_area, and intensity."}
+      },
+      {
+        {"name", "merge_subordinates"},
+        {"type", "bool"},
+        {"value", "true"},
+        {"description", "Merge subordinates"}
+      },
+    }} });
+    return ParameterSet(param_struct);
+  }
+
   void MergeInjections::process(
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
-    const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I,
+    const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
@@ -34,42 +108,45 @@ namespace SmartPeak
     std::string dilution_series_merge_feature_name;
     bool merge_subordinates = true; // whether to merge at the feature level or at the subordinate level
     for (const auto& mi_params : params_I.at("MergeInjections")) {
-      if (mi_params.at("name") == "scan_polarity_merge_rule") {
-        if (mi_params.at("value") == "Sum" || mi_params.at("value") == "Min" || mi_params.at("value") == "Max" || mi_params.at("value") == "Mean" || mi_params.at("value") == "WeightedMean") {
-          scan_polarity_merge_rule = mi_params.at("value");
+      if (mi_params.getName() == "scan_polarity_merge_rule") {
+        if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
+          scan_polarity_merge_rule = mi_params.getValueAsString();
         }
-        else {
+        else 
+        {
           LOGD << "Incorrect value for 'scan_polarity_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
       }
-      if (mi_params.at("name") == "mass_range_merge_rule") {
-        if (mi_params.at("value") == "Sum" || mi_params.at("value") == "Min" || mi_params.at("value") == "Max" || mi_params.at("value") == "Mean" || mi_params.at("value") == "WeightedMean") {
-          mass_range_merge_rule = mi_params.at("value");
+      if (mi_params.getName() == "mass_range_merge_rule") {
+        if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
+          mass_range_merge_rule = mi_params.getValueAsString();
         }
-        else {
+        else 
+        {
           LOGD << "Incorrect value for 'mass_range_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
       }
-      if (mi_params.at("name") == "dilution_series_merge_rule") {
-        if (mi_params.at("value") == "Sum" || mi_params.at("value") == "Min" || mi_params.at("value") == "Max" || mi_params.at("value") == "Mean" || mi_params.at("value") == "WeightedMean") {
-          dilution_series_merge_rule = mi_params.at("value");
+      if (mi_params.getName() == "dilution_series_merge_rule") {
+        if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
+          dilution_series_merge_rule = mi_params.getValueAsString();
         }
-        else {
+        else 
+        {
           LOGD << "Incorrect value for 'dilution_series_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
       }
-      if (mi_params.at("name") == "scan_polarity_merge_feature_name") {
-        scan_polarity_merge_feature_name = mi_params.at("value");
+      if (mi_params.getName() == "scan_polarity_merge_feature_name") {
+        scan_polarity_merge_feature_name = mi_params.getValueAsString();
       }
-      if (mi_params.at("name") == "mass_range_merge_feature_name") {
-        mass_range_merge_feature_name = mi_params.at("value");
+      if (mi_params.getName() == "mass_range_merge_feature_name") {
+        mass_range_merge_feature_name = mi_params.getValueAsString();
       }
-      if (mi_params.at("name") == "dilution_series_merge_feature_name") {
-        dilution_series_merge_feature_name = mi_params.at("value");
+      if (mi_params.getName() == "dilution_series_merge_feature_name") {
+        dilution_series_merge_feature_name = mi_params.getValueAsString();
       }
-      if (mi_params.at("name") == "merge_subordinates") {
+      if (mi_params.getName() == "merge_subordinates") {
         try {
-          std::string value = mi_params.at("value");
+          std::string value = mi_params.getValueAsString();
           std::transform(value.begin(), value.end(), value.begin(), ::tolower);
           merge_subordinates = (value == "true") ? true : false;
         }
@@ -232,7 +309,8 @@ namespace SmartPeak
           }
         }
         // Subordinate level merge
-        else if (merge_subordinates) {
+        else if (merge_subordinates) 
+        {
           for (const OpenMS::Feature& s : f.getSubordinates()) {
             std::pair<std::string, std::string> component(f.getMetaValue("PeptideRef").toString(), s.getMetaValue("native_id").toString());
             auto found = component_to_feature_to_injection_to_values.emplace(component, features_to_values);
@@ -289,33 +367,40 @@ namespace SmartPeak
               weights.push_back(value / total_value); // add to the weights
 
               // initializations
-              if (cnt == 0) {
+              if (cnt == 0) 
+              {
                 max_or_min_injections = injection_names_set;
-                if (merge_rule == "Min" || merge_rule == "Max") {
+                if (merge_rule == "Min" || merge_rule == "Max") 
+                {
                   merged_value = value;
                 }
               }
 
               // calculations
-              if (merge_rule == "Sum") {
+              if (merge_rule == "Sum") 
+              {
                 merged_value += value;
               }
-              else if (merge_rule == "Min") {
+              else if (merge_rule == "Min") 
+              {
                 if (value < merged_value) {
                   merged_value = value;
                   max_or_min_injections = injection_names_set;
                 }
               }
-              else if (merge_rule == "Max") {
+              else if (merge_rule == "Max") 
+              {
                 if (value > merged_value) {
                   merged_value = value;
                   max_or_min_injections = injection_names_set;
                 }
               }
-              else if (merge_rule == "Mean") {
+              else if (merge_rule == "Mean") 
+              {
                 merged_value += (value / merge_keys_to_injection_name.at(key).size());
               }
-              else if (merge_rule == "WeightedMean") {
+              else if (merge_rule == "WeightedMean") 
+              {
                 merged_value += (value * value / total_value);
               }
               ++cnt;
@@ -336,7 +421,8 @@ namespace SmartPeak
               if (merge_rule == "Min" || merge_rule == "Max") {
                 merged_value = feature_to_injection_to_value.second.at(max_or_min_injections);
               }
-              else {
+              else 
+              {
                 int cnt = 0;
                 for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
                   if (feature_to_injection_to_value.second.count(injection_names_set) <= 0) continue;
@@ -376,6 +462,14 @@ namespace SmartPeak
           f.setSubordinates(subs);
           subs.clear();
         }
+        else 
+        {
+          s = f; // Ensure all features have a subordinate for downstream filtering and quantitation
+          s.setMetaValue("native_id", f.getMetaValue("PeptideRef"));
+          subs.push_back(s);
+          f.setSubordinates(subs);
+          subs.clear();
+        }
         feature_map.push_back(f);
         f = OpenMS::Feature();
         f.setUniqueId();
@@ -388,46 +482,58 @@ namespace SmartPeak
         if (feature_to_injection_to_value.second.count(injection_names_set) <= 0) continue;
         float value = feature_to_injection_to_value.second.at(injection_names_set);
         if (!merge_subordinates) {
-          if (feature_to_injection_to_value.first == "RT") {
+          if (feature_to_injection_to_value.first == "RT") 
+          {
             f.setRT(value);
           }
-          else if (feature_to_injection_to_value.first == "Intensity") {
+          else if (feature_to_injection_to_value.first == "Intensity") 
+          {
             f.setIntensity(value);
           }
-          else if (feature_to_injection_to_value.first == "peak_area") {
+          else if (feature_to_injection_to_value.first == "peak_area") 
+          {
             f.setIntensity(value);
           }
-          else if (feature_to_injection_to_value.first == "mz") {
+          else if (feature_to_injection_to_value.first == "mz") 
+          {
             f.setMZ(value);
           }
-          else if (feature_to_injection_to_value.first == "charge") {
+          else if (feature_to_injection_to_value.first == "charge") 
+          {
             f.setCharge(static_cast<int>(value));
           }
-          else {
+          else 
+          {
             f.setMetaValue(feature_to_injection_to_value.first, value);
           }
         }
-        else if (merge_subordinates) {
-          if (feature_to_injection_to_value.first == "RT") {
+        else if (merge_subordinates) 
+        {
+          if (feature_to_injection_to_value.first == "RT") 
+          {
             s.setRT(value);
           }
-          else if (feature_to_injection_to_value.first == "Intensity") {
+          else if (feature_to_injection_to_value.first == "Intensity") 
+          {
             s.setIntensity(value);
           }
-          else if (feature_to_injection_to_value.first == "peak_area") {
+          else if (feature_to_injection_to_value.first == "peak_area") 
+          {
             s.setIntensity(value);
           }
-          else if (feature_to_injection_to_value.first == "mz") {
+          else if (feature_to_injection_to_value.first == "mz") 
+          {
             s.setMZ(value);
           }
-          else if (feature_to_injection_to_value.first == "charge") {
+          else if (feature_to_injection_to_value.first == "charge") 
+          {
             s.setCharge(static_cast<int>(value));
           }
-          else {
+          else 
+          {
             s.setMetaValue(feature_to_injection_to_value.first, value);
           }
-        }
-             
+        }             
       }
     }
 
@@ -441,7 +547,14 @@ namespace SmartPeak
     // Remove the first feature
     feature_map.erase(feature_map.begin());
   }
-  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+
+
+  ParameterSet LoadFeaturesSampleGroup::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
+  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START LoadFeaturesSampleGroup";
     LOGI << "Loading: " << filenames.featureXMLSampleGroup_i;
@@ -470,7 +583,13 @@ namespace SmartPeak
 
     LOGD << "END LoadFeaturesSampleGroup";
   }
-  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const std::map<std::string, std::vector<std::map<std::string, std::string>>>& params_I, const Filenames& filenames) const
+
+  ParameterSet StoreFeaturesSampleGroup::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
+  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START storeFeaturesSampleGroup";
     LOGI << "Storing: " << filenames.featureXMLSampleGroup_o;

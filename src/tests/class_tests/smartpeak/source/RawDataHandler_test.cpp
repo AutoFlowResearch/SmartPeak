@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
 
 #define BOOST_TEST_MODULE RawDataHandler test suite
 #include <boost/test/included/unit_test.hpp>
@@ -104,41 +125,30 @@ BOOST_AUTO_TEST_CASE(set_get_Parameters)
 
   rawDataHandler.setParameters(parameters1);
 
-  const map<string, vector<map<string, string>>>& parameters2 = rawDataHandler.getParameters();
+  const ParameterSet& parameters2 = rawDataHandler.getParameters();
   BOOST_CHECK_EQUAL(parameters2.count(name1), 1);
   BOOST_CHECK_EQUAL(parameters2.at(name1).size(), 1);
-  BOOST_CHECK_EQUAL(parameters2.at(name1)[0].count("name"), 1);
-  BOOST_CHECK_EQUAL(parameters2.at(name1)[0].at("name"), "stop_report_after_feature");
-  BOOST_CHECK_EQUAL(parameters2.at(name1)[0].count("value"), 1);
-  BOOST_CHECK_EQUAL(parameters2.at(name1)[0].at("value"), "-1");
-  std::shared_ptr< map<string, vector<map<string, string>>>> parameters2shared = rawDataHandler.getParametersShared();
+  BOOST_CHECK_EQUAL(parameters2.at(name1)[0].getName(), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(parameters2.at(name1)[0].getValueAsString(), "-1");
+  std::shared_ptr<ParameterSet> parameters2shared = rawDataHandler.getParametersShared();
   BOOST_CHECK_EQUAL(parameters2shared->count(name1), 1);
   BOOST_CHECK_EQUAL(parameters2shared->at(name1).size(), 1);
-  BOOST_CHECK_EQUAL(parameters2shared->at(name1)[0].count("name"), 1);
-  BOOST_CHECK_EQUAL(parameters2shared->at(name1)[0].at("name"), "stop_report_after_feature");
-  BOOST_CHECK_EQUAL(parameters2shared->at(name1)[0].count("value"), 1);
-  BOOST_CHECK_EQUAL(parameters2shared->at(name1)[0].at("value"), "-1");
+  BOOST_CHECK_EQUAL(parameters2shared->at(name1)[0].getName(), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(parameters2shared->at(name1)[0].getValueAsString(), "-1");
 
-  rawDataHandler.getParameters().at(name1)[0].insert({"type", "int"});
-
-  const map<string, vector<map<string, string>>>& parameters3 = rawDataHandler.getParameters();
+  ParameterSet& parameters3 = rawDataHandler.getParameters();
   BOOST_CHECK_EQUAL(parameters3.count(name1), 1);
   BOOST_CHECK_EQUAL(parameters3.at(name1).size(), 1);
-  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].count("name"), 1);
-  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].at("name"), "stop_report_after_feature");
-  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].count("value"), 1);
-  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].at("value"), "-1");
-  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].count("type"), 1);
-  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].at("type"), "int");
-  std::shared_ptr< map<string, vector<map<string, string>>>> parameters3shared = rawDataHandler.getParametersShared();
+  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].getName(), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].getValueAsString(), "-1");
+  BOOST_CHECK_EQUAL(parameters3.at(name1)[0].getType(), "int");
+  std::shared_ptr<ParameterSet> parameters3shared = rawDataHandler.getParametersShared();
   BOOST_CHECK_EQUAL(parameters3shared->count(name1), 1);
   BOOST_CHECK_EQUAL(parameters3shared->at(name1).size(), 1);
-  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].count("name"), 1);
-  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].at("name"), "stop_report_after_feature");
-  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].count("value"), 1);
-  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].at("value"), "-1");
-  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].count("type"), 1);
-  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].at("type"), "int");
+  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].getName(), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].getValueAsString(), "-1");
+  BOOST_CHECK_EQUAL(parameters3shared->at(name1)[0].getType(), "int");
+
 }
 
 BOOST_AUTO_TEST_CASE(set_get_QuantitationMethods)

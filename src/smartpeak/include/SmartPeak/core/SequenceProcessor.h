@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
 
 #pragma once
 
@@ -7,6 +28,7 @@
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/core/SampleGroupProcessor.h>
+#include <SmartPeak/iface/IProcessorDescription.h>
 #include <map>
 #include <memory> // shared_ptr
 #include <set>
@@ -78,11 +100,14 @@ namespace SmartPeak
     const std::vector<std::shared_ptr<RawDataProcessor>>& methods
   );
 
-  struct SequenceProcessor {
+  struct SequenceProcessor : IProcessorDescription {
     SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}
     virtual ~SequenceProcessor() = default;
 
     virtual void process() const = 0;
+    
+    /* IProcessorDescription */
+    ParameterSet getParameterSchema() const override { return ParameterSet(); };
 
     SequenceHandler* sequenceHandler_IO = nullptr; /// Sequence handler, used by all SequenceProcessor derived classes
   };
@@ -91,51 +116,98 @@ namespace SmartPeak
     Create a new sequence from files or wizard
   */
   struct CreateSequence : SequenceProcessor {
-    Filenames        filenames;                    /// Pathnames to load
-    std::string      delimiter          = ",";     /// String delimiter of the imported file
-    bool             checkConsistency   = true;    /// Check consistency of data contained in files
+    Filenames        filenames_;                            /// Pathnames to load
+    std::string      delimiter          = ",";              /// String delimiter of the imported file
+    bool             checkConsistency   = true;             /// Check consistency of data contained in files
 
     CreateSequence() = default;
     CreateSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() const override;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "CREATE_SEQUENCE"; }
+    std::string getDescription() const override { return "Create a new sequence from file or wizard"; }
   };
 
   /**
     Apply a processing workflow to all injections in a sequence
   */
   struct ProcessSequence : SequenceProcessor {
-    std::map<std::string, Filenames>               filenames;                     /// Mapping from injection names to pathnames
-    std::set<std::string>                          injection_names;               /// Injections to select from the sequence (all if empty)
-    std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods_I; /// Events to process
+    std::map<std::string, Filenames>               filenames_;                     /// Mapping from injection names to pathnames
+    std::set<std::string>                          injection_names_;               /// Injections to select from the sequence (all if empty)
+    std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods_; /// Events to process
 
     ProcessSequence() = default;
     ProcessSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    static ParameterSet getParameterSchemaStatic();
     void process() const override;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "PROCESS_SEQUENCE"; }
+    std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence"; }
+    ParameterSet getParameterSchema() const override;
   };
 
   /**
     Apply a processing workflow to all injections in a sequence segment
   */
   struct ProcessSequenceSegments : SequenceProcessor {
-    std::map<std::string, Filenames>                       filenames;                             /// Mapping from sequence groups names to pathnames
-    std::set<std::string>                                  sequence_segment_names;                /// Sequence groups to select from the sequence (all if empty)
-    std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods_I; /// Events to process
+    std::map<std::string, Filenames>                       filenames_;                             /// Mapping from sequence groups names to pathnames
+    std::set<std::string>                                  sequence_segment_names_;                /// Sequence groups to select from the sequence (all if empty)
+    std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods_; /// Events to process
 
     ProcessSequenceSegments() = default;
     ProcessSequenceSegments(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() const override;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "PROCESS_SEQUENCE_SEGMENTS"; }
+    std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence segment"; }
   };
 
   /**
     Apply a processing workflow to all injections in a sample group
   */
   struct ProcessSampleGroups : SequenceProcessor {
-    std::map<std::string, Filenames>                       filenames;                     /// Mapping from sample groups names to pathnames
-    std::set<std::string>                                  sample_group_names;            /// sample groups to select from the sequence (all if empty)
-    std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods_I; /// Events to process
+    std::map<std::string, Filenames>                       filenames_;                     /// Mapping from sample groups names to pathnames
+    std::set<std::string>                                  sample_group_names_;            /// sample groups to select from the sequence (all if empty)
+    std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods_; /// Events to process
 
     ProcessSampleGroups() = default;
     ProcessSampleGroups(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() const override;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "PROCESS_SAMPLE_GROUPS"; }
+    std::string getDescription() const override { return "Apply a processing workflow to all injections in a sample group"; }
   };
+
+  struct LoadWorkflow : SequenceProcessor {
+    LoadWorkflow() = default;
+    LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
+    void process() const override;
+    std::string filename_;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "LOAD_WORKFLOW"; }
+    std::string getDescription() const override { return "Load a workflow from file"; }
+  };
+
+  struct StoreWorkflow : SequenceProcessor {
+    StoreWorkflow() = default;
+    StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    void process() const override;
+    std::string filename_;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_WORKFLOW"; }
+    std::string getDescription() const override { return "Store a workflow to file"; }
+  };
+
 }

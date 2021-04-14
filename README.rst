@@ -4,17 +4,17 @@ SmartPeak
 
 .. begin_badges
 
-.. |docs| image:: https://readthedocs.com/projects/smartpeak2/badge/?version=develop
+.. |docs| image:: https://readthedocs.com/projects/smartpeak/badge/?version=develop
    :alt: Documentation Status
-   :target: https://smartpeak2.readthedocs.io/en/develop/?badge=develop
+   :target: https://smartpeak.readthedocs.io/en/develop/?badge=develop
 
-.. |circleci| image:: https://circleci.com/gh/dmccloskey/SmartPeak2.svg?branch=develop?style=svg
+.. |circleci| image:: https://circleci.com/gh/AutoFlowResearch/SmartPeak.svg?branch=develop?style=svg
    :alt: CircleCI Build Status (Windows, Linux & macOS)
-   :target: https://circleci.com/gh/dmccloskey/SmartPeak2
+   :target: https://circleci.com/gh/AutoFlowResearch/SmartPeak
 
-.. |license| image:: https://img.shields.io/github/license/dmccloskey/SmartPeak2.svg
+.. |license| image:: https://img.shields.io/github/license/AutoFlowResearch/SmartPeak.svg
    :alt: License MIT Clause
-   :target: https://github.com/dmccloskey/SmartPeak2/blob/develop/LICENSE
+   :target: https://github.com/AutoFlowResearch/SmartPeak/blob/develop/LICENSE
 
 .. end_badges
 
@@ -86,7 +86,7 @@ However, many of the requirements overlap with OpenMS so for practical purposes 
 STEP 4: Build SmartPeak
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Compile using cmake.
-Example cmake command on windows assuming that all external dependency libraries are in the path :code:`[home directory]/smartPeak2/build_external`
+Example cmake command on windows assuming that all external dependency libraries are in the path :code:`[home directory]/smartPeak/build_external`
 
 .. code-block:: bash
 
@@ -98,7 +98,7 @@ Example cmake command on windows assuming that all external dependency libraries
     -DIMPLOT_DIR=[home directory]/smartPeak2/build_external/Dependencies/Source/implot ^
     -DCMAKE_PREFIX_PATH="[OpenMS directory]/openms-build";"C:/qt/Qt5.12.1b/5.12.1/msvc2017_64/lib/cmake";"[SDL directory]/SDL"; ..
 
-Open "SmartPeak2_host" in visual studios and build the project of choice. Projects can be built using Visual Studios in the IDE by opening :code:`msbuild [build_dir]/src/SmartPeak2_host` and selecting the specific target to build in the GUI or on the command line by running e.g., `msbuild [build_dir]/src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount` which will build the main SmartPeak library and then running e.g., `msbuild [build_dir]/examples/SmartPeak_class_examples_smartpeak.sln -target:GUI /verbosity:normal /maxcpucount` which will build the SmartPeak GUI.
+Open "SmartPeak_host" in visual studios and build the project of choice. Projects can be built using Visual Studios in the IDE by opening :code:`msbuild [build_dir]/src/SmartPeak_host` and selecting the specific target to build in the SmartPeakGUI or on the command line by running e.g., `msbuild [build_dir]/src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount` which will build the main SmartPeak library and then running e.g., `msbuild [build_dir]/examples/SmartPeak_class_examples_smartpeak.sln -target:SmartPeakGUI /verbosity:normal /maxcpucount` which will build the SmartPeak GUI.
 
 STEP 5: Build SmartPeak-Docs
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -125,7 +125,7 @@ __ https://exhale.readthedocs.io/en/latest/
 
 Linux
 ----------------------------------------------------------------------------------------------------------
-In the below instructions it is assumed OpenMS code resides in  :code:`~/OpenMS` and SmartPeak code is in :code:`~/SmartPeak2`.
+In the below instructions it is assumed OpenMS code resides in  :code:`~/OpenMS` and SmartPeak code is in :code:`~/SmartPeak`.
 
 STEP 1: Build OpenMS dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,12 +154,12 @@ SuperBuild helps downloading the dependencies for SmartPeak.
 .. code-block:: bash
 
     cd ~
-    mkdir SmartPeak2_superbuild SmartPeak2_build
-    cd SmartPeak2_superbuild
-    cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+    mkdir SmartPeak_superbuild SmartPeak_build
+    cd SmartPeak_superbuild
+    cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
     make -j4
-    cd ~/SmartPeak2_build
-    cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak2_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak2
+    cd ~/SmartPeak_build
+    cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak_superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak_superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak_superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Debug ~/SmartPeak
     make -j4
 
 
@@ -192,8 +192,8 @@ __ https://exhale.readthedocs.io/en/latest/
 
 macOS
 ----------------------------------------------------------------------------------------------------------
-Building SmartPeak and all its dependencies is as easy as on Linux. Assuming the source code for OpenMS and SmartPeak2 reside 
-in the home directory i.e. :code:`~/OpenMS` :code:`~/SmartPeak2`, the following steps can be taken verbatim:
+Building SmartPeak and all its dependencies is as easy as on Linux. Assuming the source code for OpenMS and SmartPeak reside 
+in the home directory i.e. :code:`~/OpenMS` :code:`~/SmartPeak`, the following steps can be taken verbatim:
 
 STEP 1: Installing external libraries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -249,14 +249,14 @@ STEP 3: Building SmartPeak
 Building SmartPeak is done in 2 steps:
 
 - Fetching required libraries for SmartPeak (SuperBuild)
-- Building SmartPeak library, examples and GUI
+- Building SmartPeak library, examples and SmartPeak GUI
 
 This can be done using the following set of commands:
 
 
 .. code-block:: bash
 
-    cd ~/SmartPeak2 && mkdir smartpeak2_debug_superbuild smartpeak2_debug_build
+    cd ~/SmartPeak && mkdir smartpeak2_debug_superbuild smartpeak2_debug_build
     cd smartpeak2_debug_superbuild
     cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Debug .. && make -j4
 
@@ -317,12 +317,28 @@ The collection of examples is located at ``src/example/data`` directory of the S
 
 .. end_runningexamples
 
+.. begin_logging
+
+Log path
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Default locations of logs:
+
+- Windows: ``C:\\Users\\<user>\\AppData\\Local\\SmartPeak``
+- Linux and MacOS: ``~/.SmartPeak``
+
+User can change default location and specify directory where the logs are stored by setting ``SMARTPEAK_LOGS`` env variable. 
+If directory specified by the path doesn't exist, SmartPeak will create it.
+
+.. end_logging
+
 .. begin_gui
 
-Using GUI
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- To start the GUI, from the build directory run :bash:`./bin/GUI` for Mac and Linux, or :bash:`./bin/[Debug or Release]/GUI` for Windows. Or double-click ``GUI`` executable in the file browser of your OS.
+Using SmartPeak GUI
+~~~~~~~~~~~~~~~~~~~
+
+- After successful installation of SmartPeak, on Windows open menu start and browse for relevant icon, you can also find the shortcut on desktop.
+- If built SmartPeak from the source code, from the build directory run :bash:`./bin/SmartPeakGUI` for Mac and Linux, or :bash:`./bin/[Debug or Release]/SmartPeakGUI` for Windows. Or double-click ``SmartPeakGUI`` executable in the file browser of your OS.
 - Start the session with ``File | Load session from sequence``
 - Choose the corresponding directory with ``Change dir``. The path to example folder can be shortened to f.e. ``/data/GCMS_SIM_Unknowns`` 
 - Select the sequence file

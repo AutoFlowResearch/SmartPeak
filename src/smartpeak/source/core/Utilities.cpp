@@ -1,13 +1,38 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
 
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/CastValue.h>
+#include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/smartpeak_package_version.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <algorithm>
 #include <iostream>
 #include <numeric>
 #include <regex>
+#include <sstream>
 #include <unordered_set>
+#include <chrono>
 #include <plog/Log.h>
 
 namespace SmartPeak
@@ -29,7 +54,9 @@ namespace SmartPeak
       cast = std::stoi(value);
     } else if (lowercase_type == "float") {
       cast = std::stof(value);
-    } else if ((lowercase_type == "bool" || lowercase_type == "string")
+    } else if (lowercase_type == "long") {
+      cast = std::stol(value);
+    } else if ((lowercase_type == "bool" || lowercase_type == "boolean" || lowercase_type == "string")
                && (lowercase_value == "false" || lowercase_value == "true")) {
       cast = lowercase_value == "true";
     } else if (lowercase_type == "string") {
@@ -42,26 +69,37 @@ namespace SmartPeak
     }
   }
 
-  void Utilities::updateParameters(
-    OpenMS::Param& Param_IO,
-    const std::vector<std::map<std::string, std::string>>& parameters_I
+  void Utilities::setUserParameters(
+    OpenMS::DefaultParamHandler& Param_handler_IO,
+    const ParameterSet& user_parameters_I,
+    const std::string param_handler_name
   )
   {
-    for (const std::map<std::string,std::string>& param : parameters_I) {
-      const std::string& name = param.at("name");
+    std::string function_parameters_name = (param_handler_name.empty() ? Param_handler_IO.getName() : param_handler_name);
+    if (user_parameters_I.count(function_parameters_name))
+    {
+      OpenMS::Param parameters = Param_handler_IO.getParameters();
+      Utilities::updateParameters(parameters, user_parameters_I.at(function_parameters_name));
+      Param_handler_IO.setParameters(parameters);
+    }
+  }
+
+  void Utilities::updateParameters(
+    OpenMS::Param& Param_IO,
+    const FunctionParameters& parameters_I
+  )
+  {
+    for (const auto& param : parameters_I) {
+      const std::string& name = param.getName();
       if (!Param_IO.exists(name)) {
         LOGW << "Parameter not found: " << name;
         continue;
       }
       // check supplied user parameters
-      CastValue c;
-      if (param.count("value")) {
-        if (param.count("type")) {
-          castString(param.at("value"), param.at("type"), c);
-        } else {
-          parseString(param.at("value"), c);
-        }
-      } else {
+      CastValue c = param.getValue();
+      if ((c.getTag() == CastValue::Type::UNINITIALIZED) ||
+          (c.getTag() == CastValue::Type::UNKNOWN))
+      {
         OpenMS::DataValue::DataType dt = Param_IO.getValue(name).valueType();
         switch (dt) {
           case OpenMS::DataValue::DOUBLE_VALUE:
@@ -126,27 +164,28 @@ namespace SmartPeak
         }
       }
 
-      std::string description;
-      if (param.count("description")) {
-        description = param.at("description");
-      } else {
+      std::string description = param.getDescription();
+      if (description.empty())
+      {
         try {
           description = Param_IO.getDescription(name);
-        } catch (const OpenMS::Exception::ElementNotFound&) {
+        }
+        catch (const OpenMS::Exception::ElementNotFound&) {
           // leave description as an empty string
         }
       }
 
       OpenMS::StringList tags;
-      if (param.count("tags")) {
-        const std::string& line = param.at("tags");
-        std::regex re_tag("[^'\",]+");
-        std::sregex_iterator matches_begin = std::sregex_iterator(line.begin(), line.end(), re_tag);
-        std::sregex_iterator matches_end = std::sregex_iterator();
-        for (std::sregex_iterator it = matches_begin; it != matches_end; ++it) {
-          tags.push_back(it->str());
+      const auto& params_tag = param.getTags();
+      if (!params_tag.empty())
+      {
+        for (const auto& tag : params_tag)
+        {
+          tags.push_back(tag);
         }
-      } else {
+      }
+      else
+      {
         tags = Param_IO.getTags(name);
       }
       // update the params
@@ -213,7 +252,7 @@ namespace SmartPeak
     std::regex re_integer_number("[+-]?\\d+");
     std::regex re_float_number("[+-]?\\d+(?:\\.\\d+)?"); // can match also integers: check for integer before checking for float
     std::regex re_bool("true|false", std::regex::icase);
-    std::regex re_s("\"([^,]+)\"");
+    std::regex re_s("[\"']([^,]+)[\"']");
     std::smatch m;
 
     const std::string not_of_set = " ";
@@ -320,7 +359,7 @@ namespace SmartPeak
     size_t l, r;
 
     for (l = 0; l < s.size() && characters.count(s[l]); ++l)
-      ;
+      {;}
 
     if (l == s.size()) {
       return std::string();
@@ -328,14 +367,14 @@ namespace SmartPeak
 
     // reaching here implies that s contains at least one non-whitespace character
     for (r = s.size() - 1; r > l && characters.count(s[r]); --r)
-      ;
+      {;}
 
     return s.substr(l, r - l + 1);
   }
 
   std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> Utilities::extractSelectorParameters(
-    const std::vector<std::map<std::string, std::string>>& params,
-    const std::vector<std::map<std::string, std::string>>& score_weights
+    const FunctionParameters& params,
+    const FunctionParameters& score_weights
   )
   {
     // const std::vector<std::string> param_names = {
@@ -349,18 +388,18 @@ namespace SmartPeak
     //   "optimal_thresholds"
     // };
     std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> v;
-    // auto it = std::find_if(params.cbegin(), params.cend(), [](auto& m){ return m.at("name") == "segment_window_lengths"; });
+    // auto it = std::find_if(params.cbegin(), params.cend(), [](auto& m){ return m.getName() == "segment_window_lengths"; });
     // int n_elems = std::count(it->value.cbegin(), it->value.cend(), ',') + 1;
 
     std::map<std::string, std::vector<std::string>> params_map;
 
-    for (const std::map<std::string, std::string>& m : params) {
-      if (params_map.count(m.at("name"))) {
-        throw std::invalid_argument("Did not expect to see the same info (\"" + m.at("name") + "\") defined multiple times.");
+    for (const auto& m : params) {
+      if (params_map.count(m.getName())) {
+        throw std::invalid_argument("Did not expect to see the same info (\"" + m.getName() + "\") defined multiple times.");
       }
-      const std::string s = m.at("value");
+      const std::string s = m.getValueAsString();
       std::vector<std::string> values = splitString(s.substr(1, s.size() - 2), ',');
-      params_map.emplace(m.at("name"), values);
+      params_map.emplace(m.getName(), values);
     }
 
     /*
@@ -379,7 +418,7 @@ namespace SmartPeak
       OpenMS::MRMFeatureSelector::SelectorParameters parameters;
       for (const std::pair<std::string, std::vector<std::string>>& p : params_map) {
         const std::string& param_name = p.first;
-        if (param_name == "nn_thresholds" ) {
+        if (param_name == "nn_thresholds") {
           parameters.nn_threshold = std::stoi(p.second[i]);
         } else if (param_name == "locality_weights") {
           parameters.locality_weight = p.second[i].front() == 'T' || p.second[i].front() == 't';
@@ -404,22 +443,22 @@ namespace SmartPeak
         }
       }
 
-      for (const std::map<std::string, std::string>& sw : score_weights) {
+      for (const auto& sw : score_weights) {
         OpenMS::MRMFeatureSelector::LambdaScore ls;
-        if (sw.at("value") == "lambda score: score*1.0") {
+        if (sw.getValueAsString() == "lambda score: score*1.0") {
           ls = OpenMS::MRMFeatureSelector::LambdaScore::LINEAR;
-        } else if (sw.at("value") == "lambda score: 1/score") {
+        } else if (sw.getValueAsString() == "lambda score: 1/score") {
           ls = OpenMS::MRMFeatureSelector::LambdaScore::INVERSE;
-        } else if (sw.at("value") == "lambda score: log(score)") {
+        } else if (sw.getValueAsString() == "lambda score: log(score)") {
           ls = OpenMS::MRMFeatureSelector::LambdaScore::LOG;
-        } else if (sw.at("value") == "lambda score: 1/log(score)") {
+        } else if (sw.getValueAsString() == "lambda score: 1/log(score)") {
           ls = OpenMS::MRMFeatureSelector::LambdaScore::INVERSE_LOG;
-        } else if (sw.at("value") == "lambda score: 1/log10(score)") {
+        } else if (sw.getValueAsString() == "lambda score: 1/log10(score)") {
           ls = OpenMS::MRMFeatureSelector::LambdaScore::INVERSE_LOG10;
         } else {
-          throw std::invalid_argument("lambda score not recognized: " + sw.at("value") + "\n");
+          throw std::invalid_argument("lambda score not recognized: " + sw.getValueAsString() + "\n");
         }
-        parameters.score_weights.emplace(sw.at("name"), ls);
+        parameters.score_weights.emplace(sw.getName(), ls);
       }
 
       v.emplace_back(parameters);
@@ -612,6 +651,17 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
           });
         }
       }
+
+//      const std::string filetype = std::filesystem::is_directory(entry) ? "Directory" : entry.path().extension().string();
+
+//      char buff[128];
+//      const std::time_t t(std::filesystem::last_write_time(entry));
+//      std::strftime(buff, sizeof buff, "%F %T", std::localtime(&t));
+
+//      content[0].push_back(filename);
+//      content[1].push_back(std::to_string(filesize));
+//      content[2].push_back(filetype);
+//      content[3].push_back(std::string(buff));
     }
     
     if (entries_temp.size() > 1)
@@ -688,4 +738,147 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
     std::get<1>(directory_info) = entries;
   }
 
+  std::pair<std::string, bool> Utilities::getLogFilepath(const std::string& filename)
+  {
+    std::string path = "";
+    bool flag = false;
+    char const* logs = getenv("SMARTPEAK_LOGS");
+    char const* appdata = getenv("LOCALAPPDATA");
+    char const* home = getenv("HOME");
+    if (logs || appdata || home)
+    {
+      auto logdir = std::filesystem::path{};
+      if (logs)
+        logdir = std::filesystem::path(logs);
+      else if (appdata)
+        logdir = std::filesystem::path(appdata) / "SmartPeak";
+      else if (home)
+        logdir = std::filesystem::path(home) / ".SmartPeak";
+
+      try
+      {
+        // Creates directory tree if doesn't exist:
+        flag = std::filesystem::create_directories(logdir);
+      }
+      catch (std::filesystem::filesystem_error& fe)
+      {
+//        if (fe.code() == boost::system::errc::permission_denied)
+//          throw std::runtime_error(static_cast<std::ostringstream&&>(
+//            std::ostringstream()
+//              << "Unable to construct path to log file, permission denied while creating directory '" << logdir.string() << "'").str());
+//        else
+//          throw std::runtime_error(static_cast<std::ostringstream&&>(
+//            std::ostringstream()
+//              << "Unable to construct path to log file, failure while creating directory '" << logdir.string() << "'").str());
+      }
+//      path = (logdir / filename).string();
+//      // Test if file writeable:
+//      std::filesystem::ofstream file(path);
+//      if (!file)
+//        throw std::runtime_error(static_cast<std::ostringstream&&>(
+//          std::ostringstream()
+//            << "Unable to create log file '" << path << "', please verify permissions to directory").str());
+//      else
+//        file.close();
+    }
+    else
+    {
+      throw std::runtime_error(
+        "Unable to construct path to log file. Make sure that either "
+        "HOME, LOCALAPPDATA or SMARTPEAK_LOGS env variable is set. For details refer to user documentation");
+    }
+    return std::make_pair(path, flag);
+  }
+
+  std::string Utilities::getSmartPeakVersion()
+  {
+#if defined(SMARTPEAK_PACKAGE_VERSION)
+    return static_cast<std::ostringstream&&>(std::ostringstream()
+      << SMARTPEAK_PACKAGE_VERSION).str();
+#else
+    return "Unknown";
+#endif
+  }
+
+  void Utilities::makeHumanReadable(ImEntry& directory_entry)
+  {
+    // prettify size [1]
+    std::string entry_size_string = directory_entry.entry_contents[1];
+    if (directory_entry.entry_contents[2] != "Directory" && !directory_entry.entry_contents[1].empty()
+        && entry_size_string.find("Bytes") == std::string::npos
+        && entry_size_string.find("KB") == std::string::npos
+        && entry_size_string.find("MB") == std::string::npos
+        && entry_size_string.find("GB") == std::string::npos
+        && entry_size_string.find("TB") == std::string::npos
+        )
+    {
+      double entry_size = std::stod(entry_size_string);
+      std::string size_human_readable = "";
+      std::stringstream size_human_readable_stream;
+      
+      if (entry_size >= 0 && entry_size < 1e3)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << entry_size;
+        size_human_readable = size_human_readable_stream.str() + " Bytes";
+      }
+      if (entry_size >= 1e3 && entry_size < 1e6)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e3);
+        size_human_readable = size_human_readable_stream.str() + " KB";
+      }
+      else if (entry_size >= 1e6 && entry_size < 1e9)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e6);
+        size_human_readable = size_human_readable_stream.str() + " MB";
+      }
+      else if (entry_size >= 1e9 && entry_size < 1e12)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e9);
+        size_human_readable = size_human_readable_stream.str() + " GB";
+      }
+      else if (entry_size >= 1e12 && entry_size < 1e18)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e12);
+        size_human_readable = size_human_readable_stream.str() + " TB";
+      }
+    
+      directory_entry.entry_contents[1] = size_human_readable;
+    }
+    else if (directory_entry.entry_contents[2] == "Directory")
+    {
+      directory_entry.entry_contents[1] = entry_size_string + " Item(s)";
+    }
+    
+    // prettify extension [2]
+    std::string* extension = &directory_entry.entry_contents[2];
+    extension->erase(std::remove_if(extension->begin(), extension->end(),
+                                   [](unsigned char c){ return std::ispunct(c); }), extension->end());
+    
+    // prettify date [3]
+    std::tm * current_time_tm, entry_date_tm;
+    char date_time_buffer[80];
+    std::string date_time_buf;
+    
+    std::time_t current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    current_time_tm = std::localtime(&current_time);
+    
+    std::istringstream entry_date_ss(directory_entry.entry_contents[3]);
+    entry_date_ss >> std::get_time(&entry_date_tm, "%Y-%m-%d %T");
+    
+    entry_date_tm.tm_isdst = current_time_tm->tm_isdst;    
+    time_t entry_date_time = std::mktime(&entry_date_tm);
+        
+    if (entry_date_tm.tm_mday == current_time_tm->tm_mday
+        && entry_date_tm.tm_mon == current_time_tm->tm_mon
+        && entry_date_tm.tm_year == current_time_tm->tm_year)
+    {
+      std::strftime(date_time_buffer, sizeof date_time_buffer, "%R", std::localtime(&entry_date_time));
+      directory_entry.entry_contents[3] = "Today at " + std::string(date_time_buffer);
+    }
+    else
+    {
+      std::strftime(date_time_buffer, sizeof date_time_buffer, "%c", std::localtime(&entry_date_time));
+      directory_entry.entry_contents[3] = date_time_buffer;
+    }
+  }
 }

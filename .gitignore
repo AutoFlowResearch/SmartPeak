@@ -33,6 +33,8 @@
 
 # Distribution / packaging
 build*/
+smartpeak_build/
+smartpeak_superbuild/
 
 # VS
 .vscode/
@@ -52,3 +54,7 @@ src/examples/data/GCMS_FullScan_Unknowns/
 
 # MacOS
 *.DS_Store
+
+# Python
+*.py[cod]
+__pycache__

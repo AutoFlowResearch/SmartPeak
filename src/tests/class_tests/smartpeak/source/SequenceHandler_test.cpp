@@ -1,4 +1,25 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey $
+// --------------------------------------------------------------------------
 
 #define BOOST_TEST_MODULE SequenceHandler test suite
 #include <boost/test/included/unit_test.hpp>
@@ -162,13 +183,16 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   //       Need to implement a method that re-organizes the sequence segments if the sequence segment name attribute is modified!
 
   // Test shared resources across all raw data handlers
-  std::map<std::string, std::string> param1; param1.emplace("name", "param1");  // Wow!... MSVC does not like list initializers...
-  std::vector<std::map<std::string, std::string>> params; params.push_back(param1);
-  std::map<std::string, std::vector<std::map<std::string, std::string>>> parameters; parameters.emplace("MRMFeatureFinderScoring", params);
+  auto param1 = Parameter("param1", 0);
+  param1.setName("param1");
+  FunctionParameters params("MRMFeatureFinderScoring");
+  params.addParameter(param1);
+  ParameterSet parameters;
+  parameters.addFunctionParameters(params);
   injection0.getRawData().getParameters() = parameters;
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "param1");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "param1");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].at("name"), "param1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "param1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "param1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "param1");
   OpenMS::ReactionMonitoringTransition srm;
   srm.setPeptideRef("arg-L");
   injection0.getRawData().getTargetedExperiment().setTransitions({srm});

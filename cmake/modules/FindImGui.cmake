@@ -132,7 +132,7 @@ foreach(_component IN LISTS ImGui_FIND_COMPONENTS)
             set(ImGui_Sources_FOUND TRUE)
             set(ImGui_SOURCES )
 
-            foreach(_file imgui imgui_widgets imgui_draw imgui_demo)
+            foreach(_file imgui imgui_widgets imgui_draw  imgui_tables)
                 # Disable the find root path here, it overrides the
                 # CMAKE_FIND_ROOT_PATH_MODE_INCLUDE setting potentially set in
                 # toolchains.
@@ -205,7 +205,7 @@ foreach(_component IN LISTS ImGui_FIND_COMPONENTS)
                 # _imgui_setup_source_file(ImGui_${_file}_EXAMPLE)
 				
                 find_file(ImGui_${_file}_EXAMPLE NAMES ${_file}.cpp
-                    HINTS ${IMGUI_DIR}/examples NO_CMAKE_FIND_ROOT_PATH)
+                    HINTS ${IMGUI_DIR}/backends NO_CMAKE_FIND_ROOT_PATH)
                 list(APPEND ImGui_EXAMPLES ${ImGui_${_file}_EXAMPLE})
 
                 if(NOT ImGui_${_file}_EXAMPLE)

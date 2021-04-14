@@ -1,8 +1,31 @@
-// TODO: Add copyright
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
 
 #pragma once
 
 #include <SmartPeak/core/CastValue.h>
+#include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/ui/ImEntry.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 
@@ -50,6 +73,19 @@ public:
     );
 
     /**
+      Update a OpenMS' DefaultParamHandler object with user parameters.
+
+      @param[in,out] Param_handler_IO OpenMS' DefaultParamHandler object to update
+      @param[in] parameters_I user parameters
+      @param[in] param_handler_name set if user parameter have different name entry.
+    */
+    static void setUserParameters(
+      OpenMS::DefaultParamHandler& Param_handler_IO,
+      const ParameterSet& user_parameters_I,
+      const std::string param_handler_name_I = ""
+    );
+
+    /**
       Update a Param object.
 
       The type check is case insensitive.
@@ -61,7 +97,7 @@ public:
     */
     static void updateParameters(
       OpenMS::Param& Param_IO,
-      const std::vector<std::map<std::string, std::string>>& parameters_I
+      const FunctionParameters& parameters_I
     );
 
     /**
@@ -178,8 +214,8 @@ public:
     }
 
     static std::vector<OpenMS::MRMFeatureSelector::SelectorParameters> extractSelectorParameters(
-      const std::vector<std::map<std::string, std::string>>& params,
-      const std::vector<std::map<std::string, std::string>>& score_weights
+      const FunctionParameters& params,
+      const FunctionParameters& score_weights
     );
 
     template<typename Iterator>
@@ -283,5 +319,32 @@ public:
       and the second is the total entries in the directory (files and directories).
     */
     static void getDirectoryInfo(const std::filesystem::path& p, std::tuple<float, uintmax_t>& directory_info);
+    static size_t directorySize(const std::string& pathname);
+
+    /**
+    * @brief Constructs an absolute filepath to an application logs.
+    * 
+    * Default locations of logs:
+    *   - Windows: C:\Users\<user>\AppData\Local\SmartPeak
+    *   - Linux and MacOS: ~/.SmartPeak
+    * User can change default location and specify directory where the logs are stored by
+    * setting SMARTPEAK_LOGS env variable. If directory specified by the path doesn't exist, the function will create one.
+    * 
+    * @param[in] filename Log filename
+    * @returns The absolute path to log file and boolean flag whether the path to directory was created
+    */
+    static std::pair<std::string, bool> getLogFilepath(const std::string& filename);
+
+    /**
+    * @brief Returns the build version of SmartPeak package if available.
+    */
+    static std::string getSmartPeakVersion();
+    
+    /**
+     @brief Modify ImEntry to a human readable format.
+     
+     @param[in,out] directory_entry directory entry on which the modification is done.
+    */
+    static void makeHumanReadable(ImEntry& directory_entry);
   };
 }

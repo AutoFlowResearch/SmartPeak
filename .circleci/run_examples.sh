@@ -3,7 +3,7 @@
 if [ $# -eq 0 ]
 then
     echo "Error: please provide the path to the binaries"
-    echo "Example: ./run_example.sh ~/SmartPeak2_build/bin"
+    echo "Example: ./run_example.sh ~/SmartPeak_build/bin"
     exit 1
 fi
 

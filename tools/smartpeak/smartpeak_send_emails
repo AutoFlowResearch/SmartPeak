@@ -1,0 +1,157 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import pickle
+import os.path, os, sys
+from googleapiclient.discovery import build
+import base64, argparse
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+import smartpeak.utils as utils
+
+# If modifying these scopes, delete the file token.pickle.
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+
+
+def create_message(sender, to, subject, msgHtml, msgPlain):
+  """Creates html/plain message for multipart email content.
+  
+  Parameters
+  ----------
+  sender : str
+    An email address of sender
+  to : str
+    An email address of receiver
+  subject : str
+    A subject of email
+  msgHtml, msgPlain: str
+    Html and plain text message, the content of email
+
+  Returns
+  -------
+  dict
+    A dictionary with raw message base64 encoded.
+  """
+  msg = MIMEMultipart('alternative')
+  msg['Subject'] = subject
+  msg['From'] = sender
+  msg['To'] = to
+  msg.attach(MIMEText(msgPlain, 'plain'))
+  msg.attach(MIMEText(msgHtml, 'html'))
+  raw_message = base64.urlsafe_b64encode(msg.as_string().encode("utf-8"))
+  return {
+    'raw': raw_message.decode("utf-8")
+  }
+
+def send_message(service, user_id, message):
+  """Send email messsage using Gmail API.
+  
+  Parameters
+  ----------
+  service : Resource
+    A Resource object with methods for interacting with the service.
+  user_id : str
+    An email address of receiver
+  message : dict
+    A binary email message
+
+  Returns
+  -------
+  obj
+    Message structure on success or None on failure.
+  """
+  try:
+    message = service.users().messages().send(userId=user_id, body=message).execute()
+    print('Message Id: %s' % message['id'])
+    return message
+  except Exception as e:
+    print('An error occurred: %s' % e)
+    return None
+
+def get_user_emails():
+  """Returns a list of emails given that USER_EMAILS env variable was set accordingly"""
+  emails = os.getenv('USER_EMAILS')
+  if emails:
+    return emails.split()
+  return []
+
+
+def main(argc, argv):
+  parser = argparse.ArgumentParser(
+  description="Send email notifications to recipients listed in USER_EMAILS env variable.")
+  parser.add_argument('--version', 
+    required=True,
+    help='Specify the version tag in form of {MAJOR}.{MINOR}.{PATCH}.')
+  args = parser.parse_args()
+
+  creds = None
+  token_pickle = os.path.join(utils.get_project_path(), 'token.pickle')
+  if os.path.exists(token_pickle):
+      with open(token_pickle, 'rb') as token:
+          creds = pickle.load(token)
+  else:
+      print("Unable to find token.pickle file")
+      return 1
+
+  service = build('gmail', 'v1', credentials=creds)
+
+  recipients = get_user_emails()
+  if len(recipients) == 0:
+    print("Empty list of recipients, no emails are sent.")
+    return 0
+
+  else:
+    print("List of emails:", recipients)
+    
+    # Prepare content:
+    version = args.version
+    # Read current version:
+    changelog_file = os.path.join(utils.get_project_path(), 'CHANGELOG.rst')
+    changes = utils.read_changes(changelog_file, 'v' + version)
+
+    # Retrieve new version:
+    if changes is None:
+      changes = "Opsss! No content available..."
+      changes_pre = changes
+    else:
+      changes_pre = changes
+      changes = utils.preprocess_changes(changes)
+
+    for to in recipients:
+      sender = "smartpeak.ci@gmail.com"
+      subject = "Release SmartPeak v%s" % version
+
+      msgHtml = '''\
+<h1>SmartPeak v{version} is released!</h1>
+<i>We are constantly working to improve your SmartPeak experience, below a summary of what has changed in the new release.</i><br>
+You can download the new version: <a href="https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version}">https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version}</a><br>
+Read the documentation for more details: <a href="https://smartpeak.readthedocs.io">https://smartpeak.readthedocs.io</a><br><br>
+<div style="background: #eee; padding: 20px;">
+{changes}
+</div>
+<br><br>
+Best wishes,<br>
+SmartPeak Team
+<br><br>
+<span style="color: #999">This is an automatic notification. Please do not replay to this message.</span>'''.format(version=version, changes=changes)
+
+      msgPlain = '''\
+SmartPeak v{version} is released!\n
+We are constantly working to improve your SmartPeak experience, below a summary of what has changed in the new release.\n
+You can download the new version: https://github.com/AutoFlowResearch/SmartPeak/releases/tag/v{version} \n
+Read the documentation for more details: https://smartpeak.readthedocs.io \n\n
+{changes}
+\n\n
+Best wishes,\n
+SmartPeak Team\n\n
+This is an automatic notification. Please do not replay to this message.'''.format(version=version, changes=changes_pre)
+
+      print("Send message to %s" % to)
+      msg = create_message(sender, to, subject, msgHtml, msgPlain)
+      send = send_message(service, 'me', msg)
+      print(send)
+
+  return 0
+
+if __name__ == '__main__':
+  sys.exit(main(len(sys.argv), sys.argv))

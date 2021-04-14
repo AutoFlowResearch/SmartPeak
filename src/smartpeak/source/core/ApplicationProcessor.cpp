@@ -1,3 +1,26 @@
+// --------------------------------------------------------------------------
+//   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
+// --------------------------------------------------------------------------
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Center for Biosustainability, Technical University of Denmark 2018-2021.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL ANY OF THE AUTHORS OR THE CONTRIBUTING
+// INSTITUTIONS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// --------------------------------------------------------------------------
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// --------------------------------------------------------------------------
+
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/RawDataProcessor.h>
@@ -18,6 +41,8 @@
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <SmartPeak/core/SharedProcessors.h>
+#include <SmartPeak/io/CSVWriter.h>
+#include <SmartPeak/io/csv.h>
 
 namespace SmartPeak
 {
@@ -31,17 +56,17 @@ namespace SmartPeak
 
     LOGN << "\n\n"
       "The following list of file was searched for:\n";
-    std::vector<InputDataValidation::FilenameInfo> is_valid(10);
-    is_valid[0] = InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence");
-    is_valid[1] = InputDataValidation::isValidFilename(f.parameters_csv_i, "parameters");
-    is_valid[2] = InputDataValidation::isValidFilename(f.traML_csv_i, "traml");
-    is_valid[3] = InputDataValidation::isValidFilename(f.featureFilterComponents_csv_i, "featureFilter");
-    is_valid[4] = InputDataValidation::isValidFilename(f.featureFilterComponentGroups_csv_i, "featureFilterGroups");
-    is_valid[5] = InputDataValidation::isValidFilename(f.featureQCComponents_csv_i, "featureQC");
-    is_valid[6] = InputDataValidation::isValidFilename(f.featureQCComponentGroups_csv_i, "featureQCGroups");
-    is_valid[7] = InputDataValidation::isValidFilename(f.quantitationMethods_csv_i, "quantitationMethods");
-    is_valid[8] = InputDataValidation::isValidFilename(f.standardsConcentrations_csv_i, "standardsConcentrations");
-    is_valid[9] = InputDataValidation::isValidFilename(f.referenceData_csv_i, "referenceData");
+    std::vector<InputDataValidation::FilenameInfo> is_valid;
+    is_valid.push_back(InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.parameters_csv_i, "parameters"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.traML_csv_i, "traml"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponents_csv_i, "featureFilter"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponentGroups_csv_i, "featureFilterGroups"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponents_csv_i, "featureQC"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponentGroups_csv_i, "featureQCGroups"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.quantitationMethods_csv_i, "quantitationMethods"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.standardsConcentrations_csv_i, "standardsConcentrations"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.referenceData_csv_i, "referenceData"));
 
     std::cout << "\n\n";
 
@@ -170,6 +195,8 @@ namespace SmartPeak
         f.standardsConcentrations_csv_i = value;
       } else if (label == "referenceData") {
         f.referenceData_csv_i = value;
+      } else if (label == "workflow") {
+        f.workflow_csv_i = value;
       } else {
         LOGE << "\n\nLabel is not valid: " << label << "\n";
         std::exit(EXIT_FAILURE);
@@ -178,6 +205,14 @@ namespace SmartPeak
   }
 
   namespace ApplicationProcessors {
+
+  ParameterSet getParameterSchema()
+  {
+    ParameterSet parameter_set;
+    parameter_set.merge(ProcessSequence::getParameterSchemaStatic());
+    return parameter_set;
+  }
+
   void processCommands(ApplicationHandler& state, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names)
   {
     size_t i = 0;
@@ -193,30 +228,31 @@ namespace SmartPeak
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(raw_methods),
           [](const ApplicationHandler::Command& command){ return command.raw_data_method; });
         ProcessSequence ps(state.sequenceHandler_);
-        ps.filenames = cmd.dynamic_filenames;
-        ps.raw_data_processing_methods_I = raw_methods;
-        ps.injection_names = injection_names;
+        ps.filenames_ = cmd.dynamic_filenames;
+        ps.raw_data_processing_methods_ = raw_methods;
+        ps.injection_names_ = injection_names;
         ps.process();
       } else if (cmd.type == ApplicationHandler::Command::SequenceSegmentMethod) {
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(seq_seg_methods),
           [](const ApplicationHandler::Command& command){ return command.seq_seg_method; });
         ProcessSequenceSegments pss(state.sequenceHandler_);
-        pss.filenames = cmd.dynamic_filenames;
-        pss.sequence_segment_processing_methods_I = seq_seg_methods;
-        pss.sequence_segment_names = sequence_segment_names;
+        pss.filenames_ = cmd.dynamic_filenames;
+        pss.sequence_segment_processing_methods_ = seq_seg_methods;
+        pss.sequence_segment_names_ = sequence_segment_names;
         pss.process();
       } else if (cmd.type == ApplicationHandler::Command::SampleGroupMethod) {
         std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(sample_group_methods),
           [](const ApplicationHandler::Command& command) { return command.sample_group_method; });
         ProcessSampleGroups psg(state.sequenceHandler_);
-        psg.filenames = cmd.dynamic_filenames;
-        psg.sample_group_processing_methods_I = sample_group_methods;
-        psg.sample_group_names = sample_group_names;
+        psg.filenames_ = cmd.dynamic_filenames;
+        psg.sample_group_processing_methods_ = sample_group_methods;
+        psg.sample_group_names_ = sample_group_names;
         psg.process();
       }
-      else {
+      else 
+      {
         LOGW << "Skipping a command: " << cmd.type << "\n";
       }
       i = j;
@@ -224,7 +260,7 @@ namespace SmartPeak
   }
   }
 
-  bool CreateCommand::process(){
+  bool CreateCommand::process() {
     // Enumerate the valid command keys
     std::vector<std::string> valid_commands_raw_data_processor;
     for (const auto& it: n_to_raw_data_method_) { valid_commands_raw_data_processor.push_back(it.first); }
@@ -242,7 +278,8 @@ namespace SmartPeak
           application_handler_.mzML_dir_,
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
-          injection.getMetaData().getSampleName(),
+          injection.getMetaData().getFilename(),
+          key,
           key,
           injection.getMetaData().getSampleGroupName(),
           injection.getMetaData().getSampleGroupName()
@@ -256,6 +293,7 @@ namespace SmartPeak
           application_handler_.mzML_dir_,
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
+          "",
           key,
           key,
           key,
@@ -270,6 +308,7 @@ namespace SmartPeak
           application_handler_.mzML_dir_,
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
+          "",
           key,
           key,
           key,
@@ -277,7 +316,8 @@ namespace SmartPeak
         );
       }
     }
-    else {
+    else 
+    {
       LOGE << "\nNo command for selection name " << name_;
       return false;
     }
@@ -295,12 +335,14 @@ namespace SmartPeak
     if (pathnamesAreCorrect) {
       application_handler_.sequenceHandler_.clear();
       CreateSequence cs(application_handler_.sequenceHandler_);
-      cs.filenames        = application_handler_.static_filenames_;
+      cs.filenames_        = application_handler_.static_filenames_;
       cs.delimiter        = ",";
       cs.checkConsistency = false; // NOTE: Requires a lot of time on large sequences with a large number of components
       cs.process();
       return true;
-    } else {
+    } 
+    else 
+    {
       LOGE << "Provided and/or inferred pathnames are not correct."
         "The sequence has not been modified.";
       return false;
@@ -313,10 +355,12 @@ namespace SmartPeak
       LoadParameters loadParameters;
       Filenames filenames = application_handler_.static_filenames_;
       filenames.parameters_csv_i = pathname_;
+      loadParameters.parameters_observable_ = &application_handler_.sequenceHandler_;
       loadParameters.process(rawDataHandler, {}, filenames);
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Parameters file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -331,7 +375,8 @@ namespace SmartPeak
       loadTransitions.process(rawDataHandler, {}, filenames);
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Transitions file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -346,7 +391,8 @@ namespace SmartPeak
       loadValidationData.process(rawDataHandler, {}, filenames);
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Reference data file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -362,7 +408,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Quantitation Methods file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -378,7 +425,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Standards concentrations file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -395,7 +443,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature filters file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -412,7 +461,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature filters file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -429,7 +479,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -446,7 +497,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -463,7 +515,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature filter RSD file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -480,7 +533,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature filter RSD file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -497,7 +551,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature RSD QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -514,7 +569,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature RSD QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -531,7 +587,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature background filters file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -548,7 +605,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature background filters file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -565,7 +623,8 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature background QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
@@ -582,27 +641,65 @@ namespace SmartPeak
       }
       return true;
     }
-    else {
+    else 
+    {
       LOGE << "Feature background QCs file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool StoreSequenceFileAnalyst::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      SequenceParser::writeSequenceFileAnalyst(application_handler_.sequenceHandler_, application_handler_.main_dir_ + "/SequenceFileAnalyst.txt");
+      return true;
+    }
+    else 
+    {
+      LOGE << "Sequence file cannot be converted and stored without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool StoreSequenceFileMasshunter::process()
+  {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      SequenceParser::writeSequenceFileMasshunter(application_handler_.sequenceHandler_, application_handler_.main_dir_ + "/SequenceFileMasshunter.tsv");
+      return true;
+    }
+    else 
+    {
+      LOGE << "Sequence file cannot be converted and stored without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool StoreSequenceFileXcalibur::process()
+  {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      SequenceParser::writeSequenceFileXcalibur(application_handler_.sequenceHandler_, application_handler_.main_dir_ + "/SequenceFileXcalibur.tsv");
+      return true;
+    }
+    else 
+    {
+      LOGE << "Sequence file cannot be converted and stored without first loading the sequence.";
       return false;
     }
   }
 
   bool BuildCommandsFromNames::process()
   {
+    bool success = true;
     commands_.clear();
-
-    std::istringstream iss {names_};
-
-    for (std::string n; iss >> n;) {
-      CreateCommand createCommand(application_handler_);
-      createCommand.name_ = n;
-      const bool created = createCommand.process();
-      if (created) {
+    CreateCommand createCommand(application_handler_);
+    for (const auto& command_name : names_) {
+      createCommand.name_ = command_name;
+      bool commands_created = createCommand.process();
+      success &= commands_created;
+      if (commands_created) {
         commands_.push_back(createCommand.cmd_);
-      }
+      } // if not, no need to log. createCommand already logs an error.
     }
-    return true;
+    return success;
   }
 
   bool SetRawDataPathname::process()
@@ -620,6 +717,22 @@ namespace SmartPeak
   bool SetOutputFeaturesPathname::process()
   {
     application_handler_.features_out_dir_ = pathname_;
+    return true;
+  }
+
+  bool LoadSequenceWorkflow::process()
+  {
+    LoadWorkflow load_workflow(application_handler_.sequenceHandler_);
+    load_workflow.filename_ = pathname_;
+    load_workflow.process();
+    return true;
+  }
+
+  bool StoreSequenceWorkflow::process()
+  {
+    StoreWorkflow store_workflow(application_handler_.sequenceHandler_);
+    store_workflow.filename_ = pathname_;
+    store_workflow.process();
     return true;
   }
 }
