@@ -123,7 +123,7 @@ int main(int argc, char** argv)
   auto comp_rsd_filters_main_window_ = std::make_shared<GenericTableWidget>("CompRSDFiltersMainWindow");
   auto comp_group_rds_filters_main_window_ = std::make_shared<GenericTableWidget>("CompGroupRSDFiltersMainWindow");
   auto comp_rsdcqcs_main_window_ = std::make_shared<GenericTableWidget>("CompRSDQCsMainWindow");
-  auto comp_group_rsdqcs_main_window_ = std::make_shared<GenericTableWidget>("CompGroupRSDQCsMainWindow"); // TODO Check this one
+  auto comp_group_rsdqcs_main_window_ = std::make_shared<GenericTableWidget>("CompGroupRSDQCsMainWindow");
   auto comp_background_filters_main_window_ = std::make_shared<GenericTableWidget>("CompBackgroundFiltersMainWindow");
   auto comp_group_background_filters_main_window_ = std::make_shared<GenericTableWidget>("CompGroupBackgroundFiltersMainWindow");
   auto comp_background_qcs_main_window_ = std::make_shared<GenericTableWidget>("CompBackgroundQCsMainWindow");
