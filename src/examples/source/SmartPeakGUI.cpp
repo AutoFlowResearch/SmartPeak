@@ -788,18 +788,9 @@ int main(int argc, char** argv)
     if (statistics_->visible_)
     {
       //statistics
-      static bool statistics_initialized = false;
-      if (!workflow_is_done_)
+      if (workflow_just_finished)
       {
-        statistics_initialized = false;
-      }
-      else // workflow_is_done_
-      {
-        if (!statistics_initialized)
-        {
-          statistics_->setRefreshNeeded();
-          statistics_initialized = true;
-        }
+        statistics_->setRefreshNeeded();
       }
       statistics_->setInjections(session_handler_.injection_explorer_data.checkbox_body, session_handler_.getExplorerBody(session_handler_.sequence_table));
       statistics_->setTransitions(&session_handler_.transitions_table.body_, session_handler_.transition_explorer_data.checkbox_body, session_handler_.getExplorerBody(session_handler_.transitions_table));
