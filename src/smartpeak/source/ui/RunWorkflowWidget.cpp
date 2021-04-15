@@ -117,7 +117,8 @@ namespace SmartPeak
         if (!buildCommandsFromNames.process()) {
           LOGE << "Failed to create Commands, aborting.";
         }
-        else {
+        else 
+        {
           for (auto& cmd : buildCommandsFromNames.commands_)
           {
             for (auto& p : cmd.dynamic_filenames)
