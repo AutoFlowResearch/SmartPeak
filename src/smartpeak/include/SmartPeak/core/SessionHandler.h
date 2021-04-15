@@ -32,6 +32,9 @@ namespace SmartPeak
   class SessionHandler {
   public:
 
+    /*
+    @ brief data for generic tables: one line header, and body data
+    */
     struct GenericTableData
     {
       Eigen::Tensor<std::string, 1> headers_;
@@ -43,6 +46,9 @@ namespace SmartPeak
       }
     };
 
+    /*
+    @ brief data for explorer tables: one line header, body data, and checked rows
+    */
     struct ExplorerData
     {
       Eigen::Tensor<std::string, 1> checkbox_headers;
@@ -189,8 +195,12 @@ namespace SmartPeak
     */
     bool setCalibratorsScatterLinePlot(const SequenceHandler& sequence_handler);
 
-    Eigen::Tensor<std::string, 1> getExplorerHeader(const GenericTableData& table_data, int nb) const;
-    Eigen::Tensor<std::string, 2> getExplorerBody(const GenericTableData& table_data, int nb) const;
+    Eigen::Tensor<std::string, 1> getInjectionExplorerHeader();
+    Eigen::Tensor<std::string, 2> getInjectionExplorerBody();
+    Eigen::Tensor<std::string, 1> getTransitionExplorerHeader();
+    Eigen::Tensor<std::string, 2> getTransitionExplorerBody();
+    Eigen::Tensor<std::string, 1> getSpectrumExplorerHeader();
+    Eigen::Tensor<std::string, 2> getSpectrumExplorerBody();
 
     Eigen::Tensor<bool, 1> getSequenceTableFilters();
     Eigen::Tensor<bool, 1> getTransitionsTableFilters();
