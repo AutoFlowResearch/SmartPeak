@@ -84,11 +84,6 @@ int main(int argc, char** argv)
   bool integrity_check_failed_ = false;
   bool update_session_cache_ = false;
 
-  // 
-  bool heatmap_initialized = false;
-  bool chromatogram_initialized = false;
-  bool spectra_initialized = false;
-
   ApplicationHandler application_handler_;
   SessionHandler session_handler_;
   WorkflowManager workflow_manager_;
@@ -220,7 +215,7 @@ int main(int argc, char** argv)
 
   std::vector<std::shared_ptr<Widget>> bottom_windows = {
     quickInfoText_,
-    log_widget_
+    log_widget_,
   };
 
   std::vector<std::shared_ptr<Widget>> left_windows = {
@@ -339,8 +334,8 @@ int main(int argc, char** argv)
     { // keeping this block to easily collapse/expand the bulk of the loop
       // Intialize the window sizes
       win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
-
-      if ((!workflow_is_done_) && workflow_manager_.isWorkflowDone())
+      bool workflow_just_finished = (!workflow_is_done_) && workflow_manager_.isWorkflowDone();
+      if (workflow_just_finished)
       {
         workflow_manager_.updateApplicationHandler(application_handler_);
         quickInfoText_->setLastRunTime(workflow_manager_.getLastRunTime());
@@ -755,36 +750,18 @@ int main(int argc, char** argv)
     if (chromatogram_plot_widget_->visible_)
     {
       // Chromatogram
-      chromatogram_plot_widget_->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
-      if (!workflow_is_done_)
+      if (workflow_just_finished)
       {
-        chromatogram_initialized = false;
-      }
-      else // workflow_is_done_
-      {
-        if (!chromatogram_initialized)
-        {
-          chromatogram_plot_widget_->setRefreshNeeded();
-          chromatogram_initialized = true;
-        }
+        chromatogram_plot_widget_->setRefreshNeeded();
       }
     }
 
     if (spectra_plot_widget_->visible_)
     {
       // spectra
-      spectra_plot_widget_->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
-      if (!workflow_is_done_)
+      if (workflow_just_finished)
       {
-        spectra_initialized = false;
-      }
-      else // workflow_is_done_
-      {
-        if (!spectra_initialized)
-        {
-          spectra_plot_widget_->setRefreshNeeded();
-          spectra_initialized = true;
-        }
+        spectra_plot_widget_->setRefreshNeeded();
       }
     }
 
@@ -796,27 +773,16 @@ int main(int argc, char** argv)
       Eigen::Tensor<float, 2> y_data = session_handler_.feat_value_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
       feature_line_plot_->setValues(&x_data, &y_data, &session_handler_.feat_col_labels, &session_handler_.feat_row_labels, session_handler_.feat_line_x_axis_title, session_handler_.feat_line_y_axis_title,
         session_handler_.feat_line_sample_min, session_handler_.feat_line_sample_max, session_handler_.feat_value_min, session_handler_.feat_value_max,
-        win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "FeaturesLineMainWindow");
+        "FeaturesLineMainWindow");
     }
 
     if (heatmap_plot_widget_->visible_)
     {
       // heatmap
-      // To be replace when we have implement events
-      static bool heatmap_initialized = false;
-      if (!workflow_is_done_)
+      if (workflow_just_finished)
       {
-        heatmap_initialized = false;
+        heatmap_plot_widget_->setRefreshNeeded();
       }
-      else // workflow_is_done_
-      {
-        if (!heatmap_initialized)
-        {
-          heatmap_plot_widget_->setRefreshNeeded();
-          heatmap_initialized = true;
-        }
-      }
-      heatmap_plot_widget_->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
     }
 
     if (statistics_->visible_)
@@ -837,7 +803,6 @@ int main(int argc, char** argv)
       }
       statistics_->setInjections(session_handler_.injection_explorer_data.checkbox_body, session_handler_.getExplorerBody(session_handler_.sequence_table));
       statistics_->setTransitions(&session_handler_.transitions_table.body_, session_handler_.transition_explorer_data.checkbox_body, session_handler_.getExplorerBody(session_handler_.transitions_table));
-      statistics_->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
     }
 
     if (quickInfoText_->visible_)
@@ -894,7 +859,7 @@ int main(int argc, char** argv)
       calibrators_line_plot_->setValues(&session_handler_.calibrators_conc_fit_data, &session_handler_.calibrators_feature_fit_data,
         &session_handler_.calibrators_conc_raw_data, &session_handler_.calibrators_feature_raw_data, &session_handler_.calibrators_series_names,
         session_handler_.calibrators_x_axis_title, session_handler_.calibrators_y_axis_title, session_handler_.calibrators_conc_min, session_handler_.calibrators_conc_max,
-        session_handler_.calibrators_feature_min, session_handler_.calibrators_feature_max, win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_,
+        session_handler_.calibrators_feature_min, session_handler_.calibrators_feature_max,
         "CalibratorsMainWindow");
     }
 
@@ -922,6 +887,7 @@ int main(int argc, char** argv)
         {
           if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
           {
+            widget->setWindowSize(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_);
             widget->draw();
             ImGui::EndTabItem();
           }
@@ -947,6 +913,7 @@ int main(int argc, char** argv)
         {
           if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
           {
+            widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
             widget->draw();
             ImGui::EndTabItem();
           }
@@ -973,6 +940,7 @@ int main(int argc, char** argv)
         {
           if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
           {
+            widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.bottom_window_y_size_);
             widget->draw();
             ImGui::EndTabItem();
           }

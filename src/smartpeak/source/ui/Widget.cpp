@@ -334,7 +334,7 @@ namespace SmartPeak
     if (ImPlot::BeginPlot(plot_title_.c_str(),
                           x_axis_title_.c_str(),
                           y_axis_title_.c_str(),
-                          ImVec2(plot_width_ - 25, plot_height_ - 40),
+                          ImVec2(width_ - 25, height_ - 40),
                           imPlotFlags,
                           imPlotAxisFlagsX)) {
       for (int i = 0; i < x_data_->dimension(1); ++i) {
@@ -408,11 +408,11 @@ namespace SmartPeak
     ImGui::Checkbox("Legend", &show_legend_);
     float controls_pos_end_y = ImGui::GetCursorPosY();
     // Main graphic
-    float graphic_height = plot_height_ - (controls_pos_end_y - controls_pos_start_y);
+    float graphic_height = height_ - (controls_pos_end_y - controls_pos_start_y);
     ImPlot::SetNextPlotLimits(current_range_.first, current_range_.second, chrom_.y_min_, chrom_.y_max_, ImGuiCond_Always);
     ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
     plotFlags |= ImPlotFlags_Crosshairs;
-    if (ImPlot::BeginPlot(plot_title_.c_str(), chrom_.x_axis_title_.c_str(), chrom_.y_axis_title_.c_str(), ImVec2(plot_width_ - 25, graphic_height - 40), plotFlags)) {
+    if (ImPlot::BeginPlot(plot_title_.c_str(), chrom_.x_axis_title_.c_str(), chrom_.y_axis_title_.c_str(), ImVec2(width_ - 25, graphic_height - 40), plotFlags)) {
       int i = 0;
       for (const auto& serie_name_scatter : chrom_.series_names_scatter_)
       {

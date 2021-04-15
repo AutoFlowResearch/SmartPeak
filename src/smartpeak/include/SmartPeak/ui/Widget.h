@@ -59,8 +59,12 @@ namespace SmartPeak
     */
     virtual void draw() = 0;
 
+    void setWindowSize(float width, float height) { width_ = width; height_ = height; };
+
     bool visible_ = false;
     std::string title_;
+    float width_ = 0.0;
+    float height_ = 0.0;
   };
 
   class GenericTextWidget : public Widget
@@ -218,8 +222,6 @@ namespace SmartPeak
       const float& x_max,
       const float& y_min,
       const float& y_max,
-      const float& plot_width,
-      const float& plot_height,
       const std::string& plot_title)
     {
         x_data_ = x_data;
@@ -232,8 +234,6 @@ namespace SmartPeak
         x_max_ = x_max;
         y_min_ = y_min;
         y_max_ = y_max;
-        plot_width_ = plot_width;
-        plot_height_ = plot_height;
         plot_title_ = plot_title;
     }
     void draw() override;
@@ -248,8 +248,6 @@ namespace SmartPeak
     float x_max_;
     float y_min_;
     float y_max_;
-    float plot_width_;
-    float plot_height_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
   };
 
@@ -266,7 +264,6 @@ namespace SmartPeak
       session_handler_(session_handler),
       sequence_handler_(sequence_handler),
       plot_title_(title) {};
-    void setWindowSize(float width, float height) { plot_width_ = width; plot_height_ = height; };
     void setRefreshNeeded() { refresh_needed_ = true; };
     void draw() override;
   protected:
@@ -274,8 +271,6 @@ namespace SmartPeak
   protected:
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;
-    float plot_width_ = 0.0f;
-    float plot_height_ = 0.0f;
     const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     bool show_legend_ = true;
     bool compact_view_ = true;

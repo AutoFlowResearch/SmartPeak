@@ -46,8 +46,6 @@ namespace SmartPeak
 
     void setRefreshNeeded() { refresh_needed_ = true; };
 
-    void setWindowSize(float width, float height) { width_ = width; height_ = height; };
-
     void setTransitions(const Eigen::Tensor<std::string, 2>* transitions, const Eigen::Tensor<bool, 2>& transitions_checkbox, const Eigen::Tensor<std::string, 2>& transitions_columns)
     { 
       transitions_ = transitions;
@@ -97,8 +95,6 @@ namespace SmartPeak
     int number_of_samples_ = 0;
     int number_of_transitions_ = 0;
     bool refresh_needed_ = true;
-    float width_;
-    float height_;
     ApplicationHandler* application_handler_ = nullptr;
     Eigen::Tensor<bool, 2> injections_checkbox_;
     Eigen::Tensor<std::string, 2> injections_columns_;

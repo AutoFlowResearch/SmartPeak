@@ -23,7 +23,6 @@ namespace SmartPeak
         sequence_handler_(sequence_handler),
         plot_title_(title) {};
     void draw() override;
-    void setWindowSize(float width, float height) { plot_width_ = width; plot_height_ = height; };
     void setRefreshNeeded() { refresh_needed_ = true; };
 
   private:
@@ -32,8 +31,6 @@ namespace SmartPeak
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;
     SessionHandler::HeatMapData heatmap_data_;
-    float plot_width_;
-    float plot_height_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     std::string selected_feature_;
     bool invalid_data_;
