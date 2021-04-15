@@ -793,8 +793,8 @@ int main(int argc, char** argv)
       {
         statistics_->setRefreshNeeded();
       }
-      statistics_->setInjections(session_handler_.injection_explorer_data.checkbox_body, session_handler_.getExplorerBody(session_handler_.sequence_table));
-      statistics_->setTransitions(&session_handler_.transitions_table.body_, session_handler_.transition_explorer_data.checkbox_body, session_handler_.getExplorerBody(session_handler_.transitions_table));
+      statistics_->setInjections(session_handler_.injection_explorer_data.checkbox_body, session_handler_.getExplorerBody(session_handler_.sequence_table, 2));
+      statistics_->setTransitions(&session_handler_.transitions_table.body_, session_handler_.transition_explorer_data.checkbox_body, session_handler_.getExplorerBody(session_handler_.transitions_table, 2));
     }
 
     if (quickInfoText_->visible_)
@@ -806,8 +806,8 @@ int main(int argc, char** argv)
     if (injections_explorer_window_->visible_)
     {
       // injections 
-      injections_explorer_window_->table_data_.headers_ = session_handler_.getExplorerHeader(session_handler_.sequence_table);
-      injections_explorer_window_->table_data_.body_ = session_handler_.getExplorerBody(session_handler_.sequence_table);
+      injections_explorer_window_->table_data_.headers_ = session_handler_.getExplorerHeader(session_handler_.sequence_table, 2);
+      injections_explorer_window_->table_data_.body_ = session_handler_.getExplorerBody(session_handler_.sequence_table, 2);
       injections_explorer_window_->checked_rows_ = session_handler_.injection_explorer_data.checked_rows;
       injections_explorer_window_->checkbox_headers_ = session_handler_.injection_explorer_data.checkbox_headers;
       injections_explorer_window_->checkbox_columns_ = &session_handler_.injection_explorer_data.checkbox_body;
@@ -816,8 +816,8 @@ int main(int argc, char** argv)
     if (transitions_explorer_window_->visible_)
     {
       // transitions
-      transitions_explorer_window_->table_data_.headers_ = session_handler_.getExplorerHeader(session_handler_.transitions_table);
-      transitions_explorer_window_->table_data_.body_ = session_handler_.getExplorerBody(session_handler_.transitions_table);
+      transitions_explorer_window_->table_data_.headers_ = session_handler_.getExplorerHeader(session_handler_.transitions_table, 2);
+      transitions_explorer_window_->table_data_.body_ = session_handler_.getExplorerBody(session_handler_.transitions_table, 2);
       transitions_explorer_window_->checked_rows_ = session_handler_.transition_explorer_data.checked_rows;
       transitions_explorer_window_->checkbox_headers_ = session_handler_.transition_explorer_data.checkbox_headers;
       transitions_explorer_window_->checkbox_columns_ = &session_handler_.transition_explorer_data.checkbox_body;
@@ -837,8 +837,8 @@ int main(int argc, char** argv)
     if (spectrum_explorer_window_->visible_)
     {
       // spectrum
-      spectrum_explorer_window_->table_data_.headers_ = session_handler_.getExplorerHeader(session_handler_.spectrum_table);
-      spectrum_explorer_window_->table_data_.body_ = session_handler_.getExplorerBody(session_handler_.spectrum_table);
+      spectrum_explorer_window_->table_data_.headers_ = session_handler_.getExplorerHeader(session_handler_.spectrum_table, 1);
+      spectrum_explorer_window_->table_data_.body_ = session_handler_.getExplorerBody(session_handler_.spectrum_table, 1);
       spectrum_explorer_window_->checked_rows_ = session_handler_.spectrum_explorer_data.checked_rows;
       spectrum_explorer_window_->checkbox_headers_ = session_handler_.spectrum_explorer_data.checkbox_headers;
       spectrum_explorer_window_->checkbox_columns_ = &session_handler_.spectrum_explorer_data.checkbox_body;

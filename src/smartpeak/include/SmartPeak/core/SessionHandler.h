@@ -189,8 +189,8 @@ namespace SmartPeak
     */
     bool setCalibratorsScatterLinePlot(const SequenceHandler& sequence_handler);
 
-    Eigen::Tensor<std::string, 1> getExplorerHeader(const GenericTableData& table_data) const;
-    Eigen::Tensor<std::string, 2> getExplorerBody(const GenericTableData& table_data) const;
+    Eigen::Tensor<std::string, 1> getExplorerHeader(const GenericTableData& table_data, int nb) const;
+    Eigen::Tensor<std::string, 2> getExplorerBody(const GenericTableData& table_data, int nb) const;
 
     Eigen::Tensor<bool, 1> getSequenceTableFilters();
     Eigen::Tensor<bool, 1> getTransitionsTableFilters();

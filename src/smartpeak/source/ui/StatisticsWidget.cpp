@@ -24,7 +24,6 @@
 #include <SmartPeak/ui/StatisticsWidget.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <imgui.h>
-#include <imgui_internal.h>
 #include <plog/Log.h>
 #include <SmartPeak/core/SharedProcessors.h>
 #include <implot.h>

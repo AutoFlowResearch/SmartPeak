@@ -1979,17 +1979,17 @@ namespace SmartPeak
     if (n_points < MAX_POINTS) return true;
     else return false;
   }
-  Eigen::Tensor<std::string, 1> SessionHandler::getExplorerHeader(const GenericTableData& table_data) const
+  Eigen::Tensor<std::string, 1> SessionHandler::getExplorerHeader(const GenericTableData& table_data, int nb) const
   {
     if (table_data.headers_.size())
-      return table_data.headers_.slice(Eigen::array<Eigen::Index, 1>({ 0 }), Eigen::array<Eigen::Index, 1>({ 2 }));
+      return table_data.headers_.slice(Eigen::array<Eigen::Index, 1>({ 0 }), Eigen::array<Eigen::Index, 1>({ nb }));
     else
       return Eigen::Tensor<std::string, 1>();
   }
-  Eigen::Tensor<std::string, 2> SessionHandler::getExplorerBody(const GenericTableData& table_data) const
+  Eigen::Tensor<std::string, 2> SessionHandler::getExplorerBody(const GenericTableData& table_data, int nb) const
   {
     if (table_data.body_.size())
-      return table_data.body_.slice(Eigen::array<Eigen::Index, 2>({ 0,0 }), Eigen::array<Eigen::Index, 2>({ table_data.body_.dimension(0), 2 }));
+      return table_data.body_.slice(Eigen::array<Eigen::Index, 2>({ 0,0 }), Eigen::array<Eigen::Index, 2>({ table_data.body_.dimension(0), nb }));
     else
       return Eigen::Tensor<std::string, 2>();
   }
