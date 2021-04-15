@@ -99,9 +99,9 @@ int main(int argc, char** argv)
   auto about_widget_ = std::make_shared<AboutWidget>();
   auto log_widget_ = std::make_shared<LogWidget>(appender_, "Log");
   auto parameters_table_widget_ = std::make_shared<ParametersTableWidget>(session_handler_, application_handler_, "ParametersMainWindow", "Parameters");
-  auto chromatogram_plot_widget_ = std::make_shared<ChromatogramPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Chromatograms Main Window");
-  auto heatmap_plot_widget_ = std::make_shared<Heatmap2DWidget>(session_handler_, application_handler_.sequenceHandler_, "Heatmap Main Window");
-  auto spectra_plot_widget_ = std::make_shared<SpectraPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Spectra Main Window");
+  auto chromatogram_plot_widget_ = std::make_shared<ChromatogramPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Chromatograms Main Window", "Chromatograms");
+  auto heatmap_plot_widget_ = std::make_shared<Heatmap2DWidget>(session_handler_, application_handler_.sequenceHandler_, "Heatmap Main Window", "Features (heatmap)");
+  auto spectra_plot_widget_ = std::make_shared<SpectraPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Spectra Main Window", "Spectra");
   auto feature_line_plot_ = std::make_shared<LinePlot2DWidget>("Features (line)");
   auto calibrators_line_plot_ = std::make_shared<CalibratorsPlotWidget>("Calibrators");
   auto injections_explorer_window_ = std::make_shared<ExplorerWidget>("InjectionsExplorerWindow", "Injections");
@@ -181,6 +181,7 @@ int main(int argc, char** argv)
 
   // windows organization
   std::vector<std::shared_ptr<Widget>> top_windows = {
+    statistics_,
     sequence_main_window_,
     transitions_main_window_,
     spectrum_main_window_,
@@ -225,7 +226,7 @@ int main(int argc, char** argv)
     spectrum_explorer_window_
   };
 
-  // we need titles for all sub windows
+  // We need titles for all sub windows
   checkTitles(top_windows);
   checkTitles(bottom_windows);
   checkTitles(left_windows);
@@ -701,7 +702,7 @@ int main(int argc, char** argv)
     // ======================================
     // Data updates
     //
-    // (Widget should update their data 
+    // (Widgets should update their data 
     // themself, which is not the case for
     // all of them yet)
     // ======================================

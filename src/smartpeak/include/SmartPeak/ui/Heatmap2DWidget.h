@@ -17,11 +17,12 @@ namespace SmartPeak
   public:
     Heatmap2DWidget(SessionHandler& session_handler,
                     SequenceHandler& sequence_handler,
+                    const std::string& id,
                     const std::string& title)
       : GenericGraphicWidget(title),
         session_handler_(session_handler),
         sequence_handler_(sequence_handler),
-        plot_title_(title) {};
+        plot_title_(id) {};
     void draw() override;
     void setRefreshNeeded() { refresh_needed_ = true; };
 
