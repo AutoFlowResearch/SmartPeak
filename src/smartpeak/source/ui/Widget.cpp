@@ -97,7 +97,7 @@ namespace SmartPeak
 
   void GenericTableWidget::draw()
   {
-    // get data
+    // get data, if getter is provided
     if (session_handler_ && sequence_handler_ && data_getter_)
     {
       session_handler_->setMinimalDataAndFilters(*sequence_handler_);

@@ -85,14 +85,20 @@ namespace SmartPeak
   class GenericTableWidget : public Widget
   {
   public:
-    typedef void(SessionHandler::* DataGeterMethod)(const SequenceHandler& sequence_handler, SessionHandler::GenericTableData& generic_table_data);
+    typedef void(SessionHandler::* DataGetterMethod)(const SequenceHandler& sequence_handler, SessionHandler::GenericTableData& generic_table_data);
     typedef Eigen::Tensor<bool, 1>(SessionHandler::* DataFilterMethod)(const Eigen::Tensor<std::string, 2>& to_filter) const;
 
+    /*
+    * GenericTableWidget.
+    * 
+    * A data getter can be provided so that data will be retreive from SessionHandler automatically in the draw method.
+    * if not provided, table_data_ must be filled by external mean.
+    */
     GenericTableWidget(const std::string& table_id,
       const std::string title = "",
       SessionHandler* session_handler = nullptr,
       SequenceHandler* sequence_handler = nullptr,
-      DataGeterMethod data_getter = nullptr,
+      DataGetterMethod data_getter = nullptr,
       DataFilterMethod data_filter = nullptr)
       : Widget(title),
         table_id_(table_id),
@@ -101,6 +107,7 @@ namespace SmartPeak
         data_getter_(data_getter),
         data_filter_(data_filter)
     {};
+
     /*
     @brief Show the table
 
@@ -144,12 +151,13 @@ namespace SmartPeak
 
 
     SessionHandler::GenericTableData table_data_;
-    
     Eigen::Tensor<bool, 1> checked_rows_;
+
+  protected:
     const std::string table_id_;
     SessionHandler* session_handler_ = nullptr;
     SequenceHandler* sequence_handler_ = nullptr;
-    DataGeterMethod data_getter_ = nullptr;
+    DataGetterMethod data_getter_ = nullptr;
     DataFilterMethod data_filter_ = nullptr;
     std::vector<ImEntry> table_entries_;
     bool table_scanned_;
