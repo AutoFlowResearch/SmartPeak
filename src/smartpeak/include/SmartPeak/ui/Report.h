@@ -54,12 +54,8 @@ namespace SmartPeak
     );
 
   public:
-    bool draw_ = false;
-
     Report(ApplicationHandler& application_handler);
 
     void draw() override;
-
-    void setApplicationHandler(ApplicationHandler& application_handler);
   };
 }

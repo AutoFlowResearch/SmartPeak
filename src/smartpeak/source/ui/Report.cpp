@@ -131,7 +131,7 @@ namespace SmartPeak
     if (ImGui::Button("Close"))
     {
       LOGI << "Report window is closed.";
-      draw_ = false;
+      visible_ = false;
       ImGui::CloseCurrentPopup();
     }
 

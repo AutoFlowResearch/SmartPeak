@@ -395,7 +395,7 @@ int main(int argc, char** argv)
       ImGui::OpenPopup("About");
       about_widget_->draw();
     }
-    if (report_->draw_)
+    if (report_->visible_)
     {
       ImGui::OpenPopup("Report dialog");
       report_->draw();
@@ -668,7 +668,7 @@ int main(int argc, char** argv)
         }
         if (ImGui::MenuItem("Report"))
         {
-          report_->draw_ = true;
+          report_->visible_ = true;
         }
         ImGui::EndMenu();
       }
