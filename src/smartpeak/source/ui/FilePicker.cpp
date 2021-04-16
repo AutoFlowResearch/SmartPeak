@@ -90,13 +90,11 @@ namespace SmartPeak
         memset(selected_filename, 0, sizeof selected_filename);
         files_scanned_ = false;
         selected_entry = -1;
-        visible_ = false;
         ImGui::CloseCurrentPopup();
       }
       ImGui::SameLine();
       if (ImGui::Button("Cancel"))
       {
-        visible_ = false;
         ImGui::CloseCurrentPopup();
       }
       ImGui::EndPopup();
