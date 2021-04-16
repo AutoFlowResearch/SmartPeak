@@ -40,7 +40,7 @@ namespace SmartPeak
     std::array<bool, FeatureMetadataSize> md_checks_;
     std::set<SampleType>                  summarySampleTypes_;
     std::vector<FeatureMetadata>          summaryMetaData_;
-    ApplicationHandler*                             application_handler_ = nullptr;
+    ApplicationHandler&                   application_handler_;
 
     bool initializeMetadataAndSampleTypes();
 
@@ -56,7 +56,7 @@ namespace SmartPeak
   public:
     bool draw_ = false;
 
-    Report();
+    Report(ApplicationHandler& application_handler);
 
     void draw() override;
 

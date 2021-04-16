@@ -35,35 +35,17 @@ namespace SmartPeak
 
   void RunWorkflowWidget::draw()
   {
-    if (!application_handler_)
-    {
-      LOGE << "Workflow widget has no ApplicationHandler object associated with it";
-      return;
-    }
-
-    if (!session_handler_)
-    {
-      LOGE << "Workflow widget has no SessionHandler object associated with it";
-      return;
-    }
-
-    if (!workflow_manager_)
-    {
-      LOGE << "Workflow widget has no WorkflowManager object associated with it";
-      return;
-    }
-
     if (ImGui::BeginPopupModal("Run workflow modal", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
       ImGui::Text("mzML folder");
       ImGui::PushID(1);
-      ImGui::InputTextWithHint("", application_handler_->mzML_dir_.c_str(), &(application_handler_->mzML_dir_));
+      ImGui::InputTextWithHint("", application_handler_.mzML_dir_.c_str(), &(application_handler_.mzML_dir_));
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(11);
       if (ImGui::Button("Select"))
       {
-        static SetRawDataPathname processor(*application_handler_);
+        static SetRawDataPathname processor(application_handler_);
         file_picker_.setProcessor(processor);
         popup_file_picker_ = true;
       }
@@ -71,13 +53,13 @@ namespace SmartPeak
 
       ImGui::Text("Input features folder");
       ImGui::PushID(2);
-      ImGui::InputTextWithHint("", application_handler_->features_in_dir_.c_str(), &(application_handler_->features_in_dir_));
+      ImGui::InputTextWithHint("", application_handler_.features_in_dir_.c_str(), &(application_handler_.features_in_dir_));
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(22);
       if (ImGui::Button("Select"))
       {
-        static SetInputFeaturesPathname processor(*application_handler_);
+        static SetInputFeaturesPathname processor(application_handler_);
         file_picker_.setProcessor(processor);
         popup_file_picker_ = true;
       }
@@ -85,14 +67,14 @@ namespace SmartPeak
 
       ImGui::Text("Output features folder");
       ImGui::PushID(3);
-      ImGui::InputTextWithHint("", application_handler_->features_out_dir_.c_str(), &(application_handler_->features_out_dir_));
+      ImGui::InputTextWithHint("", application_handler_.features_out_dir_.c_str(), &(application_handler_.features_out_dir_));
       ImGui::PopID();
 
       ImGui::SameLine();
       ImGui::PushID(33);
       if (ImGui::Button("Select"))
       {
-        static SetOutputFeaturesPathname processor(*application_handler_);
+        static SetOutputFeaturesPathname processor(application_handler_);
         file_picker_.setProcessor(processor);
         popup_file_picker_ = true;
       }
@@ -109,11 +91,11 @@ namespace SmartPeak
       ImGui::Separator();
       if (ImGui::Button("Run workflow"))
       {
-        for (const std::string& pathname : { application_handler_->mzML_dir_, application_handler_->features_in_dir_, application_handler_->features_out_dir_ }) {
+        for (const std::string& pathname : { application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_ }) {
           fs::create_directories(fs::path(pathname));
         }
-        BuildCommandsFromNames buildCommandsFromNames(*application_handler_);
-        buildCommandsFromNames.names_ = application_handler_->sequenceHandler_.getWorkflow();
+        BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+        buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
         if (!buildCommandsFromNames.process()) {
           LOGE << "Failed to create Commands, aborting.";
         }
@@ -124,17 +106,17 @@ namespace SmartPeak
             for (auto& p : cmd.dynamic_filenames)
             {
               Filenames::updateDefaultDynamicFilenames(
-                application_handler_->mzML_dir_,
-                application_handler_->features_in_dir_,
-                application_handler_->features_out_dir_,
+                application_handler_.mzML_dir_,
+                application_handler_.features_in_dir_,
+                application_handler_.features_out_dir_,
                 p.second
               );
             }
           }
-          const std::set<std::string> injection_names = session_handler_->getSelectInjectionNamesWorkflow(application_handler_->sequenceHandler_);
-          const std::set<std::string> sequence_segment_names = session_handler_->getSelectSequenceSegmentNamesWorkflow(application_handler_->sequenceHandler_);
-          const std::set<std::string> sample_group_names = session_handler_->getSelectSampleGroupNamesWorkflow(application_handler_->sequenceHandler_);
-          workflow_manager_->addWorkflow(*application_handler_, injection_names, sequence_segment_names, sample_group_names, buildCommandsFromNames.commands_);
+          const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);
+          const std::set<std::string> sequence_segment_names = session_handler_.getSelectSequenceSegmentNamesWorkflow(application_handler_.sequenceHandler_);
+          const std::set<std::string> sample_group_names = session_handler_.getSelectSampleGroupNamesWorkflow(application_handler_.sequenceHandler_);
+          workflow_manager_.addWorkflow(application_handler_, injection_names, sequence_segment_names, sample_group_names, buildCommandsFromNames.commands_);
         }
         visible_ = false;
         ImGui::CloseCurrentPopup();
@@ -149,18 +131,4 @@ namespace SmartPeak
     }
   }
 
-  void RunWorkflowWidget::setApplicationHandler(ApplicationHandler& application_handler)
-  {
-    application_handler_ = &application_handler;
-  }
-
-  void RunWorkflowWidget::setSessionHandler(SessionHandler& session_handler)
-  {
-    session_handler_ = &session_handler;
-  }
-
-  void RunWorkflowWidget::setWorkflowManager(WorkflowManager& workflow_manager)
-  {
-    workflow_manager_ = &workflow_manager;
-  }
 }

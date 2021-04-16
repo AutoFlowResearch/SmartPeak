@@ -36,9 +36,12 @@ namespace SmartPeak
   {
 
   public:
-    InfoWidget(const std::string title = "")
-      : Widget(title)
-    {};
+    InfoWidget(const std::string title, ApplicationHandler & application_handler)
+      : Widget(title),
+        application_handler_(application_handler)
+    {
+      application_handler_.sequenceHandler_.addSequenceObserver(this);
+    };
 
     /**
      ISequenceObserver
@@ -49,7 +52,6 @@ namespace SmartPeak
     void draw() override;
     void setRefreshNeeded() { refresh_needed_ = true; };
 
-    void setApplicationHandler(ApplicationHandler& application_handler);
     void setTransitions(const Eigen::Tensor<std::string, 2>* transitions) { transitions = transitions_; };
 
     void setWorkflowDone(bool done) { workflow_is_done_ = done; };
@@ -69,7 +71,7 @@ namespace SmartPeak
     void drawLastRunTime();
 
   protected:
-    ApplicationHandler* application_handler_ = nullptr;
+    ApplicationHandler& application_handler_;
     const Eigen::Tensor<std::string, 2>* transitions_ = nullptr;
     std::chrono::steady_clock::duration last_run_time_ = std::chrono::steady_clock::duration::zero();
     int number_of_chromatograms_ = 0;

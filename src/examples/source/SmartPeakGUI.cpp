@@ -91,11 +91,11 @@ int main(int argc, char** argv)
 
   // widgets
   FilePicker file_picker_;
-  auto quickInfoText_= std::make_shared<InfoWidget>("Info");
-  auto report_ = std::make_shared<Report>();
-  auto workflow_ = std::make_shared<Workflow>("Workflow");
-  auto statistics_ = std::make_shared<StatisticsWidget>("Statistics");
-  auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>();
+  auto quickInfoText_= std::make_shared<InfoWidget>("Info", application_handler_);
+  auto report_ = std::make_shared<Report>(application_handler_);
+  auto workflow_ = std::make_shared<Workflow>("Workflow", application_handler_);
+  auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_);
+  auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_, session_handler_, workflow_manager_);
   auto about_widget_ = std::make_shared<AboutWidget>();
   auto log_widget_ = std::make_shared<LogWidget>(appender_, "Log");
   auto parameters_table_widget_ = std::make_shared<ParametersTableWidget>(session_handler_, application_handler_, "ParametersMainWindow", "Parameters");
@@ -167,11 +167,6 @@ int main(int argc, char** argv)
                                    &SessionHandler::setComponentGroupBackgroundEstimationsTable, &SessionHandler::getGroupFiltersTable);
   auto features_table_main_window_ = std::make_shared<GenericTableWidget>("featuresTableMainWindow", "Features table");
   auto feature_matrix_main_window_ = std::make_shared<GenericTableWidget>("featureMatrixMainWindow", "Features matrix");
-
-  report_->setApplicationHandler(application_handler_);
-  workflow_->setApplicationHandler(application_handler_);
-  statistics_->setApplicationHandler(application_handler_);
-  quickInfoText_->setApplicationHandler(application_handler_);
 
   // visible on start
   workflow_->visible_ = true;
@@ -388,13 +383,10 @@ int main(int argc, char** argv)
     if (file_picker_.visible_)
     {
       ImGui::OpenPopup("Pick a pathname");
+      file_picker_.draw();
     }
-    file_picker_.draw();
     if (run_workflow_widget_->visible_)
     {
-      run_workflow_widget_->setApplicationHandler(application_handler_);
-      run_workflow_widget_->setSessionHandler(session_handler_);
-      run_workflow_widget_->setWorkflowManager(workflow_manager_);
       ImGui::OpenPopup("Run workflow modal");
       run_workflow_widget_->draw();
     }
@@ -405,6 +397,7 @@ int main(int argc, char** argv)
     }
     if (report_->draw_)
     {
+      ImGui::OpenPopup("Report dialog");
       report_->draw();
     }
 
@@ -733,7 +726,7 @@ int main(int argc, char** argv)
       spectrum_main_window_->checked_rows_ = table_filters;
     }
 
-    if (spectrum_main_window_->visible_)
+    if (workflow_->visible_)
     {
       // workflow
       workflow_->setEditable(workflow_is_done_);

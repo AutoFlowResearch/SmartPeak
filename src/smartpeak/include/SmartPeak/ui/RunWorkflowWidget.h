@@ -35,16 +35,20 @@ namespace SmartPeak
   class RunWorkflowWidget final : public Widget
   {
   public:
+    RunWorkflowWidget(ApplicationHandler& application_handler, SessionHandler& session_handler, WorkflowManager& workflow_manager) :
+      application_handler_(application_handler),
+      session_handler_(session_handler),
+      workflow_manager_(workflow_manager)
+    {
+    };
+
     void draw() override;
-    void setApplicationHandler(ApplicationHandler& application_handler);
-    void setSessionHandler(SessionHandler& session_handler);
-    void setWorkflowManager(WorkflowManager& workflow_manager);
 
   protected:
     bool popup_file_picker_ = false;
     FilePicker file_picker_;
-    ApplicationHandler* application_handler_ = nullptr;
-    SessionHandler* session_handler_ = nullptr;
-    WorkflowManager* workflow_manager_ = nullptr;
+    ApplicationHandler& application_handler_;
+    SessionHandler& session_handler_;
+    WorkflowManager& workflow_manager_;
   };
 }
