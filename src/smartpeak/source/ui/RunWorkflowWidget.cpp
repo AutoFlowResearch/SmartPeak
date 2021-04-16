@@ -35,7 +35,7 @@ namespace SmartPeak
 
   void RunWorkflowWidget::draw()
   {
-    if (ImGui::BeginPopupModal("Run workflow modal", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    if (ImGui::BeginPopupModal("Run workflow modal", NULL, ImGuiWindowFlags_None))
     {
       ImGui::Text("mzML folder");
       ImGui::PushID(1);
