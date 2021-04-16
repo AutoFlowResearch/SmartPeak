@@ -142,12 +142,12 @@ BOOST_AUTO_TEST_CASE(setFeatureExplorer1)
   TestData testData;
   SessionHandler session_handler; 
   session_handler.setFeatureExplorer();
-  BOOST_CHECK_EQUAL(session_handler.feature_explorer_headers.size(), 1);
-  BOOST_CHECK_EQUAL(session_handler.feature_explorer_headers(0), "name");
-  BOOST_CHECK_EQUAL(session_handler.feature_explorer_body.dimension(0), 22);
-  BOOST_CHECK_EQUAL(session_handler.feature_explorer_body.dimension(1), 1);
-  BOOST_CHECK_EQUAL(session_handler.feature_explorer_body(0, 0), "asymmetry_factor");
-  BOOST_CHECK_EQUAL(session_handler.feature_explorer_body(session_handler.feature_explorer_body.dimension(0) - 1, session_handler.feature_explorer_body.dimension(1) - 1), "absolute_difference");
+  BOOST_CHECK_EQUAL(session_handler.feature_table.headers_.size(), 1);
+  BOOST_CHECK_EQUAL(session_handler.feature_table.headers_(0), "name");
+  BOOST_CHECK_EQUAL(session_handler.feature_table.body_.dimension(0), 22);
+  BOOST_CHECK_EQUAL(session_handler.feature_table.body_.dimension(1), 1);
+  BOOST_CHECK_EQUAL(session_handler.feature_table.body_(0, 0), "asymmetry_factor");
+  BOOST_CHECK_EQUAL(session_handler.feature_table.body_(session_handler.feature_table.body_.dimension(0) - 1, session_handler.feature_table.body_.dimension(1) - 1), "absolute_difference");
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_data.checkbox_headers.size(), 2);
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_data.checkbox_headers(0), "plot");
   BOOST_CHECK_EQUAL(session_handler.feature_explorer_data.checkbox_headers(session_handler.feature_explorer_data.checkbox_headers.size() - 1), "table");

@@ -237,8 +237,7 @@ namespace SmartPeak
     ExplorerData spectrum_explorer_data;
     // data for the feature explorer
     ExplorerData feature_explorer_data;
-    Eigen::Tensor<std::string, 1> feature_explorer_headers; // feature_metavalue_name
-    Eigen::Tensor<std::string, 2> feature_explorer_body;
+    GenericTableData feature_table;
     // data for the sequence table
     GenericTableData sequence_table;
     // data for the transitions table

@@ -29,7 +29,7 @@ namespace SmartPeak
 
   void Heatmap2DWidget::draw()
   {
-    Eigen::Tensor<std::string, 2> selected_feature_names = session_handler_.feature_explorer_body;
+    Eigen::Tensor<std::string, 2> selected_feature_names = session_handler_.feature_table.body_;
     std::vector<std::string> feature_names;
     for (int i = 0; i < selected_feature_names.size(); ++i) {
       if (std::count(feature_names.begin(), feature_names.end(), selected_feature_names(i)) == 0 && !selected_feature_names(i).empty())

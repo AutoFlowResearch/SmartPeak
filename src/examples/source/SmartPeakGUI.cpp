@@ -827,8 +827,7 @@ int main(int argc, char** argv)
     {
       //features
       session_handler_.setFeatureExplorer();
-      features_explorer_window_->table_data_.headers_ = session_handler_.feature_explorer_headers;
-      features_explorer_window_->table_data_.body_ = session_handler_.feature_explorer_body;
+      features_explorer_window_->table_data_ = session_handler_.feature_table;
       features_explorer_window_->checked_rows_ = session_handler_.feature_explorer_data.checked_rows;
       features_explorer_window_->checkbox_headers_ = session_handler_.feature_explorer_data.checkbox_headers;
       features_explorer_window_->checkbox_columns_ = &session_handler_.feature_explorer_data.checkbox_body;

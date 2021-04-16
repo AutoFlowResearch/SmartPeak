@@ -86,22 +86,22 @@ namespace SmartPeak
   }
   void SessionHandler::setFeatureExplorer() {
     // Make the feature explorer headers
-    if (feature_explorer_headers.size() <= 0) {
-      LOGD << "Making feature_explorer_headers";
-      feature_explorer_headers.resize(1);
-      feature_explorer_headers.setValues({ "name" });
+    if (feature_table.headers_.size() <= 0) {
+      LOGD << "Making feature_table.headers_";
+      feature_table.headers_.resize(1);
+      feature_table.headers_.setValues({ "name" });
       feature_explorer_data.checkbox_headers.resize(2);
       feature_explorer_data.checkbox_headers.setValues({ "plot", "table" });
     }
-    const int n_cols = feature_explorer_headers.size();
+    const int n_cols = feature_table.headers_.size();
     const int n_rows = metadatafloatToString.size();
     // Make the feature explorer body
-    if (feature_explorer_body.dimension(0) != n_rows) {
-      LOGD << "Making feature_explorer_body";
-      feature_explorer_body.resize(n_rows, n_cols);
+    if (feature_table.body_.dimension(0) != n_rows) {
+      LOGD << "Making feature_table.body_";
+      feature_table.body_.resize(n_rows, n_cols);
       int col = 0, row = 0;
       for (const auto& metadata : metadatafloatToString) {
-        feature_explorer_body(row, col) = metadata.second;
+        feature_table.body_(row, col) = metadata.second;
         col = 0;
         ++row;
       }
@@ -2170,15 +2170,15 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectFeatureMetaValuesTable()
   {
-    if (feature_explorer_body.size() && feature_explorer_data.checkbox_headers.size())
-      return (feature_explorer_data.checkbox_body.chip(1, 1)).select(feature_explorer_body.chip(0, 1), feature_explorer_body.chip(0, 1).constant(""));
+    if (feature_table.body_.size() && feature_explorer_data.checkbox_headers.size())
+      return (feature_explorer_data.checkbox_body.chip(1, 1)).select(feature_table.body_.chip(0, 1), feature_table.body_.chip(0, 1).constant(""));
     else
       return Eigen::Tensor<std::string, 1>();
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectFeatureMetaValuesPlot()
   {
-    if (feature_explorer_body.size() && feature_explorer_data.checkbox_headers.size())
-      return (feature_explorer_data.checkbox_body.chip(0, 1)).select(feature_explorer_body.chip(0, 1), feature_explorer_body.chip(0, 1).constant(""));
+    if (feature_table.body_.size() && feature_explorer_data.checkbox_headers.size())
+      return (feature_explorer_data.checkbox_body.chip(0, 1)).select(feature_table.body_.chip(0, 1), feature_table.body_.chip(0, 1).constant(""));
     else
       return Eigen::Tensor<std::string, 1>();
   }
