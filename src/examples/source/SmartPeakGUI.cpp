@@ -735,12 +735,17 @@ int main(int argc, char** argv)
     if (features_table_main_window_->visible_)
     {
       // feature table
-      SessionHandler::GenericTableData data;
-      exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_, data);
-      features_table_main_window_->table_data_ = data;
+      exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_, features_table_main_window_->table_data_);
       features_table_main_window_->checked_rows_ = Eigen::Tensor<bool, 1>();
     }
 
+    if (feature_matrix_main_window_)
+    {
+        session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
+        feature_matrix_main_window_->table_data_ = session_handler_.feature_pivot_table;
+        feature_matrix_main_window_->checked_rows_ = Eigen::Tensor<bool, 1>();
+    }
+    
     if (chromatogram_plot_widget_->visible_)
     {
       // Chromatogram
@@ -765,7 +770,7 @@ int main(int argc, char** argv)
       session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
       Eigen::Tensor<float, 2> x_data = session_handler_.feat_sample_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
       Eigen::Tensor<float, 2> y_data = session_handler_.feat_value_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
-      feature_line_plot_->setValues(&x_data, &y_data, &session_handler_.feat_col_labels, &session_handler_.feat_row_labels, session_handler_.feat_line_x_axis_title, session_handler_.feat_line_y_axis_title,
+      feature_line_plot_->setValues(x_data, y_data, &session_handler_.feat_col_labels, &session_handler_.feat_row_labels, session_handler_.feat_line_x_axis_title, session_handler_.feat_line_y_axis_title,
         session_handler_.feat_line_sample_min, session_handler_.feat_line_sample_max, session_handler_.feat_value_min, session_handler_.feat_value_max,
         "FeaturesLineMainWindow");
     }

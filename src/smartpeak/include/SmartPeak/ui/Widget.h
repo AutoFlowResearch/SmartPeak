@@ -212,8 +212,8 @@ namespace SmartPeak
   {
   public:
     LinePlot2DWidget(const std::string title = "") : GenericGraphicWidget(title)  {};
-    void setValues(const Eigen::Tensor<float, 2>* x_data,
-      const Eigen::Tensor<float, 2>* y_data,
+    void setValues(const Eigen::Tensor<float, 2>& x_data,
+      const Eigen::Tensor<float, 2>& y_data,
       const Eigen::Tensor<std::string, 1>* x_labels,
       const Eigen::Tensor<std::string, 1>* series_names,
       const std::string& x_axis_title, 
@@ -238,8 +238,8 @@ namespace SmartPeak
     }
     void draw() override;
   protected:
-    const Eigen::Tensor<float, 2>* x_data_;
-    const Eigen::Tensor<float, 2>* y_data_;
+    Eigen::Tensor<float, 2> x_data_;
+    Eigen::Tensor<float, 2> y_data_;
     const Eigen::Tensor<std::string, 1>* x_labels_;
     const Eigen::Tensor<std::string, 1>* series_names_;
     std::string x_axis_title_;
