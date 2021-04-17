@@ -178,6 +178,11 @@ namespace SmartPeak
 
   void ExplorerWidget::draw()
   {
+    if (ImGui::IsItemHovered() && tooltip_info.find(table_id_) != tooltip_info.end()) {
+      std::string res =  tooltip_info.find(table_id_)->second;
+      ImGui::SetTooltip("%s", tooltip_info.find(table_id_)->second.c_str());
+    }
+    
     if (headers_.size() <= 0)
       return;
 
@@ -212,6 +217,9 @@ namespace SmartPeak
       checkbox_columns_plot_col_ = 1;
     } else if (table_id_ == "TransitionsExplorerWindow" /*&& active_plot_ == "Features (line)"*/) {
       table_entries_plot_col_ = 2;
+      checkbox_columns_plot_col_ = 0;
+    } else if (table_id_ == "FeaturesExplorerWindow" /*&& active_plot_ == "Features (line)"*/) {
+      table_entries_plot_col_ = 1;
       checkbox_columns_plot_col_ = 0;
     }
     
@@ -281,16 +289,16 @@ namespace SmartPeak
     ImGui::Text("Plot-Stepper");
     
     ImGui::SameLine();
-    ImGui::Checkbox("Plot/Unplot All", &plot_all_);
+    if (ImGui::Checkbox("Plot/Unplot All", &plot_all_)) { plot_unplot_all_deactivated_ = false; };
     if (plot_all_) { plot_switch_ = "plotunplotall"; plot_idx_ = 0; }
     if (table_scanned_ && checkbox_columns_->size() > 0 && plot_switch_ != "stepper") {
-      if (plot_all_) {
+      if (plot_all_ && !plot_unplot_all_deactivated_) {
         std::for_each(table_entries_.begin(), table_entries_.end(),
                       [&](ImEntry& entry) {
                           entry.entry_contents[table_entries_plot_col_] = "true";
                           (*checkbox_columns_)(entry.ID, checkbox_columns_plot_col_) = true;
          });
-      } else if (!plot_all_) {
+      } else if (!plot_all_ && !plot_unplot_all_deactivated_) {
         std::for_each(table_entries_.begin(), table_entries_.end(),
                       [&](ImEntry& entry) {
                           entry.entry_contents[table_entries_plot_col_] = "false";
@@ -362,11 +370,13 @@ namespace SmartPeak
                   {
                     table_entries_[row].entry_contents[header_idx] = "true";
                     (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx) = true;
+                    plot_unplot_all_deactivated_ = true;
                   }
                   else if (is_checked == false && !std::strcmp(table_entries_[row].entry_contents[header_idx].c_str(), "true"))
                   {
                     table_entries_[row].entry_contents[header_idx] = "false";
                     (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx) = false;
+                    plot_unplot_all_deactivated_ = true;
                   }
                   ImGui::PopStyleColor();
                 }
@@ -453,15 +463,15 @@ namespace SmartPeak
               }
               std::ostringstream os;
               os << "Injection: " << x_labels_(injection_number);
-              ImGui::Text(os.str().c_str());
+              ImGui::Text("%s", os.str().c_str());
               os.str("");
               os.clear();
               os << "Series: " << series_names_(i);
-              ImGui::Text(os.str().c_str());
+              ImGui::Text("%s", os.str().c_str());
               os.str("");
               os.clear();
               os << "Value: " << y_data(injection_number);
-              ImGui::Text(os.str().c_str());
+              ImGui::Text("%s", os.str().c_str());
               ImGui::EndTooltip();
               tooltip_exists = true;
             }

@@ -16,6 +16,7 @@ set(sources_list_h
 	StatisticsWidget.h
 	Widget.h
 	ImEntry.h
+  Help.h
 	WindowSizesAndPositions.h
 	Workflow.h
 	WorkflowStepWidget.h
