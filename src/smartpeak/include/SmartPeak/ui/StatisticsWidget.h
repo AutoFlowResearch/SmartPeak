@@ -36,7 +36,7 @@ namespace SmartPeak
   {
 
   public:
-    StatisticsWidget(const std::string title, ApplicationHandler application_handler)
+    StatisticsWidget(const std::string title, ApplicationHandler& application_handler)
       : Widget(title),
       application_handler_(application_handler)
     {

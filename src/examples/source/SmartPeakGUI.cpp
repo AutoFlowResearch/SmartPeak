@@ -334,7 +334,6 @@ int main(int argc, char** argv)
       if (workflow_just_finished)
       {
         workflow_manager_.updateApplicationHandler(application_handler_);
-        quickInfoText_->setLastRunTime(workflow_manager_.getLastRunTime());
       }
       workflow_is_done_ = workflow_manager_.isWorkflowDone();
       file_loading_is_done_ = file_picker_.fileLoadingIsDone();
@@ -347,6 +346,11 @@ int main(int argc, char** argv)
       if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
       if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check failed.  Check the `Information` log.");
       if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check passed.");
+      if (workflow_just_finished)
+      {
+        quickInfoText_->setLastRunTime(workflow_manager_.getLastRunTime());
+        quickInfoText_->setRefreshNeeded();
+      }
 
       // Session cache updates from e.g., single file imports
       if (file_loading_is_done_ && file_picker_.fileWasLoaded() && update_session_cache_) {
@@ -702,43 +706,44 @@ int main(int argc, char** argv)
     
     session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
 
+    // Sequence
     if (sequence_main_window_->visible_)
     {
-      // Sequence
       Eigen::Tensor<bool, 1> table_filters = session_handler_.getSequenceTableFilters();
       sequence_main_window_->table_data_ = session_handler_.sequence_table;
       sequence_main_window_->checked_rows_ = table_filters;
     }
 
+    // Transitions
     if (transitions_main_window_->visible_)
     {
-      // Transitions
       Eigen::Tensor<bool, 1> table_filters = session_handler_.getTransitionsTableFilters();
       transitions_main_window_->table_data_ = session_handler_.transitions_table;
       transitions_main_window_->checked_rows_ = table_filters;
     }
 
+    // spectrum
     if (spectrum_main_window_->visible_)
     {
-      // spectrum
       Eigen::Tensor<bool, 1> table_filters = session_handler_.getSpectrumTableFilters();
       spectrum_main_window_->table_data_ = session_handler_.spectrum_table;
       spectrum_main_window_->checked_rows_ = table_filters;
     }
 
+    // workflow
     if (workflow_->visible_)
     {
-      // workflow
       workflow_->setEditable(workflow_is_done_);
     }
 
+    // feature table
     if (features_table_main_window_->visible_)
     {
-      // feature table
       exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_, features_table_main_window_->table_data_);
       features_table_main_window_->checked_rows_ = Eigen::Tensor<bool, 1>();
     }
 
+    // feature matrix
     if (feature_matrix_main_window_)
     {
         session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
@@ -746,27 +751,21 @@ int main(int argc, char** argv)
         feature_matrix_main_window_->checked_rows_ = Eigen::Tensor<bool, 1>();
     }
     
-    if (chromatogram_plot_widget_->visible_)
+    // Chromatogram
+    if (workflow_just_finished)
     {
-      // Chromatogram
-      if (workflow_just_finished)
-      {
-        chromatogram_plot_widget_->setRefreshNeeded();
-      }
+      chromatogram_plot_widget_->setRefreshNeeded();
     }
 
-    if (spectra_plot_widget_->visible_)
+    // spectra
+    if (workflow_just_finished)
     {
-      // spectra
-      if (workflow_just_finished)
-      {
-        spectra_plot_widget_->setRefreshNeeded();
-      }
+      spectra_plot_widget_->setRefreshNeeded();
     }
 
+    // feature line plot
     if (feature_line_plot_->visible_)
     {
-      // feature line plot
       session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
       Eigen::Tensor<float, 2> x_data = session_handler_.feat_sample_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
       Eigen::Tensor<float, 2> y_data = session_handler_.feat_value_data.shuffle(Eigen::array<Eigen::Index, 2>({ 1,0 }));
@@ -775,35 +774,32 @@ int main(int argc, char** argv)
         "FeaturesLineMainWindow");
     }
 
-    if (heatmap_plot_widget_->visible_)
+    // heatmap
+    if (workflow_just_finished)
     {
-      // heatmap
-      if (workflow_just_finished)
-      {
-        heatmap_plot_widget_->setRefreshNeeded();
-      }
+      heatmap_plot_widget_->setRefreshNeeded();
     }
 
+    //statistics
+    if (workflow_just_finished)
+    {
+      statistics_->setRefreshNeeded();
+    }
     if (statistics_->visible_)
     {
-      //statistics
-      if (workflow_just_finished)
-      {
-        statistics_->setRefreshNeeded();
-      }
       statistics_->setInjections(session_handler_.injection_explorer_data.checkbox_body, session_handler_.getInjectionExplorerBody());
       statistics_->setTransitions(&session_handler_.transitions_table.body_, session_handler_.transition_explorer_data.checkbox_body, session_handler_.getTransitionExplorerBody());
     }
 
+    // info
     if (quickInfoText_->visible_)
     {
-      // info
       quickInfoText_->setTransitions(&session_handler_.transitions_table.body_);
     }
 
+    // injections 
     if (injections_explorer_window_->visible_)
     {
-      // injections 
       injections_explorer_window_->table_data_.headers_ = session_handler_.getInjectionExplorerHeader();
       injections_explorer_window_->table_data_.body_ = session_handler_.getInjectionExplorerBody();
       injections_explorer_window_->checked_rows_ = session_handler_.injection_explorer_data.checked_rows;
@@ -811,9 +807,9 @@ int main(int argc, char** argv)
       injections_explorer_window_->checkbox_columns_ = &session_handler_.injection_explorer_data.checkbox_body;
     }
 
+    // transitions
     if (transitions_explorer_window_->visible_)
     {
-      // transitions
       transitions_explorer_window_->table_data_.headers_ = session_handler_.getTransitionExplorerHeader();
       transitions_explorer_window_->table_data_.body_ = session_handler_.getTransitionExplorerBody();
       transitions_explorer_window_->checked_rows_ = session_handler_.transition_explorer_data.checked_rows;
@@ -821,9 +817,9 @@ int main(int argc, char** argv)
       transitions_explorer_window_->checkbox_columns_ = &session_handler_.transition_explorer_data.checkbox_body;
     }
 
+    //features
     if (features_explorer_window_->visible_)
     {
-      //features
       session_handler_.setFeatureExplorer();
       features_explorer_window_->table_data_ = session_handler_.feature_table;
       features_explorer_window_->checked_rows_ = session_handler_.feature_explorer_data.checked_rows;
@@ -831,9 +827,9 @@ int main(int argc, char** argv)
       features_explorer_window_->checkbox_columns_ = &session_handler_.feature_explorer_data.checkbox_body;
     }
 
+    // spectrum
     if (spectrum_explorer_window_->visible_)
     {
-      // spectrum
       spectrum_explorer_window_->table_data_.headers_ = session_handler_.getSpectrumExplorerHeader();
       spectrum_explorer_window_->table_data_.body_ = session_handler_.getSpectrumExplorerBody();
       spectrum_explorer_window_->checked_rows_ = session_handler_.spectrum_explorer_data.checked_rows;
@@ -841,9 +837,9 @@ int main(int argc, char** argv)
       spectrum_explorer_window_->checkbox_columns_ = &session_handler_.spectrum_explorer_data.checkbox_body;
     }
 
+    // calibrators
     if (calibrators_line_plot_->visible_)
     {
-      // calibrators
       exceeding_plot_points_ = !session_handler_.setCalibratorsScatterLinePlot(application_handler_.sequenceHandler_);
       calibrators_line_plot_->setValues(&session_handler_.calibrators_conc_fit_data, &session_handler_.calibrators_feature_fit_data,
         &session_handler_.calibrators_conc_raw_data, &session_handler_.calibrators_feature_raw_data, &session_handler_.calibrators_series_names,
