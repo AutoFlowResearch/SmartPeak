@@ -133,7 +133,7 @@ namespace SmartPeak
     unsigned int table_entries_plot_col_ = 0;
     unsigned int checkbox_columns_plot_col_ = 0;
     std::string plot_switch_ = "";
-    std::string active_plot_;
+    std::string active_plot_ = "";
     std::vector<const char*> cols_;
   };
 

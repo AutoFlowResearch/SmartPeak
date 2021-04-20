@@ -212,15 +212,18 @@ namespace SmartPeak
 
     ImGui::Combo("In Column(s)", &selected_col_, cols_.data(), cols_.size());
     
-    if (table_id_ == "InjectionsExplorerWindow" /*&& active_plot_ == "Chromatograms"*/) {
+    if (table_id_ == "InjectionsExplorerWindow" && active_plot_ == "Chromatograms") {
       table_entries_plot_col_ = 3;
       checkbox_columns_plot_col_ = 1;
-    } else if (table_id_ == "TransitionsExplorerWindow" /*&& active_plot_ == "Features (line)"*/) {
+    } else if (table_id_ == "TransitionsExplorerWindow" && active_plot_ == "Features (line)") {
       table_entries_plot_col_ = 2;
       checkbox_columns_plot_col_ = 0;
     } else if (table_id_ == "FeaturesExplorerWindow" /*&& active_plot_ == "Features (line)"*/) {
       table_entries_plot_col_ = 1;
       checkbox_columns_plot_col_ = 0;
+    } else { // defaulting to InjectionsExplorerWindow
+      table_entries_plot_col_ = 3;
+      checkbox_columns_plot_col_ = 1;
     }
     
     ImGui::PushButtonRepeat(true);

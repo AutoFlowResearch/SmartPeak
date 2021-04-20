@@ -119,6 +119,9 @@ int main(int argc, char** argv)
   bool show_transitions_explorer = true; // list of transition names (e.g., subset of the features for non-targeted case) with advanced options for filtering
   bool show_features_explorer = false; // list of features with advanced options for filtering
   bool show_spectrum_explorer = false; // list of spectrum with advanced options for filtering
+  
+  bool chromatogram_explorer_is_active = false; // whether chromatogram is active and being drawn
+  bool featuresline_explorer_is_active = false; // whether features line is active and being drawn
 
   // View: Top window
   bool show_sequence_table = false;
@@ -783,7 +786,7 @@ int main(int argc, char** argv)
           widget->checked_rows_ = session_handler_.injection_explorer_checked_rows;
           widget->checkbox_headers_ = session_handler_.injection_explorer_checkbox_headers;
           widget->checkbox_columns_ = &session_handler_.injection_explorer_checkbox_body;
-          //show_chromatogram_line_plot ? widget->active_plot_ = "Chromatograms" : widget->active_plot_ = "";
+          show_chromatogram_line_plot && chromatogram_explorer_is_active ? widget->active_plot_ = "Chromatograms" : widget->active_plot_ = "";
           widget->draw();
           ImGui::EndTabItem();
         }
@@ -796,7 +799,7 @@ int main(int argc, char** argv)
           widget->checked_rows_ = session_handler_.transition_explorer_checked_rows;
           widget->checkbox_headers_ = session_handler_.transition_explorer_checkbox_headers;
           widget->checkbox_columns_ = &session_handler_.transition_explorer_checkbox_body;
-          //show_feature_line_plot ? widget->active_plot_ = "Features (line)" : widget->active_plot_ = "";
+          featuresline_explorer_is_active ? widget->active_plot_ = "Features (line)" : widget->active_plot_ = "";
           widget->draw();
           ImGui::EndTabItem();
         }
@@ -1157,6 +1160,7 @@ int main(int argc, char** argv)
             }
           }
           // The actual plot
+          chromatogram_explorer_is_active = true;
           chromatogram_plot_widget->draw();
           ImGui::EndTabItem();
         }
@@ -1195,6 +1199,7 @@ int main(int argc, char** argv)
           LinePlot2DWidget plot2d(x_data, y_data, session_handler_.feat_col_labels, session_handler_.feat_row_labels, session_handler_.feat_line_x_axis_title, session_handler_.feat_line_y_axis_title,
             session_handler_.feat_line_sample_min, session_handler_.feat_line_sample_max, session_handler_.feat_value_min, session_handler_.feat_value_max,
             win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_, "FeaturesLineMainWindow");
+          featuresline_explorer_is_active = true;
           plot2d.draw();
           ImGui::EndTabItem();
         }
