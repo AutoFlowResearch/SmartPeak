@@ -28,7 +28,13 @@
 #include <future>
 
 namespace SmartPeak {
-  void WorkflowManager::addWorkflow(ApplicationHandler& source_app_handler, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands)
+  void WorkflowManager::addWorkflow(ApplicationHandler& source_app_handler, 
+    const std::set<std::string>& injection_names, 
+    const std::set<std::string>& sequence_segment_names, 
+    const std::set<std::string>& sample_group_names, 
+    const std::vector<ApplicationHandler::Command>& commands, 
+    IApplicationProcessorObserver* application_processor_observer,
+    ISequenceProcessorObserver* sequence_processor_observer)
   {
     // do not run workflows concurrently
     if (!done_) {
@@ -46,11 +52,12 @@ namespace SmartPeak {
     std::thread t(run_and_join, 
                   std::ref(application_handler_),
                   std::ref(done_),
-                  std::ref(last_run_time_),
                   injection_names_,
                   sequence_segment_names_,
                   sample_group_names_,
-                  commands_);
+                  commands_,
+                  application_processor_observer,
+                  sequence_processor_observer);
     LOGD << "Created thread (to be detached): " << t.get_id();
     t.detach();
     LOGD << "Thread has been detached";
@@ -61,7 +68,14 @@ namespace SmartPeak {
     return done_;
   }
 
-  void WorkflowManager::run_and_join(ApplicationHandler& application_handler, bool& done, std::chrono::steady_clock::duration& run_time, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands)
+  void WorkflowManager::run_and_join(ApplicationHandler& application_handler, 
+    bool& done, 
+    const std::set<std::string>& injection_names, 
+    const std::set<std::string>& sequence_segment_names, 
+    const std::set<std::string>& sample_group_names, 
+    const std::vector<ApplicationHandler::Command>& commands,
+    IApplicationProcessorObserver* application_processor_observer,
+    ISequenceProcessorObserver* sequence_processor_observer)
   {
     auto run_start_time = std::chrono::steady_clock::now();
     // run workflow asynchronously
@@ -70,7 +84,11 @@ namespace SmartPeak {
       ApplicationProcessors::processCommands,
       std::ref(application_handler),
       std::cref(commands),
-      std::cref(injection_names), std::cref(sequence_segment_names), std::cref(sample_group_names)
+      std::cref(injection_names), 
+      std::cref(sequence_segment_names), 
+      std::cref(sample_group_names),
+      application_processor_observer,
+      sequence_processor_observer
     );
 
     LOGD << "Waiting on async operation...";
@@ -84,13 +102,13 @@ namespace SmartPeak {
     }
 
     done = true;
-    run_time = std::chrono::steady_clock::now() - run_start_time;
+    application_handler.sequenceHandler_.notifySequenceUpdated();
     LOGI << "State updated with workflow's results";
   }
 
   void WorkflowManager::updateApplicationHandler(ApplicationHandler& source_app_handler)
   {
-    // update the status for this workflow, to be used in the gui
+    // update the status for this workflow, to be used from the main thread (gui, client)
     source_app_handler = std::move(application_handler_);
   }
 }

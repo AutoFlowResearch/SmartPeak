@@ -23,15 +23,6 @@
 
 #pragma once
 
-#include <OpenMS/KERNEL/FeatureMap.h>
-#include <OpenMS/ANALYSIS/TARGETED/TargetedExperiment.h>
-#include <OpenMS/KERNEL/MSExperiment.h>
-#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureQC.h>
-#include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitationMethod.h>
-#include <OpenMS/ANALYSIS/QUANTITATION/IsotopeLabelingMDVs.h>
-#include <OpenMS/ANALYSIS/MAPMATCHING/TransformationDescription.h>
-#include <OpenMS/DATASTRUCTURES/DefaultParamHandler.h>
-
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataHandler.h>
@@ -39,6 +30,7 @@
 #include <SmartPeak/iface/IProcessorDescription.h>
 #include <SmartPeak/core/WorkflowObservable.h>
 #include <SmartPeak/core/ParametersObservable.h>
+#include <SmartPeak/core/TransitionsObservable.h>
 
 #include <map>
 #include <vector>
@@ -454,6 +446,8 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+    
+    TransitionsObservable* transitions_observable_ = nullptr;
   };
 
   struct LoadFeatureFiltersRDP : RawDataProcessor

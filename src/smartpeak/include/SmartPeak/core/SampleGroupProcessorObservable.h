@@ -23,26 +23,47 @@
 
 #pragma once
 
-#include <SmartPeak/iface/IParametersObserver.h>
+#include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 #include <memory>
 #include <vector>
 #include <algorithm>
 
 namespace SmartPeak
 {
-  class ParametersObservable
+  class SampleGroupProcessorObservable
   {
   public:
-    virtual void addParametersObserver(IParametersObserver* observer) { observers_.push_back(observer); };
-    virtual void removeParametersObserver(IParametersObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
-    void notifyParametersUpdated()
+    virtual void addSampleGroupProcessorObserver(ISampleGroupProcessorObserver* observer) { observers_.push_back(observer); };
+    virtual void removeSampleGroupProcessorObserver(ISampleGroupProcessorObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
+    void notifySampleGroupProcessorStart(const size_t nb_segments)
     {
       for (auto& observer : observers_)
       {
-        observer->onParametersUpdated();
+        observer->onSampleGroupProcessorStart(nb_segments);
+      }
+    }
+    void notifySampleGroupProcessorSampleStart(const std::string sample_group_name)
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onSampleGroupProcessorSampleStart(sample_group_name);
+      }
+    }
+    void notifySampleGroupProcessorSampleEnd(const std::string sample_group_name)
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onSampleGroupProcessorSampleEnd(sample_group_name);
+      }
+    }
+    void notifySampleGroupProcessorEnd()
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onSampleGroupProcessorEnd();
       }
     }
   protected:
-    std::vector<IParametersObserver*> observers_;
+    std::vector<ISampleGroupProcessorObserver*> observers_;
   };
 }

@@ -32,20 +32,20 @@
 
 namespace SmartPeak
 {
-  class StatisticsWidget final : public Widget, public ISequenceObserver
+  class StatisticsWidget final : 
+    public Widget, 
+    public ISequenceObserver
   {
 
   public:
-    StatisticsWidget(const std::string title, ApplicationHandler& application_handler)
+    StatisticsWidget(const std::string title, ApplicationHandler& application_handler, SequenceObservable& sequence_observable)
       : Widget(title),
       application_handler_(application_handler)
     {
-      application_handler_.sequenceHandler_.addSequenceObserver(this);
+      sequence_observable.addSequenceObserver(this);
     };
 
     void draw() override;
-
-    void setRefreshNeeded() { refresh_needed_ = true; };
 
     void setTransitions(const Eigen::Tensor<std::string, 2>* transitions, const Eigen::Tensor<bool, 2>& transitions_checkbox, const Eigen::Tensor<std::string, 2>& transitions_columns)
     { 
@@ -63,7 +63,7 @@ namespace SmartPeak
     /**
      ISequenceObserver
     */
-    virtual void sequenceUpdated() override;
+    virtual void onSequenceUpdated() override;
 
   private:
     struct DashboardChartData

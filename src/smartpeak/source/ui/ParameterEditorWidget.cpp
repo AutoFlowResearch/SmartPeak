@@ -104,7 +104,7 @@ namespace SmartPeak
           parameter_.setAsSchema(false);
           user_parameters.addParameter(function_parameter_, parameter_);
         }
-        application_handler_.sequenceHandler_.notifyParametersChanged();
+        application_handler_.sequenceHandler_.notifyParametersUpdated();
         ImGui::CloseCurrentPopup();
       }
       else
@@ -128,7 +128,7 @@ namespace SmartPeak
       if (user_parameters.count(function_parameter_) == 1)
       {
         user_parameters[function_parameter_].removeParameter(parameter_.getName());
-        application_handler_.sequenceHandler_.notifyParametersChanged();
+        application_handler_.sequenceHandler_.notifyParametersUpdated();
       }
       ImGui::CloseCurrentPopup();
     }

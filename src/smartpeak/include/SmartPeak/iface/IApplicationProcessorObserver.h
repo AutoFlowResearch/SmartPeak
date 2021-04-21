@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -17,32 +17,24 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
 
-#include <SmartPeak/iface/IParametersObserver.h>
-#include <memory>
-#include <vector>
-#include <algorithm>
+#include <string>
 
-namespace SmartPeak
+namespace SmartPeak 
 {
-  class ParametersObservable
+  struct IApplicationProcessorObserver
   {
-  public:
-    virtual void addParametersObserver(IParametersObserver* observer) { observers_.push_back(observer); };
-    virtual void removeParametersObserver(IParametersObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
-    void notifyParametersUpdated()
-    {
-      for (auto& observer : observers_)
-      {
-        observer->onParametersUpdated();
-      }
-    }
-  protected:
-    std::vector<IParametersObserver*> observers_;
+    /**
+      Parameters have been updated
+    */
+    virtual void onApplicationProcessorStart(const size_t nb_commands) = 0;
+    virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) = 0;
+    virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) = 0;
+    virtual void onApplicationProcessorEnd() = 0;
   };
 }

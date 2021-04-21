@@ -29,8 +29,21 @@
 
 namespace SmartPeak
 {
-  class SessionHandler {
+  class SessionHandler : 
+    public ISequenceObserver,
+    public ITransitionsObserver
+  {
   public:
+
+    /**
+    ISequenceObserver
+    */
+    virtual void onSequenceUpdated() override;
+
+    /**
+    ITransitionsObserver
+    */
+    virtual void onTransitionsUpdated() override;
 
     /*
     @ brief data for generic tables: one line header, and body data

@@ -66,7 +66,7 @@ namespace SmartPeak
           auto injection = getInjectionFromTable(std::get<0>(selected_cell), std::get<1>(selected_cell));
           injection->getMetaData().setSequenceSegmentName(sequence_segment_name);
         }
-        sequence_handler_->notifySequenceChanged();
+        sequence_handler_->notifySequenceUpdated();
       });
     }
     else if (col == sample_group_col)
@@ -79,7 +79,7 @@ namespace SmartPeak
           auto injection = getInjectionFromTable(std::get<0>(selected_cell), std::get<1>(selected_cell));
           injection->getMetaData().setSampleGroupName(sample_group_name);
         }
-        sequence_handler_->notifySequenceChanged();
+        sequence_handler_->notifySequenceUpdated();
       });
     }
     else if (col == replicate_group_name_col)
@@ -92,7 +92,7 @@ namespace SmartPeak
           auto injection = getInjectionFromTable(std::get<0>(selected_cell), std::get<1>(selected_cell));
           injection->getMetaData().setReplicateGroupName(replicate_group_name);
         }
-        sequence_handler_->notifySequenceChanged();
+        sequence_handler_->notifySequenceUpdated();
       });
     }
     else if (col == sample_type_col)
@@ -108,7 +108,7 @@ namespace SmartPeak
             auto injection = getInjectionFromTable(std::get<0>(selected_cell), std::get<1>(selected_cell));
             injection->getMetaData().setSampleType(sample_type);
           }          
-          sequence_handler_->notifySequenceChanged();
+          sequence_handler_->notifySequenceUpdated();
         }
       });
     }

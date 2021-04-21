@@ -23,26 +23,26 @@
 
 #pragma once
 
-#include <SmartPeak/iface/IParametersObserver.h>
+#include <SmartPeak/iface/ITransitionsObserver.h>
 #include <memory>
 #include <vector>
 #include <algorithm>
 
 namespace SmartPeak
 {
-  class ParametersObservable
+  class TransitionsObservable
   {
   public:
-    virtual void addParametersObserver(IParametersObserver* observer) { observers_.push_back(observer); };
-    virtual void removeParametersObserver(IParametersObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
-    void notifyParametersUpdated()
+    virtual void addTransitionsObserver(ITransitionsObserver* observer) { observers_.push_back(observer); };
+    virtual void removeTransitionsObserver(ITransitionsObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
+    void notifyTransitionsUpdated()
     {
       for (auto& observer : observers_)
       {
-        observer->onParametersUpdated();
+        observer->onTransitionsUpdated();
       }
     }
   protected:
-    std::vector<IParametersObserver*> observers_;
+    std::vector<ITransitionsObserver*> observers_;
   };
 }

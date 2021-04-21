@@ -30,6 +30,7 @@
 #include <SmartPeak/core/SequenceSegmentHandler.h>
 #include <SmartPeak/iface/IProcessorDescription.h>
 #include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/core/SequenceSegmentObservable.h>
 
 namespace SmartPeak
 {
@@ -68,6 +69,8 @@ namespace SmartPeak
       const SampleType sampleType,
       std::vector<size_t>& sampleIndices
     );
+
+    SequenceSegmentObservable* sequence_segment_observable_ = nullptr;
 
   protected:
     // Forced to write this, because the other user-defined constructors inhibit

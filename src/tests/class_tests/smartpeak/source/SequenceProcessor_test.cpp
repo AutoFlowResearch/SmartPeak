@@ -475,7 +475,7 @@ BOOST_AUTO_TEST_CASE(LoadWorkflow1)
   SequenceHandler sequenceHandler;
   struct WorkflowObserverTest : public IWorkflowObserver
   {
-    virtual void workflowUpdated() override
+    virtual void onWorkflowUpdated() override
     {
       nb_notifications_++;
     }

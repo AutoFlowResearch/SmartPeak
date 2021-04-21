@@ -32,6 +32,16 @@
 
 namespace SmartPeak
 {
+  void SessionHandler::onSequenceUpdated()
+  {
+    sequence_table.clear();
+  }
+
+  void SessionHandler::onTransitionsUpdated()
+  {
+    transitions_table.clear();
+  }
+
   void SessionHandler::setMinimalDataAndFilters(const SequenceHandler & sequence_handler)
   {
     //LOGD << "START setMinimalDataAndFilters"; // Not helpful as it is called every few seconds when the GUI is displayed

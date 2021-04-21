@@ -24,6 +24,8 @@
 #pragma once
 
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/iface/IApplicationProcessorObserver.h>
+#include <SmartPeak/iface/ISequenceProcessorObserver.h>
 #include <chrono>
 
 namespace SmartPeak {
@@ -48,7 +50,13 @@ namespace SmartPeak {
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
     */
-    void addWorkflow(ApplicationHandler& source_state, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands);
+    void addWorkflow(ApplicationHandler& source_state, 
+      const std::set<std::string>& injection_names, 
+      const std::set<std::string>& sequence_segment_names, 
+      const std::set<std::string>& sample_group_names, 
+      const std::vector<ApplicationHandler::Command>& commands, 
+      IApplicationProcessorObserver* application_processor_observer = nullptr,
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr);
 
     /**
       If this returns false, new workflows can't run and the following menu items
@@ -66,11 +74,6 @@ namespace SmartPeak {
     */
     void updateApplicationHandler(ApplicationHandler& source_app_handler);
 
-    /**
-      returns the last run time.
-    */
-    std::chrono::steady_clock::duration getLastRunTime() const { return last_run_time_; };
-
   private:
     /**
       Spawns a thread that runs the workflow, and waits for it to finish. The
@@ -86,11 +89,16 @@ namespace SmartPeak {
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
     */
-    static void run_and_join(ApplicationHandler& application_handler, bool& done, std::chrono::steady_clock::duration& run_time, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands);
+    static void run_and_join(ApplicationHandler& application_handler, 
+      bool& done,
+      const std::set<std::string>& injection_names, 
+      const std::set<std::string>& sequence_segment_names,
+      const std::set<std::string>& sample_group_names,
+      const std::vector<ApplicationHandler::Command>& commands,
+      IApplicationProcessorObserver* application_processor_observer = nullptr,
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr);
 
     ApplicationHandler application_handler_; ///< The workflow is run on this copy
     bool done_ = true;
-//    WorkFlowStatus done_ = WorkFlowStatus::IDLE;
-    std::chrono::steady_clock::duration last_run_time_;
   };
 }

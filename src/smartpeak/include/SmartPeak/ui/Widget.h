@@ -32,6 +32,7 @@
 #include <SmartPeak/ui/ImEntry.h>
 #include <SmartPeak/ui/Help.h>
 #include <unsupported/Eigen/CXX11/Tensor>
+#include <SmartPeak/iface/ISequenceSegmentObserver.h>
 
 /**
 Generic and base classes for Widgets
@@ -198,6 +199,95 @@ namespace SmartPeak
   };
 
 
+  struct SequenceSegmentWidget : public GenericTableWidget, public ISequenceSegmentObserver
+  {
+    SequenceSegmentWidget(const std::string& table_id,
+      const std::string title = "",
+      SessionHandler* session_handler = nullptr,
+      SequenceHandler* sequence_handler = nullptr,
+      GenericTableWidget::DataGetterMethod data_getter = nullptr,
+      GenericTableWidget::DataFilterMethod data_filter = nullptr,
+      SequenceSegmentObservable* observable = nullptr)
+      : GenericTableWidget(table_id, title, session_handler, sequence_handler, data_getter, data_filter)
+    {
+      if (observable) observable->addSequenceSegmentObserver(this);
+    };
+
+    /**
+      ISequenceSegmentObserver
+    */
+    virtual void onQuantitationMethodsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onStandardsConcentrationsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureFiltersComponentsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureFiltersComponentGroupsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureQCComponentsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureQCComponentGroupsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureRSDFilterComponentsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureRSDFilterComponentGroupsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureRSDQCComponentsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureRSDQCComponentGroupsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureBackgroundFilterComponentsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureBackgroundFilterComponentGroupsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureBackgroundQCComponentsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+    virtual void onFeatureBackgroundQCComponentGroupsUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
+  };
+
   /**
     @brief Base class for all tables
 
@@ -304,10 +394,11 @@ namespace SmartPeak
       session_handler_(session_handler),
       sequence_handler_(sequence_handler),
       plot_title_(id) {};
-    void setRefreshNeeded() { refresh_needed_ = true; };
     void draw() override;
+
   protected:
     virtual void updateScatterPlotData() = 0;
+
   protected:
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;

@@ -35,7 +35,13 @@ namespace SmartPeak
   class RunWorkflowWidget final : public Widget
   {
   public:
-    RunWorkflowWidget(ApplicationHandler& application_handler, SessionHandler& session_handler, WorkflowManager& workflow_manager) :
+    RunWorkflowWidget(ApplicationHandler& application_handler,
+      SessionHandler& session_handler, 
+      WorkflowManager& workflow_manager, 
+      IApplicationProcessorObserver& application_processor_observer,
+      ISequenceProcessorObserver& sequence_processor_observer) :
+      application_processor_observer_(application_processor_observer),
+      sequence_processor_observer_(sequence_processor_observer),
       application_handler_(application_handler),
       session_handler_(session_handler),
       workflow_manager_(workflow_manager)
@@ -47,6 +53,8 @@ namespace SmartPeak
   protected:
     bool popup_file_picker_ = false;
     FilePicker file_picker_;
+    IApplicationProcessorObserver& application_processor_observer_;
+    ISequenceProcessorObserver& sequence_processor_observer_;
     ApplicationHandler& application_handler_;
     SessionHandler& session_handler_;
     WorkflowManager& workflow_manager_;

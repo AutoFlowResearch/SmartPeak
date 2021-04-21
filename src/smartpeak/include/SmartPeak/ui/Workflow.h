@@ -26,6 +26,7 @@
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/WorkflowStepWidget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/WorkflowManager.h>
 #include <string>
 #include <vector>
 
@@ -35,20 +36,19 @@ namespace SmartPeak
   {
   public:
 
-    Workflow(const std::string title, ApplicationHandler& application_handler)
+    Workflow(const std::string title, ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
       : Widget(title),
       application_handler_(application_handler),
-      workflow_step_widget_(application_handler)
+      workflow_step_widget_(application_handler),
+      workflow_manager_(workflow_manager)
     {
     };
 
     void draw() override;
 
-    void setEditable(bool editable) { editable_ = editable; };
-
   protected:
     ApplicationHandler& application_handler_;
     WorkflowStepWidget workflow_step_widget_;
-    bool editable_ = true;
+    WorkflowManager& workflow_manager_;
   };
 }

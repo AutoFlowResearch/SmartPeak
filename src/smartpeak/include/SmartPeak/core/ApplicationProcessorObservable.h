@@ -23,26 +23,47 @@
 
 #pragma once
 
-#include <SmartPeak/iface/IParametersObserver.h>
+#include <SmartPeak/iface/IApplicationProcessorObserver.h>
 #include <memory>
 #include <vector>
 #include <algorithm>
 
 namespace SmartPeak
 {
-  class ParametersObservable
+  class ApplicationProcessorObservable
   {
   public:
-    virtual void addParametersObserver(IParametersObserver* observer) { observers_.push_back(observer); };
-    virtual void removeParametersObserver(IParametersObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
-    void notifyParametersUpdated()
+    virtual void addApplicationProcessorObserver(IApplicationProcessorObserver* observer) { observers_.push_back(observer); };
+    virtual void removeApplicationProcessorObserver(IApplicationProcessorObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
+    void notifyApplicationProcessorStart(const size_t nb_commands)
     {
       for (auto& observer : observers_)
       {
-        observer->onParametersUpdated();
+        observer->onApplicationProcessorStart(nb_commands);
+      }
+    }
+    void notifyApplicationProcessorCommandStart(size_t command_index, const std::string& command_name)
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onApplicationProcessorCommandStart(command_index, command_name);
+      }
+    }
+    void notifyApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name)
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onApplicationProcessorCommandEnd(command_index, command_name);
+      }
+    }
+    void notifyApplicationProcessorEnd()
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onApplicationProcessorEnd();
       }
     }
   protected:
-    std::vector<IParametersObserver*> observers_;
+    std::vector<IApplicationProcessorObserver*> observers_;
   };
 }

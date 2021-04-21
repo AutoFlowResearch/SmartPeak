@@ -50,12 +50,12 @@ namespace SmartPeak
     application_handler_.sequenceHandler_.removeWorkflowObserver(this);
   }
 
-  void ParametersTableWidget::parametersUpdated()
+  void ParametersTableWidget::onParametersUpdated()
   {
     refresh_needed_ = true;
   }
 
-  void ParametersTableWidget::workflowUpdated()
+  void ParametersTableWidget::onWorkflowUpdated()
   {
     refresh_needed_ = true;
   }

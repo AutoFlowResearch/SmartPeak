@@ -30,6 +30,6 @@ namespace SmartPeak
     /**
       Workflow has been updated
     */
-    virtual void workflowUpdated() = 0;
+    virtual void onWorkflowUpdated() = 0;
   };
 }

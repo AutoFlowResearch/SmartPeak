@@ -63,7 +63,7 @@ namespace SmartPeak
     /**
     ISequenceObserver
     */
-    virtual void sequenceUpdated() override
+    virtual void onSequenceUpdated() override
     {
       data_changed_ = true;
     }

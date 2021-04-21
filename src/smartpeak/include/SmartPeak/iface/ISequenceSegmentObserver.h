@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -17,32 +17,29 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
 
-#include <SmartPeak/iface/IParametersObserver.h>
-#include <memory>
-#include <vector>
-#include <algorithm>
-
-namespace SmartPeak
+namespace SmartPeak 
 {
-  class ParametersObservable
+  struct ISequenceSegmentObserver 
   {
-  public:
-    virtual void addParametersObserver(IParametersObserver* observer) { observers_.push_back(observer); };
-    virtual void removeParametersObserver(IParametersObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
-    void notifyParametersUpdated()
-    {
-      for (auto& observer : observers_)
-      {
-        observer->onParametersUpdated();
-      }
-    }
-  protected:
-    std::vector<IParametersObserver*> observers_;
+    virtual void onQuantitationMethodsUpdated() = 0;
+    virtual void onStandardsConcentrationsUpdated() = 0;
+    virtual void onFeatureFiltersComponentsUpdated() = 0;
+    virtual void onFeatureFiltersComponentGroupsUpdated() = 0;
+    virtual void onFeatureQCComponentsUpdated() = 0;
+    virtual void onFeatureQCComponentGroupsUpdated() = 0;
+    virtual void onFeatureRSDFilterComponentsUpdated() = 0;
+    virtual void onFeatureRSDFilterComponentGroupsUpdated() = 0;
+    virtual void onFeatureRSDQCComponentsUpdated() = 0;
+    virtual void onFeatureRSDQCComponentGroupsUpdated() = 0;
+    virtual void onFeatureBackgroundFilterComponentsUpdated() = 0;
+    virtual void onFeatureBackgroundFilterComponentGroupsUpdated() = 0;
+    virtual void onFeatureBackgroundQCComponentsUpdated() = 0;
+    virtual void onFeatureBackgroundQCComponentGroupsUpdated() = 0;
   };
 }
