@@ -175,7 +175,7 @@ namespace SmartPeak
           {
             selected_entry = row;
             std::strcpy(selected_filename, Im_directory_entries[selected_entry].entry_contents[0].c_str());
-            if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item.entry_contents[2].c_str() , "Directory") )
+            if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item.entry_contents[2].c_str() , "Directory"))
             {
               if (current_pathname_.back() != '/')
               {
@@ -190,7 +190,7 @@ namespace SmartPeak
               selected_entry = -1;
               break;
             }
-            else if (ImGui::IsMouseDoubleClicked(0))
+            else if (ImGui::IsMouseDoubleClicked(0) || ImGui::IsMouseClicked(0))
             {
               picked_pathname_ = current_pathname_;
               if (selected_entry >= 0)
@@ -208,14 +208,7 @@ namespace SmartPeak
               LOGI << "Picked file : " << picked_pathname_;
               ImGui::CloseCurrentPopup();
             }
-            current_pathname_.append(pathname_content_[0][selected_entry]);
           }
-          //current_pathname_.append(pathname_content_[0][selected_entry]);
-          pathname_content_ = Utilities::getFolderContents(current_pathname_, std::make_tuple ("last_write_time", "descending"));
-          filter.Clear();
-          selected_entry = -1;
-          selected_filename[0] = '\0';
-          break; // IMPORTANT: because the following lines in the loop assume accessing old/previous pathname_content_'s data
         }
       }
       ImGui::EndTable();
