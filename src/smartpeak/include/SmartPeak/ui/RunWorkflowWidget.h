@@ -18,37 +18,37 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
-
 #pragma once
 
 #include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/WorkflowStepWidget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/ui/FilePicker.h>
+
 #include <string>
 #include <vector>
 
 namespace SmartPeak
 {
-  class Workflow final : public Widget
+  class RunWorkflowWidget final : public Widget
   {
   public:
-
-    Workflow(const std::string title, ApplicationHandler& application_handler)
-      : Widget(title),
+    RunWorkflowWidget(ApplicationHandler& application_handler, SessionHandler& session_handler, WorkflowManager& workflow_manager) :
       application_handler_(application_handler),
-      workflow_step_widget_(application_handler)
+      session_handler_(session_handler),
+      workflow_manager_(workflow_manager)
     {
     };
 
     void draw() override;
 
-    void setEditable(bool editable) { editable_ = editable; };
-
   protected:
+    bool popup_file_picker_ = false;
+    FilePicker file_picker_;
     ApplicationHandler& application_handler_;
-    WorkflowStepWidget workflow_step_widget_;
-    bool editable_ = true;
+    SessionHandler& session_handler_;
+    WorkflowManager& workflow_manager_;
   };
 }

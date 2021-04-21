@@ -18,37 +18,35 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
-#pragma once
-
-#include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/WorkflowStepWidget.h>
-#include <SmartPeak/core/ApplicationHandler.h>
-#include <string>
-#include <vector>
+#include <SmartPeak/ui/LogWidget.h>
+#include <imgui.h>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
-  class Workflow final : public Widget
+  void LogWidget::draw()
   {
-  public:
+    const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
+    static int selected_severity = 4;
+    static plog::Severity severity = plog::Severity::info;
 
-    Workflow(const std::string title, ApplicationHandler& application_handler)
-      : Widget(title),
-      application_handler_(application_handler),
-      workflow_step_widget_(application_handler)
+    if (ImGui::Combo("Level", &selected_severity, items, IM_ARRAYSIZE(items)))
     {
-    };
+      severity = plog::severityFromString(items[selected_severity]);
+    }
 
-    void draw() override;
-
-    void setEditable(bool editable) { editable_ = editable; };
-
-  protected:
-    ApplicationHandler& application_handler_;
-    WorkflowStepWidget workflow_step_widget_;
-    bool editable_ = true;
-  };
+    ImGui::Separator();
+    ImGui::BeginChild("Log child");
+    const std::vector<plog::util::nstring> message_list = appender_.getMessageList(severity);
+    int message_list_start = (message_list.size() > 500) ? message_list.size() - 500 : 0;
+    for (int i = message_list_start; i < message_list.size(); ++i)
+    {
+      std::string str(message_list.at(i).data(), message_list.at(i).data() + message_list.at(i).size());
+      ImGui::Text("%s", str.c_str());
+    }
+    ImGui::EndChild();
+  }
 }

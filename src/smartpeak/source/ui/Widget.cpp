@@ -97,7 +97,22 @@ namespace SmartPeak
 
   void GenericTableWidget::draw()
   {
-    if (headers_.size() <= 0)
+    // get data, if getter is provided
+    if (session_handler_ && sequence_handler_ && data_getter_)
+    {
+      session_handler_->setMinimalDataAndFilters(*sequence_handler_);
+      (session_handler_->*data_getter_)(*sequence_handler_, table_data_);
+      if (data_filter_)
+      {
+        checked_rows_ = (session_handler_->*data_filter_)(table_data_.body_);
+      }
+      else
+      {
+        checked_rows_ = Eigen::Tensor<bool, 1>();
+      }
+    }
+
+    if (table_data_.headers_.size() <= 0)
       return;
 
     const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
@@ -111,53 +126,53 @@ namespace SmartPeak
     filter.Draw("Find");
 
     // drop-down list for search field(s)
-    cols.resize(headers_.size() + 1);
-    for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
+    cols.resize(table_data_.headers_.size() + 1);
+    for (size_t header_name = 0; header_name < table_data_.headers_.size() + 1; ++header_name) {
       if (header_name == 0)
       {
         cols[header_name] = "All";
       }
       else if (header_name > 0)
       {
-        cols[header_name] = headers_(header_name - 1).c_str();
+        cols[header_name] = table_data_.headers_(header_name - 1).c_str();
       }
     }
 
     ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
 
-    if (columns_.dimension(0) == table_entries_.size())
+    if (table_data_.body_.dimension(0) == table_entries_.size())
       table_scanned_ = true;
     else
       table_scanned_ = false;
 
-    if (columns_.dimensions().TotalSize() > 0) {
+    if (table_data_.body_.dimensions().TotalSize() > 0) {
       updateTableContents(table_entries_, table_scanned_,
-        columns_, Eigen::Tensor<bool, 2>());
+        table_data_.body_, Eigen::Tensor<bool, 2>());
     }
     
     if (table_scanned_ && table_entries_.size() > 0) {
-      if (headers_.size() != table_entries_[0].entry_contents.size()) {
+      if (table_data_.headers_.size() != table_entries_[0].entry_contents.size()) {
         table_scanned_ = false;
       }
     }
 
-    if (ImGui::BeginTable(table_id_.c_str(), headers_.size(), table_flags)) {
+    if (ImGui::BeginTable(table_id_.c_str(), table_data_.headers_.size(), table_flags)) {
       // First row entry_contents
-      for (int col = 0; col < headers_.size(); col++) {
-        ImGui::TableSetupColumn(headers_(col).c_str());
+      for (int col = 0; col < table_data_.headers_.size(); col++) {
+        ImGui::TableSetupColumn(table_data_.headers_(col).c_str());
       }
-      ImGui::TableSetupScrollFreeze(headers_.size(), 1);
+      ImGui::TableSetupScrollFreeze(table_data_.headers_.size(), 1);
       ImGui::TableHeadersRow();
 
-      if (columns_.size() > 0) {
-        for (size_t row = 0; row < columns_.dimension(0); ++row) {
+      if (table_data_.body_.size() > 0) {
+        for (size_t row = 0; row < table_data_.body_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
 
             if (searcher(table_entries_, selected_col, filter, row))
               continue;
 
             ImGui::TableNextRow();
-            for (size_t col = 0; col < headers_.size(); ++col) {
+            for (size_t col = 0; col < table_data_.headers_.size(); ++col) {
               if (table_scanned_ == true && !table_entries_.empty())
               {
                 ImGui::TableSetColumnIndex(col);
@@ -178,7 +193,7 @@ namespace SmartPeak
 
   void ExplorerWidget::draw()
   {
-    if (headers_.size() <= 0)
+    if (table_data_.headers_.size() <= 0)
       return;
 
     // headers
@@ -193,50 +208,50 @@ namespace SmartPeak
     filter.Draw("Find");
 
     // drop-down list for search field(s)
-    cols.resize(headers_.size() + 1);
-    for (size_t header_name = 0; header_name < headers_.size() + 1; ++header_name) {
+    cols.resize(table_data_.headers_.size() + 1);
+    for (size_t header_name = 0; header_name < table_data_.headers_.size() + 1; ++header_name) {
       if (header_name == 0)
       {
         cols[header_name] = "All";
       }
       else if (header_name > 0)
       {
-        cols[header_name] = headers_(header_name - 1).c_str();
+        cols[header_name] = table_data_.headers_(header_name - 1).c_str();
       }
     }
 
     ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
 
-    if (columns_.dimension(0) == table_entries_.size())
+    if (table_data_.body_.dimension(0) == table_entries_.size())
       table_scanned_ = true;
     else
       table_scanned_ = false;
 
-    if (columns_.dimensions().TotalSize() > 0) {
+    if (table_data_.body_.dimensions().TotalSize() > 0) {
       updateTableContents(table_entries_, table_scanned_,
-        columns_, *checkbox_columns_);
+        table_data_.body_, *checkbox_columns_);
     }
     
     if (table_scanned_ && table_entries_.size() > 0) {
-      if (headers_.size()+checkbox_headers_.size() != table_entries_[0].entry_contents.size()) {
+      if (table_data_.headers_.size()+checkbox_headers_.size() != table_entries_[0].entry_contents.size()) {
         table_scanned_ = false;
       }
     }
 
-    if (ImGui::BeginTable(table_id_.c_str(), headers_.size() + checkbox_headers_.size(), table_flags)) {
+    if (ImGui::BeginTable(table_id_.c_str(), table_data_.headers_.size() + checkbox_headers_.size(), table_flags)) {
       // First row headers
-      for (int col = 0; col < headers_.size(); col++) {
-        ImGui::TableSetupColumn(headers_(col).c_str(), col == 0 ? column_0_flags : column_any_flags, -1.0f, col);
+      for (int col = 0; col < table_data_.headers_.size(); col++) {
+        ImGui::TableSetupColumn(table_data_.headers_(col).c_str(), col == 0 ? column_0_flags : column_any_flags, -1.0f, col);
       }
       for (int col = 0; col < checkbox_headers_.size(); col++) {
         ImGui::TableSetupColumn(checkbox_headers_(col).c_str());
       }
 
-      ImGui::TableSetupScrollFreeze(headers_.size() + checkbox_headers_.size(), 1);
+      ImGui::TableSetupScrollFreeze(table_data_.headers_.size() + checkbox_headers_.size(), 1);
       ImGui::TableHeadersRow();
 
-      if (columns_.size() > 0) {
-        for (size_t row = 0; row < columns_.dimension(0); ++row) {
+      if (table_data_.body_.size() > 0) {
+        for (size_t row = 0; row < table_data_.body_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row)))
           {
             if (searcher(table_entries_, selected_col, filter, row))
@@ -244,21 +259,21 @@ namespace SmartPeak
 
             ImGui::TableNextRow();
             
-            for (size_t header_idx = 0; header_idx < columns_.dimension(1) + checkbox_columns_->dimension(1); ++header_idx)
+            for (size_t header_idx = 0; header_idx < table_data_.body_.dimension(1) + checkbox_columns_->dimension(1); ++header_idx)
             {
               if (table_scanned_ == true && !table_entries_.empty())
               {
-                if (header_idx < columns_.dimension(1)) {
+                if (header_idx < table_data_.body_.dimension(1)) {
                   ImGui::TableSetColumnIndex(header_idx);
                   ImGui::Text("%s", table_entries_[row].entry_contents[header_idx].c_str());
                 }
-                else if (header_idx < columns_.dimension(1) + checkbox_columns_->dimension(1))
+                else if (header_idx < table_data_.body_.dimension(1) + checkbox_columns_->dimension(1))
                 {
-                  std::string id = table_id_ + std::to_string(header_idx) + std::to_string(row * columns_.dimension(1));
+                  std::string id = table_id_ + std::to_string(header_idx) + std::to_string(row * table_data_.body_.dimension(1));
                   ImGui::TableSetColumnIndex(header_idx);
                   ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 0.0f));
                   
-                  std::size_t checkbox_idx = header_idx - static_cast<std::size_t>(columns_.dimension(1));
+                  std::size_t checkbox_idx = header_idx - static_cast<std::size_t>(table_data_.body_.dimension(1));
                   bool is_checked;
                   if (!std::strcmp(table_entries_[row].entry_contents[header_idx].c_str(), "true"))
                   is_checked = true;
@@ -319,14 +334,14 @@ namespace SmartPeak
     if (ImPlot::BeginPlot(plot_title_.c_str(),
                           x_axis_title_.c_str(),
                           y_axis_title_.c_str(),
-                          ImVec2(plot_width_ - 25, plot_height_ - 40),
+                          ImVec2(width_ - 25, height_ - 40),
                           imPlotFlags,
                           imPlotAxisFlagsX)) {
       for (int i = 0; i < x_data_.dimension(1); ++i) {
         ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
         Eigen::Tensor<float, 1> x_data = x_data_.chip(i, 1);
         Eigen::Tensor<float, 1> y_data = y_data_.chip(i, 1);
-        ImPlot::PlotLine(series_names_(i).c_str(), x_data.data(), y_data.data(), x_data_.dimension(0));
+        ImPlot::PlotLine((*series_names_)(i).c_str(), x_data.data(), y_data.data(), x_data_.dimension(0));
       }
       is_hovered = ImPlot::IsPlotHovered();
       if (is_hovered)
@@ -360,11 +375,11 @@ namespace SmartPeak
                 ImGui::Separator();
               }
               std::ostringstream os;
-              os << "Injection: " << x_labels_(injection_number);
+              os << "Injection: " << (*x_labels_)(injection_number);
               ImGui::Text(os.str().c_str());
               os.str("");
               os.clear();
-              os << "Series: " << series_names_(i);
+              os << "Series: " << (*series_names_)(i);
               ImGui::Text(os.str().c_str());
               os.str("");
               os.clear();
@@ -393,11 +408,11 @@ namespace SmartPeak
     ImGui::Checkbox("Legend", &show_legend_);
     float controls_pos_end_y = ImGui::GetCursorPosY();
     // Main graphic
-    float graphic_height = plot_height_ - (controls_pos_end_y - controls_pos_start_y);
+    float graphic_height = height_ - (controls_pos_end_y - controls_pos_start_y);
     ImPlot::SetNextPlotLimits(current_range_.first, current_range_.second, chrom_.y_min_, chrom_.y_max_, ImGuiCond_Always);
     ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
     plotFlags |= ImPlotFlags_Crosshairs;
-    if (ImPlot::BeginPlot(plot_title_.c_str(), chrom_.x_axis_title_.c_str(), chrom_.y_axis_title_.c_str(), ImVec2(plot_width_ - 25, graphic_height - 40), plotFlags)) {
+    if (ImPlot::BeginPlot(plot_title_.c_str(), chrom_.x_axis_title_.c_str(), chrom_.y_axis_title_.c_str(), ImVec2(width_ - 25, graphic_height - 40), plotFlags)) {
       int i = 0;
       for (const auto& serie_name_scatter : chrom_.series_names_scatter_)
       {

@@ -3,15 +3,18 @@ set(directory source/ui)
 
 ### list all filenames of the directory here
 set(sources_list
+	AboutWidget.cpp
 	CalibratorsPlotWidget.cpp
 	ChromatogramPlotWidget.cpp
 	FilePicker.cpp
 	GuiAppender.cpp
 	Heatmap2DWidget.cpp
 	InfoWidget.cpp
+	LogWidget.cpp
 	ParameterEditorWidget.cpp
 	ParametersTableWidget.cpp
 	Report.cpp
+	RunWorkflowWidget.cpp
 	SpectraPlotWidget.cpp
 	StatisticsWidget.cpp
 	Widget.cpp
