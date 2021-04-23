@@ -102,7 +102,7 @@ namespace SmartPeak
             for (const auto& subordinate : feature.getSubordinates())
             {
               const auto& native_id = subordinate.getMetaValue("native_id");
-              if (native_id.valueType() == OpenMS::DataValue::STRING_VALUE)
+              if (native_id.valueType() == OpenMS::ParamValue::STRING_VALUE)
               {
                 feature_counter[native_id]++;
               }
