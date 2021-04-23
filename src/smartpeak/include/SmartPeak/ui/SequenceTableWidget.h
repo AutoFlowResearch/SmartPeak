@@ -68,7 +68,11 @@ namespace SmartPeak
 
     void drawXEditor();
 
+  private:
+    void setInputTextField(const std::string& value);
+
   protected:
+    std::array<char, 256> input_text_field_ = { 0 };
   };
 
 }

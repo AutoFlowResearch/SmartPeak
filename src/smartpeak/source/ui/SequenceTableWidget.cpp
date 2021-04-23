@@ -53,6 +53,18 @@ namespace SmartPeak
     ImGui::SetCursorPosX(cursor_pos);
 
     ImGui::Text("Placeholder");
+    std::vector<std::string> possible_values = { "test1","test2","test3" };
+    if (!possible_values.empty() && ImGui::BeginCombo("Value", input_text_field_.data()))
+    {
+      for (const auto valid_string : possible_values)
+      {
+        if (ImGui::Selectable(valid_string.c_str()))
+        {
+          setInputTextField(valid_string);
+        }
+      }
+      ImGui::EndCombo();
+    }
     ImGui::Separator();
 
 
@@ -68,5 +80,21 @@ namespace SmartPeak
     }
 
     ImGui::EndPopup();
+  }
+
+  void SequenceTableWidget::setInputTextField(const std::string& value)
+  {
+    std::fill(input_text_field_.begin(), input_text_field_.end(), 0);
+    if (value.size() < input_text_field_.size())
+    {
+      std::copy(value.begin(), value.end(), input_text_field_.data());
+    }
+    else
+    {
+      // else we are in trouble, abnormal long value parameter, do not display.
+      // LOGE << "ParameterEditorWidget : Parameter value for " << parameter_.getName() << " is too long to display. (" << value.size() << ")";
+      std::string long_value_placeholder("# unable to display");
+      std::copy(long_value_placeholder.begin(), long_value_placeholder.end(), input_text_field_.data());
+    };
   }
 }
