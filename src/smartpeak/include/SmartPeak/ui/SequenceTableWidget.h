@@ -64,6 +64,9 @@ namespace SmartPeak
 
     virtual bool isEditable(const size_t row, const size_t col) const override;
     virtual void onEdit(const size_t row, const size_t col) override;
+    virtual void drawPopups();
+
+    void drawXEditor();
 
   protected:
   };

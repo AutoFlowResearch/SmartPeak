@@ -156,6 +156,7 @@ namespace SmartPeak
       }
     }
 
+    bool edit_cell = false;
     if (ImGui::BeginTable(table_id_.c_str(), table_data_.headers_.size(), table_flags)) {
       // First row entry_contents
       for (int col = 0; col < table_data_.headers_.size(); col++) {
@@ -176,18 +177,19 @@ namespace SmartPeak
               if (table_scanned_ == true && !table_entries_.empty())
               {
                 ImGui::TableSetColumnIndex(col);
-                bool hovered = (col == hovered_col) && (row == hovered_row);
+                bool hovered = (col == hovered_col_) && (row == hovered_row_);
                 if (hovered && isEditable(row, col)) ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
                 ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());
                 if (hovered && isEditable(row, col)) ImGui::PopStyleColor();
+                
                 if (ImGui::IsItemHovered())
                 {
-                  hovered_row = row;
-                  hovered_col = col;
+                  hovered_row_ = row;
+                  hovered_col_ = col;
                 }
                 if (ImGui::IsItemClicked() && isEditable(row, col))
                 {
-                  onEdit(row, col);
+                  edit_cell = true;
                 }
               }
             }
@@ -195,10 +197,18 @@ namespace SmartPeak
         }
       }
 
+      // we need to call onEdit outside the drawing of the table
+      if (edit_cell)
+      {
+        onEdit(hovered_row_, hovered_col_);
+      }
+      drawPopups();
+
       if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
       {
         sorter(table_entries_, sorts_specs, table_scanned_);
       }
+
       ImGui::EndTable();
     }
   }

@@ -32,6 +32,41 @@ namespace SmartPeak
 
   void SequenceTableWidget::onEdit(const size_t row, const size_t col)
   {
-    int break_here = 0;
+    ImGui::OpenPopup("Edit Sequence");
+  }
+
+  void SequenceTableWidget::drawPopups()
+  {
+    drawXEditor();
+  }
+
+  void SequenceTableWidget::drawXEditor()
+  {
+    float popup_width = 400;
+
+    if (!ImGui::BeginPopupModal("Edit Sequence", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
+      return;
+    }
+    // one documented way to set popup width
+    const auto cursor_pos = ImGui::GetCursorPosX();
+    ImGui::SetCursorPosX(popup_width);
+    ImGui::SetCursorPosX(cursor_pos);
+
+    ImGui::Text("Placeholder");
+    ImGui::Separator();
+
+
+    if (ImGui::Button("OK"))
+    {
+      ImGui::CloseCurrentPopup();
+    }
+
+    ImGui::SameLine();
+    if (ImGui::Button("Cancel"))
+    {
+      ImGui::CloseCurrentPopup();
+    }
+
+    ImGui::EndPopup();
   }
 }
