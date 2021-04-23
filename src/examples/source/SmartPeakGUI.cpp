@@ -44,6 +44,7 @@
 #include <SmartPeak/ui/RunWorkflowWidget.h>
 #include <SmartPeak/ui/AboutWidget.h>
 #include <SmartPeak/ui/LogWidget.h>
+#include <SmartPeak/ui/SequenceTableWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -108,7 +109,7 @@ int main(int argc, char** argv)
   auto transitions_explorer_window_ = std::make_shared<ExplorerWidget>("TransitionsExplorerWindow", "Transitions");
   auto features_explorer_window_ = std::make_shared<ExplorerWidget>("FeaturesExplorerWindow", "Features");
   auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Spectrum");
-  auto sequence_main_window_ = std::make_shared<GenericTableWidget>("SequenceMainWindow", "Sequence");
+  auto sequence_main_window_ = std::make_shared<SequenceTableWidget>("SequenceMainWindow", "Sequence");
   auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions");
   auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Spectrum");
   auto quant_method_main_window_ = std::make_shared<GenericTableWidget>("QuantMethodMainWindow", "Quantitation Method",

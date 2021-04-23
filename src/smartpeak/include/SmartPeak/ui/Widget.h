@@ -149,6 +149,8 @@ namespace SmartPeak
     */
     void sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs, const bool& is_scanned);
 
+    virtual bool isEditable(const size_t row, const size_t col) const { return false; };
+    virtual void onEdit(const size_t row, const size_t col) { };
 
     SessionHandler::GenericTableData table_data_;
     Eigen::Tensor<bool, 1> checked_rows_;
@@ -163,7 +165,8 @@ namespace SmartPeak
     bool table_scanned_;
     int selected_col = 0;
     std::vector<const char*> cols;
-    
+    int hovered_col = 0;
+    int hovered_row = 0;
   };
 
 

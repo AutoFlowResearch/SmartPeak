@@ -9,16 +9,17 @@ set(sources_list
 	FilePicker.cpp
 	GuiAppender.cpp
 	Heatmap2DWidget.cpp
+	ImEntry.cpp
 	InfoWidget.cpp
 	LogWidget.cpp
 	ParameterEditorWidget.cpp
 	ParametersTableWidget.cpp
 	Report.cpp
 	RunWorkflowWidget.cpp
+	SequenceTableWidget.cpp
 	SpectraPlotWidget.cpp
 	StatisticsWidget.cpp
 	Widget.cpp
-	ImEntry.cpp
 	WindowSizesAndPositions.cpp
 	Workflow.cpp
 	WorkflowStepWidget.cpp
