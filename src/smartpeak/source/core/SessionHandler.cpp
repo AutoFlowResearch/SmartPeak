@@ -1599,13 +1599,13 @@ namespace SmartPeak
     }
   }
   
-  bool SessionHandler::getChromatogramScatterPlot(const SequenceHandler & sequence_handler, 
+  void SessionHandler::getChromatogramScatterPlot(const SequenceHandler & sequence_handler, 
                                                   ScatterPlotData& result, 
                                                   const std::pair<float, float>& chrom_time_range,
                                                   const std::set<std::string>& sample_names,
-                                                  const std::set<std::string>& component_names)
+                                                  const std::set<std::string>& component_names) const
   {
-    const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
+    const int MAX_POINTS = 6000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
     int n_points = 0;
     if (sequence_handler.getSequence().size() > 0 &&
       (sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 ||
@@ -1624,6 +1624,7 @@ namespace SmartPeak
       result.x_data_scatter_.clear();
       result.y_data_scatter_.clear();
       result.series_names_scatter_.clear();
+      result.points_overflow = false;
       for (const auto& injection : sequence_handler.getSequence()) {
         if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
         // Extract out the raw data for plotting
@@ -1648,7 +1649,8 @@ namespace SmartPeak
           else 
           {
             LOGD << "Stopped adding points to the chromatogram plot";
-            return false;
+            result.points_overflow = true;
+            return;
           }
         }
         // Extract out the smoothed points for plotting
@@ -1675,26 +1677,25 @@ namespace SmartPeak
               else 
               {
                 LOGD << "Stopped adding points to the chromatogram plot";
-                return false;
+                result.points_overflow = true;
+                return;
               }
             }
           }
         }
       }
     }
-    if (n_points < MAX_POINTS) return true;
-    else return false;
   }
 
-  bool SessionHandler::getSpectrumScatterPlot(const SequenceHandler& sequence_handler,
+  void SessionHandler::getSpectrumScatterPlot(const SequenceHandler& sequence_handler,
     ScatterPlotData& result,
     const std::pair<float, float>& range,
     const std::set<std::string>& sample_names,
     const std::set<std::string>& scan_names,
-    const std::set<std::string>& component_group_names)
+    const std::set<std::string>& component_group_names) const
   {
     // Notes: native_id matches the spec NativeID (i.e., scan_names), PeptideRef matches the first annotation identifier
-    const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
+    const int MAX_POINTS = 6000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
     int n_points = 0;
     if (sequence_handler.getSequence().size() > 0 &&
        (sequence_handler.getSequence().at(0).getRawData().getExperiment().getSpectra().size() > 0 ||
@@ -1713,6 +1714,7 @@ namespace SmartPeak
       result.x_data_scatter_.clear();
       result.y_data_scatter_.clear();
       result.series_names_scatter_.clear();
+      result.points_overflow = false;
       for (const auto& injection : sequence_handler.getSequence()) {
         if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
         // Extract out the raw data for plotting
@@ -1736,7 +1738,8 @@ namespace SmartPeak
           else 
           {
             LOGD << "Stopped adding points to the spectra plot";
-            return false;
+            result.points_overflow = true;
+            return;
           }
         }
         // Extract out the smoothed points for plotting
@@ -1763,15 +1766,14 @@ namespace SmartPeak
               else 
               {
                 LOGD << "Stopped adding points to the spectra plot";
-                return false;
+                result.points_overflow = true;
+                return;
               }
             }
           }
         }
       }
     }
-    if (n_points < MAX_POINTS) return true;
-    else return false;
   }
   void SessionHandler::setFeatureLinePlot()
   {

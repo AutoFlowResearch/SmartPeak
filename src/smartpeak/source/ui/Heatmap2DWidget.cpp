@@ -76,7 +76,7 @@ namespace SmartPeak
           !compareInput(selected_transition_groups, heatmap_data_.selected_transition_groups_))
       {
         session_handler_.getHeatMap(sequence_handler_, heatmap_data_, selected_feature_);
-        // We need to handle "invalid" data - infinite values, or vey high - which will crash ImPlot.
+        // We need to handle "invalid" data - infinite values, or very high - which will crash ImPlot.
         invalid_data_ = false;
         for (int i = 0; i < heatmap_data_.feat_heatmap_row_labels.size(); ++i)
         {
