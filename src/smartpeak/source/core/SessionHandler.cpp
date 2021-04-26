@@ -1605,7 +1605,7 @@ namespace SmartPeak
                                                   const std::set<std::string>& sample_names,
                                                   const std::set<std::string>& component_names) const
   {
-    const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
+    const int MAX_POINTS = 6000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
     int n_points = 0;
     if (sequence_handler.getSequence().size() > 0 &&
       (sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 ||
@@ -1695,7 +1695,7 @@ namespace SmartPeak
     const std::set<std::string>& component_group_names) const
   {
     // Notes: native_id matches the spec NativeID (i.e., scan_names), PeptideRef matches the first annotation identifier
-    const int MAX_POINTS = 9000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
+    const int MAX_POINTS = 6000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
     int n_points = 0;
     if (sequence_handler.getSequence().size() > 0 &&
        (sequence_handler.getSequence().at(0).getRawData().getExperiment().getSpectra().size() > 0 ||
