@@ -408,39 +408,46 @@ namespace SmartPeak
     ImGui::Checkbox("Legend", &show_legend_);
     float controls_pos_end_y = ImGui::GetCursorPosY();
     // Main graphic
-    float graphic_height = height_ - (controls_pos_end_y - controls_pos_start_y);
-    ImPlot::SetNextPlotLimits(current_range_.first, current_range_.second, chrom_.y_min_, chrom_.y_max_, ImGuiCond_Always);
-    ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
-    plotFlags |= ImPlotFlags_Crosshairs;
-    if (ImPlot::BeginPlot(plot_title_.c_str(), chrom_.x_axis_title_.c_str(), chrom_.y_axis_title_.c_str(), ImVec2(width_ - 25, graphic_height - 40), plotFlags)) {
-      int i = 0;
-      for (const auto& serie_name_scatter : chrom_.series_names_scatter_)
-      {
-        assert(chrom_.x_data_scatter_.at(i).size() == chrom_.y_data_scatter_.at(i).size());
-        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_None);
-        ImPlot::PlotLine(serie_name_scatter.c_str(), chrom_.x_data_scatter_.at(i).data(), chrom_.y_data_scatter_.at(i).data(), chrom_.x_data_scatter_.at(i).size());
-        ImPlotMarker plot_marker = ImPlotMarker_Circle;
-        int feature_index = 0;
-        for (int  j = 0; j < chrom_.x_data_area_.size(); ++j) {
-          // Corresponding serie names are supposed to start with same name as the scatter name
-          if (chrom_.series_names_area_.at(j).rfind(serie_name_scatter) == 0)
-          {
-            assert(chrom_.x_data_area_.at(j).size() == chrom_.y_data_area_.at(j).size());
-            ImPlot::PushStyleVar(ImPlotStyleVar_Marker, plot_marker);
-            std::string legend_text = serie_name_scatter;
-            if (!compact_view_)
+    if (chrom_.points_overflow)
+    {
+      ImGui::Text("Unable to draw: too much points. Please reduce scope or unselect data.");
+    }
+    else
+    {
+      float graphic_height = height_ - (controls_pos_end_y - controls_pos_start_y);
+      ImPlot::SetNextPlotLimits(current_range_.first, current_range_.second, chrom_.y_min_, chrom_.y_max_, ImGuiCond_Always);
+      ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
+      plotFlags |= ImPlotFlags_Crosshairs;
+      if (ImPlot::BeginPlot(plot_title_.c_str(), chrom_.x_axis_title_.c_str(), chrom_.y_axis_title_.c_str(), ImVec2(width_ - 25, graphic_height - 40), plotFlags)) {
+        int i = 0;
+        for (const auto& serie_name_scatter : chrom_.series_names_scatter_)
+        {
+          assert(chrom_.x_data_scatter_.at(i).size() == chrom_.y_data_scatter_.at(i).size());
+          ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_None);
+          ImPlot::PlotLine(serie_name_scatter.c_str(), chrom_.x_data_scatter_.at(i).data(), chrom_.y_data_scatter_.at(i).data(), chrom_.x_data_scatter_.at(i).size());
+          ImPlotMarker plot_marker = ImPlotMarker_Circle;
+          int feature_index = 0;
+          for (int j = 0; j < chrom_.x_data_area_.size(); ++j) {
+            // Corresponding serie names are supposed to start with same name as the scatter name
+            if (chrom_.series_names_area_.at(j).rfind(serie_name_scatter) == 0)
             {
-              legend_text = chrom_.series_names_area_.at(j) + "::" + std::to_string(feature_index);
+              assert(chrom_.x_data_area_.at(j).size() == chrom_.y_data_area_.at(j).size());
+              ImPlot::PushStyleVar(ImPlotStyleVar_Marker, plot_marker);
+              std::string legend_text = serie_name_scatter;
+              if (!compact_view_)
+              {
+                legend_text = chrom_.series_names_area_.at(j) + "::" + std::to_string(feature_index);
+              }
+              ImPlot::PlotScatter(legend_text.c_str(), chrom_.x_data_area_.at(j).data(), chrom_.y_data_area_.at(j).data(), chrom_.x_data_area_.at(j).size());
+              plot_marker <<= 1;
+              if (plot_marker > ImPlotMarker_Asterisk) plot_marker = ImPlotMarker_Circle;
+              ++feature_index;
             }
-            ImPlot::PlotScatter(legend_text.c_str(), chrom_.x_data_area_.at(j).data(), chrom_.y_data_area_.at(j).data(), chrom_.x_data_area_.at(j).size());
-            plot_marker <<= 1;
-            if (plot_marker > ImPlotMarker_Asterisk) plot_marker = ImPlotMarker_Circle;
-            ++feature_index;
           }
+          ++i;
         }
-        ++i;
+        ImPlot::EndPlot();
       }
-      ImPlot::EndPlot();
     }
   }
   

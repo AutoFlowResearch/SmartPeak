@@ -126,6 +126,7 @@ namespace SmartPeak
       float x_max_ = 0.0f;
       float y_min_ = 0.0f;
       float y_max_ = 0.0f;
+      bool points_overflow = false; // true if all points were added and false if points were omitted due to performance
     };
 
     /*
@@ -136,14 +137,12 @@ namespace SmartPeak
     @param[in] range
     @param[in] sample_names
     @param[in] component_names
-
-    @returns true if all points were added and false if points were omitted due to performance
     */
-    bool getChromatogramScatterPlot(const SequenceHandler& sequence_handler, 
+    void getChromatogramScatterPlot(const SequenceHandler& sequence_handler, 
                                     ScatterPlotData& result,
                                     const std::pair<float, float>& range,
                                     const std::set<std::string>& sample_names,
-                                    const std::set<std::string>& component_names);
+                                    const std::set<std::string>& component_names) const;
     /*
     @brief Gets the spectrum data
 
@@ -153,15 +152,13 @@ namespace SmartPeak
     @param[in] sample_names
     @param[in] scan_names
     @param[in] component_group_names
-
-    @returns true if all points were added and false if points were omitted due to performance
     */
-    bool getSpectrumScatterPlot(const SequenceHandler& sequence_handler,
+    void getSpectrumScatterPlot(const SequenceHandler& sequence_handler,
                                 ScatterPlotData& result,
                                 const std::pair<float, float>& range,
                                 const std::set<std::string>& sample_names,
                                 const std::set<std::string>& scan_names,
-                                const std::set<std::string>& component_group_names);
+                                const std::set<std::string>& component_group_names) const;
     void setFeatureLinePlot();
 
     /*

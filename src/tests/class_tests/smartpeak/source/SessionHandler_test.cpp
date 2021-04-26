@@ -688,7 +688,8 @@ BOOST_AUTO_TEST_CASE(getSpectrumScatterPlot1)
   const std::pair<float, float> range = std::make_pair(0, 1800);
   const std::set<std::string> sample_names;
   const std::set<std::string> component_names;
-  BOOST_CHECK(session_handler.getChromatogramScatterPlot(testData.sequenceHandler, result, range, sample_names, component_names));
+  session_handler.getChromatogramScatterPlot(testData.sequenceHandler, result, range, sample_names, component_names);
+  BOOST_CHECK_EQUAL(result.points_overflow, false);
 }
 BOOST_AUTO_TEST_CASE(setSpectrumScatterPlot1)
 {
@@ -699,7 +700,8 @@ BOOST_AUTO_TEST_CASE(setSpectrumScatterPlot1)
   const std::set<std::string> sample_names;
   const std::set<std::string> scan_names;
   const std::set<std::string> component_group_names;
-  BOOST_CHECK(session_handler.getSpectrumScatterPlot(testData.sequenceHandler, result, range, sample_names, scan_names, component_group_names));
+  session_handler.getSpectrumScatterPlot(testData.sequenceHandler, result, range, sample_names, scan_names, component_group_names);
+  BOOST_CHECK_EQUAL(result.points_overflow, false);
 }
 BOOST_AUTO_TEST_CASE(setCalibratorsScatterLinePlot1)
 {
