@@ -52,6 +52,12 @@ namespace SmartPeak
         ParameterSet& parameters
       );
 
+      /**
+        Write parameters to csv file.
+
+        @param[in] filename Input csv file
+        @param[in] parameters a ParameterSet
+      */
       static void write(
         const std::string& filename,
         const ParameterSet& parameters
