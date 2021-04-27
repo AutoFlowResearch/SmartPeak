@@ -551,6 +551,21 @@ namespace SmartPeak
     ParametersObservable* parameters_observable_ = nullptr;
   };
 
+  struct StoreParameters : RawDataProcessor {
+    StoreParameters() = default;
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+    std::string filename_;
+
+    /* IProcessorDescription */
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_PARAMETERS"; }
+    std::string getDescription() const override { return "Store a parameters to file"; }
+  };
+
   struct FitFeaturesEMG : RawDataProcessor
   {
     int getID() const override { return 14; }

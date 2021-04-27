@@ -29,7 +29,6 @@
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Filenames.h>
-#include <boost/filesystem.hpp>
 
 using namespace SmartPeak;
 using namespace std;
@@ -759,7 +758,7 @@ BOOST_AUTO_TEST_CASE(StoreSequenceWorkflow1)
   application_handler.sequenceHandler_.setWorkflow(command_names);
   StoreSequenceWorkflow application_processor(application_handler);
   BOOST_CHECK_EQUAL(application_processor.getName(), "StoreSequenceWorkflow");
-  application_processor.pathname_ = (fs::temp_directory_path().append(fs::unique_path().string())).string();
+  application_processor.pathname_ = std::tmpnam(nullptr);
   BOOST_REQUIRE(application_processor.process());
   // compare with reference file
   const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");

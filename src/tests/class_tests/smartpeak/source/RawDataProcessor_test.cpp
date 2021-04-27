@@ -1104,7 +1104,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadParameters)
 
 BOOST_AUTO_TEST_CASE(processLoadParameters)
 {
-  // no tests, it calls FileReader::parseOpenMSParams and LoadParameters::sanitizeRawDataProcessorParameters
+  // no tests, it calls ParametersPArser::read and LoadParameters::sanitizeRawDataProcessorParameters
 }
 
 BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
