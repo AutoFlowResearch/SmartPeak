@@ -151,15 +151,15 @@ namespace SmartPeak
       for (const auto& injection : sequence_handler.getSequence()) {
         table_data.body_(row, col) = std::to_string(injection.getMetaData().inj_number);
         ++col;
-        table_data.body_(row, col) = injection.getMetaData().sample_name;
+        table_data.body_(row, col) = injection.getMetaData().getSampleName();
         ++col;
-        table_data.body_(row, col) = injection.getMetaData().sample_group_name;
+        table_data.body_(row, col) = injection.getMetaData().getSampleGroupName();
         ++col;
-        table_data.body_(row, col) = injection.getMetaData().sequence_segment_name;
+        table_data.body_(row, col) = injection.getMetaData().getSequenceSegmentName();
         ++col;
         table_data.body_(row, col) = injection.getMetaData().getSampleTypeAsString();
         ++col;
-        table_data.body_(row, col) = injection.getMetaData().original_filename;
+        table_data.body_(row, col) = injection.getMetaData().getFilename();
         ++col;
         table_data.body_(row, col) = injection.getMetaData().acq_method_name;
         ++col;

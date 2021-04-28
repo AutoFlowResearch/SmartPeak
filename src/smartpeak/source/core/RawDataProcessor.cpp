@@ -1082,7 +1082,7 @@ namespace SmartPeak
       m.emplace(s_height, height);
       m.emplace(s_area, area);
       MetaDataHandler mdh;
-      mdh.sample_name = sample_name;
+      mdh.setSampleName(sample_name);
       mdh.inj_number = sample_index;
       mdh.batch_name = experiment_id;
       mdh.setAcquisitionDateAndTimeFromString(acquisition_date_and_time, "%m-%d-%Y %H:%M");

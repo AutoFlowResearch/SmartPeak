@@ -1857,7 +1857,7 @@ BOOST_AUTO_TEST_CASE(validateFeatures)
   loadValidationData.process(rawDataHandler, params_1, filenames);
 
   MetaDataHandler& mdh = rawDataHandler.getMetaData();
-  mdh.sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file
+  mdh.setSampleName("150601_0_BloodProject01_PLT_QC_Broth-1"); // info taken from .csv file
   mdh.inj_number = 1;
   mdh.batch_name = "BloodProject01";
   mdh.setAcquisitionDateAndTimeFromString("09-06-2015 17:14", "%m-%d-%Y %H:%M");

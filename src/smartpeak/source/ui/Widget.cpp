@@ -140,10 +140,12 @@ namespace SmartPeak
 
     ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
 
+    /*
     if (table_data_.body_.dimension(0) == table_entries_.size())
       table_scanned_ = true;
     else
       table_scanned_ = false;
+    */
 
     if (table_data_.body_.dimensions().TotalSize() > 0) {
       updateTableContents(table_entries_, table_scanned_,
@@ -156,6 +158,7 @@ namespace SmartPeak
       }
     }
 
+    bool edit_cell = false;
     if (ImGui::BeginTable(table_id_.c_str(), table_data_.headers_.size(), table_flags)) {
       // First row entry_contents
       for (int col = 0; col < table_data_.headers_.size(); col++) {
@@ -176,7 +179,20 @@ namespace SmartPeak
               if (table_scanned_ == true && !table_entries_.empty())
               {
                 ImGui::TableSetColumnIndex(col);
+                bool hovered = (col == hovered_col_) && (row == hovered_row_);
+                if (hovered && isEditable(row, col)) ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
                 ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());
+                if (hovered && isEditable(row, col)) ImGui::PopStyleColor();
+                
+                if (ImGui::IsItemHovered())
+                {
+                  hovered_row_ = row;
+                  hovered_col_ = col;
+                }
+                if (ImGui::IsItemClicked() && isEditable(row, col))
+                {
+                  edit_cell = true;
+                }
               }
             }
           }
@@ -187,6 +203,14 @@ namespace SmartPeak
       {
         sorter(table_entries_, sorts_specs, table_scanned_);
       }
+
+      // we need to call onEdit outside the drawing of the table
+      if (edit_cell)
+      {
+        onEdit(hovered_row_, hovered_col_);
+      }
+      drawPopups();
+
       ImGui::EndTable();
     }
   }

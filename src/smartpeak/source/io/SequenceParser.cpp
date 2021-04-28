@@ -186,8 +186,8 @@ namespace SmartPeak
 
         if (delimiter == s_comma) 
         {
-          is_valid = in_comma.read_row(t.sample_name, t.sample_group_name,
-            t.sequence_segment_name, t_sample_type, t.original_filename,
+          is_valid = in_comma.read_row(t.getSampleName(), t.getSampleGroupName(),
+            t.getSequenceSegmentName(), t_sample_type, t.getFilename(),
             t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
             t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
             t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
@@ -195,8 +195,8 @@ namespace SmartPeak
         }
         else if (delimiter == s_semicolon)
         {
-          is_valid = in_semicolon.read_row(t.sample_name, t.sample_group_name,
-            t.sequence_segment_name, t_sample_type, t.original_filename,
+          is_valid = in_semicolon.read_row(t.getSampleName(), t.getSampleGroupName(),
+            t.getSequenceSegmentName(), t_sample_type, t.getFilename(),
             t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
             t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
             t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
@@ -204,8 +204,8 @@ namespace SmartPeak
         }
         else if (delimiter == s_tab)
         {
-          is_valid = in_tab.read_row(t.sample_name, t.sample_group_name,
-            t.sequence_segment_name, t_sample_type, t.original_filename,
+          is_valid = in_tab.read_row(t.getSampleName(), t.getSampleGroupName(),
+            t.getSequenceSegmentName(), t_sample_type, t.getFilename(),
             t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
             t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
             t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
@@ -246,11 +246,11 @@ namespace SmartPeak
         validateAndConvert(t_scan_mass_high, t.scan_mass_high);
 
         if (stringToSampleType.count(t_sample_type)) {
-          t.sample_type = stringToSampleType.at(t_sample_type);
+          t.setSampleType(stringToSampleType.at(t_sample_type));
         }
         else 
         {
-          t.sample_type = SampleType::Unrecognized;
+          t.setSampleType(SampleType::Unrecognized);
         }
 
         std::tm& adt = t.acquisition_date_and_time;
@@ -262,9 +262,9 @@ namespace SmartPeak
           adt.tm_mday = 1;
         }
 
-        if (t.original_filename.empty()) {
+        if (t.getFilename().empty()) {
           LOGW << "Warning: No value provided for the original filename. Will create a unique default filename.";
-          t.original_filename = t.getInjectionName();
+          t.setFilename(t.getInjectionName());
         }
 
         sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
@@ -554,7 +554,7 @@ namespace SmartPeak
           row.push_back(mdh.operator_name);
           row.push_back(mdh.acq_method_name);
           row.push_back(mdh.proc_method_name);
-          row.push_back(mdh.original_filename);
+          row.push_back(mdh.getFilename());
           row.push_back(mdh.getAcquisitionDateAndTimeAsString());
           row.push_back(mdh.scan_polarity);
           row.push_back(std::to_string(mdh.scan_mass_low));
@@ -611,7 +611,7 @@ namespace SmartPeak
           row.push_back(mdh.operator_name);
           row.push_back(mdh.acq_method_name);
           row.push_back(mdh.proc_method_name);
-          row.push_back(mdh.original_filename);
+          row.push_back(mdh.getFilename());
           row.push_back(mdh.getAcquisitionDateAndTimeAsString());
           row.push_back(mdh.scan_polarity);
           row.push_back(std::to_string(mdh.scan_mass_low));
