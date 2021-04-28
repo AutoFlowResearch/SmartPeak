@@ -179,15 +179,15 @@ namespace SmartPeak
               if (table_scanned_ == true && !table_entries_.empty())
               {
                 ImGui::TableSetColumnIndex(col);
-                bool hovered = (col == hovered_col_) && (row == hovered_row_);
-                if (hovered && isEditable(row, col)) ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-                ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());
-                if (hovered && isEditable(row, col)) ImGui::PopStyleColor();
-                
+                ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());               
                 if (ImGui::IsItemHovered())
                 {
                   hovered_row_ = row;
                   hovered_col_ = col;
+                  if (isEditable(row, col))
+                  {
+                    ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+                  }
                 }
                 if (ImGui::IsItemClicked() && isEditable(row, col))
                 {
