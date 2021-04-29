@@ -35,6 +35,29 @@
 
 namespace SmartPeak
 {
+  class SampleTypeEditorWidget : public Widget
+  {
+  public:
+
+    SampleTypeEditorWidget()
+    {
+      for (const auto& sample_type_entry : sampleTypeToString)
+      {
+        sequence_groups_.insert(sample_type_entry.second);
+      }
+    };
+
+    virtual void draw() override;
+
+    void open(InjectionHandler* injection, std::function<void(const std::string&)> ok_callback);
+
+  protected:
+    std::set<std::string> sequence_groups_;
+    InjectionHandler* injection_ = nullptr;
+    std::function<void(const std::string&)> ok_callback_;
+    std::string current_choice_;
+  };
+
   class SequenceTableWidget : public GenericTableWidget, public ISequenceObserver
   {
   public:
@@ -51,8 +74,8 @@ namespace SmartPeak
         sequence_handler,
         data_getter,
         data_filter),
-      sequence_segment_editor_("Edit Sequence Segment", "Move to existing segment", "Move to new segment", "New segment", "Select segment"),
-      sample_group_editor_("Edit Sample Group", "Move to existing group", "Move to new group", "New group", "Select group")
+      sequence_segment_editor_("Edit Sequence Segment", "Move to existing segment", "Create new segment", "New segment", "Select segment"),
+      sample_group_editor_("Edit Sample Group", "Move to existing group", "Create new group", "New group", "Select group")
     {
       sequence_handler_->addSequenceObserver(this);
     };
@@ -75,6 +98,7 @@ namespace SmartPeak
   protected:
     SequenceGroupsEditorWidget sequence_segment_editor_;
     SequenceGroupsEditorWidget sample_group_editor_;
+    SampleTypeEditorWidget sample_type_editor_;
   };
 
 }

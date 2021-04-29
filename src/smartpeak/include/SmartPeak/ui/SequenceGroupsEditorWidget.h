@@ -54,16 +54,13 @@ namespace SmartPeak
 
     virtual void draw() override;
 
-    void open(std::set<std::string>& choices, InjectionHandler* injection, std::function<void(const std::string&)> ok_callback);
-
-  private:
-    void setInputTextField(const std::string& value);
+    void open(std::set<std::string>& choices, const std::string& current_choice, InjectionHandler* injection, std::function<void(const std::string&)> ok_callback);
 
   protected:
-    std::array<char, 256> input_text_field_ = { 0 };
+    std::string current_choice_;
     std::string new_sequence_segment_;
     std::set<std::string> sequence_groups_;
-    InjectionHandler* injection_;
+    InjectionHandler* injection_ = nullptr;
     enum
     {
       EActionChoice_MoveSegment,

@@ -27,13 +27,17 @@
 namespace SmartPeak
 {
 
-  void SequenceGroupsEditorWidget::open(std::set<std::string>& choices, InjectionHandler* injection, std::function<void(const std::string&)> ok_callback)
+  void SequenceGroupsEditorWidget::open(std::set<std::string>& choices, 
+                                        const std::string& current_choice, 
+                                        InjectionHandler* injection, 
+                                        std::function<void(const std::string&)> ok_callback)
   {
+    action_choice_ = EActionChoice_MoveSegment;
     ok_callback_ = ok_callback;
     injection_ = injection;
     sequence_groups_ = choices;
     new_sequence_segment_.clear();
-    setInputTextField(injection_->getMetaData().getSequenceSegmentName());
+    current_choice_ = current_choice;
     ImGui::OpenPopup(title_.c_str());
   }
 
@@ -61,13 +65,13 @@ namespace SmartPeak
 
     if ((action_choice_ == EActionChoice_MoveSegment))
     {
-      if (!sequence_groups_.empty() && ImGui::BeginCombo(create_action_message_.c_str(), input_text_field_.data()))
+      if (!sequence_groups_.empty() && ImGui::BeginCombo(create_action_message_.c_str(), current_choice_.c_str()))
       {
         for (const auto valid_string : sequence_groups_)
         {
           if (ImGui::Selectable(valid_string.c_str()))
           {
-            setInputTextField(valid_string);
+            current_choice_ = valid_string;
           }
         }
         ImGui::EndCombo();
@@ -75,16 +79,16 @@ namespace SmartPeak
     }
 
     ImGui::Separator(); 
-    if (ImGui::Button("OK") && (!input_text_field_.empty()))
+    if (ImGui::Button("OK"))
     {
       if ((action_choice_ == EActionChoice_CreateSegment) && (!new_sequence_segment_.empty()))
       {
         ok_callback_(new_sequence_segment_);
         ImGui::CloseCurrentPopup();
       }
-      else if ((action_choice_ == EActionChoice_MoveSegment) && (!input_text_field_.empty()))
+      else if (action_choice_ == EActionChoice_MoveSegment)
       {
-        ok_callback_(std::string(input_text_field_.data()));
+        ok_callback_(current_choice_);
         ImGui::CloseCurrentPopup();
       }
     }
@@ -97,21 +101,4 @@ namespace SmartPeak
 
     ImGui::EndPopup();
   }
-
-  void SequenceGroupsEditorWidget::setInputTextField(const std::string& value)
-  {
-    std::fill(input_text_field_.begin(), input_text_field_.end(), 0);
-    if (value.size() < input_text_field_.size())
-    {
-      std::copy(value.begin(), value.end(), input_text_field_.data());
-    }
-    else
-    {
-      // else we are in trouble, abnormal long value parameter, do not display.
-      // LOGE << "ParameterEditorWidget : Parameter value for " << parameter_.getName() << " is too long to display. (" << value.size() << ")";
-      std::string long_value_placeholder("# unable to display");
-      std::copy(long_value_placeholder.begin(), long_value_placeholder.end(), input_text_field_.data());
-    };
-  }
-
 }
