@@ -26,124 +26,57 @@
 
 namespace SmartPeak
 {
+  static const size_t sequence_segment_col = 3;
+  static const size_t sample_group_col = 2;
+
   bool SequenceTableWidget::isEditable(const size_t row, const size_t col) const
   {
-    return (col == 3);
+    return ((col == sequence_segment_col) || (col == sample_group_col));
   }
 
   void SequenceTableWidget::onEdit(const size_t row, const size_t col)
   {
-    ImGui::OpenPopup("Edit Sequence Segment");
+    std::string sample_name = table_data_.body_(hovered_row_, 1);
+    auto find_it = std::find_if(sequence_handler_->getSequence().begin(),
+      sequence_handler_->getSequence().end(),
+      [&](const auto& injection_handler) { return injection_handler.getMetaData().getSampleName() == sample_name; });
+    assert(find_it != sequence_handler_->getSequence().end()); // This should never happen
+    InjectionHandler* injection = &(*find_it);
+    if (col == sequence_segment_col)
+    {
+      sequence_segment_editor_.open(getSequenceGroups(sequence_segment_col), injection,
+        [this, injection](const std::string& sequence_segment_name)
+      {
+        injection->getMetaData().setSequenceSegmentName(sequence_segment_name);
+        sequence_handler_->notifySequenceChanged();
+      });
+    }
+    else if (col == sample_group_col)
+    {
+      sample_group_editor_.open(getSequenceGroups(sample_group_col), injection,
+        [this, injection](const std::string& sample_group_name)
+      {
+        injection->getMetaData().setSampleGroupName(sample_group_name);
+        sequence_handler_->notifySequenceChanged();
+      });
+    }
   }
 
   void SequenceTableWidget::drawPopups()
   {
-    drawXEditor();
+    sequence_segment_editor_.draw();
+    sample_group_editor_.draw();
   }
 
-  void SequenceTableWidget::drawXEditor()
+  std::set<std::string> SequenceTableWidget::getSequenceGroups(const size_t col)
   {
-    float popup_width = 400;
-
-    if (!ImGui::BeginPopupModal("Edit Sequence Segment", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-      init_sequence_group_popup_ = false;
-      return;
-    }
-
-    if (!init_sequence_group_popup_)
-    {
-      getSequenceGroups();
-      new_sequence_segment_.clear();
-      sample_name = table_data_.body_(hovered_row_, 1);
-      auto find_it = std::find_if(sequence_handler_->getSequence().begin(),
-                                  sequence_handler_->getSequence().end(), 
-        [&](const auto& injection_handler) { return injection_handler.getMetaData().getSampleName() == sample_name; });
-      assert(find_it != sequence_handler_->getSequence().end()); // This should never happen
-      injection_ = &(*find_it);
-      setInputTextField(injection_->getMetaData().getSequenceSegmentName());
-      init_sequence_group_popup_ = true;
-    }
-
-    // one documented way to set popup width
-    const auto cursor_pos = ImGui::GetCursorPosX();
-    ImGui::SetCursorPosX(popup_width);
-    ImGui::SetCursorPosX(cursor_pos);
-
-    ImGui::RadioButton("Move to existing segment", &action_choice_, EActionChoice_MoveSegment);
-    ImGui::SameLine();
-    ImGui::RadioButton("Move to new segment", &action_choice_, EActionChoice_CreateSegment);
-
-    if (action_choice_ == EActionChoice_CreateSegment)
-    {
-      ImGui::InputText("New segment", &new_sequence_segment_);
-    }
-
-    if ((action_choice_ == EActionChoice_MoveSegment))
-    {
-      if (!sequence_groups_.empty() && ImGui::BeginCombo("Select segment", input_text_field_.data()))
-      {
-        for (const auto valid_string : sequence_groups_)
-        {
-          if (ImGui::Selectable(valid_string.c_str()))
-          {
-            setInputTextField(valid_string);
-          }
-        }
-        ImGui::EndCombo();
-      }
-    }
-
-    ImGui::Separator(); 
-    if (ImGui::Button("OK") && (!input_text_field_.empty()))
-    {
-      if ((action_choice_ == EActionChoice_CreateSegment) && (!new_sequence_segment_.empty()))
-      {
-        injection_->getMetaData().setSequenceSegmentName(new_sequence_segment_);
-        sequence_handler_->notifySequenceChanged();
-        ImGui::CloseCurrentPopup();
-      }
-      else if ((action_choice_ == EActionChoice_MoveSegment) && (!input_text_field_.empty()))
-      {
-        injection_->getMetaData().setSequenceSegmentName(std::string(input_text_field_.data()));
-        sequence_handler_->notifySequenceChanged();
-        ImGui::CloseCurrentPopup();
-      }
-    }
-
-    ImGui::SameLine();
-    if (ImGui::Button("Cancel"))
-    {
-      ImGui::CloseCurrentPopup();
-    }
-
-    ImGui::EndPopup();
-  }
-
-  void SequenceTableWidget::setInputTextField(const std::string& value)
-  {
-    std::fill(input_text_field_.begin(), input_text_field_.end(), 0);
-    if (value.size() < input_text_field_.size())
-    {
-      std::copy(value.begin(), value.end(), input_text_field_.data());
-    }
-    else
-    {
-      // else we are in trouble, abnormal long value parameter, do not display.
-      // LOGE << "ParameterEditorWidget : Parameter value for " << parameter_.getName() << " is too long to display. (" << value.size() << ")";
-      std::string long_value_placeholder("# unable to display");
-      std::copy(long_value_placeholder.begin(), long_value_placeholder.end(), input_text_field_.data());
-    };
-  }
-
-  void SequenceTableWidget::getSequenceGroups()
-  {
-    sequence_groups_.clear();
+    std::set<std::string> groups;
     for (size_t row = 0; row < table_data_.body_.dimension(0); ++row) {
       if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
-        const size_t col = 3;
         std::string group = table_data_.body_(row, col);
-        sequence_groups_.insert(group);
+        groups.insert(group);
       }
     }
+    return groups;
   }
 }

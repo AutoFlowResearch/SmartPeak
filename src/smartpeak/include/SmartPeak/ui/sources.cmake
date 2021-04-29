@@ -16,6 +16,7 @@ set(sources_list_h
 	ParametersTableWidget.h
 	Report.h
 	RunWorkflowWidget.h
+	SequenceGroupsEditorWidget.h
 	SequenceTableWidget.h
 	SpectraPlotWidget.h
 	StatisticsWidget.h

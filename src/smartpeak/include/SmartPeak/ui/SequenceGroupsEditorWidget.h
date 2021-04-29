@@ -17,8 +17,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Ahmed Khalil, Bertrand Boudaud $
-// $Authors: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Authors: Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
@@ -35,46 +35,46 @@
 
 namespace SmartPeak
 {
-  class SequenceTableWidget : public GenericTableWidget, public ISequenceObserver
+  class SequenceGroupsEditorWidget : public Widget
   {
   public:
 
-    SequenceTableWidget(const std::string& table_id,
-      const std::string title,
-      SessionHandler* session_handler,
-      SequenceHandler* sequence_handler,
-      DataGetterMethod data_getter = nullptr,
-      DataFilterMethod data_filter = nullptr)
-      : GenericTableWidget(table_id,
-        title,
-        session_handler,
-        sequence_handler,
-        data_getter,
-        data_filter),
-      sequence_segment_editor_("Edit Sequence Segment", "Move to existing segment", "Move to new segment", "New segment", "Select segment"),
-      sample_group_editor_("Edit Sample Group", "Move to existing group", "Move to new group", "New group", "Select group")
+    SequenceGroupsEditorWidget(const std::string& title,
+                              const std::string& move_option_message,
+                              const std::string& create_option_message,
+                              const std::string& move_action_message,
+                              const std::string& create_action_message):
+      Widget(title),
+      move_option_message_(move_option_message),
+      create_option_message_(create_option_message),
+      move_action_message_(move_action_message),
+      create_action_message_(create_action_message)
     {
-      sequence_handler_->addSequenceObserver(this);
     };
 
-    virtual bool isEditable(const size_t row, const size_t col) const override;
-    virtual void onEdit(const size_t row, const size_t col) override;
-    virtual void drawPopups();
+    virtual void draw() override;
 
-    /**
-    ISequenceObserver
-    */
-    virtual void sequenceUpdated() override
-    {
-      table_scanned_ = false;
-    }
+    void open(std::set<std::string>& choices, InjectionHandler* injection, std::function<void(const std::string&)> ok_callback);
 
   private:
-    std::set<std::string> getSequenceGroups(const size_t col);
+    void setInputTextField(const std::string& value);
 
   protected:
-    SequenceGroupsEditorWidget sequence_segment_editor_;
-    SequenceGroupsEditorWidget sample_group_editor_;
+    std::array<char, 256> input_text_field_ = { 0 };
+    std::string new_sequence_segment_;
+    std::set<std::string> sequence_groups_;
+    InjectionHandler* injection_;
+    enum
+    {
+      EActionChoice_MoveSegment,
+      EActionChoice_CreateSegment,
+    };
+    int action_choice_ = EActionChoice_MoveSegment;
+    std::function<void(const std::string&)> ok_callback_;
+    std::string move_option_message_;
+    std::string create_option_message_;
+    std::string move_action_message_;
+    std::string create_action_message_;
   };
 
 }
