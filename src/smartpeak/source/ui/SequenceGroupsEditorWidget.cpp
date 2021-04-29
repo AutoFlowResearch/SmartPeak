@@ -29,14 +29,12 @@ namespace SmartPeak
 
   void SequenceGroupsEditorWidget::open(std::set<std::string>& choices, 
                                         const std::string& current_choice, 
-                                        InjectionHandler* injection, 
                                         std::function<void(const std::string&)> ok_callback)
   {
     action_choice_ = EActionChoice_MoveSegment;
     ok_callback_ = ok_callback;
-    injection_ = injection;
-    sequence_groups_ = choices;
-    new_sequence_segment_.clear();
+    groups_ = choices;
+    new_group_.clear();
     current_choice_ = current_choice;
     ImGui::OpenPopup(title_.c_str());
   }
@@ -60,14 +58,14 @@ namespace SmartPeak
 
     if (action_choice_ == EActionChoice_CreateSegment)
     {
-      ImGui::InputText(move_action_message_.c_str(), &new_sequence_segment_);
+      ImGui::InputText(move_action_message_.c_str(), &new_group_);
     }
 
     if ((action_choice_ == EActionChoice_MoveSegment))
     {
-      if (!sequence_groups_.empty() && ImGui::BeginCombo(create_action_message_.c_str(), current_choice_.c_str()))
+      if (!groups_.empty() && ImGui::BeginCombo(create_action_message_.c_str(), current_choice_.c_str()))
       {
-        for (const auto valid_string : sequence_groups_)
+        for (const auto valid_string : groups_)
         {
           if (ImGui::Selectable(valid_string.c_str()))
           {
@@ -81,9 +79,9 @@ namespace SmartPeak
     ImGui::Separator(); 
     if (ImGui::Button("OK"))
     {
-      if ((action_choice_ == EActionChoice_CreateSegment) && (!new_sequence_segment_.empty()))
+      if ((action_choice_ == EActionChoice_CreateSegment) && (!new_group_.empty()))
       {
-        ok_callback_(new_sequence_segment_);
+        ok_callback_(new_group_);
         ImGui::CloseCurrentPopup();
       }
       else if (action_choice_ == EActionChoice_MoveSegment)

@@ -45,7 +45,7 @@ namespace SmartPeak
     InjectionHandler* injection = &(*find_it);
     if (col == sequence_segment_col)
     {
-      sequence_segment_editor_.open(getSequenceGroups(sequence_segment_col), injection->getMetaData().getSequenceSegmentName(), injection,
+      sequence_segment_editor_.open(getSequenceGroups(sequence_segment_col), injection->getMetaData().getSequenceSegmentName(), 
         [this, injection](const std::string& sequence_segment_name)
       {
         injection->getMetaData().setSequenceSegmentName(sequence_segment_name);
@@ -54,7 +54,7 @@ namespace SmartPeak
     }
     else if (col == sample_group_col)
     {
-      sample_group_editor_.open(getSequenceGroups(sample_group_col), injection->getMetaData().getSampleGroupName(), injection,
+      sample_group_editor_.open(getSequenceGroups(sample_group_col), injection->getMetaData().getSampleGroupName(), 
         [this, injection](const std::string& sample_group_name)
       {
         injection->getMetaData().setSampleGroupName(sample_group_name);
@@ -63,7 +63,7 @@ namespace SmartPeak
     }
     else if (col == sample_type_col)
     {
-      sample_type_editor_.open(injection,
+      sample_type_editor_.open(injection->getMetaData().getSampleTypeAsString(),
         [this, injection](const std::string& sample_type_name)
       {
         if (stringToSampleType.find(sample_type_name) != stringToSampleType.end())
@@ -95,11 +95,10 @@ namespace SmartPeak
     return groups;
   }
 
-  void SampleTypeEditorWidget::open(InjectionHandler* injection, std::function<void(const std::string&)> ok_callback)
+  void SampleTypeEditorWidget::open(const std::string& current_choice, std::function<void(const std::string&)> ok_callback)
   {
     ok_callback_ = ok_callback;
-    injection_ = injection;
-    current_choice_ = injection_->getMetaData().getSampleTypeAsString();
+    current_choice_ = current_choice;
     ImGui::OpenPopup("Edit Sample Type");
   }
 
@@ -116,9 +115,9 @@ namespace SmartPeak
     ImGui::SetCursorPosX(popup_width);
     ImGui::SetCursorPosX(cursor_pos);
 
-    if (!sequence_groups_.empty() && ImGui::BeginCombo("Select type", current_choice_.c_str()))
+    if (!groups_.empty() && ImGui::BeginCombo("Select type", current_choice_.c_str()))
     {
-      for (const auto valid_string : sequence_groups_)
+      for (const auto valid_string : groups_)
       {
         if (ImGui::Selectable(valid_string.c_str()))
         {

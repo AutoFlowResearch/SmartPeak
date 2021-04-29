@@ -40,10 +40,10 @@ namespace SmartPeak
   public:
 
     SequenceGroupsEditorWidget(const std::string& title,
-                              const std::string& move_option_message,
-                              const std::string& create_option_message,
-                              const std::string& move_action_message,
-                              const std::string& create_action_message):
+                               const std::string& move_option_message,
+                               const std::string& create_option_message,
+                               const std::string& move_action_message,
+                               const std::string& create_action_message):
       Widget(title),
       move_option_message_(move_option_message),
       create_option_message_(create_option_message),
@@ -54,13 +54,14 @@ namespace SmartPeak
 
     virtual void draw() override;
 
-    void open(std::set<std::string>& choices, const std::string& current_choice, InjectionHandler* injection, std::function<void(const std::string&)> ok_callback);
+    void open(std::set<std::string>& choices, 
+              const std::string& current_choice, 
+              std::function<void(const std::string&)> ok_callback);
 
   protected:
     std::string current_choice_;
-    std::string new_sequence_segment_;
-    std::set<std::string> sequence_groups_;
-    InjectionHandler* injection_ = nullptr;
+    std::string new_group_;
+    std::set<std::string> groups_;
     enum
     {
       EActionChoice_MoveSegment,

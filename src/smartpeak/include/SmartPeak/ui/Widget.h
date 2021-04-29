@@ -149,12 +149,31 @@ namespace SmartPeak
     */
     void sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs, const bool& is_scanned);
 
-    virtual bool isEditable(const size_t row, const size_t col) const { return false; };
-    virtual void onEdit(const size_t row, const size_t col) { };
-    virtual void drawPopups() { };
-
     SessionHandler::GenericTableData table_data_;
     Eigen::Tensor<bool, 1> checked_rows_;
+
+  protected:
+    /*
+    @brief whether a cell is editable
+
+    @param[in] row the row of the cell
+    @param[in] col the column of the cell
+    @param[out] returns true if the cell is editable (onEdit will be called)
+    */
+    virtual bool isEditable(const size_t row, const size_t col) const { return false; };
+
+    /*
+    @brief edit cell callback. to be overriden.
+
+    @param[in] row the row of the cell
+    @param[in] col the column of the cell
+    */
+    virtual void onEdit(const size_t row, const size_t col) { };
+
+    /*
+    @brief drawing popups. to be overriden.
+    */
+    virtual void drawPopups() { };
 
   protected:
     const std::string table_id_;
@@ -163,7 +182,7 @@ namespace SmartPeak
     DataGetterMethod data_getter_ = nullptr;
     DataFilterMethod data_filter_ = nullptr;
     std::vector<ImEntry> table_entries_;
-    bool table_scanned_;
+    bool table_scanned_ = false;
     int selected_col = 0;
     std::vector<const char*> cols;
     int hovered_col_ = 0;

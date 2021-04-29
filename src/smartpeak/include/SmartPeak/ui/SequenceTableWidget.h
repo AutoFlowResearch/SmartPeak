@@ -43,17 +43,16 @@ namespace SmartPeak
     {
       for (const auto& sample_type_entry : sampleTypeToString)
       {
-        sequence_groups_.insert(sample_type_entry.second);
+        groups_.insert(sample_type_entry.second);
       }
     };
 
     virtual void draw() override;
 
-    void open(InjectionHandler* injection, std::function<void(const std::string&)> ok_callback);
+    void open(const std::string& current_choice, std::function<void(const std::string&)> ok_callback);
 
   protected:
-    std::set<std::string> sequence_groups_;
-    InjectionHandler* injection_ = nullptr;
+    std::set<std::string> groups_;
     std::function<void(const std::string&)> ok_callback_;
     std::string current_choice_;
   };
