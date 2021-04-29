@@ -87,6 +87,8 @@ namespace SmartPeak
 
   void ParametersTableWidget::draw()
   {
+    Utilities::showQuickHelpToolTip("ParametersTableWidget");
+    
     if (application_handler_.sequenceHandler_.getSequence().size() == 0) {
       return;
     }

@@ -40,6 +40,7 @@
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
 #include <SmartPeak/ui/StatisticsWidget.h>
+#include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/InfoWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
@@ -54,8 +55,7 @@
 
 using namespace SmartPeak;
 namespace fs = boost::filesystem;
-
-void HelpMarker(const char* desc);
+bool SmartPeak::enable_quick_help = true;
 
 void initializeDataDirs(ApplicationHandler& state);
 
@@ -122,6 +122,8 @@ int main(int argc, char** argv)
   
   bool chromatogram_explorer_is_active = false; // whether chromatogram is active and being drawn
   bool featuresline_explorer_is_active = false; // whether features line is active and being drawn
+  
+  bool is_workflow_running = false;
 
   // View: Top window
   bool show_sequence_table = false;
@@ -490,6 +492,7 @@ int main(int argc, char** argv)
           file_picker_.setProcessor(processor);
           popup_file_picker_ = true;
         }
+        Utilities::showQuickHelpToolTip("load_session_from_sequence");
         //if (ImGui::MenuItem("Save Session", NULL, false, false))
         //{
         //  //TODO: Session (see AUT-280)
@@ -612,6 +615,8 @@ int main(int argc, char** argv)
           }
           ImGui::EndMenu();
         }
+        Utilities::showQuickHelpToolTip("import_file");
+        
         if (ImGui::BeginMenu("Export File"))
         {
           //if (ImGui::MenuItem("Sequence")) {} // TODO: updated sequence file
@@ -641,7 +646,10 @@ int main(int argc, char** argv)
           ImGui::EndMenu();
         }
         ImGui::EndMenu();
+        Utilities::showQuickHelpToolTip("export_file");
       }
+      Utilities::showQuickHelpToolTip("file");
+      
       if (ImGui::BeginMenu("Edit"))
       {
         ImGui::MenuItem("Settings", NULL, false, false);
@@ -651,6 +659,8 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Parameters", NULL, false, false)) {} // TODO: modal of settings
         ImGui::EndMenu();
       }
+      Utilities::showQuickHelpToolTip("edit");
+      
       if (ImGui::BeginMenu("View"))
       {
         ImGui::MenuItem("Explorer window", NULL, false, false);
@@ -702,6 +712,8 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Log", NULL, &show_log_)) {}
         ImGui::EndMenu();
       }
+      Utilities::showQuickHelpToolTip("view");
+      
       if (ImGui::BeginMenu("Actions"))
       {
         if (ImGui::MenuItem("Run workflow"))
@@ -713,6 +725,8 @@ int main(int argc, char** argv)
           initializeDataDirs(application_handler_);
           popup_run_workflow_ = true;
         }
+        Utilities::showQuickHelpToolTip("run_workflow");
+        
         if (ImGui::BeginMenu("Integrity checks"))
         {
           if (ImGui::MenuItem("Sample consistency")) {
@@ -733,20 +747,27 @@ int main(int argc, char** argv)
           }
           ImGui::EndMenu();
         }
+        Utilities::showQuickHelpToolTip("integrity_checks");
         if (ImGui::MenuItem("Report"))
         {
           report_.draw_ = true;
         }
+        Utilities::showQuickHelpToolTip("report");
         ImGui::EndMenu();
       }
+      Utilities::showQuickHelpToolTip("actions");
+      
       if (ImGui::BeginMenu("Help"))
       {
         ImGui::MenuItem("About", NULL, &popup_about_);
+        ImGui::MenuItem("Show Quick Help", NULL, &enable_quick_help);
         if (ImGui::MenuItem("Documentation")) {
           // TODO: Render the SmartPeak documentation (See AUT-178)
         }
         ImGui::EndMenu();
       }
+      Utilities::showQuickHelpToolTip("help");
+      
       ImGui::EndMainMenuBar();
     }
 
@@ -786,6 +807,7 @@ int main(int argc, char** argv)
           widget->checked_rows_ = session_handler_.injection_explorer_checked_rows;
           widget->checkbox_headers_ = session_handler_.injection_explorer_checkbox_headers;
           widget->checkbox_columns_ = &session_handler_.injection_explorer_checkbox_body;
+          widget->workflow_finished_ = is_workflow_running;
           show_chromatogram_line_plot && chromatogram_explorer_is_active ? widget->active_plot_ = "Chromatograms" : widget->active_plot_ = "";
           widget->draw();
           ImGui::EndTabItem();
@@ -1290,6 +1312,7 @@ int main(int argc, char** argv)
       {
         if (show_info_ && ImGui::BeginTabItem("Info", &show_info_))
         {
+          Utilities::showQuickHelpToolTip("InfoWidget");
           ImGui::BeginChild("Info child");
           quickInfoText_.setTransitions(&session_handler_.transitions_table_body);
           quickInfoText_.draw();
@@ -1298,6 +1321,7 @@ int main(int argc, char** argv)
         }
         if (show_log_ && ImGui::BeginTabItem("Log", &show_log_))
         {
+          Utilities::showQuickHelpToolTip("Log");
           const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
           static int selected_severity = 4;
           static plog::Severity severity = plog::Severity::info;
@@ -1346,21 +1370,6 @@ int main(int argc, char** argv)
   SDL_Quit();
 
   return 0;
-}
-
-// copied from imgui_demo.cpp
-// Helper to display a little (?) mark which shows a tooltip when hovered.
-void HelpMarker(const char* desc)
-{
-  ImGui::TextDisabled("(?)");
-  if (ImGui::IsItemHovered())
-  {
-    ImGui::BeginTooltip();
-    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-    ImGui::TextUnformatted(desc);
-    ImGui::PopTextWrapPos();
-    ImGui::EndTooltip();
-  }
 }
 
 void initializeDataDirs(ApplicationHandler& application_handler)

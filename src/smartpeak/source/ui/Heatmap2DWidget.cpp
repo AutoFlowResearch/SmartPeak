@@ -29,6 +29,8 @@ namespace SmartPeak
 
   void Heatmap2DWidget::draw()
   {
+    Utilities::showQuickHelpToolTip("Heatmap2DWidget");
+    
     Eigen::Tensor<std::string, 2> selected_feature_names = session_handler_.feature_explorer_body;
     std::vector<std::string> feature_names;
     for (int i = 0; i < selected_feature_names.size(); ++i) {
@@ -162,15 +164,15 @@ namespace SmartPeak
                 ImGui::BeginTooltip();
                 std::ostringstream os;
                 os << "Injection: " << selected_sample;
-                ImGui::Text(os.str().c_str());
+                ImGui::Text("%s", os.str().c_str());
                 os.str("");
                 os.clear();
                 os << "Transition: " << selected_transition;
-                ImGui::Text(os.str().c_str());
+                ImGui::Text("%s", os.str().c_str());
                 os.str("");
                 os.clear();
                 os << "Value: " << heatmap_data_.feat_heatmap_data.data()[index_item_y * heatmap_data_.feat_heatmap_col_labels.size() + index_item_x];
-                ImGui::Text(os.str().c_str());
+                ImGui::Text("%s", os.str().c_str());
                 ImGui::EndTooltip();
               }
             }

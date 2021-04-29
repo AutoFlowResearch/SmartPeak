@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, AHmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -32,6 +32,8 @@ namespace SmartPeak
 {
   void WorkflowStepWidget::draw()
   {
+    Utilities::showQuickHelpToolTip("WorkflowStepWindow");
+    
     if (!application_handler_)
     {
       LOGE << "Workflow widget has no ApplicationHandler object associated with it";
@@ -111,7 +113,7 @@ namespace SmartPeak
       buildCommandsFromNames.names_ = { selected_method_ };
       if (buildCommandsFromNames.process() && buildCommandsFromNames.commands_.size() > 0)
       {
-        ImGui::Text(buildCommandsFromNames.commands_[0].getDescription().c_str());
+        ImGui::Text("%s", buildCommandsFromNames.commands_[0].getDescription().c_str());
         command_success = true;
       }
       else

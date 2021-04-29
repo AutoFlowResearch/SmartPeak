@@ -97,6 +97,8 @@ namespace SmartPeak
 
   void GenericTableWidget::draw()
   {
+    Utilities::showQuickHelpToolTip(table_id_);
+    
     if (headers_.size() <= 0)
       return;
 
@@ -178,10 +180,7 @@ namespace SmartPeak
 
   void ExplorerWidget::draw()
   {
-    if (ImGui::IsItemHovered() && tooltip_info.find(table_id_) != tooltip_info.end()) {
-      std::string res =  tooltip_info.find(table_id_)->second;
-      ImGui::SetTooltip("%s", tooltip_info.find(table_id_)->second.c_str());
-    }
+    Utilities::showQuickHelpToolTip(table_id_);
     
     if (headers_.size() <= 0)
       return;
@@ -218,7 +217,7 @@ namespace SmartPeak
     } else if (table_id_ == "TransitionsExplorerWindow" && active_plot_ == "Features (line)") {
       table_entries_plot_col_ = 2;
       checkbox_columns_plot_col_ = 0;
-    } else if (table_id_ == "FeaturesExplorerWindow" /*&& active_plot_ == "Features (line)"*/) {
+    } else if (table_id_ == "FeaturesExplorerWindow") {
       table_entries_plot_col_ = 1;
       checkbox_columns_plot_col_ = 0;
     } else { // defaulting to InjectionsExplorerWindow
@@ -294,7 +293,7 @@ namespace SmartPeak
     ImGui::SameLine();
     if (ImGui::Checkbox("Plot/Unplot All", &plot_all_)) { plot_unplot_all_deactivated_ = false; };
     if (plot_all_) { plot_switch_ = "plotunplotall"; plot_idx_ = 0; }
-    if (table_scanned_ && checkbox_columns_->size() > 0 && plot_switch_ != "stepper") {
+    if (table_scanned_ && checkbox_columns_->size() > 0 && plot_switch_ != "stepper" && !workflow_finished_) {
       if (plot_all_ && !plot_unplot_all_deactivated_) {
         std::for_each(table_entries_.begin(), table_entries_.end(),
                       [&](ImEntry& entry) {

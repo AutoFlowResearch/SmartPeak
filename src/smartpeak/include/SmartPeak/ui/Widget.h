@@ -30,7 +30,7 @@
 #include <imgui.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/ImEntry.h>
-#include <SmartPeak/ui/Help.h>
+#include <SmartPeak/core/Utilities.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 /**
@@ -128,6 +128,7 @@ namespace SmartPeak
     bool table_scanned_;
     bool plot_all_ = false;
     bool plot_unplot_all_deactivated_ = false;
+    bool workflow_finished_ = false;
     int selected_col_ = 0;
     unsigned int plot_idx_ = 0;
     unsigned int table_entries_plot_col_ = 0;
