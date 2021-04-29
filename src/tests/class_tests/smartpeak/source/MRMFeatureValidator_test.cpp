@@ -28,7 +28,7 @@
 #include <SmartPeak/algorithm/MRMFeatureValidator.h>
 
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
-#include <SmartPeak/io/FileReader.h>
+#include <SmartPeak/io/ParametersParser.h>
 #include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
   const string filename_params = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_test_pyTOPP_MRMFeatureValidator_params.csv");
 
   ParameterSet params;
-  FileReader::parseOpenMSParams(filename_params, params); // it is assumed "," as delimiter
+  ParametersParser::read(filename_params, params); // it is assumed "," as delimiter
   BOOST_CHECK_EQUAL(params.size(), 1);
   BOOST_CHECK_EQUAL(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
   BOOST_CHECK_EQUAL(params["MRMFeatureValidator.validate_MRMFeatures"].size(), 1);

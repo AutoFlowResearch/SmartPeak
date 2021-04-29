@@ -35,10 +35,6 @@ namespace SmartPeak
 
   void InfoWidget::draw()
   {
-
-    if (!application_handler_)
-      return;
-
     drawWorkflowStatus();
     drawFileloadingStatus();
     drawLastRunTime();
@@ -81,9 +77,9 @@ namespace SmartPeak
     if (refresh_needed_)
     {
       number_of_chromatograms_ = 0;
-      if ((application_handler_) && (application_handler_->sequenceHandler_.getSequence().size() > 0))
+      if (application_handler_.sequenceHandler_.getSequence().size() > 0)
       {
-        number_of_chromatograms_ = application_handler_->sequenceHandler_.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size();
+        number_of_chromatograms_ = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size();
       }
     }
     os << "Number of chromatograms: " << number_of_chromatograms_;
@@ -96,9 +92,9 @@ namespace SmartPeak
     if (refresh_needed_)
     {
       number_of_spectrums_ = 0;
-      if ((application_handler_) && (application_handler_->sequenceHandler_.getSequence().size() > 0))
+      if (application_handler_.sequenceHandler_.getSequence().size() > 0)
       {
-        number_of_spectrums_ = application_handler_->sequenceHandler_.getSequence().at(0).getRawData().getExperiment().getSpectra().size();
+        number_of_spectrums_ = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getExperiment().getSpectra().size();
       }
     }
     os << "Number of spectrums: " << number_of_spectrums_;
@@ -110,11 +106,7 @@ namespace SmartPeak
     std::ostringstream os;
     if (refresh_needed_)
     {
-      number_of_samples_ = 0;
-      if (application_handler_)
-      {
-        number_of_samples_ = application_handler_->sequenceHandler_.getSequence().size();
-      }
+      number_of_samples_ = application_handler_.sequenceHandler_.getSequence().size();
     }
     os << "Number of samples: " << number_of_samples_;
     ImGui::Text("%s", os.str().c_str());
@@ -126,7 +118,7 @@ namespace SmartPeak
     if (refresh_needed_)
     {
       number_of_transitions_ = 0;
-      if ((application_handler_) && transitions_)
+      if (transitions_)
       {
         number_of_transitions_ = transitions_->dimension(0);
       }
@@ -162,13 +154,6 @@ namespace SmartPeak
         << std::setw(2) << s.count() << 's';
       ImGui::Text("%s", os.str().c_str());
     }
-  }
-
-  void InfoWidget::setApplicationHandler(ApplicationHandler& state)
-  {
-    LOGD << "Setting state: " << (&state);
-    application_handler_ = &state;
-    application_handler_->sequenceHandler_.addSequenceObserver(this);
   }
     
   void InfoWidget::sequenceUpdated()

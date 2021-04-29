@@ -47,7 +47,9 @@ namespace SmartPeak
   class Widget
   {
   public:
-    Widget() = default;
+    Widget(const std::string title = ""):
+      title_(title)
+    {};
     virtual ~Widget() = default;
     Widget(const Widget &&) = delete;
 
@@ -57,6 +59,13 @@ namespace SmartPeak
       NOTE: free to override in inherited implmementations
     */
     virtual void draw() = 0;
+
+    void setWindowSize(float width, float height) { width_ = width; height_ = height; };
+
+    bool visible_ = false;
+    std::string title_;
+    float width_ = 0.0;
+    float height_ = 0.0;
   };
 
   class GenericTextWidget : public Widget
@@ -77,8 +86,29 @@ namespace SmartPeak
   class GenericTableWidget : public Widget
   {
   public:
-    GenericTableWidget(const std::string& table_id)
-      : table_id_(table_id) {};
+    typedef void(SessionHandler::* DataGetterMethod)(const SequenceHandler& sequence_handler, SessionHandler::GenericTableData& generic_table_data);
+    typedef Eigen::Tensor<bool, 1>(SessionHandler::* DataFilterMethod)(const Eigen::Tensor<std::string, 2>& to_filter) const;
+
+    /*
+    * GenericTableWidget.
+    * 
+    * A data getter can be provided so that data will be retreive from SessionHandler automatically in the draw method.
+    * if not provided, table_data_ must be filled by external mean.
+    */
+    GenericTableWidget(const std::string& table_id,
+      const std::string title = "",
+      SessionHandler* session_handler = nullptr,
+      SequenceHandler* sequence_handler = nullptr,
+      DataGetterMethod data_getter = nullptr,
+      DataFilterMethod data_filter = nullptr)
+      : Widget(title),
+        table_id_(table_id),
+        session_handler_(session_handler),
+        sequence_handler_(sequence_handler),
+        data_getter_(data_getter),
+        data_filter_(data_filter)
+    {};
+
     /*
     @brief Show the table
 
@@ -120,10 +150,16 @@ namespace SmartPeak
     */
     void sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs, const bool& is_scanned);
 
-    Eigen::Tensor<std::string, 1> headers_;
-    Eigen::Tensor<std::string, 2> columns_;
+
+    SessionHandler::GenericTableData table_data_;
     Eigen::Tensor<bool, 1> checked_rows_;
+
+  protected:
     const std::string table_id_;
+    SessionHandler* session_handler_ = nullptr;
+    SequenceHandler* sequence_handler_ = nullptr;
+    DataGetterMethod data_getter_ = nullptr;
+    DataFilterMethod data_filter_ = nullptr;
     std::vector<ImEntry> table_entries_;
     bool table_scanned_;
     bool plot_all_ = false;
@@ -150,8 +186,8 @@ namespace SmartPeak
   class ExplorerWidget final : public GenericTableWidget
   {
   public:
-    ExplorerWidget(const std::string& table_id)
-      :GenericTableWidget(table_id) {};
+    ExplorerWidget(const std::string& table_id, const std::string title ="")
+      :GenericTableWidget(table_id, title) {};
     /*
     @brief Show the explorer
 
@@ -170,6 +206,10 @@ namespace SmartPeak
   class GenericGraphicWidget : public Widget
   {
   public:
+    GenericGraphicWidget(const std::string title = "")
+      : Widget(title)
+    {};
+
     void draw() override;
 
     /**
@@ -187,25 +227,44 @@ namespace SmartPeak
   class LinePlot2DWidget : public GenericGraphicWidget
   {
   public:
-    LinePlot2DWidget(const Eigen::Tensor<float, 2>&x_data, const Eigen::Tensor<float, 2>&y_data, const Eigen::Tensor<std::string, 1>& x_labels, const Eigen::Tensor<std::string, 1>&series_names,
-      const std::string& x_axis_title, const std::string& y_axis_title, const float& x_min, const float& x_max, const float& y_min, const float& y_max,
-      const float& plot_width, const float& plot_height, const std::string& plot_title) :
-      x_data_(x_data), y_data_(y_data), x_labels_(x_labels), series_names_(series_names), x_axis_title_(x_axis_title), y_axis_title_(y_axis_title),
-      x_min_(x_min), x_max_(x_max), y_min_(y_min), y_max_(y_max), plot_width_(plot_width), plot_height_(plot_height), plot_title_(plot_title) {};
+    LinePlot2DWidget(const std::string title = "") : GenericGraphicWidget(title)  {};
+    void setValues(const Eigen::Tensor<float, 2>& x_data,
+      const Eigen::Tensor<float, 2>& y_data,
+      const Eigen::Tensor<std::string, 1>* x_labels,
+      const Eigen::Tensor<std::string, 1>* series_names,
+      const std::string& x_axis_title, 
+      const std::string& y_axis_title,
+      const float& x_min,
+      const float& x_max,
+      const float& y_min,
+      const float& y_max,
+      const std::string& plot_title)
+    {
+        x_data_ = x_data;
+        y_data_ = y_data;
+        x_labels_ = x_labels;
+        series_names_ = series_names;
+        x_axis_title_ = x_axis_title;
+        y_axis_title_ = y_axis_title;
+        x_min_ = x_min;
+        x_max_ = x_max;
+        y_min_ = y_min;
+        y_max_ = y_max;
+        plot_title_ = plot_title;
+    }
     void draw() override;
-    const Eigen::Tensor<float, 2>& x_data_;
-    const Eigen::Tensor<float, 2>& y_data_;
-    const Eigen::Tensor<std::string, 1>& x_labels_;
-    const Eigen::Tensor<std::string, 1>& series_names_;
-    const std::string& x_axis_title_;
-    const std::string& y_axis_title_;
-    const float& x_min_;
-    const float& x_max_;
-    const float& y_min_;
-    const float& y_max_;
-    const float& plot_width_;
-    const float& plot_height_;
-    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
+  protected:
+    Eigen::Tensor<float, 2> x_data_;
+    Eigen::Tensor<float, 2> y_data_;
+    const Eigen::Tensor<std::string, 1>* x_labels_;
+    const Eigen::Tensor<std::string, 1>* series_names_;
+    std::string x_axis_title_;
+    std::string y_axis_title_;
+    float x_min_;
+    float x_max_;
+    float y_min_;
+    float y_max_;
+    std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
   };
 
   /**
@@ -216,11 +275,12 @@ namespace SmartPeak
   public:
     ScatterPlotWidget(SessionHandler& session_handler,
       SequenceHandler& sequence_handler,
+      const std::string& id,
       const std::string& title) :
+      GenericGraphicWidget(title),
       session_handler_(session_handler),
       sequence_handler_(sequence_handler),
-      plot_title_(title) {};
-    void setWindowSize(float width, float height) { plot_width_ = width; plot_height_ = height; };
+      plot_title_(id) {};
     void setRefreshNeeded() { refresh_needed_ = true; };
     void draw() override;
   protected:
@@ -228,8 +288,6 @@ namespace SmartPeak
   protected:
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;
-    float plot_width_ = 0.0f;
-    float plot_height_ = 0.0f;
     const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     bool show_legend_ = true;
     bool compact_view_ = true;

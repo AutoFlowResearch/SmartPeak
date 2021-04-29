@@ -33,12 +33,6 @@ namespace SmartPeak
   void Workflow::draw()
   {
 
-    if (!application_handler_)
-    {
-      LOGE << "Workflow widget has no ApplicationHandler object associated with it";
-      return;
-    }
-
     workflow_step_widget_.draw();
     if (editable_ && ImGui::BeginCombo("Presets", NULL))
     {
@@ -151,8 +145,8 @@ namespace SmartPeak
                     "MERGE_FEATURES",
                     "MERGE_INJECTIONS",
                     "STORE_FEATURES_SAMPLE_GROUP" };
-          application_handler_->sequenceHandler_.setWorkflow(ids);
-          application_handler_->sequenceHandler_.notifyWorkflowChanged();
+          application_handler_.sequenceHandler_.setWorkflow(ids);
+          application_handler_.sequenceHandler_.notifyWorkflowChanged();
           LOGI << "Local workflow has been replaced";
         }
       }
@@ -167,7 +161,7 @@ namespace SmartPeak
       ImGui::SameLine();
       if (ImGui::Button("Reset"))
       {
-        application_handler_->sequenceHandler_.getWorkflow().clear();
+        application_handler_.sequenceHandler_.getWorkflow().clear();
       }
     }
 
@@ -177,14 +171,14 @@ namespace SmartPeak
 
     ImGui::BeginChild("Workflow Steps");
 
-    if (application_handler_->sequenceHandler_.getWorkflow().empty())
+    if (application_handler_.sequenceHandler_.getWorkflow().empty())
     {
       ImGui::Text("No steps set. Please select a preset and/or add a single method step.");
     }
     else
     {
-      BuildCommandsFromNames buildCommandsFromNames(*application_handler_);
-      buildCommandsFromNames.names_ = application_handler_->sequenceHandler_.getWorkflow();
+      BuildCommandsFromNames buildCommandsFromNames(application_handler_);
+      buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
       if (buildCommandsFromNames.process()) 
       {
         int i = 0;
@@ -196,7 +190,7 @@ namespace SmartPeak
           if (editable_ && ImGui::BeginDragDropSource())
           {
             ImGui::SetDragDropPayload("DND_STEP", &i, sizeof(int));
-            ImGui::Text("Moving %s", application_handler_->sequenceHandler_.getWorkflow().at(i).c_str());
+            ImGui::Text("Moving %s", application_handler_.sequenceHandler_.getWorkflow().at(i).c_str());
             ImGui::EndDragDropSource();
           }
           else if (ImGui::IsItemHovered())
@@ -211,9 +205,9 @@ namespace SmartPeak
             {
               IM_ASSERT(payload->DataSize == sizeof(int));
               int source_n = *(const int*)payload->Data;
-              const auto tmp = application_handler_->sequenceHandler_.getWorkflow().at(source_n);
-              application_handler_->sequenceHandler_.getWorkflow().erase(application_handler_->sequenceHandler_.getWorkflow().cbegin() + source_n);
-              application_handler_->sequenceHandler_.getWorkflow().insert(application_handler_->sequenceHandler_.getWorkflow().cbegin() + i, tmp);
+              const auto tmp = application_handler_.sequenceHandler_.getWorkflow().at(source_n);
+              application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + source_n);
+              application_handler_.sequenceHandler_.getWorkflow().insert(application_handler_.sequenceHandler_.getWorkflow().cbegin() + i, tmp);
             }
             ImGui::EndDragDropTarget();
           }
@@ -222,8 +216,8 @@ namespace SmartPeak
             ImGui::SameLine();
           }
           if (editable_ && ImGui::Button("x")) {
-            application_handler_->sequenceHandler_.getWorkflow().erase(application_handler_->sequenceHandler_.getWorkflow().cbegin() + i);
-            application_handler_->sequenceHandler_.notifyWorkflowChanged();
+            application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + i);
+            application_handler_.sequenceHandler_.notifyWorkflowChanged();
           }
           else 
           {
@@ -235,13 +229,6 @@ namespace SmartPeak
     }
 
     ImGui::EndChild();
-  }
-
-  void Workflow::setApplicationHandler(ApplicationHandler& state)
-  {
-    LOGD << "Setting state: " << (&state);
-    application_handler_ = &state;
-    workflow_step_widget_.setApplicationHandler(state);
   }
 
 }

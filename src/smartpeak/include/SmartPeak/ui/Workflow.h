@@ -33,16 +33,21 @@ namespace SmartPeak
 {
   class Workflow final : public Widget
   {
-    ApplicationHandler* application_handler_ = nullptr;
-
   public:
-    void draw() override;
 
-    void setApplicationHandler(ApplicationHandler& application_handler);
+    Workflow(const std::string title, ApplicationHandler& application_handler)
+      : Widget(title),
+      application_handler_(application_handler),
+      workflow_step_widget_(application_handler)
+    {
+    };
+
+    void draw() override;
 
     void setEditable(bool editable) { editable_ = editable; };
 
   protected:
+    ApplicationHandler& application_handler_;
     WorkflowStepWidget workflow_step_widget_;
     bool editable_ = true;
   };

@@ -17,33 +17,36 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
-// $Authors: Bertrand Boudaud $
+// $Maintainer: Douglas McCloskey $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/ui/CalibratorsPlotWidget.h>
-#include <implot.h>
+#include <SmartPeak/ui/LogWidget.h>
+#include <imgui.h>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
-  void CalibratorsPlotWidget::draw()
+  void LogWidget::draw()
   {
-    Utilities::showQuickHelpToolTip("CalibratorsPlotWidget");
-    // Main graphic
-    ImPlot::SetNextPlotLimits(x_min_, x_max_, y_min_, y_max_, ImGuiCond_Always);
-    if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(width_ - 25, height_ - 40))) {
-      for (int i = 0; i < x_raw_data_->size(); ++i) {
-        assert(x_raw_data_->at(i).size() == y_raw_data_->at(i).size());
-        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotScatter((series_names_->at(i) + "-pts").c_str(), x_raw_data_->at(i).data(), y_raw_data_->at(i).data(), x_raw_data_->at(i).size());
-      }
-      for (int i = 0; i < x_fit_data_->size(); ++i) {
-        assert(x_fit_data_->at(i).size() == y_fit_data_->at(i).size());
-        ImPlot::PushStyleVar(ImPlotStyleVar_LineWeight, ImPlot::GetStyle().LineWeight);
-        ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_Circle);
-        ImPlot::PlotLine((series_names_->at(i) + "-fit").c_str(), x_fit_data_->at(i).data(), y_fit_data_->at(i).data(), x_fit_data_->at(i).size());
-      }
-      ImPlot::EndPlot();
+    const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
+    static int selected_severity = 4;
+    static plog::Severity severity = plog::Severity::info;
+
+    if (ImGui::Combo("Level", &selected_severity, items, IM_ARRAYSIZE(items)))
+    {
+      severity = plog::severityFromString(items[selected_severity]);
     }
+
+    ImGui::Separator();
+    ImGui::BeginChild("Log child");
+    const std::vector<plog::util::nstring> message_list = appender_.getMessageList(severity);
+    int message_list_start = (message_list.size() > 500) ? message_list.size() - 500 : 0;
+    for (int i = message_list_start; i < message_list.size(); ++i)
+    {
+      std::string str(message_list.at(i).data(), message_list.at(i).data() + message_list.at(i).size());
+      ImGui::Text("%s", str.c_str());
+    }
+    ImGui::EndChild();
   }
 }

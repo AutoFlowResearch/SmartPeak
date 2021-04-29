@@ -36,13 +36,16 @@ namespace SmartPeak
   {
 
   public:
+    StatisticsWidget(const std::string title, ApplicationHandler& application_handler)
+      : Widget(title),
+      application_handler_(application_handler)
+    {
+      application_handler_.sequenceHandler_.addSequenceObserver(this);
+    };
+
     void draw() override;
 
-    void setApplicationHandler(ApplicationHandler& application_handler);
-
     void setRefreshNeeded() { refresh_needed_ = true; };
-
-    void setWindowSize(float width, float height) { width_ = width; height_ = height; };
 
     void setTransitions(const Eigen::Tensor<std::string, 2>* transitions, const Eigen::Tensor<bool, 2>& transitions_checkbox, const Eigen::Tensor<std::string, 2>& transitions_columns)
     { 
@@ -93,9 +96,7 @@ namespace SmartPeak
     int number_of_samples_ = 0;
     int number_of_transitions_ = 0;
     bool refresh_needed_ = true;
-    float width_;
-    float height_;
-    ApplicationHandler* application_handler_ = nullptr;
+    ApplicationHandler& application_handler_;
     Eigen::Tensor<bool, 2> injections_checkbox_;
     Eigen::Tensor<std::string, 2> injections_columns_;
     const Eigen::Tensor<std::string, 2>* transitions_ = nullptr;

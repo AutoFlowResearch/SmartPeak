@@ -30,8 +30,9 @@ namespace SmartPeak
   void Heatmap2DWidget::draw()
   {
     Utilities::showQuickHelpToolTip("Heatmap2DWidget");
-    
-    Eigen::Tensor<std::string, 2> selected_feature_names = session_handler_.feature_explorer_body;
+
+    Eigen::Tensor<std::string, 2> selected_feature_names = session_handler_.feature_table.body_;
+
     std::vector<std::string> feature_names;
     for (int i = 0; i < selected_feature_names.size(); ++i) {
       if (std::count(feature_names.begin(), feature_names.end(), selected_feature_names(i)) == 0 && !selected_feature_names(i).empty())
@@ -78,7 +79,7 @@ namespace SmartPeak
           !compareInput(selected_transition_groups, heatmap_data_.selected_transition_groups_))
       {
         session_handler_.getHeatMap(sequence_handler_, heatmap_data_, selected_feature_);
-        // We need to handle "invalid" data - infinite values, or vey high - which will crash ImPlot.
+        // We need to handle "invalid" data - infinite values, or very high - which will crash ImPlot.
         invalid_data_ = false;
         for (int i = 0; i < heatmap_data_.feat_heatmap_row_labels.size(); ++i)
         {
@@ -126,14 +127,14 @@ namespace SmartPeak
             bool is_hovered = false;
             ImPlotPoint plot_point;
             ImPlot::SetColormap(ImPlotColormap_Jet);
-            ImPlot::ShowColormapScale(heatmap_data_.feat_value_min_, heatmap_data_.feat_value_max_, plot_height_ - 70);
+            ImPlot::ShowColormapScale(heatmap_data_.feat_value_min_, heatmap_data_.feat_value_max_, height_ - 70);
             float available_width = ImGui::GetContentRegionAvailWidth();
             ImGui::SameLine();
             const ImPlotFlags imPlotFlags = ImPlotAxisFlags_LockMin | ImPlotAxisFlags_LockMax | ImPlotAxisFlags_TickLabels;
             if (ImPlot::BeginPlot(plot_title_.c_str(),
               heatmap_data_.feat_heatmap_x_axis_title.c_str(),
               heatmap_data_.feat_heatmap_y_axis_title.c_str(),
-              ImVec2(available_width - 80, plot_height_ - 70),
+              ImVec2(available_width - 80, height_ - 70),
               imPlotFlags,
               ImPlotAxisFlags_GridLines,
               ImPlotAxisFlags_GridLines))
