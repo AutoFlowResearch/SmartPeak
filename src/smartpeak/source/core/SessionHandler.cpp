@@ -59,11 +59,11 @@ namespace SmartPeak
     // Make the injection explorer body
     if (injection_explorer_data.checkbox_body.dimension(0) != n_rows) {
       LOGD << "Making injection_explorer_checkbox_body";
-      injection_explorer_checkbox_body.resize(n_rows, (int)injection_explorer_checkbox_headers.size());
-      injection_explorer_checkbox_body.setConstant(true);
-      for (int i = 0; i < injection_explorer_checkbox_body.dimension(0); ++i) injection_explorer_checkbox_body(i, 1) = false; // set all to false
-      injection_explorer_checked_rows.resize(n_rows);
-      injection_explorer_checked_rows.setConstant(true);
+      injection_explorer_data.checkbox_body.resize(n_rows, (int)injection_explorer_data.checkbox_headers.size());
+      injection_explorer_data.checkbox_body.setConstant(true);
+      for (int i = 0; i < injection_explorer_data.checkbox_body.dimension(0); ++i) injection_explorer_data.checkbox_body(i, 1) = false; // set all to false
+      injection_explorer_data.checked_rows.resize(n_rows);
+      injection_explorer_data.checked_rows.setConstant(true);
     }
   }
   void SessionHandler::setTransitionExplorer(GenericTableData& table_data) {
@@ -77,11 +77,11 @@ namespace SmartPeak
     // Make the transition table body
     if (transition_explorer_data.checkbox_body.dimension(0) != n_rows) {
       LOGD << "Making transition_explorer_checkbox_body";
-      transition_explorer_checkbox_body.resize(n_rows, (int)transition_explorer_checkbox_headers.size());
-      transition_explorer_checkbox_body.setConstant(true);
-      for (int i = 0; i < transition_explorer_checkbox_body.dimension(0); ++i) transition_explorer_checkbox_body(i, 0) = false; // set all to false
-      transition_explorer_checked_rows.resize(n_rows);
-      transition_explorer_checked_rows.setConstant(true);
+      transition_explorer_data.checkbox_body.resize(n_rows, (int)transition_explorer_data.checkbox_headers.size());
+      transition_explorer_data.checkbox_body.setConstant(true);
+      for (int i = 0; i < transition_explorer_data.checkbox_body.dimension(0); ++i) transition_explorer_data.checkbox_body(i, 0) = false; // set all to false
+      transition_explorer_data.checked_rows.resize(n_rows);
+      transition_explorer_data.checked_rows.setConstant(true);
     }
   }
   void SessionHandler::setFeatureExplorer() {

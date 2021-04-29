@@ -829,6 +829,7 @@ int main(int argc, char** argv)
       injections_explorer_window_->checked_rows_ = session_handler_.injection_explorer_data.checked_rows;
       injections_explorer_window_->checkbox_headers_ = session_handler_.injection_explorer_data.checkbox_headers;
       injections_explorer_window_->checkbox_columns_ = &session_handler_.injection_explorer_data.checkbox_body;
+      chromatogram_plot_widget_->visible_ ? injections_explorer_window_->active_plot_ = "Chromatograms" : injections_explorer_window_->active_plot_ = "";
     }
 
     // transitions
@@ -839,6 +840,7 @@ int main(int argc, char** argv)
       transitions_explorer_window_->checked_rows_ = session_handler_.transition_explorer_data.checked_rows;
       transitions_explorer_window_->checkbox_headers_ = session_handler_.transition_explorer_data.checkbox_headers;
       transitions_explorer_window_->checkbox_columns_ = &session_handler_.transition_explorer_data.checkbox_body;
+      feature_line_plot_->visible_ ? transitions_explorer_window_->active_plot_ = "Features (line)" : transitions_explorer_window_->active_plot_ = "";
     }
 
     //features

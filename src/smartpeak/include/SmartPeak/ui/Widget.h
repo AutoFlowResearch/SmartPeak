@@ -198,6 +198,7 @@ namespace SmartPeak
     void draw() override;
     Eigen::Tensor<std::string, 1> checkbox_headers_;
     Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;
+    std::string active_plot_ = "";
   };
 
   /**

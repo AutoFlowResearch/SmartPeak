@@ -479,12 +479,11 @@ namespace SmartPeak
                 ImGui::Separator();
               }
               std::ostringstream os;
-
-              os << "Injection: " << x_labels_(injection_number);
+              os << "Injection: " << (*x_labels_)(injection_number);
               ImGui::Text("%s", os.str().c_str());
               os.str("");
               os.clear();
-              os << "Series: " << series_names_(i);
+              os << "Series: " << (*series_names_)(i);
               ImGui::Text("%s", os.str().c_str());
 
               os.str("");
