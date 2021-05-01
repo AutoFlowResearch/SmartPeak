@@ -100,15 +100,15 @@ namespace SmartPeak
       if ((c.getTag() == CastValue::Type::UNINITIALIZED) ||
           (c.getTag() == CastValue::Type::UNKNOWN))
       {
-        OpenMS::DataValue::DataType dt = Param_IO.getValue(name).valueType();
+        OpenMS::ParamValue::ValueType dt = Param_IO.getValue(name).valueType();
         switch (dt) {
-          case OpenMS::DataValue::DOUBLE_VALUE:
+          case OpenMS::ParamValue::DOUBLE_VALUE:
             c = static_cast<float>(Param_IO.getValue(name));
             break;
-          case OpenMS::DataValue::INT_VALUE:
+          case OpenMS::ParamValue::INT_VALUE:
             c = static_cast<int>(Param_IO.getValue(name));
             break;
-          case OpenMS::DataValue::STRING_VALUE:
+          case OpenMS::ParamValue::STRING_VALUE:
             {
               const std::string& value = Param_IO.getValue(name).toString();
               std::string lowercase_value;
@@ -120,23 +120,23 @@ namespace SmartPeak
               }
               break;
             }
-          case OpenMS::DataValue::DOUBLE_LIST:
+          case OpenMS::ParamValue::DOUBLE_LIST:
             c = std::vector<float>();
-            for (const double n : Param_IO.getValue(name).toDoubleList()) {
+            for (const double n : Param_IO.getValue(name).toDoubleVector()) {
               c.fl_.push_back(n);
             }
             break;
-          case OpenMS::DataValue::INT_LIST:
+          case OpenMS::ParamValue::INT_LIST:
             c = std::vector<int>();
-            for (const int n : Param_IO.getValue(name).toIntList()) {
+            for (const int n : Param_IO.getValue(name).toIntVector()) {
               c.il_.push_back(n);
             }
             break;
-          case OpenMS::DataValue::STRING_LIST:
+          case OpenMS::ParamValue::STRING_LIST:
             {
               bool strings_are_bools = false;
-              if (Param_IO.getValue(name).toStringList().size()) {
-                const std::string& value = Param_IO.getValue(name).toStringList().front();
+              if (Param_IO.getValue(name).toStringVector().size()) {
+                const std::string& value = Param_IO.getValue(name).toStringVector().front();
                 std::string lowercase_value;
                 std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
                 if (lowercase_value == "true" || lowercase_value == "false") {
@@ -147,7 +147,7 @@ namespace SmartPeak
                 c = std::vector<std::string>();
               }
 
-              for (const std::string& s : Param_IO.getValue(name).toStringList()) {
+              for (const std::string& s : Param_IO.getValue(name).toStringVector()) {
                 if (strings_are_bools) {
                   std::string lowercase_value;
                   std::transform(s.begin(), s.end(), lowercase_value.begin(), ::tolower);
@@ -175,7 +175,7 @@ namespace SmartPeak
         }
       }
 
-      OpenMS::StringList tags;
+      std::vector<std::string> tags;
       const auto& params_tag = param.getTags();
       if (!params_tag.empty())
       {
@@ -222,16 +222,12 @@ namespace SmartPeak
           }
         case CastValue::Type::STRING_LIST:
           {
-            OpenMS::StringList sl;
-            for (const std::string& s : c.sl_) {
-              sl.push_back(s);
-            }
-            Param_IO.setValue(name, sl, description, tags);
+            Param_IO.setValue(name, c.sl_, description, tags);
             break;
           }
         case CastValue::Type::BOOL_LIST:
           {
-            OpenMS::StringList sl;
+            std::vector<std::string> sl;
             for (const bool b : c.bl_) {
               sl.push_back(b ? "true" : "false");
             }
