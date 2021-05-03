@@ -32,7 +32,6 @@
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/SequenceGroupsEditorWidget.h>
 #include <SmartPeak/ui/SampleTypeEditorWidget.h>
-#include <unsupported/Eigen/CXX11/Tensor>
 
 namespace SmartPeak
 {
