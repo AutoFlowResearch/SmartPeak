@@ -76,10 +76,29 @@ namespace SmartPeak
       }
     }
 
-    ImGui::Separator(); 
-    if (ImGui::Button("OK"))
+    static const std::vector<char> forbiden_chars = { ';',',' };
+    bool new_group_name_is_valid = !std::any_of(forbiden_chars.begin(), forbiden_chars.end(),
+                                                  [&](const auto& c) { return new_group_.find(c) != std::string::npos; });
+    if (!new_group_name_is_valid)
     {
-      if ((action_choice_ == EActionChoice_CreateSegment) && (!new_group_.empty()))
+      ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+      std::ostringstream os;
+      os << "Chars not allowed: [";
+      for (const auto& c : forbiden_chars)
+      {
+        os << c;
+      }
+      os << "]";
+      ImGui::Text(os.str().c_str());
+      ImGui::PopStyleColor();
+    }
+    ImGui::Separator();
+    bool valid = (action_choice_ == EActionChoice_MoveSegment ||
+                 (action_choice_ == EActionChoice_CreateSegment) && (!new_group_.empty()) && (new_group_name_is_valid));
+    if (!valid) ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+    if (ImGui::Button("OK") && valid)
+    {
+      if (action_choice_ == EActionChoice_CreateSegment)
       {
         ok_callback_(new_group_);
         ImGui::CloseCurrentPopup();
@@ -90,6 +109,7 @@ namespace SmartPeak
         ImGui::CloseCurrentPopup();
       }
     }
+    if (!valid) ImGui::PopStyleVar();
 
     ImGui::SameLine();
     if (ImGui::Button("Cancel"))
