@@ -53,7 +53,7 @@ namespace SmartPeak
 
     virtual void draw() override;
 
-    void open(std::set<std::string>& choices, 
+    void open(const std::set<std::string>& choices, 
               const std::string& current_choice, 
               std::function<void(const std::string&)> ok_callback);
 

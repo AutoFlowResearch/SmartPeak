@@ -27,7 +27,7 @@
 namespace SmartPeak
 {
 
-  void SequenceGroupsEditorWidget::open(std::set<std::string>& choices, 
+  void SequenceGroupsEditorWidget::open(const std::set<std::string>& choices, 
                                         const std::string& current_choice, 
                                         std::function<void(const std::string&)> ok_callback)
   {
