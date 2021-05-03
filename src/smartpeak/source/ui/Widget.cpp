@@ -155,8 +155,6 @@ namespace SmartPeak
     data_changed_ = false;
 
     bool edit_cell = false;
-    int hovered_col_ = 0;
-    int hovered_row_ = 0;
     if (ImGui::BeginTable(table_id_.c_str(), table_data_.headers_.size(), table_flags)) {
       // First row entry_contents
       for (int col = 0; col < table_data_.headers_.size(); col++) {
@@ -170,26 +168,69 @@ namespace SmartPeak
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
 
             if (searcher(table_entries_, selected_col, filter, row))
+            {
+              selected_cells_.erase(std::remove_if(selected_cells_.begin(), selected_cells_.end(),
+                                    [&](const auto& selected) { return std::get<0>(selected) == row; }),
+                                    selected_cells_.end());
               continue;
+            }
 
             ImGui::TableNextRow();
             for (size_t col = 0; col < table_data_.headers_.size(); ++col) {
               if (table_scanned_ == true && !table_entries_.empty())
               {
                 ImGui::TableSetColumnIndex(col);
-                ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());               
+                std::tuple<size_t, size_t> selected_tuple = std::make_tuple(row, col);
+                if (std::find(selected_cells_.begin(), selected_cells_.end(), selected_tuple) != selected_cells_.end())
+                {
+                  ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ImColor(ImGui::GetStyle().Colors[ImGuiCol_TabActive]));
+                }
+                ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());
+                bool is_editable = isEditable(row, col);
                 if (ImGui::IsItemHovered())
                 {
-                  hovered_row_ = row;
-                  hovered_col_ = col;
                   if (isEditable(row, col))
                   {
                     ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
                   }
                 }
-                if (ImGui::IsItemClicked() && isEditable(row, col))
+                if (ImGui::IsItemClicked())
                 {
-                  edit_cell = true;
+                  if (is_editable)
+                  {
+                    selectCell(row, col);
+                  }
+                  else
+                  {
+                    selected_cells_.clear();
+                  }
+                }
+                // context menu
+                if (is_editable)
+                {
+                  std::ostringstream os_id;
+                  os_id << "cell_" << row << "_" << col;
+                  if (ImGui::BeginPopupContextItem(os_id.str().c_str()))
+                  {
+                    if (ImGui::MenuItem("Edit", nullptr, nullptr, !selected_cells_.empty()))
+                    {
+                      edit_cell = true;
+                    }
+                    ImGui::Separator();
+                    if (ImGui::MenuItem("Select All"))
+                    {
+                      selected_cells_.clear();
+                      for (auto i = 0; i < table_data_.body_.dimension(0); ++i)
+                      {
+                        selected_cells_.push_back(std::make_tuple(i, col));
+                      }
+                    }
+                    if (ImGui::MenuItem("Unselect All"))
+                    {
+                      selected_cells_.clear();
+                    }
+                    ImGui::EndPopup();
+                  }
                 }
               }
             }
@@ -205,12 +246,53 @@ namespace SmartPeak
       // we need to call onEdit outside the drawing of the table
       if (edit_cell)
       {
-        onEdit(hovered_row_, hovered_col_);
+        onEdit();
       }
       drawPopups();
 
       ImGui::EndTable();
     }
+  }
+
+  void GenericTableWidget::selectCell(size_t row, size_t col)
+  {
+    ImGuiIO& io = ImGui::GetIO();
+    if ((selected_cells_.size() > 0) && (std::get<1>(selected_cells_[0]) != col))
+    {
+      // we have selected another column
+      selected_cells_.clear();
+    }
+    
+    if (io.KeyShift)
+    {
+      size_t starting_row = 0;
+      if (selected_cells_.size() > 0)
+      {
+        starting_row = std::get<0>(selected_cells_.back());
+        if (starting_row < row)
+        {
+          // Shift-select top to bottom
+          for (auto i = starting_row + 1; i < row; ++i)
+          {
+            selected_cells_.push_back(std::make_tuple(i, col));
+          }
+        }
+        else
+        {
+          // Shift-select bottom to top
+          for (auto i = starting_row - 1; i > row; --i)
+          {
+            selected_cells_.push_back(std::make_tuple(i, col));
+          }
+        }
+      }
+    }
+    else if (!io.KeyCtrl)
+    {
+      // simple click, unselect all
+      selected_cells_.clear();
+    }
+    selected_cells_.push_back(std::make_tuple(row, col));
   }
 
   void ExplorerWidget::draw()

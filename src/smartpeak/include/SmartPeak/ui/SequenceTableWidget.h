@@ -60,7 +60,7 @@ namespace SmartPeak
     };
 
     virtual bool isEditable(const size_t row, const size_t col) const override;
-    virtual void onEdit(const size_t row, const size_t col) override;
+    virtual void onEdit() override;
     virtual void drawPopups();
 
     /**
@@ -73,6 +73,7 @@ namespace SmartPeak
 
   private:
     std::set<std::string> getSequenceGroups(const size_t col);
+    InjectionHandler* getInjectionFromTable(const size_t row, const size_t col);
 
   protected:
     SequenceGroupsEditorWidget sequence_segment_editor_;

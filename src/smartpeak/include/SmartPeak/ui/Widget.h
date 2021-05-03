@@ -164,16 +164,16 @@ namespace SmartPeak
 
     /*
     @brief edit cell callback. to be overriden.
-
-    @param[in] row the row of the cell
-    @param[in] col the column of the cell
     */
-    virtual void onEdit(const size_t row, const size_t col) { };
+    virtual void onEdit() { };
 
     /*
     @brief drawing popups. to be overriden.
     */
     virtual void drawPopups() { };
+
+  private:
+    void selectCell(size_t row, size_t col);
 
   protected:
     const std::string table_id_;
@@ -186,6 +186,7 @@ namespace SmartPeak
     int selected_col = 0;
     std::vector<const char*> cols;
     bool data_changed_ = false;
+    std::vector<std::tuple<size_t, size_t>> selected_cells_;
   };
 
 

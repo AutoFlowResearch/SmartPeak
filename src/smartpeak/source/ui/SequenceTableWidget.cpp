@@ -35,41 +35,62 @@ namespace SmartPeak
     return ((col == sequence_segment_col) || (col == sample_group_col) || (col == sample_type_col));
   }
 
-  void SequenceTableWidget::onEdit(const size_t row, const size_t col)
+  void SequenceTableWidget::onEdit()
   {
-    std::string sample_name = table_data_.body_(row, 1);
-    auto find_it = std::find_if(sequence_handler_->getSequence().begin(),
-      sequence_handler_->getSequence().end(),
-      [&](const auto& injection_handler) { return injection_handler.getMetaData().getSampleName() == sample_name; });
-    assert(find_it != sequence_handler_->getSequence().end()); // This should never happen
-    InjectionHandler* injection = &(*find_it);
+    if (selected_cells_.empty())
+      return;
+
+    // we get one selected cell to display the default value and the edited column
+    auto one_selected_cell = selected_cells_.back();
+    size_t row = std::get<0>(one_selected_cell);
+    size_t col = std::get<1>(one_selected_cell);
+
+    auto injection = getInjectionFromTable(row, col);
+    if (!injection)
+    {
+      LOGE << "Cannot edit cell (" << row << ", " << col << ")";
+      return;
+    }
+
     if (col == sequence_segment_col)
     {
       sequence_segment_editor_.open(getSequenceGroups(sequence_segment_col), injection->getMetaData().getSequenceSegmentName(), 
-        [this, injection](const std::string& sequence_segment_name)
+        [this](const std::string& sequence_segment_name)
       {
-        injection->getMetaData().setSequenceSegmentName(sequence_segment_name);
+        for (const auto selected_cell : selected_cells_)
+        {
+          auto injection = getInjectionFromTable(std::get<0>(selected_cell), std::get<1>(selected_cell));
+          injection->getMetaData().setSequenceSegmentName(sequence_segment_name);
+        }
         sequence_handler_->notifySequenceChanged();
       });
     }
     else if (col == sample_group_col)
     {
       sample_group_editor_.open(getSequenceGroups(sample_group_col), injection->getMetaData().getSampleGroupName(), 
-        [this, injection](const std::string& sample_group_name)
+        [this](const std::string& sample_group_name)
       {
-        injection->getMetaData().setSampleGroupName(sample_group_name);
+        for (const auto selected_cell : selected_cells_)
+        {
+          auto injection = getInjectionFromTable(std::get<0>(selected_cell), std::get<1>(selected_cell));
+          injection->getMetaData().setSampleGroupName(sample_group_name);
+        }
         sequence_handler_->notifySequenceChanged();
       });
     }
     else if (col == sample_type_col)
     {
       sample_type_editor_.open(injection->getMetaData().getSampleTypeAsString(),
-        [this, injection](const std::string& sample_type_name)
+        [this](const std::string& sample_type_name)
       {
         if (stringToSampleType.find(sample_type_name) != stringToSampleType.end())
         {
           const auto sample_type = stringToSampleType.at(sample_type_name);
-          injection->getMetaData().setSampleType(sample_type);
+          for (const auto selected_cell : selected_cells_)
+          {
+            auto injection = getInjectionFromTable(std::get<0>(selected_cell), std::get<1>(selected_cell));
+            injection->getMetaData().setSampleType(sample_type);
+          }          
           sequence_handler_->notifySequenceChanged();
         }
       });
@@ -93,6 +114,20 @@ namespace SmartPeak
       }
     }
     return groups;
+  }
+
+  InjectionHandler* SequenceTableWidget::getInjectionFromTable(const size_t row, const size_t col)
+  {
+    InjectionHandler* injection = nullptr;
+    std::string sample_name = table_data_.body_(row, 1);
+    auto find_it = std::find_if(sequence_handler_->getSequence().begin(),
+      sequence_handler_->getSequence().end(),
+      [&](const auto& injection_handler) { return injection_handler.getMetaData().getSampleName() == sample_name; });
+    if (find_it != sequence_handler_->getSequence().end())
+    {
+      injection = &(*find_it);
+    }
+    return injection;
   }
 
 }
