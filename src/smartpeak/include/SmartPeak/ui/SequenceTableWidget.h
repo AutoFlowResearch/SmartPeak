@@ -31,31 +31,11 @@
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/SequenceGroupsEditorWidget.h>
+#include <SmartPeak/ui/SampleTypeEditorWidget.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 namespace SmartPeak
 {
-  class SampleTypeEditorWidget : public Widget
-  {
-  public:
-
-    SampleTypeEditorWidget()
-    {
-      for (const auto& sample_type_entry : sampleTypeToString)
-      {
-        groups_.insert(sample_type_entry.second);
-      }
-    };
-
-    virtual void draw() override;
-
-    void open(const std::string& current_choice, std::function<void(const std::string&)> ok_callback);
-
-  protected:
-    std::set<std::string> groups_;
-    std::function<void(const std::string&)> ok_callback_;
-    std::string current_choice_;
-  };
 
   class SequenceTableWidget : public GenericTableWidget, public ISequenceObserver
   {
@@ -88,7 +68,7 @@ namespace SmartPeak
     */
     virtual void sequenceUpdated() override
     {
-      table_scanned_ = false;
+      data_changed_ = true;
     }
 
   private:

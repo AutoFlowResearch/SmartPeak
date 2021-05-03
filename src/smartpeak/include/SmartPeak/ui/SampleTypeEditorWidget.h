@@ -17,8 +17,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
-// $Authors: Bertrand Boudaud $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil, Bertrand Boudaud $
+// $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
 #pragma once
@@ -28,50 +28,30 @@
 #include <vector>
 #include <functional>
 #include <imgui.h>
-#include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/SequenceGroupsEditorWidget.h>
 
 namespace SmartPeak
 {
-  class SequenceGroupsEditorWidget : public Widget
+  class SampleTypeEditorWidget : public Widget
   {
   public:
 
-    SequenceGroupsEditorWidget(const std::string& title,
-                               const std::string& move_option_message,
-                               const std::string& create_option_message,
-                               const std::string& move_action_message,
-                               const std::string& create_action_message):
-      Widget(title),
-      move_option_message_(move_option_message),
-      create_option_message_(create_option_message),
-      move_action_message_(move_action_message),
-      create_action_message_(create_action_message)
+    SampleTypeEditorWidget()
     {
+      for (const auto& sample_type_entry : sampleTypeToString)
+      {
+        groups_.insert(sample_type_entry.second);
+      }
     };
 
     virtual void draw() override;
 
-    void open(std::set<std::string>& choices, 
-              const std::string& current_choice, 
-              std::function<void(const std::string&)> ok_callback);
+    void open(const std::string& current_choice, std::function<void(const std::string&)> ok_callback);
 
   protected:
-    std::string current_choice_;
-    std::string new_group_;
     std::set<std::string> groups_;
-    enum
-    {
-      EActionChoice_MoveSegment,
-      EActionChoice_CreateSegment,
-    };
-    int action_choice_ = EActionChoice_MoveSegment;
     std::function<void(const std::string&)> ok_callback_;
-    std::string move_option_message_;
-    std::string create_option_message_;
-    std::string move_action_message_;
-    std::string create_action_message_;
+    std::string current_choice_;
   };
 
 }

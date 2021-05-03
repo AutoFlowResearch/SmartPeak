@@ -185,8 +185,7 @@ namespace SmartPeak
     bool table_scanned_ = false;
     int selected_col = 0;
     std::vector<const char*> cols;
-    int hovered_col_ = 0;
-    int hovered_row_ = 0;
+    bool data_changed_ = false;
   };
 
 

@@ -736,25 +736,22 @@ int main(int argc, char** argv)
     // Sequence
     if (sequence_main_window_->visible_)
     {
-      Eigen::Tensor<bool, 1> table_filters = session_handler_.getSequenceTableFilters();
+      sequence_main_window_->checked_rows_ = session_handler_.getSequenceTableFilters();
       sequence_main_window_->table_data_ = session_handler_.sequence_table;
-      sequence_main_window_->checked_rows_ = table_filters;
     }
 
     // Transitions
     if (transitions_main_window_->visible_)
     {
-      Eigen::Tensor<bool, 1> table_filters = session_handler_.getTransitionsTableFilters();
+      transitions_main_window_->checked_rows_ = session_handler_.getTransitionsTableFilters();
       transitions_main_window_->table_data_ = session_handler_.transitions_table;
-      transitions_main_window_->checked_rows_ = table_filters;
     }
 
     // spectrum
     if (spectrum_main_window_->visible_)
     {
-      Eigen::Tensor<bool, 1> table_filters = session_handler_.getSpectrumTableFilters();
+      spectrum_main_window_->checked_rows_ = session_handler_.getSpectrumTableFilters();
       spectrum_main_window_->table_data_ = session_handler_.spectrum_table;
-      spectrum_main_window_->checked_rows_ = table_filters;
     }
 
     // workflow

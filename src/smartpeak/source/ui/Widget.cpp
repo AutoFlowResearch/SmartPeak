@@ -140,12 +140,7 @@ namespace SmartPeak
 
     ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
 
-    /*
-    if (table_data_.body_.dimension(0) == table_entries_.size())
-      table_scanned_ = true;
-    else
-      table_scanned_ = false;
-    */
+    table_scanned_ = (table_data_.body_.dimension(0) == table_entries_.size() && !data_changed_);
 
     if (table_data_.body_.dimensions().TotalSize() > 0) {
       updateTableContents(table_entries_, table_scanned_,
@@ -157,8 +152,11 @@ namespace SmartPeak
         table_scanned_ = false;
       }
     }
+    data_changed_ = false;
 
     bool edit_cell = false;
+    int hovered_col_ = 0;
+    int hovered_row_ = 0;
     if (ImGui::BeginTable(table_id_.c_str(), table_data_.headers_.size(), table_flags)) {
       // First row entry_contents
       for (int col = 0; col < table_data_.headers_.size(); col++) {

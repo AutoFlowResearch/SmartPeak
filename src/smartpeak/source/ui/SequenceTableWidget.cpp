@@ -37,7 +37,7 @@ namespace SmartPeak
 
   void SequenceTableWidget::onEdit(const size_t row, const size_t col)
   {
-    std::string sample_name = table_data_.body_(hovered_row_, 1);
+    std::string sample_name = table_data_.body_(row, 1);
     auto find_it = std::find_if(sequence_handler_->getSequence().begin(),
       sequence_handler_->getSequence().end(),
       [&](const auto& injection_handler) { return injection_handler.getMetaData().getSampleName() == sample_name; });
@@ -95,51 +95,4 @@ namespace SmartPeak
     return groups;
   }
 
-  void SampleTypeEditorWidget::open(const std::string& current_choice, std::function<void(const std::string&)> ok_callback)
-  {
-    ok_callback_ = ok_callback;
-    current_choice_ = current_choice;
-    ImGui::OpenPopup("Edit Sample Type");
-  }
-
-  void SampleTypeEditorWidget::draw()
-  {
-    float popup_width = 400;
-
-    if (!ImGui::BeginPopupModal("Edit Sample Type", NULL, ImGuiWindowFlags_AlwaysAutoResize)) {
-      return;
-    }
-
-    // one documented way to set popup width
-    const auto cursor_pos = ImGui::GetCursorPosX();
-    ImGui::SetCursorPosX(popup_width);
-    ImGui::SetCursorPosX(cursor_pos);
-
-    if (!groups_.empty() && ImGui::BeginCombo("Select type", current_choice_.c_str()))
-    {
-      for (const auto valid_string : groups_)
-      {
-        if (ImGui::Selectable(valid_string.c_str()))
-        {
-          current_choice_ = valid_string;
-        }
-      }
-      ImGui::EndCombo();
-    }
-
-    ImGui::Separator();
-    if (ImGui::Button("OK"))
-    {
-      ok_callback_(current_choice_);
-      ImGui::CloseCurrentPopup();
-    }
-
-    ImGui::SameLine();
-    if (ImGui::Button("Cancel"))
-    {
-      ImGui::CloseCurrentPopup();
-    }
-
-    ImGui::EndPopup();
-  }
 }

@@ -16,6 +16,7 @@ set(sources_list
 	ParametersTableWidget.cpp
 	Report.cpp
 	RunWorkflowWidget.cpp
+	SampleTypeEditorWidget.cpp
 	SequenceGroupsEditorWidget.cpp
 	SequenceTableWidget.cpp
 	SpectraPlotWidget.cpp
