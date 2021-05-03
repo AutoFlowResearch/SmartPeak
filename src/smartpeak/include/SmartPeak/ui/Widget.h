@@ -164,9 +164,8 @@ namespace SmartPeak
     bool table_scanned_;
     bool plot_all_ = false;
     bool plot_unplot_all_deactivated_ = false;
-    bool workflow_finished_ = false;
     int selected_col_ = 0;
-    unsigned int plot_idx_ = 0;
+    int plot_idx_ = -1;
     unsigned int table_entries_plot_col_ = 0;
     unsigned int checkbox_columns_plot_col_ = 0;
     std::string plot_switch_ = "";

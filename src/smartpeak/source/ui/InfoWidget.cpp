@@ -35,6 +35,8 @@ namespace SmartPeak
 
   void InfoWidget::draw()
   {
+    Utilities::showQuickHelpToolTip("Info");
+    
     drawWorkflowStatus();
     drawFileloadingStatus();
     drawLastRunTime();

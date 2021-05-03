@@ -69,7 +69,7 @@ namespace SmartPeak
     {"featureMatrixMainWindow", " Use this window to view feature matrix"},
     
     // info/log (bottom)
-    {"InfoWidget", " Use this window to get an overview of the currently loaded sequence"},
+    {"Info", " Use this window to get an overview of the currently loaded sequence"},
     {"Log", " Use this window to view a detailed log and spot major warnings & errors"},
     
     // menu elements
