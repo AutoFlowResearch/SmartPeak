@@ -4,7 +4,7 @@ set(directory source/io)
 ### list all filenames of the directory here
 set(sources_list
 	CSVWriter.cpp
-	FileReader.cpp
+	ParametersParser.cpp
 	SequenceParser.cpp
 	InputDataValidation.cpp
 )

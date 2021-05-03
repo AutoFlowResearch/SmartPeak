@@ -579,8 +579,13 @@ int main(int argc, char** argv)
         {
           //if (ImGui::MenuItem("Sequence")) {} // TODO: updated sequence file
           //if (ImGui::MenuItem("Transitions")) {} // TODO: updated transitions file
-          //if (ImGui::MenuItem("Parameters")) {} // TODO: updated parameters file
           //if (ImGui::MenuItem("Standards Conc")) {} // TODO: updated standards concentration file
+          if (ImGui::MenuItem("Parameters")) {
+            static StoreSequenceParameters processor(application_handler_);
+            file_picker_.setProcessor(processor);
+            file_picker_.visible_ = true;
+            update_session_cache_ = true;
+          }
           if (ImGui::MenuItem("Workflow")) {
             static StoreSequenceWorkflow processor(application_handler_);
             file_picker_.setProcessor(processor);

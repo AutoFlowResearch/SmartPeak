@@ -101,6 +101,8 @@ jobs:
       - run:
           name: Installing required libraries
           command: |
+            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core fetch --unshallow
+            git -C /usr/local/Homebrew/Library/Taps/homebrew/homebrew-cask fetch --unshallow
             brew update
             brew remove yarn node
             brew install cmake qt5 sdl2

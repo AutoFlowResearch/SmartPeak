@@ -25,7 +25,7 @@
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
-#include <SmartPeak/io/FileReader.h>
+#include <SmartPeak/io/ParametersParser.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <fstream>
 #include <string>

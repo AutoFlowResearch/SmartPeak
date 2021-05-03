@@ -42,7 +42,7 @@
 #include <SmartPeak/io/InputDataValidation.h> // check filenames and headers
 
 // load validation data and parameters
-#include <SmartPeak/io/FileReader.h>
+#include <SmartPeak/io/ParametersParser.h>
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
 #endif
@@ -1117,7 +1117,7 @@ namespace SmartPeak
     }
 
     try {
-      FileReader::parseOpenMSParams(filenames.parameters_csv_i, rawDataHandler_IO.getParameters());
+      ParametersParser::read(filenames.parameters_csv_i, rawDataHandler_IO.getParameters());
       sanitizeParameters(rawDataHandler_IO.getParameters());
       if (parameters_observable_) parameters_observable_->notifyParametersChanged();
     }
@@ -1173,6 +1173,31 @@ namespace SmartPeak
     }
 
     LOGD << "END sanitizeRawDataProcessorParameters";
+  }
+
+  void StoreParameters::process(
+    RawDataHandler& rawDataHandler_IO,
+    const ParameterSet& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START StoreParameters";
+    LOGI << "Storing " << filename_;
+
+    if (filenames.parameters_csv_i.empty()) {
+      LOGE << "Filename is empty";
+      LOGD << "END readRawDataProcessingParameters";
+      return;
+    }
+
+    try {
+      ParametersParser::write(filenames.parameters_csv_i, rawDataHandler_IO.getParameters());
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    LOGD << "END StoreParameters";
   }
 
   void ZeroChromatogramBaseline::process(
