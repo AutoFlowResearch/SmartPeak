@@ -189,6 +189,7 @@ namespace SmartPeak
     sample_name.clear();
     sample_group_name.clear();
     sequence_segment_name.clear();
+    replicate_group_name.clear();
     original_filename.clear();
     sample_type = SampleType::Unknown;
     acq_method_name.clear();
