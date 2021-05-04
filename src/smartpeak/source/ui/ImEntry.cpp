@@ -96,6 +96,11 @@ namespace SmartPeak
         search_mode = STRING;
       }
     }
+    if (*lhs)
+      return 1;
+    if (*rhs)
+      return -1;
+    return 0;
   }
 
   int IMGUI_CDECL ImEntry::CompareWithSortSpecs(const void* lhs, const void* rhs)
@@ -128,8 +133,10 @@ namespace SmartPeak
 
       if (delta > 0)
         return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? +1 : -1;
-      if (delta < 0)
+      else if (delta < 0)
         return (sort_spec->SortDirection == ImGuiSortDirection_Ascending) ? -1 : +1;
+      else
+        return 0;
     }
       
     if (a->entry_contents[1].c_str() != nullptr && b->entry_contents[1].c_str() != nullptr)
