@@ -477,7 +477,7 @@ namespace SmartPeak
     const std::set<std::string>& component_group_names,
     const std::set<std::string>& component_names) {
     std::vector<std::string> headers = {
-      "sample_name", "sample_type", "component_group_name", "component_name", "batch_name",
+      "sample_name", "sample_type", "component_group_name", "replicate_group_name", "component_name", "batch_name",
       "rack_number", "plate_number", "pos_number", "inj_number", "dilution_factor", "inj_volume",
       "inj_volume_units", "operator_name", "acq_method_name", "proc_method_name",
       "original_filename", "acquisition_date_and_time", "scan_polarity", "scan_mass_low", "scan_mass_high", "injection_name", "used_"
@@ -519,6 +519,7 @@ namespace SmartPeak
           row.push_back(mdh.getSampleName());
           row.push_back(sampleTypeToString.at(mdh.getSampleType()));
           row.push_back(component_group_name);
+          row.push_back(mdh.getReplicateGroupName());
           row.push_back("");
           row.push_back(mdh.batch_name);
           row.push_back(std::to_string(mdh.rack_number));
@@ -576,6 +577,7 @@ namespace SmartPeak
           const std::string component_name = subordinate.getMetaValue(s_native_id);
           if (component_names.size() > 0 && component_names.count(component_name) == 0)
             continue;
+          row.push_back(mdh.getReplicateGroupName());
           row.push_back(component_name);
           row.push_back(mdh.batch_name);
           row.push_back(std::to_string(mdh.rack_number));

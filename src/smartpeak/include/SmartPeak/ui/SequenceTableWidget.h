@@ -59,10 +59,7 @@ namespace SmartPeak
       sequence_handler_->addSequenceObserver(this);
     };
 
-    virtual bool isEditable(const size_t row, const size_t col) const override;
-    virtual void onEdit() override;
-    virtual void drawPopups();
-
+  protected:
     /**
     ISequenceObserver
     */
@@ -70,6 +67,13 @@ namespace SmartPeak
     {
       data_changed_ = true;
     }
+
+    /**
+    GenericTableWidget
+    */
+    virtual bool isEditable(const size_t row, const size_t col) const override;
+    virtual void onEdit() override;
+    virtual void drawPopups() override;
 
   private:
     std::set<std::string> getSequenceGroups(const size_t col);
