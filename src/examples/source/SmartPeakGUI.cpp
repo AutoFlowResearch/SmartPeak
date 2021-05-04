@@ -426,7 +426,7 @@ int main(int argc, char** argv)
           file_picker_.setProcessor(processor);
           file_picker_.visible_ = true;
         }
-        Utilities::showQuickHelpToolTip("load_session_from_sequence");
+        showQuickHelpToolTip("load_session_from_sequence");
         //if (ImGui::MenuItem("Save Session", NULL, false, false))
         //{
         //  //TODO: Session (see AUT-280)
@@ -549,7 +549,7 @@ int main(int argc, char** argv)
           }
           ImGui::EndMenu();
         }
-        Utilities::showQuickHelpToolTip("import_file");
+        showQuickHelpToolTip("import_file");
         
         if (ImGui::BeginMenu("Export File"))
         {
@@ -585,9 +585,9 @@ int main(int argc, char** argv)
           ImGui::EndMenu();
         }
         ImGui::EndMenu();
-        Utilities::showQuickHelpToolTip("export_file");
+        showQuickHelpToolTip("export_file");
       }
-      Utilities::showQuickHelpToolTip("file");
+      showQuickHelpToolTip("file");
       
       if (ImGui::BeginMenu("Edit"))
       {
@@ -598,7 +598,7 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Parameters", NULL, false, false)) {} // TODO: modal of settings
         ImGui::EndMenu();
       }
-      Utilities::showQuickHelpToolTip("edit");
+      showQuickHelpToolTip("edit");
       
       if (ImGui::BeginMenu("View"))
       {
@@ -653,7 +653,7 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Log", NULL, &log_widget_->visible_)) {}
         ImGui::EndMenu();
       }
-      Utilities::showQuickHelpToolTip("view");
+      showQuickHelpToolTip("view");
       
       if (ImGui::BeginMenu("Actions"))
       {
@@ -665,7 +665,7 @@ int main(int argc, char** argv)
           }
           initializeDataDirs(application_handler_);
         }
-        Utilities::showQuickHelpToolTip("run_workflow");
+        showQuickHelpToolTip("run_workflow");
         
         if (ImGui::BeginMenu("Integrity checks"))
         {
@@ -687,15 +687,15 @@ int main(int argc, char** argv)
           }
           ImGui::EndMenu();
         }
-        Utilities::showQuickHelpToolTip("integrity_checks");
+        showQuickHelpToolTip("integrity_checks");
         if (ImGui::MenuItem("Report"))
         {
           report_->visible_ = true;
         }
-        Utilities::showQuickHelpToolTip("report");
+        showQuickHelpToolTip("report");
         ImGui::EndMenu();
       }
-      Utilities::showQuickHelpToolTip("actions");
+      showQuickHelpToolTip("actions");
       
       if (ImGui::BeginMenu("Help"))
       {
@@ -706,7 +706,7 @@ int main(int argc, char** argv)
         }
         ImGui::EndMenu();
       }
-      Utilities::showQuickHelpToolTip("help");
+      showQuickHelpToolTip("help");
       
       ImGui::EndMainMenuBar();
     }
@@ -829,7 +829,6 @@ int main(int argc, char** argv)
       injections_explorer_window_->checked_rows_ = session_handler_.injection_explorer_data.checked_rows;
       injections_explorer_window_->checkbox_headers_ = session_handler_.injection_explorer_data.checkbox_headers;
       injections_explorer_window_->checkbox_columns_ = &session_handler_.injection_explorer_data.checkbox_body;
-      chromatogram_plot_widget_->visible_ ? injections_explorer_window_->active_plot_ = "Chromatograms" : injections_explorer_window_->active_plot_ = "";
     }
 
     // transitions
@@ -840,7 +839,6 @@ int main(int argc, char** argv)
       transitions_explorer_window_->checked_rows_ = session_handler_.transition_explorer_data.checked_rows;
       transitions_explorer_window_->checkbox_headers_ = session_handler_.transition_explorer_data.checkbox_headers;
       transitions_explorer_window_->checkbox_columns_ = &session_handler_.transition_explorer_data.checkbox_body;
-      feature_line_plot_->visible_ ? transitions_explorer_window_->active_plot_ = "Features (line)" : transitions_explorer_window_->active_plot_ = "";
     }
 
     //features
@@ -896,9 +894,11 @@ int main(int argc, char** argv)
       {
         for (auto& widget : left_windows)
         {
+          showQuickHelpToolTip(widget->title_);
           if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
           {
             widget->setWindowSize(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_);
+            showQuickHelpToolTip(widget->title_);
             widget->draw();
             ImGui::EndTabItem();
           }

@@ -34,9 +34,9 @@ namespace SmartPeak
   static std::unordered_map<std::string, std::string> tooltip_info
   {
     // explorer windows (left)
-    {"InjectionsExplorerWindow", " Use this table to view the list of injections\n and plot selected samples to the Chromatogram window"},
-    {"TransitionsExplorerWindow", " Use this table to view the list of samples\n and plot selected samples to the Features (line) window"},
-    {"FeaturesExplorerWindow", " Use this table to view and select from list of features\n and plot selected samples to the Features (line) window"},
+    {"Injections", " Use this table to view the list of injections\n and plot selected samples to the Chromatogram window"},
+    {"Transitions", " Use this table to view the list of samples\n and plot selected samples to the Features (line) window"},
+    {"Features", " Use this table to view and select from list of features\n and plot selected samples to the Features (line) window"},
     
     // main windows (right)
     {"WorkflowStepWindow", " Use this window to add, edit and remove workflow steps before running the workflow"},

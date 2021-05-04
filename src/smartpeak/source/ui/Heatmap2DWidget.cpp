@@ -29,7 +29,7 @@ namespace SmartPeak
 
   void Heatmap2DWidget::draw()
   {
-    Utilities::showQuickHelpToolTip("Heatmap2DWidget");
+    showQuickHelpToolTip("Heatmap2DWidget");
 
     Eigen::Tensor<std::string, 2> selected_feature_names = session_handler_.feature_table.body_;
 

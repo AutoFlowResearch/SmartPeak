@@ -28,7 +28,7 @@ namespace SmartPeak
 {
   void CalibratorsPlotWidget::draw()
   {
-    Utilities::showQuickHelpToolTip("CalibratorsPlotWidget");
+    showQuickHelpToolTip("CalibratorsPlotWidget");
     // Main graphic
     ImPlot::SetNextPlotLimits(x_min_, x_max_, y_min_, y_max_, ImGuiCond_Always);
     if (ImPlot::BeginPlot(plot_title_.c_str(), x_axis_title_.c_str(), y_axis_title_.c_str(), ImVec2(width_ - 25, height_ - 40))) {

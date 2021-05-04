@@ -31,7 +31,7 @@ namespace SmartPeak
 {
   void WorkflowStepWidget::draw()
   {
-    Utilities::showQuickHelpToolTip("WorkflowStepWindow");
+    showQuickHelpToolTip("WorkflowStepWindow");
 
     float popup_width = 400;
     float description_box_height = 200;

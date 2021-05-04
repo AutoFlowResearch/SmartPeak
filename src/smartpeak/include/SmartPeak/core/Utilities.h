@@ -26,7 +26,7 @@
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/ui/ImEntry.h>
-#include <SmartPeak/ui/Help.h>
+//#include <SmartPeak/ui/Help.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
@@ -45,8 +45,6 @@
 
 namespace SmartPeak
 {
-  extern bool enable_quick_help;
-
   class Utilities
   {
 public:
@@ -354,12 +352,5 @@ public:
      @param[in,out] directory_entry directory entry on which the modification is done.
     */
     static void makeHumanReadable(ImEntry& directory_entry);
-    
-    /**
-     @brief Shows Quick Help tooltip when ui_element_name is present in tooltip_info (Help.h).
-     
-     @param[in,out] ui_element_name such as table_id_.
-    */
-    static void showQuickHelpToolTip(const std::string& ui_element_name);
   };
 }

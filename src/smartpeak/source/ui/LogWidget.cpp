@@ -29,7 +29,7 @@ namespace SmartPeak
 {
   void LogWidget::draw()
   {
-    Utilities::showQuickHelpToolTip("Log");
+    showQuickHelpToolTip("Log");
     
     const char* items[] = { "NONE", "FATAL", "ERROR", "WARN", "INFO", "DEBUG", "VERB" }; // reflects the strings in plog's Severity.h
     static int selected_severity = 4;
