@@ -240,16 +240,20 @@ namespace SmartPeak
     const std::string s_semicolon{ ";" };
     const std::string s_tab{ "\t" };
 
-    if (delimiter == s_comma)  {
+    if (delimiter == s_comma)
+    {
       readSequenceFile<io::no_quote_escape<','>>(sequenceHandler, pathname);
     }
-    else if (delimiter == s_semicolon) {
+    else if (delimiter == s_semicolon)
+    {
       readSequenceFile<io::no_quote_escape<';'>>(sequenceHandler, pathname);
     }
-    else if (delimiter == s_tab)  {
+    else if (delimiter == s_tab)
+    {
       readSequenceFile<io::no_quote_escape<'\t'>>(sequenceHandler, pathname);
     }
-    else {
+    else
+    {
       throw std::invalid_argument("Delimiter \"" + delimiter + "\" is not supported.");
     }
 
