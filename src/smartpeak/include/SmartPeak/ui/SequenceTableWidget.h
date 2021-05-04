@@ -53,7 +53,8 @@ namespace SmartPeak
         data_getter,
         data_filter),
       sequence_segment_editor_("Edit Sequence Segment", "Move to existing segment", "Create new segment", "New segment", "Select segment"),
-      sample_group_editor_("Edit Sample Group", "Move to existing group", "Create new group", "New group", "Select group")
+      sample_group_editor_("Edit Sample Group", "Move to existing group", "Create new group", "New group", "Select group"),
+      replicate_group_name_editor_("Edit Replicate Group", "Move to existing group", "Create new group", "New group", "Select group")
     {
       sequence_handler_->addSequenceObserver(this);
     };
@@ -77,6 +78,7 @@ namespace SmartPeak
   protected:
     SequenceGroupsEditorWidget sequence_segment_editor_;
     SequenceGroupsEditorWidget sample_group_editor_;
+    SequenceGroupsEditorWidget replicate_group_name_editor_;
     SampleTypeEditorWidget sample_type_editor_;
   };
 

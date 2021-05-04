@@ -185,11 +185,22 @@ namespace SmartPeak
                 {
                   ImGui::TableSetBgColor(ImGuiTableBgTarget_CellBg, ImColor(ImGui::GetStyle().Colors[ImGuiCol_TabActive]));
                 }
-                ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());
                 bool is_editable = isEditable(row, col);
+                if (is_editable)
+                {
+                  ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32_BLACK_TRANS);
+                  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32_BLACK_TRANS);
+                  ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32_BLACK_TRANS);
+                  ImGui::Button(table_entries_[row].entry_contents[col].c_str(), ImVec2(ImGui::GetColumnWidth(),0));
+                  ImGui::PopStyleColor(3);
+                }
+                else
+                {
+                  ImGui::Text("%s", table_entries_[row].entry_contents[col].c_str());
+                }
                 if (ImGui::IsItemHovered())
                 {
-                  if (isEditable(row, col))
+                  if (is_editable)
                   {
                     ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
                   }

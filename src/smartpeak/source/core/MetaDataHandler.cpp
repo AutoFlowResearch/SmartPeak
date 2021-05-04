@@ -80,6 +80,21 @@ namespace SmartPeak
     return sequence_segment_name;
   }
 
+  void MetaDataHandler::setReplicateGroupName(const std::string& replicate_group_name_I)
+  {
+    replicate_group_name = replicate_group_name_I;
+  }
+
+  std::string& MetaDataHandler::getReplicateGroupName()
+  {
+    return replicate_group_name;
+  }
+
+  const std::string& MetaDataHandler::getReplicateGroupName() const
+  {
+    return replicate_group_name;
+  }
+
   void MetaDataHandler::setFilename(const std::string& filename_I)
   {
     original_filename = filename_I;

@@ -43,6 +43,10 @@ public:
     std::string& getSequenceSegmentName();
     const std::string& getSequenceSegmentName() const;
 
+    void setReplicateGroupName(const std::string& replicate_group_name_I);
+    std::string& getReplicateGroupName();
+    const std::string& getReplicateGroupName() const;
+
     void setFilename(const std::string& filename_I);
     std::string& getFilename();
     const std::string& getFilename() const;
@@ -91,6 +95,7 @@ public:
     std::string sample_name;
     std::string sample_group_name;
     std::string sequence_segment_name;
+    std::string replicate_group_name;
     std::string original_filename;
     SampleType sample_type = SampleType::Unknown;
   };

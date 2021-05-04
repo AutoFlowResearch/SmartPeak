@@ -94,7 +94,7 @@ namespace SmartPeak
     }
     ImGui::Separator();
     bool valid = (action_choice_ == EActionChoice_MoveSegment ||
-                 (action_choice_ == EActionChoice_CreateSegment) && (!new_group_.empty()) && (new_group_name_is_valid));
+                 (action_choice_ == EActionChoice_CreateSegment && new_group_name_is_valid));
     if (!valid) ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
     if (ImGui::Button("OK") && valid)
     {

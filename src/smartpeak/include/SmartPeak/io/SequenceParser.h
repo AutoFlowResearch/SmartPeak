@@ -180,5 +180,9 @@ public:
       const std::vector<FeatureMetadata>& meta_data,
       const std::set<SampleType>& sample_types
     );
+
+    private:
+      template<typename delimiter>
+      static void readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname);
   };
 }

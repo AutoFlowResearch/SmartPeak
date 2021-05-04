@@ -28,11 +28,15 @@ namespace SmartPeak
 {
   static const size_t sample_group_col = 2;
   static const size_t sequence_segment_col = 3;
-  static const size_t sample_type_col = 4;
+  static const size_t replicate_group_name_col = 4;
+  static const size_t sample_type_col = 5;
 
   bool SequenceTableWidget::isEditable(const size_t row, const size_t col) const
   {
-    return ((col == sequence_segment_col) || (col == sample_group_col) || (col == sample_type_col));
+    return ((col == sequence_segment_col) || 
+            (col == sample_group_col) ||
+            (col == replicate_group_name_col) ||
+            (col == sample_type_col));
   }
 
   void SequenceTableWidget::onEdit()
@@ -78,6 +82,19 @@ namespace SmartPeak
         sequence_handler_->notifySequenceChanged();
       });
     }
+    else if (col == replicate_group_name_col)
+    {
+      replicate_group_name_editor_.open(getSequenceGroups(replicate_group_name_col), injection->getMetaData().getReplicateGroupName(),
+        [this](const std::string& replicate_group_name)
+      {
+        for (const auto selected_cell : selected_cells_)
+        {
+          auto injection = getInjectionFromTable(std::get<0>(selected_cell), std::get<1>(selected_cell));
+          injection->getMetaData().setReplicateGroupName(replicate_group_name);
+        }
+        sequence_handler_->notifySequenceChanged();
+      });
+    }
     else if (col == sample_type_col)
     {
       sample_type_editor_.open(injection->getMetaData().getSampleTypeAsString(),
@@ -101,6 +118,7 @@ namespace SmartPeak
   {
     sequence_segment_editor_.draw();
     sample_group_editor_.draw();
+    replicate_group_name_editor_.draw();
     sample_type_editor_.draw();
   }
 
