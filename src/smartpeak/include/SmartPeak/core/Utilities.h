@@ -357,39 +357,5 @@ public:
      * @return formated string
     */
     static std::string str2upper(const std::string& str);
-
-    /**
-     * Join a container of objects into a string separated by separator, 
-     * it handles the last element by not adding the separator and at the end appends concluder string.
-     * 
-     * Requires operator<< for element's type.
-     * 
-     * @tparam T iterator type of container
-     * @param[in] begin iterator to begining of container
-     * @param[in] end iterator to end of container
-     * @param[in] separator separating string
-     * @param[in] concluder finalization string
-     * @return concatenated string
-    */
-    // template<typename T>
-    // std::string join(const T begin, const T end, std::string separator, std::string concluder = "");
   };
-
-  // template<typename T>
-  // std::string Utilities::join(const T begin, const T end, std::string separator, std::string concluder)
-  // {
-  //   const auto length = std::distance(begin, end);
-  //   std::stringstream ss;
-  //   size_t count = 0;
-  //   for (T iter = begin; iter != end; ++iter, ++count)
-  //   {
-  //     ss << *iter;
-  //     if (count < length - 1)
-  //     {
-  //       ss << separator;
-  //     }
-  //   }
-  //   ss << concluder;
-  //   return ss.str();
-  // }
 }
