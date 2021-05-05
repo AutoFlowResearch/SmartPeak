@@ -6,6 +6,7 @@ set(sources_list_h
 	ApplicationHandler.h
 	ApplicationProcessor.h
 	CastValue.h
+	ConsoleHandler.h
 	Filenames.h
 	Helloworld.h
 	FeatureMetadata.h

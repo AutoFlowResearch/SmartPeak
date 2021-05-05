@@ -1,6 +1,9 @@
 set(core_executables_list
+	ApplicationManager_test
 	ApplicationProcessor_test
+	ApplicationSettings_test
 	CastValue_test
+	ConsoleHandler_test
 	Filenames_test
 	Helloworld_test
 	MetaDataHandler_test
@@ -14,6 +17,7 @@ set(core_executables_list
 	SequenceSegmentHandler_test
 	SequenceSegmentProcessor_test
 	SessionHandler_test
+	Task_test
 	Utilities_test
 	Parameters_test
 	ParametersObservable_test

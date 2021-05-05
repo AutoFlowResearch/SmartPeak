@@ -788,4 +788,11 @@ namespace SmartPeak
       directory_entry.entry_contents[3] = date_time_buffer;
     }
   }
+
+  std::string Utilities::str2upper(const std::string& str)
+  {
+    auto str_ = str;
+    std::transform(str_.begin(), str_.end(), str_.begin(), ::toupper);
+    return str_;
+  }
 }

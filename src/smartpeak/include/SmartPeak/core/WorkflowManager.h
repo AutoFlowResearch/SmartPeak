@@ -38,7 +38,7 @@ namespace SmartPeak {
       @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
-      @param[in] blocking If true the operation runs synchronously, otherwise returns immediately
+      @param[in] blocking If true the operation runs synchronously, otherwise runs asynchronously and returns immediately
     */
     void addWorkflow(
       ApplicationHandler& source_state, 
