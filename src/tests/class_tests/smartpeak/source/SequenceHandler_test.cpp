@@ -47,6 +47,7 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   meta_data1.setSampleName("sample1");
   meta_data1.setSampleGroupName("sample");
   meta_data1.setSequenceSegmentName("sequence_segment1");
+  meta_data1.setReplicateGroupName("replicate_group_name1");
   meta_data1.setSampleType(SampleType::Unknown);
   meta_data1.acq_method_name = "6";
   meta_data1.inj_volume = 7.0;
@@ -60,6 +61,7 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   meta_data2.setSampleName("sample2");
   meta_data2.setSampleGroupName("sample");
   meta_data2.setSequenceSegmentName("sequence_segment2");
+  meta_data2.setReplicateGroupName("replicate_group_name2");
   meta_data2.setSampleType(SampleType::Unknown);
   meta_data2.acq_method_name = "6";
   meta_data2.inj_volume = 7.0;
@@ -73,6 +75,7 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   meta_data3.setSampleName("sample3");
   meta_data3.setSampleGroupName("sample");
   meta_data3.setSequenceSegmentName("sequence_segment2");
+  meta_data3.setReplicateGroupName("replicate_group_name2");
   meta_data3.setSampleType(SampleType::Unknown);
   meta_data3.acq_method_name = "6";
   meta_data3.inj_volume = 7.0;
@@ -88,6 +91,7 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
 
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 3);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getMetaData().getSequenceSegmentName(), "sequence_segment1");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getMetaData().getReplicateGroupName(), "replicate_group_name1");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getMetaData().getSampleName(), "sample1");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureMap().metaValueExists("foo1"), true);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureMap().getMetaValue("foo1"), "bar1");
@@ -105,6 +109,7 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getFeatureBackgroundEstimations().component_qcs.size(), 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[0].getRawData().getQuantitationMethods().size(), 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getMetaData().getSequenceSegmentName(), "sequence_segment2");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getMetaData().getReplicateGroupName(), "replicate_group_name2");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getMetaData().getSampleGroupName(), "sample");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().metaValueExists("foo2"), true);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getFeatureMap().getMetaValue("foo2"), "bar2");
@@ -123,6 +128,7 @@ BOOST_AUTO_TEST_CASE(addSampleToSequence)
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[1].getRawData().getQuantitationMethods().size(), 0);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSampleType() == SampleType::Unknown, true);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSequenceSegmentName(), "sequence_segment2");
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getReplicateGroupName(), "replicate_group_name2");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getMetaData().getSampleGroupName(), "sample");
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMap().metaValueExists("foo3"), true);
   BOOST_CHECK_EQUAL(sequenceHandler.getSequence()[2].getRawData().getFeatureMap().getMetaValue("foo3"), "bar3");
@@ -311,6 +317,7 @@ BOOST_AUTO_TEST_CASE(getSamplesInSequence)
   meta_data1.setSampleName("sample1");
   meta_data1.setSampleGroupName("sample");
   meta_data1.setSequenceSegmentName("sequence_segment");
+  meta_data1.setReplicateGroupName("replicate_group_name");
   meta_data1.setSampleType(SampleType::Unknown);
   meta_data1.acq_method_name = "6";
   meta_data1.inj_volume = 7.0;
@@ -322,6 +329,7 @@ BOOST_AUTO_TEST_CASE(getSamplesInSequence)
   meta_data2.setSampleName("sample2");
   meta_data2.setSampleGroupName("sample");
   meta_data2.setSequenceSegmentName("sequence_segment");
+  meta_data2.setReplicateGroupName("replicate_group_name");
   meta_data2.setSampleType(SampleType::Unknown);
   meta_data2.acq_method_name = "6";
   meta_data2.inj_volume = 7.0;
@@ -333,6 +341,7 @@ BOOST_AUTO_TEST_CASE(getSamplesInSequence)
   meta_data3.setSampleName("sample3");
   meta_data3.setSampleGroupName("sample");
   meta_data3.setSequenceSegmentName("sequence_segment");
+  meta_data3.setReplicateGroupName("replicate_group_name");
   meta_data3.setSampleType(SampleType::Unknown);
   meta_data3.acq_method_name = "6";
   meta_data3.inj_volume = 7.0;

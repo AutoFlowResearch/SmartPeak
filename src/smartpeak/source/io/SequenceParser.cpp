@@ -37,61 +37,63 @@
 
 namespace SmartPeak
 {
+  template<typename DELIMITER>
   void SequenceParser::readSequenceFile(
     SequenceHandler& sequenceHandler,
-    const std::string& pathname,
-    const std::string& delimiter
+    const std::string& pathname
   )
   {
-    LOGD << "START readSequenceFile";
-    LOGD << "Delimiter: " << delimiter;
-
-    LOGI << "Loading: " << pathname;
-
-    if (pathname.empty()) {
-      LOGE << "Pathname is empty";
-      LOGD << "END readSequenceFile";
-      return;
-    }
-
-    if (!InputDataValidation::fileExists(pathname)) {
-      LOGE << "File not found";
-      LOGD << "END readSequenceFile";
-      return;
-    }
-
-    const std::string s_sample_name {"sample_name"};
-    const std::string s_sample_group_name {"sample_group_name"};
-    const std::string s_sequence_segment_name {"sequence_segment_name"};
-    const std::string s_sample_type {"sample_type"};
-    const std::string s_original_filename {"original_filename"};
-    const std::string s_proc_method_name {"proc_method_name"};
-    const std::string s_rack_number {"rack_number"};
-    const std::string s_plate_number {"plate_number"};
-    const std::string s_pos_number {"pos_number"};
-    const std::string s_inj_number {"inj_number"};
-    const std::string s_dilution_factor {"dilution_factor"};
-    const std::string s_acq_method_name {"acq_method_name"};
-    const std::string s_operator_name {"operator_name"};
-    const std::string s_acquisition_date_and_time {"acquisition_date_and_time"};
-    const std::string s_inj_volume {"inj_volume"};
-    const std::string s_inj_volume_units {"inj_volume_units"};
-    const std::string s_batch_name {"batch_name"};
+    const std::string s_sample_name{ "sample_name" };
+    const std::string s_sample_group_name{ "sample_group_name" };
+    const std::string s_sequence_segment_name{ "sequence_segment_name" };
+    const std::string s_replicate_group_name{ "replicate_group_name" };
+    const std::string s_sample_type{ "sample_type" };
+    const std::string s_original_filename{ "original_filename" };
+    const std::string s_proc_method_name{ "proc_method_name" };
+    const std::string s_rack_number{ "rack_number" };
+    const std::string s_plate_number{ "plate_number" };
+    const std::string s_pos_number{ "pos_number" };
+    const std::string s_inj_number{ "inj_number" };
+    const std::string s_dilution_factor{ "dilution_factor" };
+    const std::string s_acq_method_name{ "acq_method_name" };
+    const std::string s_operator_name{ "operator_name" };
+    const std::string s_acquisition_date_and_time{ "acquisition_date_and_time" };
+    const std::string s_inj_volume{ "inj_volume" };
+    const std::string s_inj_volume_units{ "inj_volume_units" };
+    const std::string s_batch_name{ "batch_name" };
     const std::string s_scan_polarity{ "scan_polarity" };
     const std::string s_scan_mass_low{ "scan_mass_low" };
     const std::string s_scan_mass_high{ "scan_mass_high" };
 
-    const std::string s_comma {","};
-    const std::string s_semicolon {";"};
-    const std::string s_tab {"\t"};
+    io::CSVReader<21, io::trim_chars<>, DELIMITER> reader(pathname);
 
-    io::CSVReader<20, io::trim_chars<>, io::no_quote_escape<','>> in_comma(pathname);
-    io::CSVReader<20, io::trim_chars<>, io::no_quote_escape<';'>> in_semicolon(pathname);
-    io::CSVReader<20, io::trim_chars<>, io::no_quote_escape<'\t'>> in_tab(pathname);
+    reader.read_header(
+      io::ignore_extra_column | io::ignore_missing_column,
+      s_sample_name,
+      s_sample_group_name,
+      s_sequence_segment_name,
+      s_replicate_group_name,
+      s_sample_type,
+      s_original_filename,
+      s_proc_method_name,
+      s_rack_number,
+      s_plate_number,
+      s_pos_number,
+      s_inj_number,
+      s_dilution_factor,
+      s_acq_method_name,
+      s_operator_name,
+      s_acquisition_date_and_time,
+      s_inj_volume,
+      s_inj_volume_units,
+      s_batch_name,
+      s_scan_polarity,
+      s_scan_mass_low,
+      s_scan_mass_high
+    );
 
-    if (delimiter == s_comma) {
-      in_comma.read_header(
-        io::ignore_extra_column/* | io::ignore_missing_column*/,
+    const std::vector<std::string> mandatory_columns =
+    {
         s_sample_name,
         s_sample_group_name,
         s_sequence_segment_name,
@@ -112,57 +114,13 @@ namespace SmartPeak
         s_scan_polarity,
         s_scan_mass_low,
         s_scan_mass_high
-      );
-    } else if (delimiter == s_semicolon) {
-      in_semicolon.read_header(
-        io::ignore_extra_column/* | io::ignore_missing_column*/,
-        s_sample_name,
-        s_sample_group_name,
-        s_sequence_segment_name,
-        s_sample_type,
-        s_original_filename,
-        s_proc_method_name,
-        s_rack_number,
-        s_plate_number,
-        s_pos_number,
-        s_inj_number,
-        s_dilution_factor,
-        s_acq_method_name,
-        s_operator_name,
-        s_acquisition_date_and_time,
-        s_inj_volume,
-        s_inj_volume_units,
-        s_batch_name,
-        s_scan_polarity,
-        s_scan_mass_low,
-        s_scan_mass_high
-      );
-    } else if (delimiter == s_tab) {
-      in_tab.read_header(
-        io::ignore_extra_column/* | io::ignore_missing_column*/,
-        s_sample_name,
-        s_sample_group_name,
-        s_sequence_segment_name,
-        s_sample_type,
-        s_original_filename,
-        s_proc_method_name,
-        s_rack_number,
-        s_plate_number,
-        s_pos_number,
-        s_inj_number,
-        s_dilution_factor,
-        s_acq_method_name,
-        s_operator_name,
-        s_acquisition_date_and_time,
-        s_inj_volume,
-        s_inj_volume_units,
-        s_batch_name,
-        s_scan_polarity,
-        s_scan_mass_low,
-        s_scan_mass_high
-      );
-    } else {
-      throw std::invalid_argument("Delimiter \"" + delimiter + "\" is not supported.");
+    };
+    for (const auto& mandatory_column : mandatory_columns)
+    {
+      if (!reader.has_column(mandatory_column)) {
+        LOGE << "Missing column " << mandatory_column << " in file " << pathname;
+        throw std::runtime_error("Failed loading sequence file\n");
+      }
     }
 
     unsigned int line_number = 0;
@@ -182,35 +140,13 @@ namespace SmartPeak
         std::string t_inj_volume;
         std::string t_scan_mass_low;
         std::string t_scan_mass_high;
-        bool is_valid = false;
-
-        if (delimiter == s_comma) 
-        {
-          is_valid = in_comma.read_row(t.sample_name, t.sample_group_name,
-            t.sequence_segment_name, t_sample_type, t.original_filename,
-            t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
-            t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-            t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
-            t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
-        }
-        else if (delimiter == s_semicolon)
-        {
-          is_valid = in_semicolon.read_row(t.sample_name, t.sample_group_name,
-            t.sequence_segment_name, t_sample_type, t.original_filename,
-            t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
-            t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-            t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
-            t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
-        }
-        else if (delimiter == s_tab)
-        {
-          is_valid = in_tab.read_row(t.sample_name, t.sample_group_name,
-            t.sequence_segment_name, t_sample_type, t.original_filename,
-            t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
-            t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-            t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
-            t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
-        }
+        
+        bool is_valid = reader.read_row(t.getSampleName(), t.getSampleGroupName(),
+          t.getSequenceSegmentName(), t.getReplicateGroupName(), t_sample_type, t.getFilename(),
+          t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
+          t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
+          t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
+          t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
 
         if (!is_valid)
           break;
@@ -246,11 +182,11 @@ namespace SmartPeak
         validateAndConvert(t_scan_mass_high, t.scan_mass_high);
 
         if (stringToSampleType.count(t_sample_type)) {
-          t.sample_type = stringToSampleType.at(t_sample_type);
+          t.setSampleType(stringToSampleType.at(t_sample_type));
         }
-        else 
+        else
         {
-          t.sample_type = SampleType::Unrecognized;
+          t.setSampleType(SampleType::Unrecognized);
         }
 
         std::tm& adt = t.acquisition_date_and_time;
@@ -262,9 +198,9 @@ namespace SmartPeak
           adt.tm_mday = 1;
         }
 
-        if (t.original_filename.empty()) {
+        if (t.getFilename().empty()) {
           LOGW << "Warning: No value provided for the original filename. Will create a unique default filename.";
-          t.original_filename = t.getInjectionName();
+          t.setFilename(t.getInjectionName());
         }
 
         sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
@@ -274,6 +210,51 @@ namespace SmartPeak
         LOGE << "Error reading " << pathname << " in line " << line_number << ", column '" << current_validating_column << "'";
         throw;
       }
+    }
+  };
+
+  void SequenceParser::readSequenceFile(
+    SequenceHandler& sequenceHandler,
+    const std::string& pathname,
+    const std::string& delimiter
+  )
+  {
+    LOGD << "START readSequenceFile";
+    LOGD << "Delimiter: " << delimiter;
+
+    LOGI << "Loading: " << pathname;
+
+    if (pathname.empty()) {
+      LOGE << "Pathname is empty";
+      LOGD << "END readSequenceFile";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(pathname)) {
+      LOGE << "File not found";
+      LOGD << "END readSequenceFile";
+      return;
+    }
+
+    const std::string s_comma{ "," };
+    const std::string s_semicolon{ ";" };
+    const std::string s_tab{ "\t" };
+
+    if (delimiter == s_comma)
+    {
+      readSequenceFile<io::no_quote_escape<','>>(sequenceHandler, pathname);
+    }
+    else if (delimiter == s_semicolon)
+    {
+      readSequenceFile<io::no_quote_escape<';'>>(sequenceHandler, pathname);
+    }
+    else if (delimiter == s_tab)
+    {
+      readSequenceFile<io::no_quote_escape<'\t'>>(sequenceHandler, pathname);
+    }
+    else
+    {
+      throw std::invalid_argument("Delimiter \"" + delimiter + "\" is not supported.");
     }
 
     LOGD << "END readSequenceFile";
@@ -500,7 +481,7 @@ namespace SmartPeak
     const std::set<std::string>& component_group_names,
     const std::set<std::string>& component_names) {
     std::vector<std::string> headers = {
-      "sample_name", "sample_type", "component_group_name", "component_name", "batch_name",
+      "sample_name", "sample_type", "component_group_name", "replicate_group_name", "component_name", "batch_name",
       "rack_number", "plate_number", "pos_number", "inj_number", "dilution_factor", "inj_volume",
       "inj_volume_units", "operator_name", "acq_method_name", "proc_method_name",
       "original_filename", "acquisition_date_and_time", "scan_polarity", "scan_mass_low", "scan_mass_high", "injection_name", "used_"
@@ -542,6 +523,7 @@ namespace SmartPeak
           row.push_back(mdh.getSampleName());
           row.push_back(sampleTypeToString.at(mdh.getSampleType()));
           row.push_back(component_group_name);
+          row.push_back(mdh.getReplicateGroupName());
           row.push_back("");
           row.push_back(mdh.batch_name);
           row.push_back(std::to_string(mdh.rack_number));
@@ -554,7 +536,7 @@ namespace SmartPeak
           row.push_back(mdh.operator_name);
           row.push_back(mdh.acq_method_name);
           row.push_back(mdh.proc_method_name);
-          row.push_back(mdh.original_filename);
+          row.push_back(mdh.getFilename());
           row.push_back(mdh.getAcquisitionDateAndTimeAsString());
           row.push_back(mdh.scan_polarity);
           row.push_back(std::to_string(mdh.scan_mass_low));
@@ -599,6 +581,7 @@ namespace SmartPeak
           const std::string component_name = subordinate.getMetaValue(s_native_id);
           if (component_names.size() > 0 && component_names.count(component_name) == 0)
             continue;
+          row.push_back(mdh.getReplicateGroupName());
           row.push_back(component_name);
           row.push_back(mdh.batch_name);
           row.push_back(std::to_string(mdh.rack_number));
@@ -611,7 +594,7 @@ namespace SmartPeak
           row.push_back(mdh.operator_name);
           row.push_back(mdh.acq_method_name);
           row.push_back(mdh.proc_method_name);
-          row.push_back(mdh.original_filename);
+          row.push_back(mdh.getFilename());
           row.push_back(mdh.getAcquisitionDateAndTimeAsString());
           row.push_back(mdh.scan_polarity);
           row.push_back(std::to_string(mdh.scan_mass_low));

@@ -44,6 +44,7 @@
 #include <SmartPeak/ui/RunWorkflowWidget.h>
 #include <SmartPeak/ui/AboutWidget.h>
 #include <SmartPeak/ui/LogWidget.h>
+#include <SmartPeak/ui/SequenceTableWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
@@ -71,6 +72,24 @@ void initializeDataDir(
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows);
 
+struct MainGuiObserver : public ISequenceObserver
+{
+  MainGuiObserver(SequenceHandler& sequenceHandler_)
+  {
+    sequenceHandler_.addSequenceObserver(this);
+  }
+
+  /**
+  ISequenceObserver
+  */
+  virtual void sequenceUpdated() override
+  {
+    sequence_updated = true;
+  }
+
+  bool sequence_updated = false;
+};
+
 int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
@@ -88,6 +107,8 @@ int main(int argc, char** argv)
   SessionHandler session_handler_;
   WorkflowManager workflow_manager_;
   GuiAppender appender_;
+
+  MainGuiObserver main_gui_observer_(application_handler_.sequenceHandler_);
 
   // widgets
   FilePicker file_picker_;
@@ -108,7 +129,8 @@ int main(int argc, char** argv)
   auto transitions_explorer_window_ = std::make_shared<ExplorerWidget>("TransitionsExplorerWindow", "Transitions");
   auto features_explorer_window_ = std::make_shared<ExplorerWidget>("FeaturesExplorerWindow", "Features");
   auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Spectrum");
-  auto sequence_main_window_ = std::make_shared<GenericTableWidget>("SequenceMainWindow", "Sequence");
+  auto sequence_main_window_ = std::make_shared<SequenceTableWidget>("SequenceMainWindow", "Sequence",
+                                                                      &session_handler_, &application_handler_.sequenceHandler_);
   auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions");
   auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Spectrum");
   auto quant_method_main_window_ = std::make_shared<GenericTableWidget>("QuantMethodMainWindow", "Quantitation Method",
@@ -379,6 +401,11 @@ int main(int argc, char** argv)
           comp_group_qc_main_window_->table_data_.clear();
         }
         update_session_cache_ = false;
+      }
+      if (main_gui_observer_.sequence_updated)
+      {
+        session_handler_.sequence_table.clear();
+        main_gui_observer_.sequence_updated = false;
       }
 
     // ======================================
@@ -714,25 +741,22 @@ int main(int argc, char** argv)
     // Sequence
     if (sequence_main_window_->visible_)
     {
-      Eigen::Tensor<bool, 1> table_filters = session_handler_.getSequenceTableFilters();
+      sequence_main_window_->checked_rows_ = session_handler_.getSequenceTableFilters();
       sequence_main_window_->table_data_ = session_handler_.sequence_table;
-      sequence_main_window_->checked_rows_ = table_filters;
     }
 
     // Transitions
     if (transitions_main_window_->visible_)
     {
-      Eigen::Tensor<bool, 1> table_filters = session_handler_.getTransitionsTableFilters();
+      transitions_main_window_->checked_rows_ = session_handler_.getTransitionsTableFilters();
       transitions_main_window_->table_data_ = session_handler_.transitions_table;
-      transitions_main_window_->checked_rows_ = table_filters;
     }
 
     // spectrum
     if (spectrum_main_window_->visible_)
     {
-      Eigen::Tensor<bool, 1> table_filters = session_handler_.getSpectrumTableFilters();
+      spectrum_main_window_->checked_rows_ = session_handler_.getSpectrumTableFilters();
       spectrum_main_window_->table_data_ = session_handler_.spectrum_table;
-      spectrum_main_window_->checked_rows_ = table_filters;
     }
 
     // workflow
