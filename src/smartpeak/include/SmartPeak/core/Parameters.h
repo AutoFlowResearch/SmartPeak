@@ -25,7 +25,6 @@
 
 
 #include <SmartPeak/core/CastValue.h>
-#include <SmartPeak/ui/ImEntry.h>
 #include <OpenMS/DATASTRUCTURES/DefaultParamHandler.h>
 #include <map>
 #include <vector>
