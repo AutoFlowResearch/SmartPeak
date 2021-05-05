@@ -182,10 +182,10 @@ namespace SmartPeak
       {
         chart_data.selected_value_name = chart_data.label_strings_.at(index_item);
         ImGui::BeginTooltip();
-        ImGui::Text(chart_data.selected_value_name.c_str());
+        ImGui::Text("%s", chart_data.selected_value_name.c_str());
         std::ostringstream os;
         os << chart_data.values_[index_item] << " Features";
-        ImGui::Text(os.str().c_str());
+        ImGui::Text("%s", os.str().c_str());
         ImGui::EndTooltip();
         chart_data.selected_value_index = index_item;
       }
