@@ -135,9 +135,9 @@ namespace SmartPeak
     // Make the sequence table headers
     if (table_data.headers_.size() <= 0) {
       LOGD << "Making sequence_table_headers";
-      table_data.headers_.resize(11);
+      table_data.headers_.resize(12);
       table_data.headers_.setValues({
-      "inj#", "sample_name", "sample_group_name" , "sequence_segment_name" , "sample_type", 
+      "inj#", "sample_name", "sample_group_name" , "sequence_segment_name" , "replicate_group_name", "sample_type", 
       "original_filename", "acq_method_name", "inj_volume", "inj_volume_units", "batch_name", // skipping optional members
       "acquisition_date_and_time" });
     }
@@ -151,15 +151,17 @@ namespace SmartPeak
       for (const auto& injection : sequence_handler.getSequence()) {
         table_data.body_(row, col) = std::to_string(injection.getMetaData().inj_number);
         ++col;
-        table_data.body_(row, col) = injection.getMetaData().sample_name;
+        table_data.body_(row, col) = injection.getMetaData().getSampleName();
         ++col;
-        table_data.body_(row, col) = injection.getMetaData().sample_group_name;
+        table_data.body_(row, col) = injection.getMetaData().getSampleGroupName();
         ++col;
-        table_data.body_(row, col) = injection.getMetaData().sequence_segment_name;
+        table_data.body_(row, col) = injection.getMetaData().getSequenceSegmentName();
+        ++col;
+        table_data.body_(row, col) = injection.getMetaData().getReplicateGroupName();
         ++col;
         table_data.body_(row, col) = injection.getMetaData().getSampleTypeAsString();
         ++col;
-        table_data.body_(row, col) = injection.getMetaData().original_filename;
+        table_data.body_(row, col) = injection.getMetaData().getFilename();
         ++col;
         table_data.body_(row, col) = injection.getMetaData().acq_method_name;
         ++col;

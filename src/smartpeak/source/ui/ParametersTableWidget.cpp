@@ -273,10 +273,17 @@ namespace SmartPeak
                     ImGui::EndTooltip();
                   }
                 }
-                if ((col == EValueColumn) && ImGui::IsItemClicked())
+                if (col == EValueColumn)
                 {
-                  param_to_edit = parameter;
-                  parameter_to_edit_function = function_parameter_name;
+                  if (ImGui::IsItemHovered())
+                  {
+                    ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+                  }
+                  if (ImGui::IsItemClicked())
+                  {
+                    param_to_edit = parameter;
+                    parameter_to_edit_function = function_parameter_name;
+                  }
                 }
                 // tooltip
                 if (col == ENameColumn)

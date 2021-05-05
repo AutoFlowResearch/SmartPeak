@@ -3,6 +3,7 @@ set(core_executables_list
 	CastValue_test
 	Filenames_test
 	Helloworld_test
+	ImEntry_test
 	MetaDataHandler_test
 	RawDataHandler_test
 	RawDataProcessor_test

@@ -94,11 +94,11 @@ BOOST_AUTO_TEST_CASE(setSequenceTable1)
   TestData testData;
   SessionHandler session_handler;
   session_handler.setSequenceTable(testData.sequenceHandler, session_handler.sequence_table);
-  BOOST_CHECK_EQUAL(session_handler.sequence_table.headers_.size(), 11);
+  BOOST_CHECK_EQUAL(session_handler.sequence_table.headers_.size(), 12);
   BOOST_CHECK_EQUAL(session_handler.sequence_table.headers_(0), "inj#");
   BOOST_CHECK_EQUAL(session_handler.sequence_table.headers_(session_handler.sequence_table.headers_.size() - 1), "acquisition_date_and_time");
   BOOST_CHECK_EQUAL(session_handler.sequence_table.body_.dimension(0), 2);
-  BOOST_CHECK_EQUAL(session_handler.sequence_table.body_.dimension(1), 11);
+  BOOST_CHECK_EQUAL(session_handler.sequence_table.body_.dimension(1), 12);
   BOOST_CHECK_EQUAL(session_handler.sequence_table.body_(0, 0), "1");
   BOOST_CHECK_EQUAL(session_handler.sequence_table.body_(session_handler.sequence_table.body_.dimension(0) - 1, session_handler.sequence_table.body_.dimension(1) - 1), "1900-01-01_000000");
 
@@ -656,20 +656,20 @@ BOOST_AUTO_TEST_CASE(setFeatureTable1)
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
   session_handler.setFeatureTable(testData.sequenceHandler, table_data);
-  BOOST_CHECK_EQUAL(table_data.headers_.size(), 22);
+  BOOST_CHECK_EQUAL(table_data.headers_.size(), 23);
   BOOST_CHECK_EQUAL(table_data.headers_(0), "sample_name");
   BOOST_CHECK_EQUAL(table_data.headers_(table_data.headers_.size() - 1), "used_");
   BOOST_CHECK_EQUAL(table_data.body_.dimension(0), 13);
-  BOOST_CHECK_EQUAL(table_data.body_.dimension(1), 22);
+  BOOST_CHECK_EQUAL(table_data.body_.dimension(1), 23);
   BOOST_CHECK_EQUAL(table_data.body_(0, 0), "150516_CM1_Level1");
   BOOST_CHECK_EQUAL(table_data.body_(table_data.body_.dimension(0) - 1, table_data.body_.dimension(1) - 1), "true");
   session_handler.setMinimalDataAndFilters(testData.sequenceHandler);
   session_handler.setFeatureTable(testData.sequenceHandler, table_data);
-  BOOST_CHECK_EQUAL(table_data.headers_.size(), 23);
+  BOOST_CHECK_EQUAL(table_data.headers_.size(), 24);
   BOOST_CHECK_EQUAL(table_data.headers_(0), "sample_name");
   BOOST_CHECK_EQUAL(table_data.headers_(table_data.headers_.size() - 1), "calculated_concentration");
   BOOST_CHECK_EQUAL(table_data.body_.dimension(0), 1);
-  BOOST_CHECK_EQUAL(table_data.body_.dimension(1), 23);
+  BOOST_CHECK_EQUAL(table_data.body_.dimension(1), 24);
   BOOST_CHECK_EQUAL(table_data.body_(0, 0), "150516_CM1_Level1");
   BOOST_CHECK_EQUAL(table_data.body_(table_data.body_.dimension(0) - 1, table_data.body_.dimension(1) - 1), "");
 }
