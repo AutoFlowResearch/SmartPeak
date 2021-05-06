@@ -168,7 +168,7 @@ namespace SmartPeak
         for (size_t row = 0; row < table_data_.body_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
 
-            if (searcher(table_entries_, selected_col, filter, row))
+            if (searcher(table_entries_, selected_col_, filter, row))
             {
               selected_cells_.erase(std::remove_if(selected_cells_.begin(), selected_cells_.end(),
                                     [&](const auto& selected) { return std::get<0>(selected) == row; }),
@@ -366,12 +366,15 @@ namespace SmartPeak
         }
       } else if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "true")
                && table_scanned_ && plot_idx_ < table_entries_.size()) {
-        table_entries_[plot_idx_].entry_contents[table_entries_plot_col_] = "false";
-        (*checkbox_columns_)(table_entries_[plot_idx_].ID, checkbox_columns_plot_col_) = false;
+        if (!plot_unplot_all_deactivated_) {
+          table_entries_[plot_idx_].entry_contents[table_entries_plot_col_] = "false";
+          (*checkbox_columns_)(table_entries_[plot_idx_].ID, checkbox_columns_plot_col_) = false;
+        }
         if (!std::strcmp(table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_].c_str(), "true")) {
           table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_] = "false";
           (*checkbox_columns_)(table_entries_[plot_idx_+1].ID, checkbox_columns_plot_col_) = false;
-        } else if (!std::strcmp(table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_].c_str(), "false")) {
+        } else if (!std::strcmp(table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_].c_str(), "false")
+                   && !plot_unplot_all_deactivated_) {
           table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_] = "true";
           (*checkbox_columns_)(table_entries_[plot_idx_+1].ID, checkbox_columns_plot_col_) = true;
         }
@@ -397,14 +400,17 @@ namespace SmartPeak
         }
       } else if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "true")
                && table_scanned_ && plot_idx_ > 0) {
-        table_entries_[plot_idx_].entry_contents[table_entries_plot_col_] = "false";
-        (*checkbox_columns_)(table_entries_[plot_idx_].ID, checkbox_columns_plot_col_) = false;
+        if (!plot_unplot_all_deactivated_) {
+          table_entries_[plot_idx_].entry_contents[table_entries_plot_col_] = "false";
+          (*checkbox_columns_)(table_entries_[plot_idx_].ID, checkbox_columns_plot_col_) = false;
+        }
         if (plot_idx_ != 0)
         {
           if (!std::strcmp(table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_].c_str(), "true")) {
             table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_] = "false";
             (*checkbox_columns_)(table_entries_[plot_idx_-1].ID, checkbox_columns_plot_col_) = false;
-          } else if (!std::strcmp(table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_].c_str(), "false")) {
+          } else if (!std::strcmp(table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_].c_str(), "false")
+                     && !plot_unplot_all_deactivated_) {
             table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_] = "true";
             (*checkbox_columns_)(table_entries_[plot_idx_-1].ID, checkbox_columns_plot_col_) = true;
           }

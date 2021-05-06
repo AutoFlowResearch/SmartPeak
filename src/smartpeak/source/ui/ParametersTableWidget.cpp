@@ -107,7 +107,6 @@ namespace SmartPeak
     ImGui::PopStyleColor();
     ImGui::SameLine();
     int parameters_count = 0;
-    static bool is_scanned = false;
     for (const auto& parameter_function : parameters_)
       for (const auto& parameter : parameter_function.second)
         parameters_count++;
@@ -128,7 +127,6 @@ namespace SmartPeak
       ERestrictionColumn,
       ELastColumn
     } ParametersTableWidgetHeader;
-    static const std::vector<std::string> headers = { "function", "name", "type", "value", "restrictions" };
 
     // Edit Parameter widget needs to be open outside the table construction.
     const Parameter  *param_to_edit = nullptr;
@@ -138,42 +136,41 @@ namespace SmartPeak
     filter.Draw("Find");
     
     std::vector<const char*> searcher_dropdown_items_;
-    searcher_dropdown_items_.resize(headers.size() + 1);
-    for (size_t header_name = 0; header_name < headers.size() + 1; ++header_name) {
+    searcher_dropdown_items_.resize(header_names_.size() + 1);
+    for (size_t header_name = 0; header_name < header_names_.size() + 1; ++header_name) {
       if (header_name == 0)
       {
         searcher_dropdown_items_[header_name] = "All";
       }
       else if (header_name > 0)
       {
-        searcher_dropdown_items_[header_name] = headers.at(header_name - 1).c_str();
+        searcher_dropdown_items_[header_name] = header_names_.at(header_name - 1).c_str();
       }
     }
 
     ImGui::Combo("In Column(s)", &selected_col_, searcher_dropdown_items_.data(), searcher_dropdown_items_.size());
 
-    if (ImGui::BeginTable(table_id_.c_str(), headers.size(), table_flags))
+    if (ImGui::BeginTable(table_id_.c_str(), header_names_.size(), table_flags))
     {
-      // First row headers
-      for (auto header : headers) {
+      // First row header_names_
+      for (auto header : header_names_) {
         ImGui::TableSetupColumn(header.c_str());
       }
-      ImGui::TableSetupScrollFreeze(headers.size(), 1);
+      ImGui::TableSetupScrollFreeze(header_names_.size(), 1);
       ImGui::TableHeadersRow();
       
       // ParameterSet to vec<ImEntry>
-      static std::vector<ImEntry> table_entries;
-      if (parameters_.size() > 0 && is_scanned == false) {
-        table_entries.resize(parameters_count, ImEntry());
+      if (parameters_.size() > 0 && is_scanned_ == false) {
+        parameters_table_entries_.resize(parameters_count, ImEntry());
         size_t sub_param_idx = 0;
         for (auto it = parameters_.begin(); it != parameters_.end(); it++) {
-          auto params =it->second.getParameters();
+          auto params = it->second.getParameters();
           for (size_t param_val_idx = 0; param_val_idx < params.size(); ++param_val_idx) {
-            ImEntry& param_entry = table_entries[sub_param_idx];
-            param_entry.entry_contents.resize(headers.size(), "");
+            ImEntry& param_entry = parameters_table_entries_[sub_param_idx];
+            param_entry.entry_contents.resize(header_names_.size(), "");
             param_entry.ID = sub_param_idx;
             param_entry.entry_contents[0] = it->first;
-            std::vector<std::string> parameter_row_vals { params[param_val_idx].getAllValues() };
+            std::vector<std::string> parameter_row_vals {getAllValues_(&params[param_val_idx])};
             for (int i = 0; i < parameter_row_vals.size(); i++)
             {
               param_entry.entry_contents[i+1] = parameter_row_vals[i];
@@ -181,17 +178,17 @@ namespace SmartPeak
             sub_param_idx++;
           }
         }
-        is_scanned = true;
+        is_scanned_ = true;
       }
 
       // Second row to end body
-      if (table_entries.size() > 0)
+      if (parameters_table_entries_.size() > 0)
       {
-        for (auto param_idx = 0; param_idx < table_entries.size(); param_idx++)
+        for (auto param_idx = 0; param_idx < parameters_table_entries_.size(); param_idx++)
         {
           {
-            const std::string function_parameter_name = table_entries[param_idx].entry_contents[0];
-            const std::string parameter_name = table_entries[param_idx].entry_contents[1];
+            const std::string function_parameter_name = parameters_table_entries_[param_idx].entry_contents[0];
+            const std::string parameter_name = parameters_table_entries_[param_idx].entry_contents[1];
             auto parameter = parameters_.findParameter(function_parameter_name, parameter_name);
             
             // compute status
@@ -213,7 +210,7 @@ namespace SmartPeak
             const bool valid = parameter->isValid();
             if ((status == EUserOverride) || (show_unused_ && (status == EUnused)) || (show_default_ && (status == EDefault)))
             {
-              std::vector<std::string> parameter_row_vals {parameter->getAllValues()};
+              std::vector<std::string> parameter_row_vals {getAllValues_(parameter)};
               parameter_row_vals.insert(parameter_row_vals.begin(), function_parameter_name);
 
               if (selected_col_ > 0)
@@ -252,7 +249,7 @@ namespace SmartPeak
                   ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
                 }
                 // text
-                ImGui::Text("%s", table_entries[param_idx].entry_contents[col].c_str() );
+                ImGui::Text("%s", parameters_table_entries_[param_idx].entry_contents[col].c_str());
                 ImGui::PopStyleColor();
                 // edit value
                 if (col == EValueColumn)
@@ -304,14 +301,20 @@ namespace SmartPeak
       
       if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
       {
-        if (sorts_specs->SpecsDirty && is_scanned)
+        if (sorts_specs->SpecsDirty && is_scanned_)
         {
           ImEntry::s_current_sort_specs = sorts_specs;
-          if (table_entries.size() > 1)
-            qsort(&table_entries[0], (size_t)table_entries.size(), sizeof(table_entries[0]), ImEntry::CompareWithSortSpecs);
+          if (parameters_table_entries_.size() > 1)
+            qsort(&parameters_table_entries_[0], (size_t)parameters_table_entries_.size(), sizeof(parameters_table_entries_[0]),
+                  ImEntry::CompareWithSortSpecs);
           ImEntry::s_current_sort_specs = NULL;
           sorts_specs->SpecsDirty = false;
         }
+      }
+      
+      if (is_scanned_ && parameter_editor_widget_.isTableScanRequired()) {
+        is_scanned_ = false;
+        parameter_editor_widget_.setTableScanNotRequired();
       }
     }
     

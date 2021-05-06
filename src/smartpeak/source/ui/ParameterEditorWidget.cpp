@@ -96,6 +96,7 @@ namespace SmartPeak
         if (existing_parameter)
         {
           existing_parameter->setValueFromString(std::string(input_text_field_.data()), false);
+          table_scan_required_ = true;
         }
         else
         {
