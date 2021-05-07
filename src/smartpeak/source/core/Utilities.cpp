@@ -537,24 +537,23 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
   const std::tuple<std::string, std::string>& sorting)
 
   {
-     // name, ext, size, date
+    // name, ext, size, date
     std::array<std::vector<std::string>, 4> directory_entries;
     std::vector<std::tuple<std::string, uintmax_t, std::string, std::time_t>> entries_temp;
     
-    for (auto & p : std::filesystem::directory_iterator(folder_path))
+    for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied))
     {
-      if (p.is_regular_file() && (p.path().filename().string().at(0) != '.') ) //TODO:ASSERT_NR_FILES
+      auto last_write_time = std::filesystem::last_write_time(p.path());
+      auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(last_write_time
+                                                                                    - std::filesystem::file_time_type::clock::now()
+                                                                                    + std::chrono::system_clock::now());
+      std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
+      if (p.is_regular_file() && !isHiddenEntry(p))
       {
-        auto last_write_time = std::filesystem::last_write_time(p.path());
-        auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(last_write_time - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
-        std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
         entries_temp.push_back(std::make_tuple(p.path().filename(), p.file_size(), p.path().extension(), cftime));
       }
-       else if (p.is_directory())
+      else if (p.is_directory() && !isHiddenEntry(p))
        {
-         auto last_write_time = std::filesystem::last_write_time(p.path());
-         auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(last_write_time - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
-         std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
          std::tuple<float, uintmax_t> directory_info;
          getDirectoryInfo(p, directory_info);
          entries_temp.push_back(std::make_tuple(p.path().filename(), std::get<1>(directory_info), "Directory", cftime));
@@ -563,7 +562,7 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
     
     if (entries_temp.size() > 1)
     {
-      for (uintmax_t i = entries_temp.size()-1; i > 0; i--)
+      for (uintmax_t i = 0; i < entries_temp.size(); i++)
       {
         directory_entries[0].push_back(std::get<0>(entries_temp[i]));
         directory_entries[1].push_back((std::get<1>(entries_temp[i]) == 0 ? "0" : std::to_string(std::get<1>(entries_temp[i])) ));
@@ -611,28 +610,39 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
   {
     float size_in_bytes = 0;
     uintmax_t entries = 0;
-    for (auto & p : std::filesystem::directory_iterator(folder_path)) { // TODO:.files/folders
-      if (p.is_regular_file() && !p.is_directory()) {
+    if (!isHiddenEntry(folder_path)) {
+    for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied)) {
+      std::filesystem::path::string_type entry_name = p.path().filename();
+      if (p.is_regular_file() && !p.is_directory() && entry_name != "." && entry_name != ".." && entry_name[0] != '.') {
         size_in_bytes += p.file_size();
         entries += 1;
-      } else if (p.is_directory()) {
+      } else if (p.is_directory() && entry_name != "." && entry_name != ".." && entry_name[0] != '.') {
         entries += 1;
       }
     }
+  }
     std::get<0>(directory_info) = size_in_bytes;
     std::get<1>(directory_info) = entries;
   }
 
+  bool Utilities::isHiddenEntry(const std::filesystem::path& entry_path)
+  {
+    bool is_hidden = false;
+    std::filesystem::path::string_type entry_name = entry_path.filename();
+    if (entry_name == "." || entry_name == ".." || entry_name[0] == '.') is_hidden = true;
+    return is_hidden;
+  }
+
   std::pair<std::string, bool> Utilities::getLogFilepath(const std::string& filename)
   {
-    std::string path = "";
+    std::filesystem::path path{};
     bool flag = false;
     char const* logs = getenv("SMARTPEAK_LOGS");
     char const* appdata = getenv("LOCALAPPDATA");
     char const* home = getenv("HOME");
     if (logs || appdata || home)
     {
-      auto logdir = std::filesystem::path{};
+      auto logdir = std::filesystem::path();
       if (logs)
         logdir = std::filesystem::path(logs);
       else if (appdata)
@@ -647,29 +657,31 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
       }
       catch (std::filesystem::filesystem_error& fe)
       {
-//        if (fe.code() == boost::system::errc::permission_denied)
-//          throw std::runtime_error(static_cast<std::ostringstream&&>(
-//            std::ostringstream()
-//              << "Unable to construct path to log file, permission denied while creating directory '" << logdir.string() << "'").str());
-//        else
-//          throw std::runtime_error(static_cast<std::ostringstream&&>(
-//            std::ostringstream()
-//              << "Unable to construct path to log file, failure while creating directory '" << logdir.string() << "'").str());
+        if (fe.code() == std::errc::permission_denied)
+          throw std::runtime_error(static_cast<std::ostringstream&&>(
+            std::ostringstream()
+              << "Unable to create path to log file, permission denied while creating directory '"
+              << logdir.string() << "'").str());
+        else
+          throw std::runtime_error(static_cast<std::ostringstream&&>(
+            std::ostringstream()
+              << "Unable to create path to log file, failure while creating directory '"
+              << logdir.string() << "'").str());
       }
-//      path = (logdir / filename).string();
-//      // Test if file writeable:
-//      std::filesystem::ofstream file(path);
-//      if (!file)
-//        throw std::runtime_error(static_cast<std::ostringstream&&>(
-//          std::ostringstream()
-//            << "Unable to create log file '" << path << "', please verify permissions to directory").str());
-//      else
-//        file.close();
+      path = (logdir / filename);
+      // Test if file writeable:
+      std::ofstream file(path, std::ofstream::out);
+      if (!file)
+        throw std::runtime_error(static_cast<std::ostringstream&&>(
+          std::ostringstream()
+            << "Unable to create log file " << path << ", please verify directory permissions").str());
+      else
+        file.close();
     }
     else
     {
       throw std::runtime_error(
-        "Unable to construct path to log file. Make sure that either "
+        "Unable to create log file. Please make sure that either "
         "HOME, LOCALAPPDATA or SMARTPEAK_LOGS env variable is set. For details refer to user documentation");
     }
     return std::make_pair(path, flag);

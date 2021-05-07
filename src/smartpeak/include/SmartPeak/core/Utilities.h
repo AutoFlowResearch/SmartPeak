@@ -32,6 +32,7 @@
 #include <regex>
 #include <string>
 #include <filesystem>
+#include <fstream>
 #include <chrono>
 #include <tuple>
 
@@ -319,7 +320,8 @@ public:
       and the second is the total entries in the directory (files and directories).
     */
     static void getDirectoryInfo(const std::filesystem::path& p, std::tuple<float, uintmax_t>& directory_info);
-    static size_t directorySize(const std::string& pathname);
+    //static size_t directorySize(const std::string& pathname);
+    static bool isHiddenEntry(const std::filesystem::path& entry_path);
 
     /**
     * @brief Constructs an absolute filepath to an application logs.
