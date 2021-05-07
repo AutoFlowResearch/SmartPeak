@@ -532,10 +532,7 @@ namespace SmartPeak
     return false;
   }
 
-std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
-  const std::filesystem::path& folder_path,
-  const std::tuple<std::string, std::string>& sorting)
-
+  std::array<std::vector<std::string>, 4> Utilities::getFolderContents(const std::filesystem::path& folder_path)
   {
     // name, ext, size, date
     std::array<std::vector<std::string>, 4> directory_entries;
@@ -571,8 +568,7 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
         std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&std::get<3>(entries_temp[i])));
         directory_entries[3].push_back(buff);
       }
-    } else if (entries_temp.size() == 1)
-    {
+    } else if (entries_temp.size() == 1) {
       directory_entries[0].push_back(std::get<0>(entries_temp[0]));
       directory_entries[1].push_back((std::get<1>(entries_temp[0]) == 0 ? "0" : std::to_string(std::get<1>(entries_temp[0])) ));
       directory_entries[2].push_back(std::get<2>(entries_temp[0]));
@@ -587,7 +583,7 @@ std::array<std::vector<std::string>, 4> Utilities::getFolderContents(
   std::string Utilities::getParentPath(const std::filesystem::path& p)
   {
     std::filesystem::path parent_path;
-    if ( p.string() == ".") {
+    if (p.string() == ".") {
       std::filesystem::path working_dir(std::filesystem::current_path());
       parent_path = (working_dir.parent_path());
     } else if (p.has_parent_path()) {

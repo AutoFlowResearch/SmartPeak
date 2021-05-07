@@ -33,10 +33,6 @@
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/ImEntry.h>
 
-// #include <boost/filesystem.hpp>
-
-// namespace fs = boost::filesystem;
-
 namespace SmartPeak
 {
   class FilePicker final : public Widget

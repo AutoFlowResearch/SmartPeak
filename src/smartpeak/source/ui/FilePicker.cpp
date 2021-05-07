@@ -35,7 +35,7 @@ namespace SmartPeak
   {
     if (!files_scanned_)
     {
-      pathname_content_ = Utilities::getFolderContents(current_pathname_, std::make_tuple ("last_write_time", "descending"));
+      pathname_content_ = Utilities::getFolderContents(current_pathname_);
       Im_directory_entries.resize(pathname_content_[0].size(), ImEntry());
       for (int row = 0; row < pathname_content_[0].size(); row++)
       {
@@ -65,7 +65,7 @@ namespace SmartPeak
       if (parent.size()) {
         current_pathname_ = parent;
       }
-      pathname_content_ = Utilities::getFolderContents(current_pathname_, std::make_tuple ("last_write_time", "descending"));
+      pathname_content_ = Utilities::getFolderContents(current_pathname_);
       files_scanned_ = false;
       memset(selected_filename, 0, sizeof selected_filename);
       selected_entry = -1;
@@ -86,7 +86,7 @@ namespace SmartPeak
       if (ImGui::Button("Set") || ImGui::IsKeyPressedMap(ImGuiKey_Enter))
       {
         current_pathname_.assign(new_pathname);
-        pathname_content_ = Utilities::getFolderContents(current_pathname_, std::make_tuple ("last_write_time", "descending"));
+        pathname_content_ = Utilities::getFolderContents(current_pathname_);
         memset(selected_filename, 0, sizeof selected_filename);
         files_scanned_ = false;
         selected_entry = -1;

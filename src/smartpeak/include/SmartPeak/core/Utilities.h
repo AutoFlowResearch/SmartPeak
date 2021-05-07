@@ -256,13 +256,10 @@ public:
       @brief Retrieves information about files in a given directory
 
       @param[in] folder_path Given path to inspect and scan
-      @param[in] sorting Desired order of the results in the form of a tuple,
       where the first element is "name", "extension", "size" and "last_write_time", the second element can either be "ascending" or "descending".
       @return List of files found where each string of vectors is a representation of a file's name, size, type and date.
     */
-    static std::array<std::vector<std::string>, 4> getFolderContents(
-      const std::filesystem::path& folder_path,
-      const std::tuple<std::string, std::string>& sorting);
+    static std::array<std::vector<std::string>, 4> getFolderContents(const std::filesystem::path& folder_path);
     
     /**
       @brief Get the parent path from a given path, the given path is returned when the parent path isn't existent
@@ -320,7 +317,7 @@ public:
       and the second is the total entries in the directory (files and directories).
     */
     static void getDirectoryInfo(const std::filesystem::path& p, std::tuple<float, uintmax_t>& directory_info);
-    //static size_t directorySize(const std::string& pathname);
+    
     static bool isHiddenEntry(const std::filesystem::path& entry_path);
 
     /**

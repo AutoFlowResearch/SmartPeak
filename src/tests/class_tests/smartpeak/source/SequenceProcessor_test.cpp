@@ -27,7 +27,7 @@
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Filenames.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 using namespace SmartPeak;
 using namespace std;
@@ -447,7 +447,7 @@ BOOST_AUTO_TEST_CASE(processSampleGroups_no_injections)
 BOOST_AUTO_TEST_CASE(StoreWorkflow1)
 {
   SequenceHandler sequenceHandler;
-  namespace fs = boost::filesystem;
+  namespace fs = std::filesystem;
   std::vector<std::string> command_names = {
     "LOAD_RAW_DATA",
     "MAP_CHROMATOGRAMS",
@@ -461,7 +461,7 @@ BOOST_AUTO_TEST_CASE(StoreWorkflow1)
   };
   sequenceHandler.setWorkflow(command_names);
   StoreWorkflow processor(sequenceHandler);
-  processor.filename_ = (fs::temp_directory_path().append(fs::unique_path().string())).string();
+  processor.filename_ = (SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv"));
   processor.process();
   // compare with reference file
   const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");

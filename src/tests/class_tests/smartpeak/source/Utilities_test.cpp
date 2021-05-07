@@ -25,14 +25,14 @@
 
 #define BOOST_TEST_MODULE Utilities test suite
 #include <boost/test/included/unit_test.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <sys/stat.h>
 #include <SmartPeak/core/Utilities.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>
 
 using namespace SmartPeak;
 using namespace std;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 BOOST_AUTO_TEST_SUITE(utilities)
 
@@ -449,7 +449,7 @@ BOOST_AUTO_TEST_CASE(endsWith)
 BOOST_AUTO_TEST_CASE(getFolderContents)
 {
   const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
-  const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname);
+  const std::array<std::vector<std::string>, 4> c = Utilities::getFolderContents(pathname);
 
   // number of items in the pathname, taking .gitignore into account
   BOOST_CHECK_EQUAL(c[0].size(), 49);
@@ -457,18 +457,18 @@ BOOST_AUTO_TEST_CASE(getFolderContents)
   BOOST_CHECK_EQUAL(c[2].size(), 49);
   BOOST_CHECK_EQUAL(c[3].size(), 49);
 
-  BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_1900-01-01_000000.featureXML");
+  BOOST_CHECK_EQUAL(c[0][0], "OpenMSFile_ChromeleonFile_10ug.txt");
  #ifdef _WIN32
    // NOTE: depending on the build machine...
    //BOOST_CHECK_EQUAL(c[1][0], "774620"); // file size
  #else
-  BOOST_CHECK_EQUAL(c[1][0], "761937"); // file size
+  BOOST_CHECK_EQUAL(c[1][0], "86299"); // file size
  #endif
-  BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
+  BOOST_CHECK_EQUAL(c[2][0], ".txt");
 
-  BOOST_CHECK_EQUAL(c[0][48], "workflow_csv_files");
-  BOOST_CHECK_EQUAL(c[1][48], "22"); // number of items within the folder
-  BOOST_CHECK_EQUAL(c[2][48], "Directory");
+  BOOST_CHECK_EQUAL(c[0][48], "RawDataProcessor_serumTest_accurateMassSearch.featureXML");
+  BOOST_CHECK_EQUAL(c[1][48], "78174");
+  BOOST_CHECK_EQUAL(c[2][48], ".featureXML");
 }
 
 
@@ -533,13 +533,12 @@ BOOST_AUTO_TEST_CASE(is_less_than_icase)
 }
 
 
-BOOST_AUTO_TEST_CASE(getDirectorySize)
+BOOST_AUTO_TEST_CASE(getDirectoryInfo)
 {
+  std::tuple<float, uintmax_t> directory_info;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
-  auto& f = Utilities::directorySize;
-  BOOST_CHECK_EQUAL(f(path), 49);
-  BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 22);
-  BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
+  Utilities::getDirectoryInfo(path, directory_info);
+  BOOST_CHECK_EQUAL(std::get<1>(directory_info), 49);
 }
 
 void set_env_var_(const std::string& name, const std::string& value)
