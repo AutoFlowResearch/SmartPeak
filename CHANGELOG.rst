@@ -1,6 +1,22 @@
 SmartPeak Changelog
 ===================
 
+v1.5.0 (2020-05-07)
+-------------------
+
+Features
+~~~~~~~~
+- Ability to export Parameters `(#360) <https://github.com/AutoFlowResearch/SmartPeak/pull/360>`_  
+
+Changes
+~~~~~~~
+- Compilation now uses C++17 standard.
+
+Fix
+~~~
+- Fixed too much points to be displayed on Chromatograms `(#358) <https://github.com/AutoFlowResearch/SmartPeak/pull/358>`_
+- Fixed crash on Linux when opening Transitions Tab `(#364) <https://github.com/AutoFlowResearch/SmartPeak/pull/364>`_
+
 v1.4.0 (2020-04-26)
 -------------------
 
