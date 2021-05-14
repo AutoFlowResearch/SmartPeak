@@ -540,21 +540,24 @@ namespace SmartPeak
     
     for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied))
     {
-      auto last_write_time = std::filesystem::last_write_time(p.path());
-      auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(last_write_time
-                                                                                    - std::filesystem::file_time_type::clock::now()
-                                                                                    + std::chrono::system_clock::now());
-      std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
-      if (p.is_regular_file() && !isHiddenEntry(p))
+      if (!isHiddenEntry(p))
       {
-        entries_temp.push_back(std::make_tuple(p.path().filename(), p.file_size(), p.path().extension(), cftime));
+        auto last_write_time = std::filesystem::last_write_time(p.path());
+        auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(last_write_time
+                                                                                      - std::filesystem::file_time_type::clock::now()
+                                                                                      + std::chrono::system_clock::now());
+        std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
+        if (p.is_regular_file())
+        {
+          entries_temp.push_back(std::make_tuple(p.path().filename(), (uintmax_t)p.file_size(), p.path().extension(), cftime));
+        }
+        else if (p.is_directory())
+        {
+          std::tuple<float, uintmax_t> directory_info;
+          getDirectoryInfo(p, directory_info);
+          entries_temp.push_back(std::make_tuple(p.path().filename(), (uintmax_t)std::get<1>(directory_info), "Directory", cftime));
+        }
       }
-      else if (p.is_directory() && !isHiddenEntry(p))
-       {
-         std::tuple<float, uintmax_t> directory_info;
-         getDirectoryInfo(p, directory_info);
-         entries_temp.push_back(std::make_tuple(p.path().filename(), std::get<1>(directory_info), "Directory", cftime));
-       }
     }
     
     if (entries_temp.size() > 1)
@@ -568,7 +571,9 @@ namespace SmartPeak
         std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&std::get<3>(entries_temp[i])));
         directory_entries[3].push_back(buff);
       }
-    } else if (entries_temp.size() == 1) {
+    }
+    else if (entries_temp.size() == 1)
+    {
       directory_entries[0].push_back(std::get<0>(entries_temp[0]));
       directory_entries[1].push_back((std::get<1>(entries_temp[0]) == 0 ? "0" : std::to_string(std::get<1>(entries_temp[0])) ));
       directory_entries[2].push_back(std::get<2>(entries_temp[0]));
@@ -607,16 +612,16 @@ namespace SmartPeak
     float size_in_bytes = 0;
     uintmax_t entries = 0;
     if (!isHiddenEntry(folder_path)) {
-    for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied)) {
-      std::filesystem::path::string_type entry_name = p.path().filename();
-      if (p.is_regular_file() && !p.is_directory() && entry_name != "." && entry_name != ".." && entry_name[0] != '.') {
-        size_in_bytes += p.file_size();
-        entries += 1;
-      } else if (p.is_directory() && entry_name != "." && entry_name != ".." && entry_name[0] != '.') {
-        entries += 1;
+      for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied)) {
+        std::filesystem::path::string_type entry_name = p.path().filename();
+        if (p.is_regular_file() && !p.is_directory() && !isHiddenEntry(p)) {
+          size_in_bytes += p.file_size();
+          entries += 1;
+        } else if (p.is_directory() && !isHiddenEntry(p)) {
+          entries += 1;
+        }
       }
     }
-  }
     std::get<0>(directory_info) = size_in_bytes;
     std::get<1>(directory_info) = entries;
   }
@@ -625,11 +630,11 @@ namespace SmartPeak
   {
     bool is_hidden = false;
     std::filesystem::path::string_type entry_name = entry_path.filename();
-    if (entry_name == "." || entry_name == ".." || entry_name[0] == '.') is_hidden = true;
+    if ((std::string)entry_name == "." || (std::string)entry_name == ".." || entry_name[0] == '.') is_hidden = true;
     return is_hidden;
   }
 
-  std::pair<std::string, bool> Utilities::getLogFilepath(const std::string& filename)
+  std::pair<std::filesystem::path, bool> Utilities::getLogFilepath(const std::string& filename)
   {
     std::filesystem::path path{};
     bool flag = false;

@@ -332,7 +332,7 @@ public:
     * @param[in] filename Log filename
     * @returns The absolute path to log file and boolean flag whether the path to directory was created
     */
-    static std::pair<std::string, bool> getLogFilepath(const std::string& filename);
+    static std::pair<std::filesystem::path, bool> getLogFilepath(const std::string& filename);
 
     /**
     * @brief Returns the build version of SmartPeak package if available.

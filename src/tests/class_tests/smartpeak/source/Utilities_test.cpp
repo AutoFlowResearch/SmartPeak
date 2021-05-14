@@ -563,7 +563,7 @@ BOOST_AUTO_TEST_CASE(getLogFilepath)
   // Test doesn't assume that any env variable is set
   {
     auto dirpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("logs") };
-    auto filepath = std::string{};
+    auto filepath = std::filesystem::path{};
     auto dir_created = false;
     
     // Only HOME is set

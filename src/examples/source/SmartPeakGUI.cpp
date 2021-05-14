@@ -252,7 +252,7 @@ int main(int argc, char** argv)
   char filename[128];
   strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
 
-  auto logfilepath = std::string{};
+  auto logfilepath = std::filesystem::path{};
   auto logdirpath = std::string{};
   auto logdir_created = false;
   auto error_msg = std::string{};
@@ -268,7 +268,7 @@ int main(int argc, char** argv)
 
   // Add .csv appender: 32 MiB per file, max. 100 log files
   plog::RollingFileAppender<plog::CsvFormatter>
-    fileAppender(logfilepath.c_str(), 1024 * 1024 * 32, 100);
+    fileAppender(logfilepath.string().c_str(), 1024 * 1024 * 32, 100);
 
   // Add console appender, instead of only the file one
   plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
@@ -284,7 +284,7 @@ int main(int argc, char** argv)
   if (error_msg.empty())
   {
     if (logdir_created) { LOG_DEBUG << "Log directory created: " << logdirpath; }
-    LOG_INFO << "Log file at: " << logfilepath;
+    LOG_INFO << "Log file at: " << logfilepath.string();
   }
   else
   {
