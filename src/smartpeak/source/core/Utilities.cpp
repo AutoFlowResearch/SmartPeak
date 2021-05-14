@@ -549,13 +549,13 @@ namespace SmartPeak
         std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
         if (p.is_regular_file())
         {
-          entries_temp.push_back(std::make_tuple(p.path().filename(), (uintmax_t)p.file_size(), p.path().extension(), cftime));
+          entries_temp.push_back(std::make_tuple(p.path().filename().string(), p.file_size(), p.path().extension().string(), cftime));
         }
         else if (p.is_directory())
         {
           std::tuple<float, uintmax_t> directory_info;
           getDirectoryInfo(p, directory_info);
-          entries_temp.push_back(std::make_tuple(p.path().filename(), (uintmax_t)std::get<1>(directory_info), "Directory", cftime));
+          entries_temp.push_back(std::make_tuple(p.path().filename().string(), std::get<1>(directory_info), "Directory", cftime));
         }
       }
     }
