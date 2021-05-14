@@ -629,8 +629,8 @@ namespace SmartPeak
   bool Utilities::isHiddenEntry(const std::filesystem::path& entry_path)
   {
     bool is_hidden = false;
-    std::filesystem::path::string_type entry_name = entry_path.filename();
-    if ((std::string)entry_name == "." || (std::string)entry_name == ".." || entry_name[0] == '.') is_hidden = true;
+    std::string entry_name = entry_path.filename().string();
+    if (entry_name == "." || (std::string)entry_name == ".." || entry_name[0] == '.') is_hidden = true;
     return is_hidden;
   }
 
