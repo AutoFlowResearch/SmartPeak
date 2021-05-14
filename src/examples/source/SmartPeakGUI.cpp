@@ -918,7 +918,6 @@ int main(int argc, char** argv)
       {
         for (auto& widget : left_windows)
         {
-          showQuickHelpToolTip(widget->title_);
           if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
           {
             widget->setWindowSize(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_);
@@ -949,6 +948,7 @@ int main(int argc, char** argv)
           if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
           {
             widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
+            showQuickHelpToolTip(widget->title_);
             widget->draw();
             ImGui::EndTabItem();
           }
