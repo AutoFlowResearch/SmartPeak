@@ -758,6 +758,7 @@ BOOST_AUTO_TEST_CASE(StoreSequenceWorkflow1)
   StoreSequenceWorkflow application_processor(application_handler);
   BOOST_CHECK_EQUAL(application_processor.getName(), "StoreSequenceWorkflow");
   application_processor.pathname_ = (SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv"));
+  //application_processor.pathname_ = std::tmpnam(nullptr);
   BOOST_REQUIRE(application_processor.process());
   // compare with reference file
   const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");

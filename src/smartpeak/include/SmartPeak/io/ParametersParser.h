@@ -23,32 +23,50 @@
 
 #pragma once
 
-#include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/WorkflowStepWidget.h>
-#include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/Parameters.h>
+
+#include <map>
 #include <string>
 #include <vector>
 
 namespace SmartPeak
 {
-  class Workflow final : public Widget
+  class ParametersParser
   {
   public:
+      ParametersParser() = delete;
+      ~ParametersParser() = delete;
+      ParametersParser(const ParametersParser&) = delete;
+      ParametersParser& operator=(const ParametersParser&) = delete;
+      ParametersParser(ParametersParser&&) = delete;
+      ParametersParser& operator=(ParametersParser&&) = delete;
 
-    Workflow(const std::string title, ApplicationHandler& application_handler)
-      : Widget(title),
-      application_handler_(application_handler),
-      workflow_step_widget_(application_handler)
-    {
-    };
+      /**
+        Parse parameters from csv file.
 
-    void draw() override;
+        @param[in] filename Input csv file
+        @param[out] parameters a ParameterSet
+      */
+      static void read(
+        const std::string& filename,
+        ParameterSet& parameters
+      );
 
-    void setEditable(bool editable) { editable_ = editable; };
+      /**
+        Write parameters to csv file.
 
-  protected:
-    ApplicationHandler& application_handler_;
-    WorkflowStepWidget workflow_step_widget_;
-    bool editable_ = true;
+        @param[in] filename Input csv file
+        @param[in] parameters a ParameterSet
+      */
+      static void write(
+        const std::string& filename,
+        const ParameterSet& parameters
+      );
+
+  private:
+    /**
+      @brief add quotes around the string
+    */
+    static std::string decorateString(const std::string& string_in);
   };
 }

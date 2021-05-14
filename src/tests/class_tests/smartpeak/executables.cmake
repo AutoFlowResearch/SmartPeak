@@ -3,6 +3,7 @@ set(core_executables_list
 	CastValue_test
 	Filenames_test
 	Helloworld_test
+	ImEntry_test
 	MetaDataHandler_test
 	RawDataHandler_test
 	RawDataProcessor_test
@@ -22,7 +23,7 @@ set(core_executables_list
 
 set(io_executables_list
 	CSVWriter_test
-	FileReader_test
+	ParametersParser_test
 	SequenceParser_test
 	InputDataValidation_test
 )

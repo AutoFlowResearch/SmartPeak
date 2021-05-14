@@ -206,6 +206,7 @@ namespace SmartPeak
               runProcessor();
               clearProcessor();
               LOGI << "Picked file : " << picked_pathname_;
+              visible_ = false;
               ImGui::CloseCurrentPopup();
             }
           }
@@ -240,6 +241,7 @@ namespace SmartPeak
       runProcessor();
       clearProcessor();
       selected_entry = -1;
+      visible_ = false;
       ImGui::CloseCurrentPopup();
     }
     ImGui::PopItemWidth();
@@ -250,6 +252,7 @@ namespace SmartPeak
     {
       picked_pathname_.clear();
       selected_entry = -1;
+      visible_ = false;
       ImGui::CloseCurrentPopup();
     }
     ImGui::PopItemWidth();

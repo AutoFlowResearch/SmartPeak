@@ -17,8 +17,9 @@ namespace SmartPeak
   public:
     SpectraPlotWidget(SessionHandler& session_handler,
       SequenceHandler& sequence_handler,
+      const std::string& id,
       const std::string& title) :
-      ScatterPlotWidget(session_handler, sequence_handler, title) {};
+      ScatterPlotWidget(session_handler, sequence_handler, id, title) {};
   protected:
     virtual void updateScatterPlotData() override;
   protected:

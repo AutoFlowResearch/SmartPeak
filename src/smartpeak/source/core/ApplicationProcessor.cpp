@@ -366,6 +366,23 @@ namespace SmartPeak
     }
   }
 
+  bool StoreSequenceParameters::process()
+  {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
+      StoreParameters storeParameters;
+      Filenames filenames = application_handler_.static_filenames_;
+      filenames.parameters_csv_i = pathname_;
+      storeParameters.process(rawDataHandler, {}, filenames);
+      return true;
+    }
+    else
+    {
+      LOGE << "Parameters file cannot be stored without first loading the sequence.";
+      return false;
+    }
+  }
+
   bool LoadSequenceTransitions::process() {
     if (application_handler_.sequenceHandler_.getSequence().size()) {
       RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();

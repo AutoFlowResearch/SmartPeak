@@ -43,6 +43,10 @@ public:
     std::string& getSequenceSegmentName();
     const std::string& getSequenceSegmentName() const;
 
+    void setReplicateGroupName(const std::string& replicate_group_name_I);
+    std::string& getReplicateGroupName();
+    const std::string& getReplicateGroupName() const;
+
     void setFilename(const std::string& filename_I);
     std::string& getFilename();
     const std::string& getFilename() const;
@@ -67,11 +71,6 @@ public:
     std::string getAcquisitionDateAndTimeAsString(const std::string& format = "%Y-%m-%d_%H%M%S") const;
 
     // required
-    std::string sample_name;
-    std::string sample_group_name;
-    std::string sequence_segment_name;
-    std::string original_filename;
-    SampleType sample_type = SampleType::Unknown;
     std::string acq_method_name;
     float inj_volume = -1.0;
     std::string inj_volume_units;
@@ -90,6 +89,15 @@ public:
     std::string scan_polarity = "Unknown";
     float scan_mass_low = 0.0; // in Da
     float scan_mass_high = 1e12; // in Da
+
+  protected:
+    // required
+    std::string sample_name;
+    std::string sample_group_name;
+    std::string sequence_segment_name;
+    std::string replicate_group_name;
+    std::string original_filename;
+    SampleType sample_type = SampleType::Unknown;
   };
 
 }

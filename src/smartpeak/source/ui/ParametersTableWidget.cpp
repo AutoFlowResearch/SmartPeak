@@ -33,8 +33,9 @@
 namespace SmartPeak
 {
 
-  ParametersTableWidget::ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id)
-    : session_handler_(session_handler),
+  ParametersTableWidget::ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id, const std::string title)
+    : Widget(title),
+    session_handler_(session_handler),
     application_handler_(application_handler),
     table_id_(table_id),
     parameter_editor_widget_(application_handler)
@@ -231,10 +232,17 @@ namespace SmartPeak
                     ImGui::EndTooltip();
                   }
                 }
-                if ((col == EValueColumn) && ImGui::IsItemClicked())
+                if (col == EValueColumn)
                 {
-                  param_to_edit = &parameter;
-                  parameter_to_edit_function = function_parameter_name;
+                  if (ImGui::IsItemHovered())
+                  {
+                    ImGui::SetMouseCursor(ImGuiMouseCursor_Hand);
+                  }
+                  if (ImGui::IsItemClicked())
+                  {
+                    param_to_edit = &parameter;
+                    parameter_to_edit_function = function_parameter_name;
+                  }
                 }
                 // tooltip
                 if (col == ENameColumn)

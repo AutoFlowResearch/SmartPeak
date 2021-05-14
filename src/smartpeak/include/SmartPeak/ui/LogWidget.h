@@ -18,37 +18,24 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
-
 #pragma once
 
 #include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/WorkflowStepWidget.h>
-#include <SmartPeak/core/ApplicationHandler.h>
-#include <string>
-#include <vector>
+#include <SmartPeak/ui/GuiAppender.h>
 
 namespace SmartPeak
 {
-  class Workflow final : public Widget
+  class LogWidget final : public Widget
   {
   public:
-
-    Workflow(const std::string title, ApplicationHandler& application_handler)
-      : Widget(title),
-      application_handler_(application_handler),
-      workflow_step_widget_(application_handler)
-    {
-    };
+    LogWidget(const GuiAppender& appender, const std::string title = "") :
+      Widget(title),
+      appender_(appender) {};
 
     void draw() override;
-
-    void setEditable(bool editable) { editable_ = editable; };
-
   protected:
-    ApplicationHandler& application_handler_;
-    WorkflowStepWidget workflow_step_widget_;
-    bool editable_ = true;
+    const GuiAppender& appender_;
   };
 }

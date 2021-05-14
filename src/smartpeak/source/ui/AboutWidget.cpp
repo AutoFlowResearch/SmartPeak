@@ -18,37 +18,31 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
-#pragma once
-
-#include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/WorkflowStepWidget.h>
-#include <SmartPeak/core/ApplicationHandler.h>
-#include <string>
-#include <vector>
+#include <SmartPeak/ui/AboutWidget.h>
+#include <imgui.h>
+#include <plog/Log.h>
+#include <SmartPeak/core/Utilities.h>
 
 namespace SmartPeak
 {
-  class Workflow final : public Widget
+  void AboutWidget::draw()
   {
-  public:
-
-    Workflow(const std::string title, ApplicationHandler& application_handler)
-      : Widget(title),
-      application_handler_(application_handler),
-      workflow_step_widget_(application_handler)
+    if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
-    };
-
-    void draw() override;
-
-    void setEditable(bool editable) { editable_ = editable; };
-
-  protected:
-    ApplicationHandler& application_handler_;
-    WorkflowStepWidget workflow_step_widget_;
-    bool editable_ = true;
-  };
+      ImGui::Text("Fast, accurate, and automated processing of CE-, GC- and LC-MS(/MS) and HPLC data.");
+      ImGui::Text("SmartPeak %s", Utilities::getSmartPeakVersion().c_str());
+      ImGui::Separator();
+      ImGui::Text("By the hardworking SmartPeak developers.");
+      ImGui::Separator();
+      if (ImGui::Button("Close"))
+      {
+        ImGui::CloseCurrentPopup();
+        visible_ = false;
+      }
+      ImGui::EndPopup();
+    }
+  }
 }

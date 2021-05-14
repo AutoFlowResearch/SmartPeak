@@ -17,8 +17,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Authors: Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
@@ -26,50 +26,52 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <functional>
 #include <imgui.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/ParameterEditorWidget.h>
-#include <SmartPeak/iface/IParametersObserver.h>
-#include <SmartPeak/iface/IWorkflowObserver.h>
-#include <unsupported/Eigen/CXX11/Tensor>
+#include <SmartPeak/ui/SequenceGroupsEditorWidget.h>
 
 namespace SmartPeak
 {
-
-  /**
-    @brief Base Parameters table
-  */
-  class ParametersTableWidget : public Widget, public IParametersObserver, public IWorkflowObserver
+  class SequenceGroupsEditorWidget : public Widget
   {
   public:
-    ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id, const std::string title = "");
-    ~ParametersTableWidget();
 
-    void draw() override;
-  public:
-    /**
-     IParametersObserver
-    */
-    virtual void parametersUpdated() override;
-    /**
-     IWorkflowObserver
-    */
-    virtual void workflowUpdated() override;
-  private:
-    void updateParametersTable();
+    SequenceGroupsEditorWidget(const std::string& title,
+                               const std::string& move_option_message,
+                               const std::string& create_option_message,
+                               const std::string& move_action_message,
+                               const std::string& create_action_message):
+      Widget(title),
+      move_option_message_(move_option_message),
+      create_option_message_(create_option_message),
+      move_action_message_(move_action_message),
+      create_action_message_(create_action_message)
+    {
+    };
+
+    virtual void draw() override;
+
+    void open(const std::set<std::string>& choices, 
+              const std::string& current_choice, 
+              std::function<void(const std::string&)> ok_callback);
+
   protected:
-    Eigen::Tensor<std::string, 1> headers_;
-    Eigen::Tensor<std::string, 2> body_;
-    const std::string table_id_;
-  protected:
-    SessionHandler& session_handler_;
-    ApplicationHandler& application_handler_;
-    bool refresh_needed_ = true;
-    ParameterEditorWidget parameter_editor_widget_;
-    ParameterSet parameters_; // Parameter to list on the table
-    bool show_default_ = true;
-    bool show_unused_ = true;
+    std::string current_choice_;
+    std::string new_group_;
+    std::set<std::string> groups_;
+    enum
+    {
+      EActionChoice_MoveSegment,
+      EActionChoice_CreateSegment,
+    };
+    int action_choice_ = EActionChoice_MoveSegment;
+    std::function<void(const std::string&)> ok_callback_;
+    std::string move_option_message_;
+    std::string create_option_message_;
+    std::string move_action_message_;
+    std::string create_action_message_;
   };
 
 }

@@ -17,38 +17,41 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil, Bertrand Boudaud $
+// $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
 #pragma once
 
-#include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/WorkflowStepWidget.h>
-#include <SmartPeak/core/ApplicationHandler.h>
 #include <string>
+#include <utility>
 #include <vector>
+#include <functional>
+#include <imgui.h>
+#include <SmartPeak/ui/Widget.h>
 
 namespace SmartPeak
 {
-  class Workflow final : public Widget
+  class SampleTypeEditorWidget : public Widget
   {
   public:
 
-    Workflow(const std::string title, ApplicationHandler& application_handler)
-      : Widget(title),
-      application_handler_(application_handler),
-      workflow_step_widget_(application_handler)
+    SampleTypeEditorWidget()
     {
+      for (const auto& sample_type_entry : sampleTypeToString)
+      {
+        groups_.insert(sample_type_entry.second);
+      }
     };
 
-    void draw() override;
+    virtual void draw() override;
 
-    void setEditable(bool editable) { editable_ = editable; };
+    void open(const std::string& current_choice, std::function<void(const std::string&)> ok_callback);
 
   protected:
-    ApplicationHandler& application_handler_;
-    WorkflowStepWidget workflow_step_widget_;
-    bool editable_ = true;
+    std::set<std::string> groups_;
+    std::function<void(const std::string&)> ok_callback_;
+    std::string current_choice_;
   };
+
 }

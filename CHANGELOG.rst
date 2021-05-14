@@ -1,6 +1,47 @@
 SmartPeak Changelog
 ===================
 
+v1.5.0 (2020-05-07)
+-------------------
+
+Features
+~~~~~~~~
+- Ability to export Parameters `(#360) <https://github.com/AutoFlowResearch/SmartPeak/pull/360>`_  
+
+Changes
+~~~~~~~
+- Compilation now uses C++17 standard.
+
+Fix
+~~~
+- Fixed too much points to be displayed on Chromatograms `(#358) <https://github.com/AutoFlowResearch/SmartPeak/pull/358>`_
+- Fixed crash on Linux when opening Transitions Tab `(#364) <https://github.com/AutoFlowResearch/SmartPeak/pull/364>`_
+
+v1.4.0 (2020-04-26)
+-------------------
+
+Features
+~~~~~~~~
+- Enabling CPP Linting for SmartPeak `(#343) <https://github.com/AutoFlowResearch/SmartPeak/pull/343>`_  
+- Enhanced error message when loading sequence fails `(#351) <https://github.com/AutoFlowResearch/SmartPeak/pull/351>`_  
+  
+Changes
+~~~~~~~
+- Feat/aut722 Rework for a more modular GUI `(#355) <https://github.com/AutoFlowResearch/SmartPeak/pull/355>`_  
+
+  * Moved Run Workflow window in its own widget
+  * Moved About dialog box in its own widget
+  * Moved Log into its own widget
+  * Added `visible_` flag in Widget
+  * Moved SetWindowsize in Widget
+  * Made CalibratorsPlotWidget and LinePlot2DWidgets retainable.
+  * Report: removed `draw_` and use Widget's `visible_` instead
+  * RunworkflowWidget is resizable
+  
+Fix
+~~~
+- Fixed compilation with OpenMS, related with Parameters changes `(#357) <https://github.com/AutoFlowResearch/SmartPeak/pull/357>`_
+- FIAMS_FullScan_Unknown_test.exe assertion failure `(#348) <https://github.com/AutoFlowResearch/SmartPeak/pull/348>`_
 
 v1.3.0 (2020-04-09)
 -------------------
