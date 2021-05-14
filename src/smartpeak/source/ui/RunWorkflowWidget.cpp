@@ -27,11 +27,11 @@
 #include <misc/cpp/imgui_stdlib.h>
 #include <plog/Log.h>
 #include <SmartPeak/core/SharedProcessors.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 namespace SmartPeak
 {
-  namespace fs = boost::filesystem;
+  namespace fs = std::filesystem;
 
   void RunWorkflowWidget::draw()
   {
