@@ -35,7 +35,7 @@ namespace SmartPeak
   {
     // explorer windows (left)
     {"Injections", " Use this table to view the list of injections\n and plot selected samples to the Chromatogram window"},
-    {"Transitions", " Use this table to view the list of samples\n and plot selected samples to the Features (line) window"},
+    {"Transitions", " Use this table to view the list of transitions\n and plot selected transitions on the Features (line) or Features (heatmap) window(s) or display in the Features (table) or Features (matrix) window(s)"},
     {"Features", " Use this table to view and select from list of features\n and plot selected samples to the Features (line) window"},
     
     // main windows (right)
