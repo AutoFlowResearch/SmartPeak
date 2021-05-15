@@ -49,7 +49,7 @@ namespace SmartPeak
     {"Transitions", " Use this window to view the table of transitions"},
     {"Spectrum", " Use this window to view the spectrum"},
     {"Statistics", " Use this window to view statistics about feature samples and feature transitions"},
-    {"Quantitation Method", " Use this window to view quantitation methods"},
+    {"Quantitation Method", " Use this window to view a table of quantitation method parameters and statistics"},
     {"Standards Concentrations", " Use this window to view standard concentrations"},
     {"Component Filters", " Use this window to view component filters"},
     {"Component Group Filters", " Use this window to view component group filters"},
