@@ -40,6 +40,7 @@
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/Workflow.h>
 #include <SmartPeak/ui/StatisticsWidget.h>
+#include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/InfoWidget.h>
 #include <SmartPeak/ui/RunWorkflowWidget.h>
 #include <SmartPeak/ui/AboutWidget.h>
@@ -58,8 +59,7 @@
 
 using namespace SmartPeak;
 namespace fs = boost::filesystem;
-
-void HelpMarker(const char* desc);
+bool SmartPeak::enable_quick_help = true;
 
 void initializeDataDirs(ApplicationHandler& state);
 
@@ -284,7 +284,7 @@ int main(int argc, char** argv)
 
   if (error_msg.empty())
   {
-    if (logdir_created) LOG_DEBUG << "Log directory created: " << logdirpath;
+    if (logdir_created) { LOG_DEBUG << "Log directory created: " << logdirpath; }
     LOG_INFO << "Log file at: " << logfilepath;
   }
   else
@@ -453,6 +453,7 @@ int main(int argc, char** argv)
           file_picker_.setProcessor(processor);
           file_picker_.visible_ = true;
         }
+        showQuickHelpToolTip("load_session_from_sequence");
         //if (ImGui::MenuItem("Save Session", NULL, false, false))
         //{
         //  //TODO: Session (see AUT-280)
@@ -575,6 +576,8 @@ int main(int argc, char** argv)
           }
           ImGui::EndMenu();
         }
+        showQuickHelpToolTip("import_file");
+        
         if (ImGui::BeginMenu("Export File"))
         {
           //if (ImGui::MenuItem("Sequence")) {} // TODO: updated sequence file
@@ -609,7 +612,10 @@ int main(int argc, char** argv)
           ImGui::EndMenu();
         }
         ImGui::EndMenu();
+        showQuickHelpToolTip("export_file");
       }
+      showQuickHelpToolTip("file");
+      
       if (ImGui::BeginMenu("Edit"))
       {
         ImGui::MenuItem("Settings", NULL, false, false);
@@ -619,6 +625,8 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Parameters", NULL, false, false)) {} // TODO: modal of settings
         ImGui::EndMenu();
       }
+      showQuickHelpToolTip("edit");
+      
       if (ImGui::BeginMenu("View"))
       {
         ImGui::MenuItem("Explorer window", NULL, false, false);
@@ -672,6 +680,8 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Log", NULL, &log_widget_->visible_)) {}
         ImGui::EndMenu();
       }
+      showQuickHelpToolTip("view");
+      
       if (ImGui::BeginMenu("Actions"))
       {
         if (ImGui::MenuItem("Run workflow", NULL, &run_workflow_widget_->visible_))
@@ -682,6 +692,8 @@ int main(int argc, char** argv)
           }
           initializeDataDirs(application_handler_);
         }
+        showQuickHelpToolTip("run_workflow");
+        
         if (ImGui::BeginMenu("Integrity checks"))
         {
           if (ImGui::MenuItem("Sample consistency")) {
@@ -702,20 +714,27 @@ int main(int argc, char** argv)
           }
           ImGui::EndMenu();
         }
+        showQuickHelpToolTip("integrity_checks");
         if (ImGui::MenuItem("Report"))
         {
           report_->visible_ = true;
         }
+        showQuickHelpToolTip("report");
         ImGui::EndMenu();
       }
+      showQuickHelpToolTip("actions");
+      
       if (ImGui::BeginMenu("Help"))
       {
         ImGui::MenuItem("About", NULL, &about_widget_->visible_);
+        ImGui::MenuItem("Show Quick Help", NULL, &enable_quick_help);
         if (ImGui::MenuItem("Documentation")) {
           // TODO: Render the SmartPeak documentation (See AUT-178)
         }
         ImGui::EndMenu();
       }
+      showQuickHelpToolTip("help");
+      
       ImGui::EndMainMenuBar();
     }
 
@@ -902,6 +921,7 @@ int main(int argc, char** argv)
           if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
           {
             widget->setWindowSize(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_);
+            showQuickHelpToolTip(widget->title_);
             widget->draw();
             ImGui::EndTabItem();
           }
@@ -928,6 +948,7 @@ int main(int argc, char** argv)
           if (ImGui::BeginTabItem(widget->title_.c_str(), &widget->visible_))
           {
             widget->setWindowSize(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_);
+            showQuickHelpToolTip(widget->title_);
             widget->draw();
             ImGui::EndTabItem();
           }
@@ -986,21 +1007,6 @@ int main(int argc, char** argv)
   SDL_Quit();
 
   return 0;
-}
-
-// copied from imgui_demo.cpp
-// Helper to display a little (?) mark which shows a tooltip when hovered.
-void HelpMarker(const char* desc)
-{
-  ImGui::TextDisabled("(?)");
-  if (ImGui::IsItemHovered())
-  {
-    ImGui::BeginTooltip();
-    ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-    ImGui::TextUnformatted(desc);
-    ImGui::PopTextWrapPos();
-    ImGui::EndTooltip();
-  }
 }
 
 void initializeDataDirs(ApplicationHandler& application_handler)

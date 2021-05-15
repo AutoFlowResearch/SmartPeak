@@ -42,10 +42,10 @@ namespace SmartPeak
     ImGui::SetCursorPosX(popup_width);
     ImGui::SetCursorPosX(cursor_pos);
 
-    ImGui::Text(title_.c_str());
+    ImGui::Text("%s", title_.c_str());
     ImGui::Separator();
     ImGui::PushTextWrapPos();
-    ImGui::Text(parameter_.getDescription().c_str());
+    ImGui::Text("%s", parameter_.getDescription().c_str());
     ImGui::PopTextWrapPos();
 
     if (!valid_string_.empty() && ImGui::BeginCombo("Value", input_text_field_.data()))
@@ -64,12 +64,12 @@ namespace SmartPeak
       ImGui::InputText("Value", input_text_field_.data(), input_text_field_.size());
     }
 
-    ImGui::Text(default_value_.c_str());
+    ImGui::Text("%s", default_value_.c_str());
 
     // display min/max
     if (!parameter_.getRestrictionsAsString().empty() && parameter_.getValidStrings().empty())
     {
-      ImGui::Text(parameter_.getRestrictionsAsString().c_str());
+      ImGui::Text("%s", parameter_.getRestrictionsAsString().c_str());
     }
 
 
@@ -96,6 +96,7 @@ namespace SmartPeak
         if (existing_parameter)
         {
           existing_parameter->setValueFromString(std::string(input_text_field_.data()), false);
+          table_scan_required_ = true;
         }
         else
         {

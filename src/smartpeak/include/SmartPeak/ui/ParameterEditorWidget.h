@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 #pragma once
@@ -40,6 +40,16 @@ namespace SmartPeak
     };
     void draw() override;
     void setParameter(const std::string& function_parameter, const Parameter& parameter);
+    
+    /**
+      @brief returns true when a value has been modified
+    */
+    bool isTableScanRequired() const { return table_scan_required_; };
+    
+    /**
+      @brief sets table_scan_required_ to false after changes has taken place
+    */
+    void setTableScanNotRequired() { table_scan_required_ = false; };
   protected:
     ApplicationHandler& application_handler_;
     std::string function_parameter_;
@@ -50,5 +60,6 @@ namespace SmartPeak
     std::vector<std::string> valid_string_;
   private:
     void setInputTextField(const std::string& value);
+    bool table_scan_required_ = false;
   };
 }

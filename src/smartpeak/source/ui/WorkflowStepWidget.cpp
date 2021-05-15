@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -31,6 +31,8 @@ namespace SmartPeak
 {
   void WorkflowStepWidget::draw()
   {
+    showQuickHelpToolTip("WorkflowStepWindow");
+
     float popup_width = 400;
     float description_box_height = 200;
 
@@ -104,7 +106,7 @@ namespace SmartPeak
       buildCommandsFromNames.names_ = { selected_method_ };
       if (buildCommandsFromNames.process() && buildCommandsFromNames.commands_.size() > 0)
       {
-        ImGui::Text(buildCommandsFromNames.commands_[0].getDescription().c_str());
+        ImGui::Text("%s", buildCommandsFromNames.commands_[0].getDescription().c_str());
         command_success = true;
       }
       else
