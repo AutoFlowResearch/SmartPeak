@@ -46,7 +46,7 @@ namespace SmartPeak
     {"Parameters", " Use this window to add, edit and remove parameters assocciated with the currently selected workflow"},
     
     {"Sequence", " Use this window to view the sequences"},
-    {"Transitions", " Use this window to view transitions"},
+    {"Transitions", " Use this window to view the table of transitions"},
     {"Spectrum", " Use this window to view the spectrum"},
     {"Statistics", " Use this window to view statistics about feature samples and feature transitions"},
     {"Quantitation Method", " Use this window to view quantitation methods"},
