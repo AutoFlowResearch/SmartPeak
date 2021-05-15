@@ -45,7 +45,7 @@ namespace SmartPeak
     {"Features (line)", "Use this window to plot features and subfeatures as a 2D lines"},
     {"Parameters", " Use this window to add, edit and remove parameters assocciated with the currently selected workflow"},
     
-    {"Sequence", " Use this window to view the sequences"},
+    {"Sequence", " Use this window to view the table of injection sequence"},
     {"Transitions", " Use this window to view the table of transitions"},
     {"Spectrum", " Use this window to view the spectrum"},
     {"Statistics", " Use this window to view statistics about feature samples and feature transitions"},
