@@ -484,10 +484,10 @@ BOOST_AUTO_TEST_CASE(getParentPath)
   BOOST_CHECK_EQUAL(Utilities::getParentPath("/home/user/Downloads and a space"), "/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPath("C:/Users/user/Downloads"), "C:/Users/user");
   
-  BOOST_CHECK_EQUAL(Utilities::getParentPath("D:"), "");
-  BOOST_CHECK_EQUAL(Utilities::getParentPath("D:/"), "D:");
-  BOOST_CHECK_EQUAL(Utilities::getParentPath("D://"), "D:");
-  BOOST_CHECK_EQUAL(Utilities::getParentPath("D://///"), "D:");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D:"), "D:");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D:/"), "D:/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D://"), "D://");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D://///"), "D://///");
   BOOST_CHECK_EQUAL(Utilities::getParentPath("E:/home/user/Downloads"), "E:/home/user");
   BOOST_CHECK_EQUAL(Utilities::getParentPath("E://home///user//Downloads"), "E://home///user");
   BOOST_CHECK_EQUAL(Utilities::getParentPath("E:/home/user/Downloads and a space"), "E:/home/user");
