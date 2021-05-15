@@ -40,7 +40,7 @@ namespace SmartPeak
     
     // main windows (right)
     {"WorkflowStepWindow", " Use this window to add, edit and remove workflow steps before running the workflow"},
-    {"Calibrators", "Use this plot view calibrators in 2D"},
+    {"Calibrators", "Use this plot to view calibrators as a line plot where the line represents the calibration fit and the points represent calibration points"},
     {"Features (heatmap)", "Use this window to plot features and subfeatures as a 2D heatmap"},
     {"Features (line)", "Use this window to plot features and subfeatures as a 2D lines"},
     {"Parameters", " Use this window to add, edit and remove parameters assocciated with the currently selected workflow"},
