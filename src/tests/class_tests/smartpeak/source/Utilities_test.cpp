@@ -558,7 +558,7 @@ void set_env_var_(const std::string& name, const std::string& value)
 
 BOOST_AUTO_TEST_CASE(getLogFilepath)
 {
-  auto& f = Utilities::getLogFilepath;
+  auto& get_log_file_path = Utilities::getLogFilepath;
   // Test default behaviour
   // Test doesn't assume that any env variable is set
   {
@@ -570,7 +570,7 @@ BOOST_AUTO_TEST_CASE(getLogFilepath)
     set_env_var_("SMARTPEAK_LOGS", "");
     set_env_var_("LOCALAPPDATA", "");
     set_env_var_("HOME", dirpath);
-    std::tie(filepath, dir_created) = f("file");
+    std::tie(filepath, dir_created) = get_log_file_path("file");
     BOOST_CHECK(fs::exists(filepath));
     BOOST_CHECK(fs::exists(dirpath));
     BOOST_CHECK_MESSAGE(dir_created, "Log directory with path '" << dirpath << "' is not created");
@@ -580,7 +580,7 @@ BOOST_AUTO_TEST_CASE(getLogFilepath)
     set_env_var_("SMARTPEAK_LOGS", "");
     set_env_var_("LOCALAPPDATA", dirpath);
     set_env_var_("HOME", "");
-    std::tie(filepath, dir_created) = f("file");
+    std::tie(filepath, dir_created) = get_log_file_path("file");
     BOOST_CHECK(fs::exists(filepath));
     BOOST_CHECK(fs::exists(dirpath));
     BOOST_CHECK_MESSAGE(dir_created, "Log directory with path '" << dirpath << "' is not created");
@@ -591,20 +591,20 @@ BOOST_AUTO_TEST_CASE(getLogFilepath)
     set_env_var_("SMARTPEAK_LOGS", "");
     set_env_var_("LOCALAPPDATA", "");
     set_env_var_("HOME", "");
-    BOOST_CHECK_THROW(f("filename"), std::runtime_error);
+    BOOST_CHECK_THROW(get_log_file_path("filename"), std::runtime_error);
   }
   // SMARTPEAK_LOGS has higher priority
   {
     auto logpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("logs") };
     auto otherpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("otherlogs") };
-    auto filepath = std::string{};
+    auto filepath = std::filesystem::path{};
     auto dir_created = false;
 
     set_env_var_("SMARTPEAK_LOGS", logpath);
     set_env_var_("LOCALAPPDATA", otherpath);
     set_env_var_("HOME", otherpath);
 
-    std::tie(filepath, dir_created) = f("file");
+    std::tie(filepath, dir_created) = get_log_file_path("file");
     BOOST_CHECK(fs::exists(filepath));
     BOOST_CHECK(fs::exists(logpath));
     BOOST_CHECK(!fs::exists(otherpath));
