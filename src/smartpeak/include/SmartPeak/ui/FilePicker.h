@@ -38,7 +38,7 @@ namespace SmartPeak
   class FilePicker final : public Widget
   {
     std::array<std::vector<std::string>, 4> pathname_content_;
-    std::string current_pathname_ = std::filesystem::current_path();
+    std::filesystem::path current_pathname_ = std::filesystem::current_path();
     std::string picked_pathname_;
     
     FilePickerProcessor* processor_ = nullptr;

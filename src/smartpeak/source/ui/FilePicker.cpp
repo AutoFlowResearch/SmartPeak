@@ -61,8 +61,8 @@ namespace SmartPeak
 
     if (ImGui::Button("Up"))
     {
-      const std::string parent = Utilities::getParentPath(current_pathname_);
-      if (parent.size()) {
+      const std::filesystem::path parent = Utilities::getParentPath(current_pathname_);
+      if (parent.string().size()) {
         current_pathname_ = parent;
       }
       pathname_content_ = Utilities::getFolderContents(current_pathname_);
@@ -71,13 +71,13 @@ namespace SmartPeak
       selected_entry = -1;
     }
     ImGui::SameLine();
-    ImGui::Text("Path: %s", current_pathname_.c_str());
+    ImGui::Text("Path: %s", current_pathname_.string().c_str());
 
     static char new_pathname[4096];
     if (ImGui::Button("Change dir"))
     {
       ImGui::OpenPopup("Change directory");
-      std::strncpy(new_pathname, current_pathname_.c_str(), 4096);
+      std::strncpy(new_pathname, current_pathname_.string().c_str(), 4096);
     }
 
     if (ImGui::BeginPopupModal("Change directory", NULL, ImGuiWindowFlags_AlwaysAutoResize))
@@ -85,7 +85,7 @@ namespace SmartPeak
       ImGui::InputText("Pathname", new_pathname, 4096);
       if (ImGui::Button("Set") || ImGui::IsKeyPressedMap(ImGuiKey_Enter))
       {
-        current_pathname_.assign(new_pathname);
+        current_pathname_.string().assign(new_pathname);
         pathname_content_ = Utilities::getFolderContents(current_pathname_);
         memset(selected_filename, 0, sizeof selected_filename);
         files_scanned_ = false;
@@ -177,12 +177,7 @@ namespace SmartPeak
             std::strcpy(selected_filename, Im_directory_entries[selected_entry].entry_contents[0].c_str());
             if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item.entry_contents[2].c_str() , "Directory"))
             {
-              if (current_pathname_.back() != '/')
-              {
-                current_pathname_.append("/");
-              }
-              
-              current_pathname_.append(item.entry_contents[0].c_str());
+              current_pathname_ /= item.entry_contents[0].c_str();
               memset(selected_filename, 0, sizeof selected_filename);
               files_scanned_ = false;
               updateContents(Im_directory_entries);
@@ -192,7 +187,7 @@ namespace SmartPeak
             }
             else if (ImGui::IsMouseDoubleClicked(0) || ImGui::IsMouseClicked(0))
             {
-              picked_pathname_ = current_pathname_;
+              picked_pathname_ = current_pathname_.string();
               if (selected_entry >= 0)
               {
                 if (picked_pathname_.back() != '/')
@@ -228,10 +223,10 @@ namespace SmartPeak
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
     if (ImGui::Button("Open"))
     {
-      picked_pathname_ = current_pathname_;
+      picked_pathname_ = current_pathname_.string();
       if (selected_entry >= 0)
       {
-        if (picked_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
+        if (picked_pathname_.back() != '/')
         {
           picked_pathname_.append("/");
         }
