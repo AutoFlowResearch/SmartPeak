@@ -26,23 +26,21 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <filesystem>
 #include <atomic>
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/ImEntry.h>
 
-// #include <boost/filesystem.hpp>
-
-// namespace fs = boost::filesystem;
-
 namespace SmartPeak
 {
   class FilePicker final : public Widget
   {
     std::array<std::vector<std::string>, 4> pathname_content_;
-    std::string current_pathname_ = ".";
+    std::filesystem::path current_pathname_ = std::filesystem::current_path();
     std::string picked_pathname_;
+    
     FilePickerProcessor* processor_ = nullptr;
     std::string processor_name_ = "";
     bool loading_is_done_ = true;

@@ -49,7 +49,7 @@
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <imgui.h>
@@ -58,7 +58,7 @@
 #include <misc/cpp/imgui_stdlib.h>
 
 using namespace SmartPeak;
-namespace fs = boost::filesystem;
+
 bool SmartPeak::enable_quick_help = true;
 
 void initializeDataDirs(ApplicationHandler& state);
@@ -253,14 +253,14 @@ int main(int argc, char** argv)
   char filename[128];
   strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
 
-  auto logfilepath = std::string{};
+  auto logfilepath = std::filesystem::path{};
   auto logdirpath = std::string{};
   auto logdir_created = false;
   auto error_msg = std::string{};
   try
   {
     std::tie(logfilepath, logdir_created) = Utilities::getLogFilepath(filename);
-    logdirpath = fs::path(logfilepath).parent_path().string();
+    logdirpath = std::filesystem::path(logfilepath).parent_path().string();
   }
   catch (const std::runtime_error& re)
   {
@@ -269,7 +269,7 @@ int main(int argc, char** argv)
 
   // Add .csv appender: 32 MiB per file, max. 100 log files
   plog::RollingFileAppender<plog::CsvFormatter>
-    fileAppender(logfilepath.c_str(), 1024 * 1024 * 32, 100);
+    fileAppender(logfilepath.string().c_str(), 1024 * 1024 * 32, 100);
 
   // Add console appender, instead of only the file one
   plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
@@ -285,7 +285,7 @@ int main(int argc, char** argv)
   if (error_msg.empty())
   {
     if (logdir_created) { LOG_DEBUG << "Log directory created: " << logdirpath; }
-    LOG_INFO << "Log file at: " << logfilepath;
+    LOG_INFO << "Log file at: " << logfilepath.string();
   }
   else
   {
@@ -421,6 +421,7 @@ int main(int argc, char** argv)
       ImGui::OpenPopup("Run workflow modal");
       run_workflow_widget_->draw();
     }
+
     if (about_widget_->visible_)
     {
       ImGui::OpenPopup("About");

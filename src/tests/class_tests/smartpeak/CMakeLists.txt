@@ -12,7 +12,7 @@ configure_file(${PROJECT_SOURCE_DIR}/include/SmartPeak/test_config.h.in ${CONFIG
 #------------------------------------------------------------------------------
 # Boost
 #------------------------------------------------------------------------------
-find_package(Boost COMPONENTS filesystem unit_test_framework)
+find_package(Boost COMPONENTS unit_test_framework)
 
 if(Boost_FOUND)
   message(STATUS "[class_tests] : Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}" )

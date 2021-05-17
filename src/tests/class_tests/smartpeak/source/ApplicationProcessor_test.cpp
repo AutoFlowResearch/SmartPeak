@@ -25,14 +25,13 @@
 
 #define BOOST_TEST_MODULE ApplicationProcessor test suite
 #include <boost/test/included/unit_test.hpp>
-#include <boost/filesystem.hpp>
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Filenames.h>
+#include <filesystem>
 
 using namespace SmartPeak;
 using namespace std;
-namespace fs = boost::filesystem;
 
 struct ApplicationProcessorFixture 
 {
@@ -40,10 +39,10 @@ struct ApplicationProcessorFixture
   ApplicationProcessorFixture() 
   {
     datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
-    auto workflow = fs::path{ datapath_ } / fs::path{ "workflow_csv_files" };
+    auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
 
     filenames_ = Filenames::getDefaultStaticFilenames(workflow.string());
-    filenames_.referenceData_csv_i = (fs::path{ datapath_ } / fs::path{ "MRMFeatureValidator_referenceData_1.csv" }).string();
+    filenames_.referenceData_csv_i = (std::filesystem::path{ datapath_ } / std::filesystem::path{ "MRMFeatureValidator_referenceData_1.csv" }).string();
 
     // Injections sequence:
     std::vector<InjectionHandler> seq;
@@ -742,7 +741,7 @@ BOOST_AUTO_TEST_CASE(SetOutputFeaturesPathname_ProcessSetsPath)
 
 BOOST_AUTO_TEST_CASE(StoreSequenceWorkflow1)
 {
-  namespace fs = boost::filesystem;
+  namespace fs = std::filesystem;
   ApplicationHandler application_handler;
   std::vector<std::string> command_names = {
     "LOAD_RAW_DATA",
@@ -758,7 +757,8 @@ BOOST_AUTO_TEST_CASE(StoreSequenceWorkflow1)
   application_handler.sequenceHandler_.setWorkflow(command_names);
   StoreSequenceWorkflow application_processor(application_handler);
   BOOST_CHECK_EQUAL(application_processor.getName(), "StoreSequenceWorkflow");
-  application_processor.pathname_ = std::tmpnam(nullptr);
+  application_processor.pathname_ = (SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv"));
+  //application_processor.pathname_ = std::tmpnam(nullptr);
   BOOST_REQUIRE(application_processor.process());
   // compare with reference file
   const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
