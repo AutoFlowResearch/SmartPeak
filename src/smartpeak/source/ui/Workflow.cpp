@@ -196,7 +196,7 @@ namespace SmartPeak
           else if (ImGui::IsItemHovered())
           {
             ImGui::BeginTooltip();
-            ImGui::Text(command.getDescription().c_str());
+            ImGui::Text("%s", command.getDescription().c_str());
             ImGui::EndTooltip();
           }
           if (editable_ && ImGui::BeginDragDropTarget())

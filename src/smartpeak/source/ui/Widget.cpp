@@ -97,6 +97,7 @@ namespace SmartPeak
 
   void GenericTableWidget::draw()
   {
+    
     // get data, if getter is provided
     if (session_handler_ && sequence_handler_ && data_getter_)
     {
@@ -126,19 +127,19 @@ namespace SmartPeak
     filter.Draw("Find");
 
     // drop-down list for search field(s)
-    cols.resize(table_data_.headers_.size() + 1);
+    cols_.resize(table_data_.headers_.size() + 1);
     for (size_t header_name = 0; header_name < table_data_.headers_.size() + 1; ++header_name) {
       if (header_name == 0)
       {
-        cols[header_name] = "All";
+        cols_[header_name] = "All";
       }
       else if (header_name > 0)
       {
-        cols[header_name] = table_data_.headers_(header_name - 1).c_str();
+        cols_[header_name] = table_data_.headers_(header_name - 1).c_str();
       }
     }
 
-    ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
+    ImGui::Combo("In Column(s)", &selected_col_, cols_.data(), cols_.size());
 
     table_scanned_ = (table_data_.body_.dimension(0) == table_entries_.size() && !data_changed_);
 
@@ -167,7 +168,7 @@ namespace SmartPeak
         for (size_t row = 0; row < table_data_.body_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
 
-            if (searcher(table_entries_, selected_col, filter, row))
+            if (searcher(table_entries_, selected_col_, filter, row))
             {
               selected_cells_.erase(std::remove_if(selected_cells_.begin(), selected_cells_.end(),
                                     [&](const auto& selected) { return std::get<0>(selected) == row; }),
@@ -312,7 +313,7 @@ namespace SmartPeak
       return;
 
     // headers
-    const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
+    const ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable |
       ImGuiTableFlags_NoBordersInBody | ImGuiTableFlags_ScrollY | ImGuiTableFlags_NoSavedSettings |
       ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti;
 
@@ -323,19 +324,121 @@ namespace SmartPeak
     filter.Draw("Find");
 
     // drop-down list for search field(s)
-    cols.resize(table_data_.headers_.size() + 1);
+    cols_.resize(table_data_.headers_.size() + 1);
     for (size_t header_name = 0; header_name < table_data_.headers_.size() + 1; ++header_name) {
       if (header_name == 0)
       {
-        cols[header_name] = "All";
+        cols_[header_name] = "All";
       }
       else if (header_name > 0)
       {
-        cols[header_name] = table_data_.headers_(header_name - 1).c_str();
+        cols_[header_name] = table_data_.headers_(header_name - 1).c_str();
       }
     }
 
-    ImGui::Combo("In Column(s)", &selected_col, cols.data(), cols.size());
+    ImGui::Combo("In Column(s)", &selected_col_, cols_.data(), cols_.size());
+    
+    for (uint checkbox_header_idx = 0; checkbox_header_idx < checkbox_headers_.size(); ++checkbox_header_idx) {
+      if (checkbox_headers_(checkbox_header_idx) == "plot") checkbox_columns_plot_col_ = checkbox_header_idx;
+    }
+    if (checkbox_columns_plot_col_ == 1 && table_id_ == "InjectionsExplorerWindow") {
+      table_entries_plot_col_ = 3;
+    } else if (checkbox_columns_plot_col_ == 0 && table_id_ == "FeaturesExplorerWindow") {
+      table_entries_plot_col_ = 1;
+    } else if (checkbox_columns_plot_col_ == 0 && table_id_ == "TransitionsExplorerWindow") {
+      table_entries_plot_col_ = 2;
+    }
+    
+    ImGui::PushButtonRepeat(true);
+    if (ImGui::ArrowButton("##left_arrow_plotter", ImGuiDir_Left) && plot_idx_ > 0) {
+      plot_switch_ = "stepper";
+      plot_idx_--;
+      if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "false")
+          && table_scanned_ && plot_idx_ < table_entries_.size()) {
+        table_entries_[plot_idx_].entry_contents[table_entries_plot_col_] = "true";
+        (*checkbox_columns_)(table_entries_[plot_idx_].ID, checkbox_columns_plot_col_) = true;
+        if (!std::strcmp(table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_].c_str(), "false")) {
+          table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_] = "true";
+          (*checkbox_columns_)(table_entries_[plot_idx_+1].ID, checkbox_columns_plot_col_) = true;
+        } else if (!std::strcmp(table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_].c_str(), "true")) {
+          table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_] = "false";
+          (*checkbox_columns_)(table_entries_[plot_idx_+1].ID, checkbox_columns_plot_col_) = false;
+        }
+      } else if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "true")
+               && table_scanned_ && plot_idx_ < table_entries_.size()) {
+        if (!plot_unplot_all_deactivated_) {
+          table_entries_[plot_idx_].entry_contents[table_entries_plot_col_] = "false";
+          (*checkbox_columns_)(table_entries_[plot_idx_].ID, checkbox_columns_plot_col_) = false;
+        }
+        if (!std::strcmp(table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_].c_str(), "true")) {
+          table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_] = "false";
+          (*checkbox_columns_)(table_entries_[plot_idx_+1].ID, checkbox_columns_plot_col_) = false;
+        } else if (!std::strcmp(table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_].c_str(), "false")
+                   && !plot_unplot_all_deactivated_) {
+          table_entries_[plot_idx_+1].entry_contents[table_entries_plot_col_] = "true";
+          (*checkbox_columns_)(table_entries_[plot_idx_+1].ID, checkbox_columns_plot_col_) = true;
+        }
+      }
+    }
+    ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+    if (ImGui::ArrowButton("##right_arrow_plotter", ImGuiDir_Right) && plot_idx_ < (int)table_entries_.size() - 1) {
+      plot_switch_ = "stepper";
+      plot_idx_++;
+      if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "false")
+          && table_scanned_ && plot_idx_ >= 0) {
+        table_entries_[plot_idx_].entry_contents[table_entries_plot_col_] = "true";
+        (*checkbox_columns_)(table_entries_[plot_idx_].ID, checkbox_columns_plot_col_) = true;
+        if (plot_idx_ != 0)
+        {
+          if (!std::strcmp(table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_].c_str(), "false")) {
+            table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_] = "true";
+            (*checkbox_columns_)(table_entries_[plot_idx_-1].ID, checkbox_columns_plot_col_) = true;
+          } else if (!std::strcmp(table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_].c_str(), "true")) {
+            table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_] = "false";
+            (*checkbox_columns_)(table_entries_[plot_idx_-1].ID, checkbox_columns_plot_col_) = false;
+          }
+        }
+      } else if (!std::strcmp(table_entries_[plot_idx_].entry_contents[table_entries_plot_col_].c_str(), "true")
+               && table_scanned_ && plot_idx_ > 0) {
+        if (!plot_unplot_all_deactivated_) {
+          table_entries_[plot_idx_].entry_contents[table_entries_plot_col_] = "false";
+          (*checkbox_columns_)(table_entries_[plot_idx_].ID, checkbox_columns_plot_col_) = false;
+        }
+        if (plot_idx_ != 0)
+        {
+          if (!std::strcmp(table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_].c_str(), "true")) {
+            table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_] = "false";
+            (*checkbox_columns_)(table_entries_[plot_idx_-1].ID, checkbox_columns_plot_col_) = false;
+          } else if (!std::strcmp(table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_].c_str(), "false")
+                     && !plot_unplot_all_deactivated_) {
+            table_entries_[plot_idx_-1].entry_contents[table_entries_plot_col_] = "true";
+            (*checkbox_columns_)(table_entries_[plot_idx_-1].ID, checkbox_columns_plot_col_) = true;
+          }
+        }
+      }
+    }
+    ImGui::PopButtonRepeat();
+    ImGui::SameLine();
+    ImGui::Text("Plot-Stepper");
+    
+    ImGui::SameLine();
+    if (ImGui::Checkbox("Plot/Unplot All", &plot_all_)) { plot_unplot_all_deactivated_ = false; };
+    if (plot_all_) { plot_switch_ = "plotunplotall"; plot_idx_ = 0; }
+    if (table_scanned_ && checkbox_columns_->size() > 0 && plot_switch_ != "stepper") {
+      if (plot_all_ && !plot_unplot_all_deactivated_) {
+        std::for_each(table_entries_.begin(), table_entries_.end(),
+                      [&](ImEntry& entry) {
+                          entry.entry_contents[table_entries_plot_col_] = "true";
+                          (*checkbox_columns_)(entry.ID, checkbox_columns_plot_col_) = true;
+         });
+      } else if (!plot_all_ && !plot_unplot_all_deactivated_) {
+        std::for_each(table_entries_.begin(), table_entries_.end(),
+                      [&](ImEntry& entry) {
+                          entry.entry_contents[table_entries_plot_col_] = "false";
+                          (*checkbox_columns_)(entry.ID, checkbox_columns_plot_col_) = false;
+         });
+      }
+    }
 
     if (table_data_.body_.dimension(0) == table_entries_.size())
       table_scanned_ = true;
@@ -369,7 +472,7 @@ namespace SmartPeak
         for (size_t row = 0; row < table_data_.body_.dimension(0); ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row)))
           {
-            if (searcher(table_entries_, selected_col, filter, row))
+            if (searcher(table_entries_, selected_col_, filter, row))
               continue;
 
             ImGui::TableNextRow();
@@ -391,20 +494,22 @@ namespace SmartPeak
                   std::size_t checkbox_idx = header_idx - static_cast<std::size_t>(table_data_.body_.dimension(1));
                   bool is_checked;
                   if (!std::strcmp(table_entries_[row].entry_contents[header_idx].c_str(), "true"))
-                  is_checked = true;
+                    is_checked = true;
                   else
-                  is_checked = false;
+                    is_checked = false;
                   ImGui::Checkbox(id.c_str(), &is_checked);
 
                   if (is_checked == true && !std::strcmp(table_entries_[row].entry_contents[header_idx].c_str(), "false"))
                   {
                     table_entries_[row].entry_contents[header_idx] = "true";
                     (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx) = true;
+                    plot_unplot_all_deactivated_ = true;
                   }
                   else if (is_checked == false && !std::strcmp(table_entries_[row].entry_contents[header_idx].c_str(), "true"))
                   {
                     table_entries_[row].entry_contents[header_idx] = "false";
                     (*checkbox_columns_)(table_entries_[row].ID, checkbox_idx) = false;
+                    plot_unplot_all_deactivated_ = true;
                   }
                   ImGui::PopStyleColor();
                 }
@@ -491,15 +596,16 @@ namespace SmartPeak
               }
               std::ostringstream os;
               os << "Injection: " << (*x_labels_)(injection_number);
-              ImGui::Text(os.str().c_str());
+              ImGui::Text("%s", os.str().c_str());
               os.str("");
               os.clear();
               os << "Series: " << (*series_names_)(i);
-              ImGui::Text(os.str().c_str());
+              ImGui::Text("%s", os.str().c_str());
+
               os.str("");
               os.clear();
               os << "Value: " << y_data(injection_number);
-              ImGui::Text(os.str().c_str());
+              ImGui::Text("%s", os.str().c_str());
               ImGui::EndTooltip();
               tooltip_exists = true;
             }

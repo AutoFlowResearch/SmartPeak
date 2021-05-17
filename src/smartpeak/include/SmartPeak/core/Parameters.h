@@ -255,6 +255,11 @@ namespace SmartPeak
 
     Parameter* findParameter(const std::string& parameter);
     const std::string& getFunctionName() const { return function_name_; };
+    
+    /**
+      @brief return a vector of the currently loaded parameters
+    */
+    std::vector<Parameter> getParameters() const { return parameters_; };
 
     /**
     @brieg Add a parameter. Doesn't Replace if already exists
