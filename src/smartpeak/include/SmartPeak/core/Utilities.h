@@ -318,6 +318,12 @@ public:
     */
     static void getDirectoryInfo(const std::filesystem::path& p, std::tuple<float, uintmax_t>& directory_info);
     
+    /**
+      @brief Check whether a path is hidden
+
+      @param[in] entry_path path to inspect
+      @returns True if a hidden entry is encountered
+    */
     static bool isHiddenEntry(const std::filesystem::path& entry_path);
 
     /**
@@ -333,6 +339,15 @@ public:
     * @returns The absolute path to log file and boolean flag whether the path to directory was created
     */
     static std::pair<std::filesystem::path, bool> getLogFilepath(const std::string& filename);
+    
+    /**
+      @brief Get a value fromt the current environment
+
+      @param[in] env_name environment variable name
+      @param[out] path variable's value
+    */
+    static void getEnvVariable(const char *env_name, std::string *path);
+
 
     /**
     * @brief Returns the build version of SmartPeak package if available.

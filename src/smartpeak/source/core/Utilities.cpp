@@ -638,18 +638,25 @@ namespace SmartPeak
   {
     std::filesystem::path path{};
     bool flag = false;
-    char const* logs = getenv("SMARTPEAK_LOGS");
-    char const* appdata = getenv("LOCALAPPDATA");
-    char const* home = getenv("HOME");
-    if (logs || appdata || home)
+    std::string env_val_smartpeak_logs  = "SMARTPEAK_LOGS";
+    std::string env_val_localappdata    = "LOCALAPPDATA";
+    std::string env_val_home            = "HOME";
+    
+    std::string logs_path, appsdata_path, home_path;
+
+    getEnvVariable(env_val_smartpeak_logs.c_str(), &logs_path);
+    getEnvVariable(env_val_localappdata.c_str(), &appsdata_path);
+    getEnvVariable(env_val_home.c_str(), &home_path);
+    
+    if (!logs_path.empty() || !appsdata_path.empty() || !home_path.empty())
     {
       auto logdir = std::filesystem::path();
-      if (logs)
-        logdir = std::filesystem::path(logs);
-      else if (appdata)
-        logdir = std::filesystem::path(appdata) / "SmartPeak";
-      else if (home)
-        logdir = std::filesystem::path(home) / ".SmartPeak";
+      if (!logs_path.empty())
+        logdir = std::filesystem::path(logs_path);
+      else if (!appsdata_path.empty())
+        logdir = std::filesystem::path(appsdata_path) / "SmartPeak";
+      else if (!home_path.empty())
+        logdir = std::filesystem::path(home_path) / ".SmartPeak";
 
       try
       {
@@ -695,6 +702,30 @@ namespace SmartPeak
       << SMARTPEAK_PACKAGE_VERSION).str();
 #else
     return "Unknown";
+#endif
+  }
+
+  void Utilities::getEnvVariable(const char *env_name, std::string *path)
+  {
+#ifdef _WIN32
+    char* var_buffer;
+    size_t buffer_size;
+    errno_t error_val = _dupenv_s(&var_buffer, &buffer_size, var_name);
+    
+    if (error != 0) {
+      throw std::runtime_error(
+      "LOCALAPPDATA or SMARTPEAK_LOGS env variable is not set for the log files to be saved in these locations.");
+    } else {
+      if (var_buffer != nullptr) {
+        *path = std::string(var_buffer);
+        free(var_buffer);
+      }
+    }
+#else
+    char* var_buffer = getenv(env_name);
+    if (var_buffer != nullptr) {
+      *path = std::string(var_buffer);
+    }
 #endif
   }
 
