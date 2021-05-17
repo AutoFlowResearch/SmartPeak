@@ -710,9 +710,9 @@ namespace SmartPeak
 #ifdef _WIN32
     char* var_buffer;
     size_t buffer_size;
-    errno_t error_val = _dupenv_s(&var_buffer, &buffer_size, var_name);
+    errno_t error_val = _dupenv_s(&var_buffer, &buffer_size, env_name);
     
-    if (error != 0) {
+    if (error_val != 0) {
       throw std::runtime_error(
       "LOCALAPPDATA or SMARTPEAK_LOGS env variable is not set for the log files to be saved in these locations.");
     } else {
