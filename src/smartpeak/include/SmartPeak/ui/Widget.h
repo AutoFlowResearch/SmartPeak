@@ -30,6 +30,7 @@
 #include <imgui.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/ImEntry.h>
+#include <SmartPeak/ui/Help.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 /**
@@ -38,6 +39,7 @@ Generic and base classes for Widgets
 
 namespace SmartPeak
 {
+  extern bool enable_quick_help;
   /**
     @brief Abstract base class for all panes, windows, and widgets
 
@@ -183,8 +185,14 @@ namespace SmartPeak
     DataFilterMethod data_filter_ = nullptr;
     std::vector<ImEntry> table_entries_;
     bool table_scanned_ = false;
-    int selected_col = 0;
-    std::vector<const char*> cols;
+    bool plot_all_ = false;
+    bool plot_unplot_all_deactivated_ = false;
+    int selected_col_ = 0;
+    int plot_idx_ = -1;
+    unsigned int table_entries_plot_col_ = 0;
+    unsigned int checkbox_columns_plot_col_ = 0;
+    std::string plot_switch_ = "";
+    std::vector<const char*> cols_;
     bool data_changed_ = false;
     std::vector<std::tuple<size_t, size_t>> selected_cells_;
   };
@@ -329,4 +337,16 @@ namespace SmartPeak
   public:
     void draw() override;
   };
+
+  /**
+   @brief Shows Quick Help tooltip when ui_element_name is present in tooltip_info (Help.h).
+   
+   @param[in,out] ui_element_name such as table_id_.
+  */
+  static void showQuickHelpToolTip(const std::string& ui_element_name)
+  {
+    if (ImGui::IsItemHovered() && enable_quick_help && tooltip_info.find(ui_element_name) != tooltip_info.end()) {
+      ImGui::SetTooltip("%s", tooltip_info.find(ui_element_name)->second.c_str());
+    }
+  }
 }

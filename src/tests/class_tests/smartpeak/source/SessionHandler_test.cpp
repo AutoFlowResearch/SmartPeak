@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(setTransitionsTable1)
   BOOST_CHECK_EQUAL(session_handler.transition_explorer_data.checkbox_headers(session_handler.transition_explorer_data.checkbox_headers.size() - 1), "table");
   BOOST_CHECK_EQUAL(session_handler.transition_explorer_data.checkbox_body.dimension(0), 6);
   BOOST_CHECK_EQUAL(session_handler.transition_explorer_data.checkbox_body.dimension(1), 2);
-  BOOST_CHECK(session_handler.transition_explorer_data.checkbox_body(0, 0));
+  BOOST_CHECK(!session_handler.transition_explorer_data.checkbox_body(0, 0));
   BOOST_CHECK(!session_handler.transition_explorer_data.checkbox_body(1, 0));
   BOOST_CHECK(session_handler.transition_explorer_data.checkbox_body(session_handler.transition_explorer_data.checkbox_body.dimension(0) - 1, session_handler.transition_explorer_data.checkbox_body.dimension(1) - 1));
 }
@@ -507,9 +507,9 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getSpectrumExplorerBody()(session_handler.getSpectrumExplorerBody().dimension(0) - 1, session_handler.getSpectrumExplorerBody().dimension(1) - 1), "controllerType=0 controllerNumber=1 scan=1");
   // N selected counts
   BOOST_CHECK_EQUAL(session_handler.getNSelectedSampleNamesTable(), 2);
-  BOOST_CHECK_EQUAL(session_handler.getNSelectedSampleNamesPlot(), 1);
+  BOOST_CHECK_EQUAL(session_handler.getNSelectedSampleNamesPlot(), 0);
   BOOST_CHECK_EQUAL(session_handler.getNSelectedTransitionsTable(), 6);
-  BOOST_CHECK_EQUAL(session_handler.getNSelectedTransitionsPlot(), 1);
+  BOOST_CHECK_EQUAL(session_handler.getNSelectedTransitionsPlot(), 0);
   BOOST_CHECK_EQUAL(session_handler.getNSelectedFeatureMetaValuesTable(), 22);
   BOOST_CHECK_EQUAL(session_handler.getNSelectedFeatureMetaValuesPlot(), 1);
   // Selected string values
@@ -520,7 +520,7 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesTable()(0), "150516_CM1_Level1");
   BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesTable()(session_handler.getSelectSampleNamesTable().dimension(0)-1), "150516_CM1_Level10");
   BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesPlot().size(), 2);
-  BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesPlot()(0), "150516_CM1_Level1");
+  BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesPlot()(0), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectSampleNamesPlot()(session_handler.getSelectSampleNamesPlot().dimension(0) - 1), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionsTable().size(), 6);
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionsTable()(0), "arg-L.arg-L_1.Light");
@@ -529,10 +529,10 @@ BOOST_AUTO_TEST_CASE(sessionHandlerGetters1)
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsTable()(0), "arg-L");
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsTable()(session_handler.getSelectTransitionGroupsTable().dimension(0) - 1), "ser-L");
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionsPlot().size(), 6);
-  BOOST_CHECK_EQUAL(session_handler.getSelectTransitionsPlot()(0), "arg-L.arg-L_1.Light");
+  BOOST_CHECK_EQUAL(session_handler.getSelectTransitionsPlot()(0), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionsPlot()(session_handler.getSelectTransitionsPlot().dimension(0) - 1), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot().size(), 6);
-  BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot()(0), "arg-L");
+  BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot()(0), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectTransitionGroupsPlot()(session_handler.getSelectTransitionsPlot().dimension(0) - 1), "");
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable().size(), 22);
   BOOST_CHECK_EQUAL(session_handler.getSelectFeatureMetaValuesTable()(0), "asymmetry_factor");
@@ -665,13 +665,13 @@ BOOST_AUTO_TEST_CASE(setFeatureTable1)
   BOOST_CHECK_EQUAL(table_data.body_(table_data.body_.dimension(0) - 1, table_data.body_.dimension(1) - 1), "true");
   session_handler.setMinimalDataAndFilters(testData.sequenceHandler);
   session_handler.setFeatureTable(testData.sequenceHandler, table_data);
-  BOOST_CHECK_EQUAL(table_data.headers_.size(), 24);
+  BOOST_CHECK_EQUAL(table_data.headers_.size(), 23);
   BOOST_CHECK_EQUAL(table_data.headers_(0), "sample_name");
-  BOOST_CHECK_EQUAL(table_data.headers_(table_data.headers_.size() - 1), "calculated_concentration");
-  BOOST_CHECK_EQUAL(table_data.body_.dimension(0), 1);
-  BOOST_CHECK_EQUAL(table_data.body_.dimension(1), 24);
+  BOOST_CHECK_EQUAL(table_data.headers_(table_data.headers_.size() - 1), "used_");
+  BOOST_CHECK_EQUAL(table_data.body_.dimension(0), 13);
+  BOOST_CHECK_EQUAL(table_data.body_.dimension(1), 23);
   BOOST_CHECK_EQUAL(table_data.body_(0, 0), "150516_CM1_Level1");
-  BOOST_CHECK_EQUAL(table_data.body_(table_data.body_.dimension(0) - 1, table_data.body_.dimension(1) - 1), "");
+  BOOST_CHECK_EQUAL(table_data.body_(table_data.body_.dimension(0) - 1, table_data.body_.dimension(1) - 1), "true");
 }
 
 BOOST_AUTO_TEST_CASE(setFeatureMatrix1)

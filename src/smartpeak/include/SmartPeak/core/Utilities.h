@@ -26,6 +26,9 @@
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/ui/ImEntry.h>
+//#include <SmartPeak/ui/Help.h>
+#include <imgui.h>
+#include <imgui_internal.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 

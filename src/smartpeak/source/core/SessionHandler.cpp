@@ -61,7 +61,7 @@ namespace SmartPeak
       LOGD << "Making injection_explorer_checkbox_body";
       injection_explorer_data.checkbox_body.resize(n_rows, (int)injection_explorer_data.checkbox_headers.size());
       injection_explorer_data.checkbox_body.setConstant(true);
-      for (int i = 1; i < injection_explorer_data.checkbox_body.dimension(0); ++i) injection_explorer_data.checkbox_body(i, 1) = false; // only the first injection
+      for (int i = 0; i < injection_explorer_data.checkbox_body.dimension(0); ++i) injection_explorer_data.checkbox_body(i, 1) = false; // set all to false
       injection_explorer_data.checked_rows.resize(n_rows);
       injection_explorer_data.checked_rows.setConstant(true);
     }
@@ -79,7 +79,7 @@ namespace SmartPeak
       LOGD << "Making transition_explorer_checkbox_body";
       transition_explorer_data.checkbox_body.resize(n_rows, (int)transition_explorer_data.checkbox_headers.size());
       transition_explorer_data.checkbox_body.setConstant(true);
-      for (int i = 1; i < transition_explorer_data.checkbox_body.dimension(0); ++i) transition_explorer_data.checkbox_body(i, 0) = false; // only the first transition
+      for (int i = 0; i < transition_explorer_data.checkbox_body.dimension(0); ++i) transition_explorer_data.checkbox_body(i, 0) = false; // set all to false
       transition_explorer_data.checked_rows.resize(n_rows);
       transition_explorer_data.checked_rows.setConstant(true);
     }

@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
@@ -29,6 +29,7 @@
 #include <imgui.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/ImEntry.h>
 #include <SmartPeak/ui/ParameterEditorWidget.h>
 #include <SmartPeak/iface/IParametersObserver.h>
 #include <SmartPeak/iface/IWorkflowObserver.h>
@@ -40,7 +41,7 @@ namespace SmartPeak
   /**
     @brief Base Parameters table
   */
-  class ParametersTableWidget : public Widget, public IParametersObserver, public IWorkflowObserver
+  class ParametersTableWidget final : public Widget, public IParametersObserver, public IWorkflowObserver
   {
   public:
     ParametersTableWidget(SessionHandler& session_handler, ApplicationHandler& application_handler, const std::string& table_id, const std::string title = "");
@@ -58,6 +59,15 @@ namespace SmartPeak
     virtual void workflowUpdated() override;
   private:
     void updateParametersTable();
+    const std::vector<std::string> header_names_ = { "function", "name", "type", "value", "restrictions" };
+    std::vector<ImEntry> parameters_table_entries_;
+    /**
+      @brief return current parameter values in the same order as the columns : headers = { "name", "type", "value", "restrictions" }
+     
+      @param[in] param pointer to the parameter from which the values will be returned
+    */
+    const std::vector<std::string> getAllValues_(const Parameter* param) {
+      return { param->getName(), param->getType(), param->getValueAsString(), param->getRestrictionsAsString()}; };
   protected:
     Eigen::Tensor<std::string, 1> headers_;
     Eigen::Tensor<std::string, 2> body_;
@@ -70,6 +80,8 @@ namespace SmartPeak
     ParameterSet parameters_; // Parameter to list on the table
     bool show_default_ = true;
     bool show_unused_ = true;
+    int selected_col_ = 0;
+    bool is_scanned_ = false;
   };
 
 }

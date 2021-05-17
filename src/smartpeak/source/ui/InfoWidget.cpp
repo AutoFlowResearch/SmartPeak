@@ -35,6 +35,8 @@ namespace SmartPeak
 
   void InfoWidget::draw()
   {
+    showQuickHelpToolTip("Info");
+    
     drawWorkflowStatus();
     drawFileloadingStatus();
     drawLastRunTime();
@@ -62,7 +64,7 @@ namespace SmartPeak
       std::ostringstream os;
       os << "File loading failed.  Check the `Information` log.";
       ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-      ImGui::Text(os.str().c_str());
+      ImGui::Text("%s", os.str().c_str());
       ImGui::PopStyleColor();
     }
     else
@@ -83,7 +85,7 @@ namespace SmartPeak
       }
     }
     os << "Number of chromatograms: " << number_of_chromatograms_;
-    ImGui::Text(os.str().c_str());
+    ImGui::Text("%s", os.str().c_str());
   }
 
   void InfoWidget::drawSpectrums()
@@ -98,7 +100,7 @@ namespace SmartPeak
       }
     }
     os << "Number of spectrums: " << number_of_spectrums_;
-    ImGui::Text(os.str().c_str());
+    ImGui::Text("%s", os.str().c_str());
   }
 
   void InfoWidget::drawSamples()
@@ -109,7 +111,7 @@ namespace SmartPeak
       number_of_samples_ = application_handler_.sequenceHandler_.getSequence().size();
     }
     os << "Number of samples: " << number_of_samples_;
-    ImGui::Text(os.str().c_str());
+    ImGui::Text("%s", os.str().c_str());
   }
 
   void InfoWidget::drawTransition()
@@ -124,7 +126,7 @@ namespace SmartPeak
       }
     }
     os << "Number of transitions: " << number_of_transitions_;
-    ImGui::Text(os.str().c_str());
+    ImGui::Text("%s", os.str().c_str());
   }
 
   void InfoWidget::drawErrorMessages()
@@ -132,7 +134,7 @@ namespace SmartPeak
     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
     for (const auto& error_message : error_messages_)
     {
-      ImGui::Text(error_message.c_str());
+      ImGui::Text("%s", error_message.c_str());
     }
     ImGui::PopStyleColor();
   }
@@ -152,7 +154,7 @@ namespace SmartPeak
       os << std::setfill('0') << std::setw(2) << h.count() << "h:"
         << std::setw(2) << m.count() << "m:"
         << std::setw(2) << s.count() << 's';
-      ImGui::Text(os.str().c_str());
+      ImGui::Text("%s", os.str().c_str());
     }
   }
     

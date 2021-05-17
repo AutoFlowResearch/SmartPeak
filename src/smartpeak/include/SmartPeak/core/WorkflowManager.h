@@ -27,6 +27,15 @@
 #include <chrono>
 
 namespace SmartPeak {
+  //TODO: implement a detailed workflow status
+  enum class WorkFlowStatus
+  {
+    IDLE,
+    RUNNING,
+    FINISHED,
+    SIZE_OF_WORKFLOWSTATUS
+  };
+
   class WorkflowManager {
   public:
     /**
@@ -81,6 +90,7 @@ namespace SmartPeak {
 
     ApplicationHandler application_handler_; ///< The workflow is run on this copy
     bool done_ = true;
+//    WorkFlowStatus done_ = WorkFlowStatus::IDLE;
     std::chrono::steady_clock::duration last_run_time_;
   };
 }
