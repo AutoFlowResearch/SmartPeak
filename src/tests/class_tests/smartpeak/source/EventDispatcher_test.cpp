@@ -35,7 +35,7 @@ namespace std
     for (const auto& command : get<3>(t))
     {
       os << separator << command;
-      std::string separator = ", ";
+      separator = ", ";
     }
     os << "])";
     return os;
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(dispatchEvents)
 
   expected_commands = 
   {
-    {"onApplicationProcessorStart",4,"", commands},
+    {"onApplicationProcessorStart",0,"", commands},
     {"onApplicationProcessorCommandStart",1,"command1", std::vector<std::string>()},
     {"onApplicationProcessorCommandStart",2,"command2", std::vector<std::string>()},
     {"onSequenceProcessorStart",2,"", std::vector<std::string>()},
