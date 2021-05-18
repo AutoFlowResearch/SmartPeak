@@ -37,10 +37,10 @@ namespace SmartPeak
     /**
       IApplicationProcessorObserver
     */
-    void EventDispatcher::onApplicationProcessorStart(const size_t nb_commands)
+    void EventDispatcher::onApplicationProcessorStart(const std::vector<std::string>& commands)
     {
       queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
-        [this, nb_commands] { this->notifyApplicationProcessorStart(nb_commands); }
+        [this, commands] { this->notifyApplicationProcessorStart(commands); }
       )));
     }
     void EventDispatcher::onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name)

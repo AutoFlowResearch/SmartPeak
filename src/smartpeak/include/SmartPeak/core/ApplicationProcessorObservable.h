@@ -35,11 +35,11 @@ namespace SmartPeak
   public:
     virtual void addApplicationProcessorObserver(IApplicationProcessorObserver* observer) { observers_.push_back(observer); };
     virtual void removeApplicationProcessorObserver(IApplicationProcessorObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
-    void notifyApplicationProcessorStart(const size_t nb_commands)
+    void notifyApplicationProcessorStart(const std::vector<std::string>& commands)
     {
       for (auto& observer : observers_)
       {
-        observer->onApplicationProcessorStart(nb_commands);
+        observer->onApplicationProcessorStart(commands);
       }
     }
     void notifyApplicationProcessorCommandStart(size_t command_index, const std::string& command_name)

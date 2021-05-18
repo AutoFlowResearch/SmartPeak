@@ -28,9 +28,16 @@
 
 namespace std
 {
-  std::ostream& operator<<(ostream& os, const tuple<string, size_t, string> t)
+  std::ostream& operator<<(ostream& os, const tuple<string, size_t, string, std::vector<std::string> > t)
   {
-    os << "(" << get<0>(t) << ", " << get<1>(t) << ", " << get<2>(t) << ")";
+    os << "(" << get<0>(t) << ", " << get<1>(t) << ", " << get<2>(t) << ", [";
+    std::string separator = "";
+    for (const auto& command : get<3>(t))
+    {
+      os << separator << command;
+      std::string separator = ", ";
+    }
+    os << "])";
     return os;
   }
 }
@@ -61,56 +68,56 @@ struct EventDispatcherFixture
     /**
       IApplicationProcessorObserver
     */
-    virtual void onApplicationProcessorStart(const size_t nb_commands) override
+    virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override
     {
-      events_.push_back(std::make_tuple("onApplicationProcessorStart", nb_commands, ""));
+      events_.push_back(std::make_tuple("onApplicationProcessorStart", 0, "", commands));
     }
     virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override
     {
-      events_.push_back(std::make_tuple("onApplicationProcessorCommandStart", command_index, command_name));
+      events_.push_back(std::make_tuple("onApplicationProcessorCommandStart", command_index, command_name, std::vector<std::string>()));
     }
     virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override
     {
-      events_.push_back(std::make_tuple("onApplicationProcessorCommandEnd", command_index, command_name));
+      events_.push_back(std::make_tuple("onApplicationProcessorCommandEnd", command_index, command_name, std::vector<std::string>()));
     }
     virtual void onApplicationProcessorEnd() override
     {
-      events_.push_back(std::make_tuple("onApplicationProcessorEnd", 0, ""));
+      events_.push_back(std::make_tuple("onApplicationProcessorEnd", 0, "", std::vector<std::string>()));
     }
     /**
       ISequenceSegmentProcessorObserver
     */
     virtual void onSequenceProcessorStart(const size_t nb_injections) override
     {
-      events_.push_back(std::make_tuple("onSequenceProcessorStart", nb_injections, ""));
+      events_.push_back(std::make_tuple("onSequenceProcessorStart", nb_injections, "", std::vector<std::string>()));
     }
     virtual void onSequenceProcessorSampleStart(const std::string& sample_name) override
     {
-      events_.push_back(std::make_tuple("onSequenceProcessorSampleStart", 0, sample_name));
+      events_.push_back(std::make_tuple("onSequenceProcessorSampleStart", 0, sample_name, std::vector<std::string>()));
     }
     virtual void onSequenceProcessorSampleEnd(const std::string& sample_name) override
     {
-      events_.push_back(std::make_tuple("onSequenceProcessorSampleEnd", 0, sample_name));
+      events_.push_back(std::make_tuple("onSequenceProcessorSampleEnd", 0, sample_name, std::vector<std::string>()));
     }
     virtual void onSequenceProcessorEnd() override
     {
-      events_.push_back(std::make_tuple("onSequenceProcessorEnd", 0, ""));
+      events_.push_back(std::make_tuple("onSequenceProcessorEnd", 0, "", std::vector<std::string>()));
     }
     virtual void onSequenceSegmentProcessorStart(const size_t nb_segments) override
     {
-      events_.push_back(std::make_tuple("onSequenceSegmentProcessorStart", nb_segments, ""));
+      events_.push_back(std::make_tuple("onSequenceSegmentProcessorStart", nb_segments, "", std::vector<std::string>()));
     }
     virtual void onSequenceSegmentProcessorSampleStart(const std::string& segment_name) override
     {
-      events_.push_back(std::make_tuple("onSequenceSegmentProcessorSampleStart", 0, segment_name));
+      events_.push_back(std::make_tuple("onSequenceSegmentProcessorSampleStart", 0, segment_name, std::vector<std::string>()));
     }
     virtual void onSequenceSegmentProcessorSampleEnd(const std::string& segment_name) override
     {
-      events_.push_back(std::make_tuple("onSequenceSegmentProcessorSampleEnd", 0, segment_name));
+      events_.push_back(std::make_tuple("onSequenceSegmentProcessorSampleEnd", 0, segment_name, std::vector<std::string>()));
     }
     virtual void onSequenceSegmentProcessorEnd() override
     {
-      events_.push_back(std::make_tuple("onSequenceSegmentProcessorEnd", 0, ""));
+      events_.push_back(std::make_tuple("onSequenceSegmentProcessorEnd", 0, "", std::vector<std::string>()));
     }
 
     /**
@@ -118,19 +125,19 @@ struct EventDispatcherFixture
     */
     virtual void onSampleGroupProcessorStart(const size_t nb_groups) override
     {
-      events_.push_back(std::make_tuple("onSampleGroupProcessorStart", nb_groups, ""));
+      events_.push_back(std::make_tuple("onSampleGroupProcessorStart", nb_groups, "", std::vector<std::string>()));
     }
     virtual void onSampleGroupProcessorSampleStart(const std::string& group_name) override
     {
-      events_.push_back(std::make_tuple("onSampleGroupProcessorSampleStart", 0, group_name));
+      events_.push_back(std::make_tuple("onSampleGroupProcessorSampleStart", 0, group_name, std::vector<std::string>()));
     }
     virtual void onSampleGroupProcessorSampleEnd(const std::string& group_name) override
     {
-      events_.push_back(std::make_tuple("onSampleGroupProcessorSampleEnd", 0, group_name));
+      events_.push_back(std::make_tuple("onSampleGroupProcessorSampleEnd", 0, group_name, std::vector<std::string>()));
     }
     virtual void onSampleGroupProcessorEnd() override
     {
-      events_.push_back(std::make_tuple("onSampleGroupProcessorEnd", 0, ""));
+      events_.push_back(std::make_tuple("onSampleGroupProcessorEnd", 0, "", std::vector<std::string>()));
     }
 
     /**
@@ -138,7 +145,7 @@ struct EventDispatcherFixture
     */
     virtual void onSequenceUpdated() override
     {
-      events_.push_back(std::make_tuple("onSequenceUpdated", 0, ""));
+      events_.push_back(std::make_tuple("onSequenceUpdated", 0, "", std::vector<std::string>()));
     }
 
     /**
@@ -146,10 +153,10 @@ struct EventDispatcherFixture
     */
     virtual void onTransitionsUpdated() override
     {
-      events_.push_back(std::make_tuple("onTransitionsUpdated", 0, ""));
+      events_.push_back(std::make_tuple("onTransitionsUpdated", 0, "", std::vector<std::string>()));
     }
 
-    std::vector<std::tuple<std::string, size_t, std::string>> events_;
+    std::vector<std::tuple<std::string, size_t, std::string, std::vector<std::string>>> events_;
   };
 
   EventDispatcherFixture()
@@ -180,12 +187,19 @@ BOOST_FIXTURE_TEST_SUITE(EventDispatcher, EventDispatcherFixture)
 
 BOOST_AUTO_TEST_CASE(dispatchEvents)
 {
-  std::vector<std::tuple<std::string, size_t, std::string>>
+  std::vector<std::tuple<std::string, size_t, std::string, std::vector<std::string>>>
     expected_commands{ };
   BOOST_CHECK_EQUAL_COLLECTIONS(event_displatcher_observer.events_.begin(), event_displatcher_observer.events_.end(),
     expected_commands.begin(), expected_commands.end());
 
-  event_dispatcher_observable.notifyApplicationProcessorStart(4);
+  std::vector<std::string> commands =
+  {
+    "command1",
+    "command2",
+    "command3",
+    "command4"
+  };
+  event_dispatcher_observable.notifyApplicationProcessorStart(commands);
   event_dispatcher_observable.notifyApplicationProcessorCommandStart(1, "command1");
   event_dispatcher_observable.notifyApplicationProcessorCommandStart(2, "command2");
   event_dispatcher_observable.notifySequenceProcessorStart(2);
@@ -215,28 +229,28 @@ BOOST_AUTO_TEST_CASE(dispatchEvents)
 
   expected_commands = 
   {
-    {"onApplicationProcessorStart",4,""},
-    {"onApplicationProcessorCommandStart",1,"command1"},
-    {"onApplicationProcessorCommandStart",2,"command2"},
-    {"onSequenceProcessorStart",2,""},
-    {"onSequenceProcessorSampleStart",0,"injection1"},
-    {"onSequenceProcessorSampleEnd",0,"injection1"},
-    {"onSequenceProcessorSampleStart",0,"injection2"},
-    {"onSequenceProcessorSampleEnd",0,"injection2"},
-    {"onSequenceProcessorEnd",0,""},
-    {"onApplicationProcessorCommandEnd",1,"command1"},
-    {"onApplicationProcessorCommandEnd",2,"command2"},
-    {"onApplicationProcessorCommandStart",3,"command3"},
-    {"onApplicationProcessorCommandStart",4,"command4"},
-    {"onSampleGroupProcessorStart",2,""},
-    {"onSequenceProcessorSampleStart",0,"sample1"},
-    {"onSequenceProcessorSampleEnd",0,"sample1"},
-    {"onSequenceProcessorSampleStart",0,"sample2"},
-    {"onSequenceProcessorSampleEnd",0,"sample2"},
-    {"onSampleGroupProcessorEnd",0,""},
-    {"onApplicationProcessorCommandEnd",3,"command3"},
-    {"onApplicationProcessorCommandEnd",4,"command4"},
-    {"onApplicationProcessorEnd",0,""},
+    {"onApplicationProcessorStart",4,"", commands},
+    {"onApplicationProcessorCommandStart",1,"command1", std::vector<std::string>()},
+    {"onApplicationProcessorCommandStart",2,"command2", std::vector<std::string>()},
+    {"onSequenceProcessorStart",2,"", std::vector<std::string>()},
+    {"onSequenceProcessorSampleStart",0,"injection1", std::vector<std::string>()},
+    {"onSequenceProcessorSampleEnd",0,"injection1", std::vector<std::string>()},
+    {"onSequenceProcessorSampleStart",0,"injection2", std::vector<std::string>()},
+    {"onSequenceProcessorSampleEnd",0,"injection2", std::vector<std::string>()},
+    {"onSequenceProcessorEnd",0,"", std::vector<std::string>()},
+    {"onApplicationProcessorCommandEnd",1,"command1", std::vector<std::string>()},
+    {"onApplicationProcessorCommandEnd",2,"command2", std::vector<std::string>()},
+    {"onApplicationProcessorCommandStart",3,"command3", std::vector<std::string>()},
+    {"onApplicationProcessorCommandStart",4,"command4", std::vector<std::string>()},
+    {"onSampleGroupProcessorStart",2,"", std::vector<std::string>()},
+    {"onSequenceProcessorSampleStart",0,"sample1", std::vector<std::string>()},
+    {"onSequenceProcessorSampleEnd",0,"sample1", std::vector<std::string>()},
+    {"onSequenceProcessorSampleStart",0,"sample2", std::vector<std::string>()},
+    {"onSequenceProcessorSampleEnd",0,"sample2", std::vector<std::string>()},
+    {"onSampleGroupProcessorEnd",0,"", std::vector<std::string>()},
+    {"onApplicationProcessorCommandEnd",3,"command3", std::vector<std::string>()},
+    {"onApplicationProcessorCommandEnd",4,"command4", std::vector<std::string>()},
+    {"onApplicationProcessorEnd",0,"", std::vector<std::string>()},
   };
 
   BOOST_CHECK_EQUAL_COLLECTIONS(event_displatcher_observer.events_.begin(), event_displatcher_observer.events_.end(),

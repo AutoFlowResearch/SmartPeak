@@ -27,11 +27,11 @@
 namespace SmartPeak
 {
 
-  void ProgressInfo::onApplicationProcessorStart(const size_t nb_commands)
+  void ProgressInfo::onApplicationProcessorStart(const std::vector<std::string>& commands)
   {
     running_ = true;
     commands_step_ = 0;
-    commands_max_steps_ = nb_commands;
+    all_commands_ = commands;
     application_processor_start_time_ = std::chrono::steady_clock::now();
   }
 
@@ -146,7 +146,7 @@ namespace SmartPeak
       if (running_commands_.size() > 0)
       {
         auto time_per_command = (time_per_steps * running_batch_->max_steps_) / running_commands_.size();
-        auto nb_remaining_commands = (commands_max_steps_ - running_commands_.size() - commands_step_);
+        auto nb_remaining_commands = (all_commands_.size() - running_commands_.size() - commands_step_);
         estimated_time += time_per_command * nb_remaining_commands;
       }
       return estimated_time;
@@ -161,14 +161,14 @@ namespace SmartPeak
   float ProgressInfo::progressValue() const
   {
     float progress = 0.0f;
-    if (commands_max_steps_ > 0)
+    if (all_commands_.size() > 0)
     {
       // executed commands so far
-      progress = ((1.0 / commands_max_steps_) * commands_step_);
+      progress = ((1.0 / all_commands_.size()) * commands_step_);
       if (running_batch_ && (running_batch_->max_steps_ > 0))
       {
         // actual batch
-        progress += (((1.0 / commands_max_steps_) * running_commands_.size()) * ((1.0 / running_batch_->max_steps_) * running_batch_->current_step_));
+        progress += (((1.0 / all_commands_.size()) * running_commands_.size()) * ((1.0 / running_batch_->max_steps_) * running_batch_->current_step_));
       }
     }
     return progress;

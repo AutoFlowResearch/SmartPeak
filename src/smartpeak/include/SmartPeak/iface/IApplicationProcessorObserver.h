@@ -24,6 +24,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace SmartPeak 
 {
@@ -32,7 +33,7 @@ namespace SmartPeak
     /**
       Parameters have been updated
     */
-    virtual void onApplicationProcessorStart(const size_t nb_commands) = 0;
+    virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) = 0;
     virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) = 0;
     virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) = 0;
     virtual void onApplicationProcessorEnd() = 0;

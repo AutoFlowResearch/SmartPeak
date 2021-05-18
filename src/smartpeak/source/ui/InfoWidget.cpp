@@ -208,10 +208,20 @@ namespace SmartPeak
       // application processor steps
       if (ImGui::TreeNode("Running workflow commands"))
       {
-        for (const auto& running_command : progress_info_.runningCommands())
+        size_t index = 0;
+        for (const auto& command : progress_info_.allCommands())
         {
-          // we add 1 to the id of the command since it's the way it is displayed in the workflow window
-          ImGui::Text("%c [%d] %s", "|/-\\"[(int)(ImGui::GetTime() / 0.05f) & 3], std::get<0>(running_command) + 1, std::get<1>(running_command).c_str());
+          auto command_tuple = std::make_tuple(index, command);
+          if (std::find(progress_info_.runningCommands().begin(), progress_info_.runningCommands().end(), command_tuple) != progress_info_.runningCommands().end())
+          {
+            // we add 1 to the id of the command since it's the way it is displayed in the workflow window
+            ImGui::Text("%c [%d] %s", "|/-\\"[(int)(ImGui::GetTime() / 0.05f) & 3], index + 1, command.c_str());
+          }
+          else
+          {
+            ImGui::Text("  [%d] %s", index + 1, command.c_str());
+          }
+          index++;
         }
         ImGui::TreePop();
       }

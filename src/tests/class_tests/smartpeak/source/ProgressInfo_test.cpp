@@ -78,8 +78,21 @@ BOOST_FIXTURE_TEST_SUITE(ProgressInfo, ProgressInfoFixture)
 
 BOOST_AUTO_TEST_CASE(isRunning)
 {
+  std::vector<std::string> commands =
+  {
+    "command1",
+    "command2",
+    "command3",
+    "command4",
+    "command5",
+    "command6",
+    "command7",
+    "command8",
+    "command9",
+    "command10"
+  };
   BOOST_CHECK_EQUAL(progress_info.isRunning(), false);
-  progress_info_observable.notifyApplicationProcessorStart(10);
+  progress_info_observable.notifyApplicationProcessorStart(commands);
   BOOST_CHECK_EQUAL(progress_info.isRunning(), true);
   progress_info_observable.notifyApplicationProcessorEnd();
   BOOST_CHECK_EQUAL(progress_info.isRunning(), false);
@@ -87,9 +100,22 @@ BOOST_AUTO_TEST_CASE(isRunning)
 
 BOOST_AUTO_TEST_CASE(runningTime)
 {
+  std::vector<std::string> commands =
+  {
+    "command1",
+    "command2",
+    "command3",
+    "command4",
+    "command5",
+    "command6",
+    "command7",
+    "command8",
+    "command9",
+    "command10"
+  };
   auto init_time = progress_info.runningTime();
   BOOST_CHECK_EQUAL(init_time.count(), std::chrono::steady_clock::duration::zero().count());
-  progress_info_observable.notifyApplicationProcessorStart(10);
+  progress_info_observable.notifyApplicationProcessorStart(commands);
   std::this_thread::sleep_for(std::chrono::seconds(1));
   auto running_time = progress_info.runningTime();
   BOOST_CHECK_GE(running_time.count(), init_time.count());
@@ -97,9 +123,16 @@ BOOST_AUTO_TEST_CASE(runningTime)
 
 BOOST_AUTO_TEST_CASE(estimatedRemainingTime)
 {
+  std::vector<std::string> commands =
+  {
+    "command1",
+    "command2",
+    "command3",
+    "command4"
+  };
   auto estimated_time = progress_info.estimatedRemainingTime();
   BOOST_CHECK(!estimated_time);
-  progress_info_observable.notifyApplicationProcessorStart(4);
+  progress_info_observable.notifyApplicationProcessorStart(commands);
   progress_info_observable.notifyApplicationProcessorCommandStart(1, "command1");
   progress_info_observable.notifyApplicationProcessorCommandStart(2, "command2");
   progress_info_observable.notifyApplicationProcessorCommandStart(3, "command3");
@@ -116,9 +149,16 @@ BOOST_AUTO_TEST_CASE(estimatedRemainingTime)
 
 BOOST_AUTO_TEST_CASE(progressValue_1)
 {
+  std::vector<std::string> commands =
+  {
+    "command1",
+    "command2",
+    "command3",
+    "command4"
+  };
   auto progress_value = progress_info.progressValue();
   BOOST_CHECK_CLOSE(progress_value, 0.0f, 1e-3f);
-  progress_info_observable.notifyApplicationProcessorStart(4);
+  progress_info_observable.notifyApplicationProcessorStart(commands);
   progress_info_observable.notifyApplicationProcessorCommandStart(1, "command1");
   progress_info_observable.notifyApplicationProcessorCommandStart(2, "command2");
   progress_info_observable.notifyApplicationProcessorCommandStart(3, "command3");
@@ -134,8 +174,15 @@ BOOST_AUTO_TEST_CASE(progressValue_1)
 
 BOOST_AUTO_TEST_CASE(progressValue_2)
 {
+  std::vector<std::string> commands =
+  {
+    "command1",
+    "command2",
+    "command3",
+    "command4"
+  };
   // with 2 batches of commands, sequence and sample groups
-  progress_info_observable.notifyApplicationProcessorStart(4);
+  progress_info_observable.notifyApplicationProcessorStart(commands);
   progress_info_observable.notifyApplicationProcessorCommandStart(1, "command1");
   progress_info_observable.notifyApplicationProcessorCommandStart(2, "command2");
 
@@ -173,32 +220,68 @@ BOOST_AUTO_TEST_CASE(progressValue_2)
   BOOST_CHECK_CLOSE(progress_value, 1.0f, 1e-3f);
 }
 
+BOOST_AUTO_TEST_CASE(commands)
+{
+  std::vector<std::string> commands =
+  {
+    "command1",
+    "command2",
+    "command3",
+    "command4"
+  };
+  auto progress_value = progress_info.progressValue();
+  progress_info_observable.notifyApplicationProcessorStart(commands);
+  const auto& wf_commands = progress_info.allCommands();
+  std::vector<std::string>
+    expected_commands {
+      "command1",
+      "command2",
+      "command3",
+      "command4",
+  };
+  BOOST_CHECK_EQUAL_COLLECTIONS(wf_commands.begin(), wf_commands.end(),
+    expected_commands.begin(), expected_commands.end());
+}
 
 BOOST_AUTO_TEST_CASE(runningCommands)
 {
+  std::vector<std::string> commands =
+  {
+    "command1",
+    "command2",
+    "command3",
+    "command4"
+  };
   auto progress_value = progress_info.progressValue();
-  progress_info_observable.notifyApplicationProcessorStart(4);
+  progress_info_observable.notifyApplicationProcessorStart(commands);
   progress_info_observable.notifyApplicationProcessorCommandStart(1, "command1");
   progress_info_observable.notifyApplicationProcessorCommandStart(2, "command2");
   progress_info_observable.notifyApplicationProcessorCommandStart(3, "command3");
   progress_info_observable.notifyApplicationProcessorCommandStart(4, "command4");
-  const auto& commands = progress_info.runningCommands();
+  const auto& running_commands = progress_info.runningCommands();
   std::vector<std::tuple<size_t, std::string>> 
-    expected_commands{ 
+    expected_commands { 
       {1,"command1"},
       {2,"command2"},
       {3,"command3"},
       {4,"command4"},
     };
-  BOOST_CHECK_EQUAL_COLLECTIONS(commands.begin(), commands.end(), 
+  BOOST_CHECK_EQUAL_COLLECTIONS(running_commands.begin(), running_commands.end(),
                                 expected_commands.begin(), expected_commands.end());
 }
 
 BOOST_AUTO_TEST_CASE(runningBatch)
 {
+  std::vector<std::string> commands =
+  {
+    "command1",
+    "command2",
+    "command3",
+    "command4"
+  };
   auto progress_value = progress_info.progressValue();
   BOOST_CHECK_CLOSE(progress_value, 0.0f, 1e-3f);
-  progress_info_observable.notifyApplicationProcessorStart(4);
+  progress_info_observable.notifyApplicationProcessorStart(commands);
   progress_info_observable.notifyApplicationProcessorCommandStart(1, "command1");
   progress_info_observable.notifyApplicationProcessorCommandStart(2, "command2");
   progress_info_observable.notifyApplicationProcessorCommandStart(3, "command3");
@@ -223,8 +306,15 @@ BOOST_AUTO_TEST_CASE(runningBatch)
 
 BOOST_AUTO_TEST_CASE(lastRunTime)
 {
+  std::vector<std::string> commands =
+  {
+    "command1",
+    "command2",
+    "command3",
+    "command4"
+  };
   BOOST_CHECK_EQUAL(progress_info.lastRunTime(), std::chrono::steady_clock::duration::zero());
-  progress_info_observable.notifyApplicationProcessorStart(4);
+  progress_info_observable.notifyApplicationProcessorStart(commands);
   progress_info_observable.notifyApplicationProcessorEnd();
   BOOST_CHECK_NE(progress_info.lastRunTime(), std::chrono::steady_clock::duration::zero());
 }

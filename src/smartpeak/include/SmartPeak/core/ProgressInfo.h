@@ -66,7 +66,7 @@ namespace SmartPeak
     /**
       IApplicationProcessorObserver
     */
-    virtual void onApplicationProcessorStart(const size_t nb_commands) override;
+    virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override;
     virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override;
     virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override;
     virtual void onApplicationProcessorEnd() override;
@@ -122,6 +122,11 @@ namespace SmartPeak
     float progressValue() const;
 
     /**
+      @brief list of commands (running or not) of the workflow.
+    */
+    const std::vector<std::string>& allCommands() const { return all_commands_; };
+
+    /**
       @brief list of running commands of the workflow.
     */
     const std::vector<std::tuple<size_t, std::string>>& runningCommands() const;
@@ -146,7 +151,7 @@ namespace SmartPeak
     * ApplicationProcessor's running commands
     */
     int commands_step_ = 0;
-    int commands_max_steps_ = 0;
+    std::vector<std::string> all_commands_;
     std::chrono::steady_clock::time_point application_processor_start_time_;
     /**
     * @brief RunningBatch used for sequence, sequence segments and sample groups

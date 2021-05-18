@@ -244,8 +244,14 @@ namespace SmartPeak
     ApplicationProcessorObservable observable;
     observable.addApplicationProcessorObserver(application_processor_observer);
 
+    std::vector<std::string> commands_names;
+    for (const auto& command : commands)
+    {
+      commands_names.push_back(command.getName());
+    }
+    observable.notifyApplicationProcessorStart(commands_names);
+
     size_t i = 0;
-    observable.notifyApplicationProcessorStart(commands.size());
     while (i < commands.size()) {
       const ApplicationHandler::Command::CommandType type = commands[i].type;
       size_t j = i + 1;
