@@ -239,7 +239,9 @@ namespace SmartPeak
     const std::set<std::string>& sequence_segment_names, 
     const std::set<std::string>& sample_group_names,
     IApplicationProcessorObserver* application_processor_observer,
-    ISequenceProcessorObserver* sequence_processor_observer)
+    ISequenceProcessorObserver* sequence_processor_observer,
+    ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
+    ISampleGroupProcessorObserver* sample_group_processor_observer)
   {
     ApplicationProcessorObservable observable;
     observable.addApplicationProcessorObserver(application_processor_observer);
@@ -274,7 +276,7 @@ namespace SmartPeak
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(seq_seg_methods),
           [](const ApplicationHandler::Command& command){ return command.seq_seg_method; });
-        ProcessSequenceSegments pss(state.sequenceHandler_);
+        ProcessSequenceSegments pss(state.sequenceHandler_, sequence_segment_processor_observer);
         pss.filenames_ = cmd.dynamic_filenames;
         pss.sequence_segment_processing_methods_ = seq_seg_methods;
         pss.sequence_segment_names_ = sequence_segment_names;
@@ -285,7 +287,7 @@ namespace SmartPeak
         std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(sample_group_methods),
           [](const ApplicationHandler::Command& command) { return command.sample_group_method; });
-        ProcessSampleGroups psg(state.sequenceHandler_);
+        ProcessSampleGroups psg(state.sequenceHandler_, sample_group_processor_observer);
         psg.filenames_ = cmd.dynamic_filenames;
         psg.sample_group_processing_methods_ = sample_group_methods;
         psg.sample_group_names_ = sample_group_names;

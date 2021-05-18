@@ -27,6 +27,8 @@
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/iface/IProcessorDescription.h>
 #include <SmartPeak/iface/ISequenceProcessorObserver.h>
+#include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
+#include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 #include <SmartPeak/core/ApplicationProcessorObservable.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <string>
@@ -62,7 +64,9 @@ namespace SmartPeak
       const std::set<std::string>& sequence_segment_names, 
       const std::set<std::string>& sample_group_names,
       IApplicationProcessorObserver* application_processor_observer = nullptr,
-      ISequenceProcessorObserver* sequence_processor_observer = nullptr);
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+      ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
+      ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr);
   }
 
   struct CreateCommand : ApplicationProcessor {

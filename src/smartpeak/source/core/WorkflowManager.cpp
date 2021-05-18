@@ -34,7 +34,9 @@ namespace SmartPeak {
     const std::set<std::string>& sample_group_names, 
     const std::vector<ApplicationHandler::Command>& commands, 
     IApplicationProcessorObserver* application_processor_observer,
-    ISequenceProcessorObserver* sequence_processor_observer)
+    ISequenceProcessorObserver* sequence_processor_observer,
+    ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
+    ISampleGroupProcessorObserver* sample_group_processor_observer)
   {
     // do not run workflows concurrently
     if (!done_) {
@@ -57,7 +59,9 @@ namespace SmartPeak {
                   sample_group_names_,
                   commands_,
                   application_processor_observer,
-                  sequence_processor_observer);
+                  sequence_processor_observer,
+                  sequence_segment_processor_observer,
+                  sample_group_processor_observer);
     LOGD << "Created thread (to be detached): " << t.get_id();
     t.detach();
     LOGD << "Thread has been detached";
@@ -75,7 +79,9 @@ namespace SmartPeak {
     const std::set<std::string>& sample_group_names, 
     const std::vector<ApplicationHandler::Command>& commands,
     IApplicationProcessorObserver* application_processor_observer,
-    ISequenceProcessorObserver* sequence_processor_observer)
+    ISequenceProcessorObserver* sequence_processor_observer,
+    ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
+    ISampleGroupProcessorObserver* sample_group_processor_observer)
   {
     auto run_start_time = std::chrono::steady_clock::now();
     // run workflow asynchronously
@@ -88,7 +94,9 @@ namespace SmartPeak {
       std::cref(sequence_segment_names), 
       std::cref(sample_group_names),
       application_processor_observer,
-      sequence_processor_observer
+      sequence_processor_observer,
+      sequence_segment_processor_observer,
+      sample_group_processor_observer
     );
 
     LOGD << "Waiting on async operation...";

@@ -122,7 +122,9 @@ namespace SmartPeak
             sample_group_names, 
             buildCommandsFromNames.commands_, 
             &application_processor_observer_,
-            &sequence_processor_observer_
+            &sequence_processor_observer_,
+            &sequence_segment_processor_observer_,
+            &sample_group_processor_observer_
           );
         }
         visible_ = false;

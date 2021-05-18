@@ -171,7 +171,13 @@ namespace SmartPeak
     std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods_; /// Events to process
 
     ProcessSequenceSegments() = default;
-    ProcessSequenceSegments(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    ProcessSequenceSegments(SequenceHandler& sh, ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr) : SequenceProcessor(sh)
+    {
+      if (sequence_segment_processor_observer)
+      {
+        addSequenceSegmentProcessorObserver(sequence_segment_processor_observer);
+      }
+    }
     void process() override;
 
     /* IProcessorDescription */
@@ -189,7 +195,13 @@ namespace SmartPeak
     std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods_; /// Events to process
 
     ProcessSampleGroups() = default;
-    ProcessSampleGroups(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    ProcessSampleGroups(SequenceHandler& sh, ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr) : SequenceProcessor(sh)
+    {
+      if (sample_group_processor_observer)
+      {
+        addSampleGroupProcessorObserver(sample_group_processor_observer);
+      }
+    }
     void process() override;
 
     /* IProcessorDescription */

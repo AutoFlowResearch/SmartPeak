@@ -107,7 +107,13 @@ int main(int argc, char** argv)
   auto report_ = std::make_shared<Report>(application_handler_);
   auto workflow_ = std::make_shared<Workflow>("Workflow", application_handler_, workflow_manager_);
   auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_, event_dispatcher);
-  auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_, session_handler_, workflow_manager_, event_dispatcher, event_dispatcher);
+  auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_, 
+                                                                  session_handler_, 
+                                                                  workflow_manager_, 
+                                                                  event_dispatcher, 
+                                                                  event_dispatcher,
+                                                                  event_dispatcher,
+                                                                  event_dispatcher);
   auto about_widget_ = std::make_shared<AboutWidget>();
   auto log_widget_ = std::make_shared<LogWidget>(appender_, "Log");
   auto parameters_table_widget_ = std::make_shared<ParametersTableWidget>(session_handler_, application_handler_, "ParametersMainWindow", "Parameters");

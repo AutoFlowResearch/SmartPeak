@@ -39,9 +39,13 @@ namespace SmartPeak
       SessionHandler& session_handler, 
       WorkflowManager& workflow_manager, 
       IApplicationProcessorObserver& application_processor_observer,
-      ISequenceProcessorObserver& sequence_processor_observer) :
+      ISequenceProcessorObserver& sequence_processor_observer,
+      ISequenceSegmentProcessorObserver& sequence_segment_processor_observer,
+      ISampleGroupProcessorObserver& sample_group_processor_observer) :
       application_processor_observer_(application_processor_observer),
       sequence_processor_observer_(sequence_processor_observer),
+      sequence_segment_processor_observer_(sequence_segment_processor_observer),
+      sample_group_processor_observer_(sample_group_processor_observer),
       application_handler_(application_handler),
       session_handler_(session_handler),
       workflow_manager_(workflow_manager)
@@ -55,6 +59,8 @@ namespace SmartPeak
     FilePicker file_picker_;
     IApplicationProcessorObserver& application_processor_observer_;
     ISequenceProcessorObserver& sequence_processor_observer_;
+    ISequenceSegmentProcessorObserver& sequence_segment_processor_observer_;
+    ISampleGroupProcessorObserver& sample_group_processor_observer_;
     ApplicationHandler& application_handler_;
     SessionHandler& session_handler_;
     WorkflowManager& workflow_manager_;
