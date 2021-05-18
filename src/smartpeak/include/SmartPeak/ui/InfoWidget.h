@@ -99,7 +99,7 @@ namespace SmartPeak
     bool file_load_error_ = false;
     bool refresh_needed_ = true;
     std::vector<std::string> error_messages_;
-    
+    int spinner_counter_ = 0;
     ProgressInfo progress_info_;
   };
 }
