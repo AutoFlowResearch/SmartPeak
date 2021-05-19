@@ -103,6 +103,13 @@ namespace SmartPeak
     std::string getName() const override { return "LoadSequenceParameters"; };
   };
 
+  struct StoreSequence : FilePickerProcessor {
+    StoreSequence(ApplicationHandler& application_handler) :
+      FilePickerProcessor(application_handler) {}
+    bool process() override;
+    std::string getName() const override { return "StoreSequence"; };
+  };
+
   struct StoreSequenceParameters : FilePickerProcessor {
     StoreSequenceParameters(ApplicationHandler& application_handler) :
       FilePickerProcessor(application_handler) {}
@@ -210,6 +217,7 @@ namespace SmartPeak
     StoreSequenceFileSmartPeak(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
     bool process() override;
     std::string getName() const override { return "StoreSequenceFileSmartPeak"; };
+    std::string pathname_;
   };
 
   struct StoreSequenceFileAnalyst : ApplicationProcessor {

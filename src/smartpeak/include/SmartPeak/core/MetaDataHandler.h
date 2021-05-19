@@ -71,35 +71,41 @@ public:
 
     std::string getAcquisitionDateAndTimeAsString(const std::string& format = "%Y-%m-%d_%H%M%S") const;
 
-    std::string getRackNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const
-    {
-      return ((rack_number != -1) || (!undefined_str)) ? std::to_string(rack_number) : *undefined_str;
-    }
+    /**
+     @brief return string form of rack number
+     @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getRackNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const;
 
-    std::string getPlateNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const
-    {
-      return ((plate_number != -1) || (!undefined_str)) ? std::to_string(plate_number) : *undefined_str;
-    }
+    /**
+      @brief return string form of plate number
+      @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getPlateNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const;
+    
+    /**
+      @brief return string form of pos number
+      @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getPosNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const;
 
-    std::string getPosNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const
-    {
-      return ((pos_number != -1) || (!undefined_str)) ? std::to_string(pos_number) : *undefined_str;
-    }
+    /**
+      @brief return string form of injection number
+      @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getInjectionNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const;
 
-    std::string getInjectionNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const
-    {
-      return ((inj_number != -1) || (!undefined_str)) ? std::to_string(inj_number) : *undefined_str;
-    }
+    /**
+      @brief return string form of mass low value
+      @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getScanMassLowAsString(std::optional<std::string> undefined_str = std::nullopt) const;
 
-    std::string getScanMassLowAsString(std::optional<std::string> undefined_str = std::nullopt) const
-    {
-      return ((scan_mass_low != 0.0f) || (!undefined_str)) ? std::to_string(scan_mass_low) : *undefined_str;
-    }
-
-    std::string getScanMassHighAsString(std::optional<std::string> undefined_str = std::nullopt) const
-    {
-      return ((scan_mass_high != 1e12f) || (!undefined_str)) ? std::to_string(scan_mass_high) : *undefined_str;
-    }
+    /**
+      @brief return string form of mass high
+      @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getScanMassHighAsString(std::optional<std::string> undefined_str = std::nullopt) const;
 
     // required
     std::string acq_method_name;

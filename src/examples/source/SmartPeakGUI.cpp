@@ -585,11 +585,9 @@ int main(int argc, char** argv)
           //if (ImGui::MenuItem("Transitions")) {} // TODO: updated transitions file
           //if (ImGui::MenuItem("Standards Conc")) {} // TODO: updated standards concentration file
           if (ImGui::MenuItem("Sequence")) {
-            static StoreSequenceFileSmartPeak processor(application_handler_);
-            processor.process();
-//            file_picker_.setProcessor(processor);
-//            file_picker_.visible_ = true;
-//            update_session_cache_ = true;
+            static StoreSequence processor(application_handler_);
+            file_picker_.setProcessor(processor);
+            file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Parameters")) {
             static StoreSequenceParameters processor(application_handler_);

@@ -366,6 +366,22 @@ namespace SmartPeak
     }
   }
 
+  bool StoreSequence::process()
+  {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
+      StoreSequenceFileSmartPeak storeSequenceSmartPeak(application_handler_);
+      storeSequenceSmartPeak.pathname_ = pathname_;
+      storeSequenceSmartPeak.process();
+      return true;
+    }
+    else
+    {
+      LOGE << "Parameters file cannot be stored without first loading the sequence.";
+      return false;
+    }
+  }
+
   bool StoreSequenceParameters::process()
   {
     if (application_handler_.sequenceHandler_.getSequence().size()) {
@@ -667,7 +683,7 @@ namespace SmartPeak
 
   bool StoreSequenceFileSmartPeak::process() {
     if (application_handler_.sequenceHandler_.getSequence().size()) {
-      SequenceParser::writeSequenceFileSmartPeak(application_handler_.sequenceHandler_, application_handler_.main_dir_ + "/test.csv");
+      SequenceParser::writeSequenceFileSmartPeak(application_handler_.sequenceHandler_, pathname_);
       return true;
     }
     else
