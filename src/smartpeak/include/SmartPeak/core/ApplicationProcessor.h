@@ -206,6 +206,12 @@ namespace SmartPeak
     std::string getName() const override { return "LoadSequenceSegmentFeatureBackgroundQCComponentGroups"; };
   };
 
+  struct StoreSequenceFileSmartPeak : ApplicationProcessor {
+    StoreSequenceFileSmartPeak(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+    bool process() override;
+    std::string getName() const override { return "StoreSequenceFileSmartPeak"; };
+  };
+
   struct StoreSequenceFileAnalyst : ApplicationProcessor {
     StoreSequenceFileAnalyst(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
     bool process() override;

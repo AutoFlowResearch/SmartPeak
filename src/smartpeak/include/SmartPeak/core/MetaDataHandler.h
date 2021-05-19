@@ -27,6 +27,7 @@
 
 #include <string>
 #include <ctime>
+#include <optional>
 
 namespace SmartPeak {
   class MetaDataHandler {
@@ -70,6 +71,36 @@ public:
 
     std::string getAcquisitionDateAndTimeAsString(const std::string& format = "%Y-%m-%d_%H%M%S") const;
 
+    std::string getRackNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const
+    {
+      return ((rack_number != -1) || (!undefined_str)) ? std::to_string(rack_number) : *undefined_str;
+    }
+
+    std::string getPlateNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const
+    {
+      return ((plate_number != -1) || (!undefined_str)) ? std::to_string(plate_number) : *undefined_str;
+    }
+
+    std::string getPosNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const
+    {
+      return ((pos_number != -1) || (!undefined_str)) ? std::to_string(pos_number) : *undefined_str;
+    }
+
+    std::string getInjectionNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const
+    {
+      return ((inj_number != -1) || (!undefined_str)) ? std::to_string(inj_number) : *undefined_str;
+    }
+
+    std::string getScanMassLowAsString(std::optional<std::string> undefined_str = std::nullopt) const
+    {
+      return ((scan_mass_low != 0.0f) || (!undefined_str)) ? std::to_string(scan_mass_low) : *undefined_str;
+    }
+
+    std::string getScanMassHighAsString(std::optional<std::string> undefined_str = std::nullopt) const
+    {
+      return ((scan_mass_high != 1e12f) || (!undefined_str)) ? std::to_string(scan_mass_high) : *undefined_str;
+    }
+
     // required
     std::string acq_method_name;
     float inj_volume = -1.0;
@@ -87,8 +118,8 @@ public:
     std::string proc_method_name;
     std::tm acquisition_date_and_time = { 0, 0, 0, 1, 0, 0, 0, 0, 0 }; // Need to start at Day 1 of the month
     std::string scan_polarity = "Unknown";
-    float scan_mass_low = 0.0; // in Da
-    float scan_mass_high = 1e12; // in Da
+    float scan_mass_low = 0.0f; // in Da
+    float scan_mass_high = 1e12f; // in Da
 
   protected:
     // required
