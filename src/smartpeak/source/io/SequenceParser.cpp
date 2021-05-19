@@ -44,17 +44,21 @@ namespace SmartPeak
     T& output
   )
   {
-    if (Utilities::trimString(s).empty()) {
+    if (Utilities::trimString(s).empty())
+    {
       return false;
     }
 
-    if (std::is_same<T, int>::value) {
+    if (std::is_same<T, int>::value)
+    {
       output = std::stoi(s);
     }
-    else if (std::is_same<T, float>::value) {
+    else if (std::is_same<T, float>::value)
+    {
       output = std::stof(s);
     }
-    else {
+    else
+    {
       LOGE << "Case not handled";
       return false;
     }
