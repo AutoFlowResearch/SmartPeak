@@ -366,6 +366,22 @@ namespace SmartPeak
     }
   }
 
+  bool StoreSequence::process()
+  {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
+      StoreSequenceFileSmartPeak storeSequenceSmartPeak(application_handler_);
+      storeSequenceSmartPeak.pathname_ = pathname_;
+      storeSequenceSmartPeak.process();
+      return true;
+    }
+    else
+    {
+      LOGE << "Parameters file cannot be stored without first loading the sequence.";
+      return false;
+    }
+  }
+
   bool StoreSequenceParameters::process()
   {
     if (application_handler_.sequenceHandler_.getSequence().size()) {
@@ -661,6 +677,18 @@ namespace SmartPeak
     else 
     {
       LOGE << "Feature background QCs file cannot be loaded without first loading the sequence.";
+      return false;
+    }
+  }
+
+  bool StoreSequenceFileSmartPeak::process() {
+    if (application_handler_.sequenceHandler_.getSequence().size()) {
+      SequenceParser::writeSequenceFileSmartPeak(application_handler_.sequenceHandler_, pathname_);
+      return true;
+    }
+    else
+    {
+      LOGE << "Sequence file cannot be converted and stored without first loading the sequence.";
       return false;
     }
   }

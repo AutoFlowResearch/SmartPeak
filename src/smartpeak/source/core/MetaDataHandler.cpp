@@ -262,4 +262,34 @@ namespace SmartPeak
     std::string acquisition_datetime(time_repr);
     return acquisition_datetime;
   }
+
+  std::string MetaDataHandler::getRackNumberAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((rack_number != -1) || (!undefined_str)) ? std::to_string(rack_number) : *undefined_str;
+  }
+
+  std::string MetaDataHandler::getPlateNumberAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((plate_number != -1) || (!undefined_str)) ? std::to_string(plate_number) : *undefined_str;
+  }
+
+  std::string MetaDataHandler::getPosNumberAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((pos_number != -1) || (!undefined_str)) ? std::to_string(pos_number) : *undefined_str;
+  }
+
+  std::string MetaDataHandler::getInjectionNumberAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((inj_number != -1) || (!undefined_str)) ? std::to_string(inj_number) : *undefined_str;
+  }
+
+  std::string MetaDataHandler::getScanMassLowAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((scan_mass_low != 0.0f) || (!undefined_str)) ? std::to_string(scan_mass_low) : *undefined_str;
+  }
+
+  std::string MetaDataHandler::getScanMassHighAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((scan_mass_high != 1e12f) || (!undefined_str)) ? std::to_string(scan_mass_high) : *undefined_str;
+  }
 }

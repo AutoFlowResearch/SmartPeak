@@ -173,4 +173,70 @@ BOOST_AUTO_TEST_CASE(getInjectionName)
   BOOST_CHECK_EQUAL(m.getInjectionName(), "SampleName_14_BatchName_2019-01-31_154055");
 }
 
+BOOST_AUTO_TEST_CASE(getRackNumberAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getRackNumberAsString(), "-1");
+  BOOST_CHECK_EQUAL(m.getRackNumberAsString("invalid"s), "invalid");
+  m.rack_number = 42;
+  BOOST_CHECK_EQUAL(m.getRackNumberAsString(), "42");
+  BOOST_CHECK_EQUAL(m.getRackNumberAsString("invalid"s), "42");
+}
+
+BOOST_AUTO_TEST_CASE(getPlateNumberAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getPlateNumberAsString(), "-1");
+  BOOST_CHECK_EQUAL(m.getPlateNumberAsString("invalid"s), "invalid");
+  m.plate_number = 42;
+  BOOST_CHECK_EQUAL(m.getPlateNumberAsString(), "42");
+  BOOST_CHECK_EQUAL(m.getPlateNumberAsString("invalid"s), "42");
+}
+
+BOOST_AUTO_TEST_CASE(getPosNumberAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getPosNumberAsString(), "-1");
+  BOOST_CHECK_EQUAL(m.getPosNumberAsString("invalid"s), "invalid");
+  m.pos_number = 42;
+  BOOST_CHECK_EQUAL(m.getPosNumberAsString(), "42");
+  BOOST_CHECK_EQUAL(m.getPosNumberAsString("invalid"s), "42");
+}
+
+BOOST_AUTO_TEST_CASE(getInjectionNumberAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getInjectionNumberAsString(), "-1");
+  BOOST_CHECK_EQUAL(m.getInjectionNumberAsString("invalid"s), "invalid");
+  m.inj_number = 42;
+  BOOST_CHECK_EQUAL(m.getInjectionNumberAsString(), "42");
+  BOOST_CHECK_EQUAL(m.getInjectionNumberAsString("invalid"s), "42");
+}
+
+BOOST_AUTO_TEST_CASE(getScanMassLowAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getScanMassLowAsString(), "0.000000");
+  BOOST_CHECK_EQUAL(m.getScanMassLowAsString("invalid"s), "invalid");
+  m.scan_mass_low = 42;
+  BOOST_CHECK_EQUAL(m.getScanMassLowAsString(), "42.000000");
+  BOOST_CHECK_EQUAL(m.getScanMassLowAsString("invalid"s), "42.000000");
+}
+
+BOOST_AUTO_TEST_CASE(getScanMassHighAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getScanMassHighAsString(), "999999995904.000000");
+  BOOST_CHECK_EQUAL(m.getScanMassHighAsString("invalid"s), "invalid");
+  m.scan_mass_high = 42;
+  BOOST_CHECK_EQUAL(m.getScanMassHighAsString(), "42.000000");
+  BOOST_CHECK_EQUAL(m.getScanMassHighAsString("invalid"s), "42.000000");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

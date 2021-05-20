@@ -37,6 +37,35 @@
 
 namespace SmartPeak
 {
+
+  template<typename T>
+  static bool validateAndConvert(
+    const std::string& s,
+    T& output
+  )
+  {
+    if (Utilities::trimString(s).empty())
+    {
+      return false;
+    }
+
+    if (std::is_same<T, int>::value)
+    {
+      output = std::stoi(s);
+    }
+    else if (std::is_same<T, float>::value)
+    {
+      output = std::stof(s);
+    }
+    else
+    {
+      LOGE << "Case not handled";
+      return false;
+    }
+
+    return true;
+  }
+
   template<typename DELIMITER>
   void SequenceParser::readSequenceFile(
     SequenceHandler& sequenceHandler,
@@ -260,6 +289,99 @@ namespace SmartPeak
     LOGD << "END readSequenceFile";
   }
 
+  void SequenceParser::makeSequenceFileSmartPeak(SequenceHandler& sequenceHandler, std::vector<std::vector<std::string>>& rows_out, std::vector<std::string>& headers_out)
+  {
+    using namespace std::string_literals;
+
+    // Headers expected by the SmartPeak software
+    headers_out.clear();
+    headers_out = {
+      "sample_name",
+      "sample_group_name",
+      "sequence_segment_name",
+      "replicate_group_name",
+      "sample_type",
+      "original_filename",
+      "proc_method_name",
+      "rack_number",
+      "plate_number",
+      "pos_number",
+      "inj_number",
+      "dilution_factor",
+      "acq_method_name",
+      "operator_name",
+      "acquisition_date_and_time",
+      "inj_volume",
+      "inj_volume_units",
+      "batch_name",
+      "scan_polarity",
+      "scan_mass_low",
+      "scan_mass_high"
+    };
+
+    rows_out.clear();
+    for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
+      std::vector<std::string> row;
+      const MetaDataHandler& mdh = sampleHandler.getMetaData();
+      row.push_back(mdh.getSampleName());
+      row.push_back(mdh.getSampleGroupName());
+      row.push_back(mdh.getSequenceSegmentName());
+      row.push_back(mdh.getReplicateGroupName());
+      row.push_back(mdh.getSampleTypeAsString());
+      row.push_back(mdh.getFilename());
+      row.push_back(mdh.proc_method_name);
+      row.push_back(mdh.getRackNumberAsString(""s));
+      row.push_back(mdh.getPlateNumberAsString(""s));
+      row.push_back(mdh.getPosNumberAsString(""s));
+      row.push_back(mdh.getInjectionNumberAsString(""s));
+      row.push_back(std::to_string(mdh.dilution_factor));
+      row.push_back(mdh.acq_method_name);
+      row.push_back(mdh.operator_name);
+      row.push_back(mdh.getAcquisitionDateAndTimeAsString());
+      row.push_back(std::to_string(mdh.inj_volume));
+      row.push_back(mdh.inj_volume_units);
+      row.push_back(mdh.batch_name);
+      row.push_back(mdh.scan_polarity);
+      row.push_back(mdh.getScanMassLowAsString(""s));
+      row.push_back(mdh.getScanMassHighAsString(""s));
+      rows_out.push_back(row);
+    }
+  }
+
+  void SequenceParser::writeSequenceFileSmartPeak(SequenceHandler& sequenceHandler, const std::string& filename, const std::string& delimiter)
+  {
+    LOGD << "START writeSequenceFileSmartPeak";
+    LOGD << "Delimiter: " << delimiter;
+
+    LOGI << "Loading: " << filename;
+
+    if (filename.empty()) {
+      LOGE << "filename is empty";
+      LOGD << "END writeSequenceFileSmartPeak";
+      return;
+    }
+
+    // Make the file
+    std::vector<std::vector<std::string>> rows;
+    //  deepcode ignore ContainerUpdatedButNeverQueried: headers are used, looks like false positive
+    std::vector<std::string> headers;
+    makeSequenceFileSmartPeak(sequenceHandler, rows, headers);
+
+    // Write the output file
+    CSVWriter writer(filename, delimiter);
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      LOGD << "END writeSequenceFileSmartPeak";
+    }
+
+    for (const std::vector<std::string>& line : rows) {
+      writer.writeDataInRow(line.cbegin(), line.cend());
+    }
+
+    LOGD << "END writeSequenceFileSmartPeak";
+  }
+
   void SequenceParser::makeSequenceFileAnalyst(SequenceHandler& sequenceHandler, std::vector<std::vector<std::string>>& rows_out, std::vector<std::string>& headers_out)
   {
     // Headers expected by the Analyst software
@@ -311,6 +433,7 @@ namespace SmartPeak
 
     // Make the file
     std::vector<std::vector<std::string>> rows;
+    //  deepcode ignore ContainerUpdatedButNeverQueried: headers are used, looks like false positive
     std::vector<std::string> headers;
     makeSequenceFileAnalyst(sequenceHandler, rows, headers);
 
@@ -374,6 +497,7 @@ namespace SmartPeak
 
     // Make the file
     std::vector<std::vector<std::string>> rows;
+    //  deepcode ignore ContainerUpdatedButNeverQueried: headers are used, looks like false positive
     std::vector<std::string> headers;
     makeSequenceFileMasshunter(sequenceHandler, rows, headers);
 
@@ -667,6 +791,34 @@ namespace SmartPeak
     LOGD << "END writeDataTableFromMetaValue";
     return true;
   }
+
+  struct Row
+  {
+    Row() = default;
+    ~Row() = default;
+    Row(const Row&) = default;
+    Row& operator=(const Row&) = default;
+    Row(Row&&) = default;
+    Row& operator=(Row&&) = default;
+
+    Row(const std::string& cgn, const std::string& cn, const std::string& mvn) :
+      component_group_name(cgn),
+      component_name(cn),
+      meta_value_name(mvn) {}
+
+    std::string component_group_name;
+    std::string component_name;
+    std::string meta_value_name;
+  };
+
+  struct Row_less
+  {
+    bool operator()(const Row& lhs, const Row& rhs) const
+    {
+      return lhs.component_group_name + lhs.component_name + lhs.meta_value_name <
+        rhs.component_group_name + rhs.component_name + rhs.meta_value_name;
+    }
+  };
 
   void SequenceParser::makeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
