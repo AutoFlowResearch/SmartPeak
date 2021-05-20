@@ -363,6 +363,7 @@ namespace SmartPeak
 
     // Make the file
     std::vector<std::vector<std::string>> rows;
+    //  deepcode ignore ContainerUpdatedButNeverQueried: headers are used, looks like false positive
     std::vector<std::string> headers;
     makeSequenceFileSmartPeak(sequenceHandler, rows, headers);
 
@@ -432,6 +433,7 @@ namespace SmartPeak
 
     // Make the file
     std::vector<std::vector<std::string>> rows;
+    //  deepcode ignore ContainerUpdatedButNeverQueried: headers are used, looks like false positive
     std::vector<std::string> headers;
     makeSequenceFileAnalyst(sequenceHandler, rows, headers);
 
@@ -495,6 +497,7 @@ namespace SmartPeak
 
     // Make the file
     std::vector<std::vector<std::string>> rows;
+    //  deepcode ignore ContainerUpdatedButNeverQueried: headers are used, looks like false positive
     std::vector<std::string> headers;
     makeSequenceFileMasshunter(sequenceHandler, rows, headers);
 
