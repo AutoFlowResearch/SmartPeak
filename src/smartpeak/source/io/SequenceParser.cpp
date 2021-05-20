@@ -293,7 +293,7 @@ namespace SmartPeak
   {
     using namespace std::string_literals;
 
-    // Headers expected by the Analyst software
+    // Headers expected by the SmartPeak software
     headers_out.clear();
     headers_out = {
       "sample_name",
