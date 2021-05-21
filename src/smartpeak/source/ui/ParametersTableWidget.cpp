@@ -63,6 +63,7 @@ namespace SmartPeak
   void ParametersTableWidget::updateParametersTable()
   {
     parameters_.clear();
+    is_scanned_ = false;
     if (application_handler_.sequenceHandler_.getSequence().size() > 0)
     {
       parameters_ = application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
