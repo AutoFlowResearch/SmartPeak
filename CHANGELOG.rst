@@ -1,6 +1,27 @@
 SmartPeak Changelog
 ===================
 
+v1.6.0 (2020-05-25)
+-------------------
+
+Features
+~~~~~~~~
+- Display progress information `(#367) <https://github.com/AutoFlowResearch/SmartPeak/pull/367>`_  
+- Ability to export Sequence `(#368) <https://github.com/AutoFlowResearch/SmartPeak/pull/368>`_  
+- Advanced explorer views part 2 `(#344) <https://github.com/AutoFlowResearch/SmartPeak/pull/344>`_  
+
+  * Adding search functionality to ParametersTable
+  * Sorting functionalities for ParametersTable
+  * Plot-Stepper for chromatograms and feature line plots
+  * Plot/Unplot All
+  * App wide tooltip info
+  * Adding quick help for various UI elements
+
+Fix
+~~~
+- Fixing Crashes associated with `getPathnameContent` when starting GUI on macOS `(#279) <https://github.com/AutoFlowResearch/SmartPeak/pull/379>`_
+- Fixed crash when updating parameters list `(#369) <https://github.com/AutoFlowResearch/SmartPeak/pull/368>`_
+
 v1.5.0 (2020-05-07)
 -------------------
 
