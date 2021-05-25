@@ -323,6 +323,11 @@ namespace SmartPeak
     static ImGuiTextFilter filter;
     filter.Draw("Find");
 
+    if (table_data_.body_.dimensions().TotalSize() > 0) {
+      updateTableContents(table_entries_, table_scanned_,
+        table_data_.body_, *checkbox_columns_);
+    }
+
     // drop-down list for search field(s)
     cols_.resize(table_data_.headers_.size() + 1);
     for (size_t header_name = 0; header_name < table_data_.headers_.size() + 1; ++header_name) {
@@ -440,22 +445,6 @@ namespace SmartPeak
       }
     }
 
-    if (table_data_.body_.dimension(0) == table_entries_.size())
-      table_scanned_ = true;
-    else
-      table_scanned_ = false;
-
-    if (table_data_.body_.dimensions().TotalSize() > 0) {
-      updateTableContents(table_entries_, table_scanned_,
-        table_data_.body_, *checkbox_columns_);
-    }
-    
-    if (table_scanned_ && table_entries_.size() > 0) {
-      if (table_data_.headers_.size()+checkbox_headers_.size() != table_entries_[0].entry_contents.size()) {
-        table_scanned_ = false;
-      }
-    }
-
     if (ImGui::BeginTable(table_id_.c_str(), table_data_.headers_.size() + checkbox_headers_.size(), table_flags)) {
       // First row headers
       for (int col = 0; col < table_data_.headers_.size(); col++) {
@@ -527,6 +516,10 @@ namespace SmartPeak
     }
   }
 
+  void ExplorerWidget::onSequenceUpdated()
+  {
+    table_scanned_ = false;
+  }
 
   void GenericGraphicWidget::draw()
   {
