@@ -369,7 +369,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool LoadSessionFromSequence::process()
+  bool LoadSessionFromSequence::processFilePicker()
   {
     application_handler_.sequence_pathname_ = pathname_;
     application_handler_.mzML_dir_.clear();
@@ -394,24 +394,71 @@ namespace SmartPeak
     }
   }
 
-  bool LoadSequenceParameters::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
-      LoadParameters loadParameters;
-      Filenames filenames = application_handler_.static_filenames_;
-      filenames.parameters_csv_i = pathname_;
-      loadParameters.parameters_observable_ = &application_handler_.sequenceHandler_;
-      loadParameters.process(rawDataHandler, {}, filenames);
-      return true;
-    }
-    else 
+  bool RawDataFilePickerProcessor::processFilePicker()
+  {
+    if (!raw_data_processor_)
     {
-      LOGE << "Parameters file cannot be loaded without first loading the sequence.";
+      LOGE << "RawData Processor not set";
       return false;
+    }
+    else if (application_handler_.sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    else if (!filename_output_)
+    {
+      LOGE << "No filename output provided, cannot not load file";
+      return false;
+    }
+    else
+    {
+      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
+      *filename_output_ = pathname_;
+      raw_data_processor_->process(rawDataHandler, {}, filenames_);
+      return true;
     }
   }
 
-  bool StoreSequence::process()
+  bool SequenceSegmentFilePickerProcessor::processFilePicker()
+  {
+    if (!sequence_segment_processor_)
+    {
+      LOGE << "SequenceSegment Processor not set";
+      return false;
+    }
+    else if (application_handler_.sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    else if (!filename_output_)
+    {
+      LOGE << "No filename output provided, cannot not load file";
+      return false;
+    }
+    else
+    {
+      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
+        // TODO original instanciates one processor for each iteration of the loop
+        if (group_)
+        {
+          *filename_output_ = "";
+          *filename_output_group_ = pathname_;
+        }
+        else
+        {
+          *filename_output_ = pathname_;
+          *filename_output_group_ = "";
+        }
+        sequence_segment_processor_->sequence_segment_observable_ = &application_handler_.sequenceHandler_;
+        sequence_segment_processor_->process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
+      }
+      return true;
+    }
+  }
+
+  bool StoreSequence::processFilePicker()
   {
     if (application_handler_.sequenceHandler_.getSequence().size()) {
       RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
@@ -423,320 +470,6 @@ namespace SmartPeak
     else
     {
       LOGE << "Parameters file cannot be stored without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool StoreSequenceParameters::process()
-  {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
-      StoreParameters storeParameters;
-      Filenames filenames = application_handler_.static_filenames_;
-      filenames.parameters_csv_i = pathname_;
-      storeParameters.process(rawDataHandler, {}, filenames);
-      return true;
-    }
-    else
-    {
-      LOGE << "Parameters file cannot be stored without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceTransitions::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
-      LoadTransitions loadTransitions;
-      Filenames filenames = application_handler_.static_filenames_;
-      filenames.traML_csv_i = pathname_;
-      loadTransitions.transitions_observable_ = &application_handler_.sequenceHandler_;
-      loadTransitions.process(rawDataHandler, {}, filenames);
-      return true;
-    }
-    else 
-    {
-      LOGE << "Transitions file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceValidationData::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
-      LoadValidationData loadValidationData;
-      Filenames filenames = application_handler_.static_filenames_;
-      filenames.referenceData_csv_i = pathname_;
-      loadValidationData.process(rawDataHandler, {}, filenames);
-      return true;
-    }
-    else 
-    {
-      LOGE << "Reference data file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentQuantitationMethods::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadQuantitationMethods loadFile;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.quantitationMethods_csv_i = pathname_;
-        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Quantitation Methods file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentStandardsConcentrations::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadStandardsConcentrations loadStandardsConcentrations;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.standardsConcentrations_csv_i = pathname_;
-        loadStandardsConcentrations.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Standards concentrations file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureFilterComponents::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureFilters loadFeatureFilters;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureFilterComponents_csv_i = pathname_;
-        filenames.featureFilterComponentGroups_csv_i = "";
-        loadFeatureFilters.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature filters file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureFilterComponentGroups::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureFilters loadFeatureFilters;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureFilterComponents_csv_i = "";
-        filenames.featureFilterComponentGroups_csv_i = pathname_;
-        loadFeatureFilters.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature filters file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureQCComponents::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureQCs loadFeatureQCs;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureQCComponents_csv_i = pathname_;
-        filenames.featureQCComponentGroups_csv_i = "";
-        loadFeatureQCs.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature QCs file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureQCComponentGroups::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureQCs loadFeatureQCs;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureQCComponents_csv_i = "";
-        filenames.featureQCComponentGroups_csv_i = pathname_;
-        loadFeatureQCs.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature QCs file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureRSDFilterComponents::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureRSDFilters loadFile;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureRSDFilterComponents_csv_i = pathname_;
-        filenames.featureRSDFilterComponentGroups_csv_i = "";
-        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature filter RSD file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureRSDFilterComponentGroups::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureRSDFilters loadFile;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureRSDFilterComponents_csv_i = "";
-        filenames.featureRSDFilterComponentGroups_csv_i = pathname_;
-        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature filter RSD file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureRSDQCComponents::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureRSDQCs loadFile;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureRSDQCComponents_csv_i = pathname_;
-        filenames.featureRSDQCComponentGroups_csv_i = "";
-        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature RSD QCs file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureRSDQCComponentGroups::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureRSDQCs loadFile;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureRSDQCComponents_csv_i = "";
-        filenames.featureRSDQCComponentGroups_csv_i = pathname_;
-        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature RSD QCs file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureBackgroundFilterComponents::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureBackgroundFilters loadFile;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureBackgroundFilterComponents_csv_i = pathname_;
-        filenames.featureBackgroundFilterComponentGroups_csv_i = "";
-        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature background filters file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureBackgroundFilterComponentGroups::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureBackgroundFilters loadFile;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureBackgroundFilterComponents_csv_i = "";
-        filenames.featureBackgroundFilterComponentGroups_csv_i = pathname_;
-        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature background filters file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureBackgroundQCComponents::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureBackgroundQCs loadFile;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureBackgroundQCComponents_csv_i = pathname_;
-        filenames.featureBackgroundQCComponentGroups_csv_i = "";
-        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature background QCs file cannot be loaded without first loading the sequence.";
-      return false;
-    }
-  }
-
-  bool LoadSequenceSegmentFeatureBackgroundQCComponentGroups::process() {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        LoadFeatureBackgroundQCs loadFile;
-        Filenames filenames = application_handler_.static_filenames_;
-        filenames.featureBackgroundQCComponents_csv_i = "";
-        filenames.featureBackgroundQCComponentGroups_csv_i = pathname_;
-        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
-      }
-      return true;
-    }
-    else 
-    {
-      LOGE << "Feature background QCs file cannot be loaded without first loading the sequence.";
       return false;
     }
   }
@@ -807,25 +540,25 @@ namespace SmartPeak
     return success;
   }
 
-  bool SetRawDataPathname::process()
+  bool SetRawDataPathname::processFilePicker()
   {
     application_handler_.mzML_dir_ = pathname_;
     return true;
   }
 
-  bool SetInputFeaturesPathname::process()
+  bool SetInputFeaturesPathname::processFilePicker()
   {
     application_handler_.features_in_dir_ = pathname_;
     return true;
   }
 
-  bool SetOutputFeaturesPathname::process()
+  bool SetOutputFeaturesPathname::processFilePicker()
   {
     application_handler_.features_out_dir_ = pathname_;
     return true;
   }
 
-  bool LoadSequenceWorkflow::process()
+  bool LoadSequenceWorkflow::processFilePicker()
   {
     LoadWorkflow load_workflow(application_handler_.sequenceHandler_);
     load_workflow.filename_ = pathname_;
@@ -833,7 +566,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool StoreSequenceWorkflow::process()
+  bool StoreSequenceWorkflow::processFilePicker()
   {
     StoreWorkflow store_workflow(application_handler_.sequenceHandler_);
     store_workflow.filename_ = pathname_;

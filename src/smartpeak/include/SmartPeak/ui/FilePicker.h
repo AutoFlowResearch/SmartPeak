@@ -42,7 +42,6 @@ namespace SmartPeak
     std::string picked_pathname_;
     
     FilePickerProcessor* processor_ = nullptr;
-    std::string processor_name_ = "";
     bool loading_is_done_ = true;
     bool file_was_loaded_ = true;
     bool error_loading_file_ = false;
@@ -67,7 +66,6 @@ namespace SmartPeak
     void draw() override;
     std::string getPickedPathname() const;
     void setProcessor(FilePickerProcessor& processor);
-    const std::string getProcessorName() const { return processor_name_; };
     void runProcessor();
     void clearProcessor();
     bool fileLoadingIsDone() { return loading_is_done_; };

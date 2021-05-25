@@ -427,92 +427,128 @@ int main(int argc, char** argv)
         if (ImGui::BeginMenu("Import File"))
         {
           if (ImGui::MenuItem("Transitions")) {
-            static LoadSequenceTransitions processor(application_handler_);
+            auto raw_data_processor = std::make_shared<LoadTransitions>();
+            raw_data_processor->transitions_observable_ = &application_handler_.sequenceHandler_;
+            static RawDataFilePickerProcessor processor(application_handler_, raw_data_processor);
+            processor.setFileNameOuputPtr(&processor.filenames_.traML_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Parameters")) {
-            static LoadSequenceParameters processor(application_handler_);
+            auto raw_data_processor = std::make_shared<LoadParameters>();
+            raw_data_processor->parameters_observable_ = &application_handler_.sequenceHandler_;
+            static RawDataFilePickerProcessor processor(application_handler_, raw_data_processor);
+            processor.setFileNameOuputPtr(&processor.filenames_.parameters_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_)) {
-            static LoadSequenceWorkflow processor(application_handler_);
-            file_picker_.setProcessor(processor);
-            file_picker_.visible_ = true;
+//            static LoadSequenceWorkflow processor(application_handler_);
+//            file_picker_.setProcessor(processor);
+//            file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Reference data")) {
-            static LoadSequenceValidationData processor(application_handler_);
+            auto raw_data_processor = std::make_shared<LoadValidationData>();
+            static RawDataFilePickerProcessor processor(application_handler_, raw_data_processor);
+            processor.setFileNameOuputPtr(&processor.filenames_.referenceData_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Quant Method")) {
-            static LoadSequenceSegmentQuantitationMethods processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadQuantitationMethods>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, false);
+            processor.setFileNameOuputPtr(&processor.filenames_.quantitationMethods_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Standards Conc")) {
-            static LoadSequenceSegmentStandardsConcentrations processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadStandardsConcentrations>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, false);
+            processor.setFileNameOuputPtr(&processor.filenames_.quantitationMethods_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Filters")) {
-            static LoadSequenceSegmentFeatureFilterComponents processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureFilters>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, false);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureFilterComponents_csv_i, &processor.filenames_.featureFilterComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group Filters")) {
-            static LoadSequenceSegmentFeatureFilterComponentGroups processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureFilters>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, true);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureFilterComponents_csv_i, &processor.filenames_.featureFilterComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp QCs")) {
-            static LoadSequenceSegmentFeatureQCComponents processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureQCs>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, false);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureQCComponents_csv_i, &processor.filenames_.featureQCComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group QCs")) {
-            static LoadSequenceSegmentFeatureQCComponentGroups processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureQCs>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, true);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureQCComponents_csv_i, &processor.filenames_.featureQCComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %RSD Filters")) {
-            static LoadSequenceSegmentFeatureRSDFilterComponents processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureRSDFilters>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, false);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureRSDFilterComponents_csv_i, &processor.filenames_.featureRSDFilterComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %RSD Filters")) {
-            static LoadSequenceSegmentFeatureRSDFilterComponentGroups processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureRSDFilters>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, true);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureRSDFilterComponents_csv_i, &processor.filenames_.featureRSDFilterComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %RSD QCs")) {
-            static LoadSequenceSegmentFeatureRSDQCComponents processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureRSDQCs>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, false);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureRSDQCComponents_csv_i, &processor.filenames_.featureRSDQCComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %RSD QCs")) {
-            static LoadSequenceSegmentFeatureRSDQCComponentGroups processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureRSDQCs>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, true);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureRSDQCComponents_csv_i, &processor.filenames_.featureRSDQCComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %Background Filters")) {
-            static LoadSequenceSegmentFeatureBackgroundFilterComponents processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureBackgroundFilters>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, false);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureBackgroundFilterComponents_csv_i, &processor.filenames_.featureBackgroundFilterComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %Background Filters")) {
-            static LoadSequenceSegmentFeatureBackgroundFilterComponentGroups processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureBackgroundFilters>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, true);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureBackgroundFilterComponents_csv_i, &processor.filenames_.featureBackgroundFilterComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %Background QCs")) {
-            static LoadSequenceSegmentFeatureBackgroundQCComponents processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureBackgroundQCs>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, false);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureBackgroundQCComponents_csv_i, &processor.filenames_.featureBackgroundQCComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %Background QCs")) {
-            static LoadSequenceSegmentFeatureBackgroundQCComponentGroups processor(application_handler_);
+            auto sequence_segment_processor = std::make_shared<LoadFeatureBackgroundQCs>();
+            static SequenceSegmentFilePickerProcessor processor(application_handler_, sequence_segment_processor, false);
+            processor.setFileNameOuputPtr(&processor.filenames_.featureBackgroundQCComponents_csv_i, &processor.filenames_.featureBackgroundQCComponentGroups_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }
@@ -531,7 +567,9 @@ int main(int argc, char** argv)
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Parameters")) {
-            static StoreSequenceParameters processor(application_handler_);
+            auto raw_data_processor = std::make_shared<StoreParameters>();
+            static RawDataFilePickerProcessor processor(application_handler_, raw_data_processor);
+            processor.setFileNameOuputPtr(&processor.filenames_.parameters_csv_i);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
           }

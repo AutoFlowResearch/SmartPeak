@@ -264,7 +264,6 @@ namespace SmartPeak
   {
     LOGD << "Setting processor: " << (&processor);
     processor_ = &processor;
-    processor_name_ = processor.getName();
     error_loading_file_ = false;
     file_was_loaded_ = false;
   }
@@ -294,7 +293,7 @@ namespace SmartPeak
     processor->pathname_ = pathname;
     std::future<bool> f = std::async(
       std::launch::async, 
-      [processor](){ return processor->process(); }
+      [processor](){ return processor->processFilePicker(); }
     );
 
     LOGN << "File is being loaded...";
