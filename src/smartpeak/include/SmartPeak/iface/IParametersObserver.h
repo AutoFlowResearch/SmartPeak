@@ -30,6 +30,6 @@ namespace SmartPeak
     /**
       Parameters have been updated
     */
-    virtual void parametersUpdated() = 0;
+    virtual void onParametersUpdated() = 0;
   };
 }

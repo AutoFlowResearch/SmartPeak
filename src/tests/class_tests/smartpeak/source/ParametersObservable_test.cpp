@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_SUITE(parametersobservable)
 
 struct ParametersObserverTest : public IParametersObserver
 {
-  virtual void parametersUpdated() override
+  virtual void onParametersUpdated() override
   {
     nb_notifications_++;
   }
@@ -50,33 +50,33 @@ BOOST_AUTO_TEST_CASE(add_remove_observers)
 
   ParametersObservable observable;
 
-  observable.notifyParametersChanged();
+  observable.notifyParametersUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 0);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 0);
 
   observable.addParametersObserver(&obs1);
-  observable.notifyParametersChanged();
+  observable.notifyParametersUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 1);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 0);
 
   observable.addParametersObserver(&obs2);
-  observable.notifyParametersChanged();
+  observable.notifyParametersUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 2);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 1);
 
   observable.removeParametersObserver(&obs1);
-  observable.notifyParametersChanged();
+  observable.notifyParametersUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 2);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 2);
 
   observable.removeParametersObserver(&obs2);
-  observable.notifyParametersChanged();
+  observable.notifyParametersUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 2);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 2);
 
   // remove non registered observer
   observable.removeParametersObserver(&obs1);
-  observable.notifyParametersChanged();
+  observable.notifyParametersUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 2);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 2);
 }

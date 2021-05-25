@@ -363,7 +363,7 @@ Using SmartPeak GUI
 
 .. image:: images/SmartPeakGUIRunWorkflowModal.png
 
-- The status of the workflow can be monitored with ``View | info``. 
+- The status of the workflow can be monitored with ``View | info``. An estimated time is available. This value is only a rough estimation. It will be updated regaluary while the workflow is running. The progress bar however shows workflow steps completed. As some steps can be longer to execute, it may not reflect remaining time. More details are available about the items that are currently running.
 
 .. image:: images/SmartPeakGUIInfo.png
 

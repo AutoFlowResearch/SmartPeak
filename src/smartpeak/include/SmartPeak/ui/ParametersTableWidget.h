@@ -52,11 +52,11 @@ namespace SmartPeak
     /**
      IParametersObserver
     */
-    virtual void parametersUpdated() override;
+    virtual void onParametersUpdated() override;
     /**
      IWorkflowObserver
     */
-    virtual void workflowUpdated() override;
+    virtual void onWorkflowUpdated() override;
   private:
     void updateParametersTable();
     const std::vector<std::string> header_names_ = { "function", "name", "type", "value", "restrictions" };

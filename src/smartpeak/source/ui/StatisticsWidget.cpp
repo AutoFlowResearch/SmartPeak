@@ -196,7 +196,7 @@ namespace SmartPeak
     }
   }
 
-  void StatisticsWidget::sequenceUpdated()
+  void StatisticsWidget::onSequenceUpdated()
   {
     refresh_needed_ = true;
   }

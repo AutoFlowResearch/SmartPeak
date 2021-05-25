@@ -33,6 +33,7 @@
 #include <OpenMS/FORMAT/MzMLFile.h>
 #include <OpenMS/FORMAT/MzTabFile.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/ChromatogramExtractor.h>
+#include <OpenMS/ANALYSIS/QUANTITATION/IsotopeLabelingMDVs.h>
 #include <OpenMS/ANALYSIS/TARGETED/MRMMapping.h>
 #include <OpenMS/KERNEL/SpectrumHelper.h>
 
@@ -767,6 +768,7 @@ namespace SmartPeak
           OpenMS::FileTypes::TRAML,
           rawDataHandler_IO.getTargetedExperiment()
         );
+        if (transitions_observable_) transitions_observable_->notifyTransitionsUpdated();
       }
       else if (format == "traML") 
       {
@@ -774,6 +776,7 @@ namespace SmartPeak
         rawDataHandler_IO.getTargetedExperiment().clear(true);
         OpenMS::TraMLFile tramlfile;
         tramlfile.load(filenames.traML_csv_i, rawDataHandler_IO.getTargetedExperiment());
+        if (transitions_observable_) transitions_observable_->notifyTransitionsUpdated();
       }
       else 
       {
@@ -1119,7 +1122,7 @@ namespace SmartPeak
     try {
       ParametersParser::read(filenames.parameters_csv_i, rawDataHandler_IO.getParameters());
       sanitizeParameters(rawDataHandler_IO.getParameters());
-      if (parameters_observable_) parameters_observable_->notifyParametersChanged();
+      if (parameters_observable_) parameters_observable_->notifyParametersUpdated();
     }
     catch (const std::exception& e) {
       LOGE << e.what();

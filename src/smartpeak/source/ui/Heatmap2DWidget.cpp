@@ -206,4 +206,8 @@ namespace SmartPeak
     }
   }
 
+  void Heatmap2DWidget::onSequenceUpdated()
+  {
+    refresh_needed_ = true;
+  }
 }

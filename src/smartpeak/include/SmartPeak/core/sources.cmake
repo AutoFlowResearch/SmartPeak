@@ -5,26 +5,34 @@ set(directory include/SmartPeak/core)
 set(sources_list_h
 	ApplicationHandler.h
 	ApplicationProcessor.h
+	ApplicationProcessorObservable.h
 	CastValue.h
+	EventDispatcher.h
 	Filenames.h
-	Helloworld.h
 	FeatureMetadata.h
+	Helloworld.h
+	InjectionHandler.h
 	MetaDataHandler.h
 	Parameters.h
 	ParametersObservable.h
+	ProgressInfo.h
 	RawDataHandler.h
 	RawDataProcessor.h
 	SampleGroupHandler.h
 	SampleGroupProcessor.h
-	InjectionHandler.h
+	SampleGroupProcessorObservable.h
 	SampleType.h
 	SequenceHandler.h
 	SequenceObservable.h
 	SequenceProcessor.h
+	SequenceProcessorObservable.h
 	SequenceSegmentHandler.h
+	SequenceSegmentObservable.h
 	SequenceSegmentProcessor.h
+	SequenceSegmentProcessorObservable.h
 	SessionHandler.h
 	SharedProcessors.h
+	TransitionsObservable.h
 	Utilities.h
 	WorkflowManager.h
 	WorkflowObservable.h

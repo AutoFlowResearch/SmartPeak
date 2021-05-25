@@ -47,6 +47,7 @@
 #include <SmartPeak/ui/LogWidget.h>
 #include <SmartPeak/ui/SequenceTableWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
+#include <SmartPeak/core/EventDispatcher.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
 #include <filesystem>
@@ -72,24 +73,6 @@ void initializeDataDir(
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows);
 
-struct MainGuiObserver : public ISequenceObserver
-{
-  MainGuiObserver(SequenceHandler& sequenceHandler_)
-  {
-    sequenceHandler_.addSequenceObserver(this);
-  }
-
-  /**
-  ISequenceObserver
-  */
-  virtual void sequenceUpdated() override
-  {
-    sequence_updated = true;
-  }
-
-  bool sequence_updated = false;
-};
-
 int main(int argc, char** argv)
 // `int argc, char **argv` are required on Win to link against the proper SDL2/OpenGL implementation
 {
@@ -101,28 +84,42 @@ int main(int argc, char** argv)
   bool exceeding_table_size_ = false;
   bool ran_integrity_check_ = false;
   bool integrity_check_failed_ = false;
-  bool update_session_cache_ = false;
-
   ApplicationHandler application_handler_;
   SessionHandler session_handler_;
   WorkflowManager workflow_manager_;
   GuiAppender appender_;
 
-  MainGuiObserver main_gui_observer_(application_handler_.sequenceHandler_);
+  // EventDispatcher will dispatch events triggered by the observers in the main GUI thread
+  EventDispatcher event_dispatcher;
+  application_handler_.sequenceHandler_.addTransitionsObserver(&event_dispatcher);
+  application_handler_.sequenceHandler_.addSequenceObserver(&event_dispatcher);
+  event_dispatcher.addTransitionsObserver(&session_handler_);
+  event_dispatcher.addSequenceObserver(&session_handler_);
 
   // widgets
   FilePicker file_picker_;
-  auto quickInfoText_= std::make_shared<InfoWidget>("Info", application_handler_);
+  auto quickInfoText_= std::make_shared<InfoWidget>("Info", application_handler_, 
+                                                            event_dispatcher, 
+                                                            event_dispatcher,
+                                                            event_dispatcher,
+                                                            event_dispatcher,
+                                                            event_dispatcher);
   auto report_ = std::make_shared<Report>(application_handler_);
-  auto workflow_ = std::make_shared<Workflow>("Workflow", application_handler_);
-  auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_);
-  auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_, session_handler_, workflow_manager_);
+  auto workflow_ = std::make_shared<Workflow>("Workflow", application_handler_, workflow_manager_);
+  auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_, event_dispatcher);
+  auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_, 
+                                                                  session_handler_, 
+                                                                  workflow_manager_, 
+                                                                  event_dispatcher, 
+                                                                  event_dispatcher,
+                                                                  event_dispatcher,
+                                                                  event_dispatcher);
   auto about_widget_ = std::make_shared<AboutWidget>();
   auto log_widget_ = std::make_shared<LogWidget>(appender_, "Log");
   auto parameters_table_widget_ = std::make_shared<ParametersTableWidget>(session_handler_, application_handler_, "ParametersMainWindow", "Parameters");
-  auto chromatogram_plot_widget_ = std::make_shared<ChromatogramPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Chromatograms Main Window", "Chromatograms");
-  auto heatmap_plot_widget_ = std::make_shared<Heatmap2DWidget>(session_handler_, application_handler_.sequenceHandler_, "Heatmap Main Window", "Features (heatmap)");
-  auto spectra_plot_widget_ = std::make_shared<SpectraPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Spectra Main Window", "Spectra");
+  auto chromatogram_plot_widget_ = std::make_shared<ChromatogramPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Chromatograms Main Window", "Chromatograms", event_dispatcher);
+  auto heatmap_plot_widget_ = std::make_shared<Heatmap2DWidget>(session_handler_, application_handler_.sequenceHandler_, "Heatmap Main Window", "Features (heatmap)", event_dispatcher);
+  auto spectra_plot_widget_ = std::make_shared<SpectraPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Spectra Main Window", "Spectra", event_dispatcher);
   auto feature_line_plot_ = std::make_shared<LinePlot2DWidget>("Features (line)");
   auto calibrators_line_plot_ = std::make_shared<CalibratorsPlotWidget>("Calibrators");
   auto injections_explorer_window_ = std::make_shared<ExplorerWidget>("InjectionsExplorerWindow", "Injections");
@@ -133,60 +130,60 @@ int main(int argc, char** argv)
                                                                       &session_handler_, &application_handler_.sequenceHandler_);
   auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions");
   auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Spectrum");
-  auto quant_method_main_window_ = std::make_shared<GenericTableWidget>("QuantMethodMainWindow", "Quantitation Method",
+  auto quant_method_main_window_ = std::make_shared<SequenceSegmentWidget>("QuantMethodMainWindow", "Quantitation Method",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setQuantMethodTable, &SessionHandler::getFiltersTable);
-  auto stds_consc_main_window_ = std::make_shared<GenericTableWidget>("StdsConcsMainWindow", "Standards Concentrations",
+                                   &SessionHandler::setQuantMethodTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+  auto stds_consc_main_window_ = std::make_shared<SequenceSegmentWidget>("StdsConcsMainWindow", "Standards Concentrations",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setStdsConcsTable, &SessionHandler::getFiltersTable);
-  auto comp_filters_main_window_ = std::make_shared<GenericTableWidget>("CompFiltersMainWindow", "Component Filters",
+                                   &SessionHandler::setStdsConcsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompFiltersMainWindow", "Component Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentFiltersTable, &SessionHandler::getFiltersTable);
-  auto comp_group_filters_main_window_ = std::make_shared<GenericTableWidget>("CompGroupFiltersMainWindow", "Component Group Filters",
+                                   &SessionHandler::setComponentFiltersTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_group_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupFiltersMainWindow", "Component Group Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupFiltersTable, &SessionHandler::getGroupFiltersTable);
-  auto comp_qc_main_window_ = std::make_shared<GenericTableWidget>("CompQCsMainWindow", "Component QCs",
+                                   &SessionHandler::setComponentGroupFiltersTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_qc_main_window_ = std::make_shared<SequenceSegmentWidget>("CompQCsMainWindow", "Component QCs",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentQCsTable, &SessionHandler::getFiltersTable);
-  auto comp_group_qc_main_window_ = std::make_shared<GenericTableWidget>("CompGroupQCsMainWindow", "Component Group QCs",
+                                   &SessionHandler::setComponentQCsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_group_qc_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupQCsMainWindow", "Component Group QCs",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupQCsTable, &SessionHandler::getGroupFiltersTable);
-  auto comp_rsd_filters_main_window_ = std::make_shared<GenericTableWidget>("CompRSDFiltersMainWindow", "Component RSD Filters",
+                                   &SessionHandler::setComponentGroupQCsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_rsd_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompRSDFiltersMainWindow", "Component RSD Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentRSDFiltersTable, &SessionHandler::getFiltersTable);
-  auto comp_group_rds_filters_main_window_ = std::make_shared<GenericTableWidget>("CompGroupRSDFiltersMainWindow", "Component Group RSD Filters",
+                                   &SessionHandler::setComponentRSDFiltersTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_group_rds_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupRSDFiltersMainWindow", "Component Group RSD Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupRSDFiltersTable, &SessionHandler::getGroupFiltersTable);
-  auto comp_rsdcqcs_main_window_ = std::make_shared<GenericTableWidget>("CompRSDQCsMainWindow", "Component RSD QCs",
+                                   &SessionHandler::setComponentGroupRSDFiltersTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_rsdcqcs_main_window_ = std::make_shared<SequenceSegmentWidget>("CompRSDQCsMainWindow", "Component RSD QCs",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentRSDQCsTable, &SessionHandler::getFiltersTable);
-  auto comp_group_rsdqcs_main_window_ = std::make_shared<GenericTableWidget>("CompGroupRSDQCsMainWindow", "Component Group RSD QCs",
+                                   &SessionHandler::setComponentRSDQCsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_group_rsdqcs_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupRSDQCsMainWindow", "Component Group RSD QCs",
                                    &session_handler_, &application_handler_.sequenceHandler_, 
-                                   &SessionHandler::setComponentGroupRSDQCsTable, &SessionHandler::getGroupFiltersTable);
-  auto comp_background_filters_main_window_ = std::make_shared<GenericTableWidget>("CompBackgroundFiltersMainWindow", "Component Background Filters",
+                                   &SessionHandler::setComponentGroupRSDQCsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_background_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompBackgroundFiltersMainWindow", "Component Background Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_, 
-                                   &SessionHandler::setComponentBackgroundFiltersTable, &SessionHandler::getFiltersTable);
-  auto comp_group_background_filters_main_window_ = std::make_shared<GenericTableWidget>("CompGroupBackgroundFiltersMainWindow", "Component Group Background Filters",
+                                   &SessionHandler::setComponentBackgroundFiltersTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_group_background_filters_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupBackgroundFiltersMainWindow", "Component Group Background Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_, 
-                                   &SessionHandler::setComponentGroupBackgroundFiltersTable, &SessionHandler::getGroupFiltersTable);
-  auto comp_background_qcs_main_window_ = std::make_shared<GenericTableWidget>("CompBackgroundQCsMainWindow", "Component Background QCs",
+                                   &SessionHandler::setComponentGroupBackgroundFiltersTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_background_qcs_main_window_ = std::make_shared<SequenceSegmentWidget>("CompBackgroundQCsMainWindow", "Component Background QCs",
                                    &session_handler_, &application_handler_.sequenceHandler_, 
-                                   &SessionHandler::setComponentBackgroundQCsTable, &SessionHandler::getFiltersTable);
-  auto comp_group_background_qcs_main_window_ = std::make_shared<GenericTableWidget>("CompGroupBackgroundQCsMainWindow", "Component Group Background QCs",
+                                   &SessionHandler::setComponentBackgroundQCsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_group_background_qcs_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupBackgroundQCsMainWindow", "Component Group Background QCs",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupBackgroundQCsTable, &SessionHandler::getGroupFiltersTable);
-  auto comp_rsd_estimations_main_window_ = std::make_shared<GenericTableWidget>("CompRSDEstimationsMainWindow", "Component RSD Filters",
+                                   &SessionHandler::setComponentGroupBackgroundQCsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_rsd_estimations_main_window_ = std::make_shared<SequenceSegmentWidget>("CompRSDEstimationsMainWindow", "Component RSD Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentRSDEstimationsTable, &SessionHandler::getFiltersTable);
-  auto comp_group_rsd_estimation_main_window_ = std::make_shared<GenericTableWidget>("CompGroupRSDEstimationsMainWindow", "Component Group RSD Filters",
+                                   &SessionHandler::setComponentRSDEstimationsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_group_rsd_estimation_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupRSDEstimationsMainWindow", "Component Group RSD Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupRSDEstimationsTable, &SessionHandler::getGroupFiltersTable);
-  auto comp_background_estimations_main_window_ = std::make_shared<GenericTableWidget>("CompBackgroundEstimationsMainWindow", "Component Background Filters",
+                                   &SessionHandler::setComponentGroupRSDEstimationsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_background_estimations_main_window_ = std::make_shared<SequenceSegmentWidget>("CompBackgroundEstimationsMainWindow", "Component Background Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentBackgroundEstimationsTable, &SessionHandler::getFiltersTable);
-  auto comp_group_background_estimations_main_window_ = std::make_shared<GenericTableWidget>("CompGroupBackgroundEstimationsMainWindow", "Component Group Background Filters",
+                                   &SessionHandler::setComponentBackgroundEstimationsTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
+  auto comp_group_background_estimations_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupBackgroundEstimationsMainWindow", "Component Group Background Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_,
-                                   &SessionHandler::setComponentGroupBackgroundEstimationsTable, &SessionHandler::getGroupFiltersTable);
+                                   &SessionHandler::setComponentGroupBackgroundEstimationsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
   auto features_table_main_window_ = std::make_shared<GenericTableWidget>("featuresTableMainWindow", "Features table");
   auto feature_matrix_main_window_ = std::make_shared<GenericTableWidget>("featureMatrixMainWindow", "Features matrix");
 
@@ -351,9 +348,11 @@ int main(int argc, char** argv)
 
     { // keeping this block to easily collapse/expand the bulk of the loop
       // Intialize the window sizes
+
+      event_dispatcher.dispatchEvents();
+
       win_size_and_pos.setXAndYSizes(io.DisplaySize.x, io.DisplaySize.y);
-      bool workflow_just_finished = (!workflow_is_done_) && workflow_manager_.isWorkflowDone();
-      if (workflow_just_finished)
+      if ((!workflow_is_done_) && workflow_manager_.isWorkflowDone()) // workflow just finished
       {
         workflow_manager_.updateApplicationHandler(application_handler_);
       }
@@ -361,52 +360,12 @@ int main(int argc, char** argv)
       file_loading_is_done_ = file_picker_.fileLoadingIsDone();
 
       // Make the quick info text
-      quickInfoText_->setWorkflowDone(workflow_is_done_);
       quickInfoText_->setFileLoadingDone(file_loading_is_done_, file_picker_.errorLoadingFile());
       quickInfoText_->clearErrorMessages();
       if (exceeding_plot_points_) quickInfoText_->addErrorMessage("Plot rendering limit reached.  Not plotting all selected data.");
       if (exceeding_table_size_) quickInfoText_->addErrorMessage("Table rendering limit reached.  Not showing all selected data.");
       if (ran_integrity_check_ && integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check failed.  Check the `Information` log.");
       if (ran_integrity_check_ && !integrity_check_failed_) quickInfoText_->addErrorMessage("Integrity check passed.");
-      if (workflow_just_finished)
-      {
-        quickInfoText_->setLastRunTime(workflow_manager_.getLastRunTime());
-        quickInfoText_->setRefreshNeeded();
-      }
-
-      // Session cache updates from e.g., single file imports
-      if (file_loading_is_done_ && file_picker_.fileWasLoaded() && update_session_cache_) {
-        if (file_picker_.getProcessorName() == "LoadSequenceParameters") {
-          session_handler_.sequence_table.clear();
-        }
-        else if (file_picker_.getProcessorName() == "LoadSequenceTransitions") {
-          session_handler_.transitions_table.clear();
-        }
-        else if (file_picker_.getProcessorName() == "LoadSequenceSegmentQuantitationMethods") {
-          quant_method_main_window_->table_data_.clear();
-        }
-        else if (file_picker_.getProcessorName() == "LoadSequenceSegmentStandardsConcentrations") {
-          stds_consc_main_window_->table_data_.clear();
-        }
-        else if (file_picker_.getProcessorName() == "LoadSequenceSegmentFeatureFilterComponents") {
-          comp_filters_main_window_->table_data_.clear();
-        }
-        else if (file_picker_.getProcessorName() == "LoadSequenceSegmentFeatureFilterComponentGroups") {
-          comp_group_filters_main_window_->table_data_.clear();
-        }
-        else if (file_picker_.getProcessorName() == "LoadSequenceSegmentFeatureQCComponents") {
-          comp_qc_main_window_->table_data_.clear();
-        }
-        else if (file_picker_.getProcessorName() == "LoadSequenceSegmentFeatureQCComponentGroups") {
-          comp_group_qc_main_window_->table_data_.clear();
-        }
-        update_session_cache_ = false;
-      }
-      if (main_gui_observer_.sequence_updated)
-      {
-        session_handler_.sequence_table.clear();
-        main_gui_observer_.sequence_updated = false;
-      }
 
     // ======================================
     // Popups
@@ -471,109 +430,91 @@ int main(int argc, char** argv)
             static LoadSequenceTransitions processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Parameters")) {
             static LoadSequenceParameters processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_)) {
             static LoadSequenceWorkflow processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Reference data")) {
             static LoadSequenceValidationData processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Quant Method")) {
             static LoadSequenceSegmentQuantitationMethods processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Standards Conc")) {
             static LoadSequenceSegmentStandardsConcentrations processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Filters")) {
             static LoadSequenceSegmentFeatureFilterComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group Filters")) {
             static LoadSequenceSegmentFeatureFilterComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp QCs")) {
             static LoadSequenceSegmentFeatureQCComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group QCs")) {
             static LoadSequenceSegmentFeatureQCComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp %RSD Filters")) {
             static LoadSequenceSegmentFeatureRSDFilterComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group %RSD Filters")) {
             static LoadSequenceSegmentFeatureRSDFilterComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp %RSD QCs")) {
             static LoadSequenceSegmentFeatureRSDQCComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group %RSD QCs")) {
             static LoadSequenceSegmentFeatureRSDQCComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp %Background Filters")) {
             static LoadSequenceSegmentFeatureBackgroundFilterComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group %Background Filters")) {
             static LoadSequenceSegmentFeatureBackgroundFilterComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp %Background QCs")) {
             static LoadSequenceSegmentFeatureBackgroundQCComponents processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Comp Group %Background QCs")) {
             static LoadSequenceSegmentFeatureBackgroundQCComponentGroups processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           ImGui::EndMenu();
         }
@@ -593,7 +534,6 @@ int main(int argc, char** argv)
             static StoreSequenceParameters processor(application_handler_);
             file_picker_.setProcessor(processor);
             file_picker_.visible_ = true;
-            update_session_cache_ = true;
           }
           if (ImGui::MenuItem("Workflow")) {
             static StoreSequenceWorkflow processor(application_handler_);
@@ -784,12 +724,6 @@ int main(int argc, char** argv)
       spectrum_main_window_->table_data_ = session_handler_.spectrum_table;
     }
 
-    // workflow
-    if (workflow_->visible_)
-    {
-      workflow_->setEditable(workflow_is_done_);
-    }
-
     // feature table
     if (features_table_main_window_->visible_)
     {
@@ -805,18 +739,6 @@ int main(int argc, char** argv)
         feature_matrix_main_window_->checked_rows_ = Eigen::Tensor<bool, 1>();
     }
     
-    // Chromatogram
-    if (workflow_just_finished)
-    {
-      chromatogram_plot_widget_->setRefreshNeeded();
-    }
-
-    // spectra
-    if (workflow_just_finished)
-    {
-      spectra_plot_widget_->setRefreshNeeded();
-    }
-
     // feature line plot
     if (feature_line_plot_->visible_)
     {
@@ -828,17 +750,7 @@ int main(int argc, char** argv)
         "FeaturesLineMainWindow");
     }
 
-    // heatmap
-    if (workflow_just_finished)
-    {
-      heatmap_plot_widget_->setRefreshNeeded();
-    }
-
     //statistics
-    if (workflow_just_finished)
-    {
-      statistics_->setRefreshNeeded();
-    }
     if (statistics_->visible_)
     {
       statistics_->setInjections(session_handler_.injection_explorer_data.checkbox_body, session_handler_.getInjectionExplorerBody());

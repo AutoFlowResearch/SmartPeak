@@ -38,6 +38,9 @@ namespace SmartPeak
     showQuickHelpToolTip("Info");
     
     drawWorkflowStatus();
+
+    ImGui::Separator();
+
     drawFileloadingStatus();
     drawLastRunTime();
     drawErrorMessages();
@@ -54,7 +57,14 @@ namespace SmartPeak
 
   void InfoWidget::drawWorkflowStatus()
   {
-    ImGui::Text(workflow_is_done_ ? "Workflow status: done" : "Workflow status: running...");
+    if (progress_info_.isRunning())
+    {
+      drawWorkflowProgress();
+    }
+    else
+    {
+      ImGui::Text("Workflow status: done");
+    }
   }
 
   void InfoWidget::drawFileloadingStatus()
@@ -141,25 +151,113 @@ namespace SmartPeak
 
   void InfoWidget::drawLastRunTime()
   {
-    std::ostringstream os;
-    if (last_run_time_ != std::chrono::steady_clock::duration::zero())
+    if (progress_info_.lastRunTime() != std::chrono::steady_clock::duration::zero())
     {
-      auto ns = last_run_time_;
+      std::ostringstream os;
       os << "Last time workflow execution: ";
-      auto h = std::chrono::duration_cast<std::chrono::hours>(ns);
-      ns -= h;
-      auto m = std::chrono::duration_cast<std::chrono::minutes>(ns);
-      ns -= m;
-      auto s = std::chrono::duration_cast<std::chrono::seconds>(ns);
-      os << std::setfill('0') << std::setw(2) << h.count() << "h:"
-        << std::setw(2) << m.count() << "m:"
-        << std::setw(2) << s.count() << 's';
+      os << formattedTime(progress_info_.lastRunTime());
       ImGui::Text("%s", os.str().c_str());
     }
   }
-    
-  void InfoWidget::sequenceUpdated()
+   
+  void InfoWidget::drawWorkflowProgress()
+  {
+    if (progress_info_.isRunning())
+    {
+      // running time
+      std::chrono::steady_clock::duration running_time = progress_info_.runningTime();
+      std::ostringstream os;
+      os << "Running time: ";
+      os << formattedTime(running_time);
+      ImGui::Text("%s", os.str().c_str());
+
+      // estimated time
+      os.str("");
+      os.clear();
+      os << "Estimated remaining time: ";
+      auto estimated_time = progress_info_.estimatedRemainingTime();
+      if (estimated_time)
+      {
+        // Enable this verbose log message to check estimation function accuracy
+        // LOGD << std::chrono::duration<double>(estimated_time).count() << "," << std::chrono::duration<double>(running_time).count();
+        if ((*estimated_time).count() < 0)
+        {
+          // dont display negative time
+          (*estimated_time) = std::chrono::steady_clock::duration::zero();
+        }
+        os << formattedTime(*estimated_time);
+      }
+      else
+      {
+        os << "please wait...";
+      }
+      ImGui::Text("%s", os.str().c_str());
+      if (ImGui::IsItemHovered())
+      {
+        ImGui::SetTooltip("This time is only a rough estimation.\nIt will be updated regaluary while workflow is running.");
+      }
+      
+      // progress bar
+      float progress = progress_info_.progressValue();
+      ImGui::ProgressBar(progress);
+      if (ImGui::IsItemHovered())
+      {
+        ImGui::SetTooltip("The progress bar shows workflow steps completed.\nAs some steps can be longer to execute, it may not reflect remaining time.");
+      }
+
+      // application processor steps
+      if (ImGui::TreeNode("Running workflow commands"))
+      {
+        size_t index = 0;
+        for (const auto& command : progress_info_.allCommands())
+        {
+          auto command_tuple = std::make_tuple(index, command);
+          if (std::find(progress_info_.runningCommands().begin(), progress_info_.runningCommands().end(), command_tuple) != progress_info_.runningCommands().end())
+          {
+            // we add 1 to the id of the command since it's the way it is displayed in the workflow window
+            ImGui::Text("%c [%d] %s", "|/-\\"[spinner_counter_ & 3], index + 1, command.c_str());
+          }
+          else
+          {
+            ImGui::Text("  [%d] %s", index + 1, command.c_str());
+          }
+          index++;
+        }
+        ImGui::TreePop();
+      }
+
+      // running samples
+      if (ImGui::TreeNode("Running items"))
+      {
+        for (const auto& running_sample : progress_info_.runningBatch())
+        {
+          ImGui::Text("%c %s", "|/-\\"[spinner_counter_ & 3], running_sample.c_str());
+        }
+        ImGui::TreePop();
+      }
+
+      spinner_counter_++;
+    }
+  }
+
+  void InfoWidget::onSequenceUpdated()
   {
     refresh_needed_ = true;
   }
+
+  std::string InfoWidget::formattedTime(const std::chrono::steady_clock::duration& duration) const
+  {
+    std::ostringstream os;
+    auto ns = duration;
+    auto h = std::chrono::duration_cast<std::chrono::hours>(ns);
+    ns -= h;
+    auto m = std::chrono::duration_cast<std::chrono::minutes>(ns);
+    ns -= m;
+    auto s = std::chrono::duration_cast<std::chrono::seconds>(ns);
+    os << std::setfill('0') << std::setw(2) << h.count() << "h:"
+      << std::setw(2) << m.count() << "m:"
+      << std::setw(2) << s.count() << 's';
+    return os.str();
+  }
+
 }

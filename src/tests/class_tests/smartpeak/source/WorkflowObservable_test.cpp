@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_SUITE(workflowobservable)
 
 struct WorkflowObserverTest : public IWorkflowObserver
 {
-  virtual void workflowUpdated() override
+  virtual void onWorkflowUpdated() override
   {
     nb_notifications_++;
   }
@@ -50,33 +50,33 @@ BOOST_AUTO_TEST_CASE(add_remove_observers)
 
   WorkflowObservable observable;
 
-  observable.notifyWorkflowChanged();
+  observable.notifyWorkflowUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 0);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 0);
 
   observable.addWorkflowObserver(&obs1);
-  observable.notifyWorkflowChanged();
+  observable.notifyWorkflowUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 1);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 0);
 
   observable.addWorkflowObserver(&obs2);
-  observable.notifyWorkflowChanged();
+  observable.notifyWorkflowUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 2);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 1);
 
   observable.removeWorkflowObserver(&obs1);
-  observable.notifyWorkflowChanged();
+  observable.notifyWorkflowUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 2);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 2);
 
   observable.removeWorkflowObserver(&obs2);
-  observable.notifyWorkflowChanged();
+  observable.notifyWorkflowUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 2);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 2);
 
   // remove non registered observer
   observable.removeWorkflowObserver(&obs1);
-  observable.notifyWorkflowChanged();
+  observable.notifyWorkflowUpdated();
   BOOST_CHECK_EQUAL(obs1.nb_notifications_, 2);
   BOOST_CHECK_EQUAL(obs2.nb_notifications_, 2);
 }

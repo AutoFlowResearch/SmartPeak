@@ -213,8 +213,46 @@ namespace SmartPeak
     return parameter_set;
   }
 
-  void processCommands(ApplicationHandler& state, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names)
+  template<typename COMMANDS_LIST_TYPE>
+  void notifyStartCommands(ApplicationProcessorObservable& observable, size_t start_index, const COMMANDS_LIST_TYPE& commands)
   {
+    for (const auto command : commands)
+    {
+      observable.notifyApplicationProcessorCommandStart(start_index, command->getName());
+      start_index++;
+    }
+  }
+
+  template<typename COMMANDS_LIST_TYPE>
+  void notifyEndCommands(ApplicationProcessorObservable& observable, size_t start_index, const COMMANDS_LIST_TYPE& commands)
+  {
+    for (const auto command : commands)
+    {
+      observable.notifyApplicationProcessorCommandEnd(start_index, command->getName());
+      start_index++;
+    }
+  }
+
+  void processCommands(ApplicationHandler& state,
+    std::vector<ApplicationHandler::Command> commands,
+    const std::set<std::string>& injection_names, 
+    const std::set<std::string>& sequence_segment_names, 
+    const std::set<std::string>& sample_group_names,
+    IApplicationProcessorObserver* application_processor_observer,
+    ISequenceProcessorObserver* sequence_processor_observer,
+    ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
+    ISampleGroupProcessorObserver* sample_group_processor_observer)
+  {
+    ApplicationProcessorObservable observable;
+    observable.addApplicationProcessorObserver(application_processor_observer);
+
+    std::vector<std::string> commands_names;
+    for (const auto& command : commands)
+    {
+      commands_names.push_back(command.getName());
+    }
+    observable.notifyApplicationProcessorStart(commands_names);
+
     size_t i = 0;
     while (i < commands.size()) {
       const ApplicationHandler::Command::CommandType type = commands[i].type;
@@ -227,29 +265,35 @@ namespace SmartPeak
         std::vector<std::shared_ptr<RawDataProcessor>> raw_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(raw_methods),
           [](const ApplicationHandler::Command& command){ return command.raw_data_method; });
-        ProcessSequence ps(state.sequenceHandler_);
+        ProcessSequence ps(state.sequenceHandler_, sequence_processor_observer);
         ps.filenames_ = cmd.dynamic_filenames;
         ps.raw_data_processing_methods_ = raw_methods;
         ps.injection_names_ = injection_names;
+        notifyStartCommands<decltype(raw_methods)>(observable, i, raw_methods);
         ps.process();
+        notifyEndCommands<decltype(raw_methods)>(observable, i, raw_methods);
       } else if (cmd.type == ApplicationHandler::Command::SequenceSegmentMethod) {
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(seq_seg_methods),
           [](const ApplicationHandler::Command& command){ return command.seq_seg_method; });
-        ProcessSequenceSegments pss(state.sequenceHandler_);
+        ProcessSequenceSegments pss(state.sequenceHandler_, sequence_segment_processor_observer);
         pss.filenames_ = cmd.dynamic_filenames;
         pss.sequence_segment_processing_methods_ = seq_seg_methods;
         pss.sequence_segment_names_ = sequence_segment_names;
+        notifyStartCommands<decltype(seq_seg_methods)>(observable, i, seq_seg_methods);
         pss.process();
+        notifyEndCommands<decltype(seq_seg_methods)>(observable, i, seq_seg_methods);
       } else if (cmd.type == ApplicationHandler::Command::SampleGroupMethod) {
         std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_methods;
         std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(sample_group_methods),
           [](const ApplicationHandler::Command& command) { return command.sample_group_method; });
-        ProcessSampleGroups psg(state.sequenceHandler_);
+        ProcessSampleGroups psg(state.sequenceHandler_, sample_group_processor_observer);
         psg.filenames_ = cmd.dynamic_filenames;
         psg.sample_group_processing_methods_ = sample_group_methods;
         psg.sample_group_names_ = sample_group_names;
+        notifyStartCommands<decltype(sample_group_methods)>(observable, i, sample_group_methods);
         psg.process();
+        notifyEndCommands<decltype(sample_group_methods)>(observable, i, sample_group_methods);
       }
       else 
       {
@@ -257,6 +301,7 @@ namespace SmartPeak
       }
       i = j;
     }
+    observable.notifyApplicationProcessorEnd();
   }
   }
 
@@ -405,6 +450,7 @@ namespace SmartPeak
       LoadTransitions loadTransitions;
       Filenames filenames = application_handler_.static_filenames_;
       filenames.traML_csv_i = pathname_;
+      loadTransitions.transitions_observable_ = &application_handler_.sequenceHandler_;
       loadTransitions.process(rawDataHandler, {}, filenames);
       return true;
     }
@@ -437,6 +483,7 @@ namespace SmartPeak
         LoadQuantitationMethods loadFile;
         Filenames filenames = application_handler_.static_filenames_;
         filenames.quantitationMethods_csv_i = pathname_;
+        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -454,6 +501,7 @@ namespace SmartPeak
         LoadStandardsConcentrations loadStandardsConcentrations;
         Filenames filenames = application_handler_.static_filenames_;
         filenames.standardsConcentrations_csv_i = pathname_;
+        loadStandardsConcentrations.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -472,6 +520,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureFilterComponents_csv_i = pathname_;
         filenames.featureFilterComponentGroups_csv_i = "";
+        loadFeatureFilters.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -490,6 +539,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureFilterComponents_csv_i = "";
         filenames.featureFilterComponentGroups_csv_i = pathname_;
+        loadFeatureFilters.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -508,6 +558,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureQCComponents_csv_i = pathname_;
         filenames.featureQCComponentGroups_csv_i = "";
+        loadFeatureQCs.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -526,6 +577,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureQCComponents_csv_i = "";
         filenames.featureQCComponentGroups_csv_i = pathname_;
+        loadFeatureQCs.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -544,6 +596,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureRSDFilterComponents_csv_i = pathname_;
         filenames.featureRSDFilterComponentGroups_csv_i = "";
+        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -562,6 +615,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureRSDFilterComponents_csv_i = "";
         filenames.featureRSDFilterComponentGroups_csv_i = pathname_;
+        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -580,6 +634,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureRSDQCComponents_csv_i = pathname_;
         filenames.featureRSDQCComponentGroups_csv_i = "";
+        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -598,6 +653,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureRSDQCComponents_csv_i = "";
         filenames.featureRSDQCComponentGroups_csv_i = pathname_;
+        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -616,6 +672,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureBackgroundFilterComponents_csv_i = pathname_;
         filenames.featureBackgroundFilterComponentGroups_csv_i = "";
+        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -634,6 +691,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureBackgroundFilterComponents_csv_i = "";
         filenames.featureBackgroundFilterComponentGroups_csv_i = pathname_;
+        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -652,6 +710,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureBackgroundQCComponents_csv_i = pathname_;
         filenames.featureBackgroundQCComponentGroups_csv_i = "";
+        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;
@@ -670,6 +729,7 @@ namespace SmartPeak
         Filenames filenames = application_handler_.static_filenames_;
         filenames.featureBackgroundQCComponents_csv_i = "";
         filenames.featureBackgroundQCComponentGroups_csv_i = pathname_;
+        loadFile.sequence_segment_observable_ = &application_handler_.sequenceHandler_;
         loadFile.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
       }
       return true;

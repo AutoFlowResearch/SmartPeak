@@ -1,6 +1,7 @@
 set(core_executables_list
 	ApplicationProcessor_test
 	CastValue_test
+	EventDispatcher_test
 	Filenames_test
 	Helloworld_test
 	ImEntry_test
@@ -18,6 +19,7 @@ set(core_executables_list
 	Utilities_test
 	Parameters_test
 	ParametersObservable_test
+	ProgressInfo_test
 	WorkflowObservable_test
 )
 

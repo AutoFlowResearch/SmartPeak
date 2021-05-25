@@ -23,26 +23,47 @@
 
 #pragma once
 
-#include <SmartPeak/iface/IParametersObserver.h>
+#include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
 #include <memory>
 #include <vector>
 #include <algorithm>
 
 namespace SmartPeak
 {
-  class ParametersObservable
+  class SequenceSegmentProcessorObservable
   {
   public:
-    virtual void addParametersObserver(IParametersObserver* observer) { observers_.push_back(observer); };
-    virtual void removeParametersObserver(IParametersObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
-    void notifyParametersUpdated()
+    virtual void addSequenceSegmentProcessorObserver(ISequenceSegmentProcessorObserver* observer) { observers_.push_back(observer); };
+    virtual void removeSequenceSegmentProcessorObserver(ISequenceSegmentProcessorObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
+    void notifySequenceSegmentProcessorStart(const size_t nb_segments)
     {
       for (auto& observer : observers_)
       {
-        observer->onParametersUpdated();
+        observer->onSequenceSegmentProcessorStart(nb_segments);
+      }
+    }
+    void notifySequenceSegmentProcessorSampleStart(const std::string segment_name)
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onSequenceSegmentProcessorSampleStart(segment_name);
+      }
+    }
+    void notifySequenceSegmentProcessorSampleEnd(const std::string segment_name)
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onSequenceSegmentProcessorSampleEnd(segment_name);
+      }
+    }
+    void notifySequenceSegmentProcessorEnd()
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onSequenceSegmentProcessorEnd();
       }
     }
   protected:
-    std::vector<IParametersObserver*> observers_;
+    std::vector<ISequenceSegmentProcessorObserver*> observers_;
   };
 }

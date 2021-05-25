@@ -26,13 +26,17 @@
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/iface/IProcessorDescription.h>
+#include <SmartPeak/iface/ISequenceProcessorObserver.h>
+#include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
+#include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
+#include <SmartPeak/core/ApplicationProcessorObservable.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <string>
 #include <vector>
 
 namespace SmartPeak
 {
-  struct ApplicationProcessor : IProcessorDescription {
+  struct ApplicationProcessor : IProcessorDescription, ApplicationProcessorObservable {
     ApplicationProcessor(const ApplicationProcessor& other) = delete;
     ApplicationProcessor& operator=(const ApplicationProcessor& other) = delete;
     virtual ~ApplicationProcessor() = default;
@@ -54,13 +58,15 @@ namespace SmartPeak
 
   namespace ApplicationProcessors {
     ParameterSet getParameterSchema();
-    void processCommands(ApplicationHandler& application_handler, std::vector<ApplicationHandler::Command> commands, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names);
-    void processCommands(
-        ApplicationHandler& application_handler, 
-        std::vector<ApplicationHandler::Command> commands, 
-        const std::set<std::string>& injection_names, 
-        const std::set<std::string>& sequence_segment_names, 
-        const std::set<std::string>& sample_group_names);
+    void processCommands(ApplicationHandler& application_handler, 
+      std::vector<ApplicationHandler::Command> commands, 
+      const std::set<std::string>& injection_names, 
+      const std::set<std::string>& sequence_segment_names, 
+      const std::set<std::string>& sample_group_names,
+      IApplicationProcessorObserver* application_processor_observer = nullptr,
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+      ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr,
+      ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr);
   }
 
   struct CreateCommand : ApplicationProcessor {

@@ -34,7 +34,8 @@ namespace SmartPeak
   {
 
     workflow_step_widget_.draw();
-    if (editable_ && ImGui::BeginCombo("Presets", NULL))
+    bool editable = workflow_manager_.isWorkflowDone();
+    if (editable && ImGui::BeginCombo("Presets", NULL))
     {
       const char* presets[] = {
         "LCMS MRM Unknowns",
@@ -146,13 +147,13 @@ namespace SmartPeak
                     "MERGE_INJECTIONS",
                     "STORE_FEATURES_SAMPLE_GROUP" };
           application_handler_.sequenceHandler_.setWorkflow(ids);
-          application_handler_.sequenceHandler_.notifyWorkflowChanged();
+          application_handler_.sequenceHandler_.notifyWorkflowUpdated();
           LOGI << "Local workflow has been replaced";
         }
       }
       ImGui::EndCombo();
     }
-    if (editable_)
+    if (editable)
     {
       if (ImGui::Button("Add step"))
       {
@@ -187,7 +188,7 @@ namespace SmartPeak
           std::ostringstream os;
           os << "[" << (i + 1) << "] " << command.getName().c_str();
           ImGui::Button(os.str().c_str());
-          if (editable_ && ImGui::BeginDragDropSource())
+          if (editable && ImGui::BeginDragDropSource())
           {
             ImGui::SetDragDropPayload("DND_STEP", &i, sizeof(int));
             ImGui::Text("Moving %s", application_handler_.sequenceHandler_.getWorkflow().at(i).c_str());
@@ -199,7 +200,7 @@ namespace SmartPeak
             ImGui::Text("%s", command.getDescription().c_str());
             ImGui::EndTooltip();
           }
-          if (editable_ && ImGui::BeginDragDropTarget())
+          if (editable && ImGui::BeginDragDropTarget())
           {
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_STEP"))
             {
@@ -211,13 +212,13 @@ namespace SmartPeak
             }
             ImGui::EndDragDropTarget();
           }
-          if (editable_)
+          if (editable)
           {
             ImGui::SameLine();
           }
-          if (editable_ && ImGui::Button("x")) {
+          if (editable && ImGui::Button("x")) {
             application_handler_.sequenceHandler_.getWorkflow().erase(application_handler_.sequenceHandler_.getWorkflow().cbegin() + i);
-            application_handler_.sequenceHandler_.notifyWorkflowChanged();
+            application_handler_.sequenceHandler_.notifyWorkflowUpdated();
           }
           else 
           {
