@@ -488,7 +488,7 @@ namespace SmartPeak
 
   bool StoreSequenceFileAnalyst::process() {
     if (application_handler_.sequenceHandler_.getSequence().size()) {
-      SequenceParser::writeSequenceFileAnalyst(application_handler_.sequenceHandler_, application_handler_.main_dir_ + "/SequenceFileAnalyst.txt");
+      SequenceParser::writeSequenceFileAnalyst(application_handler_.sequenceHandler_, filename_);
       return true;
     }
     else 
@@ -501,7 +501,7 @@ namespace SmartPeak
   bool StoreSequenceFileMasshunter::process()
   {
     if (application_handler_.sequenceHandler_.getSequence().size()) {
-      SequenceParser::writeSequenceFileMasshunter(application_handler_.sequenceHandler_, application_handler_.main_dir_ + "/SequenceFileMasshunter.tsv");
+      SequenceParser::writeSequenceFileMasshunter(application_handler_.sequenceHandler_, filename_);
       return true;
     }
     else 
@@ -514,7 +514,7 @@ namespace SmartPeak
   bool StoreSequenceFileXcalibur::process()
   {
     if (application_handler_.sequenceHandler_.getSequence().size()) {
-      SequenceParser::writeSequenceFileXcalibur(application_handler_.sequenceHandler_, application_handler_.main_dir_ + "/SequenceFileXcalibur.tsv");
+      SequenceParser::writeSequenceFileXcalibur(application_handler_.sequenceHandler_, filename_);
       return true;
     }
     else 
@@ -571,6 +571,26 @@ namespace SmartPeak
     StoreWorkflow store_workflow(application_handler_.sequenceHandler_);
     store_workflow.filename_ = pathname_;
     store_workflow.process();
+    return true;
+  }
+
+  bool ApplicationFilePickerProcessor::processFilePicker()
+  {
+    if (!application_processor_)
+    {
+      LOGE << "ApplicationProcessor Processor not set";
+      return false;
+    }
+    else if (!filename_output_)
+    {
+      LOGE << "No filename output provided, cannot not load file";
+      return false;
+    }
+    else
+    {
+      *filename_output_ = pathname_;
+      application_processor_->process();
+    }
     return true;
   }
 }

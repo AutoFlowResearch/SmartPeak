@@ -579,19 +579,25 @@ int main(int argc, char** argv)
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence Analyst")) {
-            static StoreSequenceFileAnalyst processor(application_handler_);
-            processor.process();
-            // TODO: modal to allow for changing the filename and directory of where to write the file
+            auto application_processor = std::make_shared<StoreSequenceFileAnalyst>(application_handler_);
+            static ApplicationFilePickerProcessor processor(application_handler_, application_processor);
+            processor.setFileNameOuputPtr(&application_processor->filename_);
+            file_picker_.setProcessor(processor);
+            file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence MassHunter")) {
-            static StoreSequenceFileMasshunter processor(application_handler_);
-            processor.process();
-            // TODO: modal to allow for changing the filename and directory of where to write the file
+            auto application_processor = std::make_shared<StoreSequenceFileMasshunter>(application_handler_);
+            static ApplicationFilePickerProcessor processor(application_handler_, application_processor);
+            processor.setFileNameOuputPtr(&application_processor->filename_);
+            file_picker_.setProcessor(processor);
+            file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence Xcalibur")) {
-            static StoreSequenceFileXcalibur processor(application_handler_);
-            processor.process();
-            // TODO: modal to allow for changing the filename and directory of where to write the file
+            auto application_processor = std::make_shared<StoreSequenceFileXcalibur>(application_handler_);
+            static ApplicationFilePickerProcessor processor(application_handler_, application_processor);
+            processor.setFileNameOuputPtr(&application_processor->filename_);
+            file_picker_.setProcessor(processor);
+            file_picker_.visible_ = true;
           }
           ImGui::EndMenu();
         }

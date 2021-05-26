@@ -130,6 +130,20 @@ namespace SmartPeak
     bool group_;
   };
 
+  struct ApplicationFilePickerProcessor : FilePickerProcessor {
+    ApplicationFilePickerProcessor(
+      ApplicationHandler& application_handler,
+      std::shared_ptr<ApplicationProcessor> application_processor) :
+      FilePickerProcessor(application_handler),
+      application_processor_(application_processor)
+    {}
+    bool processFilePicker() override;
+    void setFileNameOuputPtr(std::string* filename_output) { filename_output_ = filename_output; };
+    //    std::string getName() const override { return "LoadSequenceParameters"; };
+    std::shared_ptr<ApplicationProcessor> application_processor_;
+    std::string* filename_output_ = nullptr;
+  };
+
   struct LoadSessionFromSequence : FilePickerProcessor {
     LoadSessionFromSequence(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
     bool processFilePicker() override;
@@ -161,18 +175,21 @@ namespace SmartPeak
     StoreSequenceFileAnalyst(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
     bool process() override;
     std::string getName() const override { return "StoreSequenceFileAnalyst"; };
+    std::string filename_;
   };
 
   struct StoreSequenceFileMasshunter : ApplicationProcessor {
     StoreSequenceFileMasshunter(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
     bool process() override;
     std::string getName() const override { return "StoreSequenceFileMasshunter"; };
+    std::string filename_;
   };
 
   struct StoreSequenceFileXcalibur : ApplicationProcessor {
     StoreSequenceFileXcalibur(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
     bool process() override;
     std::string getName() const override { return "StoreSequenceFileXcalibur"; };
+    std::string filename_;
   };
 
   struct SetRawDataPathname : FilePickerProcessor {
