@@ -197,10 +197,11 @@ namespace SmartPeak
                 picked_pathname_.append(item.entry_contents[0].c_str());
               }
               filter.Clear();
-              selected_entry = -1;
+              LOGI << "Picked file : " << picked_pathname_;
               runProcessor();
               clearProcessor();
-              LOGI << "Picked file : " << picked_pathname_;
+              selected_entry = -1;
+              memset(selected_filename, 0, sizeof selected_filename);
               visible_ = false;
               ImGui::CloseCurrentPopup();
             }
@@ -213,10 +214,7 @@ namespace SmartPeak
     ImGui::Separator();
 
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
-    if (ImGui::IsMouseClicked(0))
-      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
-    else
-      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
@@ -224,19 +222,18 @@ namespace SmartPeak
     if (ImGui::Button("Open"))
     {
       picked_pathname_ = current_pathname_.string();
-      if (selected_entry >= 0)
+      if (picked_pathname_.back() != '/')
       {
-        if (picked_pathname_.back() != '/')
-        {
-          picked_pathname_.append("/");
-        }
-        picked_pathname_.append(selected_filename);
+        picked_pathname_.append("/");
       }
+      picked_pathname_.append(selected_filename);
+      filter.Clear();
       LOGI << "Picked pathname: " << picked_pathname_;
       runProcessor();
       clearProcessor();
       selected_entry = -1;
       visible_ = false;
+      memset(selected_filename, 0, sizeof selected_filename);
       ImGui::CloseCurrentPopup();
     }
     ImGui::PopItemWidth();
