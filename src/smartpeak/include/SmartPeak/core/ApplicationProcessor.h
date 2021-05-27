@@ -31,6 +31,7 @@
 #include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 #include <SmartPeak/core/ApplicationProcessorObservable.h>
 #include <SmartPeak/io/InputDataValidation.h>
+#include <SmartPeak/iface/IFilePickerHandler.h>
 #include <string>
 #include <vector>
 
@@ -85,142 +86,91 @@ namespace SmartPeak
     std::string getName() const override { return "BuildCommandsFromNames"; };
   };
 
-  struct FilePickerProcessor {
-    FilePickerProcessor(ApplicationHandler& application_handler) : application_handler_(application_handler) {}
-    std::string pathname_;
-    ApplicationHandler& application_handler_;
-    virtual bool processFilePicker() = 0;
-  };
+  struct StoreSequenceFileSmartPeak : ApplicationProcessor, IFilePickerHandler
+  {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
 
-  struct RawDataFilePickerProcessor : FilePickerProcessor {
-    RawDataFilePickerProcessor(
-      ApplicationHandler& application_handler, 
-      std::shared_ptr<RawDataProcessor> raw_data_processor) :
-      FilePickerProcessor(application_handler),
-      raw_data_processor_(raw_data_processor)
-    {}
-    bool processFilePicker() override;
-    void setFileNameOuputPtr(std::string* filename_output) { filename_output_ = filename_output; };
-    //    std::string getName() const override { return "LoadSequenceParameters"; };
-    std::shared_ptr<RawDataProcessor> raw_data_processor_;
-    Filenames filenames_;
-    std::string * filename_output_ = nullptr;
-  };
-
-  struct SequenceSegmentFilePickerProcessor : FilePickerProcessor {
-    SequenceSegmentFilePickerProcessor(
-      ApplicationHandler& application_handler,
-      std::shared_ptr<SequenceSegmentProcessor> sequence_segment_processor,
-      bool group = false) :
-      FilePickerProcessor(application_handler),
-      sequence_segment_processor_(sequence_segment_processor),
-      group_(group)
-    {}
-    bool processFilePicker() override;
-    void setFileNameOuputPtr(std::string* filename_output, std::string* filename_output_group = nullptr)
-    { 
-      filename_output_ = filename_output; 
-      filename_output_group_ = filename_output_group;
-    };
-    //    std::string getName() const override { return "LoadSequenceParameters"; };
-    std::shared_ptr<SequenceSegmentProcessor> sequence_segment_processor_;
-    Filenames filenames_;
-    std::string* filename_output_ = nullptr;
-    std::string* filename_output_group_ = nullptr;
-    bool group_;
-  };
-
-  struct ApplicationFilePickerProcessor : FilePickerProcessor {
-    ApplicationFilePickerProcessor(
-      ApplicationHandler& application_handler,
-      std::shared_ptr<ApplicationProcessor> application_processor) :
-      FilePickerProcessor(application_handler),
-      application_processor_(application_processor)
-    {}
-    bool processFilePicker() override;
-    void setFileNameOuputPtr(std::string* filename_output) { filename_output_ = filename_output; };
-    //    std::string getName() const override { return "LoadSequenceParameters"; };
-    std::shared_ptr<ApplicationProcessor> application_processor_;
-    std::string* filename_output_ = nullptr;
-  };
-
-  struct LoadSessionFromSequence : FilePickerProcessor {
-    LoadSessionFromSequence(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
-    bool processFilePicker() override;
-//    std::string getName() const override { return "LoadSessionFromSequence"; };
-  private:
-    bool buildStaticFilenames();
-    void updateFilenames(Filenames& f, const std::string& pathname);
-    bool requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation);
-    void clearNonExistantDefaultGeneratedFilenames(Filenames& f);
-    void clearNonExistantFilename(std::string& filename);
-    std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
-  };
-
-  struct StoreSequence : FilePickerProcessor {
-    StoreSequence(ApplicationHandler& application_handler) :
-      FilePickerProcessor(application_handler) {}
-    bool processFilePicker() override;
-//    std::string getName() const override { return "StoreSequence"; };
-  };
-
-  struct StoreSequenceFileSmartPeak : ApplicationProcessor {
     StoreSequenceFileSmartPeak(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
     bool process() override;
     std::string getName() const override { return "StoreSequenceFileSmartPeak"; };
-    std::string pathname_;
+    std::string filename_;
   };
 
-  struct StoreSequenceFileAnalyst : ApplicationProcessor {
+  struct StoreSequenceFileAnalyst : ApplicationProcessor, IFilePickerHandler {
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     StoreSequenceFileAnalyst(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
     bool process() override;
     std::string getName() const override { return "StoreSequenceFileAnalyst"; };
     std::string filename_;
   };
 
-  struct StoreSequenceFileMasshunter : ApplicationProcessor {
+  struct StoreSequenceFileMasshunter : ApplicationProcessor, IFilePickerHandler {
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     StoreSequenceFileMasshunter(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
     bool process() override;
     std::string getName() const override { return "StoreSequenceFileMasshunter"; };
     std::string filename_;
   };
 
-  struct StoreSequenceFileXcalibur : ApplicationProcessor {
+  struct StoreSequenceFileXcalibur : ApplicationProcessor, IFilePickerHandler {
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     StoreSequenceFileXcalibur(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
     bool process() override;
     std::string getName() const override { return "StoreSequenceFileXcalibur"; };
     std::string filename_;
   };
 
-  struct SetRawDataPathname : FilePickerProcessor {
-    SetRawDataPathname(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
-    bool processFilePicker() override;
+  struct SetRawDataPathname : IFilePickerHandler
+  {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
+    SetRawDataPathname(ApplicationHandler& application_handler) : application_handler_(application_handler) {}
 //    std::string getName() const override { return "SetRawDataPathname"; };
+    ApplicationHandler& application_handler_;
   };
 
-  struct SetInputFeaturesPathname : FilePickerProcessor {
-    SetInputFeaturesPathname(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
-    bool processFilePicker() override;
+  struct SetInputFeaturesPathname : IFilePickerHandler {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
+    SetInputFeaturesPathname(ApplicationHandler& application_handler) : application_handler_(application_handler) {}
 //    std::string getName() const override { return "SetInputFeaturesPathname"; };
+    ApplicationHandler& application_handler_;
   };
 
-  struct SetOutputFeaturesPathname : FilePickerProcessor {
-    SetOutputFeaturesPathname(ApplicationHandler& application_handler) : FilePickerProcessor(application_handler) {}
-    bool processFilePicker() override;
+  struct SetOutputFeaturesPathname : IFilePickerHandler
+  {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
+    SetOutputFeaturesPathname(ApplicationHandler& application_handler) : application_handler_(application_handler) {}
 //    std::string getName() const override { return "SetOutputFeaturesPathname"; };
+    ApplicationHandler& application_handler_;
   };
 
-  struct LoadSequenceWorkflow : FilePickerProcessor {
-    LoadSequenceWorkflow(ApplicationHandler& application_handler) : 
-      FilePickerProcessor(application_handler) {}
-    bool processFilePicker() override;
-//    std::string getName() const override { return "LoadSequenceWorkflow"; };
-  };
-
-  struct StoreSequenceWorkflow : FilePickerProcessor {
-    StoreSequenceWorkflow(ApplicationHandler& application_handler) :
-      FilePickerProcessor(application_handler) {}
-    bool processFilePicker() override;
-//    std::string getName() const override { return "StoreSequenceWorkflow"; };
-  };
 }

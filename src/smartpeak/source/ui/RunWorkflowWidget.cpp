@@ -45,8 +45,7 @@ namespace SmartPeak
       ImGui::PushID(11);
       if (ImGui::Button("Select"))
       {
-        static SetRawDataPathname processor(application_handler_);
-        file_picker_.setProcessor(processor);
+        file_picker_.setProcessor(std::make_shared<SetRawDataPathname>(application_handler_), application_handler_);
         popup_file_picker_ = true;
       }
       ImGui::PopID();
@@ -59,8 +58,7 @@ namespace SmartPeak
       ImGui::PushID(22);
       if (ImGui::Button("Select"))
       {
-        static SetInputFeaturesPathname processor(application_handler_);
-        file_picker_.setProcessor(processor);
+        file_picker_.setProcessor(std::make_shared<SetInputFeaturesPathname>(application_handler_), application_handler_);
         popup_file_picker_ = true;
       }
       ImGui::PopID();
@@ -74,8 +72,7 @@ namespace SmartPeak
       ImGui::PushID(33);
       if (ImGui::Button("Select"))
       {
-        static SetOutputFeaturesPathname processor(application_handler_);
-        file_picker_.setProcessor(processor);
+        file_picker_.setProcessor(std::make_shared<SetOutputFeaturesPathname>(application_handler_), application_handler_);
         popup_file_picker_ = true;
       }
       ImGui::PopID();

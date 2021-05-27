@@ -31,6 +31,7 @@
 #include <SmartPeak/iface/IProcessorDescription.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/core/SequenceSegmentObservable.h>
+#include <SmartPeak/iface/IFilePickerHandler.h>
 
 namespace SmartPeak
 {
@@ -99,8 +100,13 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadStandardsConcentrations : SequenceSegmentProcessor
+  struct LoadStandardsConcentrations : SequenceSegmentProcessor, IFilePickerHandler
   {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_STANDARDS_CONCENTRATIONS"; }
     std::string getDescription() const override { return "Load the standards concentrations file that gives the relationship between injection, component, and known concentration from disk."; }
@@ -118,8 +124,13 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadQuantitationMethods : SequenceSegmentProcessor
+  struct LoadQuantitationMethods : SequenceSegmentProcessor, IFilePickerHandler
   {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     int getID() const override { return 17; }
     std::string getName() const override { return "LOAD_QUANTITATION_METHODS"; }
     std::string getDescription() const override { return "Load each transitions calibration model defined in quantitationMethods from disk."; }
@@ -156,8 +167,16 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureFilters : SequenceSegmentProcessor
+  struct LoadFeatureFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
+    LoadFeatureFilters(bool component_group = false) : component_group_(component_group) {}
+    bool component_group_;
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
     std::string getDescription() const override { return "Load the component and component group filters from file."; }
@@ -174,8 +193,16 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureQCs : SequenceSegmentProcessor
+  struct LoadFeatureQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
+    LoadFeatureQCs(bool component_group = false) : component_group_(component_group) {}
+    bool component_group_;
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_QCS"; }
     std::string getDescription() const override { return "Load the component and component group QCs from file."; }
@@ -228,8 +255,16 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureRSDFilters : SequenceSegmentProcessor
+  struct LoadFeatureRSDFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
+    LoadFeatureRSDFilters(bool component_group = false) : component_group_(component_group) {}
+    bool component_group_;
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_RSD_FILTERS"; }
     std::string getDescription() const override { return "Load the component and component group percent RSD filters from file."; }
@@ -246,8 +281,16 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureRSDQCs : SequenceSegmentProcessor
+  struct LoadFeatureRSDQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
+    LoadFeatureRSDQCs(bool component_group = false) : component_group_(component_group) {}
+    bool component_group_;
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_RSD_QCS"; }
     std::string getDescription() const override { return "Load the component and component group percent RSD QCs from file."; }
@@ -300,8 +343,16 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureBackgroundFilters : SequenceSegmentProcessor
+  struct LoadFeatureBackgroundFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
+    LoadFeatureBackgroundFilters(bool component_group = false) : component_group_(component_group) {}
+    bool component_group_;
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_FILTERS"; }
     std::string getDescription() const override { return "Load the component and component group percent Background Interference filters from file."; }
@@ -318,8 +369,16 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadFeatureBackgroundQCs : SequenceSegmentProcessor
+  struct LoadFeatureBackgroundQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
+    LoadFeatureBackgroundQCs(bool component_group = false) : component_group_(component_group) {}
+    bool component_group_;
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_QCS"; }
     std::string getDescription() const override { return "Load the component and component group percent Background Interference QCs from file."; }

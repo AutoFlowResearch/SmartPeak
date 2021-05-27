@@ -31,6 +31,7 @@
 #include <SmartPeak/core/WorkflowObservable.h>
 #include <SmartPeak/core/ParametersObservable.h>
 #include <SmartPeak/core/TransitionsObservable.h>
+#include <SmartPeak/iface/IFilePickerHandler.h>
 
 #include <map>
 #include <vector>
@@ -433,8 +434,13 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadTransitions : RawDataProcessor
+  struct LoadTransitions : RawDataProcessor, IFilePickerHandler
   {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_TRANSITIONS"; }
     std::string getDescription() const override { return "Load the transitions for the SRM experiments from the TraML file."; }
@@ -510,8 +516,13 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadValidationData : RawDataProcessor
+  struct LoadValidationData : RawDataProcessor, IFilePickerHandler
   {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_VALIDATION_DATA"; }
     std::string getDescription() const override { return "Load the validation data from file."; }
@@ -525,8 +536,13 @@ namespace SmartPeak
     ) const override;
   };
 
-  struct LoadParameters : RawDataProcessor
+  struct LoadParameters : RawDataProcessor, IFilePickerHandler
   {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_PARAMETERS"; }
     std::string getDescription() const override { return "Load the data processing parameters from file."; }
@@ -545,7 +561,13 @@ namespace SmartPeak
     ParametersObservable* parameters_observable_ = nullptr;
   };
 
-  struct StoreParameters : RawDataProcessor {
+  struct StoreParameters : RawDataProcessor, IFilePickerHandler
+  {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+
     StoreParameters() = default;
     void process(
       RawDataHandler& rawDataHandler_IO,

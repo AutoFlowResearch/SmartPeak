@@ -46,164 +46,6 @@
 
 namespace SmartPeak
 {
-  bool LoadSessionFromSequence::buildStaticFilenames()
-  {
-    Filenames& f = application_handler_.static_filenames_;
-    application_handler_.main_dir_ = application_handler_.sequence_pathname_.substr(0, application_handler_.sequence_pathname_.find_last_of('/'));
-    f = Filenames::getDefaultStaticFilenames(application_handler_.main_dir_);
-    clearNonExistantDefaultGeneratedFilenames(f);
-    f.sequence_csv_i = application_handler_.sequence_pathname_;
-
-    LOGN << "\n\n"
-      "The following list of file was searched for:\n";
-    std::vector<InputDataValidation::FilenameInfo> is_valid;
-    is_valid.push_back(InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.parameters_csv_i, "parameters"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.traML_csv_i, "traml"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponents_csv_i, "featureFilter"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponentGroups_csv_i, "featureFilterGroups"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponents_csv_i, "featureQC"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponentGroups_csv_i, "featureQCGroups"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.quantitationMethods_csv_i, "quantitationMethods"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.standardsConcentrations_csv_i, "standardsConcentrations"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.referenceData_csv_i, "referenceData"));
-
-    std::cout << "\n\n";
-
-    const bool requiredPathnamesAreValidBool = requiredPathnamesAreValid(is_valid);
-
-    const bool otherPathnamesAreFine = std::all_of(
-      is_valid.cbegin() + 3,
-      is_valid.cend(),
-      [](const InputDataValidation::FilenameInfo& arg)
-        { return arg.validity != InputDataValidation::FilenameInfo::invalid; });
-
-    if (!requiredPathnamesAreValidBool || !otherPathnamesAreFine) {
-      LOGF << "\n\nERROR!!!\n"
-        "One or more pathnames are not valid.\n";
-      if (!requiredPathnamesAreValidBool) {
-        LOGF << "\n\n"
-        "Make sure that the following required pathnames are provided:\n"
-        " - sequence\n"
-        " - parameters\n"
-        " - traml\n";
-      }
-      LOGN << "Apply the fixes and reload the sequence file.\n";
-      return false;
-    }
-
-    return true;
-  }
-
-  bool LoadSessionFromSequence::requiredPathnamesAreValid(
-    const std::vector<InputDataValidation::FilenameInfo>& validation
-  )
-  {
-    const std::unordered_set<std::string> required {"sequence", "parameters", "traml"};
-    bool is_valid {true};
-    for (const InputDataValidation::FilenameInfo& v : validation) {
-      if (required.count(v.member_name) &&
-          v.validity != InputDataValidation::FilenameInfo::valid) {
-        is_valid = false;
-      }
-    }
-    return is_valid;
-  }
-
-  void LoadSessionFromSequence::clearNonExistantDefaultGeneratedFilenames(Filenames& f)
-  {
-    // clearNonExistantFilename(f.sequence_csv_i);   // The file must exist
-    // clearNonExistantFilename(f.parameters_csv_i); // The file must exist
-    // clearNonExistantFilename(f.traML_csv_i);      // The file must exist
-    clearNonExistantFilename(f.featureFilterComponents_csv_i);
-    clearNonExistantFilename(f.featureFilterComponentGroups_csv_i);
-    clearNonExistantFilename(f.featureQCComponents_csv_i);
-    clearNonExistantFilename(f.featureQCComponentGroups_csv_i);
-    clearNonExistantFilename(f.quantitationMethods_csv_i);
-    clearNonExistantFilename(f.standardsConcentrations_csv_i);
-    clearNonExistantFilename(f.referenceData_csv_i);
-  }
-
-  void LoadSessionFromSequence::clearNonExistantFilename(std::string& filename)
-  {
-    if (InputDataValidation::fileExists(filename) == false) {
-      filename.clear();
-    }
-  }
-
-  std::string LoadSessionFromSequence::getValidPathnameOrPlaceholder(
-    const std::string& pathname, const bool is_valid
-  )
-  {
-    const std::string placeholder = "";
-    return (is_valid ? pathname : placeholder) + "\n";
-  }
-
-  void LoadSessionFromSequence::updateFilenames(Filenames& f, const std::string& pathname)
-  {
-    std::ifstream stream(pathname);
-    const std::regex re("([a-zA-Z_]+)=([^\\s]*)");
-    std::smatch match;
-    std::string line;
-    if (!stream.is_open()) {
-      LOGF << "Can't open file: " << pathname << "\n";
-      return;
-    }
-    while (std::getline(stream, line)) {
-      const bool matched = std::regex_match(line, match, re);
-      if (matched == false) {
-        LOGF << "\n\n"
-          "Regex did not match with the line: " << line << "\n"
-          "Please make sure that the format is correct.\n";
-        std::exit(EXIT_FAILURE);
-      }
-      std::string label;
-      std::string value;
-      // The entire match is at index 0
-      // Parenthesized sub-matches start from index 1
-      if (match.size() == 3) {
-        label = match[1].str();
-        value = match[2].str();
-        // LOGD << label << "=" << value << '\n';
-      }
-      if (label == "sequence") {
-        f.sequence_csv_i = value;
-        if (value.empty()) {
-          LOGE << "\n\nError!!! The sequence csv file cannot be empty.\n";
-        }
-      } else if (label == "parameters") {
-        f.parameters_csv_i = value;
-        if (value.empty()) {
-          LOGE << "\n\nError!!! The parameters csv file cannot be empty.\n";
-        }
-      } else if (label == "traml") {
-        f.traML_csv_i = value;
-        if (value.empty()) {
-          LOGE << "\n\nError!!! The TraML file cannot be empty.\n";
-        }
-      } else if (label == "featureFilter") {
-        f.featureFilterComponents_csv_i = value;
-      } else if (label == "featureFilterGroups") {
-        f.featureFilterComponentGroups_csv_i = value;
-      } else if (label == "featureQC") {
-        f.featureQCComponents_csv_i = value;
-      } else if (label == "featureQCGroups") {
-        f.featureQCComponentGroups_csv_i = value;
-      } else if (label == "quantitationMethods") {
-        f.quantitationMethods_csv_i = value;
-      } else if (label == "standardsConcentrations") {
-        f.standardsConcentrations_csv_i = value;
-      } else if (label == "referenceData") {
-        f.referenceData_csv_i = value;
-      } else if (label == "workflow") {
-        f.workflow_csv_i = value;
-      } else {
-        LOGE << "\n\nLabel is not valid: " << label << "\n";
-        std::exit(EXIT_FAILURE);
-      }
-    }
-  }
-
   namespace ApplicationProcessors {
 
   ParameterSet getParameterSchema()
@@ -369,114 +211,21 @@ namespace SmartPeak
     return true;
   }
 
-  bool LoadSessionFromSequence::processFilePicker()
+  bool StoreSequenceFileSmartPeak::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
   {
-    application_handler_.sequence_pathname_ = pathname_;
-    application_handler_.mzML_dir_.clear();
-    application_handler_.features_in_dir_.clear();
-    application_handler_.features_out_dir_.clear();
-    LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
-    const bool pathnamesAreCorrect = buildStaticFilenames();
-    if (pathnamesAreCorrect) {
-      application_handler_.sequenceHandler_.clear();
-      CreateSequence cs(application_handler_.sequenceHandler_);
-      cs.filenames_        = application_handler_.static_filenames_;
-      cs.delimiter        = ",";
-      cs.checkConsistency = false; // NOTE: Requires a lot of time on large sequences with a large number of components
-      cs.process();
-      return true;
-    } 
-    else 
-    {
-      LOGE << "Provided and/or inferred pathnames are not correct."
-        "The sequence has not been modified.";
-      return false;
-    }
-  }
-
-  bool RawDataFilePickerProcessor::processFilePicker()
-  {
-    if (!raw_data_processor_)
-    {
-      LOGE << "RawData Processor not set";
-      return false;
-    }
-    else if (application_handler_.sequenceHandler_.getSequence().size() == 0)
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
       LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    else if (!filename_output_)
-    {
-      LOGE << "No filename output provided, cannot not load file";
-      return false;
-    }
-    else
-    {
-      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
-      *filename_output_ = pathname_;
-      raw_data_processor_->process(rawDataHandler, {}, filenames_);
-      return true;
-    }
-  }
-
-  bool SequenceSegmentFilePickerProcessor::processFilePicker()
-  {
-    if (!sequence_segment_processor_)
-    {
-      LOGE << "SequenceSegment Processor not set";
-      return false;
-    }
-    else if (application_handler_.sequenceHandler_.getSequence().size() == 0)
-    {
-      LOGE << "File cannot be loaded without first loading the sequence.";
-      return false;
-    }
-    else if (!filename_output_)
-    {
-      LOGE << "No filename output provided, cannot not load file";
-      return false;
-    }
-    else
-    {
-      for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler_.sequenceHandler_.getSequenceSegments()) {
-        // TODO original instanciates one processor for each iteration of the loop
-        if (group_)
-        {
-          *filename_output_ = "";
-          *filename_output_group_ = pathname_;
-        }
-        else
-        {
-          *filename_output_ = pathname_;
-          *filename_output_group_ = "";
-        }
-        sequence_segment_processor_->sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-        sequence_segment_processor_->process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
-      }
-      return true;
-    }
-  }
-
-  bool StoreSequence::processFilePicker()
-  {
-    if (application_handler_.sequenceHandler_.getSequence().size()) {
-      RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence().at(0).getRawData();
-      StoreSequenceFileSmartPeak storeSequenceSmartPeak(application_handler_);
-      storeSequenceSmartPeak.pathname_ = pathname_;
-      storeSequenceSmartPeak.process();
-      return true;
-    }
-    else
-    {
-      LOGE << "Parameters file cannot be stored without first loading the sequence.";
-      return false;
-    }
+    filename_ = filename;
+    process();
+    return true;
   }
 
   bool StoreSequenceFileSmartPeak::process() {
     if (application_handler_.sequenceHandler_.getSequence().size()) {
-      SequenceParser::writeSequenceFileSmartPeak(application_handler_.sequenceHandler_, pathname_);
+      SequenceParser::writeSequenceFileSmartPeak(application_handler_.sequenceHandler_, filename_);
       return true;
     }
     else
@@ -484,6 +233,18 @@ namespace SmartPeak
       LOGE << "Sequence file cannot be converted and stored without first loading the sequence.";
       return false;
     }
+  }
+
+  bool StoreSequenceFileAnalyst::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    filename_ = filename;
+    process();
+    return true;
   }
 
   bool StoreSequenceFileAnalyst::process() {
@@ -498,6 +259,18 @@ namespace SmartPeak
     }
   }
 
+  bool StoreSequenceFileMasshunter::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    filename_ = filename;
+    process();
+    return true;
+  }
+
   bool StoreSequenceFileMasshunter::process()
   {
     if (application_handler_.sequenceHandler_.getSequence().size()) {
@@ -509,6 +282,18 @@ namespace SmartPeak
       LOGE << "Sequence file cannot be converted and stored without first loading the sequence.";
       return false;
     }
+  }
+
+  bool StoreSequenceFileXcalibur::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    filename_ = filename;
+    process();
+    return true;
   }
 
   bool StoreSequenceFileXcalibur::process()
@@ -540,57 +325,22 @@ namespace SmartPeak
     return success;
   }
 
-  bool SetRawDataPathname::processFilePicker()
+  bool SetRawDataPathname::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
   {
-    application_handler_.mzML_dir_ = pathname_;
+    application_handler->mzML_dir_ = filename;
     return true;
   }
 
-  bool SetInputFeaturesPathname::processFilePicker()
+  bool SetInputFeaturesPathname::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
   {
-    application_handler_.features_in_dir_ = pathname_;
+    application_handler->features_in_dir_ = filename;
     return true;
   }
 
-  bool SetOutputFeaturesPathname::processFilePicker()
+  bool SetOutputFeaturesPathname::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
   {
-    application_handler_.features_out_dir_ = pathname_;
+    application_handler->features_out_dir_ = filename;
     return true;
   }
 
-  bool LoadSequenceWorkflow::processFilePicker()
-  {
-    LoadWorkflow load_workflow(application_handler_.sequenceHandler_);
-    load_workflow.filename_ = pathname_;
-    load_workflow.process();
-    return true;
-  }
-
-  bool StoreSequenceWorkflow::processFilePicker()
-  {
-    StoreWorkflow store_workflow(application_handler_.sequenceHandler_);
-    store_workflow.filename_ = pathname_;
-    store_workflow.process();
-    return true;
-  }
-
-  bool ApplicationFilePickerProcessor::processFilePicker()
-  {
-    if (!application_processor_)
-    {
-      LOGE << "ApplicationProcessor Processor not set";
-      return false;
-    }
-    else if (!filename_output_)
-    {
-      LOGE << "No filename output provided, cannot not load file";
-      return false;
-    }
-    else
-    {
-      *filename_output_ = pathname_;
-      application_processor_->process();
-    }
-    return true;
-  }
 }

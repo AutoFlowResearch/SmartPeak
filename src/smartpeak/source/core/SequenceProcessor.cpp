@@ -25,6 +25,7 @@
 #include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
@@ -35,9 +36,120 @@
 #include <atomic>
 #include <future>
 #include <list>
+#include <unordered_set>
 
 namespace SmartPeak
 {
+
+  bool CreateSequence::requiredPathnamesAreValid(
+    const std::vector<InputDataValidation::FilenameInfo>& validation
+  )
+  {
+    const std::unordered_set<std::string> required{ "sequence", "parameters", "traml" };
+    bool is_valid{ true };
+    for (const InputDataValidation::FilenameInfo& v : validation) {
+      if (required.count(v.member_name) &&
+        v.validity != InputDataValidation::FilenameInfo::valid) {
+        is_valid = false;
+      }
+    }
+    return is_valid;
+  }
+
+  void CreateSequence::clearNonExistantDefaultGeneratedFilenames(Filenames& f)
+  {
+    // clearNonExistantFilename(f.sequence_csv_i);   // The file must exist
+    // clearNonExistantFilename(f.parameters_csv_i); // The file must exist
+    // clearNonExistantFilename(f.traML_csv_i);      // The file must exist
+    clearNonExistantFilename(f.featureFilterComponents_csv_i);
+    clearNonExistantFilename(f.featureFilterComponentGroups_csv_i);
+    clearNonExistantFilename(f.featureQCComponents_csv_i);
+    clearNonExistantFilename(f.featureQCComponentGroups_csv_i);
+    clearNonExistantFilename(f.quantitationMethods_csv_i);
+    clearNonExistantFilename(f.standardsConcentrations_csv_i);
+    clearNonExistantFilename(f.referenceData_csv_i);
+  }
+
+  void CreateSequence::clearNonExistantFilename(std::string& filename)
+  {
+    if (InputDataValidation::fileExists(filename) == false) {
+      filename.clear();
+    }
+  }
+
+  bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler)
+  {
+    Filenames& f = application_handler->static_filenames_;
+    application_handler->main_dir_ = application_handler->sequence_pathname_.substr(0, application_handler->sequence_pathname_.find_last_of('/'));
+    f = Filenames::getDefaultStaticFilenames(application_handler->main_dir_);
+    clearNonExistantDefaultGeneratedFilenames(f);
+    f.sequence_csv_i = application_handler->sequence_pathname_;
+
+    LOGN << "\n\n"
+      "The following list of file was searched for:\n";
+    std::vector<InputDataValidation::FilenameInfo> is_valid;
+    is_valid.push_back(InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.parameters_csv_i, "parameters"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.traML_csv_i, "traml"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponents_csv_i, "featureFilter"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponentGroups_csv_i, "featureFilterGroups"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponents_csv_i, "featureQC"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponentGroups_csv_i, "featureQCGroups"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.quantitationMethods_csv_i, "quantitationMethods"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.standardsConcentrations_csv_i, "standardsConcentrations"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.referenceData_csv_i, "referenceData"));
+
+    std::cout << "\n\n";
+
+    const bool requiredPathnamesAreValidBool = requiredPathnamesAreValid(is_valid);
+
+    const bool otherPathnamesAreFine = std::all_of(
+      is_valid.cbegin() + 3,
+      is_valid.cend(),
+      [](const InputDataValidation::FilenameInfo& arg)
+    { return arg.validity != InputDataValidation::FilenameInfo::invalid; });
+
+    if (!requiredPathnamesAreValidBool || !otherPathnamesAreFine) {
+      LOGF << "\n\nERROR!!!\n"
+        "One or more pathnames are not valid.\n";
+      if (!requiredPathnamesAreValidBool) {
+        LOGF << "\n\n"
+          "Make sure that the following required pathnames are provided:\n"
+          " - sequence\n"
+          " - parameters\n"
+          " - traml\n";
+      }
+      LOGN << "Apply the fixes and reload the sequence file.\n";
+      return false;
+    }
+
+    return true;
+  }
+
+  bool CreateSequence::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    application_handler->sequence_pathname_ = filename;
+    application_handler->mzML_dir_.clear();
+    application_handler->features_in_dir_.clear();
+    application_handler->features_out_dir_.clear();
+    LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
+    const bool pathnamesAreCorrect = buildStaticFilenames(application_handler);
+    if (pathnamesAreCorrect) {
+      application_handler->sequenceHandler_.clear();
+      filenames_ = application_handler->static_filenames_;
+      delimiter = ",";
+      checkConsistency = false; // NOTE: Requires a lot of time on large sequences with a large number of components
+      process();
+      return true;
+    }
+    else
+    {
+      LOGE << "Provided and/or inferred pathnames are not correct."
+        "The sequence has not been modified.";
+      return false;
+    }
+  }
+
   void CreateSequence::process()
   {
     LOGD << "START createSequence";
@@ -392,6 +504,13 @@ namespace SmartPeak
     }
   }
 
+  bool LoadWorkflow::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    filename_ = filename;
+    process();
+    return true;
+  }
+
   void LoadWorkflow::process()
   {
     // TODO: move to parameters at some point
@@ -438,6 +557,13 @@ namespace SmartPeak
     sequenceHandler_IO->setWorkflow(res);
     sequenceHandler_IO->notifyWorkflowUpdated();
     LOGD << "END LoadWorkflow";
+  }
+
+  bool StoreWorkflow::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    filename_ = filename;
+    process();
+    return true;
   }
 
   void StoreWorkflow::process()

@@ -257,40 +257,40 @@ namespace SmartPeak
     return picked_pathname_;
   }
 
-  void FilePicker::setProcessor(FilePickerProcessor& processor)
+  void FilePicker::setProcessor(std::shared_ptr<IFilePickerHandler> file_picker_handler, ApplicationHandler& application_handler)
   {
-    LOGD << "Setting processor: " << (&processor);
-    processor_ = &processor;
+    LOGD << "Setting processor: " << (file_picker_handler.get());
+    file_picker_handler_ = file_picker_handler;
+    application_handler_ = &application_handler;
     error_loading_file_ = false;
     file_was_loaded_ = false;
   }
 
   void FilePicker::runProcessor()
   {
-    LOGD << "Running processor (ptr): " << processor_;
-    if (!processor_)
+    LOGD << "Running processor (ptr): " << file_picker_handler_;
+    if (!file_picker_handler_)
       return;
     loading_is_done_ = false;
-    run_and_join(processor_, picked_pathname_, loading_is_done_, file_was_loaded_);
+    run_and_join(file_picker_handler_.get(), picked_pathname_, loading_is_done_, file_was_loaded_);
   }
 
   void FilePicker::clearProcessor()
   {
     LOGD << "Clearing processor";
-    processor_ = nullptr;
+    file_picker_handler_ = nullptr;
   }
 
   void FilePicker::run_and_join(
-    FilePickerProcessor* processor,
+    IFilePickerHandler* file_picker_handler,
     const std::string& pathname,
     bool& loading_is_done,
     bool& file_was_loaded
   )
   {
-    processor->pathname_ = pathname;
     std::future<bool> f = std::async(
       std::launch::async, 
-      [processor](){ return processor->processFilePicker(); }
+      [this, file_picker_handler, pathname](){ return file_picker_handler->onFilePicked(pathname, application_handler_); }
     );
 
     LOGN << "File is being loaded...";
