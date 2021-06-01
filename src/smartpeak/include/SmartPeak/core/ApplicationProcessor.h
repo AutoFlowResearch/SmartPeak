@@ -31,7 +31,6 @@
 #include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 #include <SmartPeak/core/ApplicationProcessorObservable.h>
 #include <SmartPeak/io/InputDataValidation.h>
-#include <SmartPeak/iface/IFilePickerHandler.h>
 #include <string>
 #include <vector>
 
@@ -84,58 +83,6 @@ namespace SmartPeak
     std::vector<std::string> names_;
     std::vector<ApplicationHandler::Command> commands_;
     std::string getName() const override { return "BuildCommandsFromNames"; };
-  };
-
-  struct StoreSequenceFileSmartPeak : ApplicationProcessor, IFilePickerHandler
-  {
-    /**
-    IFilePickerHandler
-    */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
-
-    StoreSequenceFileSmartPeak(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
-    bool process() override;
-    std::string getName() const override { return "StoreSequenceFileSmartPeak"; };
-    std::string filename_;
-  };
-
-  struct StoreSequenceFileAnalyst : ApplicationProcessor, IFilePickerHandler {
-
-    /**
-    IFilePickerHandler
-    */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
-
-    StoreSequenceFileAnalyst(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
-    bool process() override;
-    std::string getName() const override { return "StoreSequenceFileAnalyst"; };
-    std::string filename_;
-  };
-
-  struct StoreSequenceFileMasshunter : ApplicationProcessor, IFilePickerHandler {
-
-    /**
-    IFilePickerHandler
-    */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
-
-    StoreSequenceFileMasshunter(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
-    bool process() override;
-    std::string getName() const override { return "StoreSequenceFileMasshunter"; };
-    std::string filename_;
-  };
-
-  struct StoreSequenceFileXcalibur : ApplicationProcessor, IFilePickerHandler {
-
-    /**
-    IFilePickerHandler
-    */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
-
-    StoreSequenceFileXcalibur(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
-    bool process() override;
-    std::string getName() const override { return "StoreSequenceFileXcalibur"; };
-    std::string filename_;
   };
 
 }

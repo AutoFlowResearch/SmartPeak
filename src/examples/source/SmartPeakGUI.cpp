@@ -31,6 +31,7 @@
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/ui/GuiAppender.h>
 #include <SmartPeak/ui/Heatmap2DWidget.h>
@@ -508,7 +509,7 @@ int main(int argc, char** argv)
           //if (ImGui::MenuItem("Transitions")) {} // TODO: updated transitions file
           //if (ImGui::MenuItem("Standards Conc")) {} // TODO: updated standards concentration file
           if (ImGui::MenuItem("Sequence")) {
-            file_picker_.setProcessor(std::make_shared<StoreSequenceFileSmartPeak>(application_handler_), application_handler_);
+            file_picker_.setProcessor(std::make_shared<StoreSequenceFileSmartPeak>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Parameters")) {
@@ -520,15 +521,15 @@ int main(int argc, char** argv)
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence Analyst")) {
-            file_picker_.setProcessor(std::make_shared<StoreSequenceFileAnalyst>(application_handler_), application_handler_);
+            file_picker_.setProcessor(std::make_shared<StoreSequenceFileAnalyst>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence MassHunter")) {
-            file_picker_.setProcessor(std::make_shared<StoreSequenceFileMasshunter>(application_handler_), application_handler_);
+            file_picker_.setProcessor(std::make_shared<StoreSequenceFileMasshunter>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence Xcalibur")) {
-            file_picker_.setProcessor(std::make_shared<StoreSequenceFileXcalibur>(application_handler_), application_handler_);
+            file_picker_.setProcessor(std::make_shared<StoreSequenceFileXcalibur>(), application_handler_);
             file_picker_.visible_ = true;
           }
           ImGui::EndMenu();
