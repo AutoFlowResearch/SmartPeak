@@ -24,6 +24,7 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 
 // load/store raw data
 #include <OpenMS/FORMAT/FileTypes.h>
@@ -733,6 +734,21 @@ namespace SmartPeak
     LOGD << "END quantifyComponents";
   }
 
+  bool LoadTransitions::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
+    transitions_observable_ = &(application_handler->sequenceHandler_);
+    Filenames filenames;
+    filenames.traML_csv_i = filename;
+    process(rawDataHandler, {}, filenames);
+    return true;
+  }
+
   void LoadTransitions::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
@@ -962,6 +978,20 @@ namespace SmartPeak
     LOGD << "END storeFeatureQC";
   }
 
+  bool LoadValidationData::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
+    Filenames filenames;
+    filenames.referenceData_csv_i = filename;
+    process(rawDataHandler, {}, filenames);
+    return true;
+  }
+
   void LoadValidationData::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
@@ -1098,6 +1128,21 @@ namespace SmartPeak
     LOGD << "END loadValidationData";
   }
 
+  bool LoadParameters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
+    parameters_observable_ = &(application_handler->sequenceHandler_);
+    Filenames filenames;
+    filenames.parameters_csv_i = filename;
+    process(rawDataHandler, {}, filenames);
+    return true;
+  }
+
   void LoadParameters::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
@@ -1176,6 +1221,20 @@ namespace SmartPeak
     }
 
     LOGD << "END sanitizeRawDataProcessorParameters";
+  }
+
+  bool StoreParameters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
+    Filenames filenames;
+    filenames.parameters_csv_i = filename;
+    process(rawDataHandler, {}, filenames);
+    return true;
   }
 
   void StoreParameters::process(

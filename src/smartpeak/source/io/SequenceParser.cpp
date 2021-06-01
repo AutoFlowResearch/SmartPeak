@@ -25,6 +25,7 @@
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
 #endif
@@ -993,6 +994,50 @@ namespace SmartPeak
     }
 
     LOGD << "END writeDataMatrixFromMetaValue";
+    return true;
+  }
+
+  bool StoreSequenceFileSmartPeak::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be stored without first loading the sequence.";
+      return false;
+    }
+    SequenceParser::writeSequenceFileSmartPeak(application_handler->sequenceHandler_, filename);
+    return true;
+  }
+
+  bool StoreSequenceFileAnalyst::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be stored without first loading the sequence.";
+      return false;
+    }
+    SequenceParser::writeSequenceFileAnalyst(application_handler->sequenceHandler_, filename);
+    return true;
+  }
+
+  bool StoreSequenceFileMasshunter::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be stored without first loading the sequence.";
+      return false;
+    }
+    SequenceParser::writeSequenceFileMasshunter(application_handler->sequenceHandler_, filename);
+    return true;
+  }
+
+  bool StoreSequenceFileXcalibur::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be stored without first loading the sequence.";
+      return false;
+    }
+    SequenceParser::writeSequenceFileXcalibur(application_handler->sequenceHandler_, filename);
     return true;
   }
 }

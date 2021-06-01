@@ -32,6 +32,7 @@
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/ImEntry.h>
+#include <SmartPeak/iface/IFilePickerHandler.h>
 
 namespace SmartPeak
 {
@@ -41,8 +42,9 @@ namespace SmartPeak
     std::filesystem::path current_pathname_ = std::filesystem::current_path();
     std::string picked_pathname_;
     
-    FilePickerProcessor* processor_ = nullptr;
-    std::string processor_name_ = "";
+    std::shared_ptr<IFilePickerHandler> file_picker_handler_ = nullptr;
+    ApplicationHandler *application_handler_ = nullptr;
+
     bool loading_is_done_ = true;
     bool file_was_loaded_ = true;
     bool error_loading_file_ = false;
@@ -50,7 +52,7 @@ namespace SmartPeak
     const ImGuiTableSortSpecs* s_current_sort_specs = NULL;
 
     void run_and_join(
-      FilePickerProcessor* processor,
+      IFilePickerHandler* file_picker_handler,
       const std::string& pathname,
       bool& loading_is_done,
       bool& file_was_loaded
@@ -60,14 +62,11 @@ namespace SmartPeak
     void updateContents(std::vector<ImEntry>& content_items);
 
   public:
-    FilePicker()
-    {
-    }
+    FilePicker() = default;
 
     void draw() override;
     std::string getPickedPathname() const;
-    void setProcessor(FilePickerProcessor& processor);
-    const std::string getProcessorName() const { return processor_name_; };
+    void setFilePickerHandler(std::shared_ptr<IFilePickerHandler> file_picker_handler, ApplicationHandler& application_handler);
     void runProcessor();
     void clearProcessor();
     bool fileLoadingIsDone() { return loading_is_done_; };

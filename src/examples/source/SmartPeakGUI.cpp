@@ -27,9 +27,11 @@
 #include <vector>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/ui/GuiAppender.h>
 #include <SmartPeak/ui/Heatmap2DWidget.h>
@@ -409,8 +411,7 @@ int main(int argc, char** argv)
         //  //TODO: Session (see AUT-280)
         //}
         if (ImGui::MenuItem("Load session from sequence", NULL, false, workflow_is_done_ && file_loading_is_done_)) {
-          static LoadSessionFromSequence processor(application_handler_);
-          file_picker_.setProcessor(processor);
+          file_picker_.setFilePickerHandler(std::make_shared<CreateSequence>(application_handler_.sequenceHandler_), application_handler_);
           file_picker_.visible_ = true;
         }
         showQuickHelpToolTip("load_session_from_sequence");
@@ -427,93 +428,75 @@ int main(int argc, char** argv)
         if (ImGui::BeginMenu("Import File"))
         {
           if (ImGui::MenuItem("Transitions")) {
-            static LoadSequenceTransitions processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadTransitions>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Parameters")) {
-            static LoadSequenceParameters processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadParameters>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_)) {
-            static LoadSequenceWorkflow processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadWorkflow>(application_handler_.sequenceHandler_), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Reference data")) {
-            static LoadSequenceValidationData processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadValidationData>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Quant Method")) {
-            static LoadSequenceSegmentQuantitationMethods processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadQuantitationMethods>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Standards Conc")) {
-            static LoadSequenceSegmentStandardsConcentrations processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadStandardsConcentrations>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Filters")) {
-            static LoadSequenceSegmentFeatureFilterComponents processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureFilters>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group Filters")) {
-            static LoadSequenceSegmentFeatureFilterComponentGroups processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureFilters>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp QCs")) {
-            static LoadSequenceSegmentFeatureQCComponents processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureQCs>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group QCs")) {
-            static LoadSequenceSegmentFeatureQCComponentGroups processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureQCs>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %RSD Filters")) {
-            static LoadSequenceSegmentFeatureRSDFilterComponents processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDFilters>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %RSD Filters")) {
-            static LoadSequenceSegmentFeatureRSDFilterComponentGroups processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDFilters>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %RSD QCs")) {
-            static LoadSequenceSegmentFeatureRSDQCComponents processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDQCs>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %RSD QCs")) {
-            static LoadSequenceSegmentFeatureRSDQCComponentGroups processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDQCs>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %Background Filters")) {
-            static LoadSequenceSegmentFeatureBackgroundFilterComponents processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundFilters>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %Background Filters")) {
-            static LoadSequenceSegmentFeatureBackgroundFilterComponentGroups processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundFilters>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %Background QCs")) {
-            static LoadSequenceSegmentFeatureBackgroundQCComponents processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundQCs>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %Background QCs")) {
-            static LoadSequenceSegmentFeatureBackgroundQCComponentGroups processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundQCs>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           ImGui::EndMenu();
@@ -526,34 +509,28 @@ int main(int argc, char** argv)
           //if (ImGui::MenuItem("Transitions")) {} // TODO: updated transitions file
           //if (ImGui::MenuItem("Standards Conc")) {} // TODO: updated standards concentration file
           if (ImGui::MenuItem("Sequence")) {
-            static StoreSequence processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileSmartPeak>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Parameters")) {
-            static StoreSequenceParameters processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<StoreParameters>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Workflow")) {
-            static StoreSequenceWorkflow processor(application_handler_);
-            file_picker_.setProcessor(processor);
+            file_picker_.setFilePickerHandler(std::make_shared<StoreWorkflow>(application_handler_.sequenceHandler_), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence Analyst")) {
-            static StoreSequenceFileAnalyst processor(application_handler_);
-            processor.process();
-            // TODO: modal to allow for changing the filename and directory of where to write the file
+            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileAnalyst>(), application_handler_);
+            file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence MassHunter")) {
-            static StoreSequenceFileMasshunter processor(application_handler_);
-            processor.process();
-            // TODO: modal to allow for changing the filename and directory of where to write the file
+            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileMasshunter>(), application_handler_);
+            file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence Xcalibur")) {
-            static StoreSequenceFileXcalibur processor(application_handler_);
-            processor.process();
-            // TODO: modal to allow for changing the filename and directory of where to write the file
+            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileXcalibur>(), application_handler_);
+            file_picker_.visible_ = true;
           }
           ImGui::EndMenu();
         }
