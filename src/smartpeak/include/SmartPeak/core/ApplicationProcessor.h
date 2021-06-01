@@ -138,39 +138,4 @@ namespace SmartPeak
     std::string filename_;
   };
 
-  struct SetRawDataPathname : IFilePickerHandler
-  {
-    /**
-    IFilePickerHandler
-    */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
-
-    SetRawDataPathname(ApplicationHandler& application_handler) : application_handler_(application_handler) {}
-//    std::string getName() const override { return "SetRawDataPathname"; };
-    ApplicationHandler& application_handler_;
-  };
-
-  struct SetInputFeaturesPathname : IFilePickerHandler {
-    /**
-    IFilePickerHandler
-    */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
-
-    SetInputFeaturesPathname(ApplicationHandler& application_handler) : application_handler_(application_handler) {}
-//    std::string getName() const override { return "SetInputFeaturesPathname"; };
-    ApplicationHandler& application_handler_;
-  };
-
-  struct SetOutputFeaturesPathname : IFilePickerHandler
-  {
-    /**
-    IFilePickerHandler
-    */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
-
-    SetOutputFeaturesPathname(ApplicationHandler& application_handler) : application_handler_(application_handler) {}
-//    std::string getName() const override { return "SetOutputFeaturesPathname"; };
-    ApplicationHandler& application_handler_;
-  };
-
 }

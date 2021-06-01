@@ -325,22 +325,4 @@ namespace SmartPeak
     return success;
   }
 
-  bool SetRawDataPathname::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
-  {
-    application_handler->mzML_dir_ = filename;
-    return true;
-  }
-
-  bool SetInputFeaturesPathname::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
-  {
-    application_handler->features_in_dir_ = filename;
-    return true;
-  }
-
-  bool SetOutputFeaturesPathname::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
-  {
-    application_handler->features_out_dir_ = filename;
-    return true;
-  }
-
 }

@@ -248,66 +248,6 @@ BOOST_AUTO_TEST_CASE(StoreSequenceFileXcalibur_ProcessSucceedsOnNonEmptySequence
   BOOST_CHECK(store);
 }
 
-/* SetRawDataPathname */
-BOOST_AUTO_TEST_CASE(SetRawDataPathname_GetName)
-{
-  SetRawDataPathname cmd{ ah_ };
-//  BOOST_CHECK_EQUAL(cmd.getName(), "SetRawDataPathname");
-}
-
-BOOST_AUTO_TEST_CASE(SetRawDataPathname_ProcessSetsPath)
-{
-  /*
-  SetRawDataPathname cmd{ ah_ };
-  {
-    cmd.pathname_ = "path/to/directory";
-  }
-  auto set = cmd.processFilePicker();
-  BOOST_CHECK(set);
-  BOOST_CHECK_EQUAL(ah_.mzML_dir_, cmd.pathname_);
-  */
-}
-
-/* SetInputFeaturesPathname */
-BOOST_AUTO_TEST_CASE(SetInputFeaturesPathname_GetName)
-{
-  SetInputFeaturesPathname cmd{ ah_ };
-//  BOOST_CHECK_EQUAL(cmd.getName(), "SetInputFeaturesPathname");
-}
-
-BOOST_AUTO_TEST_CASE(SetInputFeaturesPathname_ProcessSetsPath)
-{
-  /*
-  SetInputFeaturesPathname cmd{ ah_ };
-  {
-    cmd.pathname_ = "path/to/directory";
-  }
-  auto set = cmd.processFilePicker();
-  BOOST_CHECK(set);
-  BOOST_CHECK_EQUAL(ah_.features_in_dir_, cmd.pathname_);
-  */
-}
-
-/* SetOutputFeaturesPathname */
-BOOST_AUTO_TEST_CASE(SetOutputFeaturesPathname_GetName)
-{
-  SetOutputFeaturesPathname cmd{ ah_ };
-//  BOOST_CHECK_EQUAL(cmd.getName(), "SetOutputFeaturesPathname");
-}
-
-BOOST_AUTO_TEST_CASE(SetOutputFeaturesPathname_ProcessSetsPath)
-{
-  /*
-  SetOutputFeaturesPathname cmd{ ah_ };
-  {
-    cmd.pathname_ = "path/to/directory";
-  }
-  auto set = cmd.processFilePicker();
-  BOOST_CHECK(set);
-  BOOST_CHECK_EQUAL(ah_.features_out_dir_, cmd.pathname_);
-  */
-}
-
 /*
 BOOST_AUTO_TEST_CASE(StoreSequenceWorkflow1)
 {
