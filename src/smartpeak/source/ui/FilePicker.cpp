@@ -257,7 +257,7 @@ namespace SmartPeak
     return picked_pathname_;
   }
 
-  void FilePicker::setProcessor(std::shared_ptr<IFilePickerHandler> file_picker_handler, ApplicationHandler& application_handler)
+  void FilePicker::setFilePickerHandler(std::shared_ptr<IFilePickerHandler> file_picker_handler, ApplicationHandler& application_handler)
   {
     LOGD << "Setting processor: " << (file_picker_handler.get());
     file_picker_handler_ = file_picker_handler;

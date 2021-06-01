@@ -411,7 +411,7 @@ int main(int argc, char** argv)
         //  //TODO: Session (see AUT-280)
         //}
         if (ImGui::MenuItem("Load session from sequence", NULL, false, workflow_is_done_ && file_loading_is_done_)) {
-          file_picker_.setProcessor(std::make_shared<CreateSequence>(application_handler_.sequenceHandler_), application_handler_);
+          file_picker_.setFilePickerHandler(std::make_shared<CreateSequence>(application_handler_.sequenceHandler_), application_handler_);
           file_picker_.visible_ = true;
         }
         showQuickHelpToolTip("load_session_from_sequence");
@@ -428,75 +428,75 @@ int main(int argc, char** argv)
         if (ImGui::BeginMenu("Import File"))
         {
           if (ImGui::MenuItem("Transitions")) {
-            file_picker_.setProcessor(std::make_shared<LoadTransitions>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadTransitions>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Parameters")) {
-            file_picker_.setProcessor(std::make_shared<LoadParameters>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadParameters>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Workflow", NULL, false, workflow_is_done_)) {
-            file_picker_.setProcessor(std::make_shared<LoadWorkflow>(application_handler_.sequenceHandler_), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadWorkflow>(application_handler_.sequenceHandler_), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Reference data")) {
-            file_picker_.setProcessor(std::make_shared<LoadValidationData>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadValidationData>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Quant Method")) {
-            file_picker_.setProcessor(std::make_shared<LoadQuantitationMethods>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadQuantitationMethods>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Standards Conc")) {
-            file_picker_.setProcessor(std::make_shared<LoadStandardsConcentrations>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadStandardsConcentrations>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Filters")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureFilters>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureFilters>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group Filters")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureFilters>(true), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureFilters>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp QCs")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureQCs>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureQCs>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group QCs")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureQCs>(true), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureQCs>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %RSD Filters")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureRSDFilters>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDFilters>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %RSD Filters")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureRSDFilters>(true), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDFilters>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %RSD QCs")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureRSDQCs>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDQCs>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %RSD QCs")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureRSDQCs>(true), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureRSDQCs>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %Background Filters")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureBackgroundFilters>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundFilters>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %Background Filters")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureBackgroundFilters>(true), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundFilters>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp %Background QCs")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureBackgroundQCs>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundQCs>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Comp Group %Background QCs")) {
-            file_picker_.setProcessor(std::make_shared<LoadFeatureBackgroundQCs>(true), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<LoadFeatureBackgroundQCs>(true), application_handler_);
             file_picker_.visible_ = true;
           }
           ImGui::EndMenu();
@@ -509,27 +509,27 @@ int main(int argc, char** argv)
           //if (ImGui::MenuItem("Transitions")) {} // TODO: updated transitions file
           //if (ImGui::MenuItem("Standards Conc")) {} // TODO: updated standards concentration file
           if (ImGui::MenuItem("Sequence")) {
-            file_picker_.setProcessor(std::make_shared<StoreSequenceFileSmartPeak>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileSmartPeak>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Parameters")) {
-            file_picker_.setProcessor(std::make_shared<StoreParameters>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<StoreParameters>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Workflow")) {
-            file_picker_.setProcessor(std::make_shared<StoreWorkflow>(application_handler_.sequenceHandler_), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<StoreWorkflow>(application_handler_.sequenceHandler_), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence Analyst")) {
-            file_picker_.setProcessor(std::make_shared<StoreSequenceFileAnalyst>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileAnalyst>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence MassHunter")) {
-            file_picker_.setProcessor(std::make_shared<StoreSequenceFileMasshunter>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileMasshunter>(), application_handler_);
             file_picker_.visible_ = true;
           }
           if (ImGui::MenuItem("Sequence Xcalibur")) {
-            file_picker_.setProcessor(std::make_shared<StoreSequenceFileXcalibur>(), application_handler_);
+            file_picker_.setFilePickerHandler(std::make_shared<StoreSequenceFileXcalibur>(), application_handler_);
             file_picker_.visible_ = true;
           }
           ImGui::EndMenu();

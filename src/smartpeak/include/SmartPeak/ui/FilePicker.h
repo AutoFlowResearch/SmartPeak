@@ -66,7 +66,7 @@ namespace SmartPeak
 
     void draw() override;
     std::string getPickedPathname() const;
-    void setProcessor(std::shared_ptr<IFilePickerHandler> file_picker_handler, ApplicationHandler& application_handler);
+    void setFilePickerHandler(std::shared_ptr<IFilePickerHandler> file_picker_handler, ApplicationHandler& application_handler);
     void runProcessor();
     void clearProcessor();
     bool fileLoadingIsDone() { return loading_is_done_; };
