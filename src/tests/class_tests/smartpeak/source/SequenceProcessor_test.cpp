@@ -26,6 +26,7 @@
 #define BOOST_TEST_MODULE SequenceProcessor test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/Filenames.h>
 #include <filesystem>
 
@@ -57,6 +58,27 @@ Filenames generateTestFilenames()
 }
 
 BOOST_AUTO_TEST_SUITE(sequenceprocessor)
+
+BOOST_AUTO_TEST_CASE(createSequence_onFilePicked)
+{
+  ApplicationHandler ah;
+  SequenceHandler sequenceHandler;
+  CreateSequence cs(sequenceHandler);
+  std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
+  auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
+  auto filenames_ = Filenames::getDefaultStaticFilenames(workflow.string());
+  cs.onFilePicked(filenames_.sequence_csv_i, &ah);
+
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 2);
+  InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
+  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleName(), "150516_CM1_Level1");
+  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "CM");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "150516_CM1_Level1");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 27);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods().size(), 10);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "arg-L.arg-L_1.Light");
+}
 
 BOOST_AUTO_TEST_CASE(createSequence)
 {
