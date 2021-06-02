@@ -304,7 +304,10 @@ namespace SmartPeak
     ExplorerWidget(const std::string& table_id, const std::string title ="", SequenceObservable* sequence_observable = nullptr)
       :GenericTableWidget(table_id, title)
     {
-      sequence_observable->addSequenceObserver(this);
+      if (sequence_observable)
+      {
+        sequence_observable->addSequenceObserver(this);
+      }
     };
     /*
     @brief Show the explorer
