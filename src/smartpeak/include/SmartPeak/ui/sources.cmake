@@ -7,6 +7,7 @@ set(sources_list_h
 	CalibratorsPlotWidget.h
 	ChromatogramPlotWidget.h
 	FilePicker.h
+	GenericFloatEditorWidget.h
 	GuiAppender.h
 	Heatmap2DWidget.h
 	ImEntry.h
@@ -21,6 +22,7 @@ set(sources_list_h
 	SequenceTableWidget.h
 	SpectraPlotWidget.h
 	StatisticsWidget.h
+	TransitionsTableWidget.h
 	Widget.h
 	ImEntry.h
 	Help.h

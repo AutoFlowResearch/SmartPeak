@@ -48,6 +48,7 @@
 #include <SmartPeak/ui/AboutWidget.h>
 #include <SmartPeak/ui/LogWidget.h>
 #include <SmartPeak/ui/SequenceTableWidget.h>
+#include <SmartPeak/ui/TransitionsTableWidget.h>
 #include <SmartPeak/ui/WindowSizesAndPositions.h>
 #include <SmartPeak/core/EventDispatcher.h>
 #include <plog/Log.h>
@@ -130,7 +131,8 @@ int main(int argc, char** argv)
   auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Spectrum");
   auto sequence_main_window_ = std::make_shared<SequenceTableWidget>("SequenceMainWindow", "Sequence",
                                                                       &session_handler_, &application_handler_.sequenceHandler_);
-  auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions");
+  auto transitions_main_window_ = std::make_shared<TransitionsTableWidget>("TransitionsMainWindow", "Transitions",
+                                                                      &session_handler_, &application_handler_.sequenceHandler_);
   auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Spectrum");
   auto quant_method_main_window_ = std::make_shared<SequenceSegmentWidget>("QuantMethodMainWindow", "Quantitation Method",
                                    &session_handler_, &application_handler_.sequenceHandler_,

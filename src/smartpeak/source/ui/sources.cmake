@@ -7,6 +7,7 @@ set(sources_list
 	CalibratorsPlotWidget.cpp
 	ChromatogramPlotWidget.cpp
 	FilePicker.cpp
+	GenericFloatEditorWidget.cpp
 	GuiAppender.cpp
 	Heatmap2DWidget.cpp
 	ImEntry.cpp
@@ -21,6 +22,7 @@ set(sources_list
 	SequenceTableWidget.cpp
 	SpectraPlotWidget.cpp
 	StatisticsWidget.cpp
+	TransitionsTableWidget.cpp
 	Widget.cpp
 	WindowSizesAndPositions.cpp
 	Workflow.cpp
