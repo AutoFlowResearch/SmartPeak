@@ -17,14 +17,13 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE ApplicationProcessor test suite
-#include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Filenames.h>
@@ -33,7 +32,7 @@
 using namespace SmartPeak;
 using namespace std;
 
-struct ApplicationProcessorFixture 
+struct ApplicationProcessorFixture : public ::testing::Test
 {
   /* ctor/dtor */
   ApplicationProcessorFixture() 
@@ -75,671 +74,671 @@ public:
   Filenames filenames_;
 };
 
-BOOST_FIXTURE_TEST_SUITE(ApplicationProcessor, ApplicationProcessorFixture)
+//BOOST_FIXTURE_TEST_SUITE(ApplicationProcessor, ApplicationProcessorFixture)
 
 /* CreateCommand */
-BOOST_AUTO_TEST_CASE(CreateCommand_GetName)
+TEST_F(ApplicationProcessorFixture, CreateCommand_GetName)
 {
   CreateCommand cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "CreateCommand");
+  EXPECT_STREQ(cmd.getName().c_str(), "CreateCommand");
 }
 
-BOOST_AUTO_TEST_CASE(CreateCommand_ProcessFailsOnEmptyCommand)
+TEST_F(ApplicationProcessorFixture, CreateCommand_ProcessFailsOnEmptyCommand)
 {
   CreateCommand cmd{ ah_ };
   cmd.name_ = "";
   auto created = cmd.process();
-  BOOST_CHECK(!created);
+  EXPECT_TRUE(!created);
 }
 
-BOOST_AUTO_TEST_CASE(CreateCommand_ProcessFailsOnWrongCommandName)
+TEST_F(ApplicationProcessorFixture, CreateCommand_ProcessFailsOnWrongCommandName)
 {
   CreateCommand cmd{ ah_ };
   cmd.name_ = "BAD_COMMAND_NAME";
   auto created = cmd.process();
-  BOOST_CHECK(!created);
+  EXPECT_TRUE(!created);
 }
 
-BOOST_AUTO_TEST_CASE(CreateCommand_ProcessSucceedsOnValidCommandName)
+TEST_F(ApplicationProcessorFixture, CreateCommand_ProcessSucceedsOnValidCommandName)
 {
   CreateCommand cmd{ ah_ };
   // Raw data method
   {
     cmd.name_ = "LOAD_RAW_DATA";
     auto created = cmd.process();
-    BOOST_CHECK(created);
+    EXPECT_TRUE(created);
   }
   // Sequence Segment Method
   {
     cmd.name_ = "LOAD_FEATURE_QCS";
     auto created = cmd.process();
-    BOOST_CHECK(created);
+    EXPECT_TRUE(created);
   }
   // Sample Group Method
   {
     cmd.name_ = "MERGE_INJECTIONS";
     auto created = cmd.process();
-    BOOST_CHECK(created);
+    EXPECT_TRUE(created);
   }
 }
 
 /* BuildCommandsFromNames */
-BOOST_AUTO_TEST_CASE(BuildCommandsFromNames_Process)
+TEST_F(ApplicationProcessorFixture, BuildCommandsFromNames_Process)
 {
   ApplicationHandler application_handler;
   BuildCommandsFromNames buildCommandsFromNames(application_handler);
   std::vector<ApplicationHandler::Command> methods;
 
   buildCommandsFromNames.names_ = {};
-  BOOST_CHECK(buildCommandsFromNames.process());
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.size(), 0);
+  EXPECT_TRUE(buildCommandsFromNames.process());
+  EXPECT_EQ(buildCommandsFromNames.commands_.size(), 0);
 
   buildCommandsFromNames.names_ = { "LOAD_RAW_DATA", "LOAD_FEATURES", "PICK_MRM_FEATURES" };
-  BOOST_CHECK(buildCommandsFromNames.process());
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.size(), 3);
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(0).getName(), "LOAD_RAW_DATA");
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(1).getName(), "LOAD_FEATURES");
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(2).getName(), "PICK_MRM_FEATURES");
+  EXPECT_TRUE(buildCommandsFromNames.process());
+  EXPECT_EQ(buildCommandsFromNames.commands_.size(), 3);
+  EXPECT_STREQ(buildCommandsFromNames.commands_.at(0).getName().c_str(), "LOAD_RAW_DATA");
+  EXPECT_STREQ(buildCommandsFromNames.commands_.at(1).getName().c_str(), "LOAD_FEATURES");
+  EXPECT_STREQ(buildCommandsFromNames.commands_.at(2).getName().c_str(), "PICK_MRM_FEATURES");
 
   buildCommandsFromNames.names_ = { "LOAD_RAW_DATA", "PLOT_FEATURES", "LOAD_FEATURES" }; // no plotting processor yet
-  BOOST_CHECK(!buildCommandsFromNames.process());
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.size(), 2);
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(0).getName(), "LOAD_RAW_DATA");
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(1).getName(), "LOAD_FEATURES");
+  EXPECT_TRUE(!buildCommandsFromNames.process());
+  EXPECT_EQ(buildCommandsFromNames.commands_.size(), 2);
+  EXPECT_STREQ(buildCommandsFromNames.commands_.at(0).getName().c_str(), "LOAD_RAW_DATA");
+  EXPECT_STREQ(buildCommandsFromNames.commands_.at(1).getName().c_str(), "LOAD_FEATURES");
 
   buildCommandsFromNames.names_ = { "55", "87" };
-  BOOST_CHECK(!buildCommandsFromNames.process());
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.size(), 0);
+  EXPECT_TRUE(!buildCommandsFromNames.process());
+  EXPECT_EQ(buildCommandsFromNames.commands_.size(), 0);
 }
 
-BOOST_AUTO_TEST_CASE(BuildCommandsFromNames_GetName)
+TEST_F(ApplicationProcessorFixture, BuildCommandsFromNames_GetName)
 {
   BuildCommandsFromNames cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "BuildCommandsFromNames");
+  EXPECT_STREQ(cmd.getName().c_str(), "BuildCommandsFromNames");
 }
 
 /* LoadSessionFromSequence */
-BOOST_AUTO_TEST_CASE(LoadSessionFromSequence_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSessionFromSequence_GetName)
 {
   LoadSessionFromSequence cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSessionFromSequence");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSessionFromSequence");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSessionFromSequence_ProcessSucceedsOnCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSessionFromSequence_ProcessSucceedsOnCorrectPath)
 {
   LoadSessionFromSequence cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.sequence_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceParameters */
-BOOST_AUTO_TEST_CASE(LoadSequenceParameters_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceParameters_GetName)
 {
   LoadSequenceParameters cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceParameters");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceParameters");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceParameters_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceParameters_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceParameters cmd{ ah };
-  BOOST_CHECK(!cmd.process());
+  EXPECT_TRUE(!cmd.process());
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceParameters_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceParameters_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceParameters cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.parameters_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceTransitions */
-BOOST_AUTO_TEST_CASE(LoadSequenceTransitions_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceTransitions_GetName)
 {
   LoadSequenceTransitions cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceTransitions");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceTransitions");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceTransitions_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceTransitions_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceTransitions cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceTransitions_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceTransitions_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceTransitions cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.traML_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceValidationData */
-BOOST_AUTO_TEST_CASE(LoadSequenceValidationData_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceValidationData_GetName)
 {
   LoadSequenceValidationData cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceValidationData");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceValidationData");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceValidationData_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceValidationData_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceValidationData cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceValidationData_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceValidationData_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceValidationData cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.referenceData_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentQuantitationMethods */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentQuantitationMethods_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentQuantitationMethods_GetName)
 {
   LoadSequenceSegmentQuantitationMethods cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentQuantitationMethods");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentQuantitationMethods");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentQuantitationMethods_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentQuantitationMethods_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentQuantitationMethods cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentQuantitationMethods_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentQuantitationMethods_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentQuantitationMethods cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.quantitationMethods_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentStandardsConcentrations */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentStandardsConcentrations_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentStandardsConcentrations_GetName)
 {
   LoadSequenceSegmentStandardsConcentrations cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentStandardsConcentrations");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentStandardsConcentrations");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentStandardsConcentrations_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentStandardsConcentrations_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentStandardsConcentrations cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentStandardsConcentrations_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentStandardsConcentrations_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentStandardsConcentrations cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.standardsConcentrations_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureFilterComponents */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureFilterComponents_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureFilterComponents_GetName)
 {
   LoadSequenceSegmentFeatureFilterComponents cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureFilterComponents");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureFilterComponents");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureFilterComponents_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureFilterComponents_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureFilterComponents cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureFilterComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureFilterComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureFilterComponents cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureFilterComponents_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureFilterComponentGroups */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureFilterComponentGroups_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureFilterComponentGroups_GetName)
 {
   LoadSequenceSegmentFeatureFilterComponentGroups cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureFilterComponentGroups");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureFilterComponentGroups");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureFilterComponentGroups_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureFilterComponentGroups_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureFilterComponentGroups cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureFilterComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureFilterComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureFilterComponentGroups cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureFilterComponentGroups_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureQCComponents */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureQCComponents_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureQCComponents_GetName)
 {
   LoadSequenceSegmentFeatureQCComponents cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureQCComponents");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureQCComponents");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureQCComponents_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureQCComponents_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureQCComponents cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureQCComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureQCComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureQCComponents cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureQCComponents_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureQCComponentGroups */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureQCComponentGroups_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureQCComponentGroups_GetName)
 {
   LoadSequenceSegmentFeatureQCComponentGroups cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureQCComponentGroups");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureQCComponentGroups");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureQCComponentGroups_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureQCComponentGroups_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureQCComponentGroups cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureQCComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureQCComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureQCComponentGroups cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureQCComponentGroups_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureRSDFilterComponents */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDFilterComponents_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDFilterComponents_GetName)
 {
   LoadSequenceSegmentFeatureRSDFilterComponents cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureRSDFilterComponents");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureRSDFilterComponents");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDFilterComponents_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDFilterComponents_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureRSDFilterComponents cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDFilterComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDFilterComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureRSDFilterComponents cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureRSDFilterComponents_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureRSDFilterComponentGroups */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDFilterComponentGroups_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDFilterComponentGroups_GetName)
 {
   LoadSequenceSegmentFeatureRSDFilterComponentGroups cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureRSDFilterComponentGroups");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureRSDFilterComponentGroups");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDFilterComponentGroups_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDFilterComponentGroups_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureRSDFilterComponentGroups cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDFilterComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDFilterComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureRSDFilterComponentGroups cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureRSDFilterComponentGroups_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureRSDQCComponents */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDQCComponents_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDQCComponents_GetName)
 {
   LoadSequenceSegmentFeatureRSDQCComponents cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureRSDQCComponents");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureRSDQCComponents");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDQCComponents_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDQCComponents_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureRSDQCComponents cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDQCComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDQCComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureRSDQCComponents cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureRSDQCComponents_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureRSDQCComponentGroups */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDQCComponentGroups_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDQCComponentGroups_GetName)
 {
   LoadSequenceSegmentFeatureRSDQCComponentGroups cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureRSDQCComponentGroups");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureRSDQCComponentGroups");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDQCComponentGroups_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDQCComponentGroups_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureRSDQCComponentGroups cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureRSDQCComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureRSDQCComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureRSDQCComponentGroups cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureRSDQCComponentGroups_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureBackgroundFilterComponents */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundFilterComponents_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundFilterComponents_GetName)
 {
   LoadSequenceSegmentFeatureBackgroundFilterComponents cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureBackgroundFilterComponents");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureBackgroundFilterComponents");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundFilterComponents_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundFilterComponents_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureBackgroundFilterComponents cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundFilterComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundFilterComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureBackgroundFilterComponents cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureBackgroundFilterComponents_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureBackgroundFilterComponentGroups */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundFilterComponentGroups_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundFilterComponentGroups_GetName)
 {
   LoadSequenceSegmentFeatureBackgroundFilterComponentGroups cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureBackgroundFilterComponentGroups");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureBackgroundFilterComponentGroups");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundFilterComponentGroups_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundFilterComponentGroups_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureBackgroundFilterComponentGroups cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundFilterComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundFilterComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureBackgroundFilterComponentGroups cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureBackgroundFilterComponentGroups_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureBackgroundQCComponents */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundQCComponents_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundQCComponents_GetName)
 {
   LoadSequenceSegmentFeatureBackgroundQCComponents cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureBackgroundQCComponents");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureBackgroundQCComponents");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundQCComponents_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundQCComponents_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureBackgroundQCComponents cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundQCComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundQCComponents_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureBackgroundQCComponents cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureBackgroundQCComponents_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* LoadSequenceSegmentFeatureBackgroundQCComponentGroups */
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundQCComponentGroups_GetName)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundQCComponentGroups_GetName)
 {
   LoadSequenceSegmentFeatureBackgroundQCComponentGroups cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "LoadSequenceSegmentFeatureBackgroundQCComponentGroups");
+  EXPECT_STREQ(cmd.getName().c_str(), "LoadSequenceSegmentFeatureBackgroundQCComponentGroups");
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundQCComponentGroups_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundQCComponentGroups_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   LoadSequenceSegmentFeatureBackgroundQCComponentGroups cmd{ ah };
   auto loaded = cmd.process();
-  BOOST_CHECK(!loaded);
+  EXPECT_TRUE(!loaded);
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceSegmentFeatureBackgroundQCComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
+TEST_F(ApplicationProcessorFixture, LoadSequenceSegmentFeatureBackgroundQCComponentGroups_ProcessSucceedsOnNonEmptySequenceAndCorrectPath)
 {
   LoadSequenceSegmentFeatureBackgroundQCComponentGroups cmd{ ah_ };
   {
     cmd.pathname_ = filenames_.featureBackgroundQCComponentGroups_csv_i;
   }
   auto loaded = cmd.process();
-  BOOST_CHECK(loaded);
+  EXPECT_TRUE(loaded);
 }
 
 /* StoreSequenceFileAnalyst */
-BOOST_AUTO_TEST_CASE(StoreSequenceFileAnalyst_GetName)
+TEST_F(ApplicationProcessorFixture, StoreSequenceFileAnalyst_GetName)
 {
   StoreSequenceFileAnalyst cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "StoreSequenceFileAnalyst");
+  EXPECT_STREQ(cmd.getName().c_str(), "StoreSequenceFileAnalyst");
 }
 
-BOOST_AUTO_TEST_CASE(StoreSequenceFileAnalyst_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, StoreSequenceFileAnalyst_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   StoreSequenceFileAnalyst cmd{ ah };
   auto store = cmd.process();
-  BOOST_CHECK(!store);
+  EXPECT_TRUE(!store);
 }
 
-BOOST_AUTO_TEST_CASE(StoreSequenceFileAnalyst_ProcessSucceedsOnNonEmptySequence)
+TEST_F(ApplicationProcessorFixture, StoreSequenceFileAnalyst_ProcessSucceedsOnNonEmptySequence)
 {
   StoreSequenceFileAnalyst cmd{ ah_ };
   auto store = cmd.process();
-  BOOST_CHECK(store);
+  EXPECT_TRUE(store);
 }
 
 /* StoreSequenceFileMasshunter */
-BOOST_AUTO_TEST_CASE(StoreSequenceFileMasshunter_GetName)
+TEST_F(ApplicationProcessorFixture, StoreSequenceFileMasshunter_GetName)
 {
   StoreSequenceFileMasshunter cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "StoreSequenceFileMasshunter");
+  EXPECT_STREQ(cmd.getName().c_str(), "StoreSequenceFileMasshunter");
 }
 
-BOOST_AUTO_TEST_CASE(StoreSequenceFileMasshunter_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, StoreSequenceFileMasshunter_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   StoreSequenceFileMasshunter cmd{ ah };
   auto store = cmd.process();
-  BOOST_CHECK(!store);
+  EXPECT_TRUE(!store);
 }
 
-BOOST_AUTO_TEST_CASE(StoreSequenceFileMasshunter_ProcessSucceedsOnNonEmptySequence)
+TEST_F(ApplicationProcessorFixture, StoreSequenceFileMasshunter_ProcessSucceedsOnNonEmptySequence)
 {
   StoreSequenceFileMasshunter cmd{ ah_ };
   auto store = cmd.process();
-  BOOST_CHECK(store);
+  EXPECT_TRUE(store);
 }
 
 /* StoreSequenceFileXcalibur */
-BOOST_AUTO_TEST_CASE(StoreSequenceFileXcalibur_GetName)
+TEST_F(ApplicationProcessorFixture, StoreSequenceFileXcalibur_GetName)
 {
   StoreSequenceFileXcalibur cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "StoreSequenceFileXcalibur");
+  EXPECT_STREQ(cmd.getName().c_str(), "StoreSequenceFileXcalibur");
 }
 
-BOOST_AUTO_TEST_CASE(StoreSequenceFileXcalibur_ProcessFailsOnEmptySequence)
+TEST_F(ApplicationProcessorFixture, StoreSequenceFileXcalibur_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHnadler with empty sequence
   ApplicationHandler ah;
   StoreSequenceFileXcalibur cmd{ ah };
   auto store = cmd.process();
-  BOOST_CHECK(!store);
+  EXPECT_TRUE(!store);
 }
 
-BOOST_AUTO_TEST_CASE(StoreSequenceFileXcalibur_ProcessSucceedsOnNonEmptySequence)
+TEST_F(ApplicationProcessorFixture, StoreSequenceFileXcalibur_ProcessSucceedsOnNonEmptySequence)
 {
   StoreSequenceFileXcalibur cmd{ ah_ };
   auto store = cmd.process();
-  BOOST_CHECK(store);
+  EXPECT_TRUE(store);
 }
 
 /* SetRawDataPathname */
-BOOST_AUTO_TEST_CASE(SetRawDataPathname_GetName)
+TEST_F(ApplicationProcessorFixture, SetRawDataPathname_GetName)
 {
   SetRawDataPathname cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "SetRawDataPathname");
+  EXPECT_STREQ(cmd.getName().c_str(), "SetRawDataPathname");
 }
 
-BOOST_AUTO_TEST_CASE(SetRawDataPathname_ProcessSetsPath)
+TEST_F(ApplicationProcessorFixture, SetRawDataPathname_ProcessSetsPath)
 {
   SetRawDataPathname cmd{ ah_ };
   {
     cmd.pathname_ = "path/to/directory";
   }
   auto set = cmd.process();
-  BOOST_CHECK(set);
-  BOOST_CHECK_EQUAL(ah_.mzML_dir_, cmd.pathname_);
+  EXPECT_TRUE(set);
+  EXPECT_EQ(ah_.mzML_dir_, cmd.pathname_);
 }
 
 /* SetInputFeaturesPathname */
-BOOST_AUTO_TEST_CASE(SetInputFeaturesPathname_GetName)
+TEST_F(ApplicationProcessorFixture, SetInputFeaturesPathname_GetName)
 {
   SetInputFeaturesPathname cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "SetInputFeaturesPathname");
+  EXPECT_STREQ(cmd.getName().c_str(), "SetInputFeaturesPathname");
 }
 
-BOOST_AUTO_TEST_CASE(SetInputFeaturesPathname_ProcessSetsPath)
+TEST_F(ApplicationProcessorFixture, SetInputFeaturesPathname_ProcessSetsPath)
 {
   SetInputFeaturesPathname cmd{ ah_ };
   {
     cmd.pathname_ = "path/to/directory";
   }
   auto set = cmd.process();
-  BOOST_CHECK(set);
-  BOOST_CHECK_EQUAL(ah_.features_in_dir_, cmd.pathname_);
+  EXPECT_TRUE(set);
+  EXPECT_EQ(ah_.features_in_dir_, cmd.pathname_);
 }
 
 /* SetOutputFeaturesPathname */
-BOOST_AUTO_TEST_CASE(SetOutputFeaturesPathname_GetName)
+TEST_F(ApplicationProcessorFixture, SetOutputFeaturesPathname_GetName)
 {
   SetOutputFeaturesPathname cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "SetOutputFeaturesPathname");
+  EXPECT_STREQ(cmd.getName().c_str(), "SetOutputFeaturesPathname");
 }
 
-BOOST_AUTO_TEST_CASE(SetOutputFeaturesPathname_ProcessSetsPath)
+TEST_F(ApplicationProcessorFixture, SetOutputFeaturesPathname_ProcessSetsPath)
 {
   SetOutputFeaturesPathname cmd{ ah_ };
   {
     cmd.pathname_ = "path/to/directory";
   }
   auto set = cmd.process();
-  BOOST_CHECK(set);
-  BOOST_CHECK_EQUAL(ah_.features_out_dir_, cmd.pathname_);
+  EXPECT_TRUE(set);
+  EXPECT_EQ(ah_.features_out_dir_, cmd.pathname_);
 }
 
-BOOST_AUTO_TEST_CASE(StoreSequenceWorkflow1)
+TEST_F(ApplicationProcessorFixture, StoreSequenceWorkflow1)
 {
   namespace fs = std::filesystem;
   ApplicationHandler application_handler;
@@ -756,26 +755,22 @@ BOOST_AUTO_TEST_CASE(StoreSequenceWorkflow1)
   };
   application_handler.sequenceHandler_.setWorkflow(command_names);
   StoreSequenceWorkflow application_processor(application_handler);
-  BOOST_CHECK_EQUAL(application_processor.getName(), "StoreSequenceWorkflow");
+  EXPECT_STREQ(application_processor.getName().c_str(), "StoreSequenceWorkflow");
   application_processor.pathname_ = (SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv"));
   //application_processor.pathname_ = std::tmpnam(nullptr);
-  BOOST_REQUIRE(application_processor.process());
+  EXPECT_TRUE(application_processor.process());
   // compare with reference file
   const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
-  std::ifstream created_if(application_processor.pathname_);
-  std::ifstream reference_if(reference_filename);
-  std::istream_iterator<char> created_is(created_if), created_end;
-  std::istream_iterator<char> reference_is(reference_if), reference_end;
-  BOOST_CHECK_EQUAL_COLLECTIONS(created_is, created_end, reference_is, reference_end);
+  EXPECT_STREQ(application_processor.pathname_.c_str(), reference_filename.c_str());
 }
 
-BOOST_AUTO_TEST_CASE(LoadSequenceWorkflow1)
+TEST_F(ApplicationProcessorFixture, LoadSequenceWorkflow1)
 {
   ApplicationHandler application_handler;
   LoadSequenceWorkflow application_processor(application_handler);
-  BOOST_CHECK_EQUAL(application_processor.getName(), "LoadSequenceWorkflow");
+  EXPECT_STREQ(application_processor.getName().c_str(), "LoadSequenceWorkflow");
   application_processor.pathname_ = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
-  BOOST_REQUIRE(application_processor.process());
+  EXPECT_TRUE(application_processor.process());
   const auto& commands = application_handler.sequenceHandler_.getWorkflow();
   std::vector<std::string> expected_command_names = {
     "LOAD_RAW_DATA",
@@ -788,11 +783,9 @@ BOOST_AUTO_TEST_CASE(LoadSequenceWorkflow1)
     "SELECT_FEATURES",
     "STORE_FEATURES"
   };
-  BOOST_REQUIRE(commands.size() == expected_command_names.size());
+  EXPECT_TRUE(commands.size() == expected_command_names.size());
   for (auto i=0; i< expected_command_names.size(); ++i)
   {
-    BOOST_CHECK_EQUAL(expected_command_names[i], commands[i]);
+    EXPECT_EQ(expected_command_names[i], commands[i]);
   }
 }
-
-BOOST_AUTO_TEST_SUITE_END()

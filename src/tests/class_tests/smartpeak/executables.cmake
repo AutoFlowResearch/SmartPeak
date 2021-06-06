@@ -2,8 +2,7 @@ set(core_executables_list
 	ApplicationProcessor_test
 	CastValue_test
 	EventDispatcher_test
-	Filenames_test
-	Helloworld_test
+	Filenames_test  
 	ImEntry_test
 	MetaDataHandler_test
 	RawDataHandler_test

@@ -17,92 +17,88 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE ParametersParser test suite
-#include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/ParametersParser.h>
 
 using namespace SmartPeak;
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(parameterparser)
-
-BOOST_AUTO_TEST_CASE(read)
+TEST(ParametersParser, read)
 {
   const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");
   ParameterSet parameters;
   ParametersParser::read(pathname, parameters);
-  BOOST_CHECK_EQUAL(parameters.size(), 3);
+  EXPECT_EQ(parameters.size(), 3);
 
   const string func1 {"func1"};
 
-  BOOST_REQUIRE(parameters.count(func1));
+  EXPECT_TRUE(parameters.count(func1));
   auto function_parameters = parameters.at(func1);
-  BOOST_REQUIRE(function_parameters.size() == 3);
-  BOOST_CHECK_EQUAL(function_parameters[0].getName(), "param1");
-  BOOST_CHECK_EQUAL(function_parameters[0].getType(), "int");
-  BOOST_CHECK_EQUAL(function_parameters[0].getValueAsString(), "-1");
-  BOOST_CHECK_EQUAL(function_parameters[0].getDescription(), "");
+  EXPECT_TRUE(function_parameters.size() == 3);
+  EXPECT_STREQ(function_parameters[0].getName().c_str(), "param1");
+  EXPECT_STREQ(function_parameters[0].getType().c_str(), "int");
+  EXPECT_STREQ(function_parameters[0].getValueAsString().c_str(), "-1");
+  EXPECT_STREQ(function_parameters[0].getDescription().c_str(), "");
 
-  BOOST_CHECK_EQUAL(function_parameters[1].getName(), "param2");
-  BOOST_CHECK_EQUAL(function_parameters[1].getType(), "float");
-  BOOST_CHECK_EQUAL(function_parameters[1].getValueAsString(), "-1");
-  BOOST_CHECK_EQUAL(function_parameters[1].getDescription(), "a description");
+  EXPECT_STREQ(function_parameters[1].getName().c_str(), "param2");
+  EXPECT_STREQ(function_parameters[1].getType().c_str(), "float");
+  EXPECT_STREQ(function_parameters[1].getValueAsString().c_str(), "-1");
+  EXPECT_STREQ(function_parameters[1].getDescription().c_str(), "a description");
 
-  BOOST_CHECK_EQUAL(function_parameters[2].getName(), "param3");
-  BOOST_CHECK_EQUAL(function_parameters[2].getType(), "float");
-  BOOST_CHECK_EQUAL(function_parameters[2].getValueAsString(), "-1");
-  BOOST_CHECK_EQUAL(function_parameters[2].getDescription(), "a quoted description, containing a comma");
+  EXPECT_STREQ(function_parameters[2].getName().c_str(), "param3");
+  EXPECT_STREQ(function_parameters[2].getType().c_str(), "float");
+  EXPECT_STREQ(function_parameters[2].getValueAsString().c_str(), "-1");
+  EXPECT_STREQ(function_parameters[2].getDescription().c_str(), "a quoted description, containing a comma");
 
   const string func2 {"func2"};
 
-  BOOST_REQUIRE(parameters.count(func2));
+  EXPECT_TRUE(parameters.count(func2));
   function_parameters = parameters.at(func2);
-  BOOST_REQUIRE(function_parameters.size() == 2);
-  BOOST_CHECK_EQUAL(function_parameters[0].getName(), "param1");
-  BOOST_CHECK_EQUAL(function_parameters[0].getType(), "float");
-  BOOST_CHECK_EQUAL(function_parameters[0].getValueAsString(), "0.5");
-  BOOST_CHECK_EQUAL(function_parameters[0].getDescription(), "");
+  EXPECT_TRUE(function_parameters.size() == 2);
+  EXPECT_STREQ(function_parameters[0].getName().c_str(), "param1");
+  EXPECT_STREQ(function_parameters[0].getType().c_str(), "float");
+  EXPECT_STREQ(function_parameters[0].getValueAsString().c_str(), "0.5");
+  EXPECT_STREQ(function_parameters[0].getDescription().c_str(), "");
 
-  BOOST_CHECK_EQUAL(function_parameters[1].getName(), "param2");
-  BOOST_CHECK_EQUAL(function_parameters[1].getType(), "bool");
-  BOOST_CHECK_EQUAL(function_parameters[1].getValueAsString(), "false");
-  BOOST_CHECK_EQUAL(function_parameters[1].getDescription(), "");
+  EXPECT_STREQ(function_parameters[1].getName().c_str(), "param2");
+  EXPECT_STREQ(function_parameters[1].getType().c_str(), "bool");
+  EXPECT_STREQ(function_parameters[1].getValueAsString().c_str(), "false");
+  EXPECT_STREQ(function_parameters[1].getDescription().c_str(), "");
 
   const string func3 {"func3"};
 
-  BOOST_REQUIRE(parameters.count(func3));
+  EXPECT_TRUE(parameters.count(func3));
   function_parameters = parameters.at(func3);
-  BOOST_REQUIRE(function_parameters.size() == 1);
-  BOOST_CHECK_EQUAL(function_parameters[0].getName(), "param1");
-  BOOST_CHECK_EQUAL(function_parameters[0].getType(), "bool");
-  BOOST_CHECK_EQUAL(function_parameters[0].getValueAsString(), "false");
-  BOOST_CHECK_EQUAL(function_parameters[0].getDescription(), "");
+  EXPECT_TRUE(function_parameters.size() == 1);
+  EXPECT_STREQ(function_parameters[0].getName().c_str(), "param1");
+  EXPECT_STREQ(function_parameters[0].getType().c_str(), "bool");
+  EXPECT_STREQ(function_parameters[0].getValueAsString().c_str(), "false");
+  EXPECT_STREQ(function_parameters[0].getDescription().c_str(), "");
 }
 
-BOOST_AUTO_TEST_CASE(write)
+TEST(ParametersParser, write)
 {
   const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");
   ParameterSet parameters;
   ParametersParser::read(pathname, parameters);
-  BOOST_CHECK_EQUAL(parameters.size(), 3);
+  EXPECT_EQ(parameters.size(), 3);
 
   const string func1{ "func1" };
 
-  BOOST_REQUIRE(parameters.count(func1));
+  EXPECT_TRUE(parameters.count(func1));
   auto function_parameters = parameters.at(func1);
-  BOOST_REQUIRE(function_parameters.size() == 3);
+  EXPECT_TRUE(function_parameters.size() == 3);
   auto parameter1 = function_parameters.findParameter("param1");
-  BOOST_REQUIRE(parameter1);
-  BOOST_CHECK_EQUAL(parameter1->getName(), "param1");
-  BOOST_CHECK_EQUAL(parameter1->getType(), "int");
-  BOOST_CHECK_EQUAL(parameter1->getValueAsString(), "-1");
-  BOOST_CHECK_EQUAL(parameter1->getDescription(), "");
+  EXPECT_TRUE(parameter1);
+  EXPECT_STREQ(parameter1->getName().c_str(), "param1");
+  EXPECT_STREQ(parameter1->getType().c_str(), "int");
+  EXPECT_STREQ(parameter1->getValueAsString().c_str(), "-1");
+  EXPECT_STREQ(parameter1->getDescription().c_str(), "");
 
   // change values, add parameters
   parameter1->setTags({ "one", "two", "three" });
@@ -126,21 +122,19 @@ BOOST_AUTO_TEST_CASE(write)
   // read back
   ParameterSet written_parameters;
   ParametersParser::read(written_filename, written_parameters);
-  BOOST_CHECK_EQUAL(written_parameters.size(), 4);
-  BOOST_REQUIRE(written_parameters.count(func1));
+  EXPECT_EQ(written_parameters.size(), 4);
+  EXPECT_TRUE(written_parameters.count(func1));
   auto written_function_parameters = written_parameters.at(func1);
   auto written_parameter1 = function_parameters.findParameter("param1");
-  BOOST_CHECK_EQUAL(written_parameter1->getName(), "param1");
-  BOOST_CHECK_EQUAL(written_parameter1->getType(), "int");
-  BOOST_CHECK_EQUAL(written_parameter1->getValueAsString(), "42");
-  BOOST_CHECK_EQUAL(written_parameter1->getDescription(), "a description");
-  BOOST_REQUIRE(written_parameters.count("new_params"));
+  EXPECT_STREQ(written_parameter1->getName().c_str(), "param1");
+  EXPECT_STREQ(written_parameter1->getType().c_str(), "int");
+  EXPECT_STREQ(written_parameter1->getValueAsString().c_str(), "42");
+  EXPECT_STREQ(written_parameter1->getDescription().c_str(), "a description");
+  EXPECT_TRUE(written_parameters.count("new_params"));
   auto written_function_parameters_new = written_parameters.at("new_params");
   auto written_parameter_new = written_function_parameters_new.findParameter("segment_window_lengths");
-  BOOST_CHECK_EQUAL(written_parameter_new->getName(), "segment_window_lengths");
-  BOOST_CHECK_EQUAL(written_parameter_new->getType(), "int_list");
-  BOOST_CHECK_EQUAL(written_parameter_new->getValueAsString(), "[8,-1]");
-  BOOST_CHECK_EQUAL(written_parameter_new->getDescription(), "");
+  EXPECT_STREQ(written_parameter_new->getName().c_str(), "segment_window_lengths");
+  EXPECT_STREQ(written_parameter_new->getType().c_str(), "int_list");
+  EXPECT_STREQ(written_parameter_new->getValueAsString().c_str(), "[8,-1]");
+  EXPECT_STREQ(written_parameter_new->getDescription().c_str(), "");
 }
-
-BOOST_AUTO_TEST_SUITE_END()
