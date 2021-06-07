@@ -124,10 +124,10 @@ int main(int argc, char** argv)
   auto spectra_plot_widget_ = std::make_shared<SpectraPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Spectra Main Window", "Spectra", event_dispatcher);
   auto feature_line_plot_ = std::make_shared<LinePlot2DWidget>("Features (line)");
   auto calibrators_line_plot_ = std::make_shared<CalibratorsPlotWidget>("Calibrators");
-  auto injections_explorer_window_ = std::make_shared<ExplorerWidget>("InjectionsExplorerWindow", "Injections");
-  auto transitions_explorer_window_ = std::make_shared<ExplorerWidget>("TransitionsExplorerWindow", "Transitions");
-  auto features_explorer_window_ = std::make_shared<ExplorerWidget>("FeaturesExplorerWindow", "Features");
-  auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Spectrum");
+  auto injections_explorer_window_ = std::make_shared<ExplorerWidget>("InjectionsExplorerWindow", "Injections", &event_dispatcher);
+  auto transitions_explorer_window_ = std::make_shared<ExplorerWidget>("TransitionsExplorerWindow", "Transitions", &event_dispatcher);
+  auto features_explorer_window_ = std::make_shared<ExplorerWidget>("FeaturesExplorerWindow", "Features", &event_dispatcher);
+  auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Spectrum", &event_dispatcher);
   auto sequence_main_window_ = std::make_shared<SequenceTableWidget>("SequenceMainWindow", "Sequence",
                                                                       &session_handler_, &application_handler_.sequenceHandler_);
   auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions");
@@ -350,6 +350,8 @@ int main(int argc, char** argv)
 
     { // keeping this block to easily collapse/expand the bulk of the loop
       // Intialize the window sizes
+
+      session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
 
       event_dispatcher.dispatchEvents();
 
@@ -678,8 +680,6 @@ int main(int argc, char** argv)
     // all of them yet)
     // ======================================
     
-    session_handler_.setMinimalDataAndFilters(application_handler_.sequenceHandler_);
-
     // Sequence
     if (sequence_main_window_->visible_)
     {

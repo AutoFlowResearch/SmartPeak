@@ -296,11 +296,19 @@ namespace SmartPeak
     - searching
     - color coding of rows by status
   */
-  class ExplorerWidget final : public GenericTableWidget
+  class ExplorerWidget final : 
+    public GenericTableWidget,
+    public ISequenceObserver
   {
   public:
-    ExplorerWidget(const std::string& table_id, const std::string title ="")
-      :GenericTableWidget(table_id, title) {};
+    ExplorerWidget(const std::string& table_id, const std::string title ="", SequenceObservable* sequence_observable = nullptr)
+      :GenericTableWidget(table_id, title)
+    {
+      if (sequence_observable)
+      {
+        sequence_observable->addSequenceObserver(this);
+      }
+    };
     /*
     @brief Show the explorer
 
@@ -309,6 +317,12 @@ namespace SmartPeak
     @param[in,out] checked_rows What rows are checked/filtered
     */
     void draw() override;
+
+    /**
+    ISequenceObserver
+    */
+    virtual void onSequenceUpdated() override;
+
     Eigen::Tensor<std::string, 1> checkbox_headers_;
     Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;
   };
