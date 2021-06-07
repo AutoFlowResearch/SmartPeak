@@ -21,7 +21,6 @@ if (USE_SUPERBUILD)
   include(external/implot.cmake)
   if (MSVC)
     include(external/eigen.cmake)
-    include(external/boost.cmake)
     include(external/openms.cmake)
   endif()
   return() # stop processing this file further
@@ -64,7 +63,6 @@ endif()
 #------------------------------------------------------------------------------
 option(MT_ENABLE_TBB "Enable Intel TBB support" OFF)
 option(MT_ENABLE_OPENMP "Enable OpenMP support" ON)
-option(BOOST_USE_STATIC "Use Boost static libraries." ON)
 
 #------------------------------------------------------------------------------
 # Extend module path with our modules

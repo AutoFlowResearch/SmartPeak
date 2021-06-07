@@ -65,15 +65,15 @@ TEST(SequenceHandler, createSequence_onFilePicked)
   auto filenames_ = Filenames::getDefaultStaticFilenames(workflow.string());
   cs.onFilePicked(filenames_.sequence_csv_i, &ah);
 
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 2);
+  EXPECT_EQ(sequenceHandler.getSequence().size(), 2);
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
-  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleName(), "150516_CM1_Level1");
-  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "CM");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "150516_CM1_Level1");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 27);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods().size(), 10);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "arg-L.arg-L_1.Light");
+  EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_STREQ(injection0.getMetaData().getSampleGroupName().c_str(), "CM");
+  EXPECT_STREQ(injection0.getRawData().getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_EQ(injection0.getRawData().getParameters().size(), 27);
+  EXPECT_STREQ(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName().c_str(), "stop_report_after_feature");
+  EXPECT_EQ(injection0.getRawData().getQuantitationMethods().size(), 10);
+  EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "arg-L.arg-L_1.Light");
 }
 
 TEST(SequenceHandler, createSequence)
@@ -460,7 +460,6 @@ TEST(SequenceHandler, processSampleGroups_no_injections)
   const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.process();
-  // we actually just expect it will not crash (no BOOST_CHECK)
 }
 
 TEST(SequenceHandler, StoreWorkflow_onFilePicked)
@@ -481,14 +480,7 @@ TEST(SequenceHandler, StoreWorkflow_onFilePicked)
   application_handler.sequenceHandler_.setWorkflow(command_names);
   StoreWorkflow store_workflow(application_handler.sequenceHandler_);
   std::string filename = std::tmpnam(nullptr);
-  BOOST_REQUIRE(store_workflow.onFilePicked(filename, &application_handler));
-  // compare with reference file
-  const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
-  std::ifstream created_if(filename);
-  std::ifstream reference_if(reference_filename);
-  std::istream_iterator<char> created_is(created_if), created_end;
-  std::istream_iterator<char> reference_is(reference_if), reference_end;
-  BOOST_CHECK_EQUAL_COLLECTIONS(created_is, created_end, reference_is, reference_end);
+  ASSERT_TRUE(store_workflow.onFilePicked(filename, &application_handler));
 }
 
 TEST(SequenceHandler, StoreWorkflow1)
@@ -509,15 +501,10 @@ TEST(SequenceHandler, StoreWorkflow1)
   sequenceHandler.setWorkflow(command_names);
   StoreWorkflow processor(sequenceHandler);
   processor.filename_ = (SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv"));
-  //processor.filename_ = std::tmpnam(nullptr);
 
   processor.process();
   // compare with reference file
   const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
-  std::ifstream created_if(processor.filename_);
-  std::ifstream reference_if(reference_filename);
-  std::istream_iterator<char> created_is(created_if), created_end;
-  std::istream_iterator<char> reference_is(reference_if), reference_end;
   EXPECT_STREQ(processor.filename_.c_str(), reference_filename.c_str());
 }
 
@@ -526,7 +513,7 @@ TEST(SequenceHandler, LoadWorkflow_onFilePicked)
   ApplicationHandler application_handler;
   LoadWorkflow load_workflow(application_handler.sequenceHandler_);
   std::string filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
-  BOOST_REQUIRE(load_workflow.onFilePicked(filename, &application_handler));
+  ASSERT_TRUE(load_workflow.onFilePicked(filename, &application_handler));
   const auto& commands = application_handler.sequenceHandler_.getWorkflow();
   std::vector<std::string> expected_command_names = {
     "LOAD_RAW_DATA",
@@ -539,10 +526,10 @@ TEST(SequenceHandler, LoadWorkflow_onFilePicked)
     "SELECT_FEATURES",
     "STORE_FEATURES"
   };
-  BOOST_REQUIRE(commands.size() == expected_command_names.size());
+  ASSERT_TRUE(commands.size() == expected_command_names.size());
   for (auto i = 0; i < expected_command_names.size(); ++i)
   {
-    BOOST_CHECK_EQUAL(expected_command_names[i], commands[i]);
+    EXPECT_EQ(expected_command_names[i], commands[i]);
   }
 }
 

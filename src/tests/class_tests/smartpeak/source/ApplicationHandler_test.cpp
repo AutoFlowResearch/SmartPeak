@@ -17,21 +17,20 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE ApplicationProcessor test suite
-#include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <filesystem>
 
 using namespace SmartPeak;
 using namespace std;
 
-struct ApplicationHandlerFixture 
+struct ApplicationHandlerFixture : public ::testing::Test
 {
   /* ctor/dtor */
   ApplicationHandlerFixture() {}
@@ -42,33 +41,29 @@ public:
   ApplicationHandler ah_;
 };
 
-BOOST_FIXTURE_TEST_SUITE(ApplicationHandler, ApplicationHandlerFixture)
-
 /* SetRawDataPathname */
-BOOST_AUTO_TEST_CASE(SetRawDataPathname_ProcessSetsPath)
+TEST_F(ApplicationHandlerFixture, SetRawDataPathname_ProcessSetsPath)
 {
   SetRawDataPathname cmd;
-  BOOST_CHECK_EQUAL(ah_.mzML_dir_, "");
-  BOOST_CHECK(cmd.onFilePicked("test", &ah_));
-  BOOST_CHECK_EQUAL(ah_.mzML_dir_, "test");
+  EXPECT_STREQ(ah_.mzML_dir_.c_str(), "");
+  EXPECT_TRUE(cmd.onFilePicked("test", &ah_));
+  EXPECT_STREQ(ah_.mzML_dir_.c_str(), "test");
 }
 
 /* SetInputFeaturesPathname */
-BOOST_AUTO_TEST_CASE(SetInputFeaturesPathname_ProcessSetsPath)
+TEST_F(ApplicationHandlerFixture, SetInputFeaturesPathname_ProcessSetsPath)
 {
   SetInputFeaturesPathname cmd;
-  BOOST_CHECK_EQUAL(ah_.features_in_dir_, "");
-  BOOST_CHECK(cmd.onFilePicked("test", &ah_));
-  BOOST_CHECK_EQUAL(ah_.features_in_dir_, "test");
+  EXPECT_STREQ(ah_.features_in_dir_.c_str(), "");
+  EXPECT_TRUE(cmd.onFilePicked("test", &ah_));
+  EXPECT_STREQ(ah_.features_in_dir_.c_str(), "test");
 }
 
 /* SetOutputFeaturesPathname */
-BOOST_AUTO_TEST_CASE(SetOutputFeaturesPathname_ProcessSetsPath)
+TEST_F(ApplicationHandlerFixture, SetOutputFeaturesPathname_ProcessSetsPath)
 {
   SetOutputFeaturesPathname cmd;
-  BOOST_CHECK_EQUAL(ah_.features_out_dir_, "");
-  BOOST_CHECK(cmd.onFilePicked("test", &ah_));
-  BOOST_CHECK_EQUAL(ah_.features_out_dir_, "test");
+  EXPECT_STREQ(ah_.features_out_dir_.c_str(), "");
+  EXPECT_TRUE(cmd.onFilePicked("test", &ah_));
+  EXPECT_STREQ(ah_.features_out_dir_.c_str(), "test");
 }
-
-BOOST_AUTO_TEST_SUITE_END()

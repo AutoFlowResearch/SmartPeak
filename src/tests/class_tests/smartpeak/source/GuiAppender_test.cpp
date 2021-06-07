@@ -77,14 +77,14 @@ TEST(Guiappender, thread_safety)
   // ensure that entries end with the expected pattern, for the correct number of times
   // since we have three threads appending the same vector elements, we expect the same
   // string endings three times for each symbol
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("0\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("1\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("2\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("3\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("4\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("5\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("6\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("7\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("8\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("9\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("0\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("1\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("2\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("3\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("4\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("5\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("6\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("7\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("8\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("9\n")), 3);
 }

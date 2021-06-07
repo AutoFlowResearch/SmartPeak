@@ -22,6 +22,7 @@
 // --------------------------------------------------------------------------
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/core/MetaDataHandler.h>
@@ -32,7 +33,7 @@
 using namespace SmartPeak;
 using namespace std;
 
-struct SequenceParserFixture
+struct SequenceParserFixture : public ::testing::Test
 {
   /* ctor/dtor */
   SequenceParserFixture()
@@ -80,8 +81,6 @@ struct SequenceParserFixture
 public:
   SequenceHandler sequence_handler_;
 };
-
-BOOST_FIXTURE_TEST_SUITE(SequenceParserTest, SequenceParserFixture)
 
 TEST(Sequenceparser, readSequenceFile)
 {
@@ -176,7 +175,7 @@ TEST(Sequenceparser, readSequenceFile)
   EXPECT_STREQ(sequence3[4].getMetaData().getAcquisitionDateAndTimeAsString().c_str(), "2015-07-07_153300");
 }
 
-TEST(SequenceHandler, makeDataTableFromMetaValue)
+TEST_F(SequenceParserFixture, makeDataTableFromMetaValue)
 {
   vector<vector<string>> data_out;
   vector<string> headers_out;
@@ -274,7 +273,7 @@ TEST(SequenceHandler, makeDataTableFromMetaValue)
   // SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
 }
 
-TEST(SequenceHandler, makeDataMatrixFromMetaValue)
+TEST_F(SequenceParserFixture, makeDataMatrixFromMetaValue)
 {
   Eigen::Tensor<float, 2> data_out;
   Eigen::Tensor<std::string, 1> columns_out;
@@ -651,41 +650,41 @@ TEST(SequenceHandler, makeSequenceFileXcalibur)
 }
 
 /* StoreSequenceFileAnalyst */
-TEST(SequenceHandler, StoreSequenceFileAnalyst_ProcessFailsOnEmptySequence)
+TEST_F(SequenceParserFixture, StoreSequenceFileAnalyst_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHandler with empty sequence
   ApplicationHandler ah;
   StoreSequenceFileAnalyst cmd;
   auto store = cmd.onFilePicked("test", &ah);
-  BOOST_CHECK(!store);
+  EXPECT_TRUE(!store);
 }
 
-TEST(SequenceHandler, StoreSequenceFileAnalyst_ProcessSucceedsOnNonEmptySequence)
+TEST_F(SequenceParserFixture, StoreSequenceFileAnalyst_ProcessSucceedsOnNonEmptySequence)
 {
   ApplicationHandler ah;
   ah.sequenceHandler_ = sequence_handler_;
   StoreSequenceFileAnalyst cmd;
   std::string filename = std::tmpnam(nullptr);
-  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
+  EXPECT_TRUE(cmd.onFilePicked(filename, &ah));
 }
 
 /* StoreSequenceFileMasshunter */
-TEST(SequenceHandler, StoreSequenceFileMasshunter_ProcessFailsOnEmptySequence)
+TEST_F(SequenceParserFixture, StoreSequenceFileMasshunter_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHandler with empty sequence
   ApplicationHandler ah;
   StoreSequenceFileMasshunter cmd;
   auto store = cmd.onFilePicked("test", &ah);
-  BOOST_CHECK(!store);
+  EXPECT_TRUE(!store);
 }
 
-TEST(SequenceHandler, StoreSequenceFileMasshunter_ProcessSucceedsOnNonEmptySequence)
+TEST_F(SequenceParserFixture, StoreSequenceFileMasshunter_ProcessSucceedsOnNonEmptySequence)
 {
   ApplicationHandler ah;
   ah.sequenceHandler_ = sequence_handler_;
   StoreSequenceFileMasshunter cmd;
   std::string filename = std::tmpnam(nullptr);
-  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
+  EXPECT_TRUE(cmd.onFilePicked(filename, &ah));
 }
 
 /* StoreSequenceFileXcalibur */
@@ -695,14 +694,14 @@ TEST(SequenceHandler, StoreSequenceFileXcalibur_ProcessFailsOnEmptySequence)
   ApplicationHandler ah;
   StoreSequenceFileXcalibur cmd;
   auto store = cmd.onFilePicked("test", &ah);
-  BOOST_CHECK(!store);
+  EXPECT_TRUE(!store);
 }
 
-TEST(SequenceHandler, StoreSequenceFileXcalibur_ProcessSucceedsOnNonEmptySequence)
+TEST_F(SequenceParserFixture, StoreSequenceFileXcalibur_ProcessSucceedsOnNonEmptySequence)
 {
   ApplicationHandler ah;
   ah.sequenceHandler_ = sequence_handler_;
   StoreSequenceFileXcalibur cmd;
   std::string filename = std::tmpnam(nullptr);
-  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
+  EXPECT_TRUE(cmd.onFilePicked(filename, &ah));
 }
