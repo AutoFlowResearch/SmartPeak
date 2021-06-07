@@ -20,6 +20,7 @@
 // $Maintainer: Douglas McCloskey, Ahmed Khalil, Bertrand Boudaud $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
+#define SDL_MAIN_HANDLED
 
 #include <stdio.h>
 #include <chrono>
