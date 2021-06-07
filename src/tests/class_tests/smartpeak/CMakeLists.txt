@@ -137,10 +137,10 @@ foreach(_class_test ${TEST_executables})
   add_executable(${_class_test} source/${_class_test})
   # message(STATUS "${_class_test}")
   if(NOT (${_class_test} STREQUAL "GuiAppender_test" OR ${_class_test} STREQUAL "AppWindow_test" OR ${_class_test} STREQUAL "Widget_test" OR ${_class_test} STREQUAL "ImEntry_test"))
-    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} gtest_main gmock_main OpenMS)
+    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE gtest_main gmock_main)
   else()
-    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} gtest_main gmock_main OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
-                            PRIVATE ImGui::Sources ImPlot::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
+                            PRIVATE gtest_main gmock_main ImGui::Sources ImPlot::Sources ImGui::Examples ImGui::SourcesMiscCpp)
   endif()
   add_test(${_class_test} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_class_test})
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
