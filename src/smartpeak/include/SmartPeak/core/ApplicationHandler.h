@@ -117,4 +117,40 @@ namespace SmartPeak
     Filenames                             static_filenames_;
     SequenceHandler                       sequenceHandler_;
   };
+
+
+  struct SetRawDataPathname : IFilePickerHandler
+  {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override
+    {
+      application_handler->mzML_dir_ = filename;
+      return true;
+    };
+  };
+
+  struct SetInputFeaturesPathname : IFilePickerHandler {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override
+    {
+      application_handler->features_in_dir_ = filename;
+      return true;
+    };
+  };
+
+  struct SetOutputFeaturesPathname : IFilePickerHandler
+  {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override
+    {
+      application_handler->features_out_dir_ = filename;
+      return true;
+    }
+  };
 }

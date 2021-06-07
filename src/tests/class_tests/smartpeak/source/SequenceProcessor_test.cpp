@@ -24,6 +24,7 @@
 #include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/Filenames.h>
 #include <filesystem>
 
@@ -52,6 +53,27 @@ Filenames generateTestFilenames()
   filenames.quantitationMethods_csv_i                     = dir + "OpenMSFile_quantitationMethods_1.csv";
   filenames.standardsConcentrations_csv_i                 = dir + "OpenMSFile_standardsConcentrations_1.csv";
   return filenames;
+}
+
+TEST(SequenceHandler, createSequence_onFilePicked)
+{
+  ApplicationHandler ah;
+  SequenceHandler sequenceHandler;
+  CreateSequence cs(sequenceHandler);
+  std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
+  auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
+  auto filenames_ = Filenames::getDefaultStaticFilenames(workflow.string());
+  cs.onFilePicked(filenames_.sequence_csv_i, &ah);
+
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 2);
+  InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
+  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleName(), "150516_CM1_Level1");
+  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "CM");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "150516_CM1_Level1");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 27);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods().size(), 10);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "arg-L.arg-L_1.Light");
 }
 
 TEST(SequenceHandler, createSequence)
@@ -441,6 +463,34 @@ TEST(SequenceHandler, processSampleGroups_no_injections)
   // we actually just expect it will not crash (no BOOST_CHECK)
 }
 
+TEST(SequenceHandler, StoreWorkflow_onFilePicked)
+{
+  namespace fs = std::filesystem;
+  ApplicationHandler application_handler;
+  std::vector<std::string> command_names = {
+    "LOAD_RAW_DATA",
+    "MAP_CHROMATOGRAMS",
+    "EXTRACT_CHROMATOGRAM_WINDOWS",
+    "ZERO_CHROMATOGRAM_BASELINE",
+    "PICK_MRM_FEATURES",
+    "QUANTIFY_FEATURES",
+    "CHECK_FEATURES",
+    "SELECT_FEATURES",
+    "STORE_FEATURES"
+  };
+  application_handler.sequenceHandler_.setWorkflow(command_names);
+  StoreWorkflow store_workflow(application_handler.sequenceHandler_);
+  std::string filename = std::tmpnam(nullptr);
+  BOOST_REQUIRE(store_workflow.onFilePicked(filename, &application_handler));
+  // compare with reference file
+  const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
+  std::ifstream created_if(filename);
+  std::ifstream reference_if(reference_filename);
+  std::istream_iterator<char> created_is(created_if), created_end;
+  std::istream_iterator<char> reference_is(reference_if), reference_end;
+  BOOST_CHECK_EQUAL_COLLECTIONS(created_is, created_end, reference_is, reference_end);
+}
+
 TEST(SequenceHandler, StoreWorkflow1)
 {
   SequenceHandler sequenceHandler;
@@ -469,6 +519,31 @@ TEST(SequenceHandler, StoreWorkflow1)
   std::istream_iterator<char> created_is(created_if), created_end;
   std::istream_iterator<char> reference_is(reference_if), reference_end;
   EXPECT_STREQ(processor.filename_.c_str(), reference_filename.c_str());
+}
+
+TEST(SequenceHandler, LoadWorkflow_onFilePicked)
+{
+  ApplicationHandler application_handler;
+  LoadWorkflow load_workflow(application_handler.sequenceHandler_);
+  std::string filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
+  BOOST_REQUIRE(load_workflow.onFilePicked(filename, &application_handler));
+  const auto& commands = application_handler.sequenceHandler_.getWorkflow();
+  std::vector<std::string> expected_command_names = {
+    "LOAD_RAW_DATA",
+    "MAP_CHROMATOGRAMS",
+    "EXTRACT_CHROMATOGRAM_WINDOWS",
+    "ZERO_CHROMATOGRAM_BASELINE",
+    "PICK_MRM_FEATURES",
+    "QUANTIFY_FEATURES",
+    "CHECK_FEATURES",
+    "SELECT_FEATURES",
+    "STORE_FEATURES"
+  };
+  BOOST_REQUIRE(commands.size() == expected_command_names.size());
+  for (auto i = 0; i < expected_command_names.size(); ++i)
+  {
+    BOOST_CHECK_EQUAL(expected_command_names[i], commands[i]);
+  }
 }
 
 TEST(SequenceHandler, LoadWorkflow1)

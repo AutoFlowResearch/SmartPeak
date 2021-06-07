@@ -197,10 +197,11 @@ namespace SmartPeak
                 picked_pathname_.append(item.entry_contents[0].c_str());
               }
               filter.Clear();
-              selected_entry = -1;
+              LOGI << "Picked file : " << picked_pathname_;
               runProcessor();
               clearProcessor();
-              LOGI << "Picked file : " << picked_pathname_;
+              selected_entry = -1;
+              memset(selected_filename, 0, sizeof selected_filename);
               visible_ = false;
               ImGui::CloseCurrentPopup();
             }
@@ -213,10 +214,7 @@ namespace SmartPeak
     ImGui::Separator();
 
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
-    if (ImGui::IsMouseClicked(0))
-      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
-    else
-      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
@@ -224,19 +222,18 @@ namespace SmartPeak
     if (ImGui::Button("Open"))
     {
       picked_pathname_ = current_pathname_.string();
-      if (selected_entry >= 0)
+      if (picked_pathname_.back() != '/')
       {
-        if (picked_pathname_.back() != '/')
-        {
-          picked_pathname_.append("/");
-        }
-        picked_pathname_.append(selected_filename);
+        picked_pathname_.append("/");
       }
+      picked_pathname_.append(selected_filename);
+      filter.Clear();
       LOGI << "Picked pathname: " << picked_pathname_;
       runProcessor();
       clearProcessor();
       selected_entry = -1;
       visible_ = false;
+      memset(selected_filename, 0, sizeof selected_filename);
       ImGui::CloseCurrentPopup();
     }
     ImGui::PopItemWidth();
@@ -260,41 +257,40 @@ namespace SmartPeak
     return picked_pathname_;
   }
 
-  void FilePicker::setProcessor(FilePickerProcessor& processor)
+  void FilePicker::setFilePickerHandler(std::shared_ptr<IFilePickerHandler> file_picker_handler, ApplicationHandler& application_handler)
   {
-    LOGD << "Setting processor: " << (&processor);
-    processor_ = &processor;
-    processor_name_ = processor.getName();
+    LOGD << "Setting processor: " << (file_picker_handler.get());
+    file_picker_handler_ = file_picker_handler;
+    application_handler_ = &application_handler;
     error_loading_file_ = false;
     file_was_loaded_ = false;
   }
 
   void FilePicker::runProcessor()
   {
-    LOGD << "Running processor (ptr): " << processor_;
-    if (!processor_)
+    LOGD << "Running processor (ptr): " << file_picker_handler_;
+    if (!file_picker_handler_)
       return;
     loading_is_done_ = false;
-    run_and_join(processor_, picked_pathname_, loading_is_done_, file_was_loaded_);
+    run_and_join(file_picker_handler_.get(), picked_pathname_, loading_is_done_, file_was_loaded_);
   }
 
   void FilePicker::clearProcessor()
   {
     LOGD << "Clearing processor";
-    processor_ = nullptr;
+    file_picker_handler_ = nullptr;
   }
 
   void FilePicker::run_and_join(
-    FilePickerProcessor* processor,
+    IFilePickerHandler* file_picker_handler,
     const std::string& pathname,
     bool& loading_is_done,
     bool& file_was_loaded
   )
   {
-    processor->pathname_ = pathname;
     std::future<bool> f = std::async(
       std::launch::async, 
-      [processor](){ return processor->process(); }
+      [this, file_picker_handler, pathname](){ return file_picker_handler->onFilePicked(pathname, application_handler_); }
     );
 
     LOGN << "File is being loaded...";

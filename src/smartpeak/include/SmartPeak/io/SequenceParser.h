@@ -27,6 +27,7 @@
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/iface/IFilePickerHandler.h>
 #include <plog/Log.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
@@ -146,5 +147,37 @@ public:
     private:
       template<typename delimiter>
       static void readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname);
+  };
+
+  struct StoreSequenceFileSmartPeak : IFilePickerHandler
+  {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+  };
+
+  struct StoreSequenceFileAnalyst : IFilePickerHandler {
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+  };
+
+  struct StoreSequenceFileMasshunter : IFilePickerHandler {
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+  };
+
+  struct StoreSequenceFileXcalibur : IFilePickerHandler {
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
   };
 }

@@ -27,9 +27,61 @@
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 
 using namespace SmartPeak;
 using namespace std;
+
+struct SequenceParserFixture
+{
+  /* ctor/dtor */
+  SequenceParserFixture()
+  {
+    const vector<string> sample_names = {
+      "170808_Jonathan_yeast_Sacc1_1x",
+      "170808_Jonathan_yeast_Sacc2_1x",
+      "170808_Jonathan_yeast_Sacc3_1x",
+      "170808_Jonathan_yeast_Yarr1_1x",
+      "170808_Jonathan_yeast_Yarr2_1x",
+      "170808_Jonathan_yeast_Yarr3_1x"
+    };
+
+    int inj_num = 0;
+    for (const string& sample_name : sample_names) {
+      ++inj_num;
+      MetaDataHandler metaDataHandler;
+      metaDataHandler.setSampleName(sample_name);
+      metaDataHandler.setFilename(sample_name + ".mzML");
+      metaDataHandler.setSampleType(SampleType::Unknown);
+      metaDataHandler.setSampleGroupName("sample_group");
+      metaDataHandler.setSequenceSegmentName("sequence_segment");
+      metaDataHandler.setReplicateGroupName("replicate_group_name");
+      metaDataHandler.inj_number = inj_num;
+      metaDataHandler.acq_method_name = "6";
+      metaDataHandler.inj_volume = 7.0;
+      metaDataHandler.inj_volume_units = "8";
+      metaDataHandler.batch_name = "FluxTest";
+      metaDataHandler.scan_polarity = "negative";
+      metaDataHandler.scan_mass_high = 2000;
+      metaDataHandler.scan_mass_low = 60;
+
+      Filenames filenames;
+      filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML");
+      RawDataHandler rawDataHandler;
+      LoadFeatures loadFeatures;
+      loadFeatures.process(rawDataHandler, {}, filenames);
+
+      sequence_handler_.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
+    }
+  }
+
+  ~SequenceParserFixture() {}
+
+public:
+  SequenceHandler sequence_handler_;
+};
+
+BOOST_FIXTURE_TEST_SUITE(SequenceParserTest, SequenceParserFixture)
 
 TEST(Sequenceparser, readSequenceFile)
 {
@@ -126,45 +178,6 @@ TEST(Sequenceparser, readSequenceFile)
 
 TEST(SequenceHandler, makeDataTableFromMetaValue)
 {
-  SequenceHandler sequenceHandler;
-
-  const vector<string> sample_names = {
-    "170808_Jonathan_yeast_Sacc1_1x",
-    "170808_Jonathan_yeast_Sacc2_1x",
-    "170808_Jonathan_yeast_Sacc3_1x",
-    "170808_Jonathan_yeast_Yarr1_1x",
-    "170808_Jonathan_yeast_Yarr2_1x",
-    "170808_Jonathan_yeast_Yarr3_1x"
-  };
-
-  int inj_num = 0;
-  for (const string& sample_name : sample_names) {
-    ++inj_num;
-    MetaDataHandler metaDataHandler;
-    metaDataHandler.setSampleName(sample_name);
-    metaDataHandler.setFilename(sample_name + ".mzML");
-    metaDataHandler.setSampleType(SampleType::Unknown);
-    metaDataHandler.setSampleGroupName("sample_group");
-    metaDataHandler.setSequenceSegmentName("sequence_segment");
-    metaDataHandler.setReplicateGroupName("replicate_group_name");
-    metaDataHandler.inj_number = inj_num;
-    metaDataHandler.acq_method_name = "6";
-    metaDataHandler.inj_volume = 7.0;
-    metaDataHandler.inj_volume_units = "8";
-    metaDataHandler.batch_name = "FluxTest";
-    metaDataHandler.scan_polarity = "negative";
-    metaDataHandler.scan_mass_high = 2000;
-    metaDataHandler.scan_mass_low = 60;
-
-    Filenames filenames;
-    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML");
-    RawDataHandler rawDataHandler;
-    LoadFeatures loadFeatures;
-    loadFeatures.process(rawDataHandler, {}, filenames);
-
-    sequenceHandler.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
-  }
-
   vector<vector<string>> data_out;
   vector<string> headers_out;
   const vector<string> meta_data {
@@ -177,7 +190,7 @@ TEST(SequenceHandler, makeDataTableFromMetaValue)
   };
   const set<SampleType> sample_types = {SampleType::Unknown};
 
-  SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+  SequenceParser::makeDataTableFromMetaValue(sequence_handler_, data_out, headers_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
   EXPECT_EQ(data_out.size(), 1657);
   EXPECT_STREQ(data_out.at(0).at(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
@@ -220,7 +233,7 @@ TEST(SequenceHandler, makeDataTableFromMetaValue)
   EXPECT_STREQ(headers_out[27].c_str(), "leftWidth");
   EXPECT_STREQ(headers_out[28].c_str(), "rightWidth");
 
-  SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, std::vector<std::string>({ "leftWidth" }), sample_types,
+  SequenceParser::makeDataTableFromMetaValue(sequence_handler_, data_out, headers_out, std::vector<std::string>({ "leftWidth" }), sample_types,
     std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
 
   EXPECT_EQ(data_out.size(), 1);
@@ -263,45 +276,6 @@ TEST(SequenceHandler, makeDataTableFromMetaValue)
 
 TEST(SequenceHandler, makeDataMatrixFromMetaValue)
 {
-  SequenceHandler sequenceHandler;
-
-  const vector<string> sample_names = {
-    "170808_Jonathan_yeast_Sacc1_1x",
-    "170808_Jonathan_yeast_Sacc2_1x",
-    "170808_Jonathan_yeast_Sacc3_1x",
-    "170808_Jonathan_yeast_Yarr1_1x",
-    "170808_Jonathan_yeast_Yarr2_1x",
-    "170808_Jonathan_yeast_Yarr3_1x"
-  };
-
-  int inj_num = 0;
-  for (const string& sample_name : sample_names) {
-    ++inj_num;
-    MetaDataHandler metaDataHandler;
-    metaDataHandler.setSampleName(sample_name);
-    metaDataHandler.setFilename(sample_name + ".mzML");
-    metaDataHandler.setSampleType(SampleType::Unknown);
-    metaDataHandler.setSampleGroupName("sample_group");
-    metaDataHandler.setSequenceSegmentName("sequence_segment");
-    metaDataHandler.setReplicateGroupName("replicate_group_name");
-    metaDataHandler.acq_method_name = "6";
-    metaDataHandler.inj_number = inj_num;
-    metaDataHandler.inj_volume = 7.0;
-    metaDataHandler.inj_volume_units = "8";
-    metaDataHandler.batch_name = "FluxTest";
-    metaDataHandler.scan_polarity = "negative";
-    metaDataHandler.scan_mass_high = 2000;
-    metaDataHandler.scan_mass_low = 60;
-
-    Filenames filenames;
-    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML");
-    RawDataHandler rawDataHandler;
-    LoadFeatures loadFeatures;
-    loadFeatures.process(rawDataHandler, {}, filenames);
-
-    sequenceHandler.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
-  }
-
   Eigen::Tensor<float, 2> data_out;
   Eigen::Tensor<std::string, 1> columns_out;
   Eigen::Tensor<std::string, 2> rows_out;
@@ -314,7 +288,7 @@ TEST(SequenceHandler, makeDataMatrixFromMetaValue)
   // const vector<string> meta_data = {"calculated_concentration"};
   const set<SampleType> sample_types = {SampleType::Unknown};
 
-  SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+  SequenceParser::makeDataMatrixFromMetaValue(sequence_handler_, data_out, columns_out, rows_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
   EXPECT_EQ(columns_out.size(), 6);
   EXPECT_STREQ(columns_out(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
@@ -324,7 +298,7 @@ TEST(SequenceHandler, makeDataMatrixFromMetaValue)
   EXPECT_NEAR(data_out(0,0), 15.6053667, 1e-3);
   EXPECT_NEAR(data_out(rows_out.dimension(0)-1,columns_out.size()-1), 1.66744995, 1e-3);
 
-  SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, std::vector<std::string>({ "leftWidth" }), sample_types,
+  SequenceParser::makeDataMatrixFromMetaValue(sequence_handler_, data_out, columns_out, rows_out, std::vector<std::string>({ "leftWidth" }), sample_types,
     std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
 
   EXPECT_EQ(columns_out.size(), 1);
@@ -674,4 +648,61 @@ TEST(SequenceHandler, makeSequenceFileXcalibur)
   EXPECT_STREQ(headers_out.at(18).c_str(), "L5 Phone");
   EXPECT_STREQ(headers_out.at(19).c_str(), "Comment");
   EXPECT_STREQ(headers_out.at(20).c_str(), "Sample Name");
+}
+
+/* StoreSequenceFileAnalyst */
+TEST(SequenceHandler, StoreSequenceFileAnalyst_ProcessFailsOnEmptySequence)
+{
+  // Default ApplicationHandler has a default SequenceHandler with empty sequence
+  ApplicationHandler ah;
+  StoreSequenceFileAnalyst cmd;
+  auto store = cmd.onFilePicked("test", &ah);
+  BOOST_CHECK(!store);
+}
+
+TEST(SequenceHandler, StoreSequenceFileAnalyst_ProcessSucceedsOnNonEmptySequence)
+{
+  ApplicationHandler ah;
+  ah.sequenceHandler_ = sequence_handler_;
+  StoreSequenceFileAnalyst cmd;
+  std::string filename = std::tmpnam(nullptr);
+  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
+}
+
+/* StoreSequenceFileMasshunter */
+TEST(SequenceHandler, StoreSequenceFileMasshunter_ProcessFailsOnEmptySequence)
+{
+  // Default ApplicationHandler has a default SequenceHandler with empty sequence
+  ApplicationHandler ah;
+  StoreSequenceFileMasshunter cmd;
+  auto store = cmd.onFilePicked("test", &ah);
+  BOOST_CHECK(!store);
+}
+
+TEST(SequenceHandler, StoreSequenceFileMasshunter_ProcessSucceedsOnNonEmptySequence)
+{
+  ApplicationHandler ah;
+  ah.sequenceHandler_ = sequence_handler_;
+  StoreSequenceFileMasshunter cmd;
+  std::string filename = std::tmpnam(nullptr);
+  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
+}
+
+/* StoreSequenceFileXcalibur */
+TEST(SequenceHandler, StoreSequenceFileXcalibur_ProcessFailsOnEmptySequence)
+{
+  // Default ApplicationHandler has a default SequenceHandler with empty sequence
+  ApplicationHandler ah;
+  StoreSequenceFileXcalibur cmd;
+  auto store = cmd.onFilePicked("test", &ah);
+  BOOST_CHECK(!store);
+}
+
+TEST(SequenceHandler, StoreSequenceFileXcalibur_ProcessSucceedsOnNonEmptySequence)
+{
+  ApplicationHandler ah;
+  ah.sequenceHandler_ = sequence_handler_;
+  StoreSequenceFileXcalibur cmd;
+  std::string filename = std::tmpnam(nullptr);
+  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
 }
