@@ -85,7 +85,7 @@ namespace SmartPeak
       ImGui::InputText("Pathname", new_pathname, 4096);
       if (ImGui::Button("Set") || ImGui::IsKeyPressedMap(ImGuiKey_Enter))
       {
-        current_pathname_.string().assign(new_pathname);
+        current_pathname_.assign(new_pathname);
         pathname_content_ = Utilities::getFolderContents(current_pathname_);
         memset(selected_filename, 0, sizeof selected_filename);
         files_scanned_ = false;
