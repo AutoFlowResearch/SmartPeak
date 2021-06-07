@@ -24,9 +24,21 @@
 #pragma once
 
 #include <SmartPeak/core/ApplicationHandler.h>
-#include <chrono>
+#include <SmartPeak/iface/IApplicationProcessorObserver.h>
+#include <SmartPeak/iface/ISequenceProcessorObserver.h>
+#include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
+#include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 
 namespace SmartPeak {
+  //TODO: implement a detailed workflow status
+  enum class WorkFlowStatus
+  {
+    IDLE,
+    RUNNING,
+    FINISHED,
+    SIZE_OF_WORKFLOWSTATUS
+  };
+
   class WorkflowManager {
   public:
     /**
@@ -38,14 +50,20 @@ namespace SmartPeak {
       @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
+      @param[in] sequence_processor_observer an observer for sequence, used to report progress
+      @param[in] sequence_segment_processor_observer an observer for sequence segment, used to report progress
+      @param[in] sample_group_processor_observer, used to report progress
       @param[in] blocking If true the operation runs synchronously, otherwise runs asynchronously and returns immediately
     */
-    void addWorkflow(
-      ApplicationHandler& source_state, 
+    void addWorkflow(ApplicationHandler& source_state, 
       const std::set<std::string>& injection_names, 
       const std::set<std::string>& sequence_segment_names, 
       const std::set<std::string>& sample_group_names, 
-      const std::vector<ApplicationHandler::Command>& commands,
+      const std::vector<ApplicationHandler::Command>& commands, 
+      IApplicationProcessorObserver* application_processor_observer = nullptr,
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+      ISequenceSegmentProcessorObserver * sequence_segment_processor_observer = nullptr,
+      ISampleGroupProcessorObserver * sample_group_processor_observer = nullptr,
       bool blocking=false);
 
     /**
@@ -64,11 +82,6 @@ namespace SmartPeak {
     */
     void updateApplicationHandler(ApplicationHandler& source_app_handler);
 
-    /**
-      returns the last run time.
-    */
-    std::chrono::steady_clock::duration getLastRunTime() const { return last_run_time_; };
-
   private:
     /**
       Spawns a thread that runs the workflow, and waits for it to finish. The
@@ -83,18 +96,22 @@ namespace SmartPeak {
       @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
+      @param[in] sequence_processor_observer an observer for sequence, used to report progress
+      @param[in] sequence_segment_processor_observer an observer for sequence segment, used to report progress
+      @param[in] sample_group_processor_observer, used to report progress
     */
-    static void run_and_join(
-      ApplicationHandler& application_handler, 
-      bool& done, 
-      std::chrono::steady_clock::duration& run_time, 
+    static void run_and_join(ApplicationHandler& application_handler, 
+      bool& done,
       const std::set<std::string>& injection_names, 
-      const std::set<std::string>& sequence_segment_names, 
-      const std::set<std::string>& sample_group_names, 
-      const std::vector<ApplicationHandler::Command>& commands);
+      const std::set<std::string>& sequence_segment_names,
+      const std::set<std::string>& sample_group_names,
+      const std::vector<ApplicationHandler::Command>& commands,
+      IApplicationProcessorObserver* application_processor_observer = nullptr,
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+      ISequenceSegmentProcessorObserver * sequence_segment_processor_observer = nullptr,
+      ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr);
 
     ApplicationHandler application_handler_; ///< The workflow is run on this copy
     bool done_ = true;
-    std::chrono::steady_clock::duration last_run_time_;
   };
 }

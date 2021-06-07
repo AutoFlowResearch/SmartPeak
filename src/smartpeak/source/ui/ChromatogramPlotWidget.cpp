@@ -65,4 +65,9 @@ namespace SmartPeak
     }
   };
 
+  void ChromatogramPlotWidget::onSequenceUpdated()
+  {
+    refresh_needed_ = true;
+  }
+
 }

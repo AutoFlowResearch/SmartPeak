@@ -31,12 +31,14 @@ namespace SmartPeak
 {
   class WorkflowStepWidget final : public Widget
   {
-    ApplicationHandler* application_handler_ = nullptr;
-
   public:
+    WorkflowStepWidget(ApplicationHandler& application_handler) :
+      application_handler_(application_handler)
+      {};
+
     void draw() override;
-    void setApplicationHandler(ApplicationHandler& application_handler);
   protected:
+    ApplicationHandler& application_handler_;
     std::string selected_method_type_;
     std::string selected_method_;
   };

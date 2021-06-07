@@ -26,8 +26,9 @@
 #define BOOST_TEST_MODULE SequenceProcessor test suite
 #include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/SequenceProcessor.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/Filenames.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 using namespace SmartPeak;
 using namespace std;
@@ -57,6 +58,27 @@ Filenames generateTestFilenames()
 }
 
 BOOST_AUTO_TEST_SUITE(sequenceprocessor)
+
+BOOST_AUTO_TEST_CASE(createSequence_onFilePicked)
+{
+  ApplicationHandler ah;
+  SequenceHandler sequenceHandler;
+  CreateSequence cs(sequenceHandler);
+  std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
+  auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
+  auto filenames_ = Filenames::getDefaultStaticFilenames(workflow.string());
+  cs.onFilePicked(filenames_.sequence_csv_i, &ah);
+
+  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 2);
+  InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
+  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleName(), "150516_CM1_Level1");
+  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "CM");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "150516_CM1_Level1");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 27);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
+  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods().size(), 10);
+  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "arg-L.arg-L_1.Light");
+}
 
 BOOST_AUTO_TEST_CASE(createSequence)
 {
@@ -444,10 +466,38 @@ BOOST_AUTO_TEST_CASE(processSampleGroups_no_injections)
   // we actually just expect it will not crash (no BOOST_CHECK)
 }
 
+BOOST_AUTO_TEST_CASE(StoreWorkflow_onFilePicked)
+{
+  namespace fs = std::filesystem;
+  ApplicationHandler application_handler;
+  std::vector<std::string> command_names = {
+    "LOAD_RAW_DATA",
+    "MAP_CHROMATOGRAMS",
+    "EXTRACT_CHROMATOGRAM_WINDOWS",
+    "ZERO_CHROMATOGRAM_BASELINE",
+    "PICK_MRM_FEATURES",
+    "QUANTIFY_FEATURES",
+    "CHECK_FEATURES",
+    "SELECT_FEATURES",
+    "STORE_FEATURES"
+  };
+  application_handler.sequenceHandler_.setWorkflow(command_names);
+  StoreWorkflow store_workflow(application_handler.sequenceHandler_);
+  std::string filename = std::tmpnam(nullptr);
+  BOOST_REQUIRE(store_workflow.onFilePicked(filename, &application_handler));
+  // compare with reference file
+  const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
+  std::ifstream created_if(filename);
+  std::ifstream reference_if(reference_filename);
+  std::istream_iterator<char> created_is(created_if), created_end;
+  std::istream_iterator<char> reference_is(reference_if), reference_end;
+  BOOST_CHECK_EQUAL_COLLECTIONS(created_is, created_end, reference_is, reference_end);
+}
+
 BOOST_AUTO_TEST_CASE(StoreWorkflow1)
 {
   SequenceHandler sequenceHandler;
-  namespace fs = boost::filesystem;
+  namespace fs = std::filesystem;
   std::vector<std::string> command_names = {
     "LOAD_RAW_DATA",
     "MAP_CHROMATOGRAMS",
@@ -461,7 +511,9 @@ BOOST_AUTO_TEST_CASE(StoreWorkflow1)
   };
   sequenceHandler.setWorkflow(command_names);
   StoreWorkflow processor(sequenceHandler);
-  processor.filename_ = (fs::temp_directory_path().append(fs::unique_path().string())).string();
+  processor.filename_ = (SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv"));
+  //processor.filename_ = std::tmpnam(nullptr);
+
   processor.process();
   // compare with reference file
   const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
@@ -472,12 +524,37 @@ BOOST_AUTO_TEST_CASE(StoreWorkflow1)
   BOOST_CHECK_EQUAL_COLLECTIONS(created_is, created_end, reference_is, reference_end);
 }
 
+BOOST_AUTO_TEST_CASE(LoadWorkflow_onFilePicked)
+{
+  ApplicationHandler application_handler;
+  LoadWorkflow load_workflow(application_handler.sequenceHandler_);
+  std::string filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
+  BOOST_REQUIRE(load_workflow.onFilePicked(filename, &application_handler));
+  const auto& commands = application_handler.sequenceHandler_.getWorkflow();
+  std::vector<std::string> expected_command_names = {
+    "LOAD_RAW_DATA",
+    "MAP_CHROMATOGRAMS",
+    "EXTRACT_CHROMATOGRAM_WINDOWS",
+    "ZERO_CHROMATOGRAM_BASELINE",
+    "PICK_MRM_FEATURES",
+    "QUANTIFY_FEATURES",
+    "CHECK_FEATURES",
+    "SELECT_FEATURES",
+    "STORE_FEATURES"
+  };
+  BOOST_REQUIRE(commands.size() == expected_command_names.size());
+  for (auto i = 0; i < expected_command_names.size(); ++i)
+  {
+    BOOST_CHECK_EQUAL(expected_command_names[i], commands[i]);
+  }
+}
+
 BOOST_AUTO_TEST_CASE(LoadWorkflow1)
 {
   SequenceHandler sequenceHandler;
   struct WorkflowObserverTest : public IWorkflowObserver
   {
-    virtual void workflowUpdated() override
+    virtual void onWorkflowUpdated() override
     {
       nb_notifications_++;
     }

@@ -25,6 +25,7 @@
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
 #endif
@@ -37,61 +38,92 @@
 
 namespace SmartPeak
 {
-  void SequenceParser::readSequenceFile(
-    SequenceHandler& sequenceHandler,
-    const std::string& pathname,
-    const std::string& delimiter
+
+  template<typename T>
+  static bool validateAndConvert(
+    const std::string& s,
+    T& output
   )
   {
-    LOGD << "START readSequenceFile";
-    LOGD << "Delimiter: " << delimiter;
-
-    LOGI << "Loading: " << pathname;
-
-    if (pathname.empty()) {
-      LOGE << "Pathname is empty";
-      LOGD << "END readSequenceFile";
-      return;
+    if (Utilities::trimString(s).empty())
+    {
+      return false;
     }
 
-    if (!InputDataValidation::fileExists(pathname)) {
-      LOGE << "File not found";
-      LOGD << "END readSequenceFile";
-      return;
+    if (std::is_same<T, int>::value)
+    {
+      output = std::stoi(s);
+    }
+    else if (std::is_same<T, float>::value)
+    {
+      output = std::stof(s);
+    }
+    else
+    {
+      LOGE << "Case not handled";
+      return false;
     }
 
-    const std::string s_sample_name {"sample_name"};
-    const std::string s_sample_group_name {"sample_group_name"};
-    const std::string s_sequence_segment_name {"sequence_segment_name"};
-    const std::string s_sample_type {"sample_type"};
-    const std::string s_original_filename {"original_filename"};
-    const std::string s_proc_method_name {"proc_method_name"};
-    const std::string s_rack_number {"rack_number"};
-    const std::string s_plate_number {"plate_number"};
-    const std::string s_pos_number {"pos_number"};
-    const std::string s_inj_number {"inj_number"};
-    const std::string s_dilution_factor {"dilution_factor"};
-    const std::string s_acq_method_name {"acq_method_name"};
-    const std::string s_operator_name {"operator_name"};
-    const std::string s_acquisition_date_and_time {"acquisition_date_and_time"};
-    const std::string s_inj_volume {"inj_volume"};
-    const std::string s_inj_volume_units {"inj_volume_units"};
-    const std::string s_batch_name {"batch_name"};
+    return true;
+  }
+
+  template<typename DELIMITER>
+  void SequenceParser::readSequenceFile(
+    SequenceHandler& sequenceHandler,
+    const std::string& pathname
+  )
+  {
+    const std::string s_sample_name{ "sample_name" };
+    const std::string s_sample_group_name{ "sample_group_name" };
+    const std::string s_sequence_segment_name{ "sequence_segment_name" };
+    const std::string s_replicate_group_name{ "replicate_group_name" };
+    const std::string s_sample_type{ "sample_type" };
+    const std::string s_original_filename{ "original_filename" };
+    const std::string s_proc_method_name{ "proc_method_name" };
+    const std::string s_rack_number{ "rack_number" };
+    const std::string s_plate_number{ "plate_number" };
+    const std::string s_pos_number{ "pos_number" };
+    const std::string s_inj_number{ "inj_number" };
+    const std::string s_dilution_factor{ "dilution_factor" };
+    const std::string s_acq_method_name{ "acq_method_name" };
+    const std::string s_operator_name{ "operator_name" };
+    const std::string s_acquisition_date_and_time{ "acquisition_date_and_time" };
+    const std::string s_inj_volume{ "inj_volume" };
+    const std::string s_inj_volume_units{ "inj_volume_units" };
+    const std::string s_batch_name{ "batch_name" };
     const std::string s_scan_polarity{ "scan_polarity" };
     const std::string s_scan_mass_low{ "scan_mass_low" };
     const std::string s_scan_mass_high{ "scan_mass_high" };
 
-    const std::string s_comma {","};
-    const std::string s_semicolon {";"};
-    const std::string s_tab {"\t"};
+    io::CSVReader<21, io::trim_chars<>, DELIMITER> reader(pathname);
 
-    io::CSVReader<20, io::trim_chars<>, io::no_quote_escape<','>> in_comma(pathname);
-    io::CSVReader<20, io::trim_chars<>, io::no_quote_escape<';'>> in_semicolon(pathname);
-    io::CSVReader<20, io::trim_chars<>, io::no_quote_escape<'\t'>> in_tab(pathname);
+    reader.read_header(
+      io::ignore_extra_column | io::ignore_missing_column,
+      s_sample_name,
+      s_sample_group_name,
+      s_sequence_segment_name,
+      s_replicate_group_name,
+      s_sample_type,
+      s_original_filename,
+      s_proc_method_name,
+      s_rack_number,
+      s_plate_number,
+      s_pos_number,
+      s_inj_number,
+      s_dilution_factor,
+      s_acq_method_name,
+      s_operator_name,
+      s_acquisition_date_and_time,
+      s_inj_volume,
+      s_inj_volume_units,
+      s_batch_name,
+      s_scan_polarity,
+      s_scan_mass_low,
+      s_scan_mass_high
+    );
 
-    if (delimiter == s_comma) {
-      in_comma.read_header(
-        io::ignore_extra_column/* | io::ignore_missing_column*/,
+    const std::vector<std::string> mandatory_columns =
+    {
         s_sample_name,
         s_sample_group_name,
         s_sequence_segment_name,
@@ -112,57 +144,13 @@ namespace SmartPeak
         s_scan_polarity,
         s_scan_mass_low,
         s_scan_mass_high
-      );
-    } else if (delimiter == s_semicolon) {
-      in_semicolon.read_header(
-        io::ignore_extra_column/* | io::ignore_missing_column*/,
-        s_sample_name,
-        s_sample_group_name,
-        s_sequence_segment_name,
-        s_sample_type,
-        s_original_filename,
-        s_proc_method_name,
-        s_rack_number,
-        s_plate_number,
-        s_pos_number,
-        s_inj_number,
-        s_dilution_factor,
-        s_acq_method_name,
-        s_operator_name,
-        s_acquisition_date_and_time,
-        s_inj_volume,
-        s_inj_volume_units,
-        s_batch_name,
-        s_scan_polarity,
-        s_scan_mass_low,
-        s_scan_mass_high
-      );
-    } else if (delimiter == s_tab) {
-      in_tab.read_header(
-        io::ignore_extra_column/* | io::ignore_missing_column*/,
-        s_sample_name,
-        s_sample_group_name,
-        s_sequence_segment_name,
-        s_sample_type,
-        s_original_filename,
-        s_proc_method_name,
-        s_rack_number,
-        s_plate_number,
-        s_pos_number,
-        s_inj_number,
-        s_dilution_factor,
-        s_acq_method_name,
-        s_operator_name,
-        s_acquisition_date_and_time,
-        s_inj_volume,
-        s_inj_volume_units,
-        s_batch_name,
-        s_scan_polarity,
-        s_scan_mass_low,
-        s_scan_mass_high
-      );
-    } else {
-      throw std::invalid_argument("Delimiter \"" + delimiter + "\" is not supported.");
+    };
+    for (const auto& mandatory_column : mandatory_columns)
+    {
+      if (!reader.has_column(mandatory_column)) {
+        LOGE << "Missing column " << mandatory_column << " in file " << pathname;
+        throw std::runtime_error("Failed loading sequence file\n");
+      }
     }
 
     unsigned int line_number = 0;
@@ -182,32 +170,13 @@ namespace SmartPeak
         std::string t_inj_volume;
         std::string t_scan_mass_low;
         std::string t_scan_mass_high;
-        bool is_valid = false;
-
-        if (delimiter == s_comma) {
-          is_valid = in_comma.read_row(t.sample_name, t.sample_group_name,
-            t.sequence_segment_name, t_sample_type, t.original_filename,
-            t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
-            t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-            t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
-            t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
-        }
-        else if (delimiter == s_semicolon) {
-          is_valid = in_semicolon.read_row(t.sample_name, t.sample_group_name,
-            t.sequence_segment_name, t_sample_type, t.original_filename,
-            t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
-            t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-            t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
-            t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
-        }
-        else if (delimiter == s_tab) {
-          is_valid = in_tab.read_row(t.sample_name, t.sample_group_name,
-            t.sequence_segment_name, t_sample_type, t.original_filename,
-            t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
-            t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
-            t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
-            t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
-        }
+        
+        bool is_valid = reader.read_row(t.getSampleName(), t.getSampleGroupName(),
+          t.getSequenceSegmentName(), t.getReplicateGroupName(), t_sample_type, t.getFilename(),
+          t.proc_method_name, t_rack_number, t_plate_number, t_pos_number,
+          t_inj_number, t_dilution_factor, t.acq_method_name, t.operator_name,
+          t_date, t_inj_volume, t.inj_volume_units, t.batch_name,
+          t.scan_polarity, t_scan_mass_low, t_scan_mass_high);
 
         if (!is_valid)
           break;
@@ -243,10 +212,11 @@ namespace SmartPeak
         validateAndConvert(t_scan_mass_high, t.scan_mass_high);
 
         if (stringToSampleType.count(t_sample_type)) {
-          t.sample_type = stringToSampleType.at(t_sample_type);
+          t.setSampleType(stringToSampleType.at(t_sample_type));
         }
-        else {
-          t.sample_type = SampleType::Unrecognized;
+        else
+        {
+          t.setSampleType(SampleType::Unrecognized);
         }
 
         std::tm& adt = t.acquisition_date_and_time;
@@ -258,9 +228,9 @@ namespace SmartPeak
           adt.tm_mday = 1;
         }
 
-        if (t.original_filename.empty()) {
+        if (t.getFilename().empty()) {
           LOGW << "Warning: No value provided for the original filename. Will create a unique default filename.";
-          t.original_filename = t.getInjectionName();
+          t.setFilename(t.getInjectionName());
         }
 
         sequenceHandler.addSampleToSequence(t, OpenMS::FeatureMap());
@@ -271,8 +241,146 @@ namespace SmartPeak
         throw;
       }
     }
+  };
+
+  void SequenceParser::readSequenceFile(
+    SequenceHandler& sequenceHandler,
+    const std::string& pathname,
+    const std::string& delimiter
+  )
+  {
+    LOGD << "START readSequenceFile";
+    LOGD << "Delimiter: " << delimiter;
+
+    LOGI << "Loading: " << pathname;
+
+    if (pathname.empty()) {
+      LOGE << "Pathname is empty";
+      LOGD << "END readSequenceFile";
+      return;
+    }
+
+    if (!InputDataValidation::fileExists(pathname)) {
+      LOGE << "File not found";
+      LOGD << "END readSequenceFile";
+      return;
+    }
+
+    const std::string s_comma{ "," };
+    const std::string s_semicolon{ ";" };
+    const std::string s_tab{ "\t" };
+
+    if (delimiter == s_comma)
+    {
+      readSequenceFile<io::no_quote_escape<','>>(sequenceHandler, pathname);
+    }
+    else if (delimiter == s_semicolon)
+    {
+      readSequenceFile<io::no_quote_escape<';'>>(sequenceHandler, pathname);
+    }
+    else if (delimiter == s_tab)
+    {
+      readSequenceFile<io::no_quote_escape<'\t'>>(sequenceHandler, pathname);
+    }
+    else
+    {
+      throw std::invalid_argument("Delimiter \"" + delimiter + "\" is not supported.");
+    }
 
     LOGD << "END readSequenceFile";
+  }
+
+  void SequenceParser::makeSequenceFileSmartPeak(SequenceHandler& sequenceHandler, std::vector<std::vector<std::string>>& rows_out, std::vector<std::string>& headers_out)
+  {
+    using namespace std::string_literals;
+
+    // Headers expected by the SmartPeak software
+    headers_out.clear();
+    headers_out = {
+      "sample_name",
+      "sample_group_name",
+      "sequence_segment_name",
+      "replicate_group_name",
+      "sample_type",
+      "original_filename",
+      "proc_method_name",
+      "rack_number",
+      "plate_number",
+      "pos_number",
+      "inj_number",
+      "dilution_factor",
+      "acq_method_name",
+      "operator_name",
+      "acquisition_date_and_time",
+      "inj_volume",
+      "inj_volume_units",
+      "batch_name",
+      "scan_polarity",
+      "scan_mass_low",
+      "scan_mass_high"
+    };
+
+    rows_out.clear();
+    for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
+      std::vector<std::string> row;
+      const MetaDataHandler& mdh = sampleHandler.getMetaData();
+      row.push_back(mdh.getSampleName());
+      row.push_back(mdh.getSampleGroupName());
+      row.push_back(mdh.getSequenceSegmentName());
+      row.push_back(mdh.getReplicateGroupName());
+      row.push_back(mdh.getSampleTypeAsString());
+      row.push_back(mdh.getFilename());
+      row.push_back(mdh.proc_method_name);
+      row.push_back(mdh.getRackNumberAsString(""s));
+      row.push_back(mdh.getPlateNumberAsString(""s));
+      row.push_back(mdh.getPosNumberAsString(""s));
+      row.push_back(mdh.getInjectionNumberAsString(""s));
+      row.push_back(std::to_string(mdh.dilution_factor));
+      row.push_back(mdh.acq_method_name);
+      row.push_back(mdh.operator_name);
+      row.push_back(mdh.getAcquisitionDateAndTimeAsString());
+      row.push_back(std::to_string(mdh.inj_volume));
+      row.push_back(mdh.inj_volume_units);
+      row.push_back(mdh.batch_name);
+      row.push_back(mdh.scan_polarity);
+      row.push_back(mdh.getScanMassLowAsString(""s));
+      row.push_back(mdh.getScanMassHighAsString(""s));
+      rows_out.push_back(row);
+    }
+  }
+
+  void SequenceParser::writeSequenceFileSmartPeak(SequenceHandler& sequenceHandler, const std::string& filename, const std::string& delimiter)
+  {
+    LOGD << "START writeSequenceFileSmartPeak";
+    LOGD << "Delimiter: " << delimiter;
+
+    LOGI << "Loading: " << filename;
+
+    if (filename.empty()) {
+      LOGE << "filename is empty";
+      LOGD << "END writeSequenceFileSmartPeak";
+      return;
+    }
+
+    // Make the file
+    std::vector<std::vector<std::string>> rows;
+    //  deepcode ignore ContainerUpdatedButNeverQueried: headers are used, looks like false positive
+    std::vector<std::string> headers;
+    makeSequenceFileSmartPeak(sequenceHandler, rows, headers);
+
+    // Write the output file
+    CSVWriter writer(filename, delimiter);
+    const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
+
+    if (cnt < headers.size()) {
+      LOGD << "END writeSequenceFileSmartPeak";
+    }
+
+    for (const std::vector<std::string>& line : rows) {
+      writer.writeDataInRow(line.cbegin(), line.cend());
+    }
+
+    LOGD << "END writeSequenceFileSmartPeak";
   }
 
   void SequenceParser::makeSequenceFileAnalyst(SequenceHandler& sequenceHandler, std::vector<std::vector<std::string>>& rows_out, std::vector<std::string>& headers_out)
@@ -326,6 +434,7 @@ namespace SmartPeak
 
     // Make the file
     std::vector<std::vector<std::string>> rows;
+    //  deepcode ignore ContainerUpdatedButNeverQueried: headers are used, looks like false positive
     std::vector<std::string> headers;
     makeSequenceFileAnalyst(sequenceHandler, rows, headers);
 
@@ -389,6 +498,7 @@ namespace SmartPeak
 
     // Make the file
     std::vector<std::vector<std::string>> rows;
+    //  deepcode ignore ContainerUpdatedButNeverQueried: headers are used, looks like false positive
     std::vector<std::string> headers;
     makeSequenceFileMasshunter(sequenceHandler, rows, headers);
 
@@ -496,7 +606,7 @@ namespace SmartPeak
     const std::set<std::string>& component_group_names,
     const std::set<std::string>& component_names) {
     std::vector<std::string> headers = {
-      "sample_name", "sample_type", "component_group_name", "component_name", "batch_name",
+      "sample_name", "sample_type", "component_group_name", "replicate_group_name", "component_name", "batch_name",
       "rack_number", "plate_number", "pos_number", "inj_number", "dilution_factor", "inj_volume",
       "inj_volume_units", "operator_name", "acq_method_name", "proc_method_name",
       "original_filename", "acquisition_date_and_time", "scan_polarity", "scan_mass_low", "scan_mass_high", "injection_name", "used_"
@@ -538,6 +648,7 @@ namespace SmartPeak
           row.push_back(mdh.getSampleName());
           row.push_back(sampleTypeToString.at(mdh.getSampleType()));
           row.push_back(component_group_name);
+          row.push_back(mdh.getReplicateGroupName());
           row.push_back("");
           row.push_back(mdh.batch_name);
           row.push_back(std::to_string(mdh.rack_number));
@@ -550,7 +661,7 @@ namespace SmartPeak
           row.push_back(mdh.operator_name);
           row.push_back(mdh.acq_method_name);
           row.push_back(mdh.proc_method_name);
-          row.push_back(mdh.original_filename);
+          row.push_back(mdh.getFilename());
           row.push_back(mdh.getAcquisitionDateAndTimeAsString());
           row.push_back(mdh.scan_polarity);
           row.push_back(std::to_string(mdh.scan_mass_low));
@@ -595,6 +706,7 @@ namespace SmartPeak
           const std::string component_name = subordinate.getMetaValue(s_native_id);
           if (component_names.size() > 0 && component_names.count(component_name) == 0)
             continue;
+          row.push_back(mdh.getReplicateGroupName());
           row.push_back(component_name);
           row.push_back(mdh.batch_name);
           row.push_back(std::to_string(mdh.rack_number));
@@ -607,7 +719,7 @@ namespace SmartPeak
           row.push_back(mdh.operator_name);
           row.push_back(mdh.acq_method_name);
           row.push_back(mdh.proc_method_name);
-          row.push_back(mdh.original_filename);
+          row.push_back(mdh.getFilename());
           row.push_back(mdh.getAcquisitionDateAndTimeAsString());
           row.push_back(mdh.scan_polarity);
           row.push_back(std::to_string(mdh.scan_mass_low));
@@ -680,6 +792,34 @@ namespace SmartPeak
     LOGD << "END writeDataTableFromMetaValue";
     return true;
   }
+
+  struct Row
+  {
+    Row() = default;
+    ~Row() = default;
+    Row(const Row&) = default;
+    Row& operator=(const Row&) = default;
+    Row(Row&&) = default;
+    Row& operator=(Row&&) = default;
+
+    Row(const std::string& cgn, const std::string& cn, const std::string& mvn) :
+      component_group_name(cgn),
+      component_name(cn),
+      meta_value_name(mvn) {}
+
+    std::string component_group_name;
+    std::string component_name;
+    std::string meta_value_name;
+  };
+
+  struct Row_less
+  {
+    bool operator()(const Row& lhs, const Row& rhs) const
+    {
+      return lhs.component_group_name + lhs.component_name + lhs.meta_value_name <
+        rhs.component_group_name + rhs.component_name + rhs.meta_value_name;
+    }
+  };
 
   void SequenceParser::makeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
@@ -854,6 +994,50 @@ namespace SmartPeak
     }
 
     LOGD << "END writeDataMatrixFromMetaValue";
+    return true;
+  }
+
+  bool StoreSequenceFileSmartPeak::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be stored without first loading the sequence.";
+      return false;
+    }
+    SequenceParser::writeSequenceFileSmartPeak(application_handler->sequenceHandler_, filename);
+    return true;
+  }
+
+  bool StoreSequenceFileAnalyst::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be stored without first loading the sequence.";
+      return false;
+    }
+    SequenceParser::writeSequenceFileAnalyst(application_handler->sequenceHandler_, filename);
+    return true;
+  }
+
+  bool StoreSequenceFileMasshunter::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be stored without first loading the sequence.";
+      return false;
+    }
+    SequenceParser::writeSequenceFileMasshunter(application_handler->sequenceHandler_, filename);
+    return true;
+  }
+
+  bool StoreSequenceFileXcalibur::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be stored without first loading the sequence.";
+      return false;
+    }
+    SequenceParser::writeSequenceFileXcalibur(application_handler->sequenceHandler_, filename);
     return true;
   }
 }

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/iface/ISequenceObserver.h>
+
 #include <string>
 #include <utility>
 #include <vector>
@@ -11,13 +13,26 @@ namespace SmartPeak
   /**
     @brief Class for plotting Chromatograms
   */
-  class ChromatogramPlotWidget : public ScatterPlotWidget
+  class ChromatogramPlotWidget : 
+    public ScatterPlotWidget,
+    public ISequenceObserver
   {
   public:
     ChromatogramPlotWidget(SessionHandler& session_handler,
       SequenceHandler& sequence_handler,
-      const std::string& title) :
-      ScatterPlotWidget(session_handler, sequence_handler, title) {};
+      const std::string& id,
+      const std::string& title,
+      SequenceObservable& sequence_observable) :
+      ScatterPlotWidget(session_handler, sequence_handler, id, title) 
+    {
+      sequence_observable.addSequenceObserver(this);
+    };
+
+    /**
+      ISequenceObserver
+    */
+    virtual void onSequenceUpdated() override;
+
   protected:
     virtual void updateScatterPlotData() override;
   protected:

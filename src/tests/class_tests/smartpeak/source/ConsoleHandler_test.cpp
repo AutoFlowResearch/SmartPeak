@@ -26,7 +26,7 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <SmartPeak/core/ConsoleHandler.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 
 struct ConsoleHandlerFixture 
@@ -45,7 +45,7 @@ BOOST_FIXTURE_TEST_SUITE(ConsoleHandler, ConsoleHandlerFixture)
 
 BOOST_AUTO_TEST_CASE(ConsoleHandler_initialize)
 {
-    namespace fs = boost::filesystem;
+    namespace fs = std::filesystem;
     auto& ch = SmartPeak::ConsoleHandler::get_instance();
     // Test singleton uniqueness:
     auto& ch1 = SmartPeak::ConsoleHandler::get_instance();

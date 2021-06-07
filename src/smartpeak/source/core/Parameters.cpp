@@ -377,9 +377,9 @@ namespace SmartPeak
       auto p_name = it.getName(); // use iterator name for full name
       switch (p.value.valueType())
       {
-      case OpenMS::DataValue::STRING_VALUE:
+      case OpenMS::ParamValue::STRING_VALUE:
       {
-        OpenMS::StringList openms_strings = p.valid_strings;
+        const auto& openms_strings = p.valid_strings;
         const auto constraints_list = std::make_shared<std::vector<CastValue>>();
         if (openms_strings.size() > 0)
         {
@@ -430,7 +430,7 @@ namespace SmartPeak
         }
       }
       break;
-      case OpenMS::DataValue::INT_VALUE:
+      case OpenMS::ParamValue::INT_VALUE:
       {
         auto param = Parameter(p_name, static_cast<int>(p.value));
         param.setDescription(p.description);
@@ -451,7 +451,7 @@ namespace SmartPeak
         addParameter(param);
       }
       break;
-      case OpenMS::DataValue::DOUBLE_VALUE:
+      case OpenMS::ParamValue::DOUBLE_VALUE:
       {
         auto param = Parameter(p_name, static_cast<float>(p.value));
         param.setDescription(p.description);
@@ -472,12 +472,11 @@ namespace SmartPeak
         addParameter(param);
       }
       break;
-      case OpenMS::DataValue::STRING_LIST:
+      case OpenMS::ParamValue::STRING_LIST:
       {
-        std::vector<std::string> list_strings;
-        for (const auto& openms_string : p.value.toStringList()) list_strings.push_back(openms_string);
+        std::vector<std::string> list_strings = p.value.toStringVector();
         auto param = Parameter(p.name, list_strings);
-        OpenMS::StringList openms_strings = p.valid_strings;
+        const auto& openms_strings = p.valid_strings;
         if (openms_strings.size() > 0)
         {
           const auto constraints_list = std::make_shared<std::vector<CastValue>>();
@@ -487,10 +486,9 @@ namespace SmartPeak
         addParameter(param);
       }
       break;
-      case OpenMS::DataValue::INT_LIST:
+      case OpenMS::ParamValue::INT_LIST:
       {
-        std::vector<int> list_ints;
-        for (const auto& openms_int : p.value.toIntList()) list_ints.push_back(openms_int);
+        std::vector<int> list_ints = p.value.toIntVector();
         auto param = Parameter(p.name, list_ints);
         std::shared_ptr<CastValue> cast_min;
         if (p.min_int != -std::numeric_limits<int>::max())
@@ -509,10 +507,10 @@ namespace SmartPeak
         addParameter(param);
       }
       break;
-      case OpenMS::DataValue::DOUBLE_LIST:
+      case OpenMS::ParamValue::DOUBLE_LIST:
       {
         std::vector<float> list_doubles;
-        for (const auto& openms_double : p.value.toDoubleList()) list_doubles.push_back(openms_double);
+        for (const auto& openms_double : p.value.toDoubleVector()) list_doubles.push_back(openms_double);
         Parameter param = Parameter(p.name, list_doubles);
         std::shared_ptr<CastValue> cast_min;
         if (p.min_float != -std::numeric_limits<double>::max())
@@ -531,7 +529,7 @@ namespace SmartPeak
         addParameter(param);
       }
       break;
-      case OpenMS::DataValue::EMPTY_VALUE:
+      case OpenMS::ParamValue::EMPTY_VALUE:
       {
         LOGE << "createFromOpenMS Ignoring empty value " << p_name;
       }

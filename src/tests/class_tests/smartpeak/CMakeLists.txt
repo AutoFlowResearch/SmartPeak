@@ -12,7 +12,7 @@ configure_file(${PROJECT_SOURCE_DIR}/include/SmartPeak/test_config.h.in ${CONFIG
 #------------------------------------------------------------------------------
 # Boost
 #------------------------------------------------------------------------------
-find_package(Boost COMPONENTS filesystem unit_test_framework)
+find_package(Boost COMPONENTS unit_test_framework)
 
 if(Boost_FOUND)
   message(STATUS "[class_tests] : Found Boost version ${Boost_MAJOR_VERSION}.${Boost_MINOR_VERSION}.${Boost_SUBMINOR_VERSION}" )
@@ -131,7 +131,7 @@ add_dependencies(ALGORITHM_TEST ${algorithm_executables_list})
 foreach(_class_test ${TEST_executables})
   add_executable(${_class_test} source/${_class_test})
   # message(STATUS "${_class_test}")
-  if(NOT (${_class_test} STREQUAL "GuiAppender_test" OR ${_class_test} STREQUAL "AppWindow_test" OR ${_class_test} STREQUAL "Widget_test"))
+  if(NOT (${_class_test} STREQUAL "GuiAppender_test" OR ${_class_test} STREQUAL "AppWindow_test" OR ${_class_test} STREQUAL "Widget_test" OR ${_class_test} STREQUAL "ImEntry_test"))
     target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} ${Boost_LIBRARIES} OpenMS)
   else()
     target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} ${Boost_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 

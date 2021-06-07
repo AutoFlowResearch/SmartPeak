@@ -23,7 +23,8 @@
 #include <SmartPeak/core/ConsoleHandler.h>
 
 #include <SmartPeak/core/Utilities.h>
-#include <boost/filesystem.hpp>
+#include <fstream>
+#include <filesystem>
 
 
 namespace SmartPeak {
@@ -64,23 +65,26 @@ std::string ConsoleHandler::_get_log_filename() const
 
 bool ConsoleHandler::_initialize_log_location(const std::string& filename, std::string& error_msg)
 {
-    namespace fs = boost::filesystem;
+    namespace fs = std::filesystem;
     m_logdir_created = false;
     try
     {
+        auto fpath = fs::path();
         if (m_log_dirpath.empty())
         {
-            std::tie(m_log_filepath, m_logdir_created) = Utilities::getLogFilepath(filename);
-            m_log_dirpath = fs::path(m_log_filepath).parent_path().string();
+            std::tie(fpath, m_logdir_created) = Utilities::getLogFilepath(filename);
+            m_log_filepath = fpath.string();
+            m_log_dirpath = fpath.parent_path().string();
         }
         else
         {
             auto path = (fs::path(m_log_dirpath) / filename).string();
-            fs::ofstream file(path);
+            std::ofstream file(path);
             if (!file)
             {
-                std::tie(m_log_filepath, m_logdir_created) = Utilities::getLogFilepath(filename);
-                m_log_dirpath = fs::path(m_log_filepath).parent_path().string();
+                std::tie(fpath, m_logdir_created) = Utilities::getLogFilepath(filename);
+                m_log_filepath = fpath.string();
+                m_log_dirpath = fpath.parent_path().string();
                 error_msg = static_cast<std::ostringstream&&>(
                     std::ostringstream() 
                         << "Unable to create log file '" << path 

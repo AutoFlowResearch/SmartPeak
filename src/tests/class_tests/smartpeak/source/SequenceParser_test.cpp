@@ -29,11 +29,61 @@
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 
 using namespace SmartPeak;
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(sequenceparser)
+struct SequenceParserFixture
+{
+  /* ctor/dtor */
+  SequenceParserFixture()
+  {
+    const vector<string> sample_names = {
+      "170808_Jonathan_yeast_Sacc1_1x",
+      "170808_Jonathan_yeast_Sacc2_1x",
+      "170808_Jonathan_yeast_Sacc3_1x",
+      "170808_Jonathan_yeast_Yarr1_1x",
+      "170808_Jonathan_yeast_Yarr2_1x",
+      "170808_Jonathan_yeast_Yarr3_1x"
+    };
+
+    int inj_num = 0;
+    for (const string& sample_name : sample_names) {
+      ++inj_num;
+      MetaDataHandler metaDataHandler;
+      metaDataHandler.setSampleName(sample_name);
+      metaDataHandler.setFilename(sample_name + ".mzML");
+      metaDataHandler.setSampleType(SampleType::Unknown);
+      metaDataHandler.setSampleGroupName("sample_group");
+      metaDataHandler.setSequenceSegmentName("sequence_segment");
+      metaDataHandler.setReplicateGroupName("replicate_group_name");
+      metaDataHandler.inj_number = inj_num;
+      metaDataHandler.acq_method_name = "6";
+      metaDataHandler.inj_volume = 7.0;
+      metaDataHandler.inj_volume_units = "8";
+      metaDataHandler.batch_name = "FluxTest";
+      metaDataHandler.scan_polarity = "negative";
+      metaDataHandler.scan_mass_high = 2000;
+      metaDataHandler.scan_mass_low = 60;
+
+      Filenames filenames;
+      filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML");
+      RawDataHandler rawDataHandler;
+      LoadFeatures loadFeatures;
+      loadFeatures.process(rawDataHandler, {}, filenames);
+
+      sequence_handler_.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
+    }
+  }
+
+  ~SequenceParserFixture() {}
+
+public:
+  SequenceHandler sequence_handler_;
+};
+
+BOOST_FIXTURE_TEST_SUITE(SequenceParserTest, SequenceParserFixture)
 
 BOOST_AUTO_TEST_CASE(readSequenceFile)
 {
@@ -130,44 +180,6 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
 
 BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
 {
-  SequenceHandler sequenceHandler;
-
-  const vector<string> sample_names = {
-    "170808_Jonathan_yeast_Sacc1_1x",
-    "170808_Jonathan_yeast_Sacc2_1x",
-    "170808_Jonathan_yeast_Sacc3_1x",
-    "170808_Jonathan_yeast_Yarr1_1x",
-    "170808_Jonathan_yeast_Yarr2_1x",
-    "170808_Jonathan_yeast_Yarr3_1x"
-  };
-
-  int inj_num = 0;
-  for (const string& sample_name : sample_names) {
-    ++inj_num;
-    MetaDataHandler metaDataHandler;
-    metaDataHandler.setSampleName(sample_name);
-    metaDataHandler.setFilename(sample_name + ".mzML");
-    metaDataHandler.setSampleType(SampleType::Unknown);
-    metaDataHandler.setSampleGroupName("sample_group");
-    metaDataHandler.setSequenceSegmentName("sequence_segment");
-    metaDataHandler.inj_number = inj_num;
-    metaDataHandler.acq_method_name = "6";
-    metaDataHandler.inj_volume = 7.0;
-    metaDataHandler.inj_volume_units = "8";
-    metaDataHandler.batch_name = "FluxTest";
-    metaDataHandler.scan_polarity = "negative";
-    metaDataHandler.scan_mass_high = 2000;
-    metaDataHandler.scan_mass_low = 60;
-
-    Filenames filenames;
-    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML");
-    RawDataHandler rawDataHandler;
-    LoadFeatures loadFeatures;
-    loadFeatures.process(rawDataHandler, {}, filenames);
-
-    sequenceHandler.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
-  }
-
   vector<vector<string>> data_out;
   vector<string> headers_out;
   const vector<string> meta_data {
@@ -180,82 +192,84 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
   };
   const set<SampleType> sample_types = {SampleType::Unknown};
 
-  SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+  SequenceParser::makeDataTableFromMetaValue(sequence_handler_, data_out, headers_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
   BOOST_CHECK_EQUAL(data_out.size(), 1657);
   BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(data_out.at(0).at(1), "Unknown");
   BOOST_CHECK_EQUAL(data_out.at(0).at(2), "23dpg");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(22), std::to_string(235.0));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(23), std::to_string(3.52866193485212));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(26), std::to_string(15.605367));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(27), std::to_string(15.836817));
-  BOOST_CHECK_EQUAL(headers_out.size(), 28);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "23dpg.23dpg_1.Heavy");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(23), std::to_string(235.0));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(24), std::to_string(3.52866193485212));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(27), std::to_string(15.605367));
+  BOOST_CHECK_EQUAL(data_out.at(0).at(28), std::to_string(15.836817));
+  BOOST_CHECK_EQUAL(headers_out.size(), 29);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
-  BOOST_CHECK_EQUAL(headers_out[3], "component_name");
-  BOOST_CHECK_EQUAL(headers_out[4], "batch_name");
-  BOOST_CHECK_EQUAL(headers_out[5], "rack_number");
-  BOOST_CHECK_EQUAL(headers_out[6], "plate_number");
-  BOOST_CHECK_EQUAL(headers_out[7], "pos_number");
-  BOOST_CHECK_EQUAL(headers_out[8], "inj_number");
-  BOOST_CHECK_EQUAL(headers_out[9], "dilution_factor");
-  BOOST_CHECK_EQUAL(headers_out[10], "inj_volume");
-  BOOST_CHECK_EQUAL(headers_out[11], "inj_volume_units");
-  BOOST_CHECK_EQUAL(headers_out[12], "operator_name");
-  BOOST_CHECK_EQUAL(headers_out[13], "acq_method_name");
-  BOOST_CHECK_EQUAL(headers_out[14], "proc_method_name");
-  BOOST_CHECK_EQUAL(headers_out[15], "original_filename");
-  BOOST_CHECK_EQUAL(headers_out[16], "acquisition_date_and_time");
-  BOOST_CHECK_EQUAL(headers_out[17], "scan_polarity");
-  BOOST_CHECK_EQUAL(headers_out[18], "scan_mass_low");
-  BOOST_CHECK_EQUAL(headers_out[19], "scan_mass_high");
-  BOOST_CHECK_EQUAL(headers_out[20], "injection_name");
-  BOOST_CHECK_EQUAL(headers_out[21], "used_");
+  BOOST_CHECK_EQUAL(headers_out[3], "replicate_group_name");
+  BOOST_CHECK_EQUAL(headers_out[4], "component_name");
+  BOOST_CHECK_EQUAL(headers_out[5], "batch_name");
+  BOOST_CHECK_EQUAL(headers_out[6], "rack_number");
+  BOOST_CHECK_EQUAL(headers_out[7], "plate_number");
+  BOOST_CHECK_EQUAL(headers_out[8], "pos_number");
+  BOOST_CHECK_EQUAL(headers_out[9], "inj_number");
+  BOOST_CHECK_EQUAL(headers_out[10], "dilution_factor");
+  BOOST_CHECK_EQUAL(headers_out[11], "inj_volume");
+  BOOST_CHECK_EQUAL(headers_out[12], "inj_volume_units");
+  BOOST_CHECK_EQUAL(headers_out[13], "operator_name");
+  BOOST_CHECK_EQUAL(headers_out[14], "acq_method_name");
+  BOOST_CHECK_EQUAL(headers_out[15], "proc_method_name");
+  BOOST_CHECK_EQUAL(headers_out[16], "original_filename");
+  BOOST_CHECK_EQUAL(headers_out[17], "acquisition_date_and_time");
+  BOOST_CHECK_EQUAL(headers_out[18], "scan_polarity");
+  BOOST_CHECK_EQUAL(headers_out[19], "scan_mass_low");
+  BOOST_CHECK_EQUAL(headers_out[20], "scan_mass_high");
+  BOOST_CHECK_EQUAL(headers_out[21], "injection_name");
+  BOOST_CHECK_EQUAL(headers_out[22], "used_");
   // metadata
-  BOOST_CHECK_EQUAL(headers_out[22], "peak_apex_int");
-  BOOST_CHECK_EQUAL(headers_out[23], "logSN");
-  BOOST_CHECK_EQUAL(headers_out[24], "QC_transition_message");
-  BOOST_CHECK_EQUAL(headers_out[25], "QC_transition_group_message");
-  BOOST_CHECK_EQUAL(headers_out[26], "leftWidth");
-  BOOST_CHECK_EQUAL(headers_out[27], "rightWidth");
+  BOOST_CHECK_EQUAL(headers_out[23], "peak_apex_int");
+  BOOST_CHECK_EQUAL(headers_out[24], "logSN");
+  BOOST_CHECK_EQUAL(headers_out[25], "QC_transition_message");
+  BOOST_CHECK_EQUAL(headers_out[26], "QC_transition_group_message");
+  BOOST_CHECK_EQUAL(headers_out[27], "leftWidth");
+  BOOST_CHECK_EQUAL(headers_out[28], "rightWidth");
 
-  SequenceParser::makeDataTableFromMetaValue(sequenceHandler, data_out, headers_out, std::vector<std::string>({ "leftWidth" }), sample_types,
+  SequenceParser::makeDataTableFromMetaValue(sequence_handler_, data_out, headers_out, std::vector<std::string>({ "leftWidth" }), sample_types,
     std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
 
   BOOST_CHECK_EQUAL(data_out.size(), 1);
   BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
   BOOST_CHECK_EQUAL(data_out.at(0).at(1), "Unknown");
   BOOST_CHECK_EQUAL(data_out.at(0).at(2), "23dpg");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(22), std::to_string(15.605367));
-  BOOST_CHECK_EQUAL(headers_out.size(), 23);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "23dpg.23dpg_1.Light");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(23), std::to_string(15.605367));
+  BOOST_CHECK_EQUAL(headers_out.size(), 24);
   BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
   BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
   BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
-  BOOST_CHECK_EQUAL(headers_out[3], "component_name");
-  BOOST_CHECK_EQUAL(headers_out[4], "batch_name");
-  BOOST_CHECK_EQUAL(headers_out[5], "rack_number");
-  BOOST_CHECK_EQUAL(headers_out[6], "plate_number");
-  BOOST_CHECK_EQUAL(headers_out[7], "pos_number");
-  BOOST_CHECK_EQUAL(headers_out[8], "inj_number");
-  BOOST_CHECK_EQUAL(headers_out[9], "dilution_factor");
-  BOOST_CHECK_EQUAL(headers_out[10], "inj_volume");
-  BOOST_CHECK_EQUAL(headers_out[11], "inj_volume_units");
-  BOOST_CHECK_EQUAL(headers_out[12], "operator_name");
-  BOOST_CHECK_EQUAL(headers_out[13], "acq_method_name");
-  BOOST_CHECK_EQUAL(headers_out[14], "proc_method_name");
-  BOOST_CHECK_EQUAL(headers_out[15], "original_filename");
-  BOOST_CHECK_EQUAL(headers_out[16], "acquisition_date_and_time");
-  BOOST_CHECK_EQUAL(headers_out[17], "scan_polarity");
-  BOOST_CHECK_EQUAL(headers_out[18], "scan_mass_low");
-  BOOST_CHECK_EQUAL(headers_out[19], "scan_mass_high");
-  BOOST_CHECK_EQUAL(headers_out[20], "injection_name");
-  BOOST_CHECK_EQUAL(headers_out[21], "used_");
+  BOOST_CHECK_EQUAL(headers_out[3], "replicate_group_name");
+  BOOST_CHECK_EQUAL(headers_out[4], "component_name");
+  BOOST_CHECK_EQUAL(headers_out[5], "batch_name");
+  BOOST_CHECK_EQUAL(headers_out[6], "rack_number");
+  BOOST_CHECK_EQUAL(headers_out[7], "plate_number");
+  BOOST_CHECK_EQUAL(headers_out[8], "pos_number");
+  BOOST_CHECK_EQUAL(headers_out[9], "inj_number");
+  BOOST_CHECK_EQUAL(headers_out[10], "dilution_factor");
+  BOOST_CHECK_EQUAL(headers_out[11], "inj_volume");
+  BOOST_CHECK_EQUAL(headers_out[12], "inj_volume_units");
+  BOOST_CHECK_EQUAL(headers_out[13], "operator_name");
+  BOOST_CHECK_EQUAL(headers_out[14], "acq_method_name");
+  BOOST_CHECK_EQUAL(headers_out[15], "proc_method_name");
+  BOOST_CHECK_EQUAL(headers_out[16], "original_filename");
+  BOOST_CHECK_EQUAL(headers_out[17], "acquisition_date_and_time");
+  BOOST_CHECK_EQUAL(headers_out[18], "scan_polarity");
+  BOOST_CHECK_EQUAL(headers_out[19], "scan_mass_low");
+  BOOST_CHECK_EQUAL(headers_out[20], "scan_mass_high");
+  BOOST_CHECK_EQUAL(headers_out[21], "injection_name");
+  BOOST_CHECK_EQUAL(headers_out[22], "used_");
   // metadata
-  BOOST_CHECK_EQUAL(headers_out[22], "leftWidth");
+  BOOST_CHECK_EQUAL(headers_out[23], "leftWidth");
 
   // write sequence to output
   // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataTableFromMetaValue.csv");
@@ -263,6 +277,45 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
 }
 
 BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
+{
+  Eigen::Tensor<float, 2> data_out;
+  Eigen::Tensor<std::string, 1> columns_out;
+  Eigen::Tensor<std::string, 2> rows_out;
+
+  const vector<string> meta_data = {
+    "calculated_concentration",
+    "leftWidth",
+    "rightWidth"
+  };
+  // const vector<string> meta_data = {"calculated_concentration"};
+  const set<SampleType> sample_types = {SampleType::Unknown};
+
+  SequenceParser::makeDataMatrixFromMetaValue(sequence_handler_, data_out, columns_out, rows_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+
+  BOOST_CHECK_EQUAL(columns_out.size(), 6);
+  BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(rows_out.dimension(0), 636);
+  BOOST_CHECK_EQUAL(rows_out.dimension(1), 3);
+  BOOST_CHECK_EQUAL(rows_out(0,1), "23dpg");
+  BOOST_CHECK_CLOSE(data_out(0,0), 15.6053667, 1e-3);
+  BOOST_CHECK_CLOSE(data_out(rows_out.dimension(0)-1,columns_out.size()-1), 1.66744995, 1e-3);
+
+  SequenceParser::makeDataMatrixFromMetaValue(sequence_handler_, data_out, columns_out, rows_out, std::vector<std::string>({ "leftWidth" }), sample_types,
+    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
+
+  BOOST_CHECK_EQUAL(columns_out.size(), 1);
+  BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(rows_out.dimension(0), 1);
+  BOOST_CHECK_EQUAL(rows_out.dimension(1), 3);
+  BOOST_CHECK_EQUAL(rows_out(0, 1), "23dpg");
+  BOOST_CHECK_CLOSE(data_out(0, 0), 15.6053667, 1e-3);
+
+  // write sequence to output
+  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataMatrixFromMetaValue.csv");
+  // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
+}
+
+BOOST_AUTO_TEST_CASE(makeSequenceSmartPeak)
 {
   SequenceHandler sequenceHandler;
 
@@ -280,63 +333,79 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
     ++inj_num;
     MetaDataHandler metaDataHandler;
     metaDataHandler.setSampleName(sample_name);
-    metaDataHandler.setFilename(sample_name + ".mzML");
     metaDataHandler.setSampleType(SampleType::Unknown);
     metaDataHandler.setSampleGroupName("sample_group");
     metaDataHandler.setSequenceSegmentName("sequence_segment");
-    metaDataHandler.acq_method_name = "6";
+    metaDataHandler.setReplicateGroupName("replicate_group_name");
+    metaDataHandler.plate_number = 3;
+    metaDataHandler.rack_number = 4;
+    metaDataHandler.pos_number = inj_num;
+    metaDataHandler.dilution_factor = 8.0;
+    metaDataHandler.setAcquisitionDateAndTimeFromString("01-01-2020 17:14:00", "%m-%d-%Y %H:%M:%S");
     metaDataHandler.inj_number = inj_num;
+    metaDataHandler.acq_method_name = "RapidRIP";
     metaDataHandler.inj_volume = 7.0;
     metaDataHandler.inj_volume_units = "8";
     metaDataHandler.batch_name = "FluxTest";
     metaDataHandler.scan_polarity = "negative";
     metaDataHandler.scan_mass_high = 2000;
     metaDataHandler.scan_mass_low = 60;
+    metaDataHandler.setFilename(metaDataHandler.getInjectionName());
 
-    Filenames filenames;
-    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML");
-    RawDataHandler rawDataHandler;
-    LoadFeatures loadFeatures;
-    loadFeatures.process(rawDataHandler, {}, filenames);
-
-    sequenceHandler.addSampleToSequence(metaDataHandler, rawDataHandler.getFeatureMap());
+    sequenceHandler.addSampleToSequence(metaDataHandler, OpenMS::FeatureMap());
   }
 
-  Eigen::Tensor<float, 2> data_out;
-  Eigen::Tensor<std::string, 1> columns_out;
-  Eigen::Tensor<std::string, 2> rows_out;
+  vector<vector<string>> data_out;
+  vector<string> headers_out;
 
-  const vector<string> meta_data = {
-    "calculated_concentration",
-    "leftWidth",
-    "rightWidth"
-  };
-  // const vector<string> meta_data = {"calculated_concentration"};
-  const set<SampleType> sample_types = {SampleType::Unknown};
+  SequenceParser::makeSequenceFileSmartPeak(sequenceHandler, data_out, headers_out);
 
-  SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+  BOOST_CHECK_EQUAL(data_out.size(), 6);
+  BOOST_REQUIRE(data_out.at(0).size() == 21);
+  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "sample_group");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "sequence_segment");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "replicate_group_name");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "Unknown");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(5), "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(6), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(7), "4");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(8), "3");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(9), "1");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(10), "1");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(11), "8.000000");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(12), "RapidRIP");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(13), "");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(14), "2020-01-01_171400");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(15), "7.000000");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(16), "8");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(17), "FluxTest");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(18), "negative");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(19), "60.000000");
+  BOOST_CHECK_EQUAL(data_out.at(0).at(20), "2000.000000");
 
-  BOOST_CHECK_EQUAL(columns_out.size(), 6);
-  BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(rows_out.dimension(0), 636);
-  BOOST_CHECK_EQUAL(rows_out.dimension(1), 3);
-  BOOST_CHECK_EQUAL(rows_out(0,1), "23dpg");
-  BOOST_CHECK_CLOSE(data_out(0,0), 15.6053667, 1e-3);
-  BOOST_CHECK_CLOSE(data_out(rows_out.dimension(0)-1,columns_out.size()-1), 1.66744995, 1e-3);
-
-  SequenceParser::makeDataMatrixFromMetaValue(sequenceHandler, data_out, columns_out, rows_out, std::vector<std::string>({ "leftWidth" }), sample_types,
-    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
-
-  BOOST_CHECK_EQUAL(columns_out.size(), 1);
-  BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(rows_out.dimension(0), 1);
-  BOOST_CHECK_EQUAL(rows_out.dimension(1), 3);
-  BOOST_CHECK_EQUAL(rows_out(0, 1), "23dpg");
-  BOOST_CHECK_CLOSE(data_out(0, 0), 15.6053667, 1e-3);
-
-  // write sequence to output
-  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataMatrixFromMetaValue.csv");
-  // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
+  BOOST_CHECK_EQUAL(headers_out.size(), 21);
+  BOOST_CHECK_EQUAL(headers_out.at(0), "sample_name");
+  BOOST_CHECK_EQUAL(headers_out.at(1), "sample_group_name");
+  BOOST_CHECK_EQUAL(headers_out.at(2), "sequence_segment_name");
+  BOOST_CHECK_EQUAL(headers_out.at(3), "replicate_group_name");
+  BOOST_CHECK_EQUAL(headers_out.at(4), "sample_type");
+  BOOST_CHECK_EQUAL(headers_out.at(5), "original_filename");
+  BOOST_CHECK_EQUAL(headers_out.at(6), "proc_method_name");
+  BOOST_CHECK_EQUAL(headers_out.at(7), "rack_number");
+  BOOST_CHECK_EQUAL(headers_out.at(8), "plate_number");
+  BOOST_CHECK_EQUAL(headers_out.at(9), "pos_number");
+  BOOST_CHECK_EQUAL(headers_out.at(10), "inj_number");
+  BOOST_CHECK_EQUAL(headers_out.at(11), "dilution_factor");
+  BOOST_CHECK_EQUAL(headers_out.at(12), "acq_method_name");
+  BOOST_CHECK_EQUAL(headers_out.at(13), "operator_name");
+  BOOST_CHECK_EQUAL(headers_out.at(14), "acquisition_date_and_time");
+  BOOST_CHECK_EQUAL(headers_out.at(15), "inj_volume");
+  BOOST_CHECK_EQUAL(headers_out.at(16), "inj_volume_units");
+  BOOST_CHECK_EQUAL(headers_out.at(17), "batch_name");
+  BOOST_CHECK_EQUAL(headers_out.at(18), "scan_polarity");
+  BOOST_CHECK_EQUAL(headers_out.at(19), "scan_mass_low");
+  BOOST_CHECK_EQUAL(headers_out.at(20), "scan_mass_high");
 }
 
 BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
@@ -360,6 +429,7 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
     metaDataHandler.setSampleType(SampleType::Unknown);
     metaDataHandler.setSampleGroupName("sample_group");
     metaDataHandler.setSequenceSegmentName("sequence_segment");
+    metaDataHandler.setReplicateGroupName("replicate_group_name");
     metaDataHandler.plate_number = 3;
     metaDataHandler.rack_number = 4;
     metaDataHandler.pos_number = inj_num;
@@ -512,6 +582,7 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileXcalibur)
     metaDataHandler.setSampleType(SampleType::Unknown);
     metaDataHandler.setSampleGroupName("sample_group");
     metaDataHandler.setSequenceSegmentName("sequence_segment");
+    metaDataHandler.setReplicateGroupName("replicate_group_name");
     metaDataHandler.plate_number = 3;
     metaDataHandler.rack_number = 4;
     metaDataHandler.pos_number = inj_num;
@@ -579,6 +650,63 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileXcalibur)
   BOOST_CHECK_EQUAL(headers_out.at(18), "L5 Phone");
   BOOST_CHECK_EQUAL(headers_out.at(19), "Comment");
   BOOST_CHECK_EQUAL(headers_out.at(20), "Sample Name");
+}
+
+/* StoreSequenceFileAnalyst */
+BOOST_AUTO_TEST_CASE(StoreSequenceFileAnalyst_ProcessFailsOnEmptySequence)
+{
+  // Default ApplicationHandler has a default SequenceHandler with empty sequence
+  ApplicationHandler ah;
+  StoreSequenceFileAnalyst cmd;
+  auto store = cmd.onFilePicked("test", &ah);
+  BOOST_CHECK(!store);
+}
+
+BOOST_AUTO_TEST_CASE(StoreSequenceFileAnalyst_ProcessSucceedsOnNonEmptySequence)
+{
+  ApplicationHandler ah;
+  ah.sequenceHandler_ = sequence_handler_;
+  StoreSequenceFileAnalyst cmd;
+  std::string filename = std::tmpnam(nullptr);
+  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
+}
+
+/* StoreSequenceFileMasshunter */
+BOOST_AUTO_TEST_CASE(StoreSequenceFileMasshunter_ProcessFailsOnEmptySequence)
+{
+  // Default ApplicationHandler has a default SequenceHandler with empty sequence
+  ApplicationHandler ah;
+  StoreSequenceFileMasshunter cmd;
+  auto store = cmd.onFilePicked("test", &ah);
+  BOOST_CHECK(!store);
+}
+
+BOOST_AUTO_TEST_CASE(StoreSequenceFileMasshunter_ProcessSucceedsOnNonEmptySequence)
+{
+  ApplicationHandler ah;
+  ah.sequenceHandler_ = sequence_handler_;
+  StoreSequenceFileMasshunter cmd;
+  std::string filename = std::tmpnam(nullptr);
+  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
+}
+
+/* StoreSequenceFileXcalibur */
+BOOST_AUTO_TEST_CASE(StoreSequenceFileXcalibur_ProcessFailsOnEmptySequence)
+{
+  // Default ApplicationHandler has a default SequenceHandler with empty sequence
+  ApplicationHandler ah;
+  StoreSequenceFileXcalibur cmd;
+  auto store = cmd.onFilePicked("test", &ah);
+  BOOST_CHECK(!store);
+}
+
+BOOST_AUTO_TEST_CASE(StoreSequenceFileXcalibur_ProcessSucceedsOnNonEmptySequence)
+{
+  ApplicationHandler ah;
+  ah.sequenceHandler_ = sequence_handler_;
+  StoreSequenceFileXcalibur cmd;
+  std::string filename = std::tmpnam(nullptr);
+  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

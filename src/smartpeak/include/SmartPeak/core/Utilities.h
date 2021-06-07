@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -26,11 +26,18 @@
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/ui/ImEntry.h>
+//#include <SmartPeak/ui/Help.h>
+#include <imgui.h>
+#include <imgui_internal.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 
 #include <regex>
 #include <string>
+#include <filesystem>
+#include <fstream>
+#include <chrono>
+#include <tuple>
 
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
@@ -247,31 +254,23 @@ public:
       std::string suffix,
       const bool case_sensitive = true
     );
-
+    
     /**
-      @brief Get information about name, size, type and modified date of all
-      entries in a folder
+      @brief Retrieves information about files in a given directory
 
-      @note Elements "." and ".." are not part of the content
-
-      @param[in] pathname Folder pathname
-      @param[in] asc Sort entries in ascending order
-
-      @returns A container with the desired information
+      @param[in] folder_path Given path to inspect and scan
+      where the first element is "name", "extension", "size" and "last_write_time", the second element can either be "ascending" or "descending".
+      @return List of files found where each string of vectors is a representation of a file's name, size, type and date.
     */
-    static std::array<std::vector<std::string>, 4> getPathnameContent(
-      const std::string& pathname,
-      const bool asc = true
-    );
-
+    static std::array<std::vector<std::string>, 4> getFolderContents(const std::filesystem::path& folder_path);
+    
     /**
-      @brief Get parent pathname from a pathname string
+      @brief Get the parent path from a given path, the given path is returned when the parent path isn't existent
 
-      @param[in] pathname Input string pathname
-
-      @returns A string representation of the parent pathname
+      @param[in] p Path to a directory of interest.
+      @param[out] parent_path The parent path of the given path as a standard string.
     */
-    static std::string getParentPathname(const std::string& pathname);
+    static std::string getParentPath(const std::filesystem::path& p);
 
     /**
       @brief Moves the elements in vector v according to indices
@@ -312,17 +311,23 @@ public:
       @returns True if 'a' is lexicographically less than 'b'. Otherwise false.
     */
     static bool is_less_than_icase(const std::string& a, const std::string& b);
-
+    
     /**
-      @brief Count the number of elements in a folder
+      @brief Retrieves basic information on a given directory
 
-      @note Elements "." and ".." are not counted
-
-      @param[in] pathname Pathname to a folder
-
-      @returns The numbers of elements found
+      @param[in] p Path to inspect
+      @param[out] directory_info A tuple where the first element is the total size of files in the directory,
+      and the second is the total entries in the directory (files and directories).
     */
-    static size_t directorySize(const std::string& pathname);
+    static void getDirectoryInfo(const std::filesystem::path& p, std::tuple<float, uintmax_t>& directory_info);
+    
+    /**
+      @brief Check whether a path is hidden
+
+      @param[in] entry_path path to inspect
+      @returns True if a hidden entry is encountered
+    */
+    static bool isHiddenEntry(const std::filesystem::path& entry_path);
 
     /**
     * @brief Constructs an absolute filepath to an application logs.
@@ -336,7 +341,16 @@ public:
     * @param[in] filename Log filename
     * @returns The absolute path to log file and boolean flag whether the path to directory was created
     */
-    static std::pair<std::string, bool> getLogFilepath(const std::string& filename);
+    static std::pair<std::filesystem::path, bool> getLogFilepath(const std::string& filename);
+    
+    /**
+      @brief Get a value fromt the current environment
+
+      @param[in] env_name environment variable name
+      @param[out] path variable's value
+    */
+    static void getEnvVariable(const char *env_name, std::string *path);
+
 
     /**
     * @brief Returns the build version of SmartPeak package if available.

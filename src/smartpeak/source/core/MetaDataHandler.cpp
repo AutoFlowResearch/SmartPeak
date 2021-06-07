@@ -80,6 +80,21 @@ namespace SmartPeak
     return sequence_segment_name;
   }
 
+  void MetaDataHandler::setReplicateGroupName(const std::string& replicate_group_name_I)
+  {
+    replicate_group_name = replicate_group_name_I;
+  }
+
+  std::string& MetaDataHandler::getReplicateGroupName()
+  {
+    return replicate_group_name;
+  }
+
+  const std::string& MetaDataHandler::getReplicateGroupName() const
+  {
+    return replicate_group_name;
+  }
+
   void MetaDataHandler::setFilename(const std::string& filename_I)
   {
     original_filename = filename_I;
@@ -174,6 +189,7 @@ namespace SmartPeak
     sample_name.clear();
     sample_group_name.clear();
     sequence_segment_name.clear();
+    replicate_group_name.clear();
     original_filename.clear();
     sample_type = SampleType::Unknown;
     acq_method_name.clear();
@@ -245,5 +261,35 @@ namespace SmartPeak
     }
     std::string acquisition_datetime(time_repr);
     return acquisition_datetime;
+  }
+
+  std::string MetaDataHandler::getRackNumberAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((rack_number != -1) || (!undefined_str)) ? std::to_string(rack_number) : *undefined_str;
+  }
+
+  std::string MetaDataHandler::getPlateNumberAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((plate_number != -1) || (!undefined_str)) ? std::to_string(plate_number) : *undefined_str;
+  }
+
+  std::string MetaDataHandler::getPosNumberAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((pos_number != -1) || (!undefined_str)) ? std::to_string(pos_number) : *undefined_str;
+  }
+
+  std::string MetaDataHandler::getInjectionNumberAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((inj_number != -1) || (!undefined_str)) ? std::to_string(inj_number) : *undefined_str;
+  }
+
+  std::string MetaDataHandler::getScanMassLowAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((scan_mass_low != 0.0f) || (!undefined_str)) ? std::to_string(scan_mass_low) : *undefined_str;
+  }
+
+  std::string MetaDataHandler::getScanMassHighAsString(std::optional<std::string> undefined_str) const
+  {
+    return ((scan_mass_high != 1e12f) || (!undefined_str)) ? std::to_string(scan_mass_high) : *undefined_str;
   }
 }

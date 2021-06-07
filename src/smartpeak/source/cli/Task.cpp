@@ -23,7 +23,8 @@
 #include <SmartPeak/cli/Task.h>
 
 #include <SmartPeak/core/ApplicationProcessor.h>
-#include <boost/filesystem.hpp>
+#include <SmartPeak/core/SequenceProcessor.h>
+#include <filesystem>
 
 
 namespace SmartPeak {
@@ -77,11 +78,13 @@ bool LoadSession::operator() (ApplicationManager& application_manager)
 {
     auto& application_settings = application_manager.get_application_settings();
     auto& application_handler = application_manager.get_application_handler();
-    LoadSessionFromSequence load_session_processor{application_handler};
-    {
-        load_session_processor.pathname_ = application_settings.load_session;
-    }
-    return load_session_processor.process();
+    auto create_sequence = CreateSequence{application_handler.sequenceHandler_};
+    return create_sequence.onFilePicked(application_settings.load_session, &application_handler);
+    // LoadSessionFromSequence load_session_processor{application_handler};
+    // {
+    //     load_session_processor.pathname_ = application_settings.load_session;
+    // }
+    // return load_session_processor.process();
 }
 
 bool RunIntegrityChecks::operator() (ApplicationManager& application_manager) 
@@ -162,7 +165,7 @@ void RunIntegrityChecks::handle_integrity_check(
     // Allow to continue the pipeline if integrity check fails and allow-inconsistent is true: 
     else if (!check && allow_inconsistent)
     {
-        LOG_WARNING << msg << " Continue the workflow with --allow-inconsistent set.";
+        LOG_WARNING << msg << " Continue the workflow with --allow-inconsistent enabled.";
     }
     if (check)
     {
@@ -181,7 +184,7 @@ bool RunIntegrityChecks::run_integrity_check(
 
 bool InitializeWorkflowResources::operator() (ApplicationManager& application_manager) 
 {
-    namespace fs = boost::filesystem;
+    namespace fs = std::filesystem;
     auto& application_settings = application_manager.get_application_settings();
     auto& application_handler = application_manager.get_application_handler();
 
@@ -212,7 +215,7 @@ bool InitializeWorkflowResources::operator() (ApplicationManager& application_ma
     }
     catch (fs::filesystem_error& fe)
     {
-        if (fe.code() == boost::system::errc::permission_denied)
+        if (fe.code() == std::errc::permission_denied)
             LOG_ERROR << static_cast<std::ostringstream&&>(
                 std::ostringstream() 
                     << "Unable to create output directory, permission denied: '" << current_path << "'").str();
@@ -285,7 +288,8 @@ bool RunWorkflow::operator() (ApplicationManager& application_manager)
 
         workflow_manager.addWorkflow(
             application_handler, injection_names, sequence_segment_names, 
-            sample_group_names, application_manager.get_workflow_commands(), true);
+            sample_group_names, application_manager.get_workflow_commands(), 
+            nullptr, nullptr, nullptr, nullptr, true);
     }
     catch(const std::exception& e)
     {

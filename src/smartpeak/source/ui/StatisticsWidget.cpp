@@ -24,7 +24,6 @@
 #include <SmartPeak/ui/StatisticsWidget.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <imgui.h>
-#include <imgui_internal.h>
 #include <plog/Log.h>
 #include <SmartPeak/core/SharedProcessors.h>
 #include <implot.h>
@@ -39,17 +38,10 @@ namespace SmartPeak
     static const int max_samples = 50;
     static const int max_transitions = 50;
 
-    if (!application_handler_)
-      return;
-
     // Number of samples
     if (refresh_needed_)
     {
-      number_of_samples_ = 0;
-      if (application_handler_)
-      {
-        number_of_samples_ = application_handler_->sequenceHandler_.getSequence().size();
-      }
+      number_of_samples_ = application_handler_.sequenceHandler_.getSequence().size();
     }    // Chart number of features/sample
     if (number_of_samples_ < max_samples)
     {
@@ -58,7 +50,7 @@ namespace SmartPeak
         samples_chart_.clear();
         int samples_counter = 0;
         int sample_index = 0;
-        for (const auto& sequence : application_handler_->sequenceHandler_.getSequence())
+        for (const auto& sequence : application_handler_.sequenceHandler_.getSequence())
         {
           if ((injections_checkbox_)(sample_index, 1))
           {
@@ -87,11 +79,7 @@ namespace SmartPeak
     // Number of transitions
     if (refresh_needed_)
     {
-      number_of_transitions_ = 0;
-      if (application_handler_)
-      {
-        number_of_transitions_ = transitions_->dimension(0);
-      }
+      number_of_transitions_= transitions_->dimension(0);
     }
     // Chart number of features/transition
     if (number_of_transitions_ < max_transitions)
@@ -107,14 +95,14 @@ namespace SmartPeak
         transitions_chart_.clear();
         int transitions_counter = 0;
         int transitions_index = 0;
-        for (const auto& sequence : application_handler_->sequenceHandler_.getSequence())
+        for (const auto& sequence : application_handler_.sequenceHandler_.getSequence())
         {
           for (const auto& feature : sequence.getRawData().getFeatureMapHistory())
           {
             for (const auto& subordinate : feature.getSubordinates())
             {
               const auto& native_id = subordinate.getMetaValue("native_id");
-              if (native_id.valueType() == OpenMS::DataValue::STRING_VALUE)
+              if (native_id.valueType() == OpenMS::ParamValue::STRING_VALUE)
               {
                 feature_counter[native_id]++;
               }
@@ -146,13 +134,6 @@ namespace SmartPeak
     }
     drawChart(transitions_chart_, "#Features/Transition", "Transitions", "#Features");
 
-  }
-
-  void StatisticsWidget::setApplicationHandler(ApplicationHandler& state)
-  {
-    LOGD << "Setting state: " << (&state);
-    application_handler_ = &state;
-    application_handler_->sequenceHandler_.addSequenceObserver(this);
   }
 
   void StatisticsWidget::drawChart(DashboardChartData& chart_data, const char* title, const char* x_label, const char* y_label) const
@@ -201,10 +182,10 @@ namespace SmartPeak
       {
         chart_data.selected_value_name = chart_data.label_strings_.at(index_item);
         ImGui::BeginTooltip();
-        ImGui::Text(chart_data.selected_value_name.c_str());
+        ImGui::Text("%s", chart_data.selected_value_name.c_str());
         std::ostringstream os;
         os << chart_data.values_[index_item] << " Features";
-        ImGui::Text(os.str().c_str());
+        ImGui::Text("%s", os.str().c_str());
         ImGui::EndTooltip();
         chart_data.selected_value_index = index_item;
       }
@@ -215,7 +196,7 @@ namespace SmartPeak
     }
   }
 
-  void StatisticsWidget::sequenceUpdated()
+  void StatisticsWidget::onSequenceUpdated()
   {
     refresh_needed_ = true;
   }

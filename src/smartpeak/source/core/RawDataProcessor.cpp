@@ -24,6 +24,7 @@
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 
 // load/store raw data
 #include <OpenMS/FORMAT/FileTypes.h>
@@ -33,6 +34,7 @@
 #include <OpenMS/FORMAT/MzMLFile.h>
 #include <OpenMS/FORMAT/MzTabFile.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/ChromatogramExtractor.h>
+#include <OpenMS/ANALYSIS/QUANTITATION/IsotopeLabelingMDVs.h>
 #include <OpenMS/ANALYSIS/TARGETED/MRMMapping.h>
 #include <OpenMS/KERNEL/SpectrumHelper.h>
 
@@ -42,7 +44,7 @@
 #include <SmartPeak/io/InputDataValidation.h> // check filenames and headers
 
 // load validation data and parameters
-#include <SmartPeak/io/FileReader.h>
+#include <SmartPeak/io/ParametersParser.h>
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
 #endif
@@ -732,6 +734,21 @@ namespace SmartPeak
     LOGD << "END quantifyComponents";
   }
 
+  bool LoadTransitions::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
+    transitions_observable_ = &(application_handler->sequenceHandler_);
+    Filenames filenames;
+    filenames.traML_csv_i = filename;
+    process(rawDataHandler, {}, filenames);
+    return true;
+  }
+
   void LoadTransitions::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
@@ -767,6 +784,7 @@ namespace SmartPeak
           OpenMS::FileTypes::TRAML,
           rawDataHandler_IO.getTargetedExperiment()
         );
+        if (transitions_observable_) transitions_observable_->notifyTransitionsUpdated();
       }
       else if (format == "traML") 
       {
@@ -774,6 +792,7 @@ namespace SmartPeak
         rawDataHandler_IO.getTargetedExperiment().clear(true);
         OpenMS::TraMLFile tramlfile;
         tramlfile.load(filenames.traML_csv_i, rawDataHandler_IO.getTargetedExperiment());
+        if (transitions_observable_) transitions_observable_->notifyTransitionsUpdated();
       }
       else 
       {
@@ -959,6 +978,20 @@ namespace SmartPeak
     LOGD << "END storeFeatureQC";
   }
 
+  bool LoadValidationData::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
+    Filenames filenames;
+    filenames.referenceData_csv_i = filename;
+    process(rawDataHandler, {}, filenames);
+    return true;
+  }
+
   void LoadValidationData::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
@@ -1082,7 +1115,7 @@ namespace SmartPeak
       m.emplace(s_height, height);
       m.emplace(s_area, area);
       MetaDataHandler mdh;
-      mdh.sample_name = sample_name;
+      mdh.setSampleName(sample_name);
       mdh.inj_number = sample_index;
       mdh.batch_name = experiment_id;
       mdh.setAcquisitionDateAndTimeFromString(acquisition_date_and_time, "%m-%d-%Y %H:%M");
@@ -1093,6 +1126,21 @@ namespace SmartPeak
     rawDataHandler_IO.setReferenceData(reference_data);
 
     LOGD << "END loadValidationData";
+  }
+
+  bool LoadParameters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
+    parameters_observable_ = &(application_handler->sequenceHandler_);
+    Filenames filenames;
+    filenames.parameters_csv_i = filename;
+    process(rawDataHandler, {}, filenames);
+    return true;
   }
 
   void LoadParameters::process(
@@ -1117,9 +1165,9 @@ namespace SmartPeak
     }
 
     try {
-      FileReader::parseOpenMSParams(filenames.parameters_csv_i, rawDataHandler_IO.getParameters());
+      ParametersParser::read(filenames.parameters_csv_i, rawDataHandler_IO.getParameters());
       sanitizeParameters(rawDataHandler_IO.getParameters());
-      if (parameters_observable_) parameters_observable_->notifyParametersChanged();
+      if (parameters_observable_) parameters_observable_->notifyParametersUpdated();
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -1173,6 +1221,45 @@ namespace SmartPeak
     }
 
     LOGD << "END sanitizeRawDataProcessorParameters";
+  }
+
+  bool StoreParameters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
+    Filenames filenames;
+    filenames.parameters_csv_i = filename;
+    process(rawDataHandler, {}, filenames);
+    return true;
+  }
+
+  void StoreParameters::process(
+    RawDataHandler& rawDataHandler_IO,
+    const ParameterSet& params_I,
+    const Filenames& filenames
+  ) const
+  {
+    LOGD << "START StoreParameters";
+    LOGI << "Storing " << filename_;
+
+    if (filenames.parameters_csv_i.empty()) {
+      LOGE << "Filename is empty";
+      LOGD << "END readRawDataProcessingParameters";
+      return;
+    }
+
+    try {
+      ParametersParser::write(filenames.parameters_csv_i, rawDataHandler_IO.getParameters());
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+
+    LOGD << "END StoreParameters";
   }
 
   void ZeroChromatogramBaseline::process(

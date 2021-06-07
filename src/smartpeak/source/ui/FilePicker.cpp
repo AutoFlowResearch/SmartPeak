@@ -35,7 +35,7 @@ namespace SmartPeak
   {
     if (!files_scanned_)
     {
-      pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+      pathname_content_ = Utilities::getFolderContents(current_pathname_);
       Im_directory_entries.resize(pathname_content_[0].size(), ImEntry());
       for (int row = 0; row < pathname_content_[0].size(); row++)
       {
@@ -61,23 +61,23 @@ namespace SmartPeak
 
     if (ImGui::Button("Up"))
     {
-      const std::string parent = Utilities::getParentPathname(current_pathname_);
-      if (parent.size()) {
+      const std::filesystem::path parent = Utilities::getParentPath(current_pathname_);
+      if (parent.string().size()) {
         current_pathname_ = parent;
       }
-      pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+      pathname_content_ = Utilities::getFolderContents(current_pathname_);
       files_scanned_ = false;
       memset(selected_filename, 0, sizeof selected_filename);
       selected_entry = -1;
     }
     ImGui::SameLine();
-    ImGui::Text("Path: %s", current_pathname_.c_str());
+    ImGui::Text("Path: %s", current_pathname_.string().c_str());
 
     static char new_pathname[4096];
     if (ImGui::Button("Change dir"))
     {
       ImGui::OpenPopup("Change directory");
-      std::strncpy(new_pathname, current_pathname_.c_str(), 4096);
+      std::strncpy(new_pathname, current_pathname_.string().c_str(), 4096);
     }
 
     if (ImGui::BeginPopupModal("Change directory", NULL, ImGuiWindowFlags_AlwaysAutoResize))
@@ -86,7 +86,7 @@ namespace SmartPeak
       if (ImGui::Button("Set") || ImGui::IsKeyPressedMap(ImGuiKey_Enter))
       {
         current_pathname_.assign(new_pathname);
-        pathname_content_ = Utilities::getPathnameContent(current_pathname_);
+        pathname_content_ = Utilities::getFolderContents(current_pathname_);
         memset(selected_filename, 0, sizeof selected_filename);
         files_scanned_ = false;
         selected_entry = -1;
@@ -112,7 +112,9 @@ namespace SmartPeak
     
     const int column_count = 4;
     const char* column_names[column_count] = { "Name", "Size", "Type", "Date Modified" };
-    static ImGuiTableColumnFlags column_flags[column_count] = { ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide
+    static ImGuiTableColumnFlags column_flags[column_count] = {
+      ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide,
+      ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide
     };
     
     static ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
@@ -173,14 +175,9 @@ namespace SmartPeak
           {
             selected_entry = row;
             std::strcpy(selected_filename, Im_directory_entries[selected_entry].entry_contents[0].c_str());
-            if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item.entry_contents[2].c_str() , "Directory") )
+            if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item.entry_contents[2].c_str() , "Directory"))
             {
-              if (current_pathname_.back() != '/')
-              {
-                current_pathname_.append("/");
-              }
-              
-              current_pathname_.append(item.entry_contents[0].c_str());
+              current_pathname_ /= item.entry_contents[0].c_str();
               memset(selected_filename, 0, sizeof selected_filename);
               files_scanned_ = false;
               updateContents(Im_directory_entries);
@@ -188,9 +185,9 @@ namespace SmartPeak
               selected_entry = -1;
               break;
             }
-            else if (ImGui::IsMouseDoubleClicked(0))
+            else if (ImGui::IsMouseDoubleClicked(0) || ImGui::IsMouseClicked(0))
             {
-              picked_pathname_ = current_pathname_;
+              picked_pathname_ = current_pathname_.string();
               if (selected_entry >= 0)
               {
                 if (picked_pathname_.back() != '/')
@@ -200,10 +197,12 @@ namespace SmartPeak
                 picked_pathname_.append(item.entry_contents[0].c_str());
               }
               filter.Clear();
-              selected_entry = -1;
+              LOGI << "Picked file : " << picked_pathname_;
               runProcessor();
               clearProcessor();
-              LOGI << "Picked file : " << picked_pathname_;
+              selected_entry = -1;
+              memset(selected_filename, 0, sizeof selected_filename);
+              visible_ = false;
               ImGui::CloseCurrentPopup();
             }
           }
@@ -215,29 +214,26 @@ namespace SmartPeak
     ImGui::Separator();
 
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
-    if (ImGui::IsMouseClicked(0))
-      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
-    else
-      ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
     if (ImGui::Button("Open"))
     {
-      picked_pathname_ = current_pathname_;
-      if (selected_entry >= 0)
+      picked_pathname_ = current_pathname_.string();
+      if (picked_pathname_.back() != '/')
       {
-        if (picked_pathname_.back() != '/') // do not insert "/" if current_pathname_ == root dir, i.e. avoid "//home"
-        {
-          picked_pathname_.append("/");
-        }
-        picked_pathname_.append(selected_filename);
+        picked_pathname_.append("/");
       }
+      picked_pathname_.append(selected_filename);
+      filter.Clear();
       LOGI << "Picked pathname: " << picked_pathname_;
       runProcessor();
       clearProcessor();
       selected_entry = -1;
+      visible_ = false;
+      memset(selected_filename, 0, sizeof selected_filename);
       ImGui::CloseCurrentPopup();
     }
     ImGui::PopItemWidth();
@@ -248,6 +244,7 @@ namespace SmartPeak
     {
       picked_pathname_.clear();
       selected_entry = -1;
+      visible_ = false;
       ImGui::CloseCurrentPopup();
     }
     ImGui::PopItemWidth();
@@ -260,41 +257,40 @@ namespace SmartPeak
     return picked_pathname_;
   }
 
-  void FilePicker::setProcessor(FilePickerProcessor& processor)
+  void FilePicker::setFilePickerHandler(std::shared_ptr<IFilePickerHandler> file_picker_handler, ApplicationHandler& application_handler)
   {
-    LOGD << "Setting processor: " << (&processor);
-    processor_ = &processor;
-    processor_name_ = processor.getName();
+    LOGD << "Setting processor: " << (file_picker_handler.get());
+    file_picker_handler_ = file_picker_handler;
+    application_handler_ = &application_handler;
     error_loading_file_ = false;
     file_was_loaded_ = false;
   }
 
   void FilePicker::runProcessor()
   {
-    LOGD << "Running processor (ptr): " << processor_;
-    if (!processor_)
+    LOGD << "Running processor (ptr): " << file_picker_handler_;
+    if (!file_picker_handler_)
       return;
     loading_is_done_ = false;
-    run_and_join(processor_, picked_pathname_, loading_is_done_, file_was_loaded_);
+    run_and_join(file_picker_handler_.get(), picked_pathname_, loading_is_done_, file_was_loaded_);
   }
 
   void FilePicker::clearProcessor()
   {
     LOGD << "Clearing processor";
-    processor_ = nullptr;
+    file_picker_handler_ = nullptr;
   }
 
   void FilePicker::run_and_join(
-    FilePickerProcessor* processor,
+    IFilePickerHandler* file_picker_handler,
     const std::string& pathname,
     bool& loading_is_done,
     bool& file_was_loaded
   )
   {
-    processor->pathname_ = pathname;
     std::future<bool> f = std::async(
       std::launch::async, 
-      [processor](){ return processor->process(); }
+      [this, file_picker_handler, pathname](){ return file_picker_handler->onFilePicked(pathname, application_handler_); }
     );
 
     LOGN << "File is being loaded...";

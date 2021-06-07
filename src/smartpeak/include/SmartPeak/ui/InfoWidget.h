@@ -25,34 +25,56 @@
 
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/ApplicationProcessorObservable.h>
+#include <SmartPeak/core/SequenceProcessorObservable.h>
+#include <SmartPeak/core/SequenceSegmentProcessorObservable.h>
+#include <SmartPeak/core/SampleGroupProcessorObservable.h>
+#include <SmartPeak/core/ProgressInfo.h>
 #include <SmartPeak/iface/ISequenceObserver.h>
+#include <SmartPeak/core/ProgressInfo.h>
+
 #include <string>
 #include <vector>
 #include <chrono>
 
 namespace SmartPeak
 {
-  class InfoWidget final : public Widget, public ISequenceObserver
+  class InfoWidget final : 
+    public Widget, 
+    public ISequenceObserver
   {
 
   public:
+    InfoWidget(const std::string title, 
+               ApplicationHandler & application_handler,
+               ApplicationProcessorObservable& application_processor_observable,
+               SequenceProcessorObservable& sequence_processor_observable,
+               SequenceSegmentProcessorObservable& sequence_segment_processor_observable,
+               SampleGroupProcessorObservable& sample_group_processor_observable,
+               SequenceObservable& sequence_observable)
+      : Widget(title),
+        application_handler_(application_handler),
+        progress_info_(application_processor_observable,
+                       sequence_processor_observable,
+                       sequence_segment_processor_observable,
+                       sample_group_processor_observable)
+    {
+      sequence_observable.addSequenceObserver(this);
+    };
+
     /**
-     ISequenceObserver
+      ISequenceObserver
     */
-    virtual void sequenceUpdated() override;
+    virtual void onSequenceUpdated() override;
 
   public:
     void draw() override;
-    void setRefreshNeeded() { refresh_needed_ = true; };
 
-    void setApplicationHandler(ApplicationHandler& application_handler);
-    void setTransitions(const Eigen::Tensor<std::string, 2>* transitions) { transitions = transitions_; };
+    void setTransitions(const Eigen::Tensor<std::string, 2>* transitions) { transitions_ = transitions; };
 
-    void setWorkflowDone(bool done) { workflow_is_done_ = done; };
     void setFileLoadingDone(bool done, bool load_error)  { file_loading_is_done_ = done; file_load_error_ = load_error;};
     void clearErrorMessages() { error_messages_.clear(); };
     void addErrorMessage(const std::string& error_message) { error_messages_.push_back(error_message); };
-    void setLastRunTime(const std::chrono::steady_clock::duration& last_run_time) { last_run_time_ = last_run_time; };
 
   private:
     void drawWorkflowStatus();
@@ -63,19 +85,21 @@ namespace SmartPeak
     void drawSamples();
     void drawTransition();
     void drawLastRunTime();
+    void drawWorkflowProgress();
+    std::string formattedTime(const std::chrono::steady_clock::duration& duration) const;
 
   protected:
-    ApplicationHandler* application_handler_ = nullptr;
+    ApplicationHandler& application_handler_;
     const Eigen::Tensor<std::string, 2>* transitions_ = nullptr;
-    std::chrono::steady_clock::duration last_run_time_ = std::chrono::steady_clock::duration::zero();
     int number_of_chromatograms_ = 0;
     int number_of_spectrums_ = 0;
     int number_of_samples_ = 0;
     int number_of_transitions_ = 0;
-    bool workflow_is_done_ = true;
     bool file_loading_is_done_ = true;
     bool file_load_error_ = false;
     bool refresh_needed_ = true;
     std::vector<std::string> error_messages_;
+    int spinner_counter_ = 0;
+    ProgressInfo progress_info_;
   };
 }

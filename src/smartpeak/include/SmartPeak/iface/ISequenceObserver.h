@@ -30,6 +30,6 @@ namespace SmartPeak
     /**
       Sequence has been updated
     */
-    virtual void sequenceUpdated() = 0;
+    virtual void onSequenceUpdated() = 0;
   };
 }

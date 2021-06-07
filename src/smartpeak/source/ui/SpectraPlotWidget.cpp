@@ -74,4 +74,8 @@ namespace SmartPeak
     }
   };
 
+  void SpectraPlotWidget::onSequenceUpdated()
+  {
+    refresh_needed_ = true;
+  }
 }

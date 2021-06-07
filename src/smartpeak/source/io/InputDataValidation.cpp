@@ -25,7 +25,7 @@
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
-#include <SmartPeak/io/FileReader.h>
+#include <SmartPeak/io/ParametersParser.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <fstream>
 #include <string>
@@ -71,7 +71,7 @@ namespace SmartPeak
 
     for (const InjectionHandler& sampleHandler : sequenceHandler.getSequence()) {
       const MetaDataHandler& sample_meta_data = sampleHandler.getMetaData();
-      oss << sample_meta_data.getInjectionName() << "\t" << sampleTypeToString.at(sample_meta_data.sample_type) << "\n";
+      oss << sample_meta_data.getInjectionName() << "\t" << sampleTypeToString.at(sample_meta_data.getSampleType()) << "\n";
     }
 
     oss << "==== END   getSequenceInfo\n";
@@ -316,7 +316,7 @@ namespace SmartPeak
     std::set<std::string> names2;
 
     for (const InjectionHandler& injection : samples) {
-      names1.insert(injection.getMetaData().sample_name);
+      names1.insert(injection.getMetaData().getSampleName());
     }
 
     for (const OpenMS::AbsoluteQuantitationStandards::runConcentration& run : standards) {

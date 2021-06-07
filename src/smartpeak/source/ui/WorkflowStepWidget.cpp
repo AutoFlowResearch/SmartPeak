@@ -17,14 +17,13 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/WorkflowStepWidget.h>
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <imgui.h>
-#include <imgui_internal.h>
 #include <plog/Log.h>
 #include <SmartPeak/core/SharedProcessors.h>
 
@@ -32,11 +31,7 @@ namespace SmartPeak
 {
   void WorkflowStepWidget::draw()
   {
-    if (!application_handler_)
-    {
-      LOGE << "Workflow widget has no ApplicationHandler object associated with it";
-      return;
-    }
+    showQuickHelpToolTip("WorkflowStepWindow");
 
     float popup_width = 400;
     float description_box_height = 200;
@@ -107,11 +102,11 @@ namespace SmartPeak
     if (!selected_method_.empty())
     {
       ImGui::PushTextWrapPos();
-      BuildCommandsFromNames buildCommandsFromNames(*application_handler_);
+      BuildCommandsFromNames buildCommandsFromNames(application_handler_);
       buildCommandsFromNames.names_ = { selected_method_ };
       if (buildCommandsFromNames.process() && buildCommandsFromNames.commands_.size() > 0)
       {
-        ImGui::Text(buildCommandsFromNames.commands_[0].getDescription().c_str());
+        ImGui::Text("%s", buildCommandsFromNames.commands_[0].getDescription().c_str());
         command_success = true;
       }
       else
@@ -129,8 +124,8 @@ namespace SmartPeak
     {
       if (!selected_method_.empty() && command_success)
       {
-        application_handler_->sequenceHandler_.getWorkflow().push_back(selected_method_);
-        application_handler_->sequenceHandler_.notifyWorkflowChanged();
+        application_handler_.sequenceHandler_.getWorkflow().push_back(selected_method_);
+        application_handler_.sequenceHandler_.notifyWorkflowUpdated();
       }
       ImGui::CloseCurrentPopup();
     }
@@ -144,9 +139,4 @@ namespace SmartPeak
     ImGui::EndPopup();
   }
 
-  void WorkflowStepWidget::setApplicationHandler(ApplicationHandler& state)
-  {
-    LOGD << "Setting state: " << (&state);
-    application_handler_ = &state;
-  }
 }

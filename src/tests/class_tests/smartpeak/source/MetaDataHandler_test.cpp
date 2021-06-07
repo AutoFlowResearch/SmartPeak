@@ -49,6 +49,7 @@ BOOST_AUTO_TEST_CASE(getters_setters)
   BOOST_CHECK_EQUAL(metaDataHandler.getSampleGroupName(), "");
   BOOST_CHECK_EQUAL(metaDataHandler.getSampleType() == SampleType::Unknown, true);
   BOOST_CHECK_EQUAL(metaDataHandler.getSequenceSegmentName(), "");
+  BOOST_CHECK_EQUAL(metaDataHandler.getReplicateGroupName(), "");
   BOOST_CHECK_EQUAL(metaDataHandler.getFilename(), "");
   BOOST_CHECK_EQUAL(metaDataHandler.getAcquisitionDateAndTimeAsString(), "1900-01-01_000000");
   BOOST_CHECK_EQUAL(metaDataHandler.getInjectionName(), "_-1__1900-01-01_000000");
@@ -58,6 +59,7 @@ BOOST_AUTO_TEST_CASE(getters_setters)
   metaDataHandler.setSampleGroupName("this is a sample GROUP name");
   metaDataHandler.setSampleType(SampleType::QC);
   metaDataHandler.setSequenceSegmentName("this is a SEQUENCE segment name");
+  metaDataHandler.setReplicateGroupName("this is a REPLICATE GROUP name");
   metaDataHandler.setFilename("some filename");
   metaDataHandler.batch_name = "SomeBatchName";
   metaDataHandler.setAcquisitionDateAndTimeFromString("09-06-2015  17:14:00", "%m-%d-%Y %H:%M:%S");
@@ -65,6 +67,7 @@ BOOST_AUTO_TEST_CASE(getters_setters)
   BOOST_CHECK_EQUAL(metaDataHandler.getSampleGroupName(), "this is a sample GROUP name");
   BOOST_CHECK_EQUAL(metaDataHandler.getSampleType() == SampleType::QC, true);
   BOOST_CHECK_EQUAL(metaDataHandler.getSequenceSegmentName(), "this is a SEQUENCE segment name");
+  BOOST_CHECK_EQUAL(metaDataHandler.getReplicateGroupName(), "this is a REPLICATE GROUP name");
   BOOST_CHECK_EQUAL(metaDataHandler.getFilename(), "some filename");
   BOOST_CHECK_EQUAL(metaDataHandler.getAcquisitionDateAndTimeAsString(), "2015-09-06_171400");
   BOOST_CHECK_EQUAL(metaDataHandler.getInjectionName(), "this is a sample name_-1_SomeBatchName_2015-09-06_171400");
@@ -110,13 +113,14 @@ BOOST_AUTO_TEST_CASE(clear)
   m.setSampleGroupName("2");
   m.setSampleType(SampleType::QC);
   m.setSequenceSegmentName("4");
-  m.setFilename("5");
-  m.acq_method_name = "6";
-  m.inj_volume = 7.0;
-  m.inj_volume_units = "8";
-  m.batch_name = "9";
+  m.setReplicateGroupName("5");
+  m.setFilename("6");
+  m.acq_method_name = "7";
+  m.inj_volume = 8.0;
+  m.inj_volume_units = "9";
+  m.batch_name = "10";
   m.acquisition_date_and_time = { 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-  m.dilution_factor = 10;
+  m.dilution_factor = 11;
   m.scan_polarity = "negative";
   m.scan_mass_high = 1000;
   m.scan_mass_low = 100;
@@ -127,6 +131,7 @@ BOOST_AUTO_TEST_CASE(clear)
   BOOST_CHECK_EQUAL(m.getSampleGroupName(), "");
   BOOST_CHECK_EQUAL((int)m.getSampleType(), (int)SampleType::Unknown);
   BOOST_CHECK_EQUAL(m.getSequenceSegmentName(), "");
+  BOOST_CHECK_EQUAL(m.getReplicateGroupName(), "");
   BOOST_CHECK_EQUAL(m.getFilename(), "");
   BOOST_CHECK_EQUAL(m.acq_method_name, "");
   BOOST_CHECK_EQUAL(m.inj_volume, -1.0);
@@ -166,6 +171,72 @@ BOOST_AUTO_TEST_CASE(getInjectionName)
   m.acquisition_date_and_time.tm_year = 119; // years since 1900
 
   BOOST_CHECK_EQUAL(m.getInjectionName(), "SampleName_14_BatchName_2019-01-31_154055");
+}
+
+BOOST_AUTO_TEST_CASE(getRackNumberAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getRackNumberAsString(), "-1");
+  BOOST_CHECK_EQUAL(m.getRackNumberAsString("invalid"s), "invalid");
+  m.rack_number = 42;
+  BOOST_CHECK_EQUAL(m.getRackNumberAsString(), "42");
+  BOOST_CHECK_EQUAL(m.getRackNumberAsString("invalid"s), "42");
+}
+
+BOOST_AUTO_TEST_CASE(getPlateNumberAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getPlateNumberAsString(), "-1");
+  BOOST_CHECK_EQUAL(m.getPlateNumberAsString("invalid"s), "invalid");
+  m.plate_number = 42;
+  BOOST_CHECK_EQUAL(m.getPlateNumberAsString(), "42");
+  BOOST_CHECK_EQUAL(m.getPlateNumberAsString("invalid"s), "42");
+}
+
+BOOST_AUTO_TEST_CASE(getPosNumberAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getPosNumberAsString(), "-1");
+  BOOST_CHECK_EQUAL(m.getPosNumberAsString("invalid"s), "invalid");
+  m.pos_number = 42;
+  BOOST_CHECK_EQUAL(m.getPosNumberAsString(), "42");
+  BOOST_CHECK_EQUAL(m.getPosNumberAsString("invalid"s), "42");
+}
+
+BOOST_AUTO_TEST_CASE(getInjectionNumberAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getInjectionNumberAsString(), "-1");
+  BOOST_CHECK_EQUAL(m.getInjectionNumberAsString("invalid"s), "invalid");
+  m.inj_number = 42;
+  BOOST_CHECK_EQUAL(m.getInjectionNumberAsString(), "42");
+  BOOST_CHECK_EQUAL(m.getInjectionNumberAsString("invalid"s), "42");
+}
+
+BOOST_AUTO_TEST_CASE(getScanMassLowAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getScanMassLowAsString(), "0.000000");
+  BOOST_CHECK_EQUAL(m.getScanMassLowAsString("invalid"s), "invalid");
+  m.scan_mass_low = 42;
+  BOOST_CHECK_EQUAL(m.getScanMassLowAsString(), "42.000000");
+  BOOST_CHECK_EQUAL(m.getScanMassLowAsString("invalid"s), "42.000000");
+}
+
+BOOST_AUTO_TEST_CASE(getScanMassHighAsString)
+{
+  using namespace std::string_literals;
+  MetaDataHandler m;
+  BOOST_CHECK_EQUAL(m.getScanMassHighAsString(), "999999995904.000000");
+  BOOST_CHECK_EQUAL(m.getScanMassHighAsString("invalid"s), "invalid");
+  m.scan_mass_high = 42;
+  BOOST_CHECK_EQUAL(m.getScanMassHighAsString(), "42.000000");
+  BOOST_CHECK_EQUAL(m.getScanMassHighAsString("invalid"s), "42.000000");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

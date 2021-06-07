@@ -27,6 +27,7 @@
 
 #include <string>
 #include <ctime>
+#include <optional>
 
 namespace SmartPeak {
   class MetaDataHandler {
@@ -42,6 +43,10 @@ public:
     void setSequenceSegmentName(const std::string& sequence_segment_name_I);
     std::string& getSequenceSegmentName();
     const std::string& getSequenceSegmentName() const;
+
+    void setReplicateGroupName(const std::string& replicate_group_name_I);
+    std::string& getReplicateGroupName();
+    const std::string& getReplicateGroupName() const;
 
     void setFilename(const std::string& filename_I);
     std::string& getFilename();
@@ -66,12 +71,43 @@ public:
 
     std::string getAcquisitionDateAndTimeAsString(const std::string& format = "%Y-%m-%d_%H%M%S") const;
 
+    /**
+     @brief return string form of rack number
+     @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getRackNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const;
+
+    /**
+      @brief return string form of plate number
+      @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getPlateNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const;
+    
+    /**
+      @brief return string form of pos number
+      @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getPosNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const;
+
+    /**
+      @brief return string form of injection number
+      @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getInjectionNumberAsString(std::optional<std::string> undefined_str = std::nullopt) const;
+
+    /**
+      @brief return string form of mass low value
+      @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getScanMassLowAsString(std::optional<std::string> undefined_str = std::nullopt) const;
+
+    /**
+      @brief return string form of mass high
+      @param[in] undefined_str string to return if the value is not defined
+    */
+    std::string getScanMassHighAsString(std::optional<std::string> undefined_str = std::nullopt) const;
+
     // required
-    std::string sample_name;
-    std::string sample_group_name;
-    std::string sequence_segment_name;
-    std::string original_filename;
-    SampleType sample_type = SampleType::Unknown;
     std::string acq_method_name;
     float inj_volume = -1.0;
     std::string inj_volume_units;
@@ -88,8 +124,17 @@ public:
     std::string proc_method_name;
     std::tm acquisition_date_and_time = { 0, 0, 0, 1, 0, 0, 0, 0, 0 }; // Need to start at Day 1 of the month
     std::string scan_polarity = "Unknown";
-    float scan_mass_low = 0.0; // in Da
-    float scan_mass_high = 1e12; // in Da
+    float scan_mass_low = 0.0f; // in Da
+    float scan_mass_high = 1e12f; // in Da
+
+  protected:
+    // required
+    std::string sample_name;
+    std::string sample_group_name;
+    std::string sequence_segment_name;
+    std::string replicate_group_name;
+    std::string original_filename;
+    SampleType sample_type = SampleType::Unknown;
   };
 
 }
