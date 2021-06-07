@@ -683,7 +683,7 @@ TEST(SessionHandler, getSpectrumScatterPlot1)
 {
   TestData testData;
   SessionHandler session_handler;
-  SessionHandler::ScatterPlotData result;
+  SessionHandler::GraphVizData result;
   const std::pair<float, float> range = std::make_pair(0, 1800);
   const std::set<std::string> sample_names;
   const std::set<std::string> component_names;
@@ -694,7 +694,7 @@ TEST(SessionHandler, setSpectrumScatterPlot1)
 {
   TestData testData;
   SessionHandler session_handler;
-  SessionHandler::ScatterPlotData result;
+  SessionHandler::GraphVizData result;
   const std::pair<float, float> range = std::make_pair(0, 2000);
   const std::set<std::string> sample_names;
   const std::set<std::string> scan_names;

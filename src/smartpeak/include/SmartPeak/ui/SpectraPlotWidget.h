@@ -1,10 +1,9 @@
 #pragma once
 
-#include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/GraphicDataVizWidget.h>
 #include <string>
 #include <utility>
 #include <vector>
-#include <imgui.h>
 
 namespace SmartPeak
 {
@@ -13,7 +12,7 @@ namespace SmartPeak
     @brief Class for plotting Spectra
   */
   class SpectraPlotWidget : 
-    public ScatterPlotWidget,
+    public GraphicDataVizWidget,
     public ISequenceObserver
   {
   public:
@@ -22,8 +21,9 @@ namespace SmartPeak
       const std::string& id,
       const std::string& title,
       SequenceObservable& sequence_observable) :
-      ScatterPlotWidget(session_handler, sequence_handler, id, title) 
+      GraphicDataVizWidget(session_handler, sequence_handler, id, title) 
     {
+      is_spectra_ = true;
       sequence_observable.addSequenceObserver(this);
     };
 
@@ -33,7 +33,8 @@ namespace SmartPeak
     virtual void onSequenceUpdated() override;
 
   protected:
-    virtual void updateScatterPlotData() override;
+    virtual void updateData() override;
+
   protected:
     // input used to create the graph
     std::pair<float, float> input_range_ = { 0.0f, 0.0f };

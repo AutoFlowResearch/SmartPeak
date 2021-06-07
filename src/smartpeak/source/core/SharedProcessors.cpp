@@ -62,7 +62,8 @@ namespace SmartPeak {
     {"CALCULATE_MDVS",                            std::make_shared<CalculateMDVs>()},
     {"ISOTOPIC_CORRECTIONS",                      std::make_shared<IsotopicCorrections>()},
     {"CALCULATE_MDV_ISOTOPIC_PURITIES",           std::make_shared<CalculateIsotopicPurities>()},
-    {"CALCULATE_MDV_ACCURACIES",                  std::make_shared<CalculateMDVAccuracies>()}
+    {"CALCULATE_MDV_ACCURACIES",                  std::make_shared<CalculateMDVAccuracies>()},
+    {"SEARCH_SPECTRUM",                           std::make_shared<searchSpectrum>()}
   };
   const std::map<std::string, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
     {"CALCULATE_CALIBRATION",                     std::make_shared<CalculateCalibration>()},

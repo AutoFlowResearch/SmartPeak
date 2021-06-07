@@ -56,6 +56,8 @@ public:
     std::string referenceData_csv_i;
     std::string selectDilutions_csv_i;
     std::string mzML_i;
+    std::string dda_features_i;
+    std::string dda_features_o;
     std::string mzTab_i;
     std::string mzTab_o;
     std::string featureXML_o;

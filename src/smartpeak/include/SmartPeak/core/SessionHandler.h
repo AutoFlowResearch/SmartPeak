@@ -123,23 +123,48 @@ namespace SmartPeak
     */
     void setFeatureMatrix(const SequenceHandler& sequence_handler);
     /*
-    @brief Scatter Plot structure, result of getChromatogramScatterPlot and getSpectrumScatterPlot
+    @brief Graph Visualization Data structure
     */
-    struct ScatterPlotData
+    struct GraphVizData
     {
+      std::vector<std::string> series_names_area_;
       std::vector<std::vector<float>> x_data_area_;
       std::vector<std::vector<float>> y_data_area_;
+      std::vector<std::string> series_names_scatter_;
       std::vector<std::vector<float>> x_data_scatter_;
       std::vector<std::vector<float>> y_data_scatter_;
-      std::vector<std::string> series_names_area_;
-      std::vector<std::string> series_names_scatter_;
       std::string x_axis_title_;
       std::string y_axis_title_;
+      std::vector<float> z_data_area_;
+      std::optional<std::string> z_axis_title_;
       float x_min_ = 0.0f;
       float x_max_ = 0.0f;
       float y_min_ = 0.0f;
       float y_max_ = 0.0f;
-      bool points_overflow = false; // true if all points were added and false if points were omitted due to performance
+      float z_min_ = 0.0f;
+      float z_max_ = 0.0f;
+      bool points_overflow = false; // true if all points were added and false if points were omitted due to performance concern
+
+      void reset(const std::string& x_axis_title, const std::string& y_axis_title, const std::optional<std::string>& z_axis_title)
+      {
+        x_axis_title_ = x_axis_title;
+        y_axis_title_ = y_axis_title;
+        z_axis_title_ = z_axis_title;
+        x_min_ = 1e6;
+        x_max_ = 0;
+        y_min_ = 1e6;
+        y_max_ = 0;
+        z_min_ = 1e6;
+        z_max_ = 0;
+        x_data_scatter_.clear();
+        y_data_scatter_.clear();
+        series_names_scatter_.clear();
+        x_data_area_.clear();
+        y_data_area_.clear();
+        z_data_area_.clear();
+        series_names_area_.clear();
+        points_overflow = false;
+      }
     };
 
     /*
@@ -152,10 +177,24 @@ namespace SmartPeak
     @param[in] component_names
     */
     void getChromatogramScatterPlot(const SequenceHandler& sequence_handler, 
-                                    ScatterPlotData& result,
+                                    GraphVizData& result,
                                     const std::pair<float, float>& range,
                                     const std::set<std::string>& sample_names,
                                     const std::set<std::string>& component_names) const;
+
+    void getChromatogramTIC(const SequenceHandler& sequence_handler,
+      GraphVizData& result,
+      const std::pair<float, float>& range,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& scan_names) const;
+
+    void getChromatogramXIC(const SequenceHandler& sequence_handler,
+      GraphVizData& result,
+      const std::pair<float, float>& range,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_names,
+      float mz) const;
+
     /*
     @brief Gets the spectrum data
 
@@ -167,11 +206,21 @@ namespace SmartPeak
     @param[in] component_group_names
     */
     void getSpectrumScatterPlot(const SequenceHandler& sequence_handler,
-                                ScatterPlotData& result,
+                                GraphVizData& result,
                                 const std::pair<float, float>& range,
                                 const std::set<std::string>& sample_names,
                                 const std::set<std::string>& scan_names,
                                 const std::set<std::string>& component_group_names) const;
+
+    void getSpectrumMSMSPlot(const SequenceHandler& sequence_handler,
+      GraphVizData& result,
+      const std::pair<float, float>& range,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& scan_names,
+      const std::set<std::string>& component_group_names,
+      const float rt,
+      const int ms_level) const;
+
     void setFeatureLinePlot();
 
     /*

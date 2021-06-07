@@ -336,6 +336,142 @@ namespace SmartPeak
       ) const override;
   };
 
+  struct MergeFeaturesDDA : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "MERGE_FEATURES_DDA"; }
+    std::string getDescription() const override { return "Organize into a map by combining features and subordinates with the same `identifier`."; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct AnnotateSpectra : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "ANNOTATE_SPECTRA"; }
+    std::string getDescription() const override { return "Annotates the MS2 spectra with the likely MS1 feature that it was derived from."; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct storeSpectraTraML : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "STORE_SPECTRA_TRAML"; }
+    std::string getDescription() const override { return "Store MS1 and the associated MS2 features"; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct searchSpectrum : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "SEARCH_SPECTRUM"; }
+    std::string getDescription() const override { return "Search accurate masses and add identification (peptide hits) as features/sub-features"; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct pickSpectrum : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "PICK_SPECTRUM"; }
+    std::string getDescription() const override { return "Picks a spectrum's peaks and saves them in picked_spectrum."; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct scoreSpectra : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "SCORE_SPECTRA"; }
+    std::string getDescription() const override { return "Assigns a score to the spectra given an input and saves them in scored_spectra."; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct selectSpectra : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "SELECT_SPECTRA"; }
+    std::string getDescription() const override { return "Assigns a score to the spectra given an input and saves them in scored_spectra."; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct DDA : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "DDA"; }
+    std::string getDescription() const override { return "DDA"; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
   struct FilterFeatures : RawDataProcessor
   {
     int getID() const override { return 4; }

@@ -1612,7 +1612,7 @@ namespace SmartPeak
   }
   
   void SessionHandler::getChromatogramScatterPlot(const SequenceHandler & sequence_handler, 
-                                                  ScatterPlotData& result, 
+                                                  GraphVizData& result, 
                                                   const std::pair<float, float>& chrom_time_range,
                                                   const std::set<std::string>& sample_names,
                                                   const std::set<std::string>& component_names) const
@@ -1624,19 +1624,7 @@ namespace SmartPeak
       sequence_handler.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0)) {
       LOGD << "Making the chromatogram data for plotting";
       // Set the axes titles and min/max defaults
-      result.x_axis_title_ = "Time (sec)";
-      result.y_axis_title_ = "Intensity (au)";
-      result.x_min_ = 1e6;
-      result.x_max_ = 0;
-      result.y_min_ = 1e6;
-      result.y_max_ = 0;
-      result.x_data_area_.clear();
-      result.y_data_area_.clear();
-      result.series_names_area_.clear();
-      result.x_data_scatter_.clear();
-      result.y_data_scatter_.clear();
-      result.series_names_scatter_.clear();
-      result.points_overflow = false;
+      result.reset("Time (sec)", "Intensity (au)", {});
       for (const auto& injection : sequence_handler.getSequence()) {
         if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
         // Extract out the raw data for plotting
@@ -1654,9 +1642,9 @@ namespace SmartPeak
           }
           n_points += x_data.size();
           if (n_points<MAX_POINTS) {
-            result.x_data_scatter_.push_back(x_data);
-            result.y_data_scatter_.push_back(y_data);
-            result.series_names_scatter_.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
+            result.x_data_area_.push_back(x_data);
+            result.y_data_area_.push_back(y_data);
+            result.series_names_area_.push_back(injection.getMetaData().getSampleName() + "::" + chromatogram.getNativeID());
           }
           else 
           {
@@ -1682,9 +1670,9 @@ namespace SmartPeak
               if (x_data.size() <= 0) continue;
               n_points += x_data.size();
               if (n_points < MAX_POINTS) {
-                result.x_data_area_.push_back(x_data);
-                result.y_data_area_.push_back(y_data);
-                result.series_names_area_.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("native_id").toString() + "::" + subordinate.getMetaValue("timestamp_").toString());
+                result.x_data_scatter_.push_back(x_data);
+                result.y_data_scatter_.push_back(y_data);
+                result.series_names_scatter_.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("native_id").toString() + "::" + subordinate.getMetaValue("timestamp_").toString());
               }
               else 
               {
@@ -1699,8 +1687,135 @@ namespace SmartPeak
     }
   }
 
+  void SessionHandler::getChromatogramTIC(const SequenceHandler& sequence_handler,
+    GraphVizData& result,
+    const std::pair<float, float>& chrom_time_range,
+    const std::set<std::string>& sample_names,
+    const std::set<std::string>& scan_names) const
+  {
+    const int MAX_POINTS = 6000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
+    int n_points = 0;
+
+    LOGD << "Making the chromatogram TIC data for plotting";
+    // Set the axes titles and min/max defaults
+    result.reset("Time (sec)", "Intensity (au)", {});
+    for (const auto& injection : sequence_handler.getSequence())
+    {
+      if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
+      const auto& experiment = injection.getRawData().getExperiment();
+      std::vector<float> x_data, y_data;
+      for (const auto& spectrum : experiment)
+      {
+        const auto ms_level = spectrum.getMSLevel();
+        if (ms_level == 1)
+        {
+          if (scan_names.count(spectrum.getNativeID()) == 0) continue;
+          x_data.push_back(spectrum.getRT());
+          y_data.push_back(spectrum.getTIC());
+          result.x_min_ = std::min((float)spectrum.getRT(), result.x_min_);
+          result.y_min_ = std::min((float)spectrum.getTIC(), result.y_min_);
+          result.x_max_ = std::max((float)spectrum.getRT(), result.x_max_);
+          result.y_max_ = std::max((float)spectrum.getTIC(), result.y_max_);
+        }
+      }
+      n_points += x_data.size();
+      if (n_points < MAX_POINTS)
+      {
+        result.x_data_area_.push_back(x_data);
+        result.y_data_area_.push_back(y_data);
+        result.series_names_area_.push_back(injection.getMetaData().getSampleName());
+      }
+      else
+      {
+        LOGD << "Stopped adding points to the chromatogram plot";
+        result.points_overflow = true;
+        return;
+      }
+    }
+  }
+
+  void SessionHandler::getChromatogramXIC(const SequenceHandler& sequence_handler,
+      GraphVizData& result,
+      const std::pair<float, float>& chrom_time_range,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_names,
+      float mz) const
+  {
+    const int MAX_POINTS = 6000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
+    int n_points = 0;
+
+    if (sequence_handler.getSequence().size() > 0 &&
+      (sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0 
+//        || sequence_handler.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0
+      ))
+    {
+      LOGD << "Making the chromatogram data for plotting";
+      // Set the axes titles and min/max defaults
+      result.reset("Time (sec)", "Intensity (au)", {});
+      for (const auto& injection : sequence_handler.getSequence()) {
+        // Extract out the smoothed points for plotting
+        for (const auto& feature : injection.getRawData().getFeatureMapHistory()) {
+          for (const auto& subordinate : feature.getSubordinates()) {
+            //if (subordinate.getMetaValue("used_") == "true" && component_names.count(subordinate.getMetaValue("native_id").toString())) {
+              auto feature_mz = subordinate.getPosition()[1];
+              if ((int)feature_mz == (int)mz)
+              {
+                std::vector<float> x_data, y_data;
+                for (const auto& point : subordinate.getConvexHull().getHullPoints()) {
+                  // try to find intensity in the spectra.
+                  auto hull_rt = point.getX();
+                  auto hull_mz = point.getY();
+                  float intensity = 0.0f;
+                  for (const auto& spectrum : injection.getRawData().getExperiment())
+                  {
+                    if (abs(spectrum.getRT() - hull_rt) < 1e-06)
+                    {
+                      for (const auto& peak : spectrum)
+                      {
+                        if (abs(peak.getMZ() - hull_mz) < 1e-06)
+                        {
+                          intensity = peak.getIntensity();
+                          break;
+                        }
+                      }
+                    }
+                  }
+                  //
+                  if (point.getX() < chrom_time_range.first || point.getX() > chrom_time_range.second) continue;
+                  x_data.push_back(point.getX());
+                  y_data.push_back(intensity);
+                  result.x_min_ = std::min((float)point.getX(), result.x_min_);
+                  result.y_min_ = std::min((float)intensity, result.y_min_);
+                  result.x_max_ = std::max((float)point.getX(), result.x_max_);
+                  result.y_max_ = std::max((float)intensity, result.y_max_);
+                }
+                if (x_data.size() <= 0) continue;
+                n_points += x_data.size();
+                if (n_points < MAX_POINTS) {
+                  bool debug_to_remove = (x_data.size() > 0) && (result.x_data_scatter_.size() == 0);
+                  if (debug_to_remove)
+                  {
+                    result.x_data_area_.push_back(x_data);
+                    result.y_data_area_.push_back(y_data);
+                    result.series_names_area_.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("native_id").toString() + "::" + subordinate.getMetaValue("timestamp_").toString());
+                  }
+                }
+                else
+                {
+                  LOGD << "Stopped adding points to the chromatogram plot";
+                  result.points_overflow = true;
+                  return;
+                }
+              }
+          //  }
+          }
+        }
+      }
+    }
+  }
+
   void SessionHandler::getSpectrumScatterPlot(const SequenceHandler& sequence_handler,
-    ScatterPlotData& result,
+    GraphVizData& result,
     const std::pair<float, float>& range,
     const std::set<std::string>& sample_names,
     const std::set<std::string>& scan_names,
@@ -1714,19 +1829,7 @@ namespace SmartPeak
        sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)) {
       LOGD << "Making the spectra data for plotting";
       // Set the axes titles and min/max defaults
-      result.x_axis_title_ = "m/z (Da)";
-      result.y_axis_title_ = "Intensity (au)";
-      result.x_min_ = 1e6;
-      result.x_max_ = 0;
-      result.y_min_ = 1e6;
-      result.y_max_ = 0;
-      result.x_data_area_.clear();
-      result.y_data_area_.clear();
-      result.series_names_area_.clear();
-      result.x_data_scatter_.clear();
-      result.y_data_scatter_.clear();
-      result.series_names_scatter_.clear();
-      result.points_overflow = false;
+      result.reset("m/z (Da)", "Intensity (au)", {});
       for (const auto& injection : sequence_handler.getSequence()) {
         if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
         // Extract out the raw data for plotting
@@ -1743,9 +1846,9 @@ namespace SmartPeak
           }
           n_points += x_data.size();
           if (n_points < MAX_POINTS) {
-            result.x_data_scatter_.push_back(x_data);
-            result.y_data_scatter_.push_back(y_data);
-            result.series_names_scatter_.push_back(injection.getMetaData().getSampleName() + "::" + spectra.getNativeID());
+            result.x_data_area_.push_back(x_data);
+            result.y_data_area_.push_back(y_data);
+            result.series_names_area_.push_back(injection.getMetaData().getSampleName() + "::" + spectra.getNativeID());
           }
           else 
           {
@@ -1771,9 +1874,9 @@ namespace SmartPeak
               if (x_data.size() <= 0) continue;
               n_points += x_data.size();
               if (n_points < MAX_POINTS) {
-                result.x_data_area_.push_back(x_data);
-                result.y_data_area_.push_back(y_data);
-                result.series_names_area_.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("chemical_formula").toString() + ":" + subordinate.getMetaValue("modifications").toString());
+                result.x_data_scatter_.push_back(x_data);
+                result.y_data_scatter_.push_back(y_data);
+                result.series_names_scatter_.push_back(injection.getMetaData().getSampleName() + "::" + subordinate.getMetaValue("chemical_formula").toString() + ":" + subordinate.getMetaValue("modifications").toString());
               }
               else 
               {
@@ -1787,6 +1890,75 @@ namespace SmartPeak
       }
     }
   }
+
+  void SessionHandler::getSpectrumMSMSPlot(const SequenceHandler& sequence_handler,
+    GraphVizData& result,
+    const std::pair<float, float>& range,
+    const std::set<std::string>& sample_names,
+    const std::set<std::string>& scan_names,
+    const std::set<std::string>& component_group_names,
+    const float rt,
+    const int ms_level) const
+  {
+    const int MAX_POINTS = 10000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
+    int n_points = 0;
+    if (sequence_handler.getSequence().size() > 0 &&
+      (sequence_handler.getSequence().at(0).getRawData().getExperiment().getSpectra().size() > 0 ||
+        sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)) {
+      LOGD << "Making the spectra data for plotting";
+      // Set the axes titles and min/max defaults
+      result.reset("m/z (Da)", "Intensity (au)", "Retention Time (s)");
+      int total_nb_points = 0;
+      for (const auto& injection : sequence_handler.getSequence())
+      {
+        if (sample_names.count(injection.getMetaData().getSampleName()) == 0) continue;
+        // Extract out the raw data for plotting
+        for (const auto& spectra : injection.getRawData().getExperiment().getSpectra())
+        {
+          if (spectra.getMSLevel() == ms_level)
+          {
+            result.z_data_area_.push_back(spectra.getRT());
+            if (scan_names.count(spectra.getNativeID()) == 0) continue;
+            std::vector<float> x_data, y_data;
+            result.z_min_ = std::min((float)spectra.getRT(), result.z_min_);
+            result.z_max_ = std::max((float)spectra.getRT(), result.z_max_);
+            const float rt_threashold = 0.50f;
+            if ((!result.points_overflow) && (abs(spectra.getRT()-rt)< rt_threashold))
+            {
+              for (auto point = spectra.PosBegin(range.first); point != spectra.PosEnd(range.second); ++point)
+              {
+                x_data.push_back(point->getMZ());
+                y_data.push_back(point->getIntensity());
+                result.x_min_ = std::min((float)point->getMZ(), result.x_min_);
+                result.y_min_ = std::min((float)point->getIntensity(), result.y_min_);
+                result.x_max_ = std::max((float)point->getMZ(), result.x_max_);
+                result.y_max_ = std::max((float)point->getIntensity(), result.y_max_);
+              }
+              n_points += x_data.size();
+              if (n_points < MAX_POINTS) {
+                result.x_data_area_.push_back(x_data);
+                result.y_data_area_.push_back(y_data);
+                result.series_names_area_.push_back(injection.getMetaData().getSampleName() + "::" + spectra.getNativeID());
+              }
+              else if (!result.points_overflow)
+              {
+                LOGD << "Stopped adding points to the spectra plot";
+                result.points_overflow = true;
+                //return;
+              }
+            }
+          }
+        }
+      }
+      if (n_points == 0)
+      {
+        // we will set the range to user's range
+        result.x_min_ = range.first;
+        result.x_max_ = range.second;
+      }
+    }
+  }
+
   void SessionHandler::setFeatureLinePlot()
   {
     // Set the axes titles and min/max defaults
