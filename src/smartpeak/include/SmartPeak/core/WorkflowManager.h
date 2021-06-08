@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -24,8 +24,21 @@
 #pragma once
 
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/iface/IApplicationProcessorObserver.h>
+#include <SmartPeak/iface/ISequenceProcessorObserver.h>
+#include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
+#include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 
 namespace SmartPeak {
+  //TODO: implement a detailed workflow status
+  enum class WorkFlowStatus
+  {
+    IDLE,
+    RUNNING,
+    FINISHED,
+    SIZE_OF_WORKFLOWSTATUS
+  };
+
   class WorkflowManager {
   public:
     /**
@@ -37,8 +50,19 @@ namespace SmartPeak {
       @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
+      @param[in] sequence_processor_observer an observer for sequence, used to report progress
+      @param[in] sequence_segment_processor_observer an observer for sequence segment, used to report progress
+      @param[in] sample_group_processor_observer, used to report progress
     */
-    void addWorkflow(ApplicationHandler& source_state, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands);
+    void addWorkflow(ApplicationHandler& source_state, 
+      const std::set<std::string>& injection_names, 
+      const std::set<std::string>& sequence_segment_names, 
+      const std::set<std::string>& sample_group_names, 
+      const std::vector<ApplicationHandler::Command>& commands, 
+      IApplicationProcessorObserver* application_processor_observer = nullptr,
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+      ISequenceSegmentProcessorObserver * sequence_segment_processor_observer = nullptr,
+      ISampleGroupProcessorObserver * sample_group_processor_observer = nullptr);
 
     /**
       If this returns false, new workflows can't run and the following menu items
@@ -64,13 +88,26 @@ namespace SmartPeak {
 
       @param[in,out] application_handler Points to the class' application_handler member
       @param[in,out] done Points to the class' done member
+      @param[in,out] run_time time taken to run the workflow
       @param[out] source_app_handler The modified application_handler is copied back here
       @param[in] injection_names Injection names to use for Sequence Processing
       @param[in] sequence_segment_names Sequence Segment Names to use for Sequence Segment Processing
       @param[in] sample_group_names Sample Group Names to use for Sample Group Processing
       @param[in] commands Workflow steps
+      @param[in] sequence_processor_observer an observer for sequence, used to report progress
+      @param[in] sequence_segment_processor_observer an observer for sequence segment, used to report progress
+      @param[in] sample_group_processor_observer, used to report progress
     */
-    static void run_and_join(ApplicationHandler& application_handler, bool& done, const std::set<std::string>& injection_names, const std::set<std::string>& sequence_segment_names, const std::set<std::string>& sample_group_names, const std::vector<ApplicationHandler::Command>& commands);
+    static void run_and_join(ApplicationHandler& application_handler, 
+      bool& done,
+      const std::set<std::string>& injection_names, 
+      const std::set<std::string>& sequence_segment_names,
+      const std::set<std::string>& sample_group_names,
+      const std::vector<ApplicationHandler::Command>& commands,
+      IApplicationProcessorObserver* application_processor_observer = nullptr,
+      ISequenceProcessorObserver* sequence_processor_observer = nullptr,
+      ISequenceSegmentProcessorObserver * sequence_segment_processor_observer = nullptr,
+      ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr);
 
     ApplicationHandler application_handler_; ///< The workflow is run on this copy
     bool done_ = true;

@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -32,10 +32,8 @@
 #include <regex>
 #include <sstream>
 #include <unordered_set>
+#include <chrono>
 #include <plog/Log.h>
-#include <boost/filesystem.hpp>
-
-namespace fs = boost::filesystem;
 
 namespace SmartPeak
 {
@@ -102,15 +100,15 @@ namespace SmartPeak
       if ((c.getTag() == CastValue::Type::UNINITIALIZED) ||
           (c.getTag() == CastValue::Type::UNKNOWN))
       {
-        OpenMS::DataValue::DataType dt = Param_IO.getValue(name).valueType();
+        OpenMS::ParamValue::ValueType dt = Param_IO.getValue(name).valueType();
         switch (dt) {
-          case OpenMS::DataValue::DOUBLE_VALUE:
+          case OpenMS::ParamValue::DOUBLE_VALUE:
             c = static_cast<float>(Param_IO.getValue(name));
             break;
-          case OpenMS::DataValue::INT_VALUE:
+          case OpenMS::ParamValue::INT_VALUE:
             c = static_cast<int>(Param_IO.getValue(name));
             break;
-          case OpenMS::DataValue::STRING_VALUE:
+          case OpenMS::ParamValue::STRING_VALUE:
             {
               const std::string& value = Param_IO.getValue(name).toString();
               std::string lowercase_value;
@@ -122,23 +120,23 @@ namespace SmartPeak
               }
               break;
             }
-          case OpenMS::DataValue::DOUBLE_LIST:
+          case OpenMS::ParamValue::DOUBLE_LIST:
             c = std::vector<float>();
-            for (const double n : Param_IO.getValue(name).toDoubleList()) {
+            for (const double n : Param_IO.getValue(name).toDoubleVector()) {
               c.fl_.push_back(n);
             }
             break;
-          case OpenMS::DataValue::INT_LIST:
+          case OpenMS::ParamValue::INT_LIST:
             c = std::vector<int>();
-            for (const int n : Param_IO.getValue(name).toIntList()) {
+            for (const int n : Param_IO.getValue(name).toIntVector()) {
               c.il_.push_back(n);
             }
             break;
-          case OpenMS::DataValue::STRING_LIST:
+          case OpenMS::ParamValue::STRING_LIST:
             {
               bool strings_are_bools = false;
-              if (Param_IO.getValue(name).toStringList().size()) {
-                const std::string& value = Param_IO.getValue(name).toStringList().front();
+              if (Param_IO.getValue(name).toStringVector().size()) {
+                const std::string& value = Param_IO.getValue(name).toStringVector().front();
                 std::string lowercase_value;
                 std::transform(value.begin(), value.end(), lowercase_value.begin(), ::tolower);
                 if (lowercase_value == "true" || lowercase_value == "false") {
@@ -149,7 +147,7 @@ namespace SmartPeak
                 c = std::vector<std::string>();
               }
 
-              for (const std::string& s : Param_IO.getValue(name).toStringList()) {
+              for (const std::string& s : Param_IO.getValue(name).toStringVector()) {
                 if (strings_are_bools) {
                   std::string lowercase_value;
                   std::transform(s.begin(), s.end(), lowercase_value.begin(), ::tolower);
@@ -177,7 +175,7 @@ namespace SmartPeak
         }
       }
 
-      OpenMS::StringList tags;
+      std::vector<std::string> tags;
       const auto& params_tag = param.getTags();
       if (!params_tag.empty())
       {
@@ -224,16 +222,12 @@ namespace SmartPeak
           }
         case CastValue::Type::STRING_LIST:
           {
-            OpenMS::StringList sl;
-            for (const std::string& s : c.sl_) {
-              sl.push_back(s);
-            }
-            Param_IO.setValue(name, sl, description, tags);
+            Param_IO.setValue(name, c.sl_, description, tags);
             break;
           }
         case CastValue::Type::BOOL_LIST:
           {
-            OpenMS::StringList sl;
+            std::vector<std::string> sl;
             for (const bool b : c.bl_) {
               sl.push_back(b ? "true" : "false");
             }
@@ -361,7 +355,7 @@ namespace SmartPeak
     size_t l, r;
 
     for (l = 0; l < s.size() && characters.count(s[l]); ++l)
-      ;
+      {;}
 
     if (l == s.size()) {
       return std::string();
@@ -369,7 +363,7 @@ namespace SmartPeak
 
     // reaching here implies that s contains at least one non-whitespace character
     for (r = s.size() - 1; r > l && characters.count(s[r]); --r)
-      ;
+      {;}
 
     return s.substr(l, r - l + 1);
   }
@@ -420,7 +414,7 @@ namespace SmartPeak
       OpenMS::MRMFeatureSelector::SelectorParameters parameters;
       for (const std::pair<std::string, std::vector<std::string>>& p : params_map) {
         const std::string& param_name = p.first;
-        if (param_name == "nn_thresholds" ) {
+        if (param_name == "nn_thresholds") {
           parameters.nn_threshold = std::stoi(p.second[i]);
         } else if (param_name == "locality_weights") {
           parameters.locality_weight = p.second[i].front() == 'T' || p.second[i].front() == 't';
@@ -538,78 +532,69 @@ namespace SmartPeak
     return false;
   }
 
-  std::array<std::vector<std::string>, 4> Utilities::getPathnameContent(
-    const std::string& pathname,
-    const bool asc
-  )
+  std::array<std::vector<std::string>, 4> Utilities::getFolderContents(const std::filesystem::path& folder_path)
   {
-    std::array<std::vector<std::string>, 4> content;
-    boost::system::error_code ec;
-
-    fs::directory_iterator it = fs::directory_iterator(fs::path(pathname), ec);
-    if (ec.value()) {
-      return content;
-    }
-    const fs::path p(pathname);
-    fs::directory_iterator it_end = fs::directory_iterator();
-
-    for ( ; it != it_end; it++) {
-      const fs::directory_entry& entry = *it;
-
-      if (!exists(entry.path())) { // protects from e.g. "dangling" symbolic links
-        LOGD << "Path does not exist. Skipping: " << entry.path();
-        continue;
-      }
-
-      const std::string filename(entry.path().filename().string());
-      if (filename == "." || filename == ".." || (*(&filename.at(0))) == '.') {
-        continue;
-      }
-
-      size_t filesize = fs::is_directory(entry)
-        ? directorySize(entry.path().string())
-        : fs::file_size(entry, ec);
-      if (ec.value()) {
-        filesize = 0;
-        ec.clear();
-      }
-
-      const std::string filetype = fs::is_directory(entry) ? "Directory" : entry.path().extension().string();
-
-      char buff[128];
-      const std::time_t t(fs::last_write_time(entry));
-      std::strftime(buff, sizeof buff, "%Y-%m-%d %H:%M:%S", std::localtime(&t)); // ISO 8601 date format
-
-      content[0].push_back(filename);
-      content[1].push_back(std::to_string(filesize));
-      content[2].push_back(filetype);
-      content[3].push_back(std::string(buff));
-    }
-
-    std::vector<size_t> indices(content[0].size());
-    std::iota(indices.begin(), indices.end(), 0);
-    const std::vector<std::string>& names = content[0];
-    std::sort(
-      indices.begin(),
-      indices.end(),
-      [&names, asc](const size_t l, const size_t r)
+    // name, ext, size, date
+    std::array<std::vector<std::string>, 4> directory_entries;
+    std::vector<std::tuple<std::string, uintmax_t, std::string, std::time_t>> entries_temp;
+    
+    for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied))
+    {
+      if (!isHiddenEntry(p))
       {
-        const bool b = is_less_than_icase(names[l], names[r]);
-        return asc ? b : !b;
+        auto last_write_time = std::filesystem::last_write_time(p.path());
+        auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(last_write_time
+                                                                                      - std::filesystem::file_time_type::clock::now()
+                                                                                      + std::chrono::system_clock::now());
+        std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
+        if (p.is_regular_file())
+        {
+          entries_temp.push_back(std::make_tuple(p.path().filename().string(), p.file_size(), p.path().extension().string(), cftime));
+        }
+        else if (p.is_directory())
+        {
+          std::tuple<float, uintmax_t> directory_info;
+          getDirectoryInfo(p, directory_info);
+          entries_temp.push_back(std::make_tuple(p.path().filename().string(), std::get<1>(directory_info), "Directory", cftime));
+        }
       }
-    );
-    sortPairs(indices, content[0]);
-    sortPairs(indices, content[1]);
-    sortPairs(indices, content[2]);
-    sortPairs(indices, content[3]);
-    return content;
+    }
+    
+    if (entries_temp.size() > 1)
+    {
+      for (uintmax_t i = 0; i < entries_temp.size(); i++)
+      {
+        directory_entries[0].push_back(std::get<0>(entries_temp[i]));
+        directory_entries[1].push_back((std::get<1>(entries_temp[i]) == 0 ? "0" : std::to_string(std::get<1>(entries_temp[i])) ));
+        directory_entries[2].push_back(std::get<2>(entries_temp[i]));
+        char buff[128];
+        std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&std::get<3>(entries_temp[i])));
+        directory_entries[3].push_back(buff);
+      }
+    }
+    else if (entries_temp.size() == 1)
+    {
+      directory_entries[0].push_back(std::get<0>(entries_temp[0]));
+      directory_entries[1].push_back((std::get<1>(entries_temp[0]) == 0 ? "0" : std::to_string(std::get<1>(entries_temp[0])) ));
+      directory_entries[2].push_back(std::get<2>(entries_temp[0]));
+      char buff[128];
+      std::strftime(buff, sizeof(buff), "%Y-%m-%d %H:%M:%S", std::localtime(&std::get<3>(entries_temp[0])));
+      directory_entries[3].push_back(buff);
+    }
+    
+    return directory_entries;
   }
 
-  std::string Utilities::getParentPathname(const std::string& pathname)
+  std::string Utilities::getParentPath(const std::filesystem::path& p)
   {
-    const fs::path p(pathname);
-    const fs::directory_entry entry(p);
-    return entry.path().parent_path().string();
+    std::filesystem::path parent_path;
+    if (p.string() == ".") {
+      std::filesystem::path working_dir(std::filesystem::current_path());
+      parent_path = (working_dir.parent_path());
+    } else if (p.has_parent_path()) {
+      parent_path = (p.parent_path());
+    }
+    return parent_path.string();
   }
 
   bool Utilities::is_less_than_icase(const std::string& a, const std::string& b)
@@ -622,76 +607,90 @@ namespace SmartPeak
     return a_lowercase.compare(b_lowercase) < 0;
   }
 
-  size_t Utilities::directorySize(const std::string& pathname)
+  void Utilities::getDirectoryInfo(const std::filesystem::path& folder_path, std::tuple<float, uintmax_t>& directory_info)
   {
-    size_t n { 0 };
-    boost::system::error_code ec;
-
-    fs::directory_iterator it = fs::directory_iterator(fs::path(pathname), ec);
-    if (ec.value()) {
-      return 0;
-    }
-    fs::directory_iterator it_end = fs::directory_iterator();
-
-    for ( ; it != it_end; it++) {
-      const fs::path& filename { it->path().filename() };
-      if (filename == fs::path(".") || filename == fs::path("..") || filename.generic_string().at(0)  == '.') {
-        continue;
+    float size_in_bytes = 0;
+    uintmax_t entries = 0;
+    if (!isHiddenEntry(folder_path)) {
+      for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied)) {
+        std::filesystem::path::string_type entry_name = p.path().filename();
+        if (p.is_regular_file() && !p.is_directory() && !isHiddenEntry(p)) {
+          size_in_bytes += p.file_size();
+          entries += 1;
+        } else if (p.is_directory() && !isHiddenEntry(p)) {
+          entries += 1;
+        }
       }
-      ++n;
     }
-
-    return n;
+    std::get<0>(directory_info) = size_in_bytes;
+    std::get<1>(directory_info) = entries;
   }
 
-  std::pair<std::string, bool> Utilities::getLogFilepath(const std::string& filename)
+  bool Utilities::isHiddenEntry(const std::filesystem::path& entry_path)
   {
-    std::string path = "";
+    bool is_hidden = false;
+    std::string entry_name = entry_path.filename().string();
+    if (entry_name == "." || (std::string)entry_name == ".." || entry_name[0] == '.') is_hidden = true;
+    return is_hidden;
+  }
+
+  std::pair<std::filesystem::path, bool> Utilities::getLogFilepath(const std::string& filename)
+  {
+    std::filesystem::path path{};
     bool flag = false;
-    char const* logs = getenv("SMARTPEAK_LOGS");
-    char const* appdata = getenv("LOCALAPPDATA");
-    char const* home = getenv("HOME");
-    if (logs || appdata || home)
+    std::string env_val_smartpeak_logs  = "SMARTPEAK_LOGS";
+    std::string env_val_localappdata    = "LOCALAPPDATA";
+    std::string env_val_home            = "HOME";
+    
+    std::string logs_path, appsdata_path, home_path;
+
+    getEnvVariable(env_val_smartpeak_logs.c_str(), &logs_path);
+    getEnvVariable(env_val_localappdata.c_str(), &appsdata_path);
+    getEnvVariable(env_val_home.c_str(), &home_path);
+    
+    if (!logs_path.empty() || !appsdata_path.empty() || !home_path.empty())
     {
-      auto logdir = fs::path{};
-      if (logs)
-        logdir = fs::path{ logs };
-      else if (appdata)
-        logdir = fs::path{ appdata } / "SmartPeak";
-      else if (home)
-        logdir = fs::path{ home } / ".SmartPeak";
+      auto logdir = std::filesystem::path();
+      if (!logs_path.empty())
+        logdir = std::filesystem::path(logs_path);
+      else if (!appsdata_path.empty())
+        logdir = std::filesystem::path(appsdata_path) / "SmartPeak";
+      else if (!home_path.empty())
+        logdir = std::filesystem::path(home_path) / ".SmartPeak";
 
       try
       {
         // Creates directory tree if doesn't exist:
-        flag = fs::create_directories(logdir);
+        flag = std::filesystem::create_directories(logdir);
       }
-      catch (fs::filesystem_error& fe)
+      catch (std::filesystem::filesystem_error& fe)
       {
-        if (fe.code() == boost::system::errc::permission_denied)
+        if (fe.code() == std::errc::permission_denied)
           throw std::runtime_error(static_cast<std::ostringstream&&>(
-            std::ostringstream() 
-              << "Unable to construct path to log file, permission denied while creating directory '" << logdir.string() << "'").str());
+            std::ostringstream()
+              << "Unable to create path to log file, permission denied while creating directory '"
+              << logdir.string() << "'").str());
         else
           throw std::runtime_error(static_cast<std::ostringstream&&>(
             std::ostringstream()
-              << "Unable to construct path to log file, failure while creating directory '" << logdir.string() << "'").str());
+              << "Unable to create path to log file, failure while creating directory '"
+              << logdir.string() << "'").str());
       }
-      path = (logdir / filename).string();
+      path = (logdir / filename);
       // Test if file writeable:
-      fs::ofstream file(path);
+      std::ofstream file(path, std::ofstream::out);
       if (!file)
         throw std::runtime_error(static_cast<std::ostringstream&&>(
           std::ostringstream()
-            << "Unable to create log file '" << path << "', please verify permissions to directory").str());
+            << "Unable to create log file " << path << ", please verify directory permissions").str());
       else
         file.close();
     }
     else
     {
       throw std::runtime_error(
-        "Unable to construct path to log file. Make sure that either \
-          HOME, LOCALAPPDATA or SMARTPEAK_LOGS env variable is set. For details refer to user documentation");
+        "Unable to create log file. Please make sure that either "
+        "HOME, LOCALAPPDATA or SMARTPEAK_LOGS env variable is set. For details refer to user documentation");
     }
     return std::make_pair(path, flag);
   }
@@ -704,5 +703,111 @@ namespace SmartPeak
 #else
     return "Unknown";
 #endif
+  }
+
+  void Utilities::getEnvVariable(const char *env_name, std::string *path)
+  {
+#ifdef _WIN32
+    char* var_buffer;
+    size_t buffer_size;
+    errno_t error_val = _dupenv_s(&var_buffer, &buffer_size, env_name);
+    
+    if (error_val != 0) {
+      throw std::runtime_error(
+      "LOCALAPPDATA or SMARTPEAK_LOGS env variable is not set for the log files to be saved in these locations.");
+    } else {
+      if (var_buffer != nullptr) {
+        *path = std::string(var_buffer);
+        free(var_buffer);
+      }
+    }
+#else
+    char* var_buffer = getenv(env_name);
+    if (var_buffer != nullptr) {
+      *path = std::string(var_buffer);
+    }
+#endif
+  }
+
+  void Utilities::makeHumanReadable(ImEntry& directory_entry)
+  {
+    // prettify size [1]
+    std::string entry_size_string = directory_entry.entry_contents[1];
+    if (directory_entry.entry_contents[2] != "Directory" && !directory_entry.entry_contents[1].empty()
+        && entry_size_string.find("Bytes") == std::string::npos
+        && entry_size_string.find("KB") == std::string::npos
+        && entry_size_string.find("MB") == std::string::npos
+        && entry_size_string.find("GB") == std::string::npos
+        && entry_size_string.find("TB") == std::string::npos
+        )
+    {
+      double entry_size = std::stod(entry_size_string);
+      std::string size_human_readable = "";
+      std::stringstream size_human_readable_stream;
+      
+      if (entry_size >= 0 && entry_size < 1e3)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << entry_size;
+        size_human_readable = size_human_readable_stream.str() + " Bytes";
+      }
+      if (entry_size >= 1e3 && entry_size < 1e6)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e3);
+        size_human_readable = size_human_readable_stream.str() + " KB";
+      }
+      else if (entry_size >= 1e6 && entry_size < 1e9)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e6);
+        size_human_readable = size_human_readable_stream.str() + " MB";
+      }
+      else if (entry_size >= 1e9 && entry_size < 1e12)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e9);
+        size_human_readable = size_human_readable_stream.str() + " GB";
+      }
+      else if (entry_size >= 1e12 && entry_size < 1e18)
+      {
+        size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e12);
+        size_human_readable = size_human_readable_stream.str() + " TB";
+      }
+    
+      directory_entry.entry_contents[1] = size_human_readable;
+    }
+    else if (directory_entry.entry_contents[2] == "Directory")
+    {
+      directory_entry.entry_contents[1] = entry_size_string + " Item(s)";
+    }
+    
+    // prettify extension [2]
+    std::string* extension = &directory_entry.entry_contents[2];
+    extension->erase(std::remove_if(extension->begin(), extension->end(),
+                                   [](unsigned char c){ return std::ispunct(c); }), extension->end());
+    
+    // prettify date [3]
+    std::tm * current_time_tm, entry_date_tm;
+    char date_time_buffer[80];
+    std::string date_time_buf;
+    
+    std::time_t current_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    current_time_tm = std::localtime(&current_time);
+    
+    std::istringstream entry_date_ss(directory_entry.entry_contents[3]);
+    entry_date_ss >> std::get_time(&entry_date_tm, "%Y-%m-%d %T");
+    
+    entry_date_tm.tm_isdst = current_time_tm->tm_isdst;    
+    time_t entry_date_time = std::mktime(&entry_date_tm);
+        
+    if (entry_date_tm.tm_mday == current_time_tm->tm_mday
+        && entry_date_tm.tm_mon == current_time_tm->tm_mon
+        && entry_date_tm.tm_year == current_time_tm->tm_year)
+    {
+      std::strftime(date_time_buffer, sizeof date_time_buffer, "%R", std::localtime(&entry_date_time));
+      directory_entry.entry_contents[3] = "Today at " + std::string(date_time_buffer);
+    }
+    else
+    {
+      std::strftime(date_time_buffer, sizeof date_time_buffer, "%c", std::localtime(&entry_date_time));
+      directory_entry.entry_contents[3] = date_time_buffer;
+    }
   }
 }

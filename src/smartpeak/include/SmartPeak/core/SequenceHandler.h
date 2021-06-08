@@ -25,6 +25,9 @@
 
 #include <SmartPeak/core/WorkflowObservable.h>
 #include <SmartPeak/core/ParametersObservable.h>
+#include <SmartPeak/core/SequenceObservable.h>
+#include <SmartPeak/core/TransitionsObservable.h>
+#include <SmartPeak/core/SequenceSegmentObservable.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/SampleGroupHandler.h>
 #include <SmartPeak/core/InjectionHandler.h>
@@ -35,7 +38,10 @@ namespace SmartPeak
 {
   class SequenceHandler : 
     public ParametersObservable, 
-    public WorkflowObservable
+    public WorkflowObservable,
+    public SequenceObservable,
+    public TransitionsObservable,
+    public SequenceSegmentObservable
   {
 public:
     void clear();

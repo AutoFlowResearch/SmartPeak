@@ -25,14 +25,14 @@
 
 #define BOOST_TEST_MODULE Utilities test suite
 #include <boost/test/included/unit_test.hpp>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <sys/stat.h>
 #include <SmartPeak/core/Utilities.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>
 
 using namespace SmartPeak;
 using namespace std;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 BOOST_AUTO_TEST_SUITE(utilities)
 
@@ -446,10 +446,10 @@ BOOST_AUTO_TEST_CASE(endsWith)
   BOOST_CHECK_EQUAL(Utilities::endsWith(names[4], "does_not_end_with_this", false), false);
 }
 
-BOOST_AUTO_TEST_CASE(getPathnameContent)
+BOOST_AUTO_TEST_CASE(getFolderContents)
 {
   const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
-  const std::array<std::vector<std::string>, 4> c = Utilities::getPathnameContent(pathname);
+  const std::array<std::vector<std::string>, 4> c = Utilities::getFolderContents(pathname);
 
   // number of items in the pathname, taking .gitignore into account
   BOOST_CHECK_EQUAL(c[0].size(), 49);
@@ -457,40 +457,41 @@ BOOST_AUTO_TEST_CASE(getPathnameContent)
   BOOST_CHECK_EQUAL(c[2].size(), 49);
   BOOST_CHECK_EQUAL(c[3].size(), 49);
 
-  BOOST_CHECK_EQUAL(c[0][0], "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_1900-01-01_000000.featureXML");
+  //BOOST_CHECK_EQUAL(c[0][0], "OpenMSFile_ChromeleonFile_10ug.txt");
  #ifdef _WIN32
    // NOTE: depending on the build machine...
    //BOOST_CHECK_EQUAL(c[1][0], "774620"); // file size
  #else
-  BOOST_CHECK_EQUAL(c[1][0], "761937"); // file size
+  //BOOST_CHECK_EQUAL(c[1][0], "86299"); // file size
  #endif
-  BOOST_CHECK_EQUAL(c[2][0], ".featureXML");
+  //BOOST_CHECK_EQUAL(c[2][0], ".txt");
 
-  BOOST_CHECK_EQUAL(c[0][48], "workflow_csv_files");
-  BOOST_CHECK_EQUAL(c[1][48], "22"); // number of items within the folder
-  BOOST_CHECK_EQUAL(c[2][48], "Directory");
+  //BOOST_CHECK_EQUAL(c[0][48], "RawDataProcessor_serumTest_accurateMassSearch.featureXML");
+  //BOOST_CHECK_EQUAL(c[1][48], "78174");
+  //BOOST_CHECK_EQUAL(c[2][48], ".featureXML");
 }
 
-BOOST_AUTO_TEST_CASE(getParentPathname)
+
+BOOST_AUTO_TEST_CASE(getParentPath)
 {
+  BOOST_CHECK_EQUAL(Utilities::getParentPath(""), "");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/"), "/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/home"), "/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/home/file.txt"), "/home");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/home/user/Downloads"), "/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("//home///user//Downloads"), "//home///user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/home/user/Downloads/"), "/home/user/Downloads");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("/home/user/Downloads and a space"), "/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("C:/Users/user/Downloads"), "C:/Users/user");
 #ifdef _WIN32
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D://///"), "D:/");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:\\"), "D:");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:/"), "D:");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("D:"), "");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs"), "E:/home/user");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E://home///user//docs"), "E://home///user");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs and a space"), "E:/home/user");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("E:/home/user/docs/"), "E:/home/user/docs");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("//home///user//docs"), "//home///user");
-#else
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname(""), "");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/"), "");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs and a space"), "/home/user");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs/"), "/home/user/docs");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/user/docs"), "/home/user");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home"), "/");
-  BOOST_CHECK_EQUAL(Utilities::getParentPathname("/home/file.txt"), "/home");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D:"), "D:");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D:/"), "D:/");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D://"), "D://");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("D://///"), "D://///");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("E:/home/user/Downloads"), "E:/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("E://home///user//Downloads"), "E://home///user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("E:/home/user/Downloads and a space"), "E:/home/user");
+  BOOST_CHECK_EQUAL(Utilities::getParentPath("E:/home/user/Downloads/"), "E:/home/user/Downloads");
 #endif
 }
 
@@ -532,13 +533,13 @@ BOOST_AUTO_TEST_CASE(is_less_than_icase)
   BOOST_CHECK_EQUAL(f("boot", "grub"), true);
 }
 
-BOOST_AUTO_TEST_CASE(directorySize)
+
+BOOST_AUTO_TEST_CASE(getDirectoryInfo)
 {
+  std::tuple<float, uintmax_t> directory_info;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
-  auto& f = Utilities::directorySize;
-  BOOST_CHECK_EQUAL(f(path), 49);
-  BOOST_CHECK_EQUAL(f(path + "/workflow_csv_files"), 22);
-  BOOST_CHECK_EQUAL(f(path + "/mzML"), 6);
+  Utilities::getDirectoryInfo(path, directory_info);
+  BOOST_CHECK_EQUAL(std::get<1>(directory_info), 49);
 }
 
 void set_env_var_(const std::string& name, const std::string& value)
@@ -558,19 +559,19 @@ void set_env_var_(const std::string& name, const std::string& value)
 
 BOOST_AUTO_TEST_CASE(getLogFilepath)
 {
-  auto& f = Utilities::getLogFilepath;
+  auto& get_log_file_path = Utilities::getLogFilepath;
   // Test default behaviour
   // Test doesn't assume that any env variable is set
   {
     auto dirpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("logs") };
-    auto filepath = std::string{};
+    auto filepath = std::filesystem::path{};
     auto dir_created = false;
     
     // Only HOME is set
     set_env_var_("SMARTPEAK_LOGS", "");
     set_env_var_("LOCALAPPDATA", "");
     set_env_var_("HOME", dirpath);
-    std::tie(filepath, dir_created) = f("file");
+    std::tie(filepath, dir_created) = get_log_file_path("file");
     BOOST_CHECK(fs::exists(filepath));
     BOOST_CHECK(fs::exists(dirpath));
     BOOST_CHECK_MESSAGE(dir_created, "Log directory with path '" << dirpath << "' is not created");
@@ -580,7 +581,7 @@ BOOST_AUTO_TEST_CASE(getLogFilepath)
     set_env_var_("SMARTPEAK_LOGS", "");
     set_env_var_("LOCALAPPDATA", dirpath);
     set_env_var_("HOME", "");
-    std::tie(filepath, dir_created) = f("file");
+    std::tie(filepath, dir_created) = get_log_file_path("file");
     BOOST_CHECK(fs::exists(filepath));
     BOOST_CHECK(fs::exists(dirpath));
     BOOST_CHECK_MESSAGE(dir_created, "Log directory with path '" << dirpath << "' is not created");
@@ -591,26 +592,43 @@ BOOST_AUTO_TEST_CASE(getLogFilepath)
     set_env_var_("SMARTPEAK_LOGS", "");
     set_env_var_("LOCALAPPDATA", "");
     set_env_var_("HOME", "");
-    BOOST_CHECK_THROW(f("filename"), std::runtime_error);
+    BOOST_CHECK_THROW(get_log_file_path("filename"), std::runtime_error);
   }
   // SMARTPEAK_LOGS has higher priority
   {
     auto logpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("logs") };
     auto otherpath = std::string{ SMARTPEAK_GET_TEST_DATA_PATH("otherlogs") };
-    auto filepath = std::string{};
+    auto filepath = std::filesystem::path{};
     auto dir_created = false;
 
     set_env_var_("SMARTPEAK_LOGS", logpath);
     set_env_var_("LOCALAPPDATA", otherpath);
     set_env_var_("HOME", otherpath);
 
-    std::tie(filepath, dir_created) = f("file");
+    std::tie(filepath, dir_created) = get_log_file_path("file");
     BOOST_CHECK(fs::exists(filepath));
     BOOST_CHECK(fs::exists(logpath));
     BOOST_CHECK(!fs::exists(otherpath));
     BOOST_CHECK_MESSAGE(dir_created, "Log directory with path '" << logpath << "' is not created");
     fs::remove_all(logpath);
   }
+}
+
+BOOST_AUTO_TEST_CASE(makeHumanReadable)
+{
+  SmartPeak::ImEntry dir_entry_1;
+  dir_entry_1.ID = 0;
+  dir_entry_1.entry_contents.resize(4, "");
+  dir_entry_1.entry_contents[0] = "testfile.csv";
+  dir_entry_1.entry_contents[1] = "1325000000";
+  dir_entry_1.entry_contents[2] = ".csv";
+  dir_entry_1.entry_contents[3] = "2021-03-22 06:59:29";
+  
+  Utilities::makeHumanReadable(dir_entry_1);
+  BOOST_CHECK_EQUAL(dir_entry_1.entry_contents[0], "testfile.csv");
+  BOOST_CHECK_EQUAL(dir_entry_1.entry_contents[1], "1.32 GB");
+  BOOST_CHECK_EQUAL(dir_entry_1.entry_contents[2], "csv");
+  BOOST_CHECK_EQUAL(dir_entry_1.entry_contents[3], "Mon Mar 22 06:59:29 2021");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

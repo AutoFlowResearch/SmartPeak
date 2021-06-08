@@ -112,7 +112,8 @@ namespace SmartPeak
         if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
           scan_polarity_merge_rule = mi_params.getValueAsString();
         }
-        else {
+        else 
+        {
           LOGD << "Incorrect value for 'scan_polarity_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
       }
@@ -120,7 +121,8 @@ namespace SmartPeak
         if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
           mass_range_merge_rule = mi_params.getValueAsString();
         }
-        else {
+        else 
+        {
           LOGD << "Incorrect value for 'mass_range_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
       }
@@ -128,7 +130,8 @@ namespace SmartPeak
         if (mi_params.getValueAsString() == "Sum" || mi_params.getValueAsString() == "Min" || mi_params.getValueAsString() == "Max" || mi_params.getValueAsString() == "Mean" || mi_params.getValueAsString() == "WeightedMean") {
           dilution_series_merge_rule = mi_params.getValueAsString();
         }
-        else {
+        else 
+        {
           LOGD << "Incorrect value for 'dilution_series_merge_rule'.  Options are 'Sum', 'Min', 'Max', 'Mean', or 'WeightedMean'.";
         }
       }
@@ -306,7 +309,8 @@ namespace SmartPeak
           }
         }
         // Subordinate level merge
-        else if (merge_subordinates) {
+        else if (merge_subordinates) 
+        {
           for (const OpenMS::Feature& s : f.getSubordinates()) {
             std::pair<std::string, std::string> component(f.getMetaValue("PeptideRef").toString(), s.getMetaValue("native_id").toString());
             auto found = component_to_feature_to_injection_to_values.emplace(component, features_to_values);
@@ -363,33 +367,40 @@ namespace SmartPeak
               weights.push_back(value / total_value); // add to the weights
 
               // initializations
-              if (cnt == 0) {
+              if (cnt == 0) 
+              {
                 max_or_min_injections = injection_names_set;
-                if (merge_rule == "Min" || merge_rule == "Max") {
+                if (merge_rule == "Min" || merge_rule == "Max") 
+                {
                   merged_value = value;
                 }
               }
 
               // calculations
-              if (merge_rule == "Sum") {
+              if (merge_rule == "Sum") 
+              {
                 merged_value += value;
               }
-              else if (merge_rule == "Min") {
+              else if (merge_rule == "Min") 
+              {
                 if (value < merged_value) {
                   merged_value = value;
                   max_or_min_injections = injection_names_set;
                 }
               }
-              else if (merge_rule == "Max") {
+              else if (merge_rule == "Max") 
+              {
                 if (value > merged_value) {
                   merged_value = value;
                   max_or_min_injections = injection_names_set;
                 }
               }
-              else if (merge_rule == "Mean") {
+              else if (merge_rule == "Mean") 
+              {
                 merged_value += (value / merge_keys_to_injection_name.at(key).size());
               }
-              else if (merge_rule == "WeightedMean") {
+              else if (merge_rule == "WeightedMean") 
+              {
                 merged_value += (value * value / total_value);
               }
               ++cnt;
@@ -410,7 +421,8 @@ namespace SmartPeak
               if (merge_rule == "Min" || merge_rule == "Max") {
                 merged_value = feature_to_injection_to_value.second.at(max_or_min_injections);
               }
-              else {
+              else 
+              {
                 int cnt = 0;
                 for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
                   if (feature_to_injection_to_value.second.count(injection_names_set) <= 0) continue;
@@ -450,7 +462,8 @@ namespace SmartPeak
           f.setSubordinates(subs);
           subs.clear();
         }
-        else {
+        else 
+        {
           s = f; // Ensure all features have a subordinate for downstream filtering and quantitation
           s.setMetaValue("native_id", f.getMetaValue("PeptideRef"));
           subs.push_back(s);
@@ -469,42 +482,55 @@ namespace SmartPeak
         if (feature_to_injection_to_value.second.count(injection_names_set) <= 0) continue;
         float value = feature_to_injection_to_value.second.at(injection_names_set);
         if (!merge_subordinates) {
-          if (feature_to_injection_to_value.first == "RT") {
+          if (feature_to_injection_to_value.first == "RT") 
+          {
             f.setRT(value);
           }
-          else if (feature_to_injection_to_value.first == "Intensity") {
+          else if (feature_to_injection_to_value.first == "Intensity") 
+          {
             f.setIntensity(value);
           }
-          else if (feature_to_injection_to_value.first == "peak_area") {
+          else if (feature_to_injection_to_value.first == "peak_area") 
+          {
             f.setIntensity(value);
           }
-          else if (feature_to_injection_to_value.first == "mz") {
+          else if (feature_to_injection_to_value.first == "mz") 
+          {
             f.setMZ(value);
           }
-          else if (feature_to_injection_to_value.first == "charge") {
+          else if (feature_to_injection_to_value.first == "charge") 
+          {
             f.setCharge(static_cast<int>(value));
           }
-          else {
+          else 
+          {
             f.setMetaValue(feature_to_injection_to_value.first, value);
           }
         }
-        else if (merge_subordinates) {
-          if (feature_to_injection_to_value.first == "RT") {
+        else if (merge_subordinates) 
+        {
+          if (feature_to_injection_to_value.first == "RT") 
+          {
             s.setRT(value);
           }
-          else if (feature_to_injection_to_value.first == "Intensity") {
+          else if (feature_to_injection_to_value.first == "Intensity") 
+          {
             s.setIntensity(value);
           }
-          else if (feature_to_injection_to_value.first == "peak_area") {
+          else if (feature_to_injection_to_value.first == "peak_area") 
+          {
             s.setIntensity(value);
           }
-          else if (feature_to_injection_to_value.first == "mz") {
+          else if (feature_to_injection_to_value.first == "mz") 
+          {
             s.setMZ(value);
           }
-          else if (feature_to_injection_to_value.first == "charge") {
+          else if (feature_to_injection_to_value.first == "charge") 
+          {
             s.setCharge(static_cast<int>(value));
           }
-          else {
+          else 
+          {
             s.setMetaValue(feature_to_injection_to_value.first, value);
           }
         }             

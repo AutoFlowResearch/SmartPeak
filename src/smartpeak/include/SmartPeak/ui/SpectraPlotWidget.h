@@ -12,13 +12,26 @@ namespace SmartPeak
   /**
     @brief Class for plotting Spectra
   */
-  class SpectraPlotWidget : public ScatterPlotWidget
+  class SpectraPlotWidget : 
+    public ScatterPlotWidget,
+    public ISequenceObserver
   {
   public:
     SpectraPlotWidget(SessionHandler& session_handler,
       SequenceHandler& sequence_handler,
-      const std::string& title) :
-      ScatterPlotWidget(session_handler, sequence_handler, title) {};
+      const std::string& id,
+      const std::string& title,
+      SequenceObservable& sequence_observable) :
+      ScatterPlotWidget(session_handler, sequence_handler, id, title) 
+    {
+      sequence_observable.addSequenceObserver(this);
+    };
+
+    /**
+      ISequenceObserver
+    */
+    virtual void onSequenceUpdated() override;
+
   protected:
     virtual void updateScatterPlotData() override;
   protected:

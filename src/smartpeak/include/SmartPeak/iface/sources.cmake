@@ -3,8 +3,16 @@ set(directory include/SmartPeak/iface)
 
 ### list all header files of the directory here
 set(sources_list_h
-  IProcessorDescription.h
+  IApplicationProcessorObserver.h
+  IFilePickerHandler.h
   IParametersObserver.h
+  IProcessorDescription.h
+  ISampleGroupProcessorObserver.h
+  ISequenceObserver.h
+  ISequenceProcessorObserver.h
+  ISequenceSegmentObserver.h
+  ISequenceSegmentProcessorObserver.h
+  ITransitionsObserver.h
   IWorkflowObserver.h
 )
 

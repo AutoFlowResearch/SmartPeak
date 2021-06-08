@@ -1,28 +1,32 @@
 set(core_executables_list
+	ApplicationHandler_test
 	ApplicationProcessor_test
 	CastValue_test
+	EventDispatcher_test
 	Filenames_test
 	Helloworld_test
+	ImEntry_test
+	InjectionHandler_test
 	MetaDataHandler_test
+	Parameters_test
+	ParametersObservable_test
+	ProgressInfo_test
 	RawDataHandler_test
 	RawDataProcessor_test
 	SampleGroupHandler_test
 	SampleGroupProcessor_test
-	InjectionHandler_test
 	SequenceHandler_test
 	SequenceProcessor_test
 	SequenceSegmentHandler_test
 	SequenceSegmentProcessor_test
 	SessionHandler_test
 	Utilities_test
-	Parameters_test
-	ParametersObservable_test
 	WorkflowObservable_test
 )
 
 set(io_executables_list
 	CSVWriter_test
-	FileReader_test
+	ParametersParser_test
 	SequenceParser_test
 	InputDataValidation_test
 )
@@ -34,6 +38,7 @@ set(algorithm_executables_list
 set(ui_executables_list
 	GuiAppender_test
 	WindowSizesAndPositions_test
+  Widget_test
 )
 
 ### collect test executables

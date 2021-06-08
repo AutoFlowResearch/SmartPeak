@@ -27,6 +27,7 @@
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/Utilities.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 #include <OpenMS/METADATA/AbsoluteQuantitationStandards.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>
@@ -153,6 +154,22 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  bool LoadStandardsConcentrations::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    filenames.quantitationMethods_csv_i = filename;
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
   void LoadStandardsConcentrations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
@@ -193,6 +210,22 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  bool LoadQuantitationMethods::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    filenames.quantitationMethods_csv_i = filename;
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
   void LoadQuantitationMethods::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
@@ -218,13 +251,13 @@ namespace SmartPeak
     try {
       OpenMS::AbsoluteQuantitationMethodFile AQMf;
       AQMf.load(filenames.quantitationMethods_csv_i, sequenceSegmentHandler_IO.getQuantitationMethods());
+      if (sequence_segment_observable_) sequence_segment_observable_->notifyQuantitationMethodsUpdated();
     }
     catch (const std::exception& e) {
       LOGE << e.what();
       sequenceSegmentHandler_IO.getQuantitationMethods().clear();
       LOGI << "quantitation methods clear";
     }
-
     LOGD << "END loadQuantitationMethods";
   }
 
@@ -268,6 +301,31 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  bool LoadFeatureFilters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.featureFilterComponents_csv_i = "";
+      filenames.featureFilterComponentGroups_csv_i = filename;
+    }
+    else
+    {
+      filenames.featureFilterComponents_csv_i = filename;
+      filenames.featureFilterComponentGroups_csv_i = "";
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
   void LoadFeatureFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
@@ -304,9 +362,11 @@ namespace SmartPeak
       OpenMS::MRMFeatureQCFile featureQCFile;
       if (filenames.featureFilterComponents_csv_i.size()) { // because we don't know if either of the two names is empty
         featureQCFile.load(filenames.featureFilterComponents_csv_i, sequenceSegmentHandler_IO.getFeatureFilter(), false);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureFiltersComponentsUpdated();
       }
       if (filenames.featureFilterComponentGroups_csv_i.size()) {
         featureQCFile.load(filenames.featureFilterComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureFilter(), true);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureFiltersComponentGroupsUpdated();
       }
     }
     catch (const std::exception& e) {
@@ -316,13 +376,37 @@ namespace SmartPeak
       sequenceSegmentHandler_IO.getFeatureFilter().component_group_pair_qcs.clear();
       LOGI << "feature filter clear";
     }
-
     LOGD << "END loadFeatureFilter";
   }
 
   ParameterSet LoadFeatureQCs::getParameterSchema() const
   {
     return ParameterSet();
+  }
+
+  bool LoadFeatureQCs::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.featureQCComponents_csv_i = "";
+      filenames.featureQCComponentGroups_csv_i = filename;
+    }
+    else
+    {
+      filenames.featureQCComponents_csv_i = filename;
+      filenames.featureQCComponentGroups_csv_i = "";
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
   }
 
   void LoadFeatureQCs::process(
@@ -361,9 +445,11 @@ namespace SmartPeak
       OpenMS::MRMFeatureQCFile featureQCFile;
       if (filenames.featureQCComponents_csv_i.size()) { // because we don't know if either of the two names is empty
         featureQCFile.load(filenames.featureQCComponents_csv_i, sequenceSegmentHandler_IO.getFeatureQC(), false);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureQCComponentsUpdated();
       }
       if (filenames.featureQCComponentGroups_csv_i.size()) {
         featureQCFile.load(filenames.featureQCComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureQC(), true);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureQCComponentGroupsUpdated();
       }
     }
     catch (const std::exception& e) {
@@ -373,7 +459,6 @@ namespace SmartPeak
       sequenceSegmentHandler_IO.getFeatureQC().component_group_pair_qcs.clear();
       LOGI << "Feature qc clear";
     }
-
     LOGD << "END loadFeatureQC";
   }
 
@@ -462,6 +547,31 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  bool LoadFeatureRSDFilters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.featureRSDFilterComponents_csv_i = "";
+      filenames.featureRSDFilterComponentGroups_csv_i = filename;
+    }
+    else
+    {
+      filenames.featureRSDFilterComponents_csv_i = filename;
+      filenames.featureRSDFilterComponentGroups_csv_i = "";
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
   void LoadFeatureRSDFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
@@ -498,9 +608,11 @@ namespace SmartPeak
       OpenMS::MRMFeatureQCFile featureQCFile;
       if (filenames.featureRSDFilterComponents_csv_i.size()) { // because we don't know if either of the two names is empty
         featureQCFile.load(filenames.featureRSDFilterComponents_csv_i, sequenceSegmentHandler_IO.getFeatureRSDFilter(), false);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDFilterComponentsUpdated();
       }
       if (filenames.featureRSDFilterComponentGroups_csv_i.size()) {
         featureQCFile.load(filenames.featureRSDFilterComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureRSDFilter(), true);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDFilterComponentGroupsUpdated();
       }
     }
     catch (const std::exception& e) {
@@ -510,13 +622,37 @@ namespace SmartPeak
       sequenceSegmentHandler_IO.getFeatureRSDFilter().component_group_pair_qcs.clear();
       LOGI << "feature filter clear";
     }
-
     LOGD << "END loadFeatureRSDFilter";
   }
 
   ParameterSet LoadFeatureRSDQCs::getParameterSchema() const
   {
     return ParameterSet();
+  }
+
+  bool LoadFeatureRSDQCs::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.featureRSDQCComponents_csv_i = "";
+      filenames.featureRSDQCComponentGroups_csv_i = filename;
+    }
+    else
+    {
+      filenames.featureRSDQCComponents_csv_i = filename;
+      filenames.featureRSDQCComponentGroups_csv_i = "";
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
   }
 
   void LoadFeatureRSDQCs::process(
@@ -555,9 +691,11 @@ namespace SmartPeak
       OpenMS::MRMFeatureQCFile featureQCFile;
       if (filenames.featureRSDQCComponents_csv_i.size()) { // because we don't know if either of the two names is empty
         featureQCFile.load(filenames.featureRSDQCComponents_csv_i, sequenceSegmentHandler_IO.getFeatureRSDQC(), false);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDQCComponentsUpdated();
       }
       if (filenames.featureRSDQCComponentGroups_csv_i.size()) {
         featureQCFile.load(filenames.featureRSDQCComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureRSDQC(), true);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDQCComponentGroupsUpdated();
       }
     }
     catch (const std::exception& e) {
@@ -567,7 +705,6 @@ namespace SmartPeak
       sequenceSegmentHandler_IO.getFeatureRSDQC().component_group_pair_qcs.clear();
       LOGI << "Feature qc clear";
     }
-
     LOGD << "END loadFeatureRSDQC";
   }
 
@@ -656,6 +793,31 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  bool LoadFeatureBackgroundFilters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.featureBackgroundFilterComponents_csv_i = "";
+      filenames.featureBackgroundFilterComponentGroups_csv_i = filename;
+    }
+    else
+    {
+      filenames.featureBackgroundFilterComponents_csv_i = filename;
+      filenames.featureBackgroundFilterComponentGroups_csv_i = "";
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
   void LoadFeatureBackgroundFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
@@ -692,9 +854,11 @@ namespace SmartPeak
       OpenMS::MRMFeatureQCFile featureQCFile;
       if (filenames.featureBackgroundFilterComponents_csv_i.size()) { // because we don't know if either of the two names is empty
         featureQCFile.load(filenames.featureBackgroundFilterComponents_csv_i, sequenceSegmentHandler_IO.getFeatureBackgroundFilter(), false);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundFilterComponentsUpdated();
       }
       if (filenames.featureBackgroundFilterComponentGroups_csv_i.size()) {
         featureQCFile.load(filenames.featureBackgroundFilterComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureBackgroundFilter(), true);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundFilterComponentGroupsUpdated();
       }
     }
     catch (const std::exception& e) {
@@ -704,13 +868,37 @@ namespace SmartPeak
       sequenceSegmentHandler_IO.getFeatureBackgroundFilter().component_group_pair_qcs.clear();
       LOGI << "feature filter clear";
     }
-
     LOGD << "END loadFeatureBackgroundFilter";
   }
 
   ParameterSet LoadFeatureBackgroundQCs::getParameterSchema() const
   {
     return ParameterSet();
+  }
+
+  bool LoadFeatureBackgroundQCs::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.featureBackgroundQCComponents_csv_i = "";
+      filenames.featureBackgroundQCComponentGroups_csv_i = filename;
+    }
+    else
+    {
+      filenames.featureBackgroundQCComponents_csv_i = filename;
+      filenames.featureBackgroundQCComponentGroups_csv_i = "";
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
   }
 
   void LoadFeatureBackgroundQCs::process(
@@ -749,9 +937,11 @@ namespace SmartPeak
       OpenMS::MRMFeatureQCFile featureQCFile;
       if (filenames.featureBackgroundQCComponents_csv_i.size()) { // because we don't know if either of the two names is empty
         featureQCFile.load(filenames.featureBackgroundQCComponents_csv_i, sequenceSegmentHandler_IO.getFeatureBackgroundQC(), false);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundQCComponentsUpdated();
       }
       if (filenames.featureBackgroundQCComponentGroups_csv_i.size()) {
         featureQCFile.load(filenames.featureBackgroundQCComponentGroups_csv_i, sequenceSegmentHandler_IO.getFeatureBackgroundQC(), true);
+        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundQCComponentGroupsUpdated();
       }
     }
     catch (const std::exception& e) {
@@ -761,7 +951,6 @@ namespace SmartPeak
       sequenceSegmentHandler_IO.getFeatureBackgroundQC().component_group_pair_qcs.clear();
       LOGI << "Feature qc clear";
     }
-
     LOGD << "END loadFeatureBackgroundQC";
   }
 

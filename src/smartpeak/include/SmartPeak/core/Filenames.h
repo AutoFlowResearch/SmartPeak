@@ -17,13 +17,14 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
 #pragma once
 
 #include <string>
+#include <filesystem>
 
 namespace SmartPeak
 {
@@ -57,6 +58,7 @@ public:
     std::string mzTab_i;
     std::string mzTab_o;
     std::string featureXML_o;
+    std::string features_pdf_o;
     std::string featureXMLSampleGroup_o;
     std::string featureXML_i;
     std::string featureXMLSampleGroup_i;

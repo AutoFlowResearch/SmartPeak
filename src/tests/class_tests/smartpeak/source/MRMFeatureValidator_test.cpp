@@ -28,7 +28,7 @@
 #include <SmartPeak/algorithm/MRMFeatureValidator.h>
 
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
-#include <SmartPeak/io/FileReader.h>
+#include <SmartPeak/io/ParametersParser.h>
 #include <SmartPeak/core/RawDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
   const string filename_params = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_test_pyTOPP_MRMFeatureValidator_params.csv");
 
   ParameterSet params;
-  FileReader::parseOpenMSParams(filename_params, params); // it is assumed "," as delimiter
+  ParametersParser::read(filename_params, params); // it is assumed "," as delimiter
   BOOST_CHECK_EQUAL(params.size(), 1);
   BOOST_CHECK_EQUAL(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
   BOOST_CHECK_EQUAL(params["MRMFeatureValidator.validate_MRMFeatures"].size(), 1);
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
   const float Tr_window = std::stof(params.at("MRMFeatureValidator.validate_MRMFeatures")[0].getValueAsString());
 
   MetaDataHandler mdh;
-  mdh.sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file
+  mdh.setSampleName("150601_0_BloodProject01_PLT_QC_Broth-1"); // info taken from .csv file
   mdh.inj_number = 1;
   mdh.batch_name = "BloodProject01";
   mdh.setAcquisitionDateAndTimeFromString("09-06-2015 17:14", "%m-%d-%Y %H:%M");

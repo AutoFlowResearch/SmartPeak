@@ -223,7 +223,7 @@ OpemMS libs can be built wihtout GUI capabilities using the following set of com
     cd OpenMS && git submodule update --init contrib && mkdir contrib_build && cd contrib_build
     cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DBUILD_TYPE=ALL ../contrib
     cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build
-    cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 \ 
+    cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=17 \ 
     -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost);$(brew --prefix)" \ 
     -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ \   
     -DSEQAN_INCLUDE_DIRS=~/OpenMS/contrib_build/include/seqan -DCOIN_INCLUDE_DIR=../contrib_build/include/ \
@@ -317,23 +317,28 @@ The collection of examples is located at ``src/example/data`` directory of the S
 
 .. end_runningexamples
 
-.. begin_gui
+.. begin_logging
 
-Set logging path
+Log path
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Default locations of logs:
 
-- Windows: `C:\\Users\\<user>\\AppData\\Local\\SmartPeak`
-- Linux and MacOS: `~/.SmartPeak`
+- Windows: ``C:\\Users\\<user>\\AppData\\Local\\SmartPeak``
+- Linux and MacOS: ``~/.SmartPeak``
 
-User can change default location and specify directory where the logs are stored by setting `SMARTPEAK_LOGS` env variable. 
-If directory specified by the path doesn't exist, SmartPeak will create specified directories.
+User can change default location and specify directory where the logs are stored by setting ``SMARTPEAK_LOGS`` env variable. 
+If directory specified by the path doesn't exist, SmartPeak will create it.
+
+.. end_logging
+
+.. begin_gui
 
 
 Using SmartPeak GUI
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
 
-- To start the SmartPeak GUI, from the build directory run :bash:`./bin/SmartPeakGUI` for Mac and Linux, or :bash:`./bin/[Debug or Release]/SmartPeakGUI` for Windows. Or double-click ``SmartPeakGUI`` executable in the file browser of your OS.
+- After successful installation of SmartPeak, on Windows open menu start and browse for relevant icon, you can also find the shortcut on desktop.
+- If built SmartPeak from the source code, from the build directory run :bash:`./bin/SmartPeakGUI` for Mac and Linux, or :bash:`./bin/[Debug or Release]/SmartPeakGUI` for Windows. Or double-click ``SmartPeakGUI`` executable in the file browser of your OS.
 - Start the session with ``File | Load session from sequence``
 - Choose the corresponding directory with ``Change dir``. The path to example folder can be shortened to f.e. ``/data/GCMS_SIM_Unknowns`` 
 - Select the sequence file
@@ -358,7 +363,7 @@ Using SmartPeak GUI
 
 .. image:: images/SmartPeakGUIRunWorkflowModal.png
 
-- The status of the workflow can be monitored with ``View | info``. 
+- The status of the workflow can be monitored with ``View | info``. An estimated time is available. This value is only a rough estimation. It will be updated regaluary while the workflow is running. The progress bar however shows workflow steps completed. As some steps can be longer to execute, it may not reflect remaining time. More details are available about the items that are currently running.
 
 .. image:: images/SmartPeakGUIInfo.png
 

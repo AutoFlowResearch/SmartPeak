@@ -5,16 +5,18 @@ set(directory source/core)
 set(sources_list
 	ApplicationProcessor.cpp
 	CastValue.cpp
+	EventDispatcher.cpp
 	FeatureMetadata.cpp
 	Filenames.cpp
 	Helloworld.cpp
+	InjectionHandler.cpp
 	MetaDataHandler.cpp
 	Parameters.cpp
+	ProgessInfo.cpp
 	RawDataHandler.cpp
 	RawDataProcessor.cpp
 	SampleGroupHandler.cpp
 	SampleGroupProcessor.cpp
-	InjectionHandler.cpp
 	SampleType.cpp
 	SequenceHandler.cpp
 	SequenceProcessor.cpp

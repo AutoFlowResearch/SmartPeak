@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
@@ -1104,7 +1104,7 @@ BOOST_AUTO_TEST_CASE(gettersLoadParameters)
 
 BOOST_AUTO_TEST_CASE(processLoadParameters)
 {
-  // no tests, it calls FileReader::parseOpenMSParams and LoadParameters::sanitizeRawDataProcessorParameters
+  // no tests, it calls ParametersParser::read and LoadParameters::sanitizeRawDataProcessorParameters
 }
 
 BOOST_AUTO_TEST_CASE(sanitizeRawDataProcessorParameters)
@@ -1857,7 +1857,7 @@ BOOST_AUTO_TEST_CASE(validateFeatures)
   loadValidationData.process(rawDataHandler, params_1, filenames);
 
   MetaDataHandler& mdh = rawDataHandler.getMetaData();
-  mdh.sample_name = "150601_0_BloodProject01_PLT_QC_Broth-1"; // info taken from .csv file
+  mdh.setSampleName("150601_0_BloodProject01_PLT_QC_Broth-1"); // info taken from .csv file
   mdh.inj_number = 1;
   mdh.batch_name = "BloodProject01";
   mdh.setAcquisitionDateAndTimeFromString("09-06-2015 17:14", "%m-%d-%Y %H:%M");
@@ -2655,11 +2655,13 @@ BOOST_AUTO_TEST_CASE(calculateMDVs)
     {
       if (i == 0) // lactate_1
       {
-        BOOST_CHECK_CLOSE(lactate_normalized_normsum.at(i).getSubordinates().at(j).getIntensity(), L1_norm_sum.at(j), 1e-6);
+        BOOST_CHECK_CLOSE((float)lactate_normalized_normsum.at(i).getSubordinates().at(j).getMetaValue("peak_apex_int"),
+                          L1_norm_sum.at(j), 1e-6);
       }
       else if (i == 1) // lactate_2
       {
-        BOOST_CHECK_CLOSE(lactate_normalized_normsum.at(i).getSubordinates().at(j).getIntensity(), L2_norm_sum.at(j), 1e-6);
+        BOOST_CHECK_CLOSE((float)lactate_normalized_normsum.at(i).getSubordinates().at(j).getMetaValue("peak_apex_int"),
+                          L2_norm_sum.at(j), 1e-6);
       }
     }
   }
@@ -2714,7 +2716,8 @@ BOOST_AUTO_TEST_CASE(isotopicCorrections)
   {
     for(uint8_t j = 0; j < lactate_1_corrected_featureMap.at(i).getSubordinates().size(); ++j)
     {
-      BOOST_CHECK_CLOSE(lactate_1_corrected_featureMap.at(i).getSubordinates().at(j).getIntensity(), L1_corrected[j], 1e-3);
+      BOOST_CHECK_CLOSE((double)lactate_1_corrected_featureMap.at(i).getSubordinates().at(j).getMetaValue("peak_apex_int"),
+                        L1_corrected[j], 1e-3);
     }
   }
 }
@@ -2778,19 +2781,19 @@ BOOST_AUTO_TEST_CASE(calculateMDVAccuracies)
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, {}, filenames);
   
-  CalculateMDVAccuracies            calculateMDVAccuracies;
-  OpenMS::Feature                   feature_1;
-  OpenMS::FeatureMap                featureMap_1;
+  CalculateMDVAccuracies calculateMDVAccuracies;
+  OpenMS::Feature        feature_1;
+  OpenMS::FeatureMap     featureMap_1;
   
-  std::vector<double>               accoa_C23H37N7O17P3S_MRM_measured_13    {0.627, 0.253, 0.096, 0.02, 0.004, 0.001};
-  std::vector<double>               accoa_C23H37N7O17P3S_abs_diff           {0.0632108, 0.0505238, 0.0119821, 0.0014131614, 3.15664365e-05, 0.000323269283};
-  std::vector<double>               Average_accuracy_groundtruth            {0.02374, 0.03451}; // [accoa_13, fad_48]
+  std::vector<double>    accoa_C23H37N7O17P3S_MRM_measured_13    {0.627, 0.253, 0.096, 0.02, 0.004, 0.001};
+  std::vector<double>    accoa_C23H37N7O17P3S_abs_diff           {0.0632108, 0.0505238, 0.0119821, 0.0014131614, 3.15664365e-05, 0.000323269283};
+  std::vector<double>    Average_accuracy_groundtruth            {0.02374, 0.03451}; // [accoa_13, fad_48]
 
   std::map<std::string,std::string> theoretical_formulas                    {{"accoa","C23H37N7O17P3S"},{"fad","C27H32N9O15P2"}};
 
   std::vector<OpenMS::Feature>      L1_subordinates, L2_subordinates;
   
-  feature_1.setMetaValue("peptideRef", "accoa");
+  feature_1.setMetaValue("PeptideRef", "accoa");
   for (uint16_t i = 0; i < accoa_C23H37N7O17P3S_MRM_measured_13.size(); ++i)
   {
     OpenMS::Feature sub;
@@ -2815,7 +2818,8 @@ BOOST_AUTO_TEST_CASE(calculateMDVAccuracies)
 
     for (size_t feature_subordinate = 0; feature_subordinate < featureMap_1.at(i).getSubordinates().size(); ++feature_subordinate)
     {
-      BOOST_CHECK_CLOSE( (float)featureMap_1.at(i).getSubordinates().at(feature_subordinate).getMetaValue("absolute_difference"), accoa_C23H37N7O17P3S_abs_diff[feature_subordinate], 1e-2 );
+      BOOST_CHECK_CLOSE( (float)featureMap_1.at(i).getSubordinates().at(feature_subordinate).getMetaValue("absolute_difference"),
+                          accoa_C23H37N7O17P3S_abs_diff[feature_subordinate], 1e-2 );
     }
   }
 }
