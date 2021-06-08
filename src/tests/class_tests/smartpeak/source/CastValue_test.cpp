@@ -21,6 +21,7 @@
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#undef main
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <SmartPeak/core/CastValue.h>
