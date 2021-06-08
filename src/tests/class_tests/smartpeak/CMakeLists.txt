@@ -84,12 +84,6 @@ include_directories(${SMARTPEAK_CLASS_TESTS_INTERNAL_INCLUDE_DIRECTORIES})
 include_directories(SYSTEM ${SMARTPEAK_CLASS_TESTS_EXTERNAL_INCLUDE_DIRECTORIES})
 
 #------------------------------------------------------------------------------
-# ImGUI SDL and OpenGL dependencies
-#------------------------------------------------------------------------------
-find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS})
-
-#------------------------------------------------------------------------------
 # OpenGL
 #------------------------------------------------------------------------------
 find_package(OpenGL REQUIRED)
@@ -139,11 +133,8 @@ foreach(_class_test ${TEST_executables})
   if(NOT (${_class_test} STREQUAL "GuiAppender_test" OR ${_class_test} STREQUAL "AppWindow_test" OR ${_class_test} STREQUAL "Widget_test" OR ${_class_test} STREQUAL "ImEntry_test"))
     target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE gtest_main gmock_main)
   else()
-    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
+    target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS  ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
                             PRIVATE gtest_main gmock_main ImGui::Sources ImPlot::Sources ImGui::Examples ImGui::SourcesMiscCpp)
-  endif()
-  if (MSVC)
-    # target_compile_definitions(${_class_test} PRIVATE SDL_MAIN_HANDLED=1)
   endif()
   add_test(${_class_test} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_class_test})
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug
