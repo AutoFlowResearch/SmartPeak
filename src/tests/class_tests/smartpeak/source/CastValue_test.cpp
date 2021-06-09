@@ -24,7 +24,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <SmartPeak/core/CastValue.h>
-#undef main
+
 using namespace SmartPeak;
 using namespace std;
 

@@ -134,7 +134,7 @@ foreach(_class_test ${TEST_executables})
     target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS PRIVATE gtest_main gmock_main)
   else()
     target_link_libraries(${_class_test} PUBLIC ${SmartPeak_LIBRARIES} OpenMS  ${OPENGL_LIBRARIES} ImGui::ImGui ImPlot::ImPlot 
-                            PRIVATE gtest_main gmock_main ImGui::Sources ImPlot::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+                            PRIVATE gtest_main gmock_main ImGui::Sources ImPlot::Sources ImGui::SourcesMiscCpp)
   endif()
   add_test(${_class_test} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${_class_test})
   # only add OPENMP flags to gcc linker (execpt Mac OS X, due to compiler bug

@@ -27,7 +27,7 @@
 #include <sys/stat.h>
 #include <SmartPeak/core/Utilities.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>
-#undef main
+
 using namespace SmartPeak;
 using namespace std;
 namespace fs = std::filesystem;

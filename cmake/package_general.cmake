@@ -69,7 +69,7 @@ elseif (WIN32)
 
 endif()
 
-
+set(SDL_BUILDING_LIBRARY true)
 find_package(SDL2 REQUIRED)
 if (SDL2_FOUND)
   if (WIN32)

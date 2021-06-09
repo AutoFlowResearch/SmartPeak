@@ -28,7 +28,7 @@
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
-
+#undef main
 
 void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
 {
