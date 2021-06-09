@@ -33,8 +33,20 @@ namespace SmartPeak
   class SampleGroupProcessorObservable
   {
   public:
-    virtual void addSampleGroupProcessorObserver(ISampleGroupProcessorObserver* observer) { observers_.push_back(observer); };
-    virtual void removeSampleGroupProcessorObserver(ISampleGroupProcessorObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
+    virtual void addSampleGroupProcessorObserver(ISampleGroupProcessorObserver* observer) 
+    { 
+      if (nullptr != observer)
+      {
+        observers_.push_back(observer); 
+      }
+    }
+    virtual void removeSampleGroupProcessorObserver(ISampleGroupProcessorObserver* observer) 
+    { 
+      if (nullptr != observer)
+      {
+        observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); 
+      }
+    }
     void notifySampleGroupProcessorStart(const size_t nb_segments)
     {
       for (auto& observer : observers_)

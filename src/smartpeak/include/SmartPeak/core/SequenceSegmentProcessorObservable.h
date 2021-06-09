@@ -33,8 +33,20 @@ namespace SmartPeak
   class SequenceSegmentProcessorObservable
   {
   public:
-    virtual void addSequenceSegmentProcessorObserver(ISequenceSegmentProcessorObserver* observer) { observers_.push_back(observer); };
-    virtual void removeSequenceSegmentProcessorObserver(ISequenceSegmentProcessorObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
+    virtual void addSequenceSegmentProcessorObserver(ISequenceSegmentProcessorObserver* observer) 
+    {
+      if (nullptr != observer)
+      {
+        observers_.push_back(observer);
+      }
+    }
+    virtual void removeSequenceSegmentProcessorObserver(ISequenceSegmentProcessorObserver* observer) 
+    {
+      if (nullptr != observer)
+      {
+        observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end());
+      }
+    }
     void notifySequenceSegmentProcessorStart(const size_t nb_segments)
     {
       for (auto& observer : observers_)

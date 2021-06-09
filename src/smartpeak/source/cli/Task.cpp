@@ -22,6 +22,11 @@
 // --------------------------------------------------------------------------
 #include <SmartPeak/cli/Task.h>
 
+#include <SmartPeak/iface/IApplicationProcessorObserver.h>
+#include <SmartPeak/iface/ISequenceProcessorObserver.h>
+#include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
+#include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
+
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <filesystem>
@@ -80,11 +85,6 @@ bool LoadSession::operator() (ApplicationManager& application_manager)
     auto& application_handler = application_manager.get_application_handler();
     auto create_sequence = CreateSequence{application_handler.sequenceHandler_};
     return create_sequence.onFilePicked(application_settings.load_session, &application_handler);
-    // LoadSessionFromSequence load_session_processor{application_handler};
-    // {
-    //     load_session_processor.pathname_ = application_settings.load_session;
-    // }
-    // return load_session_processor.process();
 }
 
 bool RunIntegrityChecks::operator() (ApplicationManager& application_manager) 
@@ -274,9 +274,18 @@ void InitializeWorkflowSettings::_update_filenames(
 
 bool RunWorkflow::operator() (ApplicationManager& application_manager) 
 {
+    auto& application_settings = application_manager.get_application_settings();
     auto& application_handler = application_manager.get_application_handler();
     auto& session_handler = application_manager.get_session_handler();
     auto& workflow_manager = application_manager.get_workflow_manager();
+    auto& event_dispatcher = application_manager.get_event_dispatcher();
+    auto& progress_info = application_manager.get_progress_info();
+    {
+        event_dispatcher.addApplicationProcessorObserver(this);
+        event_dispatcher.addSequenceProcessorObserver(this);
+        event_dispatcher.addSequenceSegmentProcessorObserver(this);
+        event_dispatcher.addSampleGroupProcessorObserver(this);
+    }
     try
     {
         const auto injection_names = session_handler.getSelectInjectionNamesWorkflow(
@@ -286,10 +295,25 @@ bool RunWorkflow::operator() (ApplicationManager& application_manager)
         const auto sample_group_names = session_handler.getSelectSampleGroupNamesWorkflow(
             application_handler.sequenceHandler_);
 
+        // If this flag is true, no progressbar is printed and workflow is ran on the main thread.
+        auto disable_progressbar = application_settings.disable_progressbar;
+
         workflow_manager.addWorkflow(
             application_handler, injection_names, sequence_segment_names, 
             sample_group_names, application_manager.get_workflow_commands(), 
-            nullptr, nullptr, nullptr, nullptr, true);
+            &event_dispatcher, &event_dispatcher, &event_dispatcher, &event_dispatcher, disable_progressbar);
+
+        if (!disable_progressbar)
+        {
+            auto freq = static_cast<double>(20.); // Hz
+            auto rate = std::chrono::milliseconds(static_cast<uint64_t>(1000. / freq));
+            while (!workflow_manager.isWorkflowDone())
+            {
+                event_dispatcher.dispatchEvents();
+                std::this_thread::sleep_for(rate);
+                show_progress(progress_info, 40);
+            }
+        }
     }
     catch(const std::exception& e)
     {
@@ -297,6 +321,61 @@ bool RunWorkflow::operator() (ApplicationManager& application_manager)
         return false;
     }
     return true;
+}
+
+std::string RunWorkflow::formatted_time(const std::chrono::steady_clock::duration& duration) const
+{
+    std::ostringstream os;
+    auto ns = duration;
+    auto h = std::chrono::duration_cast<std::chrono::hours>(ns);
+    ns -= h;
+    auto m = std::chrono::duration_cast<std::chrono::minutes>(ns);
+    ns -= m;
+    auto s = std::chrono::duration_cast<std::chrono::seconds>(ns);
+    os << std::setfill('0') << std::setw(2) << h.count() << "h:"
+    << std::setw(2) << m.count() << "m:"
+    << std::setw(2) << s.count() << 's';
+    return os.str();
+}
+
+void RunWorkflow::show_progress(const ProgressInfo& progress_info, int bar_width) const
+{
+    auto running_time = progress_info.runningTime();
+    auto progress = progress_info.progressValue();
+    auto estimated_time = progress_info.estimatedRemainingTime();
+
+    auto poss = std::ostringstream{};
+    auto eta = std::string{};
+    if (estimated_time)
+    {
+        if ((*estimated_time).count() < 0)
+        {
+            (*estimated_time) = std::chrono::steady_clock::duration::zero();
+        }
+        eta = formatted_time(*estimated_time);
+    }
+    else
+    {
+        eta = "N/A";
+    }
+
+    auto et = std::string{};
+    if (0 == m_event_type) et = " Seq";
+    else if (1 == m_event_type) et = "SeqS";
+    else if (2 == m_event_type) et = "SeqG";
+
+    poss << " " << formatted_time(running_time) << " " << "[" << et << ": " << m_event_name << "]" << " [";
+    int pos = bar_width * progress;
+    for (int i = 0; i < bar_width; ++i) {
+        if (i < pos) poss << "=";
+        else if (i == pos) poss << ">";
+        else poss << " ";
+    }
+    poss << "] " << int(progress * 100.0) << "%";
+    poss << " ETA " << eta << "\r";
+
+    std::cout << poss.str();
+    std::cout.flush();
 }
 
 bool ExportReport::operator() (ApplicationManager& application_manager) 

@@ -108,7 +108,7 @@ namespace SmartPeak
   );
 
   struct SequenceProcessor : IProcessorDescription {
-    SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}
+    explicit SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}
     virtual ~SequenceProcessor() = default;
 
     virtual void process() = 0;
@@ -134,7 +134,7 @@ namespace SmartPeak
     bool             checkConsistency   = true;             /// Check consistency of data contained in files
 
     CreateSequence() = default;
-    CreateSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    explicit CreateSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() override;
 
     /* IProcessorDescription */
@@ -160,12 +160,9 @@ namespace SmartPeak
     std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods_; /// Events to process
 
     ProcessSequence() = default;
-    ProcessSequence(SequenceHandler& sh, ISequenceProcessorObserver* sequence_processor_observer = nullptr) : SequenceProcessor(sh) 
+    explicit ProcessSequence(SequenceHandler& sh, ISequenceProcessorObserver* sequence_processor_observer = nullptr) : SequenceProcessor(sh) 
     {
-      if (sequence_processor_observer)
-      {
-        addSequenceProcessorObserver(sequence_processor_observer);
-      }
+      addSequenceProcessorObserver(sequence_processor_observer);
     }
     static ParameterSet getParameterSchemaStatic();
     void process() override;
@@ -186,12 +183,9 @@ namespace SmartPeak
     std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods_; /// Events to process
 
     ProcessSequenceSegments() = default;
-    ProcessSequenceSegments(SequenceHandler& sh, ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr) : SequenceProcessor(sh)
+    explicit ProcessSequenceSegments(SequenceHandler& sh, ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr) : SequenceProcessor(sh)
     {
-      if (sequence_segment_processor_observer)
-      {
-        addSequenceSegmentProcessorObserver(sequence_segment_processor_observer);
-      }
+      addSequenceSegmentProcessorObserver(sequence_segment_processor_observer);
     }
     void process() override;
 
@@ -210,12 +204,9 @@ namespace SmartPeak
     std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods_; /// Events to process
 
     ProcessSampleGroups() = default;
-    ProcessSampleGroups(SequenceHandler& sh, ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr) : SequenceProcessor(sh)
+    explicit ProcessSampleGroups(SequenceHandler& sh, ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr) : SequenceProcessor(sh)
     {
-      if (sample_group_processor_observer)
-      {
-        addSampleGroupProcessorObserver(sample_group_processor_observer);
-      }
+      addSampleGroupProcessorObserver(sample_group_processor_observer);
     }
     void process() override;
 
@@ -233,7 +224,7 @@ namespace SmartPeak
     bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
 
     LoadWorkflow() = default;
-    LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
+    explicit LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
     void process() override;
     std::string filename_;
 
@@ -251,7 +242,7 @@ namespace SmartPeak
     bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
 
     StoreWorkflow() = default;
-    StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    explicit StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() override;
     std::string filename_;
 

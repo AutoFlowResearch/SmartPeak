@@ -107,10 +107,66 @@ private:
         SmartPeak::ApplicationHandler& application_handler);
 };
 
-class RunWorkflow : public Task
+class RunWorkflow : public Task, 
+    public IApplicationProcessorObserver,
+    public ISequenceProcessorObserver,
+    public ISequenceSegmentProcessorObserver,
+    public ISampleGroupProcessorObserver
 {
 public:
     virtual bool operator() (ApplicationManager& application_manager) override;
+
+    /**
+      IApplicationProcessorObserver
+    */
+    virtual void onApplicationProcessorStart(const std::vector<std::string>& commands) override {}
+    virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override {}
+    virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override {}
+    virtual void onApplicationProcessorEnd() override {}
+
+    /**
+      ISequenceProcessorObserver
+    */
+    virtual void onSequenceProcessorStart(const size_t nb_injections) override {}
+    virtual void onSequenceProcessorSampleStart(const std::string& sample) override 
+    { 
+        m_event_type = 0; 
+        m_event_name = sample;
+    }
+    virtual void onSequenceProcessorSampleEnd(const std::string& sample) override {}
+    virtual void onSequenceProcessorEnd() override {}
+
+    /**
+      ISequenceSegmentProcessorObserver
+    */
+    virtual void onSequenceSegmentProcessorStart(const size_t nb_segments) override {}
+    virtual void onSequenceSegmentProcessorSampleStart(const std::string& segment_name) override 
+    { 
+        m_event_type = 1; 
+        m_event_name = segment_name;
+    }
+    virtual void onSequenceSegmentProcessorSampleEnd(const std::string& segment_name) override {}
+    virtual void onSequenceSegmentProcessorEnd() override {}
+
+    /**
+      ISampleGroupProcessorObserver
+    */
+    virtual void onSampleGroupProcessorStart(const size_t nb_segments) override {}
+    virtual void onSampleGroupProcessorSampleStart(const std::string& segment_name) override
+    { 
+        m_event_type = 2; 
+        m_event_name = segment_name;
+    }
+    virtual void onSampleGroupProcessorSampleEnd(const std::string& segment_name) override {}
+    virtual void onSampleGroupProcessorEnd() override {}
+
+private:
+    std::string formatted_time(const std::chrono::steady_clock::duration& duration) const;
+    void show_progress(const ProgressInfo& progress_info, int bar_width=50) const;
+
+private:
+    int m_event_type;
+    std::string m_event_name;
 };
 
 class ExportReport : public Task

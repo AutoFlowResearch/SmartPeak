@@ -96,6 +96,7 @@ public:
     bool allow_inconsistent;
     bool verbose;
     bool disable_colors;
+    bool disable_progressbar;
     std::string log_dir; 
     std::string out_dir;
 

@@ -28,6 +28,8 @@
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/core/EventDispatcher.h>
+#include <SmartPeak/core/ProgressInfo.h>
 #include <SmartPeak/cli/ApplicationSettings.h>
 
 
@@ -50,26 +52,40 @@ public:
      * @param application_settings reference to ApplicationSettings instance
      */
     explicit ApplicationManager(ApplicationSettings& application_settings) 
-        : m_application_settings{application_settings} {}
+        : m_application_settings{application_settings} 
+    {
+        m_application_handler.sequenceHandler_.addTransitionsObserver(&m_event_dispatcher);
+        m_application_handler.sequenceHandler_.addSequenceObserver(&m_event_dispatcher);
+        m_event_dispatcher.addTransitionsObserver(&m_session_handler);
+        m_event_dispatcher.addSequenceObserver(&m_session_handler);
+        m_progress_info_ptr = std::make_shared<ProgressInfo>(
+            m_event_dispatcher, m_event_dispatcher, m_event_dispatcher, m_event_dispatcher);
+    }
 
     virtual ~ApplicationManager() = default;
 
 public:
     /* get/set */
-    ApplicationSettings& get_application_settings() { return m_application_settings; }
-    const ApplicationSettings& get_application_settings() const { return m_application_settings; }
+    inline ApplicationSettings& get_application_settings() { return m_application_settings; }
+    inline const ApplicationSettings& get_application_settings() const { return m_application_settings; }
 
-    ApplicationHandler& get_application_handler() { return m_application_handler; }
-    const ApplicationHandler& get_application_handler() const { return m_application_handler; }
+    inline ApplicationHandler& get_application_handler() { return m_application_handler; }
+    inline const ApplicationHandler& get_application_handler() const { return m_application_handler; }
 
-    SessionHandler& get_session_handler() { return m_session_handler; }
-    const SessionHandler& get_session_handler() const { return m_session_handler; }
+    inline SessionHandler& get_session_handler() { return m_session_handler; }
+    inline const SessionHandler& get_session_handler() const { return m_session_handler; }
 
-    WorkflowManager& get_workflow_manager() { return m_workflow_manager; }
-    const WorkflowManager& get_workflow_manager() const { return m_workflow_manager; }
+    inline WorkflowManager& get_workflow_manager() { return m_workflow_manager; }
+    inline const WorkflowManager& get_workflow_manager() const { return m_workflow_manager; }
 
-    void set_workflow_commands(const std::vector<ApplicationHandler::Command>& commands) { m_commands = commands; }
-    const std::vector<ApplicationHandler::Command>& get_workflow_commands() { return m_commands; }
+    inline void set_workflow_commands(const std::vector<ApplicationHandler::Command>& commands) { m_commands = commands; }
+    inline const std::vector<ApplicationHandler::Command>& get_workflow_commands() { return m_commands; }
+
+    inline EventDispatcher& get_event_dispatcher() { return m_event_dispatcher; }
+    inline const EventDispatcher& get_event_dispatcher() const { return m_event_dispatcher; }
+
+    inline ProgressInfo& get_progress_info() { return *m_progress_info_ptr; }
+    inline const ProgressInfo& get_progress_info() const { return *m_progress_info_ptr; }
 
 public:
     /**
@@ -99,6 +115,8 @@ private:
     ApplicationHandler m_application_handler;
     SessionHandler m_session_handler;
     WorkflowManager m_workflow_manager;
+    EventDispatcher m_event_dispatcher;
+    std::shared_ptr<ProgressInfo> m_progress_info_ptr;
 
     std::vector<ApplicationHandler::Command> m_commands;
 };
