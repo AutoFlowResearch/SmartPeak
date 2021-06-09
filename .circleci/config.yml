@@ -203,6 +203,7 @@ jobs:
             refreshenv
             $qt_url = 'https://github.com/martinrotter/qt5-minimalistic-builds/releases/download/5.12.9/qt-5.12.9-dynamic-msvc2019-x86_64.7z'
             $sdl2_url = 'https://www.libsdl.org/release/SDL2-devel-2.0.12-VC.zip'
+            $boost_url = 'https://github.com/ahmedskhalil/Boost-1.73-Prebuilts/releases/download/0.0.1/boost_1_73_0.7z'
             $qt_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'qt_tmp$', '7z' } –PassThru
             Invoke-WebRequest $qt_url -OutFile $qt_tmp 
             7z x $qt_tmp -o'C:\lib\Qt'
@@ -217,6 +218,13 @@ jobs:
             7z x $sdl2_tmp -o'C:\lib\sdl2'
             $SDL_DIR = 'C:\lib\sdl2\SDL2-2.0.12'
             $sdl2_tmp | Remove-Item
+            $boost_tmp = New-TemporaryFile | Rename-Item -NewName { $_ -replace 'boost_tmp$', '7z' } –PassThru
+            Invoke-WebRequest $boost_url -OutFile $boost_tmp 
+            7z x $boost_tmp -o'C:\lib\boost'
+            ls C:\lib\boost\boost_1_73_0
+            ls C:\lib\boost\
+            $BOOST_DIR = 'C:\lib\boost\boost_1_73_0'
+            $boost_tmp | Remove-Item
             cd ~/SmartPeak
             pip install -r .\tools\smartpeak\requirements.txt
       - run:
@@ -244,8 +252,10 @@ jobs:
             Invoke-WebRequest $url_contrib -OutFile $contrib_tmp
             7z x $contrib_tmp -o'.'
             7z x $contrib_tmp.BaseName -o'.'
+            rm  .\lib\libboost_*
+            rm  -r .\include\boost
             cd ~/OpenMS; mkdir openms_build; cd openms_build
-            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
+            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/lib/boost/boost_1_73_0" -DBOOST_INCLUDE_DIR="C:/lib/boost/boost_1_73_0" -DBOOST_LIBRARYDIR="C:/lib/boost/boost_1_73_0/lib64-msvc-14.2" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build -DCMAKE_PREFIX_PATH="C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64" -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ~/OpenMS
             msbuild src\openswathalgo\OpenSWATHAlgo.sln /maxcpucount /p:Configuration=Release
             msbuild src\openms\OpenMS.sln /maxcpucount /p:Configuration=Release
       - run:
@@ -271,7 +281,7 @@ jobs:
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             cmake --build .
             cd ~/SmartPeak/smartpeak_release_build
-            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DCMAKE_PREFIX_PATH="C:/Users/circleci/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_CXX_EXTENSIONS=OFF -DCXX_STANDARD_REQUIRED=ON -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBoost_NO_SYSTEM_PATHS=ON -DBOOST_USE_STATIC=ON -DBOOST_ROOT="C:/lib/boost/boost_1_73_0" -DBOOST_INCLUDE_DIR="C:/lib/boost/boost_1_73_0" -DBOOST_LIBRARYDIR="C:/lib/boost/boost_1_73_0/lib64-msvc-14.2" -DCMAKE_PREFIX_PATH="C:/Users/circleci/OpenMS/openms_build/;C:/lib/Qt/qt-5.12.9-dynamic-msvc2019-x86_64;C:/lib/sdl2/SDL2-2.0.12" -DEIGEN3_INCLUDE_DIR=C:/Users/circleci/OpenMS/contrib_build/include/eigen3 -DPLOG_INCLUDE_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=C:/Users/circleci/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             msbuild src/SmartPeak_src.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/smartpeak/SmartPeak.sln /verbosity:normal /maxcpucount /p:Configuration=Release
             msbuild src/examples/SmartPeak_class_examples_smartpeak.sln /maxcpucount /property:Configuration=Release
