@@ -20,14 +20,14 @@
 // $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
-#undef main
+
 #include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
 #include <filesystem>
 #include <sys/stat.h>
 #include <SmartPeak/core/Utilities.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFinderScoring.h>
-
+#undef main
 using namespace SmartPeak;
 using namespace std;
 namespace fs = std::filesystem;
