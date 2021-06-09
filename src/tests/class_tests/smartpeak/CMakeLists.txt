@@ -56,6 +56,8 @@ endif()
 # get the test executables
 include(executables.cmake)
 
+#------------------------------------------------------------------------------
+# googletest
 include(FetchContent)
 FetchContent_Declare(
   googletest

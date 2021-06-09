@@ -37,9 +37,9 @@ TEST(ParametersParser, read)
 
   const string func1 {"func1"};
 
-  EXPECT_TRUE(parameters.count(func1));
+  ASSERT_TRUE(parameters.count(func1));
   auto function_parameters = parameters.at(func1);
-  EXPECT_TRUE(function_parameters.size() == 3);
+  ASSERT_TRUE(function_parameters.size() == 3);
   EXPECT_STREQ(function_parameters[0].getName().c_str(), "param1");
   EXPECT_STREQ(function_parameters[0].getType().c_str(), "int");
   EXPECT_STREQ(function_parameters[0].getValueAsString().c_str(), "-1");
@@ -57,9 +57,9 @@ TEST(ParametersParser, read)
 
   const string func2 {"func2"};
 
-  EXPECT_TRUE(parameters.count(func2));
+  ASSERT_TRUE(parameters.count(func2));
   function_parameters = parameters.at(func2);
-  EXPECT_TRUE(function_parameters.size() == 2);
+  ASSERT_TRUE(function_parameters.size() == 2);
   EXPECT_STREQ(function_parameters[0].getName().c_str(), "param1");
   EXPECT_STREQ(function_parameters[0].getType().c_str(), "float");
   EXPECT_STREQ(function_parameters[0].getValueAsString().c_str(), "0.5");
@@ -72,9 +72,9 @@ TEST(ParametersParser, read)
 
   const string func3 {"func3"};
 
-  EXPECT_TRUE(parameters.count(func3));
+  ASSERT_TRUE(parameters.count(func3));
   function_parameters = parameters.at(func3);
-  EXPECT_TRUE(function_parameters.size() == 1);
+  ASSERT_TRUE(function_parameters.size() == 1);
   EXPECT_STREQ(function_parameters[0].getName().c_str(), "param1");
   EXPECT_STREQ(function_parameters[0].getType().c_str(), "bool");
   EXPECT_STREQ(function_parameters[0].getValueAsString().c_str(), "false");
@@ -86,15 +86,15 @@ TEST(ParametersParser, write)
   const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");
   ParameterSet parameters;
   ParametersParser::read(pathname, parameters);
-  EXPECT_EQ(parameters.size(), 3);
+  ASSERT_EQ(parameters.size(), 3);
 
   const string func1{ "func1" };
 
-  EXPECT_TRUE(parameters.count(func1));
+  ASSERT_TRUE(parameters.count(func1));
   auto function_parameters = parameters.at(func1);
-  EXPECT_TRUE(function_parameters.size() == 3);
+  ASSERT_TRUE(function_parameters.size() == 3);
   auto parameter1 = function_parameters.findParameter("param1");
-  EXPECT_TRUE(parameter1);
+  ASSERT_TRUE(parameter1);
   EXPECT_STREQ(parameter1->getName().c_str(), "param1");
   EXPECT_STREQ(parameter1->getType().c_str(), "int");
   EXPECT_STREQ(parameter1->getValueAsString().c_str(), "-1");
@@ -123,14 +123,14 @@ TEST(ParametersParser, write)
   ParameterSet written_parameters;
   ParametersParser::read(written_filename, written_parameters);
   EXPECT_EQ(written_parameters.size(), 4);
-  EXPECT_TRUE(written_parameters.count(func1));
+  ASSERT_TRUE(written_parameters.count(func1));
   auto written_function_parameters = written_parameters.at(func1);
   auto written_parameter1 = function_parameters.findParameter("param1");
   EXPECT_STREQ(written_parameter1->getName().c_str(), "param1");
   EXPECT_STREQ(written_parameter1->getType().c_str(), "int");
   EXPECT_STREQ(written_parameter1->getValueAsString().c_str(), "42");
   EXPECT_STREQ(written_parameter1->getDescription().c_str(), "a description");
-  EXPECT_TRUE(written_parameters.count("new_params"));
+  ASSERT_TRUE(written_parameters.count("new_params"));
   auto written_function_parameters_new = written_parameters.at("new_params");
   auto written_parameter_new = written_function_parameters_new.findParameter("segment_window_lengths");
   EXPECT_STREQ(written_parameter_new->getName().c_str(), "segment_window_lengths");

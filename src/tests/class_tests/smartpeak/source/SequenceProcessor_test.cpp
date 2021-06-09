@@ -257,12 +257,12 @@ TEST(SequenceHandler, processSequence)
 
   // Default injection names (i.e., the entire sequence)
   ps.injection_names_ = {};
-//  ps.process(); //TODO:MzMLHandler omp SIGABRT
-//  EXPECT_EQ(sequenceHandler.getSequence().size(), 6);
-//  n_chroms = 0;
-//  for (int i = 0; i < sequenceHandler.getSequence().size(); ++i)
-//    n_chroms += sequenceHandler.getSequence().at(i).getRawData().getExperiment().getChromatograms().size();
-//  EXPECT_EQ(n_chroms, 2040); // loaded all injections
+  ps.process();
+  EXPECT_EQ(sequenceHandler.getSequence().size(), 6);
+  n_chroms = 0;
+  for (int i = 0; i < sequenceHandler.getSequence().size(); ++i)
+    n_chroms += sequenceHandler.getSequence().at(i).getRawData().getExperiment().getChromatograms().size();
+  EXPECT_EQ(n_chroms, 2040); // loaded all injections
 
   // Test multi threading parameters
   ParameterSet const* params;

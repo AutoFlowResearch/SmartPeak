@@ -28,7 +28,6 @@
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
-#undef main
 
 void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
 {
@@ -110,8 +109,8 @@ TEST(Widget, GenericTableWidget_sorter)
   TestTable1.updateTableContents(Im_table_entries, is_scanned, rows_out, checkbox_columns);
   EXPECT_TRUE(is_scanned);  // updateTableContents is successful
   
-  EXPECT_TRUE(Im_table_entries.size() > 0);
-  EXPECT_TRUE(Im_table_entries[0].entry_contents.size() > 0);
+  ASSERT_TRUE(Im_table_entries.size() > 0);
+  ASSERT_TRUE(Im_table_entries[0].entry_contents.size() > 0);
   
   // pre-sorting assertion
   // 1st row

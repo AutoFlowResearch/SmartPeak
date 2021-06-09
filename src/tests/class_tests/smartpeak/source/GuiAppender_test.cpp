@@ -20,7 +20,7 @@
 // $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
-#undef main
+
 #include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/ui/GuiAppender.h>
