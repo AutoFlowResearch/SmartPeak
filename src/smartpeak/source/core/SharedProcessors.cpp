@@ -62,6 +62,7 @@ namespace SmartPeak {
     {"PICK_SPECTRUM", std::make_shared<pickSpectrum>()},
     {"SCORE_SPECTRA", std::make_shared<scoreSpectra>()},
     {"SELECT_SPECTRA", std::make_shared<selectSpectra>()},
+    {"ALL_IN_ONE_DDA", std::make_shared<AllInOneDDA>()},
     {"STORE_ANNOTATIONS", std::make_shared<StoreAnnotations>()},
     {"CLEAR_DATA", std::make_shared<ClearData>()},
     {"STORE_RAW_DATA", std::make_shared<StoreRawData>()},

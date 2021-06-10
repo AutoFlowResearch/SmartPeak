@@ -455,6 +455,23 @@ namespace SmartPeak
     ) const override;
   };
 
+  struct AllInOneDDA : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "ALL_IN_ONE_DDA"; }
+    std::string getDescription() const override { return "ALL_IN_ONE_DDA"; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
   struct FilterFeatures : RawDataProcessor
   {
     int getID() const override { return 4; }

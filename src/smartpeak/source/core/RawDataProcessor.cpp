@@ -2393,6 +2393,82 @@ namespace SmartPeak
     LOGD << "END selectSpectra";
   }
 
+  ParameterSet AllInOneDDA::getParameterSchema() const
+  {
+    OpenMS::TargetedSpectraExtractor oms_params;
+    return ParameterSet({ oms_params });
+  }
+
+  void AllInOneDDA::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START AllInOneDDA";
+
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+
+    OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
+    OpenMS::Param parameters = targeted_spectra_extractor.getParameters();
+    targeted_spectra_extractor.setParameters(parameters);
+
+    try {
+      // WORKFLOW STEP: merge features (will be on MS1 spectra) - take from SmartPeak
+      OpenMS::FeatureMap& ms1_accurate_mass_found_feature_map = rawDataHandler_IO.getFeatureMap();
+      OpenMS::FeatureMap ms1_merged_features;
+      targeted_spectra_extractor.mergeFeatures(ms1_accurate_mass_found_feature_map, ms1_merged_features);
+
+      // WORKFLOW STEP: TSE.annotateSpectra
+      // annotateSpectra :  I would like to annotate my MS2 spectra with the likely MS1 feature that it was derived from
+      std::vector<OpenMS::MSSpectrum> annotated_spectra;
+      OpenMS::FeatureMap ms2_features; // will be the input of annoteSpectra
+      targeted_spectra_extractor.annotateSpectra(rawDataHandler_IO.getExperiment().getSpectra(), ms1_merged_features, ms2_features, annotated_spectra);
+
+      // WORKFLOW STEP: TSE.pickSpectra
+      std::vector<OpenMS::MSSpectrum> picked_spectra;
+      for (const auto& spectrum : annotated_spectra)
+      {
+        OpenMS::MSSpectrum picked_spectrum;
+        targeted_spectra_extractor.pickSpectrum(spectrum, picked_spectrum);
+        picked_spectra.push_back(picked_spectrum);
+      }
+
+      // WORKFLOW STEP: score *and* select
+      // FeatureMap scored_features;
+      std::vector<OpenMS::MSSpectrum> scored_spectra;
+      targeted_spectra_extractor.scoreSpectra(annotated_spectra, picked_spectra, scored_spectra);
+
+      std::vector<OpenMS::MSSpectrum> selected_spectra;
+      OpenMS::FeatureMap selected_features;
+      targeted_spectra_extractor.selectSpectra(scored_spectra, ms2_features, selected_spectra, selected_features, true);
+
+      // WORKFLOW STEP: searchSpectra (will be on MS2 spectra)
+      OpenMS::FeatureMap ms2_accurate_mass_found_feature_map;
+      targeted_spectra_extractor.searchSpectrum(selected_features, ms2_accurate_mass_found_feature_map);
+
+      // WORKFLOW STEP: merge features again (on MS2 spectra features)
+      OpenMS::FeatureMap ms2_merged_features;
+      targeted_spectra_extractor.mergeFeatures(ms2_accurate_mass_found_feature_map, ms2_merged_features);
+
+      // WORKFLOW STEP: store - we want to store MS1 and the associated MS2 features 
+      // (do 2 functions MSP: MS2 spectra as input param, TraML : take features map as input param)
+      // we need a link between MS2 and MS1 features, so we may need the MS2 spectra as input parameter as well (to check).
+
+      // Store
+      OpenMS::Param params = targeted_spectra_extractor.getParameters();
+      params.setValue("output_format", "traML");
+      params.setValue("deisotoping:use_deisotoper", "true");
+      targeted_spectra_extractor.setParameters(params);
+      std::string tmp_filename = "c:\\tmp\\smartpeak_all_in_one.TraML";
+      // NEW_TMP_FILE(tmp_filename);
+      targeted_spectra_extractor.storeSpectraTraML(tmp_filename, ms1_merged_features, ms2_merged_features);
+    }
+    catch (const std::exception& e) {
+      LOGE << "AllInOneDDA : " << typeid(e).name() << " : " << e.what();
+    }
+
+    LOGD << "END AllInOneDDA";
+  }
+
   void ClearData::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START ClearData";
