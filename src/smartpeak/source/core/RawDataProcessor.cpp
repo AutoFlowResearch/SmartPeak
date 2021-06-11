@@ -2458,9 +2458,8 @@ namespace SmartPeak
       params.setValue("output_format", "traML");
       params.setValue("deisotoping:use_deisotoper", "true");
       targeted_spectra_extractor.setParameters(params);
-      std::string tmp_filename = "c:\\tmp\\smartpeak_all_in_one.TraML";
-      // NEW_TMP_FILE(tmp_filename);
-      targeted_spectra_extractor.storeSpectraTraML(tmp_filename, ms1_merged_features, ms2_merged_features);
+      LOGI << "Storing: " << filenames.traML_o;
+      targeted_spectra_extractor.storeSpectraTraML(filenames.traML_o, ms1_merged_features, ms2_merged_features);
     }
     catch (const std::exception& e) {
       LOGE << "AllInOneDDA : " << typeid(e).name() << " : " << e.what();

@@ -59,6 +59,7 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultStaticFilenames)
   BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "/home/user/referenceData.csv");
   BOOST_CHECK_EQUAL(filenames.mzML_i, "");
   BOOST_CHECK_EQUAL(filenames.mzTab_o, "");
+  BOOST_CHECK_EQUAL(filenames.traML_o, "");
   BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
@@ -123,6 +124,7 @@ BOOST_AUTO_TEST_CASE(filenames_getDefaultDynamicFilenames)
   BOOST_CHECK_EQUAL(filenames.mzML_i, "/home/user/mzML/mzMLIn.mzML");
   BOOST_CHECK_EQUAL(filenames.mzTab_o, "/home/user/featuresOut/injOut.mzTab");
   BOOST_CHECK_EQUAL(filenames.mzTab_i, "/home/user/featuresIn/injIn.mzTab");
+  BOOST_CHECK_EQUAL(filenames.traML_o, "/home/user/featuresOut/injOut.traML");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "/home/user/featuresOut/injOut.featureXML");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "/home/user/featuresOut/sampleOut.featureXML");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "/home/user/featuresIn/injIn.featureXML");
@@ -178,6 +180,7 @@ BOOST_AUTO_TEST_CASE(clear1)
   BOOST_CHECK_EQUAL(filenames.mzML_i, "");
   BOOST_CHECK_EQUAL(filenames.mzTab_o, "");
   BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
+  BOOST_CHECK_EQUAL(filenames.traML_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
@@ -239,6 +242,7 @@ BOOST_AUTO_TEST_CASE(clear2)
   BOOST_CHECK_EQUAL(filenames.mzML_i, "");
   BOOST_CHECK_EQUAL(filenames.mzTab_o, "");
   BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
+  BOOST_CHECK_EQUAL(filenames.traML_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
   BOOST_CHECK_EQUAL(filenames.featureXML_i, "");

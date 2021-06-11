@@ -83,6 +83,7 @@ namespace SmartPeak
     const std::string prefix_out = output_path + "/" + output_inj_name;
     dynamic_filenames.featureXML_o                     = prefix_out + ".featureXML";
     dynamic_filenames.mzTab_o = prefix_out + ".mzTab";
+    dynamic_filenames.traML_o = prefix_out + ".traML";
     dynamic_filenames.features_pdf_o = prefix_out;
     dynamic_filenames.featureFilterComponents_csv_o = prefix_out + "_featureFilterComponents.csv";
     dynamic_filenames.featureFilterComponentGroups_csv_o = prefix_out + "_featureFilterComponentGroups.csv";
@@ -138,6 +139,7 @@ namespace SmartPeak
     filenames.featureXML_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureXML_o).filename().string()).string();
     filenames.featureXMLSampleGroup_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureXMLSampleGroup_o).filename().string()).string();
     filenames.mzTab_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.mzTab_o).filename().string()).string();
+    filenames.traML_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.traML_o).filename().string()).string();
 
     filenames.featureDB_csv_o = std::filesystem::path(prefix).append(std::filesystem::path(filenames.featureDB_csv_o).filename().string()).string();
 
@@ -193,6 +195,7 @@ namespace SmartPeak
     mzML_i.clear();
     mzTab_i.clear();
     mzTab_o.clear();
+    traML_o.clear();
     featureXML_o.clear();
     featureXMLSampleGroup_o.clear();
     featureXML_i.clear();
