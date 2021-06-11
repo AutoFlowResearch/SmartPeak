@@ -2980,7 +2980,7 @@ namespace SmartPeak
       }
       merged_chromatograms.push_back(c);
     }
-    /*
+
     // filter features with zero intensity (this can happen if the FWHM is zero (bc of overly skewed shape) and no peaks end up being summed up)
     std::vector<bool> to_filter;
     auto intensity_zero = [&](OpenMS::Feature& f) { return f.getIntensity() == 0; };
@@ -3018,14 +3018,13 @@ namespace SmartPeak
       }
       feat_map[0].setMetaValue("scan_polarity", OpenMS::ListUtils::concatenate(sl_pols, ";"));
     }
-    */
 
     feat_map.setPrimaryMSRunPath({ rawDataHandler_IO.getMetaData().getFilename() });
     LOGD << "setPrimaryMSRunPath: " << rawDataHandler_IO.getMetaData().getFilename();
 
     rawDataHandler_IO.setFeatureMap(feat_map);
     rawDataHandler_IO.updateFeatureMapHistory();
-    //rawDataHandler_IO.getExperiment().setChromatograms(merged_chromatograms);
+    rawDataHandler_IO.getExperiment().setChromatograms(merged_chromatograms);
 
     LOGD << "END PickMS2Features";
   }
