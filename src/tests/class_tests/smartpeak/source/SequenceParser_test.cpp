@@ -176,7 +176,6 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().batch_name, "FluxTest");
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().inj_number, 5);
   BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
-
   sequenceHandler.clear();
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_with_NA.csv");
   SequenceParser::readSequenceFile(sequenceHandler, pathname, ",");
@@ -195,8 +194,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().scan_polarity, "positive");
   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().scan_mass_low, 60);
   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().scan_mass_high, 2000);
-  std::string default_date = MetaDataHandler().getAcquisitionDateAndTimeAsString();
-  BOOST_CHECK_EQUAL(sequence4[0].getMetaData().getAcquisitionDateAndTimeAsString(), default_date);
+  BOOST_CHECK_EQUAL(sequence4[0].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().getSampleGroupName(), "Test01");
   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().getSequenceSegmentName(), "Group01");
@@ -210,7 +208,7 @@ BOOST_AUTO_TEST_CASE(readSequenceFile)
   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().scan_polarity, "negative");
   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().scan_mass_low, 60);
   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().scan_mass_high, 2000);
-  BOOST_CHECK_EQUAL(sequence4[3].getMetaData().getAcquisitionDateAndTimeAsString(), default_date);
+  BOOST_CHECK_EQUAL(sequence4[3].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
 }
 
 BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
