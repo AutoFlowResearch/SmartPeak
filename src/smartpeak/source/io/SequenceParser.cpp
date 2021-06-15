@@ -45,7 +45,11 @@ namespace SmartPeak
     T& output
   )
   {
-    if (Utilities::trimString(s).empty())
+    std::string trim_string = Utilities::trimString(s);
+    if (trim_string.empty() ||
+       ((trim_string.size() == 2) &&
+        (trim_string[0] == 'N' || trim_string[0] == 'n') &&
+        (trim_string[1] == 'A' || trim_string[1] == 'a')))
     {
       return false;
     }

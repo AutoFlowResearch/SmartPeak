@@ -452,10 +452,10 @@ BOOST_AUTO_TEST_CASE(getFolderContents)
   const std::array<std::vector<std::string>, 4> c = Utilities::getFolderContents(pathname);
 
   // number of items in the pathname, taking .gitignore into account
-  BOOST_CHECK_EQUAL(c[0].size(), 49);
-  BOOST_CHECK_EQUAL(c[1].size(), 49);
-  BOOST_CHECK_EQUAL(c[2].size(), 49);
-  BOOST_CHECK_EQUAL(c[3].size(), 49);
+  BOOST_CHECK_EQUAL(c[0].size(), 50);
+  BOOST_CHECK_EQUAL(c[1].size(), 50);
+  BOOST_CHECK_EQUAL(c[2].size(), 50);
+  BOOST_CHECK_EQUAL(c[3].size(), 50);
 
   //BOOST_CHECK_EQUAL(c[0][0], "OpenMSFile_ChromeleonFile_10ug.txt");
  #ifdef _WIN32
@@ -539,7 +539,7 @@ BOOST_AUTO_TEST_CASE(getDirectoryInfo)
   std::tuple<float, uintmax_t> directory_info;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   Utilities::getDirectoryInfo(path, directory_info);
-  BOOST_CHECK_EQUAL(std::get<1>(directory_info), 49);
+  BOOST_CHECK_EQUAL(std::get<1>(directory_info), 50);
 }
 
 void set_env_var_(const std::string& name, const std::string& value)
