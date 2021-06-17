@@ -17,47 +17,43 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
+// $Maintainer: Bertrand Boudaud, Ahmed Khalil $
 // $Authors: Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
-#define BOOST_TEST_MODULE ImEntry test suite
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
 #include <SmartPeak/ui/ImEntry.h>
 #include <SmartPeak/test_config.h>
 
-BOOST_AUTO_TEST_SUITE(ImEntry)
-
-BOOST_AUTO_TEST_CASE(is_digit)
+TEST(ImEntry, is_digit)
 {
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::is_digit('4'), true);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::is_digit('0'), true);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::is_digit('A'), false);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::is_digit('?'), false);
+  EXPECT_TRUE(SmartPeak::ImEntry::is_digit('4'));
+  EXPECT_TRUE(SmartPeak::ImEntry::is_digit('0'));
+  EXPECT_FALSE(SmartPeak::ImEntry::is_digit('A'));
+  EXPECT_FALSE(SmartPeak::ImEntry::is_digit('?'));
 }
 
-BOOST_AUTO_TEST_CASE(is_number)
+TEST(ImEntry, is_number)
 {
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::is_number("42"), true);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::is_number("Monday"), false);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::is_number("-42"), false);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::is_number("1e3"), false);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::is_number("-1e3"), false);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::is_number("3.14"), false);
+  EXPECT_TRUE(SmartPeak::ImEntry::is_number("42"));
+  EXPECT_FALSE(SmartPeak::ImEntry::is_number("Monday"));
+  EXPECT_FALSE(SmartPeak::ImEntry::is_number("-42"));
+  EXPECT_FALSE(SmartPeak::ImEntry::is_number("1e3"));
+  EXPECT_FALSE(SmartPeak::ImEntry::is_number("-1e3"));
+  EXPECT_FALSE(SmartPeak::ImEntry::is_number("3.14"));
 }
 
-BOOST_AUTO_TEST_CASE(lexicographical_sort)
+TEST(ImEntry, lexicographical_sort)
 {
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::lexicographical_sort("Monday", "Tuesday"), -7);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::lexicographical_sort("Test1", "Test 2"), -1);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::lexicographical_sort("", "Empty test 1"), -1);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::lexicographical_sort("Empty test 2", ""), 1);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::lexicographical_sort("AaAa", "AAAA"), 0);
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::lexicographical_sort("5-HTP", "5-HTP"), 0);
+  EXPECT_EQ(SmartPeak::ImEntry::lexicographical_sort("Monday", "Tuesday"), -7);
+  EXPECT_EQ(SmartPeak::ImEntry::lexicographical_sort("Test1", "Test 2"), -1);
+  EXPECT_EQ(SmartPeak::ImEntry::lexicographical_sort("", "Empty test 1"), -1);
+  EXPECT_EQ(SmartPeak::ImEntry::lexicographical_sort("Empty test 2", ""), 1);
+  EXPECT_EQ(SmartPeak::ImEntry::lexicographical_sort("AaAa", "AAAA"), 0);
+  EXPECT_EQ(SmartPeak::ImEntry::lexicographical_sort("5-HTP", "5-HTP"), 0);
 }
 
-
-BOOST_AUTO_TEST_CASE(CompareWithSortSpecs)
+TEST(ImEntry, CompareWithSortSpecs)
 {
   SmartPeak::ImEntry entry1{ 1, { "Monday", "Test1", "", "Empty test 2", "AaAa", "5-HTP" } };
   SmartPeak::ImEntry entry2{ 2, { "Tuesday", "Test 2", "Empty test 1", "", "AAAA", "5-HTP" } };
@@ -71,31 +67,29 @@ BOOST_AUTO_TEST_CASE(CompareWithSortSpecs)
   SmartPeak::ImEntry::s_current_sort_specs = &specs;
 
   table_specs.ColumnIndex = 0;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), -1);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), -1);
   table_specs.ColumnIndex = 1;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), -1);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), -1);
   table_specs.ColumnIndex = 2;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), -1);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), -1);
   table_specs.ColumnIndex = 3;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 1);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 1);
   table_specs.ColumnIndex = 4;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 0);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 0);
   table_specs.ColumnIndex = 5;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 0);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 0);
 
   table_specs.SortDirection = ImGuiSortDirection_Descending;
   table_specs.ColumnIndex = 0;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 1);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 1);
   table_specs.ColumnIndex = 1;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 1);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 1);
   table_specs.ColumnIndex = 2;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 1);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 1);
   table_specs.ColumnIndex = 3;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), -1);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), -1);
   table_specs.ColumnIndex = 4;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 0);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 0);
   table_specs.ColumnIndex = 5;
-  BOOST_CHECK_EQUAL(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 0);
+  EXPECT_EQ(SmartPeak::ImEntry::CompareWithSortSpecs(&entry1, &entry2), 0);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

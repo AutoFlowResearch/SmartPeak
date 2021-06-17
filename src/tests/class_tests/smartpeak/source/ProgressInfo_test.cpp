@@ -17,12 +17,12 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
+// $Maintainer: Bertrand Boudaud, Ahmed Khalil $
 // $Authors: Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
-#define BOOST_TEST_MODULE ProgressInfo test suite
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/ProgressInfo.h>
 
@@ -46,7 +46,7 @@ namespace std
 
 using namespace SmartPeak;
 
-struct ProgressInfoFixture
+struct ProgressInfoFixture : public ::testing::Test
 {
   struct ProgressInfoFixtureObservable:
     public ApplicationProcessorObservable,
@@ -73,10 +73,7 @@ public:
   ProgressInfo progress_info;
 };
 
-BOOST_FIXTURE_TEST_SUITE(ProgressInfo, ProgressInfoFixture)
-
-
-BOOST_AUTO_TEST_CASE(isRunning)
+TEST_F(ProgressInfoFixture, isRunning)
 {
   std::vector<std::string> commands =
   {
@@ -91,14 +88,14 @@ BOOST_AUTO_TEST_CASE(isRunning)
     "command9",
     "command10"
   };
-  BOOST_CHECK_EQUAL(progress_info.isRunning(), false);
+  EXPECT_FALSE(progress_info.isRunning());
   progress_info_observable.notifyApplicationProcessorStart(commands);
-  BOOST_CHECK_EQUAL(progress_info.isRunning(), true);
+  EXPECT_TRUE(progress_info.isRunning());
   progress_info_observable.notifyApplicationProcessorEnd();
-  BOOST_CHECK_EQUAL(progress_info.isRunning(), false);
+  EXPECT_FALSE(progress_info.isRunning());
 }
 
-BOOST_AUTO_TEST_CASE(runningTime)
+TEST_F(ProgressInfoFixture, runningTime)
 {
   std::vector<std::string> commands =
   {
@@ -114,14 +111,14 @@ BOOST_AUTO_TEST_CASE(runningTime)
     "command10"
   };
   auto init_time = progress_info.runningTime();
-  BOOST_CHECK_EQUAL(init_time.count(), std::chrono::steady_clock::duration::zero().count());
+  EXPECT_EQ(init_time.count(), std::chrono::steady_clock::duration::zero().count());
   progress_info_observable.notifyApplicationProcessorStart(commands);
   std::this_thread::sleep_for(std::chrono::seconds(1));
   auto running_time = progress_info.runningTime();
-  BOOST_CHECK_GE(running_time.count(), init_time.count());
+  EXPECT_GE(running_time.count(), init_time.count());
 }
 
-BOOST_AUTO_TEST_CASE(estimatedRemainingTime)
+TEST_F(ProgressInfoFixture, estimatedRemainingTime)
 {
   std::vector<std::string> commands =
   {
@@ -131,7 +128,7 @@ BOOST_AUTO_TEST_CASE(estimatedRemainingTime)
     "command4"
   };
   auto estimated_time = progress_info.estimatedRemainingTime();
-  BOOST_CHECK(!estimated_time);
+  EXPECT_TRUE(!estimated_time);
   progress_info_observable.notifyApplicationProcessorStart(commands);
   progress_info_observable.notifyApplicationProcessorCommandStart(1, "command1");
   progress_info_observable.notifyApplicationProcessorCommandStart(2, "command2");
@@ -140,14 +137,14 @@ BOOST_AUTO_TEST_CASE(estimatedRemainingTime)
   progress_info_observable.notifySequenceProcessorStart(10);
   progress_info_observable.notifySequenceProcessorSampleStart("injection1");
   estimated_time = progress_info.estimatedRemainingTime();
-  BOOST_CHECK(!estimated_time);
+  EXPECT_TRUE(!estimated_time);
   progress_info_observable.notifySequenceProcessorSampleEnd("injection1");
   estimated_time = progress_info.estimatedRemainingTime();
-  BOOST_REQUIRE(estimated_time);
-  BOOST_CHECK_GE(estimated_time->count(), 0);
+  ASSERT_TRUE(estimated_time);
+  EXPECT_GE(estimated_time->count(), 0);
 }
 
-BOOST_AUTO_TEST_CASE(progressValue_1)
+TEST_F(ProgressInfoFixture, progressValue_1)
 {
   std::vector<std::string> commands =
   {
@@ -157,7 +154,7 @@ BOOST_AUTO_TEST_CASE(progressValue_1)
     "command4"
   };
   auto progress_value = progress_info.progressValue();
-  BOOST_CHECK_CLOSE(progress_value, 0.0f, 1e-3f);
+  EXPECT_NEAR(progress_value, 0.0f, 1e-3f);
   progress_info_observable.notifyApplicationProcessorStart(commands);
   progress_info_observable.notifyApplicationProcessorCommandStart(1, "command1");
   progress_info_observable.notifyApplicationProcessorCommandStart(2, "command2");
@@ -166,13 +163,13 @@ BOOST_AUTO_TEST_CASE(progressValue_1)
   progress_info_observable.notifySequenceProcessorStart(10);
   progress_info_observable.notifySequenceProcessorSampleStart("injection1");
   progress_value = progress_info.progressValue();
-  BOOST_CHECK_CLOSE(progress_value, 0.0f, 1e-3f);
+  EXPECT_NEAR(progress_value, 0.0f, 1e-3f);
   progress_info_observable.notifySequenceProcessorSampleEnd("injection1");
   progress_value = progress_info.progressValue();
-  BOOST_CHECK_CLOSE(progress_value, 0.1f, 1e-3f);
+  EXPECT_NEAR(progress_value, 0.1f, 1e-3f);
 }
 
-BOOST_AUTO_TEST_CASE(progressValue_2)
+TEST_F(ProgressInfoFixture, progressValue_2)
 {
   std::vector<std::string> commands =
   {
@@ -196,7 +193,7 @@ BOOST_AUTO_TEST_CASE(progressValue_2)
   progress_info_observable.notifyApplicationProcessorCommandEnd(1, "command1");
   progress_info_observable.notifyApplicationProcessorCommandEnd(2, "command2");
   auto progress_value = progress_info.progressValue();
-  BOOST_CHECK_CLOSE(progress_value, 0.5f, 1e-3f);
+  EXPECT_NEAR(progress_value, 0.5f, 1e-3f);
 
   progress_info_observable.notifyApplicationProcessorCommandStart(3, "command3");
   progress_info_observable.notifyApplicationProcessorCommandStart(4, "command4");
@@ -205,22 +202,22 @@ BOOST_AUTO_TEST_CASE(progressValue_2)
   progress_info_observable.notifySequenceProcessorSampleStart("sample1");
   progress_info_observable.notifySequenceProcessorSampleEnd("sample1");
   progress_value = progress_info.progressValue();
-  BOOST_CHECK_CLOSE(progress_value, 0.75f, 1e-3f);
+  EXPECT_NEAR(progress_value, 0.75f, 1e-3f);
 
   progress_info_observable.notifySequenceProcessorSampleStart("sample2");
   progress_info_observable.notifySequenceProcessorSampleEnd("sample2");
   progress_info_observable.notifySampleGroupProcessorEnd();
   progress_value = progress_info.progressValue();
-  BOOST_CHECK_CLOSE(progress_value, 1.0f, 1e-3f);
+  EXPECT_NEAR(progress_value, 1.0f, 1e-3f);
 
   progress_info_observable.notifyApplicationProcessorCommandEnd(3, "command3");
   progress_info_observable.notifyApplicationProcessorCommandEnd(4, "command4");
   progress_info_observable.notifyApplicationProcessorEnd();
   progress_value = progress_info.progressValue();
-  BOOST_CHECK_CLOSE(progress_value, 1.0f, 1e-3f);
+  EXPECT_NEAR(progress_value, 1.0f, 1e-3f);
 }
 
-BOOST_AUTO_TEST_CASE(commands)
+TEST_F(ProgressInfoFixture, commands)
 {
   std::vector<std::string> commands =
   {
@@ -239,11 +236,10 @@ BOOST_AUTO_TEST_CASE(commands)
       "command3",
       "command4",
   };
-  BOOST_CHECK_EQUAL_COLLECTIONS(wf_commands.begin(), wf_commands.end(),
-    expected_commands.begin(), expected_commands.end());
+  EXPECT_THAT(wf_commands, ::testing::ContainerEq(expected_commands));
 }
 
-BOOST_AUTO_TEST_CASE(runningCommands)
+TEST_F(ProgressInfoFixture, runningCommands)
 {
   std::vector<std::string> commands =
   {
@@ -259,18 +255,17 @@ BOOST_AUTO_TEST_CASE(runningCommands)
   progress_info_observable.notifyApplicationProcessorCommandStart(3, "command3");
   progress_info_observable.notifyApplicationProcessorCommandStart(4, "command4");
   const auto& running_commands = progress_info.runningCommands();
-  std::vector<std::tuple<size_t, std::string>> 
-    expected_commands { 
+  std::vector<std::tuple<size_t, std::string>>
+    expected_commands {
       {1,"command1"},
       {2,"command2"},
       {3,"command3"},
       {4,"command4"},
     };
-  BOOST_CHECK_EQUAL_COLLECTIONS(running_commands.begin(), running_commands.end(),
-                                expected_commands.begin(), expected_commands.end());
+  EXPECT_THAT(running_commands, ::testing::ContainerEq(expected_commands));
 }
 
-BOOST_AUTO_TEST_CASE(runningBatch)
+TEST_F(ProgressInfoFixture, runningBatch)
 {
   std::vector<std::string> commands =
   {
@@ -280,7 +275,7 @@ BOOST_AUTO_TEST_CASE(runningBatch)
     "command4"
   };
   auto progress_value = progress_info.progressValue();
-  BOOST_CHECK_CLOSE(progress_value, 0.0f, 1e-3f);
+  EXPECT_NEAR(progress_value, 0.0f, 1e-3f);
   progress_info_observable.notifyApplicationProcessorStart(commands);
   progress_info_observable.notifyApplicationProcessorCommandStart(1, "command1");
   progress_info_observable.notifyApplicationProcessorCommandStart(2, "command2");
@@ -300,11 +295,10 @@ BOOST_AUTO_TEST_CASE(runningBatch)
     "segment4",
     "segment5"
   };
-  BOOST_CHECK_EQUAL_COLLECTIONS(segments.begin(), segments.end(),
-    expected_segments.begin(), expected_segments.end());
+  EXPECT_THAT(segments, ::testing::ContainerEq(expected_segments));
 }
 
-BOOST_AUTO_TEST_CASE(lastRunTime)
+TEST_F(ProgressInfoFixture, lastRunTime)
 {
   std::vector<std::string> commands =
   {
@@ -313,10 +307,8 @@ BOOST_AUTO_TEST_CASE(lastRunTime)
     "command3",
     "command4"
   };
-  BOOST_CHECK_EQUAL(progress_info.lastRunTime(), std::chrono::steady_clock::duration::zero());
+  EXPECT_EQ(progress_info.lastRunTime(), std::chrono::steady_clock::duration::zero());
   progress_info_observable.notifyApplicationProcessorStart(commands);
   progress_info_observable.notifyApplicationProcessorEnd();
-  BOOST_CHECK_NE(progress_info.lastRunTime(), std::chrono::steady_clock::duration::zero());
+  EXPECT_NE(progress_info.lastRunTime(), std::chrono::steady_clock::duration::zero());
 }
-
-BOOST_AUTO_TEST_SUITE_END()

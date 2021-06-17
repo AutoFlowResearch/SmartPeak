@@ -69,6 +69,7 @@ endif()
 #------------------------------------------------------------------------------
 # ImGui SDL and OpenGL dependencies
 #------------------------------------------------------------------------------
+set(SDL_BUILDING_LIBRARY true)
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 

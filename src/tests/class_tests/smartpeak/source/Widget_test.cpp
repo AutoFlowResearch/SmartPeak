@@ -21,15 +21,13 @@
 // $Authors: Ahmed Khalil $
 // --------------------------------------------------------------------------
 
-#define BOOST_TEST_MODULE Widget test suite
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
-
 
 void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
 {
@@ -88,20 +86,18 @@ void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
 }
 
 
-BOOST_AUTO_TEST_SUITE(Widget)
-
-BOOST_AUTO_TEST_CASE(widget_constructors)
+TEST(Widget, widget_constructors)
 {
   SmartPeak::GenericTableWidget* generictablewidget_ptr = nullptr;
-  BOOST_CHECK_NO_THROW(generictablewidget_ptr = new SmartPeak::GenericTableWidget("empty_generic_table"));
+  EXPECT_NO_THROW(generictablewidget_ptr = new SmartPeak::GenericTableWidget("empty_generic_table"));
   delete generictablewidget_ptr;
   
   SmartPeak::ExplorerWidget* explorerwidget_ptr = nullptr;
-  BOOST_CHECK_NO_THROW(explorerwidget_ptr = new SmartPeak::ExplorerWidget("empty_explorer_table"));
+  EXPECT_NO_THROW(explorerwidget_ptr = new SmartPeak::ExplorerWidget("empty_explorer_table"));
   delete explorerwidget_ptr;
 }
 
-BOOST_AUTO_TEST_CASE(GenericTableWidget_sorter)
+TEST(Widget, GenericTableWidget_sorter)
 {
   bool is_scanned =                 false;
   std::vector<SmartPeak::ImEntry>   Im_table_entries;
@@ -111,19 +107,19 @@ BOOST_AUTO_TEST_CASE(GenericTableWidget_sorter)
   getDummyTableEntries(rows_out);
   SmartPeak::GenericTableWidget TestTable1("TestTable1");
   TestTable1.updateTableContents(Im_table_entries, is_scanned, rows_out, checkbox_columns);
-  BOOST_CHECK_EQUAL(is_scanned, true);  // updateTableContents is successful
+  EXPECT_TRUE(is_scanned);  // updateTableContents is successful
   
-  BOOST_REQUIRE(Im_table_entries.size() > 0);
-  BOOST_REQUIRE(Im_table_entries[0].entry_contents.size() > 0);
+  ASSERT_TRUE(Im_table_entries.size() > 0);
+  ASSERT_TRUE(Im_table_entries[0].entry_contents.size() > 0);
   
   // pre-sorting assertion
   // 1st row
-  BOOST_CHECK_EQUAL(Im_table_entries[0].entry_contents[0], "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_EQUAL(Im_table_entries[0].entry_contents[1], "23dpg");
+  EXPECT_STREQ(Im_table_entries[0].entry_contents[0].c_str(), "23dpg.23dpg_1.Heavy");
+  EXPECT_STREQ(Im_table_entries[0].entry_contents[1].c_str(), "23dpg");
   // last row
   auto last_row_idx = Im_table_entries.size() - 1;
-  BOOST_CHECK_EQUAL(Im_table_entries[last_row_idx].entry_contents[0], "xan.xan_1.Light");
-  BOOST_CHECK_EQUAL(Im_table_entries[last_row_idx].entry_contents[1], "xan");
+  EXPECT_STREQ(Im_table_entries[last_row_idx].entry_contents[0].c_str(), "xan.xan_1.Light");
+  EXPECT_STREQ(Im_table_entries[last_row_idx].entry_contents[1].c_str(), "xan");
   
   // sorting
   ImGuiTableSortSpecs           sorts_specs;
@@ -141,14 +137,14 @@ BOOST_AUTO_TEST_CASE(GenericTableWidget_sorter)
   
   // post-sorting assertion
   // 1st row
-  //BOOST_CHECK_EQUAL(Im_table_entries[0].entry_contents[0], "xan.xan_1.Light");
-  //BOOST_CHECK_EQUAL(Im_table_entries[0].entry_contents[1], "xan");
+  //EXPECT_STREQ(Im_table_entries[0].entry_contents[0], "xan.xan_1.Light");
+  //EXPECT_STREQ(Im_table_entries[0].entry_contents[1], "xan");
   // last row
-  //BOOST_CHECK_EQUAL(Im_table_entries[last_row_idx].entry_contents[0], "2mcit.2mcit_1.Heavy");
-  //BOOST_CHECK_EQUAL(Im_table_entries[last_row_idx].entry_contents[1], "2mcit");
+  //EXPECT_STREQ(Im_table_entries[last_row_idx].entry_contents[0], "2mcit.2mcit_1.Heavy");
+  //EXPECT_STREQ(Im_table_entries[last_row_idx].entry_contents[1], "2mcit");
 }
 
-BOOST_AUTO_TEST_CASE(GenericTableWidget_searcher)
+TEST(Widget, GenericTableWidget_searcher)
 {
   bool is_scanned =                 false;
   std::vector<SmartPeak::ImEntry>   Im_table_entries;
@@ -158,7 +154,7 @@ BOOST_AUTO_TEST_CASE(GenericTableWidget_searcher)
   getDummyTableEntries(rows_out);
   SmartPeak::GenericTableWidget TestTable1("TestTable2");
   TestTable1.updateTableContents(Im_table_entries, is_scanned, rows_out, checkbox_columns);
-  BOOST_CHECK_EQUAL(is_scanned, true); // updateTableContents is successful
+  EXPECT_TRUE(is_scanned); // updateTableContents is successful
   
   const int         all_selected_entry = 0;
   std::vector<uint> found_in;
@@ -170,8 +166,6 @@ BOOST_AUTO_TEST_CASE(GenericTableWidget_searcher)
   }
   
   for (auto found_in_index : found_in) {
-    BOOST_CHECK_EQUAL(Im_table_entries[found_in_index].entry_contents[0], "2mcit.2mcit_1.Heavy");
+    EXPECT_STREQ(Im_table_entries[found_in_index].entry_contents[0].c_str(), "2mcit.2mcit_1.Heavy");
   }
 }
-
-BOOST_AUTO_TEST_SUITE_END()
