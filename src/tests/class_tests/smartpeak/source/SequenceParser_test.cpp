@@ -150,6 +150,7 @@ TEST(Sequenceparser, readSequenceFile)
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_tab.csv");
   SequenceParser::readSequenceFile(sequenceHandler, pathname, "\t");
   const vector<InjectionHandler>& sequence3 = sequenceHandler.getSequence();
+  
   EXPECT_EQ(sequence3.size(), 5);
   EXPECT_STREQ(sequence3[0].getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Sacc1_1x");
   EXPECT_STREQ(sequence3[0].getMetaData().getSampleGroupName().c_str(), "Test01");
@@ -173,6 +174,39 @@ TEST(Sequenceparser, readSequenceFile)
   EXPECT_STREQ(sequence3[4].getMetaData().batch_name.c_str(), "FluxTest");
   EXPECT_EQ(sequence3[4].getMetaData().inj_number, 5);
   EXPECT_STREQ(sequence3[4].getMetaData().getAcquisitionDateAndTimeAsString().c_str(), "2015-07-07_153300");
+
+//   pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_with_NA.csv");
+//   SequenceParser::readSequenceFile(sequenceHandler, pathname, ",");
+//   const vector<InjectionHandler>& sequence4 = sequenceHandler.getSequence();
+//   BOOST_CHECK_EQUAL(sequence4.size(), 4);
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc2_1x");
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().getSampleGroupName(), "Test01");
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().getSequenceSegmentName(), "Group01");
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().getSampleType() == SampleType::Unknown, true);
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().acq_method_name, "LCMS");
+//   BOOST_CHECK_CLOSE(sequence4[0].getMetaData().inj_volume, 10.0, 1e-3);
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().inj_volume_units, "uL");
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().batch_name, "FluxTest");
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().inj_number, 2);
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().scan_polarity, "positive");
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().scan_mass_low, 60);
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().scan_mass_high, 2000);
+//   BOOST_CHECK_EQUAL(sequence4[0].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().getSampleGroupName(), "Test01");
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().getSequenceSegmentName(), "Group01");
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().getSampleType() == SampleType::Unknown, true);
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().acq_method_name, "LCMS");
+//   BOOST_CHECK_CLOSE(sequence4[3].getMetaData().inj_volume, 10.0, 1e-3);
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().inj_volume_units, "uL");
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().batch_name, "FluxTest");
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().inj_number, 5);
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().scan_polarity, "negative");
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().scan_mass_low, 60);
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().scan_mass_high, 2000);
+//   BOOST_CHECK_EQUAL(sequence4[3].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
 }
 
 TEST_F(SequenceParserFixture, makeDataTableFromMetaValue)

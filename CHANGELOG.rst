@@ -1,6 +1,18 @@
 SmartPeak Changelog
 ===================
 
+v1.7.0 (2020-06-07)
+-------------------
+
+Features
+~~~~~~~~
+- Reworked FilePicker Handlers `(#371) <https://github.com/AutoFlowResearch/SmartPeak/pull/371>`_  
+
+Fix
+~~~
+- Fixed crash when loading multiple sequences `(#373) <https://github.com/AutoFlowResearch/SmartPeak/pull/373>`_
+- Fixed set path in FilePicker `(#372) <https://github.com/AutoFlowResearch/SmartPeak/pull/372>`_
+
 v1.6.0 (2020-05-25)
 -------------------
 
