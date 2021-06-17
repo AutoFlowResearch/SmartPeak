@@ -631,4 +631,19 @@ BOOST_AUTO_TEST_CASE(makeHumanReadable)
   BOOST_CHECK_EQUAL(dir_entry_1.entry_contents[3], "Mon Mar 22 06:59:29 2021");
 }
 
+BOOST_AUTO_TEST_CASE(removeTrailing)
+{
+  std::string str1 = "234.0000";
+  Utilities::removeTrailing(str1, ".00");
+  BOOST_CHECK_EQUAL(str1, "234");
+  
+  std::string str2 = "234.01";
+  Utilities::removeTrailing(str2, ".00");
+  BOOST_CHECK_EQUAL(str2, "234.01");
+  
+  std::string str3 = "234.00";
+  Utilities::removeTrailing(str3, ".00");
+  BOOST_CHECK_EQUAL(str3, "234.00");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
