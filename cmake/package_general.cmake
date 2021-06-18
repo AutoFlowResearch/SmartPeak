@@ -69,7 +69,7 @@ elseif (WIN32)
 
 endif()
 
-
+set(SDL_BUILDING_LIBRARY true)
 find_package(SDL2 REQUIRED)
 if (SDL2_FOUND)
   if (WIN32)
@@ -106,7 +106,7 @@ if (WIN32)
     SET(EXECS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/SmartPeakGUI.exe)
     SET(DEST \"\${CMAKE_INSTALL_PREFIX}/bin/SmartPeakGUI.exe\")
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"\${EXECS}\" \"\${DEST}\")
-    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR} ${BOOST_LIBRARYDIR} ${SDL2_LIBRARIES_DIR})
+    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR}  ${SDL2_LIBRARIES_DIR})
     fixup_bundle(\"\${DEST}\" \"\" \"\${DIRS}\")
     " 
     COMPONENT applications)
@@ -124,7 +124,7 @@ if (WIN32)
     include(InstallRequiredSystemLibraries)
     include(BundleUtilities)
  
-    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR} ${BOOST_LIBRARYDIR}  ${SDL2_LIBRARIES_DIR} ${HIDAPI_DIR})
+    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR}   ${SDL2_LIBRARIES_DIR} ${HIDAPI_DIR})
     fixup_bundle(\"${BUNDLE_OUTPUT_PATH}\" \"\" \"\${DIRS}\")
     verify_app(\"${BUNDLE_OUTPUT_PATH}\")
     " 
@@ -142,7 +142,7 @@ elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
     include(BundleUtilities)
     SET(EXECS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SmartPeakGUI)
     # execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"\${EXECS}\" \"\${DEST}\")
-    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR} ${BOOST_LIBRARYDIR} ${SDL2_LIBRARIES_DIR})
+    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR}  ${SDL2_LIBRARIES_DIR})
     fixup_bundle(\"\${EXECS}\" \"\" \"\${DIRS}\")
     " 
     COMPONENT applications)

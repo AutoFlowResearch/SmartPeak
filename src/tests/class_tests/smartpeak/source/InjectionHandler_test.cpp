@@ -17,30 +17,27 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
-#define BOOST_TEST_MODULE InjectionHandler test suite
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
 #include <SmartPeak/core/InjectionHandler.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 
 using namespace SmartPeak;
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(samplehandler)
-
-BOOST_AUTO_TEST_CASE(constructor)
+TEST(InjectionHandler, constructor)
 {
   InjectionHandler* ptr = nullptr;
   InjectionHandler* nullPointer = nullptr;
   ptr = new InjectionHandler();
-  BOOST_CHECK_NE(ptr, nullPointer);
+  EXPECT_NE(ptr, nullPointer);
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(set_get_MetaData)
+TEST(InjectionHandler, set_get_MetaData)
 {
   InjectionHandler injectionHandler;
 
@@ -50,33 +47,33 @@ BOOST_AUTO_TEST_CASE(set_get_MetaData)
   injectionHandler.setMetaData(mdh1);
 
   const MetaDataHandler& mdh2 = injectionHandler.getMetaData();
-  BOOST_CHECK_EQUAL(mdh2.getSampleName(), "1");
-  BOOST_CHECK_EQUAL(injectionHandler.getMetaDataShared()->getSampleName(), "1");
+  EXPECT_STREQ(mdh2.getSampleName().c_str(), "1");
+  EXPECT_STREQ(injectionHandler.getMetaDataShared()->getSampleName().c_str(), "1");
 
   mdh1.setSampleGroupName("2");
   injectionHandler.getMetaData() = mdh1;
 
   const MetaDataHandler& mdh3 = injectionHandler.getMetaData();
-  BOOST_CHECK_EQUAL(mdh3.getSampleName(), "1");
-  BOOST_CHECK_EQUAL(mdh3.getSampleGroupName(), "2");
-  BOOST_CHECK_EQUAL(injectionHandler.getMetaDataShared()->getSampleName(), "1");
-  BOOST_CHECK_EQUAL(injectionHandler.getMetaDataShared()->getSampleGroupName(), "2");
+  EXPECT_STREQ(mdh3.getSampleName().c_str(), "1");
+  EXPECT_STREQ(mdh3.getSampleGroupName().c_str(), "2");
+  EXPECT_STREQ(injectionHandler.getMetaDataShared()->getSampleName().c_str(), "1");
+  EXPECT_STREQ(injectionHandler.getMetaDataShared()->getSampleGroupName().c_str(), "2");
 
   // Quick sanity check of pointer relationships
   auto mdh4 = std::make_shared<MetaDataHandler>(mdh1);
 
   injectionHandler.setMetaData(mdh4);
   const MetaDataHandler& mdh5 = injectionHandler.getMetaData();
-  BOOST_CHECK_EQUAL(mdh5.getSampleName(), "1");
-  BOOST_CHECK_EQUAL(mdh5.getSampleGroupName(), "2");
+  EXPECT_STREQ(mdh5.getSampleName().c_str(), "1");
+  EXPECT_STREQ(mdh5.getSampleGroupName().c_str(), "2");
 
   mdh4->setSampleName("3");
   const MetaDataHandler& mdh6 = injectionHandler.getMetaData();
-  BOOST_CHECK_EQUAL(mdh6.getSampleName(), "3");
-  BOOST_CHECK_EQUAL(mdh6.getSampleGroupName(), "2");
+  EXPECT_STREQ(mdh6.getSampleName().c_str(), "3");
+  EXPECT_STREQ(mdh6.getSampleGroupName().c_str(), "2");
 }
 
-BOOST_AUTO_TEST_CASE(set_get_RawData)
+TEST(InjectionHandler, set_get_RawData)
 {
   InjectionHandler injectionHandler;
 
@@ -88,19 +85,19 @@ BOOST_AUTO_TEST_CASE(set_get_RawData)
   injectionHandler.setRawData(rdh1);
 
   const RawDataHandler& rdh2 = injectionHandler.getRawData();
-  BOOST_CHECK_EQUAL(rdh2.getFeatureMap().getIdentifier(), "1");
-  BOOST_CHECK_EQUAL(injectionHandler.getRawDataShared()->getFeatureMap().getIdentifier(), "1");
+  EXPECT_STREQ(rdh2.getFeatureMap().getIdentifier().c_str(), "1");
+  EXPECT_STREQ(injectionHandler.getRawDataShared()->getFeatureMap().getIdentifier().c_str(), "1");
 
   f1.setIdentifier("2");
   rdh1.setFeatureMap(f1);
   injectionHandler.getRawData() = rdh1;
 
   const RawDataHandler& rdh3 = injectionHandler.getRawData();
-  BOOST_CHECK_EQUAL(rdh3.getFeatureMap().getIdentifier(), "2");
-  BOOST_CHECK_EQUAL(injectionHandler.getRawDataShared()->getFeatureMap().getIdentifier(), "2");
+  EXPECT_STREQ(rdh3.getFeatureMap().getIdentifier().c_str(), "2");
+  EXPECT_STREQ(injectionHandler.getRawDataShared()->getFeatureMap().getIdentifier().c_str(), "2");
 }
 
-BOOST_AUTO_TEST_CASE(clear)
+TEST(InjectionHandler, clear)
 {
   InjectionHandler injectionHandler;
 
@@ -113,13 +110,11 @@ BOOST_AUTO_TEST_CASE(clear)
   injectionHandler.setMetaData(mdh1);
   injectionHandler.setRawData(rdh1);
 
-  BOOST_CHECK_EQUAL(injectionHandler.getMetaData().getSampleName(), "1");
-  BOOST_CHECK_EQUAL(injectionHandler.getRawData().getFeatureMap().getIdentifier(), "1");
+  EXPECT_STREQ(injectionHandler.getMetaData().getSampleName().c_str(), "1");
+  EXPECT_STREQ(injectionHandler.getRawData().getFeatureMap().getIdentifier().c_str(), "1");
 
   injectionHandler.clear();
 
-  BOOST_CHECK_EQUAL(injectionHandler.getMetaData().getSampleName(), "");
-  BOOST_CHECK_EQUAL(injectionHandler.getRawData().getFeatureMap().getIdentifier(), "");
+  EXPECT_STREQ(injectionHandler.getMetaData().getSampleName().c_str(), "");
+  EXPECT_STREQ(injectionHandler.getRawData().getFeatureMap().getIdentifier().c_str(), "");
 }
-
-BOOST_AUTO_TEST_SUITE_END()
