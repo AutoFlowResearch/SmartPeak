@@ -627,17 +627,17 @@ TEST(utilities, makeHumanReadable)
   EXPECT_STREQ(dir_entry_1.entry_contents[3].c_str(), "Mon Mar 22 06:59:29 2021");
 }
 
-BOOST_AUTO_TEST_CASE(removeTrailing)
+TEST(utilities, removeTrailing)
 {
   std::string str1 = "234.0000";
-  Utilities::removeTrailing(str1.c_str(), ".00");
-  EXPECT_STREQ(str1, "234");
+  Utilities::removeTrailing(str1, ".00");
+  EXPECT_STREQ(str1.c_str(), "234");
   
   std::string str2 = "234.01";
-  Utilities::removeTrailing(str2.c_str(), ".00");
-  EXPECT_STREQ(str2, "234.01");
+  Utilities::removeTrailing(str2, ".00");
+  EXPECT_STREQ(str2.c_str(), "234.01");
   
   std::string str3 = "234.00";
-  Utilities::removeTrailing(str3.c_str(), ".00");
-  EXPECT_STREQ(str3, "234.00");
+  Utilities::removeTrailing(str3, ".00");
+  EXPECT_STREQ(str3.c_str(), "234");
 }
