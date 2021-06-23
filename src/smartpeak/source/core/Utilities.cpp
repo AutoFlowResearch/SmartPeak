@@ -747,10 +747,8 @@ namespace SmartPeak
       
       if (entry_size >= 0 && entry_size < 1e3)
       {
-        size_human_readable_stream << std::fixed << std::setprecision(2) << entry_size;
-        auto size_human_readable_str = size_human_readable_stream.str();
-        removeTrailing(size_human_readable_str, ".00");
-        size_human_readable = size_human_readable_str + " Bytes";
+        size_human_readable_stream << entry_size;
+        size_human_readable = size_human_readable_stream.str() + " Bytes";
       }
       if (entry_size >= 1e3 && entry_size < 1e6)
       {
