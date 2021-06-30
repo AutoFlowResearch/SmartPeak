@@ -614,6 +614,37 @@ TEST(RawDataProcessor, processorMergeSpectra)
   EXPECT_EQ(spectra2.front().back().getIntensity(), 3236006.75);
 }
 
+TEST(RawDataProcessor, processorMergeSpectraZeroPeak)
+{
+  // Pre-requisites: load the parameters and associated raw data
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_SerumTest_SpecWithZeroPeak.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  // Control
+  const vector<OpenMS::MSSpectrum>& spectra1 = rawDataHandler.getExperiment().getSpectra();
+  EXPECT_EQ(spectra1.size(), 873);
+
+  // Test merge spectra
+  MergeSpectra mergeSpectra;
+  mergeSpectra.process(rawDataHandler, params_1, filenames);
+
+  const vector<OpenMS::MSSpectrum>& spectra2 = rawDataHandler.getExperiment().getSpectra();
+  EXPECT_EQ(spectra2.size(), 1);
+  EXPECT_NEAR(spectra2.front().getRT(), -1, 1e-3);
+  EXPECT_EQ(spectra2.front().size(), 0);
+  EXPECT_EQ(spectra2.front().getNativeID(), "MergeSpectra");
+  EXPECT_NEAR(spectra2[0].getMetaValue("lowest observed m/z"), 109.99865014868708, 1e-6);
+  EXPECT_NEAR(spectra2[0].getMetaValue("highest observed m/z"), 109.99994568761217, 1e-6);
+}
+
 /**
   LoadFeatures Tests
 */
