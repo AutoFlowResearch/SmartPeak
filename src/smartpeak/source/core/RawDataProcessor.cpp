@@ -1778,17 +1778,32 @@ namespace SmartPeak
 
     // Update the metavalue and members
     output.setNativeID("MergeSpectra");
-    if (rawDataHandler_IO.getExperiment().getSpectra().size()) {
-      output.setMSLevel(rawDataHandler_IO.getExperiment().getSpectra().front().getMSLevel());
-      output.setType(rawDataHandler_IO.getExperiment().getSpectra().front().getType());
-      output.setMetaValue("lowest observed m/z", rawDataHandler_IO.getExperiment().getSpectra().front().front().getMZ());
-      output.setMetaValue("highest observed m/z", rawDataHandler_IO.getExperiment().getSpectra().back().back().getMZ());
-    }
-    else 
+    OpenMS::Peak1D::CoordinateType lowest_observed = 0.0;
+    OpenMS::Peak1D::CoordinateType highest_observed = 0.0;
+    const auto& spectra = rawDataHandler_IO.getExperiment().getSpectra();
+    if (spectra.size())
     {
-      output.setMetaValue("lowest observed m/z", 0.0);
-      output.setMetaValue("highest observed m/z", 0.0);
+      output.setMSLevel(spectra.front().getMSLevel());
+      output.setType(spectra.front().getType());
+      for (auto it_spectra = spectra.begin(); it_spectra != spectra.end(); ++it_spectra)
+      {
+        if (!(*it_spectra).empty())
+        {
+          lowest_observed = (*it_spectra).front().getMZ();
+          break;
+        }
+      }
+      for (auto it_spectra = spectra.rbegin(); it_spectra != spectra.rend(); ++it_spectra)
+      {
+        if (!(*it_spectra).empty())
+        {
+          highest_observed = (*it_spectra).back().getMZ();
+          break;
+        }
+      }
     }
+    output.setMetaValue("lowest observed m/z", lowest_observed);
+    output.setMetaValue("highest observed m/z", highest_observed);
     output.setMetaValue("base peak m/z", 0.0);
     output.setMetaValue("base peak intensity", 0.0);
     output.setMetaValue("total ion current", 0.0);
