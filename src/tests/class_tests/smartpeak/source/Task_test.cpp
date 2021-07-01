@@ -20,16 +20,16 @@
 // $Maintainer: Krzysztof Abram $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
-#include <SmartPeak/test_config.h>
 
-#define BOOST_TEST_MODULE Task test suite
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <SmartPeak/test_config.h>
 
 #include <SmartPeak/cli/ApplicationManager.h>
 #include <SmartPeak/cli/Task.h>
 
 
-struct TaskFixture 
+struct TaskFixture : public ::testing::Test
 {
     /* ctor/dtor */
     TaskFixture() 
@@ -55,9 +55,7 @@ public:
 
 /* ---------------------------------------------- */
 
-BOOST_FIXTURE_TEST_SUITE(Task, TaskFixture)
-
-BOOST_AUTO_TEST_CASE(Task_InitializeApplicationSettings)
+TEST_F(TaskFixture, Task_InitializeApplicationSettings)
 {
     namespace cli = SmartPeak::cli;
     {
@@ -65,7 +63,7 @@ BOOST_AUTO_TEST_CASE(Task_InitializeApplicationSettings)
         auto as = cli::ApplicationSettings{pa};
         auto am = cli::ApplicationManager{as};
         auto task = cli::InitializeApplicationSettings{};
-        BOOST_CHECK(task(am));
+        EXPECT_TRUE(task(am));
     }
     {
         auto argv = m_args;
@@ -74,7 +72,7 @@ BOOST_AUTO_TEST_CASE(Task_InitializeApplicationSettings)
         auto as = cli::ApplicationSettings{pa};
         auto am = cli::ApplicationManager{as};
         auto task = cli::InitializeApplicationSettings{};
-        BOOST_CHECK_NO_THROW(task(am));
+        EXPECT_NO_THROW(task(am));
     }
     {
         auto argv = m_args;
@@ -83,11 +81,11 @@ BOOST_AUTO_TEST_CASE(Task_InitializeApplicationSettings)
         auto as = cli::ApplicationSettings{pa};
         auto am = cli::ApplicationManager{as};
         auto task = cli::InitializeApplicationSettings{};
-        BOOST_CHECK(!task(am));
+        EXPECT_TRUE(!task(am));
     }
 }
 
-BOOST_AUTO_TEST_CASE(Task_InitializeLogger)
+TEST_F(TaskFixture, Task_InitializeLogger)
 {
     namespace cli = SmartPeak::cli;
     {
@@ -96,19 +94,17 @@ BOOST_AUTO_TEST_CASE(Task_InitializeLogger)
         auto am = cli::ApplicationManager{as};
         auto task = cli::InitializeLogger{};
         // Can't init twice:
-        BOOST_CHECK(task(am));
-        BOOST_CHECK(!task(am));
+        EXPECT_TRUE(task(am));
+        EXPECT_TRUE(!task(am));
     }
 }
 
-BOOST_AUTO_TEST_CASE(Task_LoadSession)
+TEST_F(TaskFixture, Task_LoadSession)
 {
     namespace cli = SmartPeak::cli;
     auto pa = cli::Parser{m_args};
     auto as = cli::ApplicationSettings{pa};
     auto am = cli::ApplicationManager{as};
     auto task = cli::LoadSession{};
-    BOOST_CHECK(!task(am));
+    EXPECT_TRUE(!task(am));
 }
-
-BOOST_AUTO_TEST_SUITE_END()
