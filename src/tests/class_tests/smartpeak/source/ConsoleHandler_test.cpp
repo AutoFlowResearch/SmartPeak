@@ -34,7 +34,7 @@ struct ConsoleHandlerFixture : public ::testing::Test
     /* ctor/dtor */
     ConsoleHandlerFixture() 
     {
-        m_datapath = SMARTPEAK_GET_TEST_DATA_PATH("");
+        m_datapath = std::filesystem::temp_directory_path().string();
     }
     std::string m_datapath;
 };
@@ -52,6 +52,7 @@ TEST_F(ConsoleHandlerFixture, ConsoleHandler_initialize)
     {
         ch.set_log_directory(m_datapath);
         ch.initialize("Welcome");
+        // m_filepath = ch.get_log_filepath();
         EXPECT_TRUE(fs::exists(ch.get_log_filepath()));
     }
     // Test inability to initialize instance for the second time:
