@@ -21,7 +21,6 @@ if (USE_SUPERBUILD)
   include(external/implot.cmake)
   if (MSVC)
     include(external/eigen.cmake)
-    include(external/boost.cmake)
     include(external/openms.cmake)
   endif()
   return() # stop processing this file further
@@ -64,7 +63,6 @@ endif()
 #------------------------------------------------------------------------------
 option(MT_ENABLE_TBB "Enable Intel TBB support" OFF)
 option(MT_ENABLE_OPENMP "Enable OpenMP support" ON)
-option(BOOST_USE_STATIC "Use Boost static libraries." ON)
 
 #------------------------------------------------------------------------------
 # Extend module path with our modules
@@ -80,7 +78,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/Windows")
 # SmartPeak Version Information
 #------------------------------------------------------------------------------
 set(SMARTPEAK_PACKAGE_VERSION_MAJOR 1)
-set(SMARTPEAK_PACKAGE_VERSION_MINOR 6)
+set(SMARTPEAK_PACKAGE_VERSION_MINOR 7)
 set(SMARTPEAK_PACKAGE_VERSION_PATCH 0)
 
 #------------------------------------------------------------------------------
