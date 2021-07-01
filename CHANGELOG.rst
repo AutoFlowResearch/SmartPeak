@@ -1,6 +1,23 @@
 SmartPeak Changelog
 ===================
 
+v1.8.0 (2020-07-01)
+-------------------
+
+Features
+~~~~~~~~
+- Added support of NA keyword in the sequence file. `(#376) <https://github.com/AutoFlowResearch/SmartPeak/pull/376>`_  
+
+Changes
+~~~~~~~
+- Change testing framework to googletest `(#374) <https://github.com/AutoFlowResearch/SmartPeak/pull/374>`_  
+
+Fix
+~~~
+- Fixed display of native_id for scans in explorer view `(#379) <https://github.com/AutoFlowResearch/SmartPeak/pull/379>`_
+- Removing trailing zeros in FilePicker `(#377) <https://github.com/AutoFlowResearch/SmartPeak/pull/377>`_
+- Fixed MergeSpectra when spectrum has no peak `(#382) <https://github.com/AutoFlowResearch/SmartPeak/pull/382>`_
+
 v1.7.0 (2020-06-07)
 -------------------
 
