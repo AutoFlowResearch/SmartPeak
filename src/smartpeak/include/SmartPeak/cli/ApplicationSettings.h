@@ -97,6 +97,9 @@ public:
     bool verbose;
     bool disable_colors;
     bool disable_progressbar;
+    std::vector<std::string> param;
+    std::string param_file;
+    uint32_t threads;
     std::string log_dir; 
     std::string out_dir;
 
@@ -106,6 +109,7 @@ public:
     void validate_report_metadata() const;
     void validate_workflow() const;
     void validate_integrity() const;
+    void validate_parameters() const;
 
 private:
     Parser& m_parser;

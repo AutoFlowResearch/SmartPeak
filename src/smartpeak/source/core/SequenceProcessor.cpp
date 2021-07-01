@@ -81,9 +81,15 @@ namespace SmartPeak
   {
     Filenames& f = application_handler->static_filenames_;
     application_handler->main_dir_ = application_handler->sequence_pathname_.substr(0, application_handler->sequence_pathname_.find_last_of('/'));
+    auto parameters_csv_i = application_handler->static_filenames_.parameters_csv_i;
     f = Filenames::getDefaultStaticFilenames(application_handler->main_dir_);
     clearNonExistantDefaultGeneratedFilenames(f);
     f.sequence_csv_i = application_handler->sequence_pathname_;
+    // override parameters.csv if not empty (don't use default):
+    if (!parameters_csv_i.empty())
+    {
+      f.parameters_csv_i = parameters_csv_i;
+    }
 
     LOGN << "\n\n"
       "The following list of file was searched for:\n";

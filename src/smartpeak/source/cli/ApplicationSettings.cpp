@@ -23,6 +23,7 @@
 #include <SmartPeak/cli/ApplicationSettings.h>
 
 #include <memory>
+#include <regex>
 #include <plog/Log.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/SampleType.h>
@@ -54,10 +55,18 @@ void ApplicationSettings::define_options()
         "this option allow to run workflow even if one or more check has failed.");
     m_parser.set_optional<bool>("v", "verbose", false, 
         "Run SmartPeak in verbose mode, display more detailed information");
-    m_parser.set_optional<bool>("d", "disable-colors", false, 
+    m_parser.set_optional<bool>("dc", "disable-colors", false, 
         "By default the console output is colored, this flag disables colors.");
-    m_parser.set_optional<bool>("p", "disable-progressbar", false, 
+    m_parser.set_optional<bool>("dp", "disable-progressbar", false, 
         "Progress bar allows to track the progress of the entire workflow. This option disables the progress bar.");
+    m_parser.set_optional<std::vector<std::string>>("p", "param", std::vector<std::string>{}, 
+        "List of space separated workflow parameters given in form 'FunctionName.ParameterName=value'. ",
+        "The specified parameters override parameters from the 'parameters.csv' file or the file passed by --param-file.");
+    m_parser.set_optional<std::string>("f", "param-file", "", 
+        "An absolute or relative path to 'parameters.csv' file. If not specified, ",
+        "default path is set to the same directory as 'sequence.csv' file.");
+    m_parser.set_optional<uint32_t>("t", "threads", 0, 
+        "Number of threads used by workflow. The actual number of threads may differ. Use 0 to automatically assign the number of threads.");
     m_parser.set_optional<std::string>("ld", "log-dir", "", 
         "The path to the log directory. Given directory has to exist. Overrides the default location for the log file: "
         "https://smartpeak.readthedocs.io/en/latest/guide/guistart.html#logs");
@@ -77,8 +86,11 @@ void ApplicationSettings::load_options()
     integrity               = m_parser.get<std::vector<std::string>>("i");
     allow_inconsistent      = m_parser.get<bool>("a");
     verbose                 = m_parser.get<bool>("v");
-    disable_colors          = m_parser.get<bool>("d");
-    disable_progressbar     = m_parser.get<bool>("p");
+    disable_colors          = m_parser.get<bool>("dc");
+    disable_progressbar     = m_parser.get<bool>("dp");
+    param                   = m_parser.get<std::vector<std::string>>("p");
+    param_file              = m_parser.get<std::string>("f");
+    threads                 = m_parser.get<uint32_t>("t");
     log_dir                 = m_parser.get<std::string>("ld");
     out_dir                 = m_parser.get<std::string>("o");
 }
@@ -99,6 +111,7 @@ void ApplicationSettings::validate() const
     validate_report_metadata();
     validate_workflow();
     validate_integrity();
+    validate_parameters();
 }
 
 bool ApplicationSettings::contains_option(
@@ -207,6 +220,21 @@ void ApplicationSettings::validate_integrity() const
                 std::ostringstream{}
                     << "Invalid value for 'integrity', available options are: { " 
                     << options_str << " }").str());
+        }
+    });
+}
+
+void ApplicationSettings::validate_parameters() const
+{
+    const auto reg = std::regex(R"/(^(([A-Za-z0-9_:]*)\.?)+=([A-Za-z0-9.,\[\]+-\/*()\s:"]+)$)/", std::regex::grep);
+    std::for_each(param.cbegin(), param.cend(), [reg](const auto& p) {
+        // auto base_match = std::smatch{};
+        if (!std::regex_match(p, reg))
+        {
+            throw std::invalid_argument(std::move(std::ostringstream{}
+                << "Invalid parameter syntax for '" << p << "', correct is 'FunctionName.ParameterName=value'. "
+                << "The 'FunctionName' can be composed with multiple names connected with dot '.'. "
+                << "The 'ParameterName' can be composed with multiple names separated by colon ':'. ").str());
         }
     });
 }

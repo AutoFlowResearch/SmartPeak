@@ -270,4 +270,23 @@ BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_integrity)
     BOOST_CHECK_THROW(application_settings.validate_integrity(), std::invalid_argument);
 }
 
+BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_parameters)
+{
+    auto& application_settings = get_application_settings();
+    auto params = std::vector<std::pair<std::string, bool>>{
+        {"FunctionName", false}, {"FunctionName.ParameterName", false}, {"FunctionName.ParameterName=", false},
+        {"FunctionName.ParameterName=value", true}, {"FunctionName.FN.ParameterName:n1=value", true},
+        {"FunctionName.FN.ParameterName:n1=[1,2,3,4]", true}, {"FunctionName.FN.ParameterName:n1=\"string\"", true},
+        {"FunctionName_FN.ParameterName_n1=0.1", true}, {"FunctionName.ParameterName=-1000", true}};
+    
+    std::for_each(params.cbegin(), params.cend(), 
+        [&application_settings](const auto& pp) {
+            application_settings.param = std::vector<std::string>{ pp.first };
+            if (pp.second)
+                BOOST_CHECK_NO_THROW(application_settings.validate_parameters());
+            else
+                BOOST_CHECK_THROW(application_settings.validate_parameters(), std::invalid_argument);
+        });
+}
+
 BOOST_AUTO_TEST_SUITE_END()

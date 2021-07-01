@@ -83,8 +83,34 @@ bool LoadSession::operator() (ApplicationManager& application_manager)
 {
     auto& application_settings = application_manager.get_application_settings();
     auto& application_handler = application_manager.get_application_handler();
+    // Override parameters file path:
+    if (!application_settings.param_file.empty())
+    {
+        LOG_WARNING << "Override default 'parameters.csv' with filepath: '" << application_settings.param_file << "'";
+        application_handler.static_filenames_.parameters_csv_i = application_settings.param_file;
+    }
     auto create_sequence = CreateSequence{application_handler.sequenceHandler_};
-    return create_sequence.onFilePicked(application_settings.load_session, &application_handler);
+    auto created = create_sequence.onFilePicked(application_settings.load_session, &application_handler);
+    // Override selected parameters from parameters.csv:
+    if (created && application_handler.sequenceHandler_.getSequence().size() > 0)
+    {
+        auto& params = application_handler.sequenceHandler_.getSequence().front().getRawData().getParameters();
+        if (application_settings.threads > 0)
+        {
+            LOG_WARNING << "Override the number of threads used: n_thread=" << application_settings.threads;
+            auto n_thread = Parameter("n_thread", static_cast<int>(application_settings.threads));
+            auto n_thread_ptr = params.findParameter("SequenceProcessor", "n_thread");
+            if (nullptr != n_thread_ptr)
+            {
+                *n_thread_ptr = n_thread;
+            }
+            else
+            {
+                params.addParameter("SequenceProcessor", n_thread);
+            }
+        }
+    }
+    return created;
 }
 
 bool RunIntegrityChecks::operator() (ApplicationManager& application_manager) 
@@ -343,7 +369,6 @@ void RunWorkflow::show_progress(const ProgressInfo& progress_info, int bar_width
     auto running_time = progress_info.runningTime();
     auto progress = progress_info.progressValue();
     auto estimated_time = progress_info.estimatedRemainingTime();
-
     auto poss = std::ostringstream{};
     auto eta = std::string{};
     if (estimated_time)
@@ -358,12 +383,10 @@ void RunWorkflow::show_progress(const ProgressInfo& progress_info, int bar_width
     {
         eta = "N/A";
     }
-
     auto et = std::string{};
     if (0 == m_event_type) et = " Seq";
     else if (1 == m_event_type) et = "SeqS";
     else if (2 == m_event_type) et = "SeqG";
-
     poss << " " << formatted_time(running_time) << " " << "[" << et << ": " << m_event_name << "]" << " [";
     int pos = bar_width * progress;
     for (int i = 0; i < bar_width; ++i) {
@@ -373,7 +396,6 @@ void RunWorkflow::show_progress(const ProgressInfo& progress_info, int bar_width
     }
     poss << "] " << int(progress * 100.0) << "%";
     poss << " ETA " << eta << "\r";
-
     std::cout << poss.str();
     std::cout.flush();
 }
