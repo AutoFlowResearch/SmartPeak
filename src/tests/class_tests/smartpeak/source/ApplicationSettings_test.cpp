@@ -70,7 +70,7 @@ struct ApplicationSettingsFixture : public ::testing::Test
         {
             m_parser_ptr->get<T>(option);
         }
-        catch(const std::runtime_error& re)
+        catch (...)
         {
             return false;
         }
