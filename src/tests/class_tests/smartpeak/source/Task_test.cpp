@@ -20,16 +20,16 @@
 // $Maintainer: Krzysztof Abram $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
-#include <SmartPeak/test_config.h>
 
-#define BOOST_TEST_MODULE Task test suite
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <SmartPeak/test_config.h>
 
 #include <SmartPeak/cli/ApplicationManager.h>
 #include <SmartPeak/cli/Task.h>
 
 
-struct TaskFixture 
+struct TaskFixture : public ::testing::Test
 {
     /* ctor/dtor */
     TaskFixture() 
@@ -56,9 +56,7 @@ public:
 
 /* ---------------------------------------------- */
 
-BOOST_FIXTURE_TEST_SUITE(Task, TaskFixture)
-
-BOOST_AUTO_TEST_CASE(Task_InitializeApplicationSettings)
+TEST_F(TaskFixture, Task_InitializeApplicationSettings)
 {
     namespace cli = SmartPeak::cli;
     {
@@ -66,7 +64,7 @@ BOOST_AUTO_TEST_CASE(Task_InitializeApplicationSettings)
         auto as = cli::ApplicationSettings{pa};
         auto am = cli::ApplicationManager{as};
         auto task = cli::InitializeApplicationSettings{};
-        BOOST_CHECK(task(am));
+        EXPECT_TRUE(task(am));
     }
     {
         auto argv = m_args;
@@ -75,7 +73,7 @@ BOOST_AUTO_TEST_CASE(Task_InitializeApplicationSettings)
         auto as = cli::ApplicationSettings{pa};
         auto am = cli::ApplicationManager{as};
         auto task = cli::InitializeApplicationSettings{};
-        BOOST_CHECK_NO_THROW(task(am));
+        EXPECT_NO_THROW(task(am));
     }
     {
         auto argv = m_args;
@@ -84,11 +82,11 @@ BOOST_AUTO_TEST_CASE(Task_InitializeApplicationSettings)
         auto as = cli::ApplicationSettings{pa};
         auto am = cli::ApplicationManager{as};
         auto task = cli::InitializeApplicationSettings{};
-        BOOST_CHECK(!task(am));
+        EXPECT_TRUE(!task(am));
     }
 }
 
-BOOST_AUTO_TEST_CASE(Task_InitializeLogger)
+TEST_F(TaskFixture, Task_InitializeLogger)
 {
     namespace cli = SmartPeak::cli;
     {
@@ -97,12 +95,12 @@ BOOST_AUTO_TEST_CASE(Task_InitializeLogger)
         auto am = cli::ApplicationManager{as};
         auto task = cli::InitializeLogger{};
         // Can't init twice:
-        BOOST_CHECK(task(am));
-        BOOST_CHECK(!task(am));
+        EXPECT_TRUE(task(am));
+        EXPECT_TRUE(!task(am));
     }
 }
 
-BOOST_AUTO_TEST_CASE(Task_LoadSession)
+TEST_F(TaskFixture, Task_LoadSession)
 {
     namespace cli = SmartPeak::cli;
     auto pa = cli::Parser{m_args};
@@ -110,10 +108,10 @@ BOOST_AUTO_TEST_CASE(Task_LoadSession)
     auto am = cli::ApplicationManager{as};
     auto task = cli::LoadSession{};
     // Fails because InitializeApplicationSettings is not called
-    BOOST_CHECK(!task(am));
+    EXPECT_TRUE(!task(am));
 }
 
-BOOST_AUTO_TEST_CASE(Task_LoadSession_parameters_csv)
+TEST_F(TaskFixture, Task_LoadSession_parameters_csv)
 {
     namespace cli = SmartPeak::cli;
     auto param_file = std::string{SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv")};
@@ -123,14 +121,14 @@ BOOST_AUTO_TEST_CASE(Task_LoadSession_parameters_csv)
     auto as = cli::ApplicationSettings{pa};
     auto am = cli::ApplicationManager{as};
     auto init_app = cli::InitializeApplicationSettings{};
-    BOOST_CHECK(init_app(am));
+    EXPECT_TRUE(init_app(am));
 
     auto task = cli::LoadSession{};
-    BOOST_CHECK(task(am));
-    BOOST_CHECK_EQUAL(am.get_application_handler().static_filenames_.parameters_csv_i, param_file);
+    EXPECT_TRUE(task(am));
+    EXPECT_EQ(am.get_application_handler().static_filenames_.parameters_csv_i, param_file);
 }
 
-BOOST_AUTO_TEST_CASE(Task_LoadSession_threads)
+TEST_F(TaskFixture, Task_LoadSession_threads)
 {
     namespace cli = SmartPeak::cli;
     auto n_threads = std::vector<int>{1,2,4,6,8};
@@ -144,23 +142,15 @@ BOOST_AUTO_TEST_CASE(Task_LoadSession_threads)
         auto as = cli::ApplicationSettings{pa};
         auto am = cli::ApplicationManager{as};
         auto init_app = cli::InitializeApplicationSettings{};
-        BOOST_CHECK(init_app(am));
+        EXPECT_TRUE(init_app(am));
 
         auto task = cli::LoadSession{};
-        BOOST_CHECK(task(am));
-        BOOST_CHECK_EQUAL(as.threads, n_thread);
+        EXPECT_TRUE(task(am));
+        EXPECT_EQ(as.threads, n_thread);
         auto& params = am.get_application_handler().sequenceHandler_.getSequence().front().getRawData().getParameters();
         auto param = params.findParameter("SequenceProcessor", "n_thread");
-        BOOST_CHECK(nullptr != param);
-        BOOST_CHECK(param->isValid());
-        BOOST_CHECK_EQUAL(param->getValueAsString(), n_thread_str);
+        EXPECT_TRUE(nullptr != param);
+        EXPECT_TRUE(param->isValid());
+        EXPECT_EQ(param->getValueAsString(), n_thread_str);
     }
 }
-
-BOOST_AUTO_TEST_CASE(Task_LoadSession_param)
-{
-    namespace cli = SmartPeak::cli;
-    
-}
-
-BOOST_AUTO_TEST_SUITE_END()

@@ -20,10 +20,11 @@
 // $Maintainer: Krzysztof Abram $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
+
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <SmartPeak/test_config.h>
 
-#define BOOST_TEST_MODULE ApplicationSettings test suite
-#include <boost/test/included/unit_test.hpp>
 #include <algorithm>
 #include <random>
 
@@ -35,7 +36,7 @@
 #include <SmartPeak/core/Utilities.h>
 
 
-struct ApplicationSettingsFixture 
+struct ApplicationSettingsFixture : public ::testing::Test
 {
     /* ctor/dtor */
     ApplicationSettingsFixture() 
@@ -69,7 +70,7 @@ struct ApplicationSettingsFixture
         {
             m_parser_ptr->get<T>(option);
         }
-        catch(const std::runtime_error& re)
+        catch (...)
         {
             return false;
         }
@@ -83,54 +84,53 @@ public:
 
 /* ---------------------------------------------- */
 
-BOOST_FIXTURE_TEST_SUITE(ApplicationSettings, ApplicationSettingsFixture)
 
-BOOST_AUTO_TEST_CASE(ApplicationSettings_define_options)
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_define_options)
 {
     auto& application_settings = get_application_settings();
     {
         application_settings.define_options();
     }
-    BOOST_CHECK(option_exists<std::string>("l"));
-    BOOST_CHECK(option_exists<std::vector<std::string>>("r"));
-    BOOST_CHECK(option_exists<std::vector<std::string>>("rt"));
-    BOOST_CHECK(option_exists<std::vector<std::string>>("rm"));
-    BOOST_CHECK(option_exists<std::vector<std::string>>("w"));
-    BOOST_CHECK(option_exists<std::vector<std::string>>("i"));
-    BOOST_CHECK(option_exists<bool>("a"));
-    BOOST_CHECK(option_exists<bool>("v"));
-    BOOST_CHECK(option_exists<bool>("d"));
-    BOOST_CHECK(option_exists<std::string>("ld"));
+    EXPECT_TRUE(option_exists<std::string>("l"));
+    EXPECT_TRUE(option_exists<std::vector<std::string>>("r"));
+    EXPECT_TRUE(option_exists<std::vector<std::string>>("rt"));
+    EXPECT_TRUE(option_exists<std::vector<std::string>>("rm"));
+    EXPECT_TRUE(option_exists<std::vector<std::string>>("w"));
+    EXPECT_TRUE(option_exists<std::vector<std::string>>("i"));
+    EXPECT_TRUE(option_exists<bool>("a"));
+    EXPECT_TRUE(option_exists<bool>("v"));
+    EXPECT_TRUE(option_exists<bool>("d"));
+    EXPECT_TRUE(option_exists<std::string>("ld"));
 }
 
-BOOST_AUTO_TEST_CASE(ApplicationSettings_load_options)
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_load_options)
 {
     auto& application_settings = get_application_settings();
     {
         application_settings.define_options();
         application_settings.load_options();
     }
-    BOOST_CHECK_EQUAL(application_settings.load_session, 
+    EXPECT_EQ(application_settings.load_session, 
         "C:/SmartPeak/src/examples/data/GCMS_SIM_Unknowns/sequence.csv");
     auto report = std::vector<std::string>{"featureDB", "pivottable"};
-    BOOST_CHECK(application_settings.report == report);
+    EXPECT_EQ(application_settings.report, report);
     auto metadata = std::vector<std::string>{"PeAk_aRea", "Mz", "rt"};
-    BOOST_CHECK(application_settings.report_metadata == metadata);
+    EXPECT_EQ(application_settings.report_metadata, metadata);
     auto samples = std::vector<std::string>{"stanDard", "Unknown", "double blank"};
-    BOOST_CHECK(application_settings.report_sample_types == samples);
-    BOOST_CHECK(application_settings.verbose);
-    BOOST_CHECK(application_settings.disable_colors);
-    BOOST_CHECK(application_settings.allow_inconsistent);
+    EXPECT_EQ(application_settings.report_sample_types, samples);
+    EXPECT_TRUE(application_settings.verbose);
+    EXPECT_TRUE(application_settings.disable_colors);
+    EXPECT_TRUE(application_settings.allow_inconsistent);
     auto workflow = std::vector<std::string>{
         "load_raw_data", "EXTRACT_SPECTRA_WINDOWS", "pick_ms1_features" 
         "SEARCH_ACCURATE_MASS", "LOAD_FeATURE_BACKGROUND_FILTERS" };
-    BOOST_CHECK(application_settings.workflow == workflow);
-    BOOST_CHECK_EQUAL(application_settings.log_dir, ".");
+    EXPECT_EQ(application_settings.workflow, workflow);
+    EXPECT_EQ(application_settings.log_dir, ".");
     auto integrity = std::vector<std::string>{"SAMPLE", "is"};
-    BOOST_CHECK(application_settings.integrity == integrity);
+    EXPECT_EQ(application_settings.integrity, integrity);
 }
 
-BOOST_AUTO_TEST_CASE(ApplicationSettings_process_options)
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_process_options)
 {
     auto& application_settings = get_application_settings();
     auto& parser = application_settings.get_parser();
@@ -140,43 +140,43 @@ BOOST_AUTO_TEST_CASE(ApplicationSettings_process_options)
         application_settings.process_options();
     }
     auto report = std::vector<std::string>{"FEATUREDB", "PIVOTTABLE"};
-    BOOST_CHECK(application_settings.report == report);
+    EXPECT_EQ(application_settings.report, report);
     auto metadata = std::vector<std::string>{"PEAK_AREA", "MZ", "RT"};
-    BOOST_CHECK(application_settings.report_metadata == metadata);
+    EXPECT_EQ(application_settings.report_metadata, metadata);
     auto samples = std::vector<std::string>{"STANDARD", "UNKNOWN", "DOUBLE BLANK"};
-    BOOST_CHECK(application_settings.report_sample_types == samples);
+    EXPECT_EQ(application_settings.report_sample_types, samples);
     auto workflow = std::vector<std::string>{
         "LOAD_RAW_DATA", "EXTRACT_SPECTRA_WINDOWS", "PICK_MS1_FEATURES"
         "SEARCH_ACCURATE_MASS", "LOAD_FEATURE_BACKGROUND_FILTERS" };
-    BOOST_CHECK(application_settings.workflow == workflow);
+    EXPECT_EQ(application_settings.workflow, workflow);
     auto integrity = std::vector<std::string>{"SAMPLE", "IS"};
-    BOOST_CHECK(application_settings.integrity == integrity);
+    EXPECT_EQ(application_settings.integrity, integrity);
 }
 
-BOOST_AUTO_TEST_CASE(ApplicationSettings_contains_option)
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_contains_option)
 {
     using SmartPeak::cli::ApplicationSettings;
     auto list = std::vector<std::string>{"string1", "string2", "string3"};
-    BOOST_CHECK(ApplicationSettings::contains_option(list, "string1", "loginfo"));
-    BOOST_CHECK(!ApplicationSettings::contains_option(list, "string4", "loginfo"));
+    EXPECT_TRUE(ApplicationSettings::contains_option(list, "string1", "loginfo"));
+    EXPECT_TRUE(!ApplicationSettings::contains_option(list, "string4", "loginfo"));
 }
 
-BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_report)
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_validate_report)
 {
     auto& application_settings = get_application_settings();
     application_settings.report = std::vector<std::string>{"FEATUREDB"};
-    BOOST_CHECK_NO_THROW(application_settings.validate_report());
+    EXPECT_NO_THROW(application_settings.validate_report());
     application_settings.report = std::vector<std::string>{"PIVOTTABLE"};
-    BOOST_CHECK_NO_THROW(application_settings.validate_report());
+    EXPECT_NO_THROW(application_settings.validate_report());
     application_settings.report = std::vector<std::string>{"FEATUREDB", "PIVOTTABLE"};
-    BOOST_CHECK_NO_THROW(application_settings.validate_report());
+    EXPECT_NO_THROW(application_settings.validate_report());
     application_settings.report = std::vector<std::string>{"ALL"};
-    BOOST_CHECK_NO_THROW(application_settings.validate_report());
+    EXPECT_NO_THROW(application_settings.validate_report());
     application_settings.report = std::vector<std::string>{"aksdng"};
-    BOOST_CHECK_THROW(application_settings.validate_report(), std::invalid_argument);
+    EXPECT_THROW(application_settings.validate_report(), std::invalid_argument);
 }
 
-BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_report_sample_types)
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_validate_report_sample_types)
 {
     auto& application_settings = get_application_settings();
     auto& available_types = SmartPeak::sampleTypeToString;
@@ -186,19 +186,19 @@ BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_report_sample_types)
             auto str = SmartPeak::Utilities::str2upper(t.second);
             values.push_back(str);
             application_settings.report_sample_types = std::vector<std::string>{ str };
-            BOOST_CHECK_NO_THROW(application_settings.validate_report_sample_types());
+            EXPECT_NO_THROW(application_settings.validate_report_sample_types());
             application_settings.report_sample_types = values;
             auto& rst = application_settings.report_sample_types;
             std::random_device rd;
             std::mt19937 g(rd());
             std::shuffle(rst.begin(), rst.end(), g);
-            BOOST_CHECK_NO_THROW(application_settings.validate_report_sample_types());
+            EXPECT_NO_THROW(application_settings.validate_report_sample_types());
         });
     application_settings.report_sample_types = std::vector<std::string>{"aksdng", "Standard"};
-    BOOST_CHECK_THROW(application_settings.validate_report_sample_types(), std::invalid_argument);
+    EXPECT_THROW(application_settings.validate_report_sample_types(), std::invalid_argument);
 }
 
-BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_report_metadata)
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_validate_report_metadata)
 {
     auto& application_settings = get_application_settings();
     auto& available = SmartPeak::metadataToString;
@@ -208,19 +208,19 @@ BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_report_metadata)
             auto str = SmartPeak::Utilities::str2upper(t.second);
             values.push_back(str);
             application_settings.report_metadata = std::vector<std::string>{ str };
-            BOOST_CHECK_NO_THROW(application_settings.validate_report_metadata());
+            EXPECT_NO_THROW(application_settings.validate_report_metadata());
             application_settings.report_metadata = values;
             auto& rm = application_settings.report_metadata;
             std::random_device rd;
             std::mt19937 g(rd());
             std::shuffle(rm.begin(), rm.end(), g);
-            BOOST_CHECK_NO_THROW(application_settings.validate_report_metadata());
+            EXPECT_NO_THROW(application_settings.validate_report_metadata());
         });
     application_settings.report_metadata = std::vector<std::string>{"aksdng", "Standard"};
-    BOOST_CHECK_THROW(application_settings.validate_report_metadata(), std::invalid_argument);
+    EXPECT_THROW(application_settings.validate_report_metadata(), std::invalid_argument);
 }
 
-BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_workflow)
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_validate_workflow)
 {
     auto& application_settings = get_application_settings();
     auto cmds_ = std::vector<std::string>{};
@@ -236,20 +236,20 @@ BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_workflow)
     std::for_each(cmds_.cbegin(), cmds_.cend(), 
         [&values, &application_settings](const auto& t){
             application_settings.workflow = std::vector<std::string>{ t };
-            BOOST_CHECK_NO_THROW(application_settings.validate_workflow());
+            EXPECT_NO_THROW(application_settings.validate_workflow());
             values.push_back(t);
             application_settings.workflow = values;
             auto& w = application_settings.workflow;
             std::random_device rd;
             std::mt19937 g(rd());
             std::shuffle(w.begin(), w.end(), g);
-            BOOST_CHECK_NO_THROW(application_settings.validate_workflow());
+            EXPECT_NO_THROW(application_settings.validate_workflow());
         });
     application_settings.workflow = std::vector<std::string>{"ASDFG", "LOAD_RAW_DATA"};
-    BOOST_CHECK_THROW(application_settings.validate_workflow(), std::invalid_argument);
+    EXPECT_THROW(application_settings.validate_workflow(), std::invalid_argument);
 }
 
-BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_integrity)
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_validate_integrity)
 {
     auto& application_settings = get_application_settings();
     auto options = std::vector<std::string>{"SAMPLE", "COMP", "COMP_GROUP", "IS", "ALL", "NONE"};
@@ -257,20 +257,20 @@ BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_integrity)
     std::for_each(options.cbegin(), options.cend(), 
         [&values, &application_settings](const auto& t) {
             application_settings.integrity = std::vector<std::string>{ t };
-            BOOST_CHECK_NO_THROW(application_settings.validate_integrity());
+            EXPECT_NO_THROW(application_settings.validate_integrity());
             values.push_back(t);
             application_settings.integrity = values;
             auto& i = application_settings.integrity;
             std::random_device rd;
             std::mt19937 g(rd());
             std::shuffle(i.begin(), i.end(), g);
-            BOOST_CHECK_NO_THROW(application_settings.validate_integrity());
+            EXPECT_NO_THROW(application_settings.validate_integrity());
         });
     application_settings.integrity = std::vector<std::string>{"ASDFG", "COMP_GROUP"};
-    BOOST_CHECK_THROW(application_settings.validate_integrity(), std::invalid_argument);
+    EXPECT_THROW(application_settings.validate_integrity(), std::invalid_argument);
 }
 
-BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_parameters)
+TEST_F(ApplicationSettingsFixture, ApplicationSettings_validate_parameters)
 {
     auto& application_settings = get_application_settings();
     auto params = std::vector<std::pair<std::string, bool>>{
@@ -283,10 +283,8 @@ BOOST_AUTO_TEST_CASE(ApplicationSettings_validate_parameters)
         [&application_settings](const auto& pp) {
             application_settings.param = std::vector<std::string>{ pp.first };
             if (pp.second)
-                BOOST_CHECK_NO_THROW(application_settings.validate_parameters());
+                EXPECT_NO_THROW(application_settings.validate_parameters());
             else
-                BOOST_CHECK_THROW(application_settings.validate_parameters(), std::invalid_argument);
+                EXPECT_THROW(application_settings.validate_parameters(), std::invalid_argument);
         });
 }
-
-BOOST_AUTO_TEST_SUITE_END()

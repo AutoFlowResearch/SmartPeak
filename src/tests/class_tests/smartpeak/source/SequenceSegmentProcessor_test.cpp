@@ -17,14 +17,12 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
- #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE SequenceSegmentProcessor test suite
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
+#include <SmartPeak/test_config.h>
 #include <SmartPeak/core/SequenceSegmentProcessor.h>
 #include <SmartPeak/core/SampleType.h>
 
@@ -475,34 +473,29 @@ void addQCFeatures(SequenceHandler& sequenceHandler_IO) {
   }
 }
 
-BOOST_AUTO_TEST_SUITE(sequencesegmentprocessor)
-
-/**
-  CalculateCalibration Tests
-*/
-BOOST_AUTO_TEST_CASE(constructorCalculateCalibration)
+TEST(CalculateCalibration, constructorCalculateCalibration)
 {
   CalculateCalibration* ptrCalculateCalibration = nullptr;
   CalculateCalibration* nullPointerCalculateCalibration = nullptr;
-  BOOST_CHECK_EQUAL(ptrCalculateCalibration, nullPointerCalculateCalibration);
+  EXPECT_EQ(ptrCalculateCalibration, nullPointerCalculateCalibration);
 }
 
-BOOST_AUTO_TEST_CASE(destructorCalculateCalibration)
+TEST(CalculateCalibration, destructorCalculateCalibration)
 {
   CalculateCalibration* ptrCalculateCalibration = nullptr;
   ptrCalculateCalibration = new CalculateCalibration();
   delete ptrCalculateCalibration;
 }
 
-BOOST_AUTO_TEST_CASE(gettersCalculateCalibration)
+TEST(CalculateCalibration, gettersCalculateCalibration)
 {
   CalculateCalibration processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 15);
-  BOOST_CHECK_EQUAL(processor.getName(), "CALCULATE_CALIBRATION");
+  EXPECT_EQ(processor.getID(), 15);
+  EXPECT_EQ(processor.getName(), "CALCULATE_CALIBRATION");
 }
 
-BOOST_AUTO_TEST_CASE(getSampleIndicesBySampleType)
+TEST(SequenceSegmentProcessor, getSampleIndicesBySampleType)
 {
   MetaDataHandler meta_data1;
   meta_data1.setFilename("file1");
@@ -554,12 +547,12 @@ BOOST_AUTO_TEST_CASE(getSampleIndicesBySampleType)
     sample_indices
   );
 
-  BOOST_CHECK_EQUAL(sample_indices.size(), 2);
-  BOOST_CHECK_EQUAL(sample_indices[0], 0);
-  BOOST_CHECK_EQUAL(sample_indices[1], 2);
+  EXPECT_EQ(sample_indices.size(), 2);
+  EXPECT_EQ(sample_indices[0], 0);
+  EXPECT_EQ(sample_indices[1], 2);
 }
 
-BOOST_AUTO_TEST_CASE(processCalculateCalibration)
+TEST(SequenceSegmentProcessor, processCalculateCalibration)
 {
   // Pre-requisites: set up the parameters and data structures for testing
   const map<string, vector<map<string, string>>> absquant_params = {{"AbsoluteQuantitation", {
@@ -641,98 +634,98 @@ BOOST_AUTO_TEST_CASE(processCalculateCalibration)
 
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs = sequenceSegmentHandler.getQuantitationMethods();
 
-  BOOST_CHECK_EQUAL(AQMs.size(), 3);
+  EXPECT_EQ(AQMs.size(), 3);
 
-  BOOST_CHECK_EQUAL(AQMs[0].getComponentName(), "amp.amp_1.Light");
-  BOOST_CHECK_EQUAL(AQMs[0].getISName(), "amp.amp_1.Heavy");
-  BOOST_CHECK_EQUAL(AQMs[0].getFeatureName(), "peak_apex_int");
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("slope")), 0.957996830126945, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("intercept")), -1.0475433871941753, 1e-6);
-  BOOST_CHECK_EQUAL(AQMs[0].getNPoints(), 11);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getCorrelationCoefficient()), 0.9991692616730385, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getLLOQ()), 0.02, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getULOQ()), 40.0, 1e-6);
+  EXPECT_EQ(AQMs[0].getComponentName(), "amp.amp_1.Light");
+  EXPECT_EQ(AQMs[0].getISName(), "amp.amp_1.Heavy");
+  EXPECT_EQ(AQMs[0].getFeatureName(), "peak_apex_int");
+  EXPECT_NEAR(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("slope")), 0.957996830126945, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("intercept")), -1.0475433871941753, 1e-6);
+  EXPECT_EQ(AQMs[0].getNPoints(), 11);
+  EXPECT_NEAR(static_cast<double>(AQMs[0].getCorrelationCoefficient()), 0.9991692616730385, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[0].getLLOQ()), 0.02, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[0].getULOQ()), 40.0, 1e-6);
 
-  BOOST_CHECK_EQUAL(AQMs[1].getComponentName(), "atp.atp_1.Light");
-  BOOST_CHECK_EQUAL(AQMs[1].getISName(), "atp.atp_1.Heavy");
-  BOOST_CHECK_EQUAL(AQMs[1].getFeatureName(), "peak_apex_int");
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("slope")), 0.6230408240794582, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("intercept")), 0.36130172586029285, 1e-6);
-  BOOST_CHECK_EQUAL(AQMs[1].getNPoints(), 6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getCorrelationCoefficient()), 0.9982084021849695, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getLLOQ()), 0.02, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getULOQ()), 40.0, 1e-6);
+  EXPECT_EQ(AQMs[1].getComponentName(), "atp.atp_1.Light");
+  EXPECT_EQ(AQMs[1].getISName(), "atp.atp_1.Heavy");
+  EXPECT_EQ(AQMs[1].getFeatureName(), "peak_apex_int");
+  EXPECT_NEAR(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("slope")), 0.6230408240794582, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("intercept")), 0.36130172586029285, 1e-6);
+  EXPECT_EQ(AQMs[1].getNPoints(), 6);
+  EXPECT_NEAR(static_cast<double>(AQMs[1].getCorrelationCoefficient()), 0.9982084021849695, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[1].getLLOQ()), 0.02, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[1].getULOQ()), 40.0, 1e-6);
 
-  BOOST_CHECK_EQUAL(AQMs[2].getComponentName(), "ser-L.ser-L_1.Light");
-  BOOST_CHECK_EQUAL(AQMs[2].getISName(), "ser-L.ser-L_1.Heavy");
-  BOOST_CHECK_EQUAL(AQMs[2].getFeatureName(), "peak_apex_int");
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("slope")), 0.9011392589148208, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("intercept")), 1.8701850759567624, 1e-6);
-  BOOST_CHECK_EQUAL(AQMs[2].getNPoints(), 11);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getCorrelationCoefficient()), 0.9993200722867581, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getLLOQ()), 0.04, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 200.0, 1e-6);
+  EXPECT_EQ(AQMs[2].getComponentName(), "ser-L.ser-L_1.Light");
+  EXPECT_EQ(AQMs[2].getISName(), "ser-L.ser-L_1.Heavy");
+  EXPECT_EQ(AQMs[2].getFeatureName(), "peak_apex_int");
+  EXPECT_NEAR(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("slope")), 0.9011392589148208, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("intercept")), 1.8701850759567624, 1e-6);
+  EXPECT_EQ(AQMs[2].getNPoints(), 11);
+  EXPECT_NEAR(static_cast<double>(AQMs[2].getCorrelationCoefficient()), 0.9993200722867581, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[2].getLLOQ()), 0.04, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[2].getULOQ()), 200.0, 1e-6);
 
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs_rdh = sequenceHandler.getSequence()[0].getRawData().getQuantitationMethods();
-  BOOST_CHECK_EQUAL(AQMs_rdh.size(), 3);
+  EXPECT_EQ(AQMs_rdh.size(), 3);
 
-  BOOST_CHECK_EQUAL(AQMs_rdh[0].getComponentName(), "amp.amp_1.Light");
-  BOOST_CHECK_EQUAL(AQMs_rdh[0].getISName(), "amp.amp_1.Heavy");
-  BOOST_CHECK_EQUAL(AQMs_rdh[0].getFeatureName(), "peak_apex_int");
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[0].getTransformationModelParams().getValue("slope")), 0.957996830126945, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[0].getTransformationModelParams().getValue("intercept")), -1.0475433871941753, 1e-6);
-  BOOST_CHECK_EQUAL(AQMs_rdh[0].getNPoints(), 11);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[0].getCorrelationCoefficient()), 0.9991692616730385, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[0].getLLOQ()), 0.02, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[0].getULOQ()), 40.0, 1e-6);
+  EXPECT_EQ(AQMs_rdh[0].getComponentName(), "amp.amp_1.Light");
+  EXPECT_EQ(AQMs_rdh[0].getISName(), "amp.amp_1.Heavy");
+  EXPECT_EQ(AQMs_rdh[0].getFeatureName(), "peak_apex_int");
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[0].getTransformationModelParams().getValue("slope")), 0.957996830126945, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[0].getTransformationModelParams().getValue("intercept")), -1.0475433871941753, 1e-6);
+  EXPECT_EQ(AQMs_rdh[0].getNPoints(), 11);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[0].getCorrelationCoefficient()), 0.9991692616730385, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[0].getLLOQ()), 0.02, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[0].getULOQ()), 40.0, 1e-6);
 
-  BOOST_CHECK_EQUAL(AQMs_rdh[1].getComponentName(), "atp.atp_1.Light");
-  BOOST_CHECK_EQUAL(AQMs_rdh[1].getISName(), "atp.atp_1.Heavy");
-  BOOST_CHECK_EQUAL(AQMs_rdh[1].getFeatureName(), "peak_apex_int");
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[1].getTransformationModelParams().getValue("slope")), 0.6230408240794582, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[1].getTransformationModelParams().getValue("intercept")), 0.36130172586029285, 1e-6);
-  BOOST_CHECK_EQUAL(AQMs_rdh[1].getNPoints(), 6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[1].getCorrelationCoefficient()), 0.9982084021849695, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[1].getLLOQ()), 0.02, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[1].getULOQ()), 40.0, 1e-6);
+  EXPECT_EQ(AQMs_rdh[1].getComponentName(), "atp.atp_1.Light");
+  EXPECT_EQ(AQMs_rdh[1].getISName(), "atp.atp_1.Heavy");
+  EXPECT_EQ(AQMs_rdh[1].getFeatureName(), "peak_apex_int");
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[1].getTransformationModelParams().getValue("slope")), 0.6230408240794582, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[1].getTransformationModelParams().getValue("intercept")), 0.36130172586029285, 1e-6);
+  EXPECT_EQ(AQMs_rdh[1].getNPoints(), 6);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[1].getCorrelationCoefficient()), 0.9982084021849695, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[1].getLLOQ()), 0.02, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[1].getULOQ()), 40.0, 1e-6);
 
-  BOOST_CHECK_EQUAL(AQMs_rdh[2].getComponentName(), "ser-L.ser-L_1.Light");
-  BOOST_CHECK_EQUAL(AQMs_rdh[2].getISName(), "ser-L.ser-L_1.Heavy");
-  BOOST_CHECK_EQUAL(AQMs_rdh[2].getFeatureName(), "peak_apex_int");
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[2].getTransformationModelParams().getValue("slope")), 0.9011392589148208, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[2].getTransformationModelParams().getValue("intercept")), 1.8701850759567624, 1e-6);
-  BOOST_CHECK_EQUAL(AQMs_rdh[2].getNPoints(), 11);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[2].getCorrelationCoefficient()), 0.9993200722867581, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[2].getLLOQ()), 0.04, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs_rdh[2].getULOQ()), 200.0, 1e-6);
+  EXPECT_EQ(AQMs_rdh[2].getComponentName(), "ser-L.ser-L_1.Light");
+  EXPECT_EQ(AQMs_rdh[2].getISName(), "ser-L.ser-L_1.Heavy");
+  EXPECT_EQ(AQMs_rdh[2].getFeatureName(), "peak_apex_int");
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[2].getTransformationModelParams().getValue("slope")), 0.9011392589148208, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[2].getTransformationModelParams().getValue("intercept")), 1.8701850759567624, 1e-6);
+  EXPECT_EQ(AQMs_rdh[2].getNPoints(), 11);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[2].getCorrelationCoefficient()), 0.9993200722867581, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[2].getLLOQ()), 0.04, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs_rdh[2].getULOQ()), 200.0, 1e-6);
 }
 
 /**
   LoadStandardsConcentrations Tests
 */
-BOOST_AUTO_TEST_CASE(constructorLoadStandardsConcentrations)
+TEST(SequenceSegmentProcessor, constructorLoadStandardsConcentrations)
 {
   LoadStandardsConcentrations* ptrLoadStandardsConcentrations = nullptr;
   LoadStandardsConcentrations* nullPointerLoadStandardsConcentrations = nullptr;
-  BOOST_CHECK_EQUAL(ptrLoadStandardsConcentrations, nullPointerLoadStandardsConcentrations);
+  EXPECT_EQ(ptrLoadStandardsConcentrations, nullPointerLoadStandardsConcentrations);
 }
 
-BOOST_AUTO_TEST_CASE(destructorLoadStandardsConcentrations)
+TEST(SequenceSegmentProcessor, destructorLoadStandardsConcentrations)
 {
   LoadStandardsConcentrations* ptrLoadStandardsConcentrations = nullptr;
   ptrLoadStandardsConcentrations = new LoadStandardsConcentrations();
   delete ptrLoadStandardsConcentrations;
 }
 
-BOOST_AUTO_TEST_CASE(gettersLoadStandardsConcentrations)
+TEST(SequenceSegmentProcessor, gettersLoadStandardsConcentrations)
 {
   LoadStandardsConcentrations processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_STANDARDS_CONCENTRATIONS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "LOAD_STANDARDS_CONCENTRATIONS");
 }
 
-BOOST_AUTO_TEST_CASE(processLoadStandardsConcentrations)
+TEST(SequenceSegmentProcessor, processLoadStandardsConcentrations)
 {
   Filenames filenames;
   filenames.standardsConcentrations_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv");
@@ -741,59 +734,59 @@ BOOST_AUTO_TEST_CASE(processLoadStandardsConcentrations)
   loadStandardsConcentrations.process(ssh, SequenceHandler(), {}, filenames);
   const std::vector<OpenMS::AbsoluteQuantitationStandards::runConcentration>& rc = ssh.getStandardsConcentrations();
 
-  BOOST_CHECK_EQUAL(rc.size(), 8);
+  EXPECT_EQ(rc.size(), 8);
 
-  BOOST_CHECK_EQUAL(rc[0].sample_name, "150516_CM1_Level1");
-  BOOST_CHECK_EQUAL(rc[0].component_name, "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(rc[0].IS_component_name, "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_CLOSE(rc[0].actual_concentration, 0.0, 1e-6);
-  BOOST_CHECK_CLOSE(rc[0].IS_actual_concentration, 1.0, 1e-6);
-  BOOST_CHECK_EQUAL(rc[0].concentration_units, "uM");
-  BOOST_CHECK_CLOSE(rc[0].dilution_factor, 1.0, 1e-6);
+  EXPECT_EQ(rc[0].sample_name, "150516_CM1_Level1");
+  EXPECT_EQ(rc[0].component_name, "23dpg.23dpg_1.Light");
+  EXPECT_EQ(rc[0].IS_component_name, "23dpg.23dpg_1.Heavy");
+  EXPECT_NEAR(rc[0].actual_concentration, 0.0, 1e-6);
+  EXPECT_NEAR(rc[0].IS_actual_concentration, 1.0, 1e-6);
+  EXPECT_EQ(rc[0].concentration_units, "uM");
+  EXPECT_NEAR(rc[0].dilution_factor, 1.0, 1e-6);
 
-  BOOST_CHECK_EQUAL(rc[4].sample_name, "150516_CM3_Level9");
-  BOOST_CHECK_EQUAL(rc[4].component_name, "ump.ump_2.Light");
-  BOOST_CHECK_EQUAL(rc[4].IS_component_name, "ump.ump_1.Heavy");
-  BOOST_CHECK_CLOSE(rc[4].actual_concentration, 0.016, 1e-6);
-  BOOST_CHECK_CLOSE(rc[4].IS_actual_concentration, 1.0, 1e-6);
-  BOOST_CHECK_EQUAL(rc[4].concentration_units, "uM");
-  BOOST_CHECK_CLOSE(rc[4].dilution_factor, 1.0, 1e-6);
+  EXPECT_EQ(rc[4].sample_name, "150516_CM3_Level9");
+  EXPECT_EQ(rc[4].component_name, "ump.ump_2.Light");
+  EXPECT_EQ(rc[4].IS_component_name, "ump.ump_1.Heavy");
+  EXPECT_NEAR(rc[4].actual_concentration, 0.016, 1e-6);
+  EXPECT_NEAR(rc[4].IS_actual_concentration, 1.0, 1e-6);
+  EXPECT_EQ(rc[4].concentration_units, "uM");
+  EXPECT_NEAR(rc[4].dilution_factor, 1.0, 1e-6);
 
-  BOOST_CHECK_EQUAL(rc[7].sample_name, "150516_CM3_Level9");
-  BOOST_CHECK_EQUAL(rc[7].component_name, "utp.utp_2.Light");
-  BOOST_CHECK_EQUAL(rc[7].IS_component_name, "utp.utp_1.Heavy");
-  BOOST_CHECK_CLOSE(rc[7].actual_concentration, 0.0, 1e-6);
-  BOOST_CHECK_CLOSE(rc[7].IS_actual_concentration, 1.0, 1e-6);
-  BOOST_CHECK_EQUAL(rc[7].concentration_units, "uM");
-  BOOST_CHECK_CLOSE(rc[7].dilution_factor, 1.0, 1e-6);
+  EXPECT_EQ(rc[7].sample_name, "150516_CM3_Level9");
+  EXPECT_EQ(rc[7].component_name, "utp.utp_2.Light");
+  EXPECT_EQ(rc[7].IS_component_name, "utp.utp_1.Heavy");
+  EXPECT_NEAR(rc[7].actual_concentration, 0.0, 1e-6);
+  EXPECT_NEAR(rc[7].IS_actual_concentration, 1.0, 1e-6);
+  EXPECT_EQ(rc[7].concentration_units, "uM");
+  EXPECT_NEAR(rc[7].dilution_factor, 1.0, 1e-6);
 }
 
 /**
   LoadQuantitationMethods Tests
 */
-BOOST_AUTO_TEST_CASE(constructorLoadQuantitationMethods)
+TEST(SequenceSegmentProcessor, constructorLoadQuantitationMethods)
 {
   LoadQuantitationMethods* ptrLoadQuantitationMethods = nullptr;
   LoadQuantitationMethods* nullPointerLoadQuantitationMethods = nullptr;
-  BOOST_CHECK_EQUAL(ptrLoadQuantitationMethods, nullPointerLoadQuantitationMethods);
+  EXPECT_EQ(ptrLoadQuantitationMethods, nullPointerLoadQuantitationMethods);
 }
 
-BOOST_AUTO_TEST_CASE(destructorLoadQuantitationMethods)
+TEST(SequenceSegmentProcessor, destructorLoadQuantitationMethods)
 {
   LoadQuantitationMethods* ptrLoadQuantitationMethods = nullptr;
   ptrLoadQuantitationMethods = new LoadQuantitationMethods();
   delete ptrLoadQuantitationMethods;
 }
 
-BOOST_AUTO_TEST_CASE(gettersLoadQuantitationMethods)
+TEST(SequenceSegmentProcessor, gettersLoadQuantitationMethods)
 {
   LoadQuantitationMethods processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 17);
-  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_QUANTITATION_METHODS");
+  EXPECT_EQ(processor.getID(), 17);
+  EXPECT_EQ(processor.getName(), "LOAD_QUANTITATION_METHODS");
 }
 
-BOOST_AUTO_TEST_CASE(processLoadQuantitationMethods)
+TEST(SequenceSegmentProcessor, processLoadQuantitationMethods)
 {
   Filenames filenames;
   filenames.quantitationMethods_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv");
@@ -802,65 +795,65 @@ BOOST_AUTO_TEST_CASE(processLoadQuantitationMethods)
   loadQuantitationMethods.process(ssh, SequenceHandler(), {}, filenames);
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& aqm = ssh.getQuantitationMethods();
 
-  BOOST_CHECK_EQUAL(aqm.size(), 107);
+  EXPECT_EQ(aqm.size(), 107);
 
-  BOOST_CHECK_EQUAL(aqm[0].getComponentName(), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(aqm[0].getFeatureName(), "peak_apex_int");
-  BOOST_CHECK_EQUAL(aqm[0].getISName(), "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_EQUAL(aqm[0].getConcentrationUnits(), "uM");
-  BOOST_CHECK_EQUAL(aqm[0].getTransformationModel(), "linear");
-  BOOST_CHECK_CLOSE(aqm[0].getLLOD(), 0.0, 1e-6);
-  BOOST_CHECK_CLOSE(aqm[0].getULOD(), 0.0, 1e-6);
-  BOOST_CHECK_CLOSE(aqm[0].getLLOQ(), 0.25, 1e-6);
-  BOOST_CHECK_CLOSE(aqm[0].getULOQ(), 2.5, 1e-6);
-  BOOST_CHECK_CLOSE(aqm[0].getCorrelationCoefficient(), 0.983846949, 1e-6);
-  BOOST_CHECK_EQUAL(aqm[0].getNPoints(), 4);
+  EXPECT_EQ(aqm[0].getComponentName(), "23dpg.23dpg_1.Light");
+  EXPECT_EQ(aqm[0].getFeatureName(), "peak_apex_int");
+  EXPECT_EQ(aqm[0].getISName(), "23dpg.23dpg_1.Heavy");
+  EXPECT_EQ(aqm[0].getConcentrationUnits(), "uM");
+  EXPECT_EQ(aqm[0].getTransformationModel(), "linear");
+  EXPECT_NEAR(aqm[0].getLLOD(), 0.0, 1e-6);
+  EXPECT_NEAR(aqm[0].getULOD(), 0.0, 1e-6);
+  EXPECT_NEAR(aqm[0].getLLOQ(), 0.25, 1e-6);
+  EXPECT_NEAR(aqm[0].getULOQ(), 2.5, 1e-6);
+  EXPECT_NEAR(aqm[0].getCorrelationCoefficient(), 0.983846949, 1e-6);
+  EXPECT_EQ(aqm[0].getNPoints(), 4);
   const OpenMS::Param params1 = aqm[0].getTransformationModelParams();
-  BOOST_CHECK_CLOSE(static_cast<double>(params1.getValue("slope")), 2.429728323, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(params1.getValue("intercept")), -0.091856745, 1e-6);
+  EXPECT_NEAR(static_cast<double>(params1.getValue("slope")), 2.429728323, 1e-6);
+  EXPECT_NEAR(static_cast<double>(params1.getValue("intercept")), -0.091856745, 1e-6);
 
-  BOOST_CHECK_EQUAL(aqm[106].getComponentName(), "xan.xan_1.Light");
-  BOOST_CHECK_EQUAL(aqm[106].getFeatureName(), "peak_apex_int");
-  BOOST_CHECK_EQUAL(aqm[106].getISName(), "xan.xan_1.Heavy");
-  BOOST_CHECK_EQUAL(aqm[106].getConcentrationUnits(), "uM");
-  BOOST_CHECK_EQUAL(aqm[106].getTransformationModel(), "linear");
-  BOOST_CHECK_CLOSE(aqm[106].getLLOD(), 0.0, 1e-6);
-  BOOST_CHECK_CLOSE(aqm[106].getULOD(), 0.0, 1e-6);
-  BOOST_CHECK_CLOSE(aqm[106].getLLOQ(), 0.004, 1e-6);
-  BOOST_CHECK_CLOSE(aqm[106].getULOQ(), 0.16, 1e-6);
-  BOOST_CHECK_CLOSE(aqm[106].getCorrelationCoefficient(), 0.994348761, 1e-6);
-  BOOST_CHECK_EQUAL(aqm[106].getNPoints(), 6);
+  EXPECT_EQ(aqm[106].getComponentName(), "xan.xan_1.Light");
+  EXPECT_EQ(aqm[106].getFeatureName(), "peak_apex_int");
+  EXPECT_EQ(aqm[106].getISName(), "xan.xan_1.Heavy");
+  EXPECT_EQ(aqm[106].getConcentrationUnits(), "uM");
+  EXPECT_EQ(aqm[106].getTransformationModel(), "linear");
+  EXPECT_NEAR(aqm[106].getLLOD(), 0.0, 1e-6);
+  EXPECT_NEAR(aqm[106].getULOD(), 0.0, 1e-6);
+  EXPECT_NEAR(aqm[106].getLLOQ(), 0.004, 1e-6);
+  EXPECT_NEAR(aqm[106].getULOQ(), 0.16, 1e-6);
+  EXPECT_NEAR(aqm[106].getCorrelationCoefficient(), 0.994348761, 1e-6);
+  EXPECT_EQ(aqm[106].getNPoints(), 6);
   const OpenMS::Param params2 = aqm[106].getTransformationModelParams();
-  BOOST_CHECK_CLOSE(static_cast<double>(params2.getValue("slope")), 1.084995619, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(params2.getValue("intercept")), -0.00224781, 1e-6);
+  EXPECT_NEAR(static_cast<double>(params2.getValue("slope")), 1.084995619, 1e-6);
+  EXPECT_NEAR(static_cast<double>(params2.getValue("intercept")), -0.00224781, 1e-6);
 }
 
 /**
   StoreQuantitationMethods Tests
 */
-BOOST_AUTO_TEST_CASE(constructorStoreQuantitationMethods)
+TEST(SequenceSegmentProcessor, constructorStoreQuantitationMethods)
 {
   StoreQuantitationMethods* ptrStoreQuantitationMethods = nullptr;
   StoreQuantitationMethods* nullPointerStoreQuantitationMethods = nullptr;
-  BOOST_CHECK_EQUAL(ptrStoreQuantitationMethods, nullPointerStoreQuantitationMethods);
+  EXPECT_EQ(ptrStoreQuantitationMethods, nullPointerStoreQuantitationMethods);
 }
 
-BOOST_AUTO_TEST_CASE(destructorStoreQuantitationMethods)
+TEST(SequenceSegmentProcessor, destructorStoreQuantitationMethods)
 {
   StoreQuantitationMethods* ptrStoreQuantitationMethods = nullptr;
   ptrStoreQuantitationMethods = new StoreQuantitationMethods();
   delete ptrStoreQuantitationMethods;
 }
 
-BOOST_AUTO_TEST_CASE(gettersStoreQuantitationMethods)
+TEST(SequenceSegmentProcessor, gettersStoreQuantitationMethods)
 {
   StoreQuantitationMethods processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), 16);
-  BOOST_CHECK_EQUAL(processor.getName(), "STORE_QUANTITATION_METHODS");
+  EXPECT_EQ(processor.getID(), 16);
+  EXPECT_EQ(processor.getName(), "STORE_QUANTITATION_METHODS");
 }
 
-BOOST_AUTO_TEST_CASE(processStoreQuantitationMethods)
+TEST(SequenceSegmentProcessor, processStoreQuantitationMethods)
 {
   // no tests, it wraps OpenMS store function
 }
@@ -868,29 +861,29 @@ BOOST_AUTO_TEST_CASE(processStoreQuantitationMethods)
 /**
   LoadFeatureFilters Tests
 */
-BOOST_AUTO_TEST_CASE(constructorLoadFeatureFilters)
+TEST(SequenceSegmentProcessor, constructorLoadFeatureFilters)
 {
   LoadFeatureFilters* ptrLoadFeatureFilters = nullptr;
   LoadFeatureFilters* nullPointerLoadFeatureFilters = nullptr;
-  BOOST_CHECK_EQUAL(ptrLoadFeatureFilters, nullPointerLoadFeatureFilters);
+  EXPECT_EQ(ptrLoadFeatureFilters, nullPointerLoadFeatureFilters);
 }
 
-BOOST_AUTO_TEST_CASE(destructorLoadFeatureFilters)
+TEST(SequenceSegmentProcessor, destructorLoadFeatureFilters)
 {
   LoadFeatureFilters* ptrLoadFeatureFilters = nullptr;
   ptrLoadFeatureFilters = new LoadFeatureFilters();
   delete ptrLoadFeatureFilters;
 }
 
-BOOST_AUTO_TEST_CASE(gettersLoadFeatureFilters)
+TEST(SequenceSegmentProcessor, gettersLoadFeatureFilters)
 {
   LoadFeatureFilters processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_FILTERS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "LOAD_FEATURE_FILTERS");
 }
 
-BOOST_AUTO_TEST_CASE(processLoadFeatureFilters)
+TEST(SequenceSegmentProcessor, processLoadFeatureFilters)
 {
   SequenceSegmentHandler ssh;
 
@@ -902,38 +895,38 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureFilters)
   loadFeatureFilters.process(ssh, SequenceHandler(), {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureFilter();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+  EXPECT_EQ(fQC.component_qcs.size(), 324);
+  EXPECT_EQ(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(fQC.component_group_qcs.size(), 118);
+  EXPECT_EQ(fQC.component_group_qcs[0].component_group_name, "arg-L");
 }
 
 /**
   LoadFeatureQCs Tests
 */
-BOOST_AUTO_TEST_CASE(constructorLoadFeatureQCs)
+TEST(SequenceSegmentProcessor, constructorLoadFeatureQCs)
 {
   LoadFeatureQCs* ptrLoadFeatureQCs = nullptr;
   LoadFeatureQCs* nullPointerLoadFeatureQCs = nullptr;
-  BOOST_CHECK_EQUAL(ptrLoadFeatureQCs, nullPointerLoadFeatureQCs);
+  EXPECT_EQ(ptrLoadFeatureQCs, nullPointerLoadFeatureQCs);
 }
 
-BOOST_AUTO_TEST_CASE(destructorLoadFeatureQCs)
+TEST(SequenceSegmentProcessor, destructorLoadFeatureQCs)
 {
   LoadFeatureQCs* ptrLoadFeatureQCs = nullptr;
   ptrLoadFeatureQCs = new LoadFeatureQCs();
   delete ptrLoadFeatureQCs;
 }
 
-BOOST_AUTO_TEST_CASE(gettersLoadFeatureQCs)
+TEST(SequenceSegmentProcessor, gettersLoadFeatureQCs)
 {
   LoadFeatureQCs processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_QCS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "LOAD_FEATURE_QCS");
 }
 
-BOOST_AUTO_TEST_CASE(processLoadFeatureQCs)
+TEST(SequenceSegmentProcessor, processLoadFeatureQCs)
 {
   SequenceSegmentHandler ssh;
 
@@ -945,38 +938,38 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureQCs)
   loadFeatureQCs.process(ssh, SequenceHandler(), {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureQC();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+  EXPECT_EQ(fQC.component_qcs.size(), 324);
+  EXPECT_EQ(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(fQC.component_group_qcs.size(), 118);
+  EXPECT_EQ(fQC.component_group_qcs[0].component_group_name, "arg-L");
 }
 
 /**
   StoreFeatureFilters Tests
 */
-BOOST_AUTO_TEST_CASE(constructorStoreFeatureFilters)
+TEST(SequenceSegmentProcessor, constructorStoreFeatureFilters)
 {
   StoreFeatureFilters* ptrStoreFeatureFilters = nullptr;
   StoreFeatureFilters* nullPointerStoreFeatureFilters = nullptr;
-  BOOST_CHECK_EQUAL(ptrStoreFeatureFilters, nullPointerStoreFeatureFilters);
+  EXPECT_EQ(ptrStoreFeatureFilters, nullPointerStoreFeatureFilters);
 }
 
-BOOST_AUTO_TEST_CASE(destructorStoreFeatureFilters)
+TEST(SequenceSegmentProcessor, destructorStoreFeatureFilters)
 {
   StoreFeatureFilters* ptrStoreFeatureFilters = nullptr;
   ptrStoreFeatureFilters = new StoreFeatureFilters();
   delete ptrStoreFeatureFilters;
 }
 
-BOOST_AUTO_TEST_CASE(gettersStoreFeatureFilters)
+TEST(SequenceSegmentProcessor, gettersStoreFeatureFilters)
 {
   StoreFeatureFilters processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_FILTERS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "STORE_FEATURE_FILTERS");
 }
 
-BOOST_AUTO_TEST_CASE(processStoreFeatureFilters)
+TEST(SequenceSegmentProcessor, processStoreFeatureFilters)
 {
   SequenceSegmentHandler ssh, ssh_test;
 
@@ -993,42 +986,42 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureFilters)
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureFilter();
   const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureFilter();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  EXPECT_EQ(fQC.component_qcs.size(), fQC_test.component_qcs.size());
   for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+    EXPECT_TRUE(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
   }
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  EXPECT_EQ(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
   for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+    EXPECT_TRUE(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
   }
 }
 
 /**
   StoreFeatureQCs Tests
 */
-BOOST_AUTO_TEST_CASE(constructorStoreFeatureQCs)
+TEST(SequenceSegmentProcessor, constructorStoreFeatureQCs)
 {
   StoreFeatureQCs* ptrStoreFeatureQCs = nullptr;
   StoreFeatureQCs* nullPointerStoreFeatureQCs = nullptr;
-  BOOST_CHECK_EQUAL(ptrStoreFeatureQCs, nullPointerStoreFeatureQCs);
+  EXPECT_EQ(ptrStoreFeatureQCs, nullPointerStoreFeatureQCs);
 }
 
-BOOST_AUTO_TEST_CASE(destructorStoreFeatureQCs)
+TEST(SequenceSegmentProcessor, destructorStoreFeatureQCs)
 {
   StoreFeatureQCs* ptrStoreFeatureQCs = nullptr;
   ptrStoreFeatureQCs = new StoreFeatureQCs();
   delete ptrStoreFeatureQCs;
 }
 
-BOOST_AUTO_TEST_CASE(gettersStoreFeatureQCs)
+TEST(SequenceSegmentProcessor, gettersStoreFeatureQCs)
 {
   StoreFeatureQCs processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_QCS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "STORE_FEATURE_QCS");
 }
 
-BOOST_AUTO_TEST_CASE(processStoreFeatureQCs)
+TEST(SequenceSegmentProcessor, processStoreFeatureQCs)
 {
   SequenceSegmentHandler ssh, ssh_test;
 
@@ -1045,42 +1038,42 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureQCs)
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureQC();
   const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureQC();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  EXPECT_EQ(fQC.component_qcs.size(), fQC_test.component_qcs.size());
   for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+    EXPECT_TRUE(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
   }
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  EXPECT_EQ(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
   for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+    EXPECT_TRUE(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
   }
 }
 
 /**
   LoadFeatureRSDFilters Tests
 */
-BOOST_AUTO_TEST_CASE(constructorLoadFeatureRSDFilters)
+TEST(SequenceSegmentProcessor, constructorLoadFeatureRSDFilters)
 {
   LoadFeatureRSDFilters* ptrLoadFeatureRSDFilters = nullptr;
   LoadFeatureRSDFilters* nullPointerLoadFeatureRSDFilters = nullptr;
-  BOOST_CHECK_EQUAL(ptrLoadFeatureRSDFilters, nullPointerLoadFeatureRSDFilters);
+  EXPECT_EQ(ptrLoadFeatureRSDFilters, nullPointerLoadFeatureRSDFilters);
 }
 
-BOOST_AUTO_TEST_CASE(destructorLoadFeatureRSDFilters)
+TEST(SequenceSegmentProcessor, destructorLoadFeatureRSDFilters)
 {
   LoadFeatureRSDFilters* ptrLoadFeatureRSDFilters = nullptr;
   ptrLoadFeatureRSDFilters = new LoadFeatureRSDFilters();
   delete ptrLoadFeatureRSDFilters;
 }
 
-BOOST_AUTO_TEST_CASE(gettersLoadFeatureRSDFilters)
+TEST(SequenceSegmentProcessor, gettersLoadFeatureRSDFilters)
 {
   LoadFeatureRSDFilters processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_RSD_FILTERS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "LOAD_FEATURE_RSD_FILTERS");
 }
 
-BOOST_AUTO_TEST_CASE(processLoadFeatureRSDFilters)
+TEST(SequenceSegmentProcessor, processLoadFeatureRSDFilters)
 {
   SequenceSegmentHandler ssh;
 
@@ -1092,38 +1085,38 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureRSDFilters)
   loadFeatureRSDFilters.process(ssh, SequenceHandler(), {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDFilter();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+  EXPECT_EQ(fQC.component_qcs.size(), 324);
+  EXPECT_EQ(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(fQC.component_group_qcs.size(), 118);
+  EXPECT_EQ(fQC.component_group_qcs[0].component_group_name, "arg-L");
 }
 
 /**
   LoadFeatureRSDQCs Tests
 */
-BOOST_AUTO_TEST_CASE(constructorLoadFeatureRSDQCs)
+TEST(SequenceSegmentProcessor, constructorLoadFeatureRSDQCs)
 {
   LoadFeatureRSDQCs* ptrLoadFeatureRSDQCs = nullptr;
   LoadFeatureRSDQCs* nullPointerLoadFeatureRSDQCs = nullptr;
-  BOOST_CHECK_EQUAL(ptrLoadFeatureRSDQCs, nullPointerLoadFeatureRSDQCs);
+  EXPECT_EQ(ptrLoadFeatureRSDQCs, nullPointerLoadFeatureRSDQCs);
 }
 
-BOOST_AUTO_TEST_CASE(destructorLoadFeatureRSDQCs)
+TEST(SequenceSegmentProcessor, destructorLoadFeatureRSDQCs)
 {
   LoadFeatureRSDQCs* ptrLoadFeatureRSDQCs = nullptr;
   ptrLoadFeatureRSDQCs = new LoadFeatureRSDQCs();
   delete ptrLoadFeatureRSDQCs;
 }
 
-BOOST_AUTO_TEST_CASE(gettersLoadFeatureRSDQCs)
+TEST(SequenceSegmentProcessor, gettersLoadFeatureRSDQCs)
 {
   LoadFeatureRSDQCs processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_RSD_QCS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "LOAD_FEATURE_RSD_QCS");
 }
 
-BOOST_AUTO_TEST_CASE(processLoadFeatureRSDQCs)
+TEST(SequenceSegmentProcessor, processLoadFeatureRSDQCs)
 {
   SequenceSegmentHandler ssh;
 
@@ -1135,38 +1128,38 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureRSDQCs)
   loadFeatureRSDQCs.process(ssh, SequenceHandler(), {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDQC();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+  EXPECT_EQ(fQC.component_qcs.size(), 324);
+  EXPECT_EQ(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(fQC.component_group_qcs.size(), 118);
+  EXPECT_EQ(fQC.component_group_qcs[0].component_group_name, "arg-L");
 }
 
 /**
   StoreFeatureRSDFilters Tests
 */
-BOOST_AUTO_TEST_CASE(constructorStoreFeatureRSDFilters)
+TEST(SequenceSegmentProcessor, constructorStoreFeatureRSDFilters)
 {
   StoreFeatureRSDFilters* ptrStoreFeatureRSDFilters = nullptr;
   StoreFeatureRSDFilters* nullPointerStoreFeatureRSDFilters = nullptr;
-  BOOST_CHECK_EQUAL(ptrStoreFeatureRSDFilters, nullPointerStoreFeatureRSDFilters);
+  EXPECT_EQ(ptrStoreFeatureRSDFilters, nullPointerStoreFeatureRSDFilters);
 }
 
-BOOST_AUTO_TEST_CASE(destructorStoreFeatureRSDFilters)
+TEST(SequenceSegmentProcessor, destructorStoreFeatureRSDFilters)
 {
   StoreFeatureRSDFilters* ptrStoreFeatureRSDFilters = nullptr;
   ptrStoreFeatureRSDFilters = new StoreFeatureRSDFilters();
   delete ptrStoreFeatureRSDFilters;
 }
 
-BOOST_AUTO_TEST_CASE(gettersStoreFeatureRSDFilters)
+TEST(SequenceSegmentProcessor, gettersStoreFeatureRSDFilters)
 {
   StoreFeatureRSDFilters processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_RSD_FILTERS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "STORE_FEATURE_RSD_FILTERS");
 }
 
-BOOST_AUTO_TEST_CASE(processStoreFeatureRSDFilters)
+TEST(SequenceSegmentProcessor, processStoreFeatureRSDFilters)
 {
   SequenceSegmentHandler ssh, ssh_test;
 
@@ -1183,42 +1176,42 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureRSDFilters)
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDFilter();
   const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureRSDFilter();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  EXPECT_EQ(fQC.component_qcs.size(), fQC_test.component_qcs.size());
   for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+    EXPECT_TRUE(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
   }
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  EXPECT_EQ(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
   for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+    EXPECT_TRUE(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
   }
 }
 
 /**
   StoreFeatureRSDQCs Tests
 */
-BOOST_AUTO_TEST_CASE(constructorStoreFeatureRSDQCs)
+TEST(SequenceSegmentProcessor, constructorStoreFeatureRSDQCs)
 {
   StoreFeatureRSDQCs* ptrStoreFeatureRSDQCs = nullptr;
   StoreFeatureRSDQCs* nullPointerStoreFeatureRSDQCs = nullptr;
-  BOOST_CHECK_EQUAL(ptrStoreFeatureRSDQCs, nullPointerStoreFeatureRSDQCs);
+  EXPECT_EQ(ptrStoreFeatureRSDQCs, nullPointerStoreFeatureRSDQCs);
 }
 
-BOOST_AUTO_TEST_CASE(destructorStoreFeatureRSDQCs)
+TEST(SequenceSegmentProcessor, destructorStoreFeatureRSDQCs)
 {
   StoreFeatureRSDQCs* ptrStoreFeatureRSDQCs = nullptr;
   ptrStoreFeatureRSDQCs = new StoreFeatureRSDQCs();
   delete ptrStoreFeatureRSDQCs;
 }
 
-BOOST_AUTO_TEST_CASE(gettersStoreFeatureRSDQCs)
+TEST(SequenceSegmentProcessor, gettersStoreFeatureRSDQCs)
 {
   StoreFeatureRSDQCs processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_RSD_QCS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "STORE_FEATURE_RSD_QCS");
 }
 
-BOOST_AUTO_TEST_CASE(processStoreFeatureRSDQCs)
+TEST(SequenceSegmentProcessor, processStoreFeatureRSDQCs)
 {
   SequenceSegmentHandler ssh, ssh_test;
 
@@ -1235,42 +1228,42 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureRSDQCs)
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDQC();
   const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureRSDQC();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  EXPECT_EQ(fQC.component_qcs.size(), fQC_test.component_qcs.size());
   for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+    EXPECT_TRUE(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
   }
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  EXPECT_EQ(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
   for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+    EXPECT_TRUE(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
   }
 }
 
 /**
   LoadFeatureBackgroundFilters Tests
 */
-BOOST_AUTO_TEST_CASE(constructorLoadFeatureBackgroundFilters)
+TEST(SequenceSegmentProcessor, constructorLoadFeatureBackgroundFilters)
 {
   LoadFeatureBackgroundFilters* ptrLoadFeatureBackgroundFilters = nullptr;
   LoadFeatureBackgroundFilters* nullPointerLoadFeatureBackgroundFilters = nullptr;
-  BOOST_CHECK_EQUAL(ptrLoadFeatureBackgroundFilters, nullPointerLoadFeatureBackgroundFilters);
+  EXPECT_EQ(ptrLoadFeatureBackgroundFilters, nullPointerLoadFeatureBackgroundFilters);
 }
 
-BOOST_AUTO_TEST_CASE(destructorLoadFeatureBackgroundFilters)
+TEST(SequenceSegmentProcessor, destructorLoadFeatureBackgroundFilters)
 {
   LoadFeatureBackgroundFilters* ptrLoadFeatureBackgroundFilters = nullptr;
   ptrLoadFeatureBackgroundFilters = new LoadFeatureBackgroundFilters();
   delete ptrLoadFeatureBackgroundFilters;
 }
 
-BOOST_AUTO_TEST_CASE(gettersLoadFeatureBackgroundFilters)
+TEST(SequenceSegmentProcessor, gettersLoadFeatureBackgroundFilters)
 {
   LoadFeatureBackgroundFilters processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_BACKGROUND_FILTERS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "LOAD_FEATURE_BACKGROUND_FILTERS");
 }
 
-BOOST_AUTO_TEST_CASE(processLoadFeatureBackgroundFilters)
+TEST(SequenceSegmentProcessor, processLoadFeatureBackgroundFilters)
 {
   SequenceSegmentHandler ssh;
 
@@ -1282,38 +1275,38 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureBackgroundFilters)
   loadFeatureBackgroundFilters.process(ssh, SequenceHandler(), {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundFilter();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+  EXPECT_EQ(fQC.component_qcs.size(), 324);
+  EXPECT_EQ(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(fQC.component_group_qcs.size(), 118);
+  EXPECT_EQ(fQC.component_group_qcs[0].component_group_name, "arg-L");
 }
 
 /**
   LoadFeatureBackgroundQCs Tests
 */
-BOOST_AUTO_TEST_CASE(constructorLoadFeatureBackgroundQCs)
+TEST(SequenceSegmentProcessor, constructorLoadFeatureBackgroundQCs)
 {
   LoadFeatureBackgroundQCs* ptrLoadFeatureBackgroundQCs = nullptr;
   LoadFeatureBackgroundQCs* nullPointerLoadFeatureBackgroundQCs = nullptr;
-  BOOST_CHECK_EQUAL(ptrLoadFeatureBackgroundQCs, nullPointerLoadFeatureBackgroundQCs);
+  EXPECT_EQ(ptrLoadFeatureBackgroundQCs, nullPointerLoadFeatureBackgroundQCs);
 }
 
-BOOST_AUTO_TEST_CASE(destructorLoadFeatureBackgroundQCs)
+TEST(SequenceSegmentProcessor, destructorLoadFeatureBackgroundQCs)
 {
   LoadFeatureBackgroundQCs* ptrLoadFeatureBackgroundQCs = nullptr;
   ptrLoadFeatureBackgroundQCs = new LoadFeatureBackgroundQCs();
   delete ptrLoadFeatureBackgroundQCs;
 }
 
-BOOST_AUTO_TEST_CASE(gettersLoadFeatureBackgroundQCs)
+TEST(SequenceSegmentProcessor, gettersLoadFeatureBackgroundQCs)
 {
   LoadFeatureBackgroundQCs processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_BACKGROUND_QCS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "LOAD_FEATURE_BACKGROUND_QCS");
 }
 
-BOOST_AUTO_TEST_CASE(processLoadFeatureBackgroundQCs)
+TEST(SequenceSegmentProcessor, processLoadFeatureBackgroundQCs)
 {
   SequenceSegmentHandler ssh;
 
@@ -1325,38 +1318,38 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureBackgroundQCs)
   loadFeatureBackgroundQCs.process(ssh, SequenceHandler(), {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundQC();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+  EXPECT_EQ(fQC.component_qcs.size(), 324);
+  EXPECT_EQ(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(fQC.component_group_qcs.size(), 118);
+  EXPECT_EQ(fQC.component_group_qcs[0].component_group_name, "arg-L");
 }
 
 /**
   StoreFeatureBackgroundFilters Tests
 */
-BOOST_AUTO_TEST_CASE(constructorStoreFeatureBackgroundFilters)
+TEST(SequenceSegmentProcessor, constructorStoreFeatureBackgroundFilters)
 {
   StoreFeatureBackgroundFilters* ptrStoreFeatureBackgroundFilters = nullptr;
   StoreFeatureBackgroundFilters* nullPointerStoreFeatureBackgroundFilters = nullptr;
-  BOOST_CHECK_EQUAL(ptrStoreFeatureBackgroundFilters, nullPointerStoreFeatureBackgroundFilters);
+  EXPECT_EQ(ptrStoreFeatureBackgroundFilters, nullPointerStoreFeatureBackgroundFilters);
 }
 
-BOOST_AUTO_TEST_CASE(destructorStoreFeatureBackgroundFilters)
+TEST(SequenceSegmentProcessor, destructorStoreFeatureBackgroundFilters)
 {
   StoreFeatureBackgroundFilters* ptrStoreFeatureBackgroundFilters = nullptr;
   ptrStoreFeatureBackgroundFilters = new StoreFeatureBackgroundFilters();
   delete ptrStoreFeatureBackgroundFilters;
 }
 
-BOOST_AUTO_TEST_CASE(gettersStoreFeatureBackgroundFilters)
+TEST(SequenceSegmentProcessor, gettersStoreFeatureBackgroundFilters)
 {
   StoreFeatureBackgroundFilters processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_BACKGROUND_FILTERS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "STORE_FEATURE_BACKGROUND_FILTERS");
 }
 
-BOOST_AUTO_TEST_CASE(processStoreFeatureBackgroundFilters)
+TEST(SequenceSegmentProcessor, processStoreFeatureBackgroundFilters)
 {
   SequenceSegmentHandler ssh, ssh_test;
 
@@ -1373,42 +1366,42 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureBackgroundFilters)
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundFilter();
   const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureBackgroundFilter();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  EXPECT_EQ(fQC.component_qcs.size(), fQC_test.component_qcs.size());
   for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+    EXPECT_TRUE(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
   }
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  EXPECT_EQ(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
   for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+    EXPECT_TRUE(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
   }
 }
 
 /**
   StoreFeatureBackgroundQCs Tests
 */
-BOOST_AUTO_TEST_CASE(constructorStoreFeatureBackgroundQCs)
+TEST(SequenceSegmentProcessor, constructorStoreFeatureBackgroundQCs)
 {
   StoreFeatureBackgroundQCs* ptrStoreFeatureBackgroundQCs = nullptr;
   StoreFeatureBackgroundQCs* nullPointerStoreFeatureBackgroundQCs = nullptr;
-  BOOST_CHECK_EQUAL(ptrStoreFeatureBackgroundQCs, nullPointerStoreFeatureBackgroundQCs);
+  EXPECT_EQ(ptrStoreFeatureBackgroundQCs, nullPointerStoreFeatureBackgroundQCs);
 }
 
-BOOST_AUTO_TEST_CASE(destructorStoreFeatureBackgroundQCs)
+TEST(SequenceSegmentProcessor, destructorStoreFeatureBackgroundQCs)
 {
   StoreFeatureBackgroundQCs* ptrStoreFeatureBackgroundQCs = nullptr;
   ptrStoreFeatureBackgroundQCs = new StoreFeatureBackgroundQCs();
   delete ptrStoreFeatureBackgroundQCs;
 }
 
-BOOST_AUTO_TEST_CASE(gettersStoreFeatureBackgroundQCs)
+TEST(SequenceSegmentProcessor, gettersStoreFeatureBackgroundQCs)
 {
   StoreFeatureBackgroundQCs processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_BACKGROUND_QCS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "STORE_FEATURE_BACKGROUND_QCS");
 }
 
-BOOST_AUTO_TEST_CASE(processStoreFeatureBackgroundQCs)
+TEST(SequenceSegmentProcessor, processStoreFeatureBackgroundQCs)
 {
   SequenceSegmentHandler ssh, ssh_test;
 
@@ -1425,42 +1418,42 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureBackgroundQCs)
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundQC();
   const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureBackgroundQC();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  EXPECT_EQ(fQC.component_qcs.size(), fQC_test.component_qcs.size());
   for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+    EXPECT_TRUE(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
   }
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  EXPECT_EQ(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
   for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+    EXPECT_TRUE(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
   }
 }
 
 /**
   EstimateFeatureFilterValues Tests
 */
-BOOST_AUTO_TEST_CASE(constructorEstimateFeatureFilterValues)
+TEST(SequenceSegmentProcessor, constructorEstimateFeatureFilterValues)
 {
   EstimateFeatureFilterValues* ptrEstimateFeatureFilterValues = nullptr;
   EstimateFeatureFilterValues* nullPointerEstimateFeatureFilterValues = nullptr;
-  BOOST_CHECK_EQUAL(ptrEstimateFeatureFilterValues, nullPointerEstimateFeatureFilterValues);
+  EXPECT_EQ(ptrEstimateFeatureFilterValues, nullPointerEstimateFeatureFilterValues);
 }
 
-BOOST_AUTO_TEST_CASE(destructorEstimateFeatureFilterValues)
+TEST(SequenceSegmentProcessor, destructorEstimateFeatureFilterValues)
 {
   EstimateFeatureFilterValues* ptrEstimateFeatureFilterValues = nullptr;
   ptrEstimateFeatureFilterValues = new EstimateFeatureFilterValues();
   delete ptrEstimateFeatureFilterValues;
 }
 
-BOOST_AUTO_TEST_CASE(gettersEstimateFeatureFilterValues)
+TEST(SequenceSegmentProcessor, gettersEstimateFeatureFilterValues)
 {
   EstimateFeatureFilterValues processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "ESTIMATE_FEATURE_FILTER_VALUES");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "ESTIMATE_FEATURE_FILTER_VALUES");
 }
 
-BOOST_AUTO_TEST_CASE(processEstimateFeatureFilterValues)
+TEST(SequenceSegmentProcessor, processEstimateFeatureFilterValues)
 {
   // Make the test sequence
   SequenceHandler sequenceHandler;
@@ -1541,144 +1534,144 @@ BOOST_AUTO_TEST_CASE(processEstimateFeatureFilterValues)
   // Test for the expected values
   const OpenMS::MRMFeatureQC& feature_filters = sequenceHandler.getSequenceSegments().front().getFeatureFilter();
   // Ser-L
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_heavy_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_heavy_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_light_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_light_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_detecting_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_detecting_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_quantifying_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_quantifying_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_identifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_identifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_transitions_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_transitions_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_1, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_2, "");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).ion_ratio_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).ion_ratio_u, 1000000000000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).ion_ratio_feature_name, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).intensity_l, 2830, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).intensity_u, 2230000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").first, 2830, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").second, 2230000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).intensity_l, 2830, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).intensity_u, 24500, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").first, 2830, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").second, 24500, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_heavy_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_heavy_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_light_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_light_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_detecting_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_detecting_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_quantifying_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_quantifying_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_identifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_identifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_transitions_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_transitions_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_1, "");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_2, "");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).ion_ratio_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).ion_ratio_u, 1000000000000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).ion_ratio_feature_name, "");
+  EXPECT_EQ(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).intensity_l, 2830, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).intensity_u, 2230000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").first, 2830, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").second, 2230000, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).intensity_l, 2830, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).intensity_u, 24500, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").first, 2830, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").second, 24500, 1e-4);
   // Amp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_heavy_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_heavy_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_light_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_light_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_detecting_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_detecting_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_quantifying_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_quantifying_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_identifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_identifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_transitions_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_transitions_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_1, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_2, "");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(1).ion_ratio_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(1).ion_ratio_u, 1000000000000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).ion_ratio_feature_name, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).intensity_l, 440, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).intensity_u, 3640000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").first, 440, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").second, 3640000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).intensity_l, 215000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).intensity_u, 462000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").first, 215000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").second, 462000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_heavy_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_heavy_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_light_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_light_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_detecting_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_detecting_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_quantifying_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_quantifying_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_identifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_identifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_transitions_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_transitions_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_1, "");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_2, "");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(1).ion_ratio_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(1).ion_ratio_u, 1000000000000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).ion_ratio_feature_name, "");
+  EXPECT_EQ(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).intensity_l, 440, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).intensity_u, 3640000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").first, 440, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").second, 3640000, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).intensity_l, 215000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).intensity_u, 462000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").first, 215000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").second, 462000, 1e-4);
   // Atp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_heavy_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_heavy_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_light_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_light_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_detecting_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_detecting_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_quantifying_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_quantifying_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_identifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_identifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_transitions_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_transitions_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_1, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_2, "");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(2).ion_ratio_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(2).ion_ratio_u, 1000000000000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).ion_ratio_feature_name, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).intensity_l, 221, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).intensity_u, 4190000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").first, 221, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").second, 4190000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).intensity_l, 828, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).intensity_u, 322000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").first, 828, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").second, 322000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_heavy_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_heavy_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_light_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_light_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_detecting_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_detecting_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_quantifying_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_quantifying_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_identifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_identifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_transitions_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_transitions_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_1, "");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_2, "");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(2).ion_ratio_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(2).ion_ratio_u, 1000000000000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).ion_ratio_feature_name, "");
+  EXPECT_EQ(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).intensity_l, 221, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).intensity_u, 4190000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").first, 221, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").second, 4190000, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).intensity_l, 828, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).intensity_u, 322000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").first, 828, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").second, 322000, 1e-4);
 }
 
 /**
   EstimateFeatureQCValues Tests
 */
-BOOST_AUTO_TEST_CASE(constructorEstimateFeatureQCValues)
+TEST(SequenceSegmentProcessor, constructorEstimateFeatureQCValues)
 {
   EstimateFeatureQCValues* ptrEstimateFeatureQCValues = nullptr;
   EstimateFeatureQCValues* nullPointerEstimateFeatureQCValues = nullptr;
-  BOOST_CHECK_EQUAL(ptrEstimateFeatureQCValues, nullPointerEstimateFeatureQCValues);
+  EXPECT_EQ(ptrEstimateFeatureQCValues, nullPointerEstimateFeatureQCValues);
 }
 
-BOOST_AUTO_TEST_CASE(destructorEstimateFeatureQCValues)
+TEST(SequenceSegmentProcessor, destructorEstimateFeatureQCValues)
 {
   EstimateFeatureQCValues* ptrEstimateFeatureQCValues = nullptr;
   ptrEstimateFeatureQCValues = new EstimateFeatureQCValues();
   delete ptrEstimateFeatureQCValues;
 }
 
-BOOST_AUTO_TEST_CASE(gettersEstimateFeatureQCValues)
+TEST(SequenceSegmentProcessor, gettersEstimateFeatureQCValues)
 {
   EstimateFeatureQCValues processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "ESTIMATE_FEATURE_QC_VALUES");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "ESTIMATE_FEATURE_QC_VALUES");
 }
 
-BOOST_AUTO_TEST_CASE(processEstimateFeatureQCValues)
+TEST(SequenceSegmentProcessor, processEstimateFeatureQCValues)
 {
   // Make the test sequence
   SequenceHandler sequenceHandler;
@@ -1759,144 +1752,144 @@ BOOST_AUTO_TEST_CASE(processEstimateFeatureQCValues)
   // Test for the expected values
   const OpenMS::MRMFeatureQC& feature_filters = sequenceHandler.getSequenceSegments().front().getFeatureQC();
   // Ser-L
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_heavy_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_heavy_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_light_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_light_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_detecting_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_detecting_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_quantifying_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_quantifying_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_identifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_identifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_transitions_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_transitions_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_1, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_2, "");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).ion_ratio_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).ion_ratio_u, 1000000000000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).ion_ratio_feature_name, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).intensity_l, 2830, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).intensity_u, 2230000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").first, 2830, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").second, 2230000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).intensity_l, 2830, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).intensity_u, 24500, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").first, 2830, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").second, 24500, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_heavy_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_heavy_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_light_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_light_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_detecting_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_detecting_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_quantifying_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_quantifying_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_identifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_identifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_transitions_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_transitions_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_1, "");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_2, "");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).ion_ratio_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).ion_ratio_u, 1000000000000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).ion_ratio_feature_name, "");
+  EXPECT_EQ(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).intensity_l, 2830, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).intensity_u, 2230000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").first, 2830, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").second, 2230000, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).intensity_l, 2830, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).intensity_u, 24500, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").first, 2830, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").second, 24500, 1e-4);
   // Amp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_heavy_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_heavy_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_light_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_light_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_detecting_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_detecting_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_quantifying_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_quantifying_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_identifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_identifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_transitions_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_transitions_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_1, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_2, "");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(1).ion_ratio_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(1).ion_ratio_u, 1000000000000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).ion_ratio_feature_name, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).intensity_l, 440, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).intensity_u, 3640000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").first, 440, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").second, 3640000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).intensity_l, 215000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).intensity_u, 462000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").first, 215000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").second, 462000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_heavy_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_heavy_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_light_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_light_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_detecting_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_detecting_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_quantifying_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_quantifying_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_identifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_identifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_transitions_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_transitions_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_1, "");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_2, "");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(1).ion_ratio_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(1).ion_ratio_u, 1000000000000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).ion_ratio_feature_name, "");
+  EXPECT_EQ(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).intensity_l, 440, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).intensity_u, 3640000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").first, 440, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").second, 3640000, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).intensity_l, 215000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).intensity_u, 462000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").first, 215000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").second, 462000, 1e-4);
   // Atp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_heavy_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_heavy_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_light_l, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_light_u, 1);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_detecting_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_detecting_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_quantifying_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_quantifying_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_identifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_identifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_transitions_l, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_transitions_u, 2);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_1, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_2, "");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(2).ion_ratio_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(2).ion_ratio_u, 1000000000000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).ion_ratio_feature_name, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).intensity_l, 221, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).intensity_u, 4190000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").first, 221, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").second, 4190000, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).intensity_l, 828, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).intensity_u, 322000, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").first, 828, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").second, 322000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_heavy_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_heavy_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_light_l, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_light_u, 1);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_detecting_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_detecting_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_quantifying_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_quantifying_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_identifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_identifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_transitions_l, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_transitions_u, 2);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_1, "");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_2, "");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(2).ion_ratio_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(2).ion_ratio_u, 1000000000000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).ion_ratio_feature_name, "");
+  EXPECT_EQ(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).intensity_l, 221, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).intensity_u, 4190000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").first, 221, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").second, 4190000, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).intensity_l, 828, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).intensity_u, 322000, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").first, 828, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").second, 322000, 1e-4);
 }
 
 /**
   TransferLOQToFeatureFilters Tests
 */
-BOOST_AUTO_TEST_CASE(constructorTransferLOQToFeatureFilters)
+TEST(SequenceSegmentProcessor, constructorTransferLOQToFeatureFilters)
 {
   TransferLOQToFeatureFilters* ptrTransferLOQToFeatureFilters = nullptr;
   TransferLOQToFeatureFilters* nullPointerTransferLOQToFeatureFilters = nullptr;
-  BOOST_CHECK_EQUAL(ptrTransferLOQToFeatureFilters, nullPointerTransferLOQToFeatureFilters);
+  EXPECT_EQ(ptrTransferLOQToFeatureFilters, nullPointerTransferLOQToFeatureFilters);
 }
 
-BOOST_AUTO_TEST_CASE(destructorTransferLOQToFeatureFilters)
+TEST(SequenceSegmentProcessor, destructorTransferLOQToFeatureFilters)
 {
   TransferLOQToFeatureFilters* ptrTransferLOQToFeatureFilters = nullptr;
   ptrTransferLOQToFeatureFilters = new TransferLOQToFeatureFilters();
   delete ptrTransferLOQToFeatureFilters;
 }
 
-BOOST_AUTO_TEST_CASE(gettersTransferLOQToFeatureFilters)
+TEST(SequenceSegmentProcessor, gettersTransferLOQToFeatureFilters)
 {
   TransferLOQToFeatureFilters processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "TRANSFER_LOQ_TO_FEATURE_FILTERS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "TRANSFER_LOQ_TO_FEATURE_FILTERS");
 }
 
-BOOST_AUTO_TEST_CASE(processTransferLOQToFeatureFilters)
+TEST(SequenceSegmentProcessor, processTransferLOQToFeatureFilters)
 {
   // Make the test sequence
   SequenceHandler sequenceHandler;
@@ -1954,57 +1947,57 @@ BOOST_AUTO_TEST_CASE(processTransferLOQToFeatureFilters)
   // Test for the expected values
   const OpenMS::MRMFeatureQC& feature_filters = sequenceHandler.getSequenceSegments().front().getFeatureFilter();
   // Ser-L
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").first, 100, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").second, 1e4, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
+  EXPECT_EQ(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").first, 100, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").second, 1e4, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
   // Amp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").first, 10, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").second, 1e5, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
+  EXPECT_EQ(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").first, 10, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").second, 1e5, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
   // Atp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").first, 1, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").second, 1e6, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
+  EXPECT_EQ(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").first, 1, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").second, 1e6, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
 }
 
 /**
   TransferLOQToFeatureQCs Tests
 */
-BOOST_AUTO_TEST_CASE(constructorTransferLOQToFeatureQCs)
+TEST(SequenceSegmentProcessor, constructorTransferLOQToFeatureQCs)
 {
   TransferLOQToFeatureQCs* ptrTransferLOQToFeatureQCs = nullptr;
   TransferLOQToFeatureQCs* nullPointerTransferLOQToFeatureQCs = nullptr;
-  BOOST_CHECK_EQUAL(ptrTransferLOQToFeatureQCs, nullPointerTransferLOQToFeatureQCs);
+  EXPECT_EQ(ptrTransferLOQToFeatureQCs, nullPointerTransferLOQToFeatureQCs);
 }
 
-BOOST_AUTO_TEST_CASE(destructorTransferLOQToFeatureQCs)
+TEST(SequenceSegmentProcessor, destructorTransferLOQToFeatureQCs)
 {
   TransferLOQToFeatureQCs* ptrTransferLOQToFeatureQCs = nullptr;
   ptrTransferLOQToFeatureQCs = new TransferLOQToFeatureQCs();
   delete ptrTransferLOQToFeatureQCs;
 }
 
-BOOST_AUTO_TEST_CASE(gettersTransferLOQToFeatureQCs)
+TEST(SequenceSegmentProcessor, gettersTransferLOQToFeatureQCs)
 {
   TransferLOQToFeatureQCs processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "TRANSFER_LOQ_TO_FEATURE_QCS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "TRANSFER_LOQ_TO_FEATURE_QCS");
 }
 
-BOOST_AUTO_TEST_CASE(processTransferLOQToFeatureQCs)
+TEST(SequenceSegmentProcessor, processTransferLOQToFeatureQCs)
 {
   // Make the test sequence
   SequenceHandler sequenceHandler;
@@ -2062,57 +2055,57 @@ BOOST_AUTO_TEST_CASE(processTransferLOQToFeatureQCs)
   // Test for the expected values
   const OpenMS::MRMFeatureQC& feature_filters = sequenceHandler.getSequenceSegments().front().getFeatureQC();
   // Ser-L
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").first, 100, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").second, 1e4, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
+  EXPECT_EQ(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").first, 100, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).meta_value_qc.at("calculated_concentration").second, 1e4, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
   // Amp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").first, 10, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").second, 1e5, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
+  EXPECT_EQ(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").first, 10, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).meta_value_qc.at("calculated_concentration").second, 1e5, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
   // Atp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").first, 1, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").second, 1e6, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
+  EXPECT_EQ(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").first, 1, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).meta_value_qc.at("calculated_concentration").second, 1e6, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).meta_value_qc.at("calculated_concentration").second, 5000, 1e-4);
 }
 
 /**
   EstimateFeatureRSDs Tests
 */
-BOOST_AUTO_TEST_CASE(constructorEstimateFeatureRSDs)
+TEST(SequenceSegmentProcessor, constructorEstimateFeatureRSDs)
 {
   EstimateFeatureRSDs* ptrEstimateFeatureRSDs = nullptr;
   EstimateFeatureRSDs* nullPointerEstimateFeatureRSDs = nullptr;
-  BOOST_CHECK_EQUAL(ptrEstimateFeatureRSDs, nullPointerEstimateFeatureRSDs);
+  EXPECT_EQ(ptrEstimateFeatureRSDs, nullPointerEstimateFeatureRSDs);
 }
 
-BOOST_AUTO_TEST_CASE(destructorEstimateFeatureRSDs)
+TEST(SequenceSegmentProcessor, destructorEstimateFeatureRSDs)
 {
   EstimateFeatureRSDs* ptrEstimateFeatureRSDs = nullptr;
   ptrEstimateFeatureRSDs = new EstimateFeatureRSDs();
   delete ptrEstimateFeatureRSDs;
 }
 
-BOOST_AUTO_TEST_CASE(gettersEstimateFeatureRSDs)
+TEST(SequenceSegmentProcessor, gettersEstimateFeatureRSDs)
 {
   EstimateFeatureRSDs processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "ESTIMATE_FEATURE_RSDS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "ESTIMATE_FEATURE_RSDS");
 }
 
-BOOST_AUTO_TEST_CASE(processEstimateFeatureRSDs)
+TEST(SequenceSegmentProcessor, processEstimateFeatureRSDs)
 {
   // Make the test sequence
   SequenceHandler sequenceHandler;
@@ -2193,145 +2186,145 @@ BOOST_AUTO_TEST_CASE(processEstimateFeatureRSDs)
   // Test for the expected values
   const OpenMS::MRMFeatureQC& feature_filters = sequenceHandler.getSequenceSegments().front().getFeatureRSDEstimations();
   // Ser-L
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_heavy_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_heavy_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_light_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_light_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_detecting_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_detecting_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_quantifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_quantifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_identifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_identifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_transitions_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).n_transitions_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_1, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_2, "");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).ion_ratio_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).ion_ratio_u, 0, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).ion_ratio_feature_name, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).intensity_u, 45.940820332935274, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").second, 45.940820332935274, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).intensity_u, 45.940820332935274, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").second, 45.940820332935274, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_heavy_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_heavy_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_light_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_light_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_detecting_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_detecting_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_quantifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_quantifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_identifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_identifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_transitions_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).n_transitions_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_1, "");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).ion_ratio_pair_name_2, "");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).ion_ratio_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).ion_ratio_u, 0, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).ion_ratio_feature_name, "");
+  EXPECT_EQ(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).intensity_u, 45.940820332935274, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).meta_value_qc.at("peak_apex_int").second, 45.940820332935274, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).intensity_u, 45.940820332935274, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).meta_value_qc.at("peak_apex_int").second, 45.940820332935274, 1e-4);
   // Amp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_heavy_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_heavy_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_light_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_light_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_detecting_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_detecting_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_quantifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_quantifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_identifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_identifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_transitions_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).n_transitions_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_1, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_2, "");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(1).ion_ratio_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(1).ion_ratio_u, 0, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).ion_ratio_feature_name, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).intensity_u, 21.980528755438982, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").second, 21.980528755438982, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).intensity_u, 21.980528755438982, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").second, 21.980528755438982, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_heavy_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_heavy_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_light_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_light_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_detecting_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_detecting_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_quantifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_quantifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_identifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_identifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_transitions_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).n_transitions_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_1, "");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).ion_ratio_pair_name_2, "");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(1).ion_ratio_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(1).ion_ratio_u, 0, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).ion_ratio_feature_name, "");
+  EXPECT_EQ(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).intensity_u, 21.980528755438982, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).meta_value_qc.at("peak_apex_int").second, 21.980528755438982, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).intensity_u, 21.980528755438982, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).meta_value_qc.at("peak_apex_int").second, 21.980528755438982, 1e-4);
   // Atp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_heavy_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_heavy_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_light_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_light_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_detecting_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_detecting_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_quantifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_quantifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_identifying_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_identifying_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_transitions_l, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).n_transitions_u, 0);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_1, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_2, "");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(2).ion_ratio_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(2).ion_ratio_u, 0, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).ion_ratio_feature_name, "");
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).intensity_u, 148.21486099460165, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").second, 148.21486099460165, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).retention_time_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).retention_time_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).intensity_u, 148.21486099460165, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).overall_quality_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).overall_quality_u, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").second, 148.21486099460165, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_heavy_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_heavy_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_light_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_light_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_detecting_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_detecting_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_quantifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_quantifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_identifying_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_identifying_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_transitions_l, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).n_transitions_u, 0);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_1, "");
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).ion_ratio_pair_name_2, "");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(2).ion_ratio_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(2).ion_ratio_u, 0, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).ion_ratio_feature_name, "");
+  EXPECT_EQ(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).intensity_u, 148.21486099460165, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).meta_value_qc.at("peak_apex_int").second, 148.21486099460165, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).retention_time_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).retention_time_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).intensity_u, 148.21486099460165, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).overall_quality_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).overall_quality_u, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").first, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).meta_value_qc.at("peak_apex_int").second, 148.21486099460165, 1e-4);
 }
 
 
 /**
   EstimateFeatureBackgroundInterferences Tests
 */
-BOOST_AUTO_TEST_CASE(constructorEstimateFeatureBackgroundInterferences)
+TEST(SequenceSegmentProcessor, constructorEstimateFeatureBackgroundInterferences)
 {
   EstimateFeatureBackgroundInterferences* ptrEstimateFeatureBackgroundInterferences = nullptr;
   EstimateFeatureBackgroundInterferences* nullPointerEstimateFeatureBackgroundInterferences = nullptr;
-  BOOST_CHECK_EQUAL(ptrEstimateFeatureBackgroundInterferences, nullPointerEstimateFeatureBackgroundInterferences);
+  EXPECT_EQ(ptrEstimateFeatureBackgroundInterferences, nullPointerEstimateFeatureBackgroundInterferences);
 }
 
-BOOST_AUTO_TEST_CASE(destructorEstimateFeatureBackgroundInterferences)
+TEST(SequenceSegmentProcessor, destructorEstimateFeatureBackgroundInterferences)
 {
   EstimateFeatureBackgroundInterferences* ptrEstimateFeatureBackgroundInterferences = nullptr;
   ptrEstimateFeatureBackgroundInterferences = new EstimateFeatureBackgroundInterferences();
   delete ptrEstimateFeatureBackgroundInterferences;
 }
 
-BOOST_AUTO_TEST_CASE(gettersEstimateFeatureBackgroundInterferences)
+TEST(SequenceSegmentProcessor, gettersEstimateFeatureBackgroundInterferences)
 {
   EstimateFeatureBackgroundInterferences processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "ESTIMATE_FEATURE_BACKGROUND_INTERFERENCES");
 }
 
-BOOST_AUTO_TEST_CASE(processEstimateFeatureBackgroundInterferences)
+TEST(SequenceSegmentProcessor, processEstimateFeatureBackgroundInterferences)
 {
   // Make the test sequence
   SequenceHandler sequenceHandler;
@@ -2406,63 +2399,63 @@ BOOST_AUTO_TEST_CASE(processEstimateFeatureBackgroundInterferences)
   // Test for the expected values
   const OpenMS::MRMFeatureQC& feature_filters = sequenceHandler.getSequenceSegments().front().getFeatureBackgroundEstimations();
   // Ser-L
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).intensity_u, 400499.23928506032, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(0).intensity_u, 400349.32857131958, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(1).intensity_u, 149.91428593226843, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(0).component_group_name, "ser-L");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).intensity_u, 400499.23928506032, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(0).component_name, "ser-L.ser-L_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(0).intensity_u, 400349.32857131958, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(1).component_name, "ser-L.ser-L_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(1).intensity_u, 149.91428593226843, 1e-4);
   // Amp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).intensity_u, 400499.23928506032, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(2).intensity_u, 5839.5428571360453, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(3).intensity_u, 3019.2857142857142, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(1).component_group_name, "amp");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).intensity_u, 400499.23928506032, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(2).component_name, "amp.amp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(2).intensity_u, 5839.5428571360453, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(3).component_name, "amp.amp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(3).intensity_u, 3019.2857142857142, 1e-4);
   // Atp
-  BOOST_CHECK_EQUAL(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_group_qcs.at(0).intensity_u, 400499.23928506032, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(4).intensity_u, 6859.2635714156286, 1e-4);
-  BOOST_CHECK_EQUAL(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).intensity_l, 0, 1e-4);
-  BOOST_CHECK_CLOSE(feature_filters.component_qcs.at(5).intensity_u, 870.49857139587402, 1e-4);
+  EXPECT_EQ(feature_filters.component_group_qcs.at(2).component_group_name, "atp");
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_group_qcs.at(0).intensity_u, 400499.23928506032, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(4).component_name, "atp.atp_1.Light");
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(4).intensity_u, 6859.2635714156286, 1e-4);
+  EXPECT_EQ(feature_filters.component_qcs.at(5).component_name, "atp.atp_1.Heavy");
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).intensity_l, 0, 1e-4);
+  EXPECT_NEAR(feature_filters.component_qcs.at(5).intensity_u, 870.49857139587402, 1e-4);
 }
 
 /**
   StoreFeatureRSDEstimations Tests
 */
-BOOST_AUTO_TEST_CASE(constructorStoreFeatureRSDEstimations)
+TEST(SequenceSegmentProcessor, constructorStoreFeatureRSDEstimations)
 {
   StoreFeatureRSDEstimations* ptrStoreFeatureRSDEstimations = nullptr;
   StoreFeatureRSDEstimations* nullPointerStoreFeatureRSDEstimations = nullptr;
-  BOOST_CHECK_EQUAL(ptrStoreFeatureRSDEstimations, nullPointerStoreFeatureRSDEstimations);
+  EXPECT_EQ(ptrStoreFeatureRSDEstimations, nullPointerStoreFeatureRSDEstimations);
 }
 
-BOOST_AUTO_TEST_CASE(destructorStoreFeatureRSDEstimations)
+TEST(SequenceSegmentProcessor, destructorStoreFeatureRSDEstimations)
 {
   StoreFeatureRSDEstimations* ptrStoreFeatureRSDEstimations = nullptr;
   ptrStoreFeatureRSDEstimations = new StoreFeatureRSDEstimations();
   delete ptrStoreFeatureRSDEstimations;
 }
 
-BOOST_AUTO_TEST_CASE(gettersStoreFeatureRSDEstimations)
+TEST(SequenceSegmentProcessor, gettersStoreFeatureRSDEstimations)
 {
   StoreFeatureRSDEstimations processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_RSD_ESTIMATIONS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "STORE_FEATURE_RSD_ESTIMATIONS");
 }
 
-BOOST_AUTO_TEST_CASE(processStoreFeatureRSDEstimations)
+TEST(SequenceSegmentProcessor, processStoreFeatureRSDEstimations)
 {
   SequenceSegmentHandler ssh, ssh_test;
 
@@ -2479,42 +2472,42 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureRSDEstimations)
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDEstimations();
   const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureRSDEstimations();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  EXPECT_EQ(fQC.component_qcs.size(), fQC_test.component_qcs.size());
   for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+    EXPECT_TRUE(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
   }
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  EXPECT_EQ(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
   for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+    EXPECT_TRUE(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
   }
 }
 
 /**
   StoreFeatureBackgroundEstimations Tests
 */
-BOOST_AUTO_TEST_CASE(constructorStoreFeatureBackgroundEstimations)
+TEST(SequenceSegmentProcessor, constructorStoreFeatureBackgroundEstimations)
 {
   StoreFeatureBackgroundEstimations* ptrStoreFeatureBackgroundEstimations = nullptr;
   StoreFeatureBackgroundEstimations* nullPointerStoreFeatureBackgroundEstimations = nullptr;
-  BOOST_CHECK_EQUAL(ptrStoreFeatureBackgroundEstimations, nullPointerStoreFeatureBackgroundEstimations);
+  EXPECT_EQ(ptrStoreFeatureBackgroundEstimations, nullPointerStoreFeatureBackgroundEstimations);
 }
 
-BOOST_AUTO_TEST_CASE(destructorStoreFeatureBackgroundEstimations)
+TEST(SequenceSegmentProcessor, destructorStoreFeatureBackgroundEstimations)
 {
   StoreFeatureBackgroundEstimations* ptrStoreFeatureBackgroundEstimations = nullptr;
   ptrStoreFeatureBackgroundEstimations = new StoreFeatureBackgroundEstimations();
   delete ptrStoreFeatureBackgroundEstimations;
 }
 
-BOOST_AUTO_TEST_CASE(gettersStoreFeatureBackgroundEstimations)
+TEST(SequenceSegmentProcessor, gettersStoreFeatureBackgroundEstimations)
 {
   StoreFeatureBackgroundEstimations processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "STORE_FEATURE_BACKGROUND_ESTIMATIONS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "STORE_FEATURE_BACKGROUND_ESTIMATIONS");
 }
 
-BOOST_AUTO_TEST_CASE(processStoreFeatureBackgroundEstimations)
+TEST(SequenceSegmentProcessor, processStoreFeatureBackgroundEstimations)
 {
   SequenceSegmentHandler ssh, ssh_test;
 
@@ -2531,42 +2524,42 @@ BOOST_AUTO_TEST_CASE(processStoreFeatureBackgroundEstimations)
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundEstimations();
   const OpenMS::MRMFeatureQC& fQC_test = ssh_test.getFeatureBackgroundEstimations();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), fQC_test.component_qcs.size());
+  EXPECT_EQ(fQC.component_qcs.size(), fQC_test.component_qcs.size());
   for (size_t i = 0; i < fQC.component_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
+    EXPECT_TRUE(fQC.component_qcs.at(i) == fQC_test.component_qcs.at(i));
   }
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
+  EXPECT_EQ(fQC.component_group_qcs.size(), fQC_test.component_group_qcs.size());
   for (size_t i = 0; i < fQC.component_group_qcs.size(); ++i) {
-    BOOST_CHECK(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
+    EXPECT_TRUE(fQC.component_group_qcs.at(i) == fQC_test.component_group_qcs.at(i));
   }
 }
 
 /**
   LoadFeatureRSDEstimations Tests
 */
-BOOST_AUTO_TEST_CASE(constructorLoadFeatureRSDEstimations)
+TEST(SequenceSegmentProcessor, constructorLoadFeatureRSDEstimations)
 {
   LoadFeatureRSDEstimations* ptrLoadFeatureRSDEstimations = nullptr;
   LoadFeatureRSDEstimations* nullPointerLoadFeatureRSDEstimations = nullptr;
-  BOOST_CHECK_EQUAL(ptrLoadFeatureRSDEstimations, nullPointerLoadFeatureRSDEstimations);
+  EXPECT_EQ(ptrLoadFeatureRSDEstimations, nullPointerLoadFeatureRSDEstimations);
 }
 
-BOOST_AUTO_TEST_CASE(destructorLoadFeatureRSDEstimations)
+TEST(SequenceSegmentProcessor, destructorLoadFeatureRSDEstimations)
 {
   LoadFeatureRSDEstimations* ptrLoadFeatureRSDEstimations = nullptr;
   ptrLoadFeatureRSDEstimations = new LoadFeatureRSDEstimations();
   delete ptrLoadFeatureRSDEstimations;
 }
 
-BOOST_AUTO_TEST_CASE(gettersLoadFeatureRSDEstimations)
+TEST(SequenceSegmentProcessor, gettersLoadFeatureRSDEstimations)
 {
   LoadFeatureRSDEstimations processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_RSD_ESTIMATIONS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "LOAD_FEATURE_RSD_ESTIMATIONS");
 }
 
-BOOST_AUTO_TEST_CASE(processLoadFeatureRSDEstimations)
+TEST(SequenceSegmentProcessor, processLoadFeatureRSDEstimations)
 {
   SequenceSegmentHandler ssh;
 
@@ -2578,39 +2571,39 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureRSDEstimations)
   loadFeatureRSDEstimations.process(ssh, SequenceHandler(), {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureRSDEstimations();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+  EXPECT_EQ(fQC.component_qcs.size(), 324);
+  EXPECT_EQ(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(fQC.component_group_qcs.size(), 118);
+  EXPECT_EQ(fQC.component_group_qcs[0].component_group_name, "arg-L");
 }
 
 
 /**
   LoadFeatureBackgroundEstimations Tests
 */
-BOOST_AUTO_TEST_CASE(constructorLoadFeatureBackgroundEstimations)
+TEST(SequenceSegmentProcessor, constructorLoadFeatureBackgroundEstimations)
 {
   LoadFeatureBackgroundEstimations* ptrLoadFeatureBackgroundEstimations = nullptr;
   LoadFeatureBackgroundEstimations* nullPointerLoadFeatureBackgroundEstimations = nullptr;
-  BOOST_CHECK_EQUAL(ptrLoadFeatureBackgroundEstimations, nullPointerLoadFeatureBackgroundEstimations);
+  EXPECT_EQ(ptrLoadFeatureBackgroundEstimations, nullPointerLoadFeatureBackgroundEstimations);
 }
 
-BOOST_AUTO_TEST_CASE(destructorLoadFeatureBackgroundEstimations)
+TEST(SequenceSegmentProcessor, destructorLoadFeatureBackgroundEstimations)
 {
   LoadFeatureBackgroundEstimations* ptrLoadFeatureBackgroundEstimations = nullptr;
   ptrLoadFeatureBackgroundEstimations = new LoadFeatureBackgroundEstimations();
   delete ptrLoadFeatureBackgroundEstimations;
 }
 
-BOOST_AUTO_TEST_CASE(gettersLoadFeatureBackgroundEstimations)
+TEST(SequenceSegmentProcessor, gettersLoadFeatureBackgroundEstimations)
 {
   LoadFeatureBackgroundEstimations processor;
 
-  BOOST_CHECK_EQUAL(processor.getID(), -1);
-  BOOST_CHECK_EQUAL(processor.getName(), "LOAD_FEATURE_BACKGROUND_ESTIMATIONS");
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "LOAD_FEATURE_BACKGROUND_ESTIMATIONS");
 }
 
-BOOST_AUTO_TEST_CASE(processLoadFeatureBackgroundEstimations)
+TEST(SequenceSegmentProcessor, processLoadFeatureBackgroundEstimations)
 {
   SequenceSegmentHandler ssh;
 
@@ -2622,10 +2615,8 @@ BOOST_AUTO_TEST_CASE(processLoadFeatureBackgroundEstimations)
   loadFeatureBackgroundEstimations.process(ssh, SequenceHandler(), {}, filenames);
   const OpenMS::MRMFeatureQC& fQC = ssh.getFeatureBackgroundEstimations();
 
-  BOOST_CHECK_EQUAL(fQC.component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs.size(), 118);
-  BOOST_CHECK_EQUAL(fQC.component_group_qcs[0].component_group_name, "arg-L");
+  EXPECT_EQ(fQC.component_qcs.size(), 324);
+  EXPECT_EQ(fQC.component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(fQC.component_group_qcs.size(), 118);
+  EXPECT_EQ(fQC.component_group_qcs[0].component_group_name, "arg-L");
 }
-
-BOOST_AUTO_TEST_SUITE_END()

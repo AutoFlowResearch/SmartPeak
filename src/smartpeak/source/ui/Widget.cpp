@@ -346,13 +346,7 @@ namespace SmartPeak
     for (uint checkbox_header_idx = 0; checkbox_header_idx < checkbox_headers_.size(); ++checkbox_header_idx) {
       if (checkbox_headers_(checkbox_header_idx) == "plot") checkbox_columns_plot_col_ = checkbox_header_idx;
     }
-    if (checkbox_columns_plot_col_ == 1 && table_id_ == "InjectionsExplorerWindow") {
-      table_entries_plot_col_ = 3;
-    } else if (checkbox_columns_plot_col_ == 0 && table_id_ == "FeaturesExplorerWindow") {
-      table_entries_plot_col_ = 1;
-    } else if (checkbox_columns_plot_col_ == 0 && table_id_ == "TransitionsExplorerWindow") {
-      table_entries_plot_col_ = 2;
-    }
+    table_entries_plot_col_ = (table_data_.headers_.size() + checkbox_columns_plot_col_);
     
     ImGui::PushButtonRepeat(true);
     if (ImGui::ArrowButton("##left_arrow_plotter", ImGuiDir_Left) && plot_idx_ > 0) {

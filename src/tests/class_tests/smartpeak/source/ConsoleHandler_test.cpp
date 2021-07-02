@@ -20,44 +20,41 @@
 // $Maintainer: Krzysztof Abram $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
-#include <SmartPeak/test_config.h>
 
-#define BOOST_TEST_MODULE ConsoleHandler test suite
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <SmartPeak/test_config.h>
 
 #include <SmartPeak/core/ConsoleHandler.h>
 #include <filesystem>
 
 
-struct ConsoleHandlerFixture 
+struct ConsoleHandlerFixture : public ::testing::Test
 {
     /* ctor/dtor */
     ConsoleHandlerFixture() 
     {
-        m_datapath = SMARTPEAK_GET_TEST_DATA_PATH("");
+        m_datapath = std::filesystem::temp_directory_path().string();
     }
     std::string m_datapath;
 };
 
 /* ---------------------------------------------- */
 
-BOOST_FIXTURE_TEST_SUITE(ConsoleHandler, ConsoleHandlerFixture)
-
-BOOST_AUTO_TEST_CASE(ConsoleHandler_initialize)
+TEST_F(ConsoleHandlerFixture, ConsoleHandler_initialize)
 {
     namespace fs = std::filesystem;
     auto& ch = SmartPeak::ConsoleHandler::get_instance();
     // Test singleton uniqueness:
     auto& ch1 = SmartPeak::ConsoleHandler::get_instance();
-    BOOST_CHECK_EQUAL(&ch, &ch1);
+    EXPECT_EQ(&ch, &ch1);
     // Test custom log location:
     {
         ch.set_log_directory(m_datapath);
         ch.initialize("Welcome");
-        BOOST_CHECK(fs::exists(ch.get_log_filepath()));
+        // m_filepath = ch.get_log_filepath();
+        EXPECT_TRUE(fs::exists(ch.get_log_filepath()));
     }
     // Test inability to initialize instance for the second time:
-    BOOST_CHECK_THROW(ch.initialize("Welcome"), std::runtime_error);
+    EXPECT_THROW(ch.initialize("Welcome"), std::runtime_error);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

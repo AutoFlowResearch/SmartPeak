@@ -20,10 +20,10 @@
 // $Maintainer: Krzysztof Abram $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
-#include <SmartPeak/test_config.h>
 
-#define BOOST_TEST_MODULE ApplicationManager test suite
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <SmartPeak/test_config.h>
 
 #include <SmartPeak/cli/Parser.h>
 #include <SmartPeak/cli/ApplicationManager.h>
@@ -83,7 +83,7 @@ public:
 
 /* ---------------------------------------------- */
 
-struct ApplicationManagerFixture 
+struct ApplicationManagerFixture : public ::testing::Test
 {
     /* ctor/dtor */
     ApplicationManagerFixture() 
@@ -106,36 +106,32 @@ public:
 
 /* ---------------------------------------------- */
 
-BOOST_FIXTURE_TEST_SUITE(ApplicationManager, ApplicationManagerFixture)
-
-BOOST_AUTO_TEST_CASE(ApplicationManager_add)
+TEST_F(ApplicationManagerFixture, ApplicationManager_add)
 {
     auto& application_manager = get_application_manager()
         .add(std::make_shared<cli::SuccessTaskMock>())
         .add(std::make_shared<cli::SuccessTaskMock>())
         .add(std::make_shared<cli::SuccessTaskMock>());
     
-    BOOST_CHECK_EQUAL(application_manager.size(), 3);
-    BOOST_CHECK(application_manager.run());
+    EXPECT_EQ(application_manager.size(), 3);
+    EXPECT_TRUE(application_manager.run());
 }
 
-BOOST_AUTO_TEST_CASE(ApplicationManager_run)
+TEST_F(ApplicationManagerFixture, ApplicationManager_run)
 {
     auto& application_manager = get_application_manager()
         .add(std::make_shared<cli::ThrowTaskMock>());
 
-    BOOST_CHECK_EQUAL(application_manager.size(), 1);
-    BOOST_CHECK_THROW(application_manager.run(), std::runtime_error);
+    EXPECT_EQ(application_manager.size(), 1);
+    EXPECT_THROW(application_manager.run(), std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(ApplicationManager_run_failure)
+TEST_F(ApplicationManagerFixture, ApplicationManager_run_failure)
 {
     auto& application_manager = get_application_manager()
         .add(std::make_shared<cli::FailureTaskMock>())
         .add(std::make_shared<cli::SuccessTaskMock>());
 
-    BOOST_CHECK_EQUAL(application_manager.size(), 2);
-    BOOST_CHECK(!application_manager.run());
+    EXPECT_EQ(application_manager.size(), 2);
+    EXPECT_TRUE(!application_manager.run());
 }
-
-BOOST_AUTO_TEST_SUITE_END()

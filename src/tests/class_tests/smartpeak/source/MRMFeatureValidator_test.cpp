@@ -17,14 +17,12 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE MRMFeatureValidator test suite
-#include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/algorithm/MRMFeatureValidator.h>
 
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
@@ -35,9 +33,7 @@
 using namespace SmartPeak;
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(mrmfeaturevalidator)
-
-BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
+TEST(MRMFeaturevalidator, validate_MRMFeatures)
 {
   Filenames filenames;
   filenames.referenceData_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
@@ -46,16 +42,16 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
 
   ParameterSet params;
   ParametersParser::read(filename_params, params); // it is assumed "," as delimiter
-  BOOST_CHECK_EQUAL(params.size(), 1);
-  BOOST_CHECK_EQUAL(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
-  BOOST_CHECK_EQUAL(params["MRMFeatureValidator.validate_MRMFeatures"].size(), 1);
+  EXPECT_EQ(params.size(), 1);
+  EXPECT_EQ(params.count("MRMFeatureValidator.validate_MRMFeatures"), 1);
+  EXPECT_EQ(params["MRMFeatureValidator.validate_MRMFeatures"].size(), 1);
 
   RawDataHandler rawDataHandler;
   LoadValidationData loadValidationData;
   loadValidationData.process(rawDataHandler, {}, filenames);
   const std::vector<std::map<std::string, CastValue>>& ref_data = rawDataHandler.getReferenceData();
 
-  BOOST_CHECK_EQUAL(ref_data.size(), 179);
+  EXPECT_EQ(ref_data.size(), 179);
 
   OpenMS::FeatureXMLFile featurexml;
   OpenMS::FeatureMap featureMap;
@@ -80,9 +76,7 @@ BOOST_AUTO_TEST_CASE(validate_MRMFeatures)
     Tr_window
   );
 
-  BOOST_CHECK_CLOSE(validation_metrics.at("accuracy"), 0.987096786, 1e-3);
-  BOOST_CHECK_CLOSE(validation_metrics.at("recall"), 1.0, 1e-3);
-  BOOST_CHECK_CLOSE(validation_metrics.at("precision"), 0.987096786, 1e-3);
+  EXPECT_NEAR(validation_metrics.at("accuracy"), 0.987096786, 1e-3);
+  EXPECT_NEAR(validation_metrics.at("recall"), 1.0, 1e-3);
+  EXPECT_NEAR(validation_metrics.at("precision"), 0.987096786, 1e-3);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

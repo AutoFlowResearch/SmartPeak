@@ -371,5 +371,13 @@ public:
      * @return formated string
     */
     static std::string str2upper(const std::string& str);
+    
+    /**
+     @brief Remove trailing characters.
+      
+     @param[in] to_remove string to remove from given string.
+     @param[in,out] str string on which the modification is done.
+    */
+    static void removeTrailing(std::string& str, std::string to_remove);
   };
 }

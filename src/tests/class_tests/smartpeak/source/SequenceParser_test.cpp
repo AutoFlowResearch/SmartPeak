@@ -17,14 +17,13 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE SequenceParser test suite
-#include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
@@ -34,7 +33,7 @@
 using namespace SmartPeak;
 using namespace std;
 
-struct SequenceParserFixture
+struct SequenceParserFixture : public ::testing::Test
 {
   /* ctor/dtor */
   SequenceParserFixture()
@@ -83,102 +82,134 @@ public:
   SequenceHandler sequence_handler_;
 };
 
-BOOST_FIXTURE_TEST_SUITE(SequenceParserTest, SequenceParserFixture)
-
-BOOST_AUTO_TEST_CASE(readSequenceFile)
+TEST(Sequenceparser, readSequenceFile)
 {
   string pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1.csv");
   SequenceHandler sequenceHandler;
   SequenceParser::readSequenceFile(sequenceHandler, pathname, ",");
   const vector<InjectionHandler>& sequence1 = sequenceHandler.getSequence();
-  BOOST_CHECK_EQUAL(sequence1.size(), 4);
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc2_1x");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getSampleType() == SampleType::Unknown, true);
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().acq_method_name, "LCMS");
-  BOOST_CHECK_CLOSE(sequence1[0].getMetaData().inj_volume, 10.0, 1e-3);
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_volume_units, "uL");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().inj_number, 2);
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().scan_polarity, "positive");
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().scan_mass_low, 60);
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().scan_mass_high, 2000);
-  BOOST_CHECK_EQUAL(sequence1[0].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getSampleType() == SampleType::Unknown, true);
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().acq_method_name, "LCMS");
-  BOOST_CHECK_CLOSE(sequence1[3].getMetaData().inj_volume, 10.0, 1e-3);
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().inj_volume_units, "uL");
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().inj_number, 5);
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().scan_polarity, "negative");
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().scan_mass_low, 60);
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().scan_mass_high, 2000);
-  BOOST_CHECK_EQUAL(sequence1[3].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
+  EXPECT_EQ(sequence1.size(), 4);
+  EXPECT_STREQ(sequence1[0].getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Sacc2_1x");
+  EXPECT_STREQ(sequence1[0].getMetaData().getSampleGroupName().c_str(), "Test01");
+  EXPECT_STREQ(sequence1[0].getMetaData().getSequenceSegmentName().c_str(), "Group01");
+  EXPECT_TRUE(sequence1[0].getMetaData().getSampleType() == SampleType::Unknown);
+  EXPECT_STREQ(sequence1[0].getMetaData().getFilename().c_str(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  EXPECT_STREQ(sequence1[0].getMetaData().acq_method_name.c_str(), "LCMS");
+  EXPECT_NEAR(sequence1[0].getMetaData().inj_volume, 10.0, 1e-3);
+  EXPECT_STREQ(sequence1[0].getMetaData().inj_volume_units.c_str(), "uL");
+  EXPECT_STREQ(sequence1[0].getMetaData().batch_name.c_str(), "FluxTest");
+  EXPECT_EQ(sequence1[0].getMetaData().inj_number, 2);
+  EXPECT_STREQ(sequence1[0].getMetaData().scan_polarity.c_str(), "positive");
+  EXPECT_EQ(sequence1[0].getMetaData().scan_mass_low, 60);
+  EXPECT_EQ(sequence1[0].getMetaData().scan_mass_high, 2000);
+  EXPECT_STREQ(sequence1[0].getMetaData().getAcquisitionDateAndTimeAsString().c_str(), "2015-07-07_153300");
+  EXPECT_STREQ(sequence1[3].getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Yarr2_1x");
+  EXPECT_STREQ(sequence1[3].getMetaData().getSampleGroupName().c_str(), "Test01");
+  EXPECT_STREQ(sequence1[3].getMetaData().getSequenceSegmentName().c_str(), "Group01");
+  EXPECT_TRUE(sequence1[3].getMetaData().getSampleType() == SampleType::Unknown);
+  EXPECT_STREQ(sequence1[3].getMetaData().getFilename().c_str(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  EXPECT_STREQ(sequence1[3].getMetaData().acq_method_name.c_str(), "LCMS");
+  EXPECT_NEAR(sequence1[3].getMetaData().inj_volume, 10.0, 1e-3);
+  EXPECT_STREQ(sequence1[3].getMetaData().inj_volume_units.c_str(), "uL");
+  EXPECT_STREQ(sequence1[3].getMetaData().batch_name.c_str(), "FluxTest");
+  EXPECT_EQ(sequence1[3].getMetaData().inj_number, 5);
+  EXPECT_STREQ(sequence1[3].getMetaData().scan_polarity.c_str(), "negative");
+  EXPECT_EQ(sequence1[3].getMetaData().scan_mass_low, 60);
+  EXPECT_EQ(sequence1[3].getMetaData().scan_mass_high, 2000);
+  EXPECT_STREQ(sequence1[3].getMetaData().getAcquisitionDateAndTimeAsString().c_str(), "2015-07-07_153300");
 
   sequenceHandler.clear();
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_semicolon.csv");
   SequenceParser::readSequenceFile(sequenceHandler, pathname, ";");
   const vector<InjectionHandler>& sequence2 = sequenceHandler.getSequence();
-  BOOST_CHECK_EQUAL(sequence2.size(), 5);
-  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getSampleType() == SampleType::Unknown, true);
-  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
-  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().acq_method_name, "LCMS");
-  BOOST_CHECK_CLOSE(sequence2[0].getMetaData().inj_volume, 10.0, 1e-3);
-  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().inj_volume_units, "uL");
-  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().inj_number, 1);
-  BOOST_CHECK_EQUAL(sequence2[0].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getSampleType() == SampleType::Unknown, true);
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getFilename(), "170808_Jonathan_yeast_Yarr2_1x_5_FluxTest_2015-07-07_153300"); // No default provided
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().acq_method_name, "LCMS");
-  BOOST_CHECK_CLOSE(sequence2[4].getMetaData().inj_volume, 10.0, 1e-3);
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().inj_volume_units, "uL");
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().inj_number, 5);
-  BOOST_CHECK_EQUAL(sequence2[4].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
+  EXPECT_EQ(sequence2.size(), 5);
+  EXPECT_STREQ(sequence2[0].getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_STREQ(sequence2[0].getMetaData().getSampleGroupName().c_str(), "Test01");
+  EXPECT_STREQ(sequence2[0].getMetaData().getSequenceSegmentName().c_str(), "Group01");
+  EXPECT_TRUE(sequence2[0].getMetaData().getSampleType() == SampleType::Unknown);
+  EXPECT_STREQ(sequence2[0].getMetaData().getFilename().c_str(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  EXPECT_STREQ(sequence2[0].getMetaData().acq_method_name.c_str(), "LCMS");
+  EXPECT_NEAR(sequence2[0].getMetaData().inj_volume, 10.0, 1e-3);
+  EXPECT_STREQ(sequence2[0].getMetaData().inj_volume_units.c_str(), "uL");
+  EXPECT_STREQ(sequence2[0].getMetaData().batch_name.c_str(), "FluxTest");
+  EXPECT_EQ(sequence2[0].getMetaData().inj_number, 1);
+  EXPECT_STREQ(sequence2[0].getMetaData().getAcquisitionDateAndTimeAsString().c_str(), "2015-07-07_153300");
+  EXPECT_STREQ(sequence2[4].getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Yarr2_1x");
+  EXPECT_STREQ(sequence2[4].getMetaData().getSampleGroupName().c_str(), "Test01");
+  EXPECT_STREQ(sequence2[4].getMetaData().getSequenceSegmentName().c_str(), "Group01");
+  EXPECT_TRUE(sequence2[4].getMetaData().getSampleType() == SampleType::Unknown);
+  EXPECT_STREQ(sequence2[4].getMetaData().getFilename().c_str(), "170808_Jonathan_yeast_Yarr2_1x_5_FluxTest_2015-07-07_153300"); // No default provided
+  EXPECT_STREQ(sequence2[4].getMetaData().acq_method_name.c_str(), "LCMS");
+  EXPECT_NEAR(sequence2[4].getMetaData().inj_volume, 10.0, 1e-3);
+  EXPECT_STREQ(sequence2[4].getMetaData().inj_volume_units.c_str(), "uL");
+  EXPECT_STREQ(sequence2[4].getMetaData().batch_name.c_str(), "FluxTest");
+  EXPECT_EQ(sequence2[4].getMetaData().inj_number, 5);
+  EXPECT_STREQ(sequence2[4].getMetaData().getAcquisitionDateAndTimeAsString().c_str(), "2015-07-07_153300");
 
   sequenceHandler.clear();
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_1_tab.csv");
   SequenceParser::readSequenceFile(sequenceHandler, pathname, "\t");
   const vector<InjectionHandler>& sequence3 = sequenceHandler.getSequence();
-  BOOST_CHECK_EQUAL(sequence3.size(), 5);
-  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getSampleType() == SampleType::Unknown, true);
-  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getFilename(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
-  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().acq_method_name, "LCMS");
-  BOOST_CHECK_CLOSE(sequence3[0].getMetaData().inj_volume, 10.0, 1e-3);
-  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().inj_volume_units, "uL");
-  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().inj_number, 1);
-  BOOST_CHECK_EQUAL(sequence3[0].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr2_1x");
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSequenceSegmentName(), "Group01");
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getSampleType() == SampleType::Unknown, true);
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getFilename(), "170808_Jonathan_yeast_Yarr2_1x_5_FluxTest_2015-07-07_153300"); // No default provided
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().acq_method_name, "LCMS");
-  BOOST_CHECK_CLOSE(sequence3[4].getMetaData().inj_volume, 10.0, 1e-3);
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().inj_volume_units, "uL");
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().batch_name, "FluxTest");
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().inj_number, 5);
-  BOOST_CHECK_EQUAL(sequence3[4].getMetaData().getAcquisitionDateAndTimeAsString(), "2015-07-07_153300");
+  
+  EXPECT_EQ(sequence3.size(), 5);
+  EXPECT_STREQ(sequence3[0].getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_STREQ(sequence3[0].getMetaData().getSampleGroupName().c_str(), "Test01");
+  EXPECT_STREQ(sequence3[0].getMetaData().getSequenceSegmentName().c_str(), "Group01");
+  EXPECT_TRUE(sequence3[0].getMetaData().getSampleType() == SampleType::Unknown);
+  EXPECT_STREQ(sequence3[0].getMetaData().getFilename().c_str(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  EXPECT_STREQ(sequence3[0].getMetaData().acq_method_name.c_str(), "LCMS");
+  EXPECT_NEAR(sequence3[0].getMetaData().inj_volume, 10.0, 1e-3);
+  EXPECT_STREQ(sequence3[0].getMetaData().inj_volume_units.c_str(), "uL");
+  EXPECT_STREQ(sequence3[0].getMetaData().batch_name.c_str(), "FluxTest");
+  EXPECT_EQ(sequence3[0].getMetaData().inj_number, 1);
+  EXPECT_STREQ(sequence3[0].getMetaData().getAcquisitionDateAndTimeAsString().c_str(), "2015-07-07_153300");
+  EXPECT_STREQ(sequence3[4].getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Yarr2_1x");
+  EXPECT_STREQ(sequence3[4].getMetaData().getSampleGroupName().c_str(), "Test01");
+  EXPECT_STREQ(sequence3[4].getMetaData().getSequenceSegmentName().c_str(), "Group01");
+  EXPECT_TRUE(sequence3[4].getMetaData().getSampleType() == SampleType::Unknown);
+  EXPECT_STREQ(sequence3[4].getMetaData().getFilename().c_str(), "170808_Jonathan_yeast_Yarr2_1x_5_FluxTest_2015-07-07_153300"); // No default provided
+  EXPECT_STREQ(sequence3[4].getMetaData().acq_method_name.c_str(), "LCMS");
+  EXPECT_NEAR(sequence3[4].getMetaData().inj_volume, 10.0, 1e-3);
+  EXPECT_STREQ(sequence3[4].getMetaData().inj_volume_units.c_str(), "uL");
+  EXPECT_STREQ(sequence3[4].getMetaData().batch_name.c_str(), "FluxTest");
+  EXPECT_EQ(sequence3[4].getMetaData().inj_number, 5);
+  EXPECT_STREQ(sequence3[4].getMetaData().getAcquisitionDateAndTimeAsString().c_str(), "2015-07-07_153300");
+  sequenceHandler.clear();
+  pathname = SMARTPEAK_GET_TEST_DATA_PATH("SequenceParser_sequence_with_NA.csv");
+  SequenceParser::readSequenceFile(sequenceHandler, pathname, ",");
+  const vector<InjectionHandler>& sequence4 = sequenceHandler.getSequence();
+  EXPECT_EQ(sequence4.size(), 4);
+  EXPECT_STREQ(sequence4[0].getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Sacc2_1x");
+  EXPECT_STREQ(sequence4[0].getMetaData().getSampleGroupName().c_str(), "Test01");
+  EXPECT_STREQ(sequence4[0].getMetaData().getSequenceSegmentName().c_str(), "Group01");
+  EXPECT_TRUE(sequence4[0].getMetaData().getSampleType() == SampleType::Unknown);
+  EXPECT_STREQ(sequence4[0].getMetaData().getFilename().c_str(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  EXPECT_STREQ(sequence4[0].getMetaData().acq_method_name.c_str(), "LCMS");
+  EXPECT_NEAR(sequence4[0].getMetaData().inj_volume, 10.0, 1e-3);
+  EXPECT_STREQ(sequence4[0].getMetaData().inj_volume_units.c_str(), "uL");
+  EXPECT_STREQ(sequence4[0].getMetaData().batch_name.c_str(), "FluxTest");
+  EXPECT_EQ(sequence4[0].getMetaData().inj_number, 2);
+  EXPECT_STREQ(sequence4[0].getMetaData().scan_polarity.c_str(), "positive");
+  EXPECT_EQ(sequence4[0].getMetaData().scan_mass_low, 60);
+  EXPECT_EQ(sequence4[0].getMetaData().scan_mass_high, 2000);
+  EXPECT_STREQ(sequence4[0].getMetaData().getAcquisitionDateAndTimeAsString().c_str(), "2015-07-07_153300");
+  EXPECT_STREQ(sequence4[3].getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Yarr2_1x");
+  EXPECT_STREQ(sequence4[3].getMetaData().getSampleGroupName().c_str(), "Test01");
+  EXPECT_STREQ(sequence4[3].getMetaData().getSequenceSegmentName().c_str(), "Group01");
+  EXPECT_TRUE(sequence4[3].getMetaData().getSampleType() == SampleType::Unknown);
+  EXPECT_STREQ(sequence4[3].getMetaData().getFilename().c_str(), "/home/user/code/test/data/mzML/170808_Jonathan_yeast_Sacc1_1x.mzML");
+  EXPECT_STREQ(sequence4[3].getMetaData().acq_method_name.c_str(), "LCMS");
+  EXPECT_NEAR(sequence4[3].getMetaData().inj_volume, 10.0, 1e-3);
+  EXPECT_STREQ(sequence4[3].getMetaData().inj_volume_units.c_str(), "uL");
+  EXPECT_STREQ(sequence4[3].getMetaData().batch_name.c_str(), "FluxTest");
+  EXPECT_EQ(sequence4[3].getMetaData().inj_number, 5);
+  EXPECT_STREQ(sequence4[3].getMetaData().scan_polarity.c_str(), "negative");
+  EXPECT_EQ(sequence4[3].getMetaData().scan_mass_low, 60);
+  EXPECT_EQ(sequence4[3].getMetaData().scan_mass_high, 2000);
+  EXPECT_STREQ(sequence4[3].getMetaData().getAcquisitionDateAndTimeAsString().c_str(), "2015-07-07_153300");
 }
 
-BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
+TEST_F(SequenceParserFixture, makeDataTableFromMetaValue)
 {
   vector<vector<string>> data_out;
   vector<string> headers_out;
@@ -194,89 +225,89 @@ BOOST_AUTO_TEST_CASE(makeDataTableFromMetaValue)
 
   SequenceParser::makeDataTableFromMetaValue(sequence_handler_, data_out, headers_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
-  BOOST_CHECK_EQUAL(data_out.size(), 1657);
-  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "Unknown");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "23dpg");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(23), std::to_string(235.0));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(24), std::to_string(3.52866193485212));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(27), std::to_string(15.605367));
-  BOOST_CHECK_EQUAL(data_out.at(0).at(28), std::to_string(15.836817));
-  BOOST_CHECK_EQUAL(headers_out.size(), 29);
-  BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
-  BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
-  BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
-  BOOST_CHECK_EQUAL(headers_out[3], "replicate_group_name");
-  BOOST_CHECK_EQUAL(headers_out[4], "component_name");
-  BOOST_CHECK_EQUAL(headers_out[5], "batch_name");
-  BOOST_CHECK_EQUAL(headers_out[6], "rack_number");
-  BOOST_CHECK_EQUAL(headers_out[7], "plate_number");
-  BOOST_CHECK_EQUAL(headers_out[8], "pos_number");
-  BOOST_CHECK_EQUAL(headers_out[9], "inj_number");
-  BOOST_CHECK_EQUAL(headers_out[10], "dilution_factor");
-  BOOST_CHECK_EQUAL(headers_out[11], "inj_volume");
-  BOOST_CHECK_EQUAL(headers_out[12], "inj_volume_units");
-  BOOST_CHECK_EQUAL(headers_out[13], "operator_name");
-  BOOST_CHECK_EQUAL(headers_out[14], "acq_method_name");
-  BOOST_CHECK_EQUAL(headers_out[15], "proc_method_name");
-  BOOST_CHECK_EQUAL(headers_out[16], "original_filename");
-  BOOST_CHECK_EQUAL(headers_out[17], "acquisition_date_and_time");
-  BOOST_CHECK_EQUAL(headers_out[18], "scan_polarity");
-  BOOST_CHECK_EQUAL(headers_out[19], "scan_mass_low");
-  BOOST_CHECK_EQUAL(headers_out[20], "scan_mass_high");
-  BOOST_CHECK_EQUAL(headers_out[21], "injection_name");
-  BOOST_CHECK_EQUAL(headers_out[22], "used_");
+  EXPECT_EQ(data_out.size(), 1657);
+  EXPECT_STREQ(data_out.at(0).at(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_STREQ(data_out.at(0).at(1).c_str(), "Unknown");
+  EXPECT_STREQ(data_out.at(0).at(2).c_str(), "23dpg");
+  EXPECT_STREQ(data_out.at(0).at(4).c_str(), "23dpg.23dpg_1.Heavy");
+  EXPECT_STREQ(data_out.at(0).at(23).c_str(), std::to_string(235.0).c_str());
+  EXPECT_STREQ(data_out.at(0).at(24).c_str(), std::to_string(3.52866193485212).c_str());
+  EXPECT_STREQ(data_out.at(0).at(27).c_str(), std::to_string(15.605367).c_str());
+  EXPECT_STREQ(data_out.at(0).at(28).c_str(), std::to_string(15.836817).c_str());
+  EXPECT_EQ(headers_out.size(), 29);
+  EXPECT_STREQ(headers_out[0].c_str(), "sample_name");
+  EXPECT_STREQ(headers_out[1].c_str(), "sample_type");
+  EXPECT_STREQ(headers_out[2].c_str(), "component_group_name");
+  EXPECT_STREQ(headers_out[3].c_str(), "replicate_group_name");
+  EXPECT_STREQ(headers_out[4].c_str(), "component_name");
+  EXPECT_STREQ(headers_out[5].c_str(), "batch_name");
+  EXPECT_STREQ(headers_out[6].c_str(), "rack_number");
+  EXPECT_STREQ(headers_out[7].c_str(), "plate_number");
+  EXPECT_STREQ(headers_out[8].c_str(), "pos_number");
+  EXPECT_STREQ(headers_out[9].c_str(), "inj_number");
+  EXPECT_STREQ(headers_out[10].c_str(), "dilution_factor");
+  EXPECT_STREQ(headers_out[11].c_str(), "inj_volume");
+  EXPECT_STREQ(headers_out[12].c_str(), "inj_volume_units");
+  EXPECT_STREQ(headers_out[13].c_str(), "operator_name");
+  EXPECT_STREQ(headers_out[14].c_str(), "acq_method_name");
+  EXPECT_STREQ(headers_out[15].c_str(), "proc_method_name");
+  EXPECT_STREQ(headers_out[16].c_str(), "original_filename");
+  EXPECT_STREQ(headers_out[17].c_str(), "acquisition_date_and_time");
+  EXPECT_STREQ(headers_out[18].c_str(), "scan_polarity");
+  EXPECT_STREQ(headers_out[19].c_str(), "scan_mass_low");
+  EXPECT_STREQ(headers_out[20].c_str(), "scan_mass_high");
+  EXPECT_STREQ(headers_out[21].c_str(), "injection_name");
+  EXPECT_STREQ(headers_out[22].c_str(), "used_");
   // metadata
-  BOOST_CHECK_EQUAL(headers_out[23], "peak_apex_int");
-  BOOST_CHECK_EQUAL(headers_out[24], "logSN");
-  BOOST_CHECK_EQUAL(headers_out[25], "QC_transition_message");
-  BOOST_CHECK_EQUAL(headers_out[26], "QC_transition_group_message");
-  BOOST_CHECK_EQUAL(headers_out[27], "leftWidth");
-  BOOST_CHECK_EQUAL(headers_out[28], "rightWidth");
+  EXPECT_STREQ(headers_out[23].c_str(), "peak_apex_int");
+  EXPECT_STREQ(headers_out[24].c_str(), "logSN");
+  EXPECT_STREQ(headers_out[25].c_str(), "QC_transition_message");
+  EXPECT_STREQ(headers_out[26].c_str(), "QC_transition_group_message");
+  EXPECT_STREQ(headers_out[27].c_str(), "leftWidth");
+  EXPECT_STREQ(headers_out[28].c_str(), "rightWidth");
 
   SequenceParser::makeDataTableFromMetaValue(sequence_handler_, data_out, headers_out, std::vector<std::string>({ "leftWidth" }), sample_types,
     std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
 
-  BOOST_CHECK_EQUAL(data_out.size(), 1);
-  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "Unknown");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "23dpg");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(23), std::to_string(15.605367));
-  BOOST_CHECK_EQUAL(headers_out.size(), 24);
-  BOOST_CHECK_EQUAL(headers_out[0], "sample_name");
-  BOOST_CHECK_EQUAL(headers_out[1], "sample_type");
-  BOOST_CHECK_EQUAL(headers_out[2], "component_group_name");
-  BOOST_CHECK_EQUAL(headers_out[3], "replicate_group_name");
-  BOOST_CHECK_EQUAL(headers_out[4], "component_name");
-  BOOST_CHECK_EQUAL(headers_out[5], "batch_name");
-  BOOST_CHECK_EQUAL(headers_out[6], "rack_number");
-  BOOST_CHECK_EQUAL(headers_out[7], "plate_number");
-  BOOST_CHECK_EQUAL(headers_out[8], "pos_number");
-  BOOST_CHECK_EQUAL(headers_out[9], "inj_number");
-  BOOST_CHECK_EQUAL(headers_out[10], "dilution_factor");
-  BOOST_CHECK_EQUAL(headers_out[11], "inj_volume");
-  BOOST_CHECK_EQUAL(headers_out[12], "inj_volume_units");
-  BOOST_CHECK_EQUAL(headers_out[13], "operator_name");
-  BOOST_CHECK_EQUAL(headers_out[14], "acq_method_name");
-  BOOST_CHECK_EQUAL(headers_out[15], "proc_method_name");
-  BOOST_CHECK_EQUAL(headers_out[16], "original_filename");
-  BOOST_CHECK_EQUAL(headers_out[17], "acquisition_date_and_time");
-  BOOST_CHECK_EQUAL(headers_out[18], "scan_polarity");
-  BOOST_CHECK_EQUAL(headers_out[19], "scan_mass_low");
-  BOOST_CHECK_EQUAL(headers_out[20], "scan_mass_high");
-  BOOST_CHECK_EQUAL(headers_out[21], "injection_name");
-  BOOST_CHECK_EQUAL(headers_out[22], "used_");
+  EXPECT_EQ(data_out.size(), 1);
+  EXPECT_STREQ(data_out.at(0).at(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_STREQ(data_out.at(0).at(1).c_str(), "Unknown");
+  EXPECT_STREQ(data_out.at(0).at(2).c_str(), "23dpg");
+  EXPECT_STREQ(data_out.at(0).at(4).c_str(), "23dpg.23dpg_1.Light");
+  EXPECT_STREQ(data_out.at(0).at(23).c_str(), std::to_string(15.605367).c_str());
+  EXPECT_EQ(headers_out.size(), 24);
+  EXPECT_STREQ(headers_out[0].c_str(), "sample_name");
+  EXPECT_STREQ(headers_out[1].c_str(), "sample_type");
+  EXPECT_STREQ(headers_out[2].c_str(), "component_group_name");
+  EXPECT_STREQ(headers_out[3].c_str(), "replicate_group_name");
+  EXPECT_STREQ(headers_out[4].c_str(), "component_name");
+  EXPECT_STREQ(headers_out[5].c_str(), "batch_name");
+  EXPECT_STREQ(headers_out[6].c_str(), "rack_number");
+  EXPECT_STREQ(headers_out[7].c_str(), "plate_number");
+  EXPECT_STREQ(headers_out[8].c_str(), "pos_number");
+  EXPECT_STREQ(headers_out[9].c_str(), "inj_number");
+  EXPECT_STREQ(headers_out[10].c_str(), "dilution_factor");
+  EXPECT_STREQ(headers_out[11].c_str(), "inj_volume");
+  EXPECT_STREQ(headers_out[12].c_str(), "inj_volume_units");
+  EXPECT_STREQ(headers_out[13].c_str(), "operator_name");
+  EXPECT_STREQ(headers_out[14].c_str(), "acq_method_name");
+  EXPECT_STREQ(headers_out[15].c_str(), "proc_method_name");
+  EXPECT_STREQ(headers_out[16].c_str(), "original_filename");
+  EXPECT_STREQ(headers_out[17].c_str(), "acquisition_date_and_time");
+  EXPECT_STREQ(headers_out[18].c_str(), "scan_polarity");
+  EXPECT_STREQ(headers_out[19].c_str(), "scan_mass_low");
+  EXPECT_STREQ(headers_out[20].c_str(), "scan_mass_high");
+  EXPECT_STREQ(headers_out[21].c_str(), "injection_name");
+  EXPECT_STREQ(headers_out[22].c_str(), "used_");
   // metadata
-  BOOST_CHECK_EQUAL(headers_out[23], "leftWidth");
+  EXPECT_STREQ(headers_out[23].c_str(), "leftWidth");
 
   // write sequence to output
   // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataTableFromMetaValue.csv");
   // SequenceParser::writeDataTableFromMetaValue(sequenceHandler, pathname_output, meta_data, sample_types);
 }
 
-BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
+TEST_F(SequenceParserFixture, makeDataMatrixFromMetaValue)
 {
   Eigen::Tensor<float, 2> data_out;
   Eigen::Tensor<std::string, 1> columns_out;
@@ -292,30 +323,30 @@ BOOST_AUTO_TEST_CASE(makeDataMatrixFromMetaValue)
 
   SequenceParser::makeDataMatrixFromMetaValue(sequence_handler_, data_out, columns_out, rows_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
-  BOOST_CHECK_EQUAL(columns_out.size(), 6);
-  BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(rows_out.dimension(0), 636);
-  BOOST_CHECK_EQUAL(rows_out.dimension(1), 3);
-  BOOST_CHECK_EQUAL(rows_out(0,1), "23dpg");
-  BOOST_CHECK_CLOSE(data_out(0,0), 15.6053667, 1e-3);
-  BOOST_CHECK_CLOSE(data_out(rows_out.dimension(0)-1,columns_out.size()-1), 1.66744995, 1e-3);
+  EXPECT_EQ(columns_out.size(), 6);
+  EXPECT_STREQ(columns_out(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_EQ(rows_out.dimension(0), 636);
+  EXPECT_EQ(rows_out.dimension(1), 3);
+  EXPECT_STREQ(rows_out(0,1).c_str(), "23dpg");
+  EXPECT_NEAR(data_out(0,0), 15.6053667, 1e-3);
+  EXPECT_NEAR(data_out(rows_out.dimension(0)-1,columns_out.size()-1), 1.66744995, 1e-3);
 
   SequenceParser::makeDataMatrixFromMetaValue(sequence_handler_, data_out, columns_out, rows_out, std::vector<std::string>({ "leftWidth" }), sample_types,
     std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
 
-  BOOST_CHECK_EQUAL(columns_out.size(), 1);
-  BOOST_CHECK_EQUAL(columns_out(0), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(rows_out.dimension(0), 1);
-  BOOST_CHECK_EQUAL(rows_out.dimension(1), 3);
-  BOOST_CHECK_EQUAL(rows_out(0, 1), "23dpg");
-  BOOST_CHECK_CLOSE(data_out(0, 0), 15.6053667, 1e-3);
+  EXPECT_EQ(columns_out.size(), 1);
+  EXPECT_STREQ(columns_out(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_EQ(rows_out.dimension(0), 1);
+  EXPECT_EQ(rows_out.dimension(1), 3);
+  EXPECT_STREQ(rows_out(0, 1).c_str(), "23dpg");
+  EXPECT_NEAR(data_out(0, 0), 15.6053667, 1e-3);
 
   // write sequence to output
   // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataMatrixFromMetaValue.csv");
   // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
 }
 
-BOOST_AUTO_TEST_CASE(makeSequenceSmartPeak)
+TEST(SequenceHandler, makeSequenceSmartPeak)
 {
   SequenceHandler sequenceHandler;
 
@@ -360,55 +391,55 @@ BOOST_AUTO_TEST_CASE(makeSequenceSmartPeak)
 
   SequenceParser::makeSequenceFileSmartPeak(sequenceHandler, data_out, headers_out);
 
-  BOOST_CHECK_EQUAL(data_out.size(), 6);
-  BOOST_REQUIRE(data_out.at(0).size() == 21);
-  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "sample_group");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "sequence_segment");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "replicate_group_name");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "Unknown");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(5), "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(6), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(7), "4");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(8), "3");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(9), "1");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(10), "1");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(11), "8.000000");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(12), "RapidRIP");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(13), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(14), "2020-01-01_171400");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(15), "7.000000");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(16), "8");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(17), "FluxTest");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(18), "negative");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(19), "60.000000");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(20), "2000.000000");
+  EXPECT_EQ(data_out.size(), 6);
+  EXPECT_TRUE(data_out.at(0).size() == 21);
+  EXPECT_STREQ(data_out.at(0).at(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_STREQ(data_out.at(0).at(1).c_str(), "sample_group");
+  EXPECT_STREQ(data_out.at(0).at(2).c_str(), "sequence_segment");
+  EXPECT_STREQ(data_out.at(0).at(3).c_str(), "replicate_group_name");
+  EXPECT_STREQ(data_out.at(0).at(4).c_str(), "Unknown");
+  EXPECT_STREQ(data_out.at(0).at(5).c_str(), "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
+  EXPECT_STREQ(data_out.at(0).at(6).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(7).c_str(), "4");
+  EXPECT_STREQ(data_out.at(0).at(8).c_str(), "3");
+  EXPECT_STREQ(data_out.at(0).at(9).c_str(), "1");
+  EXPECT_STREQ(data_out.at(0).at(10).c_str(), "1");
+  EXPECT_STREQ(data_out.at(0).at(11).c_str(), "8.000000");
+  EXPECT_STREQ(data_out.at(0).at(12).c_str(), "RapidRIP");
+  EXPECT_STREQ(data_out.at(0).at(13).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(14).c_str(), "2020-01-01_171400");
+  EXPECT_STREQ(data_out.at(0).at(15).c_str(), "7.000000");
+  EXPECT_STREQ(data_out.at(0).at(16).c_str(), "8");
+  EXPECT_STREQ(data_out.at(0).at(17).c_str(), "FluxTest");
+  EXPECT_STREQ(data_out.at(0).at(18).c_str(), "negative");
+  EXPECT_STREQ(data_out.at(0).at(19).c_str(), "60.000000");
+  EXPECT_STREQ(data_out.at(0).at(20).c_str(), "2000.000000");
 
-  BOOST_CHECK_EQUAL(headers_out.size(), 21);
-  BOOST_CHECK_EQUAL(headers_out.at(0), "sample_name");
-  BOOST_CHECK_EQUAL(headers_out.at(1), "sample_group_name");
-  BOOST_CHECK_EQUAL(headers_out.at(2), "sequence_segment_name");
-  BOOST_CHECK_EQUAL(headers_out.at(3), "replicate_group_name");
-  BOOST_CHECK_EQUAL(headers_out.at(4), "sample_type");
-  BOOST_CHECK_EQUAL(headers_out.at(5), "original_filename");
-  BOOST_CHECK_EQUAL(headers_out.at(6), "proc_method_name");
-  BOOST_CHECK_EQUAL(headers_out.at(7), "rack_number");
-  BOOST_CHECK_EQUAL(headers_out.at(8), "plate_number");
-  BOOST_CHECK_EQUAL(headers_out.at(9), "pos_number");
-  BOOST_CHECK_EQUAL(headers_out.at(10), "inj_number");
-  BOOST_CHECK_EQUAL(headers_out.at(11), "dilution_factor");
-  BOOST_CHECK_EQUAL(headers_out.at(12), "acq_method_name");
-  BOOST_CHECK_EQUAL(headers_out.at(13), "operator_name");
-  BOOST_CHECK_EQUAL(headers_out.at(14), "acquisition_date_and_time");
-  BOOST_CHECK_EQUAL(headers_out.at(15), "inj_volume");
-  BOOST_CHECK_EQUAL(headers_out.at(16), "inj_volume_units");
-  BOOST_CHECK_EQUAL(headers_out.at(17), "batch_name");
-  BOOST_CHECK_EQUAL(headers_out.at(18), "scan_polarity");
-  BOOST_CHECK_EQUAL(headers_out.at(19), "scan_mass_low");
-  BOOST_CHECK_EQUAL(headers_out.at(20), "scan_mass_high");
+  EXPECT_EQ(headers_out.size(), 21);
+  EXPECT_STREQ(headers_out.at(0).c_str(), "sample_name");
+  EXPECT_STREQ(headers_out.at(1).c_str(), "sample_group_name");
+  EXPECT_STREQ(headers_out.at(2).c_str(), "sequence_segment_name");
+  EXPECT_STREQ(headers_out.at(3).c_str(), "replicate_group_name");
+  EXPECT_STREQ(headers_out.at(4).c_str(), "sample_type");
+  EXPECT_STREQ(headers_out.at(5).c_str(), "original_filename");
+  EXPECT_STREQ(headers_out.at(6).c_str(), "proc_method_name");
+  EXPECT_STREQ(headers_out.at(7).c_str(), "rack_number");
+  EXPECT_STREQ(headers_out.at(8).c_str(), "plate_number");
+  EXPECT_STREQ(headers_out.at(9).c_str(), "pos_number");
+  EXPECT_STREQ(headers_out.at(10).c_str(), "inj_number");
+  EXPECT_STREQ(headers_out.at(11).c_str(), "dilution_factor");
+  EXPECT_STREQ(headers_out.at(12).c_str(), "acq_method_name");
+  EXPECT_STREQ(headers_out.at(13).c_str(), "operator_name");
+  EXPECT_STREQ(headers_out.at(14).c_str(), "acquisition_date_and_time");
+  EXPECT_STREQ(headers_out.at(15).c_str(), "inj_volume");
+  EXPECT_STREQ(headers_out.at(16).c_str(), "inj_volume_units");
+  EXPECT_STREQ(headers_out.at(17).c_str(), "batch_name");
+  EXPECT_STREQ(headers_out.at(18).c_str(), "scan_polarity");
+  EXPECT_STREQ(headers_out.at(19).c_str(), "scan_mass_low");
+  EXPECT_STREQ(headers_out.at(20).c_str(), "scan_mass_high");
 }
 
-BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
+TEST(SequenceHandler, makeSequenceFileAnalyst)
 {
   SequenceHandler sequenceHandler;
 
@@ -453,43 +484,43 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileAnalyst)
 
   SequenceParser::makeSequenceFileAnalyst(sequenceHandler, data_out, headers_out);
 
-  BOOST_CHECK_EQUAL(data_out.size(), 6);
-  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "RapidRIP.dam");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "none");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(5), "CStk1-04");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(6), "MT96_or_VT54");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(7), "1");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(8), "7.000000");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(9), "8.000000");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(10), "0");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(11), "Unknown");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(12), "4");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(13), "3");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(14), "2020-01-01_171400");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(15), "2020-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
-  BOOST_CHECK_EQUAL(headers_out.size(), 16);
-  BOOST_CHECK_EQUAL(headers_out.at(0), "% header=SampleName");
-  BOOST_CHECK_EQUAL(headers_out.at(1), "SampleID");
-  BOOST_CHECK_EQUAL(headers_out.at(2), "Comments");
-  BOOST_CHECK_EQUAL(headers_out.at(3), "AcqMethod");
-  BOOST_CHECK_EQUAL(headers_out.at(4), "ProcMethod");
-  BOOST_CHECK_EQUAL(headers_out.at(5), "RackCode");
-  BOOST_CHECK_EQUAL(headers_out.at(6), "PlateCode");
-  BOOST_CHECK_EQUAL(headers_out.at(7), "VialPos");
-  BOOST_CHECK_EQUAL(headers_out.at(8), "SmplInjVol");
-  BOOST_CHECK_EQUAL(headers_out.at(9), "DilutFact");
-  BOOST_CHECK_EQUAL(headers_out.at(10), "WghtToVol");
-  BOOST_CHECK_EQUAL(headers_out.at(11), "Type");
-  BOOST_CHECK_EQUAL(headers_out.at(12), "RackPos");
-  BOOST_CHECK_EQUAL(headers_out.at(13), "PlatePos");
-  BOOST_CHECK_EQUAL(headers_out.at(14), "SetName");
-  BOOST_CHECK_EQUAL(headers_out.at(15), "OutputFile");
+  EXPECT_EQ(data_out.size(), 6);
+  EXPECT_STREQ(data_out.at(0).at(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
+  EXPECT_STREQ(data_out.at(0).at(1).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_STREQ(data_out.at(0).at(2).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(3).c_str(), "RapidRIP.dam");
+  EXPECT_STREQ(data_out.at(0).at(4).c_str(), "none");
+  EXPECT_STREQ(data_out.at(0).at(5).c_str(), "CStk1-04");
+  EXPECT_STREQ(data_out.at(0).at(6).c_str(), "MT96_or_VT54");
+  EXPECT_STREQ(data_out.at(0).at(7).c_str(), "1");
+  EXPECT_STREQ(data_out.at(0).at(8).c_str(), "7.000000");
+  EXPECT_STREQ(data_out.at(0).at(9).c_str(), "8.000000");
+  EXPECT_STREQ(data_out.at(0).at(10).c_str(), "0");
+  EXPECT_STREQ(data_out.at(0).at(11).c_str(), "Unknown");
+  EXPECT_STREQ(data_out.at(0).at(12).c_str(), "4");
+  EXPECT_STREQ(data_out.at(0).at(13).c_str(), "3");
+  EXPECT_STREQ(data_out.at(0).at(14).c_str(), "2020-01-01_171400");
+  EXPECT_STREQ(data_out.at(0).at(15).c_str(), "2020-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
+  EXPECT_EQ(headers_out.size(), 16);
+  EXPECT_STREQ(headers_out.at(0).c_str(), "% header=SampleName");
+  EXPECT_STREQ(headers_out.at(1).c_str(), "SampleID");
+  EXPECT_STREQ(headers_out.at(2).c_str(), "Comments");
+  EXPECT_STREQ(headers_out.at(3).c_str(), "AcqMethod");
+  EXPECT_STREQ(headers_out.at(4).c_str(), "ProcMethod");
+  EXPECT_STREQ(headers_out.at(5).c_str(), "RackCode");
+  EXPECT_STREQ(headers_out.at(6).c_str(), "PlateCode");
+  EXPECT_STREQ(headers_out.at(7).c_str(), "VialPos");
+  EXPECT_STREQ(headers_out.at(8).c_str(), "SmplInjVol");
+  EXPECT_STREQ(headers_out.at(9).c_str(), "DilutFact");
+  EXPECT_STREQ(headers_out.at(10).c_str(), "WghtToVol");
+  EXPECT_STREQ(headers_out.at(11).c_str(), "Type");
+  EXPECT_STREQ(headers_out.at(12).c_str(), "RackPos");
+  EXPECT_STREQ(headers_out.at(13).c_str(), "PlatePos");
+  EXPECT_STREQ(headers_out.at(14).c_str(), "SetName");
+  EXPECT_STREQ(headers_out.at(15).c_str(), "OutputFile");
 }
 
-BOOST_AUTO_TEST_CASE(makeSequenceFileMasshunter)
+TEST(SequenceHandler, makeSequenceFileMasshunter)
 {
   SequenceHandler sequenceHandler;
 
@@ -533,35 +564,35 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileMasshunter)
 
   SequenceParser::makeSequenceFileMasshunter(sequenceHandler, data_out, headers_out);
 
-  BOOST_CHECK_EQUAL(data_out.size(), 6);
-  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "1");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "D:\\DATA\\TODO");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "RapidRIP.M");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "D:\\DATA\\TODO");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(5), "2020-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(6), "Unknown");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(7), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(8), "8.000000");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(9), "7.000000");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(10), "Rack 4");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(11), "");
-  BOOST_CHECK_EQUAL(headers_out.size(), 12);
-  BOOST_CHECK_EQUAL(headers_out.at(0), "Name");
-  BOOST_CHECK_EQUAL(headers_out.at(1), "Vial");
-  BOOST_CHECK_EQUAL(headers_out.at(2), "Method Path");
-  BOOST_CHECK_EQUAL(headers_out.at(3), "Mathod File");
-  BOOST_CHECK_EQUAL(headers_out.at(4), "Data Path");
-  BOOST_CHECK_EQUAL(headers_out.at(5), "Data File");
-  BOOST_CHECK_EQUAL(headers_out.at(6), "Type");
-  BOOST_CHECK_EQUAL(headers_out.at(7), "Level");
-  BOOST_CHECK_EQUAL(headers_out.at(8), "Dil.");
-  BOOST_CHECK_EQUAL(headers_out.at(9), "Vol.");
-  BOOST_CHECK_EQUAL(headers_out.at(10), "Tray Name");
-  BOOST_CHECK_EQUAL(headers_out.at(11), "Comment");
+  EXPECT_EQ(data_out.size(), 6);
+  EXPECT_STREQ(data_out.at(0).at(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_STREQ(data_out.at(0).at(1).c_str(), "1");
+  EXPECT_STREQ(data_out.at(0).at(2).c_str(), "D:\\DATA\\TODO");
+  EXPECT_STREQ(data_out.at(0).at(3).c_str(), "RapidRIP.M");
+  EXPECT_STREQ(data_out.at(0).at(4).c_str(), "D:\\DATA\\TODO");
+  EXPECT_STREQ(data_out.at(0).at(5).c_str(), "2020-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
+  EXPECT_STREQ(data_out.at(0).at(6).c_str(), "Unknown");
+  EXPECT_STREQ(data_out.at(0).at(7).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(8).c_str(), "8.000000");
+  EXPECT_STREQ(data_out.at(0).at(9).c_str(), "7.000000");
+  EXPECT_STREQ(data_out.at(0).at(10).c_str(), "Rack 4");
+  EXPECT_STREQ(data_out.at(0).at(11).c_str(), "");
+  EXPECT_EQ(headers_out.size(), 12);
+  EXPECT_STREQ(headers_out.at(0).c_str(), "Name");
+  EXPECT_STREQ(headers_out.at(1).c_str(), "Vial");
+  EXPECT_STREQ(headers_out.at(2).c_str(), "Method Path");
+  EXPECT_STREQ(headers_out.at(3).c_str(), "Mathod File");
+  EXPECT_STREQ(headers_out.at(4).c_str(), "Data Path");
+  EXPECT_STREQ(headers_out.at(5).c_str(), "Data File");
+  EXPECT_STREQ(headers_out.at(6).c_str(), "Type");
+  EXPECT_STREQ(headers_out.at(7).c_str(), "Level");
+  EXPECT_STREQ(headers_out.at(8).c_str(), "Dil.");
+  EXPECT_STREQ(headers_out.at(9).c_str(), "Vol.");
+  EXPECT_STREQ(headers_out.at(10).c_str(), "Tray Name");
+  EXPECT_STREQ(headers_out.at(11).c_str(), "Comment");
 }
 
-BOOST_AUTO_TEST_CASE(makeSequenceFileXcalibur)
+TEST(SequenceHandler, makeSequenceFileXcalibur)
 {
   SequenceHandler sequenceHandler;
 
@@ -606,107 +637,105 @@ BOOST_AUTO_TEST_CASE(makeSequenceFileXcalibur)
 
   SequenceParser::makeSequenceFileXcalibur(sequenceHandler, data_out, headers_out);
 
-  BOOST_CHECK_EQUAL(data_out.size(), 6);
-  BOOST_CHECK_EQUAL(data_out.at(0).at(0), "Unknown");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(1), "2020-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(2), "1");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(3), "D:\\DATA\\TODO");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(4), "RapidRIP");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(5), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(6), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(7), "R:TODO1");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(8), "7.000000");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(9), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(10), "0");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(11), "0");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(12), "0");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(13), "8.000000");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(14), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(15), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(16), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(17), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(18), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(19), "");
-  BOOST_CHECK_EQUAL(data_out.at(0).at(20), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(headers_out.size(), 21);
-  BOOST_CHECK_EQUAL(headers_out.at(0), "Sample Type");
-  BOOST_CHECK_EQUAL(headers_out.at(1), "File Name");
-  BOOST_CHECK_EQUAL(headers_out.at(2), "Sample ID");
-  BOOST_CHECK_EQUAL(headers_out.at(3), "Path");
-  BOOST_CHECK_EQUAL(headers_out.at(4), "Instrument Method");
-  BOOST_CHECK_EQUAL(headers_out.at(5), "Process Method");
-  BOOST_CHECK_EQUAL(headers_out.at(6), "Calibration File");
-  BOOST_CHECK_EQUAL(headers_out.at(7), "Position");
-  BOOST_CHECK_EQUAL(headers_out.at(8), "Inj Vol");
-  BOOST_CHECK_EQUAL(headers_out.at(9), "Level");
-  BOOST_CHECK_EQUAL(headers_out.at(10), "Sample Wt");
-  BOOST_CHECK_EQUAL(headers_out.at(11), "Sample Vol");
-  BOOST_CHECK_EQUAL(headers_out.at(12), "ISTD Amt");
-  BOOST_CHECK_EQUAL(headers_out.at(13), "Dil Factor");
-  BOOST_CHECK_EQUAL(headers_out.at(14), "L1 Study");
-  BOOST_CHECK_EQUAL(headers_out.at(15), "L2 Client");
-  BOOST_CHECK_EQUAL(headers_out.at(16), "L3 Laboratory");
-  BOOST_CHECK_EQUAL(headers_out.at(17), "L4 Company");
-  BOOST_CHECK_EQUAL(headers_out.at(18), "L5 Phone");
-  BOOST_CHECK_EQUAL(headers_out.at(19), "Comment");
-  BOOST_CHECK_EQUAL(headers_out.at(20), "Sample Name");
+  EXPECT_EQ(data_out.size(), 6);
+  EXPECT_STREQ(data_out.at(0).at(0).c_str(), "Unknown");
+  EXPECT_STREQ(data_out.at(0).at(1).c_str(), "2020-01-01_171400\\170808_Jonathan_yeast_Sacc1_1x_1_FluxTest_2020-01-01_171400");
+  EXPECT_STREQ(data_out.at(0).at(2).c_str(), "1");
+  EXPECT_STREQ(data_out.at(0).at(3).c_str(), "D:\\DATA\\TODO");
+  EXPECT_STREQ(data_out.at(0).at(4).c_str(), "RapidRIP");
+  EXPECT_STREQ(data_out.at(0).at(5).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(6).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(7).c_str(), "R:TODO1");
+  EXPECT_STREQ(data_out.at(0).at(8).c_str(), "7.000000");
+  EXPECT_STREQ(data_out.at(0).at(9).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(10).c_str(), "0");
+  EXPECT_STREQ(data_out.at(0).at(11).c_str(), "0");
+  EXPECT_STREQ(data_out.at(0).at(12).c_str(), "0");
+  EXPECT_STREQ(data_out.at(0).at(13).c_str(), "8.000000");
+  EXPECT_STREQ(data_out.at(0).at(14).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(15).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(16).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(17).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(18).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(19).c_str(), "");
+  EXPECT_STREQ(data_out.at(0).at(20).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_EQ(headers_out.size(), 21);
+  EXPECT_STREQ(headers_out.at(0).c_str(), "Sample Type");
+  EXPECT_STREQ(headers_out.at(1).c_str(), "File Name");
+  EXPECT_STREQ(headers_out.at(2).c_str(), "Sample ID");
+  EXPECT_STREQ(headers_out.at(3).c_str(), "Path");
+  EXPECT_STREQ(headers_out.at(4).c_str(), "Instrument Method");
+  EXPECT_STREQ(headers_out.at(5).c_str(), "Process Method");
+  EXPECT_STREQ(headers_out.at(6).c_str(), "Calibration File");
+  EXPECT_STREQ(headers_out.at(7).c_str(), "Position");
+  EXPECT_STREQ(headers_out.at(8).c_str(), "Inj Vol");
+  EXPECT_STREQ(headers_out.at(9).c_str(), "Level");
+  EXPECT_STREQ(headers_out.at(10).c_str(), "Sample Wt");
+  EXPECT_STREQ(headers_out.at(11).c_str(), "Sample Vol");
+  EXPECT_STREQ(headers_out.at(12).c_str(), "ISTD Amt");
+  EXPECT_STREQ(headers_out.at(13).c_str(), "Dil Factor");
+  EXPECT_STREQ(headers_out.at(14).c_str(), "L1 Study");
+  EXPECT_STREQ(headers_out.at(15).c_str(), "L2 Client");
+  EXPECT_STREQ(headers_out.at(16).c_str(), "L3 Laboratory");
+  EXPECT_STREQ(headers_out.at(17).c_str(), "L4 Company");
+  EXPECT_STREQ(headers_out.at(18).c_str(), "L5 Phone");
+  EXPECT_STREQ(headers_out.at(19).c_str(), "Comment");
+  EXPECT_STREQ(headers_out.at(20).c_str(), "Sample Name");
 }
 
 /* StoreSequenceFileAnalyst */
-BOOST_AUTO_TEST_CASE(StoreSequenceFileAnalyst_ProcessFailsOnEmptySequence)
+TEST_F(SequenceParserFixture, StoreSequenceFileAnalyst_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHandler with empty sequence
   ApplicationHandler ah;
   StoreSequenceFileAnalyst cmd;
   auto store = cmd.onFilePicked("test", &ah);
-  BOOST_CHECK(!store);
+  EXPECT_TRUE(!store);
 }
 
-BOOST_AUTO_TEST_CASE(StoreSequenceFileAnalyst_ProcessSucceedsOnNonEmptySequence)
+TEST_F(SequenceParserFixture, StoreSequenceFileAnalyst_ProcessSucceedsOnNonEmptySequence)
 {
   ApplicationHandler ah;
   ah.sequenceHandler_ = sequence_handler_;
   StoreSequenceFileAnalyst cmd;
   std::string filename = std::tmpnam(nullptr);
-  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
+  EXPECT_TRUE(cmd.onFilePicked(filename, &ah));
 }
 
 /* StoreSequenceFileMasshunter */
-BOOST_AUTO_TEST_CASE(StoreSequenceFileMasshunter_ProcessFailsOnEmptySequence)
+TEST_F(SequenceParserFixture, StoreSequenceFileMasshunter_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHandler with empty sequence
   ApplicationHandler ah;
   StoreSequenceFileMasshunter cmd;
   auto store = cmd.onFilePicked("test", &ah);
-  BOOST_CHECK(!store);
+  EXPECT_TRUE(!store);
 }
 
-BOOST_AUTO_TEST_CASE(StoreSequenceFileMasshunter_ProcessSucceedsOnNonEmptySequence)
+TEST_F(SequenceParserFixture, StoreSequenceFileMasshunter_ProcessSucceedsOnNonEmptySequence)
 {
   ApplicationHandler ah;
   ah.sequenceHandler_ = sequence_handler_;
   StoreSequenceFileMasshunter cmd;
   std::string filename = std::tmpnam(nullptr);
-  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
+  EXPECT_TRUE(cmd.onFilePicked(filename, &ah));
 }
 
 /* StoreSequenceFileXcalibur */
-BOOST_AUTO_TEST_CASE(StoreSequenceFileXcalibur_ProcessFailsOnEmptySequence)
+TEST(SequenceHandler, StoreSequenceFileXcalibur_ProcessFailsOnEmptySequence)
 {
   // Default ApplicationHandler has a default SequenceHandler with empty sequence
   ApplicationHandler ah;
   StoreSequenceFileXcalibur cmd;
   auto store = cmd.onFilePicked("test", &ah);
-  BOOST_CHECK(!store);
+  EXPECT_TRUE(!store);
 }
 
-BOOST_AUTO_TEST_CASE(StoreSequenceFileXcalibur_ProcessSucceedsOnNonEmptySequence)
+TEST_F(SequenceParserFixture, StoreSequenceFileXcalibur_ProcessSucceedsOnNonEmptySequence)
 {
   ApplicationHandler ah;
   ah.sequenceHandler_ = sequence_handler_;
   StoreSequenceFileXcalibur cmd;
   std::string filename = std::tmpnam(nullptr);
-  BOOST_CHECK(cmd.onFilePicked(filename, &ah));
+  EXPECT_TRUE(cmd.onFilePicked(filename, &ah));
 }
-
-BOOST_AUTO_TEST_SUITE_END()

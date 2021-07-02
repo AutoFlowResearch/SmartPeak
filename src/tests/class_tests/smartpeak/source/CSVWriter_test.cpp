@@ -17,14 +17,12 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE CSVWriter test suite
-#include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/CSVWriter.h>
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
@@ -37,37 +35,35 @@ using namespace std;
 CSVWriter* ptr = nullptr;
 CSVWriter* const nullPointer = nullptr;
 
-BOOST_AUTO_TEST_SUITE(CSVWriter1)
-
-BOOST_AUTO_TEST_CASE(constructor)
+TEST(CSVWriter, constructor)
 {
   ptr = new CSVWriter();
-  BOOST_CHECK_NE(ptr, nullPointer);
+  EXPECT_NE(ptr, nullPointer);
   delete ptr;
 }
 
-BOOST_AUTO_TEST_CASE(constructor2)
+TEST(CSVWriter, constructor2)
 {
   CSVWriter csvwriter("filename1", ";");
 
-  BOOST_CHECK_EQUAL(csvwriter.getFilename(), "filename1");
-  BOOST_CHECK_EQUAL(csvwriter.getDelimeter(), ";");
-  BOOST_CHECK_EQUAL(csvwriter.getLineCount(), 0);
+  EXPECT_STREQ(csvwriter.getFilename().c_str(), "filename1");
+  EXPECT_STREQ(csvwriter.getDelimeter().c_str(), ";");
+  EXPECT_EQ(csvwriter.getLineCount(), 0);
 }
 
-BOOST_AUTO_TEST_CASE(gettersAndSetters)
+TEST(CSVWriter, gettersAndSetters)
 {
   CSVWriter csvwriter;
   csvwriter.setFilename("filename1");
   csvwriter.setDelimeter(";");
   csvwriter.setLineCount(1);
 
-  BOOST_CHECK_EQUAL(csvwriter.getFilename(), "filename1");
-  BOOST_CHECK_EQUAL(csvwriter.getDelimeter(), ";");
-  BOOST_CHECK_EQUAL(csvwriter.getLineCount(), 1);
+  EXPECT_STREQ(csvwriter.getFilename().c_str(), "filename1");
+  EXPECT_STREQ(csvwriter.getDelimeter().c_str(), ";");
+  EXPECT_EQ(csvwriter.getLineCount(), 1);
 }
 
-BOOST_AUTO_TEST_CASE(writeDataInRow)
+TEST(CSVWriter, writeDataInRow)
 {
   const std::string filename = SMARTPEAK_GET_TEST_DATA_PATH("output/CSVWriterTest.csv");
   std::vector<std::string> headers, line;
@@ -87,14 +83,12 @@ BOOST_AUTO_TEST_CASE(writeDataInRow)
   std::string col1, col2, col3;
 
   test_in.read_row(col1, col2, col3);
-  BOOST_CHECK_EQUAL(col1, "a");
-  BOOST_CHECK_EQUAL(col2, "b");
-  BOOST_CHECK_EQUAL(col3, "c");
+  EXPECT_STREQ(col1.c_str(), "a");
+  EXPECT_STREQ(col2.c_str(), "b");
+  EXPECT_STREQ(col3.c_str(), "c");
 
   test_in.read_row(col1, col2, col3);
-  BOOST_CHECK_EQUAL(col1, "1");
-  BOOST_CHECK_EQUAL(col2, "2");
-  BOOST_CHECK_EQUAL(col3, "3");
+  EXPECT_STREQ(col1.c_str(), "1");
+  EXPECT_STREQ(col2.c_str(), "2");
+  EXPECT_STREQ(col3.c_str(), "3");
 }
-
-BOOST_AUTO_TEST_SUITE_END()

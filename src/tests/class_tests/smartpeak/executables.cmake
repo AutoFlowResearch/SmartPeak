@@ -6,8 +6,7 @@ set(core_executables_list
 	CastValue_test
 	ConsoleHandler_test
 	EventDispatcher_test
-	Filenames_test
-	Helloworld_test
+	Filenames_test  
 	ImEntry_test
 	InjectionHandler_test
 	MetaDataHandler_test

@@ -17,14 +17,12 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE GuiAppender test suite
-#include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/ui/GuiAppender.h>
 #include <thread>
 
@@ -40,18 +38,16 @@ void f(GuiAppender& appender, const std::vector<int>& numbers)
   }
 }
 
-BOOST_AUTO_TEST_SUITE(guiappender)
-
-BOOST_AUTO_TEST_CASE(constructor)
+TEST(Guiappender, constructor)
 {
   GuiAppender* p1 = nullptr;
   GuiAppender* nullPointer = nullptr;
   p1 = new GuiAppender();
-  BOOST_CHECK_NE(p1, nullPointer);
+  EXPECT_NE(p1, nullPointer);
   delete p1;
 }
 
-BOOST_AUTO_TEST_CASE(thread_safety)
+TEST(Guiappender, thread_safety)
 {
   GuiAppender appender;
   const vector<int> numbers = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -67,7 +63,7 @@ BOOST_AUTO_TEST_CASE(thread_safety)
 
   const std::vector<plog::util::nstring> log = appender.getMessageList(plog::Severity::verbose);
 
-  BOOST_CHECK_EQUAL(log.size(), 30); // ensure the correct number of entries
+  EXPECT_EQ(log.size(), 30); // ensure the correct number of entries
 
   // auto endsWith = [](const plog::util::nchar* pattern)
   // {
@@ -81,16 +77,14 @@ BOOST_AUTO_TEST_CASE(thread_safety)
   // ensure that entries end with the expected pattern, for the correct number of times
   // since we have three threads appending the same vector elements, we expect the same
   // string endings three times for each symbol
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("0\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("1\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("2\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("3\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("4\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("5\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("6\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("7\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("8\n")), 3);
-  // BOOST_CHECK_EQUAL(std::count_if(log.cbegin(), log.cend(), endsWith("9\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("0\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("1\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("2\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("3\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("4\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("5\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("6\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("7\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("8\n")), 3);
+  // EXPECT_EQ(std::count_if(log.cbegin(), log.cend(), endsWith("9\n")), 3);
 }
-
-BOOST_AUTO_TEST_SUITE_END()

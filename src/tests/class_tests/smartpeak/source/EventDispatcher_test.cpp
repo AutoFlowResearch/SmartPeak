@@ -17,12 +17,12 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
+// $Maintainer: Bertrand Boudaud, Ahmed Khalil $
 // $Authors: Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
-#define BOOST_TEST_MODULE EventDispatcher test suite
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/core/EventDispatcher.h>
 
@@ -44,7 +44,7 @@ namespace std
 
 using namespace SmartPeak;
 
-struct EventDispatcherFixture
+struct EventDispatcherFixture : public ::testing::Test
 {
   struct EventDispatcherFixtureObservable:
     ApplicationProcessorObservable,
@@ -182,15 +182,12 @@ public:
   EventDispatcherObserver event_displatcher_observer;
 };
 
-BOOST_FIXTURE_TEST_SUITE(EventDispatcher, EventDispatcherFixture)
-
-
-BOOST_AUTO_TEST_CASE(dispatchEvents)
+TEST_F(EventDispatcherFixture, dispatchEvents)
 {
   std::vector<std::tuple<std::string, size_t, std::string, std::vector<std::string>>>
     expected_commands{ };
-  BOOST_CHECK_EQUAL_COLLECTIONS(event_displatcher_observer.events_.begin(), event_displatcher_observer.events_.end(),
-    expected_commands.begin(), expected_commands.end());
+  
+  EXPECT_THAT(event_displatcher_observer.events_, ::testing::ContainerEq(expected_commands));
 
   std::vector<std::string> commands =
   {
@@ -199,6 +196,7 @@ BOOST_AUTO_TEST_CASE(dispatchEvents)
     "command3",
     "command4"
   };
+  
   event_dispatcher_observable.notifyApplicationProcessorStart(commands);
   event_dispatcher_observable.notifyApplicationProcessorCommandStart(1, "command1");
   event_dispatcher_observable.notifyApplicationProcessorCommandStart(2, "command2");
@@ -222,8 +220,7 @@ BOOST_AUTO_TEST_CASE(dispatchEvents)
   event_dispatcher_observable.notifyApplicationProcessorCommandEnd(4, "command4");
   event_dispatcher_observable.notifyApplicationProcessorEnd();
 
-  BOOST_CHECK_EQUAL_COLLECTIONS(event_displatcher_observer.events_.begin(), event_displatcher_observer.events_.end(),
-    expected_commands.begin(), expected_commands.end());
+  EXPECT_THAT(event_displatcher_observer.events_, ::testing::ContainerEq(expected_commands));
 
   event_dispatcher.dispatchEvents();
 
@@ -253,8 +250,5 @@ BOOST_AUTO_TEST_CASE(dispatchEvents)
     {"onApplicationProcessorEnd",0,"", std::vector<std::string>()},
   };
 
-  BOOST_CHECK_EQUAL_COLLECTIONS(event_displatcher_observer.events_.begin(), event_displatcher_observer.events_.end(),
-    expected_commands.begin(), expected_commands.end());
+  EXPECT_THAT(event_displatcher_observer.events_, ::testing::ContainerEq(expected_commands));
 }
-
-BOOST_AUTO_TEST_SUITE_END()
