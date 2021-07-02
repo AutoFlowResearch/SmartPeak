@@ -28,6 +28,7 @@
 #include <future>
 
 namespace SmartPeak {
+
   void WorkflowManager::addWorkflow(ApplicationHandler& source_app_handler, 
     const std::set<std::string>& injection_names, 
     const std::set<std::string>& sequence_segment_names, 
@@ -36,7 +37,8 @@ namespace SmartPeak {
     IApplicationProcessorObserver* application_processor_observer,
     ISequenceProcessorObserver* sequence_processor_observer,
     ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
-    ISampleGroupProcessorObserver* sample_group_processor_observer)
+    ISampleGroupProcessorObserver* sample_group_processor_observer,
+    bool blocking)
   {
     // do not run workflows concurrently
     if (!done_) {
@@ -51,20 +53,29 @@ namespace SmartPeak {
     const std::set<std::string> sample_group_names_(sample_group_names);
     const std::vector<ApplicationHandler::Command> commands_(commands);
 
-    std::thread t(run_and_join, 
-                  std::ref(application_handler_),
-                  std::ref(done_),
-                  injection_names_,
-                  sequence_segment_names_,
-                  sample_group_names_,
-                  commands_,
-                  application_processor_observer,
-                  sequence_processor_observer,
-                  sequence_segment_processor_observer,
-                  sample_group_processor_observer);
-    LOGD << "Created thread (to be detached): " << t.get_id();
-    t.detach();
-    LOGD << "Thread has been detached";
+    if (!blocking)
+    {
+      std::thread t(run_and_join, 
+                    std::ref(application_handler_),
+                    std::ref(done_),
+                    injection_names_,
+                    sequence_segment_names_,
+                    sample_group_names_,
+                    commands_,
+                    application_processor_observer,
+                    sequence_processor_observer,
+                    sequence_segment_processor_observer,
+                    sample_group_processor_observer);
+      LOGD << "Created thread (to be detached): " << t.get_id();
+      t.detach();
+      LOGD << "Thread has been detached";
+    }
+    else
+    {
+      run_and_join(application_handler_, done_, injection_names_,
+        sequence_segment_names_, sample_group_names_, commands_, application_processor_observer,
+        sequence_processor_observer, sequence_segment_processor_observer, sample_group_processor_observer);
+    }
   }
 
   bool WorkflowManager::isWorkflowDone() const

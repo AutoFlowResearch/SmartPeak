@@ -21,12 +21,14 @@ SmartPeak
    guide/build
    guide/logs
    guide/guistart
+   guide/cli
 
 .. toctree::
    :caption: About Smartpeak
    :maxdepth: 1
 
    about/contribute
+   about/parameters
    about/developer
    api/library_root
    about/roadmap

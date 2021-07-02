@@ -363,6 +363,14 @@ public:
      @param[in,out] directory_entry directory entry on which the modification is done.
     */
     static void makeHumanReadable(ImEntry& directory_entry);
+
+    /**
+     * Converts an input string to upper case string.
+     * 
+     * @param[in] str input string
+     * @return formated string
+    */
+    static std::string str2upper(const std::string& str);
     
     /**
      @brief Remove trailing characters.

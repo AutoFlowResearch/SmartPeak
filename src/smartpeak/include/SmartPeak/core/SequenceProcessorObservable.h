@@ -33,8 +33,20 @@ namespace SmartPeak
   class SequenceProcessorObservable
   {
   public:
-    virtual void addSequenceProcessorObserver(ISequenceProcessorObserver* observer) { observers_.push_back(observer); };
-    virtual void removeSequenceProcessorObserver(ISequenceProcessorObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
+    virtual void addSequenceProcessorObserver(ISequenceProcessorObserver* observer) 
+    {
+      if (nullptr != observer)
+      {
+        observers_.push_back(observer);
+      }
+    }
+    virtual void removeSequenceProcessorObserver(ISequenceProcessorObserver* observer) 
+    {
+      if (nullptr != observer)
+      {
+        observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end());
+      }
+    }
     void notifySequenceProcessorStart(const size_t nb_injections)
     {
       for (auto& observer : observers_)

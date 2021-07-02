@@ -33,8 +33,20 @@ namespace SmartPeak
   class TransitionsObservable
   {
   public:
-    virtual void addTransitionsObserver(ITransitionsObserver* observer) { observers_.push_back(observer); };
-    virtual void removeTransitionsObserver(ITransitionsObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
+    virtual void addTransitionsObserver(ITransitionsObserver* observer) 
+    { 
+      if (nullptr != observer)
+      {
+        observers_.push_back(observer);
+      }
+    }
+    virtual void removeTransitionsObserver(ITransitionsObserver* observer) 
+    {
+      if (nullptr != observer)
+      {
+        observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); 
+      } 
+    }
     void notifyTransitionsUpdated()
     {
       for (auto& observer : observers_)

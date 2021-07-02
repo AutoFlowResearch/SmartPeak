@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -17,44 +17,44 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
-// $Authors: Douglas McCloskey, Bertrand Boudaud $
+// $Maintainer: Krzysztof Abram $
+// $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
-#pragma once
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <SmartPeak/test_config.h>
 
-#include <SmartPeak/iface/IWorkflowObserver.h>
-#include <memory>
-#include <vector>
-#include <algorithm>
+#include <SmartPeak/core/ConsoleHandler.h>
+#include <filesystem>
 
-namespace SmartPeak 
+
+struct ConsoleHandlerFixture : public ::testing::Test
 {
-  class WorkflowObservable
-  {
-  public:
-    virtual void addWorkflowObserver(IWorkflowObserver* observer) 
+    /* ctor/dtor */
+    ConsoleHandlerFixture() 
     {
-      if (nullptr != observer)
-      {
-        observers_.push_back(observer);
-      }
+        m_datapath = std::filesystem::temp_directory_path().string();
     }
-    virtual void removeWorkflowObserver(IWorkflowObserver* observer) 
-    { 
-      if (nullptr != observer)
-      {
-        observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); 
-      }
-    }
-    void notifyWorkflowUpdated()
+    std::string m_datapath;
+};
+
+/* ---------------------------------------------- */
+
+TEST_F(ConsoleHandlerFixture, ConsoleHandler_initialize)
+{
+    namespace fs = std::filesystem;
+    auto& ch = SmartPeak::ConsoleHandler::get_instance();
+    // Test singleton uniqueness:
+    auto& ch1 = SmartPeak::ConsoleHandler::get_instance();
+    EXPECT_EQ(&ch, &ch1);
+    // Test custom log location:
     {
-      for (auto& observer : observers_)
-      {
-        observer->onWorkflowUpdated();
-      }
+        ch.set_log_directory(m_datapath);
+        ch.initialize("Welcome");
+        // m_filepath = ch.get_log_filepath();
+        EXPECT_TRUE(fs::exists(ch.get_log_filepath()));
     }
-  protected:
-    std::vector<IWorkflowObserver*> observers_;
-  };
+    // Test inability to initialize instance for the second time:
+    EXPECT_THROW(ch.initialize("Welcome"), std::runtime_error);
 }

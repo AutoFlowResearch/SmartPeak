@@ -1,7 +1,7 @@
 // --------------------------------------------------------------------------
 //   SmartPeak -- Fast and Accurate CE-, GC- and LC-MS(/MS) Data Processing
 // --------------------------------------------------------------------------
-// Copyright The SmartPeak Team -- Novo Nordisk Foundation
+// Copyright The SmartPeak Team -- Novo Nordisk Foundation 
 // Center for Biosustainability, Technical University of Denmark 2018-2021.
 //
 // THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -17,44 +17,34 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
-// $Authors: Douglas McCloskey, Bertrand Boudaud $
+// $Maintainer: Krzysztof Abram $
+// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
+#include <SmartPeak/cli/ApplicationManager.h>
+#include <SmartPeak/cli/Task.h>
 
-#pragma once
+namespace SmartPeak {
+namespace cli {
 
-#include <SmartPeak/iface/IWorkflowObserver.h>
-#include <memory>
-#include <vector>
-#include <algorithm>
-
-namespace SmartPeak 
+ApplicationManager& ApplicationManager::add(const std::shared_ptr<Task>& task_ptr)
 {
-  class WorkflowObservable
-  {
-  public:
-    virtual void addWorkflowObserver(IWorkflowObserver* observer) 
-    {
-      if (nullptr != observer)
-      {
-        observers_.push_back(observer);
-      }
-    }
-    virtual void removeWorkflowObserver(IWorkflowObserver* observer) 
-    { 
-      if (nullptr != observer)
-      {
-        observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); 
-      }
-    }
-    void notifyWorkflowUpdated()
-    {
-      for (auto& observer : observers_)
-      {
-        observer->onWorkflowUpdated();
-      }
-    }
-  protected:
-    std::vector<IWorkflowObserver*> observers_;
-  };
+    m_task_pool.push_back(task_ptr);
+    return *this;
 }
+
+bool ApplicationManager::run()
+{
+    for (auto& task_ptr : m_task_pool)
+    {
+        auto& task = *task_ptr;
+        if (!task(*this))
+        {
+            LOG_ERROR << "The workflow failed!";
+            return false;
+        }
+    }
+    return true;
+}
+
+} /* namespace cli */
+} /* namespace SmartPeak */

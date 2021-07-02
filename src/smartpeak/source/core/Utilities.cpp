@@ -819,6 +819,13 @@ namespace SmartPeak
     }
   }
 
+  std::string Utilities::str2upper(const std::string& str)
+  {
+    auto str_ = str;
+    std::transform(str_.begin(), str_.end(), str_.begin(), ::toupper);
+    return str_;
+  }
+
   void Utilities::removeTrailing(std::string& str, std::string to_remove)
   {
     auto it = str.find(to_remove);

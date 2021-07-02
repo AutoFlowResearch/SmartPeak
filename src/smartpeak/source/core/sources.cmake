@@ -5,6 +5,7 @@ set(directory source/core)
 set(sources_list
 	ApplicationProcessor.cpp
 	CastValue.cpp
+	ConsoleHandler.cpp
 	EventDispatcher.cpp
 	FeatureMetadata.cpp
 	Filenames.cpp
