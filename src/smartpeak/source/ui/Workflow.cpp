@@ -46,8 +46,7 @@ namespace SmartPeak
         "GCMS Full Scan Unknowns",
         "LCMS MRM Validation - QMIP",
         "LCMS MRM Validation - LP",
-        "FIAMS Unknowns",
-        "DDA"
+        "FIAMS Unknowns"
       };
       for (const char* s : presets)
       {
@@ -147,9 +146,6 @@ namespace SmartPeak
                     "MERGE_FEATURES",
                     "MERGE_INJECTIONS",
                     "STORE_FEATURES_SAMPLE_GROUP" };
-          else if (s_string == "DDA")
-            ids = { "LOAD_RAW_DATA",
-                     };
           application_handler_.sequenceHandler_.setWorkflow(ids);
           application_handler_.sequenceHandler_.notifyWorkflowUpdated();
           LOGI << "Local workflow has been replaced";

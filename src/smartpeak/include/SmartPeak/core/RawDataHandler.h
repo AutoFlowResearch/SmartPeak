@@ -176,8 +176,6 @@ public:
     */
     void makeFeatureMapFromHistory();
 
-    std::vector<OpenMS::MSSpectrum> annotated_spectra_;
-
 private:
     // input
     OpenMS::MSExperiment experiment_;  ///< Raw MS data derived from the mzML file

@@ -201,7 +201,6 @@ namespace SmartPeak
     mzTab_i.clear();
     mzTab_o.clear();
     dda_features_o.clear();
-    dda_features_i.clear();
     featureXML_o.clear();
     featureXMLSampleGroup_o.clear();
     featureXML_i.clear();

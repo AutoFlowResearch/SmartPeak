@@ -32,6 +32,7 @@ namespace SmartPeak {
   // TODO: refactor RawDataProcessor and SequenceSegmentProcess to statically declare `getName()`
   //       to avoid duplication of text while still not needing to instantiate each object
   const std::map<std::string, std::shared_ptr<RawDataProcessor>> n_to_raw_data_method_ {
+<<<<<<< HEAD
     {"LOAD_RAW_DATA",                             std::make_shared<LoadRawData>()},
     {"LOAD_FEATURES",                             std::make_shared<LoadFeatures>()},
     {"PICK_MRM_FEATURES",                         std::make_shared<PickMRMFeatures>()},
@@ -56,14 +57,15 @@ namespace SmartPeak {
     {"SEARCH_ACCURATE_MASS",                      std::make_shared<SearchAccurateMass>()},
     {"MERGE_FEATURES",                            std::make_shared<MergeFeatures>()},
     {"LOAD_ANNOTATIONS",                          std::make_shared<LoadAnnotations>()},
+    {"SEARCH_SPECTRUM",                           std::make_shared<searchSpectrum>()},
+    {"DDA",                                       std::make_shared<DDA>()},
     {"STORE_ANNOTATIONS",                         std::make_shared<StoreAnnotations>()},
     {"CLEAR_DATA",                                std::make_shared<ClearData>()},
     {"STORE_RAW_DATA",                            std::make_shared<StoreRawData>()},
     {"CALCULATE_MDVS",                            std::make_shared<CalculateMDVs>()},
     {"ISOTOPIC_CORRECTIONS",                      std::make_shared<IsotopicCorrections>()},
     {"CALCULATE_MDV_ISOTOPIC_PURITIES",           std::make_shared<CalculateIsotopicPurities>()},
-    {"CALCULATE_MDV_ACCURACIES",                  std::make_shared<CalculateMDVAccuracies>()},
-    {"SEARCH_SPECTRUM",                           std::make_shared<searchSpectrum>()}
+    {"CALCULATE_MDV_ACCURACIES",                  std::make_shared<CalculateMDVAccuracies>()}
   };
   const std::map<std::string, std::shared_ptr<SequenceSegmentProcessor>> n_to_seq_seg_method_ {
     {"CALCULATE_CALIBRATION",                     std::make_shared<CalculateCalibration>()},
