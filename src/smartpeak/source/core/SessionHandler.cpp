@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -116,8 +116,7 @@ namespace SmartPeak
         ++row;
       }
       feature_explorer_data.checkbox_body.resize(n_rows, (int)feature_explorer_data.checkbox_headers.size());
-      feature_explorer_data.checkbox_body.setConstant(true);
-      for (int i = 0; i < feature_explorer_data.checkbox_body.dimension(0); ++i) if (i!=2) feature_explorer_data.checkbox_body(i, 0) = false; // only calculated_concentration for the plot
+      feature_explorer_data.checkbox_body.setConstant(false);
       feature_explorer_data.checked_rows.resize(n_rows);
       feature_explorer_data.checked_rows.setConstant(true);
     }
@@ -1474,17 +1473,16 @@ namespace SmartPeak
       }
     }
   }
-  bool SessionHandler::setFeatureTable(const SequenceHandler & sequence_handler, GenericTableData& table_data)
+  bool SessionHandler::setFeatureTable(const SequenceHandler & sequence_handler, GenericTableData& table_data, bool& data_changed)
   {
-    int MAX_SIZE = 5000;
     bool within_max_size = true;
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature table headers and body
-      if (feature_table_unique_samples_transitions_ != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot() || table_data.body_.dimension(1) != 22 + getNSelectedFeatureMetaValuesPlot()) {
+      if (feature_table_unique_samples_transitions_ != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot() || table_data.body_.dimension(1) != 23 + getNSelectedFeatureMetaValuesTable()) {
         LOGD << "Making feature_table_body and feature_table_headers";
         // get the selected feature names
-        Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureMetaValuesPlot();
+        Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureMetaValuesTable();
         std::vector<std::string> feature_names;
         for (int i = 0; i < selected_feature_names.size(); ++i) {
           if (std::count(feature_names.begin(), feature_names.end(), selected_feature_names(i)) == 0 && !selected_feature_names(i).empty())
@@ -1518,15 +1516,16 @@ namespace SmartPeak
         feature_table_unique_samples_transitions_ = getNSelectedSampleNamesPlot() * getNSelectedTransitionsPlot();
         std::vector<std::vector<std::string>> table;
         std::vector<std::string> headers;
-        SequenceParser::makeDataTableFromMetaValue(sequence_handler, table, headers, feature_names, sample_types, sample_names, component_group_names, component_names);
+        SequenceParser::makeDataTableFromMetaValue(sequence_handler, table, headers, feature_names,
+                                                   sample_types, sample_names, component_group_names, component_names);
         const int n_cols = headers.size();
-        const int n_rows = table.size();
+        size_t n_rows = table.size();
         table_data.headers_.resize(n_cols);
         table_data.body_.resize(n_rows, n_cols);
-        for (int row = 0; row < n_rows; ++row) {
-          if (row*n_cols > MAX_SIZE) {
+        for (size_t row = 0; row < n_rows; ++row) {
+          if (n_cols >= 64) { // 64 max. permitted columns as of ImGui v1.81
             within_max_size = false;
-            LOGI << "Stopped adding rows to the feature table";
+            LOGI << "Maximum permitted number of columns reached.";
             break;
           }
           for (int col = 0; col < n_cols; ++col) {
@@ -1534,6 +1533,7 @@ namespace SmartPeak
             table_data.body_(row, col) = table.at(row).at(col);
           }
         }
+        data_changed = true;
       }
     }
     return within_max_size;

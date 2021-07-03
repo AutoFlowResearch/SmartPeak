@@ -704,7 +704,10 @@ int main(int argc, char** argv)
     // feature table
     if (features_table_main_window_->visible_)
     {
-      exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_, features_table_main_window_->table_data_);
+      bool data_changed = false;
+      exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_,
+                                                                features_table_main_window_->table_data_, data_changed);
+      features_table_main_window_->updateDataModificationState(data_changed) ;
       features_table_main_window_->checked_rows_ = Eigen::Tensor<bool, 1>();
     }
 

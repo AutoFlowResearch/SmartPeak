@@ -151,8 +151,8 @@ TEST(SessionHandler, setFeatureExplorer1)
   EXPECT_EQ(session_handler.feature_explorer_data.checkbox_body.dimension(0), 22);
   EXPECT_EQ(session_handler.feature_explorer_data.checkbox_body.dimension(1), 2);
   EXPECT_TRUE(!session_handler.feature_explorer_data.checkbox_body(0, 0));
-  EXPECT_TRUE(session_handler.feature_explorer_data.checkbox_body(2, 0));
-  EXPECT_TRUE(session_handler.feature_explorer_data.checkbox_body(session_handler.feature_explorer_data.checkbox_body.dimension(0) - 1, session_handler.feature_explorer_data.checkbox_body.dimension(1) - 1));
+  EXPECT_FALSE(session_handler.feature_explorer_data.checkbox_body(2, 0));
+  EXPECT_FALSE(session_handler.feature_explorer_data.checkbox_body(session_handler.feature_explorer_data.checkbox_body.dimension(0) - 1, session_handler.feature_explorer_data.checkbox_body.dimension(1) - 1));
 }
 
 TEST(SessionHandler, setSpectrumExplorer1)
@@ -507,8 +507,8 @@ TEST(SessionHandler, sessionHandlerGetters1)
   EXPECT_EQ(session_handler.getNSelectedSampleNamesPlot(), 0);
   EXPECT_EQ(session_handler.getNSelectedTransitionsTable(), 6);
   EXPECT_EQ(session_handler.getNSelectedTransitionsPlot(), 0);
-  EXPECT_EQ(session_handler.getNSelectedFeatureMetaValuesTable(), 22);
-  EXPECT_EQ(session_handler.getNSelectedFeatureMetaValuesPlot(), 1);
+  EXPECT_EQ(session_handler.getNSelectedFeatureMetaValuesTable(), 0);
+  EXPECT_EQ(session_handler.getNSelectedFeatureMetaValuesPlot(), 0);
   // Selected string values
   EXPECT_TRUE(session_handler.getSelectInjectionNamesWorkflow(testData.sequenceHandler) == std::set<std::string>({"150516_CM1_Level10_2_BatchName_1900-01-01_000000", "150516_CM1_Level1_1_BatchName_1900-01-01_000000"}));
   EXPECT_TRUE(session_handler.getSelectSequenceSegmentNamesWorkflow(testData.sequenceHandler) == std::set<std::string>({ "segment1" }));
@@ -532,8 +532,8 @@ TEST(SessionHandler, sessionHandlerGetters1)
   EXPECT_STREQ(session_handler.getSelectTransitionGroupsPlot()(0).c_str(), "");
   EXPECT_STREQ(session_handler.getSelectTransitionGroupsPlot()(session_handler.getSelectTransitionsPlot().dimension(0) - 1).c_str(), "");
   EXPECT_EQ(session_handler.getSelectFeatureMetaValuesTable().size(), 22);
-  EXPECT_STREQ(session_handler.getSelectFeatureMetaValuesTable()(0).c_str(), "asymmetry_factor");
-  EXPECT_STREQ(session_handler.getSelectFeatureMetaValuesTable()(session_handler.getSelectFeatureMetaValuesTable().dimension(0) - 1).c_str(), "absolute_difference");
+  EXPECT_STREQ(session_handler.feature_table.body_(0, 0).c_str(), "asymmetry_factor");
+  EXPECT_STREQ(session_handler.feature_table.body_(session_handler.feature_table.body_.dimension(0) - 1, 0).c_str(), "absolute_difference");
   EXPECT_EQ(session_handler.getSelectFeatureMetaValuesPlot().size(), 22);
   EXPECT_STREQ(session_handler.getSelectFeatureMetaValuesPlot()(0).c_str(), "");
   EXPECT_STREQ(session_handler.getSelectFeatureMetaValuesPlot()(session_handler.getSelectFeatureMetaValuesPlot().dimension(0) - 1).c_str(), "");
@@ -652,7 +652,8 @@ TEST(SessionHandler, setFeatureTable1)
   TestData testData(true, true);
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  session_handler.setFeatureTable(testData.sequenceHandler, table_data);
+  bool data_changed;
+  session_handler.setFeatureTable(testData.sequenceHandler, table_data, data_changed);
   EXPECT_EQ(table_data.headers_.size(), 23);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "sample_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "used_");
@@ -661,7 +662,7 @@ TEST(SessionHandler, setFeatureTable1)
   EXPECT_STREQ(table_data.body_(0, 0).c_str(), "150516_CM1_Level1");
   EXPECT_STREQ(table_data.body_(table_data.body_.dimension(0) - 1, table_data.body_.dimension(1) - 1).c_str(), "true");
   session_handler.setMinimalDataAndFilters(testData.sequenceHandler);
-  session_handler.setFeatureTable(testData.sequenceHandler, table_data);
+  session_handler.setFeatureTable(testData.sequenceHandler, table_data, data_changed);
   EXPECT_EQ(table_data.headers_.size(), 23);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "sample_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "used_");

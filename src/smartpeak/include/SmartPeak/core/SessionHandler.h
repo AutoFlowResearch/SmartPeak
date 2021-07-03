@@ -109,11 +109,13 @@ namespace SmartPeak
     /*
     @brief Sets the feature table
 
-    @param[in] sequence_handler
+     @param[in] sequence_handler An instance of the SequenceHandler
+     @param[in] generic_table_data Current table data to be displayed
+     @param[out] data_changed true if the table has been altered
 
     @returns true if all rows/columns were added and false if rows/columns were omitted due to performance
     */
-    bool setFeatureTable(const SequenceHandler& sequence_handler, GenericTableData& generic_table_data);
+    bool setFeatureTable(const SequenceHandler& sequence_handler, GenericTableData& generic_table_data, bool& data_changed);
     /*
     @brief Sets the Feature matrix data used for the matrix table, line plots, and heatmap
 

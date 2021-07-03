@@ -151,6 +151,13 @@ namespace SmartPeak
     @param[in] is_scanned true if `columns_` and `checkbox_columns_` are in sync with `Im_table_entries`
     */
     void sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs, const bool& is_scanned);
+    
+    /*
+    @brief Update the table should modifications occur
+
+    @param[in] is_changed sets current `data_changed_` flag
+    */
+    void updateDataModificationState(bool& is_changed) { data_changed_ = is_changed; };
 
     SessionHandler::GenericTableData table_data_;
     Eigen::Tensor<bool, 1> checked_rows_;
@@ -190,6 +197,7 @@ namespace SmartPeak
     bool plot_unplot_all_deactivated_ = false;
     int selected_col_ = 0;
     int plot_idx_ = -1;
+    size_t print_until_ = 0;
     unsigned int table_entries_plot_col_ = 0;
     unsigned int checkbox_columns_plot_col_ = 0;
     std::string plot_switch_ = "";
