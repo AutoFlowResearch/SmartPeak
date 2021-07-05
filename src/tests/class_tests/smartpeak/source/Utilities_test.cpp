@@ -32,6 +32,8 @@ using namespace SmartPeak;
 using namespace std;
 namespace fs = std::filesystem;
 
+const unsigned int nb_files_in_data_directory = 52;
+
 TEST(utilities, castString)
 {
   CastValue c;
@@ -448,10 +450,10 @@ TEST(utilities, getFolderContents)
   const std::array<std::vector<std::string>, 4> c = Utilities::getFolderContents(pathname);
 
   // number of items in the pathname, taking .gitignore into account
-  EXPECT_EQ(c[0].size(), 51);
-  EXPECT_EQ(c[1].size(), 51);
-  EXPECT_EQ(c[2].size(), 51);
-  EXPECT_EQ(c[3].size(), 51);
+  EXPECT_EQ(c[0].size(), nb_files_in_data_directory);
+  EXPECT_EQ(c[1].size(), nb_files_in_data_directory);
+  EXPECT_EQ(c[2].size(), nb_files_in_data_directory);
+  EXPECT_EQ(c[3].size(), nb_files_in_data_directory);
 
   //EXPECT_STREQ(c[0][0], "OpenMSFile_ChromeleonFile_10ug.txt");
  #ifdef _WIN32
@@ -535,7 +537,7 @@ TEST(utilities, getDirectoryInfo)
   std::tuple<float, uintmax_t> directory_info;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   Utilities::getDirectoryInfo(path, directory_info);
-  EXPECT_EQ(std::get<1>(directory_info), 51);
+  EXPECT_EQ(std::get<1>(directory_info), nb_files_in_data_directory);
 }
 
 void set_env_var_(const std::string& name, const std::string& value)

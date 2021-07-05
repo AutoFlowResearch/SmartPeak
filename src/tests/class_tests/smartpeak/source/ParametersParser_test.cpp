@@ -81,6 +81,21 @@ TEST(ParametersParser, read)
   EXPECT_STREQ(function_parameters[0].getDescription().c_str(), "");
 }
 
+TEST(ParametersParser, read_invalid)
+{
+  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_invalid.csv");
+  ParameterSet parameters;
+  try {
+    ParametersParser::read(pathname, parameters);
+    FAIL() << "Expected std::exception";
+  }
+  catch (std::exception const& err) {
+  }
+  catch (...) {
+    FAIL() << "Expected std::exception";
+  }
+}
+
 TEST(ParametersParser, write)
 {
   const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");

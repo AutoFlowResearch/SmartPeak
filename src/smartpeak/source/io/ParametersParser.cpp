@@ -86,7 +86,9 @@ namespace SmartPeak
     std::string tags;
     std::string description;
     std::string comment;
+    unsigned int row = 1; // we have read the header, and we will start line 1 as much text editors do
     while (in.read_row(function, name, value, used, type, tags, description, comment)) {
+      row++;
       std::transform(used.begin(), used.end(), used.begin(), ::tolower);
       if (used == "false")
         continue;
@@ -100,8 +102,16 @@ namespace SmartPeak
         {"description", description},
         {"comment", comment}
       };
-      auto p = Parameter(properties);
-      parameters.addParameter(function, p);
+      try
+      {
+        auto p = Parameter(properties);
+        parameters.addParameter(function, p);
+      }
+      catch (const std::exception& e)
+      {
+        LOG_ERROR << filename << ", Error line " << row << ": " << e.what();
+        throw;
+      }
     }
   }
 
