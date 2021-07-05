@@ -52,7 +52,7 @@ namespace SmartPeak
         catch (const std::exception& e)
         {
           LOG_ERROR << "Invalid value \'" << value << "\': " << e.what();
-          throw e;
+          throw;
         }
       }
       if (attributes.count("description"))

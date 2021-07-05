@@ -110,7 +110,7 @@ namespace SmartPeak
       catch (const std::exception& e)
       {
         LOG_ERROR << filename << ", Error line " << row << ": " << e.what();
-        throw e;
+        throw;
       }
     }
   }
