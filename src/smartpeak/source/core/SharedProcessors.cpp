@@ -32,7 +32,6 @@ namespace SmartPeak {
   // TODO: refactor RawDataProcessor and SequenceSegmentProcess to statically declare `getName()`
   //       to avoid duplication of text while still not needing to instantiate each object
   const std::map<std::string, std::shared_ptr<RawDataProcessor>> n_to_raw_data_method_ {
-<<<<<<< HEAD
     {"LOAD_RAW_DATA",                             std::make_shared<LoadRawData>()},
     {"LOAD_FEATURES",                             std::make_shared<LoadFeatures>()},
     {"PICK_MRM_FEATURES",                         std::make_shared<PickMRMFeatures>()},

@@ -2186,14 +2186,14 @@ namespace SmartPeak
     LOGD << "END MergeFeatures";
   }
 
-  ParameterSet searchSpectrum::getParameterSchema() const
+  ParameterSet SearchSpectrum::getParameterSchema() const
   {
     OpenMS::TargetedSpectraExtractor oms_params;
     return ParameterSet({ oms_params });
   }
-  void searchSpectrum::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
+  void SearchSpectrum::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
   {
-    LOGD << "START searchSpectrum";
+    LOGD << "START SearchSpectrum";
 
     // Complete user parameters with schema
     ParameterSet params(params_I);
@@ -2209,10 +2209,10 @@ namespace SmartPeak
       rawDataHandler_IO.setFeatureMap(feat_map_output);
     }
     catch (const std::exception& e) {
-      LOGE << "searchSpectrum : " << typeid(e).name() << " : " << e.what();
+      LOGE << "SearchSpectrum : " << typeid(e).name() << " : " << e.what();
     }
 
-    LOGD << "END searchSpectrum";
+    LOGD << "END SearchSpectrum";
   }
 
   ParameterSet DDA::getParameterSchema() const

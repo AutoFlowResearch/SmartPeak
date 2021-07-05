@@ -336,7 +336,7 @@ namespace SmartPeak
       ) const override;
   };
 
-  struct searchSpectrum : RawDataProcessor
+  struct SearchSpectrum : RawDataProcessor
   {
     int getID() const override { return -1; }
     std::string getName() const override { return "SEARCH_SPECTRUM"; }
