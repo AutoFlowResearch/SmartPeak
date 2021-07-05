@@ -90,7 +90,6 @@ TEST(ParametersParser, read_invalid)
     FAIL() << "Expected std::exception";
   }
   catch (std::exception const& err) {
-    EXPECT_EQ(err.what(), std::string("invalid stoi argument"));
   }
   catch (...) {
     FAIL() << "Expected std::exception";
