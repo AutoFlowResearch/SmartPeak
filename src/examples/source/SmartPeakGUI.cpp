@@ -595,8 +595,16 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Features (matrix)", NULL, &feature_matrix_main_window_->visible_)) {}
         ImGui::Separator();
         ImGui::MenuItem("Main window (Plots)", NULL, false, false);
-        if (ImGui::MenuItem("Chromatogram", NULL, &chromatogram_plot_widget_->visible_)) {}
-        if (ImGui::MenuItem("Chromatogram TIC", NULL, &chromatogram_tic_plot_widget_->visible_)) {}
+        // TODO work on generalization of visualization.
+        if (application_handler_.sequenceHandler_.getSequence().size() > 0 && 
+            application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0)
+        {
+          if (ImGui::MenuItem("Chromatogram", NULL, &chromatogram_plot_widget_->visible_)) {}
+        }
+        else
+        {
+          if (ImGui::MenuItem("Chromatogram", NULL, &chromatogram_tic_plot_widget_->visible_)) {}
+        }
         if (ImGui::MenuItem("Spectra", NULL, &spectra_plot_widget_->visible_)) {}
         if (ImGui::MenuItem("Features (line)", NULL, &feature_line_plot_->visible_)) {}
         if (ImGui::MenuItem("Features (heatmap)", NULL, &heatmap_plot_widget_->visible_)) {}
