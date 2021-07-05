@@ -1171,6 +1171,7 @@ namespace SmartPeak
     }
     catch (const std::exception& e) {
       LOGE << e.what();
+      throw e;
     }
 
     LOGD << "END readRawDataProcessingParameters";

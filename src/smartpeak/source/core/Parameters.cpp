@@ -38,12 +38,21 @@ namespace SmartPeak
     {
       name_ = attributes.at("name");
       if (attributes.count("value")) {
-        if (attributes.count("type")) {
-          Utilities::castString(attributes.at("value"), attributes.at("type"), value_);
-        }
-        else 
+        const auto& value = attributes.at("value");
+        try
         {
-          Utilities::parseString(attributes.at("value"), value_);
+          if (attributes.count("type")) {
+            Utilities::castString(value, attributes.at("type"), value_);
+          }
+          else
+          {
+            Utilities::parseString(value, value_);
+          }
+        }
+        catch (const std::exception& e)
+        {
+          LOG_ERROR << "Invalid value \'" << value << "\': " << e.what();
+          throw e;
         }
       }
       if (attributes.count("description"))

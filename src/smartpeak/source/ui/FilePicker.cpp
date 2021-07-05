@@ -293,10 +293,8 @@ namespace SmartPeak
       [this, file_picker_handler, pathname](){ return file_picker_handler->onFilePicked(pathname, application_handler_); }
     );
 
-    LOGN << "File is being loaded...";
-    f.wait();
-
     try {
+      LOGN << "File is being loaded...";
       file_was_loaded = f.get();
       if (file_was_loaded) {
         LOGN << "File has been loaded.";
