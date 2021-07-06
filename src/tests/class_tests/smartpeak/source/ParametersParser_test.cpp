@@ -96,6 +96,57 @@ TEST(ParametersParser, read_invalid)
   }
 }
 
+TEST(ParametersParser, read_missing_columns)
+{
+  try {
+    ParameterSet parameters;
+    ParametersParser::read(SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_missing_function.csv"), parameters);
+    FAIL() << "Expected std::invalid_argument";
+  }
+  catch (std::invalid_argument const& err) {
+    EXPECT_STREQ(err.what(), "Missing required column 'function'");
+  }
+  catch (...) {
+    FAIL() << "Expected std::invalid_argument";
+  }
+
+  try {
+    ParameterSet parameters;
+    ParametersParser::read(SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_missing_name.csv"), parameters);
+    FAIL() << "Expected std::invalid_argument";
+  }
+  catch (std::invalid_argument const& err) {
+    EXPECT_STREQ(err.what(), "Missing required column 'name'");
+  }
+  catch (...) {
+    FAIL() << "Expected std::invalid_argument";
+  }
+
+  try {
+    ParameterSet parameters;
+    ParametersParser::read(SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_missing_used.csv"), parameters);
+    FAIL() << "Expected std::invalid_argument";
+  }
+  catch (std::invalid_argument const& err) {
+    EXPECT_STREQ(err.what(), "Missing required column 'used_'");
+  }
+  catch (...) {
+    FAIL() << "Expected std::invalid_argument";
+  }
+
+  try {
+    ParameterSet parameters;
+    ParametersParser::read(SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters_missing_value.csv"), parameters);
+    FAIL() << "Expected std::invalid_argument";
+  }
+  catch (std::invalid_argument const& err) {
+    EXPECT_STREQ(err.what(), "Missing required column 'value'");
+  }
+  catch (...) {
+    FAIL() << "Expected std::invalid_argument";
+  }
+}
+
 TEST(ParametersParser, write)
 {
   const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("FileReader_parameters.csv");

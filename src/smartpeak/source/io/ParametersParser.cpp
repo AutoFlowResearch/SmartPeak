@@ -67,13 +67,20 @@ namespace SmartPeak
       s_description, // optional
       s_comment      // optional
     );
-    if (!in.has_column(s_used)
-        || !in.has_column(s_function)
-        || !in.has_column(s_name)
-        || !in.has_column(s_value))
+
+    // check for required columns
+    static const std::vector<std::string>
+      required_column{ s_used , s_function, s_name, s_value };
+    for (const auto& column : required_column)
     {
-      throw "Missing required column.";
+      if (!in.has_column(column))
+      {
+        std::ostringstream os;
+        os << "Missing required column \'" << column  << "\'";
+        throw std::invalid_argument(os.str());
+      }
     }
+
     const bool has_type = in.has_column(s_type);
     const bool has_tags = in.has_column(s_tags);
     const bool has_description = in.has_column(s_description);

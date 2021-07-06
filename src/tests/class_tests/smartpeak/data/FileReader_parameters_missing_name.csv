@@ -1,0 +1,8 @@
+function,type,value,default,restrictions,description,used_,comment_,comparator,an_ignored_header
+func1,int,-1,-1,,,TRUE,,,
+func1,float,-1,-1,,a description,True,,,
+func1,float,-1,-1,,"a quoted description, containing a comma",True,,,
+func1,float,-1,-1,,this one won't be used,fAlSe,,,
+func2,float,0.5,,,,tRuE,,,
+func2,bool,FALSE,,,,true,,,
+func3,bool,FALSE,,,,TRUE,,,
