@@ -54,6 +54,7 @@ public:
     std::string quantitationMethods_csv_i;
     std::string standardsConcentrations_csv_i;
     std::string referenceData_csv_i;
+    std::string selectiveDilutions_csv_i;
     std::string mzML_i;
     std::string mzTab_i;
     std::string mzTab_o;
@@ -93,6 +94,7 @@ public:
     );
 
     static Filenames getDefaultDynamicFilenames(
+      const std::string& static_dir,
       const std::string& mzml_input_path,
       const std::string& features_input_path,
       const std::string& output_path,

@@ -98,6 +98,7 @@ namespace SmartPeak
     is_valid.push_back(InputDataValidation::isValidFilename(f.quantitationMethods_csv_i, "quantitationMethods"));
     is_valid.push_back(InputDataValidation::isValidFilename(f.standardsConcentrations_csv_i, "standardsConcentrations"));
     is_valid.push_back(InputDataValidation::isValidFilename(f.referenceData_csv_i, "referenceData"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.selectiveDilutions_csv_i, "selectiveDilutions"));
 
     std::cout << "\n\n";
 

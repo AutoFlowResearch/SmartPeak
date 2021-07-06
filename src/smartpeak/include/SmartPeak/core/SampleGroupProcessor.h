@@ -58,6 +58,24 @@ namespace SmartPeak
     SampleGroupProcessor() = default;
   };
 
+  struct SelectFromDilution : SampleGroupProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "SELECT_FROM_DILUTION"; }
+    std::string getDescription() const override { return "Select features from dilution preferences"; }
+    virtual ParameterSet getParameterSchema() const override;
+
+    /**
+      Merge multiple injections of the same sample.
+    */
+    void process(
+      SampleGroupHandler& sampleGroupHandler_IO,
+      const SequenceHandler& sequenceHandler_I,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
   struct MergeInjections : SampleGroupProcessor
   {
     int getID() const override { return -1; }
@@ -75,29 +93,38 @@ namespace SmartPeak
       const Filenames& filenames
     ) const override;
 
+  private:
+
+    typedef std::tuple<std::string, std::pair<float, float>, float> mergeKeyType;
+    typedef std::pair<std::string, std::string> componentKeyType;
+
     static void getMergeKeysToInjections(const SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I, 
       std::set<std::string>& scan_polarities,
       std::set<std::pair<float, float>>& scan_mass_ranges,
       std::set<float>& dilution_factors,
-      std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>>& merge_keys_to_injection_name);
+      std::map<mergeKeyType, std::vector<std::set<std::string>>>& merge_keys_to_injection_name);
+
     static void orderMergeKeysToInjections(std::set<std::string>& scan_polarities,
       const std::set<std::pair<float, float>>& scan_mass_ranges,
       const std::set<float>& dilution_factors,
-      std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>>& merge_keys_to_injection_name);
+      std::map<mergeKeyType, std::vector<std::set<std::string>>>& merge_keys_to_injection_name);
+
     static void getComponentsToFeaturesToInjectionsToValues(const SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const bool& merge_subordinates,
-      std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values);
+      std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values);
+
     static void mergeComponentsToFeaturesToInjectionsToValues(const std::string& feature_name, const std::string& merge_rule,
-      std::set<std::string>& scan_polarities,
+      const std::set<std::string>& scan_polarities,
       const std::set<std::pair<float, float>>& scan_mass_ranges,
       const std::set<float>& dilution_factors,
-      const std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>>& merge_keys_to_injection_name,
-      std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values);
+      const std::map<mergeKeyType, std::vector<std::set<std::string>>>& merge_keys_to_injection_name,
+      std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values);
+
     static void makeFeatureMap(const bool& merge_subordinates,
       std::set<std::string>& injection_names_set,
-      const std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values,
+      const std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values,
       OpenMS::FeatureMap& feature_map);
   };
 

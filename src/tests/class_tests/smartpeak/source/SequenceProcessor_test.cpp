@@ -229,6 +229,7 @@ TEST(SequenceHandler, processSequence)
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+      path,
       path + "mzML",
       path + "features",
       path + "features",
@@ -314,6 +315,7 @@ TEST(SequenceHandler, processSequenceSegments)
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string key = sequence_segment.getSequenceSegmentName();
     dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+      path,
       path + "mzML/",
       path + "features/",
       path + "features/",
@@ -398,6 +400,7 @@ TEST(SequenceHandler, processSampleGroups)
       path,
       path,
       path,
+      path,
       injection.getMetaData().getFilename(),
       key,
       key,
@@ -417,6 +420,7 @@ TEST(SequenceHandler, processSampleGroups)
   dynamic_filenames.clear();
   for (const SampleGroupHandler& sampleGroupHandler : sequenceHandler.getSampleGroups()) {
     dynamic_filenames[sampleGroupHandler.getSampleGroupName()] = Filenames::getDefaultDynamicFilenames(
+      path,
       path + "mzML/",
       path + "features/",
       path + "features/",

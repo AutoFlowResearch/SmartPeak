@@ -85,6 +85,7 @@ TEST(Filenames, filenames_getDefaultStaticFilenames)
 TEST(Filenames, filenames_getDefaultDynamicFilenames)
 {
   Filenames filenames = Filenames::getDefaultDynamicFilenames(
+    "/home/user",
     "/home/user/mzML",
     "/home/user/featuresIn", 
     "/home/user/featuresOut", 
@@ -203,6 +204,7 @@ TEST(Filenames, clear1)
 TEST(Filenames, clear2)
 {
   Filenames filenames = Filenames::getDefaultDynamicFilenames(
+    "/home/user",
     "/home/user/mzML",
     "/home/user/featuresIn",
     "/home/user/featuresOut",

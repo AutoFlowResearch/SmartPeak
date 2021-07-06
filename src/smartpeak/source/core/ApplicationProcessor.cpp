@@ -162,6 +162,7 @@ namespace SmartPeak
       for (const InjectionHandler& injection : application_handler_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
         cmd_.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+          application_handler_.main_dir_,
           application_handler_.mzML_dir_,
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
@@ -177,6 +178,7 @@ namespace SmartPeak
       for (const SequenceSegmentHandler& sequence_segment : application_handler_.sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();
         cmd_.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+          application_handler_.main_dir_,
           application_handler_.mzML_dir_,
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
@@ -192,6 +194,7 @@ namespace SmartPeak
       for (const SampleGroupHandler& sample_group : application_handler_.sequenceHandler_.getSampleGroups()) {
         const std::string& key = sample_group.getSampleGroupName();
         cmd_.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+          application_handler_.main_dir_,
           application_handler_.mzML_dir_,
           application_handler_.features_in_dir_,
           application_handler_.features_out_dir_,
