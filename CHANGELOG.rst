@@ -1,6 +1,17 @@
 SmartPeak Changelog
 ===================
 
+v1.9.0 (2020-07-07)
+-------------------
+
+Features
+~~~~~~~~
+- SmartPeak headless mode. `(#365) <https://github.com/AutoFlowResearch/SmartPeak/pull/365>`_  
+
+Fix
+~~~
+- Report error for invalid value in parameter.csv. `(#387) <https://github.com/AutoFlowResearch/SmartPeak/pull/387>`_
+
 v1.8.0 (2020-07-01)
 -------------------
 
