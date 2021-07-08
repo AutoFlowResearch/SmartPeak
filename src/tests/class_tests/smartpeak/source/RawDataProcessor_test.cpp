@@ -2934,11 +2934,11 @@ TEST(RawDataProcessor, DDA)
   filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("dda_after_search.featureXML");
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.dda_features_o = std::tmpnam(nullptr);
+  filenames.traML_csv_o = std::tmpnam(nullptr);
   DDA dda;
   dda.process(rawDataHandler, params_1, filenames);
 
-  EXPECT_TRUE(std::filesystem::exists(filenames.dda_features_o));
+  EXPECT_TRUE(std::filesystem::exists(filenames.traML_csv_o));
   ASSERT_EQ(rawDataHandler.getFeatureMap().size(), 8);
   const auto& f = rawDataHandler.getFeatureMap()[0];
   std::cout << f.getMetaValue("PeptideRef").toString() << std::endl;

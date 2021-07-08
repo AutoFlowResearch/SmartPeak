@@ -35,6 +35,7 @@ public:
     std::string parameters_csv_i;
     std::string workflow_csv_i;
     std::string traML_csv_i;
+    std::string traML_csv_o;
     std::string featureFilterComponents_csv_i;
     std::string featureFilterComponentGroups_csv_i;
     std::string featureQCComponents_csv_i;
@@ -56,7 +57,6 @@ public:
     std::string referenceData_csv_i;
     std::string selectDilutions_csv_i;
     std::string mzML_i;
-    std::string dda_features_o;
     std::string mzTab_i;
     std::string mzTab_o;
     std::string featureXML_o;

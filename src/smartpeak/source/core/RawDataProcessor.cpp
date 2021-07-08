@@ -2274,8 +2274,8 @@ namespace SmartPeak
       params.setValue("output_format", "traML");
       params.setValue("deisotoping:use_deisotoper", "true");
       targeted_spectra_extractor.setParameters(params);
-      LOGI << "Storing: " << filenames.dda_features_o;
-      targeted_spectra_extractor.storeSpectraTraML(filenames.dda_features_o, ms1_merged_features, ms2_merged_features);
+      LOGI << "Storing: " << filenames.traML_csv_o;
+      targeted_spectra_extractor.storeSpectraTraML(filenames.traML_csv_o, ms1_merged_features, ms2_merged_features);
 
       // build MS1/MS2 features
       OpenMS::FeatureMap ms1_ms2_features;
