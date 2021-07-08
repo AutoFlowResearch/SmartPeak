@@ -58,5 +58,8 @@ namespace SmartPeak
     float bottom_window_y_perc_ = 0.25;
     float left_window_x_perc_ = 0.25;
     float right_window_x_perc_ = 0;
+
+  private:
+    bool show_bottom_window_ = true;
   };
 }

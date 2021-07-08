@@ -109,6 +109,22 @@ TEST(WindowSizesAndPositions, setTopWindowYSize)
   EXPECT_NEAR(win_size_and_pos.right_window_x_pos_, 100, 1e-3);
 }
 
+TEST(WindowSizesAndPositions, showHide)
+{
+  WindowSizesAndPositions win_size_and_pos;
+  win_size_and_pos.setXAndYSizes(100, 100);
+  win_size_and_pos.setTopWindowYSize(10);
+  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
+  EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 72, 1e-3);
+  EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 10, 1e-3);
+  win_size_and_pos.setWindowSizesAndPositions(true, false, true, false);
+  EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 0, 1e-3);
+  EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 82, 1e-3);
+  win_size_and_pos.setWindowSizesAndPositions(true, true, true, false);
+  EXPECT_NEAR(win_size_and_pos.bottom_window_y_size_, 20.5, 1e-3);
+  EXPECT_NEAR(win_size_and_pos.top_window_y_size_, 61.5, 1e-3);
+}
+
 TEST(WindowSizesAndPositions, setWindowPercentages)
 {
   WindowSizesAndPositions win_size_and_pos;
