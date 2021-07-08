@@ -72,7 +72,7 @@ namespace SmartPeak
   void GraphicDataVizWidget::drawGraph()
   {
     // Main graphic
-    if (chrom_.points_overflow)
+    if (chrom_.points_overflow_)
     {
       ImGui::Text("Unable to draw: too much points. Please reduce scope or unselect data.");
     }

@@ -688,7 +688,7 @@ TEST(SessionHandler, getSpectrumScatterPlot1)
   const std::set<std::string> sample_names;
   const std::set<std::string> component_names;
   session_handler.getChromatogramScatterPlot(testData.sequenceHandler, result, range, sample_names, component_names);
-  EXPECT_FALSE(result.points_overflow);
+  EXPECT_FALSE(result.points_overflow_);
 }
 TEST(SessionHandler, setSpectrumScatterPlot1)
 {
@@ -700,7 +700,7 @@ TEST(SessionHandler, setSpectrumScatterPlot1)
   const std::set<std::string> scan_names;
   const std::set<std::string> component_group_names;
   session_handler.getSpectrumScatterPlot(testData.sequenceHandler, result, range, sample_names, scan_names, component_group_names);
-  EXPECT_FALSE(result.points_overflow);
+  EXPECT_FALSE(result.points_overflow_);
 }
 TEST(SessionHandler, setCalibratorsScatterLinePlot1)
 {

@@ -141,21 +141,20 @@ namespace SmartPeak
       float x_max_ = 0.0f;
       float y_min_ = 0.0f;
       float y_max_ = 0.0f;
-      float z_min_ = 0.0f;
-      float z_max_ = 0.0f;
-      bool points_overflow = false; // true if all points were added and false if points were omitted due to performance concern
+      bool points_overflow_ = false; // true if all points were added and false if points were omitted due to performance concern
+      int nb_points_ = 0;
+      int max_nb_points_ = 0;
 
-      void reset(const std::string& x_axis_title, const std::string& y_axis_title, const std::optional<std::string>& z_axis_title)
+      void reset(const std::string& x_axis_title, const std::string& y_axis_title, const std::optional<std::string>& z_axis_title, int max_nb_points)
       {
         x_axis_title_ = x_axis_title;
         y_axis_title_ = y_axis_title;
         z_axis_title_ = z_axis_title;
+        max_nb_points_ = max_nb_points;
         x_min_ = 1e6;
         x_max_ = 0;
         y_min_ = 1e6;
         y_max_ = 0;
-        z_min_ = 1e6;
-        z_max_ = 0;
         x_data_scatter_.clear();
         y_data_scatter_.clear();
         series_names_scatter_.clear();
@@ -163,8 +162,59 @@ namespace SmartPeak
         y_data_area_.clear();
         z_data_area_.clear();
         series_names_area_.clear();
-        points_overflow = false;
+        points_overflow_ = false;
+        nb_points_ = 0;
       }
+
+      bool addData(const std::vector<float>& x_data, const std::vector<float>& y_data, const std::string& data_name)
+      {
+        return addData(x_data_area_, y_data_area_, series_names_area_, x_data, y_data, data_name);
+      }
+
+      bool addScatterData(const std::vector<float>& x_data, const std::vector<float>& y_data, const std::string& data_name)
+      {
+        return addData(x_data_scatter_, y_data_scatter_, series_names_scatter_, x_data, y_data, data_name);
+      }
+
+    
+    private:
+      void setMinMax(const std::vector<float> v, float& current_min, float& current_max)
+      {
+        if (!v.empty())
+        {
+          current_min = std::min(*std::min_element(v.begin(), v.end()), current_min);
+          current_max = std::max(*std::max_element(v.begin(), v.end()), current_max);
+        }
+      }
+
+      bool addData(std::vector<std::vector<float>>& v_x_data,
+                   std::vector<std::vector<float>>& v_y_data,
+                   std::vector<std::string>& data_names,
+                   const std::vector<float>& x_data, 
+                   const std::vector<float>& y_data,
+                   const std::string& data_name)
+      {
+        if (!points_overflow_)
+        {
+          nb_points_ += x_data.size();
+          if (nb_points_ < max_nb_points_)
+          {
+            v_x_data.push_back(x_data);
+            v_y_data.push_back(y_data);
+            data_names.push_back(data_name);
+            setMinMax(x_data, x_min_, x_max_);
+            setMinMax(y_data, y_min_, y_max_);
+          }
+          else
+          {
+            LOGD << "Stopped adding points to the graph";
+            points_overflow_ = true;
+          }
+        }
+        return (!points_overflow_);
+      }
+
+
     };
 
     /*
