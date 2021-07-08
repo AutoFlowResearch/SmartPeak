@@ -108,6 +108,11 @@ if (WIN32)
     execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"\${EXECS}\" \"\${DEST}\")
     SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR}  ${SDL2_LIBRARIES_DIR})
     fixup_bundle(\"\${DEST}\" \"\" \"\${DIRS}\")
+    SET(EXECS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Release/SmartPeakCLI.exe)
+    SET(DEST \"\${CMAKE_INSTALL_PREFIX}/bin/SmartPeakCLI.exe\")
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"\${EXECS}\" \"\${DEST}\")
+    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR}  ${SDL2_LIBRARIES_DIR})
+    fixup_bundle(\"\${DEST}\" \"\" \"\${DIRS}\")
     " 
     COMPONENT applications)
     
@@ -140,8 +145,10 @@ elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux)
   install(CODE "
     include(InstallRequiredSystemLibraries)
     include(BundleUtilities)
+    SET(EXECS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SmartPeakCLI)
+    SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR}  ${SDL2_LIBRARIES_DIR})
+    fixup_bundle(\"\${EXECS}\" \"\" \"\${DIRS}\")
     SET(EXECS ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/SmartPeakGUI)
-    # execute_process(COMMAND ${CMAKE_COMMAND} -E copy \"\${EXECS}\" \"\${DEST}\")
     SET(DIRS ${Qt5Core_DIR} ${Qt5Network_DIR} ${Qt5_DIR} ${OpenMS_LIBRARY_DIR}  ${SDL2_LIBRARIES_DIR})
     fixup_bundle(\"\${EXECS}\" \"\" \"\${DIRS}\")
     " 

@@ -151,12 +151,13 @@ foreach(_examples ${EXAMPLE_executables})
         set(OpenMS_SHARE_DIR ${OpenMS_DIR}/../share/OpenMS/)
       endif()
       install(DIRECTORY ${OpenMS_SHARE_DIR} DESTINATION share/OpenMS COMPONENT share)
-
-    else()
-
+    elseif(${_examples} STREQUAL "SmartPeakCLI")
       add_executable(${_examples} source/${_examples})
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
-
+      install_tool(${_examples}) 
+    else()
+      add_executable(${_examples} source/${_examples})
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
     endif()
 
   else() # Win
