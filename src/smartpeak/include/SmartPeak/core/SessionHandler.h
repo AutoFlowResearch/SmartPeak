@@ -178,14 +178,6 @@ namespace SmartPeak
 
     
     private:
-      void setMinMax(const std::vector<float> v, float& current_min, float& current_max)
-      {
-        if (!v.empty())
-        {
-          current_min = std::min(*std::min_element(v.begin(), v.end()), current_min);
-          current_max = std::max(*std::max_element(v.begin(), v.end()), current_max);
-        }
-      }
 
       bool addData(std::vector<std::vector<float>>& v_x_data,
                    std::vector<std::vector<float>>& v_y_data,
@@ -214,6 +206,14 @@ namespace SmartPeak
         return (!points_overflow_);
       }
 
+      void setMinMax(const std::vector<float> v, float& current_min, float& current_max)
+      {
+        if (!v.empty())
+        {
+          current_min = std::min(*std::min_element(v.begin(), v.end()), current_min);
+          current_max = std::max(*std::max_element(v.begin(), v.end()), current_max);
+        }
+      }
 
     };
 

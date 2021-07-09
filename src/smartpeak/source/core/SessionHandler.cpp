@@ -1827,7 +1827,6 @@ namespace SmartPeak
     const float rt,
     const int ms_level) const
   {
-    const int MAX_POINTS = 10000; // Maximum number of points before either performance drops considerable or IMGUI throws an error
     if (sequence_handler.getSequence().size() > 0 &&
       (sequence_handler.getSequence().at(0).getRawData().getExperiment().getSpectra().size() > 0 ||
         sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0)) {
@@ -2071,8 +2070,7 @@ namespace SmartPeak
         }
       }
     }
-    if (n_points < MAX_POINTS) return true;
-    else return false;
+    return (n_points < MAX_POINTS);
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getInjectionExplorerHeader()
   {
