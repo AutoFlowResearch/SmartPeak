@@ -1,6 +1,15 @@
 SmartPeak Changelog
 ===================
 
+v1.10.0 (2020-07-08)
+--------------------
+
+Fix
+~~~
+- Added headless CLI to package (#391) `(#391) <https://github.com/AutoFlowResearch/SmartPeak/pull/391>`_
+- Fixed show-back of log and info panel, once previously hidden. `(#389) <https://github.com/AutoFlowResearch/SmartPeak/pull/389>`_
+- Display error if required column is missing in the parameters file. `(#388) <https://github.com/AutoFlowResearch/SmartPeak/pull/388>`_
+
 v1.9.0 (2020-07-07)
 -------------------
 
