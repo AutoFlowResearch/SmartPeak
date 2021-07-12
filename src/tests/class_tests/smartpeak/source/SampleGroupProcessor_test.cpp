@@ -446,7 +446,7 @@ TEST(SequenceHandler, processStoreFeaturesSampleGroup)
 
 TEST(SelectFromDilution, process)
 {
-  ParameterSet select_from_dilutions_params({});
+  ParameterSet select_from_dilutions_params;
 
   // setup the sequence
   SequenceHandler sequenceHandler;
