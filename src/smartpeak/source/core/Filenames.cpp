@@ -54,7 +54,6 @@ namespace SmartPeak
     static_filenames.quantitationMethods_csv_i = dir + "/quantitationMethods.csv";
     static_filenames.standardsConcentrations_csv_i = dir + "/standardsConcentrations.csv";
     static_filenames.referenceData_csv_i = dir + "/referenceData.csv";
-    static_filenames.selectiveDilutions_csv_i = dir + "/selectiveDilutions.csv";
     static_filenames.pivotTable_csv_o = dir + "/PivotTable.csv";
     static_filenames.featureDB_csv_o = dir + "/FeatureDB.csv";
     return static_filenames;
@@ -72,7 +71,7 @@ namespace SmartPeak
     const std::string& output_sample_name
   )
   {
-    Filenames dynamic_filenames = Filenames::getDefaultStaticFilenames(static_dir);
+    Filenames dynamic_filenames;
 
     dynamic_filenames.mzML_i       = mzml_input_path + "/" + input_mzML_filename + ".mzML";
 
@@ -82,6 +81,8 @@ namespace SmartPeak
 
     dynamic_filenames.featureXMLSampleGroup_i = features_input_path + "/" + input_sample_name + ".featureXML";
     dynamic_filenames.featureXMLSampleGroup_o = output_path + "/" + output_sample_name + ".featureXML";
+
+    dynamic_filenames.selectiveDilutions_csv_i = static_dir + "/selectiveDilutions.csv";
 
     const std::string prefix_out = output_path + "/" + output_inj_name;
     dynamic_filenames.featureXML_o                     = prefix_out + ".featureXML";
