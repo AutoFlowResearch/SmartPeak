@@ -467,7 +467,9 @@ namespace SmartPeak
 
               // record the injections
               // Note: this is done before checking if the feature exists to ensure that all injections are propogated to the next iteration
-              injections = injection_names_set;
+              for (const std::string& inj : injection_names_set) {
+                injections.insert(inj);
+              }
 
               // check if the feature is in the FeatureMap
               if (component_to_feature_to_injection_to_value.second.at(feature_name).count(injection_names_set) <= 0) continue;

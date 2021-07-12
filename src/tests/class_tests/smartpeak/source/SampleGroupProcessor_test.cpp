@@ -443,3 +443,89 @@ TEST(SequenceHandler, processStoreFeaturesSampleGroup)
 {
   // no tests, it wraps OpenMS store function
 }
+
+TEST(SelectFromDilution, process)
+{
+  ParameterSet select_from_dilutions_params({});
+
+  // setup the sequence
+  SequenceHandler sequenceHandler;
+
+  OpenMS::FeatureMap feature_map1;
+  {
+    OpenMS::Feature feature;
+    OpenMS::Feature sub_feature1;
+    sub_feature1.setMetaValue("native_id", "test1_1");
+    sub_feature1.setMetaValue("injection", "injection1");
+    feature.getSubordinates().push_back(sub_feature1);
+    OpenMS::Feature sub_feature2;
+    sub_feature2.setMetaValue("native_id", "test1_2");
+    sub_feature2.setMetaValue("injection", "injection1");
+    feature.getSubordinates().push_back(sub_feature2);
+    feature_map1.push_back(feature);
+  }
+  MetaDataHandler injection1;
+  injection1.setSampleName("injection1");
+  injection1.setSampleGroupName("group1");
+  injection1.setSequenceSegmentName("sequence1");
+  injection1.setFilename("filename1");
+  injection1.setSampleType(SampleType::Standard);
+  injection1.acq_method_name = "6";
+  injection1.inj_volume = 7.0;
+  injection1.inj_volume_units = "na";
+  injection1.batch_name = "batch_name1";
+  injection1.dilution_factor = 1;
+  sequenceHandler.addSampleToSequence(injection1, feature_map1);
+
+  OpenMS::FeatureMap feature_map2;
+  {
+    OpenMS::Feature feature;
+    OpenMS::Feature sub_feature1;
+    sub_feature1.setMetaValue("native_id", "test1_1");
+    sub_feature1.setMetaValue("injection", "injection10");
+    feature.getSubordinates().push_back(sub_feature1);
+    OpenMS::Feature sub_feature2;
+    sub_feature2.setMetaValue("native_id", "test1_2");
+    sub_feature2.setMetaValue("injection", "injection10");
+    feature.getSubordinates().push_back(sub_feature2);
+    feature_map2.push_back(feature);
+  }
+  MetaDataHandler injection10;
+  injection10.setSampleName("injection10");
+  injection10.setSampleGroupName("group1");
+  injection10.setSequenceSegmentName("sequence1");
+  injection10.setFilename("filename2");
+  injection10.setSampleType(SampleType::Standard);
+  injection10.acq_method_name = "6";
+  injection10.inj_volume = 7.0;
+  injection10.inj_volume_units = "na";
+  injection10.batch_name = "batch_name1";
+  injection10.dilution_factor = 10;
+  sequenceHandler.addSampleToSequence(injection10, feature_map2);
+
+  SampleGroupHandler sampleGroupHandler = sequenceHandler.getSampleGroups().front();
+
+  Filenames filenames;
+  filenames.selectiveDilutions_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectiveDilutions.csv");
+  SelectFromDilution selectFromDilution;
+  selectFromDilution.process(sampleGroupHandler, sequenceHandler, select_from_dilutions_params, filenames);
+
+  //Test file contains:
+  //compound, dilution_factor
+  //test1_1, 10
+  //test1_2, 1
+  const OpenMS::FeatureMap& result = sampleGroupHandler.getFeatureMap();
+  ASSERT_EQ(result.size(), 2);
+  
+  const OpenMS::Feature& result_feature1 = result[0];
+  ASSERT_EQ(result_feature1.getSubordinates().size(), 1);
+  const OpenMS::Feature& result_subfeature1 = result_feature1.getSubordinates()[0];
+  EXPECT_STREQ(result_subfeature1.getMetaValue("native_id").toString().c_str(), "test1_2");
+  EXPECT_STREQ(result_subfeature1.getMetaValue("injection").toString().c_str(), "injection1");
+
+  const OpenMS::Feature& result_feature2 = result[1];
+  ASSERT_EQ(result_feature2.getSubordinates().size(), 1);
+  const OpenMS::Feature& result_subfeature2 = result_feature2.getSubordinates()[0];
+  EXPECT_STREQ(result_subfeature2.getMetaValue("native_id").toString().c_str(), "test1_1");
+  EXPECT_STREQ(result_subfeature2.getMetaValue("injection").toString().c_str(), "injection10");
+}
