@@ -53,6 +53,7 @@ TEST(Filenames, filenames_getDefaultStaticFilenames)
   EXPECT_STREQ(filenames.quantitationMethods_csv_i.c_str(), "/home/user/quantitationMethods.csv");
   EXPECT_STREQ(filenames.standardsConcentrations_csv_i.c_str(), "/home/user/standardsConcentrations.csv");
   EXPECT_STREQ(filenames.referenceData_csv_i.c_str(), "/home/user/referenceData.csv");
+  EXPECT_STREQ(filenames.selectiveDilutions_csv_i.c_str(), "/home/user/selectiveDilutions.csv");
   EXPECT_STREQ(filenames.mzML_i.c_str(), "");
   EXPECT_STREQ(filenames.mzTab_o.c_str(), "");
   EXPECT_STREQ(filenames.mzTab_i.c_str(), "");
@@ -94,29 +95,29 @@ TEST(Filenames, filenames_getDefaultDynamicFilenames)
     "injOut",
     "sampleIn",
     "sampleOut");
-  EXPECT_STREQ(filenames.sequence_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.parameters_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.workflow_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.traML_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDFilterComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDFilterComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.quantitationMethods_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.standardsConcentrations_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.referenceData_csv_i.c_str(), "");
+  EXPECT_STREQ(filenames.sequence_csv_i.c_str(), "/home/user/sequence.csv");
+  EXPECT_STREQ(filenames.parameters_csv_i.c_str(), "/home/user/parameters.csv");
+  EXPECT_STREQ(filenames.traML_csv_i.c_str(), "/home/user/traML.csv");
+  EXPECT_STREQ(filenames.featureFilterComponents_csv_i.c_str(), "/home/user/featureFilterComponents.csv");
+  EXPECT_STREQ(filenames.featureFilterComponentGroups_csv_i.c_str(), "/home/user/featureFilterComponentGroups.csv");
+  EXPECT_STREQ(filenames.featureQCComponents_csv_i.c_str(), "/home/user/featureQCComponents.csv");
+  EXPECT_STREQ(filenames.featureQCComponentGroups_csv_i.c_str(), "/home/user/featureQCComponentGroups.csv");
+  EXPECT_STREQ(filenames.featureRSDFilterComponents_csv_i.c_str(), "/home/user/featureRSDFilterComponents.csv");
+  EXPECT_STREQ(filenames.featureRSDFilterComponentGroups_csv_i.c_str(), "/home/user/featureRSDFilterComponentGroups.csv");
+  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_i.c_str(), "/home/user/featureRSDQCComponents.csv");
+  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_i.c_str(), "/home/user/featureRSDQCComponentGroups.csv");
+  EXPECT_STREQ(filenames.featureBackgroundFilterComponents_csv_i.c_str(), "/home/user/featureBackgroundFilterComponents.csv");
+  EXPECT_STREQ(filenames.featureBackgroundFilterComponentGroups_csv_i.c_str(), "/home/user/featureBackgroundFilterComponentGroups.csv");
+  EXPECT_STREQ(filenames.featureBackgroundQCComponents_csv_i.c_str(), "/home/user/featureBackgroundQCComponents.csv");
+  EXPECT_STREQ(filenames.featureBackgroundQCComponentGroups_csv_i.c_str(), "/home/user/featureBackgroundQCComponentGroups.csv");
+  EXPECT_STREQ(filenames.featureRSDEstimationComponents_csv_i.c_str(), "/home/user/featureRSDEstimationComponents.csv");
+  EXPECT_STREQ(filenames.featureRSDEstimationComponentGroups_csv_i.c_str(), "/home/user/featureRSDEstimationComponentGroups.csv");
+  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_i.c_str(), "/home/user/featureRSDQCComponents.csv");
+  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_i.c_str(), "/home/user/featureRSDQCComponentGroups.csv");
+  EXPECT_STREQ(filenames.quantitationMethods_csv_i.c_str(), "/home/user/quantitationMethods.csv");
+  EXPECT_STREQ(filenames.standardsConcentrations_csv_i.c_str(), "/home/user/standardsConcentrations.csv");
+  EXPECT_STREQ(filenames.referenceData_csv_i.c_str(), "/home/user/referenceData.csv");
+  EXPECT_STREQ(filenames.selectiveDilutions_csv_i.c_str(), "/home/user/selectiveDilutions.csv");
   EXPECT_STREQ(filenames.mzML_i.c_str(), "/home/user/mzML/mzMLIn.mzML");
   EXPECT_STREQ(filenames.mzTab_o.c_str(), "/home/user/featuresOut/injOut.mzTab");
   EXPECT_STREQ(filenames.mzTab_i.c_str(), "/home/user/featuresIn/injIn.mzTab");
@@ -142,8 +143,8 @@ TEST(Filenames, filenames_getDefaultDynamicFilenames)
   EXPECT_STREQ(filenames.featureBackgroundEstimationComponentGroups_csv_o.c_str(), "/home/user/featuresOut/injOut_featureBackgroundEstimationComponentGroups.csv");
   EXPECT_STREQ(filenames.quantitationMethods_csv_o.c_str(), "/home/user/featuresOut/injOut_quantitationMethods.csv");
   EXPECT_STREQ(filenames.componentsToConcentrations_csv_o.c_str(), "/home/user/featuresOut/injOut_componentsToConcentrations.csv");
-  EXPECT_STREQ(filenames.pivotTable_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureDB_csv_o.c_str(), "");
+  EXPECT_STREQ(filenames.pivotTable_csv_o.c_str(), "/home/user/PivotTable.csv");
+  EXPECT_STREQ(filenames.featureDB_csv_o.c_str(), "/home/user/FeatureDB.csv");
 }
 
 TEST(Filenames, clear1)
@@ -172,6 +173,7 @@ TEST(Filenames, clear1)
   EXPECT_STREQ(filenames.quantitationMethods_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.standardsConcentrations_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.referenceData_csv_i.c_str(), "");
+  EXPECT_STREQ(filenames.selectiveDilutions_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.mzML_i.c_str(), "");
   EXPECT_STREQ(filenames.mzTab_o.c_str(), "");
   EXPECT_STREQ(filenames.mzTab_i.c_str(), "");
@@ -234,6 +236,7 @@ TEST(Filenames, clear2)
   EXPECT_STREQ(filenames.quantitationMethods_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.standardsConcentrations_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.referenceData_csv_i.c_str(), "");
+  EXPECT_STREQ(filenames.selectiveDilutions_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.mzML_i.c_str(), "");
   EXPECT_STREQ(filenames.mzTab_o.c_str(), "");
   EXPECT_STREQ(filenames.mzTab_i.c_str(), "");
