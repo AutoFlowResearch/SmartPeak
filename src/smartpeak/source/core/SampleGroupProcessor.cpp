@@ -122,7 +122,10 @@ namespace SmartPeak
             new_feature.getSubordinates().push_back(sub_feature);
           }
         }
-        new_feature_map.push_back(new_feature);
+        if (!new_feature.getSubordinates().empty())
+        {
+          new_feature_map.push_back(new_feature);
+        }
       }
     }
     sampleGroupHandler_IO.setFeatureMap(new_feature_map);
