@@ -5,7 +5,7 @@ set(directory source/io)
 set(sources_list
 	CSVWriter.cpp
 	ParametersParser.cpp
-	SelectiveDilutionsParser.cpp
+	SelectDilutionsParser.cpp
 	SequenceParser.cpp
 	InputDataValidation.cpp
 )

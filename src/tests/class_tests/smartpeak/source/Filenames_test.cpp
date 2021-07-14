@@ -144,7 +144,7 @@ TEST(Filenames, filenames_getDefaultDynamicFilenames)
   EXPECT_STREQ(filenames.componentsToConcentrations_csv_o.c_str(), "/home/user/featuresOut/injOut_componentsToConcentrations.csv");
   EXPECT_STREQ(filenames.pivotTable_csv_o.c_str(), "");
   EXPECT_STREQ(filenames.featureDB_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.selectiveDilutions_csv_i.c_str(), "/home/user/selectiveDilutions.csv");
+  EXPECT_STREQ(filenames.selectDilutions_csv_i.c_str(), "/home/user/selectDilutions.csv");
 }
 
 TEST(Filenames, clear1)
@@ -173,7 +173,7 @@ TEST(Filenames, clear1)
   EXPECT_STREQ(filenames.quantitationMethods_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.standardsConcentrations_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.referenceData_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.selectiveDilutions_csv_i.c_str(), "");
+  EXPECT_STREQ(filenames.selectDilutions_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.mzML_i.c_str(), "");
   EXPECT_STREQ(filenames.mzTab_o.c_str(), "");
   EXPECT_STREQ(filenames.mzTab_i.c_str(), "");
@@ -236,7 +236,7 @@ TEST(Filenames, clear2)
   EXPECT_STREQ(filenames.quantitationMethods_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.standardsConcentrations_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.referenceData_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.selectiveDilutions_csv_i.c_str(), "");
+  EXPECT_STREQ(filenames.selectDilutions_csv_i.c_str(), "");
   EXPECT_STREQ(filenames.mzML_i.c_str(), "");
   EXPECT_STREQ(filenames.mzTab_o.c_str(), "");
   EXPECT_STREQ(filenames.mzTab_i.c_str(), "");

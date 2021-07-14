@@ -444,9 +444,9 @@ TEST(SequenceHandler, processStoreFeaturesSampleGroup)
   // no tests, it wraps OpenMS store function
 }
 
-TEST(SelectFromDilution, process)
+TEST(SelectDilutionsParser, process)
 {
-  ParameterSet select_from_dilutions_params;
+  ParameterSet select_dilutions_params;
 
   // setup the sequence
   SequenceHandler sequenceHandler;
@@ -506,9 +506,9 @@ TEST(SelectFromDilution, process)
   SampleGroupHandler sampleGroupHandler = sequenceHandler.getSampleGroups().front();
 
   Filenames filenames;
-  filenames.selectiveDilutions_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectiveDilutions.csv");
-  SelectFromDilution selectFromDilution;
-  selectFromDilution.process(sampleGroupHandler, sequenceHandler, select_from_dilutions_params, filenames);
+  filenames.selectDilutions_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectDilutions.csv");
+  SelectDilutions select_dilutions;
+  select_dilutions.process(sampleGroupHandler, sequenceHandler, select_dilutions_params, filenames);
 
   //Test file contains:
   //compound, dilution_factor

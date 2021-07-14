@@ -95,6 +95,6 @@ namespace SmartPeak {
     {"MERGE_INJECTIONS",                          std::make_shared<MergeInjections>()},
     {"LOAD_FEATURES_SAMPLE_GROUP",                std::make_shared<LoadFeaturesSampleGroup>()},
     {"STORE_FEATURES_SAMPLE_GROUP",               std::make_shared<StoreFeaturesSampleGroup>()},
-    {"SELECT_FROM_DILUTION",                      std::make_shared<SelectFromDilution>()}
+    {"SELECT_DILUTIONS",                          std::make_shared<SelectDilutions>()}
   };
 }

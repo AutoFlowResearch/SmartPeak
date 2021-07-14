@@ -26,36 +26,36 @@
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
-#include <SmartPeak/io/SelectiveDilutionsParser.h>
+#include <SmartPeak/io/SelectDilutionsParser.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
 {
-  ParameterSet SelectFromDilution::getParameterSchema() const
+  ParameterSet SelectDilutions::getParameterSchema() const
   {
     return ParameterSet();
   }
 
-  void SelectFromDilution::process(
+  void SelectDilutions::process(
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
-    LOGD << "START SelectFromDilution";
+    LOGD << "START SelectDilutionsParser";
 
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
 
-    std::map<std::string, int> selective_dilution_map;
+    std::map<std::string, int> select_dilution_map;
     try
     {
-      SelectiveDilutionsParser::read(filenames.selectiveDilutions_csv_i, selective_dilution_map);
+      SelectDilutionsParser::read(filenames.selectDilutions_csv_i, select_dilution_map);
     }
     catch (const std::exception& e)
     {
-      LOGE << "Failed to read selective dilutions file [" << filenames.selectiveDilutions_csv_i << "] : " << e.what();
+      LOGE << "Failed to read select dilutions file [" << filenames.selectDilutions_csv_i << "] : " << e.what();
       return;
     }
 
@@ -86,9 +86,9 @@ namespace SmartPeak
         {
           bool add_feature = true;
           const auto& native_id = sub_feature.getMetaValue("native_id");
-          if (selective_dilution_map.count(native_id))
+          if (select_dilution_map.count(native_id))
           {
-            const auto preferred_dilution = selective_dilution_map.at(native_id);
+            const auto preferred_dilution = select_dilution_map.at(native_id);
             if (injection.getMetaData().dilution_factor == preferred_dilution)
             {
               add_feature = true;
@@ -109,7 +109,7 @@ namespace SmartPeak
       }
     }
     sampleGroupHandler_IO.setFeatureMap(new_feature_map);
-    LOGD << "END SelectFromDilution";
+    LOGD << "END SelectDilutionsParser";
   }
 
   ParameterSet MergeInjections::getParameterSchema() const

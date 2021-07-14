@@ -28,15 +28,15 @@
 
 namespace SmartPeak
 {
-  class SelectiveDilutionsParser
+  class SelectDilutionsParser
   {
   public:
-    SelectiveDilutionsParser() = delete;
-    ~SelectiveDilutionsParser() = delete;
-    SelectiveDilutionsParser(const SelectiveDilutionsParser&) = delete;
-    SelectiveDilutionsParser& operator=(const SelectiveDilutionsParser&) = delete;
-    SelectiveDilutionsParser(SelectiveDilutionsParser&&) = delete;
-    SelectiveDilutionsParser& operator=(SelectiveDilutionsParser&&) = delete;
+    SelectDilutionsParser() = delete;
+    ~SelectDilutionsParser() = delete;
+    SelectDilutionsParser(const SelectDilutionsParser&) = delete;
+    SelectDilutionsParser& operator=(const SelectDilutionsParser&) = delete;
+    SelectDilutionsParser(SelectDilutionsParser&&) = delete;
+    SelectDilutionsParser& operator=(SelectDilutionsParser&&) = delete;
 
     /**
       Parse parameters from csv file.

@@ -23,16 +23,16 @@
 
 #include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
-#include <SmartPeak/io/SelectiveDilutionsParser.h>
+#include <SmartPeak/io/SelectDilutionsParser.h>
 
 using namespace SmartPeak;
 using namespace std;
 
-TEST(SelectiveDilutionsParser, read)
+TEST(SelectDilutions, read)
 {
-  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectiveDilutions.csv");
+  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectDilutions.csv");
   std::map<std::string, int> dilution_map;
-  SelectiveDilutionsParser::read(pathname, dilution_map);
+  SelectDilutionsParser::read(pathname, dilution_map);
   ASSERT_EQ(dilution_map.size(), 2);
   ASSERT_EQ(dilution_map.count("test1_1"), 1);
   EXPECT_EQ(dilution_map["test1_1"], 10);
@@ -40,12 +40,12 @@ TEST(SelectiveDilutionsParser, read)
   EXPECT_EQ(dilution_map["test1_2"], 1);
 }
 
-TEST(SelectiveDilutionsParser, read_invalid)
+TEST(SelectDilutions, read_invalid)
 {
-  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("SelectiveDilutionsParser_invalid.csv");
+  const string pathname = SMARTPEAK_GET_TEST_DATA_PATH("SelectDilutionsParser_invalid.csv");
   try {
     std::map<std::string, int> dilution_map;
-    SelectiveDilutionsParser::read(pathname, dilution_map);
+    SelectDilutionsParser::read(pathname, dilution_map);
     FAIL() << "Expected std::exception";
   }
   catch (std::exception const& err) {
@@ -56,15 +56,15 @@ TEST(SelectiveDilutionsParser, read_invalid)
 }
 
 
-TEST(SelectiveDilutionsParser, read_missing_columns)
+TEST(SelectDilutions, read_missing_columns)
 {
   std::map<std::string, int> dilution_map;
   try {
-    SelectiveDilutionsParser::read(SMARTPEAK_GET_TEST_DATA_PATH("SelectiveDilutionsParser_missing_compound.csv"), dilution_map);
+    SelectDilutionsParser::read(SMARTPEAK_GET_TEST_DATA_PATH("SelectDilutionsParser_missing_component_name.csv"), dilution_map);
     FAIL() << "Expected std::invalid_argument";
   }
   catch (std::invalid_argument const& err) {
-    EXPECT_STREQ(err.what(), "Missing required column 'compound'");
+    EXPECT_STREQ(err.what(), "Missing required column 'component_name'");
     EXPECT_EQ(dilution_map.size(), 0);
   }
   catch (...) {
@@ -72,7 +72,7 @@ TEST(SelectiveDilutionsParser, read_missing_columns)
   }
 
   try {
-    SelectiveDilutionsParser::read(SMARTPEAK_GET_TEST_DATA_PATH("SelectiveDilutionsParser_missing_dilution_factor.csv"), dilution_map);
+    SelectDilutionsParser::read(SMARTPEAK_GET_TEST_DATA_PATH("SelectDilutionsParser_missing_dilution_factor.csv"), dilution_map);
     FAIL() << "Expected std::invalid_argument";
   }
   catch (std::invalid_argument const& err) {

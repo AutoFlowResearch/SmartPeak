@@ -54,7 +54,7 @@ public:
     std::string quantitationMethods_csv_i;
     std::string standardsConcentrations_csv_i;
     std::string referenceData_csv_i;
-    std::string selectiveDilutions_csv_i;
+    std::string selectDilutions_csv_i;
     std::string mzML_i;
     std::string mzTab_i;
     std::string mzTab_o;

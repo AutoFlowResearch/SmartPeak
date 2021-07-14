@@ -21,7 +21,7 @@
 // $Authors: Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/io/SelectiveDilutionsParser.h>
+#include <SmartPeak/io/SelectDilutionsParser.h>
 #ifndef CSV_IO_NO_THREAD
 #define CSV_IO_NO_THREAD
 #endif
@@ -30,10 +30,10 @@
 
 namespace SmartPeak
 {
-  const std::string s_compound{ "compound" };
+  const std::string s_component_name{ "component_name" };
   const std::string s_dilution_factor{ "dilution_factor" };
 
-  void SelectiveDilutionsParser::read(
+  void SelectDilutionsParser::read(
     const std::string& filename,
     std::map<std::string,int>& dilution_map
   )
@@ -47,13 +47,13 @@ namespace SmartPeak
 
     in.read_header(
       io::ignore_extra_column | io::ignore_missing_column,
-      s_compound,
+      s_component_name,
       s_dilution_factor
     );
 
     // check for required columns
     static const std::vector<std::string>
-      required_column{ s_compound, s_dilution_factor };
+      required_column{ s_component_name, s_dilution_factor };
     for (const auto& column : required_column)
     {
       if (!in.has_column(column))
@@ -64,19 +64,19 @@ namespace SmartPeak
       }
     }
 
-    std::string compound;
+    std::string component;
     std::string dilution_factor;
     unsigned int row = 1; // we have read the header, and we will start line 1 as much text editors do
-    while (in.read_row(compound, dilution_factor)) {
+    while (in.read_row(component, dilution_factor)) {
       row++;
       std::map<std::string, std::string> properties =
       {
-        {"compound", compound},
-        {"dilution_factor", dilution_factor}
+        {s_component_name, component},
+        {s_dilution_factor, dilution_factor}
       };
       try
       {
-        dilution_map.insert_or_assign(compound, std::stoi(dilution_factor));
+        dilution_map.insert_or_assign(component, std::stoi(dilution_factor));
       }
       catch (const std::exception& e)
       {

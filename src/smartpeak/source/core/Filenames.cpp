@@ -82,7 +82,7 @@ namespace SmartPeak
     dynamic_filenames.featureXMLSampleGroup_i = features_input_path + "/" + input_sample_name + ".featureXML";
     dynamic_filenames.featureXMLSampleGroup_o = output_path + "/" + output_sample_name + ".featureXML";
 
-    dynamic_filenames.selectiveDilutions_csv_i = static_dir + "/selectiveDilutions.csv";
+    dynamic_filenames.selectDilutions_csv_i = static_dir + "/selectDilutions.csv";
 
     const std::string prefix_out = output_path + "/" + output_inj_name;
     dynamic_filenames.featureXML_o                     = prefix_out + ".featureXML";
@@ -194,7 +194,7 @@ namespace SmartPeak
     quantitationMethods_csv_i.clear();
     standardsConcentrations_csv_i.clear();
     referenceData_csv_i.clear();
-    selectiveDilutions_csv_i.clear();
+    selectDilutions_csv_i.clear();
     mzML_i.clear();
     mzTab_i.clear();
     mzTab_o.clear();

@@ -58,10 +58,10 @@ namespace SmartPeak
     SampleGroupProcessor() = default;
   };
 
-  struct SelectFromDilution : SampleGroupProcessor
+  struct SelectDilutions : SampleGroupProcessor
   {
     int getID() const override { return -1; }
-    std::string getName() const override { return "SELECT_FROM_DILUTION"; }
+    std::string getName() const override { return "SELECT_DILUTIONS"; }
     std::string getDescription() const override { return "Select features from dilution preferences"; }
     virtual ParameterSet getParameterSchema() const override;
 
