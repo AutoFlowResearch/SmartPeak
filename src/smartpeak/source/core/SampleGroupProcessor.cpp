@@ -33,7 +33,17 @@ namespace SmartPeak
 {
   ParameterSet SelectDilutions::getParameterSchema() const
   {
-    return ParameterSet();
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"SelectDilutions", {
+      {
+        {"name", "selection_method"},
+        {"type", "string"},
+        {"value", "preferred"},
+        {"description", "'preferred' will use provided preferred component, but if not present we will use features from other dilutions. 'exclusive' will exclude all features that does not correspond to the dilution set in the select dilution file."},
+        {"valid_strings", "['preferred','exclusive']"}
+      }
+    }} });
+    return ParameterSet(param_struct);
   }
 
   void SelectDilutions::process(
@@ -89,15 +99,22 @@ namespace SmartPeak
           if (select_dilution_map.count(native_id))
           {
             const auto preferred_dilution = select_dilution_map.at(native_id);
-            if (injection.getMetaData().dilution_factor == preferred_dilution)
+            const auto injection_dilution = injection.getMetaData().dilution_factor;
+            if (!(std::abs(injection_dilution-preferred_dilution)<1e-6))
             {
-              add_feature = true;
-            }
-            else
-            {
-              // if there is no other feature is listed with the preferred dilution, we will use that one
-              const auto& existing_dilutions = existing_dilutions_map[native_id];
-              add_feature = (std::find(existing_dilutions.begin(), existing_dilutions.end(), preferred_dilution) == existing_dilutions.end());
+              const auto select_method_param = params.findParameter("SelectDilutions", "selection_method");
+              assert(select_method_param != nullptr); // parameter merging will ensure that it cannot be null
+              const std::string& method = select_method_param->getValueAsString();
+              if (method == "preferred")
+              {
+                // if there is no other feature is listed with the preferred dilution, we will use that one
+                const auto& existing_dilutions = existing_dilutions_map[native_id];
+                add_feature = (std::find(existing_dilutions.begin(), existing_dilutions.end(), preferred_dilution) == existing_dilutions.end());
+              }
+              else // (method == "exclusive")
+              {
+                add_feature = false;
+              }
             }
           }
           if (add_feature)

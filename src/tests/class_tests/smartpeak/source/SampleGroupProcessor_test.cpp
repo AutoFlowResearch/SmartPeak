@@ -514,18 +514,49 @@ TEST(SelectDilutionsParser, process)
   //compound, dilution_factor
   //test1_1, 10
   //test1_2, 1
-  const OpenMS::FeatureMap& result = sampleGroupHandler.getFeatureMap();
-  ASSERT_EQ(result.size(), 2);
-  
-  const OpenMS::Feature& result_feature1 = result[0];
-  ASSERT_EQ(result_feature1.getSubordinates().size(), 1);
-  const OpenMS::Feature& result_subfeature1 = result_feature1.getSubordinates()[0];
-  EXPECT_STREQ(result_subfeature1.getMetaValue("native_id").toString().c_str(), "test1_2");
-  EXPECT_STREQ(result_subfeature1.getMetaValue("injection").toString().c_str(), "injection1");
+  {
+    const OpenMS::FeatureMap& result = sampleGroupHandler.getFeatureMap();
+    ASSERT_EQ(result.size(), 2);
 
-  const OpenMS::Feature& result_feature2 = result[1];
-  ASSERT_EQ(result_feature2.getSubordinates().size(), 1);
-  const OpenMS::Feature& result_subfeature2 = result_feature2.getSubordinates()[0];
-  EXPECT_STREQ(result_subfeature2.getMetaValue("native_id").toString().c_str(), "test1_1");
-  EXPECT_STREQ(result_subfeature2.getMetaValue("injection").toString().c_str(), "injection10");
+    const OpenMS::Feature& result_feature1 = result[0];
+    ASSERT_EQ(result_feature1.getSubordinates().size(), 1);
+    const OpenMS::Feature& result_subfeature1 = result_feature1.getSubordinates()[0];
+    EXPECT_STREQ(result_subfeature1.getMetaValue("native_id").toString().c_str(), "test1_2");
+    EXPECT_STREQ(result_subfeature1.getMetaValue("injection").toString().c_str(), "injection1");
+
+    const OpenMS::Feature& result_feature2 = result[1];
+    ASSERT_EQ(result_feature2.getSubordinates().size(), 1);
+    const OpenMS::Feature& result_subfeature2 = result_feature2.getSubordinates()[0];
+    EXPECT_STREQ(result_subfeature2.getMetaValue("native_id").toString().c_str(), "test1_1");
+    EXPECT_STREQ(result_subfeature2.getMetaValue("injection").toString().c_str(), "injection10");
+  }
+
+  // use selective method
+  map<std::string, vector<map<string, string>>> params_struct({
+  {"SelectDilutions", {
+    { {"name", "selection_method"}, {"type", "string"}, {"value", "exclusive"} },
+  }}
+  });
+  ParameterSet params_exclusive(params_struct);
+  
+  sampleGroupHandler.getFeatureMap().clear();
+  select_dilutions.process(sampleGroupHandler, sequenceHandler, params_exclusive, filenames);
+
+  {
+    const OpenMS::FeatureMap& result = sampleGroupHandler.getFeatureMap();
+    ASSERT_EQ(result.size(), 2);
+
+    const OpenMS::Feature& result_feature1 = result[0];
+    ASSERT_EQ(result_feature1.getSubordinates().size(), 1);
+    const OpenMS::Feature& result_subfeature1 = result_feature1.getSubordinates()[0];
+    EXPECT_STREQ(result_subfeature1.getMetaValue("native_id").toString().c_str(), "test1_2");
+    EXPECT_STREQ(result_subfeature1.getMetaValue("injection").toString().c_str(), "injection1");
+
+    const OpenMS::Feature& result_feature2 = result[1];
+    ASSERT_EQ(result_feature2.getSubordinates().size(), 1);
+    const OpenMS::Feature& result_subfeature2 = result_feature2.getSubordinates()[0];
+    EXPECT_STREQ(result_subfeature2.getMetaValue("native_id").toString().c_str(), "test1_1");
+    EXPECT_STREQ(result_subfeature2.getMetaValue("injection").toString().c_str(), "injection10");
+  }
+
 }
