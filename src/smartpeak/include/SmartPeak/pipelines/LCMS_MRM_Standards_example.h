@@ -58,6 +58,7 @@ void example_LCMS_MRM_Standards(
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames1[key] = Filenames::getDefaultDynamicFilenames(
+      dir_I,
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
@@ -83,6 +84,7 @@ void example_LCMS_MRM_Standards(
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string& key = sequence_segment.getSequenceSegmentName();
     dynamic_filenames2[key] = Filenames::getDefaultDynamicFilenames(
+      dir_I,
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",
@@ -108,6 +110,7 @@ void example_LCMS_MRM_Standards(
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames3[key] = Filenames::getDefaultDynamicFilenames(
+      dir_I,
       dir_I + "/mzML/",
       dir_I + "/features/",
       dir_I + "/features/",

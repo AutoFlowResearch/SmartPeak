@@ -47,6 +47,7 @@ struct TestData {
       LoadFeatures loadFeatures;
       for (auto& injection : sequenceHandler.getSequence()) {
         Filenames filenames_ = Filenames::getDefaultDynamicFilenames(
+          pathname,
           pathname + "/mzML",
           pathname + "/features",
           pathname + "/features",
@@ -66,6 +67,7 @@ struct TestData {
       LoadRawData loadRawData;
       for (auto& injection : sequenceHandler.getSequence()) {
         Filenames filenames_ = Filenames::getDefaultDynamicFilenames(
+          pathname,
           pathname + "/mzML",
           pathname + "/features",
           pathname + "/features",

@@ -94,6 +94,7 @@ namespace SmartPeak {
   const std::map<std::string, std::shared_ptr<SampleGroupProcessor>> n_to_sample_group_method_ {
     {"MERGE_INJECTIONS",                          std::make_shared<MergeInjections>()},
     {"LOAD_FEATURES_SAMPLE_GROUP",                std::make_shared<LoadFeaturesSampleGroup>()},
-    {"STORE_FEATURES_SAMPLE_GROUP",               std::make_shared<StoreFeaturesSampleGroup>()}
+    {"STORE_FEATURES_SAMPLE_GROUP",               std::make_shared<StoreFeaturesSampleGroup>()},
+    {"SELECT_DILUTIONS",                          std::make_shared<SelectDilutions>()}
   };
 }
