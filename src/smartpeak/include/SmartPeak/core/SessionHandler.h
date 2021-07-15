@@ -188,9 +188,9 @@ namespace SmartPeak
       {
         if (!points_overflow_)
         {
-          nb_points_ += x_data.size();
-          if (nb_points_ < max_nb_points_)
+          if (nb_points_ + x_data.size() < max_nb_points_)
           {
+            nb_points_ += x_data.size();
             v_x_data.push_back(x_data);
             v_y_data.push_back(y_data);
             data_names.push_back(data_name);
