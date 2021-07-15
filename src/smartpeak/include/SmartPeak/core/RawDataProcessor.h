@@ -479,6 +479,8 @@ namespace SmartPeak
     std::string getName() const override { return "LOAD_TRANSITIONS"; }
     std::string getDescription() const override { return "Load the transitions for the SRM experiments from the TraML file."; }
 
+    virtual ParameterSet getParameterSchema() const override;
+
     /** Load the transitions from the TraML file.
     */
     void process(

@@ -844,13 +844,43 @@ TEST(RawDataProcessor, gettersLoadTransitions)
   EXPECT_EQ(processor.getName(), "LOAD_TRANSITIONS");
 }
 
-TEST(RawDataProcessor, processLoadTransitions)
+TEST(RawDataProcessor, processLoadTransitions_csv)
 {
   Filenames filenames;
   filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
   RawDataHandler rawDataHandler;
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, {}, filenames);
+  const std::vector<OpenMS::ReactionMonitoringTransition>& t = rawDataHandler.getTargetedExperiment().getTransitions();
+
+  EXPECT_EQ(t.size(), 324);
+
+  EXPECT_EQ(t[0].getPeptideRef(), "arg-L");
+  EXPECT_NEAR(t[0].getPrecursorMZ(), 179.0, 1e-6);
+  EXPECT_NEAR(t[0].getProductMZ(), 136.0, 1e-6);
+
+  EXPECT_EQ(t[10].getPeptideRef(), "citr-L");
+  EXPECT_NEAR(t[10].getPrecursorMZ(), 180.0, 1e-6);
+  EXPECT_NEAR(t[10].getProductMZ(), 136.0, 1e-6);
+
+  EXPECT_EQ(t[19].getPeptideRef(), "Lcystin");
+  EXPECT_NEAR(t[19].getPrecursorMZ(), 239.0, 1e-6);
+  EXPECT_NEAR(t[19].getProductMZ(), 120.0, 1e-6);
+}
+
+TEST(RawDataProcessor, processLoadTransitions_traML)
+{
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("LoadTransitions_test.TraML");
+  RawDataHandler rawDataHandler;
+  LoadTransitions loadTransitions;
+  map<std::string, vector<map<string, string>>> params_struct({
+    {"LoadTransitions", {
+      { {"name", "format"}, {"type", "string"}, {"value", "traML"} },
+    }}
+    });
+  ParameterSet params(params_struct);
+  loadTransitions.process(rawDataHandler, params, filenames);
   const std::vector<OpenMS::ReactionMonitoringTransition>& t = rawDataHandler.getTargetedExperiment().getTransitions();
 
   EXPECT_EQ(t.size(), 324);

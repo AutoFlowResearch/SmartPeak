@@ -34,6 +34,7 @@ namespace SmartPeak {
   const std::map<std::string, std::shared_ptr<RawDataProcessor>> n_to_raw_data_method_ {
     {"LOAD_RAW_DATA",                             std::make_shared<LoadRawData>()},
     {"LOAD_FEATURES",                             std::make_shared<LoadFeatures>()},
+    {"LOAD_TRANSITIONS",                          std::make_shared<LoadTransitions>()},
     {"PICK_MRM_FEATURES",                         std::make_shared<PickMRMFeatures>()},
     {"FILTER_FEATURES",                           std::make_shared<FilterFeatures>()},
     {"SELECT_FEATURES",                           std::make_shared<SelectFeatures>()},

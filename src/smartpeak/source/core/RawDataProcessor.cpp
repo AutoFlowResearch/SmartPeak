@@ -750,15 +750,43 @@ namespace SmartPeak
     return true;
   }
 
+  ParameterSet LoadTransitions::getParameterSchema() const
+  {
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"LoadTransitions", {
+      {
+        {"name", "format"},
+        {"type", "string"},
+        {"value", "csv"},
+        {"description", "Transitions file format"},
+        {"valid_strings", "['csv','traML']"}
+      }
+    }} });
+    return ParameterSet(param_struct);
+  }
+
   void LoadTransitions::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
-    // TODO: move to parameters at some point
-    std::string format = "csv";
     LOGD << "START loadTraML";
+
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+
+    const auto format_param = params.findParameter("LoadTransitions", "format");
+    if (!format_param)
+    {
+      // should actually not happen since we merge with the default params
+      LOGE << "LoadTransitions/format parameter not found";
+      return;
+    }
+
+    const std::string format = format_param->getValueAsString();
+
     LOGI << "Loading " << filenames.traML_csv_i;
     LOGI << "Format: " << format;
 
