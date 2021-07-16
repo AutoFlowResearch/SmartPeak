@@ -1,12 +1,20 @@
 SmartPeak Changelog
 ===================
 
+v1.11.0 (2020-07-16)
+--------------------
+
+Features
+~~~~~~~~
+- DDA Workflow and Support for visualization of non-targeted LC-MS/MS data `(#386) <https://github.com/AutoFlowResearch/SmartPeak/pull/386>`_
+- Automatic, accurate selection of data based on dilution and compound `(#394) <https://github.com/AutoFlowResearch/SmartPeak/pull/394>`_
+
 v1.10.0 (2020-07-08)
 --------------------
 
 Fix
 ~~~
-- Added headless CLI to package (#391) `(#391) <https://github.com/AutoFlowResearch/SmartPeak/pull/391>`_
+- Added headless CLI to package `(#391) <https://github.com/AutoFlowResearch/SmartPeak/pull/391>`_
 - Fixed show-back of log and info panel, once previously hidden. `(#389) <https://github.com/AutoFlowResearch/SmartPeak/pull/389>`_
 - Display error if required column is missing in the parameters file. `(#388) <https://github.com/AutoFlowResearch/SmartPeak/pull/388>`_
 
