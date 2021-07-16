@@ -38,6 +38,7 @@ namespace SmartPeak
     if (editable && ImGui::BeginCombo("Presets", NULL))
     {
       const char* presets[] = {
+        "DDA",
         "LCMS MRM Unknowns",
         "LCMS MRM Standards",
         "HPLC UV Unknowns",
@@ -54,7 +55,13 @@ namespace SmartPeak
         {
           std::vector<std::string> ids;
           const std::string s_string { s };
-          if (s_string == "LCMS MRM Unknowns")
+          if (s_string == "DDA")
+            ids = { "LOAD_RAW_DATA",
+                    "PICK_MS2_FEATURES",
+                    "SEARCH_SPECTRUM",
+                    "DDA",
+                    "STORE_FEATURES"};
+          else if (s_string == "LCMS MRM Unknowns")
             ids = { "LOAD_RAW_DATA", 
                     "MAP_CHROMATOGRAMS",
                     "PICK_MRM_FEATURES",

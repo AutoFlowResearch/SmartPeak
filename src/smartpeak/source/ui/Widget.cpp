@@ -523,10 +523,15 @@ namespace SmartPeak
   {
     // Main graphic
     assert(x_data_.dimensions() == y_data_.dimensions());
+    if (x_data_.size() == 0)
+    {
+      ImGui::Text("No data to display select data to render or adjust ranges.");
+      return;
+    }
     // add some padding
     float border_padding_x = (x_max_ - x_min_) * 0.05f;
     float border_padding_y = (y_max_ - y_min_) * 0.01f;
-    ImPlot::SetNextPlotLimits(x_min_- border_padding_x, x_max_+ border_padding_x, y_min_ - border_padding_y, y_max_*1.1f, ImGuiCond_Always);
+    ImPlot::SetNextPlotLimits(x_min_ - border_padding_x, x_max_ + border_padding_x, y_min_ - border_padding_y, y_max_ * 1.1f, ImGuiCond_Always);
     const ImPlotFlags imPlotFlags = ImPlotFlags_Legend | ImPlotFlags_Highlight | ImPlotFlags_BoxSelect | ImPlotFlags_ContextMenu;
     const ImPlotAxisFlags imPlotAxisFlagsX = ImPlotAxisFlags_GridLines;
     std::vector<double> ticks_values;
@@ -598,63 +603,6 @@ namespace SmartPeak
             }
           }
         }
-      }
-    }
-  }
-
-  void ScatterPlotWidget::draw()
-  {
-    updateScatterPlotData();
-    // Widget's controls - that ImGui does not support natively
-    const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_AlwaysClamp;
-    float controls_pos_start_y = ImGui::GetCursorPosY();
-    ImGui::SliderFloat((std::string("min ") + chrom_.x_axis_title_).c_str(), &current_range_.first, slider_min_max_.first, current_range_.second, "%.4f", slider_flags);
-    ImGui::SameLine();
-    ImGui::Checkbox("Compact View", &compact_view_);
-    ImGui::SliderFloat((std::string("max ") + chrom_.x_axis_title_).c_str(), &current_range_.second, current_range_.first, slider_min_max_.second, "%.4f", slider_flags);
-    ImGui::SameLine();
-    ImGui::Checkbox("Legend", &show_legend_);
-    float controls_pos_end_y = ImGui::GetCursorPosY();
-    // Main graphic
-    if (chrom_.points_overflow)
-    {
-      ImGui::Text("Unable to draw: too much points. Please reduce scope or unselect data.");
-    }
-    else
-    {
-      float graphic_height = height_ - (controls_pos_end_y - controls_pos_start_y);
-      ImPlot::SetNextPlotLimits(current_range_.first, current_range_.second, chrom_.y_min_, chrom_.y_max_, ImGuiCond_Always);
-      ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
-      plotFlags |= ImPlotFlags_Crosshairs;
-      if (ImPlot::BeginPlot(plot_title_.c_str(), chrom_.x_axis_title_.c_str(), chrom_.y_axis_title_.c_str(), ImVec2(width_ - 25, graphic_height - 40), plotFlags)) {
-        int i = 0;
-        for (const auto& serie_name_scatter : chrom_.series_names_scatter_)
-        {
-          assert(chrom_.x_data_scatter_.at(i).size() == chrom_.y_data_scatter_.at(i).size());
-          ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_None);
-          ImPlot::PlotLine(serie_name_scatter.c_str(), chrom_.x_data_scatter_.at(i).data(), chrom_.y_data_scatter_.at(i).data(), chrom_.x_data_scatter_.at(i).size());
-          ImPlotMarker plot_marker = ImPlotMarker_Circle;
-          int feature_index = 0;
-          for (int j = 0; j < chrom_.x_data_area_.size(); ++j) {
-            // Corresponding serie names are supposed to start with same name as the scatter name
-            if (chrom_.series_names_area_.at(j).rfind(serie_name_scatter) == 0)
-            {
-              assert(chrom_.x_data_area_.at(j).size() == chrom_.y_data_area_.at(j).size());
-              ImPlot::PushStyleVar(ImPlotStyleVar_Marker, plot_marker);
-              std::string legend_text = serie_name_scatter;
-              if (!compact_view_)
-              {
-                legend_text = chrom_.series_names_area_.at(j) + "::" + std::to_string(feature_index);
-              }
-              ImPlot::PlotScatter(legend_text.c_str(), chrom_.x_data_area_.at(j).data(), chrom_.y_data_area_.at(j).data(), chrom_.x_data_area_.at(j).size());
-              plot_marker <<= 1;
-              if (plot_marker > ImPlotMarker_Asterisk) plot_marker = ImPlotMarker_Circle;
-              ++feature_index;
-            }
-          }
-          ++i;
-        }
-        ImPlot::EndPlot();
       }
     }
   }

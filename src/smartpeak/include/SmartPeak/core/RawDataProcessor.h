@@ -336,6 +336,40 @@ namespace SmartPeak
       ) const override;
   };
 
+  struct SearchSpectrum : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "SEARCH_SPECTRUM"; }
+    std::string getDescription() const override { return "Search accurate masses and add identification (peptide hits) as features/sub-features"; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
+  struct DDA : RawDataProcessor
+  {
+    int getID() const override { return -1; }
+    std::string getName() const override { return "DDA"; }
+    std::string getDescription() const override { return "Data-Dependent Acquisition workflow step"; }
+
+    virtual ParameterSet getParameterSchema() const override;
+
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      const Filenames& filenames
+    ) const override;
+  };
+
   struct FilterFeatures : RawDataProcessor
   {
     int getID() const override { return 4; }
@@ -444,6 +478,8 @@ namespace SmartPeak
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_TRANSITIONS"; }
     std::string getDescription() const override { return "Load the transitions for the SRM experiments from the TraML file."; }
+
+    virtual ParameterSet getParameterSchema() const override;
 
     /** Load the transitions from the TraML file.
     */

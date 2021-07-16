@@ -6,7 +6,10 @@ set(sources_list_h
 	AboutWidget.h
 	CalibratorsPlotWidget.h
 	ChromatogramPlotWidget.h
+	ChromatogramTICPlotWidget.h
+	ChromatogramXICPlotWidget.h
 	FilePicker.h
+	GraphicDataVizWidget.h
 	GuiAppender.h
 	Heatmap2DWidget.h
 	ImEntry.h
@@ -19,6 +22,7 @@ set(sources_list_h
 	SampleTypeEditorWidget.h
 	SequenceGroupsEditorWidget.h
 	SequenceTableWidget.h
+	SpectraMSMSPlotWidget.h
 	SpectraPlotWidget.h
 	StatisticsWidget.h
 	Widget.h

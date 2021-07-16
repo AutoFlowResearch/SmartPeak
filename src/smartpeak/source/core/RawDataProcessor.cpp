@@ -34,6 +34,7 @@
 #include <OpenMS/FORMAT/MzMLFile.h>
 #include <OpenMS/FORMAT/MzTabFile.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/ChromatogramExtractor.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/TargetedSpectraExtractor.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/IsotopeLabelingMDVs.h>
 #include <OpenMS/ANALYSIS/TARGETED/MRMMapping.h>
 #include <OpenMS/KERNEL/SpectrumHelper.h>
@@ -749,15 +750,43 @@ namespace SmartPeak
     return true;
   }
 
+  ParameterSet LoadTransitions::getParameterSchema() const
+  {
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"LoadTransitions", {
+      {
+        {"name", "format"},
+        {"type", "string"},
+        {"value", "csv"},
+        {"description", "Transitions file format"},
+        {"valid_strings", "['csv','traML']"}
+      }
+    }} });
+    return ParameterSet(param_struct);
+  }
+
   void LoadTransitions::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
     const Filenames& filenames
   ) const
   {
-    // TODO: move to parameters at some point
-    std::string format = "csv";
     LOGD << "START loadTraML";
+
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+
+    const auto format_param = params.findParameter("LoadTransitions", "format");
+    if (!format_param)
+    {
+      // should actually not happen since we merge with the default params
+      LOGE << "LoadTransitions/format parameter not found";
+      return;
+    }
+
+    const std::string format = format_param->getValueAsString();
+
     LOGI << "Loading " << filenames.traML_csv_i;
     LOGI << "Format: " << format;
 
@@ -2183,6 +2212,121 @@ namespace SmartPeak
 
     LOGI << "MergeFeatures output size: " << rawDataHandler_IO.getFeatureMap().size();
     LOGD << "END MergeFeatures";
+  }
+
+  ParameterSet SearchSpectrum::getParameterSchema() const
+  {
+    OpenMS::TargetedSpectraExtractor oms_params;
+    return ParameterSet({ oms_params });
+  }
+  void SearchSpectrum::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START SearchSpectrum";
+
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+
+    OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
+    OpenMS::Param parameters = targeted_spectra_extractor.getParameters();
+    targeted_spectra_extractor.setParameters(parameters);
+
+    try {
+      OpenMS::FeatureMap feat_map_output;
+      targeted_spectra_extractor.searchSpectrum(rawDataHandler_IO.getFeatureMap(), feat_map_output);
+      rawDataHandler_IO.setFeatureMap(feat_map_output);
+    }
+    catch (const std::exception& e) {
+      LOGE << "SearchSpectrum : " << typeid(e).name() << " : " << e.what();
+    }
+
+    LOGD << "END SearchSpectrum";
+  }
+
+  ParameterSet DDA::getParameterSchema() const
+  {
+    OpenMS::TargetedSpectraExtractor oms_params;
+    return ParameterSet({ oms_params });
+  }
+
+  void DDA::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const
+  {
+    LOGD << "START DDA";
+
+    // Complete user parameters with schema
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+
+    OpenMS::TargetedSpectraExtractor targeted_spectra_extractor;
+    OpenMS::Param parameters = targeted_spectra_extractor.getParameters();
+    targeted_spectra_extractor.setParameters(parameters);
+
+    try {
+      // merge features (will be on MS1 spectra)
+      OpenMS::FeatureMap& ms1_accurate_mass_found_feature_map = rawDataHandler_IO.getFeatureMap();
+      OpenMS::FeatureMap ms1_merged_features;
+      targeted_spectra_extractor.mergeFeatures(ms1_accurate_mass_found_feature_map, ms1_merged_features);
+
+      // annotateSpectra :  I would like to annotate my MS2 spectra with the likely MS1 feature that it was derived from
+      std::vector<OpenMS::MSSpectrum> annotated_spectra;
+      OpenMS::FeatureMap ms2_features; // will be the input of annoteSpectra
+      targeted_spectra_extractor.annotateSpectra(rawDataHandler_IO.getExperiment().getSpectra(), ms1_merged_features, ms2_features, annotated_spectra);
+
+      // pickSpectra
+      std::vector<OpenMS::MSSpectrum> picked_spectra;
+      for (const auto& spectrum : annotated_spectra)
+      {
+        OpenMS::MSSpectrum picked_spectrum;
+        targeted_spectra_extractor.pickSpectrum(spectrum, picked_spectrum);
+        picked_spectra.push_back(picked_spectrum);
+      }
+
+      // score and select
+      std::vector<OpenMS::MSSpectrum> scored_spectra;
+      targeted_spectra_extractor.scoreSpectra(annotated_spectra, picked_spectra, scored_spectra);
+
+      std::vector<OpenMS::MSSpectrum> selected_spectra;
+      OpenMS::FeatureMap selected_features;
+      targeted_spectra_extractor.selectSpectra(scored_spectra, ms2_features, selected_spectra, selected_features, true);
+
+      // searchSpectra (will be on MS2 spectra)
+      OpenMS::FeatureMap ms2_accurate_mass_found_feature_map;
+      targeted_spectra_extractor.searchSpectrum(selected_features, ms2_accurate_mass_found_feature_map);
+
+      // merge features again (on MS2 spectra features)
+      OpenMS::FeatureMap ms2_merged_features;
+      targeted_spectra_extractor.mergeFeatures(ms2_accurate_mass_found_feature_map, ms2_merged_features);
+
+      // Store - we want to store MS1 and the associated MS2 features 
+      OpenMS::Param params = targeted_spectra_extractor.getParameters();
+      params.setValue("output_format", "traML");
+      params.setValue("deisotoping:use_deisotoper", "true");
+      targeted_spectra_extractor.setParameters(params);
+      LOGI << "Storing: " << filenames.traML_csv_o;
+      targeted_spectra_extractor.storeSpectraTraML(filenames.traML_csv_o, ms1_merged_features, ms2_merged_features);
+
+      // build MS1/MS2 features
+      OpenMS::FeatureMap ms1_ms2_features;
+      for (const auto& ms1_feature : ms1_merged_features)
+      {
+        OpenMS::Feature ms_level_annotated_feature = ms1_feature;
+        ms_level_annotated_feature.setMetaValue("ms_level", 1);
+        ms1_ms2_features.push_back(ms_level_annotated_feature);
+      }
+      for (const auto& ms2_feature : ms2_merged_features)
+      {
+        OpenMS::Feature ms_level_annotated_feature = ms2_feature;
+        ms_level_annotated_feature.setMetaValue("ms_level", 2);
+        ms1_ms2_features.push_back(ms_level_annotated_feature);
+      }
+      rawDataHandler_IO.setFeatureMap(ms1_ms2_features);
+      rawDataHandler_IO.updateFeatureMapHistory();
+    }
+    catch (const std::exception& e) {
+      LOGE << "DDA : " << typeid(e).name() << " : " << e.what();
+    }
+
+    LOGD << "END DDA";
   }
 
   void ClearData::process(RawDataHandler& rawDataHandler_IO, const ParameterSet& params_I, const Filenames& filenames) const

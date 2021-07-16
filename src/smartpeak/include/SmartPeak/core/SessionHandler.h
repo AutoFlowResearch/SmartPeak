@@ -123,23 +123,98 @@ namespace SmartPeak
     */
     void setFeatureMatrix(const SequenceHandler& sequence_handler);
     /*
-    @brief Scatter Plot structure, result of getChromatogramScatterPlot and getSpectrumScatterPlot
+    @brief Graph Visualization Data structure
     */
-    struct ScatterPlotData
+    struct GraphVizData
     {
+      std::vector<std::string> series_names_area_;
       std::vector<std::vector<float>> x_data_area_;
       std::vector<std::vector<float>> y_data_area_;
+      std::vector<std::string> series_names_scatter_;
       std::vector<std::vector<float>> x_data_scatter_;
       std::vector<std::vector<float>> y_data_scatter_;
-      std::vector<std::string> series_names_area_;
-      std::vector<std::string> series_names_scatter_;
       std::string x_axis_title_;
       std::string y_axis_title_;
+      std::vector<float> z_data_area_;
+      std::optional<std::string> z_axis_title_;
       float x_min_ = 0.0f;
       float x_max_ = 0.0f;
       float y_min_ = 0.0f;
       float y_max_ = 0.0f;
-      bool points_overflow = false; // true if all points were added and false if points were omitted due to performance
+      bool points_overflow_ = false; // true if all points were added and false if points were omitted due to performance concern
+      int nb_points_ = 0;
+      int max_nb_points_ = 0;
+
+      void reset(const std::string& x_axis_title, const std::string& y_axis_title, const std::optional<std::string>& z_axis_title, int max_nb_points)
+      {
+        x_axis_title_ = x_axis_title;
+        y_axis_title_ = y_axis_title;
+        z_axis_title_ = z_axis_title;
+        max_nb_points_ = max_nb_points;
+        x_min_ = 1e6;
+        x_max_ = 0;
+        y_min_ = 1e6;
+        y_max_ = 0;
+        x_data_scatter_.clear();
+        y_data_scatter_.clear();
+        series_names_scatter_.clear();
+        x_data_area_.clear();
+        y_data_area_.clear();
+        z_data_area_.clear();
+        series_names_area_.clear();
+        points_overflow_ = false;
+        nb_points_ = 0;
+      }
+
+      bool addData(const std::vector<float>& x_data, const std::vector<float>& y_data, const std::string& data_name)
+      {
+        return addData(x_data_area_, y_data_area_, series_names_area_, x_data, y_data, data_name);
+      }
+
+      bool addScatterData(const std::vector<float>& x_data, const std::vector<float>& y_data, const std::string& data_name)
+      {
+        return addData(x_data_scatter_, y_data_scatter_, series_names_scatter_, x_data, y_data, data_name);
+      }
+
+    
+    private:
+
+      bool addData(std::vector<std::vector<float>>& v_x_data,
+                   std::vector<std::vector<float>>& v_y_data,
+                   std::vector<std::string>& data_names,
+                   const std::vector<float>& x_data, 
+                   const std::vector<float>& y_data,
+                   const std::string& data_name)
+      {
+        if (!points_overflow_)
+        {
+          if (nb_points_ + x_data.size() < max_nb_points_)
+          {
+            nb_points_ += x_data.size();
+            v_x_data.push_back(x_data);
+            v_y_data.push_back(y_data);
+            data_names.push_back(data_name);
+            setMinMax(x_data, x_min_, x_max_);
+            setMinMax(y_data, y_min_, y_max_);
+          }
+          else
+          {
+            LOGD << "Stopped adding points to the graph";
+            points_overflow_ = true;
+          }
+        }
+        return (!points_overflow_);
+      }
+
+      void setMinMax(const std::vector<float> v, float& current_min, float& current_max)
+      {
+        if (!v.empty())
+        {
+          current_min = std::min(*std::min_element(v.begin(), v.end()), current_min);
+          current_max = std::max(*std::max_element(v.begin(), v.end()), current_max);
+        }
+      }
+
     };
 
     /*
@@ -152,10 +227,43 @@ namespace SmartPeak
     @param[in] component_names
     */
     void getChromatogramScatterPlot(const SequenceHandler& sequence_handler, 
-                                    ScatterPlotData& result,
+                                    GraphVizData& result,
                                     const std::pair<float, float>& range,
                                     const std::set<std::string>& sample_names,
                                     const std::set<std::string>& component_names) const;
+
+    /*
+    @brief Gets the TIC chromatogram data
+
+    @param[in] sequence_handler
+    @param[out] result
+    @param[in] range
+    @param[in] sample_names
+    @param[in] component_names
+    */
+    void getChromatogramTIC(const SequenceHandler& sequence_handler,
+      GraphVizData& result,
+      const std::pair<float, float>& range,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_names) const;
+
+    /*
+    @brief Gets the XIC chromatogram data
+
+    @param[in] sequence_handler
+    @param[out] result
+    @param[in] range
+    @param[in] sample_names
+    @param[in] component_names
+    @param[in] mz
+    */
+    void getChromatogramXIC(const SequenceHandler& sequence_handler,
+      GraphVizData& result,
+      const std::pair<float, float>& range,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& component_names,
+      float mz) const;
+
     /*
     @brief Gets the spectrum data
 
@@ -167,11 +275,33 @@ namespace SmartPeak
     @param[in] component_group_names
     */
     void getSpectrumScatterPlot(const SequenceHandler& sequence_handler,
-                                ScatterPlotData& result,
+                                GraphVizData& result,
                                 const std::pair<float, float>& range,
                                 const std::set<std::string>& sample_names,
                                 const std::set<std::string>& scan_names,
                                 const std::set<std::string>& component_group_names) const;
+
+    /*
+    @brief Gets MS1/MS2 spectrum data
+
+    @param[in] sequence_handler
+    @param[in] result
+    @param[in] range
+    @param[in] sample_names
+    @param[in] scan_names
+    @param[in] component_group_names
+    @param[in] rt
+    @param[in] ms_level
+    */
+    void getSpectrumMSMSPlot(const SequenceHandler& sequence_handler,
+      GraphVizData& result,
+      const std::pair<float, float>& range,
+      const std::set<std::string>& sample_names,
+      const std::set<std::string>& scan_names,
+      const std::set<std::string>& component_group_names,
+      const float rt,
+      const int ms_level) const;
+
     void setFeatureLinePlot();
 
     /*

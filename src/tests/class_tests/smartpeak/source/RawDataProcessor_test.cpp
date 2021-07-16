@@ -844,13 +844,43 @@ TEST(RawDataProcessor, gettersLoadTransitions)
   EXPECT_EQ(processor.getName(), "LOAD_TRANSITIONS");
 }
 
-TEST(RawDataProcessor, processLoadTransitions)
+TEST(RawDataProcessor, processLoadTransitions_csv)
 {
   Filenames filenames;
   filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv");
   RawDataHandler rawDataHandler;
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, {}, filenames);
+  const std::vector<OpenMS::ReactionMonitoringTransition>& t = rawDataHandler.getTargetedExperiment().getTransitions();
+
+  EXPECT_EQ(t.size(), 324);
+
+  EXPECT_EQ(t[0].getPeptideRef(), "arg-L");
+  EXPECT_NEAR(t[0].getPrecursorMZ(), 179.0, 1e-6);
+  EXPECT_NEAR(t[0].getProductMZ(), 136.0, 1e-6);
+
+  EXPECT_EQ(t[10].getPeptideRef(), "citr-L");
+  EXPECT_NEAR(t[10].getPrecursorMZ(), 180.0, 1e-6);
+  EXPECT_NEAR(t[10].getProductMZ(), 136.0, 1e-6);
+
+  EXPECT_EQ(t[19].getPeptideRef(), "Lcystin");
+  EXPECT_NEAR(t[19].getPrecursorMZ(), 239.0, 1e-6);
+  EXPECT_NEAR(t[19].getProductMZ(), 120.0, 1e-6);
+}
+
+TEST(RawDataProcessor, processLoadTransitions_traML)
+{
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("LoadTransitions_test.TraML");
+  RawDataHandler rawDataHandler;
+  LoadTransitions loadTransitions;
+  map<std::string, vector<map<string, string>>> params_struct({
+    {"LoadTransitions", {
+      { {"name", "format"}, {"type", "string"}, {"value", "traML"} },
+    }}
+    });
+  ParameterSet params(params_struct);
+  loadTransitions.process(rawDataHandler, params, filenames);
   const std::vector<OpenMS::ReactionMonitoringTransition>& t = rawDataHandler.getTargetedExperiment().getTransitions();
 
   EXPECT_EQ(t.size(), 324);
@@ -2850,4 +2880,109 @@ TEST(RawDataProcessor, calculateMDVAccuracies)
                           accoa_C23H37N7O17P3S_abs_diff[feature_subordinate], 1e-2 );
     }
   }
+}
+
+/**
+  SearchSpectrum Tests
+*/
+TEST(RawDataProcessor, gettersSearchSpectrum)
+{
+  SearchSpectrum processor;
+
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "SEARCH_SPECTRUM");
+}
+
+TEST(RawDataProcessor, SearchSpectrum)
+{
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("dda_min.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures;
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("dda_min.featureXML");
+  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+  SearchSpectrum searchSpectrum;
+  searchSpectrum.process(rawDataHandler, params_1, filenames);
+
+  ASSERT_EQ(rawDataHandler.getFeatureMap().size(), 1986);
+  ASSERT_EQ(rawDataHandler.getFeatureMap()[0].getSubordinates().size(), 1);
+  const auto& f = rawDataHandler.getFeatureMap()[0];
+  EXPECT_EQ(f.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0002362");
+  const auto& s = rawDataHandler.getFeatureMap()[0].getSubordinates()[0];
+  EXPECT_EQ(s.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0002362");
+  EXPECT_EQ(s.getMetaValue("native_id").toString(), "C4H10N2O2;M+H+K;2+");
+  EXPECT_EQ(s.getMetaValue("identifier").toString(), "[HMDB:HMDB0002362, HMDB:HMDB0006284]");
+  EXPECT_EQ(s.getMetaValue("modifications").toString(), "M+H+K;2+");
+  EXPECT_NEAR(s.getMetaValue("dc_charge_adduct_mass"), 39.97047649376457, 1e-6);
+  EXPECT_EQ(s.getMetaValue("chemical_formula").toString(), "C4H10N2O2");
+  EXPECT_NEAR(s.getMetaValue("mz_error_ppm"), 0.180061646746413, 1e-6);
+  EXPECT_NEAR(s.getMetaValue("mz_error_Da"), 1.4228891060952265e-05, 1e-6);
+}
+
+/**
+  DDA Tests
+*/
+TEST(RawDataProcessor, gettersDDA)
+{
+  DDA processor;
+
+  EXPECT_EQ(processor.getID(), -1);
+  EXPECT_EQ(processor.getName(), "DDA");
+}
+
+TEST(RawDataProcessor, DDA)
+{
+  ParameterSet params_1;
+  ParameterSet params_2;
+  load_data(params_1, params_2);
+  RawDataHandler rawDataHandler;
+
+  Filenames filenames;
+  filenames.traML_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv");
+  LoadTransitions loadTransitions;
+  loadTransitions.process(rawDataHandler, params_1, filenames);
+
+  filenames.mzML_i = SMARTPEAK_GET_TEST_DATA_PATH("dda_min.mzML");
+  LoadRawData loadRawData;
+  loadRawData.process(rawDataHandler, params_1, filenames);
+  loadRawData.extractMetaData(rawDataHandler);
+
+  LoadFeatures loadFeatures;
+  filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("dda_after_search.featureXML");
+  loadFeatures.process(rawDataHandler, params_1, filenames);
+
+  filenames.traML_csv_o = std::tmpnam(nullptr);
+  DDA dda;
+  dda.process(rawDataHandler, params_1, filenames);
+
+  EXPECT_TRUE(std::filesystem::exists(filenames.traML_csv_o));
+  ASSERT_EQ(rawDataHandler.getFeatureMap().size(), 8);
+  const auto& f = rawDataHandler.getFeatureMap()[0];
+  std::cout << f.getMetaValue("PeptideRef").toString() << std::endl;
+  EXPECT_EQ(f.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0002362");
+  ASSERT_EQ(f.getSubordinates().size(), 1);
+  const auto& s = f.getSubordinates()[0];
+  std::cout << s.getMetaValue("PeptideRef").toString() << std::endl;
+  EXPECT_EQ(s.getMetaValue("PeptideRef").toString(), "HMDB:HMDB0002362");
+  std::cout << s.getMetaValue("native_id").toString() << std::endl;
+  EXPECT_EQ(s.getMetaValue("native_id").toString(), "C4H10N2O2;M+H+K;2+");
+  std::cout << s.getMetaValue("identifier").toString() << std::endl;
+  EXPECT_EQ(s.getMetaValue("identifier").toString(), "[HMDB:HMDB0002362, HMDB:HMDB0006284]");
+  std::cout << s.getMetaValue("modifications").toString() << std::endl;
+  EXPECT_EQ(s.getMetaValue("modifications").toString(), "M+H+K;2+");
+  std::cout << s.getMetaValue("chemical_formula").toString() << std::endl;
+  EXPECT_EQ(s.getMetaValue("chemical_formula").toString(), "C4H10N2O2");
 }

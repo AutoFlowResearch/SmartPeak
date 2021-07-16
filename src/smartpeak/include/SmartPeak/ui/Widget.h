@@ -23,16 +23,18 @@
 
 #pragma once
 
-#include <string>
-#include <utility>
-#include <vector>
-#include <functional>
+
 #include <imgui.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/ImEntry.h>
 #include <SmartPeak/ui/Help.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 #include <SmartPeak/iface/ISequenceSegmentObserver.h>
+
+#include <string>
+#include <utility>
+#include <vector>
+#include <functional>
 
 /**
 Generic and base classes for Widgets
@@ -392,37 +394,6 @@ namespace SmartPeak
     float y_min_;
     float y_max_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
-  };
-
-  /**
-  @brief Base class for ScatterPlot widgets
-  */
-  class ScatterPlotWidget : public GenericGraphicWidget
-  {
-  public:
-    ScatterPlotWidget(SessionHandler& session_handler,
-      SequenceHandler& sequence_handler,
-      const std::string& id,
-      const std::string& title) :
-      GenericGraphicWidget(title),
-      session_handler_(session_handler),
-      sequence_handler_(sequence_handler),
-      plot_title_(id) {};
-    void draw() override;
-
-  protected:
-    virtual void updateScatterPlotData() = 0;
-
-  protected:
-    SessionHandler& session_handler_;
-    SequenceHandler& sequence_handler_;
-    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
-    bool show_legend_ = true;
-    bool compact_view_ = true;
-    SessionHandler::ScatterPlotData chrom_;
-    bool refresh_needed_ = false;
-    std::pair<float, float> slider_min_max_ = { 0.0f, 0.0f };
-    std::pair<float, float> current_range_ = { 0.0f, 0.0f };
   };
 
   /**
