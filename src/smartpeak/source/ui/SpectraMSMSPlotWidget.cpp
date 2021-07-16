@@ -47,11 +47,11 @@ namespace SmartPeak
        ) 
     {
       // get the whole graph area
-      if (chrom_.z_data_area_.size())
+      if (graph_viz_data_.z_data_area_.size())
       {
-        current_rt_ = chrom_.z_data_area_[current_z_];
+        current_rt_ = graph_viz_data_.z_data_area_[current_z_];
       }
-      session_handler_.getSpectrumMSMSPlot(sequence_handler_, chrom_, init_range, sample_names, scan_names, component_group_names, current_rt_, ms_level_);
+      session_handler_.getSpectrumMSMSPlot(sequence_handler_, graph_viz_data_, init_range, sample_names, scan_names, component_group_names, current_rt_, ms_level_);
       updateRanges();
       input_sample_names_ = sample_names;
       input_scan_names_ = scan_names;
@@ -62,10 +62,10 @@ namespace SmartPeak
     }
     else if (input_range_ != current_range_) // user zoom in / out
     {
-      session_handler_.getSpectrumMSMSPlot(sequence_handler_, chrom_, current_range_, sample_names, scan_names, component_group_names, current_rt_, ms_level_);
+      session_handler_.getSpectrumMSMSPlot(sequence_handler_, graph_viz_data_, current_range_, sample_names, scan_names, component_group_names, current_rt_, ms_level_);
       input_range_ = current_range_;
     }
-    chrom_.y_min_ = 0.0f; // bottom line will start from 0.0
+    graph_viz_data_.y_min_ = 0.0f; // bottom line will start from 0.0
   };
 
   void SpectraMSMSPlotWidget::onSequenceUpdated()
@@ -100,13 +100,13 @@ namespace SmartPeak
 
   int SpectraMSMSPlotWidget::getScanIndexFromRetentionTime(const float& retention_time) const
   {
-    if (chrom_.z_data_area_.empty())
+    if (graph_viz_data_.z_data_area_.empty())
     {
       return 0;
     }
     int result = 0;
     float current_distance = std::numeric_limits<float>::max();
-    for (const auto& z : chrom_.z_data_area_)
+    for (const auto& z : graph_viz_data_.z_data_area_)
     {
       auto distance = std::abs(z - retention_time);
       if (distance > current_distance)
@@ -117,9 +117,9 @@ namespace SmartPeak
       result++;
     }
     // out of range
-    if (result == chrom_.z_data_area_.size())
+    if (result == graph_viz_data_.z_data_area_.size())
     {
-      result = chrom_.z_data_area_.size() - 1;
+      result = graph_viz_data_.z_data_area_.size() - 1;
     }
     return result;
   }

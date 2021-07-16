@@ -206,7 +206,7 @@ public:
   // setters for test
   void setGraphVizData(SmartPeak::SessionHandler::GraphVizData& graph_viz_data)
   {
-    chrom_ = graph_viz_data;
+    graph_viz_data_ = graph_viz_data;
   }
 
 };

@@ -75,7 +75,7 @@ namespace SmartPeak
     const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     bool show_legend_ = true;
     bool compact_view_ = true;
-    SessionHandler::GraphVizData chrom_;
+    SessionHandler::GraphVizData graph_viz_data_;
     bool refresh_needed_ = false;
     std::pair<float, float> slider_min_max_ = { 0.0f, 0.0f };
     std::pair<float, float> current_range_ = { 0.0f, 0.0f };

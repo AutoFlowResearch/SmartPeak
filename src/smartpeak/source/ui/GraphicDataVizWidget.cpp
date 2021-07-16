@@ -41,17 +41,17 @@ namespace SmartPeak
     // Widget's controls - that ImGui does not support natively
     const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_AlwaysClamp;
     float controls_pos_start_y = ImGui::GetCursorPosY();
-    ImGui::SliderFloat((std::string("min ") + chrom_.x_axis_title_).c_str(), &current_range_.first, slider_min_max_.first, current_range_.second, "%.4f", slider_flags);
+    ImGui::SliderFloat((std::string("min ") + graph_viz_data_.x_axis_title_).c_str(), &current_range_.first, slider_min_max_.first, current_range_.second, "%.4f", slider_flags);
     ImGui::SameLine();
     ImGui::Checkbox("Compact View", &compact_view_);
-    ImGui::SliderFloat((std::string("max ") + chrom_.x_axis_title_).c_str(), &current_range_.second, current_range_.first, slider_min_max_.second, "%.4f", slider_flags);
+    ImGui::SliderFloat((std::string("max ") + graph_viz_data_.x_axis_title_).c_str(), &current_range_.second, current_range_.first, slider_min_max_.second, "%.4f", slider_flags);
     ImGui::SameLine();
     ImGui::Checkbox("Legend", &show_legend_);
-    if (chrom_.z_axis_title_)
+    if (graph_viz_data_.z_axis_title_)
     {
       std::ostringstream os;
-      os << chrom_.z_data_area_[current_z_];
-      ImGui::SliderInt(chrom_.z_axis_title_->c_str(), &current_z_, 0, chrom_.z_data_area_.size() - 1, os.str().c_str(), ImGuiSliderFlags_NoInput);
+      os << graph_viz_data_.z_data_area_[current_z_];
+      ImGui::SliderInt(graph_viz_data_.z_axis_title_->c_str(), &current_z_, 0, graph_viz_data_.z_data_area_.size() - 1, os.str().c_str(), ImGuiSliderFlags_NoInput);
     }
     float controls_pos_end_y = ImGui::GetCursorPosY();
     sliders_height_ = (controls_pos_end_y - controls_pos_start_y);
@@ -60,35 +60,35 @@ namespace SmartPeak
   std::tuple<float, float, float, float> GraphicDataVizWidget::plotLimits() const
   {
     // compute plot limit by adding padding
-    float border_padding_x = (chrom_.x_max_ - chrom_.x_min_) * 0.01f;
-    float border_padding_y = (chrom_.y_max_ - chrom_.y_min_) * 0.01f;
+    float border_padding_x = (graph_viz_data_.x_max_ - graph_viz_data_.x_min_) * 0.01f;
+    float border_padding_y = (graph_viz_data_.y_max_ - graph_viz_data_.y_min_) * 0.01f;
     auto plot_min_x = current_range_.first - border_padding_x;
     auto plot_max_x = current_range_.second + border_padding_x;
-    auto plot_min_y = chrom_.y_min_ - border_padding_y;
-    auto plot_max_y = chrom_.y_max_ * 1.1f;
+    auto plot_min_y = graph_viz_data_.y_min_ - border_padding_y;
+    auto plot_max_y = graph_viz_data_.y_max_ * 1.1f;
     return std::make_tuple(plot_min_x, plot_max_x, plot_min_y, plot_max_y);
   }
 
   // update ranges after having refreshed the graph
   void GraphicDataVizWidget::updateRanges()
   {
-    if ((std::abs(slider_min_max_.first - chrom_.x_min_) > std::numeric_limits<double>::epsilon()) ||
-        (std::abs(slider_min_max_.second - chrom_.x_max_) > std::numeric_limits<double>::epsilon()))
+    if ((std::abs(slider_min_max_.first - graph_viz_data_.x_min_) > std::numeric_limits<double>::epsilon()) ||
+        (std::abs(slider_min_max_.second - graph_viz_data_.x_max_) > std::numeric_limits<double>::epsilon()))
     {
       // min max changed, reset the sliders and current range
-      current_range_ = slider_min_max_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
+      current_range_ = slider_min_max_ = std::make_pair(graph_viz_data_.x_min_, graph_viz_data_.x_max_);
     }
-    input_range_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
+    input_range_ = std::make_pair(graph_viz_data_.x_min_, graph_viz_data_.x_max_);
   }
 
   void GraphicDataVizWidget::drawGraph()
   {
     // Main graphic
-    if (chrom_.points_overflow_)
+    if (graph_viz_data_.points_overflow_)
     {
       ImGui::Text("Unable to draw: too much points. Please reduce scope or unselect data.");
     }
-    else if (chrom_.x_data_area_.empty() && chrom_.y_data_area_.empty())
+    else if (graph_viz_data_.x_data_area_.empty() && graph_viz_data_.y_data_area_.empty())
     {
       ImGui::Text("No data to display select data to render or adjust ranges.");
     }
@@ -99,49 +99,49 @@ namespace SmartPeak
       ImPlotFlags plotFlags = show_legend_ ? ImPlotFlags_Default | ImPlotFlags_Legend : ImPlotFlags_Default & ~ImPlotFlags_Legend;
       plotFlags |= ImPlotFlags_Crosshairs;
       float graphic_height = height_ - sliders_height_;
-      if (ImPlot::BeginPlot(plot_title_.c_str(), chrom_.x_axis_title_.c_str(), chrom_.y_axis_title_.c_str(), ImVec2(width_ - 25, graphic_height - 40), plotFlags)) {
+      if (ImPlot::BeginPlot(plot_title_.c_str(), graph_viz_data_.x_axis_title_.c_str(), graph_viz_data_.y_axis_title_.c_str(), ImVec2(width_ - 25, graphic_height - 40), plotFlags)) {
         int i = 0;
-        for (const auto& serie_name_scatter : chrom_.series_names_area_)
+        for (const auto& serie_name_scatter : graph_viz_data_.series_names_area_)
         {
-          if (chrom_.x_data_area_.size())
+          if (graph_viz_data_.x_data_area_.size())
           {
-            assert(chrom_.x_data_area_.at(i).size() == chrom_.y_data_area_.at(i).size());
+            assert(graph_viz_data_.x_data_area_.at(i).size() == graph_viz_data_.y_data_area_.at(i).size());
             ImPlot::PushStyleVar(ImPlotStyleVar_Marker, ImPlotMarker_None);
             if (!is_spectra_)
             {
               ImPlot::PlotLine(serie_name_scatter.c_str(),
-                               chrom_.x_data_area_.at(i).data(),
-                               chrom_.y_data_area_.at(i).data(),
-                               chrom_.x_data_area_.at(i).size());
+                               graph_viz_data_.x_data_area_.at(i).data(),
+                               graph_viz_data_.y_data_area_.at(i).data(),
+                               graph_viz_data_.x_data_area_.at(i).size());
             }
             else
             {
               static const float bar_width_in_pixel = 3.0f;
               auto bar_width = ImPlot::PixelsToPlot({ bar_width_in_pixel ,0.0f }).x - ImPlot::PixelsToPlot({ 0.0f,0.0f }).x;
               ImPlot::PlotBars(serie_name_scatter.c_str(),
-                               chrom_.x_data_area_.at(i).data(), 
-                               chrom_.y_data_area_.at(i).data(), 
-                               chrom_.x_data_area_.at(i).size(),
+                               graph_viz_data_.x_data_area_.at(i).data(), 
+                               graph_viz_data_.y_data_area_.at(i).data(), 
+                               graph_viz_data_.x_data_area_.at(i).size(),
                                bar_width);
             }
           }
           ImPlotMarker plot_marker = ImPlotMarker_Circle;
           int feature_index = 0;
-          for (int j = 0; j < chrom_.x_data_scatter_.size(); ++j) {
+          for (int j = 0; j < graph_viz_data_.x_data_scatter_.size(); ++j) {
             // Corresponding serie names are supposed to start with same name as the scatter name
-            if (chrom_.series_names_scatter_.at(j).rfind(serie_name_scatter) == 0)
+            if (graph_viz_data_.series_names_scatter_.at(j).rfind(serie_name_scatter) == 0)
             {
-              assert(chrom_.x_data_scatter_.at(j).size() == chrom_.y_data_scatter_.at(j).size());
+              assert(graph_viz_data_.x_data_scatter_.at(j).size() == graph_viz_data_.y_data_scatter_.at(j).size());
               ImPlot::PushStyleVar(ImPlotStyleVar_Marker, plot_marker);
               std::string legend_text = serie_name_scatter;
               if (!compact_view_)
               {
-                legend_text = chrom_.series_names_scatter_.at(j) + "::" + std::to_string(feature_index);
+                legend_text = graph_viz_data_.series_names_scatter_.at(j) + "::" + std::to_string(feature_index);
               }
               ImPlot::PlotScatter(legend_text.c_str(), 
-                                  chrom_.x_data_scatter_.at(j).data(), 
-                                  chrom_.y_data_scatter_.at(j).data(),
-                                  chrom_.x_data_scatter_.at(j).size());
+                                  graph_viz_data_.x_data_scatter_.at(j).data(), 
+                                  graph_viz_data_.y_data_scatter_.at(j).data(),
+                                  graph_viz_data_.x_data_scatter_.at(j).size());
               plot_marker <<= 1;
               if (plot_marker > ImPlotMarker_Asterisk) plot_marker = ImPlotMarker_Circle;
               ++feature_index;
@@ -250,7 +250,7 @@ namespace SmartPeak
     std::optional<float> result = {};
     float current_distance = std::numeric_limits<float>::max();
     size_t nearest_serie_index = -1;
-    for (const auto& scatter_x : chrom_.x_data_area_)
+    for (const auto& scatter_x : graph_viz_data_.x_data_area_)
     {
       for (const auto& pos_x : scatter_x)
       {

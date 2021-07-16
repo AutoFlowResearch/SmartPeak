@@ -43,7 +43,7 @@ namespace SmartPeak
        ((input_component_names_ != transitions_names) || (input_sample_names_ != sample_names))) // user select different items
     {
       // we may recompute the RT window, get the whole graph area
-      session_handler_.getChromatogramXIC(sequence_handler_, chrom_, std::make_pair(0, 1800), sample_names, transitions_names, current_mz_);
+      session_handler_.getChromatogramXIC(sequence_handler_, graph_viz_data_, std::make_pair(0, 1800), sample_names, transitions_names, current_mz_);
       updateRanges();
       input_mz_ = current_mz_;
       input_sample_names_ = sample_names;
@@ -52,11 +52,11 @@ namespace SmartPeak
     }
     else if ((input_range_ != current_range_) || (input_mz_ != current_mz_)) // user zoom in/out
     {
-      session_handler_.getChromatogramXIC(sequence_handler_, chrom_, current_range_, sample_names, transitions_names, current_mz_);
+      session_handler_.getChromatogramXIC(sequence_handler_, graph_viz_data_, current_range_, sample_names, transitions_names, current_mz_);
       input_range_ = current_range_;
       input_mz_ = current_mz_;
     }
-    chrom_.y_min_ = 0.0f; // bottom line will start from 0.0
+    graph_viz_data_.y_min_ = 0.0f; // bottom line will start from 0.0
   };
 
   void ChromatogramXICPlotWidget::onSequenceUpdated()
