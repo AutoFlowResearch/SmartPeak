@@ -52,10 +52,9 @@ namespace SmartPeak
 
     void draw() override;
     
+  protected:
     virtual void setMarkerPosition(const std::optional<float>& marker_position);
     virtual std::optional<float> getMarkerPosition() const;
-
-  protected:
     virtual void drawSliders();
     virtual void drawGraph();
     virtual void drawMarkers();
