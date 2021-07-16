@@ -2277,7 +2277,7 @@ namespace SmartPeak
   }
   Eigen::Tensor<std::string, 1> SessionHandler::getSelectSpectrumPlot()
   {
-    if (spectrum_table.body_.size() && transition_explorer_data.checkbox_headers.size())
+    if (spectrum_table.body_.size() && spectrum_explorer_data.checkbox_headers.size())
       return (spectrum_explorer_data.checkbox_body.chip(0, 1)).select(spectrum_table.body_.chip(0, 1), spectrum_table.body_.chip(0, 1).constant(""));
     else
       return Eigen::Tensor<std::string, 1>();

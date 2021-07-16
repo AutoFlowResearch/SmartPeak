@@ -82,10 +82,13 @@ namespace SmartPeak
   void SpectraMSMSPlotWidget::setMarkerPosition(const std::optional<float>& marker_position)
   {
     GraphicDataVizWidget::setMarkerPosition(marker_position);
-    if (marker_position)
+    if (ms_level_ == 1) // XIC is not supported at the moment for MS level 2
     {
-      chromatogram_xic_widget_->setMZ(*marker_position);
-      chromatogram_xic_widget_->visible_ = true;
+      if (marker_position)
+      {
+        chromatogram_xic_widget_->setMZ(*marker_position);
+        chromatogram_xic_widget_->visible_ = true;
+      }
     }
   }
 
