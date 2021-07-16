@@ -1687,7 +1687,7 @@ namespace SmartPeak
         {
           if (scan_names.count(spectrum.getNativeID()) == 0) continue;
           x_data.push_back(spectrum.getRT());
-          y_data.push_back(spectrum.getTIC());
+          y_data.push_back(spectrum.calculateTIC());
         }
       }
       if (!result.addData(x_data, y_data, injection.getMetaData().getSampleName()))
