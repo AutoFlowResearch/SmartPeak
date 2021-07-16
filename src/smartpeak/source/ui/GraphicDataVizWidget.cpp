@@ -69,6 +69,18 @@ namespace SmartPeak
     return std::make_tuple(plot_min_x, plot_max_x, plot_min_y, plot_max_y);
   }
 
+  // update ranges after having refreshed the graph
+  void GraphicDataVizWidget::updateRanges()
+  {
+    if ((std::abs(slider_min_max_.first - chrom_.x_min_) > std::numeric_limits<double>::epsilon()) ||
+        (std::abs(slider_min_max_.second - chrom_.x_max_) > std::numeric_limits<double>::epsilon()))
+    {
+      // min max changed, reset the sliders and current range
+      current_range_ = slider_min_max_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
+    }
+    input_range_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
+  }
+
   void GraphicDataVizWidget::drawGraph()
   {
     // Main graphic

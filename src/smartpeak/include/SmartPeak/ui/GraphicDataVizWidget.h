@@ -61,6 +61,7 @@ namespace SmartPeak
     virtual void drawMarkers();
     virtual void updateData() = 0;
     virtual std::tuple<float, float, float, float> plotLimits() const;
+    virtual void updateRanges();
     
     // Utility methods
     std::set<std::string> getSelectedSampleNames() const;
@@ -79,6 +80,7 @@ namespace SmartPeak
     bool refresh_needed_ = false;
     std::pair<float, float> slider_min_max_ = { 0.0f, 0.0f };
     std::pair<float, float> current_range_ = { 0.0f, 0.0f };
+    std::pair<float, float> input_range_ = { 0.0f, 0.0f };
     int current_z_ = 0;
     float sliders_height_ = 0.0f;
     std::optional<float> marker_position_;

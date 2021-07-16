@@ -37,7 +37,6 @@ namespace SmartPeak
 
   protected:
     // input used to create the graph
-    std::pair<float, float> input_range_ = { 0.0f, 0.0f };
     std::set<std::string> input_sample_names_;
     std::set<std::string> input_scan_names_;
     std::set<std::string> input_component_group_names_;

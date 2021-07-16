@@ -28,22 +28,16 @@ namespace SmartPeak
 
   void SpectraPlotWidget::updateData()
   {
-    std::set<std::string> sample_names = getSelectedSampleNames();
-    std::set<std::string> scan_names = getSelectedSpectrum();
-    std::set<std::string> component_group_names = getSelectedTransitionGroups();
+    const std::set<std::string> sample_names = getSelectedSampleNames();
+    const std::set<std::string> scan_names = getSelectedSpectrum();
+    const std::set<std::string> component_group_names = getSelectedTransitionGroups();
 
     if ((refresh_needed_) || // data changed
        ((input_sample_names_ != sample_names) || (input_scan_names_ != scan_names) || (input_component_group_names_ != component_group_names))) // user select different items
     {
       // get the whole graph area
       session_handler_.getSpectrumScatterPlot(sequence_handler_, chrom_, std::make_pair(0, 2000), sample_names, scan_names, component_group_names);
-      if ((std::abs(slider_min_max_.first - chrom_.x_min_) > std::numeric_limits<double>::epsilon()) ||
-          (std::abs(slider_min_max_.second - chrom_.x_max_) > std::numeric_limits<double>::epsilon()))
-      {
-        // min max changed, reset the sliders and current range
-        current_range_ = slider_min_max_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
-      }
-      input_range_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
+      updateRanges();
       input_sample_names_ = sample_names;
       input_scan_names_ = scan_names;
       input_component_group_names_ = component_group_names;

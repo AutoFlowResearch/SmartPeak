@@ -36,27 +36,21 @@ namespace SmartPeak
       marker_position_ = getNearestPoint(rt);
     }
 
-    std::set<std::string> sample_names = getSelectedSampleNames();
-    std::set<std::string> transitions_names = getSelectedTransitions();
+    const std::set<std::string> sample_names = getSelectedSampleNames();
+    const std::set<std::string> transitions_names = getSelectedTransitions();
 
     if ((refresh_needed_) || // data changed
        ((input_component_names_ != transitions_names) || (input_sample_names_ != sample_names))) // user select different items
     {
       // we may recompute the RT window, get the whole graph area
       session_handler_.getChromatogramXIC(sequence_handler_, chrom_, std::make_pair(0, 1800), sample_names, transitions_names, current_mz_);
-      if ((std::abs(slider_min_max_.first - chrom_.x_min_) > std::numeric_limits<double>::epsilon()) ||
-          (std::abs(slider_min_max_.second - chrom_.x_max_) > std::numeric_limits<double>::epsilon()))
-      {
-        // min max changed, reset the sliders and current range
-        current_range_ = slider_min_max_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
-      }
-      input_range_ = std::make_pair(chrom_.x_min_, chrom_.x_max_);
+      updateRanges();
       input_mz_ = current_mz_;
       input_sample_names_ = sample_names;
       input_component_names_ = transitions_names;
       refresh_needed_ = false;
     }
-    else if ((input_range_ != current_range_) || (input_mz_ != current_mz_))// user zoom in/out
+    else if ((input_range_ != current_range_) || (input_mz_ != current_mz_)) // user zoom in/out
     {
       session_handler_.getChromatogramXIC(sequence_handler_, chrom_, current_range_, sample_names, transitions_names, current_mz_);
       input_range_ = current_range_;
