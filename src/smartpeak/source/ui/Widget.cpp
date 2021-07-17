@@ -144,6 +144,12 @@ namespace SmartPeak
     table_scanned_ = (table_data_.body_.dimension(0) == table_entries_.size() && !data_changed_);
 
     if (table_data_.body_.dimensions().TotalSize() > 0) {
+      if (100 < table_data_.body_.dimension(0)) {
+        print_until_ = 100;
+        ImGui::Text("Showing first 100 Entries For Performance");
+      } else if (100 > table_data_.body_.dimension(0)) {
+        print_until_ = table_data_.body_.dimension(0);
+      }
       updateTableContents(table_entries_, table_scanned_,
         table_data_.body_, Eigen::Tensor<bool, 2>());
     }
@@ -159,13 +165,17 @@ namespace SmartPeak
     if (ImGui::BeginTable(table_id_.c_str(), table_data_.headers_.size(), table_flags)) {
       // First row entry_contents
       for (int col = 0; col < table_data_.headers_.size(); col++) {
-        ImGui::TableSetupColumn(table_data_.headers_(col).c_str());
+        if (col > 4 && col < 23 && table_id_ == "featuresTableMainWindow") {
+          ImGui::TableSetupColumn(table_data_.headers_(col).c_str(), ImGuiTableColumnFlags_DefaultHide);
+        } else {
+          ImGui::TableSetupColumn(table_data_.headers_(col).c_str());
+        }
       }
       ImGui::TableSetupScrollFreeze(table_data_.headers_.size(), 1);
       ImGui::TableHeadersRow();
 
       if (table_data_.body_.size() > 0) {
-        for (size_t row = 0; row < table_data_.body_.dimension(0); ++row) {
+        for (size_t row = 0; row < print_until_; ++row) {
           if (checked_rows_.size() <= 0 || (checked_rows_.size() > 0 && checked_rows_(row))) {
 
             if (searcher(table_entries_, selected_col_, filter, row))
