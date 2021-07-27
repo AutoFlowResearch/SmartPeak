@@ -31,9 +31,15 @@ namespace SmartPeak
 {
   class SessionHandler : 
     public ISequenceObserver,
-    public ITransitionsObserver
+    public ITransitionsObserver,
+    public IFeaturesObserver
   {
   public:
+    
+    /**
+    IFeaturesObserver
+    */
+    virtual void onFeaturesUpdated() override;
 
     /**
     ISequenceObserver
@@ -250,6 +256,7 @@ namespace SmartPeak
     // data for the feature explorer
     ExplorerData feature_explorer_data;
     GenericTableData feature_table;
+    bool feature_table_updated = false;
     // data for the sequence table
     GenericTableData sequence_table;
     // data for the transitions table

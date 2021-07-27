@@ -95,8 +95,10 @@ int main(int argc, char** argv)
   EventDispatcher event_dispatcher;
   application_handler_.sequenceHandler_.addTransitionsObserver(&event_dispatcher);
   application_handler_.sequenceHandler_.addSequenceObserver(&event_dispatcher);
+  application_handler_.sequenceHandler_.addFeaturesObserver(&event_dispatcher);
   event_dispatcher.addTransitionsObserver(&session_handler_);
   event_dispatcher.addSequenceObserver(&session_handler_);
+  event_dispatcher.addFeaturesObserver(&session_handler_);
 
   // widgets
   FilePicker file_picker_;
@@ -707,7 +709,10 @@ int main(int argc, char** argv)
       bool data_changed = false;
       exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_,
                                                                 features_table_main_window_->table_data_, data_changed);
-      features_table_main_window_->updateDataModificationState(data_changed) ;
+      features_table_main_window_->updateDataModificationState(data_changed);
+      
+//      if (session_handler_.feature_table_updated)
+//        features_explorer_window_->onFeaturesUpdated();
       features_table_main_window_->checked_rows_ = Eigen::Tensor<bool, 1>();
     }
 

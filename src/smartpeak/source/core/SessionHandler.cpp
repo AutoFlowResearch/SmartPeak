@@ -42,6 +42,11 @@ namespace SmartPeak
     transitions_table.clear();
   }
 
+  void SessionHandler::onFeaturesUpdated()
+  {
+    feature_table_updated = true;
+  }
+
   void SessionHandler::setMinimalDataAndFilters(const SequenceHandler & sequence_handler)
   {
     //LOGD << "START setMinimalDataAndFilters"; // Not helpful as it is called every few seconds when the GUI is displayed
@@ -1534,10 +1539,12 @@ namespace SmartPeak
           }
         }
         data_changed = true;
+        this->onFeaturesUpdated();
       }
     }
     return within_max_size;
   }
+
   void SessionHandler::setFeatureMatrix(const SequenceHandler & sequence_handler)
   {
     if (sequence_handler.getSequence().size() > 0 &&

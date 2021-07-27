@@ -144,10 +144,10 @@ namespace SmartPeak
     table_scanned_ = (table_data_.body_.dimension(0) == table_entries_.size() && !data_changed_);
 
     if (table_data_.body_.dimensions().TotalSize() > 0) {
-      if (100 < table_data_.body_.dimension(0)) {
-        print_until_ = 100;
-        ImGui::Text("Showing first 100 Entries For Performance");
-      } else if (100 > table_data_.body_.dimension(0)) {
+      if (max_rows_ < table_data_.body_.dimension(0)) {
+        print_until_ = max_rows_;
+        ImGui::Text("Showing first 100 samples for performance, total nr. of samples : %li", table_data_.body_.dimension(0));
+      } else if (max_rows_ > table_data_.body_.dimension(0)) {
         print_until_ = table_data_.body_.dimension(0);
       }
       updateTableContents(table_entries_, table_scanned_,
@@ -529,6 +529,11 @@ namespace SmartPeak
   void ExplorerWidget::onSequenceUpdated()
   {
     table_scanned_ = false;
+  }
+
+  void ExplorerWidget::onFeaturesUpdated()
+  {
+    data_changed_ = true;
   }
 
   void GenericGraphicWidget::draw()

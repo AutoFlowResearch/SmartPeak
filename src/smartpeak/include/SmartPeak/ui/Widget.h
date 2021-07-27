@@ -33,6 +33,8 @@
 #include <SmartPeak/ui/Help.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 #include <SmartPeak/iface/ISequenceSegmentObserver.h>
+#include <SmartPeak/iface/IFeaturesObserver.h>
+#include <SmartPeak/core/EventDispatcher.h>
 
 /**
 Generic and base classes for Widgets
@@ -197,6 +199,7 @@ namespace SmartPeak
     bool plot_unplot_all_deactivated_ = false;
     int selected_col_ = 0;
     int plot_idx_ = -1;
+    const int max_rows_ = 100;
     size_t print_until_ = 0;
     unsigned int table_entries_plot_col_ = 0;
     unsigned int checkbox_columns_plot_col_ = 0;
@@ -304,17 +307,22 @@ namespace SmartPeak
     - searching
     - color coding of rows by status
   */
-  class ExplorerWidget final : 
+  class ExplorerWidget : 
     public GenericTableWidget,
-    public ISequenceObserver
+    public ISequenceObserver,
+    public IFeaturesObserver
   {
   public:
-    ExplorerWidget(const std::string& table_id, const std::string title ="", SequenceObservable* sequence_observable = nullptr)
+    ExplorerWidget(const std::string& table_id, const std::string title ="", EventDispatcher* event_dispatcher = nullptr)
       :GenericTableWidget(table_id, title)
     {
-      if (sequence_observable)
+      if (SequenceObservable *so = dynamic_cast<SequenceObservable*>(event_dispatcher))
       {
-        sequence_observable->addSequenceObserver(this);
+        so->addSequenceObserver(this);
+      }
+      if (FeaturesObservable *fo = dynamic_cast<FeaturesObservable*>(event_dispatcher))
+      {
+        fo->addFeaturesObserver(this);
       }
     };
     /*
@@ -330,6 +338,11 @@ namespace SmartPeak
     ISequenceObserver
     */
     virtual void onSequenceUpdated() override;
+    
+    /**
+    IFeaturesObserver
+    */
+    virtual void onFeaturesUpdated() override;
 
     Eigen::Tensor<std::string, 1> checkbox_headers_;
     Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;

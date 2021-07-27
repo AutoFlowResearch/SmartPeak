@@ -8,6 +8,7 @@ set(sources_list_h
 	ApplicationProcessorObservable.h
 	CastValue.h
 	EventDispatcher.h
+  FeaturesObservable.h
 	Filenames.h
 	FeatureMetadata.h
 	Helloworld.h

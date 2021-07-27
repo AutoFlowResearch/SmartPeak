@@ -24,6 +24,7 @@
 #pragma once
 
 #include <SmartPeak/core/WorkflowObservable.h>
+#include <SmartPeak/core/FeaturesObservable.h>
 #include <SmartPeak/core/ParametersObservable.h>
 #include <SmartPeak/core/SequenceObservable.h>
 #include <SmartPeak/core/TransitionsObservable.h>
@@ -41,6 +42,7 @@ namespace SmartPeak
     public WorkflowObservable,
     public SequenceObservable,
     public TransitionsObservable,
+    public FeaturesObservable,
     public SequenceSegmentObservable
   {
 public:
