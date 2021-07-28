@@ -307,24 +307,20 @@ namespace SmartPeak
     - searching
     - color coding of rows by status
   */
-  class ExplorerWidget : 
-    public GenericTableWidget,
-    public ISequenceObserver,
-    public IFeaturesObserver
-  {
-  public:
-    ExplorerWidget(const std::string& table_id, const std::string title ="", EventDispatcher* event_dispatcher = nullptr)
-      :GenericTableWidget(table_id, title)
+  class ExplorerWidget final :
+      public GenericTableWidget,
+      public ISequenceObserver,
+      public IFeaturesObserver
     {
-      if (SequenceObservable *so = dynamic_cast<SequenceObservable*>(event_dispatcher))
+    public:
+      ExplorerWidget(const std::string& table_id, const std::string title ="", SequenceObservable* sequence_observable = nullptr)
+        :GenericTableWidget(table_id, title)
       {
-        so->addSequenceObserver(this);
-      }
-      if (FeaturesObservable *fo = dynamic_cast<FeaturesObservable*>(event_dispatcher))
-      {
-        fo->addFeaturesObserver(this);
-      }
-    };
+        if (sequence_observable)
+        {
+          sequence_observable->addSequenceObserver(this);
+        }
+      };
     /*
     @brief Show the explorer
 
