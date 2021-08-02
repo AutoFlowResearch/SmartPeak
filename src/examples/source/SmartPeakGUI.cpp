@@ -43,7 +43,7 @@
 #include <SmartPeak/ui/SpectraMSMSPlotWidget.h>
 #include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
-#include <SmartPeak/ui/Workflow.h>
+#include <SmartPeak/ui/WorkflowWidget.h>
 #include <SmartPeak/ui/StatisticsWidget.h>
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/InfoWidget.h>
@@ -110,7 +110,7 @@ int main(int argc, char** argv)
                                                             event_dispatcher,
                                                             event_dispatcher);
   auto report_ = std::make_shared<Report>(application_handler_);
-  auto workflow_ = std::make_shared<Workflow>("Workflow", application_handler_, workflow_manager_);
+  auto workflow_ = std::make_shared<WorkflowWidget>("Workflow", application_handler_, workflow_manager_);
   auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_, event_dispatcher);
   auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_, 
                                                                   session_handler_, 
