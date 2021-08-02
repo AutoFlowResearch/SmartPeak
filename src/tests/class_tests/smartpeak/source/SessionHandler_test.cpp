@@ -35,7 +35,8 @@ struct TestData {
     const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
     // Load the sequence
     if (load_sequence) {
-      Filenames filenames_ = Filenames::getDefaultStaticFilenames(pathname);
+      Filenames filenames_;
+      filenames_.setRootPaths(pathname, "", "", "");
       CreateSequence cs(sequenceHandler);
       cs.filenames_ = filenames_;
       cs.delimiter = ",";
@@ -45,8 +46,11 @@ struct TestData {
     // Load the picked features
     if (load_features) {
       LoadFeatures loadFeatures;
+      Filenames method_filenames;
+      loadFeatures.getInputsOutputs(method_filenames);
       for (auto& injection : sequenceHandler.getSequence()) {
-        Filenames filenames_ = Filenames::getDefaultDynamicFilenames(
+        Filenames filenames_ = method_filenames;
+        filenames_.setPathsAndNames(
           pathname,
           pathname + "/mzML",
           pathname + "/features",
@@ -65,8 +69,11 @@ struct TestData {
       params.addFunctionParameters(FunctionParameters("mzML"));
       params.addFunctionParameters(FunctionParameters("ChromatogramExtractor"));
       LoadRawData loadRawData;
+      Filenames method_filenames;
+      loadRawData.getInputsOutputs(method_filenames);
       for (auto& injection : sequenceHandler.getSequence()) {
-        Filenames filenames_ = Filenames::getDefaultDynamicFilenames(
+        Filenames filenames_ = method_filenames;
+        filenames_.setPathsAndNames(
           pathname,
           pathname + "/mzML",
           pathname + "/features",

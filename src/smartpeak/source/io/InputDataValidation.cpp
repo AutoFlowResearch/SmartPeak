@@ -55,7 +55,14 @@ namespace SmartPeak
       msg << "NOT PROVIDED\n";
       v.validity = FilenameInfo::not_provided;
     }
-    LOGI << msg.str();
+    if (v.validity == FilenameInfo::invalid)
+    {
+      LOGE << msg.str();
+    }
+    else
+    {
+      LOGI << msg.str();
+    }
     return v;
   }
 

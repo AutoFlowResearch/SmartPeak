@@ -46,6 +46,11 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
+  void SelectDilutions::getInputsOutputs(Filenames& filenames) const
+  {
+    filenames.addFileName("selectDilutions_csv_i", "selectDilutions.csv", Filenames::FileScope::EFileScopeMain);
+  };
+
   void SelectDilutions::process(
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
@@ -61,11 +66,11 @@ namespace SmartPeak
     std::map<std::string, int> select_dilution_map;
     try
     {
-      SelectDilutionsParser::read(filenames.selectDilutions_csv_i, select_dilution_map);
+      SelectDilutionsParser::read(filenames.getFullPathName("selectDilutions_csv_i"), select_dilution_map);
     }
     catch (const std::exception& e)
     {
-      LOGE << "Failed to read select dilutions file [" << filenames.selectDilutions_csv_i << "] : " << e.what();
+      LOGE << "Failed to read select dilutions file [" << filenames.getFullPathName("selectDilutions_csv_i") << "] : " << e.what();
       return;
     }
 
@@ -685,18 +690,23 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  void LoadFeaturesSampleGroup::getInputsOutputs(Filenames& filenames) const
+  {
+    filenames.addFileName("featureXMLSampleGroup_i", ".featureXML", Filenames::FileScope::EFileScopeSampleGroupInput);
+  };
+
   void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START LoadFeaturesSampleGroup";
-    LOGI << "Loading: " << filenames.featureXMLSampleGroup_i;
+    LOGI << "Loading: " << filenames.getFullPathName("featureXMLSampleGroup_i");
 
-    if (filenames.featureXMLSampleGroup_i.empty()) {
+    if (filenames.getFullPathName("featureXMLSampleGroup_i").empty()) {
       LOGE << "Filename is empty";
       LOGD << "END LoadFeaturesSampleGroup";
       return;
     }
 
-    if (!InputDataValidation::fileExists(filenames.featureXMLSampleGroup_i)) {
+    if (!InputDataValidation::fileExists(filenames.getFullPathName("featureXMLSampleGroup_i"))) {
       LOGE << "File not found";
       LOGD << "END LoadFeaturesSampleGroup";
       return;
@@ -704,7 +714,7 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.load(filenames.featureXMLSampleGroup_i, sampleGroupHandler_IO.getFeatureMap());
+      featurexml.load(filenames.getFullPathName("featureXMLSampleGroup_i"), sampleGroupHandler_IO.getFeatureMap());
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -720,12 +730,17 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  void StoreFeaturesSampleGroup::getInputsOutputs(Filenames& filenames) const
+  {
+    filenames.addFileName("featureXMLSampleGroup_o", ".featureXML", Filenames::FileScope::EFileScopeSampleGroupOutput);
+  };
+
   void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
   {
     LOGD << "START storeFeaturesSampleGroup";
-    LOGI << "Storing: " << filenames.featureXMLSampleGroup_o;
+    LOGI << "Storing: " << filenames.getFullPathName("featureXMLSampleGroup_o");
 
-    if (filenames.featureXMLSampleGroup_o.empty()) {
+    if (filenames.getFullPathName("featureXMLSampleGroup_o").empty()) {
       LOGE << "Filename is empty";
       LOGD << "END storeFeaturesSampleGroup";
       return;
@@ -734,7 +749,7 @@ namespace SmartPeak
     try {
       // Store outfile as featureXML
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.store(filenames.featureXMLSampleGroup_o, sampleGroupHandler_IO.getFeatureMap());
+      featurexml.store(filenames.getFullPathName("featureXMLSampleGroup_o"), sampleGroupHandler_IO.getFeatureMap());
     }
     catch (const std::exception& e) {
       LOGE << e.what();

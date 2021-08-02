@@ -32,6 +32,7 @@
 #include <SmartPeak/core/ParametersObservable.h>
 #include <SmartPeak/core/TransitionsObservable.h>
 #include <SmartPeak/iface/IFilePickerHandler.h>
+#include <SmartPeak/iface/IInputsOutputsProvider.h>
 
 #include <map>
 #include <vector>
@@ -40,7 +41,7 @@
 
 namespace SmartPeak
 {
-  struct RawDataProcessor : IProcessorDescription
+  struct RawDataProcessor : IProcessorDescription, IInputsOutputsProvider
   {
     RawDataProcessor(const RawDataProcessor& other) = delete;
     RawDataProcessor& operator=(const RawDataProcessor& other) = delete;
@@ -59,6 +60,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const = 0;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override { };
 
   protected:
     // Forced to write this, because the other user-defined constructors inhibit
@@ -95,6 +99,9 @@ namespace SmartPeak
         with current injection, sample, and file naming patterns
     */
     static void extractMetaData(RawDataHandler& rawDataHandler_IO);
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreRawData : RawDataProcessor
@@ -110,6 +117,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct ZeroChromatogramBaseline : RawDataProcessor
@@ -206,6 +216,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreFeatures : RawDataProcessor
@@ -221,6 +234,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct LoadAnnotations : RawDataProcessor
@@ -236,6 +252,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreAnnotations : RawDataProcessor
@@ -251,6 +270,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct PickMRMFeatures : RawDataProcessor
@@ -368,6 +390,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct FilterFeatures : RawDataProcessor
@@ -489,6 +514,9 @@ namespace SmartPeak
       const Filenames& filenames
     ) const override;
     
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
+
     TransitionsObservable* transitions_observable_ = nullptr;
   };
 
@@ -505,6 +533,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct LoadFeatureQCsRDP : RawDataProcessor
@@ -520,6 +551,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreFeatureFiltersRDP : RawDataProcessor
@@ -535,6 +569,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreFeatureQCsRDP : RawDataProcessor
@@ -550,6 +587,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct LoadValidationData : RawDataProcessor, IFilePickerHandler
@@ -570,6 +610,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct LoadParameters : RawDataProcessor, IFilePickerHandler
@@ -594,6 +637,9 @@ namespace SmartPeak
       ParameterSet& params_I
     );
 
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
+
     ParametersObservable* parameters_observable_ = nullptr;
   };
 
@@ -616,6 +662,9 @@ namespace SmartPeak
     int getID() const override { return -1; }
     std::string getName() const override { return "STORE_PARAMETERS"; }
     std::string getDescription() const override { return "Store a parameters to file"; }
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct FitFeaturesEMG : RawDataProcessor

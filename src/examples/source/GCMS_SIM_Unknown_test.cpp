@@ -12,7 +12,7 @@ using namespace std;
 void test_main_GCMS_SIM_Unknown()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_SIM_Unknowns");
-  const Filenames static_filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames static_filenames;
 
   example_GCMS_SIM_Unknowns(main_dir, static_filenames, ",");
 
@@ -20,13 +20,13 @@ void test_main_GCMS_SIM_Unknown()
   LoadFeatures loadFeatures;
   Filenames filenames;
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_SIM_Unknowns/features/GCMS_SIM_1_BatchName_1900-01-01_000000.featureXML");
+  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_SIM_Unknowns/features/GCMS_SIM_1_BatchName_1900-01-01_000000.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   rawDataHandler.clear();
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_SIM_Unknowns/features/GCMS_SIM_test.featureXML");
+  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_SIM_Unknowns/features/GCMS_SIM_test.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 

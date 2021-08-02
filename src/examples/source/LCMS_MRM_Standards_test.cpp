@@ -12,7 +12,7 @@ using namespace std;
 void test_main_LCMS_MRM_Standards()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Standards");
-  const Filenames static_filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames static_filenames;
 
   example_LCMS_MRM_Standards(main_dir, static_filenames, ",");
 
@@ -20,13 +20,13 @@ void test_main_LCMS_MRM_Standards()
   LoadFeatures loadFeatures;
   Filenames filenames;
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Standards/features/150516_CM1_Level1_1_BatchName_1900-01-01_000000.featureXML");
+  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Standards/features/150516_CM1_Level1_1_BatchName_1900-01-01_000000.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   rawDataHandler.clear();
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Standards/features/150516_CM1_Level1_test.featureXML");
+  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Standards/features/150516_CM1_Level1_test.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 

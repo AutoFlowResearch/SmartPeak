@@ -50,10 +50,16 @@ void example_FIAMS_FullScan_Unknowns(
     std::make_shared<StoreFeatures>()
   };
 
+  Filenames methods_filenames;
+  for (const auto& m : raw_data_processing_methods)
+  {
+    m->getInputsOutputs(methods_filenames);
+  }
   std::map<std::string, Filenames> dynamic_filenames;
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
-    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+    Filenames injection_filenames = methods_filenames;
+    injection_filenames.setPathsAndNames(
       dir_I,
       dir_I + "/mzML/",
       dir_I + "/features/",
@@ -64,6 +70,7 @@ void example_FIAMS_FullScan_Unknowns(
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
     );
+     dynamic_filenames[key] = injection_filenames;
   }
 
   ProcessSequence ps(sequenceHandler);
