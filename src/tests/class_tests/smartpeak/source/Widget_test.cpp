@@ -28,7 +28,11 @@
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
+#include <SmartPeak/core/WorkflowManager.h>
 #include <SmartPeak/ui/GraphicDataVizWidget.h>
+#include <SmartPeak/ui/WorkflowWidget.h>
+
+bool SmartPeak::enable_quick_help = false;
 
 void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
 {
@@ -248,3 +252,48 @@ TEST(GraphicDataVizWidget, plotLimits)
   EXPECT_NEAR(plot_min_y, 98.910003662109375, 1e-6);
   EXPECT_NEAR(plot_max_y, 341, 1e-6);
 }
+
+class WorkflowWidget_Test : public SmartPeak::WorkflowWidget
+{
+public:
+  WorkflowWidget_Test(const std::string title, 
+                      SmartPeak::ApplicationHandler& application_handler, 
+                      SmartPeak::WorkflowManager& workflow_manager) :
+    WorkflowWidget(title, application_handler, workflow_manager)
+  {};
+
+public:
+  // wrappers to protected methods
+  virtual void updatecommands() override
+  {
+    WorkflowWidget::updatecommands();
+  }
+
+  bool errorBuildingCommands()
+  {
+    return error_building_commands_;
+  }
+};
+
+TEST(WorkflowWidget, updateCommands)
+{
+  SmartPeak::ApplicationHandler application_handler;
+  SmartPeak::WorkflowManager workflow_manager;
+  WorkflowWidget_Test workflow_widget("Workflow Widget", application_handler, workflow_manager);
+  
+  // initial state
+  EXPECT_FALSE(workflow_widget.errorBuildingCommands());
+  
+  // empty commands
+  workflow_widget.updatecommands();
+  EXPECT_FALSE(workflow_widget.errorBuildingCommands());
+
+  application_handler.sequenceHandler_.setWorkflow({ "LOAD_FEATURES" });
+  workflow_widget.updatecommands();
+  EXPECT_FALSE(workflow_widget.errorBuildingCommands());
+  
+  application_handler.sequenceHandler_.setWorkflow({ "NON_EXISTING_COMMAND" });
+  workflow_widget.updatecommands();
+  EXPECT_TRUE(workflow_widget.errorBuildingCommands());
+}
+

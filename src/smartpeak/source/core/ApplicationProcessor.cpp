@@ -208,7 +208,7 @@ namespace SmartPeak
     }
     else 
     {
-      LOGE << "\nNo command for selection name " << name_;
+      LOGE << "No command for selection name " << name_;
       return false;
     }
     return true;

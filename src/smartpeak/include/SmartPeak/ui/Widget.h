@@ -406,15 +406,6 @@ namespace SmartPeak
   };
 
   /**
-    @brief Class for configuring a workflow
-  */
-  class WorkflowWidget : public GenericGraphicWidget
-  {
-  public:
-    void draw() override;
-  };
-
-  /**
    @brief Shows Quick Help tooltip when ui_element_name is present in tooltip_info (Help.h).
    
    @param[in,out] ui_element_name such as table_id_.

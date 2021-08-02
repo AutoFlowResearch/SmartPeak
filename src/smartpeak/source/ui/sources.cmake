@@ -27,7 +27,7 @@ set(sources_list
 	StatisticsWidget.cpp
 	Widget.cpp
 	WindowSizesAndPositions.cpp
-	Workflow.cpp
+	WorkflowWidget.cpp
 	WorkflowStepWidget.cpp
 )
 
