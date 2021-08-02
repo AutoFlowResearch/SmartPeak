@@ -277,8 +277,6 @@ public:
 
 TEST(WorkflowWidget, updateCommands)
 {
-  SmartPeak::SessionHandler session_handler;
-  SmartPeak::SequenceHandler sequence_handler;
   SmartPeak::ApplicationHandler application_handler;
   SmartPeak::WorkflowManager workflow_manager;
   WorkflowWidget_Test workflow_widget("Workflow Widget", application_handler, workflow_manager);
