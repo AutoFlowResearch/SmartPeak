@@ -287,8 +287,7 @@ namespace SmartPeak
       injections,
       filenames_,
       raw_data_processing_methods_,
-      this
-    );
+      this);
     manager.spawn_workers(n_threads);
     notifySequenceProcessorEnd();
   }
@@ -312,37 +311,82 @@ namespace SmartPeak
 
     notifySequenceSegmentProcessorStart(sequence_segments.size());
 
-    // process by sequence segment
-    for (SequenceSegmentHandler& sequence_segment : sequence_segments) {
-
-      // handle user-desired sequence_segment_processing_methods
-      if (!sequence_segment_processing_methods_.size()) {
-        throw "no sequence segment processing methods given.\n";
-      }
-
-      notifySequenceSegmentProcessorSampleStart(sequence_segment.getSequenceSegmentName());
-
-      const size_t n = sequence_segment_processing_methods_.size();
-
-      // process the sequence segment
-      for (size_t i = 0; i < n; ++i) {
-        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sequence segments";
-        sequence_segment_processing_methods_[i]->process(
-          sequence_segment,
-          *sequenceHandler_IO,
-          (*sequenceHandler_IO)
-            .getSequence()
-            .at(sequence_segment.getSampleIndices().front())
-            .getRawData()
-            .getParameters(), // assumption: all parameters are the same for each sample in the sequence segment!
-          filenames_.at(sequence_segment.getSequenceSegmentName())
-        );
-      }
-      notifySequenceSegmentProcessorSampleEnd(sequence_segment.getSequenceSegmentName());
+    // handle user-desired sequence_segment_processing_methods
+    if (!sequence_segment_processing_methods_.size()) {
+      throw "no sequence segment processing methods given.\n";
     }
 
+    SequenceSegmentProcessorMultithread manager(
+      sequence_segments,
+      (*sequenceHandler_IO),
+      sequence_segment_processing_methods_,
+      filenames_,
+      this);
+    manager.run_sequence_processing();
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
     notifySequenceSegmentProcessorEnd();
+  }
+
+  void processSegment(
+    SequenceSegmentHandler& sequence_segment,
+    SequenceHandler& sequenceHandler_IO,
+    const Filenames& filenames,
+    const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& methods)
+  {
+    const size_t nr_methods = methods.size();
+    LOGI << ">>Processing SequenceSegment [" << sequence_segment.getSequenceSegmentName() << "]\n";
+    for (size_t i = 0; i < nr_methods; ++i) {
+      LOGI << "[" << (i + 1) << "/" << nr_methods << "] steps in processing sequence segments";
+      methods[i]->process(
+        sequence_segment,
+        sequenceHandler_IO,
+        (sequenceHandler_IO)
+          .getSequence()
+          .at(sequence_segment.getSampleIndices().front())
+          .getRawData()
+          .getParameters(),
+        filenames
+      );
+    }
+  }
+
+  void SequenceSegmentProcessorMultithread::run_sequence_processing()
+  {
+    while (true) {
+      const size_t i = i_.fetch_add(1);
+      if (i >= sequence_segment_.size()) {
+        break;
+      }
+  
+      SequenceSegmentHandler& sequence_seg {sequence_segment_[i]};
+      if (observable_) observable_->notifySequenceSegmentProcessorSampleStart(sequence_seg.getSequenceSegmentName());
+      
+      try {
+        std::future<void> f = std::async(
+        std::launch::async,
+        processSegment,
+        std::ref(sequence_seg),
+        std::ref(sequenceHandler_IO),
+        std::cref(filenames_.at( sequence_seg.getSequenceSegmentName())),
+        std::cref(sequence_segment_processing_methods_));
+          
+        LOGI << ">>SequenceSegment [" << sequence_seg.getSequenceSegmentName() << "]: waiting...";
+        f.wait();
+        LOGI << ">>SequenceSegment [" << sequence_seg.getSequenceSegmentName() << "]: done";
+          
+        try {
+          f.get();
+        }
+        catch (const std::exception& e) {
+          LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+        }
+          
+        if (observable_) observable_->notifySequenceSegmentProcessorSampleEnd(sequence_seg.getSequenceSegmentName());
+      }
+      catch (const std::exception& e) {
+        LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+      }
+    }
   }
 
   void ProcessSampleGroups::process()
