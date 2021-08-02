@@ -12,7 +12,7 @@ using namespace std;
 void test_main_LCMS_MRM_Unknown()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns");
-  const Filenames static_filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames static_filenames;
 
   example_LCMS_MRM_Unknowns(main_dir, static_filenames, ",");
 
@@ -21,19 +21,19 @@ void test_main_LCMS_MRM_Unknown()
   LoadParameters loadParameters;
   Filenames filenames;
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_1_BatchName_1900-01-01_000000.featureXML");
+  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_1_BatchName_1900-01-01_000000.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   rawDataHandler.clear();
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_test.featureXML");
+  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_test.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
   
   rawDataHandler.clear();
   
-  filenames.parameters_csv_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/parameters.csv");
+  filenames.setFullPathName("parameters_csv_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/parameters.csv"));
   loadParameters.process(rawDataHandler,{}, filenames);
   
   ParameterSet* params;

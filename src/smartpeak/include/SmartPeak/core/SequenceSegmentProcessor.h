@@ -29,13 +29,14 @@
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
 #include <SmartPeak/iface/IProcessorDescription.h>
+#include <SmartPeak/iface/IInputsOutputsProvider.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/core/SequenceSegmentObservable.h>
 #include <SmartPeak/iface/IFilePickerHandler.h>
 
 namespace SmartPeak
 {
-  struct SequenceSegmentProcessor : IProcessorDescription
+  struct SequenceSegmentProcessor : IProcessorDescription, IInputsOutputsProvider
   {
     SequenceSegmentProcessor(const SequenceSegmentProcessor& other) = delete;
     SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor& other) = delete;
@@ -70,6 +71,10 @@ namespace SmartPeak
       const SampleType sampleType,
       std::vector<size_t>& sampleIndices
     );
+
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override { };
 
     SequenceSegmentObservable* sequence_segment_observable_ = nullptr;
 
@@ -122,6 +127,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct LoadQuantitationMethods : SequenceSegmentProcessor, IFilePickerHandler
@@ -146,6 +154,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreQuantitationMethods : SequenceSegmentProcessor
@@ -165,6 +176,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct LoadFeatureFilters : SequenceSegmentProcessor, IFilePickerHandler
@@ -235,6 +249,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreFeatureQCs : SequenceSegmentProcessor
@@ -253,6 +270,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct LoadFeatureRSDFilters : SequenceSegmentProcessor, IFilePickerHandler
@@ -279,6 +299,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct LoadFeatureRSDQCs : SequenceSegmentProcessor, IFilePickerHandler
@@ -305,6 +328,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreFeatureRSDFilters : SequenceSegmentProcessor
@@ -323,6 +349,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreFeatureRSDQCs : SequenceSegmentProcessor
@@ -341,6 +370,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct LoadFeatureBackgroundFilters : SequenceSegmentProcessor, IFilePickerHandler
@@ -367,6 +399,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct LoadFeatureBackgroundQCs : SequenceSegmentProcessor, IFilePickerHandler
@@ -393,6 +428,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreFeatureBackgroundFilters : SequenceSegmentProcessor
@@ -411,6 +449,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreFeatureBackgroundQCs : SequenceSegmentProcessor
@@ -429,6 +470,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct EstimateFeatureFilterValues : SequenceSegmentProcessor
@@ -568,6 +612,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreFeatureRSDEstimations : SequenceSegmentProcessor
@@ -586,6 +633,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct LoadFeatureBackgroundEstimations : SequenceSegmentProcessor
@@ -604,6 +654,9 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 
   struct StoreFeatureBackgroundEstimations : SequenceSegmentProcessor
@@ -622,5 +675,8 @@ namespace SmartPeak
       const ParameterSet& params_I,
       const Filenames& filenames
     ) const override;
+
+    /* IInputsOutputsProvider */
+    virtual void getInputsOutputs(Filenames& filenames) const override;
   };
 }

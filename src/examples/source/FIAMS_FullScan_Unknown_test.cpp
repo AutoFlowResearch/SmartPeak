@@ -12,7 +12,7 @@ using namespace std;
 void test_main_FIAMS_FullScan_Unknown()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns");
-  const Filenames static_filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames static_filenames;
 
   example_FIAMS_FullScan_Unknowns(main_dir, static_filenames, ",");
 
@@ -21,19 +21,19 @@ void test_main_FIAMS_FullScan_Unknown()
   LoadAnnotations loadAnnotations;
   Filenames filenames;
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns/features/20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1_13_BatchName_1900-01-01_000000.featureXML");
+  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns/features/20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1_13_BatchName_1900-01-01_000000.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
-  filenames.mzTab_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns/features/20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1_13_BatchName_1900-01-01_000000.mzTab");
+  filenames.setFullPathName("mzTab_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns/features/20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1_13_BatchName_1900-01-01_000000.mzTab"));
   loadAnnotations.process(rawDataHandler, {}, filenames);
   OpenMS::MzTab mt1 = rawDataHandler.getMzTab();
 
   rawDataHandler.clear();
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns/features/20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1_test.featureXML");
+  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns/features/20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1_test.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
-  filenames.mzTab_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns/features/20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1_test.mzTab");
+  filenames.setFullPathName("mzTab_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns/features/20200618_QCserum_NewSourceSettings_80_20MeOH_water_100to1000Da_NEG_1_test.mzTab"));
   loadAnnotations.process(rawDataHandler, {}, filenames);
   OpenMS::MzTab mt2 = rawDataHandler.getMzTab();
   

@@ -96,7 +96,7 @@ TEST(InputDataValidation, findMissingNames)
 TEST(InputDataValidation, sampleNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
-  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames filenames;
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -109,7 +109,7 @@ TEST(InputDataValidation, sampleNamesAreConsistent)
   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.sequence_csv_i = main_dir + "/sequence_missing.csv";
+  filenames.setFullPathName("sequence_csv_i", main_dir + "/sequence_missing.csv");
   sequenceHandler.clear();
 
   cs.filenames_ = filenames;
@@ -122,7 +122,7 @@ TEST(InputDataValidation, sampleNamesAreConsistent)
 TEST(InputDataValidation, componentNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
-  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames filenames;
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -135,7 +135,7 @@ TEST(InputDataValidation, componentNamesAreConsistent)
   result = InputDataValidation::componentNamesAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.traML_csv_i = main_dir + "/traML_missing.csv";
+  filenames.setFullPathName("traML_csv_i", main_dir + "/traML_missing.csv");
   // SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   RawDataHandler& rawData0 = sequenceHandler.getSequence().front().getRawData();
   LoadTransitions loadTransitions;
@@ -148,7 +148,7 @@ TEST(InputDataValidation, componentNamesAreConsistent)
 TEST(InputDataValidation, componentNameGroupsAreConsistent)
 {
   SequenceHandler sequenceHandler;
-  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames filenames;
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -161,7 +161,7 @@ TEST(InputDataValidation, componentNameGroupsAreConsistent)
   result = InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.traML_csv_i = main_dir + "/traML_missing.csv";
+  filenames.setFullPathName("traML_csv_i", main_dir + "/traML_missing.csv");
   //SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   RawDataHandler& rawData0 = sequenceHandler.getSequence().front().getRawData();
   LoadTransitions loadTransitions;
@@ -174,7 +174,7 @@ TEST(InputDataValidation, componentNameGroupsAreConsistent)
 TEST(InputDataValidation, heavyComponentsAreConsistent)
 {
   SequenceHandler sequenceHandler;
-  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames filenames;
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -187,7 +187,7 @@ TEST(InputDataValidation, heavyComponentsAreConsistent)
   result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.quantitationMethods_csv_i = main_dir + "/quantitationMethods_missing.csv";
+  filenames.setFullPathName("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
   //SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   SequenceSegmentHandler& seqSeg0 = sequenceHandler.getSequenceSegments().front();
   LoadQuantitationMethods loadQuantitationMethods;

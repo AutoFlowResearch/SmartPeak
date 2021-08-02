@@ -54,10 +54,16 @@ void example_LCMS_MRM_Standards(
     std::make_shared<StoreFeatures>()
   };
 
+  Filenames methods_filenames1;
+  for (const auto& m : raw_data_processing_methods)
+  {
+    m->getInputsOutputs(methods_filenames1);
+  }
   std::map<std::string, Filenames> dynamic_filenames1;
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
-    dynamic_filenames1[key] = Filenames::getDefaultDynamicFilenames(
+    Filenames injection_filenames = methods_filenames1;
+    injection_filenames.setPathsAndNames(
       dir_I,
       dir_I + "/mzML/",
       dir_I + "/features/",
@@ -68,6 +74,7 @@ void example_LCMS_MRM_Standards(
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
     );
+    dynamic_filenames1[key] = injection_filenames;
   }
 
   ProcessSequence ps(sequenceHandler);
@@ -81,6 +88,7 @@ void example_LCMS_MRM_Standards(
   };
 
   std::map<std::string, Filenames> dynamic_filenames2;
+  /*
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string& key = sequence_segment.getSequenceSegmentName();
     dynamic_filenames2[key] = Filenames::getDefaultDynamicFilenames(
@@ -94,6 +102,7 @@ void example_LCMS_MRM_Standards(
       "", ""
     );
   }
+  */
 
   ProcessSequenceSegments pss(sequenceHandler);
   pss.filenames_                             = dynamic_filenames2;
@@ -107,6 +116,7 @@ void example_LCMS_MRM_Standards(
   };
 
   std::map<std::string, Filenames> dynamic_filenames3;
+  /*
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames3[key] = Filenames::getDefaultDynamicFilenames(
@@ -121,6 +131,7 @@ void example_LCMS_MRM_Standards(
       injection.getMetaData().getSampleGroupName()
     );
   }
+  */
 
   ps.filenames_                     = dynamic_filenames3;
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
@@ -128,14 +139,14 @@ void example_LCMS_MRM_Standards(
 
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,
-    static_filenames.pivotTable_csv_o,
+    static_filenames.getFullPathName("pivotTable_csv_o"),
     {FeatureMetadata::calculated_concentration},
     {SampleType::Standard}
   );
 
   SequenceParser::writeDataTableFromMetaValue(
     sequenceHandler,
-    static_filenames.featureDB_csv_o,
+    static_filenames.getFullPathName("featureDB_csv_o"),
     {
       FeatureMetadata::peak_apex_intensity,
       FeatureMetadata::total_width,

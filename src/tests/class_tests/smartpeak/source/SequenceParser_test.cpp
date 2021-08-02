@@ -67,7 +67,7 @@ struct SequenceParserFixture : public ::testing::Test
       metaDataHandler.scan_mass_low = 60;
 
       Filenames filenames;
-      filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML");
+      filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML"));
       RawDataHandler rawDataHandler;
       LoadFeatures loadFeatures;
       loadFeatures.process(rawDataHandler, {}, filenames);

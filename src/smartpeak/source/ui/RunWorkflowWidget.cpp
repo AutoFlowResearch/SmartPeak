@@ -102,11 +102,11 @@ namespace SmartPeak
           {
             for (auto& p : cmd.dynamic_filenames)
             {
-              Filenames::updateDefaultDynamicFilenames(
+              p.second.setRootPaths(
+                application_handler_.main_dir_,
                 application_handler_.mzML_dir_,
                 application_handler_.features_in_dir_,
-                application_handler_.features_out_dir_,
-                p.second
+                application_handler_.features_out_dir_
               );
             }
           }

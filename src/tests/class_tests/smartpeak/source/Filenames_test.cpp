@@ -27,7 +27,7 @@
 
 using namespace SmartPeak;
 using namespace std;
-
+/*
 TEST(Filenames, filenames_getDefaultStaticFilenames)
 {
   Filenames filenames = Filenames::getDefaultStaticFilenames("/home/user");
@@ -263,3 +263,4 @@ TEST(Filenames, clear2)
   EXPECT_STREQ(filenames.pivotTable_csv_o.c_str(), "");
   EXPECT_STREQ(filenames.featureDB_csv_o.c_str(), "");
 }
+*/

@@ -61,44 +61,48 @@ namespace SmartPeak
     // clearNonExistantFilename(f.sequence_csv_i);   // The file must exist
     // clearNonExistantFilename(f.parameters_csv_i); // The file must exist
     // clearNonExistantFilename(f.traML_csv_i);      // The file must exist
-    clearNonExistantFilename(f.featureFilterComponents_csv_i);
-    clearNonExistantFilename(f.featureFilterComponentGroups_csv_i);
-    clearNonExistantFilename(f.featureQCComponents_csv_i);
-    clearNonExistantFilename(f.featureQCComponentGroups_csv_i);
-    clearNonExistantFilename(f.quantitationMethods_csv_i);
-    clearNonExistantFilename(f.standardsConcentrations_csv_i);
-    clearNonExistantFilename(f.referenceData_csv_i);
+    // TODO add another property to the Files and clear based on that information
+    clearNonExistantFilename(f, "featureFilterComponents_csv_i");
+    clearNonExistantFilename(f, "featureFilterComponentGroups_csv_i");
+    clearNonExistantFilename(f, "featureQCComponents_csv_i");
+    clearNonExistantFilename(f, "featureQCComponentGroups_csv_i");
+    clearNonExistantFilename(f, "quantitationMethods_csv_i");
+    clearNonExistantFilename(f, "standardsConcentrations_csv_i");
+    clearNonExistantFilename(f, "referenceData_csv_i");
   }
 
-  void CreateSequence::clearNonExistantFilename(std::string& filename)
+  void CreateSequence::clearNonExistantFilename(Filenames& f, const std::string& file_id)
   {
+    const auto& filename = f.getFullPathName(file_id);
     if (InputDataValidation::fileExists(filename) == false) {
-      filename.clear();
+      f.setFullPathName(file_id, "");
     }
   }
 
   bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler)
   {
+    getInputsOutputs(application_handler->static_filenames_);
     Filenames& f = application_handler->static_filenames_;
     application_handler->main_dir_ = application_handler->sequence_pathname_.substr(0, application_handler->sequence_pathname_.find_last_of('/'));
-    f = Filenames::getDefaultStaticFilenames(application_handler->main_dir_);
+    f.setRootPaths(application_handler->main_dir_, "", "", "");
     clearNonExistantDefaultGeneratedFilenames(f);
-    f.sequence_csv_i = application_handler->sequence_pathname_;
+    f.setFullPathName("sequence_csv_i", application_handler->sequence_pathname_);
 
     LOGN << "\n\n"
       "The following list of file was searched for:\n";
     std::vector<InputDataValidation::FilenameInfo> is_valid;
-    is_valid.push_back(InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.parameters_csv_i, "parameters"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.traML_csv_i, "traml"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponents_csv_i, "featureFilter"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponentGroups_csv_i, "featureFilterGroups"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponents_csv_i, "featureQC"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponentGroups_csv_i, "featureQCGroups"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.quantitationMethods_csv_i, "quantitationMethods"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.standardsConcentrations_csv_i, "standardsConcentrations"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.referenceData_csv_i, "referenceData"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.selectDilutions_csv_i, "selectDilutions"));
+    // TODO add another property to the Files and check validity based on that information
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("sequence_csv_i"), "sequence"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("parameters_csv_i"), "parameters"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("traML_csv_i"), "traml"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureFilterComponents_csv_i"), "featureFilter"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureFilterComponentGroups_csv_i"), "featureFilterGroups"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureQCComponents_csv_i"), "featureQC"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureQCComponentGroups_csv_i"), "featureQCGroups"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("quantitationMethods_csv_i"), "quantitationMethods"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("standardsConcentrations_csv_i"), "standardsConcentrations"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("referenceData_csv_i"), "referenceData"));
+//    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("selectDilutions_csv_i"), "selectDilutions"));
 
     std::cout << "\n\n";
 
@@ -111,8 +115,7 @@ namespace SmartPeak
     { return arg.validity != InputDataValidation::FilenameInfo::invalid; });
 
     if (!requiredPathnamesAreValidBool || !otherPathnamesAreFine) {
-      LOGF << "\n\nERROR!!!\n"
-        "One or more pathnames are not valid.\n";
+      LOGE << "One or more pathnames are not valid.\n";
       if (!requiredPathnamesAreValidBool) {
         LOGF << "\n\n"
           "Make sure that the following required pathnames are provided:\n"
@@ -151,11 +154,46 @@ namespace SmartPeak
     }
   }
 
+  void CreateSequence::getInputsOutputs(Filenames& filenames) const
+  {
+    filenames.addFileName("sequence_csv_i", "sequence.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("workflow_csv_i", "workflow.csv", Filenames::FileScope::EFileScopeMain);
+    LoadWorkflow loadWorkflow(*sequenceHandler_IO);
+    loadWorkflow.getInputsOutputs(filenames);
+    LoadParameters loadParameters;
+    loadParameters.getInputsOutputs(filenames);
+    LoadTransitions loadTransitions;
+    loadTransitions.getInputsOutputs(filenames);
+    // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
+    LoadValidationData loadValidationData;
+    loadValidationData.getInputsOutputs(filenames);
+    LoadQuantitationMethods loadQuantitationMethods;
+    loadQuantitationMethods.getInputsOutputs(filenames);
+    LoadStandardsConcentrations loadStandardsConcentrations;
+    loadStandardsConcentrations.getInputsOutputs(filenames);
+    LoadFeatureFilters loadFeatureFilters;
+    loadFeatureFilters.getInputsOutputs(filenames);
+    LoadFeatureQCs loadFeatureQCs;
+    loadFeatureQCs.getInputsOutputs(filenames);
+    LoadFeatureRSDFilters loadFeatureRSDFilters;
+    loadFeatureRSDFilters.getInputsOutputs(filenames);
+    LoadFeatureRSDQCs loadFeatureRSDQCs;
+    loadFeatureRSDQCs.getInputsOutputs(filenames);
+    LoadFeatureBackgroundFilters loadFeatureBackgroundFilters;
+    loadFeatureBackgroundFilters.getInputsOutputs(filenames);
+    LoadFeatureBackgroundQCs loadFeatureBackgroundQCs;
+    loadFeatureBackgroundQCs.getInputsOutputs(filenames);
+    LoadFeatureFiltersRDP loadFeatureFiltersRDP;
+    loadFeatureFiltersRDP.getInputsOutputs(filenames);
+    LoadFeatureQCsRDP loadFeatureQCsRDP;
+    loadFeatureQCsRDP.getInputsOutputs(filenames);
+  };
+
   void CreateSequence::process()
   {
     LOGD << "START createSequence";
 
-    SequenceParser::readSequenceFile(*sequenceHandler_IO, filenames_.sequence_csv_i, delimiter);
+    SequenceParser::readSequenceFile(*sequenceHandler_IO, filenames_.getFullPathName("sequence_csv_i"), delimiter);
     if (sequenceHandler_IO->getSequence().empty()) {
       LOGE << "Empty sequence. Returning";
       LOGD << "END createSequence";
@@ -164,7 +202,8 @@ namespace SmartPeak
 
     // load workflow
     LoadWorkflow loadWorkflow(*sequenceHandler_IO);
-    loadWorkflow.filename_ = filenames_.workflow_csv_i;
+    loadWorkflow.getInputsOutputs(filenames_);
+    loadWorkflow.filename_ = filenames_.getFullPathName("workflow_csv_i");
     loadWorkflow.process();
 
     // TODO: Given that the raw data is shared between all injections, it could
@@ -174,40 +213,51 @@ namespace SmartPeak
 
     // load rawDataHandler files (applies to the whole session)
     LoadParameters loadParameters;
+    loadParameters.getInputsOutputs(filenames_);
     loadParameters.parameters_observable_ = sequenceHandler_IO;
     loadParameters.process(rawDataHandler, {}, filenames_);
     LoadTransitions loadTransitions;
+    loadTransitions.getInputsOutputs(filenames_);
     loadTransitions.transitions_observable_ = sequenceHandler_IO;
     loadTransitions.process(rawDataHandler, {}, filenames_);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
     LoadValidationData loadValidationData;
+    loadValidationData.getInputsOutputs(filenames_);
     loadValidationData.process(rawDataHandler, {}, filenames_);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
 
     // load sequenceSegmentHandler files
     for (SequenceSegmentHandler& sequenceSegmentHandler: sequenceHandler_IO->getSequenceSegments()) {
       LoadQuantitationMethods loadQuantitationMethods;
+      loadQuantitationMethods.getInputsOutputs(filenames_);
       loadQuantitationMethods.sequence_segment_observable_ = sequenceHandler_IO;
       loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadStandardsConcentrations loadStandardsConcentrations;
+      loadStandardsConcentrations.getInputsOutputs(filenames_);
       loadStandardsConcentrations.sequence_segment_observable_ = sequenceHandler_IO;
       loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureFilters loadFeatureFilters;
+      loadFeatureFilters.getInputsOutputs(filenames_);
       loadFeatureFilters.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureQCs loadFeatureQCs;
+      loadFeatureQCs.getInputsOutputs(filenames_);
       loadFeatureQCs.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureRSDFilters loadFeatureRSDFilters;
+      loadFeatureRSDFilters.getInputsOutputs(filenames_);
       loadFeatureRSDFilters.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureRSDFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureRSDQCs loadFeatureRSDQCs;
+      loadFeatureRSDQCs.getInputsOutputs(filenames_);
       loadFeatureRSDQCs.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureRSDQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureBackgroundFilters loadFeatureBackgroundFilters;
+      loadFeatureBackgroundFilters.getInputsOutputs(filenames_);
       loadFeatureBackgroundFilters.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureBackgroundFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureBackgroundQCs loadFeatureBackgroundQCs;
+      loadFeatureBackgroundQCs.getInputsOutputs(filenames_);
       loadFeatureBackgroundQCs.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureBackgroundQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
     }
@@ -511,6 +561,11 @@ namespace SmartPeak
     process();
     return true;
   }
+
+  void LoadWorkflow::getInputsOutputs(Filenames& filenames) const
+  {
+    filenames.addFileName("workflow_csv_i", "workflow.csv", Filenames::FileScope::EFileScopeMain);
+  };
 
   void LoadWorkflow::process()
   {

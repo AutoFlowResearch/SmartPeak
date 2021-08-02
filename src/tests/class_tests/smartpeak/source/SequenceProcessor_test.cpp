@@ -35,23 +35,23 @@ Filenames generateTestFilenames()
 {
   const std::string dir = SMARTPEAK_GET_TEST_DATA_PATH("");
   Filenames filenames;
-  filenames.sequence_csv_i                                = dir + "SequenceProcessor_sequence.csv";
-  filenames.parameters_csv_i                              = dir + "RawDataProcessor_params_1_core.csv";
-  filenames.traML_csv_i                                   = dir + "OpenMSFile_traML_1.csv";
-  filenames.featureFilterComponents_csv_i                 = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureFilterComponentGroups_csv_i            = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureQCComponents_csv_i                     = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureQCComponentGroups_csv_i                = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureRSDFilterComponents_csv_i              = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureRSDFilterComponentGroups_csv_i         = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureRSDQCComponents_csv_i                  = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureRSDQCComponentGroups_csv_i             = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureBackgroundFilterComponents_csv_i       = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureBackgroundFilterComponentGroups_csv_i  = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureBackgroundQCComponents_csv_i           = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureBackgroundQCComponentGroups_csv_i      = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.quantitationMethods_csv_i                     = dir + "OpenMSFile_quantitationMethods_1.csv";
-  filenames.standardsConcentrations_csv_i                 = dir + "OpenMSFile_standardsConcentrations_1.csv";
+  filenames.setFullPathName("sequence_csv_i"                                , dir + "SequenceProcessor_sequence.csv");
+  filenames.setFullPathName("parameters_csv_i"                              , dir + "RawDataProcessor_params_1_core.csv");
+  filenames.setFullPathName("traML_csv_i"                                   , dir + "OpenMSFile_traML_1.csv");
+  filenames.setFullPathName("featureFilterComponents_csv_i"                 , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPathName("featureFilterComponentGroups_csv_i"            , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPathName("featureQCComponents_csv_i"                     , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPathName("featureQCComponentGroups_csv_i"                , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPathName("featureRSDFilterComponents_csv_i"              , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPathName("featureRSDFilterComponentGroups_csv_i"         , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPathName("featureRSDQCComponents_csv_i"                  , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPathName("featureRSDQCComponentGroups_csv_i"             , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPathName("featureBackgroundFilterComponents_csv_i"       , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPathName("featureBackgroundFilterComponentGroups_csv_i"  , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPathName("featureBackgroundQCComponents_csv_i"           , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPathName("featureBackgroundQCComponentGroups_csv_i"      , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPathName("quantitationMethods_csv_i"                     , dir + "OpenMSFile_quantitationMethods_1.csv");
+  filenames.setFullPathName("standardsConcentrations_csv_i"                 , dir + "OpenMSFile_standardsConcentrations_1.csv");
   return filenames;
 }
 
@@ -62,8 +62,8 @@ TEST(SequenceHandler, createSequence_onFilePicked)
   CreateSequence cs(sequenceHandler);
   std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
-  auto filenames_ = Filenames::getDefaultStaticFilenames(workflow.string());
-  cs.onFilePicked(filenames_.sequence_csv_i, &ah);
+  Filenames filenames_;
+  cs.onFilePicked(filenames_.getFullPathName("sequence_csv_i"), &ah);
 
   EXPECT_EQ(sequenceHandler.getSequence().size(), 2);
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
@@ -194,7 +194,7 @@ TEST(SequenceHandler, createSequence)
 
   sequenceHandler.clear();
   Filenames filenames { generateTestFilenames() };
-  filenames.sequence_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv");
+  filenames.setFullPathName("sequence_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv"));
 
   cs.filenames_ = filenames;
   cs.process();
@@ -225,10 +225,16 @@ TEST(SequenceHandler, processSequence)
   EXPECT_EQ(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
 
   std::map<std::string, Filenames> dynamic_filenames;
+  Filenames methods_filenames;
+  for (const auto& m : raw_data_processing_methods)
+  {
+    m->getInputsOutputs(methods_filenames);
+  }
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
-    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+    Filenames injection_filenames = methods_filenames;
+    injection_filenames.setPathsAndNames(
       path,
       path + "mzML",
       path + "features",
@@ -239,6 +245,7 @@ TEST(SequenceHandler, processSequence)
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
     );
+    dynamic_filenames[key] = injection_filenames;
   }
 
   EXPECT_EQ(sequenceHandler.getSequence().size(), dynamic_filenames.size());
@@ -310,11 +317,17 @@ TEST(SequenceHandler, processSequenceSegments)
   const vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods =
     { std::make_shared<CalculateCalibration>() };
 
+  Filenames methods_filenames;
+  for (const auto& m : sequence_segment_processing_methods)
+  {
+    m->getInputsOutputs(methods_filenames);
+  }
   std::map<std::string, Filenames> dynamic_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string key = sequence_segment.getSequenceSegmentName();
-    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+    Filenames sequence_segment_filenames = methods_filenames;
+    sequence_segment_filenames.setPathsAndNames(
       path,
       path + "mzML/",
       path + "features/",
@@ -325,6 +338,7 @@ TEST(SequenceHandler, processSequenceSegments)
       key,
       key
     );
+    dynamic_filenames[key] = sequence_segment_filenames;
   }
 
   // Default sequence segment names (i.e., all)
@@ -391,12 +405,19 @@ TEST(SequenceHandler, processSampleGroups)
   cs.checkConsistency = false;
   cs.process();
 
-  // Generate the filenames
+  // Load in the raw data featureMaps
+  const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };
+  Filenames methods_filenames;
+  for (const auto& m : raw_data_processing_methods)
+  {
+    m->getInputsOutputs(methods_filenames);
+  }
   std::map<std::string, Filenames> dynamic_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+    Filenames injection_filenames = methods_filenames;
     const std::string key = injection.getMetaData().getInjectionName();
-    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
+    injection_filenames.setPathsAndNames(
       path,
       path,
       path,
@@ -407,19 +428,25 @@ TEST(SequenceHandler, processSampleGroups)
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
     );
+    dynamic_filenames[key] = injection_filenames;
   }
 
-  // Load in the raw data featureMaps
-  const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };
   ProcessSequence ps(sequenceHandler);
   ps.filenames_ = dynamic_filenames;
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.process();
 
-  // Update the filenames
+  const vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods =
+  { std::make_shared<MergeInjections>() };
   dynamic_filenames.clear();
+  Filenames methods_filenames2;
+  for (const auto& m : raw_data_processing_methods)
+  {
+    m->getInputsOutputs(methods_filenames2);
+  }
   for (const SampleGroupHandler& sampleGroupHandler : sequenceHandler.getSampleGroups()) {
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()] = Filenames::getDefaultDynamicFilenames(
+    Filenames sample_group_filenames = methods_filenames2;
+    sample_group_filenames.setPathsAndNames(
       path,
       path + "mzML/",
       path + "features/",
@@ -430,10 +457,8 @@ TEST(SequenceHandler, processSampleGroups)
       sampleGroupHandler.getSampleGroupName(),
       sampleGroupHandler.getSampleGroupName()
     );
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()] = sample_group_filenames;
   }
-
-  const vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods =
-  { std::make_shared<MergeInjections>() };
 
   // Default sample group names (i.e., all)
   ProcessSampleGroups psg(sequenceHandler);
