@@ -76,6 +76,7 @@ TEST(SequenceHandler, createSequence_onFilePicked)
   EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "arg-L.arg-L_1.Light");
 }
 
+#if (WIN32)
 TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
 {
   ApplicationHandler ah;
@@ -98,6 +99,7 @@ TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
   EXPECT_EQ(injection0.getRawData().getQuantitationMethods().size(), 10);
   EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "arg-L.arg-L_1.Light");
 }
+#endif(WIN32)
 
 TEST(SequenceHandler, createSequence)
 {
