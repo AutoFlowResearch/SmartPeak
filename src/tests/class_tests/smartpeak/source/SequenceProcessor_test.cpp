@@ -65,7 +65,30 @@ TEST(SequenceHandler, createSequence_onFilePicked)
   auto filenames_ = Filenames::getDefaultStaticFilenames(workflow.string());
   cs.onFilePicked(filenames_.sequence_csv_i, &ah);
 
-  EXPECT_EQ(sequenceHandler.getSequence().size(), 2);
+  ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
+  InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
+  EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_STREQ(injection0.getMetaData().getSampleGroupName().c_str(), "CM");
+  EXPECT_STREQ(injection0.getRawData().getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_EQ(injection0.getRawData().getParameters().size(), 27);
+  EXPECT_STREQ(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName().c_str(), "stop_report_after_feature");
+  EXPECT_EQ(injection0.getRawData().getQuantitationMethods().size(), 10);
+  EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "arg-L.arg-L_1.Light");
+}
+
+TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
+{
+  ApplicationHandler ah;
+  SequenceHandler sequenceHandler;
+  CreateSequence cs(sequenceHandler);
+  std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
+  auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
+  auto filenames_ = Filenames::getDefaultStaticFilenames(workflow.string());
+  // replace separators (this way of specifying filename can happen with command line interface actually)
+  std::replace(filenames_.sequence_csv_i.begin(), filenames_.sequence_csv_i.end(), '/', '\\');
+  cs.onFilePicked(filenames_.sequence_csv_i, &ah);
+
+  ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
   EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
   EXPECT_STREQ(injection0.getMetaData().getSampleGroupName().c_str(), "CM");

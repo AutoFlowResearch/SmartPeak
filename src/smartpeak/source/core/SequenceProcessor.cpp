@@ -37,6 +37,7 @@
 #include <future>
 #include <list>
 #include <unordered_set>
+#include <filesystem>
 
 namespace SmartPeak
 {
@@ -80,7 +81,7 @@ namespace SmartPeak
   bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler)
   {
     Filenames& f = application_handler->static_filenames_;
-    application_handler->main_dir_ = application_handler->sequence_pathname_.substr(0, application_handler->sequence_pathname_.find_last_of('/'));
+    application_handler->main_dir_ = std::filesystem::path(application_handler->sequence_pathname_).remove_filename().generic_string();
     f = Filenames::getDefaultStaticFilenames(application_handler->main_dir_);
     clearNonExistantDefaultGeneratedFilenames(f);
     f.sequence_csv_i = application_handler->sequence_pathname_;
