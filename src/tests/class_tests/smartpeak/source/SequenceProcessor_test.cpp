@@ -63,6 +63,7 @@ TEST(SequenceHandler, createSequence_onFilePicked)
   std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
   Filenames filenames_;
+  cs.getInputsOutputs(filenames_);
   cs.onFilePicked(filenames_.getFullPathName("sequence_csv_i"), &ah);
 
   ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
