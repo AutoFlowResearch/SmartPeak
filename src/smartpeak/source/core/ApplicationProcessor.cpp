@@ -206,15 +206,16 @@ namespace SmartPeak
       const auto& method = n_to_raw_data_method_.at(name_);
       cmd_.setMethod(method);
       Filenames method_filenames;
+      method_filenames.setRootPaths(
+        application_handler_.main_dir_,
+        application_handler_.mzML_dir_,
+        application_handler_.features_in_dir_,
+        application_handler_.features_out_dir_);
       method->getInputsOutputs(method_filenames);
       for (const InjectionHandler& injection : application_handler_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
         Filenames injection_filenames = method_filenames;
-        injection_filenames.setPathsAndNames(
-          application_handler_.main_dir_,
-          application_handler_.mzML_dir_,
-          application_handler_.features_in_dir_,
-          application_handler_.features_out_dir_,
+        injection_filenames.setFileVariants(
           injection.getMetaData().getFilename(),
           key,
           key,
@@ -227,15 +228,15 @@ namespace SmartPeak
       const auto& method = n_to_seq_seg_method_.at(name_);
       cmd_.setMethod(method);
       Filenames method_filenames;
+      method_filenames.setRootPaths(application_handler_.main_dir_,
+        application_handler_.mzML_dir_,
+        application_handler_.features_in_dir_,
+        application_handler_.features_out_dir_);
       method->getInputsOutputs(method_filenames);
       for (const SequenceSegmentHandler& sequence_segment : application_handler_.sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();
         Filenames sequence_segment_filenames = method_filenames;
-        sequence_segment_filenames.setPathsAndNames(
-          application_handler_.main_dir_,
-          application_handler_.mzML_dir_,
-          application_handler_.features_in_dir_,
-          application_handler_.features_out_dir_,
+        sequence_segment_filenames.setFileVariants(
           "",
           key,
           key,
@@ -248,15 +249,15 @@ namespace SmartPeak
       const auto& method = n_to_sample_group_method_.at(name_);
       cmd_.setMethod(method);
       Filenames method_filenames;
+      method_filenames.setRootPaths(application_handler_.main_dir_,
+        application_handler_.mzML_dir_,
+        application_handler_.features_in_dir_,
+        application_handler_.features_out_dir_);
       method->getInputsOutputs(method_filenames);
       for (const SampleGroupHandler& sample_group : application_handler_.sequenceHandler_.getSampleGroups()) {
         const std::string& key = sample_group.getSampleGroupName();
         Filenames sample_group_filenames = method_filenames;
-        sample_group_filenames.setPathsAndNames(
-          application_handler_.main_dir_,
-          application_handler_.mzML_dir_,
-          application_handler_.features_in_dir_,
-          application_handler_.features_out_dir_,
+        sample_group_filenames.setFileVariants(
           "",
           key,
           key,

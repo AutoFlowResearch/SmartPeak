@@ -226,19 +226,19 @@ TEST(SequenceHandler, processSequence)
 
   std::map<std::string, Filenames> dynamic_filenames;
   Filenames methods_filenames;
+  const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
+  methods_filenames.setRootPaths(path,
+    path + "mzML",
+    path + "features",
+    path + "features");
   for (const auto& m : raw_data_processing_methods)
   {
     m->getInputsOutputs(methods_filenames);
   }
-  const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
     Filenames injection_filenames = methods_filenames;
-    injection_filenames.setPathsAndNames(
-      path,
-      path + "mzML",
-      path + "features",
-      path + "features",
+    injection_filenames.setFileVariants(
       injection.getMetaData().getFilename(), // previous: injection.getMetaData().getSampleName(),
       key,
       key,
@@ -318,20 +318,20 @@ TEST(SequenceHandler, processSequenceSegments)
     { std::make_shared<CalculateCalibration>() };
 
   Filenames methods_filenames;
+  const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
+  methods_filenames.setRootPaths(path,
+    path + "mzML/",
+    path + "features/",
+    path + "features/");
   for (const auto& m : sequence_segment_processing_methods)
   {
     m->getInputsOutputs(methods_filenames);
   }
   std::map<std::string, Filenames> dynamic_filenames;
-  const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string key = sequence_segment.getSequenceSegmentName();
     Filenames sequence_segment_filenames = methods_filenames;
-    sequence_segment_filenames.setPathsAndNames(
-      path,
-      path + "mzML/",
-      path + "features/",
-      path + "features/",
+    sequence_segment_filenames.setFileVariants(
       "",
       key,
       key,
@@ -417,11 +417,11 @@ TEST(SequenceHandler, processSampleGroups)
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     Filenames injection_filenames = methods_filenames;
     const std::string key = injection.getMetaData().getInjectionName();
-    injection_filenames.setPathsAndNames(
+    injection_filenames.setRootPaths(path,
       path,
       path,
-      path,
-      path,
+      path);
+    injection_filenames.setFileVariants(
       injection.getMetaData().getFilename(),
       key,
       key,
@@ -440,17 +440,17 @@ TEST(SequenceHandler, processSampleGroups)
   { std::make_shared<MergeInjections>() };
   dynamic_filenames.clear();
   Filenames methods_filenames2;
+  methods_filenames2.setRootPaths(path,
+    path + "mzML/",
+    path + "features/",
+    path + "features/");
   for (const auto& m : raw_data_processing_methods)
   {
     m->getInputsOutputs(methods_filenames2);
   }
   for (const SampleGroupHandler& sampleGroupHandler : sequenceHandler.getSampleGroups()) {
     Filenames sample_group_filenames = methods_filenames2;
-    sample_group_filenames.setPathsAndNames(
-      path,
-      path + "mzML/",
-      path + "features/",
-      path + "features/",
+    sample_group_filenames.setFileVariants(
       "",
       sampleGroupHandler.getSampleGroupName(),
       sampleGroupHandler.getSampleGroupName(),

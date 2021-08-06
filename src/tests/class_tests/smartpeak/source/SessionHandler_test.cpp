@@ -47,14 +47,14 @@ struct TestData {
     if (load_features) {
       LoadFeatures loadFeatures;
       Filenames method_filenames;
+      method_filenames.setRootPaths(pathname,
+        pathname + "/mzML",
+        pathname + "/features",
+        pathname + "/features");
       loadFeatures.getInputsOutputs(method_filenames);
       for (auto& injection : sequenceHandler.getSequence()) {
         Filenames filenames_ = method_filenames;
-        filenames_.setPathsAndNames(
-          pathname,
-          pathname + "/mzML",
-          pathname + "/features",
-          pathname + "/features",
+        filenames_.setFileVariants(
           injection.getMetaData().getFilename(),
           injection.getMetaData().getInjectionName(),
           injection.getMetaData().getInjectionName(),
@@ -70,14 +70,14 @@ struct TestData {
       params.addFunctionParameters(FunctionParameters("ChromatogramExtractor"));
       LoadRawData loadRawData;
       Filenames method_filenames;
+      method_filenames.setRootPaths(pathname,
+        pathname + "/mzML",
+        pathname + "/features",
+        pathname + "/features");
       loadRawData.getInputsOutputs(method_filenames);
       for (auto& injection : sequenceHandler.getSequence()) {
         Filenames filenames_ = method_filenames;
-        filenames_.setPathsAndNames(
-          pathname,
-          pathname + "/mzML",
-          pathname + "/features",
-          pathname + "/features",
+        filenames_.setFileVariants(
           injection.getMetaData().getFilename(),
           injection.getMetaData().getSampleName(),
           injection.getMetaData().getSampleName(),

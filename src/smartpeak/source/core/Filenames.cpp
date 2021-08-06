@@ -29,11 +29,7 @@
 
 namespace SmartPeak
 {
-  void Filenames::setPathsAndNames(
-    const std::string& main_dir,
-    const std::string& mzml_input_path,
-    const std::string& features_input_path,
-    const std::string& output_path,
+  void Filenames::setFileVariants(
     const std::string& input_mzML_filename,
     const std::string& input_inj_name,
     const std::string& output_inj_name,
@@ -46,10 +42,6 @@ namespace SmartPeak
     setFileVariant(input_sample_name, FileScope::EFileScopeSampleGroupInput);
     setFileVariant(output_sample_name, FileScope::EFileScopeSampleGroupOutput);
     setFileVariant(output_inj_name, FileScope::EFileScopeInjectionOutput);
-    setRootPaths(main_dir,
-                mzml_input_path,
-                features_input_path,
-                output_path);
   }
 
   void Filenames::setRootPaths(
