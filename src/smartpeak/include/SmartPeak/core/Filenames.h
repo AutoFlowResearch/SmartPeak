@@ -33,11 +33,7 @@ namespace SmartPeak
   {
 public:
 
-    void setPathsAndNames(
-      const std::string& main_dir,
-      const std::string& mzml_input_path,
-      const std::string& features_input_path,
-      const std::string& output_path,
+    void setFileVariants(
       const std::string& input_mzML_filename,
       const std::string& input_inj_name,
       const std::string& output_inj_name,

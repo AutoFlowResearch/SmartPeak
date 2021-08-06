@@ -57,6 +57,10 @@ void example_GCMS_SIM_Unknowns(
   };
 
   Filenames methods_filenames;
+  methods_filenames.setRootPaths(dir_I,
+    dir_I + "/mzML/",
+    dir_I + "/features/",
+    dir_I + "/features/");
   for (const auto& m : raw_data_processing_methods)
   {
     m->getInputsOutputs(methods_filenames);
@@ -65,11 +69,7 @@ void example_GCMS_SIM_Unknowns(
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
     Filenames injection_filenames = methods_filenames;
-    injection_filenames.setPathsAndNames(
-      dir_I,
-      dir_I + "/mzML/",
-      dir_I + "/features/",
-      dir_I + "/features/",
+    injection_filenames.setFileVariants(
       injection.getMetaData().getFilename(),
       key,
       key,

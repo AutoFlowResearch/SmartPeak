@@ -56,6 +56,10 @@ void example_HPLC_UV_Standards(
   };
 
   Filenames methods_filenames1;
+  methods_filenames1.setRootPaths(dir_I,
+    dir_I + "/mzML/",
+    dir_I + "/features/",
+    dir_I + "/features/");
   for (const auto& m : raw_data_processing_methods)
   {
     m->getInputsOutputs(methods_filenames1);
@@ -64,11 +68,7 @@ void example_HPLC_UV_Standards(
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
     Filenames injection_filenames = methods_filenames1;
-    injection_filenames.setPathsAndNames(
-      dir_I,
-      dir_I + "/mzML/",
-      dir_I + "/features/",
-      dir_I + "/features/",
+    injection_filenames.setFileVariants(
       injection.getMetaData().getFilename(),
       key,
       key,
