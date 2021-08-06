@@ -40,20 +40,23 @@ namespace SmartPeak
     return ifs.is_open();
   }
 
-  InputDataValidation::FilenameInfo InputDataValidation::isValidFilename(const std::string& filename, const std::string& member_name)
+  InputDataValidation::FilenameInfo InputDataValidation::isValidFilename(const std::string& filename, const std::string& member_name, bool required)
   {
     FilenameInfo v;
     v.pathname = filename;
     v.member_name = member_name;
     std::ostringstream msg;
     msg << member_name << ":\n\t";
-    if (filename.size()) {
-      const bool is_valid = fileExists(filename);
-      msg << (is_valid ? "SUCCESS" : "FAILURE") << " <- " << filename << "\n";
-      v.validity = is_valid ? FilenameInfo::valid : FilenameInfo::invalid;
-    } else {
+    const bool file_exists = fileExists(filename);
+    if (!file_exists && !required)
+    {
       msg << "NOT PROVIDED\n";
       v.validity = FilenameInfo::not_provided;
+    }
+    else
+    {
+      msg << (file_exists ? "SUCCESS" : "FAILURE") << " <- " << filename << "\n";
+      v.validity = file_exists ? FilenameInfo::valid : FilenameInfo::invalid;
     }
     if (v.validity == FilenameInfo::invalid)
     {

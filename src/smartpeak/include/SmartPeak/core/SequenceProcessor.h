@@ -153,8 +153,6 @@ namespace SmartPeak
     bool buildStaticFilenames(ApplicationHandler* application_handler);
     void updateFilenames(Filenames& f, const std::string& pathname);
     bool requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation);
-    void clearNonExistantDefaultGeneratedFilenames(Filenames& f);
-    void clearNonExistantFilename(Filenames& f, const std::string& file_id);
     std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
   };
 
