@@ -37,30 +37,30 @@ namespace SmartPeak
     const std::string& output_sample_name
   )
   {
-    setFileVariant(input_mzML_filename, FileScope::EFileScopeMzMLInput);
-    setFileVariant(input_inj_name, FileScope::EFileScopeInjectionInput);
-    setFileVariant(input_sample_name, FileScope::EFileScopeSampleGroupInput);
-    setFileVariant(output_sample_name, FileScope::EFileScopeSampleGroupOutput);
-    setFileVariant(output_inj_name, FileScope::EFileScopeInjectionOutput);
+    updateFileVariant(input_mzML_filename, FileScope::EFileScopeMzMLInput);
+    updateFileVariant(input_inj_name, FileScope::EFileScopeInjectionInput);
+    updateFileVariant(input_sample_name, FileScope::EFileScopeSampleGroupInput);
+    updateFileVariant(output_sample_name, FileScope::EFileScopeSampleGroupOutput);
+    updateFileVariant(output_inj_name, FileScope::EFileScopeInjectionOutput);
   }
 
   void Filenames::setRootPaths(
     const std::string& main_dir,
     const std::string& mzml_input_path,
-    const std::string& features_input_path,
+    const std::string& input_path,
     const std::string& output_path
   )
   {
     mzml_input_path_ = mzml_input_path;
-    features_input_path_ = features_input_path;
+    input_path_ = input_path;
     output_path_ = output_path;
     main_dir_ = main_dir;
-    setRootPath(main_dir, FileScope::EFileScopeMain);
-    setRootPath(mzml_input_path, FileScope::EFileScopeMzMLInput);
-    setRootPath(features_input_path, FileScope::EFileScopeInjectionInput);
-    setRootPath(features_input_path, FileScope::EFileScopeSampleGroupInput);
-    setRootPath(output_path, FileScope::EFileScopeSampleGroupOutput);
-    setRootPath(output_path, FileScope::EFileScopeInjectionOutput);
+    updateRootPath(main_dir, FileScope::EFileScopeMain);
+    updateRootPath(mzml_input_path, FileScope::EFileScopeMzMLInput);
+    updateRootPath(input_path, FileScope::EFileScopeInjectionInput);
+    updateRootPath(input_path, FileScope::EFileScopeSampleGroupInput);
+    updateRootPath(output_path, FileScope::EFileScopeSampleGroupOutput);
+    updateRootPath(output_path, FileScope::EFileScopeInjectionOutput);
   }
 
   void Filenames::addFileName(const std::string& id, const std::string& default_name, FileScope file_scope)
@@ -78,7 +78,7 @@ namespace SmartPeak
     return file_names_.at(id).full_path_;
   }
 
-  void Filenames::setRootPath(const std::string& dir, FileScope file_scope)
+  void Filenames::updateRootPath(const std::string& dir, FileScope file_scope)
   {
     for (auto& f : file_names_)
     {
@@ -90,7 +90,7 @@ namespace SmartPeak
     }
   }
 
-  void Filenames::setFileVariant(const std::string& variant, FileScope file_scope)
+  void Filenames::updateFileVariant(const std::string& variant, FileScope file_scope)
   {
     for (auto& f : file_names_)
     {

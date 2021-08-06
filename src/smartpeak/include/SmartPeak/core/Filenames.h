@@ -64,9 +64,10 @@ public:
     void setFullPathName(const std::string& id, const std::string& full_path);
     void merge(const Filenames& other);
 
+  protected:
+
     friend class Filenames;
 
-  protected:
     struct FileName
     {
       std::string default_name_;
@@ -77,15 +78,14 @@ public:
       bool full_path_override_ = false;
     };
 
-    std::map<std::string, FileName> file_names_;
-
-    void setRootPath(const std::string& dir, FileScope file_scope);
-    void setFileVariant(const std::string& variant, FileScope file_scope);
+    void updateRootPath(const std::string& dir, FileScope file_scope);
+    void updateFileVariant(const std::string& variant, FileScope file_scope);
     void updateFullPathName(FileName& filname);
 
+    std::map<std::string, FileName> file_names_;
     std::string main_dir_;
     std::string mzml_input_path_;
-    std::string features_input_path_;
+    std::string input_path_;
     std::string output_path_;
   };
 }
