@@ -44,13 +44,13 @@ TEST(InputDataValidation, isValidFilename)
 {
   string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv");
   InputDataValidation::FilenameInfo v;
-  v = InputDataValidation::isValidFilename(pathname, "some standards file");
+  v = InputDataValidation::isValidFilename(pathname, "some standards file", true);
   EXPECT_EQ(v.validity, InputDataValidation::FilenameInfo::valid);  // success
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("this_does_not_exist.csv");
-  v = InputDataValidation::isValidFilename(pathname, "a file that does not exist");
+  v = InputDataValidation::isValidFilename(pathname, "a file that does not exist", true);
   EXPECT_EQ(v.validity, InputDataValidation::FilenameInfo::invalid); // failure
   pathname.clear();
-  v = InputDataValidation::isValidFilename(pathname, "an empty pathname");
+  v = InputDataValidation::isValidFilename(pathname, "an empty pathname", false);
   EXPECT_EQ(v.validity, InputDataValidation::FilenameInfo::not_provided);  // not provided
 }
 

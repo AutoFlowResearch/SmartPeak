@@ -46,7 +46,7 @@ public:
     };
 
     static bool fileExists(const std::string& filepath);
-    static FilenameInfo isValidFilename(const std::string& filename, const std::string& member_name);
+    static FilenameInfo isValidFilename(const std::string& filename, const std::string& member_name, bool required);
 
     static std::string getSequenceInfo(
       const SequenceHandler& sequenceHandler

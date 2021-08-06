@@ -56,53 +56,28 @@ namespace SmartPeak
     return is_valid;
   }
 
-  void CreateSequence::clearNonExistantDefaultGeneratedFilenames(Filenames& f)
-  {
-    // clearNonExistantFilename(f.sequence_csv_i);   // The file must exist
-    // clearNonExistantFilename(f.parameters_csv_i); // The file must exist
-    // clearNonExistantFilename(f.traML_csv_i);      // The file must exist
-    // TODO add another property to the Files and clear based on that information
-    clearNonExistantFilename(f, "featureFilterComponents_csv_i");
-    clearNonExistantFilename(f, "featureFilterComponentGroups_csv_i");
-    clearNonExistantFilename(f, "featureQCComponents_csv_i");
-    clearNonExistantFilename(f, "featureQCComponentGroups_csv_i");
-    clearNonExistantFilename(f, "quantitationMethods_csv_i");
-    clearNonExistantFilename(f, "standardsConcentrations_csv_i");
-    clearNonExistantFilename(f, "referenceData_csv_i");
-  }
-
-  void CreateSequence::clearNonExistantFilename(Filenames& f, const std::string& file_id)
-  {
-    const auto& filename = f.getFullPathName(file_id);
-    if (InputDataValidation::fileExists(filename) == false) {
-      f.setFullPathName(file_id, "");
-    }
-  }
-
   bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler)
   {
     getInputsOutputs(application_handler->static_filenames_);
     Filenames& f = application_handler->static_filenames_;
     application_handler->main_dir_ = application_handler->sequence_pathname_.substr(0, application_handler->sequence_pathname_.find_last_of('/'));
     f.setRootPaths(application_handler->main_dir_, "", "", "");
-    clearNonExistantDefaultGeneratedFilenames(f);
     f.setFullPathName("sequence_csv_i", application_handler->sequence_pathname_);
 
     LOGN << "\n\n"
       "The following list of file was searched for:\n";
     std::vector<InputDataValidation::FilenameInfo> is_valid;
     // TODO add another property to the Files and check validity based on that information
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("sequence_csv_i"), "sequence"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("parameters_csv_i"), "parameters"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("traML_csv_i"), "traml"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureFilterComponents_csv_i"), "featureFilter"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureFilterComponentGroups_csv_i"), "featureFilterGroups"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureQCComponents_csv_i"), "featureQC"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureQCComponentGroups_csv_i"), "featureQCGroups"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("quantitationMethods_csv_i"), "quantitationMethods"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("standardsConcentrations_csv_i"), "standardsConcentrations"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("referenceData_csv_i"), "referenceData"));
-//    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("selectDilutions_csv_i"), "selectDilutions"));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("sequence_csv_i"), "sequence", true));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("parameters_csv_i"), "parameters", true));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("traML_csv_i"), "traml", true));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureFilterComponents_csv_i"), "featureFilter", false));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureFilterComponentGroups_csv_i"), "featureFilterGroups", false));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureQCComponents_csv_i"), "featureQC", false));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureQCComponentGroups_csv_i"), "featureQCGroups", false));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("quantitationMethods_csv_i"), "quantitationMethods", false));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("standardsConcentrations_csv_i"), "standardsConcentrations", false));
+    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("referenceData_csv_i"), "referenceData", false));
 
     std::cout << "\n\n";
 
