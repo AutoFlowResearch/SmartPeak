@@ -282,8 +282,9 @@ TEST(SequenceHandler, processSequence)
   EXPECT_EQ(n_chroms, 680); // loaded only the first two injections
 
   // Default injection names (i.e., the entire sequence)
-  ps.injection_names_ = {};
+  ps.injection_names_.clear();
   ps.process();
+  
   EXPECT_EQ(sequenceHandler.getSequence().size(), 6);
   n_chroms = 0;
   for (int i = 0; i < sequenceHandler.getSequence().size(); ++i)
