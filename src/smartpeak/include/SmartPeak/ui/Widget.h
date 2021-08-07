@@ -153,13 +153,6 @@ namespace SmartPeak
     @param[in] is_scanned true if `columns_` and `checkbox_columns_` are in sync with `Im_table_entries`
     */
     void sorter(std::vector<ImEntry>& Im_table_entries, ImGuiTableSortSpecs* sorts_specs, const bool& is_scanned);
-    
-    /*
-    @brief Update the table should modifications occur
-
-    @param[in] is_changed sets current `data_changed_` flag
-    */
-    void updateDataModificationState(bool& is_changed) { data_changed_ = is_changed; };
 
     SessionHandler::GenericTableData table_data_;
     Eigen::Tensor<bool, 1> checked_rows_;
@@ -207,6 +200,26 @@ namespace SmartPeak
     std::vector<const char*> cols_;
     bool data_changed_ = false;
     std::vector<std::tuple<size_t, size_t>> selected_cells_;
+  };
+
+  struct FeaturesTableWidget : public GenericTableWidget, public IFeaturesObserver
+  {
+    FeaturesTableWidget(const std::string& table_id,
+      const std::string title = "",
+      FeaturesObservable* observable = nullptr)
+    : GenericTableWidget(table_id, title)
+    {
+      if (observable) observable->addFeaturesObserver(this);
+    };
+
+    /**
+      IFeaturesObserver
+    */
+    virtual void onFeaturesUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = true;
+    };
   };
 
 

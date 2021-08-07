@@ -1478,13 +1478,14 @@ namespace SmartPeak
       }
     }
   }
-  bool SessionHandler::setFeatureTable(const SequenceHandler & sequence_handler, GenericTableData& table_data, bool& data_changed)
+  bool SessionHandler::setFeatureTable(const SequenceHandler & sequence_handler, GenericTableData& table_data)
   {
     bool within_max_size = true;
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature table headers and body
-      if (feature_table_unique_samples_transitions_ != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot() || table_data.body_.dimension(1) != 23 + getNSelectedFeatureMetaValuesTable()) {
+      if (feature_table_unique_samples_transitions_ != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot()
+          || table_data.body_.dimension(1) != 23 + getNSelectedFeatureMetaValuesTable()) {
         LOGD << "Making feature_table_body and feature_table_headers";
         // get the selected feature names
         Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureMetaValuesTable();
@@ -1538,7 +1539,6 @@ namespace SmartPeak
             table_data.body_(row, col) = table.at(row).at(col);
           }
         }
-        data_changed = true;
         this->onFeaturesUpdated();
       }
     }

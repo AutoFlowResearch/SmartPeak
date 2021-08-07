@@ -188,7 +188,7 @@ int main(int argc, char** argv)
   auto comp_group_background_estimations_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupBackgroundEstimationsMainWindow", "Component Group Background Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_,
                                    &SessionHandler::setComponentGroupBackgroundEstimationsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
-  auto features_table_main_window_ = std::make_shared<GenericTableWidget>("featuresTableMainWindow", "Features table");
+  auto features_table_main_window_ = std::make_shared<FeaturesTableWidget>("featuresTableMainWindow", "Features table", &event_dispatcher);
   auto feature_matrix_main_window_ = std::make_shared<GenericTableWidget>("featureMatrixMainWindow", "Features matrix");
 
   // visible on start
@@ -706,13 +706,9 @@ int main(int argc, char** argv)
     // feature table
     if (features_table_main_window_->visible_)
     {
-      bool data_changed = false;
       exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_,
-                                                                features_table_main_window_->table_data_, data_changed);
-      features_table_main_window_->updateDataModificationState(data_changed);
-      
-//      if (session_handler_.feature_table_updated)
-//        features_explorer_window_->onFeaturesUpdated();
+                                                                features_table_main_window_->table_data_);
+      event_dispatcher.onFeaturesUpdated();
       features_table_main_window_->checked_rows_ = Eigen::Tensor<bool, 1>();
     }
 

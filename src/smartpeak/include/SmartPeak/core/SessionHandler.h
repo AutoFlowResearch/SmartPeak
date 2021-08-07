@@ -121,7 +121,7 @@ namespace SmartPeak
 
     @returns true if all rows/columns were added and false if rows/columns were omitted due to performance
     */
-    bool setFeatureTable(const SequenceHandler& sequence_handler, GenericTableData& generic_table_data, bool& data_changed);
+    bool setFeatureTable(const SequenceHandler& sequence_handler, GenericTableData& generic_table_data);
     /*
     @brief Sets the Feature matrix data used for the matrix table, line plots, and heatmap
 
