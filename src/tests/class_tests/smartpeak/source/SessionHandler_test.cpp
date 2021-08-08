@@ -652,8 +652,7 @@ TEST(SessionHandler, setFeatureTable1)
   TestData testData(true, true);
   SessionHandler session_handler;
   SessionHandler::GenericTableData table_data;
-  bool data_changed;
-  session_handler.setFeatureTable(testData.sequenceHandler, table_data, data_changed);
+  session_handler.setFeatureTable(testData.sequenceHandler, table_data);
   EXPECT_EQ(table_data.headers_.size(), 23);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "sample_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "used_");
@@ -662,7 +661,7 @@ TEST(SessionHandler, setFeatureTable1)
   EXPECT_STREQ(table_data.body_(0, 0).c_str(), "150516_CM1_Level1");
   EXPECT_STREQ(table_data.body_(table_data.body_.dimension(0) - 1, table_data.body_.dimension(1) - 1).c_str(), "true");
   session_handler.setMinimalDataAndFilters(testData.sequenceHandler);
-  session_handler.setFeatureTable(testData.sequenceHandler, table_data, data_changed);
+  session_handler.setFeatureTable(testData.sequenceHandler, table_data);
   EXPECT_EQ(table_data.headers_.size(), 23);
   EXPECT_STREQ(table_data.headers_(0).c_str(), "sample_name");
   EXPECT_STREQ(table_data.headers_(table_data.headers_.size() - 1).c_str(), "used_");
