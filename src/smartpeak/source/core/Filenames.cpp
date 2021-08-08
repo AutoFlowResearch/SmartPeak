@@ -75,7 +75,7 @@ namespace SmartPeak
 
   std::string Filenames::getFullPathName(const std::string& id) const
   {
-    return file_names_.at(id).full_path_;
+    return file_names_.at(id).full_path_.generic_string();
   }
 
   void Filenames::updateRootPath(const std::string& dir, FileScope file_scope)
@@ -119,11 +119,11 @@ namespace SmartPeak
       filename.full_path_.clear();
       if (!filename.root_path_.empty())
       {
-        filename.full_path_ += filename.root_path_ + "/";
+        filename.full_path_ = filename.root_path_;
       }
       if (!filename.file_variant_.empty())
       {
-        filename.full_path_ += filename.file_variant_;
+        filename.full_path_ /= filename.file_variant_;
       }
       filename.full_path_ += filename.default_name_;
     }

@@ -73,8 +73,8 @@ public:
       std::string default_name_;
       FileScope file_scope_;
       std::string file_variant_;
-      std::string root_path_;
-      std::string full_path_;
+      std::filesystem::path root_path_;
+      std::filesystem::path full_path_;
       bool full_path_override_ = false;
     };
 
@@ -83,9 +83,9 @@ public:
     void updateFullPathName(FileName& filname);
 
     std::map<std::string, FileName> file_names_;
-    std::string main_dir_;
-    std::string mzml_input_path_;
-    std::string input_path_;
-    std::string output_path_;
+    std::filesystem::path main_dir_;
+    std::filesystem::path mzml_input_path_;
+    std::filesystem::path input_path_;
+    std::filesystem::path output_path_;
   };
 }
