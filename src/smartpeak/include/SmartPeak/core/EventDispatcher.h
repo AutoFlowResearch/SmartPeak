@@ -80,6 +80,7 @@ namespace SmartPeak
       IFeaturesObserver
     */
     virtual void onFeaturesUpdated() override;
+    virtual void onFeaturesSynced() override;
 
     /**
       ISequenceSegmentProcessorObserver

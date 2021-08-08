@@ -31,5 +31,10 @@ namespace SmartPeak
       Features have been updated
     */
     virtual void onFeaturesUpdated() = 0;
+    
+    /**
+      Features have been synced
+    */
+    virtual void onFeaturesSynced() = 0;
   };
 }

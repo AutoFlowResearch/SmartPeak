@@ -536,6 +536,11 @@ namespace SmartPeak
     data_changed_ = true;
   }
 
+  void ExplorerWidget::onFeaturesSynced()
+  {
+    data_changed_ = false;
+  }
+
   void GenericGraphicWidget::draw()
   {
   }

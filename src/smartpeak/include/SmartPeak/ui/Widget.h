@@ -220,6 +220,11 @@ namespace SmartPeak
       table_data_.clear();
       data_changed_ = true;
     };
+    
+    virtual void onFeaturesSynced() override
+    {
+      data_changed_ = false;
+    };
   };
 
 
@@ -320,7 +325,7 @@ namespace SmartPeak
     - searching
     - color coding of rows by status
   */
-  class ExplorerWidget final :
+  class ExplorerWidget :
       public GenericTableWidget,
       public ISequenceObserver,
       public IFeaturesObserver
@@ -352,6 +357,7 @@ namespace SmartPeak
     IFeaturesObserver
     */
     virtual void onFeaturesUpdated() override;
+    virtual void onFeaturesSynced() override;
 
     Eigen::Tensor<std::string, 1> checkbox_headers_;
     Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;

@@ -42,6 +42,13 @@ namespace SmartPeak
         observer->onFeaturesUpdated();
       }
     }
+    void notifyFeaturesSynced()
+    {
+      for (auto& observer : observers_)
+      {
+        observer->onFeaturesSynced();
+      }
+    }
   protected:
     std::vector<IFeaturesObserver*> observers_;
   };

@@ -25,6 +25,7 @@
 
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/EventDispatcher.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 namespace SmartPeak
@@ -40,6 +41,7 @@ namespace SmartPeak
     IFeaturesObserver
     */
     virtual void onFeaturesUpdated() override;
+    virtual void onFeaturesSynced() override;
 
     /**
     ISequenceObserver
@@ -121,7 +123,7 @@ namespace SmartPeak
 
     @returns true if all rows/columns were added and false if rows/columns were omitted due to performance
     */
-    bool setFeatureTable(const SequenceHandler& sequence_handler, GenericTableData& generic_table_data);
+    bool setFeatureTable(const SequenceHandler& sequence_handler, GenericTableData& generic_table_data, EventDispatcher& event_dispatcher);
     /*
     @brief Sets the Feature matrix data used for the matrix table, line plots, and heatmap
 

@@ -71,6 +71,12 @@ namespace SmartPeak
         [this] { this->notifyFeaturesUpdated(); }
       )));
     }
+    void EventDispatcher::onFeaturesSynced()
+    {
+      queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
+        [this] { this->notifyFeaturesSynced(); }
+      )));
+    }
 
     /**
       ISequenceSegmentProcessorObserver
