@@ -40,7 +40,6 @@ struct ApplicationProcessorFixture : public ::testing::Test
     datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
     auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
 
-//    filenames_.updatePaths(workflow.string(),"","","");
     filenames_.setFullPathName("referenceData_csv_i", (std::filesystem::path{datapath_} / std::filesystem::path{"MRMFeatureValidator_referenceData_1.csv"}).string());
 
     // Injections sequence:

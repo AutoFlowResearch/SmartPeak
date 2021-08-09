@@ -58,7 +58,7 @@ namespace SmartPeak
     virtual void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const = 0;
 
     /* IInputsOutputsProvider */
@@ -88,7 +88,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /** Extracts metadata from the chromatogram.
@@ -115,7 +115,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -133,7 +133,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -150,7 +150,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -165,7 +165,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -182,7 +182,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -199,7 +199,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -214,7 +214,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -232,7 +232,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -250,7 +250,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -268,7 +268,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -288,7 +288,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -305,7 +305,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -322,7 +322,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -339,7 +339,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -354,7 +354,7 @@ namespace SmartPeak
       void process(
           RawDataHandler& rawDataHandler_IO,
           const ParameterSet& params_I,
-          const Filenames& filenames_override
+          const Filenames& filenames_I
       ) const override;
   };
 
@@ -371,7 +371,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -388,7 +388,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -408,7 +408,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -425,7 +425,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -440,7 +440,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -457,7 +457,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -474,7 +474,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -489,7 +489,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -511,7 +511,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
     
     /* IInputsOutputsProvider */
@@ -531,7 +531,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -549,7 +549,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -567,7 +567,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -585,7 +585,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -608,7 +608,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -631,7 +631,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
     static void sanitizeParameters(
       ParameterSet& params_I
@@ -654,7 +654,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
     std::string filename_;
 
@@ -680,7 +680,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
   private:
@@ -706,7 +706,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -723,7 +723,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -740,7 +740,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -757,7 +757,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -772,7 +772,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
   };
   
@@ -789,7 +789,7 @@ namespace SmartPeak
     void process(
                  RawDataHandler& rawDataHandler_IO,
                  const ParameterSet& params_I,
-                 const Filenames& filenames_override
+                 const Filenames& filenames_I
                  ) const override;
   };
   
@@ -806,7 +806,7 @@ namespace SmartPeak
     void process(
                  RawDataHandler& rawDataHandler_IO,
                  const ParameterSet& params_I,
-                 const Filenames& filenames_override
+                 const Filenames& filenames_I
                  ) const override;
   };
   
@@ -823,7 +823,7 @@ namespace SmartPeak
     void process(
                  RawDataHandler& rawDataHandler_IO,
                  const ParameterSet& params_I,
-                 const Filenames& filenames_override
+                 const Filenames& filenames_I
                  ) const override;
   };
 
@@ -840,7 +840,7 @@ namespace SmartPeak
     void process(
                  RawDataHandler& rawDataHandler_IO,
                  const ParameterSet& params_I,
-                 const Filenames& filenames_override
+                 const Filenames& filenames_I
                  ) const override;
   };
 

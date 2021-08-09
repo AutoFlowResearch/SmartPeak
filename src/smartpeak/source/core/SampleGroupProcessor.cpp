@@ -55,11 +55,11 @@ namespace SmartPeak
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_override
+    const Filenames& filenames_I
   ) const
   {
     LOGD << "START SelectDilutionsParser";
-    Filenames filenames = prepareFileNames(filenames_override);
+    Filenames filenames = prepareFileNames(filenames_I);
 
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
@@ -195,11 +195,11 @@ namespace SmartPeak
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_override
+    const Filenames& filenames_I
   ) const
   {
     LOGD << "START MergeInjections";
-    Filenames filenames = prepareFileNames(filenames_override);
+    Filenames filenames = prepareFileNames(filenames_I);
 
     // Check the parameters
     if (params_I.at("MergeInjections").empty() && params_I.at("MergeInjections").empty()) {
@@ -700,11 +700,11 @@ namespace SmartPeak
   void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_override
+    const Filenames& filenames_I
   ) const
   {
     LOGD << "START LoadFeaturesSampleGroup";
-    Filenames filenames = prepareFileNames(filenames_override);
+    Filenames filenames = prepareFileNames(filenames_I);
     LOGI << "Loading: " << filenames.getFullPathName("featureXMLSampleGroup_i");
 
     if (filenames.getFullPathName("featureXMLSampleGroup_i").empty()) {
@@ -745,11 +745,11 @@ namespace SmartPeak
   void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_override
+    const Filenames& filenames_I
   ) const
   {
     LOGD << "START storeFeaturesSampleGroup";
-    Filenames filenames = prepareFileNames(filenames_override);
+    Filenames filenames = prepareFileNames(filenames_I);
     LOGI << "Storing: " << filenames.getFullPathName("featureXMLSampleGroup_o");
 
     if (filenames.getFullPathName("featureXMLSampleGroup_o").empty()) {

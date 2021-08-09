@@ -63,7 +63,6 @@ TEST(SequenceHandler, createSequence_onFilePicked)
   std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
   Filenames filenames_ = generateTestFilenames();
-  cs.getInputsOutputs(filenames_);
   cs.onFilePicked(filenames_.getFullPathName("sequence_csv_i"), &ah);
 
   ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
@@ -259,21 +258,16 @@ TEST(SequenceHandler, processSequence)
     path + "mzML",
     path + "features",
     path + "features");
-  for (const auto& m : raw_data_processing_methods)
-  {
-    m->getInputsOutputs(methods_filenames);
-  }
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
-    Filenames injection_filenames = methods_filenames;
-    injection_filenames.setFileVariants(
+    dynamic_filenames[key] = methods_filenames;
+    dynamic_filenames[key].setFileVariants(
       injection.getMetaData().getFilename(), // previous: injection.getMetaData().getSampleName(),
       key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
     );
-    dynamic_filenames[key] = injection_filenames;
   }
 
   EXPECT_EQ(sequenceHandler.getSequence().size(), dynamic_filenames.size());
@@ -351,22 +345,17 @@ TEST(SequenceHandler, processSequenceSegments)
     path + "mzML/",
     path + "features/",
     path + "features/");
-  for (const auto& m : sequence_segment_processing_methods)
-  {
-    m->getInputsOutputs(methods_filenames);
-  }
   std::map<std::string, Filenames> dynamic_filenames;
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string key = sequence_segment.getSequenceSegmentName();
-    Filenames sequence_segment_filenames = methods_filenames;
-    sequence_segment_filenames.setFileVariants(
+    dynamic_filenames[key] = methods_filenames;
+    dynamic_filenames[key].setFileVariants(
       "",
       key,
       key,
       key,
       key
     );
-    dynamic_filenames[key] = sequence_segment_filenames;
   }
 
   // Default sequence segment names (i.e., all)
@@ -436,27 +425,22 @@ TEST(SequenceHandler, processSampleGroups)
   // Load in the raw data featureMaps
   const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };
   Filenames methods_filenames;
-  for (const auto& m : raw_data_processing_methods)
-  {
-    m->getInputsOutputs(methods_filenames);
-  }
   std::map<std::string, Filenames> dynamic_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
-    Filenames injection_filenames = methods_filenames;
     const std::string key = injection.getMetaData().getInjectionName();
-    injection_filenames.setRootPaths(path,
+    dynamic_filenames[key] = methods_filenames;
+    dynamic_filenames[key].setRootPaths(path,
       path,
       path,
       path);
-    injection_filenames.setFileVariants(
+    dynamic_filenames[key].setFileVariants(
       injection.getMetaData().getFilename(),
       key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
     );
-    dynamic_filenames[key] = injection_filenames;
   }
 
   ProcessSequence ps(sequenceHandler);
@@ -472,20 +456,15 @@ TEST(SequenceHandler, processSampleGroups)
     path + "mzML/",
     path + "features/",
     path + "features/");
-  for (const auto& m : raw_data_processing_methods)
-  {
-    m->getInputsOutputs(methods_filenames2);
-  }
   for (const SampleGroupHandler& sampleGroupHandler : sequenceHandler.getSampleGroups()) {
-    Filenames sample_group_filenames = methods_filenames2;
-    sample_group_filenames.setFileVariants(
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()] = methods_filenames2;
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setFileVariants(
       "",
       sampleGroupHandler.getSampleGroupName(),
       sampleGroupHandler.getSampleGroupName(),
       sampleGroupHandler.getSampleGroupName(),
       sampleGroupHandler.getSampleGroupName()
     );
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()] = sample_group_filenames;
   }
 
   // Default sample group names (i.e., all)

@@ -51,7 +51,6 @@ struct TestData {
         pathname + "/mzML",
         pathname + "/features",
         pathname + "/features");
-      loadFeatures.getInputsOutputs(method_filenames);
       for (auto& injection : sequenceHandler.getSequence()) {
         Filenames filenames_ = method_filenames;
         filenames_.setFileVariants(
@@ -74,7 +73,6 @@ struct TestData {
         pathname + "/mzML",
         pathname + "/features",
         pathname + "/features");
-      loadRawData.getInputsOutputs(method_filenames);
       for (auto& injection : sequenceHandler.getSequence()) {
         Filenames filenames_ = method_filenames;
         filenames_.setFileVariants(

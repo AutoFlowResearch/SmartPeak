@@ -69,6 +69,7 @@ namespace SmartPeak
       "The following list of file was searched for:\n";
     std::vector<InputDataValidation::FilenameInfo> is_valid;
     // TODO add another property to the Files and check validity based on that information
+    /*
     is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("sequence_csv_i"), "sequence", true));
     is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("parameters_csv_i"), "parameters", true));
     is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("traML_csv_i"), "traml", true));
@@ -102,7 +103,7 @@ namespace SmartPeak
       LOGN << "Apply the fixes and reload the sequence file.\n";
       return false;
     }
-
+    */
     return true;
   }
 
@@ -134,35 +135,6 @@ namespace SmartPeak
   {
     filenames.addFileName("sequence_csv_i", "sequence.csv", Filenames::FileScope::EFileScopeMain);
     filenames.addFileName("workflow_csv_i", "workflow.csv", Filenames::FileScope::EFileScopeMain);
-    LoadWorkflow loadWorkflow(*sequenceHandler_IO);
-    loadWorkflow.getInputsOutputs(filenames);
-    LoadParameters loadParameters;
-    loadParameters.getInputsOutputs(filenames);
-    LoadTransitions loadTransitions;
-    loadTransitions.getInputsOutputs(filenames);
-    // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
-    LoadValidationData loadValidationData;
-    loadValidationData.getInputsOutputs(filenames);
-    LoadQuantitationMethods loadQuantitationMethods;
-    loadQuantitationMethods.getInputsOutputs(filenames);
-    LoadStandardsConcentrations loadStandardsConcentrations;
-    loadStandardsConcentrations.getInputsOutputs(filenames);
-    LoadFeatureFilters loadFeatureFilters;
-    loadFeatureFilters.getInputsOutputs(filenames);
-    LoadFeatureQCs loadFeatureQCs;
-    loadFeatureQCs.getInputsOutputs(filenames);
-    LoadFeatureRSDFilters loadFeatureRSDFilters;
-    loadFeatureRSDFilters.getInputsOutputs(filenames);
-    LoadFeatureRSDQCs loadFeatureRSDQCs;
-    loadFeatureRSDQCs.getInputsOutputs(filenames);
-    LoadFeatureBackgroundFilters loadFeatureBackgroundFilters;
-    loadFeatureBackgroundFilters.getInputsOutputs(filenames);
-    LoadFeatureBackgroundQCs loadFeatureBackgroundQCs;
-    loadFeatureBackgroundQCs.getInputsOutputs(filenames);
-    LoadFeatureFiltersRDP loadFeatureFiltersRDP;
-    loadFeatureFiltersRDP.getInputsOutputs(filenames);
-    LoadFeatureQCsRDP loadFeatureQCsRDP;
-    loadFeatureQCsRDP.getInputsOutputs(filenames);
   };
 
   void CreateSequence::process()
@@ -189,51 +161,40 @@ namespace SmartPeak
 
     // load rawDataHandler files (applies to the whole session)
     LoadParameters loadParameters;
-    loadParameters.getInputsOutputs(filenames_);
     loadParameters.parameters_observable_ = sequenceHandler_IO;
     loadParameters.process(rawDataHandler, {}, filenames_);
     LoadTransitions loadTransitions;
-    loadTransitions.getInputsOutputs(filenames_);
     loadTransitions.transitions_observable_ = sequenceHandler_IO;
     loadTransitions.process(rawDataHandler, {}, filenames_);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
     LoadValidationData loadValidationData;
-    loadValidationData.getInputsOutputs(filenames_);
     loadValidationData.process(rawDataHandler, {}, filenames_);
     // raw data files (i.e., mzML, trafo, etc., will be loaded dynamically)
 
     // load sequenceSegmentHandler files
     for (SequenceSegmentHandler& sequenceSegmentHandler: sequenceHandler_IO->getSequenceSegments()) {
       LoadQuantitationMethods loadQuantitationMethods;
-      loadQuantitationMethods.getInputsOutputs(filenames_);
       loadQuantitationMethods.sequence_segment_observable_ = sequenceHandler_IO;
       loadQuantitationMethods.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadStandardsConcentrations loadStandardsConcentrations;
-      loadStandardsConcentrations.getInputsOutputs(filenames_);
       loadStandardsConcentrations.sequence_segment_observable_ = sequenceHandler_IO;
       loadStandardsConcentrations.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureFilters loadFeatureFilters;
-      loadFeatureFilters.getInputsOutputs(filenames_);
       loadFeatureFilters.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureQCs loadFeatureQCs;
-      loadFeatureQCs.getInputsOutputs(filenames_);
       loadFeatureQCs.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureRSDFilters loadFeatureRSDFilters;
-      loadFeatureRSDFilters.getInputsOutputs(filenames_);
       loadFeatureRSDFilters.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureRSDFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureRSDQCs loadFeatureRSDQCs;
-      loadFeatureRSDQCs.getInputsOutputs(filenames_);
       loadFeatureRSDQCs.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureRSDQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureBackgroundFilters loadFeatureBackgroundFilters;
-      loadFeatureBackgroundFilters.getInputsOutputs(filenames_);
       loadFeatureBackgroundFilters.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureBackgroundFilters.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
       LoadFeatureBackgroundQCs loadFeatureBackgroundQCs;
-      loadFeatureBackgroundQCs.getInputsOutputs(filenames_);
       loadFeatureBackgroundQCs.sequence_segment_observable_ = sequenceHandler_IO;
       loadFeatureBackgroundQCs.process(sequenceSegmentHandler, SequenceHandler(), {}, filenames_);
     }
@@ -514,7 +475,7 @@ namespace SmartPeak
 
   void processInjection(
     InjectionHandler& injection,
-    const Filenames& filenames_override,
+    const Filenames& filenames_I,
     const std::vector<std::shared_ptr<RawDataProcessor>>& methods
   )
   {
@@ -526,7 +487,7 @@ namespace SmartPeak
       p->process( //TODO: (SIGABRT)
         injection.getRawData(),
         injection.getRawData().getParameters(),
-        filenames_override
+        filenames_I
       );
     }
   }

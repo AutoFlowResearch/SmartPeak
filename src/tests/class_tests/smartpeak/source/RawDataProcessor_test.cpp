@@ -2462,7 +2462,6 @@ TEST(RawDataProcessor, process)
   rawDataHandler.setQuantitationMethods(sequenceSegmentHandler_IO.getQuantitationMethods());
 
   LoadFeatureQCsRDP loadFeatureQCs;
-  loadFeatureQCs.getInputsOutputs(filenames);
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
   filenames.setFullPathName("mzML_i", SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_mzML_1.mzML"));

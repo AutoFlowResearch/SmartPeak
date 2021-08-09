@@ -78,7 +78,9 @@ public:
       bool full_path_override_ = false;
     };
 
-    void updateRootPath(const std::string& dir, FileScope file_scope);
+    void updateRootPath(const std::filesystem::path& dir, FileScope file_scope);
+    void updateRootPaths();
+    void updateFileVariants();
     void updateFileVariant(const std::string& variant, FileScope file_scope);
     void updateFullPathName(FileName& filname);
 
@@ -87,5 +89,10 @@ public:
     std::filesystem::path mzml_input_path_;
     std::filesystem::path input_path_;
     std::filesystem::path output_path_;
+    std::string input_mzML_filename_;
+    std::string input_inj_name_;
+    std::string output_inj_name_;
+    std::string input_sample_name_;
+    std::string output_sample_name_;
   };
 }

@@ -60,22 +60,17 @@ void example_HPLC_UV_Standards(
     dir_I + "/mzML/",
     dir_I + "/features/",
     dir_I + "/features/");
-  for (const auto& m : raw_data_processing_methods)
-  {
-    m->getInputsOutputs(methods_filenames1);
-  }
   std::map<std::string, Filenames> dynamic_filenames1;
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
-    Filenames injection_filenames = methods_filenames1;
-    injection_filenames.setFileVariants(
+    dynamic_filenames1[key] = methods_filenames1;
+    dynamic_filenames1[key].setFileVariants(
       injection.getMetaData().getFilename(),
       key,
       key,
       injection.getMetaData().getSampleGroupName(),
       injection.getMetaData().getSampleGroupName()
     );
-    dynamic_filenames1[key] = injection_filenames;
   }
 
   ProcessSequence ps(sequenceHandler);

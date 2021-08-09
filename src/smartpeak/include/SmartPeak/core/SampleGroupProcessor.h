@@ -55,7 +55,7 @@ namespace SmartPeak
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const = 0;
 
   protected:
@@ -76,7 +76,7 @@ namespace SmartPeak
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -97,7 +97,7 @@ namespace SmartPeak
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
   private:
@@ -149,7 +149,7 @@ namespace SmartPeak
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -170,7 +170,7 @@ namespace SmartPeak
       SampleGroupHandler& sampleGroupHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames_override
+      const Filenames& filenames_I
     ) const override;
 
     /* IInputsOutputsProvider */
