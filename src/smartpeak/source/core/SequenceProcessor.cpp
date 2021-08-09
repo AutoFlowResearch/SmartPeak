@@ -57,10 +57,8 @@ namespace SmartPeak
     return is_valid;
   }
 
-  bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler)
+  bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler, Filenames& f)
   {
-    getInputsOutputs(application_handler->static_filenames_);
-    Filenames& f = application_handler->static_filenames_;
     application_handler->main_dir_ = std::filesystem::path(application_handler->sequence_pathname_).remove_filename().generic_string();
     f.setRootPaths(application_handler->main_dir_, "", "", "");
     f.setFullPathName("sequence_csv_i", application_handler->sequence_pathname_);
@@ -68,8 +66,6 @@ namespace SmartPeak
     LOGN << "\n\n"
       "The following list of file was searched for:\n";
     std::vector<InputDataValidation::FilenameInfo> is_valid;
-    // TODO add another property to the Files and check validity based on that information
-    /*
     is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("sequence_csv_i"), "sequence", true));
     is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("parameters_csv_i"), "parameters", true));
     is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("traML_csv_i"), "traml", true));
@@ -103,7 +99,6 @@ namespace SmartPeak
       LOGN << "Apply the fixes and reload the sequence file.\n";
       return false;
     }
-    */
     return true;
   }
 
@@ -114,10 +109,9 @@ namespace SmartPeak
     application_handler->features_in_dir_.clear();
     application_handler->features_out_dir_.clear();
     LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
-    const bool pathnamesAreCorrect = buildStaticFilenames(application_handler);
+    const bool pathnamesAreCorrect = buildStaticFilenames(application_handler, filenames_);
     if (pathnamesAreCorrect) {
       application_handler->sequenceHandler_.clear();
-      filenames_ = application_handler->static_filenames_;
       delimiter = ",";
       checkConsistency = false; // NOTE: Requires a lot of time on large sequences with a large number of components
       process();

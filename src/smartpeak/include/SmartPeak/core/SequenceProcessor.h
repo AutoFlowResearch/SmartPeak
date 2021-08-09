@@ -150,7 +150,7 @@ namespace SmartPeak
     virtual void getInputsOutputs(Filenames& filenames) const override;
 
   private:
-    bool buildStaticFilenames(ApplicationHandler* application_handler);
+    bool buildStaticFilenames(ApplicationHandler* application_handler, Filenames& f);
     void updateFilenames(Filenames& f, const std::string& pathname);
     bool requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation);
     std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);

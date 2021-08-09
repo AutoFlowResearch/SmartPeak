@@ -114,7 +114,6 @@ namespace SmartPeak
     std::filesystem::path mzML_dir_;
     std::filesystem::path features_in_dir_;
     std::filesystem::path features_out_dir_;
-    Filenames             static_filenames_;
     SequenceHandler       sequenceHandler_;
   };
 
