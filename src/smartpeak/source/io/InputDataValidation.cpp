@@ -34,13 +34,13 @@
 
 namespace SmartPeak
 {
-  bool InputDataValidation::fileExists(const std::string& filepath)
+  bool InputDataValidation::fileExists(const std::filesystem::path& filepath)
   {
     std::ifstream ifs(filepath);
     return ifs.is_open();
   }
 
-  InputDataValidation::FilenameInfo InputDataValidation::isValidFilename(const std::string& filename, const std::string& member_name, bool required)
+  InputDataValidation::FilenameInfo InputDataValidation::isValidFilename(const std::filesystem::path& filename, const std::string& member_name, bool required)
   {
     FilenameInfo v;
     v.pathname = filename;

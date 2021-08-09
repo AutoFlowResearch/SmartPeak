@@ -41,12 +41,12 @@ public:
 
     struct FilenameInfo {
       enum ValidityEnum {invalid, valid, not_provided} validity;
-      std::string pathname;
+      std::filesystem::path pathname;
       std::string member_name;
     };
 
-    static bool fileExists(const std::string& filepath);
-    static FilenameInfo isValidFilename(const std::string& filename, const std::string& member_name, bool required);
+    static bool fileExists(const std::filesystem::path& filepath);
+    static FilenameInfo isValidFilename(const std::filesystem::path& filename, const std::string& member_name, bool required);
 
     static std::string getSequenceInfo(
       const SequenceHandler& sequenceHandler

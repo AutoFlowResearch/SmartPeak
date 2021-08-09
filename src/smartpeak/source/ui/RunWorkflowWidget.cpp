@@ -37,9 +37,18 @@ namespace SmartPeak
   {
     if (ImGui::BeginPopupModal("Run workflow modal", NULL, ImGuiWindowFlags_None))
     {
+      if (!directories_set_)
+      {
+        // InputTextWithHint does not support std::filesystem::path so we have to create temporary strings for the paths
+        mzML_dir_ = application_handler_.mzML_dir_.generic_string();
+        features_in_dir_ = application_handler_.features_in_dir_.generic_string();
+        features_out_dir_ = application_handler_.features_out_dir_.generic_string();
+        directories_set_ = true;
+      }
+
       ImGui::Text("mzML folder");
       ImGui::PushID(1);
-      ImGui::InputTextWithHint("", application_handler_.mzML_dir_.c_str(), &(application_handler_.mzML_dir_));
+      ImGui::InputTextWithHint("", mzML_dir_.c_str(), &mzML_dir_);
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(11);
@@ -52,7 +61,7 @@ namespace SmartPeak
 
       ImGui::Text("Input features folder");
       ImGui::PushID(2);
-      ImGui::InputTextWithHint("", application_handler_.features_in_dir_.c_str(), &(application_handler_.features_in_dir_));
+      ImGui::InputTextWithHint("", features_in_dir_.c_str(), &features_in_dir_);
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(22);
@@ -65,7 +74,7 @@ namespace SmartPeak
 
       ImGui::Text("Output features folder");
       ImGui::PushID(3);
-      ImGui::InputTextWithHint("", application_handler_.features_out_dir_.c_str(), &(application_handler_.features_out_dir_));
+      ImGui::InputTextWithHint("", features_out_dir_.c_str(), &features_out_dir_);
       ImGui::PopID();
 
       ImGui::SameLine();
@@ -88,7 +97,10 @@ namespace SmartPeak
       ImGui::Separator();
       if (ImGui::Button("Run workflow"))
       {
-        for (const std::string& pathname : { application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_ }) {
+        application_handler_.mzML_dir_ = mzML_dir_;
+        application_handler_.features_in_dir_ = features_in_dir_;
+        application_handler_.features_out_dir_ = features_out_dir_;
+        for (const auto& pathname : { application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_ }) {
           fs::create_directories(fs::path(pathname));
         }
         BuildCommandsFromNames buildCommandsFromNames(application_handler_);
@@ -132,6 +144,7 @@ namespace SmartPeak
       {
         visible_ = false;
         ImGui::CloseCurrentPopup();
+        directories_set_ = false;
       }
       ImGui::EndPopup();
     }

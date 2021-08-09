@@ -46,10 +46,10 @@ namespace SmartPeak
   }
 
   void Filenames::setRootPaths(
-    const std::string& main_dir,
-    const std::string& mzml_input_path,
-    const std::string& input_path,
-    const std::string& output_path
+    const std::filesystem::path& main_dir,
+    const std::filesystem::path& mzml_input_path,
+    const std::filesystem::path& input_path,
+    const std::filesystem::path& output_path
   )
   {
     mzml_input_path_ = mzml_input_path;

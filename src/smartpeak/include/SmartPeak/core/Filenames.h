@@ -42,10 +42,10 @@ public:
     );
 
     void setRootPaths(
-      const std::string& main_dir,
-      const std::string& mzml_input_path,
-      const std::string& features_input_path,
-      const std::string& output_path
+      const std::filesystem::path& main_dir,
+      const std::filesystem::path& mzml_input_path,
+      const std::filesystem::path& features_input_path,
+      const std::filesystem::path& output_path
     );
 
     enum class FileScope
