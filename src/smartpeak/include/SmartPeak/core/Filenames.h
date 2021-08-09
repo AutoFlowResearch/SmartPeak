@@ -64,10 +64,6 @@ public:
     void setFullPathName(const std::string& id, const std::filesystem::path& full_path);
     void merge(const Filenames& other);
 
-  protected:
-
-    friend class Filenames;
-
     struct FileName
     {
       std::string default_name_;
@@ -77,6 +73,12 @@ public:
       std::filesystem::path full_path_;
       bool full_path_override_ = false;
     };
+
+    const std::map<std::string, FileName>& getFileNames() const { return file_names_; };
+
+  protected:
+
+    friend class Filenames;
 
     void updateRootPath(const std::filesystem::path& dir, FileScope file_scope);
     void updateRootPaths();

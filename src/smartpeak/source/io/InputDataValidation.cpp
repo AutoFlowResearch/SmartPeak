@@ -40,33 +40,44 @@ namespace SmartPeak
     return ifs.is_open();
   }
 
-  InputDataValidation::FilenameInfo InputDataValidation::isValidFilename(const std::filesystem::path& filename, const std::string& member_name, bool required)
+  InputDataValidation::FilenameInfo InputDataValidation::processorInputAreReady(
+    const IInputsOutputsProvider& input_files,
+    const std::string& member_name,
+    const Filenames& filenames_I,
+    bool required)
   {
-    FilenameInfo v;
-    v.pathname = filename;
-    v.member_name = member_name;
-    std::ostringstream msg;
-    msg << member_name << ":\n\t";
-    const bool file_exists = fileExists(filename);
-    if (!file_exists && !required)
+    Filenames filenames = filenames_I;
+    input_files.getInputsOutputs(filenames);
+
+    for (const auto& f : filenames.getFileNames())
     {
-      msg << "NOT PROVIDED\n";
-      v.validity = FilenameInfo::not_provided;
+      FilenameInfo v;
+      // v.pathname = filename;
+      v.member_name = member_name;
+      std::ostringstream msg;
+      msg << member_name << ":\n\t";
+      const bool file_exists = fileExists(f.second.full_path_);
+      if (!file_exists && !required)
+      {
+        msg << "NOT PROVIDED\n";
+        v.validity = FilenameInfo::not_provided;
+      }
+      else
+      {
+        msg << (file_exists ? "SUCCESS" : "FAILURE") << " <- " << f.second.full_path_.generic_string() << "\n";
+        v.validity = file_exists ? FilenameInfo::valid : FilenameInfo::invalid;
+      }
+      if (v.validity == FilenameInfo::invalid)
+      {
+        LOGE << msg.str();
+      }
+      else
+      {
+        LOGI << msg.str();
+      }
+      return v;
     }
-    else
-    {
-      msg << (file_exists ? "SUCCESS" : "FAILURE") << " <- " << filename << "\n";
-      v.validity = file_exists ? FilenameInfo::valid : FilenameInfo::invalid;
-    }
-    if (v.validity == FilenameInfo::invalid)
-    {
-      LOGE << msg.str();
-    }
-    else
-    {
-      LOGI << msg.str();
-    }
-    return v;
+
   }
 
   std::string InputDataValidation::getSequenceInfo(

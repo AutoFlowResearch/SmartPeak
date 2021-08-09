@@ -57,26 +57,23 @@ namespace SmartPeak
     return is_valid;
   }
 
-  bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler, Filenames& f)
+  bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler, Filenames& filenames)
   {
     application_handler->main_dir_ = std::filesystem::path(application_handler->sequence_pathname_).remove_filename().generic_string();
-    f.setRootPaths(application_handler->main_dir_, "", "", "");
-    f.setFullPathName("sequence_csv_i", application_handler->sequence_pathname_);
+    filenames.setRootPaths(application_handler->main_dir_, "", "", "");
+    filenames.setFullPathName("sequence_csv_i", application_handler->sequence_pathname_);
 
     LOGN << "\n\n"
       "The following list of file was searched for:\n";
     std::vector<InputDataValidation::FilenameInfo> is_valid;
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("sequence_csv_i"), "sequence", true));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("parameters_csv_i"), "parameters", true));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("traML_csv_i"), "traml", true));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureFilterComponents_csv_i"), "featureFilter", false));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureFilterComponentGroups_csv_i"), "featureFilterGroups", false));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureQCComponents_csv_i"), "featureQC", false));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("featureQCComponentGroups_csv_i"), "featureQCGroups", false));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("quantitationMethods_csv_i"), "quantitationMethods", false));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("standardsConcentrations_csv_i"), "standardsConcentrations", false));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.getFullPathName("referenceData_csv_i"), "referenceData", false));
-
+    is_valid.push_back(InputDataValidation::processorInputAreReady(*this, "sequence", filenames, true));
+    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadParameters(), "parameters", filenames, true));
+    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadTransitions(), "traml", filenames, true));
+    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadFeatureFilters(), "featureFilter", filenames, false));
+    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadFeatureQCs(), "featureQC", filenames, false));
+    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadQuantitationMethods(), "quantitationMethods", filenames, false));
+    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadStandardsConcentrations(), "standardsConcentrations", filenames, false));
+    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadValidationData(), "referenceData", filenames, false));
     std::cout << "\n\n";
 
     const bool requiredPathnamesAreValidBool = requiredPathnamesAreValid(is_valid);
