@@ -140,6 +140,7 @@ namespace SmartPeak
   void CreateSequence::process()
   {
     LOGD << "START createSequence";
+    filenames_ = prepareFileNames(filenames_);
 
     SequenceParser::readSequenceFile(*sequenceHandler_IO, filenames_.getFullPathName("sequence_csv_i"), delimiter);
     if (sequenceHandler_IO->getSequence().empty()) {
@@ -150,7 +151,6 @@ namespace SmartPeak
 
     // load workflow
     LoadWorkflow loadWorkflow(*sequenceHandler_IO);
-    loadWorkflow.getInputsOutputs(filenames_);
     loadWorkflow.filename_ = filenames_.getFullPathName("workflow_csv_i");
     loadWorkflow.process();
 

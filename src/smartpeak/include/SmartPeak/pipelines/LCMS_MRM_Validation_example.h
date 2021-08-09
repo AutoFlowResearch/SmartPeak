@@ -52,13 +52,16 @@ void example_LCMS_MRM_Validation(
     std::make_shared<ValidateFeatures>()
   };
 
+  Filenames methods_filenames;
+  methods_filenames.setRootPaths(dir_I,
+    dir_I + "/mzML/",
+    dir_I + "/features/",
+    dir_I + "/features/");
   std::map<std::string, Filenames> dynamic_filenames;
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
-    dynamic_filenames[key] = Filenames::setFileVariants(
-      dir_I + "/mzML/",
-      dir_I + "/features/",
-      dir_I + "/features/",
+    dynamic_filenames1[key] = methods_filenames;
+    dynamic_filenames1[key].setFileVariants(
       injection.getMetaData().getSampleName(),
       key
     );

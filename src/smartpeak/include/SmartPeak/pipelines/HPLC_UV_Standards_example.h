@@ -55,15 +55,15 @@ void example_HPLC_UV_Standards(
     std::make_shared<StoreFeatures>()
   };
 
-  Filenames methods_filenames1;
-  methods_filenames1.setRootPaths(dir_I,
+  Filenames methods_filenames;
+  methods_filenames.setRootPaths(dir_I,
     dir_I + "/mzML/",
     dir_I + "/features/",
     dir_I + "/features/");
   std::map<std::string, Filenames> dynamic_filenames1;
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
-    dynamic_filenames1[key] = methods_filenames1;
+    dynamic_filenames1[key] = methods_filenames;
     dynamic_filenames1[key].setFileVariants(
       injection.getMetaData().getFilename(),
       key,
@@ -84,21 +84,17 @@ void example_HPLC_UV_Standards(
   };
 
   std::map<std::string, Filenames> dynamic_filenames2;
-  /*
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string& key = sequence_segment.getSequenceSegmentName();
-    dynamic_filenames2[key] = Filenames::getDefaultDynamicFilenames(
-      dir_I,
-      dir_I + "/mzML/",
-      dir_I + "/features/",
-      dir_I + "/features/",
+    dynamic_filenames2[key] = methods_filenames;
+    dynamic_filenames2[key].setFileVariants(
       "",
       key,
       key,
-      "",""
+      "",
+      ""
     );
   }
-  */
 
   ProcessSequenceSegments pss(sequenceHandler);
   pss.filenames_                             = dynamic_filenames2;
@@ -112,14 +108,10 @@ void example_HPLC_UV_Standards(
   };
 
   std::map<std::string, Filenames> dynamic_filenames3;
-  /*
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
-    dynamic_filenames3[key] = Filenames::getDefaultDynamicFilenames(
-      dir_I,
-      dir_I + "/mzML/",
-      dir_I + "/features/",
-      dir_I + "/features/",
+    dynamic_filenames3[key] = methods_filenames;
+    dynamic_filenames3[key].setFileVariants(
       injection.getMetaData().getFilename(),
       key,
       key,
@@ -127,7 +119,6 @@ void example_HPLC_UV_Standards(
       injection.getMetaData().getSampleGroupName()
     );
   }
-  */
 
   ps.filenames_                     = dynamic_filenames3;
   ps.raw_data_processing_methods_ = raw_data_processing_methods;

@@ -109,7 +109,7 @@ namespace SmartPeak
       }
     };
 
-    std::string           sequence_pathname_;
+    std::filesystem::path sequence_pathname_;
     std::filesystem::path main_dir_                = ".";
     std::filesystem::path mzML_dir_;
     std::filesystem::path features_in_dir_;

@@ -118,7 +118,7 @@ namespace SmartPeak
     }
   }
 
-  void Filenames::setFullPathName(const std::string& id, const std::string& full_path)
+  void Filenames::setFullPathName(const std::string& id, const std::filesystem::path& full_path)
   {
     if (file_names_.find(id) == file_names_.end())
     {

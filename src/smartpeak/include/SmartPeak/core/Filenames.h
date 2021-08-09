@@ -61,7 +61,7 @@ public:
 
     void addFileName(const std::string& id, const std::string& default_name, FileScope file_scope);
     std::string getFullPathName(const std::string& id) const;
-    void setFullPathName(const std::string& id, const std::string& full_path);
+    void setFullPathName(const std::string& id, const std::filesystem::path& full_path);
     void merge(const Filenames& other);
 
   protected:
