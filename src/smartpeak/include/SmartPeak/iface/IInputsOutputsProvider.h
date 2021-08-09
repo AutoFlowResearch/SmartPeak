@@ -35,5 +35,12 @@ namespace SmartPeak
       name
     */
     virtual void getInputsOutputs(Filenames& filenames) const = 0;
+
+    virtual Filenames prepareFileNames(const Filenames& filenames_override) const
+    {
+      Filenames prepared_filenames(filenames_override);
+      getInputsOutputs(prepared_filenames);
+      return prepared_filenames;
+    }
   };
 }

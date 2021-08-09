@@ -64,10 +64,11 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START optimizeCalibrationCurves";
+    Filenames filenames = prepareFileNames(filenames_override);
 
     std::vector<size_t> standards_indices;
     // get all standards
@@ -179,10 +180,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START loadStandardsConcentrations";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("standardsConcentrations_csv_i");
 
     if (filenames.getFullPathName("standardsConcentrations_csv_i").empty()) {
@@ -240,10 +243,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START loadQuantitationMethods";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("quantitationMethods_csv_i");
 
     if (filenames.getFullPathName("quantitationMethods_csv_i").empty()) {
@@ -285,10 +290,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START storeQuantitationMethods";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Storing: " << filenames.getFullPathName("quantitationMethods_csv_o");
 
     if (filenames.getFullPathName("quantitationMethods_csv_o").empty()) {
@@ -345,10 +352,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START loadFeatureFilter";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("featureFilterComponents_csv_i") << " and " <<
       filenames.getFullPathName("featureFilterComponentGroups_csv_i");
 
@@ -428,10 +437,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START loadFeatureQC";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("featureQCComponents_csv_i") << " and " <<
       filenames.getFullPathName("featureQCComponentGroups_csv_i");
 
@@ -492,10 +503,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START storeFeatureFilter";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Storing: " << filenames.getFullPathName("featureFilterComponents_csv_o") << " and " <<
       filenames.getFullPathName("featureFilterComponentGroups_csv_o");
 
@@ -538,10 +551,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START storeFeatureQC";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("featureQCComponents_csv_o") << " and " <<
       filenames.getFullPathName("featureQCComponentGroups_csv_o");
 
@@ -609,10 +624,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START loadFeatureRSDFilter";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("featureRSDFilterComponents_csv_i") << " and " <<
       filenames.getFullPathName("featureRSDFilterComponentGroups_csv_i");
 
@@ -698,10 +715,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START loadFeatureRSDQC";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("featureRSDQCComponents_csv_i") << " and " <<
       filenames.getFullPathName("featureRSDQCComponentGroups_csv_i");
 
@@ -762,10 +781,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START storeFeatureRSDFilter";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Storing: " << filenames.getFullPathName("featureRSDFilterComponents_csv_o") << " and " <<
       filenames.getFullPathName("featureRSDFilterComponentGroups_csv_o");
 
@@ -808,10 +829,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START storeFeatureRSDQC";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("featureRSDQCComponents_csv_o") << " and " <<
       filenames.getFullPathName("featureRSDQCComponentGroups_csv_o");
 
@@ -879,10 +902,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START loadFeatureBackgroundFilter";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("featureBackgroundFilterComponents_csv_i") << " and " <<
       filenames.getFullPathName("featureBackgroundFilterComponentGroups_csv_i");
 
@@ -968,10 +993,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START loadFeatureBackgroundQC";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("featureBackgroundQCComponents_csv_i") << " and " <<
       filenames.getFullPathName("featureBackgroundQCComponentGroups_csv_i");
 
@@ -1032,10 +1059,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START storeFeatureBackgroundFilter";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Storing: " << filenames.getFullPathName("featureBackgroundFilterComponents_csv_o") << " and " <<
       filenames.getFullPathName("featureBackgroundFilterComponentGroups_csv_o");
 
@@ -1078,10 +1107,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START storeFeatureBackgroundQC";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("featureBackgroundQCComponents_csv_o") << " and " <<
       filenames.getFullPathName("featureBackgroundQCComponentGroups_csv_o");
 
@@ -1118,10 +1149,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START estimateFeatureFilterValues";
+    Filenames filenames = prepareFileNames(filenames_override);
+
 
     std::vector<size_t> standards_indices, qcs_indices;
 
@@ -1177,10 +1210,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START estimateFeatureQCValues";
+    Filenames filenames = prepareFileNames(filenames_override);
+
 
     std::vector<size_t> standards_indices, qcs_indices;
 
@@ -1236,10 +1271,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START TransferLOQToFeatureFilters";
+    Filenames filenames = prepareFileNames(filenames_override);
+
 
     // check if there are any quantitation methods
     if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
@@ -1266,10 +1303,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START TransferLOQToFeatureQCs";
+    Filenames filenames = prepareFileNames(filenames_override);
+
 
     // check if there are any quantitation methods
     if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
@@ -1296,10 +1335,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START EstimateFeatureRSDs";
+    Filenames filenames = prepareFileNames(filenames_override);
+
 
     // get all QCs
     std::vector<size_t> qcs_indices;
@@ -1343,10 +1384,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START EstimateFeatureBackgroundInterferences";
+    Filenames filenames = prepareFileNames(filenames_override);
+
 
     // get all Blanks
     std::vector<size_t> blanks_indices;
@@ -1398,10 +1441,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START loadFeatureRSDEstimation";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("featureRSDEstimationComponents_csv_i") << " and " <<
       filenames.getFullPathName("featureRSDEstimationComponentGroups_csv_i");
 
@@ -1461,10 +1506,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START storeFeatureRSDEstimation";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Storing: " << filenames.getFullPathName("featureRSDEstimationComponents_csv_o") << " and " <<
       filenames.getFullPathName("featureRSDEstimationComponentGroups_csv_o");
 
@@ -1507,10 +1554,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START loadFeatureBackgroundEstimation";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Loading: " << filenames.getFullPathName("featureBackgroundEstimationComponents_csv_i") << " and " <<
       filenames.getFullPathName("featureBackgroundEstimationComponentGroups_csv_i");
 
@@ -1570,10 +1619,12 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START storeFeatureBackgroundEstimation";
+    Filenames filenames = prepareFileNames(filenames_override);
+
     LOGI << "Storing: " << filenames.getFullPathName("featureBackgroundEstimationComponents_csv_o") << " and " <<
       filenames.getFullPathName("featureBackgroundEstimationComponentGroups_csv_o");
 

@@ -104,7 +104,7 @@ namespace SmartPeak
   */
   void processInjection(
     InjectionHandler& injection,
-    const Filenames& filenames,
+    const Filenames& filenames_override,
     const std::vector<std::shared_ptr<RawDataProcessor>>& methods
   );
 

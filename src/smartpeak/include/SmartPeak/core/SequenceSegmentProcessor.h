@@ -54,7 +54,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const = 0;
 
     /**
@@ -101,7 +101,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
   };
 
@@ -125,7 +125,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -152,7 +152,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -174,7 +174,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -203,7 +203,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
   };
 
@@ -229,7 +229,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
   };
 
@@ -247,7 +247,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -268,7 +268,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -297,7 +297,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -326,7 +326,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -347,7 +347,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -368,7 +368,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -397,7 +397,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -426,7 +426,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -447,7 +447,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -468,7 +468,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -492,7 +492,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
   };
 
@@ -513,7 +513,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
   };
 
@@ -532,7 +532,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
   };
 
@@ -551,7 +551,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
   };
 
@@ -572,7 +572,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
   };
 
@@ -591,7 +591,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
   };
 
@@ -610,7 +610,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -631,7 +631,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -652,7 +652,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */
@@ -673,7 +673,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_override
     ) const override;
 
     /* IInputsOutputsProvider */

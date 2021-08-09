@@ -55,10 +55,11 @@ namespace SmartPeak
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START SelectDilutionsParser";
+    Filenames filenames = prepareFileNames(filenames_override);
 
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
@@ -194,10 +195,11 @@ namespace SmartPeak
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_override
   ) const
   {
     LOGD << "START MergeInjections";
+    Filenames filenames = prepareFileNames(filenames_override);
 
     // Check the parameters
     if (params_I.at("MergeInjections").empty() && params_I.at("MergeInjections").empty()) {
@@ -695,9 +697,14 @@ namespace SmartPeak
     filenames.addFileName("featureXMLSampleGroup_i", ".featureXML", Filenames::FileScope::EFileScopeSampleGroupInput);
   };
 
-  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
+  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    const Filenames& filenames_override
+  ) const
   {
     LOGD << "START LoadFeaturesSampleGroup";
+    Filenames filenames = prepareFileNames(filenames_override);
     LOGI << "Loading: " << filenames.getFullPathName("featureXMLSampleGroup_i");
 
     if (filenames.getFullPathName("featureXMLSampleGroup_i").empty()) {
@@ -735,9 +742,14 @@ namespace SmartPeak
     filenames.addFileName("featureXMLSampleGroup_o", ".featureXML", Filenames::FileScope::EFileScopeSampleGroupOutput);
   };
 
-  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
+  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    const Filenames& filenames_override
+  ) const
   {
     LOGD << "START storeFeaturesSampleGroup";
+    Filenames filenames = prepareFileNames(filenames_override);
     LOGI << "Storing: " << filenames.getFullPathName("featureXMLSampleGroup_o");
 
     if (filenames.getFullPathName("featureXMLSampleGroup_o").empty()) {
