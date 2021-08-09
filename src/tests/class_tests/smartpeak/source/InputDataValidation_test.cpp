@@ -97,6 +97,7 @@ TEST(InputDataValidation, sampleNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
+  filenames.setRootPaths(main_dir, "", "", "");
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -123,6 +124,7 @@ TEST(InputDataValidation, componentNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
+  filenames.setRootPaths(main_dir, "", "", "");
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -149,6 +151,7 @@ TEST(InputDataValidation, componentNameGroupsAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
+  filenames.setRootPaths(main_dir, "", "", "");
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -175,6 +178,7 @@ TEST(InputDataValidation, heavyComponentsAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
+  filenames.setRootPaths(main_dir, "", "", "");
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;

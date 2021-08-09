@@ -34,7 +34,7 @@ struct TaskFixture : public ::testing::Test
     /* ctor/dtor */
     TaskFixture() 
     {
-        std::string seq = std::string{SMARTPEAK_GET_TEST_DATA_PATH("/SequenceProcessor_sequence.csv")};
+        std::string seq = std::string{SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_sequence.csv")};
         m_args = std::vector<std::string>{
             "Task_test", 
                 "--report", "featureDB", "pivottable",

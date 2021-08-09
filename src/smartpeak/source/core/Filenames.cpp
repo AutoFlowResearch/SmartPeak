@@ -140,8 +140,12 @@ namespace SmartPeak
       if (!filename.file_variant_.empty())
       {
         filename.full_path_ /= filename.file_variant_;
+        filename.full_path_ += filename.default_name_;
       }
-      filename.full_path_ += filename.default_name_;
+      else
+      {
+        filename.full_path_ /= filename.default_name_;
+      }
     }
   }
 

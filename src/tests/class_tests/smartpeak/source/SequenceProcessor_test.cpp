@@ -62,7 +62,8 @@ TEST(SequenceHandler, createSequence_onFilePicked)
   CreateSequence cs(sequenceHandler);
   std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
-  Filenames filenames_ = generateTestFilenames();
+  Filenames filenames_;
+  filenames_.setFullPathName("sequence_csv_i", workflow / "sequence.csv");
   cs.onFilePicked(filenames_.getFullPathName("sequence_csv_i"), &ah);
 
   ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
@@ -84,7 +85,8 @@ TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
   CreateSequence cs(sequenceHandler);
   std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
-  Filenames filenames_ = generateTestFilenames();
+  Filenames filenames_;
+  filenames_.setFullPathName("sequence_csv_i", workflow / "sequence.csv");
   std::string full_name = filenames_.getFullPathName("sequence_csv_i");
   // replace separators (this way of specifying filename can happen with command line interface actually)
   std::replace(full_name.begin(), full_name.end(), '/', '\\');
