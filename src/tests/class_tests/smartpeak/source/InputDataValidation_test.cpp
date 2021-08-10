@@ -202,3 +202,41 @@ TEST(InputDataValidation, heavyComponentsAreConsistent)
   result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
   EXPECT_FALSE(result); // g6p.g6p_2.Heavy is missing
 }
+
+TEST(InputDataValidation, prepareToLoad)
+{
+  Filenames filenames;
+  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("non_existing_file", main_dir + "/non_existing_file.csv");
+  EXPECT_TRUE(InputDataValidation::prepareToLoad(filenames, "quantitationMethods_csv_i"));
+  EXPECT_FALSE(InputDataValidation::prepareToLoad(filenames, "non_existing_file"));
+}
+
+TEST(InputDataValidation, prepareToLoadOneOfTwo)
+{
+  Filenames filenames;
+  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("empty_file", "");
+  filenames.setFullPath("another_empty_file", "");
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "quantitationMethods_csv_i", "empty_file"));
+  EXPECT_FALSE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "empty_file", "another_empty_file"));
+}
+
+TEST(InputDataValidation, prepareToStore)
+{
+  Filenames filenames;
+  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("empty_file", "");
+  EXPECT_TRUE(InputDataValidation::prepareToStore(filenames, "quantitationMethods_csv_i"));
+  EXPECT_FALSE(InputDataValidation::prepareToStore(filenames, "empty_file"));
+}
+
+TEST(InputDataValidation, prepareToStoreOneOfTwo)
+{
+  Filenames filenames;
+  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("empty_file", "");
+  filenames.setFullPath("another_empty_file", "");
+  EXPECT_TRUE(InputDataValidation::prepareToStoreOneOfTwo(filenames, "quantitationMethods_csv_i", "empty_file"));
+  EXPECT_FALSE(InputDataValidation::prepareToStoreOneOfTwo(filenames, "empty_file", "another_empty_file"));
+}
