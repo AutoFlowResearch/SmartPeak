@@ -12,9 +12,9 @@ using namespace std;
 void test_main_FIAMS_FullScan_Unknown()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns");
-  Filenames static_filenames;
+  Filenames filenames_main;
 
-  example_FIAMS_FullScan_Unknowns(main_dir, static_filenames, ",");
+  example_FIAMS_FullScan_Unknowns(main_dir, filenames_main, ",");
 
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;

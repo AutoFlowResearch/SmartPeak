@@ -12,9 +12,9 @@ using namespace std;
 void test_main_HPLC_UV_Standards()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards");
-  Filenames static_filenames;
+  Filenames filenames_main;
 
-  example_HPLC_UV_Standards(main_dir, static_filenames, ",");
+  example_HPLC_UV_Standards(main_dir, filenames_main, ",");
 
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;

@@ -12,9 +12,9 @@ using namespace std;
 void test_main_GCMS_FullScan_Unknown()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_FullScan_Unknowns");
-  Filenames static_filenames;
+  Filenames filenames_main;
 
-  example_LCMS_MRM_Unknowns(main_dir, static_filenames, ",");
+  example_LCMS_MRM_Unknowns(main_dir, filenames_main, ",");
 
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;

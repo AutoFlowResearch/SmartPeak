@@ -31,14 +31,14 @@ using namespace SmartPeak;
 
 void example_LCMS_MRM_Validation(
   const std::string& dir_I,
-  const Filenames& static_filenames,
+  const Filenames& filenames,
   const std::string& delimiter_I = ","
 )
 {
   SequenceHandler sequenceHandler;
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames_        = static_filenames;
+  cs.filenames_        = filenames;
   cs.delimiter        = delimiter_I;
   cs.checkConsistency = true;
   cs.process();
@@ -74,14 +74,14 @@ void example_LCMS_MRM_Validation(
 
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,
-    static_filenames.pivotTable_csv_o,
+    filenames.pivotTable_csv_o,
     {FeatureMetadata::accuracy, FeatureMetadata::n_features},
     {SampleType::Unknown}
   );
 
   SequenceParser::writeDataTableFromMetaValue(
     sequenceHandler,
-    static_filenames.featureDB_csv_o,
+    filenames.featureDB_csv_o,
     {
       FeatureMetadata::peak_apex_intensity,
       FeatureMetadata::total_width,
