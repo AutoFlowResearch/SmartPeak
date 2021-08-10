@@ -263,7 +263,7 @@ int main(int argc, char** argv)
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   char filename[128];
-  strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
+  strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.log", std::localtime(&t));
 
   auto logfilepath = std::filesystem::path{};
   auto logdirpath = std::string{};
