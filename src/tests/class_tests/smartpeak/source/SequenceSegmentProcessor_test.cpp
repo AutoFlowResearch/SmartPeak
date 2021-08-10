@@ -728,7 +728,7 @@ TEST(SequenceSegmentProcessor, gettersLoadStandardsConcentrations)
 TEST(SequenceSegmentProcessor, processLoadStandardsConcentrations)
 {
   Filenames filenames;
-  filenames.setFullPathName("standardsConcentrations_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv"));
+  filenames.setFullPath("standardsConcentrations_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv"));
   SequenceSegmentHandler ssh;
   LoadStandardsConcentrations loadStandardsConcentrations;
   loadStandardsConcentrations.process(ssh, SequenceHandler(), {}, filenames);
@@ -789,7 +789,7 @@ TEST(SequenceSegmentProcessor, gettersLoadQuantitationMethods)
 TEST(SequenceSegmentProcessor, processLoadQuantitationMethods)
 {
   Filenames filenames;
-  filenames.setFullPathName("quantitationMethods_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv"));
+  filenames.setFullPath("quantitationMethods_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv"));
   SequenceSegmentHandler ssh;
   LoadQuantitationMethods loadQuantitationMethods;
   loadQuantitationMethods.process(ssh, SequenceHandler(), {}, filenames);
@@ -888,8 +888,8 @@ TEST(SequenceSegmentProcessor, processLoadFeatureFilters)
   SequenceSegmentHandler ssh;
 
   Filenames filenames;
-  filenames.setFullPathName("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
 
   LoadFeatureFilters loadFeatureFilters;
   loadFeatureFilters.process(ssh, SequenceHandler(), {}, filenames);
@@ -931,8 +931,8 @@ TEST(SequenceSegmentProcessor, processLoadFeatureQCs)
   SequenceSegmentHandler ssh;
 
   Filenames filenames;
-  filenames.setFullPathName("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
 
   LoadFeatureQCs loadFeatureQCs;
   loadFeatureQCs.process(ssh, SequenceHandler(), {}, filenames);
@@ -974,12 +974,12 @@ TEST(SequenceSegmentProcessor, processStoreFeatureFilters)
   SequenceSegmentHandler ssh, ssh_test;
 
   Filenames filenames;
-  filenames.setFullPathName("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureFilters loadFeatureFilters;
   loadFeatureFilters.process(ssh, SequenceHandler(), {}, filenames);
-  filenames.setFullPathName("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
-  filenames.setFullPathName("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
+  filenames.setFullPath("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
+  filenames.setFullPath("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
   StoreFeatureFilters storeFeatureFilters;
   storeFeatureFilters.process(ssh, SequenceHandler(), {}, filenames);
   loadFeatureFilters.process(ssh_test, SequenceHandler(), {}, filenames);
@@ -1026,12 +1026,12 @@ TEST(SequenceSegmentProcessor, processStoreFeatureQCs)
   SequenceSegmentHandler ssh, ssh_test;
 
   Filenames filenames;
-  filenames.setFullPathName("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureQCs loadFeatureQCs;
   loadFeatureQCs.process(ssh, SequenceHandler(), {}, filenames);
-  filenames.setFullPathName("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
-  filenames.setFullPathName("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
+  filenames.setFullPath("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
+  filenames.setFullPath("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
   StoreFeatureQCs storeFeatureQCs;
   storeFeatureQCs.process(ssh, SequenceHandler(), {}, filenames);
   loadFeatureQCs.process(ssh_test, SequenceHandler(), {}, filenames);
@@ -1078,8 +1078,8 @@ TEST(SequenceSegmentProcessor, processLoadFeatureRSDFilters)
   SequenceSegmentHandler ssh;
 
   Filenames filenames;
-  filenames.setFullPathName("featureRSDFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureRSDFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureRSDFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureRSDFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
 
   LoadFeatureRSDFilters loadFeatureRSDFilters;
   loadFeatureRSDFilters.process(ssh, SequenceHandler(), {}, filenames);
@@ -1121,8 +1121,8 @@ TEST(SequenceSegmentProcessor, processLoadFeatureRSDQCs)
   SequenceSegmentHandler ssh;
 
   Filenames filenames;
-  filenames.setFullPathName("featureRSDQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureRSDQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureRSDQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureRSDQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
 
   LoadFeatureRSDQCs loadFeatureRSDQCs;
   loadFeatureRSDQCs.process(ssh, SequenceHandler(), {}, filenames);
@@ -1164,12 +1164,12 @@ TEST(SequenceSegmentProcessor, processStoreFeatureRSDFilters)
   SequenceSegmentHandler ssh, ssh_test;
 
   Filenames filenames;
-  filenames.setFullPathName("featureRSDFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureRSDFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureRSDFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureRSDFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureRSDFilters loadFeatureRSDFilters;
   loadFeatureRSDFilters.process(ssh, SequenceHandler(), {}, filenames);
-  filenames.setFullPathName("featureRSDFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
-  filenames.setFullPathName("featureRSDFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
+  filenames.setFullPath("featureRSDFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
+  filenames.setFullPath("featureRSDFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
   StoreFeatureRSDFilters storeFeatureRSDFilters;
   storeFeatureRSDFilters.process(ssh, SequenceHandler(), {}, filenames);
   loadFeatureRSDFilters.process(ssh_test, SequenceHandler(), {}, filenames);
@@ -1216,12 +1216,12 @@ TEST(SequenceSegmentProcessor, processStoreFeatureRSDQCs)
   SequenceSegmentHandler ssh, ssh_test;
 
   Filenames filenames;
-  filenames.setFullPathName("featureRSDQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureRSDQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureRSDQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureRSDQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureRSDQCs loadFeatureRSDQCs;
   loadFeatureRSDQCs.process(ssh, SequenceHandler(), {}, filenames);
-  filenames.setFullPathName("featureRSDQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
-  filenames.setFullPathName("featureRSDQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
+  filenames.setFullPath("featureRSDQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
+  filenames.setFullPath("featureRSDQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
   StoreFeatureRSDQCs storeFeatureRSDQCs;
   storeFeatureRSDQCs.process(ssh, SequenceHandler(), {}, filenames);
   loadFeatureRSDQCs.process(ssh_test, SequenceHandler(), {}, filenames);
@@ -1268,8 +1268,8 @@ TEST(SequenceSegmentProcessor, processLoadFeatureBackgroundFilters)
   SequenceSegmentHandler ssh;
 
   Filenames filenames;
-  filenames.setFullPathName("featureBackgroundFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureBackgroundFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureBackgroundFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureBackgroundFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
 
   LoadFeatureBackgroundFilters loadFeatureBackgroundFilters;
   loadFeatureBackgroundFilters.process(ssh, SequenceHandler(), {}, filenames);
@@ -1311,8 +1311,8 @@ TEST(SequenceSegmentProcessor, processLoadFeatureBackgroundQCs)
   SequenceSegmentHandler ssh;
 
   Filenames filenames;
-  filenames.setFullPathName("featureBackgroundQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureBackgroundQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureBackgroundQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureBackgroundQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
 
   LoadFeatureBackgroundQCs loadFeatureBackgroundQCs;
   loadFeatureBackgroundQCs.process(ssh, SequenceHandler(), {}, filenames);
@@ -1354,12 +1354,12 @@ TEST(SequenceSegmentProcessor, processStoreFeatureBackgroundFilters)
   SequenceSegmentHandler ssh, ssh_test;
 
   Filenames filenames;
-  filenames.setFullPathName("featureBackgroundFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureBackgroundFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureBackgroundFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureBackgroundFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureBackgroundFilters loadFeatureBackgroundFilters;
   loadFeatureBackgroundFilters.process(ssh, SequenceHandler(), {}, filenames);
-  filenames.setFullPathName("featureBackgroundFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
-  filenames.setFullPathName("featureBackgroundFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
+  filenames.setFullPath("featureBackgroundFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
+  filenames.setFullPath("featureBackgroundFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
   StoreFeatureBackgroundFilters storeFeatureBackgroundFilters;
   storeFeatureBackgroundFilters.process(ssh, SequenceHandler(), {}, filenames);
   loadFeatureBackgroundFilters.process(ssh_test, SequenceHandler(), {}, filenames);
@@ -1406,12 +1406,12 @@ TEST(SequenceSegmentProcessor, processStoreFeatureBackgroundQCs)
   SequenceSegmentHandler ssh, ssh_test;
 
   Filenames filenames;
-  filenames.setFullPathName("featureBackgroundQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureBackgroundQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureBackgroundQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureBackgroundQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureBackgroundQCs loadFeatureBackgroundQCs;
   loadFeatureBackgroundQCs.process(ssh, SequenceHandler(), {}, filenames);
-  filenames.setFullPathName("featureBackgroundQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
-  filenames.setFullPathName("featureBackgroundQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
+  filenames.setFullPath("featureBackgroundQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
+  filenames.setFullPath("featureBackgroundQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
   StoreFeatureBackgroundQCs storeFeatureBackgroundQCs;
   storeFeatureBackgroundQCs.process(ssh, SequenceHandler(), {}, filenames);
   loadFeatureBackgroundQCs.process(ssh_test, SequenceHandler(), {}, filenames);
@@ -2460,12 +2460,12 @@ TEST(SequenceSegmentProcessor, processStoreFeatureRSDEstimations)
   SequenceSegmentHandler ssh, ssh_test;
 
   Filenames filenames;
-  filenames.setFullPathName("featureRSDEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureRSDEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureRSDEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureRSDEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureRSDEstimations loadFeatureRSDEstimations;
   loadFeatureRSDEstimations.process(ssh, SequenceHandler(), {}, filenames);
-  filenames.setFullPathName("featureRSDEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
-  filenames.setFullPathName("featureRSDEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
+  filenames.setFullPath("featureRSDEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
+  filenames.setFullPath("featureRSDEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
   StoreFeatureRSDEstimations storeFeatureRSDEstimations;
   storeFeatureRSDEstimations.process(ssh, SequenceHandler(), {}, filenames);
   loadFeatureRSDEstimations.process(ssh_test, SequenceHandler(), {}, filenames);
@@ -2512,12 +2512,12 @@ TEST(SequenceSegmentProcessor, processStoreFeatureBackgroundEstimations)
   SequenceSegmentHandler ssh, ssh_test;
 
   Filenames filenames;
-  filenames.setFullPathName("featureBackgroundEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureBackgroundEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureBackgroundEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureBackgroundEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureBackgroundEstimations loadFeatureBackgroundEstimations;
   loadFeatureBackgroundEstimations.process(ssh, SequenceHandler(), {}, filenames);
-  filenames.setFullPathName("featureBackgroundEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
-  filenames.setFullPathName("featureBackgroundEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
+  filenames.setFullPath("featureBackgroundEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
+  filenames.setFullPath("featureBackgroundEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
   StoreFeatureBackgroundEstimations storeFeatureBackgroundEstimations;
   storeFeatureBackgroundEstimations.process(ssh, SequenceHandler(), {}, filenames);
   loadFeatureBackgroundEstimations.process(ssh_test, SequenceHandler(), {}, filenames);
@@ -2564,8 +2564,8 @@ TEST(SequenceSegmentProcessor, processLoadFeatureRSDEstimations)
   SequenceSegmentHandler ssh;
 
   Filenames filenames;
-  filenames.setFullPathName("featureRSDEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureRSDEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureRSDEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureRSDEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
 
   LoadFeatureRSDEstimations loadFeatureRSDEstimations;
   loadFeatureRSDEstimations.process(ssh, SequenceHandler(), {}, filenames);
@@ -2608,8 +2608,8 @@ TEST(SequenceSegmentProcessor, processLoadFeatureBackgroundEstimations)
   SequenceSegmentHandler ssh;
 
   Filenames filenames;
-  filenames.setFullPathName("featureBackgroundEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPathName("featureBackgroundEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureBackgroundEstimationComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureBackgroundEstimationComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
 
   LoadFeatureBackgroundEstimations loadFeatureBackgroundEstimations;
   loadFeatureBackgroundEstimations.process(ssh, SequenceHandler(), {}, filenames);

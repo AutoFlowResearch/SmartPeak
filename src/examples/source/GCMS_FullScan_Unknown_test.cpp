@@ -20,13 +20,13 @@ void test_main_GCMS_FullScan_Unknown()
   LoadFeatures loadFeatures;
   Filenames filenames;
 
-  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_FullScan_Unknowns/features/GCMS_FullScan_1_BatchName_1900-01-01_000000.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_FullScan_Unknowns/features/GCMS_FullScan_1_BatchName_1900-01-01_000000.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   rawDataHandler.clear();
 
-  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_FullScan_Unknowns/features/GCMS_FullScan_test.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("GCMS_FullScan_Unknowns/features/GCMS_FullScan_test.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 

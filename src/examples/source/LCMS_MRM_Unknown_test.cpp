@@ -21,19 +21,19 @@ void test_main_LCMS_MRM_Unknown()
   LoadParameters loadParameters;
   Filenames filenames;
 
-  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_1_BatchName_1900-01-01_000000.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_1_BatchName_1900-01-01_000000.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   rawDataHandler.clear();
 
-  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_test.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/features/170808_Jonathan_yeast_Sacc1_1x_test.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
   
   rawDataHandler.clear();
   
-  filenames.setFullPathName("parameters_csv_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/parameters.csv"));
+  filenames.setFullPath("parameters_csv_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns/parameters.csv"));
   loadParameters.process(rawDataHandler,{}, filenames);
   
   ParameterSet* params;

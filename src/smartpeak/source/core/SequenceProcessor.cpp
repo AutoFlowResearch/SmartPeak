@@ -61,7 +61,7 @@ namespace SmartPeak
   {
     application_handler->main_dir_ = std::filesystem::path(application_handler->sequence_pathname_).remove_filename().generic_string();
     filenames.setRootPaths(application_handler->main_dir_, "", "", "");
-    filenames.setFullPathName("sequence_csv_i", application_handler->sequence_pathname_);
+    filenames.setFullPath("sequence_csv_i", application_handler->sequence_pathname_);
 
     LOGN << "\n\n"
       "The following list of file was searched for:\n";
@@ -133,7 +133,7 @@ namespace SmartPeak
     LOGD << "START createSequence";
     filenames_ = prepareFileNames(filenames_);
 
-    SequenceParser::readSequenceFile(*sequenceHandler_IO, filenames_.getFullPathName("sequence_csv_i"), delimiter);
+    SequenceParser::readSequenceFile(*sequenceHandler_IO, filenames_.getFullPath("sequence_csv_i"), delimiter);
     if (sequenceHandler_IO->getSequence().empty()) {
       LOGE << "Empty sequence. Returning";
       LOGD << "END createSequence";
@@ -142,7 +142,7 @@ namespace SmartPeak
 
     // load workflow
     LoadWorkflow loadWorkflow(*sequenceHandler_IO);
-    loadWorkflow.filename_ = filenames_.getFullPathName("workflow_csv_i");
+    loadWorkflow.filename_ = filenames_.getFullPath("workflow_csv_i");
     loadWorkflow.process();
 
     // TODO: Given that the raw data is shared between all injections, it could

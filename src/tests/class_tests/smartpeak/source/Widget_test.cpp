@@ -67,7 +67,7 @@ void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
     metaDataHandler.scan_mass_low = 60;
 
     SmartPeak::Filenames filenames;
-    filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML"));
+    filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML"));
     SmartPeak::RawDataHandler rawDataHandler;
     SmartPeak::LoadFeatures loadFeatures;
     loadFeatures.process(rawDataHandler, {}, filenames);

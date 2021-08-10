@@ -112,7 +112,7 @@ TEST(InputDataValidation, sampleNamesAreConsistent)
   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.setFullPathName("sequence_csv_i", main_dir + "/sequence_missing.csv");
+  filenames.setFullPath("sequence_csv_i", main_dir + "/sequence_missing.csv");
   sequenceHandler.clear();
 
   cs.filenames_ = filenames;
@@ -139,7 +139,7 @@ TEST(InputDataValidation, componentNamesAreConsistent)
   result = InputDataValidation::componentNamesAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.setFullPathName("traML_csv_i", main_dir + "/traML_missing.csv");
+  filenames.setFullPath("traML_csv_i", main_dir + "/traML_missing.csv");
   // SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   RawDataHandler& rawData0 = sequenceHandler.getSequence().front().getRawData();
   LoadTransitions loadTransitions;
@@ -166,7 +166,7 @@ TEST(InputDataValidation, componentNameGroupsAreConsistent)
   result = InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.setFullPathName("traML_csv_i", main_dir + "/traML_missing.csv");
+  filenames.setFullPath("traML_csv_i", main_dir + "/traML_missing.csv");
   //SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   RawDataHandler& rawData0 = sequenceHandler.getSequence().front().getRawData();
   LoadTransitions loadTransitions;
@@ -193,7 +193,7 @@ TEST(InputDataValidation, heavyComponentsAreConsistent)
   result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
   EXPECT_TRUE(result);
 
-  filenames.setFullPathName("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
   //SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   SequenceSegmentHandler& seqSeg0 = sequenceHandler.getSequenceSegments().front();
   LoadQuantitationMethods loadQuantitationMethods;

@@ -156,7 +156,7 @@ namespace SmartPeak
 
     // # load chromatograms
     OpenMS::MSExperiment chromatograms;
-    if (filenames.getFullPathName("mzML_i").size()) {
+    if (filenames.getFullPath("mzML_i").size()) {
       if (params_I.at("mzML").size()) {
         // # convert parameters
         std::map<std::string, CastValue> mzML_params;
@@ -167,8 +167,8 @@ namespace SmartPeak
         }
         // Deal with ChromeleonFile format
         if (mzML_params.count("format") && mzML_params.at("format").s_ == "ChromeleonFile") {
-          const size_t pos = filenames.getFullPathName("mzML_i").rfind(".");
-          std::string txt_name = filenames.getFullPathName("mzML_i");
+          const size_t pos = filenames.getFullPath("mzML_i").rfind(".");
+          std::string txt_name = filenames.getFullPath("mzML_i");
           if (pos != std::string::npos) {
             txt_name.replace(txt_name.cbegin() + pos + 1, txt_name.cend(), "txt"); // replace extension
           }
@@ -184,8 +184,8 @@ namespace SmartPeak
         // Deal with .mzXML format
         else if (mzML_params.count("format") && mzML_params.at("format").s_ == "XML") 
         {
-          const size_t pos = filenames.getFullPathName("mzML_i").rfind(".");
-          std::string txt_name = filenames.getFullPathName("mzML_i");
+          const size_t pos = filenames.getFullPath("mzML_i").rfind(".");
+          std::string txt_name = filenames.getFullPath("mzML_i");
           if (pos != std::string::npos) {
             txt_name.replace(txt_name.cbegin() + pos + 1, txt_name.cend(), "xml"); // replace extension
           }
@@ -196,15 +196,15 @@ namespace SmartPeak
         else 
         {
           OpenMS::FileHandler fh;
-          LOGI << "Loading: " << filenames.getFullPathName("mzML_i");
-          fh.loadExperiment(filenames.getFullPathName("mzML_i"), chromatograms);
+          LOGI << "Loading: " << filenames.getFullPath("mzML_i");
+          fh.loadExperiment(filenames.getFullPath("mzML_i"), chromatograms);
         }
       }
       else 
       {
         OpenMS::FileHandler fh;
-        LOGI << "Loading: " << filenames.getFullPathName("mzML_i");
-        fh.loadExperiment(filenames.getFullPathName("mzML_i"), chromatograms); //TODO:try-catch (SIGABRT)
+        LOGI << "Loading: " << filenames.getFullPath("mzML_i");
+        fh.loadExperiment(filenames.getFullPath("mzML_i"), chromatograms); //TODO:try-catch (SIGABRT)
       }
     }
 
@@ -330,9 +330,9 @@ namespace SmartPeak
   {
     LOGD << "START storeMzML";
     Filenames filenames = prepareFileNames(filenames_I);
-    LOGI << "Storing: " << filenames.getFullPathName("mzML_i");
+    LOGI << "Storing: " << filenames.getFullPath("mzML_i");
 
-    if (filenames.getFullPathName("mzML_i").empty()) {
+    if (filenames.getFullPath("mzML_i").empty()) {
       LOGE << "Filename is empty";
       LOGD << "END storeMzML";
       return;
@@ -341,11 +341,11 @@ namespace SmartPeak
     try {
       OpenMS::MzMLFile mzmlfile;
       if (rawDataHandler_IO.getChromatogramMap().size()) {
-        mzmlfile.store(filenames.getFullPathName("mzML_i"), rawDataHandler_IO.getChromatogramMap());
+        mzmlfile.store(filenames.getFullPath("mzML_i"), rawDataHandler_IO.getChromatogramMap());
       }
       else 
       {
-        mzmlfile.store(filenames.getFullPathName("mzML_i"), rawDataHandler_IO.getExperiment());
+        mzmlfile.store(filenames.getFullPath("mzML_i"), rawDataHandler_IO.getExperiment());
       }
     }
     catch (const std::exception& e) {
@@ -368,15 +368,15 @@ namespace SmartPeak
   {
     LOGD << "START LoadFeatures";
     Filenames filenames = prepareFileNames(filenames_I);
-    LOGI << "Loading: " << filenames.getFullPathName("featureXML_i");
+    LOGI << "Loading: " << filenames.getFullPath("featureXML_i");
 
-    if (filenames.getFullPathName("featureXML_i").empty()) {
+    if (filenames.getFullPath("featureXML_i").empty()) {
       LOGE << "Filename is empty";
       LOGD << "END LoadFeatures";
       return;
     }
 
-    if (!InputDataValidation::fileExists(filenames.getFullPathName("featureXML_i"))) {
+    if (!InputDataValidation::fileExists(filenames.getFullPath("featureXML_i"))) {
       LOGE << "File not found";
       LOGD << "END LoadFeatures";
       return;
@@ -384,7 +384,7 @@ namespace SmartPeak
 
     try {
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.load(filenames.getFullPathName("featureXML_i"), rawDataHandler_IO.getFeatureMapHistory());
+      featurexml.load(filenames.getFullPath("featureXML_i"), rawDataHandler_IO.getFeatureMapHistory());
       // NOTE: setPrimaryMSRunPath() is needed for calculate_calibration
       rawDataHandler_IO.getFeatureMapHistory().setPrimaryMSRunPath({ rawDataHandler_IO.getMetaData().getFilename() });
       rawDataHandler_IO.makeFeatureMapFromHistory();
@@ -413,9 +413,9 @@ namespace SmartPeak
   {
     LOGD << "START storeFeatureMap";
     Filenames filenames = prepareFileNames(filenames_I);
-    LOGI << "Storing: " << filenames.getFullPathName("featureXML_o");
+    LOGI << "Storing: " << filenames.getFullPath("featureXML_o");
 
-    if (filenames.getFullPathName("featureXML_o").empty()) {
+    if (filenames.getFullPath("featureXML_o").empty()) {
       LOGE << "Filename is empty";
       LOGD << "END storeFeatureMap";
       return;
@@ -424,7 +424,7 @@ namespace SmartPeak
     try {
       // Store outfile as featureXML
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.store(filenames.getFullPathName("featureXML_o"), rawDataHandler_IO.getFeatureMapHistory());
+      featurexml.store(filenames.getFullPath("featureXML_o"), rawDataHandler_IO.getFeatureMapHistory());
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -446,15 +446,15 @@ namespace SmartPeak
   {
     LOGD << "START LoadAnnotations";
     Filenames filenames = prepareFileNames(filenames_I);
-    LOGI << "Loading: " << filenames.getFullPathName("mzTab_i");
+    LOGI << "Loading: " << filenames.getFullPath("mzTab_i");
 
-    if (filenames.getFullPathName("mzTab_i").empty()) {
+    if (filenames.getFullPath("mzTab_i").empty()) {
       LOGE << "Filename is empty";
       LOGD << "END LoadAnnotations";
       return;
     }
 
-    if (!InputDataValidation::fileExists(filenames.getFullPathName("mzTab_i"))) {
+    if (!InputDataValidation::fileExists(filenames.getFullPath("mzTab_i"))) {
       LOGE << "File not found";
       LOGD << "END LoadAnnotations";
       return;
@@ -462,7 +462,7 @@ namespace SmartPeak
 
     try {
       OpenMS::MzTabFile mztabfile;
-      mztabfile.load(filenames.getFullPathName("mzTab_i"), rawDataHandler_IO.getMzTab());
+      mztabfile.load(filenames.getFullPath("mzTab_i"), rawDataHandler_IO.getMzTab());
       rawDataHandler_IO.updateFeatureMapHistory();
     }
     catch (const std::exception& e) {
@@ -487,9 +487,9 @@ namespace SmartPeak
   {
     LOGD << "START StoreAnnotations";
     Filenames filenames = prepareFileNames(filenames_I);
-    LOGI << "Storing: " << filenames.getFullPathName("mzTab_o");
+    LOGI << "Storing: " << filenames.getFullPath("mzTab_o");
 
-    if (filenames.getFullPathName("mzTab_o").empty()) {
+    if (filenames.getFullPath("mzTab_o").empty()) {
       LOGE << "Filename is empty";
       LOGD << "END StoreAnnotations";
       return;
@@ -498,7 +498,7 @@ namespace SmartPeak
     try {
       // Store outfile as mzTab
       OpenMS::MzTabFile mztabfile;
-      mztabfile.store(filenames.getFullPathName("mzTab_o"), rawDataHandler_IO.getMzTab());
+      mztabfile.store(filenames.getFullPath("mzTab_o"), rawDataHandler_IO.getMzTab());
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -786,7 +786,7 @@ namespace SmartPeak
     RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
     transitions_observable_ = &(application_handler->sequenceHandler_);
     Filenames filenames;
-    filenames.setFullPathName("traML_csv_i", filename);
+    filenames.setFullPath("traML_csv_i", filename);
     process(rawDataHandler, {}, filenames);
     return true;
   }
@@ -833,16 +833,16 @@ namespace SmartPeak
 
     const std::string format = format_param->getValueAsString();
 
-    LOGI << "Loading " << filenames.getFullPathName("traML_csv_i");
+    LOGI << "Loading " << filenames.getFullPath("traML_csv_i");
     LOGI << "Format: " << format;
 
-    if (filenames.getFullPathName("traML_csv_i").empty()) {
+    if (filenames.getFullPath("traML_csv_i").empty()) {
       LOGE << "Filename is empty";
       LOGD << "END loadTraML";
       return;
     }
 
-    if (!InputDataValidation::fileExists(filenames.getFullPathName("traML_csv_i"))) {
+    if (!InputDataValidation::fileExists(filenames.getFullPath("traML_csv_i"))) {
       LOGE << "File not found";
       LOGD << "END loadTraML";
       return;
@@ -855,7 +855,7 @@ namespace SmartPeak
         rawDataHandler_IO.getTargetedExperiment().clear(true);
         OpenMS::TransitionTSVFile tsvfile;
         tsvfile.convertTSVToTargetedExperiment(
-          filenames.getFullPathName("traML_csv_i").c_str(),
+          filenames.getFullPath("traML_csv_i").c_str(),
           OpenMS::FileTypes::TRAML,
           rawDataHandler_IO.getTargetedExperiment()
         );
@@ -866,7 +866,7 @@ namespace SmartPeak
         // Transitions are appended to the existing experiment in OpenMS
         rawDataHandler_IO.getTargetedExperiment().clear(true);
         OpenMS::TraMLFile tramlfile;
-        tramlfile.load(filenames.getFullPathName("traML_csv_i"), rawDataHandler_IO.getTargetedExperiment());
+        tramlfile.load(filenames.getFullPath("traML_csv_i"), rawDataHandler_IO.getTargetedExperiment());
         if (transitions_observable_) transitions_observable_->notifyTransitionsUpdated();
       }
       else 
@@ -897,37 +897,37 @@ namespace SmartPeak
   {
     LOGD << "START loadFeatureFilter";
     Filenames filenames = prepareFileNames(filenames_I);
-    LOGI << "Loading: " << filenames.getFullPathName("featureFilterComponents_csv_i") << " and " <<
-      filenames.getFullPathName("featureFilterComponentGroups_csv_i");
+    LOGI << "Loading: " << filenames.getFullPath("featureFilterComponents_csv_i") << " and " <<
+      filenames.getFullPath("featureFilterComponentGroups_csv_i");
 
-    if (filenames.getFullPathName("featureFilterComponents_csv_i").empty() &&
-        filenames.getFullPathName("featureFilterComponentGroups_csv_i").empty()) {
+    if (filenames.getFullPath("featureFilterComponents_csv_i").empty() &&
+        filenames.getFullPath("featureFilterComponentGroups_csv_i").empty()) {
       LOGE << "Filenames are both empty";
       LOGD << "END loadFeatureFilter";
       return;
     }
 
-    if (filenames.getFullPathName("featureFilterComponents_csv_i").size() &&
-        !InputDataValidation::fileExists(filenames.getFullPathName("featureFilterComponents_csv_i"))) {
-      LOGE << "File not found: " << filenames.getFullPathName("featureFilterComponents_csv_i");
+    if (filenames.getFullPath("featureFilterComponents_csv_i").size() &&
+        !InputDataValidation::fileExists(filenames.getFullPath("featureFilterComponents_csv_i"))) {
+      LOGE << "File not found: " << filenames.getFullPath("featureFilterComponents_csv_i");
       LOGD << "END loadFeatureFilter";
       return;
     }
 
-    if (filenames.getFullPathName("featureFilterComponentGroups_csv_i").size() &&
-        !InputDataValidation::fileExists(filenames.getFullPathName("featureFilterComponentGroups_csv_i"))) {
-      LOGE << "File not found: " << filenames.getFullPathName("featureFilterComponentGroups_csv_i");
+    if (filenames.getFullPath("featureFilterComponentGroups_csv_i").size() &&
+        !InputDataValidation::fileExists(filenames.getFullPath("featureFilterComponentGroups_csv_i"))) {
+      LOGE << "File not found: " << filenames.getFullPath("featureFilterComponentGroups_csv_i");
       LOGD << "END loadFeatureFilter";
       return;
     }
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (filenames.getFullPathName("featureFilterComponents_csv_i").size()) { // because we don't know if either of the two names is empty
-        featureQCFile.load(filenames.getFullPathName("featureFilterComponents_csv_i"), rawDataHandler_IO.getFeatureFilter(), false);
+      if (filenames.getFullPath("featureFilterComponents_csv_i").size()) { // because we don't know if either of the two names is empty
+        featureQCFile.load(filenames.getFullPath("featureFilterComponents_csv_i"), rawDataHandler_IO.getFeatureFilter(), false);
       }
-      if (filenames.getFullPathName("featureFilterComponentGroups_csv_i").size()) {
-        featureQCFile.load(filenames.getFullPathName("featureFilterComponentGroups_csv_i"), rawDataHandler_IO.getFeatureFilter(), true);
+      if (filenames.getFullPath("featureFilterComponentGroups_csv_i").size()) {
+        featureQCFile.load(filenames.getFullPath("featureFilterComponentGroups_csv_i"), rawDataHandler_IO.getFeatureFilter(), true);
       }
     }
     catch (const std::exception& e) {
@@ -955,37 +955,37 @@ namespace SmartPeak
   {
     LOGD << "START loadFeatureQC";
     Filenames filenames = prepareFileNames(filenames_I);
-    LOGI << "Loading: " << filenames.getFullPathName("featureQCComponents_csv_i") << " and " <<
-      filenames.getFullPathName("featureQCComponentGroups_csv_i");
+    LOGI << "Loading: " << filenames.getFullPath("featureQCComponents_csv_i") << " and " <<
+      filenames.getFullPath("featureQCComponentGroups_csv_i");
 
-    if (filenames.getFullPathName("featureQCComponents_csv_i").empty() &&
-        filenames.getFullPathName("featureQCComponentGroups_csv_i").empty()) {
+    if (filenames.getFullPath("featureQCComponents_csv_i").empty() &&
+        filenames.getFullPath("featureQCComponentGroups_csv_i").empty()) {
       LOGE << "Filenames are both empty";
       LOGD << "END loadFeatureQC";
       return;
     }
 
-    if (filenames.getFullPathName("featureQCComponents_csv_i").size() &&
-        !InputDataValidation::fileExists(filenames.getFullPathName("featureQCComponents_csv_i"))) {
-      LOGE << "File not found: " << filenames.getFullPathName("featureQCComponents_csv_i");
+    if (filenames.getFullPath("featureQCComponents_csv_i").size() &&
+        !InputDataValidation::fileExists(filenames.getFullPath("featureQCComponents_csv_i"))) {
+      LOGE << "File not found: " << filenames.getFullPath("featureQCComponents_csv_i");
       LOGD << "END loadFeatureQC";
       return;
     }
 
-    if (filenames.getFullPathName("featureQCComponentGroups_csv_i").size() &&
-        !InputDataValidation::fileExists(filenames.getFullPathName("featureQCComponentGroups_csv_i"))) {
-      LOGE << "File not found: " << filenames.getFullPathName("featureQCComponentGroups_csv_i");
+    if (filenames.getFullPath("featureQCComponentGroups_csv_i").size() &&
+        !InputDataValidation::fileExists(filenames.getFullPath("featureQCComponentGroups_csv_i"))) {
+      LOGE << "File not found: " << filenames.getFullPath("featureQCComponentGroups_csv_i");
       LOGD << "END loadFeatureQC";
       return;
     }
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (filenames.getFullPathName("featureQCComponents_csv_i").size()) { // because we don't know if either of the two names is empty
-        featureQCFile.load(filenames.getFullPathName("featureQCComponents_csv_i"), rawDataHandler_IO.getFeatureQC(), false);
+      if (filenames.getFullPath("featureQCComponents_csv_i").size()) { // because we don't know if either of the two names is empty
+        featureQCFile.load(filenames.getFullPath("featureQCComponents_csv_i"), rawDataHandler_IO.getFeatureQC(), false);
       }
-      if (filenames.getFullPathName("featureQCComponentGroups_csv_i").size()) {
-        featureQCFile.load(filenames.getFullPathName("featureQCComponentGroups_csv_i"), rawDataHandler_IO.getFeatureQC(), true);
+      if (filenames.getFullPath("featureQCComponentGroups_csv_i").size()) {
+        featureQCFile.load(filenames.getFullPath("featureQCComponentGroups_csv_i"), rawDataHandler_IO.getFeatureQC(), true);
       }
     }
     catch (const std::exception& e) {
@@ -1013,11 +1013,11 @@ namespace SmartPeak
   {
     LOGD << "START storeFeatureFilter";
     Filenames filenames = prepareFileNames(filenames_I);
-    LOGI << "Storing: " << filenames.getFullPathName("featureFilterComponents_csv_i") << " and " <<
-      filenames.getFullPathName("featureFilterComponentGroups_csv_i");
+    LOGI << "Storing: " << filenames.getFullPath("featureFilterComponents_csv_i") << " and " <<
+      filenames.getFullPath("featureFilterComponentGroups_csv_i");
 
-    if (filenames.getFullPathName("featureFilterComponents_csv_i").empty() &&
-      filenames.getFullPathName("featureFilterComponentGroups_csv_i").empty()) {
+    if (filenames.getFullPath("featureFilterComponents_csv_i").empty() &&
+      filenames.getFullPath("featureFilterComponentGroups_csv_i").empty()) {
       LOGE << "Filenames are both empty";
       LOGD << "END storeFeatureFilter";
       return;
@@ -1025,11 +1025,11 @@ namespace SmartPeak
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (filenames.getFullPathName("featureFilterComponents_csv_i").size()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.getFullPathName("featureFilterComponents_csv_i"), rawDataHandler_IO.getFeatureFilter(), false);
+      if (filenames.getFullPath("featureFilterComponents_csv_i").size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.getFullPath("featureFilterComponents_csv_i"), rawDataHandler_IO.getFeatureFilter(), false);
       }
-      if (filenames.getFullPathName("featureFilterComponentGroups_csv_i").size()) {
-        featureQCFile.store(filenames.getFullPathName("featureFilterComponentGroups_csv_i"), rawDataHandler_IO.getFeatureFilter(), true);
+      if (filenames.getFullPath("featureFilterComponentGroups_csv_i").size()) {
+        featureQCFile.store(filenames.getFullPath("featureFilterComponentGroups_csv_i"), rawDataHandler_IO.getFeatureFilter(), true);
       }
     }
     catch (const std::exception& e) {
@@ -1054,11 +1054,11 @@ namespace SmartPeak
   {
     LOGD << "START storeFeatureQC";
     Filenames filenames = prepareFileNames(filenames_I);
-    LOGI << "Loading: " << filenames.getFullPathName("featureQCComponents_csv_i") << " and " <<
-      filenames.getFullPathName("featureQCComponentGroups_csv_i");
+    LOGI << "Loading: " << filenames.getFullPath("featureQCComponents_csv_i") << " and " <<
+      filenames.getFullPath("featureQCComponentGroups_csv_i");
 
-    if (filenames.getFullPathName("featureQCComponents_csv_i").empty() &&
-      filenames.getFullPathName("featureQCComponentGroups_csv_i").empty()) {
+    if (filenames.getFullPath("featureQCComponents_csv_i").empty() &&
+      filenames.getFullPath("featureQCComponentGroups_csv_i").empty()) {
       LOGE << "Filenames are both empty";
       LOGD << "END storeFeatureQC";
       return;
@@ -1066,11 +1066,11 @@ namespace SmartPeak
 
     try {
       OpenMS::MRMFeatureQCFile featureQCFile;
-      if (filenames.getFullPathName("featureQCComponents_csv_i").size()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.getFullPathName("featureQCComponents_csv_i"), rawDataHandler_IO.getFeatureQC(), false);
+      if (filenames.getFullPath("featureQCComponents_csv_i").size()) { // because we don't know if either of the two names is empty
+        featureQCFile.store(filenames.getFullPath("featureQCComponents_csv_i"), rawDataHandler_IO.getFeatureQC(), false);
       }
-      if (filenames.getFullPathName("featureQCComponentGroups_csv_i").size()) {
-        featureQCFile.store(filenames.getFullPathName("featureQCComponentGroups_csv_i"), rawDataHandler_IO.getFeatureQC(), true);
+      if (filenames.getFullPath("featureQCComponentGroups_csv_i").size()) {
+        featureQCFile.store(filenames.getFullPath("featureQCComponentGroups_csv_i"), rawDataHandler_IO.getFeatureQC(), true);
       }
     }
     catch (const std::exception& e) {
@@ -1095,7 +1095,7 @@ namespace SmartPeak
     }
     RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
     Filenames filenames;
-    filenames.setFullPathName("referenceData_csv_i", filename);
+    filenames.setFullPath("referenceData_csv_i", filename);
     process(rawDataHandler, {}, filenames);
     return true;
   }
@@ -1108,21 +1108,21 @@ namespace SmartPeak
   {
     LOGD << "START loadValidationData";
     Filenames filenames = prepareFileNames(filenames_I);
-    LOGI << "Loading: " << filenames.getFullPathName("referenceData_csv_i");
+    LOGI << "Loading: " << filenames.getFullPath("referenceData_csv_i");
 
-    if (filenames.getFullPathName("referenceData_csv_i").empty()) {
+    if (filenames.getFullPath("referenceData_csv_i").empty()) {
       LOGE << "Filename is empty";
       LOGD << "END loadValidationData";
       return;
     }
 
-    if (!InputDataValidation::fileExists(filenames.getFullPathName("referenceData_csv_i"))) {
+    if (!InputDataValidation::fileExists(filenames.getFullPath("referenceData_csv_i"))) {
       LOGE << "File not found";
       LOGD << "END loadValidationData";
       return;
     }
 
-    io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(filenames.getFullPathName("referenceData_csv_i"));
+    io::CSVReader<17, io::trim_chars<>, io::no_quote_escape<','>> in(filenames.getFullPath("referenceData_csv_i"));
 
     const std::string s_sample_index{ "sample_index" };
     const std::string s_original_filename{ "original_filename" };
@@ -1252,7 +1252,7 @@ namespace SmartPeak
     RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
     parameters_observable_ = &(application_handler->sequenceHandler_);
     Filenames filenames;
-    filenames.setFullPathName("parameters_csv_i", filename);
+    filenames.setFullPath("parameters_csv_i", filename);
     process(rawDataHandler, {}, filenames);
     return true;
   }
@@ -1265,22 +1265,22 @@ namespace SmartPeak
   {
     LOGD << "START readRawDataProcessingParameters";
     Filenames filenames = prepareFileNames(filenames_I);
-    LOGI << "Loading: " << filenames.getFullPathName("parameters_csv_i");
+    LOGI << "Loading: " << filenames.getFullPath("parameters_csv_i");
 
-    if (filenames.getFullPathName("parameters_csv_i").empty()) {
+    if (filenames.getFullPath("parameters_csv_i").empty()) {
       LOGE << "Filename is empty";
       LOGD << "END readRawDataProcessingParameters";
       return;
     }
 
-    if (!InputDataValidation::fileExists(filenames.getFullPathName("parameters_csv_i"))) {
+    if (!InputDataValidation::fileExists(filenames.getFullPath("parameters_csv_i"))) {
       LOGE << "File not found";
       LOGD << "END readRawDataProcessingParameters";
       return;
     }
 
     try {
-      ParametersParser::read(filenames.getFullPathName("parameters_csv_i"), rawDataHandler_IO.getParameters());
+      ParametersParser::read(filenames.getFullPath("parameters_csv_i"), rawDataHandler_IO.getParameters());
       sanitizeParameters(rawDataHandler_IO.getParameters());
       if (parameters_observable_) parameters_observable_->notifyParametersUpdated();
     }
@@ -1353,7 +1353,7 @@ namespace SmartPeak
     }
     RawDataHandler& rawDataHandler = application_handler->sequenceHandler_.getSequence().at(0).getRawData();
     Filenames filenames;
-    filenames.setFullPathName("parameters_csv_i", filename);
+    filenames.setFullPath("parameters_csv_i", filename);
     process(rawDataHandler, {}, filenames);
     return true;
   }
@@ -1368,14 +1368,14 @@ namespace SmartPeak
     Filenames filenames = prepareFileNames(filenames_I);
     LOGI << "Storing " << filename_;
 
-    if (filenames.getFullPathName("parameters_csv_i").empty()) {
+    if (filenames.getFullPath("parameters_csv_i").empty()) {
       LOGE << "Filename is empty";
       LOGD << "END readRawDataProcessingParameters";
       return;
     }
 
     try {
-      ParametersParser::write(filenames.getFullPathName("parameters_csv_i"), rawDataHandler_IO.getParameters());
+      ParametersParser::write(filenames.getFullPath("parameters_csv_i"), rawDataHandler_IO.getParameters());
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -2433,8 +2433,8 @@ namespace SmartPeak
       params.setValue("output_format", "traML");
       params.setValue("deisotoping:use_deisotoper", "true");
       targeted_spectra_extractor.setParameters(params);
-      LOGI << "Storing: " << filenames.getFullPathName("traML_csv_o");
-      targeted_spectra_extractor.storeSpectraTraML(filenames.getFullPathName("traML_csv_o"), ms1_merged_features, ms2_merged_features);
+      LOGI << "Storing: " << filenames.getFullPath("traML_csv_o");
+      targeted_spectra_extractor.storeSpectraTraML(filenames.getFullPath("traML_csv_o"), ms1_merged_features, ms2_merged_features);
 
       // build MS1/MS2 features
       OpenMS::FeatureMap ms1_ms2_features;

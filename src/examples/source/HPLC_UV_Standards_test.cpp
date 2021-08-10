@@ -20,13 +20,13 @@ void test_main_HPLC_UV_Standards()
   LoadFeatures loadFeatures;
   Filenames filenames;
 
-  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_8_BatchName_1900-01-01_000000.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_8_BatchName_1900-01-01_000000.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   rawDataHandler.clear();
 
-  filenames.setFullPathName("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_test.featureXML"));
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards/features/100ug_test.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 

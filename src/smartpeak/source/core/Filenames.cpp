@@ -70,7 +70,7 @@ namespace SmartPeak
     }
   }
 
-  std::string Filenames::getFullPathName(const std::string& id) const
+  std::string Filenames::getFullPath(const std::string& id) const
   {
     return file_names_.at(id).full_path_.generic_string();
   }
@@ -92,7 +92,7 @@ namespace SmartPeak
       if (f.second.file_scope_ == file_scope)
       {
         f.second.root_path_ = dir;
-        updateFullPathName(f.second);
+        updateFullPath(f.second);
       }
     }
   }
@@ -113,12 +113,12 @@ namespace SmartPeak
       if (f.second.file_scope_ == file_scope)
       {
         f.second.file_variant_ = variant;
-        updateFullPathName(f.second);
+        updateFullPath(f.second);
       }
     }
   }
 
-  void Filenames::setFullPathName(const std::string& id, const std::filesystem::path& full_path)
+  void Filenames::setFullPath(const std::string& id, const std::filesystem::path& full_path)
   {
     if (file_names_.find(id) == file_names_.end())
     {
@@ -128,7 +128,7 @@ namespace SmartPeak
     file_names_.at(id).full_path_ = full_path;
   }
 
-  void Filenames::updateFullPathName(FileName& filename)
+  void Filenames::updateFullPath(FileName& filename)
   {
     if (!filename.full_path_override_)
     {

@@ -33,6 +33,9 @@ namespace SmartPeak
   {
 public:
 
+    /**
+      @brief sets the file name vairants: injection name, group names ...
+    */
     void setFileVariants(
       const std::string& input_mzML_filename,
       const std::string& input_inj_name,
@@ -41,6 +44,9 @@ public:
       const std::string& output_sample_name
     );
 
+    /**
+      @brief sets the directories paths
+    */
     void setRootPaths(
       const std::filesystem::path& main_dir,
       const std::filesystem::path& mzml_input_path,
@@ -59,9 +65,24 @@ public:
       EFileScopeUnspecified
     };
 
+    /**
+      @brief Adds file to the Filename
+    */
     void addFileName(const std::string& id, const std::string& default_name, FileScope file_scope);
-    std::string getFullPathName(const std::string& id) const;
-    void setFullPathName(const std::string& id, const std::filesystem::path& full_path);
+
+    /**
+      @brief Returns the full path, with root path and variant applied (or the overridden full path).
+    */
+    std::string getFullPath(const std::string& id) const;
+
+    /**
+      @brief Sets the ful path name, overriding computation using variant and root path.
+    */
+    void setFullPath(const std::string& id, const std::filesystem::path& full_path);
+
+    /**
+      @brief Merges two Filenames. Will not overwrite file that already exists.
+    */
     void merge(const Filenames& other);
 
     struct FileName
@@ -74,6 +95,9 @@ public:
       bool full_path_override_ = false;
     };
 
+    /**
+      @brief returns detailed filenames.
+    */
     const std::map<std::string, FileName>& getFileNames() const { return file_names_; };
 
   protected:
@@ -84,7 +108,7 @@ public:
     void updateRootPaths();
     void updateFileVariants();
     void updateFileVariant(const std::string& variant, FileScope file_scope);
-    void updateFullPathName(FileName& filname);
+    void updateFullPath(FileName& filname);
 
     std::map<std::string, FileName> file_names_;
     std::filesystem::path main_dir_;

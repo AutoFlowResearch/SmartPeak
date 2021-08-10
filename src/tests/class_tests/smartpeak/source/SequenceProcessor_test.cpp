@@ -35,23 +35,23 @@ Filenames generateTestFilenames()
 {
   const std::string dir = SMARTPEAK_GET_TEST_DATA_PATH("");
   Filenames filenames;
-  filenames.setFullPathName("sequence_csv_i"                                , dir + "SequenceProcessor_sequence.csv");
-  filenames.setFullPathName("parameters_csv_i"                              , dir + "RawDataProcessor_params_1_core.csv");
-  filenames.setFullPathName("traML_csv_i"                                   , dir + "OpenMSFile_traML_1.csv");
-  filenames.setFullPathName("featureFilterComponents_csv_i"                 , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.setFullPathName("featureFilterComponentGroups_csv_i"            , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  filenames.setFullPathName("featureQCComponents_csv_i"                     , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.setFullPathName("featureQCComponentGroups_csv_i"                , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  filenames.setFullPathName("featureRSDFilterComponents_csv_i"              , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.setFullPathName("featureRSDFilterComponentGroups_csv_i"         , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  filenames.setFullPathName("featureRSDQCComponents_csv_i"                  , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.setFullPathName("featureRSDQCComponentGroups_csv_i"             , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  filenames.setFullPathName("featureBackgroundFilterComponents_csv_i"       , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.setFullPathName("featureBackgroundFilterComponentGroups_csv_i"  , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  filenames.setFullPathName("featureBackgroundQCComponents_csv_i"           , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
-  filenames.setFullPathName("featureBackgroundQCComponentGroups_csv_i"      , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
-  filenames.setFullPathName("quantitationMethods_csv_i"                     , dir + "OpenMSFile_quantitationMethods_1.csv");
-  filenames.setFullPathName("standardsConcentrations_csv_i"                 , dir + "OpenMSFile_standardsConcentrations_1.csv");
+  filenames.setFullPath("sequence_csv_i"                                , dir + "SequenceProcessor_sequence.csv");
+  filenames.setFullPath("parameters_csv_i"                              , dir + "RawDataProcessor_params_1_core.csv");
+  filenames.setFullPath("traML_csv_i"                                   , dir + "OpenMSFile_traML_1.csv");
+  filenames.setFullPath("featureFilterComponents_csv_i"                 , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureFilterComponentGroups_csv_i"            , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("featureQCComponents_csv_i"                     , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureQCComponentGroups_csv_i"                , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("featureRSDFilterComponents_csv_i"              , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureRSDFilterComponentGroups_csv_i"         , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("featureRSDQCComponents_csv_i"                  , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureRSDQCComponentGroups_csv_i"             , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("featureBackgroundFilterComponents_csv_i"       , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureBackgroundFilterComponentGroups_csv_i"  , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("featureBackgroundQCComponents_csv_i"           , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureBackgroundQCComponentGroups_csv_i"      , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("quantitationMethods_csv_i"                     , dir + "OpenMSFile_quantitationMethods_1.csv");
+  filenames.setFullPath("standardsConcentrations_csv_i"                 , dir + "OpenMSFile_standardsConcentrations_1.csv");
   return filenames;
 }
 
@@ -63,8 +63,8 @@ TEST(SequenceHandler, createSequence_onFilePicked)
   std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
   Filenames filenames_;
-  filenames_.setFullPathName("sequence_csv_i", workflow / "sequence.csv");
-  cs.onFilePicked(filenames_.getFullPathName("sequence_csv_i"), &ah);
+  filenames_.setFullPath("sequence_csv_i", workflow / "sequence.csv");
+  cs.onFilePicked(filenames_.getFullPath("sequence_csv_i"), &ah);
 
   ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
@@ -86,12 +86,12 @@ TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
   std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
   Filenames filenames_;
-  filenames_.setFullPathName("sequence_csv_i", workflow / "sequence.csv");
-  std::string full_name = filenames_.getFullPathName("sequence_csv_i");
+  filenames_.setFullPath("sequence_csv_i", workflow / "sequence.csv");
+  std::string full_name = filenames_.getFullPath("sequence_csv_i");
   // replace separators (this way of specifying filename can happen with command line interface actually)
   std::replace(full_name.begin(), full_name.end(), '/', '\\');
-  filenames_.setFullPathName("sequence_csv_i", full_name);
-  cs.onFilePicked(filenames_.getFullPathName("sequence_csv_i"), &ah);
+  filenames_.setFullPath("sequence_csv_i", full_name);
+  cs.onFilePicked(filenames_.getFullPath("sequence_csv_i"), &ah);
 
   ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
@@ -223,7 +223,7 @@ TEST(SequenceHandler, createSequence)
 
   sequenceHandler.clear();
   Filenames filenames { generateTestFilenames() };
-  filenames.setFullPathName("sequence_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv"));
+  filenames.setFullPath("sequence_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv"));
 
   cs.filenames_ = filenames;
   cs.process();
