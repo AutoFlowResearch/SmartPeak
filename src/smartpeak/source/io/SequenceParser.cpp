@@ -1010,7 +1010,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool StoreSequenceFileSmartPeak::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool StoreSequenceFileSmartPeak::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -1021,7 +1021,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool StoreSequenceFileAnalyst::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool StoreSequenceFileAnalyst::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -1032,7 +1032,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool StoreSequenceFileMasshunter::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool StoreSequenceFileMasshunter::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -1043,7 +1043,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool StoreSequenceFileXcalibur::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool StoreSequenceFileXcalibur::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {

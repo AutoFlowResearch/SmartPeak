@@ -123,7 +123,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
       application_handler->mzML_dir_ = filename;
       return true;
@@ -134,7 +134,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
       application_handler->features_in_dir_ = filename;
       return true;
@@ -146,7 +146,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
       application_handler->features_out_dir_ = filename;
       return true;

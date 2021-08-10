@@ -131,7 +131,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     Filenames        filenames_;                            /// Pathnames to load
     std::string      delimiter          = ",";              /// String delimiter of the imported file
@@ -229,12 +229,12 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     LoadWorkflow() = default;
     explicit LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
     void process() override;
-    std::string filename_;
+    std::filesystem::path filename_;
 
     /* IProcessorDescription */
     int getID() const override { return -1; }
@@ -250,12 +250,12 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     StoreWorkflow() = default;
     explicit StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() override;
-    std::string filename_;
+    std::filesystem::path filename_;
 
     /* IProcessorDescription */
     int getID() const override { return -1; }

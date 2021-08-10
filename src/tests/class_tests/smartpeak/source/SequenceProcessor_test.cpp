@@ -543,7 +543,7 @@ TEST(SequenceHandler, StoreWorkflow1)
   processor.process();
   // compare with reference file
   const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
-  EXPECT_STREQ(processor.filename_.c_str(), reference_filename.c_str());
+  EXPECT_STREQ(processor.filename_.generic_string().c_str(), reference_filename.c_str());
 }
 
 TEST(SequenceHandler, LoadWorkflow_onFilePicked)

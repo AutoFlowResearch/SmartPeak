@@ -154,7 +154,7 @@ public:
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
   struct StoreSequenceFileAnalyst : IFilePickerHandler {
@@ -162,7 +162,7 @@ public:
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
   struct StoreSequenceFileMasshunter : IFilePickerHandler {
@@ -170,7 +170,7 @@ public:
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
   struct StoreSequenceFileXcalibur : IFilePickerHandler {
@@ -178,6 +178,6 @@ public:
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 }

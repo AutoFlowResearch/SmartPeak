@@ -155,7 +155,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  bool LoadStandardsConcentrations::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadStandardsConcentrations::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -223,7 +223,7 @@ namespace SmartPeak
     filenames.addFileName("quantitationMethods_csv_i", "quantitationMethods.csv", Filenames::FileScope::EFileScopeMain);
   };
 
-  bool LoadQuantitationMethods::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadQuantitationMethods::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -323,7 +323,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  bool LoadFeatureFilters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadFeatureFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -414,7 +414,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  bool LoadFeatureQCs::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadFeatureQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -607,7 +607,7 @@ namespace SmartPeak
     filenames.addFileName("featureRSDFilterComponentGroups_csv_i", "featureRSDFilterComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
   };
 
-  bool LoadFeatureRSDFilters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadFeatureRSDFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -698,7 +698,7 @@ namespace SmartPeak
     filenames.addFileName("featureRSDQCComponentGroups_csv_i", "featureRSDQCComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
   };
 
-  bool LoadFeatureRSDQCs::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadFeatureRSDQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -885,7 +885,7 @@ namespace SmartPeak
     filenames.addFileName("featureBackgroundFilterComponentGroups_csv_i", "featureBackgroundFilterComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
   };
 
-  bool LoadFeatureBackgroundFilters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadFeatureBackgroundFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -976,7 +976,7 @@ namespace SmartPeak
     filenames.addFileName("featureBackgroundQCComponentGroups_csv_i", "featureBackgroundQCComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
   };
 
-  bool LoadFeatureBackgroundQCs::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadFeatureBackgroundQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {

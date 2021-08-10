@@ -110,7 +110,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_STANDARDS_CONCENTRATIONS"; }
@@ -137,7 +137,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return 17; }
     std::string getName() const override { return "LOAD_QUANTITATION_METHODS"; }
@@ -189,7 +189,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
@@ -218,7 +218,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_QCS"; }
@@ -289,7 +289,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_RSD_FILTERS"; }
@@ -318,7 +318,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_RSD_QCS"; }
@@ -389,7 +389,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_FILTERS"; }
@@ -418,7 +418,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_QCS"; }

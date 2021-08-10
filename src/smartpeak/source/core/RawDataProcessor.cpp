@@ -776,7 +776,7 @@ namespace SmartPeak
     LOGD << "END quantifyComponents";
   }
 
-  bool LoadTransitions::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadTransitions::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -1086,7 +1086,7 @@ namespace SmartPeak
     filenames.addFileName("referenceData_csv_i", "referenceData.csv", Filenames::FileScope::EFileScopeMain);
   };
 
-  bool LoadValidationData::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadValidationData::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -1242,7 +1242,7 @@ namespace SmartPeak
     filenames.addFileName("parameters_csv_i", "parameters.csv", Filenames::FileScope::EFileScopeMain);
   };
 
-  bool LoadParameters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadParameters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -1344,7 +1344,7 @@ namespace SmartPeak
     filenames.addFileName("parameters_csv_i", "parameters.csv", Filenames::FileScope::EFileScopeMain);
   };
 
-  bool StoreParameters::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool StoreParameters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {

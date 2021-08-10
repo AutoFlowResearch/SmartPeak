@@ -99,7 +99,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool CreateSequence::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool CreateSequence::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     application_handler->sequence_pathname_ = filename;
     application_handler->mzML_dir_.clear();
@@ -483,7 +483,7 @@ namespace SmartPeak
     }
   }
 
-  bool LoadWorkflow::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadWorkflow::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     filename_ = filename;
     process();
@@ -499,7 +499,7 @@ namespace SmartPeak
   {
     // TODO: move to parameters at some point
     LOGD << "START LoadWorkflow";
-    LOGI << "Loading " << filename_;
+    LOGI << "Loading " << filename_.generic_string();
 
     if (filename_.empty()) {
       LOGE << "Filename is empty";
@@ -515,7 +515,7 @@ namespace SmartPeak
 
     std::vector<std::string> res;
     try {
-      io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(filename_);
+      io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(filename_.generic_string());
       const std::string s_command_name{ "command_name" };
       in.read_header(
         io::ignore_extra_column,
@@ -543,7 +543,7 @@ namespace SmartPeak
     LOGD << "END LoadWorkflow";
   }
 
-  bool StoreWorkflow::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool StoreWorkflow::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     filename_ = filename;
     process();
@@ -553,10 +553,10 @@ namespace SmartPeak
   void StoreWorkflow::process()
   {
     LOGD << "START StoreWorkflow";
-    LOGI << "Storing " << filename_;
+    LOGI << "Storing " << filename_.generic_string();
 
     std::vector<std::string> headers = { "command_name" };
-    CSVWriter writer(filename_, ",");
+    CSVWriter writer(filename_.generic_string(), ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     if (cnt < headers.size()) {
