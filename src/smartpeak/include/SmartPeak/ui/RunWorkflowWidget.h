@@ -64,9 +64,11 @@ namespace SmartPeak
     ApplicationHandler& application_handler_;
     SessionHandler& session_handler_;
     WorkflowManager& workflow_manager_;
-    std::string mzML_dir_;
-    std::string features_in_dir_;
-    std::string features_out_dir_;
-    bool directories_set_ = false;
+    std::string mzML_dir_edit_;
+    std::string features_in_dir_edit_;
+    std::string features_out_dir_edit_;
+    std::string mzML_dir_old_;
+    std::string features_in_dir_old_;
+    std::string features_out_dir_old_;
   };
 }
