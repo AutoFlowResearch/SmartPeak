@@ -577,4 +577,77 @@ namespace SmartPeak
     oss << "\n";
     return oss.str();
   }
+
+  bool InputDataValidation::prepareToLoad(const Filenames filenames, const std::string& id)
+  {
+    LOGI << "Loading: " << filenames.getFullPath(id).generic_string();
+
+    if (filenames.getFullPath(id).empty()) {
+      LOGE << "Filename is empty";
+      return false;
+    }
+
+    if (!InputDataValidation::fileExists(filenames.getFullPath(id))) {
+      LOGE << "File not found";
+      return false;
+    }
+
+    return true;
+  }
+
+  bool InputDataValidation::prepareToLoadOneOfTwo(const Filenames filenames, const std::string& id1, const std::string& id2)
+  {
+    LOGI << "Loading: " << 
+      filenames.getFullPath(id1).generic_string() 
+      << " and " <<
+      filenames.getFullPath(id2).generic_string();
+
+    if (filenames.getFullPath(id1).empty() &&
+      filenames.getFullPath(id2).empty()) {
+      LOGE << "Filenames are both empty";
+      return false;
+    }
+
+    if (!filenames.getFullPath(id1).empty() &&
+      !InputDataValidation::fileExists(filenames.getFullPath(id1))) {
+      LOGE << "File not found: " << filenames.getFullPath(id1).generic_string();
+      return false;
+    }
+
+    if (!filenames.getFullPath(id2).empty() &&
+      !InputDataValidation::fileExists(filenames.getFullPath(id2))) {
+      LOGE << "File not found: " << filenames.getFullPath(id2).generic_string();
+      return false;
+    }
+
+    return true;
+  }
+
+  bool InputDataValidation::prepareToStore(const Filenames filenames, const std::string& id)
+  {
+    LOGI << "Storing: " << filenames.getFullPath(id).generic_string();
+
+    if (filenames.getFullPath(id).empty()) {
+      LOGE << "Filename is empty";
+      return false;
+    }
+
+    return true;
+  }
+
+  bool InputDataValidation::prepareToStoreOneOfTwo(const Filenames filenames, const std::string& id1, const std::string& id2)
+  {
+    LOGI << "Storing: " << 
+      filenames.getFullPath(id1).generic_string()
+      << " and " <<
+      filenames.getFullPath(id2).generic_string();
+
+    if (filenames.getFullPath(id1).empty() &&
+      filenames.getFullPath(id2).empty()) {
+      LOGE << "Filenames are both empty";
+      return false;
+    }
+
+    return true;
+  }
 }

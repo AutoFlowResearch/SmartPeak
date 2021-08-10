@@ -51,15 +51,15 @@ public:
       const std::filesystem::path& main_dir,
       const std::filesystem::path& mzml_input_path,
       const std::filesystem::path& features_input_path,
-      const std::filesystem::path& output_path
+      const std::filesystem::path& features_output_path
     );
 
     enum class FileScope
     {
       EFileScopeMain,
       EFileScopeMzMLInput,
-      EFileScopeInjectionOutput,
       EFileScopeInjectionInput,
+      EFileScopeInjectionOutput,
       EFileScopeSampleGroupInput,
       EFileScopeSampleGroupOutput,
       EFileScopeUnspecified
@@ -73,7 +73,7 @@ public:
     /**
       @brief Returns the full path, with root path and variant applied (or the overridden full path).
     */
-    std::string getFullPath(const std::string& id) const;
+    std::filesystem::path getFullPath(const std::string& id) const;
 
     /**
       @brief Sets the ful path name, overriding computation using variant and root path.

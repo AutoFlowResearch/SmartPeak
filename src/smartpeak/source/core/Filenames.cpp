@@ -70,7 +70,7 @@ namespace SmartPeak
     }
   }
 
-  std::string Filenames::getFullPath(const std::string& id) const
+  std::filesystem::path Filenames::getFullPath(const std::string& id) const
   {
     return file_names_.at(id).full_path_.generic_string();
   }
@@ -153,6 +153,8 @@ namespace SmartPeak
   {
     for (const auto& p : other.file_names_)
       file_names_.emplace(p.first, p.second);
+    updateRootPaths();
+    updateFileVariants();
   }
 
 }

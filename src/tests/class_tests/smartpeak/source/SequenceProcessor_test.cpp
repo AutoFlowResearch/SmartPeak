@@ -87,7 +87,7 @@ TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
   auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
   Filenames filenames_;
   filenames_.setFullPath("sequence_csv_i", workflow / "sequence.csv");
-  std::string full_name = filenames_.getFullPath("sequence_csv_i");
+  std::string full_name = filenames_.getFullPath("sequence_csv_i").generic_string();
   // replace separators (this way of specifying filename can happen with command line interface actually)
   std::replace(full_name.begin(), full_name.end(), '/', '\\');
   filenames_.setFullPath("sequence_csv_i", full_name);
