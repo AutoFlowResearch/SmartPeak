@@ -8,7 +8,7 @@ jobs:
     docker:
       - image: ubuntu:20.04
     working_directory: ~/SmartPeak
-    resource_class: large
+    resource_class: small
     steps:
       - checkout
       - run: |
@@ -506,37 +506,3 @@ workflows:
           filters:
             branches:
               ignore: /^release\/.*$/
-      - build_macos:
-          filters:
-            branches:
-              ignore: /^release\/.*$/
-      - build_windows:
-          filters:
-            branches:
-              ignore: /^release\/.*$/
-  release_check:
-    jobs:
-      - trigger_release:
-          filters:
-            branches:
-              only: develop
-  release:
-    jobs:
-      - prepare_release:
-          filters:
-            branches:
-              only: /^release\/.*$/
-      - build_ubuntu:
-          requires:
-            - prepare_release
-      - build_macos:
-          requires:
-            - prepare_release
-      - build_windows:
-          requires:
-            - prepare_release
-      - publish_release:
-          requires:
-            - build_ubuntu
-            - build_macos
-            - build_windows
