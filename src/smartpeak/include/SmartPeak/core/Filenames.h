@@ -26,6 +26,7 @@
 #include <string>
 #include <filesystem>
 #include <map>
+#include <vector>
 
 namespace SmartPeak
 {
