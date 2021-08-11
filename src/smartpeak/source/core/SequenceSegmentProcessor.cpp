@@ -173,7 +173,7 @@ namespace SmartPeak
 
   void LoadStandardsConcentrations::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("standardsConcentrations_csv_i", "standardsConcentrations.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("standardsConcentrations_csv_i", "${MAIN_DIR}/standardsConcentrations.csv");
   };
 
   void LoadStandardsConcentrations::process(
@@ -212,7 +212,7 @@ namespace SmartPeak
 
   void LoadQuantitationMethods::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("quantitationMethods_csv_i", "quantitationMethods.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("quantitationMethods_csv_i", "${MAIN_DIR}/quantitationMethods.csv");
   };
 
   bool LoadQuantitationMethods::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -267,7 +267,7 @@ namespace SmartPeak
 
   void StoreQuantitationMethods::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("quantitationMethods_csv_o", "_quantitationMethods.csv", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("quantitationMethods_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_quantitationMethods.csv");
   };
 
   void StoreQuantitationMethods::process(
@@ -332,8 +332,8 @@ namespace SmartPeak
 
   void LoadFeatureFilters::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureFilterComponents_csv_i", "featureFilterComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureFilterComponentGroups_csv_i", "featureFilterComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureFilterComponents_csv_i", "${MAIN_DIR}/featureFilterComponents.csv");
+    filenames.addFileName("featureFilterComponentGroups_csv_i", "${MAIN_DIR}/featureFilterComponentGroups.csv");
   };
 
   void LoadFeatureFilters::process(
@@ -405,8 +405,8 @@ namespace SmartPeak
 
   void LoadFeatureQCs::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureQCComponents_csv_i", "featureQCComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureQCComponentGroups_csv_i", "featureQCComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureQCComponents_csv_i", "${MAIN_DIR}/featureQCComponents.csv");
+    filenames.addFileName("featureQCComponentGroups_csv_i", "${MAIN_DIR}/featureQCComponentGroups.csv");
   };
 
   void LoadFeatureQCs::process(
@@ -453,8 +453,8 @@ namespace SmartPeak
 
   void StoreFeatureFilters::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureFilterComponents_csv_o", "_featureFilterComponents.csv", Filenames::FileScope::EFileScopeInjectionOutput);
-    filenames.addFileName("featureFilterComponentGroups_csv_o", "_featureFilterComponentGroups.csv", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("featureFilterComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureFilterComponents.csv");
+    filenames.addFileName("featureFilterComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureFilterComponentGroups.csv");
   };
 
   void StoreFeatureFilters::process(
@@ -497,8 +497,8 @@ namespace SmartPeak
 
   void StoreFeatureQCs::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureQCComponents_csv_o", "_featureQCComponents.csv", Filenames::FileScope::EFileScopeInjectionOutput);
-    filenames.addFileName("featureQCComponentGroups_csv_o", "_featureQCComponentGroups.csv", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("featureQCComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureQCComponents.csv");
+    filenames.addFileName("featureQCComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureQCComponentGroups.csv");
   };
 
   void StoreFeatureQCs::process(
@@ -541,8 +541,8 @@ namespace SmartPeak
 
   void LoadFeatureRSDFilters::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDFilterComponents_csv_i", "featureRSDFilterComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureRSDFilterComponentGroups_csv_i", "featureRSDFilterComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureRSDFilterComponents_csv_i", "${MAIN_DIR}/featureRSDFilterComponents.csv");
+    filenames.addFileName("featureRSDFilterComponentGroups_csv_i", "${MAIN_DIR}/featureRSDFilterComponentGroups.csv");
   };
 
   bool LoadFeatureRSDFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -621,8 +621,8 @@ namespace SmartPeak
 
   void LoadFeatureRSDQCs::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDQCComponents_csv_i", "featureRSDQCComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureRSDQCComponentGroups_csv_i", "featureRSDQCComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureRSDQCComponents_csv_i", "${MAIN_DIR}/featureRSDQCComponents.csv");
+    filenames.addFileName("featureRSDQCComponentGroups_csv_i", "${MAIN_DIR}/featureRSDQCComponentGroups.csv");
   };
 
   bool LoadFeatureRSDQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -694,8 +694,8 @@ namespace SmartPeak
 
   void StoreFeatureRSDFilters::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDFilterComponents_csv_o", "_featureRSDFilterComponents.csv", Filenames::FileScope::EFileScopeInjectionOutput);
-    filenames.addFileName("featureRSDFilterComponentGroups_csv_o", "_featureRSDFilterComponentGroups.csv", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("featureRSDFilterComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDFilterComponents.csv");
+    filenames.addFileName("featureRSDFilterComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDFilterComponentGroups.csv");
   };
 
   void StoreFeatureRSDFilters::process(
@@ -738,8 +738,8 @@ namespace SmartPeak
 
   void StoreFeatureRSDQCs::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDQCComponents_csv_o", "_featureRSDQCComponents.csv", Filenames::FileScope::EFileScopeInjectionOutput);
-    filenames.addFileName("featureRSDQCComponentGroups_csv_o", "_featureRSDQCComponentGroups.csv", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("featureRSDQCComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDQCComponents.csv");
+    filenames.addFileName("featureRSDQCComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDQCComponentGroups.csv");
   };
 
   void StoreFeatureRSDQCs::process(
@@ -782,8 +782,8 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundFilters::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundFilterComponents_csv_i", "featureBackgroundFilterComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureBackgroundFilterComponentGroups_csv_i", "featureBackgroundFilterComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureBackgroundFilterComponents_csv_i", "${MAIN_DIR}/featureBackgroundFilterComponents.csv");
+    filenames.addFileName("featureBackgroundFilterComponentGroups_csv_i", "${MAIN_DIR}/featureBackgroundFilterComponentGroups.csv");
   };
 
   bool LoadFeatureBackgroundFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -855,8 +855,8 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundQCs::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundQCComponents_csv_i", "featureBackgroundQCComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureBackgroundQCComponentGroups_csv_i", "featureBackgroundQCComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureBackgroundQCComponents_csv_i", "${MAIN_DIR}/featureBackgroundQCComponents.csv");
+    filenames.addFileName("featureBackgroundQCComponentGroups_csv_i", "${MAIN_DIR}/featureBackgroundQCComponentGroups.csv");
   };
 
   bool LoadFeatureBackgroundQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -928,8 +928,8 @@ namespace SmartPeak
 
   void StoreFeatureBackgroundFilters::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundFilterComponents_csv_o", "_featureBackgroundFilterComponents.csv", Filenames::FileScope::EFileScopeInjectionOutput);
-    filenames.addFileName("featureBackgroundFilterComponentGroups_csv_o", "_featureBackgroundFilterComponentGroups.csv", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("featureBackgroundFilterComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundFilterComponents.csv");
+    filenames.addFileName("featureBackgroundFilterComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundFilterComponentGroups.csv");
   };
 
   void StoreFeatureBackgroundFilters::process(
@@ -972,8 +972,8 @@ namespace SmartPeak
 
   void StoreFeatureBackgroundQCs::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundQCComponents_csv_o", "_featureBackgroundQCComponents.csv", Filenames::FileScope::EFileScopeInjectionOutput);
-    filenames.addFileName("featureBackgroundQCComponentGroups_csv_o", "_featureBackgroundQCComponentGroups.csv", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("featureBackgroundQCComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundQCComponents.csv");
+    filenames.addFileName("featureBackgroundQCComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundQCComponentGroups.csv");
   };
 
   void StoreFeatureBackgroundQCs::process(
@@ -1302,8 +1302,8 @@ namespace SmartPeak
 
   void LoadFeatureRSDEstimations::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDEstimationComponents_csv_i", "featureRSDEstimationComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureRSDEstimationComponentGroups_csv_i", "featureRSDEstimationComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureRSDEstimationComponents_csv_i", "${MAIN_DIR}/featureRSDEstimationComponents.csv");
+    filenames.addFileName("featureRSDEstimationComponentGroups_csv_i", "${MAIN_DIR}/featureRSDEstimationComponentGroups.csv");
   };
 
   void LoadFeatureRSDEstimations::process(
@@ -1349,8 +1349,8 @@ namespace SmartPeak
 
   void StoreFeatureRSDEstimations::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDEstimationComponents_csv_o", "_featureRSDEstimationComponents.csv", Filenames::FileScope::EFileScopeInjectionOutput);
-    filenames.addFileName("featureRSDEstimationComponentGroups_csv_o", "_featureRSDEstimationComponentGroups.csv", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("featureRSDEstimationComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDEstimationComponents.csv");
+    filenames.addFileName("featureRSDEstimationComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDEstimationComponentGroups.csv");
   };
 
   void StoreFeatureRSDEstimations::process(
@@ -1393,8 +1393,8 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundEstimations::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundEstimationComponents_csv_i", "featureBackgroundEstimationComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureBackgroundEstimationComponentGroups_csv_i", "featureBackgroundEstimationComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureBackgroundEstimationComponents_csv_i", "${MAIN_DIR}/featureBackgroundEstimationComponents.csv");
+    filenames.addFileName("featureBackgroundEstimationComponentGroups_csv_i", "${MAIN_DIR}/featureBackgroundEstimationComponentGroups.csv");
   };
 
   void LoadFeatureBackgroundEstimations::process(
@@ -1440,8 +1440,8 @@ namespace SmartPeak
 
   void StoreFeatureBackgroundEstimations::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundEstimationComponents_csv_o", "_featureBackgroundEstimationComponents.csv", Filenames::FileScope::EFileScopeInjectionOutput);
-    filenames.addFileName("featureBackgroundEstimationComponentGroups_csv_o", "_featureBackgroundEstimationComponentGroups.csv", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("featureBackgroundEstimationComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundEstimationComponents.csv");
+    filenames.addFileName("featureBackgroundEstimationComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundEstimationComponentGroups.csv");
   };
 
   void StoreFeatureBackgroundEstimations::process(

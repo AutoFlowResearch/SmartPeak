@@ -26,47 +26,18 @@
 #include <map>
 #include <iostream>
 #include <string>
+#include <regex>
 
 namespace SmartPeak
 {
-  void Filenames::setFileVariants(
-    const std::string& input_mzML_filename,
-    const std::string& input_inj_name,
-    const std::string& output_inj_name,
-    const std::string& input_sample_name,
-    const std::string& output_sample_name
-  )
-  {
-    input_mzML_filename_ = input_mzML_filename;
-    input_inj_name_ = input_inj_name;
-    output_inj_name_ = output_inj_name;
-    input_sample_name_ = input_sample_name;
-    output_sample_name_ = output_sample_name;
-    updateFileVariants();
-  }
 
-  void Filenames::setRootPaths(
-    const std::filesystem::path& main_dir,
-    const std::filesystem::path& mzml_input_path,
-    const std::filesystem::path& input_path,
-    const std::filesystem::path& output_path
-  )
-  {
-    mzml_input_path_ = mzml_input_path;
-    input_path_ = input_path;
-    output_path_ = output_path;
-    main_dir_ = main_dir;
-    updateRootPaths();
-  }
-
-  void Filenames::addFileName(const std::string& id, const std::string& default_name, FileScope file_scope)
+  void Filenames::addFileName(const std::string& id, const std::string& name_pattern)
   {
     if (file_names_.find(id) == file_names_.end())
     {
-      FileName f{ default_name , file_scope };
+      FileName f{ name_pattern };
       file_names_.insert_or_assign(id, f);
-      updateRootPaths();
-      updateFileVariants();
+      updateFullPaths();
     }
   }
 
@@ -75,77 +46,51 @@ namespace SmartPeak
     return file_names_.at(id).full_path_.generic_string();
   }
 
-  void Filenames::updateRootPaths()
-  {
-    updateRootPath(main_dir_, FileScope::EFileScopeMain);
-    updateRootPath(mzml_input_path_, FileScope::EFileScopeMzMLInput);
-    updateRootPath(input_path_, FileScope::EFileScopeInjectionInput);
-    updateRootPath(input_path_, FileScope::EFileScopeSampleGroupInput);
-    updateRootPath(output_path_, FileScope::EFileScopeSampleGroupOutput);
-    updateRootPath(output_path_, FileScope::EFileScopeInjectionOutput);
-  }
-
-  void Filenames::updateRootPath(const std::filesystem::path& dir, FileScope file_scope)
-  {
-    for (auto& f : file_names_)
-    {
-      if (f.second.file_scope_ == file_scope)
-      {
-        f.second.root_path_ = dir;
-        updateFullPath(f.second);
-      }
-    }
-  }
-
-  void Filenames::updateFileVariants()
-  {
-    updateFileVariant(input_mzML_filename_, FileScope::EFileScopeMzMLInput);
-    updateFileVariant(input_inj_name_, FileScope::EFileScopeInjectionInput);
-    updateFileVariant(input_sample_name_, FileScope::EFileScopeSampleGroupInput);
-    updateFileVariant(output_sample_name_, FileScope::EFileScopeSampleGroupOutput);
-    updateFileVariant(output_inj_name_, FileScope::EFileScopeInjectionOutput);
-  }
-
-  void Filenames::updateFileVariant(const std::string& variant, FileScope file_scope)
-  {
-    for (auto& f : file_names_)
-    {
-      if (f.second.file_scope_ == file_scope)
-      {
-        f.second.file_variant_ = variant;
-        updateFullPath(f.second);
-      }
-    }
-  }
-
   void Filenames::setFullPath(const std::string& id, const std::filesystem::path& full_path)
   {
     if (file_names_.find(id) == file_names_.end())
     {
-      addFileName(id, "", FileScope::EFileScopeUnspecified);
+      addFileName(id, "");
     }
     file_names_.at(id).full_path_override_ = true;
     file_names_.at(id).full_path_ = full_path;
+  }
+
+  void Filenames::updateFullPaths()
+  {
+    for (auto& filename : file_names_)
+    {
+      updateFullPath(filename.second);
+    }
   }
 
   void Filenames::updateFullPath(FileName& filename)
   {
     if (!filename.full_path_override_)
     {
-      filename.full_path_.clear();
-      if (!filename.root_path_.empty())
-      {
-        filename.full_path_ = filename.root_path_;
+      std::string file_pattern = filename.name_pattern_;
+      std::regex search_regex("\\$\\{([^}]*)\\}");
+      std::smatch match;
+      std::string search_string = file_pattern;
+      while (std::regex_search(search_string, match, search_regex)) {
+        std::string replace_with;
+        if (tags_.count(match.str(1)))
+        {
+          replace_with = tags_[match.str(1)];
+        }
+        std::regex replace_regex(std::string("\\$\\{") + match.str(1) + std::string("\\}"));
+        file_pattern = std::regex_replace(file_pattern, replace_regex, replace_with);
+        search_string = match.suffix().str();
       }
-      if (!filename.file_variant_.empty())
+/*
+      for (const auto& tag : tags_)
       {
-        filename.full_path_ /= filename.file_variant_;
-        filename.full_path_ += filename.default_name_;
+        const std::string tag_to_replace = std::string("\\$\\{") + tag.first + std::string("\\}");
+        std::regex reg(tag_to_replace);
+        file_pattern = std::regex_replace(file_pattern, reg, tag.second);
       }
-      else
-      {
-        filename.full_path_ /= filename.default_name_;
-      }
+*/
+      filename.full_path_ = file_pattern;
     }
   }
 
@@ -153,8 +98,7 @@ namespace SmartPeak
   {
     for (const auto& p : other.file_names_)
       file_names_.emplace(p.first, p.second);
-    updateRootPaths();
-    updateFileVariants();
+    updateFullPaths();
   }
 
   std::vector<std::string> Filenames::getFileIds() const
@@ -166,4 +110,11 @@ namespace SmartPeak
     }
     return file_ids;
   }
+
+  void Filenames::setTag(const std::string& tag_id, const std::string& value)
+  {
+    tags_[tag_id] = value;
+    updateFullPaths();
+  }
+
 }

@@ -55,21 +55,19 @@ void example_LCMS_MRM_Standards(
   };
 
   Filenames methods_filenames;
-  methods_filenames.setRootPaths(dir_I,
-    dir_I + "/mzML/",
-    dir_I + "/features/",
-    dir_I + "/features/");
+  methods_filenames.setTag("MAIN_DIR", dir_I);
+  methods_filenames.setTag("MZML_INPUT_PATH", dir_I + "/mzML/");
+  methods_filenames.setTag("FEATURES_INPUT_PATH", dir_I + "/features/");
+  methods_filenames.setTag("FEATURES_OUTPUT_PATH", dir_I + "/features/");
   std::map<std::string, Filenames> dynamic_filenames1;
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames1[key] = methods_filenames;
-    dynamic_filenames1[key].setFileVariants(
-      injection.getMetaData().getFilename(),
-      key,
-      key,
-      injection.getMetaData().getSampleGroupName(),
-      injection.getMetaData().getSampleGroupName()
-    );
+    dynamic_filenames1[key].setTag("INPUT_MZML_FILENAME", injection.getMetaData().getFilename());
+    dynamic_filenames1[key].setTag("INPUT_INJECTION_NAME", key);
+    dynamic_filenames1[key].setTag("OUTPUT_INJECTION_NAME", key);
+    dynamic_filenames1[key].setTag("INPUT_GROUP_NAME", injection.getMetaData().getSampleGroupName());
+    dynamic_filenames1[key].setTag("OUTPUT_GROUP_NAME", injection.getMetaData().getSampleGroupName());
   }
 
   ProcessSequence ps(sequenceHandler);
@@ -86,13 +84,8 @@ void example_LCMS_MRM_Standards(
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string& key = sequence_segment.getSequenceSegmentName();
     dynamic_filenames2[key] = methods_filenames;
-    dynamic_filenames2[key].setFileVariants(
-      "",
-      key,
-      key,
-      "",
-      ""
-    );
+    dynamic_filenames2[key].setTag("INPUT_INJECTION_NAME", key);
+    dynamic_filenames2[key].setTag("OUTPUT_INJECTION_NAME", key);
   }
 
   ProcessSequenceSegments pss(sequenceHandler);
@@ -110,13 +103,11 @@ void example_LCMS_MRM_Standards(
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames3[key] = methods_filenames;
-    dynamic_filenames3[key].setFileVariants(
-      injection.getMetaData().getFilename(),
-      key,
-      key,
-      injection.getMetaData().getSampleGroupName(),
-      injection.getMetaData().getSampleGroupName()
-    );
+    dynamic_filenames3[key].setTag("INPUT_MZML_FILENAME", injection.getMetaData().getFilename());
+    dynamic_filenames3[key].setTag("INPUT_INJECTION_NAME", key);
+    dynamic_filenames3[key].setTag("OUTPUT_INJECTION_NAME", key);
+    dynamic_filenames3[key].setTag("INPUT_GROUP_NAME", injection.getMetaData().getSampleGroupName());
+    dynamic_filenames3[key].setTag("OUTPUT_GROUP_NAME", injection.getMetaData().getSampleGroupName());
   }
 
   ps.filenames_                     = dynamic_filenames3;

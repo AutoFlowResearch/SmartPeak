@@ -48,7 +48,7 @@ namespace SmartPeak
 
   void SelectDilutions::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("selectDilutions_csv_i", "selectDilutions.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("selectDilutions_csv_i", "${MAIN_DIR}/selectDilutions.csv");
   };
 
   void SelectDilutions::process(
@@ -694,7 +694,7 @@ namespace SmartPeak
 
   void LoadFeaturesSampleGroup::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureXMLSampleGroup_i", ".featureXML", Filenames::FileScope::EFileScopeSampleGroupInput);
+    filenames.addFileName("featureXMLSampleGroup_i", ".featureXML");
   };
 
   void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
@@ -732,7 +732,7 @@ namespace SmartPeak
 
   void StoreFeaturesSampleGroup::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureXMLSampleGroup_o", ".featureXML", Filenames::FileScope::EFileScopeSampleGroupOutput);
+    filenames.addFileName("featureXMLSampleGroup_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}.featureXML");
   };
 
   void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,

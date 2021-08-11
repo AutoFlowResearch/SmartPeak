@@ -206,59 +206,52 @@ namespace SmartPeak
       const auto& method = n_to_raw_data_method_.at(name_);
       cmd_.setMethod(method);
       Filenames method_filenames;
-      method_filenames.setRootPaths(
-        application_handler_.main_dir_,
-        application_handler_.mzML_dir_,
-        application_handler_.features_in_dir_,
-        application_handler_.features_out_dir_);
+      method_filenames.setTag("MAIN_DIR", application_handler_.main_dir_.generic_string());
+      method_filenames.setTag("MZML_INPUT_PATH", application_handler_.mzML_dir_.generic_string());
+      method_filenames.setTag("FEATURES_INPUT_PATH", application_handler_.features_in_dir_.generic_string());
+      method_filenames.setTag("FEATURES_OUTPUT_PATH", application_handler_.features_out_dir_.generic_string());
       for (const InjectionHandler& injection : application_handler_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
         cmd_.dynamic_filenames[key] = method_filenames;
-        cmd_.dynamic_filenames[key].setFileVariants(
-          injection.getMetaData().getFilename(),
-          key,
-          key,
-          injection.getMetaData().getSampleGroupName(),
-          injection.getMetaData().getSampleGroupName()
-        );
+        cmd_.dynamic_filenames[key].setTag("INPUT_MZML_FILENAME", injection.getMetaData().getFilename());
+        cmd_.dynamic_filenames[key].setTag("INPUT_INJECTION_NAME", key);
+        cmd_.dynamic_filenames[key].setTag("OUTPUT_INJECTION_NAME", key);
+        cmd_.dynamic_filenames[key].setTag("INPUT_GROUP_NAME", injection.getMetaData().getSampleGroupName());
+        cmd_.dynamic_filenames[key].setTag("OUTPUT_GROUP_NAME", injection.getMetaData().getSampleGroupName());
       }
     } else if (std::count(valid_commands_sequence_segment_processor.begin(), valid_commands_sequence_segment_processor.end(), name_)) {
       const auto& method = n_to_seq_seg_method_.at(name_);
       cmd_.setMethod(method);
       Filenames method_filenames;
-      method_filenames.setRootPaths(application_handler_.main_dir_,
-        application_handler_.mzML_dir_,
-        application_handler_.features_in_dir_,
-        application_handler_.features_out_dir_);
+      method_filenames.setTag("MAIN_DIR", application_handler_.main_dir_.generic_string());
+      method_filenames.setTag("MZML_INPUT_PATH", application_handler_.mzML_dir_.generic_string());
+      method_filenames.setTag("FEATURES_INPUT_PATH", application_handler_.features_in_dir_.generic_string());
+      method_filenames.setTag("FEATURES_OUTPUT_PATH", application_handler_.features_out_dir_.generic_string());
       for (const SequenceSegmentHandler& sequence_segment : application_handler_.sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();
         cmd_.dynamic_filenames[key] = method_filenames;
-        cmd_.dynamic_filenames[key].setFileVariants(
-          "",
-          key,
-          key,
-          key,
-          key
-        );
+        cmd_.dynamic_filenames[key].setTag("INPUT_MZML_FILENAME", "");
+        cmd_.dynamic_filenames[key].setTag("INPUT_INJECTION_NAME", key);
+        cmd_.dynamic_filenames[key].setTag("OUTPUT_INJECTION_NAME", key);
+        cmd_.dynamic_filenames[key].setTag("INPUT_GROUP_NAME", key);
+        cmd_.dynamic_filenames[key].setTag("OUTPUT_GROUP_NAME", key);
       }
     } else if (std::count(valid_commands_sample_group_processor.begin(), valid_commands_sample_group_processor.end(), name_)) {
       const auto& method = n_to_sample_group_method_.at(name_);
       cmd_.setMethod(method);
       Filenames method_filenames;
-      method_filenames.setRootPaths(application_handler_.main_dir_,
-        application_handler_.mzML_dir_,
-        application_handler_.features_in_dir_,
-        application_handler_.features_out_dir_);
+      method_filenames.setTag("MAIN_DIR", application_handler_.main_dir_.generic_string());
+      method_filenames.setTag("MZML_INPUT_PATH", application_handler_.mzML_dir_.generic_string());
+      method_filenames.setTag("FEATURES_INPUT_PATH", application_handler_.features_in_dir_.generic_string());
+      method_filenames.setTag("FEATURES_OUTPUT_PATH", application_handler_.features_out_dir_.generic_string());
       for (const SampleGroupHandler& sample_group : application_handler_.sequenceHandler_.getSampleGroups()) {
         const std::string& key = sample_group.getSampleGroupName();
         cmd_.dynamic_filenames[key] = method_filenames;
-        cmd_.dynamic_filenames[key].setFileVariants(
-          "",
-          key,
-          key,
-          key,
-          key
-        );
+        cmd_.dynamic_filenames[key].setTag("INPUT_MZML_FILENAME", "");
+        cmd_.dynamic_filenames[key].setTag("INPUT_INJECTION_NAME", key);
+        cmd_.dynamic_filenames[key].setTag("OUTPUT_INJECTION_NAME", key);
+        cmd_.dynamic_filenames[key].setTag("INPUT_GROUP_NAME", key);
+        cmd_.dynamic_filenames[key].setTag("OUTPUT_GROUP_NAME", key);
       }
     }
     else 

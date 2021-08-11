@@ -36,7 +36,7 @@ struct TestData {
     // Load the sequence
     if (load_sequence) {
       Filenames filenames_;
-      filenames_.setRootPaths(pathname, "", "", "");
+      filenames_.setTag("MAIN_DIR", pathname);
       CreateSequence cs(sequenceHandler);
       cs.filenames_ = filenames_;
       cs.delimiter = ",";
@@ -47,18 +47,17 @@ struct TestData {
     if (load_features) {
       LoadFeatures loadFeatures;
       Filenames method_filenames;
-      method_filenames.setRootPaths(pathname,
-        pathname + "/mzML",
-        pathname + "/features",
-        pathname + "/features");
+      method_filenames.setTag("MAIN_DIR", pathname);
+      method_filenames.setTag("MZML_INPUT_PATH", pathname + "mzML");
+      method_filenames.setTag("FEATURES_INPUT_PATH", pathname + "features");
+      method_filenames.setTag("FEATURES_OUTPUT_PATH", pathname + "features");
       for (auto& injection : sequenceHandler.getSequence()) {
         Filenames filenames_ = method_filenames;
-        filenames_.setFileVariants(
-          injection.getMetaData().getFilename(),
-          injection.getMetaData().getInjectionName(),
-          injection.getMetaData().getInjectionName(),
-          injection.getMetaData().getSampleGroupName(),
-          injection.getMetaData().getSampleGroupName());
+        filenames_.setTag("INPUT_MZML_FILENAME", injection.getMetaData().getFilename());
+        filenames_.setTag("INPUT_INJECTION_NAME", injection.getMetaData().getInjectionName());
+        filenames_.setTag("OUTPUT_INJECTION_NAME", injection.getMetaData().getInjectionName());
+        filenames_.setTag("INPUT_GROUP_NAME", injection.getMetaData().getSampleGroupName());
+        filenames_.setTag("OUTPUT_GROUP_NAME", injection.getMetaData().getSampleGroupName());
         loadFeatures.process(injection.getRawData(), {}, filenames_);
       }
     }
@@ -69,18 +68,17 @@ struct TestData {
       params.addFunctionParameters(FunctionParameters("ChromatogramExtractor"));
       LoadRawData loadRawData;
       Filenames method_filenames;
-      method_filenames.setRootPaths(pathname,
-        pathname + "/mzML",
-        pathname + "/features",
-        pathname + "/features");
+      method_filenames.setTag("MAIN_DIR", pathname);
+      method_filenames.setTag("MZML_INPUT_PATH", pathname + "mzML");
+      method_filenames.setTag("FEATURES_INPUT_PATH", pathname + "features");
+      method_filenames.setTag("FEATURES_OUTPUT_PATH", pathname + "features");
       for (auto& injection : sequenceHandler.getSequence()) {
         Filenames filenames_ = method_filenames;
-        filenames_.setFileVariants(
-          injection.getMetaData().getFilename(),
-          injection.getMetaData().getSampleName(),
-          injection.getMetaData().getSampleName(),
-          injection.getMetaData().getSampleGroupName(),
-          injection.getMetaData().getSampleGroupName());
+        filenames_.setTag("INPUT_MZML_FILENAME", injection.getMetaData().getFilename());
+        filenames_.setTag("INPUT_INJECTION_NAME", injection.getMetaData().getInjectionName());
+        filenames_.setTag("OUTPUT_INJECTION_NAME", injection.getMetaData().getInjectionName());
+        filenames_.setTag("INPUT_GROUP_NAME", injection.getMetaData().getSampleGroupName());
+        filenames_.setTag("OUTPUT_GROUP_NAME", injection.getMetaData().getSampleGroupName());
         loadRawData.process(injection.getRawData(), params, filenames_);
       }
     }

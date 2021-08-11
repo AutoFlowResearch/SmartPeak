@@ -262,12 +262,10 @@ void InitializeWorkflowSettings::_update_filenames(
     {
         for (auto& p : cmd.dynamic_filenames)
         {
-          p.second.setRootPaths(
-                application_handler.main_dir_,
-                application_handler.mzML_dir_,
-                application_handler.features_in_dir_,
-                application_handler.features_out_dir_
-          );
+          p.second.setTag("MAIN_DIR", application_handler.main_dir_.generic_string());
+          p.second.setTag("MZML_INPUT_PATH", application_handler.mzML_dir_.generic_string());
+          p.second.setTag("FEATURES_INPUT_PATH", application_handler.features_in_dir_.generic_string());
+          p.second.setTag("FEATURES_OUTPUT_PATH", application_handler.features_out_dir_.generic_string());
         }
     }
 }

@@ -46,21 +46,21 @@ TEST(InputDataValidation, isValidFilename)
   {
     void getInputsOutputs(Filenames& filenames) const
     {
-      filenames.addFileName("some standards file", "OpenMSFile_standardsConcentrations_1.csv", Filenames::FileScope::EFileScopeMain);
+      filenames.addFileName("some standards file", "${MAIN_DIR}/OpenMSFile_standardsConcentrations_1.csv");
     };
   };
   struct NonExistingFile : public IInputsOutputsProvider
   {
     void getInputsOutputs(Filenames& filenames) const
     {
-      filenames.addFileName("a file that does not exist", "this_does_not_exist.csv", Filenames::FileScope::EFileScopeMain);
+      filenames.addFileName("a file that does not exist", "${MAIN_DIR}/this_does_not_exist.csv");
     };
   };
   struct EmptyFileName : public IInputsOutputsProvider
   {
     void getInputsOutputs(Filenames& filenames) const
     {
-      filenames.addFileName("an empty pathname", "", Filenames::FileScope::EFileScopeMain);
+      filenames.addFileName("an empty pathname", "");
     };
   };
   Filenames filenames;
@@ -117,8 +117,7 @@ TEST(InputDataValidation, sampleNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
-  filenames.setRootPaths(main_dir, "", "", "");
-
+  filenames.setTag("MAIN_DIR", main_dir);
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
   cs.delimiter          = ",";
@@ -144,7 +143,7 @@ TEST(InputDataValidation, componentNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
-  filenames.setRootPaths(main_dir, "", "", "");
+  filenames.setTag("MAIN_DIR", main_dir);
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -171,7 +170,7 @@ TEST(InputDataValidation, componentNameGroupsAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
-  filenames.setRootPaths(main_dir, "", "", "");
+  filenames.setTag("MAIN_DIR", main_dir);
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -198,7 +197,7 @@ TEST(InputDataValidation, heavyComponentsAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
-  filenames.setRootPaths(main_dir, "", "", "");
+  filenames.setTag("MAIN_DIR", main_dir);
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;

@@ -45,7 +45,7 @@ namespace SmartPeak
   bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler, Filenames& filenames)
   {
     application_handler->main_dir_ = std::filesystem::path(application_handler->sequence_pathname_).remove_filename().generic_string();
-    filenames.setRootPaths(application_handler->main_dir_, "", "", "");
+    filenames.setTag("MAIN_DIR", application_handler->main_dir_.generic_string());
     filenames.setFullPath("sequence_csv_i", application_handler->sequence_pathname_);
 
     LOGN << "\n\n"
@@ -97,7 +97,7 @@ namespace SmartPeak
 
   void CreateSequence::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("sequence_csv_i", "sequence.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("sequence_csv_i", "${MAIN_DIR}/sequence.csv");
   };
 
   void CreateSequence::process()
@@ -464,7 +464,7 @@ namespace SmartPeak
 
   void LoadWorkflow::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("workflow_csv_i", "workflow.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("workflow_csv_i", "${MAIN_DIR}/workflow.csv");
   };
 
   void LoadWorkflow::process()

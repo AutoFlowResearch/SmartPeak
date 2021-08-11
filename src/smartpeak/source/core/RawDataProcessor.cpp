@@ -137,7 +137,7 @@ namespace SmartPeak
 
   void LoadRawData::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("mzML_i", ".mzML", Filenames::FileScope::EFileScopeMzMLInput);
+    filenames.addFileName("mzML_i", "${MZML_INPUT_PATH}/${INPUT_MZML_FILENAME}.mzML");
   };
 
   void LoadRawData::process(
@@ -319,7 +319,7 @@ namespace SmartPeak
 
   void StoreRawData::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("mzML_i", ".mzML", Filenames::FileScope::EFileScopeMzMLInput);
+    filenames.addFileName("mzML_i", "${MZML_INPUT_PATH}/${INPUT_MZML_FILENAME}.mzML");
   };
 
   void StoreRawData::process(
@@ -356,7 +356,7 @@ namespace SmartPeak
 
   void LoadFeatures::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureXML_i", ".featureXML", Filenames::FileScope::EFileScopeInjectionInput);
+    filenames.addFileName("featureXML_i", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}.featureXML");
   };
 
   void LoadFeatures::process(
@@ -394,7 +394,7 @@ namespace SmartPeak
 
   void StoreFeatures::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureXML_o", ".featureXML", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("featureXML_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.featureXML");
   };
 
   void StoreFeatures::process(
@@ -426,7 +426,7 @@ namespace SmartPeak
 
   void LoadAnnotations::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("mzTab_i", ".mzTab", Filenames::FileScope::EFileScopeInjectionInput);
+    filenames.addFileName("mzTab_i", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}.mzTab");
   };
 
   void LoadAnnotations::process(
@@ -460,7 +460,7 @@ namespace SmartPeak
 
   void StoreAnnotations::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("mzTab_o", ".mzTab", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("mzTab_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.mzTab");
   };
 
   void StoreAnnotations::process(
@@ -791,7 +791,7 @@ namespace SmartPeak
 
   void LoadTransitions::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("traML_csv_i", "traML.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("traML_csv_i", "${MAIN_DIR}/traML.csv");
   };
 
   void LoadTransitions::process(
@@ -868,8 +868,8 @@ namespace SmartPeak
 
   void LoadFeatureFiltersRDP::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureFilterComponents_csv_i", "featureFilterComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureFilterComponentGroups_csv_i", "featureFilterComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureFilterComponents_csv_i", "${MAIN_DIR}/featureFilterComponents.csv");
+    filenames.addFileName("featureFilterComponentGroups_csv_i", "${MAIN_DIR}/featureFilterComponentGroups.csv");
   };
 
   void LoadFeatureFiltersRDP::process(
@@ -909,8 +909,8 @@ namespace SmartPeak
 
   void LoadFeatureQCsRDP::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureQCComponents_csv_i", "featureQCComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureQCComponentGroups_csv_i", "featureQCComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureQCComponents_csv_i", "${MAIN_DIR}/featureQCComponents.csv");
+    filenames.addFileName("featureQCComponentGroups_csv_i", "${MAIN_DIR}/featureQCComponentGroups.csv");
   };
 
   void LoadFeatureQCsRDP::process(
@@ -950,8 +950,8 @@ namespace SmartPeak
 
   void StoreFeatureFiltersRDP::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureFilterComponents_csv_i", "featureFilterComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureFilterComponentGroups_csv_i", "featureFilterComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureFilterComponents_csv_i", "${MAIN_DIR}/featureFilterComponents.csv");
+    filenames.addFileName("featureFilterComponentGroups_csv_i", "${MAIN_DIR}/featureFilterComponentGroups.csv");
   };
 
   void StoreFeatureFiltersRDP::process(
@@ -988,8 +988,8 @@ namespace SmartPeak
 
   void StoreFeatureQCsRDP::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureQCComponents_csv_i", "featureQCComponents.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("featureQCComponentGroups_csv_i", "featureQCComponentGroups.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("featureQCComponents_csv_i", "${MAIN_DIR}/featureQCComponents.csv");
+    filenames.addFileName("featureQCComponentGroups_csv_i", "${MAIN_DIR}/featureQCComponentGroups.csv");
   };
 
   void StoreFeatureQCsRDP::process(
@@ -1026,7 +1026,7 @@ namespace SmartPeak
 
   void LoadValidationData::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("referenceData_csv_i", "referenceData.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("referenceData_csv_i", "${MAIN_DIR}/referenceData.csv");
   };
 
   bool LoadValidationData::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -1175,7 +1175,7 @@ namespace SmartPeak
 
   void LoadParameters::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("parameters_csv_i", "parameters.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("parameters_csv_i", "${MAIN_DIR}/parameters.csv");
   };
 
   bool LoadParameters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -1270,7 +1270,7 @@ namespace SmartPeak
 
   void StoreParameters::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("parameters_csv_i", "parameters.csv", Filenames::FileScope::EFileScopeMain);
+    filenames.addFileName("parameters_csv_i", "${MAIN_DIR}/parameters.csv");
   };
 
   bool StoreParameters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -2302,7 +2302,7 @@ namespace SmartPeak
 
   void DDA::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("traML_csv_o", ".traML", Filenames::FileScope::EFileScopeInjectionOutput);
+    filenames.addFileName("traML_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.traML");
   };
 
   void DDA::process(RawDataHandler& rawDataHandler_IO,

@@ -34,42 +34,10 @@ namespace SmartPeak
   {
 public:
 
-    /**
-      @brief sets the file name vairants: injection name, group names ...
-    */
-    void setFileVariants(
-      const std::string& input_mzML_filename,
-      const std::string& input_inj_name,
-      const std::string& output_inj_name,
-      const std::string& input_sample_name,
-      const std::string& output_sample_name
-    );
-
-    /**
-      @brief sets the directories paths
-    */
-    void setRootPaths(
-      const std::filesystem::path& main_dir,
-      const std::filesystem::path& mzml_input_path,
-      const std::filesystem::path& features_input_path,
-      const std::filesystem::path& features_output_path
-    );
-
-    enum class FileScope
-    {
-      EFileScopeMain,
-      EFileScopeMzMLInput,
-      EFileScopeInjectionInput,
-      EFileScopeInjectionOutput,
-      EFileScopeSampleGroupInput,
-      EFileScopeSampleGroupOutput,
-      EFileScopeUnspecified
-    };
-
-    /**
+  /**
       @brief Adds file to the Filename
     */
-    void addFileName(const std::string& id, const std::string& default_name, FileScope file_scope);
+    void addFileName(const std::string& id, const std::string& name_pattern);
 
     /**
       @brief Returns the full path, with root path and variant applied (or the overridden full path).
@@ -91,35 +59,26 @@ public:
     */
     std::vector<std::string> getFileIds() const;
 
+    /**
+      @brief set tags and update paths.
+    */
+    void setTag(const std::string& tag_id, const std::string& value);
+
   protected:
 
     struct FileName
     {
-      std::string default_name_;
-      FileScope file_scope_;
-      std::string file_variant_;
-      std::filesystem::path root_path_;
+      std::string name_pattern_;
       std::filesystem::path full_path_;
       bool full_path_override_ = false;
     };
 
     friend class Filenames;
 
-    void updateRootPath(const std::filesystem::path& dir, FileScope file_scope);
-    void updateRootPaths();
-    void updateFileVariants();
-    void updateFileVariant(const std::string& variant, FileScope file_scope);
-    void updateFullPath(FileName& filname);
+    void updateFullPaths();
+    void updateFullPath(FileName& filename);
 
     std::map<std::string, FileName> file_names_;
-    std::filesystem::path main_dir_;
-    std::filesystem::path mzml_input_path_;
-    std::filesystem::path input_path_;
-    std::filesystem::path output_path_;
-    std::string input_mzML_filename_;
-    std::string input_inj_name_;
-    std::string output_inj_name_;
-    std::string input_sample_name_;
-    std::string output_sample_name_;
+    std::map<std::string, std::string> tags_;
   };
 }
