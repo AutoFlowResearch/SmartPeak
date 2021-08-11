@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -32,12 +32,15 @@ namespace SmartPeak
   class GuiAppender : public plog::IAppender
   {
   public:
+    typedef std::pair<plog::Severity, plog::util::nstring> GuiAppenderRecord;
+    
     void write(const plog::Record& record) override;
 
     std::vector<plog::util::nstring> getMessageList(plog::Severity severity) const;
+    
+    std::vector<GuiAppenderRecord> getAppenderRecordList(plog::Severity severity) const;
 
   private:
-    typedef std::pair<plog::Severity, plog::util::nstring> GuiAppenderRecord;
     std::vector<GuiAppenderRecord> messages;
     mutable std::mutex messages_mutex;
   };
