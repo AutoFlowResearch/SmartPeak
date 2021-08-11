@@ -82,14 +82,6 @@ namespace SmartPeak
         file_pattern = std::regex_replace(file_pattern, replace_regex, replace_with);
         search_string = match.suffix().str();
       }
-/*
-      for (const auto& tag : tags_)
-      {
-        const std::string tag_to_replace = std::string("\\$\\{") + tag.first + std::string("\\}");
-        std::regex reg(tag_to_replace);
-        file_pattern = std::regex_replace(file_pattern, reg, tag.second);
-      }
-*/
       filename.full_path_ = file_pattern;
     }
   }

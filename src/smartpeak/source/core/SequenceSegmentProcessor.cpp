@@ -1024,7 +1024,6 @@ namespace SmartPeak
     LOGD << "START estimateFeatureFilterValues";
     Filenames filenames = prepareFileNames(filenames_I);
 
-
     std::vector<size_t> standards_indices, qcs_indices;
 
     // get all standards
@@ -1084,7 +1083,6 @@ namespace SmartPeak
   {
     LOGD << "START estimateFeatureQCValues";
     Filenames filenames = prepareFileNames(filenames_I);
-
 
     std::vector<size_t> standards_indices, qcs_indices;
 
@@ -1146,7 +1144,6 @@ namespace SmartPeak
     LOGD << "START TransferLOQToFeatureFilters";
     Filenames filenames = prepareFileNames(filenames_I);
 
-
     // check if there are any quantitation methods
     if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
       LOGE << "quantitation methods is empty. Returning";
@@ -1178,7 +1175,6 @@ namespace SmartPeak
     LOGD << "START TransferLOQToFeatureQCs";
     Filenames filenames = prepareFileNames(filenames_I);
 
-
     // check if there are any quantitation methods
     if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
       LOGE << "quantitation methods is empty. Returning";
@@ -1209,7 +1205,6 @@ namespace SmartPeak
   {
     LOGD << "START EstimateFeatureRSDs";
     Filenames filenames = prepareFileNames(filenames_I);
-
 
     // get all QCs
     std::vector<size_t> qcs_indices;
@@ -1258,7 +1253,6 @@ namespace SmartPeak
   {
     LOGD << "START EstimateFeatureBackgroundInterferences";
     Filenames filenames = prepareFileNames(filenames_I);
-
 
     // get all Blanks
     std::vector<size_t> blanks_indices;

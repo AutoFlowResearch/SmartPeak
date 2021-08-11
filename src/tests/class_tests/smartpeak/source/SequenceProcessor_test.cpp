@@ -257,9 +257,9 @@ TEST(SequenceHandler, processSequence)
   Filenames methods_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   methods_filenames.setTag("MAIN_DIR", path);
-  methods_filenames.setTag("MZML_INPUT_PATH", path + "mzML");
-  methods_filenames.setTag("FEATURES_INPUT_PATH", path + "features");
-  methods_filenames.setTag("FEATURES_OUTPUT_PATH", path + "features");
+  methods_filenames.setTag("MZML_INPUT_PATH", path + "/mzML");
+  methods_filenames.setTag("FEATURES_INPUT_PATH", path + "/features");
+  methods_filenames.setTag("FEATURES_OUTPUT_PATH", path + "/features");
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = methods_filenames;

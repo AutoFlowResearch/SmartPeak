@@ -115,7 +115,6 @@ namespace SmartPeak
           {
             for (auto& p : cmd.dynamic_filenames)
             {
-              p.second.setTag("MAIN_DIR", application_handler_.main_dir_.generic_string());
               p.second.setTag("MZML_INPUT_PATH", application_handler_.mzML_dir_.generic_string());
               p.second.setTag("FEATURES_INPUT_PATH", application_handler_.features_in_dir_.generic_string());
               p.second.setTag("FEATURES_OUTPUT_PATH", application_handler_.features_out_dir_.generic_string());

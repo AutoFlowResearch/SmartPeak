@@ -48,9 +48,9 @@ struct TestData {
       LoadFeatures loadFeatures;
       Filenames method_filenames;
       method_filenames.setTag("MAIN_DIR", pathname);
-      method_filenames.setTag("MZML_INPUT_PATH", pathname + "mzML");
-      method_filenames.setTag("FEATURES_INPUT_PATH", pathname + "features");
-      method_filenames.setTag("FEATURES_OUTPUT_PATH", pathname + "features");
+      method_filenames.setTag("MZML_INPUT_PATH", pathname + "/mzML");
+      method_filenames.setTag("FEATURES_INPUT_PATH", pathname + "/features");
+      method_filenames.setTag("FEATURES_OUTPUT_PATH", pathname + "/features");
       for (auto& injection : sequenceHandler.getSequence()) {
         Filenames filenames_ = method_filenames;
         filenames_.setTag("INPUT_MZML_FILENAME", injection.getMetaData().getFilename());
@@ -69,9 +69,9 @@ struct TestData {
       LoadRawData loadRawData;
       Filenames method_filenames;
       method_filenames.setTag("MAIN_DIR", pathname);
-      method_filenames.setTag("MZML_INPUT_PATH", pathname + "mzML");
-      method_filenames.setTag("FEATURES_INPUT_PATH", pathname + "features");
-      method_filenames.setTag("FEATURES_OUTPUT_PATH", pathname + "features");
+      method_filenames.setTag("MZML_INPUT_PATH", pathname + "/mzML");
+      method_filenames.setTag("FEATURES_INPUT_PATH", pathname + "/features");
+      method_filenames.setTag("FEATURES_OUTPUT_PATH", pathname + "/features");
       for (auto& injection : sequenceHandler.getSequence()) {
         Filenames filenames_ = method_filenames;
         filenames_.setTag("INPUT_MZML_FILENAME", injection.getMetaData().getFilename());

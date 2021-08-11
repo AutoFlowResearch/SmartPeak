@@ -18,7 +18,7 @@
 //
 // --------------------------------------------------------------------------
 // $Maintainer: Douglas McCloskey, Bertrand Boudaud $
-// $Authors: Bertrand Boudaud $
+// $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
 #include <gtest/gtest.h>

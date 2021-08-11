@@ -30,9 +30,7 @@ namespace SmartPeak
   struct IInputsOutputsProvider
   {
     /**
-      TODO
-      id
-      name
+     @brief add files handled by the processor to the Filnames instance
     */
     virtual void getInputsOutputs(Filenames& filenames) const = 0;
 

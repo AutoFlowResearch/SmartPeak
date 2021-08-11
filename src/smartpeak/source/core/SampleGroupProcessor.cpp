@@ -58,7 +58,7 @@ namespace SmartPeak
     const Filenames& filenames_I
   ) const
   {
-    LOGD << "START SelectDilutionsParser";
+    LOGD << "START SelectDilutions";
     Filenames filenames = prepareFileNames(filenames_I);
 
     ParameterSet params(params_I);
@@ -135,7 +135,7 @@ namespace SmartPeak
       }
     }
     sampleGroupHandler_IO.setFeatureMap(new_feature_map);
-    LOGD << "END SelectDilutionsParser";
+    LOGD << "END SelectDilutions";
   }
 
   ParameterSet MergeInjections::getParameterSchema() const
@@ -694,7 +694,7 @@ namespace SmartPeak
 
   void LoadFeaturesSampleGroup::getInputsOutputs(Filenames& filenames) const
   {
-    filenames.addFileName("featureXMLSampleGroup_i", ".featureXML");
+    filenames.addFileName("featureXMLSampleGroup_i", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}.featureXML");
   };
 
   void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,

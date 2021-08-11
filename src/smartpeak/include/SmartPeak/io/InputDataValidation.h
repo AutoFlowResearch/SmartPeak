@@ -48,13 +48,26 @@ public:
       const Filenames& filenames_I,
       bool required);
 
-    static bool prepareToLoad(const Filenames filenames, const std::string& id);
+    static bool prepareToLoad(
+      const Filenames filenames, const std::string& id
+    );
 
-    static bool prepareToLoadOneOfTwo(const Filenames filenames, const std::string& id1, const std::string& id2);
+    static bool prepareToLoadOneOfTwo(
+      const Filenames filenames,
+      const std::string& id1,
+      const std::string& id2
+    );
 
-    static bool prepareToStore(const Filenames filenames, const std::string& id);
+    static bool prepareToStore(
+      const Filenames filenames,
+      const std::string& id
+    );
 
-    static bool prepareToStoreOneOfTwo(const Filenames filenames, const std::string& id1, const std::string& id2);
+    static bool prepareToStoreOneOfTwo(
+      const Filenames filenames,
+      const std::string& id1,
+      const std::string& id2
+    );
 
     static std::string getSequenceInfo(
       const SequenceHandler& sequenceHandler
