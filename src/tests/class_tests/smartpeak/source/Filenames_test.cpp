@@ -31,22 +31,15 @@ using namespace std;
 TEST(Filenames, constructor)
 {
   Filenames filenames;
-  EXPECT_EQ(filenames.getFileNames().size(), 0);
+  EXPECT_EQ(filenames.getFileIds().size(), 0);
 }
 
 TEST(Filenames, addFileName)
 {
   Filenames filenames;
   filenames.addFileName("my_file", "file.txt", Filenames::FileScope::EFileScopeMain);
-  const auto& filenames_list = filenames.getFileNames();
-  ASSERT_EQ(filenames_list.size(), 1);
-  const auto& filename = filenames_list.at("my_file");
-  EXPECT_STREQ(filename.default_name_.c_str(), "file.txt");
-  EXPECT_EQ(filename.file_scope_, Filenames::FileScope::EFileScopeMain);
-  EXPECT_STREQ(filename.file_variant_.c_str(), "");
-  EXPECT_STREQ(filename.root_path_.generic_string().c_str(), "");
-  EXPECT_STREQ(filename.full_path_.generic_string().c_str(), "file.txt");
-  EXPECT_FALSE(filename.full_path_override_);
+  const auto& file_ids = filenames.getFileIds();
+  ASSERT_EQ(file_ids.size(), 1);
 }
 
 TEST(Filenames, getFullPath)

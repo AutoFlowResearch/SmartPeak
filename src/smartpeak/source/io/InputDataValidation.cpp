@@ -40,44 +40,64 @@ namespace SmartPeak
     return ifs.is_open();
   }
 
-  InputDataValidation::FilenameInfo InputDataValidation::processorInputAreReady(
+  bool InputDataValidation::precheckProcessorInputs(
     const IInputsOutputsProvider& input_files,
-    const std::string& member_name,
+    const std::string& processor_name,
     const Filenames& filenames_I,
     bool required)
   {
-    Filenames filenames = filenames_I;
-    input_files.getInputsOutputs(filenames);
+    Filenames processor_filenames;
+    input_files.getInputsOutputs(processor_filenames);
 
-    for (const auto& f : filenames.getFileNames())
+    Filenames merged_filenames = filenames_I;
+    merged_filenames.merge(processor_filenames);
+
+    bool valid = true;
+    std::ostringstream msg;
+    msg << processor_name << "\n";
+    for (const auto& processor_file : processor_filenames.getFileIds())
     {
-      FilenameInfo v;
-      // v.pathname = filename;
-      v.member_name = member_name;
-      std::ostringstream msg;
-      msg << member_name << ":\n\t";
-      const bool file_exists = fileExists(f.second.full_path_);
-      if (!file_exists && !required)
+      const auto& full_path = merged_filenames.getFullPath(processor_file);
+      msg << processor_file << " [" << full_path << "] ";
+      if (full_path.empty())
       {
-        msg << "NOT PROVIDED\n";
-        v.validity = FilenameInfo::not_provided;
+        if (required)
+        {
+          msg << "FAILURE\n";
+          valid = false;
+        }
+        else
+        {
+          msg << "NOT PROVIDED\n";
+        }
+      }
+      const bool file_exists = fileExists(full_path);
+      if (!file_exists)
+      {
+        if (required)
+        {
+          msg << "FAILURE\n";
+          valid = false;
+        }
+        else
+        {
+          msg << "NOT PROVIDED\n";
+        }
       }
       else
       {
-        msg << (file_exists ? "SUCCESS" : "FAILURE") << " <- " << f.second.full_path_.generic_string() << "\n";
-        v.validity = file_exists ? FilenameInfo::valid : FilenameInfo::invalid;
+        msg << "SUCCESS\n";
       }
-      if (v.validity == FilenameInfo::invalid)
-      {
-        LOGE << msg.str();
-      }
-      else
-      {
-        LOGI << msg.str();
-      }
-      return v;
     }
-
+    if (!valid)
+    {
+      LOGE << msg.str();
+    }
+    else
+    {
+      LOGI << msg.str();
+    }
+    return valid;
   }
 
   std::string InputDataValidation::getSequenceInfo(

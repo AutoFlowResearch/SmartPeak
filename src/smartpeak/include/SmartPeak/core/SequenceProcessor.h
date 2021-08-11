@@ -152,7 +152,6 @@ namespace SmartPeak
   private:
     bool buildStaticFilenames(ApplicationHandler* application_handler, Filenames& f);
     void updateFilenames(Filenames& f, const std::string& pathname);
-    bool requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation);
     std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
   };
 
@@ -234,7 +233,7 @@ namespace SmartPeak
     LoadWorkflow() = default;
     explicit LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
     void process() override;
-    std::filesystem::path filename_;
+    Filenames filenames_;
 
     /* IProcessorDescription */
     int getID() const override { return -1; }

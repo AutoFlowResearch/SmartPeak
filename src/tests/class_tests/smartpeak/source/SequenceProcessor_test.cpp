@@ -584,7 +584,7 @@ TEST(SequenceHandler, LoadWorkflow1)
   } workflow_observer;
   sequenceHandler.addWorkflowObserver(&workflow_observer);
   LoadWorkflow processor(sequenceHandler);
-  processor.filename_ = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
+  processor.filenames_.setFullPath("workflow_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv"));
   processor.process();
   const auto& commands = sequenceHandler.getWorkflow();
   std::vector<std::string> expected_command_names = {

@@ -42,21 +42,6 @@
 namespace SmartPeak
 {
 
-  bool CreateSequence::requiredPathnamesAreValid(
-    const std::vector<InputDataValidation::FilenameInfo>& validation
-  )
-  {
-    const std::unordered_set<std::string> required{ "sequence", "parameters", "traml" };
-    bool is_valid{ true };
-    for (const InputDataValidation::FilenameInfo& v : validation) {
-      if (required.count(v.member_name) &&
-        v.validity != InputDataValidation::FilenameInfo::valid) {
-        is_valid = false;
-      }
-    }
-    return is_valid;
-  }
-
   bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler, Filenames& filenames)
   {
     application_handler->main_dir_ = std::filesystem::path(application_handler->sequence_pathname_).remove_filename().generic_string();
@@ -65,34 +50,22 @@ namespace SmartPeak
 
     LOGN << "\n\n"
       "The following list of file was searched for:\n";
-    std::vector<InputDataValidation::FilenameInfo> is_valid;
-    is_valid.push_back(InputDataValidation::processorInputAreReady(*this, "sequence", filenames, true));
-    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadParameters(), "parameters", filenames, true));
-    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadTransitions(), "traml", filenames, true));
-    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadFeatureFilters(), "featureFilter", filenames, false));
-    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadFeatureQCs(), "featureQC", filenames, false));
-    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadQuantitationMethods(), "quantitationMethods", filenames, false));
-    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadStandardsConcentrations(), "standardsConcentrations", filenames, false));
-    is_valid.push_back(InputDataValidation::processorInputAreReady(LoadValidationData(), "referenceData", filenames, false));
+    bool is_valid  = InputDataValidation::precheckProcessorInputs(*this, "sequence", filenames, true);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadParameters(), "parameters", filenames, true);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadTransitions(), "traml", filenames, true);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadFeatureFilters(), "featureFilter", filenames, false);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadFeatureQCs(), "featureQC", filenames, false);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadQuantitationMethods(), "quantitationMethods", filenames, false);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadStandardsConcentrations(), "standardsConcentrations", filenames, false);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadValidationData(), "referenceData", filenames, false);
     std::cout << "\n\n";
 
-    const bool requiredPathnamesAreValidBool = requiredPathnamesAreValid(is_valid);
-
-    const bool otherPathnamesAreFine = std::all_of(
-      is_valid.cbegin() + 3,
-      is_valid.cend(),
-      [](const InputDataValidation::FilenameInfo& arg)
-    { return arg.validity != InputDataValidation::FilenameInfo::invalid; });
-
-    if (!requiredPathnamesAreValidBool || !otherPathnamesAreFine) {
+    if (!is_valid) {
       LOGE << "One or more pathnames are not valid.\n";
-      if (!requiredPathnamesAreValidBool) {
-        LOGF << "\n\n"
-          "Make sure that the following required pathnames are provided:\n"
-          " - sequence\n"
-          " - parameters\n"
-          " - traml\n";
-      }
+      LOGF << "Make sure that the following required pathnames are provided:\n"
+              " - sequence\n"
+              " - parameters\n"
+              " - traml\n";
       LOGN << "Apply the fixes and reload the sequence file.\n";
       return false;
     }
@@ -125,7 +98,6 @@ namespace SmartPeak
   void CreateSequence::getInputsOutputs(Filenames& filenames) const
   {
     filenames.addFileName("sequence_csv_i", "sequence.csv", Filenames::FileScope::EFileScopeMain);
-    filenames.addFileName("workflow_csv_i", "workflow.csv", Filenames::FileScope::EFileScopeMain);
   };
 
   void CreateSequence::process()
@@ -142,7 +114,7 @@ namespace SmartPeak
 
     // load workflow
     LoadWorkflow loadWorkflow(*sequenceHandler_IO);
-    loadWorkflow.filename_ = filenames_.getFullPath("workflow_csv_i");
+    loadWorkflow.filenames_ = filenames_;
     loadWorkflow.process();
 
     // TODO: Given that the raw data is shared between all injections, it could
@@ -485,7 +457,7 @@ namespace SmartPeak
 
   bool LoadWorkflow::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    filename_ = filename;
+    filenames_.setFullPath("workflow_csv_i", filename);
     process();
     return true;
   }
@@ -499,23 +471,16 @@ namespace SmartPeak
   {
     // TODO: move to parameters at some point
     LOGD << "START LoadWorkflow";
-    LOGI << "Loading " << filename_.generic_string();
-
-    if (filename_.empty()) {
-      LOGE << "Filename is empty";
-      LOGD << "END LoadWorkflow";
-      return;
-    }
-
-    if (!InputDataValidation::fileExists(filename_)) {
-      LOGE << "File not found";
-      LOGD << "END LoadWorkflow";
+    filenames_ = prepareFileNames(filenames_);
+    if (!InputDataValidation::prepareToLoad(filenames_, "workflow_csv_i"))
+    {
+      LOGD << "END " << getName();
       return;
     }
 
     std::vector<std::string> res;
     try {
-      io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(filename_.generic_string());
+      io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(filenames_.getFullPath("workflow_csv_i").generic_string());
       const std::string s_command_name{ "command_name" };
       in.read_header(
         io::ignore_extra_column,

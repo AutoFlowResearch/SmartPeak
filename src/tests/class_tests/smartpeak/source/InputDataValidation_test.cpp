@@ -42,18 +42,36 @@ TEST(InputDataValidation, fileExists)
 
 TEST(InputDataValidation, isValidFilename)
 {
-  /*
-  string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv");
-  InputDataValidation::FilenameInfo v;
-  v = InputDataValidation::isValidFilename(pathname, "some standards file", true);
-  EXPECT_EQ(v.validity, InputDataValidation::FilenameInfo::valid);  // success
-  pathname = SMARTPEAK_GET_TEST_DATA_PATH("this_does_not_exist.csv");
-  v = InputDataValidation::isValidFilename(pathname, "a file that does not exist", true);
-  EXPECT_EQ(v.validity, InputDataValidation::FilenameInfo::invalid); // failure
-  pathname.clear();
-  v = InputDataValidation::isValidFilename(pathname, "an empty pathname", false);
-  EXPECT_EQ(v.validity, InputDataValidation::FilenameInfo::not_provided);  // not provided
-  */
+  struct ExistingFile : public IInputsOutputsProvider
+  {
+    void getInputsOutputs(Filenames& filenames) const
+    {
+      filenames.addFileName("some standards file", "OpenMSFile_standardsConcentrations_1.csv", Filenames::FileScope::EFileScopeMain);
+    };
+  };
+  struct NonExistingFile : public IInputsOutputsProvider
+  {
+    void getInputsOutputs(Filenames& filenames) const
+    {
+      filenames.addFileName("a file that does not exist", "this_does_not_exist.csv", Filenames::FileScope::EFileScopeMain);
+    };
+  };
+  struct EmptyFileName : public IInputsOutputsProvider
+  {
+    void getInputsOutputs(Filenames& filenames) const
+    {
+      filenames.addFileName("an empty pathname", "", Filenames::FileScope::EFileScopeMain);
+    };
+  };
+  Filenames filenames;
+  filenames.setFullPath("some standards file", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv"));
+  EXPECT_TRUE(InputDataValidation::precheckProcessorInputs(ExistingFile(), "some standards file", filenames, true));
+  filenames.setFullPath("a file that does not exist", SMARTPEAK_GET_TEST_DATA_PATH("this_does_not_exist.csv"));
+  EXPECT_FALSE(InputDataValidation::precheckProcessorInputs(NonExistingFile(), "a file that does not exist", filenames, true));
+  EXPECT_TRUE(InputDataValidation::precheckProcessorInputs(NonExistingFile(), "a file that does not exist", filenames, false));
+  filenames.setFullPath("an empty pathname", "");
+  EXPECT_FALSE(InputDataValidation::precheckProcessorInputs(EmptyFileName(), "an empty pathname", filenames, true));
+  EXPECT_TRUE(InputDataValidation::precheckProcessorInputs(EmptyFileName(), "an empty pathname", filenames, false));
 }
 
 TEST(InputDataValidation, validateNamesInStructures)

@@ -40,17 +40,11 @@ public:
     InputDataValidation(InputDataValidation&&)                 = delete;
     InputDataValidation& operator=(InputDataValidation&&)      = delete;
 
-    struct FilenameInfo {
-      enum ValidityEnum {invalid, valid, not_provided} validity;
-//      std::filesystem::path pathname;
-      std::string member_name;
-    };
-
     static bool fileExists(const std::filesystem::path& filepath);
 
-    static FilenameInfo processorInputAreReady(
+    static bool precheckProcessorInputs(
       const IInputsOutputsProvider& input_files,
-      const std::string& member_name,
+      const std::string& processor_name,
       const Filenames& filenames_I,
       bool required);
 

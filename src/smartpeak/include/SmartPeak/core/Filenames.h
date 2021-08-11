@@ -85,6 +85,13 @@ public:
     */
     void merge(const Filenames& other);
 
+    /**
+      @brief returns registered file ids.
+    */
+    std::vector<std::string> getFileIds() const;
+
+  protected:
+
     struct FileName
     {
       std::string default_name_;
@@ -94,13 +101,6 @@ public:
       std::filesystem::path full_path_;
       bool full_path_override_ = false;
     };
-
-    /**
-      @brief returns detailed filenames.
-    */
-    const std::map<std::string, FileName>& getFileNames() const { return file_names_; };
-
-  protected:
 
     friend class Filenames;
 

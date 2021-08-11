@@ -157,4 +157,13 @@ namespace SmartPeak
     updateFileVariants();
   }
 
+  std::vector<std::string> Filenames::getFileIds() const
+  {
+    std::vector<std::string> file_ids;
+    for (const auto& key : file_names_)
+    {
+      file_ids.push_back(key.first);
+    }
+    return file_ids;
+  }
 }
