@@ -31,14 +31,14 @@ using namespace SmartPeak;
 
 void example_HPLC_UV_Unknowns(
   const std::string& dir_I,
-  const Filenames& filenames,
+  const Filenames& filenames_I,
   const std::string& delimiter_I = ","
 )
 {
   SequenceHandler sequenceHandler;
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames_        = filenames;
+  cs.filenames_        = filenames_I;
   cs.delimiter        = delimiter_I;
   cs.checkConsistency = true;
   cs.process();
@@ -79,6 +79,10 @@ void example_HPLC_UV_Unknowns(
   ps.filenames_                     = dynamic_filenames;
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.process();
+
+  Filenames filenames = filenames_I;
+  filenames.setFullPath("pivotTable_csv_o", dir_I + "/PivotTable.csv");
+  filenames.setFullPath("featureDB_csv_o", dir_I + "/FeatureDB.csv");
 
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,

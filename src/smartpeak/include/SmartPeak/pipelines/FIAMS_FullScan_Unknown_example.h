@@ -28,14 +28,14 @@ using namespace SmartPeak;
 
 void example_FIAMS_FullScan_Unknowns(
   const std::string& dir_I,
-  const Filenames& filenames,
+  const Filenames& filenames_I,
   const std::string& delimiter_I = ","
 )
 {
   SequenceHandler sequenceHandler;
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames_        = filenames;
+  cs.filenames_        = filenames_I;
   cs.delimiter        = delimiter_I;
   cs.checkConsistency = true;
   cs.process();

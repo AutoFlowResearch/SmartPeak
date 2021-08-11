@@ -13,6 +13,10 @@ void test_main_LCMS_MRM_Unknown()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("LCMS_MRM_Unknowns");
   Filenames filenames_main;
+  filenames_main.setRootPaths(main_dir,
+    main_dir + "/mzML/",
+    main_dir + "/features/",
+    main_dir + "/features/");
 
   example_LCMS_MRM_Unknowns(main_dir, filenames_main, ",");
 

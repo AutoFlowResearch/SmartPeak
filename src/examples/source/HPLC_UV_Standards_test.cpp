@@ -13,6 +13,10 @@ void test_main_HPLC_UV_Standards()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Standards");
   Filenames filenames_main;
+  filenames_main.setRootPaths(main_dir,
+    main_dir + "/mzML/",
+    main_dir + "/features/",
+    main_dir + "/features/");
 
   example_HPLC_UV_Standards(main_dir, filenames_main, ",");
 
