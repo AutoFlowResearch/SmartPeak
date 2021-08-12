@@ -35,8 +35,6 @@ namespace SmartPeak
     typedef std::pair<plog::Severity, plog::util::nstring> GuiAppenderRecord;
     
     void write(const plog::Record& record) override;
-
-    std::vector<plog::util::nstring> getMessageList(plog::Severity severity) const;
     
     std::vector<GuiAppenderRecord> getAppenderRecordList(plog::Severity severity) const;
 
