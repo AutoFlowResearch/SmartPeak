@@ -25,94 +25,75 @@
 
 #include <string>
 #include <filesystem>
+#include <map>
+#include <vector>
 
 namespace SmartPeak
 {
   class Filenames
   {
-public:
-    std::string sequence_csv_i;
-    std::string parameters_csv_i;
-    std::string workflow_csv_i;
-    std::string traML_csv_i;
-    std::string traML_csv_o;
-    std::string featureFilterComponents_csv_i;
-    std::string featureFilterComponentGroups_csv_i;
-    std::string featureQCComponents_csv_i;
-    std::string featureQCComponentGroups_csv_i;
-    std::string featureRSDFilterComponents_csv_i;
-    std::string featureRSDFilterComponentGroups_csv_i;
-    std::string featureRSDQCComponents_csv_i;
-    std::string featureRSDQCComponentGroups_csv_i;
-    std::string featureBackgroundFilterComponents_csv_i;
-    std::string featureBackgroundFilterComponentGroups_csv_i;
-    std::string featureBackgroundQCComponents_csv_i;
-    std::string featureBackgroundQCComponentGroups_csv_i;
-    std::string featureRSDEstimationComponents_csv_i;
-    std::string featureRSDEstimationComponentGroups_csv_i;
-    std::string featureBackgroundEstimationComponents_csv_i;
-    std::string featureBackgroundEstimationComponentGroups_csv_i;
-    std::string quantitationMethods_csv_i;
-    std::string standardsConcentrations_csv_i;
-    std::string referenceData_csv_i;
-    std::string selectDilutions_csv_i;
-    std::string mzML_i;
-    std::string mzTab_i;
-    std::string mzTab_o;
-    std::string featureXML_o;
-    std::string features_pdf_o;
-    std::string featureXMLSampleGroup_o;
-    std::string featureXML_i;
-    std::string featureXMLSampleGroup_i;
-    std::string featureFilterComponents_csv_o;
-    std::string featureFilterComponentGroups_csv_o;
-    std::string featureQCComponents_csv_o;
-    std::string featureQCComponentGroups_csv_o;
-    std::string featureRSDFilterComponents_csv_o;
-    std::string featureRSDFilterComponentGroups_csv_o;
-    std::string featureRSDQCComponents_csv_o;
-    std::string featureRSDQCComponentGroups_csv_o;
-    std::string featureBackgroundFilterComponents_csv_o;
-    std::string featureBackgroundFilterComponentGroups_csv_o;
-    std::string featureBackgroundQCComponents_csv_o;
-    std::string featureBackgroundQCComponentGroups_csv_o;
-    std::string featureRSDEstimationComponents_csv_o;
-    std::string featureRSDEstimationComponentGroups_csv_o;
-    std::string featureBackgroundEstimationComponents_csv_o;
-    std::string featureBackgroundEstimationComponentGroups_csv_o;
-    std::string quantitationMethods_csv_o;
-    std::string componentsToConcentrations_csv_o;
-    std::string pivotTable_csv_o;
-    std::string featureDB_csv_o;
-    // TODO: do not hardcode entire pathnames (all those above this line)
-    // Instead, construct them when needed, using the strings below
-    std::string mzml_input_path;
-    std::string features_input_path;
-    std::string output_path;
+  public:
 
-    static Filenames getDefaultStaticFilenames(
-      const std::string& dir
-    );
+    enum class Tag
+    {
+      MAIN_DIR,
+      MZML_INPUT_PATH,
+      FEATURES_INPUT_PATH,
+      FEATURES_OUTPUT_PATH,
+      INPUT_MZML_FILENAME,
+      INPUT_INJECTION_NAME,
+      OUTPUT_INJECTION_NAME,
+      INPUT_GROUP_NAME,
+      OUTPUT_GROUP_NAME
+    };
 
-    static Filenames getDefaultDynamicFilenames(
-      const std::string& static_dir,
-      const std::string& mzml_input_path,
-      const std::string& features_input_path,
-      const std::string& output_path,
-      const std::string& input_mzML_filename,
-      const std::string& input_inj_name,
-      const std::string& output_inj_name,
-      const std::string& input_sample_name,
-      const std::string& output_sample_name
-    );
+    /**
+      @brief Adds file to the Filename
+    */
+    void addFileName(const std::string& id, const std::string& name_pattern);
 
-    static void updateDefaultDynamicFilenames(
-      const std::string& mzml_input_path,
-      const std::string& features_input_path,
-      const std::string& output_path,
-      Filenames& filenames
-    );
+    /**
+      @brief Returns the full path, with root path and variant applied (or the overridden full path).
+    */
+    std::filesystem::path getFullPath(const std::string& id) const;
 
-    void clear();
+    /**
+      @brief Sets the ful path name, overriding computation using variant and root path.
+    */
+    void setFullPath(const std::string& id, const std::filesystem::path& full_path);
+
+    /**
+      @brief Merges two Filenames. Will not overwrite file that already exists.
+    */
+    void merge(const Filenames& other);
+
+    /**
+      @brief returns registered file ids.
+    */
+    std::vector<std::string> getFileIds() const;
+
+    /**
+      @brief set tags and update paths.
+    */
+    void setTag(Tag tag, const std::string& value);
+
+  protected:
+
+    struct FileName
+    {
+      std::string name_pattern_;
+      std::filesystem::path full_path_;
+      bool full_path_override_ = false;
+    };
+
+    friend class Filenames;
+
+    void updateFullPaths();
+    void updateFullPath(FileName& filename);
+
+    std::map<std::string, FileName> file_names_;
+    std::map<Tag, std::string> tags_;
+
+    static std::map<std::string, Tag> string_to_tag_;
   };
 }

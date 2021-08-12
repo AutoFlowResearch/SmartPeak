@@ -400,7 +400,7 @@ TEST(SequenceHandler, processLoadFeaturesSampleGroup)
   // test store features
   LoadFeaturesSampleGroup process;
   Filenames filenames;
-  filenames.featureXMLSampleGroup_i = SMARTPEAK_GET_TEST_DATA_PATH(sampleGroupHandler.getSampleGroupName() + ".featureXML");
+  filenames.setFullPath("featureXMLSampleGroup_i", SMARTPEAK_GET_TEST_DATA_PATH(sampleGroupHandler.getSampleGroupName() + ".featureXML"));
   process.process(sampleGroupHandler, sequenceHandler, {}, filenames);
 
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().size(), 3);
@@ -514,7 +514,7 @@ TEST(SelectDilutionsParser, process_preferred)
   SampleGroupHandler sampleGroupHandler = sequenceHandler.getSampleGroups().front();
 
   Filenames filenames;
-  filenames.selectDilutions_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectDilutions.csv");
+  filenames.setFullPath("selectDilutions_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectDilutions.csv"));
   SelectDilutions select_dilutions;
   select_dilutions.process(sampleGroupHandler, sequenceHandler, select_dilutions_params, filenames);
 
@@ -621,7 +621,7 @@ TEST(SelectDilutionsParser, process_exclusive)
   ParameterSet params_exclusive(params_struct);
 
   Filenames filenames;
-  filenames.selectDilutions_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectDilutions.csv");
+  filenames.setFullPath("selectDilutions_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectDilutions.csv"));
   sampleGroupHandler.getFeatureMap().clear();
   SelectDilutions select_dilutions;
   select_dilutions.process(sampleGroupHandler, sequenceHandler, params_exclusive, filenames);

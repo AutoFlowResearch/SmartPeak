@@ -88,7 +88,7 @@ namespace SmartPeak
       const bool checkboxes_check = initializeMetadataAndSampleTypes();
       if (checkboxes_check)
       {
-        const std::string pathname = application_handler_.main_dir_ + "/FeatureDB.csv";
+        const auto pathname = application_handler_.main_dir_ / "FeatureDB.csv";
         run_and_join(
           SequenceParser::writeDataTableFromMetaValue,
           "FeatureDB.csv",
@@ -111,7 +111,7 @@ namespace SmartPeak
       const bool checkboxes_check = initializeMetadataAndSampleTypes();
       if (checkboxes_check)
       {
-        const std::string pathname = application_handler_.main_dir_ + "/PivotTable.csv";
+        const auto pathname = application_handler_.main_dir_ / "PivotTable.csv";
         run_and_join(
           SequenceParser::writeDataMatrixFromMetaValue,
           "PivotTable.csv",
@@ -161,10 +161,10 @@ namespace SmartPeak
   }
 
   void Report::run_and_join(
-    bool (*data_writer)(const SequenceHandler&, const std::string&, const std::vector<FeatureMetadata>&, const std::set<SampleType>&),
+    bool (*data_writer)(const SequenceHandler&, const std::filesystem::path&, const std::vector<FeatureMetadata>&, const std::set<SampleType>&),
     const std::string& data_writer_label,
     const SequenceHandler sequence,
-    const std::string& pathname,
+    const std::filesystem::path& pathname,
     const std::vector<FeatureMetadata>& meta_data,
     const std::set<SampleType>& sample_types
   )
@@ -188,7 +188,7 @@ namespace SmartPeak
     }
 
     if (data_was_written) {
-      LOGN << data_writer_label << " file has been stored at: " << pathname;
+      LOGN << data_writer_label << " file has been stored at: " << pathname.generic_string();
     } else {
       LOGE << "Error during write. " << data_writer_label << " content is invalid.";
     }

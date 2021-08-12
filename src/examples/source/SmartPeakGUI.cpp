@@ -72,8 +72,8 @@ void initializeDataDirs(ApplicationHandler& state);
 void initializeDataDir(
   ApplicationHandler& state,
   const std::string& label,
-  std::string& data_dir_member,
-  const std::string& default_dir
+  std::filesystem::path& data_dir_member,
+  const std::filesystem::path& default_dir
 );
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows);
@@ -925,15 +925,15 @@ void initializeDataDirs(ApplicationHandler& application_handler)
 void initializeDataDir(
   ApplicationHandler& application_handler,
   const std::string& label,
-  std::string& data_dir_member,
-  const std::string& default_dir
+  std::filesystem::path& data_dir_member,
+  const std::filesystem::path& default_dir
 )
 {
-  if (data_dir_member.size()) {
+  if (!data_dir_member.empty()) {
     return;
   }
-  data_dir_member = application_handler.main_dir_ + "/" + default_dir;
-  LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member;
+  data_dir_member = application_handler.main_dir_ / default_dir;
+  LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member.generic_string();
 }
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows)

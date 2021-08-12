@@ -109,13 +109,12 @@ namespace SmartPeak
       }
     };
 
-    std::string                           sequence_pathname_;
-    std::string                           main_dir_                = ".";
-    std::string                           mzML_dir_;
-    std::string                           features_in_dir_;
-    std::string                           features_out_dir_;
-    Filenames                             static_filenames_;
-    SequenceHandler                       sequenceHandler_;
+    std::filesystem::path sequence_pathname_;
+    std::filesystem::path main_dir_                = ".";
+    std::filesystem::path mzML_dir_;
+    std::filesystem::path features_in_dir_;
+    std::filesystem::path features_out_dir_;
+    SequenceHandler       sequenceHandler_;
   };
 
 
@@ -124,7 +123,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
       application_handler->mzML_dir_ = filename;
       return true;
@@ -135,7 +134,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
       application_handler->features_in_dir_ = filename;
       return true;
@@ -147,7 +146,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override
     {
       application_handler->features_out_dir_ = filename;
       return true;

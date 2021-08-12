@@ -105,10 +105,25 @@ namespace SmartPeak
       const ApplicationHandler::Command& cmd = commands[i];
       if (cmd.type == ApplicationHandler::Command::RawDataMethod) {
         std::vector<std::shared_ptr<RawDataProcessor>> raw_methods;
-        std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(raw_methods),
-          [](const ApplicationHandler::Command& command){ return command.raw_data_method; });
+        std::map<std::string, Filenames> filenames;
+        std::for_each(commands.begin() + i, commands.begin() + j,
+          [&](const ApplicationHandler::Command& command) 
+        { 
+          raw_methods.push_back(command.raw_data_method);
+          for (const auto& filename_to_merge : command.dynamic_filenames)
+          {
+            if (filenames.find(filename_to_merge.first) == filenames.end())
+            {
+              filenames.emplace(filename_to_merge.first, filename_to_merge.second);
+            }
+            else
+            {
+              filenames.at(filename_to_merge.first).merge(filename_to_merge.second);
+            }
+          }
+        });
         ProcessSequence ps(state.sequenceHandler_, sequence_processor_observer);
-        ps.filenames_ = cmd.dynamic_filenames;
+        ps.filenames_ = filenames;
         ps.raw_data_processing_methods_ = raw_methods;
         ps.injection_names_ = injection_names;
         notifyStartCommands<decltype(raw_methods)>(observable, i, raw_methods);
@@ -116,10 +131,25 @@ namespace SmartPeak
         notifyEndCommands<decltype(raw_methods)>(observable, i, raw_methods);
       } else if (cmd.type == ApplicationHandler::Command::SequenceSegmentMethod) {
         std::vector<std::shared_ptr<SequenceSegmentProcessor>> seq_seg_methods;
-        std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(seq_seg_methods),
-          [](const ApplicationHandler::Command& command){ return command.seq_seg_method; });
+        std::map<std::string, Filenames> filenames;
+        std::for_each(commands.begin() + i, commands.begin() + j,
+          [&](const ApplicationHandler::Command& command)
+        {
+          seq_seg_methods.push_back(command.seq_seg_method);
+          for (const auto& filename_to_merge : command.dynamic_filenames)
+          {
+            if (filenames.find(filename_to_merge.first) == filenames.end())
+            {
+              filenames.emplace(filename_to_merge.first, filename_to_merge.second);
+            }
+            else
+            {
+              filenames.at(filename_to_merge.first).merge(filename_to_merge.second);
+            }
+          }
+        });
         ProcessSequenceSegments pss(state.sequenceHandler_, sequence_segment_processor_observer);
-        pss.filenames_ = cmd.dynamic_filenames;
+        pss.filenames_ = filenames;
         pss.sequence_segment_processing_methods_ = seq_seg_methods;
         pss.sequence_segment_names_ = sequence_segment_names;
         notifyStartCommands<decltype(seq_seg_methods)>(observable, i, seq_seg_methods);
@@ -127,10 +157,25 @@ namespace SmartPeak
         notifyEndCommands<decltype(seq_seg_methods)>(observable, i, seq_seg_methods);
       } else if (cmd.type == ApplicationHandler::Command::SampleGroupMethod) {
         std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_methods;
-        std::transform(commands.begin() + i, commands.begin() + j, std::back_inserter(sample_group_methods),
-          [](const ApplicationHandler::Command& command) { return command.sample_group_method; });
+        std::map<std::string, Filenames> filenames;
+        std::for_each(commands.begin() + i, commands.begin() + j,
+          [&](const ApplicationHandler::Command& command)
+        {
+          sample_group_methods.push_back(command.sample_group_method);
+          for (const auto& filename_to_merge : command.dynamic_filenames)
+          {
+            if (filenames.find(filename_to_merge.first) == filenames.end())
+            {
+              filenames.emplace(filename_to_merge.first, filename_to_merge.second);
+            }
+            else
+            {
+              filenames.at(filename_to_merge.first).merge(filename_to_merge.second);
+            }
+          }
+        });
         ProcessSampleGroups psg(state.sequenceHandler_, sample_group_processor_observer);
-        psg.filenames_ = cmd.dynamic_filenames;
+        psg.filenames_ = filenames;
         psg.sample_group_processing_methods_ = sample_group_methods;
         psg.sample_group_names_ = sample_group_names;
         notifyStartCommands<decltype(sample_group_methods)>(observable, i, sample_group_methods);
@@ -158,52 +203,55 @@ namespace SmartPeak
 
     // Run the command depending on whether it is a raw data processor method or sequence segment processor method
     if (std::count(valid_commands_raw_data_processor.begin(), valid_commands_raw_data_processor.end(), name_)) {
-      cmd_.setMethod(n_to_raw_data_method_.at(name_));
+      const auto& method = n_to_raw_data_method_.at(name_);
+      cmd_.setMethod(method);
+      Filenames method_filenames;
+      method_filenames.setTag(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
+      method_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler_.mzML_dir_.generic_string());
+      method_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.features_in_dir_.generic_string());
+      method_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.features_out_dir_.generic_string());
       for (const InjectionHandler& injection : application_handler_.sequenceHandler_.getSequence()) {
         const std::string& key = injection.getMetaData().getInjectionName();
-        cmd_.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-          application_handler_.main_dir_,
-          application_handler_.mzML_dir_,
-          application_handler_.features_in_dir_,
-          application_handler_.features_out_dir_,
-          injection.getMetaData().getFilename(),
-          key,
-          key,
-          injection.getMetaData().getSampleGroupName(),
-          injection.getMetaData().getSampleGroupName()
-        );
+        cmd_.dynamic_filenames[key] = method_filenames;
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
       }
     } else if (std::count(valid_commands_sequence_segment_processor.begin(), valid_commands_sequence_segment_processor.end(), name_)) {
-      cmd_.setMethod(n_to_seq_seg_method_.at(name_));
+      const auto& method = n_to_seq_seg_method_.at(name_);
+      cmd_.setMethod(method);
+      Filenames method_filenames;
+      method_filenames.setTag(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
+      method_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler_.mzML_dir_.generic_string());
+      method_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.features_in_dir_.generic_string());
+      method_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.features_out_dir_.generic_string());
       for (const SequenceSegmentHandler& sequence_segment : application_handler_.sequenceHandler_.getSequenceSegments()) {
         const std::string& key = sequence_segment.getSequenceSegmentName();
-        cmd_.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-          application_handler_.main_dir_,
-          application_handler_.mzML_dir_,
-          application_handler_.features_in_dir_,
-          application_handler_.features_out_dir_,
-          "",
-          key,
-          key,
-          key,
-          key
-        );
+        cmd_.dynamic_filenames[key] = method_filenames;
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, key);
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, key);
       }
     } else if (std::count(valid_commands_sample_group_processor.begin(), valid_commands_sample_group_processor.end(), name_)) {
-      cmd_.setMethod(n_to_sample_group_method_.at(name_));
+      const auto& method = n_to_sample_group_method_.at(name_);
+      cmd_.setMethod(method);
+      Filenames method_filenames;
+      method_filenames.setTag(Filenames::Tag::MAIN_DIR, application_handler_.main_dir_.generic_string());
+      method_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler_.mzML_dir_.generic_string());
+      method_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.features_in_dir_.generic_string());
+      method_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.features_out_dir_.generic_string());
       for (const SampleGroupHandler& sample_group : application_handler_.sequenceHandler_.getSampleGroups()) {
         const std::string& key = sample_group.getSampleGroupName();
-        cmd_.dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-          application_handler_.main_dir_,
-          application_handler_.mzML_dir_,
-          application_handler_.features_in_dir_,
-          application_handler_.features_out_dir_,
-          "",
-          key,
-          key,
-          key,
-          key
-        );
+        cmd_.dynamic_filenames[key] = method_filenames;
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, key);
+        cmd_.dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, key);
       }
     }
     else 

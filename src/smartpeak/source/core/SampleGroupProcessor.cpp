@@ -46,14 +46,20 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
+  void SelectDilutions::getFilenames(Filenames& filenames) const
+  {
+    filenames.addFileName("selectDilutions_csv_i", "${MAIN_DIR}/selectDilutions.csv");
+  };
+
   void SelectDilutions::process(
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_I
   ) const
   {
-    LOGD << "START SelectDilutionsParser";
+    LOGD << "START SelectDilutions";
+    Filenames filenames = prepareFilenames(filenames_I);
 
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
@@ -61,11 +67,11 @@ namespace SmartPeak
     std::map<std::string, int> select_dilution_map;
     try
     {
-      SelectDilutionsParser::read(filenames.selectDilutions_csv_i, select_dilution_map);
+      SelectDilutionsParser::read(filenames.getFullPath("selectDilutions_csv_i").generic_string(), select_dilution_map);
     }
     catch (const std::exception& e)
     {
-      LOGE << "Failed to read select dilutions file [" << filenames.selectDilutions_csv_i << "] : " << e.what();
+      LOGE << "Failed to read select dilutions file [" << filenames.getFullPath("selectDilutions_csv_i").generic_string() << "] : " << e.what();
       return;
     }
 
@@ -129,7 +135,7 @@ namespace SmartPeak
       }
     }
     sampleGroupHandler_IO.setFeatureMap(new_feature_map);
-    LOGD << "END SelectDilutionsParser";
+    LOGD << "END SelectDilutions";
   }
 
   ParameterSet MergeInjections::getParameterSchema() const
@@ -189,10 +195,11 @@ namespace SmartPeak
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_I
   ) const
   {
     LOGD << "START MergeInjections";
+    Filenames filenames = prepareFilenames(filenames_I);
 
     // Check the parameters
     if (params_I.at("MergeInjections").empty() && params_I.at("MergeInjections").empty()) {
@@ -685,26 +692,29 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
+  void LoadFeaturesSampleGroup::getFilenames(Filenames& filenames) const
+  {
+    filenames.addFileName("featureXMLSampleGroup_i", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}.featureXML");
+  };
+
+  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    const Filenames& filenames_I
+  ) const
   {
     LOGD << "START LoadFeaturesSampleGroup";
-    LOGI << "Loading: " << filenames.featureXMLSampleGroup_i;
+    Filenames filenames = prepareFilenames(filenames_I);
 
-    if (filenames.featureXMLSampleGroup_i.empty()) {
-      LOGE << "Filename is empty";
-      LOGD << "END LoadFeaturesSampleGroup";
-      return;
-    }
-
-    if (!InputDataValidation::fileExists(filenames.featureXMLSampleGroup_i)) {
-      LOGE << "File not found";
-      LOGD << "END LoadFeaturesSampleGroup";
+    if (!InputDataValidation::prepareToLoad(filenames, "featureXMLSampleGroup_i"))
+    {
+      LOGD << "END " << getName();
       return;
     }
 
     try {
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.load(filenames.featureXMLSampleGroup_i, sampleGroupHandler_IO.getFeatureMap());
+      featurexml.load(filenames.getFullPath("featureXMLSampleGroup_i").generic_string(), sampleGroupHandler_IO.getFeatureMap());
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -720,21 +730,30 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
+  void StoreFeaturesSampleGroup::getFilenames(Filenames& filenames) const
+  {
+    filenames.addFileName("featureXMLSampleGroup_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}.featureXML");
+  };
+
+  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    const Filenames& filenames_I
+  ) const
   {
     LOGD << "START storeFeaturesSampleGroup";
-    LOGI << "Storing: " << filenames.featureXMLSampleGroup_o;
+    Filenames filenames = prepareFilenames(filenames_I);
 
-    if (filenames.featureXMLSampleGroup_o.empty()) {
-      LOGE << "Filename is empty";
-      LOGD << "END storeFeaturesSampleGroup";
+    if (!InputDataValidation::prepareToStore(filenames, "featureXMLSampleGroup_o"))
+    {
+      LOGD << "END " << getName();
       return;
     }
 
     try {
       // Store outfile as featureXML
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.store(filenames.featureXMLSampleGroup_o, sampleGroupHandler_IO.getFeatureMap());
+      featurexml.store(filenames.getFullPath("featureXMLSampleGroup_o").generic_string(), sampleGroupHandler_IO.getFeatureMap());
     }
     catch (const std::exception& e) {
       LOGE << e.what();

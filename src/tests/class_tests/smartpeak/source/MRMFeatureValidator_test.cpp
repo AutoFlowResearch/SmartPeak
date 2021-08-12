@@ -36,7 +36,7 @@ using namespace std;
 TEST(MRMFeaturevalidator, validate_MRMFeatures)
 {
   Filenames filenames;
-  filenames.referenceData_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv");
+  filenames.setFullPath("referenceData_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv"));
   const string featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_test_1_algorithm_MRMFeatureValidator.featureXML");
   const string filename_params = SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_test_pyTOPP_MRMFeatureValidator_params.csv");
 

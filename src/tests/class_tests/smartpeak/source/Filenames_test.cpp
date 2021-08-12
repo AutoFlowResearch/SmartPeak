@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Ahmed Khalil $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
@@ -28,238 +28,133 @@
 using namespace SmartPeak;
 using namespace std;
 
-TEST(Filenames, filenames_getDefaultStaticFilenames)
+TEST(Filenames, constructor)
 {
-  Filenames filenames = Filenames::getDefaultStaticFilenames("/home/user");
-  EXPECT_STREQ(filenames.sequence_csv_i.c_str(), "/home/user/sequence.csv");
-  EXPECT_STREQ(filenames.parameters_csv_i.c_str(), "/home/user/parameters.csv");
-  EXPECT_STREQ(filenames.traML_csv_i.c_str(), "/home/user/traML.csv");
-  EXPECT_STREQ(filenames.featureFilterComponents_csv_i.c_str(), "/home/user/featureFilterComponents.csv");
-  EXPECT_STREQ(filenames.featureFilterComponentGroups_csv_i.c_str(), "/home/user/featureFilterComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureQCComponents_csv_i.c_str(), "/home/user/featureQCComponents.csv");
-  EXPECT_STREQ(filenames.featureQCComponentGroups_csv_i.c_str(), "/home/user/featureQCComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureRSDFilterComponents_csv_i.c_str(), "/home/user/featureRSDFilterComponents.csv");
-  EXPECT_STREQ(filenames.featureRSDFilterComponentGroups_csv_i.c_str(), "/home/user/featureRSDFilterComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_i.c_str(), "/home/user/featureRSDQCComponents.csv");
-  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_i.c_str(), "/home/user/featureRSDQCComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponents_csv_i.c_str(), "/home/user/featureBackgroundFilterComponents.csv");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponentGroups_csv_i.c_str(), "/home/user/featureBackgroundFilterComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponents_csv_i.c_str(), "/home/user/featureBackgroundQCComponents.csv");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponentGroups_csv_i.c_str(), "/home/user/featureBackgroundQCComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponents_csv_i.c_str(), "/home/user/featureRSDEstimationComponents.csv");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponentGroups_csv_i.c_str(), "/home/user/featureRSDEstimationComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_i.c_str(), "/home/user/featureRSDQCComponents.csv");
-  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_i.c_str(), "/home/user/featureRSDQCComponentGroups.csv");
-  EXPECT_STREQ(filenames.quantitationMethods_csv_i.c_str(), "/home/user/quantitationMethods.csv");
-  EXPECT_STREQ(filenames.standardsConcentrations_csv_i.c_str(), "/home/user/standardsConcentrations.csv");
-  EXPECT_STREQ(filenames.referenceData_csv_i.c_str(), "/home/user/referenceData.csv");
-  EXPECT_STREQ(filenames.mzML_i.c_str(), "");
-  EXPECT_STREQ(filenames.mzTab_o.c_str(), "");
-  EXPECT_STREQ(filenames.mzTab_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureXML_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureXMLSampleGroup_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureXML_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureXMLSampleGroup_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDFilterComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDFilterComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.quantitationMethods_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.componentsToConcentrations_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.pivotTable_csv_o.c_str(), "/home/user/PivotTable.csv");
-  EXPECT_STREQ(filenames.featureDB_csv_o.c_str(), "/home/user/FeatureDB.csv");
+  Filenames filenames;
+  EXPECT_EQ(filenames.getFileIds().size(), 0);
 }
 
-TEST(Filenames, filenames_getDefaultDynamicFilenames)
+TEST(Filenames, addFileName)
 {
-  Filenames filenames = Filenames::getDefaultDynamicFilenames(
-    "/home/user",
-    "/home/user/mzML",
-    "/home/user/featuresIn", 
-    "/home/user/featuresOut", 
-    "mzMLIn",
-    "injIn",
-    "injOut",
-    "sampleIn",
-    "sampleOut");
-  EXPECT_STREQ(filenames.sequence_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.parameters_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.workflow_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.traML_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDFilterComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDFilterComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.quantitationMethods_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.standardsConcentrations_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.referenceData_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.mzML_i.c_str(), "/home/user/mzML/mzMLIn.mzML");
-  EXPECT_STREQ(filenames.mzTab_o.c_str(), "/home/user/featuresOut/injOut.mzTab");
-  EXPECT_STREQ(filenames.mzTab_i.c_str(), "/home/user/featuresIn/injIn.mzTab");
-  EXPECT_STREQ(filenames.featureXML_o.c_str(), "/home/user/featuresOut/injOut.featureXML");
-  EXPECT_STREQ(filenames.featureXMLSampleGroup_o.c_str(), "/home/user/featuresOut/sampleOut.featureXML");
-  EXPECT_STREQ(filenames.featureXML_i.c_str(), "/home/user/featuresIn/injIn.featureXML");
-  EXPECT_STREQ(filenames.featureXMLSampleGroup_i.c_str(), "/home/user/featuresIn/sampleIn.featureXML");
-  EXPECT_STREQ(filenames.featureFilterComponents_csv_o.c_str(), "/home/user/featuresOut/injOut_featureFilterComponents.csv");
-  EXPECT_STREQ(filenames.featureFilterComponentGroups_csv_o.c_str(), "/home/user/featuresOut/injOut_featureFilterComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureQCComponents_csv_o.c_str(), "/home/user/featuresOut/injOut_featureQCComponents.csv");
-  EXPECT_STREQ(filenames.featureQCComponentGroups_csv_o.c_str(), "/home/user/featuresOut/injOut_featureQCComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureRSDFilterComponents_csv_o.c_str(), "/home/user/featuresOut/injOut_featureRSDFilterComponents.csv");
-  EXPECT_STREQ(filenames.featureRSDFilterComponentGroups_csv_o.c_str(), "/home/user/featuresOut/injOut_featureRSDFilterComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_o.c_str(), "/home/user/featuresOut/injOut_featureRSDQCComponents.csv");
-  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_o.c_str(), "/home/user/featuresOut/injOut_featureRSDQCComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponents_csv_o.c_str(), "/home/user/featuresOut/injOut_featureBackgroundFilterComponents.csv");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponentGroups_csv_o.c_str(), "/home/user/featuresOut/injOut_featureBackgroundFilterComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponents_csv_o.c_str(), "/home/user/featuresOut/injOut_featureBackgroundQCComponents.csv");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponentGroups_csv_o.c_str(), "/home/user/featuresOut/injOut_featureBackgroundQCComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponents_csv_o.c_str(), "/home/user/featuresOut/injOut_featureRSDEstimationComponents.csv");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponentGroups_csv_o.c_str(), "/home/user/featuresOut/injOut_featureRSDEstimationComponentGroups.csv");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponents_csv_o.c_str(), "/home/user/featuresOut/injOut_featureBackgroundEstimationComponents.csv");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponentGroups_csv_o.c_str(), "/home/user/featuresOut/injOut_featureBackgroundEstimationComponentGroups.csv");
-  EXPECT_STREQ(filenames.quantitationMethods_csv_o.c_str(), "/home/user/featuresOut/injOut_quantitationMethods.csv");
-  EXPECT_STREQ(filenames.componentsToConcentrations_csv_o.c_str(), "/home/user/featuresOut/injOut_componentsToConcentrations.csv");
-  EXPECT_STREQ(filenames.pivotTable_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureDB_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.selectDilutions_csv_i.c_str(), "/home/user/selectDilutions.csv");
+  Filenames filenames;
+  filenames.addFileName("my_file", "${MAIN_DIR}/file.txt");
+  const auto& file_ids = filenames.getFileIds();
+  ASSERT_EQ(file_ids.size(), 1);
 }
 
-TEST(Filenames, clear1)
+TEST(Filenames, getFullPath)
 {
-  Filenames filenames = Filenames::getDefaultStaticFilenames("/home/user");
-  filenames.clear();
-  EXPECT_STREQ(filenames.sequence_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.parameters_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.traML_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDFilterComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDFilterComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.quantitationMethods_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.standardsConcentrations_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.referenceData_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.selectDilutions_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.mzML_i.c_str(), "");
-  EXPECT_STREQ(filenames.mzTab_o.c_str(), "");
-  EXPECT_STREQ(filenames.mzTab_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureXML_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureXMLSampleGroup_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureXML_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureXMLSampleGroup_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDFilterComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDFilterComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.quantitationMethods_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.componentsToConcentrations_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.pivotTable_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureDB_csv_o.c_str(), "");
+  Filenames filenames;
+  filenames.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/file_main.txt");
 }
 
-TEST(Filenames, clear2)
+TEST(Filenames, getFullPath_non_existing)
 {
-  Filenames filenames = Filenames::getDefaultDynamicFilenames(
-    "/home/user",
-    "/home/user/mzML",
-    "/home/user/featuresIn",
-    "/home/user/featuresOut",
-    "mzMLIn",
-    "injIn",
-    "injOut",
-    "sampleIn",
-    "sampleOut");
-  filenames.clear();
-  EXPECT_STREQ(filenames.sequence_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.parameters_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.traML_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponents_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponentGroups_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.quantitationMethods_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.standardsConcentrations_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.referenceData_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.selectDilutions_csv_i.c_str(), "");
-  EXPECT_STREQ(filenames.mzML_i.c_str(), "");
-  EXPECT_STREQ(filenames.mzTab_o.c_str(), "");
-  EXPECT_STREQ(filenames.mzTab_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureXML_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureXMLSampleGroup_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureXML_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureXMLSampleGroup_i.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureFilterComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureQCComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDQCComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundFilterComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundQCComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureRSDEstimationComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponents_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureBackgroundEstimationComponentGroups_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.quantitationMethods_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.componentsToConcentrations_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.pivotTable_csv_o.c_str(), "");
-  EXPECT_STREQ(filenames.featureDB_csv_o.c_str(), "");
+  Filenames filenames;
+  try {
+    filenames.getFullPath("test");
+    FAIL() << "Expected std::out_of_range";
+  }
+  catch (std::out_of_range const& err) {
+  }
+  catch (...) {
+    FAIL() << "Expected std::out_of_range";
+  }
+}
+
+TEST(Filenames, setFullPath)
+{
+  Filenames filenames;
+  filenames.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  filenames.setFullPath("my_file_main", "/file/to/file_main.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/file/to/file_main.txt");
+  // setting variant or root has no effect
+  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/file/to/file_main.txt");
+}
+
+TEST(Filenames, setRootPath_setVariant_after)
+{
+  Filenames filenames;
+  filenames.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  filenames.addFileName("my_file_injection_input", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}file_injection_input.txt");
+  filenames.addFileName("my_file_injection_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}file_injection_output.txt");
+  filenames.addFileName("my_file_group_input", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}file_group_input.txt");
+  filenames.addFileName("my_file_group_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}file_group_output.txt");
+  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/main/file_main.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_injection_input").generic_string().c_str(), "/feat_input/variant_input_injection_file_injection_input.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_injection_output").generic_string().c_str(), "/feat_output/variant_output_injection_file_injection_output.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_group_input").generic_string().c_str(), "/feat_input/variant_input_sample_file_group_input.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_group_output").generic_string().c_str(), "/feat_output/variant_output_sample_file_group_output.txt");
+}
+
+TEST(Filenames, setRootPath_setVariant_before)
+{
+  Filenames filenames;
+  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  filenames.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  filenames.addFileName("my_file_injection_input", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}file_injection_input.txt");
+  filenames.addFileName("my_file_injection_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}file_injection_output.txt");
+  filenames.addFileName("my_file_group_input", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}file_group_input.txt");
+  filenames.addFileName("my_file_group_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}file_group_output.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/main/file_main.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_injection_input").generic_string().c_str(), "/feat_input/variant_input_injection_file_injection_input.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_injection_output").generic_string().c_str(), "/feat_output/variant_output_injection_file_injection_output.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_group_input").generic_string().c_str(), "/feat_input/variant_input_sample_file_group_input.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_group_output").generic_string().c_str(), "/feat_output/variant_output_sample_file_group_output.txt");
+}
+
+TEST(Filenames, merge)
+{
+  Filenames filenames1;
+  filenames1.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames1.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames1.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames1.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames1.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames1.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames1.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames1.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames1.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  filenames1.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  filenames1.addFileName("my_file_injection_input", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}file_injection_input.txt");
+
+  Filenames filenames2;
+  filenames1.addFileName("my_file_main", "${MAIN_DIR}/file_main_again.txt");
+  filenames2.addFileName("my_file_injection_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}file_injection_output.txt");
+  filenames2.addFileName("my_file_group_input", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}file_group_input.txt");
+  filenames2.addFileName("my_file_group_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}file_group_output.txt");
+
+  filenames1.merge(filenames2);
+  EXPECT_STREQ(filenames1.getFullPath("my_file_main").generic_string().c_str(), "/main/file_main.txt");
+  EXPECT_STREQ(filenames1.getFullPath("my_file_injection_input").generic_string().c_str(), "/feat_input/variant_input_injection_file_injection_input.txt");
+  EXPECT_STREQ(filenames1.getFullPath("my_file_injection_output").generic_string().c_str(), "/feat_output/variant_output_injection_file_injection_output.txt");
+  EXPECT_STREQ(filenames1.getFullPath("my_file_group_input").generic_string().c_str(), "/feat_input/variant_input_sample_file_group_input.txt");
+  EXPECT_STREQ(filenames1.getFullPath("my_file_group_output").generic_string().c_str(), "/feat_output/variant_output_sample_file_group_output.txt");
 }

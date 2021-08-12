@@ -34,29 +34,70 @@
 
 namespace SmartPeak
 {
-  bool InputDataValidation::fileExists(const std::string& filepath)
+  bool InputDataValidation::fileExists(const std::filesystem::path& filepath)
   {
     std::ifstream ifs(filepath);
     return ifs.is_open();
   }
 
-  InputDataValidation::FilenameInfo InputDataValidation::isValidFilename(const std::string& filename, const std::string& member_name)
+  bool InputDataValidation::precheckProcessorInputs(
+    const IFilenamesHandler& input_files,
+    const std::string& processor_name,
+    const Filenames& filenames_I,
+    bool required)
   {
-    FilenameInfo v;
-    v.pathname = filename;
-    v.member_name = member_name;
+    Filenames processor_filenames;
+    input_files.getFilenames(processor_filenames);
+
+    Filenames merged_filenames = filenames_I;
+    merged_filenames.merge(processor_filenames);
+
+    bool valid = true;
     std::ostringstream msg;
-    msg << member_name << ":\n\t";
-    if (filename.size()) {
-      const bool is_valid = fileExists(filename);
-      msg << (is_valid ? "SUCCESS" : "FAILURE") << " <- " << filename << "\n";
-      v.validity = is_valid ? FilenameInfo::valid : FilenameInfo::invalid;
-    } else {
-      msg << "NOT PROVIDED\n";
-      v.validity = FilenameInfo::not_provided;
+    msg << processor_name << "\n";
+    for (const auto& processor_file : processor_filenames.getFileIds())
+    {
+      const auto& full_path = merged_filenames.getFullPath(processor_file);
+      msg << processor_file << " [" << full_path << "] ";
+      if (full_path.empty())
+      {
+        if (required)
+        {
+          msg << "FAILURE\n";
+          valid = false;
+        }
+        else
+        {
+          msg << "NOT PROVIDED\n";
+        }
+      }
+      const bool file_exists = fileExists(full_path);
+      if (!file_exists)
+      {
+        if (required)
+        {
+          msg << "FAILURE\n";
+          valid = false;
+        }
+        else
+        {
+          msg << "NOT PROVIDED\n";
+        }
+      }
+      else
+      {
+        msg << "SUCCESS\n";
+      }
     }
-    LOGI << msg.str();
-    return v;
+    if (!valid)
+    {
+      LOGE << msg.str();
+    }
+    else
+    {
+      LOGI << msg.str();
+    }
+    return valid;
   }
 
   std::string InputDataValidation::getSequenceInfo(
@@ -555,5 +596,78 @@ namespace SmartPeak
     }
     oss << "\n";
     return oss.str();
+  }
+
+  bool InputDataValidation::prepareToLoad(const Filenames& filenames, const std::string& id)
+  {
+    LOGI << "Loading: " << filenames.getFullPath(id).generic_string();
+
+    if (filenames.getFullPath(id).empty()) {
+      LOGE << "Filename is empty";
+      return false;
+    }
+
+    if (!InputDataValidation::fileExists(filenames.getFullPath(id))) {
+      LOGE << "File not found";
+      return false;
+    }
+
+    return true;
+  }
+
+  bool InputDataValidation::prepareToLoadOneOfTwo(const Filenames& filenames, const std::string& id1, const std::string& id2)
+  {
+    LOGI << "Loading: " << 
+      filenames.getFullPath(id1).generic_string() 
+      << " and " <<
+      filenames.getFullPath(id2).generic_string();
+
+    if (filenames.getFullPath(id1).empty() &&
+      filenames.getFullPath(id2).empty()) {
+      LOGE << "Filenames are both empty";
+      return false;
+    }
+
+    if (!filenames.getFullPath(id1).empty() &&
+      !InputDataValidation::fileExists(filenames.getFullPath(id1))) {
+      LOGE << "File not found: " << filenames.getFullPath(id1).generic_string();
+      return false;
+    }
+
+    if (!filenames.getFullPath(id2).empty() &&
+      !InputDataValidation::fileExists(filenames.getFullPath(id2))) {
+      LOGE << "File not found: " << filenames.getFullPath(id2).generic_string();
+      return false;
+    }
+
+    return true;
+  }
+
+  bool InputDataValidation::prepareToStore(const Filenames& filenames, const std::string& id)
+  {
+    LOGI << "Storing: " << filenames.getFullPath(id).generic_string();
+
+    if (filenames.getFullPath(id).empty()) {
+      LOGE << "Filename is empty";
+      return false;
+    }
+
+    return true;
+  }
+
+  bool InputDataValidation::prepareToStoreOneOfTwo(const Filenames& filenames, const std::string& id1, const std::string& id2)
+  {
+    LOGI << "Storing: " << 
+      filenames.getFullPath(id1).generic_string()
+      << " and " <<
+      filenames.getFullPath(id2).generic_string();
+
+    if (filenames.getFullPath(id1).empty() &&
+      filenames.getFullPath(id2).empty()) {
+      LOGE << "Filenames are both empty";
+      return false;
+    }
+
+    return true;
   }
 }

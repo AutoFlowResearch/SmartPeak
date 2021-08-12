@@ -23,12 +23,22 @@
 
 #pragma once
 
+#include <SmartPeak/core/Filenames.h>
+
 namespace SmartPeak 
 {
-  struct ApplicationHandler;
-
-  struct IFilePickerHandler
+  struct IFilenamesHandler
   {
-    virtual bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) = 0;
+    /**
+     @brief add files handled by the processor to the Filnames instance
+    */
+    virtual void getFilenames(Filenames& filenames) const = 0;
+
+    virtual Filenames prepareFilenames(const Filenames& filenames_I) const
+    {
+      Filenames prepared_filenames(filenames_I);
+      getFilenames(prepared_filenames);
+      return prepared_filenames;
+    }
   };
 }
