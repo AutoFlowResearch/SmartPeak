@@ -61,7 +61,7 @@ namespace SmartPeak
         ImGui::Text("%s", str.c_str());
         ImGui::PopStyleColor();
       } else if (record_list.at(i).first == plog::Severity::info) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.9f, 0.1f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
         ImGui::Text("%s", str.c_str());
         ImGui::PopStyleColor();
       } else if (record_list.at(i).first == plog::Severity::debug) {
