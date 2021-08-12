@@ -46,7 +46,7 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
-  void SelectDilutions::getInputsOutputs(Filenames& filenames) const
+  void SelectDilutions::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("selectDilutions_csv_i", "${MAIN_DIR}/selectDilutions.csv");
   };
@@ -59,7 +59,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START SelectDilutions";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     ParameterSet params(params_I);
     params.merge(getParameterSchema());
@@ -199,7 +199,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START MergeInjections";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     // Check the parameters
     if (params_I.at("MergeInjections").empty() && params_I.at("MergeInjections").empty()) {
@@ -692,7 +692,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void LoadFeaturesSampleGroup::getInputsOutputs(Filenames& filenames) const
+  void LoadFeaturesSampleGroup::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureXMLSampleGroup_i", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}.featureXML");
   };
@@ -704,7 +704,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START LoadFeaturesSampleGroup";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoad(filenames, "featureXMLSampleGroup_i"))
     {
@@ -730,7 +730,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreFeaturesSampleGroup::getInputsOutputs(Filenames& filenames) const
+  void StoreFeaturesSampleGroup::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureXMLSampleGroup_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}.featureXML");
   };
@@ -742,7 +742,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeaturesSampleGroup";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStore(filenames, "featureXMLSampleGroup_o"))
     {

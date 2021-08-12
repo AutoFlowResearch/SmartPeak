@@ -95,7 +95,7 @@ namespace SmartPeak
     }
   }
 
-  void CreateSequence::getInputsOutputs(Filenames& filenames) const
+  void CreateSequence::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("sequence_csv_i", "${MAIN_DIR}/sequence.csv");
   };
@@ -103,7 +103,7 @@ namespace SmartPeak
   void CreateSequence::process()
   {
     LOGD << "START createSequence";
-    filenames_ = prepareFileNames(filenames_);
+    filenames_ = prepareFilenames(filenames_);
 
     SequenceParser::readSequenceFile(*sequenceHandler_IO, filenames_.getFullPath("sequence_csv_i"), delimiter);
     if (sequenceHandler_IO->getSequence().empty()) {
@@ -462,7 +462,7 @@ namespace SmartPeak
     return true;
   }
 
-  void LoadWorkflow::getInputsOutputs(Filenames& filenames) const
+  void LoadWorkflow::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("workflow_csv_i", "${MAIN_DIR}/workflow.csv");
   };
@@ -471,7 +471,7 @@ namespace SmartPeak
   {
     // TODO: move to parameters at some point
     LOGD << "START LoadWorkflow";
-    filenames_ = prepareFileNames(filenames_);
+    filenames_ = prepareFilenames(filenames_);
     if (!InputDataValidation::prepareToLoad(filenames_, "workflow_csv_i"))
     {
       LOGD << "END " << getName();

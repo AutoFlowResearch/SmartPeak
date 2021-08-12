@@ -41,13 +41,13 @@ namespace SmartPeak
   }
 
   bool InputDataValidation::precheckProcessorInputs(
-    const IInputsOutputsProvider& input_files,
+    const IFilenamesHandler& input_files,
     const std::string& processor_name,
     const Filenames& filenames_I,
     bool required)
   {
     Filenames processor_filenames;
-    input_files.getInputsOutputs(processor_filenames);
+    input_files.getFilenames(processor_filenames);
 
     Filenames merged_filenames = filenames_I;
     merged_filenames.merge(processor_filenames);
@@ -598,7 +598,7 @@ namespace SmartPeak
     return oss.str();
   }
 
-  bool InputDataValidation::prepareToLoad(const Filenames filenames, const std::string& id)
+  bool InputDataValidation::prepareToLoad(const Filenames& filenames, const std::string& id)
   {
     LOGI << "Loading: " << filenames.getFullPath(id).generic_string();
 
@@ -615,7 +615,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool InputDataValidation::prepareToLoadOneOfTwo(const Filenames filenames, const std::string& id1, const std::string& id2)
+  bool InputDataValidation::prepareToLoadOneOfTwo(const Filenames& filenames, const std::string& id1, const std::string& id2)
   {
     LOGI << "Loading: " << 
       filenames.getFullPath(id1).generic_string() 
@@ -643,7 +643,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool InputDataValidation::prepareToStore(const Filenames filenames, const std::string& id)
+  bool InputDataValidation::prepareToStore(const Filenames& filenames, const std::string& id)
   {
     LOGI << "Storing: " << filenames.getFullPath(id).generic_string();
 
@@ -655,7 +655,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool InputDataValidation::prepareToStoreOneOfTwo(const Filenames filenames, const std::string& id1, const std::string& id2)
+  bool InputDataValidation::prepareToStoreOneOfTwo(const Filenames& filenames, const std::string& id1, const std::string& id2)
   {
     LOGI << "Storing: " << 
       filenames.getFullPath(id1).generic_string()

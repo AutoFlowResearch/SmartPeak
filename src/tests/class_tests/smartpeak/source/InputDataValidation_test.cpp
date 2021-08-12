@@ -42,23 +42,23 @@ TEST(InputDataValidation, fileExists)
 
 TEST(InputDataValidation, isValidFilename)
 {
-  struct ExistingFile : public IInputsOutputsProvider
+  struct ExistingFile : public IFilenamesHandler
   {
-    void getInputsOutputs(Filenames& filenames) const
+    void getFilenames(Filenames& filenames) const
     {
       filenames.addFileName("some standards file", "${MAIN_DIR}/OpenMSFile_standardsConcentrations_1.csv");
     };
   };
-  struct NonExistingFile : public IInputsOutputsProvider
+  struct NonExistingFile : public IFilenamesHandler
   {
-    void getInputsOutputs(Filenames& filenames) const
+    void getFilenames(Filenames& filenames) const
     {
       filenames.addFileName("a file that does not exist", "${MAIN_DIR}/this_does_not_exist.csv");
     };
   };
-  struct EmptyFileName : public IInputsOutputsProvider
+  struct EmptyFileName : public IFilenamesHandler
   {
-    void getInputsOutputs(Filenames& filenames) const
+    void getFilenames(Filenames& filenames) const
     {
       filenames.addFileName("an empty pathname", "");
     };

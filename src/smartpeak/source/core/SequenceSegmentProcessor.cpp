@@ -68,7 +68,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START optimizeCalibrationCurves";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     std::vector<size_t> standards_indices;
     // get all standards
@@ -171,7 +171,7 @@ namespace SmartPeak
     return true;
   }
 
-  void LoadStandardsConcentrations::getInputsOutputs(Filenames& filenames) const
+  void LoadStandardsConcentrations::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("standardsConcentrations_csv_i", "${MAIN_DIR}/standardsConcentrations.csv");
   };
@@ -184,7 +184,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START loadStandardsConcentrations";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoad(filenames, "standardsConcentrations_csv_i"))
     {
@@ -210,7 +210,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void LoadQuantitationMethods::getInputsOutputs(Filenames& filenames) const
+  void LoadQuantitationMethods::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("quantitationMethods_csv_i", "${MAIN_DIR}/quantitationMethods.csv");
   };
@@ -239,7 +239,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START loadQuantitationMethods";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoad(filenames, "quantitationMethods_csv_i"))
     {
@@ -265,7 +265,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreQuantitationMethods::getInputsOutputs(Filenames& filenames) const
+  void StoreQuantitationMethods::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("quantitationMethods_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_quantitationMethods.csv");
   };
@@ -278,7 +278,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeQuantitationMethods";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStore(filenames, "quantitationMethods_csv_o"))
     {
@@ -330,7 +330,7 @@ namespace SmartPeak
     return true;
   }
 
-  void LoadFeatureFilters::getInputsOutputs(Filenames& filenames) const
+  void LoadFeatureFilters::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureFilterComponents_csv_i", "${MAIN_DIR}/featureFilterComponents.csv");
     filenames.addFileName("featureFilterComponentGroups_csv_i", "${MAIN_DIR}/featureFilterComponentGroups.csv");
@@ -344,7 +344,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START loadFeatureFilter";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureFilterComponents_csv_i", "featureFilterComponentGroups_csv_i"))
     {
@@ -403,7 +403,7 @@ namespace SmartPeak
     return true;
   }
 
-  void LoadFeatureQCs::getInputsOutputs(Filenames& filenames) const
+  void LoadFeatureQCs::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureQCComponents_csv_i", "${MAIN_DIR}/featureQCComponents.csv");
     filenames.addFileName("featureQCComponentGroups_csv_i", "${MAIN_DIR}/featureQCComponentGroups.csv");
@@ -417,7 +417,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START loadFeatureQC";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureQCComponents_csv_i", "featureQCComponentGroups_csv_i"))
     {
@@ -451,7 +451,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreFeatureFilters::getInputsOutputs(Filenames& filenames) const
+  void StoreFeatureFilters::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureFilterComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureFilterComponents.csv");
     filenames.addFileName("featureFilterComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureFilterComponentGroups.csv");
@@ -465,7 +465,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureFilter";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureFilterComponents_csv_o", "featureFilterComponentGroups_csv_o"))
     {
@@ -495,7 +495,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreFeatureQCs::getInputsOutputs(Filenames& filenames) const
+  void StoreFeatureQCs::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureQCComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureQCComponents.csv");
     filenames.addFileName("featureQCComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureQCComponentGroups.csv");
@@ -509,7 +509,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureQC";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureQCComponents_csv_o", "featureQCComponentGroups_csv_o"))
     {
@@ -539,7 +539,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void LoadFeatureRSDFilters::getInputsOutputs(Filenames& filenames) const
+  void LoadFeatureRSDFilters::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureRSDFilterComponents_csv_i", "${MAIN_DIR}/featureRSDFilterComponents.csv");
     filenames.addFileName("featureRSDFilterComponentGroups_csv_i", "${MAIN_DIR}/featureRSDFilterComponentGroups.csv");
@@ -578,7 +578,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START loadFeatureRSDFilter";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureRSDFilterComponents_csv_i", "featureRSDFilterComponentGroups_csv_i"))
     {
@@ -619,7 +619,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void LoadFeatureRSDQCs::getInputsOutputs(Filenames& filenames) const
+  void LoadFeatureRSDQCs::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureRSDQCComponents_csv_i", "${MAIN_DIR}/featureRSDQCComponents.csv");
     filenames.addFileName("featureRSDQCComponentGroups_csv_i", "${MAIN_DIR}/featureRSDQCComponentGroups.csv");
@@ -658,7 +658,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START loadFeatureRSDQC";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureRSDQCComponents_csv_i", "featureRSDQCComponentGroups_csv_i"))
     {
@@ -692,7 +692,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreFeatureRSDFilters::getInputsOutputs(Filenames& filenames) const
+  void StoreFeatureRSDFilters::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureRSDFilterComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDFilterComponents.csv");
     filenames.addFileName("featureRSDFilterComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDFilterComponentGroups.csv");
@@ -706,7 +706,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureRSDFilter";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureRSDFilterComponents_csv_o", "featureRSDFilterComponentGroups_csv_o"))
     {
@@ -736,7 +736,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreFeatureRSDQCs::getInputsOutputs(Filenames& filenames) const
+  void StoreFeatureRSDQCs::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureRSDQCComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDQCComponents.csv");
     filenames.addFileName("featureRSDQCComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDQCComponentGroups.csv");
@@ -750,7 +750,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureRSDQC";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureRSDQCComponents_csv_o", "featureRSDQCComponentGroups_csv_o"))
     {
@@ -780,7 +780,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void LoadFeatureBackgroundFilters::getInputsOutputs(Filenames& filenames) const
+  void LoadFeatureBackgroundFilters::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureBackgroundFilterComponents_csv_i", "${MAIN_DIR}/featureBackgroundFilterComponents.csv");
     filenames.addFileName("featureBackgroundFilterComponentGroups_csv_i", "${MAIN_DIR}/featureBackgroundFilterComponentGroups.csv");
@@ -819,7 +819,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START loadFeatureBackgroundFilter";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureBackgroundFilterComponents_csv_i", "featureBackgroundFilterComponentGroups_csv_i"))
     {
@@ -853,7 +853,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void LoadFeatureBackgroundQCs::getInputsOutputs(Filenames& filenames) const
+  void LoadFeatureBackgroundQCs::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureBackgroundQCComponents_csv_i", "${MAIN_DIR}/featureBackgroundQCComponents.csv");
     filenames.addFileName("featureBackgroundQCComponentGroups_csv_i", "${MAIN_DIR}/featureBackgroundQCComponentGroups.csv");
@@ -892,7 +892,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START loadFeatureBackgroundQC";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureBackgroundQCComponents_csv_i", "featureBackgroundQCComponentGroups_csv_i"))
     {
@@ -926,7 +926,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreFeatureBackgroundFilters::getInputsOutputs(Filenames& filenames) const
+  void StoreFeatureBackgroundFilters::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureBackgroundFilterComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundFilterComponents.csv");
     filenames.addFileName("featureBackgroundFilterComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundFilterComponentGroups.csv");
@@ -940,7 +940,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureBackgroundFilter";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureBackgroundFilterComponents_csv_o", "featureBackgroundFilterComponentGroups_csv_o"))
     {
@@ -970,7 +970,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreFeatureBackgroundQCs::getInputsOutputs(Filenames& filenames) const
+  void StoreFeatureBackgroundQCs::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureBackgroundQCComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundQCComponents.csv");
     filenames.addFileName("featureBackgroundQCComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundQCComponentGroups.csv");
@@ -984,7 +984,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureBackgroundQC";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureBackgroundQCComponents_csv_o", "featureBackgroundQCComponentGroups_csv_o"))
     {
@@ -1022,7 +1022,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START estimateFeatureFilterValues";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     std::vector<size_t> standards_indices, qcs_indices;
 
@@ -1082,7 +1082,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START estimateFeatureQCValues";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     std::vector<size_t> standards_indices, qcs_indices;
 
@@ -1142,7 +1142,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START TransferLOQToFeatureFilters";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     // check if there are any quantitation methods
     if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
@@ -1173,7 +1173,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START TransferLOQToFeatureQCs";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     // check if there are any quantitation methods
     if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
@@ -1204,7 +1204,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START EstimateFeatureRSDs";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     // get all QCs
     std::vector<size_t> qcs_indices;
@@ -1252,7 +1252,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START EstimateFeatureBackgroundInterferences";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     // get all Blanks
     std::vector<size_t> blanks_indices;
@@ -1294,7 +1294,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void LoadFeatureRSDEstimations::getInputsOutputs(Filenames& filenames) const
+  void LoadFeatureRSDEstimations::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureRSDEstimationComponents_csv_i", "${MAIN_DIR}/featureRSDEstimationComponents.csv");
     filenames.addFileName("featureRSDEstimationComponentGroups_csv_i", "${MAIN_DIR}/featureRSDEstimationComponentGroups.csv");
@@ -1308,7 +1308,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START loadFeatureRSDEstimation";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureRSDEstimationComponents_csv_i", "featureRSDEstimationComponentGroups_csv_i"))
     {
@@ -1341,7 +1341,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreFeatureRSDEstimations::getInputsOutputs(Filenames& filenames) const
+  void StoreFeatureRSDEstimations::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureRSDEstimationComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDEstimationComponents.csv");
     filenames.addFileName("featureRSDEstimationComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDEstimationComponentGroups.csv");
@@ -1355,7 +1355,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureRSDEstimation";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureRSDEstimationComponents_csv_o", "featureRSDEstimationComponentGroups_csv_o"))
     {
@@ -1385,7 +1385,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void LoadFeatureBackgroundEstimations::getInputsOutputs(Filenames& filenames) const
+  void LoadFeatureBackgroundEstimations::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureBackgroundEstimationComponents_csv_i", "${MAIN_DIR}/featureBackgroundEstimationComponents.csv");
     filenames.addFileName("featureBackgroundEstimationComponentGroups_csv_i", "${MAIN_DIR}/featureBackgroundEstimationComponentGroups.csv");
@@ -1399,7 +1399,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START loadFeatureBackgroundEstimation";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureBackgroundEstimationComponents_csv_i", "featureBackgroundEstimationComponentGroups_csv_i"))
     {
@@ -1432,7 +1432,7 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreFeatureBackgroundEstimations::getInputsOutputs(Filenames& filenames) const
+  void StoreFeatureBackgroundEstimations::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureBackgroundEstimationComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundEstimationComponents.csv");
     filenames.addFileName("featureBackgroundEstimationComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundEstimationComponentGroups.csv");
@@ -1446,7 +1446,7 @@ namespace SmartPeak
   ) const
   {
     LOGD << "START storeFeatureBackgroundEstimation";
-    Filenames filenames = prepareFileNames(filenames_I);
+    Filenames filenames = prepareFilenames(filenames_I);
 
     if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureBackgroundEstimationComponents_csv_o", "featureBackgroundEstimationComponentGroups_csv_o"))
     {

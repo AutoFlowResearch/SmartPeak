@@ -27,17 +27,17 @@
 
 namespace SmartPeak 
 {
-  struct IInputsOutputsProvider
+  struct IFilenamesHandler
   {
     /**
      @brief add files handled by the processor to the Filnames instance
     */
-    virtual void getInputsOutputs(Filenames& filenames) const = 0;
+    virtual void getFilenames(Filenames& filenames) const = 0;
 
-    virtual Filenames prepareFileNames(const Filenames& filenames_I) const
+    virtual Filenames prepareFilenames(const Filenames& filenames_I) const
     {
       Filenames prepared_filenames(filenames_I);
-      getInputsOutputs(prepared_filenames);
+      getFilenames(prepared_filenames);
       return prepared_filenames;
     }
   };

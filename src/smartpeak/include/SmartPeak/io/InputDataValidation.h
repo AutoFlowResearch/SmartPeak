@@ -25,7 +25,7 @@
 
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/SequenceHandler.h>
-#include <SmartPeak/iface/IInputsOutputsProvider.h>
+#include <SmartPeak/iface/IFilenamesHandler.h>
 #include <string>
 
 namespace SmartPeak
@@ -43,28 +43,29 @@ public:
     static bool fileExists(const std::filesystem::path& filepath);
 
     static bool precheckProcessorInputs(
-      const IInputsOutputsProvider& input_files,
+      const IFilenamesHandler& input_files,
       const std::string& processor_name,
       const Filenames& filenames_I,
       bool required);
 
     static bool prepareToLoad(
-      const Filenames filenames, const std::string& id
+      const Filenames& filenames,
+      const std::string& id
     );
 
     static bool prepareToLoadOneOfTwo(
-      const Filenames filenames,
+      const Filenames& filenames,
       const std::string& id1,
       const std::string& id2
     );
 
     static bool prepareToStore(
-      const Filenames filenames,
+      const Filenames& filenames,
       const std::string& id
     );
 
     static bool prepareToStoreOneOfTwo(
-      const Filenames filenames,
+      const Filenames& filenames,
       const std::string& id1,
       const std::string& id2
     );

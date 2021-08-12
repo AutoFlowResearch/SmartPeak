@@ -30,18 +30,18 @@
 #include <SmartPeak/core/SampleGroupHandler.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/iface/IProcessorDescription.h>
-#include <SmartPeak/iface/IInputsOutputsProvider.h>
+#include <SmartPeak/iface/IFilenamesHandler.h>
 
 namespace SmartPeak
 {
-  struct SampleGroupProcessor : IProcessorDescription, IInputsOutputsProvider
+  struct SampleGroupProcessor : IProcessorDescription, IFilenamesHandler
   {
     SampleGroupProcessor(const SampleGroupProcessor& other) = delete;
     SampleGroupProcessor& operator=(const SampleGroupProcessor& other) = delete;
     virtual ~SampleGroupProcessor() = default;
 
-    /* IInputsOutputsProvider */
-    virtual void getInputsOutputs(Filenames& filenames) const override { };
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override { };
 
     /**
       Interface to all sample group processing methods.
@@ -79,8 +79,8 @@ namespace SmartPeak
       const Filenames& filenames_I
     ) const override;
 
-    /* IInputsOutputsProvider */
-    virtual void getInputsOutputs(Filenames& filenames) const override;
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct MergeInjections : SampleGroupProcessor
@@ -152,8 +152,8 @@ namespace SmartPeak
       const Filenames& filenames_I
     ) const override;
 
-    /* IInputsOutputsProvider */
-    virtual void getInputsOutputs(Filenames& filenames) const override;
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreFeaturesSampleGroup : SampleGroupProcessor
@@ -173,7 +173,7 @@ namespace SmartPeak
       const Filenames& filenames_I
     ) const override;
 
-    /* IInputsOutputsProvider */
-    virtual void getInputsOutputs(Filenames& filenames) const override;
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 }
