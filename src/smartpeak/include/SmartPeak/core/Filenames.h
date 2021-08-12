@@ -32,9 +32,22 @@ namespace SmartPeak
 {
   class Filenames
   {
-public:
+  public:
 
-  /**
+    enum class Tag
+    {
+      MAIN_DIR,
+      MZML_INPUT_PATH,
+      FEATURES_INPUT_PATH,
+      FEATURES_OUTPUT_PATH,
+      INPUT_MZML_FILENAME,
+      INPUT_INJECTION_NAME,
+      OUTPUT_INJECTION_NAME,
+      INPUT_GROUP_NAME,
+      OUTPUT_GROUP_NAME
+    };
+
+    /**
       @brief Adds file to the Filename
     */
     void addFileName(const std::string& id, const std::string& name_pattern);
@@ -62,7 +75,7 @@ public:
     /**
       @brief set tags and update paths.
     */
-    void setTag(const std::string& tag_id, const std::string& value);
+    void setTag(Tag tag, const std::string& value);
 
   protected:
 
@@ -79,6 +92,8 @@ public:
     void updateFullPath(FileName& filename);
 
     std::map<std::string, FileName> file_names_;
-    std::map<std::string, std::string> tags_;
+    std::map<Tag, std::string> tags_;
+
+    static std::map<std::string, Tag> string_to_tag_;
   };
 }

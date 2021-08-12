@@ -70,15 +70,15 @@ TEST(Filenames, setFullPath)
   filenames.setFullPath("my_file_main", "/file/to/file_main.txt");
   EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/file/to/file_main.txt");
   // setting variant or root has no effect
-  filenames.setTag("MAIN_DIR", "/main");
-  filenames.setTag("MZML_INPUT_PATH", "/mzml");
-  filenames.setTag("FEATURES_INPUT_PATH", "/feat_input");
-  filenames.setTag("FEATURES_OUTPUT_PATH", "/feat_output");
-  filenames.setTag("INPUT_MZML_FILENAME", "variant_mzml_");
-  filenames.setTag("INPUT_INJECTION_NAME", "variant_input_injection_");
-  filenames.setTag("OUTPUT_INJECTION_NAME", "variant_output_injection_");
-  filenames.setTag("INPUT_GROUP_NAME", "variant_input_sample_");
-  filenames.setTag("OUTPUT_GROUP_NAME", "variant_output_sample_");
+  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
   EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/file/to/file_main.txt");
 }
 
@@ -90,15 +90,15 @@ TEST(Filenames, setRootPath_setVariant_after)
   filenames.addFileName("my_file_injection_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}file_injection_output.txt");
   filenames.addFileName("my_file_group_input", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}file_group_input.txt");
   filenames.addFileName("my_file_group_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}file_group_output.txt");
-  filenames.setTag("MAIN_DIR", "/main");
-  filenames.setTag("MZML_INPUT_PATH", "/mzml");
-  filenames.setTag("FEATURES_INPUT_PATH", "/feat_input");
-  filenames.setTag("FEATURES_OUTPUT_PATH", "/feat_output");
-  filenames.setTag("INPUT_MZML_FILENAME", "variant_mzml_");
-  filenames.setTag("INPUT_INJECTION_NAME", "variant_input_injection_");
-  filenames.setTag("OUTPUT_INJECTION_NAME", "variant_output_injection_");
-  filenames.setTag("INPUT_GROUP_NAME", "variant_input_sample_");
-  filenames.setTag("OUTPUT_GROUP_NAME", "variant_output_sample_");
+  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
   EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/main/file_main.txt");
   EXPECT_STREQ(filenames.getFullPath("my_file_injection_input").generic_string().c_str(), "/feat_input/variant_input_injection_file_injection_input.txt");
   EXPECT_STREQ(filenames.getFullPath("my_file_injection_output").generic_string().c_str(), "/feat_output/variant_output_injection_file_injection_output.txt");
@@ -109,15 +109,15 @@ TEST(Filenames, setRootPath_setVariant_after)
 TEST(Filenames, setRootPath_setVariant_before)
 {
   Filenames filenames;
-  filenames.setTag("MAIN_DIR", "/main");
-  filenames.setTag("MZML_INPUT_PATH", "/mzml");
-  filenames.setTag("FEATURES_INPUT_PATH", "/feat_input");
-  filenames.setTag("FEATURES_OUTPUT_PATH", "/feat_output");
-  filenames.setTag("INPUT_MZML_FILENAME", "variant_mzml_");
-  filenames.setTag("INPUT_INJECTION_NAME", "variant_input_injection_");
-  filenames.setTag("OUTPUT_INJECTION_NAME", "variant_output_injection_");
-  filenames.setTag("INPUT_GROUP_NAME", "variant_input_sample_");
-  filenames.setTag("OUTPUT_GROUP_NAME", "variant_output_sample_");
+  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
   filenames.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
   filenames.addFileName("my_file_injection_input", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}file_injection_input.txt");
   filenames.addFileName("my_file_injection_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}file_injection_output.txt");
@@ -133,15 +133,15 @@ TEST(Filenames, setRootPath_setVariant_before)
 TEST(Filenames, merge)
 {
   Filenames filenames1;
-  filenames1.setTag("MAIN_DIR", "/main");
-  filenames1.setTag("MZML_INPUT_PATH", "/mzml");
-  filenames1.setTag("FEATURES_INPUT_PATH", "/feat_input");
-  filenames1.setTag("FEATURES_OUTPUT_PATH", "/feat_output");
-  filenames1.setTag("INPUT_MZML_FILENAME", "variant_mzml_");
-  filenames1.setTag("INPUT_INJECTION_NAME", "variant_input_injection_");
-  filenames1.setTag("OUTPUT_INJECTION_NAME", "variant_output_injection_");
-  filenames1.setTag("INPUT_GROUP_NAME", "variant_input_sample_");
-  filenames1.setTag("OUTPUT_GROUP_NAME", "variant_output_sample_");
+  filenames1.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames1.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames1.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames1.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames1.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames1.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames1.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames1.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames1.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
   filenames1.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
   filenames1.addFileName("my_file_injection_input", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}file_injection_input.txt");
 

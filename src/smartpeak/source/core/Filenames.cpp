@@ -31,6 +31,20 @@
 namespace SmartPeak
 {
 
+
+  std::map<std::string, Filenames::Tag> Filenames::string_to_tag_ =
+  {
+    { "MAIN_DIR", Filenames::Tag::MAIN_DIR },
+    { "MZML_INPUT_PATH", Filenames::Tag::MZML_INPUT_PATH },
+    { "FEATURES_INPUT_PATH", Filenames::Tag::FEATURES_INPUT_PATH },
+    { "FEATURES_OUTPUT_PATH", Filenames::Tag::FEATURES_OUTPUT_PATH },
+    { "INPUT_MZML_FILENAME", Filenames::Tag::INPUT_MZML_FILENAME },
+    { "INPUT_INJECTION_NAME", Filenames::Tag::INPUT_INJECTION_NAME },
+    { "OUTPUT_INJECTION_NAME", Filenames::Tag::OUTPUT_INJECTION_NAME },
+    { "INPUT_GROUP_NAME", Filenames::Tag::INPUT_GROUP_NAME },
+    { "OUTPUT_GROUP_NAME", Filenames::Tag::OUTPUT_GROUP_NAME }
+  };
+
   void Filenames::addFileName(const std::string& id, const std::string& name_pattern)
   {
     if (file_names_.find(id) == file_names_.end())
@@ -72,11 +86,12 @@ namespace SmartPeak
       std::regex search_regex("\\$\\{([^}]*)\\}");
       std::smatch match;
       std::string search_string = file_pattern;
-      while (std::regex_search(search_string, match, search_regex)) {
+      while (std::regex_search(search_string, match, search_regex))
+      {
         std::string replace_with;
-        if (tags_.count(match.str(1)))
+        if (string_to_tag_.count(match.str(1)))
         {
-          replace_with = tags_[match.str(1)];
+          replace_with = tags_[string_to_tag_[match.str(1)]];
         }
         std::regex replace_regex(std::string("\\$\\{") + match.str(1) + std::string("\\}"));
         file_pattern = std::regex_replace(file_pattern, replace_regex, replace_with);
@@ -103,9 +118,9 @@ namespace SmartPeak
     return file_ids;
   }
 
-  void Filenames::setTag(const std::string& tag_id, const std::string& value)
+  void Filenames::setTag(Tag tag, const std::string& value)
   {
-    tags_[tag_id] = value;
+    tags_[tag] = value;
     updateFullPaths();
   }
 

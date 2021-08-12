@@ -117,7 +117,7 @@ TEST(InputDataValidation, sampleNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
-  filenames.setTag("MAIN_DIR", main_dir);
+  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
   cs.delimiter          = ",";
@@ -143,7 +143,7 @@ TEST(InputDataValidation, componentNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
-  filenames.setTag("MAIN_DIR", main_dir);
+  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -170,7 +170,7 @@ TEST(InputDataValidation, componentNameGroupsAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
-  filenames.setTag("MAIN_DIR", main_dir);
+  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -197,7 +197,7 @@ TEST(InputDataValidation, heavyComponentsAreConsistent)
 {
   SequenceHandler sequenceHandler;
   Filenames filenames;
-  filenames.setTag("MAIN_DIR", main_dir);
+  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;

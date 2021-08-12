@@ -45,7 +45,7 @@ namespace SmartPeak
   bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler, Filenames& filenames)
   {
     application_handler->main_dir_ = std::filesystem::path(application_handler->sequence_pathname_).remove_filename().generic_string();
-    filenames.setTag("MAIN_DIR", application_handler->main_dir_.generic_string());
+    filenames.setTag(Filenames::Tag::MAIN_DIR, application_handler->main_dir_.generic_string());
     filenames.setFullPath("sequence_csv_i", application_handler->sequence_pathname_);
 
     LOGN << "\n\n"

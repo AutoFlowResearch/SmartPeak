@@ -13,10 +13,10 @@ void test_main_FIAMS_FullScan_Unknown()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("FIAMS_FullScan_Unknowns");
   Filenames filenames_main;
-  filenames_main.setTag("MAIN_DIR", main_dir);
-  filenames_main.setTag("MZML_INPUT_PATH", main_dir + "/mzML/");
-  filenames_main.setTag("FEATURES_INPUT_PATH", main_dir + "/features/");
-  filenames_main.setTag("FEATURES_OUTPUT_PATH", main_dir + "/features/");
+  filenames_main.setTag(Filenames::Tag::MAIN_DIR, main_dir);
+  filenames_main.setTag(Filenames::Tag::MZML_INPUT_PATH, main_dir + "/mzML/");
+  filenames_main.setTag(Filenames::Tag::FEATURES_INPUT_PATH, main_dir + "/features/");
+  filenames_main.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, main_dir + "/features/");
 
   example_FIAMS_FullScan_Unknowns(main_dir, filenames_main, ",");
 
