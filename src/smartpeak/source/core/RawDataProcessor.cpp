@@ -203,8 +203,12 @@ namespace SmartPeak
       else 
       {
         OpenMS::FileHandler fh;
-        LOGI << "Loading: " << filenames.getFullPath("mzML_i").generic_string();
-        fh.loadExperiment(filenames.getFullPath("mzML_i").generic_string(), chromatograms); //TODO:try-catch (SIGABRT)
+        try {
+          LOGI << "Loading: " << filenames.getFullPath("mzML_i").generic_string();
+          fh.loadExperiment(filenames.getFullPath("mzML_i").generic_string(), chromatograms);
+        } catch (const std::exception& e) {
+          LOGE << "LoadRawData::process : " << typeid(e).name() << " : " << e.what();
+        }
       }
     }
 
