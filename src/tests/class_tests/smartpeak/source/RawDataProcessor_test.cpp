@@ -1541,11 +1541,6 @@ TEST(RawDataProcessor, searchAccurateMass)
   SearchAccurateMass searchAccurateMass;
   searchAccurateMass.process(rawDataHandler, params_1, filenames);
 
-  // DELETE ME
-  filenames.setFullPath("featureXML_o", SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_serumTest_accurateMassSearch.featureXML"));
-  StoreFeatures storeFeatures;
-  storeFeatures.process(rawDataHandler, params_1, filenames);
-
   EXPECT_EQ(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().size(), 21);
   EXPECT_NEAR(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().calc_mass_to_charge.get(), 109.9994567849957, 1e-6);
   EXPECT_EQ(static_cast<std::string>(rawDataHandler.getMzTab().getSmallMoleculeSectionRows().front().chemical_formula.get()), "C9H11NO6S");
