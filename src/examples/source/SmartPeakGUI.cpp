@@ -55,6 +55,7 @@
 #include <SmartPeak/core/EventDispatcher.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
+#include <plog/Appenders/ColorConsoleAppender.h>
 #include <filesystem>
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -284,8 +285,12 @@ int main(int argc, char** argv)
     fileAppender(logfilepath.string().c_str(), 1024 * 1024 * 32, 100);
 
   // Add console appender, instead of only the file one
+#ifdef _WIN32
+  plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
+#else
   plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
-
+#endif
+  
   // Init logger with all the appenders
   plog::init(plog::debug, &fileAppender)
     .addAppender(&consoleAppender)
