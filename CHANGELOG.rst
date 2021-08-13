@@ -1,6 +1,26 @@
 SmartPeak Changelog
 ===================
 
+v1.12.0 (2020-08-13)
+--------------------
+
+Features
+~~~~~~~~
+- Colouring logs `(#406) <https://github.com/AutoFlowResearch/SmartPeak/pull/406>`_
+
+Changes
+~~~~~~~
+- Chromatogram's time-ranger in compact form `(#397) <https://github.com/AutoFlowResearch/SmartPeak/pull/397>`_  
+- CI: moved to python 3.7.2 to fix a change in typing module `(#400) <https://github.com/AutoFlowResearch/SmartPeak/pull/400>`_  
+- Enhancing issue filing usability `(#403) <https://github.com/AutoFlowResearch/SmartPeak/pull/403>`_  
+- Rework of Filenames class `(#404) <https://github.com/AutoFlowResearch/SmartPeak/pull/404>`_  
+ 
+Fix
+~~~
+- Fixed flooding of log when workflow fails to be loaded `(#399) <https://github.com/AutoFlowResearch/SmartPeak/pull/399>`_
+- Fixed handling of windows separators in CLI. `(#402) <https://github.com/AutoFlowResearch/SmartPeak/pull/402>`_
+- Fixed ProcessSequence Fails with SIGABRT `(#398) <https://github.com/AutoFlowResearch/SmartPeak/pull/398>`_
+
 v1.11.0 (2020-07-16)
 --------------------
 
