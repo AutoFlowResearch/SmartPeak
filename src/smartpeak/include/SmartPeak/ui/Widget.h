@@ -218,11 +218,6 @@ namespace SmartPeak
     virtual void onFeaturesUpdated() override
     {
       table_data_.clear();
-      data_changed_ = true;
-    };
-    
-    virtual void onFeaturesSynced() override
-    {
       data_changed_ = false;
     };
   };
@@ -357,7 +352,6 @@ namespace SmartPeak
     IFeaturesObserver
     */
     virtual void onFeaturesUpdated() override;
-    virtual void onFeaturesSynced() override;
 
     Eigen::Tensor<std::string, 1> checkbox_headers_;
     Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;

@@ -42,15 +42,7 @@ namespace SmartPeak
     transitions_table.clear();
   }
 
-  void SessionHandler::onFeaturesUpdated()
-  {
-    feature_table_updated = true;
-  }
-
-  void SessionHandler::onFeaturesSynced()
-  {
-    feature_table_updated = true;
-  }
+  void SessionHandler::onFeaturesUpdated() {}
 
   void SessionHandler::setMinimalDataAndFilters(const SequenceHandler & sequence_handler)
   {
@@ -68,6 +60,7 @@ namespace SmartPeak
     setSpectrumExplorer(spectrum_table);
     //LOGD << "END setMinimalDataAndFilters";
   }
+
   void SessionHandler::setInjectionExplorer(GenericTableData& table_data) {
     // Make the injection explorer headers
     if (injection_explorer_data.checkbox_headers.size() <= 0) {
@@ -86,6 +79,7 @@ namespace SmartPeak
       injection_explorer_data.checked_rows.setConstant(true);
     }
   }
+
   void SessionHandler::setTransitionExplorer(GenericTableData& table_data) {
     // Make the transition explorer headers
     if (transition_explorer_data.checkbox_headers.size() <= 0) {
@@ -104,6 +98,7 @@ namespace SmartPeak
       transition_explorer_data.checked_rows.setConstant(true);
     }
   }
+
   void SessionHandler::setFeatureExplorer() {
     // Make the feature explorer headers
     if (feature_table.headers_.size() <= 0) {
@@ -131,6 +126,7 @@ namespace SmartPeak
       feature_explorer_data.checked_rows.setConstant(true);
     }
   }
+
   void SessionHandler::setSpectrumExplorer(GenericTableData& table_data)
   {
     // Make the spectrum explorer headers
@@ -150,6 +146,7 @@ namespace SmartPeak
       spectrum_explorer_data.checked_rows.setConstant(true);
     }
   }
+
   void SessionHandler::setSequenceTable(const SequenceHandler & sequence_handler, GenericTableData& table_data) {
     // Make the sequence table headers
     if (table_data.headers_.size() <= 0) {
@@ -197,6 +194,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setTransitionsTable(const SequenceHandler & sequence_handler, GenericTableData& table_data)
   {
     // Make the transition table headers
@@ -241,6 +239,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setSpectrumTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     // Make the spectrum table headers
@@ -281,6 +280,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setWorkflowTable(const std::vector<ApplicationHandler::Command>& commands, GenericTableData& table_data)
   {
     // Make the workflow table headers
@@ -381,6 +381,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setStdsConcsTable(const SequenceHandler & sequence_handler, GenericTableData& table_data)
   {
     // Make the stds_concs table headers
@@ -420,6 +421,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentFiltersTable(const SequenceHandler & sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0) {
@@ -469,6 +471,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentGroupFiltersTable(const SequenceHandler & sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureFilter().component_group_qcs.size() > 0) {
@@ -553,6 +556,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentQCsTable(const SequenceHandler & sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureQC().component_qcs.size() > 0) {
@@ -602,6 +606,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentGroupQCsTable(const SequenceHandler & sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureQC().component_group_qcs.size() > 0) {
@@ -686,6 +691,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentRSDFiltersTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_qcs.size() > 0) {
@@ -735,6 +741,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentGroupRSDFiltersTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDFilter().component_group_qcs.size() > 0) {
@@ -819,6 +826,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentRSDQCsTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_qcs.size() > 0) {
@@ -868,6 +876,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentGroupRSDQCsTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDQC().component_group_qcs.size() > 0) {
@@ -952,6 +961,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentBackgroundFiltersTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_qcs.size() > 0) {
@@ -1001,6 +1011,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentGroupBackgroundFiltersTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundFilter().component_group_qcs.size() > 0) {
@@ -1085,6 +1096,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentBackgroundQCsTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.size() > 0) {
@@ -1134,6 +1146,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentGroupBackgroundQCsTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundQC().component_qcs.size() > 0) {
@@ -1217,7 +1230,9 @@ namespace SmartPeak
         }
       }
     }
-  }  void SessionHandler::setComponentRSDEstimationsTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
+  }
+
+  void SessionHandler::setComponentRSDEstimationsTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_qcs.size() > 0) {
       // Make the comp_rsd_estimations table headers
@@ -1266,6 +1281,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentGroupRSDEstimationsTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureRSDEstimations().component_group_qcs.size() > 0) {
@@ -1350,6 +1366,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentBackgroundEstimationsTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_qcs.size() > 0) {
@@ -1399,6 +1416,7 @@ namespace SmartPeak
       }
     }
   }
+
   void SessionHandler::setComponentGroupBackgroundEstimationsTable(const SequenceHandler& sequence_handler, GenericTableData& table_data)
   {
     if (sequence_handler.getSequenceSegments().size() > 0 && sequence_handler.getSequenceSegments().at(0).getFeatureBackgroundEstimations().component_group_qcs.size() > 0) {
@@ -1483,7 +1501,8 @@ namespace SmartPeak
       }
     }
   }
-  bool SessionHandler::setFeatureTable(const SequenceHandler & sequence_handler, GenericTableData& table_data, EventDispatcher& event_dispatcher)
+
+  bool SessionHandler::setFeatureTable(const SequenceHandler & sequence_handler, GenericTableData& table_data)
   {
     bool within_max_size = true;
     if (sequence_handler.getSequence().size() > 0 &&
@@ -1544,11 +1563,6 @@ namespace SmartPeak
             table_data.body_(row, col) = table.at(row).at(col);
           }
         }
-        event_dispatcher.onFeaturesUpdated();
-        this->onFeaturesUpdated();
-      } else {
-        event_dispatcher.onFeaturesSynced();
-        this->onFeaturesSynced();
       }
     }
     return within_max_size;

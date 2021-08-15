@@ -41,7 +41,6 @@ namespace SmartPeak
     IFeaturesObserver
     */
     virtual void onFeaturesUpdated() override;
-    virtual void onFeaturesSynced() override;
 
     /**
     ISequenceObserver
@@ -123,7 +122,7 @@ namespace SmartPeak
 
     @returns true if all rows/columns were added and false if rows/columns were omitted due to performance
     */
-    bool setFeatureTable(const SequenceHandler& sequence_handler, GenericTableData& generic_table_data, EventDispatcher& event_dispatcher);
+    bool setFeatureTable(const SequenceHandler& sequence_handler, GenericTableData& generic_table_data);
     /*
     @brief Sets the Feature matrix data used for the matrix table, line plots, and heatmap
 
@@ -258,7 +257,6 @@ namespace SmartPeak
     // data for the feature explorer
     ExplorerData feature_explorer_data;
     GenericTableData feature_table;
-    bool feature_table_updated = false;
     // data for the sequence table
     GenericTableData sequence_table;
     // data for the transitions table

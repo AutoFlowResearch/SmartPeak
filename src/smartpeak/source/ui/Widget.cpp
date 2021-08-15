@@ -160,6 +160,11 @@ namespace SmartPeak
       }
     }
     data_changed_ = false;
+    
+    if (!table_scanned_) {
+      updateTableContents(table_entries_, table_scanned_,
+        table_data_.body_, Eigen::Tensor<bool, 2>());
+    }
 
     bool edit_cell = false;
     if (ImGui::BeginTable(table_id_.c_str(), table_data_.headers_.size(), table_flags)) {
@@ -534,11 +539,6 @@ namespace SmartPeak
   void ExplorerWidget::onFeaturesUpdated()
   {
     data_changed_ = true;
-  }
-
-  void ExplorerWidget::onFeaturesSynced()
-  {
-    data_changed_ = false;
   }
 
   void GenericGraphicWidget::draw()
