@@ -31,14 +31,14 @@ using namespace SmartPeak;
 
 void example_LCMS_MRM_Standards(
   const std::string& dir_I,
-  const Filenames& static_filenames,
+  const Filenames& filenames_I,
   const std::string& delimiter_I = ","
 )
 {
   SequenceHandler sequenceHandler;
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames_          = static_filenames;
+  cs.filenames_          = filenames_I;
   cs.delimiter          = delimiter_I;
   cs.checkConsistency   = true;
   cs.process();
@@ -54,20 +54,20 @@ void example_LCMS_MRM_Standards(
     std::make_shared<StoreFeatures>()
   };
 
+  Filenames methods_filenames;
+  methods_filenames.setTag(Filenames::Tag::MAIN_DIR, dir_I);
+  methods_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, dir_I + "/mzML/");
+  methods_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, dir_I + "/features/");
+  methods_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, dir_I + "/features/");
   std::map<std::string, Filenames> dynamic_filenames1;
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
-    dynamic_filenames1[key] = Filenames::getDefaultDynamicFilenames(
-      dir_I,
-      dir_I + "/mzML/",
-      dir_I + "/features/",
-      dir_I + "/features/",
-      injection.getMetaData().getFilename(),
-      key,
-      key,
-      injection.getMetaData().getSampleGroupName(),
-      injection.getMetaData().getSampleGroupName()
-    );
+    dynamic_filenames1[key] = methods_filenames;
+    dynamic_filenames1[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+    dynamic_filenames1[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames1[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames1[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames1[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
   ProcessSequence ps(sequenceHandler);
@@ -83,16 +83,9 @@ void example_LCMS_MRM_Standards(
   std::map<std::string, Filenames> dynamic_filenames2;
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string& key = sequence_segment.getSequenceSegmentName();
-    dynamic_filenames2[key] = Filenames::getDefaultDynamicFilenames(
-      dir_I,
-      dir_I + "/mzML/",
-      dir_I + "/features/",
-      dir_I + "/features/",
-      "",
-      key,
-      key,
-      "", ""
-    );
+    dynamic_filenames2[key] = methods_filenames;
+    dynamic_filenames2[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames2[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
   }
 
   ProcessSequenceSegments pss(sequenceHandler);
@@ -109,33 +102,32 @@ void example_LCMS_MRM_Standards(
   std::map<std::string, Filenames> dynamic_filenames3;
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
-    dynamic_filenames3[key] = Filenames::getDefaultDynamicFilenames(
-      dir_I,
-      dir_I + "/mzML/",
-      dir_I + "/features/",
-      dir_I + "/features/",
-      injection.getMetaData().getFilename(),
-      key,
-      key,
-      injection.getMetaData().getSampleGroupName(),
-      injection.getMetaData().getSampleGroupName()
-    );
+    dynamic_filenames3[key] = methods_filenames;
+    dynamic_filenames3[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+    dynamic_filenames3[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames3[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames3[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames3[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
   ps.filenames_                     = dynamic_filenames3;
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.process();
 
+  Filenames filenames = filenames_I;
+  filenames.setFullPath("pivotTable_csv_o", dir_I + "/PivotTable.csv");
+  filenames.setFullPath("featureDB_csv_o", dir_I + "/FeatureDB.csv");
+
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,
-    static_filenames.pivotTable_csv_o,
+    filenames.getFullPath("pivotTable_csv_o"),
     {FeatureMetadata::calculated_concentration},
     {SampleType::Standard}
   );
 
   SequenceParser::writeDataTableFromMetaValue(
     sequenceHandler,
-    static_filenames.featureDB_csv_o,
+    filenames.getFullPath("featureDB_csv_o"),
     {
       FeatureMetadata::peak_apex_intensity,
       FeatureMetadata::total_width,

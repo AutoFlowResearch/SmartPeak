@@ -17,29 +17,45 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey, Ahmed Khalil $
+// $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
 #pragma once
 
-#include <mutex>
+#include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/WorkflowStepWidget.h>
+#include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
+#include <string>
 #include <vector>
-#include <plog/Log.h>
 
 namespace SmartPeak
 {
-  class GuiAppender : public plog::IAppender
+  class WorkflowWidget : public Widget
   {
   public:
-    typedef std::pair<plog::Severity, plog::util::nstring> GuiAppenderRecord;
-    
-    void write(const plog::Record& record) override;
-    
-    std::vector<GuiAppenderRecord> getAppenderRecordList(plog::Severity severity) const;
 
-  private:
-    std::vector<GuiAppenderRecord> messages;
-    mutable std::mutex messages_mutex;
+    WorkflowWidget(const std::string title, ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
+      : Widget(title),
+      application_handler_(application_handler),
+      workflow_step_widget_(application_handler),
+      workflow_manager_(workflow_manager),
+      buildCommandsFromNames_(application_handler)
+    {
+    };
+
+    void draw() override;
+
+  protected:
+    virtual void updatecommands();
+
+  protected:
+    ApplicationHandler& application_handler_;
+    WorkflowStepWidget workflow_step_widget_;
+    WorkflowManager& workflow_manager_;
+    BuildCommandsFromNames buildCommandsFromNames_;
+    bool error_building_commands_ = false;
   };
 }

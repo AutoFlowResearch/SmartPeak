@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
@@ -42,12 +42,37 @@ namespace SmartPeak
 
     ImGui::Separator();
     ImGui::BeginChild("Log child");
-    const std::vector<plog::util::nstring> message_list = appender_.getMessageList(severity);
-    int message_list_start = (message_list.size() > 500) ? message_list.size() - 500 : 0;
-    for (int i = message_list_start; i < message_list.size(); ++i)
+    const auto record_list = appender_.getAppenderRecordList(severity);
+    int message_list_start = (record_list.size() > 500) ? record_list.size() - 500 : 0;
+    for (int i = message_list_start; i < record_list.size(); ++i)
     {
-      std::string str(message_list.at(i).data(), message_list.at(i).data() + message_list.at(i).size());
-      ImGui::Text("%s", str.c_str());
+      std::string str(record_list.at(i).second.data(), record_list.at(i).second.data() + record_list.at(i).second.size());
+      
+      if (record_list.at(i).first == plog::Severity::fatal) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f,  0.0f, 0.0f, 1.0f));
+        ImGui::Text("%s", str.c_str());
+        ImGui::PopStyleColor();
+      } else if (record_list.at(i).first == plog::Severity::error) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(8.0f,  0.15f, 0.15f, 1.0f));
+        ImGui::Text("%s", str.c_str());
+        ImGui::PopStyleColor();
+      } else if (record_list.at(i).first == plog::Severity::warning) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(8.0f,  0.5f, 0.5f, 1.0f));
+        ImGui::Text("%s", str.c_str());
+        ImGui::PopStyleColor();
+      } else if (record_list.at(i).first == plog::Severity::info) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+        ImGui::Text("%s", str.c_str());
+        ImGui::PopStyleColor();
+      } else if (record_list.at(i).first == plog::Severity::debug) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.6f, 0.0f, 1.0f));
+        ImGui::Text("%s", str.c_str());
+        ImGui::PopStyleColor();
+      } else if (record_list.at(i).first == plog::Severity::verbose) {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f,  0.0f, 0.0f, 1.0f));
+        ImGui::Text("%s", str.c_str());
+        ImGui::PopStyleColor();
+      }
     }
     ImGui::EndChild();
   }

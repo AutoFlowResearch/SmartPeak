@@ -21,8 +21,7 @@
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
-#include <SmartPeak/ui/Workflow.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/ui/WorkflowWidget.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <plog/Log.h>
@@ -30,14 +29,14 @@
 
 namespace SmartPeak
 {
-  void Workflow::draw()
+  void WorkflowWidget::draw()
   {
 
     workflow_step_widget_.draw();
     bool editable = workflow_manager_.isWorkflowDone();
     if (editable && ImGui::BeginCombo("Presets", NULL))
     {
-      const char* presets[] = {
+      static const char* presets[] = {
         "DDA",
         "LCMS MRM Unknowns",
         "LCMS MRM Standards",
@@ -185,12 +184,11 @@ namespace SmartPeak
     }
     else
     {
-      BuildCommandsFromNames buildCommandsFromNames(application_handler_);
-      buildCommandsFromNames.names_ = application_handler_.sequenceHandler_.getWorkflow();
-      if (buildCommandsFromNames.process()) 
+      updatecommands();
+      if (!error_building_commands_)
       {
         int i = 0;
-        for (const auto& command: buildCommandsFromNames.commands_) {
+        for (const auto& command: buildCommandsFromNames_.commands_) {
           ImGui::PushID(i + 1 ); // avoid hashing an id := 0, not sure it's necessary
           std::ostringstream os;
           os << "[" << (i + 1) << "] " << command.getName().c_str();
@@ -234,9 +232,25 @@ namespace SmartPeak
           ImGui::PopID();
         }
       }
+      else
+      {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+        ImGui::Text("Unable to load workflow. Please check log.");
+        ImGui::PopStyleColor();
+      }
     }
 
     ImGui::EndChild();
+  }
+
+  void WorkflowWidget::updatecommands()
+  {
+    const auto& names = application_handler_.sequenceHandler_.getWorkflow();
+    if (buildCommandsFromNames_.names_ != names)
+    {
+      buildCommandsFromNames_.names_ = names;
+      error_building_commands_ = !buildCommandsFromNames_.process();
+    }
   }
 
 }

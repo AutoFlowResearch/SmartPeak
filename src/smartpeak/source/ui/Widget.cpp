@@ -667,10 +667,6 @@ namespace SmartPeak
     // TODO: add selected samples to workflow widget
   }
 
-  void WorkflowWidget::draw()
-  {
-  }
-
   void GenericTextWidget::draw()
   {
     for (const std::string& line : text_lines) {

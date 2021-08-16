@@ -38,15 +38,17 @@ namespace SmartPeak
 
   void GraphicDataVizWidget::drawSliders()
   {
-    // Widget's controls - that ImGui does not support natively
-    const ImGuiSliderFlags slider_flags = ImGuiSliderFlags_AlwaysClamp;
+    ImGui::DragFloatRange2("Time-Range",
+                           &current_range_.first, &current_range_.second, 0.25f,
+                           slider_min_max_.first, slider_min_max_.second,
+                           "min: %.4f (sec)", "max: %.4f (sec)",
+                           ImGuiSliderFlags_AlwaysClamp);
+    
     float controls_pos_start_y = ImGui::GetCursorPosY();
-    ImGui::SliderFloat((std::string("min ") + graph_viz_data_.x_axis_title_).c_str(), &current_range_.first, slider_min_max_.first, current_range_.second, "%.4f", slider_flags);
-    ImGui::SameLine();
     ImGui::Checkbox("Compact View", &compact_view_);
-    ImGui::SliderFloat((std::string("max ") + graph_viz_data_.x_axis_title_).c_str(), &current_range_.second, current_range_.first, slider_min_max_.second, "%.4f", slider_flags);
     ImGui::SameLine();
     ImGui::Checkbox("Legend", &show_legend_);
+    
     if (graph_viz_data_.z_axis_title_)
     {
       std::ostringstream os;

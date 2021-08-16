@@ -193,21 +193,21 @@ bool InitializeWorkflowResources::operator() (ApplicationManager& application_ma
     if (!application_settings.out_dir.empty() && application_settings.out_dir != ".")
     {
         main_dir = application_settings.out_dir;
-        LOG_DEBUG << "Output feature directory: " << main_dir;
+        LOG_DEBUG << "Output feature directory: " << main_dir.generic_string();
     }
-    application_handler.mzML_dir_           = application_handler.main_dir_ + "/mzML";
-    application_handler.features_in_dir_    = application_handler.main_dir_ + "/features";
-    application_handler.features_out_dir_   = main_dir + "/features";
+    application_handler.mzML_dir_           = application_handler.main_dir_ / "mzML";
+    application_handler.features_in_dir_    = application_handler.main_dir_ / "features";
+    application_handler.features_out_dir_   = main_dir / "features";
 
     auto paths = {
         application_handler.mzML_dir_, 
         application_handler.features_in_dir_, 
         application_handler.features_out_dir_ 
     };
-    auto current_path = std::string{};
+    auto current_path = std::filesystem::path{};
     try
     {
-        for (const std::string& pathname : paths) 
+        for (const auto& pathname : paths) 
         {
             current_path = pathname;
             fs::create_directories(fs::path(pathname));
@@ -262,12 +262,10 @@ void InitializeWorkflowSettings::_update_filenames(
     {
         for (auto& p : cmd.dynamic_filenames)
         {
-            SmartPeak::Filenames::updateDefaultDynamicFilenames(
-                application_handler.mzML_dir_,
-                application_handler.features_in_dir_,
-                application_handler.features_out_dir_,
-                p.second
-            );
+          p.second.setTag(Filenames::Tag::MAIN_DIR, application_handler.main_dir_.generic_string());
+          p.second.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler.mzML_dir_.generic_string());
+          p.second.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler.features_in_dir_.generic_string());
+          p.second.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler.features_out_dir_.generic_string());
         }
     }
 }
@@ -405,7 +403,7 @@ bool ExportReport::operator() (ApplicationManager& application_manager)
         if (feature_db)
         {
             auto& sequance_handler = application_handler.sequenceHandler_;
-            const auto filepath = main_dir + "/FeatureDB.csv";
+            const auto filepath = main_dir / "FeatureDB.csv";
             SequenceParser::writeDataTableFromMetaValue(
                 sequance_handler, filepath, 
                 report_metadata, report_sample_types);
@@ -413,7 +411,7 @@ bool ExportReport::operator() (ApplicationManager& application_manager)
         if (pivot_table)
         {
             auto& sequance_handler = application_handler.sequenceHandler_;
-            const auto filepath = main_dir + "/PivotTable.csv";
+            const auto filepath = main_dir / "PivotTable.csv";
             SequenceParser::writeDataMatrixFromMetaValue(
                 sequance_handler, filepath, 
                 report_metadata, report_sample_types);

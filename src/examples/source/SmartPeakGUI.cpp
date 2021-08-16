@@ -43,7 +43,7 @@
 #include <SmartPeak/ui/SpectraMSMSPlotWidget.h>
 #include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
-#include <SmartPeak/ui/Workflow.h>
+#include <SmartPeak/ui/WorkflowWidget.h>
 #include <SmartPeak/ui/StatisticsWidget.h>
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/InfoWidget.h>
@@ -55,6 +55,7 @@
 #include <SmartPeak/core/EventDispatcher.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
+#include <plog/Appenders/ColorConsoleAppender.h>
 #include <filesystem>
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -72,8 +73,8 @@ void initializeDataDirs(ApplicationHandler& state);
 void initializeDataDir(
   ApplicationHandler& state,
   const std::string& label,
-  std::string& data_dir_member,
-  const std::string& default_dir
+  std::filesystem::path& data_dir_member,
+  const std::filesystem::path& default_dir
 );
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows);
@@ -110,7 +111,7 @@ int main(int argc, char** argv)
                                                             event_dispatcher,
                                                             event_dispatcher);
   auto report_ = std::make_shared<Report>(application_handler_);
-  auto workflow_ = std::make_shared<Workflow>("Workflow", application_handler_, workflow_manager_);
+  auto workflow_ = std::make_shared<WorkflowWidget>("Workflow", application_handler_, workflow_manager_);
   auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_, event_dispatcher);
   auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_, 
                                                                   session_handler_, 
@@ -263,7 +264,7 @@ int main(int argc, char** argv)
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   char filename[128];
-  strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
+  strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.log", std::localtime(&t));
 
   auto logfilepath = std::filesystem::path{};
   auto logdirpath = std::string{};
@@ -284,8 +285,12 @@ int main(int argc, char** argv)
     fileAppender(logfilepath.string().c_str(), 1024 * 1024 * 32, 100);
 
   // Add console appender, instead of only the file one
+#ifdef _WIN32
+  plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
+#else
   plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
-
+#endif
+  
   // Init logger with all the appenders
   plog::init(plog::debug, &fileAppender)
     .addAppender(&consoleAppender)
@@ -925,15 +930,15 @@ void initializeDataDirs(ApplicationHandler& application_handler)
 void initializeDataDir(
   ApplicationHandler& application_handler,
   const std::string& label,
-  std::string& data_dir_member,
-  const std::string& default_dir
+  std::filesystem::path& data_dir_member,
+  const std::filesystem::path& default_dir
 )
 {
-  if (data_dir_member.size()) {
+  if (!data_dir_member.empty()) {
     return;
   }
-  data_dir_member = application_handler.main_dir_ + "/" + default_dir;
-  LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member;
+  data_dir_member = application_handler.main_dir_ / default_dir;
+  LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member.generic_string();
 }
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows)

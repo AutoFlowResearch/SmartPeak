@@ -17,38 +17,28 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
-// $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
+// $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
 #pragma once
 
-#include <SmartPeak/ui/Widget.h>
-#include <SmartPeak/ui/WorkflowStepWidget.h>
-#include <SmartPeak/core/ApplicationHandler.h>
-#include <SmartPeak/core/WorkflowManager.h>
-#include <string>
-#include <vector>
+#include <SmartPeak/core/Filenames.h>
 
-namespace SmartPeak
+namespace SmartPeak 
 {
-  class Workflow final : public Widget
+  struct IFilenamesHandler
   {
-  public:
+    /**
+     @brief add files handled by the processor to the Filnames instance
+    */
+    virtual void getFilenames(Filenames& filenames) const = 0;
 
-    Workflow(const std::string title, ApplicationHandler& application_handler, WorkflowManager& workflow_manager)
-      : Widget(title),
-      application_handler_(application_handler),
-      workflow_step_widget_(application_handler),
-      workflow_manager_(workflow_manager)
+    virtual Filenames prepareFilenames(const Filenames& filenames_I) const
     {
-    };
-
-    void draw() override;
-
-  protected:
-    ApplicationHandler& application_handler_;
-    WorkflowStepWidget workflow_step_widget_;
-    WorkflowManager& workflow_manager_;
+      Filenames prepared_filenames(filenames_I);
+      getFilenames(prepared_filenames);
+      return prepared_filenames;
+    }
   };
 }
