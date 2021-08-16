@@ -1,6 +1,71 @@
 SmartPeak Changelog
 ===================
 
+v1.12.0 (2020-08-13)
+--------------------
+
+Features
+~~~~~~~~
+- Colouring logs `(#406) <https://github.com/AutoFlowResearch/SmartPeak/pull/406>`_
+
+Changes
+~~~~~~~
+- Chromatogram's time-ranger in compact form `(#397) <https://github.com/AutoFlowResearch/SmartPeak/pull/397>`_  
+- CI: moved to python 3.7.2 to fix a change in typing module `(#400) <https://github.com/AutoFlowResearch/SmartPeak/pull/400>`_  
+- Enhancing issue filing usability `(#403) <https://github.com/AutoFlowResearch/SmartPeak/pull/403>`_  
+- Rework of Filenames class `(#404) <https://github.com/AutoFlowResearch/SmartPeak/pull/404>`_  
+ 
+Fix
+~~~
+- Fixed flooding of log when workflow fails to be loaded `(#399) <https://github.com/AutoFlowResearch/SmartPeak/pull/399>`_
+- Fixed handling of windows separators in CLI. `(#402) <https://github.com/AutoFlowResearch/SmartPeak/pull/402>`_
+- Fixed ProcessSequence Fails with SIGABRT `(#398) <https://github.com/AutoFlowResearch/SmartPeak/pull/398>`_
+
+v1.11.0 (2020-07-16)
+--------------------
+
+Features
+~~~~~~~~
+- DDA Workflow and Support for visualization of non-targeted LC-MS/MS data `(#386) <https://github.com/AutoFlowResearch/SmartPeak/pull/386>`_
+- Automatic, accurate selection of data based on dilution and compound `(#394) <https://github.com/AutoFlowResearch/SmartPeak/pull/394>`_
+
+v1.10.0 (2020-07-08)
+--------------------
+
+Fix
+~~~
+- Added headless CLI to package `(#391) <https://github.com/AutoFlowResearch/SmartPeak/pull/391>`_
+- Fixed show-back of log and info panel, once previously hidden. `(#389) <https://github.com/AutoFlowResearch/SmartPeak/pull/389>`_
+- Display error if required column is missing in the parameters file. `(#388) <https://github.com/AutoFlowResearch/SmartPeak/pull/388>`_
+
+v1.9.0 (2020-07-07)
+-------------------
+
+Features
+~~~~~~~~
+- SmartPeak headless mode. `(#365) <https://github.com/AutoFlowResearch/SmartPeak/pull/365>`_  
+
+Fix
+~~~
+- Report error for invalid value in parameter.csv. `(#387) <https://github.com/AutoFlowResearch/SmartPeak/pull/387>`_
+
+v1.8.0 (2020-07-01)
+-------------------
+
+Features
+~~~~~~~~
+- Added support of NA keyword in the sequence file. `(#376) <https://github.com/AutoFlowResearch/SmartPeak/pull/376>`_  
+
+Changes
+~~~~~~~
+- Change testing framework to googletest `(#374) <https://github.com/AutoFlowResearch/SmartPeak/pull/374>`_  
+
+Fix
+~~~
+- Fixed display of native_id for scans in explorer view `(#379) <https://github.com/AutoFlowResearch/SmartPeak/pull/379>`_
+- Removing trailing zeros in FilePicker `(#377) <https://github.com/AutoFlowResearch/SmartPeak/pull/377>`_
+- Fixed MergeSpectra when spectrum has no peak `(#382) <https://github.com/AutoFlowResearch/SmartPeak/pull/382>`_
+
 v1.7.0 (2020-06-07)
 -------------------
 

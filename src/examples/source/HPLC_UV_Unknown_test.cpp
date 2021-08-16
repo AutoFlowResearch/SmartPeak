@@ -12,21 +12,25 @@ using namespace std;
 void test_main_HPLC_UV_Unknown()
 {
   const std::string main_dir = SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Unknowns");
-  const Filenames static_filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames filenames_main;
+  filenames_main.setTag(Filenames::Tag::MAIN_DIR, main_dir);
+  filenames_main.setTag(Filenames::Tag::MZML_INPUT_PATH, main_dir + "/mzML/");
+  filenames_main.setTag(Filenames::Tag::FEATURES_INPUT_PATH, main_dir + "/features/");
+  filenames_main.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, main_dir + "/features/");
 
-  example_HPLC_UV_Unknowns(main_dir, static_filenames, ",");
+  example_HPLC_UV_Unknowns(main_dir, filenames_main, ",");
 
   RawDataHandler rawDataHandler;
   LoadFeatures loadFeatures;
   Filenames filenames;
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Unknowns/features/20171013_HMP_C61_ISO_P1_GA1_UV_VIS_2_1_BatchName_1900-01-01_000000.featureXML");
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Unknowns/features/20171013_HMP_C61_ISO_P1_GA1_UV_VIS_2_1_BatchName_1900-01-01_000000.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm1 = rawDataHandler.getFeatureMap();
 
   rawDataHandler.clear();
 
-  filenames.featureXML_i = SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Unknowns/features/20171013_HMP_C61_ISO_P1_GA1_UV_VIS_2_test.featureXML");
+  filenames.setFullPath("featureXML_i", SMARTPEAK_GET_EXAMPLES_DATA_PATH("HPLC_UV_Unknowns/features/20171013_HMP_C61_ISO_P1_GA1_UV_VIS_2_test.featureXML"));
   loadFeatures.process(rawDataHandler, {}, filenames);
   OpenMS::FeatureMap fm2 = rawDataHandler.getFeatureMap();
 

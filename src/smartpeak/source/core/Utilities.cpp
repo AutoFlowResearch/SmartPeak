@@ -750,28 +750,36 @@ namespace SmartPeak
       
       if (entry_size >= 0 && entry_size < 1e3)
       {
-        size_human_readable_stream << std::fixed << std::setprecision(2) << entry_size;
+        size_human_readable_stream << entry_size;
         size_human_readable = size_human_readable_stream.str() + " Bytes";
       }
       if (entry_size >= 1e3 && entry_size < 1e6)
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e3);
-        size_human_readable = size_human_readable_stream.str() + " KB";
+        auto size_human_readable_str = size_human_readable_stream.str();
+        removeTrailing(size_human_readable_str, ".00");
+        size_human_readable = size_human_readable_str + " KB";
       }
       else if (entry_size >= 1e6 && entry_size < 1e9)
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e6);
-        size_human_readable = size_human_readable_stream.str() + " MB";
+        auto size_human_readable_str = size_human_readable_stream.str();
+        removeTrailing(size_human_readable_str, ".00");
+        size_human_readable = size_human_readable_str + " MB";
       }
       else if (entry_size >= 1e9 && entry_size < 1e12)
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e9);
-        size_human_readable = size_human_readable_stream.str() + " GB";
+        auto size_human_readable_str = size_human_readable_stream.str();
+        removeTrailing(size_human_readable_str, ".00");
+        size_human_readable = size_human_readable_str + " GB";
       }
       else if (entry_size >= 1e12 && entry_size < 1e18)
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e12);
-        size_human_readable = size_human_readable_stream.str() + " TB";
+        auto size_human_readable_str = size_human_readable_stream.str();
+        removeTrailing(size_human_readable_str, ".00");
+        size_human_readable = size_human_readable_str + " TB";
       }
     
       directory_entry.entry_contents[1] = size_human_readable;
@@ -812,5 +820,18 @@ namespace SmartPeak
       std::strftime(date_time_buffer, sizeof date_time_buffer, "%c", std::localtime(&entry_date_time));
       directory_entry.entry_contents[3] = date_time_buffer;
     }
+  }
+
+  std::string Utilities::str2upper(const std::string& str)
+  {
+    auto str_ = str;
+    std::transform(str_.begin(), str_.end(), str_.begin(), ::toupper);
+    return str_;
+  }
+
+  void Utilities::removeTrailing(std::string& str, std::string to_remove)
+  {
+    auto it = str.find(to_remove);
+    if (it != std::string::npos) str.erase(it, str.length());
   }
 }

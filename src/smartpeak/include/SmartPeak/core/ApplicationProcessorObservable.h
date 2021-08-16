@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
+// $Maintainer: Bertrand Boudaud, Krzysztof Abram $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
@@ -33,8 +33,20 @@ namespace SmartPeak
   class ApplicationProcessorObservable
   {
   public:
-    virtual void addApplicationProcessorObserver(IApplicationProcessorObserver* observer) { observers_.push_back(observer); };
-    virtual void removeApplicationProcessorObserver(IApplicationProcessorObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
+    virtual void addApplicationProcessorObserver(IApplicationProcessorObserver* observer) 
+    { 
+      if (nullptr != observer)
+      {
+        observers_.push_back(observer); 
+      }
+    }
+    virtual void removeApplicationProcessorObserver(IApplicationProcessorObserver* observer) 
+    { 
+      if (nullptr != observer)
+      {
+        observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); 
+      }
+    }
     void notifyApplicationProcessorStart(const std::vector<std::string>& commands)
     {
       for (auto& observer : observers_)

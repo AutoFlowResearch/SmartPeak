@@ -35,7 +35,8 @@ struct TestData {
     const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
     // Load the sequence
     if (load_sequence) {
-      Filenames filenames_ = Filenames::getDefaultStaticFilenames(pathname);
+      Filenames filenames_;
+      filenames_.setTag(Filenames::Tag::MAIN_DIR, pathname);
       CreateSequence cs(sequenceHandler);
       cs.filenames_ = filenames_;
       cs.delimiter = ",";
@@ -45,16 +46,18 @@ struct TestData {
     // Load the picked features
     if (load_features) {
       LoadFeatures loadFeatures;
+      Filenames method_filenames;
+      method_filenames.setTag(Filenames::Tag::MAIN_DIR, pathname);
+      method_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, pathname + "/mzML");
+      method_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, pathname + "/features");
+      method_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, pathname + "/features");
       for (auto& injection : sequenceHandler.getSequence()) {
-        Filenames filenames_ = Filenames::getDefaultDynamicFilenames(
-          pathname + "/mzML",
-          pathname + "/features",
-          pathname + "/features",
-          injection.getMetaData().getFilename(),
-          injection.getMetaData().getInjectionName(),
-          injection.getMetaData().getInjectionName(),
-          injection.getMetaData().getSampleGroupName(),
-          injection.getMetaData().getSampleGroupName());
+        Filenames filenames_ = method_filenames;
+        filenames_.setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+        filenames_.setTag(Filenames::Tag::INPUT_INJECTION_NAME, injection.getMetaData().getInjectionName());
+        filenames_.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, injection.getMetaData().getInjectionName());
+        filenames_.setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+        filenames_.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
         loadFeatures.process(injection.getRawData(), {}, filenames_);
       }
     }
@@ -64,16 +67,18 @@ struct TestData {
       params.addFunctionParameters(FunctionParameters("mzML"));
       params.addFunctionParameters(FunctionParameters("ChromatogramExtractor"));
       LoadRawData loadRawData;
+      Filenames method_filenames;
+      method_filenames.setTag(Filenames::Tag::MAIN_DIR, pathname);
+      method_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, pathname + "/mzML");
+      method_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, pathname + "/features");
+      method_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, pathname + "/features");
       for (auto& injection : sequenceHandler.getSequence()) {
-        Filenames filenames_ = Filenames::getDefaultDynamicFilenames(
-          pathname + "/mzML",
-          pathname + "/features",
-          pathname + "/features",
-          injection.getMetaData().getFilename(),
-          injection.getMetaData().getSampleName(),
-          injection.getMetaData().getSampleName(),
-          injection.getMetaData().getSampleGroupName(),
-          injection.getMetaData().getSampleGroupName());
+        Filenames filenames_ = method_filenames;
+        filenames_.setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+        filenames_.setTag(Filenames::Tag::INPUT_INJECTION_NAME, injection.getMetaData().getInjectionName());
+        filenames_.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, injection.getMetaData().getInjectionName());
+        filenames_.setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+        filenames_.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
         loadRawData.process(injection.getRawData(), params, filenames_);
       }
     }
@@ -681,24 +686,24 @@ TEST(SessionHandler, getSpectrumScatterPlot1)
 {
   TestData testData;
   SessionHandler session_handler;
-  SessionHandler::ScatterPlotData result;
+  SessionHandler::GraphVizData result;
   const std::pair<float, float> range = std::make_pair(0, 1800);
   const std::set<std::string> sample_names;
   const std::set<std::string> component_names;
   session_handler.getChromatogramScatterPlot(testData.sequenceHandler, result, range, sample_names, component_names);
-  EXPECT_FALSE(result.points_overflow);
+  EXPECT_FALSE(result.points_overflow_);
 }
 TEST(SessionHandler, setSpectrumScatterPlot1)
 {
   TestData testData;
   SessionHandler session_handler;
-  SessionHandler::ScatterPlotData result;
+  SessionHandler::GraphVizData result;
   const std::pair<float, float> range = std::make_pair(0, 2000);
   const std::set<std::string> sample_names;
   const std::set<std::string> scan_names;
   const std::set<std::string> component_group_names;
   session_handler.getSpectrumScatterPlot(testData.sequenceHandler, result, range, sample_names, scan_names, component_group_names);
-  EXPECT_FALSE(result.points_overflow);
+  EXPECT_FALSE(result.points_overflow_);
 }
 TEST(SessionHandler, setCalibratorsScatterLinePlot1)
 {
@@ -724,4 +729,130 @@ TEST(SessionHandler, getHeatMap)
   EXPECT_EQ(result.selected_sample_names_.size(), 0);
   EXPECT_EQ(result.selected_transitions_.size(), 0);
   EXPECT_EQ(result.selected_transition_groups_.size(), 0);
+}
+
+TEST(SessionHandler, GraphVizData)
+{
+  SessionHandler::GraphVizData graph_viz_data;
+  EXPECT_TRUE(graph_viz_data.series_names_area_.empty());
+  EXPECT_TRUE(graph_viz_data.x_data_area_.empty());
+  EXPECT_TRUE(graph_viz_data.y_data_area_.empty());
+  EXPECT_TRUE(graph_viz_data.series_names_scatter_.empty());
+  EXPECT_TRUE(graph_viz_data.x_data_scatter_.empty());
+  EXPECT_TRUE(graph_viz_data.y_data_scatter_.empty());
+  EXPECT_STREQ(graph_viz_data.x_axis_title_.c_str(), "");
+  EXPECT_STREQ(graph_viz_data.y_axis_title_.c_str(), "");
+  EXPECT_TRUE(graph_viz_data.z_data_area_.empty());
+  EXPECT_FALSE(graph_viz_data.z_axis_title_);
+  EXPECT_NEAR(graph_viz_data.x_min_, 0.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.x_max_, 0.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.y_min_, 0.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.y_max_, 0.0f, 1e-6);
+  EXPECT_FALSE(graph_viz_data.points_overflow_);
+  EXPECT_EQ(graph_viz_data.nb_points_, 0);
+  EXPECT_EQ(graph_viz_data.max_nb_points_, 0);
+
+  graph_viz_data.reset("x_axis", "y_axis", "z_axis", 13);
+  EXPECT_TRUE(graph_viz_data.series_names_area_.empty());
+  EXPECT_TRUE(graph_viz_data.x_data_area_.empty());
+  EXPECT_TRUE(graph_viz_data.y_data_area_.empty());
+  EXPECT_TRUE(graph_viz_data.series_names_scatter_.empty());
+  EXPECT_TRUE(graph_viz_data.x_data_scatter_.empty());
+  EXPECT_TRUE(graph_viz_data.y_data_scatter_.empty());
+  EXPECT_STREQ(graph_viz_data.x_axis_title_.c_str(), "x_axis");
+  EXPECT_STREQ(graph_viz_data.y_axis_title_.c_str(), "y_axis");
+  EXPECT_TRUE(graph_viz_data.z_data_area_.empty());
+  EXPECT_STREQ(graph_viz_data.z_axis_title_->c_str(), "z_axis");
+  EXPECT_NEAR(graph_viz_data.x_min_, 1000000.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.x_max_, 0.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.y_min_, 1000000.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.y_max_, 0.0f, 1e-6);
+  EXPECT_FALSE(graph_viz_data.points_overflow_);
+  EXPECT_EQ(graph_viz_data.nb_points_, 0);
+  EXPECT_EQ(graph_viz_data.max_nb_points_, 13);
+
+  std::vector<float> data_x_1 = { 1.0f, 10.0f, 5.0f };
+  std::vector<float> data_y_1 = { 101.0f, 110.0f, 105.0f };
+  std::vector<float> data_x_2 = { 201.0f, 210.0f, 205.0f };
+  std::vector<float> data_y_2 = { 301.0f, 310.0f, 305.0f };
+
+  EXPECT_TRUE(graph_viz_data.addData(data_x_1, data_y_1, "data1"));
+  EXPECT_TRUE(graph_viz_data.addData(data_x_2, data_y_2, "data2"));
+  EXPECT_TRUE(std::equal(graph_viz_data.series_names_area_.begin(), graph_viz_data.series_names_area_.end(), 
+              std::vector<std::string>({ "data1", "data2" }).begin()));
+  EXPECT_TRUE(std::equal(graph_viz_data.x_data_area_.begin(), graph_viz_data.x_data_area_.end(),
+    std::vector<std::vector<float>>({ { 1.0f, 10.0f, 5.0f }, { 201.0f, 210.0f, 205.0f } }).begin()));
+  EXPECT_TRUE(std::equal(graph_viz_data.y_data_area_.begin(), graph_viz_data.y_data_area_.end(),
+    std::vector<std::vector<float>>({ { 101.0f, 110.0f, 105.0f }, { 301.0f, 310.0f, 305.0f } }).begin()));
+  EXPECT_TRUE(graph_viz_data.series_names_scatter_.empty());
+  EXPECT_TRUE(graph_viz_data.x_data_scatter_.empty());
+  EXPECT_TRUE(graph_viz_data.y_data_scatter_.empty());
+  EXPECT_STREQ(graph_viz_data.x_axis_title_.c_str(), "x_axis");
+  EXPECT_STREQ(graph_viz_data.y_axis_title_.c_str(), "y_axis");
+  EXPECT_TRUE(graph_viz_data.z_data_area_.empty());
+  EXPECT_STREQ(graph_viz_data.z_axis_title_->c_str(), "z_axis");
+  EXPECT_NEAR(graph_viz_data.x_min_, 1.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.x_max_, 210.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.y_min_, 101.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.y_max_, 310.0f, 1e-6);
+  EXPECT_FALSE(graph_viz_data.points_overflow_);
+  EXPECT_EQ(graph_viz_data.nb_points_, 6);
+  EXPECT_EQ(graph_viz_data.max_nb_points_, 13);
+
+  std::vector<float> scatter_data_x_1 = { 401.0f, 410.0f, 405.0f };
+  std::vector<float> scatter_data_y_1 = { 501.0f, 510.0f, 505.0f };
+  std::vector<float> scatter_data_x_2 = { 601.0f, 610.0f, 605.0f };
+  std::vector<float> scatter_data_y_2 = { 701.0f, 710.0f, 705.0f };
+  EXPECT_TRUE(graph_viz_data.addScatterData(scatter_data_x_1, scatter_data_y_1, "scatter_data1"));
+  EXPECT_TRUE(graph_viz_data.addScatterData(scatter_data_x_2, scatter_data_y_2, "scatter_data2"));
+  EXPECT_TRUE(std::equal(graph_viz_data.series_names_area_.begin(), graph_viz_data.series_names_area_.end(),
+    std::vector<std::string>({ "data1", "data2" }).begin()));
+  EXPECT_TRUE(std::equal(graph_viz_data.x_data_area_.begin(), graph_viz_data.x_data_area_.end(),
+    std::vector<std::vector<float>>({ { 1.0f, 10.0f, 5.0f }, { 201.0f, 210.0f, 205.0f } }).begin()));
+  EXPECT_TRUE(std::equal(graph_viz_data.y_data_area_.begin(), graph_viz_data.y_data_area_.end(),
+    std::vector<std::vector<float>>({ { 101.0f, 110.0f, 105.0f }, { 301.0f, 310.0f, 305.0f } }).begin()));
+  EXPECT_STREQ(graph_viz_data.x_axis_title_.c_str(), "x_axis");
+  EXPECT_STREQ(graph_viz_data.y_axis_title_.c_str(), "y_axis");
+  EXPECT_TRUE(graph_viz_data.z_data_area_.empty());
+  EXPECT_STREQ(graph_viz_data.z_axis_title_->c_str(), "z_axis");
+  EXPECT_TRUE(std::equal(graph_viz_data.series_names_scatter_.begin(), graph_viz_data.series_names_scatter_.end(),
+    std::vector<std::string>({ "scatter_data1", "scatter_data2" }).begin()));
+  EXPECT_TRUE(std::equal(graph_viz_data.x_data_scatter_.begin(), graph_viz_data.x_data_scatter_.end(),
+    std::vector<std::vector<float>>({ { 401.0f, 410.0f, 405.0f }, { 601.0f, 610.0f, 605.0f } }).begin()));
+  EXPECT_TRUE(std::equal(graph_viz_data.y_data_scatter_.begin(), graph_viz_data.y_data_scatter_.end(),
+    std::vector<std::vector<float>>({ { 501.0f, 510.0f, 505.0f }, { 701.0f, 710.0f, 705.0f } }).begin()));
+  EXPECT_NEAR(graph_viz_data.x_min_, 1.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.x_max_, 610.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.y_min_, 101.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.y_max_, 710.0f, 1e-6);
+  EXPECT_FALSE(graph_viz_data.points_overflow_);
+  EXPECT_EQ(graph_viz_data.nb_points_, 12);
+  EXPECT_EQ(graph_viz_data.max_nb_points_, 13);
+
+  // overflow
+  EXPECT_FALSE(graph_viz_data.addScatterData(scatter_data_x_1, scatter_data_y_1, "scatter_data1"));
+  EXPECT_FALSE(graph_viz_data.addScatterData(scatter_data_x_2, scatter_data_y_2, "scatter_data2"));
+  EXPECT_TRUE(std::equal(graph_viz_data.series_names_area_.begin(), graph_viz_data.series_names_area_.end(),
+    std::vector<std::string>({ "data1", "data2" }).begin()));
+  EXPECT_TRUE(std::equal(graph_viz_data.x_data_area_.begin(), graph_viz_data.x_data_area_.end(),
+    std::vector<std::vector<float>>({ { 1.0f, 10.0f, 5.0f }, { 201.0f, 210.0f, 205.0f } }).begin()));
+  EXPECT_TRUE(std::equal(graph_viz_data.y_data_area_.begin(), graph_viz_data.y_data_area_.end(),
+    std::vector<std::vector<float>>({ { 101.0f, 110.0f, 105.0f }, { 301.0f, 310.0f, 305.0f } }).begin()));
+  EXPECT_STREQ(graph_viz_data.x_axis_title_.c_str(), "x_axis");
+  EXPECT_STREQ(graph_viz_data.y_axis_title_.c_str(), "y_axis");
+  EXPECT_TRUE(graph_viz_data.z_data_area_.empty());
+  EXPECT_STREQ(graph_viz_data.z_axis_title_->c_str(), "z_axis");
+  EXPECT_TRUE(std::equal(graph_viz_data.series_names_scatter_.begin(), graph_viz_data.series_names_scatter_.end(),
+    std::vector<std::string>({ "scatter_data1", "scatter_data2" }).begin()));
+  EXPECT_TRUE(std::equal(graph_viz_data.x_data_scatter_.begin(), graph_viz_data.x_data_scatter_.end(),
+    std::vector<std::vector<float>>({ { 401.0f, 410.0f, 405.0f }, { 601.0f, 610.0f, 605.0f } }).begin()));
+  EXPECT_TRUE(std::equal(graph_viz_data.y_data_scatter_.begin(), graph_viz_data.y_data_scatter_.end(),
+    std::vector<std::vector<float>>({ { 501.0f, 510.0f, 505.0f }, { 701.0f, 710.0f, 705.0f } }).begin()));
+  EXPECT_NEAR(graph_viz_data.x_min_, 1.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.x_max_, 610.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.y_min_, 101.0f, 1e-6);
+  EXPECT_NEAR(graph_viz_data.y_max_, 710.0f, 1e-6);
+  EXPECT_TRUE(graph_viz_data.points_overflow_);
+  EXPECT_EQ(graph_viz_data.nb_points_, 12);
+  EXPECT_EQ(graph_viz_data.max_nb_points_, 13);
 }

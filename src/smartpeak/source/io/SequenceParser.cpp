@@ -74,7 +74,7 @@ namespace SmartPeak
   template<typename DELIMITER>
   void SequenceParser::readSequenceFile(
     SequenceHandler& sequenceHandler,
-    const std::string& pathname
+    const std::filesystem::path& pathname
   )
   {
     const std::string s_sample_name{ "sample_name" };
@@ -99,7 +99,7 @@ namespace SmartPeak
     const std::string s_scan_mass_low{ "scan_mass_low" };
     const std::string s_scan_mass_high{ "scan_mass_high" };
 
-    io::CSVReader<21, io::trim_chars<>, DELIMITER> reader(pathname);
+    io::CSVReader<21, io::trim_chars<>, DELIMITER> reader(pathname.generic_string());
 
     reader.read_header(
       io::ignore_extra_column | io::ignore_missing_column,
@@ -152,7 +152,7 @@ namespace SmartPeak
     for (const auto& mandatory_column : mandatory_columns)
     {
       if (!reader.has_column(mandatory_column)) {
-        LOGE << "Missing column " << mandatory_column << " in file " << pathname;
+        LOGE << "Missing column " << mandatory_column << " in file " << pathname.generic_string();
         throw std::runtime_error("Failed loading sequence file\n");
       }
     }
@@ -241,7 +241,7 @@ namespace SmartPeak
       }
       catch (const std::exception& e)
       {
-        LOGE << "Error reading " << pathname << " in line " << line_number << ", column '" << current_validating_column << "'";
+        LOGE << "Error reading " << pathname.generic_string() << " in line " << line_number << ", column '" << current_validating_column << "'";
         throw;
       }
     }
@@ -249,14 +249,14 @@ namespace SmartPeak
 
   void SequenceParser::readSequenceFile(
     SequenceHandler& sequenceHandler,
-    const std::string& pathname,
+    const std::filesystem::path& pathname,
     const std::string& delimiter
   )
   {
     LOGD << "START readSequenceFile";
     LOGD << "Delimiter: " << delimiter;
 
-    LOGI << "Loading: " << pathname;
+    LOGI << "Loading: " << pathname.generic_string();
 
     if (pathname.empty()) {
       LOGE << "Pathname is empty";
@@ -353,12 +353,14 @@ namespace SmartPeak
     }
   }
 
-  void SequenceParser::writeSequenceFileSmartPeak(SequenceHandler& sequenceHandler, const std::string& filename, const std::string& delimiter)
+  void SequenceParser::writeSequenceFileSmartPeak(SequenceHandler& sequenceHandler,
+    const std::filesystem::path& filename,
+    const std::string& delimiter)
   {
     LOGD << "START writeSequenceFileSmartPeak";
     LOGD << "Delimiter: " << delimiter;
 
-    LOGI << "Loading: " << filename;
+    LOGI << "Loading: " << filename.generic_string();
 
     if (filename.empty()) {
       LOGE << "filename is empty";
@@ -373,7 +375,7 @@ namespace SmartPeak
     makeSequenceFileSmartPeak(sequenceHandler, rows, headers);
 
     // Write the output file
-    CSVWriter writer(filename, delimiter);
+    CSVWriter writer(filename.generic_string(), delimiter);
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     if (cnt < headers.size()) {
@@ -423,12 +425,15 @@ namespace SmartPeak
     }
   }
 
-  void SequenceParser::writeSequenceFileAnalyst(SequenceHandler& sequenceHandler, const std::string& filename, const std::string& delimiter)
+  void SequenceParser::writeSequenceFileAnalyst(SequenceHandler& sequenceHandler,
+    const std::filesystem::path& filename,
+    const std::string& delimiter
+  )
   {
     LOGD << "START writeSequenceFileAnalyst";
     LOGD << "Delimiter: " << delimiter;
 
-    LOGI << "Loading: " << filename;
+    LOGI << "Loading: " << filename.generic_string();
 
     if (filename.empty()) {
       LOGE << "filename is empty";
@@ -443,7 +448,7 @@ namespace SmartPeak
     makeSequenceFileAnalyst(sequenceHandler, rows, headers);
 
     // Write the output file
-    CSVWriter writer(filename, delimiter);
+    CSVWriter writer(filename.generic_string(), delimiter);
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     if (cnt < headers.size()) {
@@ -487,12 +492,14 @@ namespace SmartPeak
     }
   }
 
-  void SequenceParser::writeSequenceFileMasshunter(SequenceHandler& sequenceHandler, const std::string& filename, const std::string& delimiter)
+  void SequenceParser::writeSequenceFileMasshunter(SequenceHandler& sequenceHandler,
+    const std::filesystem::path& filename,
+    const std::string& delimiter)
   {
     LOGD << "START writeSequenceFileMasshunter";
     LOGD << "Delimiter: " << delimiter;
 
-    LOGI << "Loading: " << filename;
+    LOGI << "Loading: " << filename.generic_string();
 
     if (filename.empty()) {
       LOGE << "filename is empty";
@@ -507,7 +514,7 @@ namespace SmartPeak
     makeSequenceFileMasshunter(sequenceHandler, rows, headers);
 
     // Write the output file
-    CSVWriter writer(filename, delimiter);
+    CSVWriter writer(filename.generic_string(), delimiter);
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     if (cnt < headers.size()) {
@@ -562,11 +569,13 @@ namespace SmartPeak
     }
   }
 
-  void SequenceParser::writeSequenceFileXcalibur(SequenceHandler& sequenceHandler, const std::string& filename, const std::string& delimiter)
+  void SequenceParser::writeSequenceFileXcalibur(SequenceHandler& sequenceHandler,
+    const std::filesystem::path& filename,
+    const std::string& delimiter)
   {
     LOGD << "START writeSequenceFileXcalibur";
     LOGD << "Delimiter: " << delimiter;
-    LOGI << "Loading: " << filename;
+    LOGI << "Loading: " << filename.generic_string();
 
     if (filename.empty()) {
       LOGE << "filename is empty";
@@ -580,7 +589,7 @@ namespace SmartPeak
     makeSequenceFileXcalibur(sequenceHandler, rows, headers);
 
     // Write the output file
-    CSVWriter writer(filename, delimiter);
+    CSVWriter writer(filename.generic_string(), delimiter);
     std::vector<std::string> pre_headers;
     for (int i = 0; i < headers.size(); ++i) {
       if (i == 0) pre_headers.push_back("Bracket Type=4");
@@ -757,13 +766,13 @@ namespace SmartPeak
 
   bool SequenceParser::writeDataTableFromMetaValue(
     const SequenceHandler& sequenceHandler,
-    const std::string& filename,
+    const std::filesystem::path& filename,
     const std::vector<FeatureMetadata>& meta_data,
     const std::set<SampleType>& sample_types
   )
   {
     LOGD << "START writeDataTableFromMetaValue";
-    LOGI << "Storing: " << filename;
+    LOGI << "Storing: " << filename.generic_string();
 
     std::vector<std::vector<std::string>> rows;
     std::vector<std::string> headers;
@@ -773,7 +782,7 @@ namespace SmartPeak
     }
     makeDataTableFromMetaValue(sequenceHandler, rows, headers, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
-    CSVWriter writer(filename, ",");
+    CSVWriter writer(filename.generic_string(), ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     if (cnt < headers.size()) {
@@ -948,14 +957,14 @@ namespace SmartPeak
 
   bool SequenceParser::writeDataMatrixFromMetaValue(
     const SequenceHandler& sequenceHandler,
-    const std::string& filename,
+    const std::filesystem::path& filename,
     const std::vector<FeatureMetadata>& meta_data,
     const std::set<SampleType>& sample_types
   )
   {
     LOGD << "START writeDataMatrixFromMetaValue";
 
-    LOGI << "Storing: " << filename;
+    LOGI << "Storing: " << filename.generic_string();
 
     Eigen::Tensor<float,2> data;
     Eigen::Tensor<std::string,1> columns;
@@ -969,7 +978,7 @@ namespace SmartPeak
     std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
     for (int i=0;i<columns.size();++i) headers.push_back(columns(i));
 
-    CSVWriter writer(filename, ",");
+    CSVWriter writer(filename.generic_string(), ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     if (cnt < headers.size()) {
@@ -993,7 +1002,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool StoreSequenceFileSmartPeak::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool StoreSequenceFileSmartPeak::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -1004,7 +1013,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool StoreSequenceFileAnalyst::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool StoreSequenceFileAnalyst::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -1015,7 +1024,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool StoreSequenceFileMasshunter::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool StoreSequenceFileMasshunter::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {
@@ -1026,7 +1035,7 @@ namespace SmartPeak
     return true;
   }
 
-  bool StoreSequenceFileXcalibur::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool StoreSequenceFileXcalibur::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
     {

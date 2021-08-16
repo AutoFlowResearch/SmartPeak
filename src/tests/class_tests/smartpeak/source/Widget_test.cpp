@@ -28,6 +28,11 @@
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
+#include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/ui/GraphicDataVizWidget.h>
+#include <SmartPeak/ui/WorkflowWidget.h>
+
+bool SmartPeak::enable_quick_help = false;
 
 void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
 {
@@ -62,7 +67,7 @@ void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
     metaDataHandler.scan_mass_low = 60;
 
     SmartPeak::Filenames filenames;
-    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML");
+    filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML"));
     SmartPeak::RawDataHandler rawDataHandler;
     SmartPeak::LoadFeatures loadFeatures;
     loadFeatures.process(rawDataHandler, {}, filenames);
@@ -169,3 +174,126 @@ TEST(Widget, GenericTableWidget_searcher)
     EXPECT_STREQ(Im_table_entries[found_in_index].entry_contents[0].c_str(), "2mcit.2mcit_1.Heavy");
   }
 }
+
+class GraphicDataVizWidget_Test : public SmartPeak::GraphicDataVizWidget
+{
+public:
+  GraphicDataVizWidget_Test(SmartPeak::SessionHandler& session_handler,
+    SmartPeak::SequenceHandler& sequence_handler,
+    const std::string& id,
+    const std::string& title) :
+    GraphicDataVizWidget(session_handler, sequence_handler, id, title)
+  {};
+
+  virtual void updateData() override
+  {
+  };
+
+public:
+  // wrappers to protected methods
+  void wrapper_setMarkerPosition(const std::optional<float>& marker_position)
+  {
+    setMarkerPosition(marker_position);
+  }
+
+  std::optional<float> wrapper_getMarkerPosition() const
+  {
+    return getMarkerPosition();
+  }
+
+  std::tuple<float, float, float, float> wrapper_plotLimits() const
+  {
+    return plotLimits();
+  }
+
+public:
+  // setters for test
+  void setGraphVizData(SmartPeak::SessionHandler::GraphVizData& graph_viz_data)
+  {
+    graph_viz_data_ = graph_viz_data;
+  }
+
+};
+
+TEST(GraphicDataVizWidget, markerPosition)
+{
+  SmartPeak::SessionHandler session_handler;
+  SmartPeak::SequenceHandler sequence_handler;
+  std::string id = "GraphicDataVizWidget";
+  std::string title = "GraphicDataVizWidget";
+  GraphicDataVizWidget_Test test_graphic_data_viz(session_handler, sequence_handler, id, title);
+  EXPECT_FALSE(test_graphic_data_viz.wrapper_getMarkerPosition());
+  test_graphic_data_viz.wrapper_setMarkerPosition(42.0f);
+  EXPECT_EQ(test_graphic_data_viz.wrapper_getMarkerPosition(), 42.0f);
+}
+
+TEST(GraphicDataVizWidget, plotLimits)
+{
+  SmartPeak::SessionHandler session_handler;
+  SmartPeak::SequenceHandler sequence_handler;
+  std::string id = "GraphicDataVizWidget";
+  std::string title = "GraphicDataVizWidget";
+  GraphicDataVizWidget_Test test_graphic_data_viz(session_handler, sequence_handler, id, title);
+  
+  std::vector<float> data_x_1 = { 1.0f, 10.0f, 5.0f };
+  std::vector<float> data_y_1 = { 101.0f, 110.0f, 105.0f };
+  std::vector<float> data_x_2 = { 201.0f, 210.0f, 205.0f };
+  std::vector<float> data_y_2 = { 301.0f, 310.0f, 305.0f };
+
+  SmartPeak::SessionHandler::GraphVizData graph_viz_data;
+  graph_viz_data.reset("x_axis", "y_axis", "z_axis", 100);
+  graph_viz_data.addData(data_x_1, data_y_1, "data1");
+  graph_viz_data.addData(data_x_2, data_y_2, "data2");
+  test_graphic_data_viz.setGraphVizData(graph_viz_data);
+
+  const auto [plot_min_x, plot_max_x, plot_min_y, plot_max_y] = test_graphic_data_viz.wrapper_plotLimits();
+  EXPECT_NEAR(plot_min_x, -2.09, 1e-6);
+  EXPECT_NEAR(plot_max_x, 2.09, 1e-6);
+  EXPECT_NEAR(plot_min_y, 98.910003662109375, 1e-6);
+  EXPECT_NEAR(plot_max_y, 341, 1e-6);
+}
+
+class WorkflowWidget_Test : public SmartPeak::WorkflowWidget
+{
+public:
+  WorkflowWidget_Test(const std::string title, 
+                      SmartPeak::ApplicationHandler& application_handler, 
+                      SmartPeak::WorkflowManager& workflow_manager) :
+    WorkflowWidget(title, application_handler, workflow_manager)
+  {};
+
+public:
+  // wrappers to protected methods
+  virtual void updatecommands() override
+  {
+    WorkflowWidget::updatecommands();
+  }
+
+  bool errorBuildingCommands()
+  {
+    return error_building_commands_;
+  }
+};
+
+TEST(WorkflowWidget, updateCommands)
+{
+  SmartPeak::ApplicationHandler application_handler;
+  SmartPeak::WorkflowManager workflow_manager;
+  WorkflowWidget_Test workflow_widget("Workflow Widget", application_handler, workflow_manager);
+  
+  // initial state
+  EXPECT_FALSE(workflow_widget.errorBuildingCommands());
+  
+  // empty commands
+  workflow_widget.updatecommands();
+  EXPECT_FALSE(workflow_widget.errorBuildingCommands());
+
+  application_handler.sequenceHandler_.setWorkflow({ "LOAD_FEATURES" });
+  workflow_widget.updatecommands();
+  EXPECT_FALSE(workflow_widget.errorBuildingCommands());
+  
+  application_handler.sequenceHandler_.setWorkflow({ "NON_EXISTING_COMMAND" });
+  workflow_widget.updatecommands();
+  EXPECT_TRUE(workflow_widget.errorBuildingCommands());
+}
+

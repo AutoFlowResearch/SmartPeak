@@ -45,10 +45,10 @@ namespace SmartPeak
     bool initializeMetadataAndSampleTypes();
 
     static void run_and_join(
-      bool (*data_writer)(const SequenceHandler&, const std::string&, const std::vector<FeatureMetadata>&, const std::set<SampleType>&),
+      bool (*data_writer)(const SequenceHandler&, const std::filesystem::path&, const std::vector<FeatureMetadata>&, const std::set<SampleType>&),
       const std::string& data_writer_label,
       const SequenceHandler sequence,
-      const std::string& pathname,
+      const std::filesystem::path& pathname,
       const std::vector<FeatureMetadata>& meta_data,
       const std::set<SampleType>& sample_types
     );

@@ -67,13 +67,20 @@ namespace SmartPeak
       s_description, // optional
       s_comment      // optional
     );
-    if (!in.has_column(s_used)
-        || !in.has_column(s_function)
-        || !in.has_column(s_name)
-        || !in.has_column(s_value))
+
+    // check for required columns
+    static const std::vector<std::string>
+      required_column{ s_used , s_function, s_name, s_value };
+    for (const auto& column : required_column)
     {
-      throw "Missing required column.";
+      if (!in.has_column(column))
+      {
+        std::ostringstream os;
+        os << "Missing required column \'" << column  << "\'";
+        throw std::invalid_argument(os.str());
+      }
     }
+
     const bool has_type = in.has_column(s_type);
     const bool has_tags = in.has_column(s_tags);
     const bool has_description = in.has_column(s_description);
@@ -86,7 +93,9 @@ namespace SmartPeak
     std::string tags;
     std::string description;
     std::string comment;
+    unsigned int row = 1; // we have read the header, and we will start line 1 as much text editors do
     while (in.read_row(function, name, value, used, type, tags, description, comment)) {
+      row++;
       std::transform(used.begin(), used.end(), used.begin(), ::tolower);
       if (used == "false")
         continue;
@@ -100,8 +109,16 @@ namespace SmartPeak
         {"description", description},
         {"comment", comment}
       };
-      auto p = Parameter(properties);
-      parameters.addParameter(function, p);
+      try
+      {
+        auto p = Parameter(properties);
+        parameters.addParameter(function, p);
+      }
+      catch (const std::exception& e)
+      {
+        LOG_ERROR << filename << ", Error line " << row << ": " << e.what();
+        throw;
+      }
     }
   }
 

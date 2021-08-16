@@ -58,6 +58,13 @@ namespace SmartPeak
     right_window_x_pos_ = left_window_x_size_ + bottom_and_top_window_x_size_;
   }
   void WindowSizesAndPositions::setWindowSizesAndPositions(const bool& show_top_window, const bool& show_bottom_window, const bool& show_left_window, const bool& show_right_window) {
+    // reset perc for bottom if needed
+    if (!show_bottom_window_ && show_bottom_window)
+    {
+      bottom_window_y_perc_ = 0.25;
+    }
+    show_bottom_window_ = show_bottom_window;
+
     if (show_top_window && show_bottom_window && show_left_window && show_right_window) 
     {
       setWindowSizesAndPositions_(bottom_window_y_perc_, left_window_x_perc_, right_window_x_perc_);

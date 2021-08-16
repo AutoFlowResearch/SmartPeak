@@ -855,6 +855,26 @@ TEST(ParameterSet, Parameter_constructorFromStruct)
   EXPECT_EQ(param_invalid.getTags().size(), 0);
   EXPECT_STREQ(param_invalid.getRestrictionsAsString().c_str(), "");
   EXPECT_TRUE(!param_invalid.isSchema());
+
+  // invalid values
+  std::map<std::string, std::string> param_struct_empty_value = { {"name", "param_string"} , {"value", ""}, {"type", "int"} };
+  try {
+    Parameter p(param_struct_empty_value);
+    FAIL() << "Expected std::exception";
+  }
+  catch (std::exception const& err) {
+  }
+  catch (...) {
+    FAIL() << "Expected std::exception";
+  }
+
+  std::map<std::string, std::string> param_struct_wrong_min = { {"name", "param_string"} , {"value", "42"}, {"type", "int"}, {"min", "test"} };
+  Parameter param_wrong_min(param_struct_wrong_min);
+  EXPECT_EQ(param_wrong_min.getRestrictionsAsString(), "");
+
+  std::map<std::string, std::string> param_struct_wrong_max = { {"name", "param_string"} , {"value", "42"}, {"type", "int"}, {"max", "test"} };
+  Parameter param_wrong_max(param_struct_wrong_max);
+  EXPECT_EQ(param_wrong_max.getRestrictionsAsString(), "");
 }
 
 TEST(ParameterSet, Parameter_type)

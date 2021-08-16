@@ -37,10 +37,13 @@
 #include <SmartPeak/ui/Heatmap2DWidget.h>
 #include <SmartPeak/ui/CalibratorsPlotWidget.h>
 #include <SmartPeak/ui/ChromatogramPlotWidget.h>
+#include <SmartPeak/ui/ChromatogramTICPlotWidget.h>
+#include <SmartPeak/ui/ChromatogramXICPlotWidget.h>
 #include <SmartPeak/ui/SpectraPlotWidget.h>
+#include <SmartPeak/ui/SpectraMSMSPlotWidget.h>
 #include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
-#include <SmartPeak/ui/Workflow.h>
+#include <SmartPeak/ui/WorkflowWidget.h>
 #include <SmartPeak/ui/StatisticsWidget.h>
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/InfoWidget.h>
@@ -52,6 +55,7 @@
 #include <SmartPeak/core/EventDispatcher.h>
 #include <plog/Log.h>
 #include <plog/Appenders/ConsoleAppender.h>
+#include <plog/Appenders/ColorConsoleAppender.h>
 #include <filesystem>
 #include <SDL.h>
 #include <SDL_opengl.h>
@@ -69,8 +73,8 @@ void initializeDataDirs(ApplicationHandler& state);
 void initializeDataDir(
   ApplicationHandler& state,
   const std::string& label,
-  std::string& data_dir_member,
-  const std::string& default_dir
+  std::filesystem::path& data_dir_member,
+  const std::filesystem::path& default_dir
 );
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows);
@@ -109,7 +113,7 @@ int main(int argc, char** argv)
                                                             event_dispatcher,
                                                             event_dispatcher);
   auto report_ = std::make_shared<Report>(application_handler_);
-  auto workflow_ = std::make_shared<Workflow>("Workflow", application_handler_, workflow_manager_);
+  auto workflow_ = std::make_shared<WorkflowWidget>("Workflow", application_handler_, workflow_manager_);
   auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_, event_dispatcher);
   auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_, 
                                                                   session_handler_, 
@@ -122,6 +126,11 @@ int main(int argc, char** argv)
   auto log_widget_ = std::make_shared<LogWidget>(appender_, "Log");
   auto parameters_table_widget_ = std::make_shared<ParametersTableWidget>(session_handler_, application_handler_, "ParametersMainWindow", "Parameters");
   auto chromatogram_plot_widget_ = std::make_shared<ChromatogramPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Chromatograms Main Window", "Chromatograms", event_dispatcher);
+  auto chromatogram_ms2_xic_plot_widget_ = std::make_shared<ChromatogramXICPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Chromatogram MS2 XIC Main Window", "Chromatograms MS2 XIC", nullptr, event_dispatcher);
+  auto spectra_ms2_plot_widget_ = std::make_shared<SpectraMSMSPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Spectra MS2 Main Window", "Spectra MS2", chromatogram_ms2_xic_plot_widget_, 2, event_dispatcher);
+  auto chromatogram_ms1_xic_plot_widget_ = std::make_shared<ChromatogramXICPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Chromatogram MS1 XIC Main Window", "Chromatograms MS1 XIC", spectra_ms2_plot_widget_, event_dispatcher);
+  auto spectra_msms_plot_widget_ = std::make_shared<SpectraMSMSPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Spectra MS1 Main Window", "Spectra MS1", chromatogram_ms1_xic_plot_widget_, 1, event_dispatcher);
+  auto chromatogram_tic_plot_widget_ = std::make_shared<ChromatogramTICPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Chromatogram TIC Main Window", "Chromatograms TIC", spectra_msms_plot_widget_, event_dispatcher);
   auto heatmap_plot_widget_ = std::make_shared<Heatmap2DWidget>(session_handler_, application_handler_.sequenceHandler_, "Heatmap Main Window", "Features (heatmap)", event_dispatcher);
   auto spectra_plot_widget_ = std::make_shared<SpectraPlotWidget>(session_handler_, application_handler_.sequenceHandler_, "Spectra Main Window", "Spectra", event_dispatcher);
   auto feature_line_plot_ = std::make_shared<LinePlot2DWidget>("Features (line)");
@@ -129,11 +138,11 @@ int main(int argc, char** argv)
   auto injections_explorer_window_ = std::make_shared<ExplorerWidget>("InjectionsExplorerWindow", "Injections", &event_dispatcher);
   auto transitions_explorer_window_ = std::make_shared<ExplorerWidget>("TransitionsExplorerWindow", "Transitions", &event_dispatcher);
   auto features_explorer_window_ = std::make_shared<ExplorerWidget>("FeaturesExplorerWindow", "Features", &event_dispatcher);
-  auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Spectrum", &event_dispatcher);
+  auto spectrum_explorer_window_ = std::make_shared<ExplorerWidget>("SpectrumExplorerWindow", "Scans", &event_dispatcher);
   auto sequence_main_window_ = std::make_shared<SequenceTableWidget>("SequenceMainWindow", "Sequence",
                                                                       &session_handler_, &application_handler_.sequenceHandler_);
   auto transitions_main_window_ = std::make_shared<GenericTableWidget>("TransitionsMainWindow", "Transitions");
-  auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Spectrum");
+  auto spectrum_main_window_ = std::make_shared<GenericTableWidget>("SpectrumMainWindow", "Scans");
   auto quant_method_main_window_ = std::make_shared<SequenceSegmentWidget>("QuantMethodMainWindow", "Quantitation Method",
                                    &session_handler_, &application_handler_.sequenceHandler_,
                                    &SessionHandler::setQuantMethodTable, &SessionHandler::getFiltersTable, &application_handler_.sequenceHandler_);
@@ -226,6 +235,9 @@ int main(int argc, char** argv)
     features_table_main_window_,
     feature_matrix_main_window_,
     chromatogram_plot_widget_,
+    chromatogram_tic_plot_widget_,
+    chromatogram_ms1_xic_plot_widget_,
+    chromatogram_ms2_xic_plot_widget_,
     spectra_plot_widget_,
     feature_line_plot_,
     heatmap_plot_widget_,
@@ -235,6 +247,8 @@ int main(int argc, char** argv)
   std::vector<std::shared_ptr<Widget>> bottom_windows = {
     quickInfoText_,
     log_widget_,
+    spectra_msms_plot_widget_,
+    spectra_ms2_plot_widget_,
   };
 
   std::vector<std::shared_ptr<Widget>> left_windows = {
@@ -252,7 +266,7 @@ int main(int argc, char** argv)
   // Create log path
   const std::time_t t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   char filename[128];
-  strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.csv", std::localtime(&t));
+  strftime(filename, 128, "smartpeak_log_%Y-%m-%d_%H-%M-%S.log", std::localtime(&t));
 
   auto logfilepath = std::filesystem::path{};
   auto logdirpath = std::string{};
@@ -273,8 +287,12 @@ int main(int argc, char** argv)
     fileAppender(logfilepath.string().c_str(), 1024 * 1024 * 32, 100);
 
   // Add console appender, instead of only the file one
+#ifdef _WIN32
+  plog::ColorConsoleAppender<plog::TxtFormatter> consoleAppender;
+#else
   plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
-
+#endif
+  
   // Init logger with all the appenders
   plog::init(plog::debug, &fileAppender)
     .addAppender(&consoleAppender)
@@ -543,17 +561,6 @@ int main(int argc, char** argv)
       }
       showQuickHelpToolTip("file");
       
-      if (ImGui::BeginMenu("Edit"))
-      {
-        ImGui::MenuItem("Settings", NULL, false, false);
-        if (ImGui::MenuItem("Tables", NULL, false, false)) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Plots", NULL, false, false)) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Explorer", NULL, false, false)) {} // TODO: modal of settings
-        if (ImGui::MenuItem("Parameters", NULL, false, false)) {} // TODO: modal of settings
-        ImGui::EndMenu();
-      }
-      showQuickHelpToolTip("edit");
-      
       if (ImGui::BeginMenu("View"))
       {
         ImGui::MenuItem("Explorer window", NULL, false, false);
@@ -595,7 +602,16 @@ int main(int argc, char** argv)
         if (ImGui::MenuItem("Features (matrix)", NULL, &feature_matrix_main_window_->visible_)) {}
         ImGui::Separator();
         ImGui::MenuItem("Main window (Plots)", NULL, false, false);
-        if (ImGui::MenuItem("Chromatogram", NULL, &chromatogram_plot_widget_->visible_)) {}
+        // TODO work on generalization of visualization.
+        if (application_handler_.sequenceHandler_.getSequence().size() > 0 && 
+            application_handler_.sequenceHandler_.getSequence().at(0).getRawData().getChromatogramMap().getChromatograms().size() > 0)
+        {
+          if (ImGui::MenuItem("Chromatogram", NULL, &chromatogram_plot_widget_->visible_)) {}
+        }
+        else
+        {
+          if (ImGui::MenuItem("Chromatogram", NULL, &chromatogram_tic_plot_widget_->visible_)) {}
+        }
         if (ImGui::MenuItem("Spectra", NULL, &spectra_plot_widget_->visible_)) {}
         if (ImGui::MenuItem("Features (line)", NULL, &feature_line_plot_->visible_)) {}
         if (ImGui::MenuItem("Features (heatmap)", NULL, &heatmap_plot_widget_->visible_)) {}
@@ -712,7 +728,7 @@ int main(int argc, char** argv)
     }
 
     // feature matrix
-    if (feature_matrix_main_window_)
+    if (feature_matrix_main_window_->visible_)
     {
         session_handler_.setFeatureMatrix(application_handler_.sequenceHandler_);
         feature_matrix_main_window_->table_data_ = session_handler_.feature_pivot_table;
@@ -812,7 +828,7 @@ int main(int argc, char** argv)
       ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.left_window_x_size_, win_size_and_pos.left_and_right_window_y_size_));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       ImGui::Begin("Left window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Left window tab bar", ImGuiTabBarFlags_Reorderable))
+      if (ImGui::BeginTabBar("Left window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
       {
         for (auto& widget : left_windows)
         {
@@ -839,7 +855,7 @@ int main(int argc, char** argv)
       ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.top_window_y_size_));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       ImGui::Begin("Top window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Top window tab bar", ImGuiTabBarFlags_Reorderable))
+      if (ImGui::BeginTabBar("Top window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
       {
         for (auto& widget : top_windows)
         {
@@ -867,7 +883,7 @@ int main(int argc, char** argv)
       ImGui::SetNextWindowSize(ImVec2(win_size_and_pos.bottom_and_top_window_x_size_, win_size_and_pos.bottom_window_y_size_));
       ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0);
       ImGui::Begin("Bottom window", NULL, window_flags);
-      if (ImGui::BeginTabBar("Bottom window tab bar", ImGuiTabBarFlags_Reorderable))
+      if (ImGui::BeginTabBar("Bottom window tab bar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs))
       {
         for (auto& widget : bottom_windows)
         {
@@ -917,15 +933,15 @@ void initializeDataDirs(ApplicationHandler& application_handler)
 void initializeDataDir(
   ApplicationHandler& application_handler,
   const std::string& label,
-  std::string& data_dir_member,
-  const std::string& default_dir
+  std::filesystem::path& data_dir_member,
+  const std::filesystem::path& default_dir
 )
 {
-  if (data_dir_member.size()) {
+  if (!data_dir_member.empty()) {
     return;
   }
-  data_dir_member = application_handler.main_dir_ + "/" + default_dir;
-  LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member;
+  data_dir_member = application_handler.main_dir_ / default_dir;
+  LOGN << "\n\nGenerated path for '" << label << "':\t" << data_dir_member.generic_string();
 }
 
 void checkTitles(const std::vector<std::shared_ptr<Widget>> windows)

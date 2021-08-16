@@ -53,6 +53,7 @@ namespace SmartPeak {
       @param[in] sequence_processor_observer an observer for sequence, used to report progress
       @param[in] sequence_segment_processor_observer an observer for sequence segment, used to report progress
       @param[in] sample_group_processor_observer, used to report progress
+      @param[in] blocking If true the operation runs synchronously, otherwise runs asynchronously and returns immediately
     */
     void addWorkflow(ApplicationHandler& source_state, 
       const std::set<std::string>& injection_names, 
@@ -62,7 +63,8 @@ namespace SmartPeak {
       IApplicationProcessorObserver* application_processor_observer = nullptr,
       ISequenceProcessorObserver* sequence_processor_observer = nullptr,
       ISequenceSegmentProcessorObserver * sequence_segment_processor_observer = nullptr,
-      ISampleGroupProcessorObserver * sample_group_processor_observer = nullptr);
+      ISampleGroupProcessorObserver * sample_group_processor_observer = nullptr,
+      bool blocking=false);
 
     /**
       If this returns false, new workflows can't run and the following menu items

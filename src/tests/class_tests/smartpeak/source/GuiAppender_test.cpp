@@ -61,7 +61,7 @@ TEST(Guiappender, thread_safety)
   t3.join();
   std::cout << "threads joined.\n";
 
-  const std::vector<plog::util::nstring> log = appender.getMessageList(plog::Severity::verbose);
+  const auto log = appender.getAppenderRecordList(plog::Severity::verbose);
 
   EXPECT_EQ(log.size(), 30); // ensure the correct number of entries
 

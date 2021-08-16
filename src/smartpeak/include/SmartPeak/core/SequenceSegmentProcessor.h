@@ -29,13 +29,14 @@
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceSegmentHandler.h>
 #include <SmartPeak/iface/IProcessorDescription.h>
+#include <SmartPeak/iface/IFilenamesHandler.h>
 #include <SmartPeak/core/Parameters.h>
 #include <SmartPeak/core/SequenceSegmentObservable.h>
 #include <SmartPeak/iface/IFilePickerHandler.h>
 
 namespace SmartPeak
 {
-  struct SequenceSegmentProcessor : IProcessorDescription
+  struct SequenceSegmentProcessor : IProcessorDescription, IFilenamesHandler
   {
     SequenceSegmentProcessor(const SequenceSegmentProcessor& other) = delete;
     SequenceSegmentProcessor& operator=(const SequenceSegmentProcessor& other) = delete;
@@ -53,7 +54,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const = 0;
 
     /**
@@ -70,6 +71,10 @@ namespace SmartPeak
       const SampleType sampleType,
       std::vector<size_t>& sampleIndices
     );
+
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override { };
 
     SequenceSegmentObservable* sequence_segment_observable_ = nullptr;
 
@@ -96,7 +101,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -105,7 +110,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_STANDARDS_CONCENTRATIONS"; }
@@ -120,8 +125,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct LoadQuantitationMethods : SequenceSegmentProcessor, IFilePickerHandler
@@ -129,7 +137,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return 17; }
     std::string getName() const override { return "LOAD_QUANTITATION_METHODS"; }
@@ -144,8 +152,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreQuantitationMethods : SequenceSegmentProcessor
@@ -163,8 +174,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct LoadFeatureFilters : SequenceSegmentProcessor, IFilePickerHandler
@@ -175,7 +189,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
@@ -189,8 +203,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct LoadFeatureQCs : SequenceSegmentProcessor, IFilePickerHandler
@@ -201,7 +218,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_QCS"; }
@@ -215,8 +232,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreFeatureFilters : SequenceSegmentProcessor
@@ -233,8 +253,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreFeatureQCs : SequenceSegmentProcessor
@@ -251,8 +274,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct LoadFeatureRSDFilters : SequenceSegmentProcessor, IFilePickerHandler
@@ -263,7 +289,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_RSD_FILTERS"; }
@@ -277,8 +303,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct LoadFeatureRSDQCs : SequenceSegmentProcessor, IFilePickerHandler
@@ -289,7 +318,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_RSD_QCS"; }
@@ -303,8 +332,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreFeatureRSDFilters : SequenceSegmentProcessor
@@ -321,8 +353,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreFeatureRSDQCs : SequenceSegmentProcessor
@@ -339,8 +374,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct LoadFeatureBackgroundFilters : SequenceSegmentProcessor, IFilePickerHandler
@@ -351,7 +389,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_FILTERS"; }
@@ -365,8 +403,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct LoadFeatureBackgroundQCs : SequenceSegmentProcessor, IFilePickerHandler
@@ -377,7 +418,7 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_QCS"; }
@@ -391,8 +432,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreFeatureBackgroundFilters : SequenceSegmentProcessor
@@ -409,8 +453,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreFeatureBackgroundQCs : SequenceSegmentProcessor
@@ -427,8 +474,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct EstimateFeatureFilterValues : SequenceSegmentProcessor
@@ -448,7 +498,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -469,7 +519,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -488,7 +538,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -507,7 +557,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -528,7 +578,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -547,7 +597,7 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
   };
 
@@ -566,8 +616,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreFeatureRSDEstimations : SequenceSegmentProcessor
@@ -584,8 +637,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct LoadFeatureBackgroundEstimations : SequenceSegmentProcessor
@@ -602,8 +658,11 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreFeatureBackgroundEstimations : SequenceSegmentProcessor
@@ -620,7 +679,10 @@ namespace SmartPeak
       SequenceSegmentHandler& sequenceSegmentHandler_IO,
       const SequenceHandler& sequenceHandler_I,
       const ParameterSet& params_I,
-      const Filenames& filenames
+      const Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 }

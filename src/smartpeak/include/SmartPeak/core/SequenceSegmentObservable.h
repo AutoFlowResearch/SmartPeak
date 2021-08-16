@@ -33,8 +33,20 @@ namespace SmartPeak
   class SequenceSegmentObservable
   {
   public:
-    virtual void addSequenceSegmentObserver(ISequenceSegmentObserver* observer) { observers_.push_back(observer); };
-    virtual void removeSequenceSegmentObserver(ISequenceSegmentObserver* observer) { observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); };
+    virtual void addSequenceSegmentObserver(ISequenceSegmentObserver* observer) 
+    { 
+      if (nullptr != observer)
+      {
+        observers_.push_back(observer); 
+      }
+    }
+    virtual void removeSequenceSegmentObserver(ISequenceSegmentObserver* observer) 
+    {
+      if (nullptr != observer)
+      {
+        observers_.erase(std::remove(observers_.begin(), observers_.end(), observer), observers_.end()); 
+      }
+    }
     void notifyQuantitationMethodsUpdated()
     {
       for (auto& observer : observers_)

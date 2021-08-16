@@ -37,9 +37,19 @@ namespace SmartPeak
   {
     if (ImGui::BeginPopupModal("Run workflow modal", NULL, ImGuiWindowFlags_None))
     {
+      if (   mzML_dir_old_ != application_handler_.mzML_dir_.generic_string()
+          || features_in_dir_old_ != application_handler_.features_in_dir_.generic_string()
+          || features_out_dir_old_ != application_handler_.features_out_dir_.generic_string())
+      {
+        // InputTextWithHint does not support std::filesystem::path so we have to create temporary strings for the paths
+        mzML_dir_old_ = mzML_dir_edit_ = application_handler_.mzML_dir_.generic_string();
+        features_in_dir_old_ = features_in_dir_edit_ = application_handler_.features_in_dir_.generic_string();
+        features_out_dir_old_ = features_out_dir_edit_ = application_handler_.features_out_dir_.generic_string();
+      }
+
       ImGui::Text("mzML folder");
       ImGui::PushID(1);
-      ImGui::InputTextWithHint("", application_handler_.mzML_dir_.c_str(), &(application_handler_.mzML_dir_));
+      ImGui::InputTextWithHint("", mzML_dir_edit_.c_str(), &mzML_dir_edit_);
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(11);
@@ -52,7 +62,7 @@ namespace SmartPeak
 
       ImGui::Text("Input features folder");
       ImGui::PushID(2);
-      ImGui::InputTextWithHint("", application_handler_.features_in_dir_.c_str(), &(application_handler_.features_in_dir_));
+      ImGui::InputTextWithHint("", features_in_dir_edit_.c_str(), &features_in_dir_edit_);
       ImGui::PopID();
       ImGui::SameLine();
       ImGui::PushID(22);
@@ -65,7 +75,7 @@ namespace SmartPeak
 
       ImGui::Text("Output features folder");
       ImGui::PushID(3);
-      ImGui::InputTextWithHint("", application_handler_.features_out_dir_.c_str(), &(application_handler_.features_out_dir_));
+      ImGui::InputTextWithHint("", features_out_dir_edit_.c_str(), &features_out_dir_edit_);
       ImGui::PopID();
 
       ImGui::SameLine();
@@ -88,7 +98,10 @@ namespace SmartPeak
       ImGui::Separator();
       if (ImGui::Button("Run workflow"))
       {
-        for (const std::string& pathname : { application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_ }) {
+        application_handler_.mzML_dir_ = mzML_dir_edit_;
+        application_handler_.features_in_dir_ = features_in_dir_edit_;
+        application_handler_.features_out_dir_ = features_out_dir_edit_;
+        for (const auto& pathname : { application_handler_.mzML_dir_, application_handler_.features_in_dir_, application_handler_.features_out_dir_ }) {
           fs::create_directories(fs::path(pathname));
         }
         BuildCommandsFromNames buildCommandsFromNames(application_handler_);
@@ -102,12 +115,9 @@ namespace SmartPeak
           {
             for (auto& p : cmd.dynamic_filenames)
             {
-              Filenames::updateDefaultDynamicFilenames(
-                application_handler_.mzML_dir_,
-                application_handler_.features_in_dir_,
-                application_handler_.features_out_dir_,
-                p.second
-              );
+              p.second.setTag(Filenames::Tag::MZML_INPUT_PATH, application_handler_.mzML_dir_.generic_string());
+              p.second.setTag(Filenames::Tag::FEATURES_INPUT_PATH, application_handler_.features_in_dir_.generic_string());
+              p.second.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, application_handler_.features_out_dir_.generic_string());
             }
           }
           const std::set<std::string> injection_names = session_handler_.getSelectInjectionNamesWorkflow(application_handler_.sequenceHandler_);

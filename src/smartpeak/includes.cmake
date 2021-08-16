@@ -2,6 +2,7 @@ set(SmartPeak_sources  CACHE INTERNAL "This variable should hold all SmartPeak s
 
 ## ATTENTION: The order of includes should be similar to the inclusion hierarchy
 include(source/core/sources.cmake)
+include(source/cli/sources.cmake)
 include(source/algorithm/sources.cmake)
 include(source/io/sources.cmake)
 include(source/ui/sources.cmake)
@@ -10,6 +11,7 @@ set(SmartPeak_sources_h  CACHE INTERNAL "This variable should hold all SmartPeak
 
 ## ATTENTION: The order of includes should be similar to the inclusion hierarchy
 include(include/SmartPeak/core/sources.cmake)
+include(include/SmartPeak/cli/sources.cmake)
 include(include/SmartPeak/iface/sources.cmake)
 include(include/SmartPeak/algorithm/sources.cmake)
 include(include/SmartPeak/io/sources.cmake)

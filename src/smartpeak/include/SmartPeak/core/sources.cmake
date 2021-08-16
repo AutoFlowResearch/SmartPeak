@@ -7,6 +7,7 @@ set(sources_list_h
 	ApplicationProcessor.h
 	ApplicationProcessorObservable.h
 	CastValue.h
+	ConsoleHandler.h
 	EventDispatcher.h
   FeaturesObservable.h
 	Filenames.h

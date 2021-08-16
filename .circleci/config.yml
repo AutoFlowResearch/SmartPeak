@@ -327,7 +327,7 @@ jobs:
     # The update is done automatically and changes are pushed back to release branch.
     working_directory: ~/SmartPeak
     docker:
-      - image: python:3.7.0
+      - image: python:3.7.2
     steps:
       - checkout
       - run:
@@ -367,7 +367,7 @@ jobs:
     # used as artifacts visible in github releases.
     working_directory: ~/SmartPeak
     docker:
-      - image: python:3.7.0
+      - image: python:3.7.2
     steps:
       - checkout
       - run:
@@ -465,7 +465,7 @@ jobs:
     # the job will push release branch, otherwise nothing will happen.
     working_directory: ~/SmartPeak
     docker:
-      - image: python:3.7.0
+      - image: python:3.7.2
     steps:
       - checkout
       - run:

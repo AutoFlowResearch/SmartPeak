@@ -32,6 +32,7 @@
 #include <SmartPeak/core/SequenceProcessorObservable.h>
 #include <SmartPeak/core/SequenceSegmentProcessorObservable.h>
 #include <SmartPeak/iface/IProcessorDescription.h>
+#include <SmartPeak/iface/IFilenamesHandler.h>
 #include <SmartPeak/io/InputDataValidation.h>
 
 #include <map>
@@ -103,18 +104,21 @@ namespace SmartPeak
   */
   void processInjection(
     InjectionHandler& injection,
-    const Filenames& filenames,
+    const Filenames& filenames_I,
     const std::vector<std::shared_ptr<RawDataProcessor>>& methods
   );
 
-  struct SequenceProcessor : IProcessorDescription {
-    SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}
+  struct SequenceProcessor : IProcessorDescription, IFilenamesHandler {
+    explicit SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}
     virtual ~SequenceProcessor() = default;
 
     virtual void process() = 0;
     
     /* IProcessorDescription */
     ParameterSet getParameterSchema() const override { return ParameterSet(); };
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override {};
 
     SequenceHandler* sequenceHandler_IO = nullptr; /// Sequence handler, used by all SequenceProcessor derived classes
   };
@@ -127,14 +131,14 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     Filenames        filenames_;                            /// Pathnames to load
     std::string      delimiter          = ",";              /// String delimiter of the imported file
     bool             checkConsistency   = true;             /// Check consistency of data contained in files
 
     CreateSequence() = default;
-    CreateSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    explicit CreateSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() override;
 
     /* IProcessorDescription */
@@ -142,12 +146,12 @@ namespace SmartPeak
     std::string getName() const override { return "CREATE_SEQUENCE"; }
     std::string getDescription() const override { return "Create a new sequence from file or wizard"; }
 
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
+
   private:
-    bool buildStaticFilenames(ApplicationHandler* application_handler);
+    bool buildStaticFilenames(ApplicationHandler* application_handler, Filenames& f);
     void updateFilenames(Filenames& f, const std::string& pathname);
-    bool requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation);
-    void clearNonExistantDefaultGeneratedFilenames(Filenames& f);
-    void clearNonExistantFilename(std::string& filename);
     std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
   };
 
@@ -160,12 +164,9 @@ namespace SmartPeak
     std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods_; /// Events to process
 
     ProcessSequence() = default;
-    ProcessSequence(SequenceHandler& sh, ISequenceProcessorObserver* sequence_processor_observer = nullptr) : SequenceProcessor(sh) 
+    explicit ProcessSequence(SequenceHandler& sh, ISequenceProcessorObserver* sequence_processor_observer = nullptr) : SequenceProcessor(sh) 
     {
-      if (sequence_processor_observer)
-      {
-        addSequenceProcessorObserver(sequence_processor_observer);
-      }
+      addSequenceProcessorObserver(sequence_processor_observer);
     }
     static ParameterSet getParameterSchemaStatic();
     void process() override;
@@ -175,6 +176,9 @@ namespace SmartPeak
     std::string getName() const override { return "PROCESS_SEQUENCE"; }
     std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence"; }
     ParameterSet getParameterSchema() const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override {};
   };
 
   /**
@@ -186,12 +190,9 @@ namespace SmartPeak
     std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods_; /// Events to process
 
     ProcessSequenceSegments() = default;
-    ProcessSequenceSegments(SequenceHandler& sh, ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr) : SequenceProcessor(sh)
+    explicit ProcessSequenceSegments(SequenceHandler& sh, ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr) : SequenceProcessor(sh)
     {
-      if (sequence_segment_processor_observer)
-      {
-        addSequenceSegmentProcessorObserver(sequence_segment_processor_observer);
-      }
+      addSequenceSegmentProcessorObserver(sequence_segment_processor_observer);
     }
     void process() override;
 
@@ -210,12 +211,9 @@ namespace SmartPeak
     std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods_; /// Events to process
 
     ProcessSampleGroups() = default;
-    ProcessSampleGroups(SequenceHandler& sh, ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr) : SequenceProcessor(sh)
+    explicit ProcessSampleGroups(SequenceHandler& sh, ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr) : SequenceProcessor(sh)
     {
-      if (sample_group_processor_observer)
-      {
-        addSampleGroupProcessorObserver(sample_group_processor_observer);
-      }
+      addSampleGroupProcessorObserver(sample_group_processor_observer);
     }
     void process() override;
 
@@ -230,17 +228,20 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     LoadWorkflow() = default;
-    LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
+    explicit LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
     void process() override;
-    std::string filename_;
+    Filenames filenames_;
 
     /* IProcessorDescription */
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_WORKFLOW"; }
     std::string getDescription() const override { return "Load a workflow from file"; }
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreWorkflow : SequenceProcessor, IFilePickerHandler
@@ -248,12 +249,12 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     StoreWorkflow() = default;
-    StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    explicit StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() override;
-    std::string filename_;
+    std::filesystem::path filename_;
 
     /* IProcessorDescription */
     int getID() const override { return -1; }
