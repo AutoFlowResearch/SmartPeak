@@ -149,35 +149,30 @@ public:
       static void readSequenceFile(SequenceHandler& sequenceHandler, const std::filesystem::path& pathname);
   };
 
-  struct StoreSequenceFileSmartPeak : IFilePickerHandler
-  {
-    /**
-    IFilePickerHandler
-    */
+  struct StoreSequenceFileAnalyst : IFilePickerHandler, IFilenamesHandler {
+
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
-  struct StoreSequenceFileAnalyst : IFilePickerHandler {
+  struct StoreSequenceFileMasshunter : IFilePickerHandler, IFilenamesHandler {
 
-    /**
-    IFilePickerHandler
-    */
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
-  struct StoreSequenceFileMasshunter : IFilePickerHandler {
+  struct StoreSequenceFileXcalibur : IFilePickerHandler, IFilenamesHandler {
 
-    /**
-    IFilePickerHandler
-    */
+    /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
-  };
 
-  struct StoreSequenceFileXcalibur : IFilePickerHandler {
-
-    /**
-    IFilePickerHandler
-    */
-    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 }

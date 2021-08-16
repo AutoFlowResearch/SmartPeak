@@ -47,7 +47,9 @@ namespace SmartPeak
     RawDataProcessor& operator=(const RawDataProcessor& other) = delete;
     virtual ~RawDataProcessor() = default;
 
+    /* IProcessorDescription */
     virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
+    virtual std::vector<std::string> getRequirements() const override { return {}; };
 
     /** Interface to all raw data processing methods.
 
@@ -58,7 +60,7 @@ namespace SmartPeak
     virtual void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const = 0;
 
     /* IFilenamesHandler */
@@ -74,11 +76,10 @@ namespace SmartPeak
 
   struct LoadRawData : RawDataProcessor
   {
-    int getID() const override { return 1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "LOAD_RAW_DATA"; }
     std::string getDescription() const override { return "Read in raw data mzML file from disk."; }
-
-    virtual ParameterSet getParameterSchema() const;
+    virtual ParameterSet getParameterSchema() const override;
 
     /** Read in raw data mzML file from disk.
 
@@ -88,7 +89,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /** Extracts metadata from the chromatogram.
@@ -106,7 +107,8 @@ namespace SmartPeak
 
   struct StoreRawData : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    
+    /* IProcessorDescription */
     std::string getName() const override { return "STORE_RAW_DATA"; }
     std::string getDescription() const override { return "Store the processed raw data mzML file to disk."; }
 
@@ -115,7 +117,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -124,7 +126,7 @@ namespace SmartPeak
 
   struct ZeroChromatogramBaseline : RawDataProcessor
   {
-    int getID() const override { return 12; }
+    /* IProcessorDescription */
     std::string getName() const override { return "ZERO_CHROMATOGRAM_BASELINE"; }
     std::string getDescription() const override { return "Normalize the lowest chromatogram intensity to zero."; }
 
@@ -133,16 +135,16 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct MapChromatograms : RawDataProcessor
   {
-    int getID() const override { return 11; }
+    
+    /* IProcessorDescription */
     std::string getName() const override { return "MAP_CHROMATOGRAMS"; }
     std::string getDescription() const override { return "Map chromatograms to the loaded set of transitions."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Map chromatograms to the loaded set of transitions.
@@ -150,13 +152,13 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct ExtractChromatogramWindows : RawDataProcessor
   {
-    int getID() const override { return 13; }
+    /* IProcessorDescription */
     std::string getName() const override { return "EXTRACT_CHROMATOGRAM_WINDOWS"; }
     std::string getDescription() const override { return "Extract out specified chromatogram windows using the componentFeatureFilters."; }
 
@@ -165,16 +167,15 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct ExtractSpectraWindows : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "EXTRACT_SPECTRA_WINDOWS"; }
     std::string getDescription() const override { return "Extract out specified spectra windows based on the user parameters."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Extract out specified spectra windows from an MSExperiment using the range specified in the parameters
@@ -182,16 +183,15 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct MergeSpectra : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "MERGE_SPECTRA"; }
     std::string getDescription() const override { return "Merge all spectra along the time axis."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Merge all spectra along the time axis using a binning strategy that is resolution dependent
@@ -199,13 +199,13 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct LoadFeatures : RawDataProcessor
   {
-    int getID() const override { return 2; }
+    /* IProcessorDescription */
     std::string getName() const override { return "LOAD_FEATURES"; }
     std::string getDescription() const override { return "Read in the features from disk."; }
 
@@ -214,7 +214,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -223,7 +223,7 @@ namespace SmartPeak
 
   struct StoreFeatures : RawDataProcessor
   {
-    int getID() const override { return 9; }
+    /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURES"; }
     std::string getDescription() const override { return "Write the features to disk."; }
 
@@ -232,7 +232,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -241,7 +241,7 @@ namespace SmartPeak
 
   struct LoadAnnotations : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "LOAD_ANNOTATIONS"; }
     std::string getDescription() const override { return "Read in the annotations from disk."; }
 
@@ -250,7 +250,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -259,7 +259,7 @@ namespace SmartPeak
 
   struct StoreAnnotations : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "STORE_ANNOTATIONS"; }
     std::string getDescription() const override { return "Write the annotations to disk."; }
 
@@ -268,7 +268,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -277,10 +277,9 @@ namespace SmartPeak
 
   struct PickMRMFeatures : RawDataProcessor
   {
-    int getID() const override { return 3; }
+    /* IProcessorDescription */
     std::string getName() const override { return "PICK_MRM_FEATURES"; }
     std::string getDescription() const override { return "Run the peak picking algorithm for SRMs/MRMs."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Run the openSWATH pick peaking and scoring workflow for a single raw data file.
@@ -288,16 +287,15 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct PickMS1Features : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "PICK_MS1_FEATURES"; }
     std::string getDescription() const override { return "Run the peak picking algorithm for MS1 spectra."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Run the MS1 peak picking and scoring algorithm.
@@ -305,16 +303,15 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct PickMS2Features : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "PICK_MS2_FEATURES"; }
     std::string getDescription() const override { return "Pick MS2 Features"; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** PickMS2Features
@@ -322,16 +319,15 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct SearchAccurateMass : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "SEARCH_ACCURATE_MASS"; }
     std::string getDescription() const override { return "Run the accurate mass search algorithm."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Run the accurate mass search algorithm.
@@ -339,31 +335,30 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct MergeFeatures : RawDataProcessor
   {
-      int getID() const override { return -1; }
-      std::string getName() const override { return "MERGE_FEATURES"; }
-      std::string getDescription() const override { return "Create merged features from accurate mass search results."; }
+    /* IProcessorDescription */
+    std::string getName() const override { return "MERGE_FEATURES"; }
+    std::string getDescription() const override { return "Create merged features from accurate mass search results."; }
 
-      /** Create merged features from accurate mass search results.
-      */
-      void process(
-          RawDataHandler& rawDataHandler_IO,
-          const ParameterSet& params_I,
-          const Filenames& filenames_I
-      ) const override;
+    /** Create merged features from accurate mass search results.
+    */
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      Filenames& filenames_I
+    ) const override;
   };
 
   struct SearchSpectrum : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "SEARCH_SPECTRUM"; }
     std::string getDescription() const override { return "Search accurate masses and add identification (peptide hits) as features/sub-features"; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Create merged features from accurate mass search results.
@@ -371,16 +366,15 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct DDA : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "DDA"; }
     std::string getDescription() const override { return "Data-Dependent Acquisition workflow step"; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Create merged features from accurate mass search results.
@@ -388,7 +382,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -397,10 +391,9 @@ namespace SmartPeak
 
   struct FilterFeatures : RawDataProcessor
   {
-    int getID() const override { return 4; }
+    /* IProcessorDescription */
     std::string getName() const override { return "FILTER_FEATURES"; }
     std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Filter features that do not pass the filter QCs.
@@ -408,16 +401,15 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct CheckFeatures : RawDataProcessor
   {
-    int getID() const override { return 8; }
+    /* IProcessorDescription */
     std::string getName() const override { return "CHECK_FEATURES"; }
     std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Flag features that do not pass the filter QCs.
@@ -425,13 +417,13 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct SelectFeatures : RawDataProcessor
   {
-    int getID() const override { return 5; }
+    /* IProcessorDescription */
     std::string getName() const override { return "SELECT_FEATURES"; }
     std::string getDescription() const override { return "Run the peak selection/alignment algorithm."; }
 
@@ -440,16 +432,15 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct ValidateFeatures : RawDataProcessor
   {
-    int getID() const override { return 6; }
+    /* IProcessorDescription */
     std::string getName() const override { return "VALIDATE_FEATURES"; }
     std::string getDescription() const override { return "Compare selected features to a reference data set."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Validate the selected peaks against reference data.
@@ -457,30 +448,30 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct QuantifyFeatures : RawDataProcessor
   {
-    int getID() const override { return 7; }
+    /* IProcessorDescription */
     std::string getName() const override { return "QUANTIFY_FEATURES"; }
     std::string getDescription() const override { return "Apply a calibration model defined in quantitationMethods to each transition."; }
-
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Quantify all unknown samples based on the quantitationMethod.
     */
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct PlotFeatures : RawDataProcessor
   {
-    int getID() const override { return 10; }
+    /* IProcessorDescription */
     std::string getName() const override { return "PLOT_FEATURES"; }
     std::string getDescription() const override { return "Plot the raw chromatogram with selected peaks overlaid."; }
 
@@ -489,7 +480,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
@@ -500,10 +491,9 @@ namespace SmartPeak
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "LOAD_TRANSITIONS"; }
     std::string getDescription() const override { return "Load the transitions for the SRM experiments from the TraML file."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Load the transitions from the TraML file.
@@ -511,7 +501,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
     
     /* IFilenamesHandler */
@@ -522,7 +512,7 @@ namespace SmartPeak
 
   struct LoadFeatureFiltersRDP : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
     std::string getDescription() const override { return "Load the component and component group transition filters from file."; }
 
@@ -531,7 +521,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
@@ -540,7 +530,7 @@ namespace SmartPeak
 
   struct LoadFeatureQCsRDP : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "LOAD_FEATURE_QCS"; }
     std::string getDescription() const override { return "Load the component and component group transition QC specifications from file."; }
 
@@ -549,16 +539,19 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
   };
 
-  struct StoreFeatureFiltersRDP : RawDataProcessor
+  struct StoreFeatureFiltersRDP : RawDataProcessor, IFilePickerHandler
   {
-    int getID() const override { return -1; }
+    StoreFeatureFiltersRDP(bool component_group = false) : component_group_(component_group) {}
+    bool component_group_;
+
+    /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
     std::string getDescription() const override { return "Store the component and component group transition filters from file."; }
 
@@ -567,16 +560,24 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
   };
 
-  struct StoreFeatureQCsRDP : RawDataProcessor
+  struct StoreFeatureQCsRDP : RawDataProcessor, IFilePickerHandler
   {
-    int getID() const override { return -1; }
+    StoreFeatureQCsRDP(bool component_group = false) : component_group_(component_group) {}
+    bool component_group_;
+
+    /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_QCS"; }
     std::string getDescription() const override { return "Store the component and component group transition QC specifications from file."; }
 
@@ -585,8 +586,13 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
@@ -599,7 +605,7 @@ namespace SmartPeak
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "LOAD_VALIDATION_DATA"; }
     std::string getDescription() const override { return "Load the validation data from file."; }
 
@@ -608,8 +614,31 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
+  };
+
+  struct StoreValidationData : RawDataProcessor, IFilePickerHandler
+  {
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+
+    StoreValidationData() = default;
+    void process(
+      RawDataHandler& rawDataHandler_IO,
+      const ParameterSet& params_I,
+      Filenames& filenames_I
+    ) const override;
+    std::string filename_;
+
+    /* IProcessorDescription */
+    std::string getName() const override { return "STORE_VALIDATION_DATA"; }
+    std::string getDescription() const override { return "Store the validation data."; }
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
@@ -622,7 +651,7 @@ namespace SmartPeak
     */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "LOAD_PARAMETERS"; }
     std::string getDescription() const override { return "Load the data processing parameters from file."; }
 
@@ -631,7 +660,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
     static void sanitizeParameters(
       ParameterSet& params_I
@@ -654,12 +683,11 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
     std::string filename_;
 
     /* IProcessorDescription */
-    int getID() const override { return -1; }
     std::string getName() const override { return "STORE_PARAMETERS"; }
     std::string getDescription() const override { return "Store a parameters to file"; }
 
@@ -669,10 +697,9 @@ namespace SmartPeak
 
   struct FitFeaturesEMG : RawDataProcessor
   {
-    int getID() const override { return 14; }
+    /* IProcessorDescription */
     std::string getName() const override { return "FIT_FEATURES_EMG"; }
     std::string getDescription() const override { return "Reconstruct a peak from available data points."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Apply the EMG peak reconstruction technique to the data points.
@@ -680,7 +707,7 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
 
   private:
@@ -695,10 +722,9 @@ namespace SmartPeak
 
   struct FilterFeaturesRSDs : RawDataProcessor
   {
-    int getID() const override { return 4; }
+    /* IProcessorDescription */
     std::string getName() const override { return "FILTER_FEATURES_RSDS"; }
     std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Filter features that do not pass the filter QCs.
@@ -706,16 +732,15 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct CheckFeaturesRSDs : RawDataProcessor
   {
-    int getID() const override { return 8; }
+    /* IProcessorDescription */
     std::string getName() const override { return "CHECK_FEATURES_RSDS"; }
     std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Flag features that do not pass the filter QCs.
@@ -723,16 +748,16 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct FilterFeaturesBackgroundInterferences : RawDataProcessor
   {
-    int getID() const override { return 4; }
+    
+    /* IProcessorDescription */
     std::string getName() const override { return "FILTER_FEATURES_BACKGROUND_INTERFERENCES"; }
     std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Filter features that do not pass the filter QCs.
@@ -740,16 +765,15 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct CheckFeaturesBackgroundInterferences : RawDataProcessor
   {
-    int getID() const override { return 8; }
+    /* IProcessorDescription */
     std::string getName() const override { return "CHECK_FEATURES_BACKGROUND_INTERFERENCES"; }
     std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
-
     virtual ParameterSet getParameterSchema() const override;
 
     /** Flag features that do not pass the filter QCs.
@@ -757,13 +781,13 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
 
   struct ClearData : RawDataProcessor
   {
-    int getID() const override { return -1; }
+    /* IProcessorDescription */
     std::string getName() const override { return "CLEAR_DATA"; }
     std::string getDescription() const override { return "Clear raw and processed data."; }
 
@@ -772,16 +796,15 @@ namespace SmartPeak
     void process(
       RawDataHandler& rawDataHandler_IO,
       const ParameterSet& params_I,
-      const Filenames& filenames_I
+      Filenames& filenames_I
     ) const override;
   };
   
   struct CalculateMDVs : RawDataProcessor
   {
-    int getID() const override { return 0; }
+    /* IProcessorDescription */
     std::string getName() const override { return "CALCULATE_MDVS"; }
     std::string getDescription() const override { return "Calculate MDVs."; }
-    
     virtual ParameterSet getParameterSchema() const override;
 
     /** Calculate MDVs
@@ -789,16 +812,15 @@ namespace SmartPeak
     void process(
                  RawDataHandler& rawDataHandler_IO,
                  const ParameterSet& params_I,
-                 const Filenames& filenames_I
+                 Filenames& filenames_I
                  ) const override;
   };
   
   struct IsotopicCorrections : RawDataProcessor
   {
-    int getID() const override { return 0; }
+    /* IProcessorDescription */
     std::string getName() const override { return "ISOTOPIC_CORRECTIONS"; }
     std::string getDescription() const override { return "Perform Isotopic Corrections."; }
-    
     virtual ParameterSet getParameterSchema() const override;
 
     /** Correct MDVs
@@ -806,16 +828,15 @@ namespace SmartPeak
     void process(
                  RawDataHandler& rawDataHandler_IO,
                  const ParameterSet& params_I,
-                 const Filenames& filenames_I
+                 Filenames& filenames_I
                  ) const override;
   };
   
   struct CalculateIsotopicPurities : RawDataProcessor
   {
-    int getID() const override { return 0; }
+    /* IProcessorDescription */
     std::string getName() const override { return "CALCULATE_MDV_ISOTOPIC_PURITIES"; }
     std::string getDescription() const override { return "Calculate MDV Isotopic Purities."; }
-    
     virtual ParameterSet getParameterSchema() const override;
 
     /** Calculate MDV Isotopic Purities
@@ -823,16 +844,15 @@ namespace SmartPeak
     void process(
                  RawDataHandler& rawDataHandler_IO,
                  const ParameterSet& params_I,
-                 const Filenames& filenames_I
+                 Filenames& filenames_I
                  ) const override;
   };
 
   struct CalculateMDVAccuracies : RawDataProcessor
   {
-    int getID() const override { return 0; }
+    /* IProcessorDescription */
     std::string getName() const override { return "CALCULATE_MDV_ACCURACIES"; }
     std::string getDescription() const override { return "Compare MDVs to Theoretical"; }
-    
     virtual ParameterSet getParameterSchema() const override;
 
     /** Compare MDVs to Theoretical
@@ -840,7 +860,7 @@ namespace SmartPeak
     void process(
                  RawDataHandler& rawDataHandler_IO,
                  const ParameterSet& params_I,
-                 const Filenames& filenames_I
+                 Filenames& filenames_I
                  ) const override;
   };
 

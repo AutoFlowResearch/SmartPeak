@@ -31,7 +31,7 @@ using namespace SmartPeak;
 
 void example_LCMS_MRM_Validation(
   const std::string& dir_I,
-  const Filenames& filenames_I,
+  Filenames& filenames_I,
   const std::string& delimiter_I = ","
 )
 {
@@ -74,8 +74,8 @@ void example_LCMS_MRM_Validation(
   ps.process();
 
   Filenames filenames = filenames_I;
-  filenames.setFullPath("pivotTable_csv_o", dir_I + "/PivotTable.csv");
-  filenames.setFullPath("featureDB_csv_o", dir_I + "/FeatureDB.csv");
+  filenames.setFullPath("pivotTable", dir_I + "/PivotTable.csv");
+  filenames.setFullPath("featureDB", dir_I + "/FeatureDB.csv");
 
   SequenceParser::writeDataMatrixFromMetaValue(
     sequenceHandler,

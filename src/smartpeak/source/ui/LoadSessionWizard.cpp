@@ -17,19 +17,48 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
-#pragma once
 
-#include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/LoadSessionWizard.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
+#include <plog/Log.h>
 
 namespace SmartPeak
 {
-  class AboutWidget final : public Widget
+  bool LoadSessionWizard::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-  public:
-    AboutWidget() : Widget("About") {};
-    void draw() override;
+    auto filenames = LoadFilenames::loadFilenamesFromDB(filename);
+    auto main_dir = std::filesystem::path(filename).remove_filename().generic_string();
+    filenames->setTag(Filenames::Tag::MAIN_DIR, main_dir);
+    // Popup Session Files management if some files are not existing
+    if (filenames)
+    {
+      bool missing_file = false;
+      for (const auto& file_id : (*filenames).getFileIds())
+      {
+        const auto full_path = (*filenames).getFullPath(file_id);
+        if ((!(*filenames).isEmbedded(file_id)) && (!full_path.empty()) && (!std::filesystem::exists(full_path)))
+        {
+          missing_file = true;
+          break;
+        }
+      }
+      if (missing_file)
+      {
+        session_files_widget_manage_->open(*filenames);
+      }
+      else
+      {
+        application_handler->closeSession();
+        application_handler->filenames_ = *filenames;
+        application_handler->main_dir_ = filenames->getTag(Filenames::Tag::MAIN_DIR);
+        LoadSession load_session(*application_handler);
+        load_session.filenames_ = filenames;
+        load_session.process();
+      }
+    }
+    return true;
   };
 }

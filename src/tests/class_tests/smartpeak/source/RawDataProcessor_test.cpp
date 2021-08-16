@@ -44,8 +44,8 @@ void load_data(
 )
 {
   Filenames filenames1, filenames2;
-  filenames1.setFullPath("parameters_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_1_core_tmpFix.csv"));
-  filenames2.setFullPath("parameters_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_2_tmpFix.csv"));
+  filenames1.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_1_core_tmpFix.csv"));
+  filenames2.setFullPath("parameters", SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_2_tmpFix.csv"));
   RawDataHandler rawDataHandler;
   LoadParameters loadParameters;
   loadParameters.process(rawDataHandler, {}, filenames1);
@@ -75,8 +75,6 @@ TEST(RawDataProcessor, destructorClearData)
 TEST(RawDataProcessor, gettersClearData)
 {
   ClearData processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "CLEAR_DATA");
 }
 
@@ -129,8 +127,6 @@ TEST(RawDataProcessor, destructorLoadRawData)
 TEST(RawDataProcessor, gettersLoadRawData)
 {
   LoadRawData processor;
-
-  EXPECT_EQ(processor.getID(), 1);
   EXPECT_EQ(processor.getName(), "LOAD_RAW_DATA");
 }
 
@@ -210,7 +206,7 @@ TEST(RawDataProcessor, extractMetaData)
 
   // Pre-requisites: load the transitions and raw data
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, {}, filenames);
 
@@ -260,8 +256,6 @@ TEST(RawDataProcessor, destructorStoreRawData)
 TEST(RawDataProcessor, gettersStoreRawData)
 {
   StoreRawData processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "STORE_RAW_DATA");
 }
 
@@ -290,8 +284,6 @@ TEST(RawDataProcessor, destructorMapChromatograms)
 TEST(RawDataProcessor, gettersMapChromatograms)
 {
   MapChromatograms processor;
-
-  EXPECT_EQ(processor.getID(), 11);
   EXPECT_EQ(processor.getName(), "MAP_CHROMATOGRAMS");
 }
 
@@ -304,7 +296,7 @@ TEST(RawDataProcessor, processorMapChromatograms)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -350,8 +342,6 @@ TEST(RawDataProcessor, destructorZeroChromatogramBaseline)
 TEST(RawDataProcessor, gettersZeroChromatogramBaseline)
 {
   ZeroChromatogramBaseline processor;
-
-  EXPECT_EQ(processor.getID(), 12);
   EXPECT_EQ(processor.getName(), "ZERO_CHROMATOGRAM_BASELINE");
 }
 
@@ -434,8 +424,6 @@ TEST(RawDataProcessor, destructorExtractChromatogramWindows)
 TEST(RawDataProcessor, gettersExtractChromatogramWindows)
 {
   ExtractChromatogramWindows processor;
-
-  EXPECT_EQ(processor.getID(), 13);
   EXPECT_EQ(processor.getName(), "EXTRACT_CHROMATOGRAM_WINDOWS");
 }
 
@@ -448,7 +436,7 @@ TEST(RawDataProcessor, processorExtractChromatogramWindows)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -477,8 +465,8 @@ TEST(RawDataProcessor, processorExtractChromatogramWindows)
   EXPECT_NEAR(chromatograms1.back()[2].getMZ(), 914.139, 1e-3);
 
   // Test window extraction
-  filenames.setFullPath("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_extractChromWindowTest_1.csv"));
-  filenames.setFullPath("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureFilterComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_extractChromWindowTest_1.csv"));
+  filenames.setFullPath("featureFilterComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, {}, filenames);
 
@@ -521,8 +509,6 @@ TEST(RawDataProcessor, destructorExtractSpectraWindows)
 TEST(RawDataProcessor, gettersExtractSpectraWindows)
 {
   ExtractSpectraWindows processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "EXTRACT_SPECTRA_WINDOWS");
 }
 
@@ -576,8 +562,6 @@ TEST(RawDataProcessor, destructorMergeSpectra)
 TEST(RawDataProcessor, gettersMergeSpectra)
 {
   MergeSpectra processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "MERGE_SPECTRA");
 }
 
@@ -665,8 +649,6 @@ TEST(RawDataProcessor, destructorLoadFeatures)
 TEST(RawDataProcessor, gettersLoadFeatures)
 {
   LoadFeatures processor;
-
-  EXPECT_EQ(processor.getID(), 2);
   EXPECT_EQ(processor.getName(), "LOAD_FEATURES");
 }
 
@@ -737,8 +719,6 @@ TEST(RawDataProcessor, destructorStoreFeatures)
 TEST(RawDataProcessor, gettersStoreFeatures)
 {
   StoreFeatures processor;
-
-  EXPECT_EQ(processor.getID(), 9);
   EXPECT_EQ(processor.getName(), "STORE_FEATURES");
 }
 
@@ -767,8 +747,6 @@ TEST(RawDataProcessor, destructorLoadAnnotations)
 TEST(RawDataProcessor, gettersLoadAnnotations)
 {
   LoadAnnotations processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "LOAD_ANNOTATIONS");
 }
 
@@ -809,8 +787,6 @@ TEST(RawDataProcessor, destructorStoreAnnotations)
 TEST(RawDataProcessor, gettersStoreAnnotations)
 {
   StoreAnnotations processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "STORE_ANNOTATIONS");
 }
 
@@ -839,15 +815,13 @@ TEST(RawDataProcessor, destructorLoadTransitions)
 TEST(RawDataProcessor, gettersLoadTransitions)
 {
   LoadTransitions processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "LOAD_TRANSITIONS");
 }
 
 TEST(RawDataProcessor, processLoadTransitions_csv)
 {
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   RawDataHandler rawDataHandler;
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, {}, filenames);
@@ -871,7 +845,7 @@ TEST(RawDataProcessor, processLoadTransitions_csv)
 TEST(RawDataProcessor, processLoadTransitions_traML)
 {
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("LoadTransitions_test.TraML"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("LoadTransitions_test.TraML"));
   RawDataHandler rawDataHandler;
   LoadTransitions loadTransitions;
   map<std::string, vector<map<string, string>>> params_struct({
@@ -918,8 +892,6 @@ TEST(RawDataProcessor, destructorLoadFeatureFilters)
 TEST(RawDataProcessor, gettersLoadFeatureFilters)
 {
   LoadFeatureFiltersRDP processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "LOAD_FEATURE_FILTERS");
 }
 
@@ -928,8 +900,8 @@ TEST(RawDataProcessor, processLoadFeatureFilters)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPath("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureFilterComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureFilterComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
 
   LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, {}, filenames);
@@ -961,8 +933,6 @@ TEST(RawDataProcessor, destructorLoadFeatureQCs)
 TEST(RawDataProcessor, gettersLoadFeatureQCs)
 {
   LoadFeatureQCsRDP processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "LOAD_FEATURE_QCS");
 }
 
@@ -971,8 +941,8 @@ TEST(RawDataProcessor, processLoadFeatureQCs)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPath("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureQCComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureQCComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
 
   LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, {}, filenames);
@@ -1004,8 +974,6 @@ TEST(RawDataProcessor, destructorStoreFeatureFilters)
 TEST(RawDataProcessor, gettersStoreFeatureFilters)
 {
   StoreFeatureFiltersRDP processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "STORE_FEATURE_FILTERS");
 }
 
@@ -1014,12 +982,12 @@ TEST(RawDataProcessor, processStoreFeatureFilters)
   RawDataHandler rawDataHandler, rawDataHandler_test;
 
   Filenames filenames;
-  filenames.setFullPath("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPath("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureFilterComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureFilterComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, {}, filenames);
-  filenames.setFullPath("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
-  filenames.setFullPath("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
+  filenames.setFullPath("featureFilterComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
+  filenames.setFullPath("featureFilterComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
   StoreFeatureFiltersRDP storeFeatureFilters;
   storeFeatureFilters.process(rawDataHandler, {}, filenames);
   loadFeatureFilters.process(rawDataHandler_test, {}, filenames);
@@ -1056,8 +1024,6 @@ TEST(RawDataProcessor, destructorStoreFeatureQCs)
 TEST(RawDataProcessor, gettersStoreFeatureQCs)
 {
   StoreFeatureQCsRDP processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "STORE_FEATURE_QCS");
 }
 
@@ -1066,12 +1032,12 @@ TEST(RawDataProcessor, processStoreFeatureQCs)
   RawDataHandler rawDataHandler, rawDataHandler_test;
 
   Filenames filenames;
-  filenames.setFullPath("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPath("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureQCComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureQCComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, {}, filenames);
-  filenames.setFullPath("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
-  filenames.setFullPath("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
+  filenames.setFullPath("featureQCComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1_test.csv"));
+  filenames.setFullPath("featureQCComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1_test.csv"));
   StoreFeatureQCsRDP storeFeatureQCs;
   storeFeatureQCs.process(rawDataHandler, {}, filenames);
   loadFeatureQCs.process(rawDataHandler_test, {}, filenames);
@@ -1108,15 +1074,13 @@ TEST(RawDataProcessor, destructorLoadValidationData)
 TEST(RawDataProcessor, gettersLoadValidationData)
 {
   LoadValidationData processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "LOAD_VALIDATION_DATA");
 }
 
 TEST(RawDataProcessor, processLoadValidationData)
 {
   Filenames filenames;
-  filenames.setFullPath("referenceData_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv"));
+  filenames.setFullPath("referenceData", SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv"));
   RawDataHandler rawDataHandler;
 
   LoadValidationData loadValidationData;
@@ -1155,8 +1119,6 @@ TEST(RawDataProcessor, destructorLoadParameters)
 TEST(RawDataProcessor, gettersLoadParameters)
 {
   LoadParameters processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "LOAD_PARAMETERS");
 }
 
@@ -1243,8 +1205,6 @@ TEST(RawDataProcessor, destructorPickMRMFeatures)
 TEST(RawDataProcessor, gettersPickMRMFeatures)
 {
   PickMRMFeatures processor;
-
-  EXPECT_EQ(processor.getID(), 3);
   EXPECT_EQ(processor.getName(), "PICK_MRM_FEATURES");
 }
 
@@ -1257,7 +1217,7 @@ TEST(RawDataProcessor, pickFeaturesMRM)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -1322,8 +1282,6 @@ TEST(RawDataProcessor, destructorPickMS1Features)
 TEST(RawDataProcessor, gettersPickMS1Features)
 {
   PickMS1Features processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "PICK_MS1_FEATURES");
 }
 
@@ -1425,8 +1383,6 @@ TEST(RawDataProcessor, destructorPickMS2Features)
 TEST(RawDataProcessor, gettersPickMS2Features)
 {
   PickMS2Features processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "PICK_MS2_FEATURES");
 }
 
@@ -1519,8 +1475,6 @@ TEST(RawDataProcessor, destructorSearchAccurateMass)
 TEST(RawDataProcessor, gettersSearchAccurateMass)
 {
   SearchAccurateMass processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "SEARCH_ACCURATE_MASS");
 }
 
@@ -1606,8 +1560,6 @@ TEST(RawDataProcessor, destructorMergeFeatures)
 TEST(RawDataProcessor, gettersMergeFeatures)
 {
   MergeFeatures processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "MERGE_FEATURES");
 }
 
@@ -1708,8 +1660,6 @@ TEST(RawDataProcessor, destructorFilterFeatures)
 TEST(RawDataProcessor, gettersFilterFeatures)
 {
   FilterFeatures processor;
-
-  EXPECT_EQ(processor.getID(), 4);
   EXPECT_EQ(processor.getName(), "FILTER_FEATURES");
 }
 
@@ -1722,7 +1672,7 @@ TEST(RawDataProcessor, filterFeatures)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -1738,8 +1688,8 @@ TEST(RawDataProcessor, filterFeatures)
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPath("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureFilterComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureFilterComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
 
@@ -1800,8 +1750,6 @@ TEST(RawDataProcessor, destructorSelectFeatures)
 TEST(RawDataProcessor, gettersSelectFeatures)
 {
   SelectFeatures processor;
-
-  EXPECT_EQ(processor.getID(), 5);
   EXPECT_EQ(processor.getName(), "SELECT_FEATURES");
 }
 
@@ -1814,7 +1762,7 @@ TEST(RawDataProcessor, selectFeatures)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -1887,8 +1835,6 @@ TEST(RawDataProcessor, destructorValidateFeatures)
 TEST(RawDataProcessor, gettersValidateFeatures)
 {
   ValidateFeatures processor;
-
-  EXPECT_EQ(processor.getID(), 6);
   EXPECT_EQ(processor.getName(), "VALIDATE_FEATURES");
 }
 
@@ -1905,7 +1851,7 @@ TEST(RawDataProcessor, validateFeatures)
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("referenceData_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv"));
+  filenames.setFullPath("referenceData", SMARTPEAK_GET_TEST_DATA_PATH("MRMFeatureValidator_referenceData_1.csv"));
   LoadValidationData loadValidationData;
   loadValidationData.process(rawDataHandler, params_1, filenames);
 
@@ -1945,8 +1891,6 @@ TEST(RawDataProcessor, destructorPlotFeatures)
 TEST(RawDataProcessor, gettersPlotFeatures)
 {
   PlotFeatures processor;
-
-  EXPECT_EQ(processor.getID(), 10);
   EXPECT_EQ(processor.getName(), "PLOT_FEATURES");
 }
 
@@ -1975,8 +1919,6 @@ TEST(RawDataProcessor, destructorQuantifyFeatures)
 TEST(RawDataProcessor, gettersQuantifyFeatures)
 {
   QuantifyFeatures processor;
-
-  EXPECT_EQ(processor.getID(), 7);
   EXPECT_EQ(processor.getName(), "QUANTIFY_FEATURES");
 }
 
@@ -1984,7 +1926,7 @@ TEST(RawDataProcessor, quantifyComponents)
 {
   // Pre-requisites: load the parameters and associated raw data
   Filenames filenames;
-  filenames.setFullPath("quantitationMethods_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv"));
+  filenames.setFullPath("quantitationMethods", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv"));
   SequenceSegmentHandler sequenceSegmentHandler_IO;
   
   LoadQuantitationMethods loadQuantitationMethods;
@@ -2039,8 +1981,6 @@ TEST(RawDataProcessor, destructorCheckFeatures)
 TEST(RawDataProcessor, gettersCheckFeatures)
 {
   CheckFeatures processor;
-
-  EXPECT_EQ(processor.getID(), 8);
   EXPECT_EQ(processor.getName(), "CHECK_FEATURES");
 }
 
@@ -2053,7 +1993,7 @@ TEST(RawDataProcessor, checkFeatures)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -2061,8 +2001,8 @@ TEST(RawDataProcessor, checkFeatures)
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPath("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureQCComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureQCComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
@@ -2108,8 +2048,6 @@ TEST(RawDataProcessor, destructorFilterFeaturesRSDs)
 TEST(RawDataProcessor, gettersFilterFeaturesRSDs)
 {
   FilterFeaturesRSDs processor;
-
-  EXPECT_EQ(processor.getID(), 4);
   EXPECT_EQ(processor.getName(), "FILTER_FEATURES_RSDS");
 }
 
@@ -2122,7 +2060,7 @@ TEST(RawDataProcessor, filterFeaturesRSDs)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -2138,8 +2076,8 @@ TEST(RawDataProcessor, filterFeaturesRSDs)
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv"));
-  filenames.setFullPath("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureFilterComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv"));
+  filenames.setFullPath("featureFilterComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv"));
   LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
   rawDataHandler.setFeatureRSDFilter(rawDataHandler.getFeatureFilter()); // copy over the feature filter
@@ -2207,8 +2145,6 @@ TEST(RawDataProcessor, destructorFilterFeaturesBackgroundInterferences)
 TEST(RawDataProcessor, gettersFilterFeaturesBackgroundInterferences)
 {
   FilterFeaturesBackgroundInterferences processor;
-
-  EXPECT_EQ(processor.getID(), 4);
   EXPECT_EQ(processor.getName(), "FILTER_FEATURES_BACKGROUND_INTERFERENCES");
 }
 
@@ -2221,7 +2157,7 @@ TEST(RawDataProcessor, filterFeaturesBackgroundInterferences)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -2237,8 +2173,8 @@ TEST(RawDataProcessor, filterFeaturesBackgroundInterferences)
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv"));
-  filenames.setFullPath("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureFilterComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv"));
+  filenames.setFullPath("featureFilterComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv"));
   LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
   rawDataHandler.setFeatureBackgroundFilter(rawDataHandler.getFeatureFilter()); // copy over the feature filter
@@ -2301,8 +2237,6 @@ TEST(RawDataProcessor, destructorCheckFeaturesBackgroundInterferences)
 TEST(RawDataProcessor, gettersCheckFeaturesBackgroundInterferences)
 {
   CheckFeaturesBackgroundInterferences processor;
-
-  EXPECT_EQ(processor.getID(), 8);
   EXPECT_EQ(processor.getName(), "CHECK_FEATURES_BACKGROUND_INTERFERENCES");
 }
 
@@ -2315,7 +2249,7 @@ TEST(RawDataProcessor, checkFeaturesBackgroundInterferences)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -2323,8 +2257,8 @@ TEST(RawDataProcessor, checkFeaturesBackgroundInterferences)
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv"));
-  filenames.setFullPath("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureQCComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv"));
+  filenames.setFullPath("featureQCComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv"));
   LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
 
@@ -2377,8 +2311,6 @@ TEST(RawDataProcessor, destructorCheckFeaturesRSDs)
 TEST(RawDataProcessor, gettersCheckFeaturesRSDs)
 {
   CheckFeaturesRSDs processor;
-
-  EXPECT_EQ(processor.getID(), 8);
   EXPECT_EQ(processor.getName(), "CHECK_FEATURES_RSDS");
 }
 
@@ -2391,7 +2323,7 @@ TEST(RawDataProcessor, checkFeaturesRSDs)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -2399,8 +2331,8 @@ TEST(RawDataProcessor, checkFeaturesRSDs)
   LoadFeatures loadFeatures;
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("featureQCComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv"));
-  filenames.setFullPath("featureQCComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureQCComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponents_1.csv"));
+  filenames.setFullPath("featureQCComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeaturersdqccomponentgroups_1.csv"));
   LoadFeatureQCsRDP loadFeatureQCs;
   loadFeatureQCs.process(rawDataHandler, params_1, filenames);
   rawDataHandler.setFeatureRSDQC(rawDataHandler.getFeatureQC()); // copy over the feature filter
@@ -2441,16 +2373,16 @@ TEST(RawDataProcessor, process)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("featureFilterComponents_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
-  filenames.setFullPath("featureFilterComponentGroups_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
+  filenames.setFullPath("featureFilterComponents", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponents_1.csv"));
+  filenames.setFullPath("featureFilterComponentGroups", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_mrmfeatureqccomponentgroups_1.csv"));
   LoadFeatureFiltersRDP loadFeatureFilters;
   loadFeatureFilters.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("quantitationMethods_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv"));
+  filenames.setFullPath("quantitationMethods", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_quantitationMethods_1.csv"));
   SequenceSegmentHandler sequenceSegmentHandler_IO;
   LoadQuantitationMethods loadQuantitationMethods;
   loadQuantitationMethods.process(sequenceSegmentHandler_IO, SequenceHandler(), {}, filenames);
@@ -2535,7 +2467,7 @@ TEST(RawDataProcessor, emg_processor)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -2830,7 +2762,7 @@ TEST(RawDataProcessor, calculateMDVAccuracies)
 
   // for peptide SumFormula
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_traML_1.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, {}, filenames);
   
@@ -2883,8 +2815,6 @@ TEST(RawDataProcessor, calculateMDVAccuracies)
 TEST(RawDataProcessor, gettersSearchSpectrum)
 {
   SearchSpectrum processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "SEARCH_SPECTRUM");
 }
 
@@ -2896,7 +2826,7 @@ TEST(RawDataProcessor, SearchSpectrum)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -2933,8 +2863,6 @@ TEST(RawDataProcessor, SearchSpectrum)
 TEST(RawDataProcessor, gettersDDA)
 {
   DDA processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "DDA");
 }
 
@@ -2946,7 +2874,7 @@ TEST(RawDataProcessor, DDA)
   RawDataHandler rawDataHandler;
 
   Filenames filenames;
-  filenames.setFullPath("traML_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv"));
+  filenames.setFullPath("traML", SMARTPEAK_GET_TEST_DATA_PATH("dda_min_traML.csv"));
   LoadTransitions loadTransitions;
   loadTransitions.process(rawDataHandler, params_1, filenames);
 
@@ -2959,11 +2887,11 @@ TEST(RawDataProcessor, DDA)
   filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH("dda_after_search.featureXML"));
   loadFeatures.process(rawDataHandler, params_1, filenames);
 
-  filenames.setFullPath("traML_csv_o", std::tmpnam(nullptr));
+  filenames.setFullPath("traML", std::tmpnam(nullptr));
   DDA dda;
   dda.process(rawDataHandler, params_1, filenames);
 
-  EXPECT_TRUE(std::filesystem::exists(filenames.getFullPath("traML_csv_o")));
+  EXPECT_TRUE(std::filesystem::exists(filenames.getFullPath("traML")));
   ASSERT_EQ(rawDataHandler.getFeatureMap().size(), 8);
   const auto& f = rawDataHandler.getFeatureMap()[0];
   std::cout << f.getMetaValue("PeptideRef").toString() << std::endl;

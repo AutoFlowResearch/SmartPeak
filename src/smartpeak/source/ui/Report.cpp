@@ -35,6 +35,7 @@
 namespace SmartPeak
 {
   Report::Report(ApplicationHandler& application_handler) :
+    Widget("Create Report"),
     application_handler_(application_handler)
   {
     std::fill(st_checks_.begin(), st_checks_.end(), false);
@@ -43,7 +44,7 @@ namespace SmartPeak
 
   void Report::draw()
   {
-    if (!ImGui::BeginPopupModal("Report dialog", NULL, ImGuiWindowFlags_NoResize)) {
+    if (!ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_NoResize)) {
       return;
     }
 

@@ -24,7 +24,11 @@
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
+#include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/smartpeak_package_version.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
+#include <SmartPeak/core/SharedProcessors.h>
+#include <SmartPeak/core/SequenceProcessor.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <algorithm>
 #include <iostream>
@@ -532,7 +536,7 @@ namespace SmartPeak
     return false;
   }
 
-  std::array<std::vector<std::string>, 4> Utilities::getFolderContents(const std::filesystem::path& folder_path)
+  std::array<std::vector<std::string>, 4> Utilities::getFolderContents(const std::filesystem::path& folder_path, bool only_directories)
   {
     // name, ext, size, date
     std::array<std::vector<std::string>, 4> directory_entries;
@@ -546,7 +550,7 @@ namespace SmartPeak
                                                                                         - std::filesystem::file_time_type::clock::now()
                                                                                         + std::chrono::system_clock::now());
           std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
-          if (p.is_regular_file()) {
+          if (p.is_regular_file() && (!only_directories))
             entries_temp.push_back(std::make_tuple(p.path().filename().string(), p.file_size(), p.path().extension().string(), cftime));
           } else if (p.is_directory()) {
             std::tuple<float, uintmax_t> directory_info;
@@ -838,4 +842,41 @@ namespace SmartPeak
     auto it = str.find(to_remove);
     if (it != std::string::npos) str.erase(it, str.length());
   }
+
+  Filenames Utilities::buildFilenamesFromDirectory(ApplicationHandler& application_handler, const std::filesystem::path& path)
+  {
+    Filenames filenames;
+    filenames.setTag(Filenames::Tag::MAIN_DIR, path.generic_string());
+    for (const auto& filename_handler : application_handler.loading_processors_)
+    {
+      filename_handler->getFilenames(filenames);
+    }
+    for (auto& file_id : filenames.getFileIds())
+    {
+      filenames.setEmbedded(file_id, false);
+    }
+    return filenames;
+  }
+
+  std::filesystem::path Utilities::createEmptyTempDirectory()
+  {
+    std::filesystem::path path;
+    uint i;
+    uint max_tries = 1000;
+    while (true)
+    {
+      path = std::tmpnam(nullptr);
+      if (std::filesystem::create_directory(path))
+      {
+        break;
+      }
+      if (i == max_tries)
+      {
+        throw std::runtime_error("could not find non-existing directory");
+      }
+      i++;
+    }
+    return path;
+  }
 }
+

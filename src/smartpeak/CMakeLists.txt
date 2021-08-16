@@ -67,6 +67,7 @@ smartpeak_add_library(TARGET_NAME  SmartPeak
                                      ${IMPLOT_INCLUDE_DIR}
                                      ${EIGEN3_INCLUDE_DIR}
                                      ${PLOG_INCLUDE_DIR}
+                                     ${SQLITE_INCLUDE_DIR}
                    LINK_LIBRARIES ${APPLE_EXTRA_LIBS}
                                   ${SMARTPEAK_DEP_LIBRARIES}
                    DLL_EXPORT_PATH "SmartPeak/")

@@ -52,15 +52,7 @@ TEST(Filenames, getFullPath)
 TEST(Filenames, getFullPath_non_existing)
 {
   Filenames filenames;
-  try {
-    filenames.getFullPath("test");
-    FAIL() << "Expected std::out_of_range";
-  }
-  catch (std::out_of_range const& err) {
-  }
-  catch (...) {
-    FAIL() << "Expected std::out_of_range";
-  }
+  EXPECT_STREQ(filenames.getFullPath("test").generic_string().c_str(), "");
 }
 
 TEST(Filenames, setFullPath)

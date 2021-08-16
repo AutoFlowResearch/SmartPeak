@@ -199,8 +199,6 @@ TEST(MergeInjections, destructorMergeInjections)
 TEST(MergeInjections, gettersMergeInjections)
 {
   MergeInjections processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_STREQ(processor.getName().c_str(), "MERGE_INJECTIONS");
 }
 
@@ -245,7 +243,8 @@ TEST(SampleGroupHandler, processMergeInjections)
 
   // test merge injections on all with subordinates
   MergeInjections sampleGroupProcessor;
-  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+  Filenames filenames;
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, filenames);
 
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().size(), 3);
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
@@ -259,7 +258,7 @@ TEST(SampleGroupHandler, processMergeInjections)
 
   // test merge injections on all with out subordinates
   mergeinjs_params.at("MergeInjections").at(6).setValueFromString("false");
-  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, filenames);
 
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().size(), 3);
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 1);
@@ -284,7 +283,7 @@ TEST(SampleGroupHandler, processMergeInjections)
   sampleGroupHandler = sequenceHandler.getSampleGroups().front();
   mergeinjs_params.at("MergeInjections").at(0).setValueFromString("Max");
   mergeinjs_params.at("MergeInjections").at(6).setValueFromString("true");
-  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, filenames);
 
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().size(), 3);
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
@@ -301,7 +300,7 @@ TEST(SampleGroupHandler, processMergeInjections)
   makeSequence(sequenceHandler, true);
   sampleGroupHandler = sequenceHandler.getSampleGroups().front();
   mergeinjs_params.at("MergeInjections").at(0).setValueFromString("Min");
-  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, filenames);
 
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().size(), 3);
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
@@ -318,7 +317,7 @@ TEST(SampleGroupHandler, processMergeInjections)
   makeSequence(sequenceHandler, true);
   sampleGroupHandler = sequenceHandler.getSampleGroups().front();
   mergeinjs_params.at("MergeInjections").at(0).setValueFromString("Sum");
-  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, filenames);
 
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().size(), 3);
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
@@ -335,7 +334,7 @@ TEST(SampleGroupHandler, processMergeInjections)
   makeSequence(sequenceHandler, true);
   sampleGroupHandler = sequenceHandler.getSampleGroups().front();
   mergeinjs_params.at("MergeInjections").at(0).setValueFromString("Mean");
-  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, filenames);
 
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().size(), 3);
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
@@ -352,7 +351,7 @@ TEST(SampleGroupHandler, processMergeInjections)
   makeSequence(sequenceHandler, true);
   sampleGroupHandler = sequenceHandler.getSampleGroups().front();
   mergeinjs_params.at("MergeInjections").at(0).setValueFromString("WeightedMean");
-  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, Filenames());
+  sampleGroupProcessor.process(sampleGroupHandler, sequenceHandler, mergeinjs_params, filenames);
 
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().size(), 3);
   EXPECT_EQ(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 2);
@@ -385,8 +384,6 @@ TEST(LoadFeaturesSampleGroup, destructorLoadFeaturesSampleGroup)
 TEST(LoadFeaturesSampleGroup, gettersLoadFeaturesSampleGroup)
 {
   LoadFeaturesSampleGroup processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "LOAD_FEATURES_SAMPLE_GROUP");
 }
 
@@ -434,8 +431,6 @@ TEST(StoreFeaturesSampleGroup, destructorStoreFeaturesSampleGroup)
 TEST(StoreFeaturesSampleGroup, gettersStoreFeaturesSampleGroup)
 {
   StoreFeaturesSampleGroup processor;
-
-  EXPECT_EQ(processor.getID(), -1);
   EXPECT_EQ(processor.getName(), "STORE_FEATURES_SAMPLE_GROUP");
 }
 
@@ -514,7 +509,7 @@ TEST(SelectDilutionsParser, process_preferred)
   SampleGroupHandler sampleGroupHandler = sequenceHandler.getSampleGroups().front();
 
   Filenames filenames;
-  filenames.setFullPath("selectDilutions_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectDilutions.csv"));
+  filenames.setFullPath("selectDilutions", SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectDilutions.csv"));
   SelectDilutions select_dilutions;
   select_dilutions.process(sampleGroupHandler, sequenceHandler, select_dilutions_params, filenames);
 
@@ -621,7 +616,7 @@ TEST(SelectDilutionsParser, process_exclusive)
   ParameterSet params_exclusive(params_struct);
 
   Filenames filenames;
-  filenames.setFullPath("selectDilutions_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectDilutions.csv"));
+  filenames.setFullPath("selectDilutions", SMARTPEAK_GET_TEST_DATA_PATH("SampleGroupProcessor_selectDilutions.csv"));
   sampleGroupHandler.getFeatureMap().clear();
   SelectDilutions select_dilutions;
   select_dilutions.process(sampleGroupHandler, sequenceHandler, params_exclusive, filenames);

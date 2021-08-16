@@ -602,14 +602,20 @@ namespace SmartPeak
   {
     LOGI << "Loading: " << filenames.getFullPath(id).generic_string();
 
-    if (filenames.getFullPath(id).empty()) {
-      LOGE << "Filename is empty";
-      return false;
-    }
+    const auto& full_path = filenames.getFullPath(id);
+    const bool is_embedded = filenames.isEmbedded(id);
 
-    if (!InputDataValidation::fileExists(filenames.getFullPath(id))) {
-      LOGE << "File not found";
-      return false;
+    if (!is_embedded)
+    {
+      if (full_path.empty()) {
+        LOGE << "Filename is empty";
+        return false;
+      }
+
+      if (!InputDataValidation::fileExists(full_path)) {
+        LOGE << "File not found " << full_path.generic_string();
+        return false;
+      }
     }
 
     return true;
@@ -622,48 +628,61 @@ namespace SmartPeak
       << " and " <<
       filenames.getFullPath(id2).generic_string();
 
-    if (filenames.getFullPath(id1).empty() &&
-      filenames.getFullPath(id2).empty()) {
+    const auto& full_path_1 = filenames.getFullPath(id1);
+    const auto& full_path_2 = filenames.getFullPath(id2);
+    const bool is_embedded_1 = filenames.isEmbedded(id1);
+    const bool is_embedded_2 = filenames.isEmbedded(id2);
+
+    if (full_path_1.empty() && (!is_embedded_1) &&
+        full_path_2.empty() && (!is_embedded_2)) {
       LOGE << "Filenames are both empty";
       return false;
     }
 
-    if (!filenames.getFullPath(id1).empty() &&
-      !InputDataValidation::fileExists(filenames.getFullPath(id1))) {
-      LOGE << "File not found: " << filenames.getFullPath(id1).generic_string();
+    if (!is_embedded_1 && !full_path_1.empty() &&
+      !InputDataValidation::fileExists(full_path_1)) {
+      LOGE << "File not found: " << full_path_1.generic_string();
       return false;
     }
 
-    if (!filenames.getFullPath(id2).empty() &&
-      !InputDataValidation::fileExists(filenames.getFullPath(id2))) {
-      LOGE << "File not found: " << filenames.getFullPath(id2).generic_string();
+    if (!is_embedded_2 && !full_path_2.empty() &&
+      !InputDataValidation::fileExists(full_path_2)) {
+      LOGE << "File not found: " << full_path_2.generic_string();
       return false;
     }
 
     return true;
   }
 
-  bool InputDataValidation::prepareToStore(const Filenames& filenames, const std::string& id)
+  bool InputDataValidation::prepareToStore(const Filenames& filenames, const std::string& file_id)
   {
-    LOGI << "Storing: " << filenames.getFullPath(id).generic_string();
+    const auto full_path = filenames.getFullPath(file_id);
 
-    if (filenames.getFullPath(id).empty()) {
+    LOGI << "Storing: " << full_path.generic_string();
+
+    if (full_path.empty()) {
       LOGE << "Filename is empty";
       return false;
     }
 
+    if (filenames.isSaved(file_id))
+    {
+      LOGI << "Filename is up to date";
+      return false;
+    }
+
     return true;
   }
 
-  bool InputDataValidation::prepareToStoreOneOfTwo(const Filenames& filenames, const std::string& id1, const std::string& id2)
+  bool InputDataValidation::prepareToStoreOneOfTwo(const Filenames& filenames, const std::string& file_id1, const std::string& file_id2)
   {
     LOGI << "Storing: " << 
-      filenames.getFullPath(id1).generic_string()
+      filenames.getFullPath(file_id1).generic_string()
       << " and " <<
-      filenames.getFullPath(id2).generic_string();
+      filenames.getFullPath(file_id2).generic_string();
 
-    if (filenames.getFullPath(id1).empty() &&
-      filenames.getFullPath(id2).empty()) {
+    if (filenames.getFullPath(file_id1).empty() &&
+      filenames.getFullPath(file_id2).empty()) {
       LOGE << "Filenames are both empty";
       return false;
     }

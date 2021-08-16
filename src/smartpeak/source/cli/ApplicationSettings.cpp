@@ -35,7 +35,7 @@ namespace cli {
 
 void ApplicationSettings::define_options()
 {
-    m_parser.set_required<std::string>("l", "load-session", "The path to sequence.csv file");
+    m_parser.set_required<std::string>("l", "load-session", "The path to session file, or a directory with structured file organization (prefer session file)");
     m_parser.set_optional<std::vector<std::string>>("r", "report", std::vector<std::string>{ "FeatureDB", "PivotTable" }, 
         "Specify a report type to export.");
     m_parser.set_optional<std::vector<std::string>>("rt", "report-sample-types", std::vector<std::string>{ "ALL" }, 

@@ -30,7 +30,7 @@ namespace SmartPeak
 {
   void AboutWidget::draw()
   {
-    if (ImGui::BeginPopupModal("About", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    if (ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_AlwaysAutoResize))
     {
       ImGui::Text("Fast, accurate, and automated processing of CE-, GC- and LC-MS(/MS) and HPLC data.");
       ImGui::Text("SmartPeak %s", Utilities::getSmartPeakVersion().c_str());

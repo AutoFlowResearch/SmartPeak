@@ -29,11 +29,6 @@ namespace SmartPeak
   struct IProcessorDescription 
   {
     /**
-      Get the processor struct ID
-    */
-    virtual int getID() const = 0;
-
-    /**
       Get the processor struct name
     */
     virtual std::string getName() const = 0;
@@ -47,6 +42,11 @@ namespace SmartPeak
       Get the Schema (possible, default parameters) of the processor.
     */
     virtual ParameterSet getParameterSchema() const = 0;
+
+    /**
+      Returns the list of file ids that has to be defined prior to be process.
+    */
+    virtual std::vector<std::string> getRequirements() const = 0;
 
     virtual ~IProcessorDescription() = default;
   };

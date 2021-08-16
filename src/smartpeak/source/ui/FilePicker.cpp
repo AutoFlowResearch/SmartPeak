@@ -27,6 +27,7 @@
 #include <future>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <misc/cpp/imgui_stdlib.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
@@ -35,7 +36,7 @@ namespace SmartPeak
   {
     if (!files_scanned_)
     {
-      pathname_content_ = Utilities::getFolderContents(current_pathname_);
+      pathname_content_ = Utilities::getFolderContents(current_pathname_, (mode_ == Mode::EDirectory));
       Im_directory_entries.resize(pathname_content_[0].size(), ImEntry());
       for (int row = 0; row < pathname_content_[0].size(); row++)
       {
@@ -52,12 +53,9 @@ namespace SmartPeak
 
   void FilePicker::draw()
   {
-    if (!ImGui::BeginPopupModal("Pick a pathname", NULL, ImGuiWindowFlags_NoResize)) {
+    if (!ImGui::BeginPopupModal(title_.c_str(), NULL, ImGuiWindowFlags_NoResize)) {
       return;
     }
-
-    static int selected_entry = -1;
-    static char selected_filename[256] = {0};
 
     if (ImGui::Button("Up"))
     {
@@ -65,9 +63,12 @@ namespace SmartPeak
       if (parent.string().size()) {
         current_pathname_ = parent;
       }
-      pathname_content_ = Utilities::getFolderContents(current_pathname_);
+      pathname_content_ = Utilities::getFolderContents(current_pathname_, (mode_ == Mode::EDirectory));
       files_scanned_ = false;
-      memset(selected_filename, 0, sizeof selected_filename);
+      if (mode_ != Mode::EFileCreate)
+      {
+        selected_filename_.clear();
+      }
       selected_entry = -1;
     }
     ImGui::SameLine();
@@ -86,8 +87,11 @@ namespace SmartPeak
       if (ImGui::Button("Set") || ImGui::IsKeyPressedMap(ImGuiKey_Enter))
       {
         current_pathname_.assign(new_pathname);
-        pathname_content_ = Utilities::getFolderContents(current_pathname_);
-        memset(selected_filename, 0, sizeof selected_filename);
+        pathname_content_ = Utilities::getFolderContents(current_pathname_, (mode_ == Mode::EDirectory));
+        if (mode_ != Mode::EFileCreate)
+        {
+          selected_filename_.clear();
+        }
         files_scanned_ = false;
         selected_entry = -1;
         ImGui::CloseCurrentPopup();
@@ -100,7 +104,9 @@ namespace SmartPeak
       ImGui::EndPopup();
     }
 
-    static ImGuiTextFilter filter;
+    static bool show_confirmation_popup = false;
+    drawConfirmationPopup();
+
     filter.Draw("Filter filename (inc,-exc)");
 
     // File type filter
@@ -109,21 +115,21 @@ namespace SmartPeak
     ImGui::Combo("File type", &selected_extension, extensions, IM_ARRAYSIZE(extensions));
 
     ImGui::BeginChild("Content", ImVec2(1024, 400));
-    
+
     const int column_count = 4;
     const char* column_names[column_count] = { "Name", "Size", "Type", "Date Modified" };
     static ImGuiTableColumnFlags column_flags[column_count] = {
       ImGuiTableColumnFlags_DefaultSort | ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide,
       ImGuiTableColumnFlags_NoHide, ImGuiTableColumnFlags_NoHide
     };
-    
+
     static ImGuiTableFlags table_flags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable |
-        ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti | ImGuiTableFlags_NoBordersInBody;
-    
+      ImGuiTableFlags_NoSavedSettings | ImGuiTableFlags_Sortable | ImGuiTableFlags_SortMulti | ImGuiTableFlags_NoBordersInBody;
+
     static std::vector<ImEntry> Im_directory_entries;
     static ImVector<int> selection;
     updateContents(Im_directory_entries);
-    
+
     ImVec2 size = ImVec2(0, ImGui::GetTextLineHeightWithSpacing() * 2);
     if (ImGui::BeginTable("FileBrowser", column_count, table_flags, size))
     {
@@ -132,35 +138,34 @@ namespace SmartPeak
       }
       ImGui::TableSetupScrollFreeze(column_count, 1);
       ImGui::TableHeadersRow();
-      
+
       if (ImGuiTableSortSpecs* sorts_specs = ImGui::TableGetSortSpecs())
       {
         if (sorts_specs->SpecsDirty)
         {
           ImEntry::s_current_sort_specs = sorts_specs;
           if (Im_directory_entries.size() > 1)
-              qsort(&Im_directory_entries[0], (size_t)Im_directory_entries.size(), sizeof(Im_directory_entries[0]), ImEntry::CompareWithSortSpecs);
+            qsort(&Im_directory_entries[0], (size_t)Im_directory_entries.size(), sizeof(Im_directory_entries[0]), ImEntry::CompareWithSortSpecs);
           ImEntry::s_current_sort_specs = NULL;
           sorts_specs->SpecsDirty = false;
-          memset(selected_filename, 0, sizeof selected_filename);
           selected_entry = -1;
         }
       }
 
       const ImGuiWindowFlags selectable_flags = ImGuiSelectableFlags_SpanAllColumns | ImGuiSelectableFlags_AllowDoubleClick;
-      
+
       for (int row = 0; row < pathname_content_[0].size(); row++)
       {
         if (!filter.PassFilter(pathname_content_[0][row].c_str()))
         {
           continue; // continue if it does not pass the filter
         }
-        
+
         if (selected_extension > 0 && !Utilities::endsWith(pathname_content_[0][row], "." + std::string(extensions[selected_extension]), false))
         {
           continue; // continue if the file type is not desired
         }
-                
+
         ImGui::TableNextRow();
         for (int column = 0; column < column_count; column++)
         {
@@ -168,17 +173,25 @@ namespace SmartPeak
           Utilities::makeHumanReadable(item);
           char text_buffer[256];
           std::snprintf(text_buffer, sizeof text_buffer, "%s", item.entry_contents[column].c_str());
-          
+
           const bool is_selected = (selected_entry == row);
           ImGui::TableSetColumnIndex(column);
           if (ImGui::Selectable(text_buffer, is_selected, selectable_flags))
           {
             selected_entry = row;
-            std::strcpy(selected_filename, Im_directory_entries[selected_entry].entry_contents[0].c_str());
-            if (ImGui::IsMouseDoubleClicked(0) && !std::strcmp(item.entry_contents[2].c_str() , "Directory"))
+            bool is_dir = !std::strcmp(item.entry_contents[2].c_str(), "Directory");
+            if ((is_dir && (mode_ == Mode::EDirectory)) ||
+              (!is_dir && (mode_ != Mode::EDirectory)))
+            {
+              selected_filename_ = Im_directory_entries[selected_entry].entry_contents[0];
+            }
+            if (ImGui::IsMouseDoubleClicked(0) && is_dir)
             {
               current_pathname_ /= item.entry_contents[0].c_str();
-              memset(selected_filename, 0, sizeof selected_filename);
+              if (mode_ != Mode::EFileCreate)
+              {
+                selected_filename_.clear();
+              }
               files_scanned_ = false;
               updateContents(Im_directory_entries);
               filter.Clear();
@@ -196,14 +209,14 @@ namespace SmartPeak
                 }
                 picked_pathname_.append(item.entry_contents[0].c_str());
               }
-              filter.Clear();
-              LOGI << "Picked file : " << picked_pathname_;
-              runProcessor();
-              clearProcessor();
-              selected_entry = -1;
-              memset(selected_filename, 0, sizeof selected_filename);
-              visible_ = false;
-              ImGui::CloseCurrentPopup();
+              if ((mode_ == Mode::EFileCreate) && (std::filesystem::exists(picked_pathname_)))
+              {
+                show_confirmation_popup = true;
+              }
+              else
+              {
+                doOpenFile();
+              }
             }
           }
         }
@@ -214,27 +227,26 @@ namespace SmartPeak
     ImGui::Separator();
 
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.9f);
-    ImGui::InputTextWithHint("", "File name", selected_filename, IM_ARRAYSIZE(selected_filename));
+    ImGui::InputTextWithHint("", "File name", &selected_filename_);
     ImGui::PopItemWidth();
 
     ImGui::SameLine();
     ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x * 0.5f);
-    if (ImGui::Button( set_button_to_save_ ? "Save" : "Open"))
+    if (ImGui::Button(open_button_text_.c_str()))
     {
-      picked_pathname_ = current_pathname_.string();
-      if (picked_pathname_.back() != '/')
+      picked_pathname_ = current_pathname_.string();      if (picked_pathname_.back() != '/')
       {
         picked_pathname_.append("/");
       }
-      picked_pathname_.append(selected_filename);
-      filter.Clear();
-      LOGI << "Picked pathname: " << picked_pathname_;
-      runProcessor();
-      clearProcessor();
-      selected_entry = -1;
-      visible_ = false;
-      memset(selected_filename, 0, sizeof selected_filename);
-      ImGui::CloseCurrentPopup();
+      picked_pathname_.append(selected_filename_);
+      if ((mode_ == Mode::EFileCreate) && (std::filesystem::exists(picked_pathname_)))
+      {
+        show_confirmation_popup = true;
+      }
+      else
+      {
+        doOpenFile();
+      }
     }
     ImGui::PopItemWidth();
 
@@ -249,7 +261,45 @@ namespace SmartPeak
     }
     ImGui::PopItemWidth();
 
+    if (show_confirmation_popup)
+    {
+      ImGui::OpenPopup("Overwrite confirmation");
+      show_confirmation_popup = false;
+    }
+
     ImGui::EndPopup();
+  }
+
+  void FilePicker::drawConfirmationPopup()
+  {
+    if (ImGui::BeginPopupModal("Overwrite confirmation", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+      ImGui::Text("Overwrite file:");
+      ImGui::Text(picked_pathname_.c_str());
+      ImGui::SameLine();
+      ImGui::Text("?");
+      ImGui::Separator();
+      if (ImGui::Button("Ok"))
+      {
+        try
+        {
+          std::filesystem::remove(picked_pathname_);
+        }
+        catch (const std::exception& e)
+        {
+          LOGE << e.what();
+          // let's continue ...
+        }
+        doOpenFile();
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::SameLine();
+      if (ImGui::Button("Cancel"))
+      {
+        ImGui::CloseCurrentPopup();
+      }
+      ImGui::EndPopup();
+    }
   }
 
   std::string FilePicker::getPickedPathname() const
@@ -257,13 +307,38 @@ namespace SmartPeak
     return picked_pathname_;
   }
 
-  void FilePicker::setFilePickerHandler(std::shared_ptr<IFilePickerHandler> file_picker_handler, ApplicationHandler& application_handler)
+  void FilePicker::open(const std::string& title, 
+                        std::shared_ptr<IFilePickerHandler> file_picker_handler,
+                        FilePicker::Mode mode,
+                        ApplicationHandler& application_handler,
+                        const std::string& default_file_name)
   {
     LOGD << "Setting processor: " << (file_picker_handler.get());
+    title_ = title;
     file_picker_handler_ = file_picker_handler;
     application_handler_ = &application_handler;
     error_loading_file_ = false;
+    mode_ = mode;
     file_was_loaded_ = false;
+    visible_ = true;
+    selected_filename_ = default_file_name;
+    files_scanned_ = false;
+    switch (mode)
+    {
+    case SmartPeak::FilePicker::Mode::EFileRead:
+      open_button_text_ = "Open";
+      break;
+    case SmartPeak::FilePicker::Mode::EFileCreate:
+      open_button_text_ = "Save";
+      break;
+    case SmartPeak::FilePicker::Mode::EDirectory:
+      open_button_text_ = "Select";
+      break;
+    default:
+      open_button_text_ = "Open";
+      break;
+    }
+    ImGui::OpenPopup(title_.c_str());
   }
 
   void FilePicker::runProcessor()
@@ -310,5 +385,49 @@ namespace SmartPeak
     }
 
     loading_is_done = true;    
+  }
+
+  void FilePicker::doOpenFile()
+  {
+    filter.Clear();
+    LOGI << "Picked file : " << picked_pathname_;
+    if (isReadyToOpen(picked_pathname_))
+    {
+      runProcessor();
+    }
+    else
+    {
+      LOGE << "Invalid File selection: " << picked_pathname_;
+    }
+    clearProcessor();
+    selected_entry = -1;
+    if (mode_ != Mode::EFileCreate)
+    {
+      selected_filename_.clear();
+    }
+    visible_ = false;
+    ImGui::CloseCurrentPopup();
+  }
+
+  bool FilePicker::isReadyToOpen(const std::string& full_path)
+  {
+    bool ready_to_open = false;
+    switch (mode_)
+    {
+    case Mode::EFileCreate:
+      ready_to_open = (!std::filesystem::is_directory(full_path));
+      break;
+    case Mode::EFileRead:
+      ready_to_open = (std::filesystem::is_regular_file(full_path) && std::filesystem::exists(full_path));
+      break;
+    case Mode::EDirectory:
+      ready_to_open = std::filesystem::is_directory(full_path);
+      break;
+    default:
+      // should not happen
+      LOGE << "Mode not supported";
+      break;
+    }
+    return ready_to_open;
   }
 }

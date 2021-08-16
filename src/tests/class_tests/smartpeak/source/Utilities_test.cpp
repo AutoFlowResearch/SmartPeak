@@ -447,7 +447,7 @@ TEST(utilities, endsWith)
 TEST(utilities, getFolderContents)
 {
   const std::string pathname = SMARTPEAK_GET_TEST_DATA_PATH("");
-  const std::array<std::vector<std::string>, 4> c = Utilities::getFolderContents(pathname);
+  const std::array<std::vector<std::string>, 4> c = Utilities::getFolderContents(pathname, false);
 
   // number of items in the pathname, taking .gitignore into account
   EXPECT_EQ(c[0].size(), nb_files_in_data_directory);

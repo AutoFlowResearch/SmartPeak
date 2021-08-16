@@ -21,6 +21,8 @@
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/core/SampleType.h>
 #include <SmartPeak/core/SequenceHandler.h>
@@ -31,13 +33,12 @@ using namespace SmartPeak;
 
 void example_HPLC_UV_Standards(
   const std::string& dir_I,
-  const Filenames& filenames_I,
+  Filenames& filenames_I,
   const std::string& delimiter_I = ","
 )
 {
-  SequenceHandler sequenceHandler;
-
-  CreateSequence cs(sequenceHandler);
+  ApplicationHandler application_handler;
+  LoadSession cs(application_handler);
   cs.filenames_        = filenames_I;
   cs.delimiter        = delimiter_I;
   cs.checkConsistency = true;
@@ -61,7 +62,7 @@ void example_HPLC_UV_Standards(
   methods_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, dir_I + "/features/");
   methods_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, dir_I + "/features/");
   std::map<std::string, Filenames> dynamic_filenames1;
-  for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+  for (const InjectionHandler& injection : application_handler.sequenceHandler_.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames1[key] = methods_filenames;
     dynamic_filenames1[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
@@ -71,10 +72,10 @@ void example_HPLC_UV_Standards(
     dynamic_filenames1[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
-  ProcessSequence ps(sequenceHandler);
+  ProcessSequence ps(application_handler.sequenceHandler_);
   ps.filenames_                     = dynamic_filenames1;
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
-  ps.process();
+  ps.process(methods_filenames);
 
   const std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods = {
     std::make_shared<CalculateCalibration>(),
@@ -82,17 +83,17 @@ void example_HPLC_UV_Standards(
   };
 
   std::map<std::string, Filenames> dynamic_filenames2;
-  for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
+  for (const SequenceSegmentHandler& sequence_segment : application_handler.sequenceHandler_.getSequenceSegments()) {
     const std::string& key = sequence_segment.getSequenceSegmentName();
     dynamic_filenames2[key] = methods_filenames;
     dynamic_filenames2[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
     dynamic_filenames2[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
   }
 
-  ProcessSequenceSegments pss(sequenceHandler);
+  ProcessSequenceSegments pss(application_handler.sequenceHandler_);
   pss.filenames_                             = dynamic_filenames2;
   pss.sequence_segment_processing_methods_ = sequence_segment_processing_methods;
-  pss.process();
+  pss.process(methods_filenames);
 
   raw_data_processing_methods = {
     std::make_shared<QuantifyFeatures>(),
@@ -101,7 +102,7 @@ void example_HPLC_UV_Standards(
   };
 
   std::map<std::string, Filenames> dynamic_filenames3;
-  for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+  for (const InjectionHandler& injection : application_handler.sequenceHandler_.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames3[key] = methods_filenames;
     dynamic_filenames3[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
@@ -113,22 +114,22 @@ void example_HPLC_UV_Standards(
 
   ps.filenames_                     = dynamic_filenames3;
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
-  ps.process();
+  ps.process(methods_filenames);
 
   Filenames filenames = filenames_I;
-  filenames.setFullPath("pivotTable_csv_o", dir_I + "/PivotTable.csv");
-  filenames.setFullPath("featureDB_csv_o", dir_I + "/FeatureDB.csv");
+  filenames.setFullPath("pivotTable", dir_I + "/PivotTable.csv");
+  filenames.setFullPath("featureDB", dir_I + "/FeatureDB.csv");
 
   SequenceParser::writeDataMatrixFromMetaValue(
-    sequenceHandler,
-    filenames.getFullPath("pivotTable_csv_o"),
+    application_handler.sequenceHandler_,
+    filenames.getFullPath("pivotTable"),
     {FeatureMetadata::calculated_concentration},
     {SampleType::Standard}
   );
 
   SequenceParser::writeDataTableFromMetaValue(
-    sequenceHandler,
-    filenames.getFullPath("featureDB_csv_o"),
+    application_handler.sequenceHandler_,
+    filenames.getFullPath("featureDB"),
     {
       FeatureMetadata::peak_apex_intensity,
       FeatureMetadata::total_width,

@@ -21,6 +21,8 @@
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 
@@ -28,13 +30,12 @@ using namespace SmartPeak;
 
 void example_FIAMS_FullScan_Unknowns(
   const std::string& dir_I,
-  const Filenames& filenames_I,
+  Filenames& filenames_I,
   const std::string& delimiter_I = ","
 )
 {
-  SequenceHandler sequenceHandler;
-
-  CreateSequence cs(sequenceHandler);
+  ApplicationHandler application_handler;
+  LoadSession cs(application_handler);
   cs.filenames_        = filenames_I;
   cs.delimiter        = delimiter_I;
   cs.checkConsistency = true;
@@ -57,7 +58,7 @@ void example_FIAMS_FullScan_Unknowns(
   methods_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, dir_I + "/features/");
 
   std::map<std::string, Filenames> dynamic_filenames;
-  for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
+  for (const InjectionHandler& injection : application_handler.sequenceHandler_.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
     dynamic_filenames[key] = methods_filenames;
     dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
@@ -67,8 +68,8 @@ void example_FIAMS_FullScan_Unknowns(
     dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
-  ProcessSequence ps(sequenceHandler);
+  ProcessSequence ps(application_handler.sequenceHandler_);
   ps.filenames_                     = dynamic_filenames;
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
-  ps.process();
+  ps.process(methods_filenames);
 }

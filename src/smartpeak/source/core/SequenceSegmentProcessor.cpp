@@ -28,6 +28,7 @@
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/FeatureFiltersUtils.h>
 #include <OpenMS/ANALYSIS/QUANTITATION/AbsoluteQuantitation.h>
 #include <OpenMS/METADATA/AbsoluteQuantitationStandards.h>
 #include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureFilter.h>
@@ -64,11 +65,11 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START optimizeCalibrationCurves";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
     std::vector<size_t> standards_indices;
     // get all standards
@@ -163,7 +164,7 @@ namespace SmartPeak
       return false;
     }
     Filenames filenames;
-    filenames.setFullPath("quantitationMethods_csv_i", filename);
+    filenames.setFullPath("quantitationMethods", filename);
     for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
       sequence_segment_observable_ = &(application_handler->sequenceHandler_);
       process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
@@ -173,28 +174,64 @@ namespace SmartPeak
 
   void LoadStandardsConcentrations::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("standardsConcentrations_csv_i", "${MAIN_DIR}/standardsConcentrations.csv");
+    filenames.addFileName("standardsConcentrations", "${MAIN_DIR}/standardsConcentrations.csv", "Standards Concentrations", true, true);
   };
 
   void LoadStandardsConcentrations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START loadStandardsConcentrations";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames, "standardsConcentrations_csv_i"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "standardsConcentrations"))
     {
       LOGD << "END " << getName();
       return;
     }
 
-    try {
-      OpenMS::AbsoluteQuantitationStandardsFile AQSf;
-      AQSf.load(filenames.getFullPath("standardsConcentrations_csv_i").generic_string(), sequenceSegmentHandler_IO.getStandardsConcentrations());
+    try
+    {
+      if (filenames_I.isEmbedded("standardsConcentrations"))
+      {
+        auto db_context = filenames_I.getSessionDB().beginRead(
+          "standardsConcentrations",
+          "sample_name",
+          "component_name",
+          "IS_component_name",
+          "actual_concentration",
+          "IS_actual_concentration",
+          "concentration_units",
+          "dilution_factor"
+        );
+        if (!db_context)
+        {
+          return;
+        }
+        OpenMS::AbsoluteQuantitationStandards::runConcentration run_concentration;
+        while (filenames_I.getSessionDB().read(
+          *db_context,
+          run_concentration.sample_name,
+          run_concentration.component_name,
+          run_concentration.IS_component_name,
+          run_concentration.actual_concentration,
+          run_concentration.IS_actual_concentration,
+          run_concentration.concentration_units,
+          run_concentration.dilution_factor
+        ))
+        {
+          sequenceSegmentHandler_IO.getStandardsConcentrations().push_back(run_concentration);
+        }
+        filenames_I.getSessionDB().endRead(*db_context);
+      }
+      else
+      {
+        OpenMS::AbsoluteQuantitationStandardsFile AQSf;
+        AQSf.load(filenames_I.getFullPath("standardsConcentrations").generic_string(), sequenceSegmentHandler_IO.getStandardsConcentrations());
+      }
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -205,6 +242,93 @@ namespace SmartPeak
     LOGD << "END loadStandardsConcentrations";
   }
 
+  ParameterSet StoreStandardsConcentrations::getParameterSchema() const
+  {
+    return ParameterSet();
+  }
+
+  bool StoreStandardsConcentrations::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    filenames.setFullPath("quantitationMethods", filename);
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
+  void StoreStandardsConcentrations::getFilenames(Filenames& filenames) const
+  {
+    filenames.addFileName("standardsConcentrations", "${MAIN_DIR}/standardsConcentrations.csv", "Standards Concentrations", true, true);
+  };
+
+  void StoreStandardsConcentrations::process(
+    SequenceSegmentHandler& sequenceSegmentHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    Filenames& filenames_I
+  ) const
+  {
+    LOGD << "START StoreStandardsConcentrations";
+
+    try
+    {
+      if (!InputDataValidation::prepareToStore(filenames_I, "standardsConcentrations"))
+      {
+        LOGD << "END " << getName();
+        return;
+      }
+      if (filenames_I.isEmbedded("standardsConcentrations"))
+      {
+        auto db_context = filenames_I.getSessionDB().beginWrite(
+          "standardsConcentrations",
+          "sample_name", "TEXT",
+          "component_name", "TEXT",
+          "IS_component_name", "TEXT",
+          "actual_concentration", "REAL",
+          "IS_actual_concentration", "REAL",
+          "concentration_units", "TEXT",
+          "dilution_factor", "REAL"
+          );
+        if (!db_context)
+        {
+          return;
+        }
+        for (const auto& concentration : sequenceSegmentHandler_IO.getStandardsConcentrations())
+        {
+          filenames_I.getSessionDB().write(
+            *db_context,
+            concentration.sample_name,
+            concentration.component_name,
+            concentration.IS_component_name,
+            concentration.actual_concentration,
+            concentration.IS_actual_concentration,
+            concentration.concentration_units,
+            concentration.dilution_factor
+            );
+        }
+        filenames_I.getSessionDB().endWrite(*db_context);
+      }
+      else
+      {
+        // TODO
+      }
+      filenames_I.setSavedState("standardsConcentrations", true);
+    }
+    catch (const std::exception& e)
+    {
+      LOGE << e.what();
+    }
+
+    LOGD << "END StoreStandardsConcentrations";
+  }
+
   ParameterSet LoadQuantitationMethods::getParameterSchema() const
   {
     return ParameterSet();
@@ -212,7 +336,7 @@ namespace SmartPeak
 
   void LoadQuantitationMethods::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("quantitationMethods_csv_i", "${MAIN_DIR}/quantitationMethods.csv");
+    filenames.addFileName("quantitationMethods", "${MAIN_DIR}/quantitationMethods.csv", "Quantitation Methods");
   };
 
   bool LoadQuantitationMethods::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -223,7 +347,7 @@ namespace SmartPeak
       return false;
     }
     Filenames filenames;
-    filenames.setFullPath("quantitationMethods_csv_i", filename);
+    filenames.setFullPath("quantitationMethods", filename);
     for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
       sequence_segment_observable_ = &(application_handler->sequenceHandler_);
       process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
@@ -235,13 +359,13 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START loadQuantitationMethods";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToLoad(filenames, "quantitationMethods_csv_i"))
+    if (!InputDataValidation::prepareToLoad(filenames_I, "quantitationMethods"))
     {
       LOGD << "END " << getName();
       return;
@@ -249,7 +373,7 @@ namespace SmartPeak
 
     try {
       OpenMS::AbsoluteQuantitationMethodFile AQMf;
-      AQMf.load(filenames.getFullPath("quantitationMethods_csv_i").generic_string(), sequenceSegmentHandler_IO.getQuantitationMethods());
+      AQMf.load(filenames_I.getFullPath("quantitationMethods").generic_string(), sequenceSegmentHandler_IO.getQuantitationMethods());
       if (sequence_segment_observable_) sequence_segment_observable_->notifyQuantitationMethodsUpdated();
     }
     catch (const std::exception& e) {
@@ -267,20 +391,20 @@ namespace SmartPeak
 
   void StoreQuantitationMethods::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("quantitationMethods_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_quantitationMethods.csv");
+    filenames.addFileName("quantitationMethods", "${MAIN_DIR}/quantitationMethods.csv", "Quantitation Methods");
   };
 
   void StoreQuantitationMethods::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START storeQuantitationMethods";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
-    if (!InputDataValidation::prepareToStore(filenames, "quantitationMethods_csv_o"))
+    if (!InputDataValidation::prepareToStore(filenames_I, "quantitationMethods"))
     {
       LOGD << "END " << getName();
       return;
@@ -289,7 +413,7 @@ namespace SmartPeak
     try {
       OpenMS::AbsoluteQuantitationMethodFile aqmf;
       aqmf.store(
-        filenames.getFullPath("quantitationMethods_csv_o").generic_string(),
+        filenames_I.getFullPath("quantitationMethods").generic_string(),
         sequenceSegmentHandler_IO.getQuantitationMethods()
       );
     }
@@ -315,13 +439,13 @@ namespace SmartPeak
     Filenames filenames;
     if (component_group_)
     {
-      filenames.setFullPath("featureFilterComponents_csv_i", "");
-      filenames.setFullPath("featureFilterComponentGroups_csv_i", filename);
+      filenames.setFullPath("featureFilterComponents", "");
+      filenames.setFullPath("featureFilterComponentGroups", filename);
     }
     else
     {
-      filenames.setFullPath("featureFilterComponents_csv_i", filename);
-      filenames.setFullPath("featureFilterComponentGroups_csv_i", "");
+      filenames.setFullPath("featureFilterComponents", filename);
+      filenames.setFullPath("featureFilterComponentGroups", "");
     }
     for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
       sequence_segment_observable_ = &(application_handler->sequenceHandler_);
@@ -332,44 +456,33 @@ namespace SmartPeak
 
   void LoadFeatureFilters::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureFilterComponents_csv_i", "${MAIN_DIR}/featureFilterComponents.csv");
-    filenames.addFileName("featureFilterComponentGroups_csv_i", "${MAIN_DIR}/featureFilterComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureFilterComponentGroups", "${MAIN_DIR}/featureFilterComponentGroups.csv", "Components Group Filters", true, true);
+    }
+    else
+    {
+      filenames.addFileName("featureFilterComponents", "${MAIN_DIR}/featureFilterComponents.csv", "Components Filters", true, true);
+    }
   };
 
   void LoadFeatureFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START loadFeatureFilter";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureFilterComponents_csv_i", "featureFilterComponentGroups_csv_i"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureFilterComponents_csv_i").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.load(filenames.getFullPath("featureFilterComponents_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureFilter(), false);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureFiltersComponentsUpdated();
-      }
-      if (!filenames.getFullPath("featureFilterComponentGroups_csv_i").empty()) {
-        featureQCFile.load(filenames.getFullPath("featureFilterComponentGroups_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureFilter(), true);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureFiltersComponentGroupsUpdated();
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      sequenceSegmentHandler_IO.getFeatureFilter().component_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureFilter().component_group_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureFilter().component_group_pair_qcs.clear();
-      LOGI << "feature filter clear";
-    }
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+      "featureFilterComponents",
+      "featureFilterComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureFilter(),
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureFiltersComponentsUpdated(); },
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureFiltersComponentGroupsUpdated(); }
+    );
     LOGD << "END loadFeatureFilter";
   }
 
@@ -388,13 +501,13 @@ namespace SmartPeak
     Filenames filenames;
     if (component_group_)
     {
-      filenames.setFullPath("featureQCComponents_csv_i", "");
-      filenames.setFullPath("featureQCComponentGroups_csv_i", filename);
+      filenames.setFullPath("featureQCComponents", "");
+      filenames.setFullPath("featureQCComponentGroups", filename);
     }
     else
     {
-      filenames.setFullPath("featureQCComponents_csv_i", filename);
-      filenames.setFullPath("featureQCComponentGroups_csv_i", "");
+      filenames.setFullPath("featureQCComponents", filename);
+      filenames.setFullPath("featureQCComponentGroups", "");
     }
     for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
       sequence_segment_observable_ = &(application_handler->sequenceHandler_);
@@ -405,44 +518,33 @@ namespace SmartPeak
 
   void LoadFeatureQCs::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureQCComponents_csv_i", "${MAIN_DIR}/featureQCComponents.csv");
-    filenames.addFileName("featureQCComponentGroups_csv_i", "${MAIN_DIR}/featureQCComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureQCComponentGroups", "${MAIN_DIR}/featureQCComponentGroups.csv", "Components Group QCs", true, true);
+    }
+    else
+    {
+      filenames.addFileName("featureQCComponents", "${MAIN_DIR}/featureQCComponents.csv", "Components QCs", true, true);
+    }
   };
 
   void LoadFeatureQCs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START loadFeatureQC";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureQCComponents_csv_i", "featureQCComponentGroups_csv_i"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureQCComponents_csv_i").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.load(filenames.getFullPath("featureQCComponents_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureQC(), false);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureQCComponentsUpdated();
-      }
-      if (!filenames.getFullPath("featureQCComponentGroups_csv_i").empty()) {
-        featureQCFile.load(filenames.getFullPath("featureQCComponentGroups_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureQC(), true);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureQCComponentGroupsUpdated();
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      sequenceSegmentHandler_IO.getFeatureQC().component_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureQC().component_group_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureQC().component_group_pair_qcs.clear();
-      LOGI << "Feature qc clear";
-    }
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+      "featureQCComponents",
+      "featureQCComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureQC(),
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureQCComponentsUpdated(); },
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureQCComponentGroupsUpdated(); }
+    );
     LOGD << "END loadFeatureQC";
   }
 
@@ -451,42 +553,57 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  bool StoreFeatureFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.setFullPath("featureFilterComponents", "");
+      filenames.setFullPath("featureFilterComponentGroups", filename);
+    }
+    else
+    {
+      filenames.setFullPath("featureFilterComponents", filename);
+      filenames.setFullPath("featureFilterComponentGroups", "");
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
   void StoreFeatureFilters::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureFilterComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureFilterComponents.csv");
-    filenames.addFileName("featureFilterComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureFilterComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureFilterComponentGroups", "${MAIN_DIR}/featureFilterComponentGroups.csv", "Components Group Filters", true, true);
+    }
+    else
+    {
+      filenames.addFileName("featureFilterComponents", "${MAIN_DIR}/featureFilterComponents.csv", "Components Filters", true, true);
+    }
   };
 
   void StoreFeatureFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START storeFeatureFilter";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureFilterComponents_csv_o", "featureFilterComponentGroups_csv_o"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureFilterComponents_csv_o").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.getFullPath("featureFilterComponents_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureFilter(), false);
-      }
-      if (!filenames.getFullPath("featureFilterComponentGroups_csv_o").empty()) {
-        featureQCFile.store(filenames.getFullPath("featureFilterComponentGroups_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureFilter(), true);
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      LOGI << "feature filter store exception";
-    }
-
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::storeFeatureFiltersInDB(
+      "featureFilterComponents",
+      "featureFilterComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureFilter());
     LOGD << "END storeFeatureFilter";
   }
 
@@ -495,42 +612,57 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  bool StoreFeatureQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.setFullPath("featureQCComponents", "");
+      filenames.setFullPath("featureQCComponentGroups", filename);
+    }
+    else
+    {
+      filenames.setFullPath("featureQCComponents", filename);
+      filenames.setFullPath("featureQCComponentGroups", "");
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
   void StoreFeatureQCs::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureQCComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureQCComponents.csv");
-    filenames.addFileName("featureQCComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureQCComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureQCComponentGroups", "${MAIN_DIR}/featureQCComponentGroups.csv", "Components Group QC", true, true);
+    }
+    else
+    {
+      filenames.addFileName("featureQCComponents", "${MAIN_DIR}/featureQCComponents.csv", "Components QC", true, true);
+    }
   };
 
   void StoreFeatureQCs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START storeFeatureQC";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureQCComponents_csv_o", "featureQCComponentGroups_csv_o"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureQCComponents_csv_o").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.getFullPath("featureQCComponents_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureQC(), false);
-      }
-      if (!filenames.getFullPath("featureQCComponentGroups_csv_o").empty()) {
-        featureQCFile.store(filenames.getFullPath("featureQCComponentGroups_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureQC(), true);
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      LOGI << "Feature qc store exception";
-    }
-
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::storeFeatureFiltersInDB(
+      "featureQCComponents",
+      "featureQCComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureQC());
     LOGD << "END storeFeatureQC";
   }
 
@@ -541,8 +673,22 @@ namespace SmartPeak
 
   void LoadFeatureRSDFilters::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDFilterComponents_csv_i", "${MAIN_DIR}/featureRSDFilterComponents.csv");
-    filenames.addFileName("featureRSDFilterComponentGroups_csv_i", "${MAIN_DIR}/featureRSDFilterComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureRSDFilterComponentGroups", 
+                            "${MAIN_DIR}/featureRSDFilterComponentGroups.csv",
+                            "Components group %RSD Filters",
+                            true,
+                            true);
+    }
+    else
+    {
+      filenames.addFileName("featureRSDFilterComponents",
+                            "${MAIN_DIR}/featureRSDFilterComponents.csv",
+                            "Components %RSD Filters",
+                            true,
+                            true);
+    }
   };
 
   bool LoadFeatureRSDFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -555,13 +701,13 @@ namespace SmartPeak
     Filenames filenames;
     if (component_group_)
     {
-      filenames.setFullPath("featureRSDFilterComponents_csv_i", "");
-      filenames.setFullPath("featureRSDFilterComponentGroups_csv_i", filename);
+      filenames.setFullPath("featureRSDFilterComponents", "");
+      filenames.setFullPath("featureRSDFilterComponentGroups", filename);
     }
     else
     {
-      filenames.setFullPath("featureRSDFilterComponents_csv_i", filename);
-      filenames.setFullPath("featureRSDFilterComponentGroups_csv_i", "");
+      filenames.setFullPath("featureRSDFilterComponents", filename);
+      filenames.setFullPath("featureRSDFilterComponentGroups", "");
     }
     for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
       sequence_segment_observable_ = &(application_handler->sequenceHandler_);
@@ -574,43 +720,19 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START loadFeatureRSDFilter";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureRSDFilterComponents_csv_i", "featureRSDFilterComponentGroups_csv_i"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    if (!filenames.getFullPath("featureRSDFilterComponentGroups_csv_i").empty() &&
-      !InputDataValidation::fileExists(filenames.getFullPath("featureRSDFilterComponentGroups_csv_i"))) {
-      LOGE << "File not found: " << filenames.getFullPath("featureRSDFilterComponentGroups_csv_i").generic_string();
-      LOGD << "END loadFeatureRSDFilter";
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureRSDFilterComponents_csv_i").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.load(filenames.getFullPath("featureRSDFilterComponents_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDFilter(), false);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDFilterComponentsUpdated();
-      }
-      if (!filenames.getFullPath("featureRSDFilterComponentGroups_csv_i").empty()) {
-        featureQCFile.load(filenames.getFullPath("featureRSDFilterComponentGroups_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDFilter(), true);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDFilterComponentGroupsUpdated();
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      sequenceSegmentHandler_IO.getFeatureRSDFilter().component_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureRSDFilter().component_group_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureRSDFilter().component_group_pair_qcs.clear();
-      LOGI << "feature filter clear";
-    }
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+      "featureRSDFilterComponents",
+      "featureRSDFilterComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureRSDFilter(),
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDFilterComponentsUpdated(); },
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDFilterComponentGroupsUpdated(); }
+    );
     LOGD << "END loadFeatureRSDFilter";
   }
 
@@ -621,8 +743,22 @@ namespace SmartPeak
 
   void LoadFeatureRSDQCs::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDQCComponents_csv_i", "${MAIN_DIR}/featureRSDQCComponents.csv");
-    filenames.addFileName("featureRSDQCComponentGroups_csv_i", "${MAIN_DIR}/featureRSDQCComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureRSDQCComponentGroups",
+                            "${MAIN_DIR}/featureRSDQCComponentGroups.csv",
+                            "Components Group %RSD QCs",
+                            true,
+                            true);
+    }
+    else
+    {
+      filenames.addFileName("featureRSDQCComponents",
+                            "${MAIN_DIR}/featureRSDQCComponents.csv",
+                            "Components %RSD QCs",
+                            true,
+                            true);
+    }
   };
 
   bool LoadFeatureRSDQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -635,13 +771,13 @@ namespace SmartPeak
     Filenames filenames;
     if (component_group_)
     {
-      filenames.setFullPath("featureRSDQCComponents_csv_i", "");
-      filenames.setFullPath("featureRSDQCComponentGroups_csv_i", filename);
+      filenames.setFullPath("featureRSDQCComponents", "");
+      filenames.setFullPath("featureRSDQCComponentGroups", filename);
     }
     else
     {
-      filenames.setFullPath("featureRSDQCComponents_csv_i", filename);
-      filenames.setFullPath("featureRSDQCComponentGroups_csv_i", "");
+      filenames.setFullPath("featureRSDQCComponents", filename);
+      filenames.setFullPath("featureRSDQCComponentGroups", "");
     }
     for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
       sequence_segment_observable_ = &(application_handler->sequenceHandler_);
@@ -654,36 +790,19 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START loadFeatureRSDQC";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureRSDQCComponents_csv_i", "featureRSDQCComponentGroups_csv_i"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureRSDQCComponents_csv_i").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.load(filenames.getFullPath("featureRSDQCComponents_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDQC(), false);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDQCComponentsUpdated();
-      }
-      if (!filenames.getFullPath("featureRSDQCComponentGroups_csv_i").empty()) {
-        featureQCFile.load(filenames.getFullPath("featureRSDQCComponentGroups_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDQC(), true);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDQCComponentGroupsUpdated();
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      sequenceSegmentHandler_IO.getFeatureRSDQC().component_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureRSDQC().component_group_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureRSDQC().component_group_pair_qcs.clear();
-      LOGI << "Feature qc clear";
-    }
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+      "featureRSDQCComponents",
+      "featureRSDQCComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureRSDQC(),
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDQCComponentsUpdated(); },
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureRSDQCComponentGroupsUpdated(); }
+    );
     LOGD << "END loadFeatureRSDQC";
   }
 
@@ -692,42 +811,61 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  bool StoreFeatureRSDFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.setFullPath("featureRSDFilterComponents", "");
+      filenames.setFullPath("featureRSDFilterComponentGroups", filename);
+    }
+    else
+    {
+      filenames.setFullPath("featureRSDFilterComponents", filename);
+      filenames.setFullPath("featureRSDFilterComponentGroups", "");
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
   void StoreFeatureRSDFilters::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDFilterComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDFilterComponents.csv");
-    filenames.addFileName("featureRSDFilterComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDFilterComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureRSDFilterComponentGroups",
+                            "${MAIN_DIR}/featureRSDFilterComponentGroups.csv",
+                            "Components group %RSD Filters");
+    }
+    else
+    {
+      filenames.addFileName("featureRSDFilterComponents",
+                            "${MAIN_DIR}/featureRSDFilterComponents.csv",
+                            "Components %RSD Filters");
+    }
   };
 
   void StoreFeatureRSDFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START storeFeatureRSDFilter";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureRSDFilterComponents_csv_o", "featureRSDFilterComponentGroups_csv_o"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureRSDFilterComponents_csv_o").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.getFullPath("featureRSDFilterComponents_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDFilter(), false);
-      }
-      if (!filenames.getFullPath("featureRSDFilterComponentGroups_csv_o").empty()) {
-        featureQCFile.store(filenames.getFullPath("featureRSDFilterComponentGroups_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDFilter(), true);
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      LOGI << "feature filter store exception";
-    }
-
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::storeFeatureFiltersInDB(
+      "featureRSDFilterComponents",
+      "featureRSDFilterComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureRSDFilter());
     LOGD << "END storeFeatureRSDFilter";
   }
 
@@ -736,42 +874,61 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  bool StoreFeatureRSDQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.setFullPath("featureRSDQCComponents", "");
+      filenames.setFullPath("featureRSDQCComponentGroups", filename);
+    }
+    else
+    {
+      filenames.setFullPath("featureRSDQCComponents", filename);
+      filenames.setFullPath("featureRSDQCComponentGroups", "");
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
   void StoreFeatureRSDQCs::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDQCComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDQCComponents.csv");
-    filenames.addFileName("featureRSDQCComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDQCComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureRSDQCComponentGroups",
+                            "${MAIN_DIR}/featureRSDQCComponentGroups.csv",
+                            "Components Group %RSD QCs");
+    }
+    else
+    {
+      filenames.addFileName("featureRSDQCComponents",
+                            "${MAIN_DIR}/featureRSDQCComponents.csv",
+                            "Components %RSD QCs");
+    }
   };
 
   void StoreFeatureRSDQCs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START storeFeatureRSDQC";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureRSDQCComponents_csv_o", "featureRSDQCComponentGroups_csv_o"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureRSDQCComponents_csv_o").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.getFullPath("featureRSDQCComponents_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDQC(), false);
-      }
-      if (!filenames.getFullPath("featureRSDQCComponentGroups_csv_o").empty()) {
-        featureQCFile.store(filenames.getFullPath("featureRSDQCComponentGroups_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDQC(), true);
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      LOGI << "Feature qc store exception";
-    }
-
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::storeFeatureFiltersInDB(
+      "featureRSDQCComponents",
+      "featureRSDQCComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureRSDQC());
     LOGD << "END storeFeatureRSDQC";
   }
 
@@ -782,8 +939,22 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundFilters::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundFilterComponents_csv_i", "${MAIN_DIR}/featureBackgroundFilterComponents.csv");
-    filenames.addFileName("featureBackgroundFilterComponentGroups_csv_i", "${MAIN_DIR}/featureBackgroundFilterComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureBackgroundFilterComponentGroups", 
+        "${MAIN_DIR}/featureBackgroundFilterComponentGroups.csv", 
+        "Components Group % Background Filters",
+        true,
+        true);
+    }
+    else
+    {
+      filenames.addFileName("featureBackgroundFilterComponents", 
+        "${MAIN_DIR}/featureBackgroundFilterComponents.csv", 
+        "Components % Background Filters",
+        true,
+        true);
+    }
   };
 
   bool LoadFeatureBackgroundFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -796,13 +967,13 @@ namespace SmartPeak
     Filenames filenames;
     if (component_group_)
     {
-      filenames.setFullPath("featureBackgroundFilterComponents_csv_i", "");
-      filenames.setFullPath("featureBackgroundFilterComponentGroups_csv_i", filename);
+      filenames.setFullPath("featureBackgroundFilterComponents", "");
+      filenames.setFullPath("featureBackgroundFilterComponentGroups", filename);
     }
     else
     {
-      filenames.setFullPath("featureBackgroundFilterComponents_csv_i", filename);
-      filenames.setFullPath("featureBackgroundFilterComponentGroups_csv_i", "");
+      filenames.setFullPath("featureBackgroundFilterComponents", filename);
+      filenames.setFullPath("featureBackgroundFilterComponentGroups", "");
     }
     for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
       sequence_segment_observable_ = &(application_handler->sequenceHandler_);
@@ -815,36 +986,19 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START loadFeatureBackgroundFilter";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureBackgroundFilterComponents_csv_i", "featureBackgroundFilterComponentGroups_csv_i"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureBackgroundFilterComponents_csv_i").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.load(filenames.getFullPath("featureBackgroundFilterComponents_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundFilter(), false);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundFilterComponentsUpdated();
-      }
-      if (!filenames.getFullPath("featureBackgroundFilterComponentGroups_csv_i").empty()) {
-        featureQCFile.load(filenames.getFullPath("featureBackgroundFilterComponentGroups_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundFilter(), true);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundFilterComponentGroupsUpdated();
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      sequenceSegmentHandler_IO.getFeatureBackgroundFilter().component_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureBackgroundFilter().component_group_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureBackgroundFilter().component_group_pair_qcs.clear();
-      LOGI << "feature filter clear";
-    }
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+      "featureBackgroundFilterComponents",
+      "featureBackgroundFilterComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureBackgroundFilter(),
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundFilterComponentsUpdated(); },
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundFilterComponentGroupsUpdated(); }
+    );
     LOGD << "END loadFeatureBackgroundFilter";
   }
 
@@ -855,8 +1009,22 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundQCs::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundQCComponents_csv_i", "${MAIN_DIR}/featureBackgroundQCComponents.csv");
-    filenames.addFileName("featureBackgroundQCComponentGroups_csv_i", "${MAIN_DIR}/featureBackgroundQCComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureBackgroundQCComponentGroups",
+                            "${MAIN_DIR}/featureBackgroundQCComponentGroups.csv",
+                            "Components Group %Background QCs",
+                            true,
+                            true);
+    }
+    else
+    {
+      filenames.addFileName("featureBackgroundQCComponents",
+                            "${MAIN_DIR}/featureBackgroundQCComponents.csv",
+                            "Components % Background QCs",
+                            true,
+                            true);
+    }
   };
 
   bool LoadFeatureBackgroundQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -869,13 +1037,13 @@ namespace SmartPeak
     Filenames filenames;
     if (component_group_)
     {
-      filenames.setFullPath("featureBackgroundQCComponents_csv_i", "");
-      filenames.setFullPath("featureBackgroundQCComponentGroups_csv_i", filename);
+      filenames.setFullPath("featureBackgroundQCComponents", "");
+      filenames.setFullPath("featureBackgroundQCComponentGroups", filename);
     }
     else
     {
-      filenames.setFullPath("featureBackgroundQCComponents_csv_i", filename);
-      filenames.setFullPath("featureBackgroundQCComponentGroups_csv_i", "");
+      filenames.setFullPath("featureBackgroundQCComponents", filename);
+      filenames.setFullPath("featureBackgroundQCComponentGroups", "");
     }
     for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
       sequence_segment_observable_ = &(application_handler->sequenceHandler_);
@@ -888,36 +1056,19 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START loadFeatureBackgroundQC";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureBackgroundQCComponents_csv_i", "featureBackgroundQCComponentGroups_csv_i"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureBackgroundQCComponents_csv_i").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.load(filenames.getFullPath("featureBackgroundQCComponents_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundQC(), false);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundQCComponentsUpdated();
-      }
-      if (!filenames.getFullPath("featureBackgroundQCComponentGroups_csv_i").empty()) {
-        featureQCFile.load(filenames.getFullPath("featureBackgroundQCComponentGroups_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundQC(), true);
-        if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundQCComponentGroupsUpdated();
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      sequenceSegmentHandler_IO.getFeatureBackgroundQC().component_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureBackgroundQC().component_group_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureBackgroundQC().component_group_pair_qcs.clear();
-      LOGI << "Feature qc clear";
-    }
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+      "featureBackgroundQCComponents",
+      "featureBackgroundQCComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureBackgroundQC(),
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundQCComponentsUpdated(); },
+      [&]() { if (sequence_segment_observable_) sequence_segment_observable_->notifyFeatureBackgroundQCComponentGroupsUpdated(); }
+    );
     LOGD << "END loadFeatureBackgroundQC";
   }
 
@@ -926,42 +1077,61 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  bool StoreFeatureBackgroundFilters::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.setFullPath("featureBackgroundFilterComponents", "");
+      filenames.setFullPath("featureBackgroundFilterComponentGroups", filename);
+    }
+    else
+    {
+      filenames.setFullPath("featureBackgroundFilterComponents", filename);
+      filenames.setFullPath("featureBackgroundFilterComponentGroups", "");
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
   void StoreFeatureBackgroundFilters::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundFilterComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundFilterComponents.csv");
-    filenames.addFileName("featureBackgroundFilterComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundFilterComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureBackgroundFilterComponentGroups",
+                            "${MAIN_DIR}/featureBackgroundFilterComponentGroups.csv",
+                            "Components Group % Background Filters");
+    }
+    else
+    {
+      filenames.addFileName("featureBackgroundFilterComponents",
+                            "${MAIN_DIR}/featureBackgroundFilterComponents.csv",
+                            "Components % Background Filters");
+    }
   };
 
   void StoreFeatureBackgroundFilters::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START storeFeatureBackgroundFilter";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureBackgroundFilterComponents_csv_o", "featureBackgroundFilterComponentGroups_csv_o"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureBackgroundFilterComponents_csv_o").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.getFullPath("featureBackgroundFilterComponents_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundFilter(), false);
-      }
-      if (!filenames.getFullPath("featureBackgroundFilterComponentGroups_csv_o").empty()) {
-        featureQCFile.store(filenames.getFullPath("featureBackgroundFilterComponentGroups_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundFilter(), true);
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      LOGI << "feature filter store exception";
-    }
-
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::storeFeatureFiltersInDB(
+      "featureBackgroundFilterComponents",
+      "featureBackgroundFilterComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureBackgroundFilter());
     LOGD << "END storeFeatureBackgroundFilter";
   }
 
@@ -970,42 +1140,61 @@ namespace SmartPeak
     return ParameterSet();
   }
 
+  bool StoreFeatureBackgroundQCs::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.setFullPath("featureBackgroundQCComponents", "");
+      filenames.setFullPath("featureBackgroundQCComponentGroups", filename);
+    }
+    else
+    {
+      filenames.setFullPath("featureBackgroundQCComponents", filename);
+      filenames.setFullPath("featureBackgroundQCComponentGroups", "");
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
+  }
+
   void StoreFeatureBackgroundQCs::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundQCComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundQCComponents.csv");
-    filenames.addFileName("featureBackgroundQCComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundQCComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureBackgroundQCComponentGroups",
+                            "${MAIN_DIR}/featureBackgroundQCComponentGroups.csv",
+                            "Components Group %Background QCs");
+    }
+    else
+    {
+      filenames.addFileName("featureBackgroundQCComponents",
+                            "${MAIN_DIR}/featureBackgroundQCComponents.csv",
+                            "Components %Background QCs");
+    }
   };
 
   void StoreFeatureBackgroundQCs::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START storeFeatureBackgroundQC";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureBackgroundQCComponents_csv_o", "featureBackgroundQCComponentGroups_csv_o"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureBackgroundQCComponents_csv_o").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.getFullPath("featureBackgroundQCComponents_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundQC(), false);
-      }
-      if (!filenames.getFullPath("featureBackgroundQCComponentGroups_csv_o").empty()) {
-        featureQCFile.store(filenames.getFullPath("featureBackgroundQCComponentGroups_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundQC(), true);
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      LOGI << "Feature qc store exception";
-    }
-
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::storeFeatureFiltersInDB(
+      "featureBackgroundQCComponents",
+      "featureBackgroundQCComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureBackgroundQC());
     LOGD << "END storeFeatureBackgroundQC";
   }
 
@@ -1018,11 +1207,11 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START estimateFeatureFilterValues";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
     std::vector<size_t> standards_indices, qcs_indices;
 
@@ -1078,11 +1267,11 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START estimateFeatureQCValues";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
     std::vector<size_t> standards_indices, qcs_indices;
 
@@ -1138,11 +1327,11 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START TransferLOQToFeatureFilters";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
     // check if there are any quantitation methods
     if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
@@ -1169,11 +1358,11 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START TransferLOQToFeatureQCs";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
     // check if there are any quantitation methods
     if (sequenceSegmentHandler_IO.getQuantitationMethods().empty()) {
@@ -1200,11 +1389,11 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START EstimateFeatureRSDs";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
     // get all QCs
     std::vector<size_t> qcs_indices;
@@ -1248,11 +1437,11 @@ namespace SmartPeak
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START EstimateFeatureBackgroundInterferences";
-    Filenames filenames = prepareFilenames(filenames_I);
+    getFilenames(filenames_I);
 
     // get all Blanks
     std::vector<size_t> blanks_indices;
@@ -1296,44 +1485,67 @@ namespace SmartPeak
 
   void LoadFeatureRSDEstimations::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDEstimationComponents_csv_i", "${MAIN_DIR}/featureRSDEstimationComponents.csv");
-    filenames.addFileName("featureRSDEstimationComponentGroups_csv_i", "${MAIN_DIR}/featureRSDEstimationComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureRSDEstimationComponentGroups",
+        "${MAIN_DIR}/featureRSDEstimationComponentGroups.csv",
+        "Feature RSD Estimation Component Groups",
+        true,
+        true);
+    }
+    else
+    {
+      filenames.addFileName("featureRSDEstimationComponents",
+        "${MAIN_DIR}/featureRSDEstimationComponents.csv",
+        "Feature RSD Estimation Component",
+        true,
+        true);
+    }
   };
 
   void LoadFeatureRSDEstimations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START loadFeatureRSDEstimation";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureRSDEstimationComponents_csv_i", "featureRSDEstimationComponentGroups_csv_i"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureRSDEstimationComponents_csv_i").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.load(filenames.getFullPath("featureRSDEstimationComponents_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDEstimations(), false);
-      }
-      if (!filenames.getFullPath("featureRSDEstimationComponentGroups_csv_i").empty()) {
-        featureQCFile.load(filenames.getFullPath("featureRSDEstimationComponentGroups_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDEstimations(), true);
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      sequenceSegmentHandler_IO.getFeatureRSDEstimations().component_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureRSDEstimations().component_group_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureRSDEstimations().component_group_pair_qcs.clear();
-      LOGI << "feature filter clear";
-    }
-
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+      "featureRSDEstimationComponents",
+      "featureRSDEstimationComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureRSDEstimations(),
+      nullptr,
+      nullptr
+    );
     LOGD << "END loadFeatureRSDEstimation";
+  }
+
+  bool StoreFeatureRSDEstimations::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.setFullPath("featureRSDEstimationComponents", "");
+      filenames.setFullPath("featureRSDEstimationComponentGroups", filename);
+    }
+    else
+    {
+      filenames.setFullPath("featureRSDEstimationComponents", filename);
+      filenames.setFullPath("featureRSDEstimationComponentGroups", "");
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
   }
 
   ParameterSet StoreFeatureRSDEstimations::getParameterSchema() const
@@ -1343,40 +1555,38 @@ namespace SmartPeak
 
   void StoreFeatureRSDEstimations::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureRSDEstimationComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDEstimationComponents.csv");
-    filenames.addFileName("featureRSDEstimationComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureRSDEstimationComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureRSDEstimationComponentGroups",
+        "${MAIN_DIR}/featureRSDEstimationComponentGroups.csv",
+        "Feature RSD Estimation Component Groups",
+        true,
+        true);
+    }
+    else
+    {
+      filenames.addFileName("featureRSDEstimationComponents",
+        "${MAIN_DIR}/featureRSDEstimationComponents.csv",
+        "Feature RSD Estimation Component",
+        true,
+        true);
+    }
   };
 
   void StoreFeatureRSDEstimations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START storeFeatureRSDEstimation";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureRSDEstimationComponents_csv_o", "featureRSDEstimationComponentGroups_csv_o"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureRSDEstimationComponents_csv_o").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.getFullPath("featureRSDEstimationComponents_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDEstimations(), false);
-      }
-      if (!filenames.getFullPath("featureRSDEstimationComponentGroups_csv_o").empty()) {
-        featureQCFile.store(filenames.getFullPath("featureRSDEstimationComponentGroups_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureRSDEstimations(), true);
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      LOGI << "feature filter store exception";
-    }
-
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::storeFeatureFiltersInDB(
+      "featureRSDEstimationComponents",
+      "featureRSDEstimationComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureRSDEstimations());
     LOGD << "END storeFeatureRSDEstimation";
   }
 
@@ -1387,44 +1597,69 @@ namespace SmartPeak
 
   void LoadFeatureBackgroundEstimations::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundEstimationComponents_csv_i", "${MAIN_DIR}/featureBackgroundEstimationComponents.csv");
-    filenames.addFileName("featureBackgroundEstimationComponentGroups_csv_i", "${MAIN_DIR}/featureBackgroundEstimationComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureBackgroundEstimationComponentGroups",
+        "${MAIN_DIR}/featureBackgroundEstimationComponentGroups.csv",
+        "Feature Background Estimation Groups",
+        true,
+        true
+      );
+    }
+    else
+    {
+      filenames.addFileName("featureBackgroundEstimationComponents",
+        "${MAIN_DIR}/featureBackgroundEstimationComponents.csv",
+        "Feature Background Estimation",
+        true,
+        true
+      );
+    }
   };
 
   void LoadFeatureBackgroundEstimations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START loadFeatureBackgroundEstimation";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToLoadOneOfTwo(filenames, "featureBackgroundEstimationComponents_csv_i", "featureBackgroundEstimationComponentGroups_csv_i"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureBackgroundEstimationComponents_csv_i").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.load(filenames.getFullPath("featureBackgroundEstimationComponents_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(), false);
-      }
-      if (!filenames.getFullPath("featureBackgroundEstimationComponentGroups_csv_i").empty()) {
-        featureQCFile.load(filenames.getFullPath("featureBackgroundEstimationComponentGroups_csv_i").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(), true);
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      sequenceSegmentHandler_IO.getFeatureBackgroundEstimations().component_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureBackgroundEstimations().component_group_qcs.clear();
-      sequenceSegmentHandler_IO.getFeatureBackgroundEstimations().component_group_pair_qcs.clear();
-      LOGI << "feature filter clear";
-    }
-
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::loadFeatureFiltersFromDB(
+      "featureBackgroundEstimationComponents",
+      "featureBackgroundEstimationComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(),
+      nullptr,
+      nullptr
+    );
     LOGD << "END loadFeatureBackgroundEstimation";
+  }
+
+  bool StoreFeatureBackgroundEstimations::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
+  {
+    if (application_handler->sequenceHandler_.getSequence().size() == 0)
+    {
+      LOGE << "File cannot be loaded without first loading the sequence.";
+      return false;
+    }
+    Filenames filenames;
+    if (component_group_)
+    {
+      filenames.setFullPath("featureBackgroundEstimationComponents", "");
+      filenames.setFullPath("featureBackgroundEstimationComponentGroups", filename);
+    }
+    else
+    {
+      filenames.setFullPath("featureBackgroundEstimationComponents", filename);
+      filenames.setFullPath("featureBackgroundEstimationComponentGroups", "");
+    }
+    for (SequenceSegmentHandler& sequenceSegmentHandler : application_handler->sequenceHandler_.getSequenceSegments()) {
+      sequence_segment_observable_ = &(application_handler->sequenceHandler_);
+      process(sequenceSegmentHandler, SequenceHandler(), {}, filenames);
+    }
+    return true;
   }
 
   ParameterSet StoreFeatureBackgroundEstimations::getParameterSchema() const
@@ -1434,40 +1669,40 @@ namespace SmartPeak
 
   void StoreFeatureBackgroundEstimations::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("featureBackgroundEstimationComponents_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundEstimationComponents.csv");
-    filenames.addFileName("featureBackgroundEstimationComponentGroups_csv_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_featureBackgroundEstimationComponentGroups.csv");
+    if (component_group_)
+    {
+      filenames.addFileName("featureBackgroundEstimationComponentGroups",
+        "${MAIN_DIR}/featureBackgroundEstimationComponentGroups.csv",
+        "Feature Background Estimation Groups",
+        true,
+        true
+      );
+    }
+    else
+    {
+      filenames.addFileName("featureBackgroundEstimationComponents",
+        "${MAIN_DIR}/featureBackgroundEstimationComponents.csv",
+        "Feature Background Estimation",
+        true,
+        true
+        );
+    }
   };
 
   void StoreFeatureBackgroundEstimations::process(
     SequenceSegmentHandler& sequenceSegmentHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames_I
+    Filenames& filenames_I
   ) const
   {
     LOGD << "START storeFeatureBackgroundEstimation";
-    Filenames filenames = prepareFilenames(filenames_I);
-
-    if (!InputDataValidation::prepareToStoreOneOfTwo(filenames, "featureBackgroundEstimationComponents_csv_o", "featureBackgroundEstimationComponentGroups_csv_o"))
-    {
-      LOGD << "END " << getName();
-      return;
-    }
-
-    try {
-      OpenMS::MRMFeatureQCFile featureQCFile;
-      if (!filenames.getFullPath("featureBackgroundEstimationComponents_csv_o").empty()) { // because we don't know if either of the two names is empty
-        featureQCFile.store(filenames.getFullPath("featureBackgroundEstimationComponents_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(), false);
-      }
-      if (!filenames.getFullPath("featureBackgroundEstimationComponentGroups_csv_o").empty()) {
-        featureQCFile.store(filenames.getFullPath("featureBackgroundEstimationComponentGroups_csv_o").generic_string(), sequenceSegmentHandler_IO.getFeatureBackgroundEstimations(), true);
-      }
-    }
-    catch (const std::exception& e) {
-      LOGE << e.what();
-      LOGI << "feature filter store exception";
-    }
-
+    getFilenames(filenames_I);
+    FeatureFiltersUtils::storeFeatureFiltersInDB(
+      "featureBackgroundEstimationComponents",
+      "featureBackgroundEstimationComponentGroups",
+      filenames_I,
+      sequenceSegmentHandler_IO.getFeatureBackgroundEstimations());
     LOGD << "END storeFeatureBackgroundEstimation";
   }
 }

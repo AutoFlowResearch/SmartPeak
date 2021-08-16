@@ -88,6 +88,7 @@ struct ApplicationSettings {
 public:
     /* options */
     std::string load_session;
+    std::string load_session_from_dir;
     std::vector<std::string> report;
     std::vector<std::string> report_sample_types;
     std::vector<std::string> report_metadata;

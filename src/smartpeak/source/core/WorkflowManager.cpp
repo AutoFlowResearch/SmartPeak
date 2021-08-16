@@ -129,4 +129,38 @@ namespace SmartPeak {
     // update the status for this workflow, to be used from the main thread (gui, client)
     source_app_handler = std::move(application_handler_);
   }
+
+  std::set<std::string> WorkflowManager::getRequirements(
+    ApplicationHandler& source_app_handler,
+    const std::vector<ApplicationHandler::Command>& commands) const
+  {
+    std::set<std::string> requirements;
+    for (const auto& command : commands)
+    {
+      const IProcessorDescription* processor_description = nullptr;
+      switch (command.type)
+      {
+      case ApplicationHandler::Command::RawDataMethod:
+        processor_description = command.raw_data_method.get();
+        break;
+      case ApplicationHandler::Command::SampleGroupMethod:
+        processor_description = command.sample_group_method.get();
+        break;
+      case ApplicationHandler::Command::SequenceSegmentMethod:
+        processor_description = command.seq_seg_method.get();
+        break;
+      default:
+        break;
+      }
+      if (processor_description)
+      {
+        const auto processor_required = processor_description->getRequirements();
+        for (const auto& req_file_id : processor_required)
+        {
+          requirements.insert(req_file_id);
+        }
+      }
+    }
+    return requirements;
+  }
 }

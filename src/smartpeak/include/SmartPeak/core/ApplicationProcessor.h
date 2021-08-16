@@ -30,7 +30,6 @@
 #include <SmartPeak/iface/ISequenceSegmentProcessorObserver.h>
 #include <SmartPeak/iface/ISampleGroupProcessorObserver.h>
 #include <SmartPeak/core/ApplicationProcessorObservable.h>
-#include <SmartPeak/io/InputDataValidation.h>
 #include <string>
 #include <vector>
 
@@ -41,14 +40,14 @@ namespace SmartPeak
     ApplicationProcessor& operator=(const ApplicationProcessor& other) = delete;
     virtual ~ApplicationProcessor() = default;
 
-    // Each of the derived classes implement the following virtual methods
     virtual bool process() = 0;
 
     /* IProcessorDescription */
-    int getID() const override { return -1; }
-    std::string getDescription() const override { return ""; }
-    ParameterSet getParameterSchema() const override { return ParameterSet(); };
+    virtual std::string getDescription() const override { return ""; }
+    virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
+    virtual std::vector<std::string> getRequirements() const override { return {}; };
 
+  protected:
     ApplicationHandler& application_handler_;
 
   protected:
@@ -83,6 +82,70 @@ namespace SmartPeak
     std::vector<std::string> names_;
     std::vector<ApplicationHandler::Command> commands_;
     std::string getName() const override { return "BuildCommandsFromNames"; };
+  };
+
+  struct LoadSession : ApplicationProcessor, IFilePickerHandler
+  {
+    /* IFilePickerHandler */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+
+    std::optional<Filenames> filenames_;                            /// Pathnames to load
+    std::string      delimiter = ",";              /// String delimiter of the imported file
+    bool             checkConsistency = true;             /// Check consistency of data contained in files
+
+    LoadSession() = default;
+    explicit LoadSession(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+
+    /* ApplicationProcessor */
+    bool process() override;
+
+    /* IProcessorDescription */
+    std::string getName() const override { return "LOAD_SESSION"; }
+    std::string getDescription() const override { return "Load an existing session"; }
+  };
+
+  struct SaveSession : ApplicationProcessor, IFilePickerHandler
+  {
+    SaveSession() = default;
+    explicit SaveSession(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+
+    /* ApplicationProcessor */
+    bool process() override;
+
+    /* IFilePickerHandler */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+
+    /* IProcessorDescription */
+    std::string getName() const override { return "SAVE_SESSION"; }
+    std::string getDescription() const override { return "Save the session"; }
+  };
+
+  struct LoadFilenames : ApplicationProcessor
+  {
+    LoadFilenames() = default;
+    explicit LoadFilenames(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+
+    /* ApplicationProcessor */
+    bool process() override;
+
+    /* IProcessorDescription */
+    std::string getName() const override { return "LOAD_FILENAMES"; }
+    std::string getDescription() const override { return "Load Filenames from the DB"; }
+
+    static std::optional<Filenames> loadFilenamesFromDB(const std::filesystem::path& path_db);
+  };
+
+  struct StoreFilenames : ApplicationProcessor
+  {
+    StoreFilenames() = default;
+    explicit StoreFilenames(ApplicationHandler& application_handler) : ApplicationProcessor(application_handler) {}
+
+    /* ApplicationProcessor */
+    bool process() override;
+
+    /* IProcessorDescription */
+    std::string getName() const override { return "STORE_FILENAMES"; }
+    std::string getDescription() const override { return "Store Filenames to the DB"; }
   };
 
 }

@@ -17,19 +17,33 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 #pragma once
 
-#include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/iface/IFilePickerHandler.h>
+#include <SmartPeak/ui/SessionFilesWidget.h>
+#include <string>
+#include <memory>
 
+/* 
+* This class will check if a file session popup needs to be done before to load the session
+* (in case of missing files)
+*/
 namespace SmartPeak
 {
-  class AboutWidget final : public Widget
+  struct LoadSessionWizard : IFilePickerHandler
   {
-  public:
-    AboutWidget() : Widget("About") {};
-    void draw() override;
+    LoadSessionWizard(std::shared_ptr<SessionFilesWidget>& session_files_widget_manage) :
+      session_files_widget_manage_(session_files_widget_manage)
+    {};
+
+    /**
+    IFilePickerHandler
+    */
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
+  protected:
+    std::shared_ptr<SessionFilesWidget> session_files_widget_manage_;
   };
 }

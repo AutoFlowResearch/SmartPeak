@@ -24,14 +24,40 @@
 #pragma once
 
 #include <SmartPeak/core/Filenames.h>
+#include <SmartPeak/core/ApplicationHandler.h>
+#include <OpenMS/ANALYSIS/OPENSWATH/MRMFeatureSelector.h>
+#include <OpenMS/FORMAT/MRMFeatureQCFile.h>
 
-namespace SmartPeak 
+#include <string>
+
+#ifndef CSV_IO_NO_THREAD
+#define CSV_IO_NO_THREAD
+#endif
+#include <SmartPeak/io/csv.h>
+#include <plog/Log.h>
+
+namespace SmartPeak
 {
-  struct IFilenamesHandler
+  class FeatureFiltersUtils
   {
-    /**
-     @brief add files handled by the processor to the Filnames instance
-    */
-    virtual void getFilenames(Filenames& filenames) const = 0;
+public:
+    FeatureFiltersUtils()                                      = delete;
+    ~FeatureFiltersUtils()                                     = delete;
+    FeatureFiltersUtils(const FeatureFiltersUtils&)            = delete;
+    FeatureFiltersUtils& operator=(const FeatureFiltersUtils&) = delete;
+    FeatureFiltersUtils(FeatureFiltersUtils&&)                 = delete;
+    FeatureFiltersUtils& operator=(FeatureFiltersUtils&&)      = delete;
+
+    static void storeFeatureFiltersInDB(std::string file_id,
+                                        std::string file_group_id,
+                                        Filenames& filenames,
+                                        const OpenMS::MRMFeatureQC& features_qc);
+
+    static void loadFeatureFiltersFromDB(std::string file_id, 
+                                         std::string file_group_id,
+                                         Filenames& filenames,
+                                         OpenMS::MRMFeatureQC& features_qc,
+                                         std::function<void()> notification,
+                                         std::function<void()> notification_group);
   };
 }

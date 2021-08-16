@@ -8,6 +8,7 @@ set(sources_list_h
 	ParametersParser.h
 	SelectDilutionsParser.h
 	SequenceParser.h
+	SessionDB.h
 	InputDataValidation.h
 )
 

@@ -35,7 +35,24 @@
 
 namespace SmartPeak
 {
-  struct ApplicationHandler final {
+  struct ApplicationHandler final : 
+    public IParametersObserver,
+    public IWorkflowObserver
+  {
+
+  public:
+
+    ApplicationHandler();
+
+    /**
+     IParametersObserver
+    */
+    virtual void onParametersUpdated() override;
+    /**
+     IWorkflowObserver
+    */
+    virtual void onWorkflowUpdated() override;
+
     class Command {
     public:
       enum CommandType {
@@ -44,70 +61,34 @@ namespace SmartPeak
         SampleGroupMethod,
       } type;
 
-      void setMethod(const std::shared_ptr<RawDataProcessor> method)
-      {
-        type = RawDataMethod;
-        raw_data_method = method;
-      }
+      void setMethod(const std::shared_ptr<RawDataProcessor> method);
 
-      void setMethod(const std::shared_ptr<SequenceSegmentProcessor> method)
-      {
-        type = SequenceSegmentMethod;
-        seq_seg_method = method;
-      }
+      void setMethod(const std::shared_ptr<SequenceSegmentProcessor> method);
 
-      void setMethod(const std::shared_ptr<SampleGroupProcessor> method)
-      {
-        type = SampleGroupMethod;
-        sample_group_method = method;
-      }
+      void setMethod(const std::shared_ptr<SampleGroupProcessor> method);
 
-      int getID() const
-      {
-        const auto description = getIProcessorDescription();
-        return (description ? description->getID() : 0);
-      }
+      std::string getName() const;
 
-      std::string getName() const
-      {
-        const auto description = getIProcessorDescription();
-        return (description ? description->getName() : "");
-      }
+      ParameterSet getParameterSchema() const;
 
-      ParameterSet getParameterSchema() const
-      {
-        const auto description = getIProcessorDescription();
-        return (description ? description->getParameterSchema() : ParameterSet());
-      }
+      std::string getDescription() const;
 
-      std::string getDescription() const
-      {
-        const auto description = getIProcessorDescription();
-        return (description ? description->getDescription() : "");
-      }
-
+    public:
       std::shared_ptr<RawDataProcessor> raw_data_method;
       std::shared_ptr<SequenceSegmentProcessor> seq_seg_method;
       std::shared_ptr<SampleGroupProcessor> sample_group_method;
-
       std::map<std::string, Filenames> dynamic_filenames;
 
     private:
-      const IProcessorDescription* getIProcessorDescription() const
-      {
-        switch (type)
-        {
-        case RawDataMethod:
-          return raw_data_method.get();
-        case SequenceSegmentMethod:
-          return seq_seg_method.get();
-        case SampleGroupMethod:
-          return sample_group_method.get();
-        default:
-          throw "Unsupported CommandType in ApplicationHandler::Command::getIProcessorDescription()";
-        }
-      }
+      const IProcessorDescription* getIProcessorDescription() const;
     };
+
+    /**
+    * @brief clear all data in the aapplication handler.
+    */
+    void closeSession();
+    bool sessionIsOpened() const;
+    bool sessionIsSaved() const;
 
     std::filesystem::path sequence_pathname_;
     std::filesystem::path main_dir_                = ".";
@@ -115,6 +96,9 @@ namespace SmartPeak
     std::filesystem::path features_in_dir_;
     std::filesystem::path features_out_dir_;
     SequenceHandler       sequenceHandler_;
+    Filenames             filenames_;
+    std::vector<std::shared_ptr<IFilenamesHandler>> loading_processors_;
+    std::vector<std::shared_ptr<IFilenamesHandler>> storing_processors_;
   };
 
 

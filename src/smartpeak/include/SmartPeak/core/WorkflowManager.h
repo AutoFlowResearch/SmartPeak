@@ -82,6 +82,12 @@ namespace SmartPeak {
     */
     void updateApplicationHandler(ApplicationHandler& source_app_handler);
 
+    /**
+      @brief Returns the list of requirements to run the workflow.
+    */
+    std::set<std::string> getRequirements(ApplicationHandler& source_app_handler,
+                                      const std::vector<ApplicationHandler::Command>& commands) const;
+
   private:
     /**
       Spawns a thread that runs the workflow, and waits for it to finish. The

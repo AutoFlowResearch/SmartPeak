@@ -47,13 +47,11 @@ namespace SmartPeak
   extern bool enable_quick_help;
   /**
     @brief Abstract base class for all panes, windows, and widgets
-
-    TODO: potential refactors
   */
   class Widget
   {
   public:
-    Widget(const std::string title = ""):
+    explicit Widget(std::string title = ""):
       title_(title)
     {};
     virtual ~Widget() = default;
