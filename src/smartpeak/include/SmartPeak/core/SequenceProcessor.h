@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -46,9 +46,26 @@
 namespace SmartPeak
 {
   /**
+    Multithreaded execution processor
+  */
+  class ProcessorMultithread {
+  public:
+    /**
+      Determine the number of workers available based on the maximum available
+      threads and the desired thread count. 1 thread will always be preserved for
+      the GUI unless the maximum number of available threads couldn't be determined
+
+      @param[in] n_threads desired number of threads to use
+    */
+    size_t getNumWorkers(unsigned int n_threads) const;
+    
+    virtual void run_processing() = 0;
+  };
+
+  /**
     Processes injections onto multiple threads of execution
   */
-  class SequenceProcessorMultithread {
+  class SequenceProcessorMultithread : public ProcessorMultithread {
   public:
     SequenceProcessorMultithread(
       std::vector<InjectionHandler>& injections,
@@ -67,15 +84,6 @@ namespace SmartPeak
     void spawn_workers(unsigned int n_threads);
 
     /**
-      Determine the number of workers available based on the maximum available
-      threads and the desired thread count. 1 thread will always be preserved for
-      the GUI unless the maximum number of available threads couldn't be determined
-
-      @param[in] n_threads desired number of threads to use
-    */
-    size_t getNumWorkers(unsigned int n_threads) const;
-
-    /**
       Workers run this function. It implements a loop that runs the following steps:
       - fetch an injection
       - process all methods on it
@@ -85,7 +93,7 @@ namespace SmartPeak
 
       The loop ends when the worker fetches an index that is out of range.
     */
-    void run_injection_processing();
+    void run_processing();
 
   private:
     std::atomic_size_t i_ { 0 }; ///< a worker works on the i_-th injection
@@ -93,6 +101,100 @@ namespace SmartPeak
     const std::map<std::string, Filenames>& filenames_; ///< mapping from injections names to the associated filenames
     const std::vector<std::shared_ptr<RawDataProcessor>>& methods_; ///< methods to run on each injection
     SequenceProcessorObservable* observable_;
+  };
+
+  /**
+    Processes Sequence Segment onto multiple threads of execution
+  */
+  class SequenceSegmentProcessorMultithread : public ProcessorMultithread  {
+  public:
+    SequenceSegmentProcessorMultithread(
+      std::vector<SequenceSegmentHandler>& sequenceSegmentHandler_IO,
+      SequenceHandler& sequenceHandler_I,
+      std::vector<std::shared_ptr<SequenceSegmentProcessor>>& sequence_segment_processing_methods_,
+      std::map<std::string, Filenames>& filenames,
+      SequenceSegmentProcessorObservable* observable = nullptr
+    ) : sequence_segment_(sequenceSegmentHandler_IO),
+        sequenceHandler_IO(sequenceHandler_I),
+        sequence_segment_processing_methods_(sequence_segment_processing_methods_),
+        filenames_(filenames),
+        observable_(observable) {}
+    
+    /**
+      Spawn a number of workers equal to the number of threads of execution
+      offered by the CPU
+
+      @note If the API is unable to fetch the required information, only a
+      single thread will be used
+    */
+    void spawn_workers(unsigned int n_threads);
+
+    /**
+      Workers run this function. It implements a loop that runs the following steps:
+      - fetch sequence segments
+      - process all methods on it
+
+      Workers decide on which sequence segment to work according to an index fetched and
+      incremented atomically (i_).
+
+      The loop ends when the worker fetches an index that is out of range.
+    */
+    void run_processing();
+
+  private:
+    std::atomic_size_t i_ { 0 }; ///< a worker works on the i_-th injection
+    std::map<std::string, Filenames>& filenames_; ///< mapping from injections names to the associated filenames
+    std::vector<SequenceSegmentHandler>& sequence_segment_;
+    SequenceHandler& sequenceHandler_IO;
+    std::vector<std::shared_ptr<SequenceSegmentProcessor>>& sequence_segment_processing_methods_;
+    SequenceSegmentProcessorObservable* observable_;
+  };
+
+  /**
+    Processes Sample Group onto multiple threads of execution
+  */
+  class SampleGroupProcessorMultithread : public ProcessorMultithread  {
+  public:
+    SampleGroupProcessorMultithread(
+      std::vector<SampleGroupHandler>& sequenceSegmentHandler_IO,
+      SequenceHandler& sequenceHandler_I,
+      std::vector<std::shared_ptr<SampleGroupProcessor>>& sample_group_processing_methods,
+      std::map<std::string, Filenames>& filenames,
+      SampleGroupProcessorObservable* observable = nullptr
+    ) : sample_group_(sequenceSegmentHandler_IO),
+        sequenceHandler_IO(sequenceHandler_I),
+        sample_group_processing_methods_(sample_group_processing_methods),
+        filenames_(filenames),
+        observable_(observable) {}
+    
+    /**
+      Spawn a number of workers equal to the number of threads of execution
+      offered by the CPU
+
+      @note If the API is unable to fetch the required information, only a
+      single thread will be used
+    */
+    void spawn_workers(unsigned int n_threads);
+
+    /**
+      Workers run this function. It implements a loop that runs the following steps:
+      - fetch sequence segments
+      - process all methods on it
+
+      Workers decide on which sequence segment to work according to an index fetched and
+      incremented atomically (i_).
+
+      The loop ends when the worker fetches an index that is out of range.
+    */
+    void run_processing();
+
+  private:
+    std::atomic_size_t i_ { 0 }; ///< a worker works on the i_-th injection
+    std::map<std::string, Filenames>& filenames_; ///< mapping from injections names to the associated filenames
+    std::vector<SampleGroupHandler>& sample_group_;
+    SequenceHandler& sequenceHandler_IO;
+    std::vector<std::shared_ptr<SampleGroupProcessor>>& sample_group_processing_methods_;
+    SampleGroupProcessorObservable* observable_;
   };
 
   /**
@@ -107,6 +209,32 @@ namespace SmartPeak
     const Filenames& filenames_I,
     const std::vector<std::shared_ptr<RawDataProcessor>>& methods
   );
+
+  /**
+    Apply a processing workflow to a single sequence segment
+
+    @param[in,out] sequence_segment The injection to process
+    @param[in] SequenceHandler Sequence Segment IO
+    @param[in] filenames Used by the methods
+    @param[in] methods Methods to process on the sequence segment
+  */
+  void processSegment(SequenceSegmentHandler& sequence_segment,
+                      SequenceHandler& sequenceHandler_IO,
+                      const Filenames& filenames,
+                      const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& methods);
+
+  /**
+    Apply a processing workflow to a single sample group
+
+    @param[in,out] sample_group The sample group to process
+    @param[in] SequenceHandler Sequence Segment IO
+    @param[in] filenames Used by the methods
+    @param[in] methods Methods to process on the sample group
+  */
+  void processSampleGroup(SampleGroupHandler& sample_group,
+                          SequenceHandler& sequenceHandler_IO,
+                          const Filenames& filenames,
+                          const std::vector<std::shared_ptr<SampleGroupProcessor>>& methods);
 
   struct SequenceProcessor : IProcessorDescription, IFilenamesHandler {
     explicit SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}

@@ -222,7 +222,7 @@ namespace SmartPeak
           if (p.getName() == "n_thread") {
             try {
               n_threads = std::stoi(p.getValueAsString());
-              LOGI << "n_threads set to " << n_threads;
+              LOGI << "SequenceProcessor::n_threads set to " << n_threads;
             }
             catch (const std::exception& e) {
               LOGE << e.what();
@@ -237,8 +237,7 @@ namespace SmartPeak
       injections,
       filenames_,
       raw_data_processing_methods_,
-      this
-    );
+      this);
     manager.spawn_workers(n_threads);
     notifySequenceProcessorEnd();
   }
@@ -262,37 +261,121 @@ namespace SmartPeak
 
     notifySequenceSegmentProcessorStart(sequence_segments.size());
 
-    // process by sequence segment
-    for (SequenceSegmentHandler& sequence_segment : sequence_segments) {
-
-      // handle user-desired sequence_segment_processing_methods
-      if (!sequence_segment_processing_methods_.size()) {
-        throw "no sequence segment processing methods given.\n";
-      }
-
-      notifySequenceSegmentProcessorSampleStart(sequence_segment.getSequenceSegmentName());
-
-      const size_t n = sequence_segment_processing_methods_.size();
-
-      // process the sequence segment
-      for (size_t i = 0; i < n; ++i) {
-        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sequence segments";
-        sequence_segment_processing_methods_[i]->process(
-          sequence_segment,
-          *sequenceHandler_IO,
-          (*sequenceHandler_IO)
-            .getSequence()
-            .at(sequence_segment.getSampleIndices().front())
-            .getRawData()
-            .getParameters(), // assumption: all parameters are the same for each sample in the sequence segment!
-          filenames_.at(sequence_segment.getSequenceSegmentName())
-        );
-      }
-      notifySequenceSegmentProcessorSampleEnd(sequence_segment.getSequenceSegmentName());
+    // handle user-desired sequence_segment_processing_methods
+    if (!sequence_segment_processing_methods_.size()) {
+      throw "no sequence segment processing methods given.\n";
     }
 
+    SequenceSegmentProcessorMultithread manager(
+      sequence_segments,
+      (*sequenceHandler_IO),
+      sequence_segment_processing_methods_,
+      filenames_,
+      this);
+    manager.run_processing();
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
     notifySequenceSegmentProcessorEnd();
+  }
+
+  void processSegment(
+    SequenceSegmentHandler& sequence_segment,
+    SequenceHandler& sequenceHandler_IO,
+    const Filenames& filenames,
+    const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& methods)
+  {
+    const size_t nr_methods = methods.size();
+    LOGI << ">>Processing SequenceSegment [" << sequence_segment.getSequenceSegmentName() << "]\n";
+    for (size_t i = 0; i < nr_methods; ++i) {
+      LOGI << "[" << (i + 1) << "/" << nr_methods << "] steps in processing sequence segments";
+      methods[i]->process(
+        sequence_segment,
+        sequenceHandler_IO,
+        (sequenceHandler_IO)
+          .getSequence()
+          .at(sequence_segment.getSampleIndices().front())
+          .getRawData()
+          .getParameters(),
+        filenames
+      );
+    }
+  }
+
+  void SequenceSegmentProcessorMultithread::run_processing()
+  {
+    while (true) {
+      const size_t i = i_.fetch_add(1);
+      if (i >= sequence_segment_.size()) {
+        break;
+      }
+  
+      SequenceSegmentHandler& sequence_seg {sequence_segment_[i]};
+      if (observable_) observable_->notifySequenceSegmentProcessorSampleStart(sequence_seg.getSequenceSegmentName());
+      
+      try {
+        std::future<void> f = std::async(
+        std::launch::async,
+        processSegment,
+        std::ref(sequence_seg),
+        std::ref(sequenceHandler_IO),
+        std::cref(filenames_.at( sequence_seg.getSequenceSegmentName())),
+        std::cref(sequence_segment_processing_methods_));
+          
+        LOGI << ">>SequenceSegment [" << sequence_seg.getSequenceSegmentName() << "]: waiting...";
+        f.wait();
+        LOGI << ">>SequenceSegment [" << sequence_seg.getSequenceSegmentName() << "]: done";
+          
+        try {
+          f.get();
+        }
+        catch (const std::exception& e) {
+          LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+        }
+          
+        if (observable_) observable_->notifySequenceSegmentProcessorSampleEnd(sequence_seg.getSequenceSegmentName());
+      }
+      catch (const std::exception& e) {
+        LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+      }
+    }
+  }
+
+  void SampleGroupProcessorMultithread::run_processing()
+  {
+    while (true) {
+      const size_t i = i_.fetch_add(1);
+      if (i >= sample_group_.size()) {
+        break;
+      }
+  
+      SampleGroupHandler& sequence_seg {sample_group_[i]};
+      if (observable_) observable_->notifySampleGroupProcessorSampleStart(sequence_seg.getSampleGroupName());
+      
+      try {
+        std::future<void> f = std::async(
+        std::launch::async,
+        processSampleGroup,
+        std::ref(sequence_seg),
+        std::ref(sequenceHandler_IO),
+        std::cref(filenames_.at( sequence_seg.getSampleGroupName())),
+        std::cref(sample_group_processing_methods_));
+          
+        LOGI << ">>SequenceSegment [" << sequence_seg.getSampleGroupName() << "]: waiting...";
+        f.wait();
+        LOGI << ">>SequenceSegment [" << sequence_seg.getSampleGroupName() << "]: done";
+          
+        try {
+          f.get();
+        }
+        catch (const std::exception& e) {
+          LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+        }
+          
+        if (observable_) observable_->notifySampleGroupProcessorSampleEnd(sequence_seg.getSampleGroupName());
+      }
+      catch (const std::exception& e) {
+        LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+      }
+    }
   }
 
   void ProcessSampleGroups::process()
@@ -324,28 +407,90 @@ namespace SmartPeak
       if (!sample_group_processing_methods_.size()) {
         throw "no sample group processing methods given.\n";
       }
-
-      const size_t n = sample_group_processing_methods_.size();
-
-      // process the sample group
-      for (size_t i = 0; i < n; ++i) {
-        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sample groups";
-        sample_group_processing_methods_[i]->process(
-          sample_group,
-          *sequenceHandler_IO,
-          (*sequenceHandler_IO)
-          .getSequence()
-          .at(sample_group.getSampleIndices().front())
-          .getRawData()
-          .getParameters(), // assumption: all parameters are the same for each sample in the sample group!
-          filenames_.at(sample_group.getSampleGroupName())
-        );
-      }
+      
+      SampleGroupProcessorMultithread manager(
+        sample_groups,
+        (*sequenceHandler_IO),
+        sample_group_processing_methods_,
+        filenames_,
+        this);
+      manager.run_processing();
+      //manager.spawn_workers(8);
       notifySampleGroupProcessorSampleEnd(sample_group.getSampleGroupName());
     }
 
     sequenceHandler_IO->setSampleGroups(sample_groups);
     notifySampleGroupProcessorEnd();
+  }
+
+  void processSampleGroup(
+    SampleGroupHandler& sample_group,
+    SequenceHandler& sequenceHandler_IO,
+    const Filenames& filenames,
+    const std::vector<std::shared_ptr<SampleGroupProcessor>>& methods)
+  {
+    const size_t n = methods.size();
+    for (size_t i = 0; i < n; ++i) {
+      LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sample groups";
+      methods[i]->process(
+        sample_group,
+        sequenceHandler_IO,
+        (sequenceHandler_IO)
+        .getSequence()
+        .at(sample_group.getSampleIndices().front())
+        .getRawData()
+        .getParameters(),
+        filenames
+      );
+    }
+  }
+
+  void SequenceSegmentProcessorMultithread::spawn_workers(unsigned int n_threads)
+  {
+    // Refine the # of threads based on the hardware
+    size_t n_workers = getNumWorkers(n_threads);
+    LOGD << "Number of workers: " << n_workers;
+
+    // Spawn the workers
+    try {
+      std::list<std::future<void>> futures;
+      LOGD << "Spawning workers...";
+      for (size_t i = 0; i < n_workers; ++i) {
+        futures.emplace_back(std::async(std::launch::async, &SequenceSegmentProcessorMultithread::run_processing, this));
+      }
+      LOGD << "Waiting for workers...";
+      for (std::future<void>& f : futures) {
+        f.wait();
+      }
+      LOGD << "Workers are done";
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+  }
+
+  void SampleGroupProcessorMultithread::spawn_workers(unsigned int n_threads)
+  {
+    // Refine the # of threads based on the hardware
+    size_t n_workers = getNumWorkers(n_threads);
+    LOGD << "Number of workers: " << n_workers;
+
+    // Spawn the workers
+    try {
+      std::list<std::future<void>> futures;
+      LOGD << "Spawning workers...";
+      for (size_t i = 0; i < n_workers; ++i) {
+        futures.emplace_back(std::async(std::launch::async, &SampleGroupProcessorMultithread::run_processing, this));
+      }
+      LOGD << "Waiting for workers...";
+      for (std::future<void>& f : futures) {
+        f.wait();
+      }
+      LOGD << "Workers are done";
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
   }
 
   void SequenceProcessorMultithread::spawn_workers(unsigned int n_threads)
@@ -359,7 +504,7 @@ namespace SmartPeak
       std::list<std::future<void>> futures;
       LOGD << "Spawning workers...";
       for (size_t i = 0; i < n_workers; ++i) {
-        futures.emplace_back(std::async(std::launch::async, &SequenceProcessorMultithread::run_injection_processing, this));
+        futures.emplace_back(std::async(std::launch::async, &SequenceProcessorMultithread::run_processing, this));
       }
       LOGD << "Waiting for workers...";
       for (std::future<void>& f : futures) {
@@ -372,7 +517,7 @@ namespace SmartPeak
     }
   }
 
-  void SequenceProcessorMultithread::run_injection_processing()
+  void SequenceProcessorMultithread::run_processing()
   {
     while (true) {
       // fetch the atomic injection counter
@@ -409,27 +554,21 @@ namespace SmartPeak
     LOGD << "Worker is done";
   }
 
-  size_t SequenceProcessorMultithread::getNumWorkers(unsigned int n_threads) const {
+  size_t ProcessorMultithread::getNumWorkers(unsigned int n_threads) const {
     const unsigned int max_threads = std::thread::hardware_concurrency(); // might return 0
     size_t n_workers = 0;
 
     if (max_threads != 0) {
       if (n_threads > max_threads) {
         n_workers = max_threads - 1;
-      }
-      else if (n_threads <= max_threads && n_threads > 1) 
-      {
+      } else if (n_threads <= max_threads && n_threads > 1) {
         n_workers = n_threads - 1;
-      }
-      else if (n_threads >= 0) 
-      {
+      } else if (n_threads >= 0) {
         LOGD << "Max available threads: " << max_threads;
         LOGD << "but using just 1 thread.";
         n_workers = 1;
       }
-    }
-    else 
-    {
+    } else {
       LOGD << "Couldn't determine # of threads, using just 1 thread!";
       n_workers = 1;
     }
