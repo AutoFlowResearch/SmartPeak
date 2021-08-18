@@ -1508,7 +1508,8 @@ namespace SmartPeak
     if (sequence_handler.getSequence().size() > 0 &&
       sequence_handler.getSequence().at(0).getRawData().getFeatureMapHistory().size() > 0) {
       // Make the feature table headers and body
-      if (table_data.body_.dimension(1) != 23 + getNSelectedFeatureMetaValuesTable()) {
+      if (feature_table_unique_samples_transitions_ != getNSelectedSampleNamesPlot()*getNSelectedTransitionsPlot()
+          || table_data.body_.dimension(1) != 23 + getNSelectedFeatureMetaValuesTable()) {
         LOGD << "Making feature_table_body and feature_table_headers";
         // get the selected feature names
         Eigen::Tensor<std::string, 1> selected_feature_names = getSelectFeatureMetaValuesTable();
@@ -1542,6 +1543,7 @@ namespace SmartPeak
             component_group_names.insert(selected_transition_groups(i));
         }
         // update the number of unique samples, transitions, and feature metavalues
+        feature_table_unique_samples_transitions_ = getNSelectedSampleNamesPlot() * getNSelectedTransitionsPlot();
         std::vector<std::vector<std::string>> table;
         std::vector<std::string> headers;
         SequenceParser::makeDataTableFromMetaValue(sequence_handler, table, headers, feature_names,
