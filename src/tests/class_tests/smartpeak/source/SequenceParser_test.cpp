@@ -321,7 +321,15 @@ TEST_F(SequenceParserFixture, makeDataMatrixFromMetaValue)
   // const vector<string> meta_data = {"calculated_concentration"};
   const set<SampleType> sample_types = {SampleType::Unknown};
 
-  SequenceParser::makeDataMatrixFromMetaValue(sequence_handler_, data_out, columns_out, rows_out, meta_data, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
+  SequenceParser::makeDataMatrixFromMetaValue(sequence_handler_,
+                                              data_out,
+                                              columns_out,
+                                              rows_out,
+                                              meta_data,
+                                              sample_types,
+                                              std::set<std::string>(),
+                                              std::set<std::string>(),
+                                              std::set<std::string>());
 
   EXPECT_EQ(columns_out.size(), 6);
   EXPECT_STREQ(columns_out(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
@@ -331,8 +339,15 @@ TEST_F(SequenceParserFixture, makeDataMatrixFromMetaValue)
   EXPECT_NEAR(data_out(0,0), 15.6053667, 1e-3);
   EXPECT_NEAR(data_out(rows_out.dimension(0)-1,columns_out.size()-1), 1.66744995, 1e-3);
 
-  SequenceParser::makeDataMatrixFromMetaValue(sequence_handler_, data_out, columns_out, rows_out, std::vector<std::string>({ "leftWidth" }), sample_types,
-    std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }), std::set<std::string>({ "23dpg" }), std::set<std::string>({ "23dpg.23dpg_1.Light" }));
+  SequenceParser::makeDataMatrixFromMetaValue(sequence_handler_,
+                                              data_out,
+                                              columns_out,
+                                              rows_out,
+                                              std::vector<std::string>({ "leftWidth" }),
+                                              sample_types,
+                                              std::set<std::string>({ "170808_Jonathan_yeast_Sacc1_1x" }),
+                                              std::set<std::string>({ "23dpg" }),
+                                              std::set<std::string>({ "23dpg.23dpg_1.Light" }));
 
   EXPECT_EQ(columns_out.size(), 1);
   EXPECT_STREQ(columns_out(0).c_str(), "170808_Jonathan_yeast_Sacc1_1x");
@@ -340,10 +355,79 @@ TEST_F(SequenceParserFixture, makeDataMatrixFromMetaValue)
   EXPECT_EQ(rows_out.dimension(1), 3);
   EXPECT_STREQ(rows_out(0, 1).c_str(), "23dpg");
   EXPECT_NEAR(data_out(0, 0), 15.6053667, 1e-3);
+}
 
-  // write sequence to output
-  // const std::string pathname_output = SMARTPEAK_GET_TEST_DATA_PATH("output/SequenceParser_writeDataMatrixFromMetaValue.csv");
-  // SequenceParser::writeDataMatrixFromMetaValue(sequenceHandler, pathname_output);
+TEST_F(SequenceParserFixture, writeDataMatrixFromMetaValue)
+{
+  Eigen::Tensor<float, 2> data_out;
+  Eigen::Tensor<std::string, 1> columns_out;
+  Eigen::Tensor<std::string, 2> rows_out;
+
+  const vector<FeatureMetadata> meta_data = {
+    FeatureMetadata::calculated_concentration,
+  };
+
+  const set<SampleType> sample_types = { SampleType::Unknown };
+
+  std::string written_filename = std::tmpnam(nullptr);
+  SequenceParser::writeDataMatrixFromMetaValue(sequence_handler_, written_filename, meta_data, sample_types);
+
+  // read back the file
+  io::CSVReader<9, io::trim_chars<>, io::no_quote_escape<','>> in(written_filename);
+
+  const std::string s_component_name{ "component_name" };
+  const std::string s_component_group_name{ "component_group_name" };
+  const std::string s_meta_value{ "meta_value" };
+  const std::string s_injection_1{ "170808_Jonathan_yeast_Sacc1_1x" };
+  const std::string s_injection_2{ "170808_Jonathan_yeast_Sacc2_1x" };
+  const std::string s_injection_3{ "170808_Jonathan_yeast_Sacc3_1x" };
+  const std::string s_injection_4{ "170808_Jonathan_yeast_Yarr1_1x" };
+  const std::string s_injection_5{ "170808_Jonathan_yeast_Yarr2_1x" };
+  const std::string s_injection_6{ "170808_Jonathan_yeast_Yarr3_1x" };
+
+  in.read_header(
+    io::ignore_no_column,
+    s_component_name,
+    s_component_group_name,
+    s_meta_value,
+    s_injection_1,
+    s_injection_2,
+    s_injection_3,
+    s_injection_4,
+    s_injection_5,
+    s_injection_6
+    );
+
+  std::string component_name;
+  std::string component_group_name;
+  std::string meta_value;
+  std::string injection_1;
+  std::string injection_2;
+  std::string injection_3;
+  std::string injection_4;
+  std::string injection_5;
+  std::string injection_6;
+  in.read_row(
+    component_name,
+    component_group_name,
+    meta_value,
+    injection_1,
+    injection_2,
+    injection_3,
+    injection_4,
+    injection_5,
+    injection_6
+  );
+
+  EXPECT_STREQ(component_name.c_str(), "accoa.accoa_1.Light");
+  EXPECT_STREQ(component_group_name.c_str(), "accoa");
+  EXPECT_STREQ(meta_value.c_str(), "calculated_concentration");
+  EXPECT_STREQ(injection_1.c_str(), "1.284786");
+  EXPECT_STREQ(injection_2.c_str(), "2.345204");
+  EXPECT_STREQ(injection_3.c_str(), "2.027345");
+  EXPECT_STREQ(injection_4.c_str(), "2.128750");
+  EXPECT_STREQ(injection_5.c_str(), "0.782144");
+  EXPECT_STREQ(injection_6.c_str(), "2.478645");
 }
 
 TEST(SequenceHandler, makeSequenceSmartPeak)

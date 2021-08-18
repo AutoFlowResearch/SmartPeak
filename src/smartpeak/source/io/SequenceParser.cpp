@@ -983,7 +983,7 @@ namespace SmartPeak
     }
     makeDataMatrixFromMetaValue(sequenceHandler, data, columns, rows, meta_data_strings, sample_types, std::set<std::string>(), std::set<std::string>(), std::set<std::string>());
 
-    std::vector<std::string> headers = {"component_group_name", "component_name", "meta_value"};
+    std::vector<std::string> headers = {"component_name", "component_group_name", "meta_value"};
     for (int i=0;i<columns.size();++i) headers.push_back(columns(i));
 
     CSVWriter writer(filename.generic_string(), ",");
