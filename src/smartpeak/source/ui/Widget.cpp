@@ -146,7 +146,7 @@ namespace SmartPeak
     if (table_data_.body_.dimensions().TotalSize() > 0) {
       if (max_rows_ < table_data_.body_.dimension(0)) {
         print_until_ = max_rows_;
-        ImGui::Text("Showing first 100 samples for performance, total nr. of samples : %li", table_data_.body_.dimension(0));
+        ImGui::Text("Showing first %i samples for performance, total nr. of samples : %li", max_rows_, table_data_.body_.dimension(0));
       } else if (max_rows_ > table_data_.body_.dimension(0)) {
         print_until_ = table_data_.body_.dimension(0);
       }
