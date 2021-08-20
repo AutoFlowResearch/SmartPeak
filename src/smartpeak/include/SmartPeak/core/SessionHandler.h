@@ -25,15 +25,22 @@
 
 #include <SmartPeak/core/SequenceHandler.h>
 #include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/EventDispatcher.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 
 namespace SmartPeak
 {
   class SessionHandler : 
     public ISequenceObserver,
-    public ITransitionsObserver
+    public ITransitionsObserver,
+    public IFeaturesObserver
   {
   public:
+    
+    /**
+    IFeaturesObserver
+    */
+    virtual void onFeaturesUpdated() override;
 
     /**
     ISequenceObserver
@@ -109,7 +116,9 @@ namespace SmartPeak
     /*
     @brief Sets the feature table
 
-    @param[in] sequence_handler
+     @param[in] sequence_handler An instance of the SequenceHandler
+     @param[in] generic_table_data Current table data to be displayed
+     @param[out] data_changed true if the table has been altered
 
     @returns true if all rows/columns were added and false if rows/columns were omitted due to performance
     */

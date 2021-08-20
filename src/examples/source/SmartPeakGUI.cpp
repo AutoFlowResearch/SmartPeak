@@ -99,8 +99,10 @@ int main(int argc, char** argv)
   EventDispatcher event_dispatcher;
   application_handler_.sequenceHandler_.addTransitionsObserver(&event_dispatcher);
   application_handler_.sequenceHandler_.addSequenceObserver(&event_dispatcher);
+  application_handler_.sequenceHandler_.addFeaturesObserver(&event_dispatcher);
   event_dispatcher.addTransitionsObserver(&session_handler_);
   event_dispatcher.addSequenceObserver(&session_handler_);
+  event_dispatcher.addFeaturesObserver(&session_handler_);
 
   // widgets
   FilePicker file_picker_;
@@ -195,7 +197,7 @@ int main(int argc, char** argv)
   auto comp_group_background_estimations_main_window_ = std::make_shared<SequenceSegmentWidget>("CompGroupBackgroundEstimationsMainWindow", "Component Group Background Filters",
                                    &session_handler_, &application_handler_.sequenceHandler_,
                                    &SessionHandler::setComponentGroupBackgroundEstimationsTable, &SessionHandler::getGroupFiltersTable, &application_handler_.sequenceHandler_);
-  auto features_table_main_window_ = std::make_shared<GenericTableWidget>("featuresTableMainWindow", "Features table");
+  auto features_table_main_window_ = std::make_shared<FeaturesTableWidget>("featuresTableMainWindow", "Features table", &event_dispatcher);
   auto feature_matrix_main_window_ = std::make_shared<GenericTableWidget>("featureMatrixMainWindow", "Features matrix");
 
   // visible on start
@@ -720,7 +722,8 @@ int main(int argc, char** argv)
     // feature table
     if (features_table_main_window_->visible_)
     {
-      exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_, features_table_main_window_->table_data_);
+      exceeding_table_size_ = !session_handler_.setFeatureTable(application_handler_.sequenceHandler_,
+                                                                features_table_main_window_->table_data_);
       features_table_main_window_->checked_rows_ = Eigen::Tensor<bool, 1>();
     }
 

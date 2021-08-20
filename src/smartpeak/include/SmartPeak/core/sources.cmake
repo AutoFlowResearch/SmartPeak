@@ -10,6 +10,7 @@ set(sources_list_h
 	ConsoleHandler.h
 	EventDispatcher.h
 	Filenames.h
+  FeaturesObservable.h
 	FeatureMetadata.h
 	Helloworld.h
 	InjectionHandler.h

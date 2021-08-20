@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -625,14 +625,6 @@ namespace SmartPeak
       "original_filename", "acquisition_date_and_time", "scan_polarity", "scan_mass_low", "scan_mass_high", "injection_name", "used_"
     };
     headers.insert(headers.end(), meta_data.cbegin(), meta_data.cend());
-    for (size_t i = 0; i < headers.size() - 1; ++i) { // checking headers are unique, stable (maintaining the same positions)
-      for (size_t j = i + 1; j < headers.size(); ) {
-        if (headers[i] == headers[j])
-          headers.erase(headers.begin() + j);
-        else
-          ++j;
-      }
-    }
     headers_out = headers;
 
     const std::string delimiter {"_____"};

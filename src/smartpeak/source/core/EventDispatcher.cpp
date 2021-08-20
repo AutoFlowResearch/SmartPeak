@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Bertrand Boudaud $
+// $Maintainer: Bertrand Boudaud, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Bertrand Boudaud $
 // --------------------------------------------------------------------------
 
@@ -59,6 +59,16 @@ namespace SmartPeak
     {
       queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
         [this] { this->notifyApplicationProcessorEnd(); }
+      )));
+    }
+
+    /**
+      IFeaturesObserver
+    */
+    void EventDispatcher::onFeaturesUpdated()
+    {
+      queueEvent(std::make_shared<std::future<void>>(std::async(std::launch::deferred,
+        [this] { this->notifyFeaturesUpdated(); }
       )));
     }
 

@@ -35,6 +35,8 @@
 #include <SmartPeak/core/SequenceObservable.h>
 #include <SmartPeak/iface/ITransitionsObserver.h>
 #include <SmartPeak/core/TransitionsObservable.h>
+#include <SmartPeak/iface/IFeaturesObserver.h>
+#include <SmartPeak/core/FeaturesObservable.h>
 
 #include <plog/Log.h>
 #include <future>
@@ -48,19 +50,21 @@ namespace SmartPeak
   /**
     The EventDispatcher can be used to store and dispatch Observer events to another thread.
   */
-  struct EventDispatcher :
+  struct EventDispatcher : public
     IApplicationProcessorObserver,
     ISequenceProcessorObserver,
     ISequenceSegmentProcessorObserver,
     ISampleGroupProcessorObserver,
     ISequenceObserver,
     ITransitionsObserver,
+    IFeaturesObserver,
     ApplicationProcessorObservable,
     SequenceProcessorObservable,
     SequenceSegmentProcessorObservable,
     SampleGroupProcessorObservable,
     SequenceObservable,
-    TransitionsObservable
+    TransitionsObservable,
+    FeaturesObservable
   {
     EventDispatcher() = default;
 
@@ -71,6 +75,11 @@ namespace SmartPeak
     virtual void onApplicationProcessorCommandStart(size_t command_index, const std::string& command_name) override;
     virtual void onApplicationProcessorCommandEnd(size_t command_index, const std::string& command_name) override;
     virtual void onApplicationProcessorEnd() override;
+    
+    /**
+      IFeaturesObserver
+    */
+    virtual void onFeaturesUpdated() override;
 
     /**
       ISequenceSegmentProcessorObserver
