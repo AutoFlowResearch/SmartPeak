@@ -21,7 +21,7 @@ Steps to reproduce the behavior:
 A clear and concise description of what you expected to happen.
 
 **logs**
-Attach log file. Log, by default, can be found in:
+Attach all recent SmartPeak log files which can be found in the following locations :
  - Windows: C:\Users\user_name\AppData\Local\SmartPeak
  - Linux: /home/user_name/.SmartPeak
  - MacOS: /Users/user_name/.SmartPeak

@@ -25,6 +25,7 @@
 
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/SequenceHandler.h>
+#include <SmartPeak/iface/IFilenamesHandler.h>
 #include <string>
 
 namespace SmartPeak
@@ -39,14 +40,35 @@ public:
     InputDataValidation(InputDataValidation&&)                 = delete;
     InputDataValidation& operator=(InputDataValidation&&)      = delete;
 
-    struct FilenameInfo {
-      enum ValidityEnum {invalid, valid, not_provided} validity;
-      std::string pathname;
-      std::string member_name;
-    };
+    static bool fileExists(const std::filesystem::path& filepath);
 
-    static bool fileExists(const std::string& filepath);
-    static FilenameInfo isValidFilename(const std::string& filename, const std::string& member_name);
+    static bool precheckProcessorInputs(
+      const IFilenamesHandler& input_files,
+      const std::string& processor_name,
+      const Filenames& filenames_I,
+      bool required);
+
+    static bool prepareToLoad(
+      const Filenames& filenames,
+      const std::string& id
+    );
+
+    static bool prepareToLoadOneOfTwo(
+      const Filenames& filenames,
+      const std::string& id1,
+      const std::string& id2
+    );
+
+    static bool prepareToStore(
+      const Filenames& filenames,
+      const std::string& id
+    );
+
+    static bool prepareToStoreOneOfTwo(
+      const Filenames& filenames,
+      const std::string& id1,
+      const std::string& id2
+    );
 
     static std::string getSequenceInfo(
       const SequenceHandler& sequenceHandler

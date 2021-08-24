@@ -65,7 +65,7 @@ endif()
 ## Plus an additional entry in the nsis template (see CPack-NSIS docu)
 
 set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-set(CPACK_NSIS_MODIFY_PATH OFF)
+set(CPACK_NSIS_MODIFY_PATH ON)
 set(CPACK_NSIS_MUI_FINISHPAGE_RUN "SmartPeakGUI.exe")
 set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\SmartPeakGUI.exe")
 

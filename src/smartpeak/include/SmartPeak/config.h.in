@@ -27,8 +27,6 @@
 // include SMARTPEAK_DLLAPI macros
 #include <SmartPeak/SmartPeakConfig.h>
 
-#include <boost/current_function.hpp>
-
 // Here are some global configuration flags for SmartPeak
 
 // Define compiler specifics (used in VERY few places only)

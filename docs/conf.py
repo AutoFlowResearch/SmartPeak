@@ -22,7 +22,8 @@ extensions              = [ "breathe",
                             "sphinx.ext.todo",
                             "sphinx.ext.autodoc",
                             "sphinx.ext.intersphinx",
-                            "sphinx.ext.viewcode"]
+                            "sphinx.ext.viewcode",
+                            "sphinx_tabs.tabs"]
 
 todo_include_todos      = True
 todo_link_only          = True

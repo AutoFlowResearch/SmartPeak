@@ -6,9 +6,13 @@ set(sources_list_h
 	AboutWidget.h
 	CalibratorsPlotWidget.h
 	ChromatogramPlotWidget.h
+	ChromatogramTICPlotWidget.h
+	ChromatogramXICPlotWidget.h
 	FilePicker.h
+	GraphicDataVizWidget.h
 	GuiAppender.h
 	Heatmap2DWidget.h
+	Help.h
 	ImEntry.h
 	InfoWidget.h
 	LogWidget.h
@@ -19,13 +23,12 @@ set(sources_list_h
 	SampleTypeEditorWidget.h
 	SequenceGroupsEditorWidget.h
 	SequenceTableWidget.h
+	SpectraMSMSPlotWidget.h
 	SpectraPlotWidget.h
 	StatisticsWidget.h
 	Widget.h
-	ImEntry.h
-	Help.h
 	WindowSizesAndPositions.h
-	Workflow.h
+	WorkflowWidget.h
 	WorkflowStepWidget.h
 )
 

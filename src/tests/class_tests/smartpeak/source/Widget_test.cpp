@@ -21,15 +21,18 @@
 // $Authors: Ahmed Khalil $
 // --------------------------------------------------------------------------
 
-#define BOOST_TEST_MODULE Widget test suite
-#include <boost/test/included/unit_test.hpp>
+#include <gtest/gtest.h>
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/test_config.h>
 #include <SmartPeak/io/SequenceParser.h>
 #include <SmartPeak/core/MetaDataHandler.h>
 #include <SmartPeak/core/RawDataProcessor.h>
 #include <SmartPeak/core/SampleType.h>
+#include <SmartPeak/core/WorkflowManager.h>
+#include <SmartPeak/ui/GraphicDataVizWidget.h>
+#include <SmartPeak/ui/WorkflowWidget.h>
 
+bool SmartPeak::enable_quick_help = false;
 
 void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
 {
@@ -64,7 +67,7 @@ void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
     metaDataHandler.scan_mass_low = 60;
 
     SmartPeak::Filenames filenames;
-    filenames.featureXML_i = SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML");
+    filenames.setFullPath("featureXML_i", SMARTPEAK_GET_TEST_DATA_PATH(metaDataHandler.getInjectionName() + ".featureXML"));
     SmartPeak::RawDataHandler rawDataHandler;
     SmartPeak::LoadFeatures loadFeatures;
     loadFeatures.process(rawDataHandler, {}, filenames);
@@ -88,20 +91,18 @@ void getDummyTableEntries(Eigen::Tensor<std::string, 2>& rows_out)
 }
 
 
-BOOST_AUTO_TEST_SUITE(Widget)
-
-BOOST_AUTO_TEST_CASE(widget_constructors)
+TEST(Widget, widget_constructors)
 {
   SmartPeak::GenericTableWidget* generictablewidget_ptr = nullptr;
-  BOOST_CHECK_NO_THROW(generictablewidget_ptr = new SmartPeak::GenericTableWidget("empty_generic_table"));
+  EXPECT_NO_THROW(generictablewidget_ptr = new SmartPeak::GenericTableWidget("empty_generic_table"));
   delete generictablewidget_ptr;
   
   SmartPeak::ExplorerWidget* explorerwidget_ptr = nullptr;
-  BOOST_CHECK_NO_THROW(explorerwidget_ptr = new SmartPeak::ExplorerWidget("empty_explorer_table"));
+  EXPECT_NO_THROW(explorerwidget_ptr = new SmartPeak::ExplorerWidget("empty_explorer_table"));
   delete explorerwidget_ptr;
 }
 
-BOOST_AUTO_TEST_CASE(GenericTableWidget_sorter)
+TEST(Widget, GenericTableWidget_sorter)
 {
   bool is_scanned =                 false;
   std::vector<SmartPeak::ImEntry>   Im_table_entries;
@@ -111,19 +112,19 @@ BOOST_AUTO_TEST_CASE(GenericTableWidget_sorter)
   getDummyTableEntries(rows_out);
   SmartPeak::GenericTableWidget TestTable1("TestTable1");
   TestTable1.updateTableContents(Im_table_entries, is_scanned, rows_out, checkbox_columns);
-  BOOST_CHECK_EQUAL(is_scanned, true);  // updateTableContents is successful
+  EXPECT_TRUE(is_scanned);  // updateTableContents is successful
   
-  BOOST_REQUIRE(Im_table_entries.size() > 0);
-  BOOST_REQUIRE(Im_table_entries[0].entry_contents.size() > 0);
+  ASSERT_TRUE(Im_table_entries.size() > 0);
+  ASSERT_TRUE(Im_table_entries[0].entry_contents.size() > 0);
   
   // pre-sorting assertion
   // 1st row
-  BOOST_CHECK_EQUAL(Im_table_entries[0].entry_contents[0], "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_EQUAL(Im_table_entries[0].entry_contents[1], "23dpg");
+  EXPECT_STREQ(Im_table_entries[0].entry_contents[0].c_str(), "23dpg.23dpg_1.Heavy");
+  EXPECT_STREQ(Im_table_entries[0].entry_contents[1].c_str(), "23dpg");
   // last row
   auto last_row_idx = Im_table_entries.size() - 1;
-  BOOST_CHECK_EQUAL(Im_table_entries[last_row_idx].entry_contents[0], "xan.xan_1.Light");
-  BOOST_CHECK_EQUAL(Im_table_entries[last_row_idx].entry_contents[1], "xan");
+  EXPECT_STREQ(Im_table_entries[last_row_idx].entry_contents[0].c_str(), "xan.xan_1.Light");
+  EXPECT_STREQ(Im_table_entries[last_row_idx].entry_contents[1].c_str(), "xan");
   
   // sorting
   ImGuiTableSortSpecs           sorts_specs;
@@ -141,14 +142,14 @@ BOOST_AUTO_TEST_CASE(GenericTableWidget_sorter)
   
   // post-sorting assertion
   // 1st row
-  //BOOST_CHECK_EQUAL(Im_table_entries[0].entry_contents[0], "xan.xan_1.Light");
-  //BOOST_CHECK_EQUAL(Im_table_entries[0].entry_contents[1], "xan");
+  //EXPECT_STREQ(Im_table_entries[0].entry_contents[0], "xan.xan_1.Light");
+  //EXPECT_STREQ(Im_table_entries[0].entry_contents[1], "xan");
   // last row
-  //BOOST_CHECK_EQUAL(Im_table_entries[last_row_idx].entry_contents[0], "2mcit.2mcit_1.Heavy");
-  //BOOST_CHECK_EQUAL(Im_table_entries[last_row_idx].entry_contents[1], "2mcit");
+  //EXPECT_STREQ(Im_table_entries[last_row_idx].entry_contents[0], "2mcit.2mcit_1.Heavy");
+  //EXPECT_STREQ(Im_table_entries[last_row_idx].entry_contents[1], "2mcit");
 }
 
-BOOST_AUTO_TEST_CASE(GenericTableWidget_searcher)
+TEST(Widget, GenericTableWidget_searcher)
 {
   bool is_scanned =                 false;
   std::vector<SmartPeak::ImEntry>   Im_table_entries;
@@ -158,7 +159,7 @@ BOOST_AUTO_TEST_CASE(GenericTableWidget_searcher)
   getDummyTableEntries(rows_out);
   SmartPeak::GenericTableWidget TestTable1("TestTable2");
   TestTable1.updateTableContents(Im_table_entries, is_scanned, rows_out, checkbox_columns);
-  BOOST_CHECK_EQUAL(is_scanned, true); // updateTableContents is successful
+  EXPECT_TRUE(is_scanned); // updateTableContents is successful
   
   const int         all_selected_entry = 0;
   std::vector<uint> found_in;
@@ -170,8 +171,129 @@ BOOST_AUTO_TEST_CASE(GenericTableWidget_searcher)
   }
   
   for (auto found_in_index : found_in) {
-    BOOST_CHECK_EQUAL(Im_table_entries[found_in_index].entry_contents[0], "2mcit.2mcit_1.Heavy");
+    EXPECT_STREQ(Im_table_entries[found_in_index].entry_contents[0].c_str(), "2mcit.2mcit_1.Heavy");
   }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+class GraphicDataVizWidget_Test : public SmartPeak::GraphicDataVizWidget
+{
+public:
+  GraphicDataVizWidget_Test(SmartPeak::SessionHandler& session_handler,
+    SmartPeak::SequenceHandler& sequence_handler,
+    const std::string& id,
+    const std::string& title) :
+    GraphicDataVizWidget(session_handler, sequence_handler, id, title)
+  {};
+
+  virtual void updateData() override
+  {
+  };
+
+public:
+  // wrappers to protected methods
+  void wrapper_setMarkerPosition(const std::optional<float>& marker_position)
+  {
+    setMarkerPosition(marker_position);
+  }
+
+  std::optional<float> wrapper_getMarkerPosition() const
+  {
+    return getMarkerPosition();
+  }
+
+  std::tuple<float, float, float, float> wrapper_plotLimits() const
+  {
+    return plotLimits();
+  }
+
+public:
+  // setters for test
+  void setGraphVizData(SmartPeak::SessionHandler::GraphVizData& graph_viz_data)
+  {
+    graph_viz_data_ = graph_viz_data;
+  }
+
+};
+
+TEST(GraphicDataVizWidget, markerPosition)
+{
+  SmartPeak::SessionHandler session_handler;
+  SmartPeak::SequenceHandler sequence_handler;
+  std::string id = "GraphicDataVizWidget";
+  std::string title = "GraphicDataVizWidget";
+  GraphicDataVizWidget_Test test_graphic_data_viz(session_handler, sequence_handler, id, title);
+  EXPECT_FALSE(test_graphic_data_viz.wrapper_getMarkerPosition());
+  test_graphic_data_viz.wrapper_setMarkerPosition(42.0f);
+  EXPECT_EQ(test_graphic_data_viz.wrapper_getMarkerPosition(), 42.0f);
+}
+
+TEST(GraphicDataVizWidget, plotLimits)
+{
+  SmartPeak::SessionHandler session_handler;
+  SmartPeak::SequenceHandler sequence_handler;
+  std::string id = "GraphicDataVizWidget";
+  std::string title = "GraphicDataVizWidget";
+  GraphicDataVizWidget_Test test_graphic_data_viz(session_handler, sequence_handler, id, title);
+  
+  std::vector<float> data_x_1 = { 1.0f, 10.0f, 5.0f };
+  std::vector<float> data_y_1 = { 101.0f, 110.0f, 105.0f };
+  std::vector<float> data_x_2 = { 201.0f, 210.0f, 205.0f };
+  std::vector<float> data_y_2 = { 301.0f, 310.0f, 305.0f };
+
+  SmartPeak::SessionHandler::GraphVizData graph_viz_data;
+  graph_viz_data.reset("x_axis", "y_axis", "z_axis", 100);
+  graph_viz_data.addData(data_x_1, data_y_1, "data1");
+  graph_viz_data.addData(data_x_2, data_y_2, "data2");
+  test_graphic_data_viz.setGraphVizData(graph_viz_data);
+
+  const auto [plot_min_x, plot_max_x, plot_min_y, plot_max_y] = test_graphic_data_viz.wrapper_plotLimits();
+  EXPECT_NEAR(plot_min_x, -2.09, 1e-6);
+  EXPECT_NEAR(plot_max_x, 2.09, 1e-6);
+  EXPECT_NEAR(plot_min_y, 98.910003662109375, 1e-6);
+  EXPECT_NEAR(plot_max_y, 341, 1e-6);
+}
+
+class WorkflowWidget_Test : public SmartPeak::WorkflowWidget
+{
+public:
+  WorkflowWidget_Test(const std::string title, 
+                      SmartPeak::ApplicationHandler& application_handler, 
+                      SmartPeak::WorkflowManager& workflow_manager) :
+    WorkflowWidget(title, application_handler, workflow_manager)
+  {};
+
+public:
+  // wrappers to protected methods
+  virtual void updatecommands() override
+  {
+    WorkflowWidget::updatecommands();
+  }
+
+  bool errorBuildingCommands()
+  {
+    return error_building_commands_;
+  }
+};
+
+TEST(WorkflowWidget, updateCommands)
+{
+  SmartPeak::ApplicationHandler application_handler;
+  SmartPeak::WorkflowManager workflow_manager;
+  WorkflowWidget_Test workflow_widget("Workflow Widget", application_handler, workflow_manager);
+  
+  // initial state
+  EXPECT_FALSE(workflow_widget.errorBuildingCommands());
+  
+  // empty commands
+  workflow_widget.updatecommands();
+  EXPECT_FALSE(workflow_widget.errorBuildingCommands());
+
+  application_handler.sequenceHandler_.setWorkflow({ "LOAD_FEATURES" });
+  workflow_widget.updatecommands();
+  EXPECT_FALSE(workflow_widget.errorBuildingCommands());
+  
+  application_handler.sequenceHandler_.setWorkflow({ "NON_EXISTING_COMMAND" });
+  workflow_widget.updatecommands();
+  EXPECT_TRUE(workflow_widget.errorBuildingCommands());
+}
+

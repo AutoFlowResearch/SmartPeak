@@ -215,11 +215,11 @@ namespace SmartPeak
           if (std::find(progress_info_.runningCommands().begin(), progress_info_.runningCommands().end(), command_tuple) != progress_info_.runningCommands().end())
           {
             // we add 1 to the id of the command since it's the way it is displayed in the workflow window
-            ImGui::Text("%c [%d] %s", "|/-\\"[spinner_counter_ & 3], index + 1, command.c_str());
+            ImGui::Text("%c [%lu] %s", "|/-\\"[spinner_counter_ & 3], index + 1, command.c_str());
           }
           else
           {
-            ImGui::Text("  [%d] %s", index + 1, command.c_str());
+            ImGui::Text("  [%lu] %s", index + 1, command.c_str());
           }
           index++;
         }

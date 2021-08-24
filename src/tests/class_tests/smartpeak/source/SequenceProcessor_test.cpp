@@ -17,14 +17,12 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE SequenceProcessor test suite
-#include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 #include <SmartPeak/core/Filenames.h>
@@ -37,50 +35,77 @@ Filenames generateTestFilenames()
 {
   const std::string dir = SMARTPEAK_GET_TEST_DATA_PATH("");
   Filenames filenames;
-  filenames.sequence_csv_i                                = dir + "SequenceProcessor_sequence.csv";
-  filenames.parameters_csv_i                              = dir + "RawDataProcessor_params_1_core.csv";
-  filenames.traML_csv_i                                   = dir + "OpenMSFile_traML_1.csv";
-  filenames.featureFilterComponents_csv_i                 = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureFilterComponentGroups_csv_i            = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureQCComponents_csv_i                     = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureQCComponentGroups_csv_i                = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureRSDFilterComponents_csv_i              = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureRSDFilterComponentGroups_csv_i         = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureRSDQCComponents_csv_i                  = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureRSDQCComponentGroups_csv_i             = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureBackgroundFilterComponents_csv_i       = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureBackgroundFilterComponentGroups_csv_i  = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.featureBackgroundQCComponents_csv_i           = dir + "OpenMSFile_mrmfeatureqccomponents_1.csv";
-  filenames.featureBackgroundQCComponentGroups_csv_i      = dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv";
-  filenames.quantitationMethods_csv_i                     = dir + "OpenMSFile_quantitationMethods_1.csv";
-  filenames.standardsConcentrations_csv_i                 = dir + "OpenMSFile_standardsConcentrations_1.csv";
+  filenames.setFullPath("sequence_csv_i"                                , dir + "SequenceProcessor_sequence.csv");
+  filenames.setFullPath("parameters_csv_i"                              , dir + "RawDataProcessor_params_1_core.csv");
+  filenames.setFullPath("traML_csv_i"                                   , dir + "OpenMSFile_traML_1.csv");
+  filenames.setFullPath("featureFilterComponents_csv_i"                 , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureFilterComponentGroups_csv_i"            , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("featureQCComponents_csv_i"                     , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureQCComponentGroups_csv_i"                , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("featureRSDFilterComponents_csv_i"              , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureRSDFilterComponentGroups_csv_i"         , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("featureRSDQCComponents_csv_i"                  , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureRSDQCComponentGroups_csv_i"             , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("featureBackgroundFilterComponents_csv_i"       , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureBackgroundFilterComponentGroups_csv_i"  , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("featureBackgroundQCComponents_csv_i"           , dir + "OpenMSFile_mrmfeatureqccomponents_1.csv");
+  filenames.setFullPath("featureBackgroundQCComponentGroups_csv_i"      , dir + "OpenMSFile_mrmfeatureqccomponentgroups_1.csv");
+  filenames.setFullPath("quantitationMethods_csv_i"                     , dir + "OpenMSFile_quantitationMethods_1.csv");
+  filenames.setFullPath("standardsConcentrations_csv_i"                 , dir + "OpenMSFile_standardsConcentrations_1.csv");
   return filenames;
 }
 
-BOOST_AUTO_TEST_SUITE(sequenceprocessor)
-
-BOOST_AUTO_TEST_CASE(createSequence_onFilePicked)
+TEST(SequenceHandler, createSequence_onFilePicked)
 {
   ApplicationHandler ah;
   SequenceHandler sequenceHandler;
   CreateSequence cs(sequenceHandler);
   std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
   auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
-  auto filenames_ = Filenames::getDefaultStaticFilenames(workflow.string());
-  cs.onFilePicked(filenames_.sequence_csv_i, &ah);
+  Filenames filenames_;
+  filenames_.setFullPath("sequence_csv_i", workflow / "sequence.csv");
+  cs.onFilePicked(filenames_.getFullPath("sequence_csv_i"), &ah);
 
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 2);
+  ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
-  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleName(), "150516_CM1_Level1");
-  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "CM");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "150516_CM1_Level1");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 27);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods().size(), 10);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "arg-L.arg-L_1.Light");
+  EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_STREQ(injection0.getMetaData().getSampleGroupName().c_str(), "CM");
+  EXPECT_STREQ(injection0.getRawData().getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_EQ(injection0.getRawData().getParameters().size(), 27);
+  EXPECT_STREQ(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName().c_str(), "stop_report_after_feature");
+  EXPECT_EQ(injection0.getRawData().getQuantitationMethods().size(), 10);
+  EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "arg-L.arg-L_1.Light");
 }
 
-BOOST_AUTO_TEST_CASE(createSequence)
+#if (WIN32)
+TEST(SequenceHandler, createSequence_onFilePicked_windows_separators)
+{
+  ApplicationHandler ah;
+  SequenceHandler sequenceHandler;
+  CreateSequence cs(sequenceHandler);
+  std::string datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
+  auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
+  Filenames filenames_;
+  filenames_.setFullPath("sequence_csv_i", workflow / "sequence.csv");
+  std::string full_name = filenames_.getFullPath("sequence_csv_i").generic_string();
+  // replace separators (this way of specifying filename can happen with command line interface actually)
+  std::replace(full_name.begin(), full_name.end(), '/', '\\');
+  filenames_.setFullPath("sequence_csv_i", full_name);
+  cs.onFilePicked(filenames_.getFullPath("sequence_csv_i"), &ah);
+
+  ASSERT_EQ(sequenceHandler.getSequence().size(), 2);
+  InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
+  EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_STREQ(injection0.getMetaData().getSampleGroupName().c_str(), "CM");
+  EXPECT_STREQ(injection0.getRawData().getMetaData().getSampleName().c_str(), "150516_CM1_Level1");
+  EXPECT_EQ(injection0.getRawData().getParameters().size(), 27);
+  EXPECT_STREQ(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName().c_str(), "stop_report_after_feature");
+  EXPECT_EQ(injection0.getRawData().getQuantitationMethods().size(), 10);
+  EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "arg-L.arg-L_1.Light");
+}
+#endif(WIN32)
+
+TEST(SequenceHandler, createSequence)
 {
   SequenceHandler sequenceHandler;
   CreateSequence cs(sequenceHandler);
@@ -90,132 +115,132 @@ BOOST_AUTO_TEST_CASE(createSequence)
   cs.process();
 
   // Test initialization of the sequence
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
+  EXPECT_EQ(sequenceHandler.getSequence().size(), 6);
   InjectionHandler& injection0 = sequenceHandler.getSequence()[0];
-  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(injection0.getMetaData().getSampleGroupName(), "Test01");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Sacc1_1x");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().size(), 27);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions().size(), 324);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureFilter().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureQC().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDFilter().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDQC().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundFilter().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundQC().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods().size(), 107);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
+  EXPECT_STREQ(injection0.getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_STREQ(injection0.getMetaData().getSampleGroupName().c_str(), "Test01");
+  EXPECT_STREQ(injection0.getRawData().getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Sacc1_1x");
+  EXPECT_EQ(injection0.getRawData().getParameters().size(), 27);
+  EXPECT_STREQ(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName().c_str(), "stop_report_after_feature");
+  EXPECT_EQ(injection0.getRawData().getTargetedExperiment().getTransitions().size(), 324);
+  EXPECT_STREQ(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef().c_str(), "arg-L");
+  EXPECT_EQ(injection0.getRawData().getFeatureFilter().component_qcs.size(), 324);
+  EXPECT_STREQ(injection0.getRawData().getFeatureFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection0.getRawData().getFeatureQC().component_qcs.size(), 324);
+  EXPECT_STREQ(injection0.getRawData().getFeatureQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection0.getRawData().getFeatureRSDFilter().component_qcs.size(), 324);
+  EXPECT_STREQ(injection0.getRawData().getFeatureRSDFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection0.getRawData().getFeatureRSDQC().component_qcs.size(), 324);
+  EXPECT_STREQ(injection0.getRawData().getFeatureRSDQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection0.getRawData().getFeatureBackgroundFilter().component_qcs.size(), 324);
+  EXPECT_STREQ(injection0.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection0.getRawData().getFeatureBackgroundQC().component_qcs.size(), 324);
+  EXPECT_STREQ(injection0.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection0.getRawData().getQuantitationMethods().size(), 107);
+  EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "23dpg.23dpg_1.Light");
   InjectionHandler& injection5 = sequenceHandler.getSequence()[5];
-  BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleGroupName(), "Test02");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().size(), 27);
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "stop_report_after_feature");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions().size(), 324);
-  BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureFilter().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureQC().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDFilter().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDQC().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundFilter().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundQC().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getQuantitationMethods().size(), 107);
-  BOOST_CHECK_EQUAL(injection5.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 1);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 107);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureFilter().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDFilter().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDQC().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundFilter().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundQC().component_qcs.size(), 324);
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy");
+  EXPECT_STREQ(injection5.getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Yarr3_1x");
+  EXPECT_STREQ(injection5.getMetaData().getSampleGroupName().c_str(), "Test02");
+  EXPECT_STREQ(injection5.getRawData().getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Yarr3_1x");
+  EXPECT_EQ(injection5.getRawData().getParameters().size(), 27);
+  EXPECT_STREQ(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName().c_str(), "stop_report_after_feature");
+  EXPECT_EQ(injection5.getRawData().getTargetedExperiment().getTransitions().size(), 324);
+  EXPECT_STREQ(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef().c_str(), "arg-L");
+  EXPECT_EQ(injection5.getRawData().getFeatureFilter().component_qcs.size(), 324);
+  EXPECT_STREQ(injection5.getRawData().getFeatureFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection5.getRawData().getFeatureQC().component_qcs.size(), 324);
+  EXPECT_STREQ(injection5.getRawData().getFeatureQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection5.getRawData().getFeatureRSDFilter().component_qcs.size(), 324);
+  EXPECT_STREQ(injection5.getRawData().getFeatureRSDFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection5.getRawData().getFeatureRSDQC().component_qcs.size(), 324);
+  EXPECT_STREQ(injection5.getRawData().getFeatureRSDQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection5.getRawData().getFeatureBackgroundFilter().component_qcs.size(), 324);
+  EXPECT_STREQ(injection5.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection5.getRawData().getFeatureBackgroundQC().component_qcs.size(), 324);
+  EXPECT_STREQ(injection5.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(injection5.getRawData().getQuantitationMethods().size(), 107);
+  EXPECT_STREQ(injection5.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "23dpg.23dpg_1.Light");
+  EXPECT_EQ(sequenceHandler.getSequenceSegments().size(), 1);
+  EXPECT_EQ(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods().size(), 107);
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName().c_str(), "23dpg.23dpg_1.Light");
+  EXPECT_EQ(sequenceHandler.getSequenceSegments()[0].getFeatureFilter().component_qcs.size(), 324);
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs.size(), 324);
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(sequenceHandler.getSequenceSegments()[0].getFeatureRSDFilter().component_qcs.size(), 324);
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureRSDFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(sequenceHandler.getSequenceSegments()[0].getFeatureRSDQC().component_qcs.size(), 324);
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureRSDQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundFilter().component_qcs.size(), 324);
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
+  EXPECT_EQ(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundQC().component_qcs.size(), 324);
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy");
 
   // Test non-shared resources
   injection0.getMetaData().setSampleName("modified");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getMetaData().getSampleName(), "modified");
-  BOOST_CHECK_EQUAL(injection5.getMetaData().getSampleName(), "170808_Jonathan_yeast_Yarr3_1x");
+  EXPECT_STREQ(injection0.getRawData().getMetaData().getSampleName().c_str(), "modified");
+  EXPECT_STREQ(injection5.getMetaData().getSampleName().c_str(), "170808_Jonathan_yeast_Yarr3_1x");
 
   // Test shared resources between all raw data handlers
   injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].setName("modified");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "modified");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName(), "modified");
+  EXPECT_STREQ(injection0.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName().c_str(), "modified");
+  EXPECT_STREQ(injection5.getRawData().getParameters().at("MRMFeatureFinderScoring")[0].getName().c_str(), "modified");
   auto transitions = injection0.getRawData().getTargetedExperiment().getTransitions();
   transitions[0].setPeptideRef("arg-L-mod");
   injection0.getRawData().getTargetedExperiment().setTransitions(transitions);
-  BOOST_CHECK_EQUAL(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L-mod");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef(), "arg-L-mod");
+  EXPECT_STREQ(injection0.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef().c_str(), "arg-L-mod");
+  EXPECT_STREQ(injection5.getRawData().getTargetedExperiment().getTransitions()[0].getPeptideRef().c_str(), "arg-L-mod");
 
   // Test shared resources between sequence segment handlers
   injection0.getRawData().getQuantitationMethods()[0].setComponentName("23dpg.23dpg_1.Light-mod");
-  BOOST_CHECK_EQUAL(injection0.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName(), "23dpg.23dpg_1.Light-mod");
+  EXPECT_STREQ(injection0.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "23dpg.23dpg_1.Light-mod");
+  EXPECT_STREQ(injection5.getRawData().getQuantitationMethods()[0].getComponentName().c_str(), "23dpg.23dpg_1.Light-mod");
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getQuantitationMethods()[0].getComponentName().c_str(), "23dpg.23dpg_1.Light-mod");
   injection0.getRawData().getFeatureFilter().component_qcs[0].component_name = "arg-L.arg-L_1.Heavy-mod";
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-mod");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-mod");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureFilter().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-mod");
+  EXPECT_STREQ(injection0.getRawData().getFeatureFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy-mod");
+  EXPECT_STREQ(injection5.getRawData().getFeatureFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy-mod");
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureFilter().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy-mod");
   injection0.getRawData().getFeatureQC().component_qcs[0].component_name = "arg-L.arg-L_1.Heavy-modified";
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-modified");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-modified");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs[0].component_name, "arg-L.arg-L_1.Heavy-modified");
+  EXPECT_STREQ(injection0.getRawData().getFeatureQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy-modified");
+  EXPECT_STREQ(injection5.getRawData().getFeatureQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy-modified");
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureQC().component_qcs[0].component_name.c_str(), "arg-L.arg-L_1.Heavy-modified");
   injection0.getRawData().getFeatureRSDFilter().component_qcs[0].component_name = "trp-L.trp-L_1.Heavy-mod";
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDFilter().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-mod");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDFilter().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-mod");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDFilter().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-mod");
+  EXPECT_STREQ(injection0.getRawData().getFeatureRSDFilter().component_qcs[0].component_name.c_str(), "trp-L.trp-L_1.Heavy-mod");
+  EXPECT_STREQ(injection5.getRawData().getFeatureRSDFilter().component_qcs[0].component_name.c_str(), "trp-L.trp-L_1.Heavy-mod");
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureRSDFilter().component_qcs[0].component_name.c_str(), "trp-L.trp-L_1.Heavy-mod");
   injection0.getRawData().getFeatureRSDQC().component_qcs[0].component_name = "trp-L.trp-L_1.Heavy-modified";
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureRSDQC().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-modified");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureRSDQC().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-modified");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureRSDQC().component_qcs[0].component_name, "trp-L.trp-L_1.Heavy-modified");
+  EXPECT_STREQ(injection0.getRawData().getFeatureRSDQC().component_qcs[0].component_name.c_str(), "trp-L.trp-L_1.Heavy-modified");
+  EXPECT_STREQ(injection5.getRawData().getFeatureRSDQC().component_qcs[0].component_name.c_str(), "trp-L.trp-L_1.Heavy-modified");
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureRSDQC().component_qcs[0].component_name.c_str(), "trp-L.trp-L_1.Heavy-modified");
   injection0.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name = "ala-L.ala-L_1.Heavy-mod";
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-mod");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-mod");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundFilter().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-mod");
+  EXPECT_STREQ(injection0.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name.c_str(), "ala-L.ala-L_1.Heavy-mod");
+  EXPECT_STREQ(injection5.getRawData().getFeatureBackgroundFilter().component_qcs[0].component_name.c_str(), "ala-L.ala-L_1.Heavy-mod");
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundFilter().component_qcs[0].component_name.c_str(), "ala-L.ala-L_1.Heavy-mod");
   injection0.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name = "ala-L.ala-L_1.Heavy-modified";
-  BOOST_CHECK_EQUAL(injection0.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-modified");
-  BOOST_CHECK_EQUAL(injection5.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-modified");
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundQC().component_qcs[0].component_name, "ala-L.ala-L_1.Heavy-modified");
+  EXPECT_STREQ(injection0.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name.c_str(), "ala-L.ala-L_1.Heavy-modified");
+  EXPECT_STREQ(injection5.getRawData().getFeatureBackgroundQC().component_qcs[0].component_name.c_str(), "ala-L.ala-L_1.Heavy-modified");
+  EXPECT_STREQ(sequenceHandler.getSequenceSegments()[0].getFeatureBackgroundQC().component_qcs[0].component_name.c_str(), "ala-L.ala-L_1.Heavy-modified");
 
   sequenceHandler.clear();
   Filenames filenames { generateTestFilenames() };
-  filenames.sequence_csv_i = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv");
+  filenames.setFullPath("sequence_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_empty_sequence.csv"));
 
   cs.filenames_ = filenames;
   cs.process();
 
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 0);
+  EXPECT_EQ(sequenceHandler.getSequence().size(), 0);
 }
 
-BOOST_AUTO_TEST_CASE(gettersCreateSequence)
+TEST(SequenceHandler, gettersCreateSequence)
 {
   SequenceHandler sequenceHandler;
   CreateSequence cs(sequenceHandler);
 
-  BOOST_CHECK_EQUAL(cs.getID(), -1);
-  BOOST_CHECK_EQUAL(cs.getName(), "CREATE_SEQUENCE");
+  EXPECT_EQ(cs.getID(), -1);
+  EXPECT_STREQ(cs.getName().c_str(), "CREATE_SEQUENCE");
 }
 
-BOOST_AUTO_TEST_CASE(processSequence)
+TEST(SequenceHandler, processSequence)
 {
   SequenceHandler sequenceHandler;
   CreateSequence cs(sequenceHandler);
@@ -226,25 +251,26 @@ BOOST_AUTO_TEST_CASE(processSequence)
 
   const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadRawData>() };
   const RawDataHandler& rawDataHandler0 = sequenceHandler.getSequence()[0].getRawData();
-  BOOST_CHECK_EQUAL(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
+  EXPECT_EQ(rawDataHandler0.getExperiment().getChromatograms().size(), 0); // empty (not loaded, yet)
 
   std::map<std::string, Filenames> dynamic_filenames;
+  Filenames methods_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
+  methods_filenames.setTag(Filenames::Tag::MAIN_DIR, path);
+  methods_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, path + "/mzML");
+  methods_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, path + "/features");
+  methods_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "/features");
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
-    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-      path + "mzML/",
-      path + "features/",
-      path + "features/",
-      injection.getMetaData().getFilename(), // previous: injection.getMetaData().getSampleName(),
-      key,
-      key,
-      injection.getMetaData().getSampleGroupName(),
-      injection.getMetaData().getSampleGroupName()
-    );
+    dynamic_filenames[key] = methods_filenames;
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), dynamic_filenames.size());
+  EXPECT_EQ(sequenceHandler.getSequence().size(), dynamic_filenames.size());
 
   // Select injection names
   std::set<std::string> injection_names;
@@ -254,26 +280,28 @@ BOOST_AUTO_TEST_CASE(processSequence)
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.injection_names_ = injection_names;
   ps.process();
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
+  EXPECT_EQ(sequenceHandler.getSequence().size(), 6);
   int n_chroms = 0;
   for (int i = 0; i < sequenceHandler.getSequence().size(); ++i) n_chroms += sequenceHandler.getSequence().at(i).getRawData().getExperiment().getChromatograms().size();
-  BOOST_CHECK_EQUAL(n_chroms, 680); // loaded only the first two injections
+  EXPECT_EQ(n_chroms, 680); // loaded only the first two injections
 
   // Default injection names (i.e., the entire sequence)
-  ps.injection_names_ = {};
+  ps.injection_names_.clear();
   ps.process();
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequence().size(), 6);
+  
+  EXPECT_EQ(sequenceHandler.getSequence().size(), 6);
   n_chroms = 0;
-  for (int i = 0; i < sequenceHandler.getSequence().size(); ++i) n_chroms += sequenceHandler.getSequence().at(i).getRawData().getExperiment().getChromatograms().size();
-  BOOST_CHECK_EQUAL(n_chroms, 2040); // loaded all injections
+  for (int i = 0; i < sequenceHandler.getSequence().size(); ++i)
+    n_chroms += sequenceHandler.getSequence().at(i).getRawData().getExperiment().getChromatograms().size();
+  EXPECT_EQ(n_chroms, 2040); // loaded all injections
 
-  // Test multi threading parameters  
+  // Test multi threading parameters
   ParameterSet const* params;
   params = &rawDataHandler0.getParameters();
-  BOOST_CHECK_EQUAL(params->count("SequenceProcessor"), 1);
+  EXPECT_EQ(params->count("SequenceProcessor"), 1);
   unsigned int n_threads = std::stoul(params->at("SequenceProcessor")[0].getValueAsString());
-  BOOST_CHECK_EQUAL(n_threads, 4);
-  
+  EXPECT_EQ(n_threads, 4);
+
   SmartPeak::SequenceProcessorMultithread spMT1(sequenceHandler.getSequence(),
     dynamic_filenames,
     raw_data_processing_methods);
@@ -282,25 +310,25 @@ BOOST_AUTO_TEST_CASE(processSequence)
     raw_data_processing_methods);
   const unsigned int max_threads = std::thread::hardware_concurrency();
   if (max_threads != 0 && 4 <= max_threads) {
-    BOOST_CHECK_EQUAL(spMT1.getNumWorkers(4), 3);
-    BOOST_CHECK_EQUAL(spMT2.getNumWorkers(3), 2);
+    EXPECT_EQ(spMT1.getNumWorkers(4), 3);
+    EXPECT_EQ(spMT2.getNumWorkers(3), 2);
   }
   else {
-    BOOST_CHECK_EQUAL(spMT1.getNumWorkers(8), 1);
-    BOOST_CHECK_EQUAL(spMT2.getNumWorkers(3), 1);
+    EXPECT_EQ(spMT1.getNumWorkers(8), 1);
+    EXPECT_EQ(spMT2.getNumWorkers(3), 1);
   }
 }
 
-BOOST_AUTO_TEST_CASE(gettersProcessSequence)
+TEST(SequenceHandler, gettersProcessSequence)
 {
   SequenceHandler sequenceHandler;
   ProcessSequence cs(sequenceHandler);
 
-  BOOST_CHECK_EQUAL(cs.getID(), -1);
-  BOOST_CHECK_EQUAL(cs.getName(), "PROCESS_SEQUENCE");
+  EXPECT_EQ(cs.getID(), -1);
+  EXPECT_STREQ(cs.getName().c_str(), "PROCESS_SEQUENCE");
 }
 
-BOOST_AUTO_TEST_CASE(processSequenceSegments)
+TEST(SequenceHandler, processSequenceSegments)
 {
   SequenceHandler sequenceHandler;
   CreateSequence cs(sequenceHandler);
@@ -312,20 +340,21 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
   const vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods =
     { std::make_shared<CalculateCalibration>() };
 
-  std::map<std::string, Filenames> dynamic_filenames;
+  Filenames methods_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
+  methods_filenames.setTag(Filenames::Tag::MAIN_DIR, path);
+  methods_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, path + "mzML");
+  methods_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, path + "features");
+  methods_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "features");
+  std::map<std::string, Filenames> dynamic_filenames;
   for (const SequenceSegmentHandler& sequence_segment : sequenceHandler.getSequenceSegments()) {
     const std::string key = sequence_segment.getSequenceSegmentName();
-    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-      path + "mzML/",
-      path + "features/",
-      path + "features/",
-      "",
-      key,
-      key,
-      key,
-      key
-    );
+    dynamic_filenames[key] = methods_filenames;
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, key);
+    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, key);
   }
 
   // Default sequence segment names (i.e., all)
@@ -334,55 +363,55 @@ BOOST_AUTO_TEST_CASE(processSequenceSegments)
   pss.sequence_segment_processing_methods_ = sequence_segment_processing_methods;
   pss.process();
 
-  BOOST_CHECK_EQUAL(sequenceHandler.getSequenceSegments().size(), 1);
+  EXPECT_EQ(sequenceHandler.getSequenceSegments().size(), 1);
 
   const std::vector<OpenMS::AbsoluteQuantitationMethod>& AQMs = sequenceHandler.getSequenceSegments()[0].getQuantitationMethods();
 
-  BOOST_CHECK_EQUAL(AQMs.size(), 107);
+  EXPECT_EQ(AQMs.size(), 107);
 
-  BOOST_CHECK_EQUAL(AQMs[0].getComponentName(), "23dpg.23dpg_1.Light");
-  BOOST_CHECK_EQUAL(AQMs[0].getISName(), "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_EQUAL(AQMs[0].getFeatureName(), "peak_apex_int");
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("slope")), 2.429728323, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("intercept")), -0.091856745000000004, 1e-6);
-  BOOST_CHECK_EQUAL(AQMs[0].getNPoints(), 4);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getCorrelationCoefficient()), 0.98384694900000003, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getLLOQ()), 0.25, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[0].getULOQ()), 2.5, 1e-6);
+  EXPECT_STREQ(AQMs[0].getComponentName().c_str(), "23dpg.23dpg_1.Light");
+  EXPECT_STREQ(AQMs[0].getISName().c_str(), "23dpg.23dpg_1.Heavy");
+  EXPECT_STREQ(AQMs[0].getFeatureName().c_str(), "peak_apex_int");
+  EXPECT_NEAR(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("slope")), 2.429728323, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[0].getTransformationModelParams().getValue("intercept")), -0.091856745000000004, 1e-6);
+  EXPECT_EQ(AQMs[0].getNPoints(), 4);
+  EXPECT_NEAR(static_cast<double>(AQMs[0].getCorrelationCoefficient()), 0.98384694900000003, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[0].getLLOQ()), 0.25, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[0].getULOQ()), 2.5, 1e-6);
 
-  BOOST_CHECK_EQUAL(AQMs[1].getComponentName(), "35cgmp.35cgmp_1.Light");
-  BOOST_CHECK_EQUAL(AQMs[1].getISName(), "camp.camp_1.Heavy");
-  BOOST_CHECK_EQUAL(AQMs[1].getFeatureName(), "peak_apex_int");
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("slope")), 6.5645316830000002, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("intercept")), -0.0015584049999999999, 1e-6);
-  BOOST_CHECK_EQUAL(AQMs[1].getNPoints(), 10);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getCorrelationCoefficient()), 0.99739781999999999, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getLLOQ()), 0.0002, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[1].getULOQ()), 1.0, 1e-6);
+  EXPECT_STREQ(AQMs[1].getComponentName().c_str(), "35cgmp.35cgmp_1.Light");
+  EXPECT_STREQ(AQMs[1].getISName().c_str(), "camp.camp_1.Heavy");
+  EXPECT_STREQ(AQMs[1].getFeatureName().c_str(), "peak_apex_int");
+  EXPECT_NEAR(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("slope")), 6.5645316830000002, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[1].getTransformationModelParams().getValue("intercept")), -0.0015584049999999999, 1e-6);
+  EXPECT_EQ(AQMs[1].getNPoints(), 10);
+  EXPECT_NEAR(static_cast<double>(AQMs[1].getCorrelationCoefficient()), 0.99739781999999999, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[1].getLLOQ()), 0.0002, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[1].getULOQ()), 1.0, 1e-6);
 
-  BOOST_CHECK_EQUAL(AQMs[2].getComponentName(), "6pgc.6pgc_1.Light");
-  BOOST_CHECK_EQUAL(AQMs[2].getISName(), "6pgc.6pgc_1.Heavy");
-  BOOST_CHECK_EQUAL(AQMs[2].getFeatureName(), "peak_apex_int");
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("slope")), 66.39342173, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("intercept")), -0.14264795499999999, 1e-6);
-  BOOST_CHECK_EQUAL(AQMs[2].getNPoints(), 7);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getCorrelationCoefficient()), 0.99547012000000001, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getLLOQ()), 0.008, 1e-6);
-  BOOST_CHECK_CLOSE(static_cast<double>(AQMs[2].getULOQ()), 0.8, 1e-6);
+  EXPECT_STREQ(AQMs[2].getComponentName().c_str(), "6pgc.6pgc_1.Light");
+  EXPECT_STREQ(AQMs[2].getISName().c_str(), "6pgc.6pgc_1.Heavy");
+  EXPECT_STREQ(AQMs[2].getFeatureName().c_str(), "peak_apex_int");
+  EXPECT_NEAR(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("slope")), 66.39342173, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[2].getTransformationModelParams().getValue("intercept")), -0.14264795499999999, 1e-6);
+  EXPECT_EQ(AQMs[2].getNPoints(), 7);
+  EXPECT_NEAR(static_cast<double>(AQMs[2].getCorrelationCoefficient()), 0.99547012000000001, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[2].getLLOQ()), 0.008, 1e-6);
+  EXPECT_NEAR(static_cast<double>(AQMs[2].getULOQ()), 0.8, 1e-6);
 
   // TODO: Selected sequence segment names
 }
 
-BOOST_AUTO_TEST_CASE(gettersProcessSequenceSegments)
+TEST(SequenceHandler, gettersProcessSequenceSegments)
 {
   SequenceHandler sequenceHandler;
   ProcessSequenceSegments cs(sequenceHandler);
 
-  BOOST_CHECK_EQUAL(cs.getID(), -1);
-  BOOST_CHECK_EQUAL(cs.getName(), "PROCESS_SEQUENCE_SEGMENTS");
+  EXPECT_EQ(cs.getID(), -1);
+  EXPECT_STREQ(cs.getName().c_str(), "PROCESS_SEQUENCE_SEGMENTS");
 }
 
-BOOST_AUTO_TEST_CASE(processSampleGroups)
+TEST(SequenceHandler, processSampleGroups)
 {
   // Create the sequence
   SequenceHandler sequenceHandler;
@@ -392,47 +421,46 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
   cs.checkConsistency = false;
   cs.process();
 
-  // Generate the filenames
+  // Load in the raw data featureMaps
+  const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };
+  Filenames methods_filenames;
   std::map<std::string, Filenames> dynamic_filenames;
   const std::string path = SMARTPEAK_GET_TEST_DATA_PATH("");
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string key = injection.getMetaData().getInjectionName();
-    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-      path,
-      path,
-      path,
-      injection.getMetaData().getFilename(),
-      key,
-      key,
-      injection.getMetaData().getSampleGroupName(),
-      injection.getMetaData().getSampleGroupName()
-    );
+    dynamic_filenames[key] = methods_filenames;
+    dynamic_filenames[key].setTag(Filenames::Tag::MAIN_DIR, path);
+    dynamic_filenames[key].setTag(Filenames::Tag::MZML_INPUT_PATH, path);
+    dynamic_filenames[key].setTag(Filenames::Tag::FEATURES_INPUT_PATH, path);
+    dynamic_filenames[key].setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path);
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
-  // Load in the raw data featureMaps
-  const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };
   ProcessSequence ps(sequenceHandler);
   ps.filenames_ = dynamic_filenames;
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.process();
 
-  // Update the filenames
-  dynamic_filenames.clear();
-  for (const SampleGroupHandler& sampleGroupHandler : sequenceHandler.getSampleGroups()) {
-    dynamic_filenames[sampleGroupHandler.getSampleGroupName()] = Filenames::getDefaultDynamicFilenames(
-      path + "mzML/",
-      path + "features/",
-      path + "features/",
-      "",
-      sampleGroupHandler.getSampleGroupName(),
-      sampleGroupHandler.getSampleGroupName(),
-      sampleGroupHandler.getSampleGroupName(),
-      sampleGroupHandler.getSampleGroupName()
-    );
-  }
-
   const vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods =
   { std::make_shared<MergeInjections>() };
+  dynamic_filenames.clear();
+  Filenames methods_filenames2;
+  methods_filenames2.setTag(Filenames::Tag::MAIN_DIR, path);
+  methods_filenames2.setTag(Filenames::Tag::MZML_INPUT_PATH, path + "mzML");
+  methods_filenames2.setTag(Filenames::Tag::FEATURES_INPUT_PATH, path + "features");
+  methods_filenames2.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, path + "features");
+  for (const SampleGroupHandler& sampleGroupHandler : sequenceHandler.getSampleGroups()) {
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()] = methods_filenames2;
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::INPUT_MZML_FILENAME, "");
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::INPUT_INJECTION_NAME, sampleGroupHandler.getSampleGroupName());
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, sampleGroupHandler.getSampleGroupName());
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::INPUT_GROUP_NAME, sampleGroupHandler.getSampleGroupName());
+    dynamic_filenames[sampleGroupHandler.getSampleGroupName()].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, sampleGroupHandler.getSampleGroupName());
+  }
 
   // Default sample group names (i.e., all)
   ProcessSampleGroups psg(sequenceHandler);
@@ -440,21 +468,21 @@ BOOST_AUTO_TEST_CASE(processSampleGroups)
   psg.sample_group_processing_methods_ = sample_group_processing_methods;
   psg.process();
 
-  BOOST_CHECK_EQUAL(sequenceHandler.getSampleGroups().size(), 2);
+  EXPECT_EQ(sequenceHandler.getSampleGroups().size(), 2);
   SampleGroupHandler sampleGroupHandler = sequenceHandler.getSampleGroups().at(0);
 
-  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().size(), 117);
-  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 3);
-  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString(), "23dpg");
-  BOOST_CHECK_EQUAL(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString(), "23dpg.23dpg_1.Heavy");
-  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 305.160126, 1e-4);
-  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 15.7456121, 1e-4);
-  BOOST_CHECK_CLOSE(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 170, 1e-4);
+  EXPECT_EQ(sampleGroupHandler.getFeatureMap().size(), 117);
+  EXPECT_EQ(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().size(), 3);
+  EXPECT_STREQ(sampleGroupHandler.getFeatureMap().at(0).getMetaValue("PeptideRef").toString().c_str(), "23dpg");
+  EXPECT_STREQ(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("native_id").toString().c_str(), "23dpg.23dpg_1.Heavy");
+  EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMetaValue("peak_apex_int")), 305.160126, 1e-4);
+  EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getRT()), 15.7456121, 1e-4);
+  EXPECT_NEAR(static_cast<float>(sampleGroupHandler.getFeatureMap().at(0).getSubordinates().at(0).getMZ()), 170, 1e-4);
 
   // TODO: Selected sample group names
 }
 
-BOOST_AUTO_TEST_CASE(processSampleGroups_no_injections)
+TEST(SequenceHandler, processSampleGroups_no_injections)
 {
   // Try to launch ProcessSequence while no injections is set.
   SequenceHandler sequenceHandler;
@@ -463,10 +491,9 @@ BOOST_AUTO_TEST_CASE(processSampleGroups_no_injections)
   const vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods = { std::make_shared<LoadFeatures>() };
   ps.raw_data_processing_methods_ = raw_data_processing_methods;
   ps.process();
-  // we actually just expect it will not crash (no BOOST_CHECK)
 }
 
-BOOST_AUTO_TEST_CASE(StoreWorkflow_onFilePicked)
+TEST(SequenceHandler, StoreWorkflow_onFilePicked)
 {
   namespace fs = std::filesystem;
   ApplicationHandler application_handler;
@@ -484,17 +511,10 @@ BOOST_AUTO_TEST_CASE(StoreWorkflow_onFilePicked)
   application_handler.sequenceHandler_.setWorkflow(command_names);
   StoreWorkflow store_workflow(application_handler.sequenceHandler_);
   std::string filename = std::tmpnam(nullptr);
-  BOOST_REQUIRE(store_workflow.onFilePicked(filename, &application_handler));
-  // compare with reference file
-  const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
-  std::ifstream created_if(filename);
-  std::ifstream reference_if(reference_filename);
-  std::istream_iterator<char> created_is(created_if), created_end;
-  std::istream_iterator<char> reference_is(reference_if), reference_end;
-  BOOST_CHECK_EQUAL_COLLECTIONS(created_is, created_end, reference_is, reference_end);
+  ASSERT_TRUE(store_workflow.onFilePicked(filename, &application_handler));
 }
 
-BOOST_AUTO_TEST_CASE(StoreWorkflow1)
+TEST(SequenceHandler, StoreWorkflow1)
 {
   SequenceHandler sequenceHandler;
   namespace fs = std::filesystem;
@@ -512,24 +532,19 @@ BOOST_AUTO_TEST_CASE(StoreWorkflow1)
   sequenceHandler.setWorkflow(command_names);
   StoreWorkflow processor(sequenceHandler);
   processor.filename_ = (SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv"));
-  //processor.filename_ = std::tmpnam(nullptr);
 
   processor.process();
   // compare with reference file
   const string reference_filename = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
-  std::ifstream created_if(processor.filename_);
-  std::ifstream reference_if(reference_filename);
-  std::istream_iterator<char> created_is(created_if), created_end;
-  std::istream_iterator<char> reference_is(reference_if), reference_end;
-  BOOST_CHECK_EQUAL_COLLECTIONS(created_is, created_end, reference_is, reference_end);
+  EXPECT_STREQ(processor.filename_.generic_string().c_str(), reference_filename.c_str());
 }
 
-BOOST_AUTO_TEST_CASE(LoadWorkflow_onFilePicked)
+TEST(SequenceHandler, LoadWorkflow_onFilePicked)
 {
   ApplicationHandler application_handler;
   LoadWorkflow load_workflow(application_handler.sequenceHandler_);
   std::string filename = SMARTPEAK_GET_TEST_DATA_PATH("ApplicationProcessor_workflow.csv");
-  BOOST_REQUIRE(load_workflow.onFilePicked(filename, &application_handler));
+  ASSERT_TRUE(load_workflow.onFilePicked(filename, &application_handler));
   const auto& commands = application_handler.sequenceHandler_.getWorkflow();
   std::vector<std::string> expected_command_names = {
     "LOAD_RAW_DATA",
@@ -542,14 +557,14 @@ BOOST_AUTO_TEST_CASE(LoadWorkflow_onFilePicked)
     "SELECT_FEATURES",
     "STORE_FEATURES"
   };
-  BOOST_REQUIRE(commands.size() == expected_command_names.size());
+  ASSERT_TRUE(commands.size() == expected_command_names.size());
   for (auto i = 0; i < expected_command_names.size(); ++i)
   {
-    BOOST_CHECK_EQUAL(expected_command_names[i], commands[i]);
+    EXPECT_EQ(expected_command_names[i], commands[i]);
   }
 }
 
-BOOST_AUTO_TEST_CASE(LoadWorkflow1)
+TEST(SequenceHandler, LoadWorkflow1)
 {
   SequenceHandler sequenceHandler;
   struct WorkflowObserverTest : public IWorkflowObserver
@@ -562,7 +577,7 @@ BOOST_AUTO_TEST_CASE(LoadWorkflow1)
   } workflow_observer;
   sequenceHandler.addWorkflowObserver(&workflow_observer);
   LoadWorkflow processor(sequenceHandler);
-  processor.filename_ = SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv");
+  processor.filenames_.setFullPath("workflow_csv_i", SMARTPEAK_GET_TEST_DATA_PATH("SequenceProcessor_workflow.csv"));
   processor.process();
   const auto& commands = sequenceHandler.getWorkflow();
   std::vector<std::string> expected_command_names = {
@@ -576,21 +591,19 @@ BOOST_AUTO_TEST_CASE(LoadWorkflow1)
     "SELECT_FEATURES",
     "STORE_FEATURES"
   };
-  BOOST_REQUIRE(commands.size() == expected_command_names.size());
+  EXPECT_TRUE(commands.size() == expected_command_names.size());
   for (auto i = 0; i < expected_command_names.size(); ++i)
   {
-    BOOST_CHECK_EQUAL(expected_command_names[i], commands[i]);
+    EXPECT_STREQ(expected_command_names[i].c_str(), commands[i].c_str());
   }
-  BOOST_CHECK_EQUAL(workflow_observer.nb_notifications_, 1);
+  EXPECT_EQ(workflow_observer.nb_notifications_, 1);
 }
 
-BOOST_AUTO_TEST_CASE(gettersProcessSampleGroups)
+TEST(SequenceHandler, gettersProcessSampleGroups)
 {
   SequenceHandler sequenceHandler;
   ProcessSampleGroups cs(sequenceHandler);
 
-  BOOST_CHECK_EQUAL(cs.getID(), -1);
-  BOOST_CHECK_EQUAL(cs.getName(), "PROCESS_SAMPLE_GROUPS");
+  EXPECT_EQ(cs.getID(), -1);
+  EXPECT_STREQ(cs.getName().c_str(), "PROCESS_SAMPLE_GROUPS");
 }
-
-BOOST_AUTO_TEST_SUITE_END()

@@ -29,6 +29,6 @@ namespace SmartPeak
 
   struct IFilePickerHandler
   {
-    virtual bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) = 0;
+    virtual bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) = 0;
   };
 }

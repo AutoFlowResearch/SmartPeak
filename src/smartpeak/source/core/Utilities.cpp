@@ -538,26 +538,25 @@ namespace SmartPeak
     std::array<std::vector<std::string>, 4> directory_entries;
     std::vector<std::tuple<std::string, uintmax_t, std::string, std::time_t>> entries_temp;
     
-    for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied))
-    {
-      if (!isHiddenEntry(p))
-      {
-        auto last_write_time = std::filesystem::last_write_time(p.path());
-        auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(last_write_time
-                                                                                      - std::filesystem::file_time_type::clock::now()
-                                                                                      + std::chrono::system_clock::now());
-        std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
-        if (p.is_regular_file())
-        {
-          entries_temp.push_back(std::make_tuple(p.path().filename().string(), p.file_size(), p.path().extension().string(), cftime));
-        }
-        else if (p.is_directory())
-        {
-          std::tuple<float, uintmax_t> directory_info;
-          getDirectoryInfo(p, directory_info);
-          entries_temp.push_back(std::make_tuple(p.path().filename().string(), std::get<1>(directory_info), "Directory", cftime));
+    try {
+      for (auto & p : std::filesystem::directory_iterator(folder_path, std::filesystem::directory_options::skip_permission_denied)) {
+        if (!isHiddenEntry(p)) {
+          auto last_write_time = std::filesystem::last_write_time(p.path());
+          auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(last_write_time
+                                                                                        - std::filesystem::file_time_type::clock::now()
+                                                                                        + std::chrono::system_clock::now());
+          std::time_t cftime = std::chrono::system_clock::to_time_t(sctp);
+          if (p.is_regular_file()) {
+            entries_temp.push_back(std::make_tuple(p.path().filename().string(), p.file_size(), p.path().extension().string(), cftime));
+          } else if (p.is_directory()) {
+            std::tuple<float, uintmax_t> directory_info;
+            getDirectoryInfo(p, directory_info);
+            entries_temp.push_back(std::make_tuple(p.path().filename().string(), std::get<1>(directory_info), "Directory", cftime));
+          }
         }
       }
+    } catch (const std::exception& e) {
+      LOGE << "Utilities::getFolderContents : " << typeid(e).name() << " : " << e.what();
     }
     
     if (entries_temp.size() > 1)
@@ -588,11 +587,15 @@ namespace SmartPeak
   std::string Utilities::getParentPath(const std::filesystem::path& p)
   {
     std::filesystem::path parent_path;
-    if (p.string() == ".") {
-      std::filesystem::path working_dir(std::filesystem::current_path());
-      parent_path = (working_dir.parent_path());
-    } else if (p.has_parent_path()) {
-      parent_path = (p.parent_path());
+    try {
+      if (p.string() == ".") {
+        std::filesystem::path working_dir(std::filesystem::current_path());
+        parent_path = (working_dir.parent_path());
+      } else if (p.has_parent_path()) {
+        parent_path = (p.parent_path());
+      }
+    } catch (const std::exception& e) {
+      LOGE << "Utilities::getParentPath : " << typeid(e).name() << " : " << e.what();
     }
     return parent_path.string();
   }
@@ -747,28 +750,36 @@ namespace SmartPeak
       
       if (entry_size >= 0 && entry_size < 1e3)
       {
-        size_human_readable_stream << std::fixed << std::setprecision(2) << entry_size;
+        size_human_readable_stream << entry_size;
         size_human_readable = size_human_readable_stream.str() + " Bytes";
       }
       if (entry_size >= 1e3 && entry_size < 1e6)
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e3);
-        size_human_readable = size_human_readable_stream.str() + " KB";
+        auto size_human_readable_str = size_human_readable_stream.str();
+        removeTrailing(size_human_readable_str, ".00");
+        size_human_readable = size_human_readable_str + " KB";
       }
       else if (entry_size >= 1e6 && entry_size < 1e9)
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e6);
-        size_human_readable = size_human_readable_stream.str() + " MB";
+        auto size_human_readable_str = size_human_readable_stream.str();
+        removeTrailing(size_human_readable_str, ".00");
+        size_human_readable = size_human_readable_str + " MB";
       }
       else if (entry_size >= 1e9 && entry_size < 1e12)
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e9);
-        size_human_readable = size_human_readable_stream.str() + " GB";
+        auto size_human_readable_str = size_human_readable_stream.str();
+        removeTrailing(size_human_readable_str, ".00");
+        size_human_readable = size_human_readable_str + " GB";
       }
       else if (entry_size >= 1e12 && entry_size < 1e18)
       {
         size_human_readable_stream << std::fixed << std::setprecision(2) << (entry_size / 1e12);
-        size_human_readable = size_human_readable_stream.str() + " TB";
+        auto size_human_readable_str = size_human_readable_stream.str();
+        removeTrailing(size_human_readable_str, ".00");
+        size_human_readable = size_human_readable_str + " TB";
       }
     
       directory_entry.entry_contents[1] = size_human_readable;
@@ -809,5 +820,18 @@ namespace SmartPeak
       std::strftime(date_time_buffer, sizeof date_time_buffer, "%c", std::localtime(&entry_date_time));
       directory_entry.entry_contents[3] = date_time_buffer;
     }
+  }
+
+  std::string Utilities::str2upper(const std::string& str)
+  {
+    auto str_ = str;
+    std::transform(str_.begin(), str_.end(), str_.begin(), ::toupper);
+    return str_;
+  }
+
+  void Utilities::removeTrailing(std::string& str, std::string to_remove)
+  {
+    auto it = str.find(to_remove);
+    if (it != std::string::npos) str.erase(it, str.length());
   }
 }

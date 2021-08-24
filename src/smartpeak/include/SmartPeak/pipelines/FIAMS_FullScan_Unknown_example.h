@@ -28,14 +28,14 @@ using namespace SmartPeak;
 
 void example_FIAMS_FullScan_Unknowns(
   const std::string& dir_I,
-  const Filenames& static_filenames,
+  const Filenames& filenames_I,
   const std::string& delimiter_I = ","
 )
 {
   SequenceHandler sequenceHandler;
 
   CreateSequence cs(sequenceHandler);
-  cs.filenames_        = static_filenames;
+  cs.filenames_        = filenames_I;
   cs.delimiter        = delimiter_I;
   cs.checkConsistency = true;
   cs.process();
@@ -50,19 +50,21 @@ void example_FIAMS_FullScan_Unknowns(
     std::make_shared<StoreFeatures>()
   };
 
+  Filenames methods_filenames;
+  methods_filenames.setTag(Filenames::Tag::MAIN_DIR, dir_I);
+  methods_filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, dir_I + "/mzML/");
+  methods_filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, dir_I + "/features/");
+  methods_filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, dir_I + "/features/");
+
   std::map<std::string, Filenames> dynamic_filenames;
   for (const InjectionHandler& injection : sequenceHandler.getSequence()) {
     const std::string& key = injection.getMetaData().getInjectionName();
-    dynamic_filenames[key] = Filenames::getDefaultDynamicFilenames(
-      dir_I + "/mzML/",
-      dir_I + "/features/",
-      dir_I + "/features/",
-      injection.getMetaData().getFilename(),
-      key,
-      key,
-      injection.getMetaData().getSampleGroupName(),
-      injection.getMetaData().getSampleGroupName()
-    );
+    dynamic_filenames[key] = methods_filenames;
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_MZML_FILENAME, injection.getMetaData().getFilename());
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, key);
+    dynamic_filenames[key].setTag(Filenames::Tag::INPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
+    dynamic_filenames[key].setTag(Filenames::Tag::OUTPUT_GROUP_NAME, injection.getMetaData().getSampleGroupName());
   }
 
   ProcessSequence ps(sequenceHandler);

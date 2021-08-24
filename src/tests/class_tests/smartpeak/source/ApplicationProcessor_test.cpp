@@ -17,14 +17,13 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE ApplicationProcessor test suite
-#include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/ApplicationProcessor.h>
 #include <SmartPeak/core/SequenceProcessor.h>
 #include <SmartPeak/core/Filenames.h>
@@ -33,7 +32,7 @@
 using namespace SmartPeak;
 using namespace std;
 
-struct ApplicationProcessorFixture 
+struct ApplicationProcessorFixture : public ::testing::Test
 {
   /* ctor/dtor */
   ApplicationProcessorFixture() 
@@ -41,8 +40,7 @@ struct ApplicationProcessorFixture
     datapath_ = SMARTPEAK_GET_TEST_DATA_PATH("");
     auto workflow = std::filesystem::path{ datapath_ } / std::filesystem::path{ "workflow_csv_files" };
 
-    filenames_ = Filenames::getDefaultStaticFilenames(workflow.string());
-    filenames_.referenceData_csv_i = (std::filesystem::path{ datapath_ } / std::filesystem::path{ "MRMFeatureValidator_referenceData_1.csv" }).string();
+    filenames_.setFullPath("referenceData_csv_i", (std::filesystem::path{datapath_} / std::filesystem::path{"MRMFeatureValidator_referenceData_1.csv"}).string());
 
     // Injections sequence:
     std::vector<InjectionHandler> seq;
@@ -75,87 +73,83 @@ public:
   Filenames filenames_;
 };
 
-BOOST_FIXTURE_TEST_SUITE(ApplicationProcessor, ApplicationProcessorFixture)
-
 /* CreateCommand */
-BOOST_AUTO_TEST_CASE(CreateCommand_GetName)
+TEST_F(ApplicationProcessorFixture, CreateCommand_GetName)
 {
   CreateCommand cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "CreateCommand");
+  EXPECT_STREQ(cmd.getName().c_str(), "CreateCommand");
 }
 
-BOOST_AUTO_TEST_CASE(CreateCommand_ProcessFailsOnEmptyCommand)
+TEST_F(ApplicationProcessorFixture, CreateCommand_ProcessFailsOnEmptyCommand)
 {
   CreateCommand cmd{ ah_ };
   cmd.name_ = "";
   auto created = cmd.process();
-  BOOST_CHECK(!created);
+  EXPECT_TRUE(!created);
 }
 
-BOOST_AUTO_TEST_CASE(CreateCommand_ProcessFailsOnWrongCommandName)
+TEST_F(ApplicationProcessorFixture, CreateCommand_ProcessFailsOnWrongCommandName)
 {
   CreateCommand cmd{ ah_ };
   cmd.name_ = "BAD_COMMAND_NAME";
   auto created = cmd.process();
-  BOOST_CHECK(!created);
+  EXPECT_TRUE(!created);
 }
 
-BOOST_AUTO_TEST_CASE(CreateCommand_ProcessSucceedsOnValidCommandName)
+TEST_F(ApplicationProcessorFixture, CreateCommand_ProcessSucceedsOnValidCommandName)
 {
   CreateCommand cmd{ ah_ };
   // Raw data method
   {
     cmd.name_ = "LOAD_RAW_DATA";
     auto created = cmd.process();
-    BOOST_CHECK(created);
+    EXPECT_TRUE(created);
   }
   // Sequence Segment Method
   {
     cmd.name_ = "LOAD_FEATURE_QCS";
     auto created = cmd.process();
-    BOOST_CHECK(created);
+    EXPECT_TRUE(created);
   }
   // Sample Group Method
   {
     cmd.name_ = "MERGE_INJECTIONS";
     auto created = cmd.process();
-    BOOST_CHECK(created);
+    EXPECT_TRUE(created);
   }
 }
 
 /* BuildCommandsFromNames */
-BOOST_AUTO_TEST_CASE(BuildCommandsFromNames_Process)
+TEST_F(ApplicationProcessorFixture, BuildCommandsFromNames_Process)
 {
   ApplicationHandler application_handler;
   BuildCommandsFromNames buildCommandsFromNames(application_handler);
   std::vector<ApplicationHandler::Command> methods;
 
   buildCommandsFromNames.names_ = {};
-  BOOST_CHECK(buildCommandsFromNames.process());
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.size(), 0);
+  EXPECT_TRUE(buildCommandsFromNames.process());
+  EXPECT_EQ(buildCommandsFromNames.commands_.size(), 0);
 
   buildCommandsFromNames.names_ = { "LOAD_RAW_DATA", "LOAD_FEATURES", "PICK_MRM_FEATURES" };
-  BOOST_CHECK(buildCommandsFromNames.process());
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.size(), 3);
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(0).getName(), "LOAD_RAW_DATA");
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(1).getName(), "LOAD_FEATURES");
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(2).getName(), "PICK_MRM_FEATURES");
+  EXPECT_TRUE(buildCommandsFromNames.process());
+  EXPECT_EQ(buildCommandsFromNames.commands_.size(), 3);
+  EXPECT_STREQ(buildCommandsFromNames.commands_.at(0).getName().c_str(), "LOAD_RAW_DATA");
+  EXPECT_STREQ(buildCommandsFromNames.commands_.at(1).getName().c_str(), "LOAD_FEATURES");
+  EXPECT_STREQ(buildCommandsFromNames.commands_.at(2).getName().c_str(), "PICK_MRM_FEATURES");
 
   buildCommandsFromNames.names_ = { "LOAD_RAW_DATA", "PLOT_FEATURES", "LOAD_FEATURES" }; // no plotting processor yet
-  BOOST_CHECK(!buildCommandsFromNames.process());
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.size(), 2);
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(0).getName(), "LOAD_RAW_DATA");
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.at(1).getName(), "LOAD_FEATURES");
+  EXPECT_TRUE(!buildCommandsFromNames.process());
+  EXPECT_EQ(buildCommandsFromNames.commands_.size(), 2);
+  EXPECT_STREQ(buildCommandsFromNames.commands_.at(0).getName().c_str(), "LOAD_RAW_DATA");
+  EXPECT_STREQ(buildCommandsFromNames.commands_.at(1).getName().c_str(), "LOAD_FEATURES");
 
   buildCommandsFromNames.names_ = { "55", "87" };
-  BOOST_CHECK(!buildCommandsFromNames.process());
-  BOOST_CHECK_EQUAL(buildCommandsFromNames.commands_.size(), 0);
+  EXPECT_TRUE(!buildCommandsFromNames.process());
+  EXPECT_EQ(buildCommandsFromNames.commands_.size(), 0);
 }
 
-BOOST_AUTO_TEST_CASE(BuildCommandsFromNames_GetName)
+TEST_F(ApplicationProcessorFixture, BuildCommandsFromNames_GetName)
 {
   BuildCommandsFromNames cmd{ ah_ };
-  BOOST_CHECK_EQUAL(cmd.getName(), "BuildCommandsFromNames");
+  EXPECT_STREQ(cmd.getName().c_str(), "BuildCommandsFromNames");
 }
-
-BOOST_AUTO_TEST_SUITE_END()

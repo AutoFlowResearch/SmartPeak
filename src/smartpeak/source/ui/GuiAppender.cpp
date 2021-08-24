@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -35,13 +35,13 @@ namespace SmartPeak
     messages.emplace_back(record.getSeverity(), str);
   }
 
-  std::vector<plog::util::nstring> GuiAppender::getMessageList(plog::Severity severity) const
+  std::vector<GuiAppender::GuiAppenderRecord> GuiAppender::getAppenderRecordList(plog::Severity severity) const
   {
-    std::vector<plog::util::nstring> filtered;
+    std::vector<GuiAppender::GuiAppenderRecord> filtered;
     std::lock_guard<std::mutex> g(messages_mutex);
-    for (const GuiAppenderRecord& p : messages) {
+    for (const GuiAppender::GuiAppenderRecord& p : messages) {
       if (p.first <= severity) {
-        filtered.push_back(p.second);
+        filtered.push_back(p);
       }
     }
     return filtered;

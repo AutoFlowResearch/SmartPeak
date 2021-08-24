@@ -23,16 +23,20 @@
 
 #pragma once
 
-#include <string>
-#include <utility>
-#include <vector>
-#include <functional>
+
 #include <imgui.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/ui/ImEntry.h>
 #include <SmartPeak/ui/Help.h>
 #include <unsupported/Eigen/CXX11/Tensor>
 #include <SmartPeak/iface/ISequenceSegmentObserver.h>
+#include <SmartPeak/iface/IFeaturesObserver.h>
+#include <SmartPeak/core/EventDispatcher.h>
+
+#include <string>
+#include <utility>
+#include <vector>
+#include <functional>
 
 /**
 Generic and base classes for Widgets
@@ -190,12 +194,34 @@ namespace SmartPeak
     bool plot_unplot_all_deactivated_ = false;
     int selected_col_ = 0;
     int plot_idx_ = -1;
+    const int max_rows_ = 100;
+    size_t print_until_ = 0;
     unsigned int table_entries_plot_col_ = 0;
     unsigned int checkbox_columns_plot_col_ = 0;
     std::string plot_switch_ = "";
     std::vector<const char*> cols_;
     bool data_changed_ = false;
     std::vector<std::tuple<size_t, size_t>> selected_cells_;
+  };
+
+  struct FeaturesTableWidget : public GenericTableWidget, public IFeaturesObserver
+  {
+    FeaturesTableWidget(const std::string& table_id,
+      const std::string title = "",
+      FeaturesObservable* observable = nullptr)
+    : GenericTableWidget(table_id, title)
+    {
+      if (observable) observable->addFeaturesObserver(this);
+    };
+
+    /**
+      IFeaturesObserver
+    */
+    virtual void onFeaturesUpdated() override
+    {
+      table_data_.clear();
+      data_changed_ = false;
+    };
   };
 
 
@@ -296,19 +322,20 @@ namespace SmartPeak
     - searching
     - color coding of rows by status
   */
-  class ExplorerWidget final : 
-    public GenericTableWidget,
-    public ISequenceObserver
-  {
-  public:
-    ExplorerWidget(const std::string& table_id, const std::string title ="", SequenceObservable* sequence_observable = nullptr)
-      :GenericTableWidget(table_id, title)
+  class ExplorerWidget :
+      public GenericTableWidget,
+      public ISequenceObserver,
+      public IFeaturesObserver
     {
-      if (sequence_observable)
+    public:
+      ExplorerWidget(const std::string& table_id, const std::string title ="", SequenceObservable* sequence_observable = nullptr)
+        :GenericTableWidget(table_id, title)
       {
-        sequence_observable->addSequenceObserver(this);
-      }
-    };
+        if (sequence_observable)
+        {
+          sequence_observable->addSequenceObserver(this);
+        }
+      };
     /*
     @brief Show the explorer
 
@@ -322,6 +349,11 @@ namespace SmartPeak
     ISequenceObserver
     */
     virtual void onSequenceUpdated() override;
+    
+    /**
+    IFeaturesObserver
+    */
+    virtual void onFeaturesUpdated() override;
 
     Eigen::Tensor<std::string, 1> checkbox_headers_;
     Eigen::Tensor<bool, 2> *checkbox_columns_ = nullptr;
@@ -395,49 +427,9 @@ namespace SmartPeak
   };
 
   /**
-  @brief Base class for ScatterPlot widgets
-  */
-  class ScatterPlotWidget : public GenericGraphicWidget
-  {
-  public:
-    ScatterPlotWidget(SessionHandler& session_handler,
-      SequenceHandler& sequence_handler,
-      const std::string& id,
-      const std::string& title) :
-      GenericGraphicWidget(title),
-      session_handler_(session_handler),
-      sequence_handler_(sequence_handler),
-      plot_title_(id) {};
-    void draw() override;
-
-  protected:
-    virtual void updateScatterPlotData() = 0;
-
-  protected:
-    SessionHandler& session_handler_;
-    SequenceHandler& sequence_handler_;
-    const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
-    bool show_legend_ = true;
-    bool compact_view_ = true;
-    SessionHandler::ScatterPlotData chrom_;
-    bool refresh_needed_ = false;
-    std::pair<float, float> slider_min_max_ = { 0.0f, 0.0f };
-    std::pair<float, float> current_range_ = { 0.0f, 0.0f };
-  };
-
-  /**
     @brief Base class for all tree layouts
   */
   class GenericTreeWidget : public Widget
-  {
-  public:
-    void draw() override;
-  };
-
-  /**
-    @brief Class for configuring a workflow
-  */
-  class WorkflowWidget : public GenericGraphicWidget
   {
   public:
     void draw() override;

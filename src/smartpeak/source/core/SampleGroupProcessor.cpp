@@ -26,10 +26,118 @@
 #include <SmartPeak/core/FeatureMetadata.h>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <OpenMS/FORMAT/FeatureXMLFile.h>
+#include <SmartPeak/io/SelectDilutionsParser.h>
 #include <plog/Log.h>
 
 namespace SmartPeak
 {
+  ParameterSet SelectDilutions::getParameterSchema() const
+  {
+    std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
+    {"SelectDilutions", {
+      {
+        {"name", "selection_method"},
+        {"type", "string"},
+        {"value", "preferred"},
+        {"description", "'preferred' will use provided preferred component, but if not present we will use features from other dilutions. 'exclusive' will exclude all features that does not correspond to the dilution set in the select dilution file."},
+        {"valid_strings", "['preferred','exclusive']"}
+      }
+    }} });
+    return ParameterSet(param_struct);
+  }
+
+  void SelectDilutions::getFilenames(Filenames& filenames) const
+  {
+    filenames.addFileName("selectDilutions_csv_i", "${MAIN_DIR}/selectDilutions.csv");
+  };
+
+  void SelectDilutions::process(
+    SampleGroupHandler& sampleGroupHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    const Filenames& filenames_I
+  ) const
+  {
+    LOGD << "START SelectDilutions";
+    Filenames filenames = prepareFilenames(filenames_I);
+
+    ParameterSet params(params_I);
+    params.merge(getParameterSchema());
+
+    std::map<std::string, int> select_dilution_map;
+    try
+    {
+      SelectDilutionsParser::read(filenames.getFullPath("selectDilutions_csv_i").generic_string(), select_dilution_map);
+    }
+    catch (const std::exception& e)
+    {
+      LOGE << "Failed to read select dilutions file [" << filenames.getFullPath("selectDilutions_csv_i").generic_string() << "] : " << e.what();
+      return;
+    }
+
+    std::map<std::string, std::set<int>> existing_dilutions_map;
+    for (const std::size_t& index : sampleGroupHandler_IO.getSampleIndices())
+    {
+      auto& injection = sequenceHandler_I.getSequence().at(index);
+      for (const auto& feature : injection.getRawData().getFeatureMap())
+      {
+        for (const auto& sub_feature : feature.getSubordinates())
+        {
+          const auto& native_id = sub_feature.getMetaValue("native_id");
+          existing_dilutions_map.emplace(native_id, std::set<int>());
+          existing_dilutions_map[native_id].insert(injection.getMetaData().dilution_factor);
+        }
+      }
+    }
+
+    OpenMS::FeatureMap new_feature_map;
+    for (const std::size_t& index : sampleGroupHandler_IO.getSampleIndices())
+    {
+      auto& injection = sequenceHandler_I.getSequence().at(index);
+      for (const auto& feature : injection.getRawData().getFeatureMap())
+      {
+        auto new_feature = feature;
+        new_feature.getSubordinates().clear();
+        for (const auto& sub_feature : feature.getSubordinates())
+        {
+          bool add_feature = true;
+          const auto& native_id = sub_feature.getMetaValue("native_id");
+          if (select_dilution_map.count(native_id))
+          {
+            const auto preferred_dilution = select_dilution_map.at(native_id);
+            const auto injection_dilution = injection.getMetaData().dilution_factor;
+            if (!(std::abs(injection_dilution-preferred_dilution)<1e-6))
+            {
+              const auto select_method_param = params.findParameter("SelectDilutions", "selection_method");
+              assert(select_method_param != nullptr); // parameter merging will ensure that it cannot be null
+              const std::string& method = select_method_param->getValueAsString();
+              if (method == "preferred")
+              {
+                // if there is no other feature is listed with the preferred dilution, we will use that one
+                const auto& existing_dilutions = existing_dilutions_map[native_id];
+                add_feature = (std::find(existing_dilutions.begin(), existing_dilutions.end(), preferred_dilution) == existing_dilutions.end());
+              }
+              else // (method == "exclusive")
+              {
+                add_feature = false;
+              }
+            }
+          }
+          if (add_feature)
+          {
+            new_feature.getSubordinates().push_back(sub_feature);
+          }
+        }
+        if (!new_feature.getSubordinates().empty())
+        {
+          new_feature_map.push_back(new_feature);
+        }
+      }
+    }
+    sampleGroupHandler_IO.setFeatureMap(new_feature_map);
+    LOGD << "END SelectDilutions";
+  }
+
   ParameterSet MergeInjections::getParameterSchema() const
   {
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
@@ -87,10 +195,11 @@ namespace SmartPeak
     SampleGroupHandler& sampleGroupHandler_IO,
     const SequenceHandler& sequenceHandler_I,
     const ParameterSet& params_I,
-    const Filenames& filenames
+    const Filenames& filenames_I
   ) const
   {
     LOGD << "START MergeInjections";
+    Filenames filenames = prepareFilenames(filenames_I);
 
     // Check the parameters
     if (params_I.at("MergeInjections").empty() && params_I.at("MergeInjections").empty()) {
@@ -166,7 +275,7 @@ namespace SmartPeak
     std::set<std::string> scan_polarities;
     std::set<std::pair<float, float>> scan_mass_ranges;
     std::set<float> dilution_factors;
-    std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>> merge_keys_to_injection_name;
+    std::map<mergeKeyType, std::vector<std::set<std::string>>> merge_keys_to_injection_name;
     getMergeKeysToInjections(sampleGroupHandler_IO, sequenceHandler_I, scan_polarities, scan_mass_ranges, dilution_factors, merge_keys_to_injection_name);
 
     // Determine the ordering of merge
@@ -175,7 +284,7 @@ namespace SmartPeak
     // Organize the injection `FeatureMaps` into a map of std::pair<PeptideRef, native_id> with a value of
     // a map of `feature_name` with a value of
     // a map of a set of injection names with a value of the feature metadata value
-    std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>> component_to_feature_to_injection_to_values;
+    std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>> component_to_feature_to_injection_to_values;
     getComponentsToFeaturesToInjectionsToValues(sampleGroupHandler_IO, sequenceHandler_I, merge_subordinates, component_to_feature_to_injection_to_values);
     
     // Merge the components and features in order and in place
@@ -189,15 +298,23 @@ namespace SmartPeak
 
     // pass 2: mass ranges
     scan_mass_ranges_keys_tup = std::set<std::pair<float, float>>({std::make_pair(-1,-1)});
-    mergeComponentsToFeaturesToInjectionsToValues(scan_polarity_merge_feature_name, mass_range_merge_rule,
-      scan_polarities_keys_tup, scan_mass_ranges_keys_tup, dilution_factors_keys_tup,
-      merge_keys_to_injection_name, component_to_feature_to_injection_to_values);
+    mergeComponentsToFeaturesToInjectionsToValues(scan_polarity_merge_feature_name,
+                                                  mass_range_merge_rule,
+                                                  scan_polarities_keys_tup,
+                                                  scan_mass_ranges_keys_tup,
+                                                  dilution_factors_keys_tup,
+                                                  merge_keys_to_injection_name,
+                                                  component_to_feature_to_injection_to_values);
 
     // pass 3: scan polarities
     scan_polarities_keys_tup = std::set<std::string>({ "" });
-    mergeComponentsToFeaturesToInjectionsToValues(scan_polarity_merge_feature_name, scan_polarity_merge_rule,
-      scan_polarities_keys_tup, scan_mass_ranges_keys_tup, dilution_factors_keys_tup,
-      merge_keys_to_injection_name, component_to_feature_to_injection_to_values);
+    mergeComponentsToFeaturesToInjectionsToValues(scan_polarity_merge_feature_name,
+                                                  scan_polarity_merge_rule,
+                                                  scan_polarities_keys_tup,
+                                                  scan_mass_ranges_keys_tup,
+                                                  dilution_factors_keys_tup,
+                                                  merge_keys_to_injection_name,
+                                                  component_to_feature_to_injection_to_values);
 
     // Make the final merged feature
     std::set<std::string> injection_names_set;
@@ -212,21 +329,32 @@ namespace SmartPeak
     LOGI << "MergeInjections output size: " << fmap.size();
     LOGD << "END MergeInjections";
   }
-  void MergeInjections::getMergeKeysToInjections(const SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, std::set<std::string>& scan_polarities, std::set<std::pair<float, float>>& scan_mass_ranges, std::set<float>& dilution_factors, std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>>& merge_keys_to_injection_name)
+
+  void MergeInjections::getMergeKeysToInjections(const SampleGroupHandler& sampleGroupHandler_IO,
+                                                 const SequenceHandler& sequenceHandler_I,
+                                                 std::set<std::string>& scan_polarities,
+                                                 std::set<std::pair<float, float>>& scan_mass_ranges,
+                                                 std::set<float>& dilution_factors,
+                                                 std::map<mergeKeyType, std::vector<std::set<std::string>>>& merge_keys_to_injection_name)
   {
-    for (const std::size_t& index : sampleGroupHandler_IO.getSampleIndices()) {
-      const auto key = std::make_tuple(sequenceHandler_I.getSequence().at(index).getMetaData().scan_polarity,
-        std::make_pair(sequenceHandler_I.getSequence().at(index).getMetaData().scan_mass_low, sequenceHandler_I.getSequence().at(index).getMetaData().scan_mass_high),
-        sequenceHandler_I.getSequence().at(index).getMetaData().dilution_factor);
+    for (const std::size_t& index : sampleGroupHandler_IO.getSampleIndices())
+    {
+      const auto& injection_metadata = sequenceHandler_I.getSequence().at(index).getMetaData();
+      const auto key = std::make_tuple(injection_metadata.scan_polarity,
+                                       std::make_pair(injection_metadata.scan_mass_low, injection_metadata.scan_mass_high),
+                                       injection_metadata.dilution_factor);
       merge_keys_to_injection_name.emplace(key, std::vector<std::set<std::string>>());
-      std::set<std::string> value({ sequenceHandler_I.getSequence().at(index).getMetaData().getInjectionName() });
+      std::set<std::string> value({ injection_metadata.getInjectionName() });
       merge_keys_to_injection_name.at(key).push_back(value);
-      scan_polarities.insert(sequenceHandler_I.getSequence().at(index).getMetaData().scan_polarity);
-      scan_mass_ranges.insert(std::make_pair(sequenceHandler_I.getSequence().at(index).getMetaData().scan_mass_low, sequenceHandler_I.getSequence().at(index).getMetaData().scan_mass_high));
-      dilution_factors.insert(sequenceHandler_I.getSequence().at(index).getMetaData().dilution_factor);
+      scan_polarities.insert(injection_metadata.scan_polarity);
+      scan_mass_ranges.insert(std::make_pair(injection_metadata.scan_mass_low, injection_metadata.scan_mass_high));
+      dilution_factors.insert(injection_metadata.dilution_factor);
     }
   }
-  void MergeInjections::orderMergeKeysToInjections(std::set<std::string>& scan_polarities, const std::set<std::pair<float, float>>& scan_mass_ranges, const std::set<float>& dilution_factors, std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>>& merge_keys_to_injection_name)
+  void MergeInjections::orderMergeKeysToInjections(std::set<std::string>& scan_polarities,
+                                                   const std::set<std::pair<float, float>>& scan_mass_ranges,
+                                                   const std::set<float>& dilution_factors,
+                                                   std::map<mergeKeyType, std::vector<std::set<std::string>>>& merge_keys_to_injection_name)
   {
     // pass 1: dilutions
     for (const auto& scan_polarity : scan_polarities) {
@@ -279,7 +407,10 @@ namespace SmartPeak
       merge_keys_to_injection_name.at(key).push_back(injection_names_prev_merge);
     }
   }
-  void MergeInjections::getComponentsToFeaturesToInjectionsToValues(const SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const bool& merge_subordinates, std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values)
+  void MergeInjections::getComponentsToFeaturesToInjectionsToValues(const SampleGroupHandler& sampleGroupHandler_IO,
+                                                                    const SequenceHandler& sequenceHandler_I,
+                                                                    const bool& merge_subordinates,
+                                                                    std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values)
   {
     // initialize our map of feature names to values
     std::map<std::string, std::map<std::set<std::string>, float>> features_to_values;
@@ -297,10 +428,10 @@ namespace SmartPeak
       for (const OpenMS::Feature& f : fmap) {
         // Feature level merge
         if (!merge_subordinates) {
-          std::pair<std::string, std::string> component(f.getMetaValue("PeptideRef").toString(), "");
-          auto found = component_to_feature_to_injection_to_values.emplace(component, features_to_values);
+          componentKeyType component(f.getMetaValue("PeptideRef").toString(), "");
+          component_to_feature_to_injection_to_values.emplace(component, features_to_values);
           for (const auto& f_to_v : features_to_values) {
-            CastValue datum = SequenceHandler::getMetaValue(f, f, f_to_v.first);
+            const CastValue& datum = SequenceHandler::getMetaValue(f, f, f_to_v.first);
             if (datum.getTag() == CastValue::Type::UNINITIALIZED || datum.getTag() == CastValue::Type::STRING) {
               //LOGD << "Feature name: " << f_to_v.first << " was not found in the FeatureMap."; // This will polute the log
               continue;
@@ -312,10 +443,10 @@ namespace SmartPeak
         else if (merge_subordinates) 
         {
           for (const OpenMS::Feature& s : f.getSubordinates()) {
-            std::pair<std::string, std::string> component(f.getMetaValue("PeptideRef").toString(), s.getMetaValue("native_id").toString());
-            auto found = component_to_feature_to_injection_to_values.emplace(component, features_to_values);
+            componentKeyType component(f.getMetaValue("PeptideRef").toString(), s.getMetaValue("native_id").toString());
+            component_to_feature_to_injection_to_values.emplace(component, features_to_values);
             for (const auto& f_to_v : features_to_values) {
-              CastValue datum = SequenceHandler::getMetaValue(s, s, f_to_v.first);
+              const CastValue& datum = SequenceHandler::getMetaValue(s, s, f_to_v.first);
               if (datum.getTag() == CastValue::Type::UNINITIALIZED || datum.getTag() == CastValue::Type::STRING) {
                 //LOGD << "Feature name: " << f_to_v.first << " was not found in the FeatureMap."; // This will polute the log
                 continue;
@@ -327,7 +458,13 @@ namespace SmartPeak
       }
     }
   }
-  void MergeInjections::mergeComponentsToFeaturesToInjectionsToValues(const std::string& feature_name, const std::string& merge_rule, std::set<std::string>& scan_polarities, const std::set<std::pair<float, float>>& scan_mass_ranges, const std::set<float>& dilution_factors, const std::map<std::tuple<std::string, std::pair<float, float>, float>, std::vector<std::set<std::string>>>& merge_keys_to_injection_name, std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values)
+  void MergeInjections::mergeComponentsToFeaturesToInjectionsToValues(const std::string& feature_name,
+                                                                      const std::string& merge_rule,
+                                                                      const std::set<std::string>& scan_polarities,
+                                                                      const std::set<std::pair<float, float>>& scan_mass_ranges,
+                                                                      const std::set<float>& dilution_factors,
+                                                                      const std::map<mergeKeyType, std::vector<std::set<std::string>>>& merge_keys_to_injection_names,
+                                                                      std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values)
   {
     for (const auto& scan_polarity : scan_polarities) {
       for (const auto& scan_mass_range : scan_mass_ranges) {
@@ -338,11 +475,11 @@ namespace SmartPeak
               //LOGD << "Feature name: " << feature_name << " was not found in the FeatureMap."; // This will polute the log
               continue;
             }
-            if (merge_keys_to_injection_name.count(key) <= 0) continue;
+            if (merge_keys_to_injection_names.count(key) <= 0) continue;
 
             // Find the total value for weighting
             float total_value = 0;
-            for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
+            for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_names.at(key)) {
               if (component_to_feature_to_injection_to_value.second.at(feature_name).count(injection_names_set) <= 0) continue;
               total_value += component_to_feature_to_injection_to_value.second.at(feature_name).at(injection_names_set);
             }
@@ -353,7 +490,7 @@ namespace SmartPeak
             std::set<std::string> injections;
             std::set<std::string> max_or_min_injections;
             int cnt = 0;
-            for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
+            for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_names.at(key)) {
 
               // record the injections
               // Note: this is done before checking if the feature exists to ensure that all injections are propogated to the next iteration
@@ -397,7 +534,7 @@ namespace SmartPeak
               }
               else if (merge_rule == "Mean") 
               {
-                merged_value += (value / merge_keys_to_injection_name.at(key).size());
+                merged_value += (value / merge_keys_to_injection_names.at(key).size());
               }
               else if (merge_rule == "WeightedMean") 
               {
@@ -408,8 +545,7 @@ namespace SmartPeak
 
             // Make the merged feature
             if (weights.size() <= 0) continue; // Note: we use the weights to check instead of the injections as the weights will be empty if no features exist for any of the injections
-            component_to_feature_to_injection_to_value.second.at(feature_name).emplace(injections, 0);
-            component_to_feature_to_injection_to_value.second.at(feature_name).at(injections) = merged_value;
+            component_to_feature_to_injection_to_value.second.at(feature_name).insert_or_assign(injections, merged_value);
 
             // Repeat for all other features
             for (auto& feature_to_injection_to_value : component_to_feature_to_injection_to_value.second) {
@@ -424,7 +560,7 @@ namespace SmartPeak
               else 
               {
                 int cnt = 0;
-                for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_name.at(key)) {
+                for (const std::set<std::string>& injection_names_set : merge_keys_to_injection_names.at(key)) {
                   if (feature_to_injection_to_value.second.count(injection_names_set) <= 0) continue;
                   float value = feature_to_injection_to_value.second.at(injection_names_set);
                   if (merge_rule == "Sum") merged_value += value;
@@ -435,15 +571,17 @@ namespace SmartPeak
               }
 
               // Make the merged feature
-              feature_to_injection_to_value.second.emplace(injections, 0);
-              feature_to_injection_to_value.second.at(injections) = merged_value;
+              feature_to_injection_to_value.second.insert_or_assign(injections, merged_value);
             }
           }
         }
       }
     }
   }
-  void MergeInjections::makeFeatureMap(const bool& merge_subordinates, std::set<std::string>& injection_names_set, const std::map<std::pair<std::string, std::string>, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values, OpenMS::FeatureMap& feature_map)
+  void MergeInjections::makeFeatureMap(const bool& merge_subordinates,
+                                       std::set<std::string>& injection_names_set,
+                                       const std::map<componentKeyType, std::map<std::string, std::map<std::set<std::string>, float>>>& component_to_feature_to_injection_to_values,
+                                       OpenMS::FeatureMap& feature_map)
   {
     OpenMS::Feature f, s;
     std::vector<OpenMS::Feature> subs;
@@ -554,26 +692,29 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
+  void LoadFeaturesSampleGroup::getFilenames(Filenames& filenames) const
+  {
+    filenames.addFileName("featureXMLSampleGroup_i", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}.featureXML");
+  };
+
+  void LoadFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    const Filenames& filenames_I
+  ) const
   {
     LOGD << "START LoadFeaturesSampleGroup";
-    LOGI << "Loading: " << filenames.featureXMLSampleGroup_i;
+    Filenames filenames = prepareFilenames(filenames_I);
 
-    if (filenames.featureXMLSampleGroup_i.empty()) {
-      LOGE << "Filename is empty";
-      LOGD << "END LoadFeaturesSampleGroup";
-      return;
-    }
-
-    if (!InputDataValidation::fileExists(filenames.featureXMLSampleGroup_i)) {
-      LOGE << "File not found";
-      LOGD << "END LoadFeaturesSampleGroup";
+    if (!InputDataValidation::prepareToLoad(filenames, "featureXMLSampleGroup_i"))
+    {
+      LOGD << "END " << getName();
       return;
     }
 
     try {
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.load(filenames.featureXMLSampleGroup_i, sampleGroupHandler_IO.getFeatureMap());
+      featurexml.load(filenames.getFullPath("featureXMLSampleGroup_i").generic_string(), sampleGroupHandler_IO.getFeatureMap());
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -589,21 +730,30 @@ namespace SmartPeak
     return ParameterSet();
   }
 
-  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO, const SequenceHandler& sequenceHandler_I, const ParameterSet& params_I, const Filenames& filenames) const
+  void StoreFeaturesSampleGroup::getFilenames(Filenames& filenames) const
+  {
+    filenames.addFileName("featureXMLSampleGroup_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}.featureXML");
+  };
+
+  void StoreFeaturesSampleGroup::process(SampleGroupHandler& sampleGroupHandler_IO,
+    const SequenceHandler& sequenceHandler_I,
+    const ParameterSet& params_I,
+    const Filenames& filenames_I
+  ) const
   {
     LOGD << "START storeFeaturesSampleGroup";
-    LOGI << "Storing: " << filenames.featureXMLSampleGroup_o;
+    Filenames filenames = prepareFilenames(filenames_I);
 
-    if (filenames.featureXMLSampleGroup_o.empty()) {
-      LOGE << "Filename is empty";
-      LOGD << "END storeFeaturesSampleGroup";
+    if (!InputDataValidation::prepareToStore(filenames, "featureXMLSampleGroup_o"))
+    {
+      LOGD << "END " << getName();
       return;
     }
 
     try {
       // Store outfile as featureXML
       OpenMS::FeatureXMLFile featurexml;
-      featurexml.store(filenames.featureXMLSampleGroup_o, sampleGroupHandler_IO.getFeatureMap());
+      featurexml.store(filenames.getFullPath("featureXMLSampleGroup_o").generic_string(), sampleGroupHandler_IO.getFeatureMap());
     }
     catch (const std::exception& e) {
       LOGE << e.what();

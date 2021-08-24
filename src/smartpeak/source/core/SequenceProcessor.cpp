@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -37,106 +37,51 @@
 #include <future>
 #include <list>
 #include <unordered_set>
+#include <filesystem>
 
 namespace SmartPeak
 {
 
-  bool CreateSequence::requiredPathnamesAreValid(
-    const std::vector<InputDataValidation::FilenameInfo>& validation
-  )
+  bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler, Filenames& filenames)
   {
-    const std::unordered_set<std::string> required{ "sequence", "parameters", "traml" };
-    bool is_valid{ true };
-    for (const InputDataValidation::FilenameInfo& v : validation) {
-      if (required.count(v.member_name) &&
-        v.validity != InputDataValidation::FilenameInfo::valid) {
-        is_valid = false;
-      }
-    }
-    return is_valid;
-  }
-
-  void CreateSequence::clearNonExistantDefaultGeneratedFilenames(Filenames& f)
-  {
-    // clearNonExistantFilename(f.sequence_csv_i);   // The file must exist
-    // clearNonExistantFilename(f.parameters_csv_i); // The file must exist
-    // clearNonExistantFilename(f.traML_csv_i);      // The file must exist
-    clearNonExistantFilename(f.featureFilterComponents_csv_i);
-    clearNonExistantFilename(f.featureFilterComponentGroups_csv_i);
-    clearNonExistantFilename(f.featureQCComponents_csv_i);
-    clearNonExistantFilename(f.featureQCComponentGroups_csv_i);
-    clearNonExistantFilename(f.quantitationMethods_csv_i);
-    clearNonExistantFilename(f.standardsConcentrations_csv_i);
-    clearNonExistantFilename(f.referenceData_csv_i);
-  }
-
-  void CreateSequence::clearNonExistantFilename(std::string& filename)
-  {
-    if (InputDataValidation::fileExists(filename) == false) {
-      filename.clear();
-    }
-  }
-
-  bool CreateSequence::buildStaticFilenames(ApplicationHandler* application_handler)
-  {
-    Filenames& f = application_handler->static_filenames_;
-    application_handler->main_dir_ = application_handler->sequence_pathname_.substr(0, application_handler->sequence_pathname_.find_last_of('/'));
-    f = Filenames::getDefaultStaticFilenames(application_handler->main_dir_);
-    clearNonExistantDefaultGeneratedFilenames(f);
-    f.sequence_csv_i = application_handler->sequence_pathname_;
+    application_handler->main_dir_ = std::filesystem::path(application_handler->sequence_pathname_).remove_filename().generic_string();
+    filenames.setTag(Filenames::Tag::MAIN_DIR, application_handler->main_dir_.generic_string());
+    filenames.setFullPath("sequence_csv_i", application_handler->sequence_pathname_);
 
     LOGN << "\n\n"
       "The following list of file was searched for:\n";
-    std::vector<InputDataValidation::FilenameInfo> is_valid;
-    is_valid.push_back(InputDataValidation::isValidFilename(f.sequence_csv_i, "sequence"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.parameters_csv_i, "parameters"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.traML_csv_i, "traml"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponents_csv_i, "featureFilter"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureFilterComponentGroups_csv_i, "featureFilterGroups"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponents_csv_i, "featureQC"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.featureQCComponentGroups_csv_i, "featureQCGroups"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.quantitationMethods_csv_i, "quantitationMethods"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.standardsConcentrations_csv_i, "standardsConcentrations"));
-    is_valid.push_back(InputDataValidation::isValidFilename(f.referenceData_csv_i, "referenceData"));
-
+    bool is_valid  = InputDataValidation::precheckProcessorInputs(*this, "sequence", filenames, true);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadParameters(), "parameters", filenames, true);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadTransitions(), "traml", filenames, true);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadFeatureFilters(), "featureFilter", filenames, false);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadFeatureQCs(), "featureQC", filenames, false);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadQuantitationMethods(), "quantitationMethods", filenames, false);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadStandardsConcentrations(), "standardsConcentrations", filenames, false);
+    is_valid &= InputDataValidation::precheckProcessorInputs(LoadValidationData(), "referenceData", filenames, false);
     std::cout << "\n\n";
 
-    const bool requiredPathnamesAreValidBool = requiredPathnamesAreValid(is_valid);
-
-    const bool otherPathnamesAreFine = std::all_of(
-      is_valid.cbegin() + 3,
-      is_valid.cend(),
-      [](const InputDataValidation::FilenameInfo& arg)
-    { return arg.validity != InputDataValidation::FilenameInfo::invalid; });
-
-    if (!requiredPathnamesAreValidBool || !otherPathnamesAreFine) {
-      LOGF << "\n\nERROR!!!\n"
-        "One or more pathnames are not valid.\n";
-      if (!requiredPathnamesAreValidBool) {
-        LOGF << "\n\n"
-          "Make sure that the following required pathnames are provided:\n"
-          " - sequence\n"
-          " - parameters\n"
-          " - traml\n";
-      }
+    if (!is_valid) {
+      LOGE << "One or more pathnames are not valid.\n";
+      LOGF << "Make sure that the following required pathnames are provided:\n"
+              " - sequence\n"
+              " - parameters\n"
+              " - traml\n";
       LOGN << "Apply the fixes and reload the sequence file.\n";
       return false;
     }
-
     return true;
   }
 
-  bool CreateSequence::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool CreateSequence::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     application_handler->sequence_pathname_ = filename;
     application_handler->mzML_dir_.clear();
     application_handler->features_in_dir_.clear();
     application_handler->features_out_dir_.clear();
     LOGI << "Pathnames for 'mzML', 'INPUT features' and 'OUTPUT features' reset.";
-    const bool pathnamesAreCorrect = buildStaticFilenames(application_handler);
+    const bool pathnamesAreCorrect = buildStaticFilenames(application_handler, filenames_);
     if (pathnamesAreCorrect) {
       application_handler->sequenceHandler_.clear();
-      filenames_ = application_handler->static_filenames_;
       delimiter = ",";
       checkConsistency = false; // NOTE: Requires a lot of time on large sequences with a large number of components
       process();
@@ -150,11 +95,17 @@ namespace SmartPeak
     }
   }
 
+  void CreateSequence::getFilenames(Filenames& filenames) const
+  {
+    filenames.addFileName("sequence_csv_i", "${MAIN_DIR}/sequence.csv");
+  };
+
   void CreateSequence::process()
   {
     LOGD << "START createSequence";
+    filenames_ = prepareFilenames(filenames_);
 
-    SequenceParser::readSequenceFile(*sequenceHandler_IO, filenames_.sequence_csv_i, delimiter);
+    SequenceParser::readSequenceFile(*sequenceHandler_IO, filenames_.getFullPath("sequence_csv_i"), delimiter);
     if (sequenceHandler_IO->getSequence().empty()) {
       LOGE << "Empty sequence. Returning";
       LOGD << "END createSequence";
@@ -163,7 +114,7 @@ namespace SmartPeak
 
     // load workflow
     LoadWorkflow loadWorkflow(*sequenceHandler_IO);
-    loadWorkflow.filename_ = filenames_.workflow_csv_i;
+    loadWorkflow.filenames_ = filenames_;
     loadWorkflow.process();
 
     // TODO: Given that the raw data is shared between all injections, it could
@@ -271,7 +222,7 @@ namespace SmartPeak
           if (p.getName() == "n_thread") {
             try {
               n_threads = std::stoi(p.getValueAsString());
-              LOGI << "n_threads set to " << n_threads;
+              LOGI << "SequenceProcessor::n_threads set to " << n_threads;
             }
             catch (const std::exception& e) {
               LOGE << e.what();
@@ -286,8 +237,7 @@ namespace SmartPeak
       injections,
       filenames_,
       raw_data_processing_methods_,
-      this
-    );
+      this);
     manager.spawn_workers(n_threads);
     notifySequenceProcessorEnd();
   }
@@ -311,37 +261,121 @@ namespace SmartPeak
 
     notifySequenceSegmentProcessorStart(sequence_segments.size());
 
-    // process by sequence segment
-    for (SequenceSegmentHandler& sequence_segment : sequence_segments) {
-
-      // handle user-desired sequence_segment_processing_methods
-      if (!sequence_segment_processing_methods_.size()) {
-        throw "no sequence segment processing methods given.\n";
-      }
-
-      notifySequenceSegmentProcessorSampleStart(sequence_segment.getSequenceSegmentName());
-
-      const size_t n = sequence_segment_processing_methods_.size();
-
-      // process the sequence segment
-      for (size_t i = 0; i < n; ++i) {
-        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sequence segments";
-        sequence_segment_processing_methods_[i]->process(
-          sequence_segment,
-          *sequenceHandler_IO,
-          (*sequenceHandler_IO)
-            .getSequence()
-            .at(sequence_segment.getSampleIndices().front())
-            .getRawData()
-            .getParameters(), // assumption: all parameters are the same for each sample in the sequence segment!
-          filenames_.at(sequence_segment.getSequenceSegmentName())
-        );
-      }
-      notifySequenceSegmentProcessorSampleEnd(sequence_segment.getSequenceSegmentName());
+    // handle user-desired sequence_segment_processing_methods
+    if (!sequence_segment_processing_methods_.size()) {
+      throw "no sequence segment processing methods given.\n";
     }
 
+    SequenceSegmentProcessorMultithread manager(
+      sequence_segments,
+      (*sequenceHandler_IO),
+      sequence_segment_processing_methods_,
+      filenames_,
+      this);
+    manager.run_processing();
     sequenceHandler_IO->setSequenceSegments(sequence_segments);
     notifySequenceSegmentProcessorEnd();
+  }
+
+  void processSegment(
+    SequenceSegmentHandler& sequence_segment,
+    SequenceHandler& sequenceHandler_IO,
+    const Filenames& filenames,
+    const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& methods)
+  {
+    const size_t nr_methods = methods.size();
+    LOGI << ">>Processing SequenceSegment [" << sequence_segment.getSequenceSegmentName() << "]\n";
+    for (size_t i = 0; i < nr_methods; ++i) {
+      LOGI << "[" << (i + 1) << "/" << nr_methods << "] steps in processing sequence segments";
+      methods[i]->process(
+        sequence_segment,
+        sequenceHandler_IO,
+        (sequenceHandler_IO)
+          .getSequence()
+          .at(sequence_segment.getSampleIndices().front())
+          .getRawData()
+          .getParameters(),
+        filenames
+      );
+    }
+  }
+
+  void SequenceSegmentProcessorMultithread::run_processing()
+  {
+    while (true) {
+      const size_t i = i_.fetch_add(1);
+      if (i >= sequence_segment_.size()) {
+        break;
+      }
+  
+      SequenceSegmentHandler& sequence_seg {sequence_segment_[i]};
+      if (observable_) observable_->notifySequenceSegmentProcessorSampleStart(sequence_seg.getSequenceSegmentName());
+      
+      try {
+        std::future<void> f = std::async(
+        std::launch::async,
+        processSegment,
+        std::ref(sequence_seg),
+        std::ref(sequenceHandler_IO),
+        std::cref(filenames_.at( sequence_seg.getSequenceSegmentName())),
+        std::cref(sequence_segment_processing_methods_));
+          
+        LOGI << ">>SequenceSegment [" << sequence_seg.getSequenceSegmentName() << "]: waiting...";
+        f.wait();
+        LOGI << ">>SequenceSegment [" << sequence_seg.getSequenceSegmentName() << "]: done";
+          
+        try {
+          f.get();
+        }
+        catch (const std::exception& e) {
+          LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+        }
+          
+        if (observable_) observable_->notifySequenceSegmentProcessorSampleEnd(sequence_seg.getSequenceSegmentName());
+      }
+      catch (const std::exception& e) {
+        LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+      }
+    }
+  }
+
+  void SampleGroupProcessorMultithread::run_processing()
+  {
+    while (true) {
+      const size_t i = i_.fetch_add(1);
+      if (i >= sample_group_.size()) {
+        break;
+      }
+  
+      SampleGroupHandler& sequence_seg {sample_group_[i]};
+      if (observable_) observable_->notifySampleGroupProcessorSampleStart(sequence_seg.getSampleGroupName());
+      
+      try {
+        std::future<void> f = std::async(
+        std::launch::async,
+        processSampleGroup,
+        std::ref(sequence_seg),
+        std::ref(sequenceHandler_IO),
+        std::cref(filenames_.at( sequence_seg.getSampleGroupName())),
+        std::cref(sample_group_processing_methods_));
+          
+        LOGI << ">>SequenceSegment [" << sequence_seg.getSampleGroupName() << "]: waiting...";
+        f.wait();
+        LOGI << ">>SequenceSegment [" << sequence_seg.getSampleGroupName() << "]: done";
+          
+        try {
+          f.get();
+        }
+        catch (const std::exception& e) {
+          LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+        }
+          
+        if (observable_) observable_->notifySampleGroupProcessorSampleEnd(sequence_seg.getSampleGroupName());
+      }
+      catch (const std::exception& e) {
+        LOGE << "SequenceSegment [" << "i" << "]: " << typeid(e).name() << " : " << e.what();
+      }
+    }
   }
 
   void ProcessSampleGroups::process()
@@ -373,28 +407,90 @@ namespace SmartPeak
       if (!sample_group_processing_methods_.size()) {
         throw "no sample group processing methods given.\n";
       }
-
-      const size_t n = sample_group_processing_methods_.size();
-
-      // process the sample group
-      for (size_t i = 0; i < n; ++i) {
-        LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sample groups";
-        sample_group_processing_methods_[i]->process(
-          sample_group,
-          *sequenceHandler_IO,
-          (*sequenceHandler_IO)
-          .getSequence()
-          .at(sample_group.getSampleIndices().front())
-          .getRawData()
-          .getParameters(), // assumption: all parameters are the same for each sample in the sample group!
-          filenames_.at(sample_group.getSampleGroupName())
-        );
-      }
+      
+      SampleGroupProcessorMultithread manager(
+        sample_groups,
+        (*sequenceHandler_IO),
+        sample_group_processing_methods_,
+        filenames_,
+        this);
+      manager.run_processing();
+      //manager.spawn_workers(8);
       notifySampleGroupProcessorSampleEnd(sample_group.getSampleGroupName());
     }
 
     sequenceHandler_IO->setSampleGroups(sample_groups);
     notifySampleGroupProcessorEnd();
+  }
+
+  void processSampleGroup(
+    SampleGroupHandler& sample_group,
+    SequenceHandler& sequenceHandler_IO,
+    const Filenames& filenames,
+    const std::vector<std::shared_ptr<SampleGroupProcessor>>& methods)
+  {
+    const size_t n = methods.size();
+    for (size_t i = 0; i < n; ++i) {
+      LOGI << "[" << (i + 1) << "/" << n << "] steps in processing sample groups";
+      methods[i]->process(
+        sample_group,
+        sequenceHandler_IO,
+        (sequenceHandler_IO)
+        .getSequence()
+        .at(sample_group.getSampleIndices().front())
+        .getRawData()
+        .getParameters(),
+        filenames
+      );
+    }
+  }
+
+  void SequenceSegmentProcessorMultithread::spawn_workers(unsigned int n_threads)
+  {
+    // Refine the # of threads based on the hardware
+    size_t n_workers = getNumWorkers(n_threads);
+    LOGD << "Number of workers: " << n_workers;
+
+    // Spawn the workers
+    try {
+      std::list<std::future<void>> futures;
+      LOGD << "Spawning workers...";
+      for (size_t i = 0; i < n_workers; ++i) {
+        futures.emplace_back(std::async(std::launch::async, &SequenceSegmentProcessorMultithread::run_processing, this));
+      }
+      LOGD << "Waiting for workers...";
+      for (std::future<void>& f : futures) {
+        f.wait();
+      }
+      LOGD << "Workers are done";
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
+  }
+
+  void SampleGroupProcessorMultithread::spawn_workers(unsigned int n_threads)
+  {
+    // Refine the # of threads based on the hardware
+    size_t n_workers = getNumWorkers(n_threads);
+    LOGD << "Number of workers: " << n_workers;
+
+    // Spawn the workers
+    try {
+      std::list<std::future<void>> futures;
+      LOGD << "Spawning workers...";
+      for (size_t i = 0; i < n_workers; ++i) {
+        futures.emplace_back(std::async(std::launch::async, &SampleGroupProcessorMultithread::run_processing, this));
+      }
+      LOGD << "Waiting for workers...";
+      for (std::future<void>& f : futures) {
+        f.wait();
+      }
+      LOGD << "Workers are done";
+    }
+    catch (const std::exception& e) {
+      LOGE << e.what();
+    }
   }
 
   void SequenceProcessorMultithread::spawn_workers(unsigned int n_threads)
@@ -408,7 +504,7 @@ namespace SmartPeak
       std::list<std::future<void>> futures;
       LOGD << "Spawning workers...";
       for (size_t i = 0; i < n_workers; ++i) {
-        futures.emplace_back(std::async(std::launch::async, &SequenceProcessorMultithread::run_injection_processing, this));
+        futures.emplace_back(std::async(std::launch::async, &SequenceProcessorMultithread::run_processing, this));
       }
       LOGD << "Waiting for workers...";
       for (std::future<void>& f : futures) {
@@ -421,7 +517,7 @@ namespace SmartPeak
     }
   }
 
-  void SequenceProcessorMultithread::run_injection_processing()
+  void SequenceProcessorMultithread::run_processing()
   {
     while (true) {
       // fetch the atomic injection counter
@@ -458,27 +554,21 @@ namespace SmartPeak
     LOGD << "Worker is done";
   }
 
-  size_t SequenceProcessorMultithread::getNumWorkers(unsigned int n_threads) const {
+  size_t ProcessorMultithread::getNumWorkers(unsigned int n_threads) const {
     const unsigned int max_threads = std::thread::hardware_concurrency(); // might return 0
     size_t n_workers = 0;
 
     if (max_threads != 0) {
       if (n_threads > max_threads) {
         n_workers = max_threads - 1;
-      }
-      else if (n_threads <= max_threads && n_threads > 1) 
-      {
+      } else if (n_threads <= max_threads && n_threads > 1) {
         n_workers = n_threads - 1;
-      }
-      else if (n_threads >= 0) 
-      {
+      } else if (n_threads >= 0) {
         LOGD << "Max available threads: " << max_threads;
         LOGD << "but using just 1 thread.";
         n_workers = 1;
       }
-    }
-    else 
-    {
+    } else {
       LOGD << "Couldn't determine # of threads, using just 1 thread!";
       n_workers = 1;
     }
@@ -487,7 +577,7 @@ namespace SmartPeak
 
   void processInjection(
     InjectionHandler& injection,
-    const Filenames& filenames,
+    const Filenames& filenames_I,
     const std::vector<std::shared_ptr<RawDataProcessor>>& methods
   )
   {
@@ -499,39 +589,37 @@ namespace SmartPeak
       p->process( //TODO: (SIGABRT)
         injection.getRawData(),
         injection.getRawData().getParameters(),
-        filenames
+        filenames_I
       );
     }
   }
 
-  bool LoadWorkflow::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool LoadWorkflow::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
-    filename_ = filename;
+    filenames_.setFullPath("workflow_csv_i", filename);
     process();
     return true;
   }
+
+  void LoadWorkflow::getFilenames(Filenames& filenames) const
+  {
+    filenames.addFileName("workflow_csv_i", "${MAIN_DIR}/workflow.csv");
+  };
 
   void LoadWorkflow::process()
   {
     // TODO: move to parameters at some point
     LOGD << "START LoadWorkflow";
-    LOGI << "Loading " << filename_;
-
-    if (filename_.empty()) {
-      LOGE << "Filename is empty";
-      LOGD << "END LoadWorkflow";
-      return;
-    }
-
-    if (!InputDataValidation::fileExists(filename_)) {
-      LOGE << "File not found";
-      LOGD << "END LoadWorkflow";
+    filenames_ = prepareFilenames(filenames_);
+    if (!InputDataValidation::prepareToLoad(filenames_, "workflow_csv_i"))
+    {
+      LOGD << "END " << getName();
       return;
     }
 
     std::vector<std::string> res;
     try {
-      io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(filename_);
+      io::CSVReader<1, io::trim_chars<>, io::no_quote_escape<','>> in(filenames_.getFullPath("workflow_csv_i").generic_string());
       const std::string s_command_name{ "command_name" };
       in.read_header(
         io::ignore_extra_column,
@@ -559,7 +647,7 @@ namespace SmartPeak
     LOGD << "END LoadWorkflow";
   }
 
-  bool StoreWorkflow::onFilePicked(const std::string& filename, ApplicationHandler* application_handler)
+  bool StoreWorkflow::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     filename_ = filename;
     process();
@@ -569,10 +657,10 @@ namespace SmartPeak
   void StoreWorkflow::process()
   {
     LOGD << "START StoreWorkflow";
-    LOGI << "Storing " << filename_;
+    LOGI << "Storing " << filename_.generic_string();
 
     std::vector<std::string> headers = { "command_name" };
-    CSVWriter writer(filename_, ",");
+    CSVWriter writer(filename_.generic_string(), ",");
     const size_t cnt = writer.writeDataInRow(headers.cbegin(), headers.cend());
 
     if (cnt < headers.size()) {

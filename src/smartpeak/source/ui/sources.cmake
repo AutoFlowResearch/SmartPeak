@@ -6,7 +6,10 @@ set(sources_list
 	AboutWidget.cpp
 	CalibratorsPlotWidget.cpp
 	ChromatogramPlotWidget.cpp
+	ChromatogramTICPlotWidget.cpp
+	ChromatogramXICPlotWidget.cpp
 	FilePicker.cpp
+	GraphicDataVizWidget.cpp
 	GuiAppender.cpp
 	Heatmap2DWidget.cpp
 	ImEntry.cpp
@@ -19,11 +22,12 @@ set(sources_list
 	SampleTypeEditorWidget.cpp
 	SequenceGroupsEditorWidget.cpp
 	SequenceTableWidget.cpp
+	SpectraMSMSPlotWidget.cpp
 	SpectraPlotWidget.cpp
 	StatisticsWidget.cpp
 	Widget.cpp
 	WindowSizesAndPositions.cpp
-	Workflow.cpp
+	WorkflowWidget.cpp
 	WorkflowStepWidget.cpp
 )
 

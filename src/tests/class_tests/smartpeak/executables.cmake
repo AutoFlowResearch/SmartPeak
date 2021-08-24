@@ -1,10 +1,12 @@
 set(core_executables_list
+	ApplicationManager_test
 	ApplicationHandler_test
 	ApplicationProcessor_test
+	ApplicationSettings_test
 	CastValue_test
+	ConsoleHandler_test
 	EventDispatcher_test
-	Filenames_test
-	Helloworld_test
+	Filenames_test  
 	ImEntry_test
 	InjectionHandler_test
 	MetaDataHandler_test
@@ -20,6 +22,7 @@ set(core_executables_list
 	SequenceSegmentHandler_test
 	SequenceSegmentProcessor_test
 	SessionHandler_test
+	Task_test
 	Utilities_test
 	WorkflowObservable_test
 )
@@ -27,6 +30,7 @@ set(core_executables_list
 set(io_executables_list
 	CSVWriter_test
 	ParametersParser_test
+	SelectDilutionsParser_test
 	SequenceParser_test
 	InputDataValidation_test
 )

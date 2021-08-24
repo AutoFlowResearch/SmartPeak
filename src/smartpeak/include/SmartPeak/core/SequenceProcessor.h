@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 
@@ -32,6 +32,7 @@
 #include <SmartPeak/core/SequenceProcessorObservable.h>
 #include <SmartPeak/core/SequenceSegmentProcessorObservable.h>
 #include <SmartPeak/iface/IProcessorDescription.h>
+#include <SmartPeak/iface/IFilenamesHandler.h>
 #include <SmartPeak/io/InputDataValidation.h>
 
 #include <map>
@@ -45,9 +46,26 @@
 namespace SmartPeak
 {
   /**
+    Multithreaded execution processor
+  */
+  class ProcessorMultithread {
+  public:
+    /**
+      Determine the number of workers available based on the maximum available
+      threads and the desired thread count. 1 thread will always be preserved for
+      the GUI unless the maximum number of available threads couldn't be determined
+
+      @param[in] n_threads desired number of threads to use
+    */
+    size_t getNumWorkers(unsigned int n_threads) const;
+    
+    virtual void run_processing() = 0;
+  };
+
+  /**
     Processes injections onto multiple threads of execution
   */
-  class SequenceProcessorMultithread {
+  class SequenceProcessorMultithread : public ProcessorMultithread {
   public:
     SequenceProcessorMultithread(
       std::vector<InjectionHandler>& injections,
@@ -66,15 +84,6 @@ namespace SmartPeak
     void spawn_workers(unsigned int n_threads);
 
     /**
-      Determine the number of workers available based on the maximum available
-      threads and the desired thread count. 1 thread will always be preserved for
-      the GUI unless the maximum number of available threads couldn't be determined
-
-      @param[in] n_threads desired number of threads to use
-    */
-    size_t getNumWorkers(unsigned int n_threads) const;
-
-    /**
       Workers run this function. It implements a loop that runs the following steps:
       - fetch an injection
       - process all methods on it
@@ -84,7 +93,7 @@ namespace SmartPeak
 
       The loop ends when the worker fetches an index that is out of range.
     */
-    void run_injection_processing();
+    void run_processing();
 
   private:
     std::atomic_size_t i_ { 0 }; ///< a worker works on the i_-th injection
@@ -92,6 +101,100 @@ namespace SmartPeak
     const std::map<std::string, Filenames>& filenames_; ///< mapping from injections names to the associated filenames
     const std::vector<std::shared_ptr<RawDataProcessor>>& methods_; ///< methods to run on each injection
     SequenceProcessorObservable* observable_;
+  };
+
+  /**
+    Processes Sequence Segment onto multiple threads of execution
+  */
+  class SequenceSegmentProcessorMultithread : public ProcessorMultithread  {
+  public:
+    SequenceSegmentProcessorMultithread(
+      std::vector<SequenceSegmentHandler>& sequenceSegmentHandler_IO,
+      SequenceHandler& sequenceHandler_I,
+      std::vector<std::shared_ptr<SequenceSegmentProcessor>>& sequence_segment_processing_methods_,
+      std::map<std::string, Filenames>& filenames,
+      SequenceSegmentProcessorObservable* observable = nullptr
+    ) : sequence_segment_(sequenceSegmentHandler_IO),
+        sequenceHandler_IO(sequenceHandler_I),
+        sequence_segment_processing_methods_(sequence_segment_processing_methods_),
+        filenames_(filenames),
+        observable_(observable) {}
+    
+    /**
+      Spawn a number of workers equal to the number of threads of execution
+      offered by the CPU
+
+      @note If the API is unable to fetch the required information, only a
+      single thread will be used
+    */
+    void spawn_workers(unsigned int n_threads);
+
+    /**
+      Workers run this function. It implements a loop that runs the following steps:
+      - fetch sequence segments
+      - process all methods on it
+
+      Workers decide on which sequence segment to work according to an index fetched and
+      incremented atomically (i_).
+
+      The loop ends when the worker fetches an index that is out of range.
+    */
+    void run_processing();
+
+  private:
+    std::atomic_size_t i_ { 0 }; ///< a worker works on the i_-th injection
+    std::map<std::string, Filenames>& filenames_; ///< mapping from injections names to the associated filenames
+    std::vector<SequenceSegmentHandler>& sequence_segment_;
+    SequenceHandler& sequenceHandler_IO;
+    std::vector<std::shared_ptr<SequenceSegmentProcessor>>& sequence_segment_processing_methods_;
+    SequenceSegmentProcessorObservable* observable_;
+  };
+
+  /**
+    Processes Sample Group onto multiple threads of execution
+  */
+  class SampleGroupProcessorMultithread : public ProcessorMultithread  {
+  public:
+    SampleGroupProcessorMultithread(
+      std::vector<SampleGroupHandler>& sequenceSegmentHandler_IO,
+      SequenceHandler& sequenceHandler_I,
+      std::vector<std::shared_ptr<SampleGroupProcessor>>& sample_group_processing_methods,
+      std::map<std::string, Filenames>& filenames,
+      SampleGroupProcessorObservable* observable = nullptr
+    ) : sample_group_(sequenceSegmentHandler_IO),
+        sequenceHandler_IO(sequenceHandler_I),
+        sample_group_processing_methods_(sample_group_processing_methods),
+        filenames_(filenames),
+        observable_(observable) {}
+    
+    /**
+      Spawn a number of workers equal to the number of threads of execution
+      offered by the CPU
+
+      @note If the API is unable to fetch the required information, only a
+      single thread will be used
+    */
+    void spawn_workers(unsigned int n_threads);
+
+    /**
+      Workers run this function. It implements a loop that runs the following steps:
+      - fetch sequence segments
+      - process all methods on it
+
+      Workers decide on which sequence segment to work according to an index fetched and
+      incremented atomically (i_).
+
+      The loop ends when the worker fetches an index that is out of range.
+    */
+    void run_processing();
+
+  private:
+    std::atomic_size_t i_ { 0 }; ///< a worker works on the i_-th injection
+    std::map<std::string, Filenames>& filenames_; ///< mapping from injections names to the associated filenames
+    std::vector<SampleGroupHandler>& sample_group_;
+    SequenceHandler& sequenceHandler_IO;
+    std::vector<std::shared_ptr<SampleGroupProcessor>>& sample_group_processing_methods_;
+    SampleGroupProcessorObservable* observable_;
   };
 
   /**
@@ -103,18 +206,47 @@ namespace SmartPeak
   */
   void processInjection(
     InjectionHandler& injection,
-    const Filenames& filenames,
+    const Filenames& filenames_I,
     const std::vector<std::shared_ptr<RawDataProcessor>>& methods
   );
 
-  struct SequenceProcessor : IProcessorDescription {
-    SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}
+  /**
+    Apply a processing workflow to a single sequence segment
+
+    @param[in,out] sequence_segment The injection to process
+    @param[in] SequenceHandler Sequence Segment IO
+    @param[in] filenames Used by the methods
+    @param[in] methods Methods to process on the sequence segment
+  */
+  void processSegment(SequenceSegmentHandler& sequence_segment,
+                      SequenceHandler& sequenceHandler_IO,
+                      const Filenames& filenames,
+                      const std::vector<std::shared_ptr<SequenceSegmentProcessor>>& methods);
+
+  /**
+    Apply a processing workflow to a single sample group
+
+    @param[in,out] sample_group The sample group to process
+    @param[in] SequenceHandler Sequence Segment IO
+    @param[in] filenames Used by the methods
+    @param[in] methods Methods to process on the sample group
+  */
+  void processSampleGroup(SampleGroupHandler& sample_group,
+                          SequenceHandler& sequenceHandler_IO,
+                          const Filenames& filenames,
+                          const std::vector<std::shared_ptr<SampleGroupProcessor>>& methods);
+
+  struct SequenceProcessor : IProcessorDescription, IFilenamesHandler {
+    explicit SequenceProcessor(SequenceHandler& sh) : sequenceHandler_IO(&sh) {}
     virtual ~SequenceProcessor() = default;
 
     virtual void process() = 0;
     
     /* IProcessorDescription */
     ParameterSet getParameterSchema() const override { return ParameterSet(); };
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override {};
 
     SequenceHandler* sequenceHandler_IO = nullptr; /// Sequence handler, used by all SequenceProcessor derived classes
   };
@@ -127,14 +259,14 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     Filenames        filenames_;                            /// Pathnames to load
     std::string      delimiter          = ",";              /// String delimiter of the imported file
     bool             checkConsistency   = true;             /// Check consistency of data contained in files
 
     CreateSequence() = default;
-    CreateSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    explicit CreateSequence(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() override;
 
     /* IProcessorDescription */
@@ -142,12 +274,12 @@ namespace SmartPeak
     std::string getName() const override { return "CREATE_SEQUENCE"; }
     std::string getDescription() const override { return "Create a new sequence from file or wizard"; }
 
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
+
   private:
-    bool buildStaticFilenames(ApplicationHandler* application_handler);
+    bool buildStaticFilenames(ApplicationHandler* application_handler, Filenames& f);
     void updateFilenames(Filenames& f, const std::string& pathname);
-    bool requiredPathnamesAreValid(const std::vector<InputDataValidation::FilenameInfo>& validation);
-    void clearNonExistantDefaultGeneratedFilenames(Filenames& f);
-    void clearNonExistantFilename(std::string& filename);
     std::string getValidPathnameOrPlaceholder(const std::string& pathname, const bool is_valid);
   };
 
@@ -160,12 +292,9 @@ namespace SmartPeak
     std::vector<std::shared_ptr<RawDataProcessor>> raw_data_processing_methods_; /// Events to process
 
     ProcessSequence() = default;
-    ProcessSequence(SequenceHandler& sh, ISequenceProcessorObserver* sequence_processor_observer = nullptr) : SequenceProcessor(sh) 
+    explicit ProcessSequence(SequenceHandler& sh, ISequenceProcessorObserver* sequence_processor_observer = nullptr) : SequenceProcessor(sh) 
     {
-      if (sequence_processor_observer)
-      {
-        addSequenceProcessorObserver(sequence_processor_observer);
-      }
+      addSequenceProcessorObserver(sequence_processor_observer);
     }
     static ParameterSet getParameterSchemaStatic();
     void process() override;
@@ -175,6 +304,9 @@ namespace SmartPeak
     std::string getName() const override { return "PROCESS_SEQUENCE"; }
     std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence"; }
     ParameterSet getParameterSchema() const override;
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override {};
   };
 
   /**
@@ -186,12 +318,9 @@ namespace SmartPeak
     std::vector<std::shared_ptr<SequenceSegmentProcessor>> sequence_segment_processing_methods_; /// Events to process
 
     ProcessSequenceSegments() = default;
-    ProcessSequenceSegments(SequenceHandler& sh, ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr) : SequenceProcessor(sh)
+    explicit ProcessSequenceSegments(SequenceHandler& sh, ISequenceSegmentProcessorObserver* sequence_segment_processor_observer = nullptr) : SequenceProcessor(sh)
     {
-      if (sequence_segment_processor_observer)
-      {
-        addSequenceSegmentProcessorObserver(sequence_segment_processor_observer);
-      }
+      addSequenceSegmentProcessorObserver(sequence_segment_processor_observer);
     }
     void process() override;
 
@@ -210,12 +339,9 @@ namespace SmartPeak
     std::vector<std::shared_ptr<SampleGroupProcessor>> sample_group_processing_methods_; /// Events to process
 
     ProcessSampleGroups() = default;
-    ProcessSampleGroups(SequenceHandler& sh, ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr) : SequenceProcessor(sh)
+    explicit ProcessSampleGroups(SequenceHandler& sh, ISampleGroupProcessorObserver* sample_group_processor_observer = nullptr) : SequenceProcessor(sh)
     {
-      if (sample_group_processor_observer)
-      {
-        addSampleGroupProcessorObserver(sample_group_processor_observer);
-      }
+      addSampleGroupProcessorObserver(sample_group_processor_observer);
     }
     void process() override;
 
@@ -230,17 +356,20 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     LoadWorkflow() = default;
-    LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
+    explicit LoadWorkflow(SequenceHandler & sh) : SequenceProcessor(sh) {}
     void process() override;
-    std::string filename_;
+    Filenames filenames_;
 
     /* IProcessorDescription */
     int getID() const override { return -1; }
     std::string getName() const override { return "LOAD_WORKFLOW"; }
     std::string getDescription() const override { return "Load a workflow from file"; }
+
+    /* IFilenamesHandler */
+    virtual void getFilenames(Filenames& filenames) const override;
   };
 
   struct StoreWorkflow : SequenceProcessor, IFilePickerHandler
@@ -248,12 +377,12 @@ namespace SmartPeak
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     StoreWorkflow() = default;
-    StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
+    explicit StoreWorkflow(SequenceHandler& sh) : SequenceProcessor(sh) {}
     void process() override;
-    std::string filename_;
+    std::filesystem::path filename_;
 
     /* IProcessorDescription */
     int getID() const override { return -1; }

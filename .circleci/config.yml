@@ -63,7 +63,7 @@ jobs:
           command: |
             mkdir ~/smartpeak_release_build
             cd ~/smartpeak_release_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -G "Unix Makefiles" -DCMAKE_PREFIX_PATH=$HOME/OpenMS-build/ -DPLOG_INCLUDE_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/plog/include -DIMGUI_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/imgui -DIMPLOT_DIR=$HOME/SmartPeak/superbuild/Dependencies/Source/implot -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
@@ -106,7 +106,7 @@ jobs:
             brew update
             brew remove yarn node
             brew install cmake qt5 sdl2
-            brew install boost cppcheck
+            brew install cppcheck
             pip3 install -r tools/smartpeak/requirements.txt
       - run:
           name: "Pull latest (only release)"
@@ -122,13 +122,14 @@ jobs:
           command: |
             cd ~ &&
             git clone --branch develop --depth 1 https://github.com/OpenMS/OpenMS.git &&
-            cd OpenMS && mkdir contrib_build && cd contrib_build
+            cd OpenMS
+            sed -i '' 's/#pragma omp parallel for//g' src/openms/source/FORMAT/HANDLERS/MzMLHandler.cpp
+            mkdir contrib_build && cd contrib_build
             curl -C - -O https://abibuilder.informatik.uni-tuebingen.de/archive/openms/contrib/macOS/10.15.4/x64/appleclang-11.0.0/contrib_build.tar.gz
             tar -xzf contrib_build.tar.gz
-            rm lib/libboost_* && rm -r include/boost && rm -r lib/cmake/Boost* && rm -r lib/cmake/boost*
             sed -i '' 's/std::auto_ptr/std::unique_ptr/g' include/seqan/basic/test_system.h
             cd ~/OpenMS &&  mkdir openms_debug_build && cd openms_debug_build &&
-            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5);$(brew --prefix boost)" -DBOOST_USE_STATIC=OFF -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
+            cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_STANDARD=14 -DCMAKE_CXX_EXTENSIONS=OFF -DCMAKE_PREFIX_PATH="$(brew --prefix qt5)" -DOPENMS_CONTRIB_LIBS=~/OpenMS/contrib_build/ -DHAS_XSERVER=OFF -DWITH_GUI=OFF -DENABLE_TUTORIALS=OFF -DENABLE_DOCS=OFF -DGIT_TRACKING=OFF -DENABLE_UPDATE_CHECK=OFF -DCMAKE_BUILD_TYPE=Release -DPYOPENMS=OFF -DOPENMS_COVERAGE=OFF ..
             make -j4 OpenMS
       - run:
           name: Building SmartPeak (Including SuperBuild)
@@ -139,7 +140,7 @@ jobs:
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -DCMAKE_BUILD_TYPE=Release .. && make -j4
             cd ../smartpeak_release_build
-            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);$(brew --prefix boost);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib ~/SmartPeak
+            cmake -DEIGEN_USE_GPU=OFF -DUSE_SUPERBUILD=OFF -DBOOST_USE_STATIC=OFF -DCMAKE_PREFIX_PATH="~/OpenMS/openms_debug_build/;~/OpenMS/contrib_build;$(brew --prefix qt5);(brew --prefix eigen)" -DPLOG_INCLUDE_DIR=~/SmartPeak/superbuild/Dependencies/Source/plog/include   -DIMGUI_DIR=~/SmartPeak/superbuild/Dependencies/Source/imgui  -DIMPLOT_DIR=~/SmartPeak/superbuild/Dependencies/Source/implot   -DCMAKE_BUILD_TYPE=RelWithDebInfo -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include" -DOpenMP_CXX_LIB_NAMES="omp" -DOpenMP_omp_LIBRARY=/usr/local/opt/libomp/lib/libomp.dylib ~/SmartPeak
             make -j4
       - run:
           name: Running SmartPeak Class Tests
@@ -197,7 +198,6 @@ jobs:
             $ProgressPreference = "SilentlyContinue"
             Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
             choco install cmake --version=3.17.2 --installargs '"ADD_CMAKE_TO_PATH=System"'
-            # choco install boost-msvc-14.1
             choco install doxygen.install
             choco install nsis.portable
             refreshenv
@@ -327,7 +327,7 @@ jobs:
     # The update is done automatically and changes are pushed back to release branch.
     working_directory: ~/SmartPeak
     docker:
-      - image: python:3.7.0
+      - image: python:3.7.2
     steps:
       - checkout
       - run:
@@ -367,7 +367,7 @@ jobs:
     # used as artifacts visible in github releases.
     working_directory: ~/SmartPeak
     docker:
-      - image: python:3.7.0
+      - image: python:3.7.2
     steps:
       - checkout
       - run:
@@ -465,7 +465,7 @@ jobs:
     # the job will push release branch, otherwise nothing will happen.
     working_directory: ~/SmartPeak
     docker:
-      - image: python:3.7.0
+      - image: python:3.7.2
     steps:
       - checkout
       - run:

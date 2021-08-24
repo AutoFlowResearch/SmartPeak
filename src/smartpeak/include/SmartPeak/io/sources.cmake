@@ -6,6 +6,7 @@ set(sources_list_h
 	csv.h
 	CSVWriter.h
 	ParametersParser.h
+	SelectDilutionsParser.h
 	SequenceParser.h
 	InputDataValidation.h
 )

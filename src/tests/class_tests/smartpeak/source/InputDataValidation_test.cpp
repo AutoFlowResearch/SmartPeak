@@ -17,14 +17,12 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Ahmed Khalil $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE InputDataValidation test suite
-#include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/core/Filenames.h>
 #include <SmartPeak/core/SequenceProcessor.h>
@@ -34,44 +32,62 @@ using namespace std;
 
 const std::string main_dir = SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files");
 
-BOOST_AUTO_TEST_SUITE(inputdatavalidation)
-
-BOOST_AUTO_TEST_CASE(fileExists)
+TEST(InputDataValidation, fileExists)
 {
   string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv");
-  BOOST_CHECK_EQUAL(InputDataValidation::fileExists(pathname), true);
+  EXPECT_TRUE(InputDataValidation::fileExists(pathname));
   pathname = SMARTPEAK_GET_TEST_DATA_PATH("this_does_not_exist.csv");
-  BOOST_CHECK_EQUAL(InputDataValidation::fileExists(pathname), false);
+  EXPECT_FALSE(InputDataValidation::fileExists(pathname));
 }
 
-BOOST_AUTO_TEST_CASE(isValidFilename)
+TEST(InputDataValidation, isValidFilename)
 {
-  string pathname = SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv");
-  InputDataValidation::FilenameInfo v;
-  v = InputDataValidation::isValidFilename(pathname, "some standards file");
-  BOOST_CHECK_EQUAL(v.validity, InputDataValidation::FilenameInfo::valid);  // success
-  pathname = SMARTPEAK_GET_TEST_DATA_PATH("this_does_not_exist.csv");
-  v = InputDataValidation::isValidFilename(pathname, "a file that does not exist");
-  BOOST_CHECK_EQUAL(v.validity, InputDataValidation::FilenameInfo::invalid); // failure
-  pathname.clear();
-  v = InputDataValidation::isValidFilename(pathname, "an empty pathname");
-  BOOST_CHECK_EQUAL(v.validity, InputDataValidation::FilenameInfo::not_provided);  // not provided
+  struct ExistingFile : public IFilenamesHandler
+  {
+    void getFilenames(Filenames& filenames) const
+    {
+      filenames.addFileName("some standards file", "${MAIN_DIR}/OpenMSFile_standardsConcentrations_1.csv");
+    };
+  };
+  struct NonExistingFile : public IFilenamesHandler
+  {
+    void getFilenames(Filenames& filenames) const
+    {
+      filenames.addFileName("a file that does not exist", "${MAIN_DIR}/this_does_not_exist.csv");
+    };
+  };
+  struct EmptyFileName : public IFilenamesHandler
+  {
+    void getFilenames(Filenames& filenames) const
+    {
+      filenames.addFileName("an empty pathname", "");
+    };
+  };
+  Filenames filenames;
+  filenames.setFullPath("some standards file", SMARTPEAK_GET_TEST_DATA_PATH("OpenMSFile_standardsConcentrations_1.csv"));
+  EXPECT_TRUE(InputDataValidation::precheckProcessorInputs(ExistingFile(), "some standards file", filenames, true));
+  filenames.setFullPath("a file that does not exist", SMARTPEAK_GET_TEST_DATA_PATH("this_does_not_exist.csv"));
+  EXPECT_FALSE(InputDataValidation::precheckProcessorInputs(NonExistingFile(), "a file that does not exist", filenames, true));
+  EXPECT_TRUE(InputDataValidation::precheckProcessorInputs(NonExistingFile(), "a file that does not exist", filenames, false));
+  filenames.setFullPath("an empty pathname", "");
+  EXPECT_FALSE(InputDataValidation::precheckProcessorInputs(EmptyFileName(), "an empty pathname", filenames, true));
+  EXPECT_TRUE(InputDataValidation::precheckProcessorInputs(EmptyFileName(), "an empty pathname", filenames, false));
 }
 
-BOOST_AUTO_TEST_CASE(validateNamesInStructures)
+TEST(InputDataValidation, validateNamesInStructures)
 {
   const set<string> s1 = {"1", "2", "3"};
   const set<string> s2 = {"1", "2", "4"};
   const set<string> s3 = {"1", "2", "3", "4"};
-  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s1, s1, "", "", true), true); // check itself
-  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s1, s2, "", "", false), false); // s1 -> s2, "3" is missing
-  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s2, s1, "", "", false), false); // s1 -> s2, "4" is missing
-  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s2, s1, "", "", true), false); // s1 <-> s2, "3" and "4" are missing
-  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s1, s3, "", "", false), true); // s1 -> s3, no name is missing
-  BOOST_CHECK_EQUAL(InputDataValidation::validateNamesInStructures(s1, s3, "", "", true), false); // s1 <-> s3, "4" is missing
+  EXPECT_TRUE(InputDataValidation::validateNamesInStructures(s1, s1, "", "", true)); // check itself
+  EXPECT_FALSE(InputDataValidation::validateNamesInStructures(s1, s2, "", "", false)); // s1 -> s2, "3" is missing
+  EXPECT_FALSE(InputDataValidation::validateNamesInStructures(s2, s1, "", "", false)); // s1 -> s2, "4" is missing
+  EXPECT_FALSE(InputDataValidation::validateNamesInStructures(s2, s1, "", "", true)); // s1 <-> s2, "3" and "4" are missing
+  EXPECT_TRUE(InputDataValidation::validateNamesInStructures(s1, s3, "", "", false)); // s1 -> s3, no name is missing
+  EXPECT_FALSE(InputDataValidation::validateNamesInStructures(s1, s3, "", "", true)); // s1 <-> s3, "4" is missing
 }
 
-BOOST_AUTO_TEST_CASE(findMissingNames)
+TEST(InputDataValidation, findMissingNames)
 {
   const set<string> s1 = {"1", "2", "3"};
   const set<string> s2 = {"1", "2", "4"};
@@ -79,29 +95,29 @@ BOOST_AUTO_TEST_CASE(findMissingNames)
   set<string> result;
 
   result = InputDataValidation::findMissingNames(s1, s1);
-  BOOST_CHECK_EQUAL(result.size(), 0);
+  EXPECT_EQ(result.size(), 0);
 
   result = InputDataValidation::findMissingNames(s1, s2);
-  BOOST_CHECK_EQUAL(result.size(), 1);
-  BOOST_CHECK_EQUAL(result.count("3"), 1);
+  EXPECT_EQ(result.size(), 1);
+  EXPECT_EQ(result.count("3"), 1);
 
   result = InputDataValidation::findMissingNames(s2, s1);
-  BOOST_CHECK_EQUAL(result.size(), 1);
-  BOOST_CHECK_EQUAL(result.count("4"), 1);
+  EXPECT_EQ(result.size(), 1);
+  EXPECT_EQ(result.count("4"), 1);
 
   result = InputDataValidation::findMissingNames(s1, s3);
-  BOOST_CHECK_EQUAL(result.size(), 0);
+  EXPECT_EQ(result.size(), 0);
 
   result = InputDataValidation::findMissingNames(s3, s1);
-  BOOST_CHECK_EQUAL(result.size(), 1);
-  BOOST_CHECK_EQUAL(result.count("4"), 1);
+  EXPECT_EQ(result.size(), 1);
+  EXPECT_EQ(result.count("4"), 1);
 }
 
-BOOST_AUTO_TEST_CASE(sampleNamesAreConsistent)
+TEST(InputDataValidation, sampleNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
-  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
-
+  Filenames filenames;
+  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
   cs.delimiter          = ",";
@@ -111,22 +127,23 @@ BOOST_AUTO_TEST_CASE(sampleNamesAreConsistent)
   bool result;
 
   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
-  BOOST_CHECK_EQUAL(result, true);
+  EXPECT_TRUE(result);
 
-  filenames.sequence_csv_i = main_dir + "/sequence_missing.csv";
+  filenames.setFullPath("sequence_csv_i", main_dir + "/sequence_missing.csv");
   sequenceHandler.clear();
 
   cs.filenames_ = filenames;
   cs.process();
 
   result = InputDataValidation::sampleNamesAreConsistent(sequenceHandler);
-  BOOST_CHECK_EQUAL(result, false); // missing sample: fakeSample
+  EXPECT_FALSE(result); // missing sample: fakeSample
 }
 
-BOOST_AUTO_TEST_CASE(componentNamesAreConsistent)
+TEST(InputDataValidation, componentNamesAreConsistent)
 {
   SequenceHandler sequenceHandler;
-  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames filenames;
+  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -137,22 +154,23 @@ BOOST_AUTO_TEST_CASE(componentNamesAreConsistent)
   bool result;
 
   result = InputDataValidation::componentNamesAreConsistent(sequenceHandler);
-  BOOST_CHECK_EQUAL(result, true);
+  EXPECT_TRUE(result);
 
-  filenames.traML_csv_i = main_dir + "/traML_missing.csv";
+  filenames.setFullPath("traML_csv_i", main_dir + "/traML_missing.csv");
   // SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   RawDataHandler& rawData0 = sequenceHandler.getSequence().front().getRawData();
   LoadTransitions loadTransitions;
   loadTransitions.process(rawData0, {}, filenames);
 
   result = InputDataValidation::componentNamesAreConsistent(sequenceHandler);
-  BOOST_CHECK_EQUAL(result, false);
+  EXPECT_FALSE(result);
 }
 
-BOOST_AUTO_TEST_CASE(componentNameGroupsAreConsistent)
+TEST(InputDataValidation, componentNameGroupsAreConsistent)
 {
   SequenceHandler sequenceHandler;
-  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames filenames;
+  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -163,22 +181,23 @@ BOOST_AUTO_TEST_CASE(componentNameGroupsAreConsistent)
   bool result;
 
   result = InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler);
-  BOOST_CHECK_EQUAL(result, true);
+  EXPECT_TRUE(result);
 
-  filenames.traML_csv_i = main_dir + "/traML_missing.csv";
+  filenames.setFullPath("traML_csv_i", main_dir + "/traML_missing.csv");
   //SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   RawDataHandler& rawData0 = sequenceHandler.getSequence().front().getRawData();
   LoadTransitions loadTransitions;
   loadTransitions.process(rawData0, {}, filenames);
 
   result = InputDataValidation::componentNameGroupsAreConsistent(sequenceHandler);
-  BOOST_CHECK_EQUAL(result, false);
+  EXPECT_FALSE(result);
 }
 
-BOOST_AUTO_TEST_CASE(heavyComponentsAreConsistent)
+TEST(InputDataValidation, heavyComponentsAreConsistent)
 {
   SequenceHandler sequenceHandler;
-  Filenames filenames = Filenames::getDefaultStaticFilenames(main_dir);
+  Filenames filenames;
+  filenames.setTag(Filenames::Tag::MAIN_DIR, main_dir);
 
   CreateSequence cs(sequenceHandler);
   cs.filenames_          = filenames;
@@ -189,16 +208,52 @@ BOOST_AUTO_TEST_CASE(heavyComponentsAreConsistent)
   bool result;
 
   result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
-  BOOST_CHECK_EQUAL(result, true);
+  EXPECT_TRUE(result);
 
-  filenames.quantitationMethods_csv_i = main_dir + "/quantitationMethods_missing.csv";
+  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
   //SequenceProcessor::createSequence(sequenceHandler, filenames, ",", false);
   SequenceSegmentHandler& seqSeg0 = sequenceHandler.getSequenceSegments().front();
   LoadQuantitationMethods loadQuantitationMethods;
   loadQuantitationMethods.process(seqSeg0, SequenceHandler(), {}, filenames);
 
   result = InputDataValidation::heavyComponentsAreConsistent(sequenceHandler);
-  BOOST_CHECK_EQUAL(result, false); // g6p.g6p_2.Heavy is missing
+  EXPECT_FALSE(result); // g6p.g6p_2.Heavy is missing
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+TEST(InputDataValidation, prepareToLoad)
+{
+  Filenames filenames;
+  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("non_existing_file", main_dir + "/non_existing_file.csv");
+  EXPECT_TRUE(InputDataValidation::prepareToLoad(filenames, "quantitationMethods_csv_i"));
+  EXPECT_FALSE(InputDataValidation::prepareToLoad(filenames, "non_existing_file"));
+}
+
+TEST(InputDataValidation, prepareToLoadOneOfTwo)
+{
+  Filenames filenames;
+  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("empty_file", "");
+  filenames.setFullPath("another_empty_file", "");
+  EXPECT_TRUE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "quantitationMethods_csv_i", "empty_file"));
+  EXPECT_FALSE(InputDataValidation::prepareToLoadOneOfTwo(filenames, "empty_file", "another_empty_file"));
+}
+
+TEST(InputDataValidation, prepareToStore)
+{
+  Filenames filenames;
+  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("empty_file", "");
+  EXPECT_TRUE(InputDataValidation::prepareToStore(filenames, "quantitationMethods_csv_i"));
+  EXPECT_FALSE(InputDataValidation::prepareToStore(filenames, "empty_file"));
+}
+
+TEST(InputDataValidation, prepareToStoreOneOfTwo)
+{
+  Filenames filenames;
+  filenames.setFullPath("quantitationMethods_csv_i", main_dir + "/quantitationMethods_missing.csv");
+  filenames.setFullPath("empty_file", "");
+  filenames.setFullPath("another_empty_file", "");
+  EXPECT_TRUE(InputDataValidation::prepareToStoreOneOfTwo(filenames, "quantitationMethods_csv_i", "empty_file"));
+  EXPECT_FALSE(InputDataValidation::prepareToStoreOneOfTwo(filenames, "empty_file", "another_empty_file"));
+}

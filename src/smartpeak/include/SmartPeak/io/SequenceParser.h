@@ -48,7 +48,7 @@ public:
 
     static void readSequenceFile(
       SequenceHandler& sequenceHandler,
-      const std::string& pathname,
+      const std::filesystem::path& pathname,
       const std::string& delimiter
     );
 
@@ -60,7 +60,7 @@ public:
 
     static void writeSequenceFileSmartPeak(
       SequenceHandler& sequenceHandler,
-      const std::string& filename,
+      const std::filesystem::path& filename,
       const std::string& delimiter = ","
     );
 
@@ -72,7 +72,7 @@ public:
 
     static void writeSequenceFileAnalyst(
       SequenceHandler& sequenceHandler,
-      const std::string& filename,
+      const std::filesystem::path& filename,
       const std::string& delimiter = "\t"
     );
 
@@ -84,7 +84,7 @@ public:
 
     static void writeSequenceFileMasshunter(
       SequenceHandler& sequenceHandler,
-      const std::string& filename,
+      const std::filesystem::path& filename,
       const std::string& delimiter = "\t"
     );
 
@@ -96,7 +96,7 @@ public:
 
     static void writeSequenceFileXcalibur(
       SequenceHandler& sequenceHandler,
-      const std::string& filename,
+      const std::filesystem::path& filename,
       const std::string& delimiter = "\t"
     );
 
@@ -119,7 +119,7 @@ public:
 
     static bool writeDataTableFromMetaValue(
       const SequenceHandler& sequenceHandler,
-      const std::string& filename,
+      const std::filesystem::path& filename,
       const std::vector<FeatureMetadata>& meta_data,
       const std::set<SampleType>& sample_types
     );
@@ -139,14 +139,14 @@ public:
     // NOTE: Internally, to_string() rounds at 1e-6. Therefore, some precision might be lost.
     static bool writeDataMatrixFromMetaValue(
       const SequenceHandler& sequenceHandler,
-      const std::string& filename,
+      const std::filesystem::path& filename,
       const std::vector<FeatureMetadata>& meta_data,
       const std::set<SampleType>& sample_types
     );
 
     private:
       template<typename delimiter>
-      static void readSequenceFile(SequenceHandler& sequenceHandler, const std::string& pathname);
+      static void readSequenceFile(SequenceHandler& sequenceHandler, const std::filesystem::path& pathname);
   };
 
   struct StoreSequenceFileSmartPeak : IFilePickerHandler
@@ -154,7 +154,7 @@ public:
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
   struct StoreSequenceFileAnalyst : IFilePickerHandler {
@@ -162,7 +162,7 @@ public:
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
   struct StoreSequenceFileMasshunter : IFilePickerHandler {
@@ -170,7 +170,7 @@ public:
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 
   struct StoreSequenceFileXcalibur : IFilePickerHandler {
@@ -178,6 +178,6 @@ public:
     /**
     IFilePickerHandler
     */
-    bool onFilePicked(const std::string& filename, ApplicationHandler* application_handler) override;
+    bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
   };
 }

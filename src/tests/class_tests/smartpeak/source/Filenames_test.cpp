@@ -17,250 +17,144 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Douglas McCloskey $
+// $Maintainer: Douglas McCloskey, Bertrand Boudaud $
 // $Authors: Douglas McCloskey $
 // --------------------------------------------------------------------------
 
+#include <gtest/gtest.h>
 #include <SmartPeak/test_config.h>
-
-#define BOOST_TEST_MODULE Filenames test suite
-#include <boost/test/included/unit_test.hpp>
 #include <SmartPeak/core/Filenames.h>
 
 using namespace SmartPeak;
 using namespace std;
 
-BOOST_AUTO_TEST_SUITE(filenames)
-
-BOOST_AUTO_TEST_CASE(filenames_getDefaultStaticFilenames)
+TEST(Filenames, constructor)
 {
-  Filenames filenames = Filenames::getDefaultStaticFilenames("/home/user");
-  BOOST_CHECK_EQUAL(filenames.sequence_csv_i, "/home/user/sequence.csv");
-  BOOST_CHECK_EQUAL(filenames.parameters_csv_i, "/home/user/parameters.csv");
-  BOOST_CHECK_EQUAL(filenames.traML_csv_i, "/home/user/traML.csv");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_i, "/home/user/featureFilterComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_i, "/home/user/featureFilterComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_i, "/home/user/featureQCComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_i, "/home/user/featureQCComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponents_csv_i, "/home/user/featureRSDFilterComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponentGroups_csv_i, "/home/user/featureRSDFilterComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_i, "/home/user/featureRSDQCComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_i, "/home/user/featureRSDQCComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_i, "/home/user/featureBackgroundFilterComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_i, "/home/user/featureBackgroundFilterComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_i, "/home/user/featureBackgroundQCComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_i, "/home/user/featureBackgroundQCComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_i, "/home/user/featureRSDEstimationComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_i, "/home/user/featureRSDEstimationComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_i, "/home/user/featureRSDQCComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_i, "/home/user/featureRSDQCComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_i, "/home/user/quantitationMethods.csv");
-  BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "/home/user/standardsConcentrations.csv");
-  BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "/home/user/referenceData.csv");
-  BOOST_CHECK_EQUAL(filenames.mzML_i, "");
-  BOOST_CHECK_EQUAL(filenames.mzTab_o, "");
-  BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "/home/user/PivotTable.csv");
-  BOOST_CHECK_EQUAL(filenames.featureDB_csv_o, "/home/user/FeatureDB.csv");
+  Filenames filenames;
+  EXPECT_EQ(filenames.getFileIds().size(), 0);
 }
 
-BOOST_AUTO_TEST_CASE(filenames_getDefaultDynamicFilenames)
+TEST(Filenames, addFileName)
 {
-  Filenames filenames = Filenames::getDefaultDynamicFilenames(
-    "/home/user/mzML",
-    "/home/user/featuresIn", 
-    "/home/user/featuresOut", 
-    "mzMLIn",
-    "injIn",
-    "injOut",
-    "sampleIn",
-    "sampleOut");
-  BOOST_CHECK_EQUAL(filenames.sequence_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.parameters_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.workflow_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.traML_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.mzML_i, "/home/user/mzML/mzMLIn.mzML");
-  BOOST_CHECK_EQUAL(filenames.mzTab_o, "/home/user/featuresOut/injOut.mzTab");
-  BOOST_CHECK_EQUAL(filenames.mzTab_i, "/home/user/featuresIn/injIn.mzTab");
-  BOOST_CHECK_EQUAL(filenames.featureXML_o, "/home/user/featuresOut/injOut.featureXML");
-  BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "/home/user/featuresOut/sampleOut.featureXML");
-  BOOST_CHECK_EQUAL(filenames.featureXML_i, "/home/user/featuresIn/injIn.featureXML");
-  BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "/home/user/featuresIn/sampleIn.featureXML");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "/home/user/featuresOut/injOut_featureFilterComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureFilterComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "/home/user/featuresOut/injOut_featureQCComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureQCComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponents_csv_o, "/home/user/featuresOut/injOut_featureRSDFilterComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureRSDFilterComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_o, "/home/user/featuresOut/injOut_featureRSDQCComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureRSDQCComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_o, "/home/user/featuresOut/injOut_featureBackgroundFilterComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureBackgroundFilterComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_o, "/home/user/featuresOut/injOut_featureBackgroundQCComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureBackgroundQCComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_o, "/home/user/featuresOut/injOut_featureRSDEstimationComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureRSDEstimationComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_o, "/home/user/featuresOut/injOut_featureBackgroundEstimationComponents.csv");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_o, "/home/user/featuresOut/injOut_featureBackgroundEstimationComponentGroups.csv");
-  BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "/home/user/featuresOut/injOut_quantitationMethods.csv");
-  BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "/home/user/featuresOut/injOut_componentsToConcentrations.csv");
-  BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureDB_csv_o, "");
+  Filenames filenames;
+  filenames.addFileName("my_file", "${MAIN_DIR}/file.txt");
+  const auto& file_ids = filenames.getFileIds();
+  ASSERT_EQ(file_ids.size(), 1);
 }
 
-BOOST_AUTO_TEST_CASE(clear1)
+TEST(Filenames, getFullPath)
 {
-  Filenames filenames = Filenames::getDefaultStaticFilenames("/home/user");
-  filenames.clear();
-  BOOST_CHECK_EQUAL(filenames.sequence_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.parameters_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.traML_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.mzML_i, "");
-  BOOST_CHECK_EQUAL(filenames.mzTab_o, "");
-  BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDFilterComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureDB_csv_o, "");
+  Filenames filenames;
+  filenames.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/file_main.txt");
 }
 
-BOOST_AUTO_TEST_CASE(clear2)
+TEST(Filenames, getFullPath_non_existing)
 {
-  Filenames filenames = Filenames::getDefaultDynamicFilenames(
-    "/home/user/mzML",
-    "/home/user/featuresIn",
-    "/home/user/featuresOut",
-    "mzMLIn",
-    "injIn",
-    "injOut",
-    "sampleIn",
-    "sampleOut");
-  filenames.clear();
-  BOOST_CHECK_EQUAL(filenames.sequence_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.parameters_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.traML_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.standardsConcentrations_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.referenceData_csv_i, "");
-  BOOST_CHECK_EQUAL(filenames.mzML_i, "");
-  BOOST_CHECK_EQUAL(filenames.mzTab_o, "");
-  BOOST_CHECK_EQUAL(filenames.mzTab_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureXML_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureXML_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureXMLSampleGroup_i, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureFilterComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureQCComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDQCComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundFilterComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundQCComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureRSDEstimationComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponents_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureBackgroundEstimationComponentGroups_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.quantitationMethods_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.componentsToConcentrations_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.pivotTable_csv_o, "");
-  BOOST_CHECK_EQUAL(filenames.featureDB_csv_o, "");
+  Filenames filenames;
+  try {
+    filenames.getFullPath("test");
+    FAIL() << "Expected std::out_of_range";
+  }
+  catch (std::out_of_range const& err) {
+  }
+  catch (...) {
+    FAIL() << "Expected std::out_of_range";
+  }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+TEST(Filenames, setFullPath)
+{
+  Filenames filenames;
+  filenames.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  filenames.setFullPath("my_file_main", "/file/to/file_main.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/file/to/file_main.txt");
+  // setting variant or root has no effect
+  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/file/to/file_main.txt");
+}
+
+TEST(Filenames, setRootPath_setVariant_after)
+{
+  Filenames filenames;
+  filenames.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  filenames.addFileName("my_file_injection_input", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}file_injection_input.txt");
+  filenames.addFileName("my_file_injection_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}file_injection_output.txt");
+  filenames.addFileName("my_file_group_input", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}file_group_input.txt");
+  filenames.addFileName("my_file_group_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}file_group_output.txt");
+  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/main/file_main.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_injection_input").generic_string().c_str(), "/feat_input/variant_input_injection_file_injection_input.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_injection_output").generic_string().c_str(), "/feat_output/variant_output_injection_file_injection_output.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_group_input").generic_string().c_str(), "/feat_input/variant_input_sample_file_group_input.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_group_output").generic_string().c_str(), "/feat_output/variant_output_sample_file_group_output.txt");
+}
+
+TEST(Filenames, setRootPath_setVariant_before)
+{
+  Filenames filenames;
+  filenames.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  filenames.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  filenames.addFileName("my_file_injection_input", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}file_injection_input.txt");
+  filenames.addFileName("my_file_injection_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}file_injection_output.txt");
+  filenames.addFileName("my_file_group_input", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}file_group_input.txt");
+  filenames.addFileName("my_file_group_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}file_group_output.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_main").generic_string().c_str(), "/main/file_main.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_injection_input").generic_string().c_str(), "/feat_input/variant_input_injection_file_injection_input.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_injection_output").generic_string().c_str(), "/feat_output/variant_output_injection_file_injection_output.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_group_input").generic_string().c_str(), "/feat_input/variant_input_sample_file_group_input.txt");
+  EXPECT_STREQ(filenames.getFullPath("my_file_group_output").generic_string().c_str(), "/feat_output/variant_output_sample_file_group_output.txt");
+}
+
+TEST(Filenames, merge)
+{
+  Filenames filenames1;
+  filenames1.setTag(Filenames::Tag::MAIN_DIR, "/main");
+  filenames1.setTag(Filenames::Tag::MZML_INPUT_PATH, "/mzml");
+  filenames1.setTag(Filenames::Tag::FEATURES_INPUT_PATH, "/feat_input");
+  filenames1.setTag(Filenames::Tag::FEATURES_OUTPUT_PATH, "/feat_output");
+  filenames1.setTag(Filenames::Tag::INPUT_MZML_FILENAME, "variant_mzml_");
+  filenames1.setTag(Filenames::Tag::INPUT_INJECTION_NAME, "variant_input_injection_");
+  filenames1.setTag(Filenames::Tag::OUTPUT_INJECTION_NAME, "variant_output_injection_");
+  filenames1.setTag(Filenames::Tag::INPUT_GROUP_NAME, "variant_input_sample_");
+  filenames1.setTag(Filenames::Tag::OUTPUT_GROUP_NAME, "variant_output_sample_");
+  filenames1.addFileName("my_file_main", "${MAIN_DIR}/file_main.txt");
+  filenames1.addFileName("my_file_injection_input", "${FEATURES_INPUT_PATH}/${INPUT_INJECTION_NAME}file_injection_input.txt");
+
+  Filenames filenames2;
+  filenames1.addFileName("my_file_main", "${MAIN_DIR}/file_main_again.txt");
+  filenames2.addFileName("my_file_injection_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}file_injection_output.txt");
+  filenames2.addFileName("my_file_group_input", "${FEATURES_INPUT_PATH}/${INPUT_GROUP_NAME}file_group_input.txt");
+  filenames2.addFileName("my_file_group_output", "${FEATURES_OUTPUT_PATH}/${OUTPUT_GROUP_NAME}file_group_output.txt");
+
+  filenames1.merge(filenames2);
+  EXPECT_STREQ(filenames1.getFullPath("my_file_main").generic_string().c_str(), "/main/file_main.txt");
+  EXPECT_STREQ(filenames1.getFullPath("my_file_injection_input").generic_string().c_str(), "/feat_input/variant_input_injection_file_injection_input.txt");
+  EXPECT_STREQ(filenames1.getFullPath("my_file_injection_output").generic_string().c_str(), "/feat_output/variant_output_injection_file_injection_output.txt");
+  EXPECT_STREQ(filenames1.getFullPath("my_file_group_input").generic_string().c_str(), "/feat_input/variant_input_sample_file_group_input.txt");
+  EXPECT_STREQ(filenames1.getFullPath("my_file_group_output").generic_string().c_str(), "/feat_output/variant_output_sample_file_group_output.txt");
+}
