@@ -39,7 +39,7 @@ namespace SmartPeak
   bool GenericTableWidget::searcher(const std::vector<ImEntry>& Im_table_entries, const int& selected_entry,
     const ImGuiTextFilter& filter, const size_t row) const
   {
-    bool is_to_filter;
+    bool is_to_filter = false;
     if (selected_entry > 0) {
       is_to_filter = !filter.PassFilter(Im_table_entries[row].entry_contents[selected_entry - 1].c_str());
     }

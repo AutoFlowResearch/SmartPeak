@@ -24,7 +24,9 @@
 #pragma once
 
 #include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/ui/Plotter.h>
 #include <SmartPeak/core/SessionHandler.h>
+#include <SmartPeak/core/ApplicationHandler.h>
 
 #include <string>
 #include <utility>
@@ -42,12 +44,13 @@ namespace SmartPeak
   {
   public:
     GraphicDataVizWidget(SessionHandler& session_handler,
-      SequenceHandler& sequence_handler,
+      ApplicationHandler& application_handler,
       const std::string& id,
       const std::string& title) :
       GenericGraphicWidget(title),
       session_handler_(session_handler),
-      sequence_handler_(sequence_handler),
+      sequence_handler_(application_handler.sequenceHandler_),
+      application_handler_(application_handler),
       plot_title_(id) {};
 
     void draw() override;
@@ -72,6 +75,7 @@ namespace SmartPeak
   protected:
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;
+    ApplicationHandler& application_handler_;
     const std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     bool show_legend_ = true;
     bool compact_view_ = true;
@@ -85,6 +89,7 @@ namespace SmartPeak
     std::optional<float> marker_position_;
     bool use_markers_ = false;
     bool is_spectra_ = false;
+//    const std::unique_ptr<std::filesystem::path> working_path_ = std::make_unique<std::filesystem::path>(application_handler_.main_dir_);
   };
 
 }

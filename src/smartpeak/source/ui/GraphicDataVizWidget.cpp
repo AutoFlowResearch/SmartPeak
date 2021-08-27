@@ -22,6 +22,7 @@
 // --------------------------------------------------------------------------
 
 #include <SmartPeak/ui/GraphicDataVizWidget.h>
+#include <SmartPeak/ui/FilePicker.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <implot.h>
@@ -57,7 +58,19 @@ namespace SmartPeak
     }
     float controls_pos_end_y = ImGui::GetCursorPosY();
     sliders_height_ = (controls_pos_end_y - controls_pos_start_y);
+    
+    static int selected_format = 0;
+    static const char* formats[] = { "Save As PNG", "Save As PDF", "Save As HTML", "Save As SVG"};
+    ImGui::Combo(" ", &selected_format, formats, IM_ARRAYSIZE(formats));
+    ImGui::SameLine();
+    if (ImGui::Button("Save Plot"))
+    {
+      PlotExporter* exported_plot = new PlotExporter(application_handler_.main_dir_.string(), graph_viz_data_, selected_format);
+      exported_plot->plot();
+    }
+    ImGui::Spacing();
   }
+
 
   std::tuple<float, float, float, float> GraphicDataVizWidget::plotLimits() const
   {

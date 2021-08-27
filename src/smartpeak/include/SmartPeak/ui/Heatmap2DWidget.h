@@ -19,13 +19,14 @@ namespace SmartPeak
   {
   public:
     Heatmap2DWidget(SessionHandler& session_handler,
-                    SequenceHandler& sequence_handler,
+                    ApplicationHandler& application_handler,
                     const std::string& id,
                     const std::string& title,
                     SequenceObservable& sequence_observable)
       : GenericGraphicWidget(title),
         session_handler_(session_handler),
-        sequence_handler_(sequence_handler),
+        sequence_handler_(application_handler.sequenceHandler_),
+        application_handler_(application_handler),
         plot_title_(id) 
     {
       sequence_observable.addSequenceObserver(this);
@@ -43,6 +44,7 @@ namespace SmartPeak
   protected:
     SessionHandler& session_handler_;
     SequenceHandler& sequence_handler_;
+    ApplicationHandler& application_handler_;
     SessionHandler::HeatMapData heatmap_data_;
     std::string plot_title_; // used as the ID of the plot as well so this should be unique across the different Widgets
     std::string selected_feature_;
