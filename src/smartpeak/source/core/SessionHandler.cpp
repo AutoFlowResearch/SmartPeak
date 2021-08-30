@@ -1977,7 +1977,8 @@ namespace SmartPeak
         if (!selected_transitions(i).empty())
           component_names.insert(selected_transitions(i));
       }
-      if (calibrators_conc_fit_data.size() != component_names.size() && calibrators_conc_raw_data.size() != component_names.size()) {
+      if (calibrators_conc_fit_data.size() != component_names.size() && calibrators_conc_raw_data.size() != component_names.size()) 
+      {
         LOGD << "Making the calibrators data for plotting";
         // Update the axis titles and clear the data
         calibrators_x_axis_title = "Concentration (" + sequence_handler.getSequenceSegments().at(0).getQuantitationMethods().at(0).getConcentrationUnits() + ")";
@@ -1994,28 +1995,34 @@ namespace SmartPeak
         for (const auto& sequence_segment : sequence_handler.getSequenceSegments()) {
           // Extract out raw data used to make the calibrators found in `StandardsConcentrations`
           std::map<std::string, std::pair<std::vector<float>, std::vector<std::string>>> stand_concs_map; // map of x_data and sample_name for a component
-          for (const auto& stand_concs : sequence_segment.getStandardsConcentrations()) {
+          for (const auto& stand_concs : sequence_segment.getStandardsConcentrations())
+          {
             // Skip components that have not been fitted with a calibration curve
             if (sequence_segment.getComponentsToConcentrations().count(stand_concs.component_name) > 0 &&
-              sequence_segment.getComponentsToConcentrations().at(stand_concs.component_name).size() > 0 &&
-              component_names.count(stand_concs.component_name) > 0) { // TODO: filter out components that have not been fitted
+                sequence_segment.getComponentsToConcentrations().at(stand_concs.component_name).size() > 0 &&
+                component_names.count(stand_concs.component_name) > 0) // TODO: filter out components that have not been fitted
+            { 
               const float x_datum = float(stand_concs.actual_concentration / stand_concs.IS_actual_concentration / stand_concs.dilution_factor);
               auto found = stand_concs_map.emplace(stand_concs.component_name,
-                std::make_pair(std::vector<float>({ x_datum }),
-                  std::vector<std::string>({ stand_concs.sample_name })));
-              if (!found.second) {
+                                                   std::make_pair(
+                                                     std::vector<float>({ x_datum }),
+                                                     std::vector<std::string>({ stand_concs.sample_name })));
+              if (!found.second)
+              {
                 stand_concs_map.at(stand_concs.component_name).first.push_back(x_datum);
                 stand_concs_map.at(stand_concs.component_name).second.push_back(stand_concs.sample_name);
               }
             }
           }
           // Make the line of best fit using the `QuantitationMethods`
-          for (const auto& quant_method : sequence_segment.getQuantitationMethods()) {
+          for (const auto& quant_method : sequence_segment.getQuantitationMethods())
+          {
             // Skip components that have not been fitted with a calibration curve
             if (sequence_segment.getComponentsToConcentrations().count(quant_method.getComponentName()) > 0 &&
-              sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName()).size() > 0 &&
-              (double)quant_method.getTransformationModelParams().getValue("slope") != 1.0&&
-              component_names.count(quant_method.getComponentName()) > 0) { // TODO: filter out components that have not been fitted
+                sequence_segment.getComponentsToConcentrations().at(quant_method.getComponentName()).size() > 0 &&
+                (double)quant_method.getTransformationModelParams().getValue("slope") != 1.0&&
+                component_names.count(quant_method.getComponentName()) > 0) // TODO: filter out components that have not been fitted
+            { 
               // Make the line of best fit using the `QuantitationMethods
               std::vector<float> y_fit_data;
               for (const auto& ratio : stand_concs_map.at(quant_method.getComponentName()).first) {
@@ -2027,7 +2034,10 @@ namespace SmartPeak
                 tmd.fitModel(quant_method.getTransformationModel(), quant_method.getTransformationModelParams());
                 float calculated_feature_ratio = tmd.apply(ratio);
                 // check for less than zero
-                if (calculated_feature_ratio < 0.0) calculated_feature_ratio = 0.0;
+                if (calculated_feature_ratio < 0.0)
+                {
+                  calculated_feature_ratio = 0.0;
+                }
                 y_fit_data.push_back(calculated_feature_ratio);
                 calibrators_conc_min = std::min(ratio, calibrators_conc_min);
                 calibrators_conc_max = std::max(ratio, calibrators_conc_max);
@@ -2066,6 +2076,32 @@ namespace SmartPeak
                 return false;
               }
             }
+          }
+        }
+        // Sort data
+        for (int j = 0; j < calibrators_conc_fit_data.size(); ++j)
+        {
+          auto& fit_data_x = calibrators_conc_fit_data[j];
+          auto& fit_data_y = calibrators_feature_fit_data[j];
+          std::vector<std::pair<float,float>> sorting_vector;
+          for (int i = 0; i < fit_data_x.size(); ++i)
+          {
+            const auto& x = fit_data_x[i];
+            const auto& y = fit_data_y[i];
+            const auto pair_x_y = std::make_pair(x, y);
+            sorting_vector.push_back(pair_x_y);
+          }
+          std::sort(std::begin(sorting_vector), std::end(sorting_vector),
+            [&](const auto& a, const auto& b)
+          {
+            return a.first > b.first;
+          });
+          fit_data_x.clear();
+          fit_data_y.clear();
+          for (const auto& p : sorting_vector)
+          {
+            fit_data_x.push_back(p.first);
+            fit_data_y.push_back(p.second);
           }
         }
       }
