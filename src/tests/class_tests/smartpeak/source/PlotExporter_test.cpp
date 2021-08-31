@@ -36,7 +36,7 @@ TEST(PlotExporter, plot)
   
   std::vector<float> x;
   std::vector<float> y;
-  float rads = M_PI/180;
+  float rads = 3.14159265/180;
   for(int i = 0; i < 3000; i++) {
     x.push_back((3076 * sin(1.4 * i * rads) + 34767));
     y.push_back(i);
