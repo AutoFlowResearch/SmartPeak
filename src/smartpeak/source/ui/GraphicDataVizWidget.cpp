@@ -66,11 +66,11 @@ namespace SmartPeak
     if (ImGui::Button("Save Plot"))
     {
       PlotExporter* exported_plot = new PlotExporter(application_handler_.main_dir_.string(), graph_viz_data_, selected_format);
-      exported_plot->plot();
+      if (!exported_plot->plot()) showInstallationInstructions();
+      delete exported_plot;
     }
     ImGui::Spacing();
   }
-
 
   std::tuple<float, float, float, float> GraphicDataVizWidget::plotLimits() const
   {
@@ -279,5 +279,33 @@ namespace SmartPeak
     }
     return result;
   }
+
+  void GraphicDataVizWidget::showInstallationInstructions()
+  {
+    ImGui::Text("gnuplot program could not be found! Show me instructions on how to install it : ");
+    ImGui::SameLine();
+    if (ImGui::Button("Instructions")) {
+      ImGui::OpenPopup("About");
+      if (ImGui::BeginPopupModal("Instructions", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+      {
+#if defined(__APPLE__) || defined(__linux__)
+        ImGui::Text("In your terminal install brew package manager if you haven't : ");
+        ImGui::Text("   /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\" ");
+        ImGui::Text("Then install gnuplot : ");
+        ImGui::Text("   brew install gnuplot");
+#elif _WIN32
+        ImGui::Separator();
+        ImGui::Text("Download and install from http://ftp.cstug.cz/pub/CTAN/graphics/gnuplot/5.2.6/gp526-win64-mingw_2.exe ");
+#endif
+        ImGui::Separator();
+        if (ImGui::Button("Close"))
+        {
+          ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+      }
+    }
+  }
+
   
 }

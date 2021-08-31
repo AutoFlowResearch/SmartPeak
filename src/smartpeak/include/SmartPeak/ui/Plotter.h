@@ -38,16 +38,52 @@ namespace SmartPeak {
 
   enum PlotLineSetting {LineStyle, LineWidth, Marker, MarkerSize, Color};
 
+  /**
+  @brief Plot line properties manager
+  */
   class PlotLineProperties {
   public:
     PlotLineProperties(uint index = 0);
     
+    /*
+    @brief styles plot
+
+    @param[out] styling string
+    */
     std::string plotStyler() const;
+    
+    /*
+    @brief check if point type is of style "none"
+
+    @param[out] true if of style "none"
+    */
     bool pointtypeNone() const;
+    
+    /*
+    @brief reads grid line type
+
+    @param[out] grid line type
+    */
     static uint getGridLineType();
+    
+    /*
+    @brief resets line count
+    */
     static void resetLineCount();
 
+    /*
+    @brief sets plotline settings
+
+    @param[int]     property plotline property
+    @param[int,out] property sets plotline property
+    */
     void set(const PlotLineSetting property, const std::string &value);
+    
+    /*
+    @brief sets plotline settings
+
+    @param[int,out] property plotline property and property sets plotline property paired
+    */
     void set(const std::pair<PlotLineSetting, std::string> &input);
 
   private:
@@ -64,23 +100,83 @@ namespace SmartPeak {
     static const std::map<std::string, int> pointtype_generic_term_;
   };
 
-
+  /**
+  @brief Class for generating plots
+  */
   class PlotExporter
   {
   public:
     PlotExporter(std::string output_path, SessionHandler::GraphVizData& graphvis_data, int mode);
     
-    void plot();
+    /*
+    @brief starts plotting
+
+    @param[out] true if plotting is successful
+    */
+    bool plot();
     
   private:
+    /*
+    @brief checks gnuplot-term availability
+
+    @param[out] true if term found
+    */
     bool isTermAvailable_(std::string term_name);
+    
+    /*
+    @brief checks gnuplot availability on host system
+
+    @param[out] true if detected
+    */
+    bool isGNUPLOTPresent_();
+    
+    /*
+    @brief sets grid visibility
+     
+    @param[in] fout filestream to append to
+    */
     void setGrid_(std::ofstream &fout);
+    
+    /*
+    @brief get list of plotnames/legend
+     
+    @param[out] list of legends for the plot
+    */
     std::vector<std::string> getLegend_();
+    
+    /*
+    @brief generates PNG plots
+    */
     void generatePNG_();
+    
+    /*
+    @brief generates PDF plots
+    */
     void generatePDF_();
+    
+    /*
+    @brief generates HTML plots
+    */
     void generateHTML_();
+    
+    /*
+    @brief generates SVG plots
+    */
     void generateSVG_();
+    
+    /*
+    @brief adds basic gnuplot script information
+     
+    @param[in] fout filestream to append to
+    */
     void appendFileHeader_(std::ofstream &fout);
+    
+    /*
+    @brief gnuplot executer
+     
+    @param[in] fout filestream to append to
+    @param[in] path to generated gnuplot script
+    */
     void generatePlot_(std::ofstream &fout, const std::string &filename);
     
     uint        nr_plots_;

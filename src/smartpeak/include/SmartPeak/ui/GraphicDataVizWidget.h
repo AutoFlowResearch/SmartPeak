@@ -62,6 +62,7 @@ namespace SmartPeak
     virtual void drawGraph();
     virtual void drawMarkers();
     virtual void updateData() = 0;
+    virtual void showInstallationInstructions();
     virtual std::tuple<float, float, float, float> plotLimits() const;
     virtual void updateRanges();
     

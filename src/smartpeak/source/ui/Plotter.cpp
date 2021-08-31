@@ -188,41 +188,92 @@ namespace SmartPeak {
     output_path_.append("plots/");
   }
 
-  void PlotExporter::plot()
+  bool PlotExporter::plot()
   {
-    std::ofstream data_vals_file((output_path_ + this->filename + std::string(".dat")).c_str());
-    nr_plots_ = 0;
-    if (graphvis_data_.x_data_area_.size() != graphvis_data_.y_data_area_.size()) {
-      throw std::length_error("Graph visualisation data are not equal in size!");
-    }
-    for (size_t i = 0; i < graphvis_data_.x_data_area_.size(); ++i) {
-      const std::vector<float> &x = graphvis_data_.x_data_area_.at(i);
-      const std::vector<float> &y = graphvis_data_.y_data_area_.at(i);
-      data_vals_file << "# PLOT " << (nr_plots_)++ << std::endl;
-      for (uint i = 0; i < x.size(); ++i) {
-        data_vals_file << x[i] << "," << y[i] << std::endl;
-      }
-      data_vals_file << std::endl << std::endl;
-    }
-    data_vals_file.close();
+   if (isGNUPLOTPresent_()) {
+     std::ofstream data_vals_file((output_path_ + this->filename + std::string(".dat")).c_str());
+     nr_plots_ = 0;
+     if (graphvis_data_.x_data_area_.size() != graphvis_data_.y_data_area_.size()) {
+       throw std::length_error("Graph visualisation data are not equal in size!");
+     }
+     if (data_vals_file.is_open()) {
+       for (size_t i = 0; i < graphvis_data_.x_data_area_.size(); ++i) {
+         const std::vector<float> &x = graphvis_data_.x_data_area_.at(i);
+         const std::vector<float> &y = graphvis_data_.y_data_area_.at(i);
+         data_vals_file << "# PLOT " << (nr_plots_)++ << std::endl;
+         for (uint i = 0; i < x.size(); ++i) {
+           data_vals_file << x[i] << "," << y[i] << std::endl;
+         }
+         data_vals_file << std::endl << std::endl;
+       }
+       data_vals_file.close();
+     } else {
+       LOGE << "PlotExporter::plot : Cannot save plot data to disk. ";
+     }
     
-    if (nr_plots_==0) return;
+     if (nr_plots_==0) {
+       LOGE << "PlotExporter::plot : nothing to plot ";
+       return true;
+     }
 
-    PlotLineProperties::resetLineCount();
-    plotlines_properties_.resize(nr_plots_);
+     PlotLineProperties::resetLineCount();
+     plotlines_properties_.resize(nr_plots_);
 
-    if (plot_PNG_) {
-        generatePNG_();
+     if (plot_PNG_) {
+       generatePNG_();
+     }
+     if (plot_PDF_) {
+       generatePDF_();
+     }
+     if (plot_HTML_) {
+       generateHTML_();
+     }
+     if (plot_SVG_) {
+       generateSVG_();
+     }
+     return true;
+   } else {
+     LOGW << "gnuplot not found! Not generating any plots.";
+     return false;
+   }
+  }
+
+  bool PlotExporter::isGNUPLOTPresent_()
+  {
+    bool is_gnuplot_present = false;
+    std::string is_present = "";
+    
+#if defined(__APPLE__) || defined(__linux__)
+    std::string check_gnuplot = "command -v gnuplot 2>&1 | tee " +  output_path_ + "is_gnuplot_present.tmp";
+    system(check_gnuplot.c_str());
+
+    std::ifstream tmp_file((output_path_ + "is_gnuplot_present.tmp").c_str());
+    if (tmp_file.is_open()) {
+      tmp_file >> is_present;
+      if (!is_present.empty() && is_present.size() >= 7) is_gnuplot_present = true;
+      tmp_file.close();
+    } else {
+      LOGE << "Cannot save temporary files to disk.";
     }
-    if (plot_PDF_) {
-        generatePDF_();
+
+#elif _WIN32
+    std::string check_gnuplot =
+      "if ((Get-Command \"gnuplot.exe\" -ErrorAction SilentlyContinue) -eq $null) { Write \"0\" | Out-File "
+      +  output_path_ +  "is_gnuplot_present.tmp -Append } else { Write \"1\" | Out-File "
+      +  output_path_ +  "is_gnuplot_present.tmp -Append }";
+    system(check_gnuplot.c_str());
+
+    std::ifstream tmp_file((output_path_ + "is_gnuplot_present.tmp").c_str());
+    if (tmp_file.is_open()) {
+      tmp_file >> is_present;
+      if (is_present == "1") is_gnuplot_present = true;
+      tmp_file.close();
+    } else {
+      LOGE << "Cannot save temporary files to disk.";
     }
-    if (plot_HTML_) {
-        generateHTML_();
-    }
-    if (plot_SVG_) {
-        generateSVG_();
-    }
+#endif
+    
+    return is_gnuplot_present;
   }
 
   bool PlotExporter::isTermAvailable_(std::string term_name)
@@ -235,9 +286,13 @@ namespace SmartPeak {
     system(check_term.c_str());
 
     std::ifstream tmp_file((output_path_ + "plots/" + this->filename + "-exists-" + term_name + ".tmp").c_str());
-    tmp_file >> term_available;
-    if (term_available == "1") term_exists = true;
-    tmp_file.close();
+    if (tmp_file.is_open()) {
+      tmp_file >> term_available;
+      if (term_available == "1") term_exists = true;
+      tmp_file.close();
+    } else {
+      LOGE << "Cannot save temporary files to disk.";
+    }
     return term_exists;
   }
 
@@ -252,31 +307,34 @@ namespace SmartPeak {
     std::string exported_plot = output_path_+this->filename+".png";
     std::ofstream fout(filename.c_str());
 
-    appendFileHeader_(fout);
-
-    if (cairo_available_) {
-      fout << "set terminal pngcairo dashed enhanced" << std::endl;
-      fout << "set output '" << exported_plot << "'" << std::endl;
-      if (with_grid_) {
-        setGrid_(fout);
+    if (fout.is_open()) {
+      appendFileHeader_(fout);
+      if (cairo_available_) {
+        fout << "set terminal pngcairo dashed enhanced" << std::endl;
+        fout << "set output '" << exported_plot << "'" << std::endl;
+        if (with_grid_) {
+          setGrid_(fout);
+        }
+        for (uint i = 0; i < plotlines_properties_.size(); ++i) {
+          fout << plotlines_properties_[i].plotStyler() << std::endl;
+        }
+      } else {
+        fout << "# No cairo terminal found. Defaulting png terminal." << std::endl;
+        fout << "set terminal png dashed enhanced" << std::endl;
+        fout << "set output '" << exported_plot << "'" << std::endl;
+        if (with_grid_) {
+          setGrid_(fout);
+        }
+        for (uint i = 0; i < plotlines_properties_.size(); ++i) {
+          fout << plotlines_properties_[i].plotStyler() << std::endl;
+        }
       }
-      for (uint i = 0; i < plotlines_properties_.size(); ++i) {
-        fout << plotlines_properties_[i].plotStyler() << std::endl;
-      }
+      generatePlot_(fout, filename);
+      fout.close();
+      plot_PNG_ = false;
     } else {
-      fout << "# No cairo terminal found. Defaulting png terminal." << std::endl;
-      fout << "set terminal png dashed enhanced" << std::endl;
-      fout << "set output '" << exported_plot << "'" << std::endl;
-      if (with_grid_) {
-        setGrid_(fout);
-      }
-      for (uint i = 0; i < plotlines_properties_.size(); ++i) {
-        fout << plotlines_properties_[i].plotStyler() << std::endl;
-      }
+      LOGE << "Failed to save plot to disk.";
     }
-    generatePlot_(fout, filename);
-    fout.close();
-    plot_PNG_ = false;
   }
 
   void PlotExporter::generatePDF_()
@@ -284,21 +342,25 @@ namespace SmartPeak {
     std::string filename =  output_path_+this->filename+"-pdf.gpi";
     std::string exported_plot =  output_path_+this->filename+".pdf";
     std::ofstream fout(filename.c_str());
-    appendFileHeader_(fout);
-
-    if (cairo_available_) {
-      fout << "set terminal pdfcairo transparent color dashed enhanced" << std::endl;
-      fout << "set output '" << exported_plot << "'" << std::endl;
-      if (with_grid_) {
-        setGrid_(fout);
+    
+    if (fout.is_open()) {
+      appendFileHeader_(fout);
+      if (cairo_available_) {
+        fout << "set terminal pdfcairo transparent color dashed enhanced" << std::endl;
+        fout << "set output '" << exported_plot << "'" << std::endl;
+        if (with_grid_) {
+          setGrid_(fout);
+        }
+        for (uint i = 0; i < plotlines_properties_.size(); ++i) {
+          fout << plotlines_properties_[i].plotStyler() << std::endl;
+        }
       }
-      for (uint i = 0; i < plotlines_properties_.size(); ++i) {
-        fout << plotlines_properties_[i].plotStyler() << std::endl;
-      }
+      generatePlot_(fout, filename);
+      fout.close();
+      plot_PDF_ = false;
+    } else {
+      LOGE << "Failed to save plot to disk.";
     }
-    generatePlot_(fout, filename);
-    fout.close();
-    plot_PDF_ = false;
   }
 
   void PlotExporter::generateHTML_()
@@ -306,21 +368,25 @@ namespace SmartPeak {
     std::string filename = output_path_+this->filename+"-html.gpi";
     std::string exported_plot = output_path_+this->filename+".html";
     std::ofstream fout(filename.c_str());
-    appendFileHeader_(fout);
-
-    if (cairo_available_) {
-      fout << "set terminal canvas dashed enhanced" << std::endl;
-      fout << "set output '" << exported_plot << "'" << std::endl;
-      if (with_grid_) {
-        setGrid_(fout);
+    
+    if (fout.is_open()) {
+      appendFileHeader_(fout);
+      if (cairo_available_) {
+        fout << "set terminal canvas dashed enhanced" << std::endl;
+        fout << "set output '" << exported_plot << "'" << std::endl;
+        if (with_grid_) {
+          setGrid_(fout);
+        }
+        for (uint i = 0; i < plotlines_properties_.size(); ++i) {
+          fout << plotlines_properties_[i].plotStyler() << std::endl;
+        }
       }
-      for (uint i = 0; i < plotlines_properties_.size(); ++i) {
-        fout << plotlines_properties_[i].plotStyler() << std::endl;
-      }
+      generatePlot_(fout, filename);
+      fout.close();
+      plot_HTML_ = false;
+    } else {
+      LOGE << "Failed to save plot to disk.";
     }
-    generatePlot_(fout, filename);
-    fout.close();
-    plot_HTML_ = false;
   }
 
   void PlotExporter::generateSVG_()
@@ -328,21 +394,25 @@ namespace SmartPeak {
     std::string filename = output_path_+this->filename+"-svg.gpi";
     std::string exported_plot = output_path_+this->filename+".svg";
     std::ofstream fout(filename.c_str());
-    appendFileHeader_(fout);
-
-    if (cairo_available_) {
-      fout << "set terminal svg dashed enhanced" << std::endl;
-      fout << "set output '" << exported_plot << "'" << std::endl;
-      if (with_grid_) {
-        setGrid_(fout);
+    
+    if (fout.is_open()) {
+      appendFileHeader_(fout);
+      if (cairo_available_) {
+        fout << "set terminal svg dashed enhanced" << std::endl;
+        fout << "set output '" << exported_plot << "'" << std::endl;
+        if (with_grid_) {
+          setGrid_(fout);
+        }
+        for (int i = 0; i < plotlines_properties_.size(); ++i) {
+          fout << plotlines_properties_[i].plotStyler() << std::endl;
+        }
       }
-      for (int i = 0; i < plotlines_properties_.size(); ++i) {
-        fout << plotlines_properties_[i].plotStyler() << std::endl;
-      }
+      generatePlot_(fout, filename);
+      fout.close();
+      plot_SVG_ = false;
+    } else {
+      LOGE << "Failed to save plot to disk.";
     }
-    generatePlot_(fout, filename);
-    fout.close();
-    plot_SVG_ = false;
   }
 
   void PlotExporter::appendFileHeader_(std::ofstream &fout)
@@ -395,13 +465,13 @@ namespace SmartPeak {
 #if defined(__APPLE__) || defined(__linux__)
     std::system(("gnuplot " + filename).c_str());
     std::system(("rm " + output_path_ + "*.gpi").c_str());
-    std::system(("rm " + output_path_ + "*.dat").c_str());
+//    std::system(("rm " + output_path_ + "*.dat").c_str());
     std::system(("rm " + output_path_ + "*.tmp").c_str());
 #elif _WIN32
-    std::system(("start powershell.exe gnuplot " + filename).c_str());
-    std::system(("start powershell.exe rm " + output_path_ + "*.gpi").c_str());
-    std::system(("start powershell.exe rm " + output_path_ + "*.dat").c_str());
-    std::system(("start powershell.exe rm " + output_path_ + "*.tmp").c_str());
+    std::system(("start powershell.exe -windowstyle hidden gnuplot " + filename).c_str());
+    std::system(("start powershell.exe -windowstyle hidden rm " + output_path_ + "*.gpi").c_str());
+    std::system(("start powershell.exe -windowstyle hidden rm " + output_path_ + "*.dat").c_str());
+    std::system(("start powershell.exe -windowstyle hidden rm " + output_path_ + "*.tmp").c_str());
 #endif
   }
 }
