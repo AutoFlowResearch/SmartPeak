@@ -297,8 +297,10 @@ namespace SmartPeak {
   }
 
   void PlotExporter::setGrid_(std::ofstream &file_stream) {
-    file_stream << "set grid lc rgb '" << "#cccccc" << "' lw 1 lt "
-                << PlotLineProperties::getGridLineType() << std::endl;
+    if (file_stream.is_open()) {
+      file_stream << "set grid lc rgb '" << "#cccccc" << "' lw 1 lt "
+                  << PlotLineProperties::getGridLineType() << std::endl;
+    }
   }
 
   void PlotExporter::generatePNG_()

@@ -31,8 +31,7 @@
 
 TEST(PlotExporter, plot)
 {
-//  std::string main_path = "~/SmartPeak/";
-  std::string main_path = "/Users/s200370/dev/git/spdata/src/examples/data/LCMS_MRM_QCs/";
+  std::string main_path = "~/SmartPeak/";
   SmartPeak::SessionHandler::GraphVizData graph_viz_data_;
   
   std::vector<float> x;
