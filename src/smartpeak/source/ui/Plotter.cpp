@@ -169,10 +169,6 @@ namespace SmartPeak {
       graphvis_data_(graphvis_data),
       output_path_(output_path)
   {
-    cairo_available_  = isTermAvailable_("cairo");
-    canvas_available_ = isTermAvailable_("canvas");
-    svg_available_    = isTermAvailable_("svg");
-
     //PNG=0, PDF=1, HTML=2, SVG=3
     if (format == 0) plot_PNG_ = true;
     if (format == 1) plot_PDF_ = true;
@@ -186,6 +182,10 @@ namespace SmartPeak {
         }
     }
     output_path_.append("plots/");
+    
+    cairo_available_  = isTermAvailable_("cairo");
+    canvas_available_ = isTermAvailable_("canvas");
+    svg_available_    = isTermAvailable_("svg");
   }
 
   bool PlotExporter::plot()
@@ -280,12 +280,12 @@ namespace SmartPeak {
   {
     bool term_exists = false;
     std::string term_available = "";
-    std::string check_term = "gnuplot -e \"set print '" +  output_path_ + "plots/" +
+    std::string check_term = "gnuplot -e \"set print '" +  output_path_ +
                               this->filename + "-exists-" + term_name + ".tmp" +
                               "'; if (strstrt(GPVAL_TERMINALS, '" + term_name + "')) print 1; else print 0\"";
     system(check_term.c_str());
 
-    std::ifstream tmp_file((output_path_ + "plots/" + this->filename + "-exists-" + term_name + ".tmp").c_str());
+    std::ifstream tmp_file((output_path_ + this->filename + "-exists-" + term_name + ".tmp").c_str());
     if (tmp_file.is_open()) {
       tmp_file >> term_available;
       if (term_available == "1") term_exists = true;
@@ -467,7 +467,7 @@ namespace SmartPeak {
 #if defined(__APPLE__) || defined(__linux__)
     std::system(("gnuplot " + filename).c_str());
     std::system(("rm " + output_path_ + "*.gpi").c_str());
-//    std::system(("rm " + output_path_ + "*.dat").c_str());
+    std::system(("rm " + output_path_ + "*.dat").c_str());
     std::system(("rm " + output_path_ + "*.tmp").c_str());
 #elif _WIN32
     std::system(("start powershell.exe -windowstyle hidden gnuplot " + filename).c_str());

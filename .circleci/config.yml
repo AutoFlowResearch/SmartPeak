@@ -55,8 +55,6 @@ jobs:
           name: Installing SmartPeak SuperBuild
           command: |
             cd ~/SmartPeak
-            mkdir ~/SmartPeak/plots
-            chmod -rwx ~/SmartPeak/plots
             mkdir -p superbuild
             cd superbuild
             cmake -DUSE_SUPERBUILD=ON -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release ~/SmartPeak
@@ -138,8 +136,6 @@ jobs:
           name: Building SmartPeak (Including SuperBuild)
           command: |
             cd ~/SmartPeak
-            mkdir ~/SmartPeak/plots
-            chmod -rwx ~/SmartPeak/plots
             mkdir superbuild
             mkdir smartpeak_release_build
             cd superbuild
