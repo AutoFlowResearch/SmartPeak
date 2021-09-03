@@ -39,7 +39,7 @@ namespace SmartPeak {
   {
     switch (property) {
     case LineStyle:
-      if (value.empty()){
+      if (value.empty()) {
         throw std::invalid_argument("Line style must be provided.");
       }
       line_type_ = value;
@@ -177,7 +177,7 @@ namespace SmartPeak {
     
     if (!std::filesystem::is_directory(output_path_ + "plots/") ||
         !std::filesystem::exists(output_path_ + "plots/")) {
-        if(output_path_ != "." && std::filesystem::create_directory(output_path_ + "plots/")) {
+        if (output_path_ != "." && std::filesystem::create_directory(output_path_ + "plots/")) {
           LOGI << "Plots will be exported to the default location : " << output_path_ + "plots/";
         }
     }
