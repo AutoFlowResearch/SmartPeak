@@ -79,6 +79,6 @@ TEST(PlotExporter, plot)
   EXPECT_TRUE(std::filesystem::exists(main_path.string() + "plots/smartpeak-exported-plot.svg"));
   EXPECT_TRUE(std::filesystem::file_size(main_path.string() + "plots/smartpeak-exported-plot.svg") > 250000 );
   
-  std::filesystem::remove_all(main_path);
+  std::filesystem::remove_all(main_path / "plots");
   bool deb = true;
 }
