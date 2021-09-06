@@ -127,7 +127,7 @@ foreach(_examples ${EXAMPLE_executables})
             OpenMS ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
             ${COREFOUNDATION_LIBRARY} ${APPLICATIONSERVICES_LIBRARY}
             PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
-      set_target_properties(${_examples} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${SMARTPEAK_HOST_DIRECTORY}/cmake/MacOSX/Info.plist)
+      # set_target_properties(${_examples} PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${SMARTPEAK_HOST_DIRECTORY}/cmake/MacOSX/Info.plist)
       install(TARGETS ${_examples}  BUNDLE DESTINATION .  COMPONENT Applications)
     else()
       add_executable(${_examples} source/${_examples})
