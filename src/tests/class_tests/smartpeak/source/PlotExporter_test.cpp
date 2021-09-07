@@ -55,6 +55,7 @@ TEST(PlotExporter, plot)
   bool is_successful = false;
 
   //PNG=0, PDF=1, HTML=2, SVG=3
+  #if defined(__APPLE__) || defined(__linux__)
   SmartPeak::PlotExporter* exported_png = new SmartPeak::PlotExporter(main_path.string(), graph_viz_data_, 0);
   EXPECT_TRUE(exported_png->plot());
   delete exported_png;
@@ -80,5 +81,5 @@ TEST(PlotExporter, plot)
   EXPECT_TRUE(std::filesystem::file_size(main_path.string() + "plots/smartpeak-exported-plot.svg") > 250000 );
   
   std::filesystem::remove_all(main_path / "plots");
-  bool deb = true;
+  #endif
 }
