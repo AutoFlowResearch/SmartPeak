@@ -175,6 +175,7 @@ namespace SmartPeak {
     if (format == 2) plot_HTML_ = true;
     if (format == 3) plot_SVG_ = true;
     
+    try {
     if (!std::filesystem::is_directory(output_path_ + "plots/") ||
         !std::filesystem::exists(output_path_ + "plots/")) {
         if (output_path_ != "." && std::filesystem::create_directory(output_path_ + "plots/")) {
@@ -182,6 +183,9 @@ namespace SmartPeak {
         }
     }
     output_path_.append("plots/");
+    } catch (const std::exception& e) {
+      LOGE << "LoadRawData::process : " << typeid(e).name() << " : " << e.what();
+    }
     
     cairo_available_  = isTermAvailable_("cairo");
     canvas_available_ = isTermAvailable_("canvas");

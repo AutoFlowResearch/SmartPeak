@@ -25,6 +25,7 @@
 
 #include <SmartPeak/ui/Widget.h>
 #include <SmartPeak/ui/Plotter.h>
+#include <SmartPeak/ui/FilePicker.h>
 #include <SmartPeak/core/SessionHandler.h>
 #include <SmartPeak/core/ApplicationHandler.h>
 
@@ -90,7 +91,7 @@ namespace SmartPeak
     std::optional<float> marker_position_;
     bool use_markers_ = false;
     bool is_spectra_ = false;
-//    const std::unique_ptr<std::filesystem::path> working_path_ = std::make_unique<std::filesystem::path>(application_handler_.main_dir_);
+    bool show_installation_guide_ = false;
   };
 
 }

@@ -59,17 +59,32 @@ namespace SmartPeak
     float controls_pos_end_y = ImGui::GetCursorPosY();
     sliders_height_ = (controls_pos_end_y - controls_pos_start_y);
     
+    static FilePicker file_picker_;
+    
+    if (ImGui::Button("Choose folder"))
+    {
+      file_picker_.setButtonToSave();
+      file_picker_.visible_ = true;
+    }
+    if (file_picker_.visible_)
+    {
+      ImGui::OpenPopup("Pick a pathname");
+      file_picker_.draw();
+    }
+    ImGui::SameLine();
     static int selected_format = 0;
     static const char* formats[] = { "Save As PNG", "Save As PDF", "Save As HTML", "Save As SVG"};
     ImGui::Combo(" ", &selected_format, formats, IM_ARRAYSIZE(formats));
     ImGui::SameLine();
     if (ImGui::Button("Save Plot"))
     {
-      PlotExporter* exported_plot = new PlotExporter(application_handler_.main_dir_.string(), graph_viz_data_, selected_format);
-      if (!exported_plot->plot()) showInstallationInstructions();
+      PlotExporter* exported_plot = new PlotExporter(file_picker_.getPickedPathname(), graph_viz_data_, selected_format);
+      if (!exported_plot->plot()) show_installation_guide_ = true;
       delete exported_plot;
     }
     ImGui::Spacing();
+    
+    if (show_installation_guide_) showInstallationInstructions();
   }
 
   std::tuple<float, float, float, float> GraphicDataVizWidget::plotLimits() const
@@ -282,30 +297,26 @@ namespace SmartPeak
 
   void GraphicDataVizWidget::showInstallationInstructions()
   {
-    ImGui::Text("gnuplot program could not be found! Show me instructions on how to install it : ");
-    ImGui::SameLine();
-    if (ImGui::Button("Instructions")) {
-      ImGui::OpenPopup("About");
-      if (ImGui::BeginPopupModal("Instructions", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-      {
-#if defined(__APPLE__) || defined(__linux__)
-        ImGui::Text("In your terminal install brew package manager if you haven't : ");
-        ImGui::Text("   /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\" ");
-        ImGui::Text("Then install gnuplot : ");
-        ImGui::Text("   brew install gnuplot");
+    ImGui::OpenPopup("gnuplot program could not be found! Instructions:");
+    if (ImGui::BeginPopupModal("gnuplot program could not be found! Instructions:", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+      
+#if defined(__APPLE__)
+      ImGui::Text("In your terminal install brew package manager if you haven't : ");
+      ImGui::Text("   /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\" ");
+      ImGui::Text("Then install gnuplot : ");
+      ImGui::Text("   brew install gnuplot");
 #elif _WIN32
-        ImGui::Separator();
-        ImGui::Text("Download and install from http://ftp.cstug.cz/pub/CTAN/graphics/gnuplot/5.2.6/gp526-win64-mingw_2.exe ");
+      ImGui::Separator();
+      ImGui::Text("Download and install from http://ftp.cstug.cz/pub/CTAN/graphics/gnuplot/5.2.6/gp526-win64-mingw_2.exe ");
 #endif
-        ImGui::Separator();
-        if (ImGui::Button("Close"))
-        {
-          ImGui::CloseCurrentPopup();
-        }
-        ImGui::EndPopup();
+      ImGui::Separator();
+      if (ImGui::Button("Close"))
+      {
+        show_installation_guide_ = false;
+        ImGui::CloseCurrentPopup();
       }
+      ImGui::EndPopup();
     }
   }
-
-  
 }
