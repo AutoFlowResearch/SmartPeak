@@ -237,7 +237,7 @@ namespace SmartPeak {
      }
      return true;
    } else {
-     LOGW << "gnuplot not found! Not generating any plots.";
+     LOGE << "gnuplot not found! Not generating any plots.";
      return false;
    }
   }

@@ -30,7 +30,7 @@ set(core_executables_list
 set(io_executables_list
 	CSVWriter_test
 	ParametersParser_test
-  PlotExporter_test
+	PlotExporter_test
 	SelectDilutionsParser_test
 	SequenceParser_test
 	InputDataValidation_test

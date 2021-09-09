@@ -17,7 +17,7 @@ set(sources_list
 	LogWidget.cpp
 	ParameterEditorWidget.cpp
 	ParametersTableWidget.cpp
-  Plotter.cpp
+	Plotter.cpp
 	Report.cpp
 	RunWorkflowWidget.cpp
 	SampleTypeEditorWidget.cpp

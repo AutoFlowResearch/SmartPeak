@@ -30,16 +30,8 @@
 
 TEST(PlotExporter, plot)
 {
-  std::string home_path;
-  std::filesystem::path main_path;
+  auto main_path = std::filesystem::temp_directory_path();
   SmartPeak::SessionHandler::GraphVizData graph_viz_data_;
-  
-  SmartPeak::Utilities::getEnvVariable("HOME", &home_path);
-  main_path = std::filesystem::path(home_path) / "SmartPeak/";
-  
-  if (!std::filesystem::exists(main_path)) {
-    std::filesystem::create_directory(main_path);
-  }
   
   std::vector<float> x;
   std::vector<float> y;
@@ -55,31 +47,29 @@ TEST(PlotExporter, plot)
   bool is_successful = false;
 
   //PNG=0, PDF=1, HTML=2, SVG=3
-  #if defined(__APPLE__) || defined(__linux__)
-  SmartPeak::PlotExporter* exported_png = new SmartPeak::PlotExporter(main_path.string(), graph_viz_data_, 0);
+  auto exported_png = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 0);
   EXPECT_TRUE(exported_png->plot());
-  delete exported_png;
+  
   EXPECT_TRUE(std::filesystem::exists(main_path.string() + "plots/smartpeak-exported-plot.png"));
   EXPECT_TRUE(std::filesystem::file_size(main_path.string() + "plots/smartpeak-exported-plot.png") > 50000 );
   
-  SmartPeak::PlotExporter* exported_pdf = new SmartPeak::PlotExporter(main_path.string(), graph_viz_data_, 1);
+  auto exported_pdf = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 1);
   EXPECT_TRUE(exported_pdf->plot());
-  delete exported_pdf;
+  
   EXPECT_TRUE(std::filesystem::exists(main_path.string() + "plots/smartpeak-exported-plot.pdf"));
   EXPECT_TRUE(std::filesystem::file_size(main_path.string() + "plots/smartpeak-exported-plot.pdf") > 100000 );
   
-  SmartPeak::PlotExporter* exported_html = new SmartPeak::PlotExporter(main_path.string(), graph_viz_data_, 2);
+  auto exported_html = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 2);
   EXPECT_TRUE(exported_html->plot());
-  delete exported_html;
+  
   EXPECT_TRUE(std::filesystem::exists(main_path.string() + "plots/smartpeak-exported-plot.html"));
   EXPECT_TRUE(std::filesystem::file_size(main_path.string() + "plots/smartpeak-exported-plot.html") > 50000 );
   
-  SmartPeak::PlotExporter* exported_svg = new SmartPeak::PlotExporter(main_path.string(), graph_viz_data_, 3);
+  auto exported_svg = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 3);
   EXPECT_TRUE(exported_svg->plot());
-  delete exported_svg;
+  
   EXPECT_TRUE(std::filesystem::exists(main_path.string() + "plots/smartpeak-exported-plot.svg"));
   EXPECT_TRUE(std::filesystem::file_size(main_path.string() + "plots/smartpeak-exported-plot.svg") > 250000 );
   
   std::filesystem::remove_all(main_path / "plots");
-  #endif
 }
