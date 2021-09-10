@@ -1,0 +1,21 @@
+
+syntax = "proto3";
+package SmartPeakServer;
+
+service Workflow {
+  rpc runWorkflow (WorkflowParameters) returns (WorkflowStatus) {}
+}
+
+message WorkflowParameters {
+  string sequence_file = 1;
+}
+
+// workflow progression status
+message WorkflowStatus {
+  int32 progress_in_percent = 1;
+  string status_code = 2;
+  string session_id = 3;
+  string path_to_results = 4;
+}
+
+// log streaming

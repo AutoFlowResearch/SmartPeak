@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.8.2 FATAL_ERROR)
 project("SmartPeak_class_examples_smartpeak")
-
+cmake_policy(SET CMP0115 OLD)
 message(STATUS "building examples...")
 
 #------------------------------------------------------------------------------
@@ -105,6 +105,45 @@ find_package(ImPlot COMPONENTS Sources REQUIRED)
 include_directories(${IMPLOT_INCLUDE_DIR})
 
 #------------------------------------------------------------------------------
+# gRPC
+#------------------------------------------------------------------------------
+option(FETCHCONTENT_QUIET OFF)
+option(abseil-cpp_BUILD_TESTS OFF)
+option(gRPC_BUILD_TESTS OFF)
+option(ABSL_RUN_TESTS OFF)
+option(protobuf_BUILD_TESTS OFF)
+option(gRPC_BUILD_CSHARP_EXT OFF)
+option(gRPC_BUILD_GRPC_CSHARP_PLUGIN OFF)
+option(gRPC_BUILD_GRPC_NODE_PLUGIN OFF)
+option(gRPC_BUILD_GRPC_JAVA_PLUGIN OFF)
+option(gRPC_BUILD_GRPC_OBJECTIVE_C_PLUGIN OFF)
+option(gRPC_BUILD_GRPC_PHP_PLUGIN OFF)
+option(gRPC_BUILD_GRPC_PYTHON_PLUGIN OFF)
+option(gRPC_BUILD_GRPC_RUBY_PLUGIN OFF)
+option(ABSL_USE_GOOGLETEST_HEAD ON)
+# option(ABSL_USE_EXTERNAL_GOOGLETEST ON)
+# set(ABSL_LOCAL_GOOGLETEST_DIR ${googletest-distribution_SOURCE_DIR})
+set(absl_gtest_download_url "https://github.com/google/googletest/archive/refs/tags/release-1.11.0.zip")
+include(FetchContent)
+FetchContent_Declare(
+  gRPC
+  GIT_REPOSITORY https://github.com/grpc/grpc.git
+  GIT_TAG        v1.39.1
+  GIT_PROGRESS   TRUE
+)
+FetchContent_MakeAvailable(gRPC)
+
+set(grpc_required_libs 
+libprotobuf grpc++ 
+            grpc++_reflection 
+            grpc++_unsecure grpc_unsecure
+            grpc++_error_details
+            grpc gpr
+            absl_flags
+            crypto
+            address_sorting
+            grpc_plugin_support grpcpp_channelz)
+#------------------------------------------------------------------------------
 # pipeline examples
 add_custom_target(PIPELINE_EXAMPLES)
 add_dependencies(PIPELINE_EXAMPLES ${pipeline_executables_list})
@@ -122,24 +161,30 @@ foreach(_examples ${EXAMPLE_executables})
     if (${_examples} STREQUAL "SmartPeakGUI")
       set(ASSETS ${PROJECT_SOURCE_DIR}/../../cmake/MacOSX/sp.icns)
       set_source_files_properties(${ASSETS} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-      add_executable(${_examples} MACOSX_BUNDLE source/${_examples} ${ASSETS})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
+      add_executable(${_examples} MACOSX_BUNDLE source/${_examples} ${ASSETS} )
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES}
             OpenMS ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
             ${COREFOUNDATION_LIBRARY} ${APPLICATIONSERVICES_LIBRARY}
-            PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+            PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
+            ${grpc_required_libs})
       install(TARGETS ${_examples}  BUNDLE DESTINATION .  COMPONENT Applications)
     else()
+    # incl. CLI
       add_executable(${_examples} source/${_examples})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS 
+						PRIVATE 
+						${grpc_required_libs})
+      target_include_directories(${_examples} SYSTEM INTERFACE  "${PROJECT_BINARY_DIR}/source/service/")
     endif()
 
   elseif(UNIX AND CMAKE_SYSTEM_NAME MATCHES Linux) 
 
     if (${_examples} STREQUAL "SmartPeakGUI")
       add_executable(${_examples} source/${_examples})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES}
           OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
-          PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+          PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
+					${grpc_required_libs})
       install_tool(${_examples}) 
     
       file(GLOB_RECURSE OpenMSLibs ${OpenMS_DIR}/lib/*.so)
@@ -153,23 +198,24 @@ foreach(_examples ${EXAMPLE_executables})
       install(DIRECTORY ${OpenMS_SHARE_DIR} DESTINATION share/OpenMS COMPONENT share)
     elseif(${_examples} STREQUAL "SmartPeakCLI")
       add_executable(${_examples} source/${_examples})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${grpc_required_libs})
       install_tool(${_examples}) 
     else()
       add_executable(${_examples} source/${_examples})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${grpc_required_libs})
     endif()
 
   else() # Win
 
     if(NOT ${_examples} STREQUAL "SmartPeakGUI")
       add_executable(${_examples} source/${_examples})
-      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS)
+      target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} OpenMS ${grpc_required_libs})
     else()
       add_executable(${_examples} source/${_examples} ${CMAKE_SOURCE_DIR}/cmake/Windows/SmartPeakGUI.rc)
       target_link_libraries(${_examples} PUBLIC ${SmartPeak_LIBRARIES} 
           OpenMS ${SDL2_LIBRARIES} ${OPENGL_LIBRARIES} ImPlot::ImPlot ImGui::ImGui 
-          PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp)
+          PRIVATE ImPlot::Sources ImGui::Sources ImGui::Examples ImGui::SourcesMiscCpp
+					${grpc_required_libs})
       install_tool(${_examples})
     endif()
 

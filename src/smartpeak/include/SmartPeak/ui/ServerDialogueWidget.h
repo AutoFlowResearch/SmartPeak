@@ -17,45 +17,36 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Krzysztof Abram $
+// $Maintainer: Douglas McCloskey $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
-#include <iostream>
-#include <chrono>
-#include <algorithm>
-#include <plog/Log.h>
 
-#include <SmartPeak/cli/Parser.h>
-#include <SmartPeak/cli/ApplicationSettings.h>
-#include <SmartPeak/cli/ApplicationManager.h>
-#include <SmartPeak/cli/Task.h>
+#pragma once
 
+#include <SmartPeak/ui/Widget.h>
+#include <SmartPeak/core/ApplicationHandler.h>
+#include <SmartPeak/core/FeatureMetadata.h>
+#include <SmartPeak/core/SampleType.h>
+#include <SmartPeak/ui/FilePicker.h>
+#include <array>
+#include <set>
+#include <string>
+#include <vector>
 
-int main(int argc, char** argv) 
+namespace SmartPeak
 {
-    namespace cli = SmartPeak::cli;
+  class ServerDialogueWidget final : public Widget
+  {
+  public:
+    bool fields_set_ = false;
+    std::string server_ip_address_;
+    std::string sequence_file_path_;
+  protected:
+    ApplicationHandler& application_handler_;
 
-    auto parser = cli::Parser{argc, argv};
-    auto application_settings = cli::ApplicationSettings{parser};
-    auto application = cli::ApplicationManager{application_settings};
-    try
-    {
-        application
-            .add(std::make_shared<cli::InitializeApplicationSettings>())
-            .add(std::make_shared<cli::InitializeLogger>())
-            .add(std::make_shared<cli::LoadSession>())
-            .add(std::make_shared<cli::InitializeWorkflowResources>())
-            .add(std::make_shared<cli::InitializeWorkflowSettings>())
-            .add(std::make_shared<cli::RunIntegrityChecks>())
-            .add(std::make_shared<cli::RunWorkflow>())
-            .add(std::make_shared<cli::ExportReport>());
+  public:
+    ServerDialogueWidget(ApplicationHandler& application_handler);
 
-        return !application.run();
-    }
-    catch(const std::exception& e)
-    {
-        LOG_ERROR << e.what();
-        return 1;
-    }
-    return 0;
+    void draw() override;
+  };
 }

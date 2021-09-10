@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.8.2 FATAL_ERROR)
 project("SmartPeak_class_tests_smartpeak")
-
+cmake_policy(SET CMP0115 OLD)
 #------------------------------------------------------------------------------
 # Configure test file to get the TEST_DATA_PATH into the tests
 set(CF_SMARTPEAK_TEST_DATA_PATH "${PROJECT_SOURCE_DIR}/data/")
@@ -55,27 +55,6 @@ endif()
 #------------------------------------------------------------------------------
 # get the test executables
 include(executables.cmake)
-
-#------------------------------------------------------------------------------
-# googletest
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG release-1.10.0
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
-include(FetchContent)
-if(NOT googletest_POPULATED)
-  FetchContent_Populate(googletest)
-  add_subdirectory(
-    ${googletest_SOURCE_DIR}
-    ${googletest_BINARY_DIR}
-  )
-endif()
-include(GoogleTest)
 
 #------------------------------------------------------------------------------
 # Include directories for tests

@@ -23,6 +23,7 @@ set(sources_list_h
 	SampleTypeEditorWidget.h
 	SequenceGroupsEditorWidget.h
 	SequenceTableWidget.h
+	ServerDialogueWidget.h
 	SpectraMSMSPlotWidget.h
 	SpectraPlotWidget.h
 	StatisticsWidget.h

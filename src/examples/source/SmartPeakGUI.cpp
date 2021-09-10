@@ -41,6 +41,7 @@
 #include <SmartPeak/ui/ChromatogramXICPlotWidget.h>
 #include <SmartPeak/ui/SpectraPlotWidget.h>
 #include <SmartPeak/ui/SpectraMSMSPlotWidget.h>
+#include <SmartPeak/ui/ServerDialogueWidget.h>
 #include <SmartPeak/ui/ParametersTableWidget.h>
 #include <SmartPeak/ui/Report.h>
 #include <SmartPeak/ui/WorkflowWidget.h>
@@ -64,7 +65,38 @@
 #include <backends/imgui_impl_opengl2.h>
 #include <misc/cpp/imgui_stdlib.h>
 
+#include "service/workflow_grpc.h"
+#include <grpcpp/grpcpp.h>
+
 using namespace SmartPeak;
+
+class WorkflowClient {
+ public:
+  WorkflowClient(std::shared_ptr<grpc::Channel> channel)
+      : stub_(SmartPeakServer::Workflow::NewStub(channel)) {}
+  
+  std::string runWorkflow(const std::string& sequence_file_path) {
+
+  SmartPeakServer::WorkflowParameters workflow_parameters;
+  workflow_parameters.set_sequence_file(sequence_file_path);
+  SmartPeakServer::WorkflowStatus workflow_status;
+    
+  grpc::ClientContext context;
+  context.AddMetadata("smartpeak_version", Utilities::getSmartPeakVersion());
+  grpc::Status status = stub_->runWorkflow(&context, workflow_parameters, &workflow_status);
+
+  if (status.ok()) {
+    return workflow_status.status_code();
+  } else {
+    std::cout << status.error_code() << ": " << status.error_message()
+              << std::endl;
+    return "RPC failed";
+  }
+}
+
+ private:
+  std::unique_ptr<SmartPeakServer::Workflow::Stub> stub_;
+};
 
 bool SmartPeak::enable_quick_help = true;
 
@@ -85,6 +117,7 @@ int main(int argc, char** argv)
 
   // to disable buttons, display info, and update the session cache
   bool workflow_is_done_ = true;
+  bool remote_execution_done_ = false;
   bool file_loading_is_done_ = true;
   bool exceeding_plot_points_ = false;
   bool exceeding_table_size_ = false;
@@ -113,6 +146,7 @@ int main(int argc, char** argv)
                                                             event_dispatcher,
                                                             event_dispatcher);
   auto report_ = std::make_shared<Report>(application_handler_);
+  auto server_dialogue_ = std::make_shared<ServerDialogueWidget>(application_handler_);
   auto workflow_ = std::make_shared<WorkflowWidget>("Workflow", application_handler_, workflow_manager_);
   auto statistics_ = std::make_shared<StatisticsWidget>("Statistics", application_handler_, event_dispatcher);
   auto run_workflow_widget_ = std::make_shared<RunWorkflowWidget>(application_handler_, 
@@ -415,6 +449,12 @@ int main(int argc, char** argv)
       ImGui::OpenPopup("Report dialog");
       report_->draw();
     }
+    
+    if (server_dialogue_->visible_)
+    {
+      ImGui::OpenPopup("Connect to server");
+      server_dialogue_->draw();
+    }
 
     // ======================================
     // Menu
@@ -663,6 +703,11 @@ int main(int argc, char** argv)
           report_->visible_ = true;
         }
         showQuickHelpToolTip("report");
+        
+        if (ImGui::MenuItem("Connect to server"))
+        {
+          server_dialogue_->visible_ = true;
+        }
         ImGui::EndMenu();
       }
       showQuickHelpToolTip("actions");
@@ -689,6 +734,17 @@ int main(int argc, char** argv)
     bool show_left_window_ = std::find_if(left_windows.begin(), left_windows.end(), [](const auto& w) { return w->visible_; }) != left_windows.end();
     bool show_right_window_ = false;
     win_size_and_pos.setWindowSizesAndPositions(show_top_window_, show_bottom_window_, show_left_window_, show_right_window_);
+      
+    // ======================================
+    // Server-Side Execution
+    // ======================================
+      if (server_dialogue_->fields_set_) {
+        WorkflowClient workflow_client( grpc::CreateChannel(server_dialogue_->server_ip_address_, grpc::InsecureChannelCredentials()) );
+        std::string workflow_status = workflow_client.runWorkflow(server_dialogue_->sequence_file_path_);
+        std::cout << " >>> GUI client received: " << workflow_status << std::endl;
+        //remote_execution_done_ = true;
+        server_dialogue_->fields_set_ = false;
+      }
 
     // ======================================
     // Data updates

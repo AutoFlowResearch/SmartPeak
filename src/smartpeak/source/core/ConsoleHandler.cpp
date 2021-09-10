@@ -17,7 +17,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 // --------------------------------------------------------------------------
-// $Maintainer: Krzysztof Abram $
+// $Maintainer: Krzysztof Abram, Ahmed Khalil $
 // $Authors: Douglas McCloskey, Pasquale Domenico Colaianni $
 // --------------------------------------------------------------------------
 #include <SmartPeak/core/ConsoleHandler.h>
@@ -31,10 +31,8 @@ namespace SmartPeak {
 
 void ConsoleHandler::initialize(const std::string& welcome_msg)
 {
-    if (is_initialized())
-    {
-        throw std::runtime_error("plog instance already initialized");
-    }
+  if (!is_initialized())
+  {
     auto error_msg = std::string{};
     m_log_filename = _get_log_filename();
     auto log_location_correct = _initialize_log_location(m_log_filename, error_msg);
@@ -44,8 +42,10 @@ void ConsoleHandler::initialize(const std::string& welcome_msg)
     LOG_INFO << welcome_msg;
     if (error_msg.empty())
     {
-        if (m_logdir_created) LOG_DEBUG << "Log directory created: " << m_log_filepath;
+      if (m_logdir_created) {
+        LOG_DEBUG << "Log directory created: " << m_log_filepath;
         LOG_INFO << "Log file at: " << m_log_filepath;
+      }
     }
     else
     {
@@ -53,6 +53,7 @@ void ConsoleHandler::initialize(const std::string& welcome_msg)
         LOG_WARNING << error_msg;
     }
     m_is_initialized = true;
+  }
 }
 
 std::string ConsoleHandler::_get_log_filename() const

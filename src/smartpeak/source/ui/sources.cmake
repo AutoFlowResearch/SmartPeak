@@ -22,6 +22,7 @@ set(sources_list
 	SampleTypeEditorWidget.cpp
 	SequenceGroupsEditorWidget.cpp
 	SequenceTableWidget.cpp
+	ServerDialogueWidget.cpp
 	SpectraMSMSPlotWidget.cpp
 	SpectraPlotWidget.cpp
 	StatisticsWidget.cpp

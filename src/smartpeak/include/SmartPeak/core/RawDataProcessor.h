@@ -78,7 +78,7 @@ namespace SmartPeak
     std::string getName() const override { return "LOAD_RAW_DATA"; }
     std::string getDescription() const override { return "Read in raw data mzML file from disk."; }
 
-    virtual ParameterSet getParameterSchema() const;
+    virtual ParameterSet getParameterSchema() const override;
 
     /** Read in raw data mzML file from disk.
 
@@ -843,5 +843,4 @@ namespace SmartPeak
                  const Filenames& filenames_I
                  ) const override;
   };
-
 }
