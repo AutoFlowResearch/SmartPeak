@@ -31,6 +31,13 @@
 TEST(PlotExporter, plot)
 {
   auto main_path = std::filesystem::temp_directory_path();
+  std::filesystem::current_path(main_path);
+  std::filesystem::create_directory("plots");
+  std::string seperator = "/";
+#ifdef _WIN32
+  seperator = "\\";
+#endif
+  main_path.append("plots" + seperator);
   SmartPeak::SessionHandler::GraphVizData graph_viz_data_;
   
   std::vector<float> x;
@@ -71,5 +78,5 @@ TEST(PlotExporter, plot)
   EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.svg"));
   EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.svg") > 250000 );
   
-  std::filesystem::remove_all(main_path / "plots");
+  std::filesystem::remove_all(main_path);
 }
