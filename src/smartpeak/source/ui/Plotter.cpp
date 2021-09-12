@@ -167,17 +167,14 @@ namespace SmartPeak {
       nr_plots_(0),
       with_grid_(true),
       graphvis_data_(graphvis_data),
-      output_path_(output_path)
+      output_path_(output_path),
+      gnuplot_path_("gnuplot")
   {
     //PNG=0, PDF=1, HTML=2, SVG=3
     if (format == 0) plot_PNG_ = true;
     if (format == 1) plot_PDF_ = true;
     if (format == 2) plot_HTML_ = true;
     if (format == 3) plot_SVG_ = true;
-    
-    cairo_available_  = isTermAvailable_("cairo");
-    canvas_available_ = isTermAvailable_("canvas");
-    svg_available_    = isTermAvailable_("svg");
   }
 
   bool PlotExporter::plot()
@@ -236,7 +233,7 @@ namespace SmartPeak {
     std::string is_present = "";
     
 #if defined(__APPLE__) || defined(__linux__)
-    std::string check_gnuplot = "command -v gnuplot 2>&1 | tee " +  output_path_ + "is_gnuplot_present.tmp";
+    std::string check_gnuplot = "command -v " + gnuplot_path_ + " 2>&1 | tee " +  output_path_ + "is_gnuplot_present.tmp";
     system(check_gnuplot.c_str());
 
     std::ifstream tmp_file((output_path_ + "is_gnuplot_present.tmp").c_str());
@@ -250,7 +247,7 @@ namespace SmartPeak {
 
 #elif _WIN32
     std::string check_gnuplot =
-      "if ((Get-Command \"gnuplot.exe\" -ErrorAction SilentlyContinue) -eq $null) { Write \"0\" | Out-File "
+      "if ((Get-Command \"" + gnuplot_path_ + "\" -ErrorAction SilentlyContinue) -eq $null) { Write \"0\" | Out-File "
       +  output_path_ +  "is_gnuplot_present.tmp -Append } else { Write \"1\" | Out-File "
       +  output_path_ +  "is_gnuplot_present.tmp -Append }";
     system(check_gnuplot.c_str());
@@ -272,7 +269,7 @@ namespace SmartPeak {
   {
     bool term_exists = false;
     std::string term_available = "";
-    std::string check_term = "gnuplot -e \"set print '" +  output_path_ +
+    std::string check_term = gnuplot_path_ + " -e \"set print '" +  output_path_ +
                               this->filename + "-exists-" + term_name + ".tmp" +
                               "'; if (strstrt(GPVAL_TERMINALS, '" + term_name + "')) print 1; else print 0\"";
     system(check_term.c_str());
@@ -303,7 +300,7 @@ namespace SmartPeak {
 
     if (fout.is_open()) {
       appendFileHeader_(fout);
-      if (cairo_available_) {
+      if (isTermAvailable_("cairo")) {
         fout << "set terminal pngcairo dashed enhanced" << std::endl;
         fout << "set output '" << exported_plot << "'" << std::endl;
         if (with_grid_) {
@@ -339,7 +336,7 @@ namespace SmartPeak {
     
     if (fout.is_open()) {
       appendFileHeader_(fout);
-      if (cairo_available_) {
+      if (isTermAvailable_("cairo")) {
         fout << "set terminal pdfcairo transparent color dashed enhanced" << std::endl;
         fout << "set output '" << exported_plot << "'" << std::endl;
         if (with_grid_) {
@@ -365,7 +362,7 @@ namespace SmartPeak {
     
     if (fout.is_open()) {
       appendFileHeader_(fout);
-      if (cairo_available_) {
+      if (isTermAvailable_("cairo")) {
         fout << "set terminal canvas dashed enhanced" << std::endl;
         fout << "set output '" << exported_plot << "'" << std::endl;
         if (with_grid_) {
@@ -391,7 +388,7 @@ namespace SmartPeak {
     
     if (fout.is_open()) {
       appendFileHeader_(fout);
-      if (cairo_available_) {
+      if (isTermAvailable_("cairo")) {
         fout << "set terminal svg dashed enhanced" << std::endl;
         fout << "set output '" << exported_plot << "'" << std::endl;
         if (with_grid_) {
@@ -457,12 +454,12 @@ namespace SmartPeak {
       fout << std::endl;
 
 #if defined(__APPLE__) || defined(__linux__)
-    std::system(("gnuplot " + filename).c_str());
+    std::system((gnuplot_path_ + " " + filename).c_str());
     std::system(("rm " + output_path_ + "*.gpi").c_str());
     std::system(("rm " + output_path_ + "*.dat").c_str());
     std::system(("rm " + output_path_ + "*.tmp").c_str());
 #elif _WIN32
-    std::system(("start powershell.exe -windowstyle hidden gnuplot " + filename).c_str());
+    std::system(("start powershell.exe -windowstyle hidden " + gnuplot_path_ + filename).c_str());
     std::system(("start powershell.exe -windowstyle hidden rm " + output_path_ + "*.gpi").c_str());
     std::system(("start powershell.exe -windowstyle hidden rm " + output_path_ + "*.dat").c_str());
     std::system(("start powershell.exe -windowstyle hidden rm " + output_path_ + "*.tmp").c_str());

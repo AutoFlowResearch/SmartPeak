@@ -33,8 +33,10 @@ TEST(PlotExporter, plot)
   auto main_path = std::filesystem::temp_directory_path();
   std::filesystem::current_path(main_path);
   std::filesystem::create_directory("plots");
+  std::string gnuplot_path = "gnuplot";
   std::string seperator = "/";
 #ifdef _WIN32
+  gnuplot_path = "C:\\ProgramData\\chocolatey\\bin\\gnuplot.exe";
   seperator = "\\";
 #endif
   main_path.append("plots" + seperator);
@@ -55,26 +57,26 @@ TEST(PlotExporter, plot)
 
   //PNG=0, PDF=1, HTML=2, SVG=3
   auto exported_png = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 0);
+  exported_png->setGNUPLOTPath(gnuplot_path);
   EXPECT_TRUE(exported_png->plot());
-  
   EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.png"));
   EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.png") > 50000 );
   
   auto exported_pdf = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 1);
+  exported_pdf->setGNUPLOTPath(gnuplot_path);
   EXPECT_TRUE(exported_pdf->plot());
-  
   EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.pdf"));
   EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.pdf") > 100000 );
   
   auto exported_html = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 2);
+  exported_html->setGNUPLOTPath(gnuplot_path);
   EXPECT_TRUE(exported_html->plot());
-  
   EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.html"));
   EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.html") > 50000 );
   
   auto exported_svg = std::make_unique<SmartPeak::PlotExporter>(main_path.string(), graph_viz_data_, 3);
+  exported_svg->setGNUPLOTPath(gnuplot_path);
   EXPECT_TRUE(exported_svg->plot());
-  
   EXPECT_TRUE(std::filesystem::exists(main_path / "smartpeak-exported-plot.svg"));
   EXPECT_TRUE(std::filesystem::file_size(main_path / "smartpeak-exported-plot.svg") > 250000 );
   

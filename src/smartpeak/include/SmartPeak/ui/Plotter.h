@@ -115,6 +115,8 @@ namespace SmartPeak {
     */
     bool plot();
     
+    void setGNUPLOTPath(std::string gnuplot_path) { gnuplot_path_ = gnuplot_path; };
+    
   private:
     /*
     @brief checks gnuplot-term availability
@@ -186,6 +188,7 @@ namespace SmartPeak {
     std::string x_title_;
     std::string y_title_;
     std::string plot_title_;
+    std::string gnuplot_path_;
     
     std::vector<PlotLineProperties> plotlines_properties_;
     SessionHandler::GraphVizData& graphvis_data_;
@@ -194,9 +197,5 @@ namespace SmartPeak {
     bool plot_PDF_  = false;
     bool plot_HTML_ = false;
     bool plot_SVG_  = false;
-
-    bool canvas_available_  = false;
-    bool cairo_available_   = false;
-    bool svg_available_     = false;
   };
 }
