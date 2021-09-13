@@ -69,7 +69,7 @@ bool InitializeLogger::operator() (ApplicationManager& application_manager)
         console_handler.use_colors(!application_settings.disable_colors);
         console_handler.set_severity(application_settings.verbose ? plog::debug : plog::info);
         console_handler.initialize("Start SmartPeak version " + SmartPeak::Utilities::getSmartPeakVersion());
-        if (application_settings.verbose) LOG_DEBUG << "Verbose mode ON";
+      if (application_settings.verbose) { LOG_DEBUG << "Verbose mode ON"; }
     }
     catch(const std::exception& e)
     {

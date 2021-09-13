@@ -94,7 +94,6 @@ namespace SmartPeak {
     ISequenceSegmentProcessorObserver* sequence_segment_processor_observer,
     ISampleGroupProcessorObserver* sample_group_processor_observer)
   {
-    auto run_start_time = std::chrono::steady_clock::now();
     // run workflow asynchronously
     std::future<void> f = std::async(
       std::launch::async,

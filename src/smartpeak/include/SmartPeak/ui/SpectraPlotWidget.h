@@ -17,11 +17,11 @@ namespace SmartPeak
   {
   public:
     SpectraPlotWidget(SessionHandler& session_handler,
-      SequenceHandler& sequence_handler,
+      ApplicationHandler& application_handler,
       const std::string& id,
       const std::string& title,
       SequenceObservable& sequence_observable) :
-      GraphicDataVizWidget(session_handler, sequence_handler, id, title) 
+      GraphicDataVizWidget(session_handler, application_handler, id, title)
     {
       is_spectra_ = true;
       sequence_observable.addSequenceObserver(this);

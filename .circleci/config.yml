@@ -25,6 +25,7 @@ jobs:
             apt-get install -y libwildmagic-dev libsqlite3-dev &&
             apt-get install -y libglpk-dev seqan-dev libsdl2-dev libhdf5-dev
             apt-get install -y graphviz doxygen python3-pip &&
+            apt-get install -y libpango1.0-dev gnuplot
             apt-get install -y cppcheck &&
             apt-get install -y python3-sphinx python3-breathe python3-sphinx-rtd-theme sphinx-doc doxygen-latex doxygen-doc gsfonts graphviz-doc libgd-tools xapian-tools &&
             pip3 install exhale && 
@@ -106,7 +107,7 @@ jobs:
             brew update
             brew remove yarn node
             brew install cmake qt5 sdl2
-            brew install cppcheck
+            brew install cppcheck gnuplot
             pip3 install -r tools/smartpeak/requirements.txt
       - run:
           name: "Pull latest (only release)"
@@ -198,6 +199,7 @@ jobs:
             $ProgressPreference = "SilentlyContinue"
             Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
             choco install cmake --version=3.17.2 --installargs '"ADD_CMAKE_TO_PATH=System"'
+            choco install gnuplot.portable
             choco install doxygen.install
             choco install nsis.portable
             refreshenv
