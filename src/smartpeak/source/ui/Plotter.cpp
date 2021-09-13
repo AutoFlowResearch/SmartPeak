@@ -248,9 +248,14 @@ namespace SmartPeak {
 #elif _WIN32
     if (std::filesystem::exists(gnuplot_path_)) {
       is_gnuplot_present = true;
+    } else if (std::filesystem::exists("C:\\ProgramData\\chocolatey\\bin\\gnuplot.exe")) {
+      this->setGNUPLOTPath("C:\\ProgramData\\chocolatey\\bin\\gnuplot.exe");
+      is_gnuplot_present = true;
+    } else if (std::filesystem::exists("C:\\Program Files\\gnuplot\\bin\\gnuplot.exe")) {
+      this->setGNUPLOTPath("C:\\Program Files\\gnuplot\\bin\\gnuplot.exe");
+      is_gnuplot_present = true;
     }
 #endif
-    
     return is_gnuplot_present;
   }
 
