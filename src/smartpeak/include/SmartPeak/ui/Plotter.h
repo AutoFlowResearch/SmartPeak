@@ -174,6 +174,11 @@ namespace SmartPeak {
     void appendFileHeader_(std::ofstream &fout);
     
     /*
+    @brief discards temporary files
+    */
+    void removeTempFiles_();
+    
+    /*
     @brief gnuplot executer
      
     @param[in] fout filestream to append to

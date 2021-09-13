@@ -246,19 +246,8 @@ namespace SmartPeak {
     }
 
 #elif _WIN32
-    std::string check_gnuplot =
-      "if ((Get-Command \"" + gnuplot_path_ + "\" -ErrorAction SilentlyContinue) -eq $null) { Write \"0\" | Out-File "
-      +  output_path_ +  "is_gnuplot_present.tmp -Append } else { Write \"1\" | Out-File "
-      +  output_path_ +  "is_gnuplot_present.tmp -Append }";
-    system(check_gnuplot.c_str());
-
-    std::ifstream tmp_file((output_path_ + "is_gnuplot_present.tmp").c_str());
-    if (tmp_file.is_open()) {
-      tmp_file >> is_present;
-      if (is_present == "1") is_gnuplot_present = true;
-      tmp_file.close();
-    } else {
-      LOGE << "Cannot save temporary files to disk.";
+    if (std::filesystem::exists(gnuplot_path_)) {
+      is_gnuplot_present = true;
     }
 #endif
     
@@ -423,6 +412,22 @@ namespace SmartPeak {
     return legends;
   }
 
+  void PlotExporter::removeTempFiles_()
+  {
+    try {
+      for (auto& tmp_file : std::filesystem::directory_iterator(std::filesystem::path(output_path_))) {
+        if (tmp_file.path().extension() == ".tmp" ||
+            tmp_file.path().extension() == ".gpi" ||
+            tmp_file.path().extension() == ".dat"
+            ) {
+          std::filesystem::remove_all(tmp_file);
+        }
+      }
+    } catch (const std::exception& e) {
+      LOGW << "Could not remove temporary files.";
+    }
+  }
+
   void PlotExporter::generatePlot_(std::ofstream &fout, const std::string &filename)
   {
     auto legends = getLegend_();
@@ -453,16 +458,7 @@ namespace SmartPeak {
       }
       fout << std::endl;
 
-#if defined(__APPLE__) || defined(__linux__)
     std::system((gnuplot_path_ + " " + filename).c_str());
-    std::system(("rm " + output_path_ + "*.gpi").c_str());
-    std::system(("rm " + output_path_ + "*.dat").c_str());
-    std::system(("rm " + output_path_ + "*.tmp").c_str());
-#elif _WIN32
-    std::system(("start powershell.exe -windowstyle hidden " + gnuplot_path_ + filename).c_str());
-    std::system(("start powershell.exe -windowstyle hidden rm " + output_path_ + "*.gpi").c_str());
-    std::system(("start powershell.exe -windowstyle hidden rm " + output_path_ + "*.dat").c_str());
-    std::system(("start powershell.exe -windowstyle hidden rm " + output_path_ + "*.tmp").c_str());
-#endif
+    removeTempFiles_();
   }
 }
