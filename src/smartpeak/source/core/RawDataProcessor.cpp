@@ -397,6 +397,11 @@ namespace SmartPeak
     LOGD << "END LoadFeatures";
   }
 
+  std::vector<std::string> StoreFeatures::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   void StoreFeatures::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("featureXML_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.featureXML");
@@ -463,6 +468,11 @@ namespace SmartPeak
     LOGD << "END LoadAnnotations";
   }
 
+  std::vector<std::string> StoreAnnotations::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   void StoreAnnotations::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("mzTab_o", "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}.mzTab");
@@ -493,6 +503,11 @@ namespace SmartPeak
     }
 
     LOGD << "END StoreAnnotations";
+  }
+
+  std::vector<std::string> PickMRMFeatures::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet PickMRMFeatures::getParameterSchema() const
@@ -539,6 +554,11 @@ namespace SmartPeak
     LOGD << "END PickMRMFeatures";
   }
 
+  std::vector<std::string> FilterFeatures::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet FilterFeatures::getParameterSchema() const
   {
     OpenMS::MRMFeatureFilter oms_param;
@@ -572,6 +592,11 @@ namespace SmartPeak
     LOGD << "END filterFeatures";
   }
 
+  std::vector<std::string> CheckFeatures::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet CheckFeatures::getParameterSchema() const
   {
     OpenMS::MRMFeatureFilter oms_param;
@@ -601,6 +626,11 @@ namespace SmartPeak
 
     LOGI << "Feature Checker output size: " << rawDataHandler_IO.getFeatureMap().size();
     LOGD << "END checkFeatures";
+  }
+
+  std::vector<std::string> SelectFeatures::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   void SelectFeatures::process(
@@ -666,6 +696,11 @@ namespace SmartPeak
     LOGD << "END selectFeatures";
   }
 
+  std::vector<std::string> ValidateFeatures::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet ValidateFeatures::getParameterSchema() const
   {
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
@@ -712,6 +747,11 @@ namespace SmartPeak
     LOGD << "END validateFeatures";
   }
 
+  std::vector<std::string> PlotFeatures::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   void PlotFeatures::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
@@ -738,7 +778,7 @@ namespace SmartPeak
 
   std::vector<std::string> QuantifyFeatures::getRequirements() const
   {
-    return { "quantitationMethods" };
+    return { "quantitationMethods", "sequence"};
   }
 
   ParameterSet QuantifyFeatures::getParameterSchema() const
@@ -920,6 +960,11 @@ namespace SmartPeak
     LOGD << "END loadFeatureQC";
   }
 
+  std::vector<std::string> StoreFeatureFiltersRDP::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   bool StoreFeatureFiltersRDP::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
   {
     if (application_handler->sequenceHandler_.getSequence().size() == 0)
@@ -990,6 +1035,11 @@ namespace SmartPeak
     }
     process(rawDataHandler, {}, filenames);
     return true;
+  }
+
+  std::vector<std::string> StoreFeatureQCsRDP::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   void StoreFeatureQCsRDP::getFilenames(Filenames& filenames) const
@@ -1243,6 +1293,11 @@ namespace SmartPeak
     LOGD << "END loadValidationData";
   }
 
+  std::vector<std::string> StoreValidationData::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   void StoreValidationData::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("referenceData", "${MAIN_DIR}/referenceData.csv", "Reference data", true, true);
@@ -1478,6 +1533,11 @@ namespace SmartPeak
     LOGD << "END sanitizeRawDataProcessorParameters";
   }
 
+  std::vector<std::string> StoreParameters::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   void StoreParameters::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("parameters", "${MAIN_DIR}/parameters.csv", "Parameters", true, true);
@@ -1559,6 +1619,11 @@ namespace SmartPeak
     LOGD << "END StoreParameters";
   }
 
+  std::vector<std::string> ZeroChromatogramBaseline::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   void ZeroChromatogramBaseline::process(
     RawDataHandler& rawDataHandler_IO,
     const ParameterSet& params_I,
@@ -1573,6 +1638,11 @@ namespace SmartPeak
     }
 
     LOGD << "END ZeroChromatogramBaseline";
+  }
+
+  std::vector<std::string> MapChromatograms::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet MapChromatograms::getParameterSchema() const
@@ -1600,6 +1670,11 @@ namespace SmartPeak
     );
 
     LOGD << "END MapChromatograms";
+  }
+
+  std::vector<std::string> ExtractChromatogramWindows::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   void ExtractChromatogramWindows::process(
@@ -1663,6 +1738,11 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
+  std::vector<std::string> ExtractSpectraWindows::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet ExtractSpectraWindows::getParameterSchema() const
   {
     return FIAMSParameters();
@@ -1724,6 +1804,11 @@ namespace SmartPeak
     rawDataHandler_IO.getExperiment().setSpectra(output);
 
     LOGD << "END ExtractSpectraWindows";
+  }
+
+  std::vector<std::string> FitFeaturesEMG::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet FitFeaturesEMG::getParameterSchema() const
@@ -1867,6 +1952,11 @@ namespace SmartPeak
     }
   }
 
+  std::vector<std::string> FilterFeaturesRSDs::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet FilterFeaturesRSDs::getParameterSchema() const
   {
     OpenMS::MRMFeatureFilter oms_params;
@@ -1900,6 +1990,11 @@ namespace SmartPeak
     LOGD << "END filterFeaturesRSDs";
   }
 
+  std::vector<std::string> CheckFeaturesRSDs::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet CheckFeaturesRSDs::getParameterSchema() const
   {
     OpenMS::MRMFeatureFilter oms_params;
@@ -1929,6 +2024,11 @@ namespace SmartPeak
 
     LOGI << "Feature Checker output size: " << rawDataHandler_IO.getFeatureMap().size();
     LOGD << "END checkFeaturesRSDs";
+  }
+
+  std::vector<std::string> FilterFeaturesBackgroundInterferences::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet FilterFeaturesBackgroundInterferences::getParameterSchema() const
@@ -1964,6 +2064,11 @@ namespace SmartPeak
     LOGD << "END filterFeaturesBackgroundInterferences";
   }
 
+  std::vector<std::string> CheckFeaturesBackgroundInterferences::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet CheckFeaturesBackgroundInterferences::getParameterSchema() const
   {
     OpenMS::MRMFeatureFilter oms_params;
@@ -1993,6 +2098,11 @@ namespace SmartPeak
 
     LOGI << "Feature Checker output size: " << rawDataHandler_IO.getFeatureMap().size();
     LOGD << "END checkFeaturesBackgroundInterferences";
+  }
+
+  std::vector<std::string> MergeSpectra::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet MergeSpectra::getParameterSchema() const
@@ -2121,6 +2231,11 @@ namespace SmartPeak
     rawDataHandler_IO.getExperiment().setSpectra({ output });
 
     LOGD << "END MergeSpectra";
+  }
+
+  std::vector<std::string> PickMS1Features::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet PickMS1Features::getParameterSchema() const
@@ -2344,6 +2459,11 @@ namespace SmartPeak
     LOGD << "END PickMS1Features";
   }
 
+  std::vector<std::string> SearchAccurateMass::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet SearchAccurateMass::getParameterSchema() const
   {
     OpenMS::AccurateMassSearchEngine oms_params;
@@ -2417,6 +2537,11 @@ namespace SmartPeak
 
     LOGI << "SearchAccurateMass output size: " << rawDataHandler_IO.getFeatureMap().size();
     LOGD << "END SearchAccurateMass";
+  }
+
+  std::vector<std::string> MergeFeatures::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   void MergeFeatures::process(RawDataHandler& rawDataHandler_IO,
@@ -2507,6 +2632,11 @@ namespace SmartPeak
     LOGD << "END MergeFeatures";
   }
 
+  std::vector<std::string> SearchSpectrum::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet SearchSpectrum::getParameterSchema() const
   {
     OpenMS::TargetedSpectraExtractor oms_params;
@@ -2538,6 +2668,11 @@ namespace SmartPeak
     }
 
     LOGD << "END SearchSpectrum";
+  }
+
+  std::vector<std::string> DDA::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet DDA::getParameterSchema() const
@@ -2646,6 +2781,11 @@ namespace SmartPeak
     LOGD << "END ClearData";
   }
 
+  std::vector<std::string> CalculateMDVs::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet CalculateMDVs::getParameterSchema() const
   {
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
@@ -2720,6 +2860,11 @@ namespace SmartPeak
     LOGD << "END calculateMDVs";
   }
 
+  std::vector<std::string> IsotopicCorrections::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet IsotopicCorrections::getParameterSchema() const
   {
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
@@ -2777,6 +2922,11 @@ namespace SmartPeak
     }
 
     LOGD << "END IsotopicCorrections";
+  }
+
+  std::vector<std::string> CalculateIsotopicPurities::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet CalculateIsotopicPurities::getParameterSchema() const
@@ -2875,6 +3025,11 @@ namespace SmartPeak
     LOGD << "END CalculateIsotopicPurities";
   }
 
+  std::vector<std::string> CalculateMDVAccuracies::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet CalculateMDVAccuracies::getParameterSchema() const
   {
     std::map<std::string, std::vector<std::map<std::string, std::string>>> param_struct({
@@ -2949,6 +3104,11 @@ namespace SmartPeak
     }
 
     LOGD << "END CalculateMDVAccuracies";
+  }
+
+  std::vector<std::string> PickMS2Features::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet PickMS2Features::getParameterSchema() const

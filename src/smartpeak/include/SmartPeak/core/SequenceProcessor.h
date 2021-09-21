@@ -269,8 +269,8 @@ namespace SmartPeak
     void process(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "PROCESS_SEQUENCE"; }
-    std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence"; }
+    virtual std::string getName() const override { return "PROCESS_SEQUENCE"; }
+    virtual std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence"; }
     ParameterSet getParameterSchema() const override;
 
     /* IFilenamesHandler */
@@ -293,8 +293,8 @@ namespace SmartPeak
     void process(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "PROCESS_SEQUENCE_SEGMENTS"; }
-    std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence segment"; }
+    virtual std::string getName() const override { return "PROCESS_SEQUENCE_SEGMENTS"; }
+    virtual std::string getDescription() const override { return "Apply a processing workflow to all injections in a sequence segment"; }
   };
 
   /**
@@ -313,8 +313,8 @@ namespace SmartPeak
     void process(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "PROCESS_SAMPLE_GROUPS"; }
-    std::string getDescription() const override { return "Apply a processing workflow to all injections in a sample group"; }
+    virtual std::string getName() const override { return "PROCESS_SAMPLE_GROUPS"; }
+    virtual std::string getDescription() const override { return "Apply a processing workflow to all injections in a sample group"; }
   };
 
   struct LoadSequence : SequenceProcessor, IFilePickerHandler
@@ -329,8 +329,8 @@ namespace SmartPeak
     void process(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_SEQUENCE"; }
-    std::string getDescription() const override { return "Load a sequence from file"; }
+    virtual std::string getName() const override { return "LOAD_SEQUENCE"; }
+    virtual std::string getDescription() const override { return "Load a sequence from file"; }
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
@@ -348,8 +348,8 @@ namespace SmartPeak
     void process(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "STORE_SEQUENCE"; }
-    std::string getDescription() const override { return "Store sequence to file"; }
+    virtual std::string getName() const override { return "STORE_SEQUENCE"; }
+    virtual std::string getDescription() const override { return "Store sequence to file"; }
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
@@ -367,8 +367,8 @@ namespace SmartPeak
     void process(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_WORKFLOW"; }
-    std::string getDescription() const override { return "Load a workflow from file"; }
+    virtual std::string getName() const override { return "LOAD_WORKFLOW"; }
+    virtual std::string getDescription() const override { return "Load a workflow from file"; }
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
@@ -386,8 +386,8 @@ namespace SmartPeak
     void process(Filenames& filenames_I) override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "STORE_WORKFLOW"; }
-    std::string getDescription() const override { return "Store a workflow to file"; }
+    virtual std::string getName() const override { return "STORE_WORKFLOW"; }
+    virtual std::string getDescription() const override { return "Store a workflow to file"; }
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;

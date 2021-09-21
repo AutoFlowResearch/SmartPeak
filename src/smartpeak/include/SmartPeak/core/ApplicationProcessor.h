@@ -43,7 +43,7 @@ namespace SmartPeak
     virtual bool process() = 0;
 
     /* IProcessorDescription */
-    virtual std::string getDescription() const override { return ""; }
+    virtual virtual std::string getDescription() const override { return ""; }
     virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
     virtual std::vector<std::string> getRequirements() const override { return {}; };
 
@@ -73,7 +73,7 @@ namespace SmartPeak
     bool process() override;
     std::string name_;
     ApplicationHandler::Command cmd_; 
-    std::string getName() const override { return "CreateCommand"; };
+    virtual std::string getName() const override { return "CreateCommand"; };
   };
 
   struct BuildCommandsFromNames : ApplicationProcessor {
@@ -81,7 +81,7 @@ namespace SmartPeak
     bool process() override;
     std::vector<std::string> names_;
     std::vector<ApplicationHandler::Command> commands_;
-    std::string getName() const override { return "BuildCommandsFromNames"; };
+    virtual std::string getName() const override { return "BuildCommandsFromNames"; };
   };
 
   struct LoadSession : ApplicationProcessor, IFilePickerHandler
@@ -100,8 +100,8 @@ namespace SmartPeak
     bool process() override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_SESSION"; }
-    std::string getDescription() const override { return "Load an existing session"; }
+    virtual std::string getName() const override { return "LOAD_SESSION"; }
+    virtual std::string getDescription() const override { return "Load an existing session"; }
   };
 
   struct SaveSession : ApplicationProcessor, IFilePickerHandler
@@ -116,8 +116,8 @@ namespace SmartPeak
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "SAVE_SESSION"; }
-    std::string getDescription() const override { return "Save the session"; }
+    virtual std::string getName() const override { return "SAVE_SESSION"; }
+    virtual std::string getDescription() const override { return "Save the session"; }
   };
 
   struct LoadFilenames : ApplicationProcessor
@@ -129,8 +129,8 @@ namespace SmartPeak
     bool process() override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_FILENAMES"; }
-    std::string getDescription() const override { return "Load Filenames from the DB"; }
+    virtual std::string getName() const override { return "LOAD_FILENAMES"; }
+    virtual std::string getDescription() const override { return "Load Filenames from the DB"; }
 
     static std::optional<Filenames> loadFilenamesFromDB(const std::filesystem::path& path_db);
   };
@@ -144,8 +144,8 @@ namespace SmartPeak
     bool process() override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "STORE_FILENAMES"; }
-    std::string getDescription() const override { return "Store Filenames to the DB"; }
+    virtual std::string getName() const override { return "STORE_FILENAMES"; }
+    virtual std::string getDescription() const override { return "Store Filenames to the DB"; }
   };
 
 }

@@ -68,9 +68,10 @@ namespace SmartPeak
   struct SelectDilutions : SampleGroupProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "SELECT_DILUTIONS"; }
-    std::string getDescription() const override { return "Select features from dilution preferences"; }
+    virtual std::string getName() const override { return "SELECT_DILUTIONS"; }
+    virtual std::string getDescription() const override { return "Select features from dilution preferences"; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Merge multiple injections of the same sample.
@@ -89,9 +90,10 @@ namespace SmartPeak
   struct MergeInjections : SampleGroupProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "MERGE_INJECTIONS"; }
-    std::string getDescription() const override { return "Merge multiple injections of the same sample."; }
+    virtual std::string getName() const override { return "MERGE_INJECTIONS"; }
+    virtual std::string getDescription() const override { return "Merge multiple injections of the same sample."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /**
       Merge multiple injections of the same sample.
@@ -141,8 +143,8 @@ namespace SmartPeak
   struct LoadFeaturesSampleGroup : SampleGroupProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_FEATURES_SAMPLE_GROUP"; }
-    std::string getDescription() const override { return "Load the features for the sample group."; }
+    virtual std::string getName() const override { return "LOAD_FEATURES_SAMPLE_GROUP"; }
+    virtual std::string getDescription() const override { return "Load the features for the sample group."; }
     virtual ParameterSet getParameterSchema() const override;
 
     /**
@@ -162,8 +164,8 @@ namespace SmartPeak
   struct StoreFeaturesSampleGroup : SampleGroupProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "STORE_FEATURES_SAMPLE_GROUP"; }
-    std::string getDescription() const override { return "Store the features for the sample group."; }
+    virtual std::string getName() const override { return "STORE_FEATURES_SAMPLE_GROUP"; }
+    virtual std::string getDescription() const override { return "Store the features for the sample group."; }
     virtual ParameterSet getParameterSchema() const override;
 
     /**

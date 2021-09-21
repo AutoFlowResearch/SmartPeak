@@ -46,6 +46,11 @@ namespace SmartPeak
     return ParameterSet(param_struct);
   }
 
+  std::vector<std::string> SelectDilutions::getRequirements() const
+  {
+    return { "sequence" }; // TODO add selectDilutions, but at the moment there is no separate Load processor for this file
+  }
+
   void SelectDilutions::getFilenames(Filenames& filenames) const
   {
     filenames.addFileName("selectDilutions", "${MAIN_DIR}/selectDilutions.csv", "Dilution selection", false, false);
@@ -136,6 +141,11 @@ namespace SmartPeak
     }
     sampleGroupHandler_IO.setFeatureMap(new_feature_map);
     LOGD << "END SelectDilutions";
+  }
+
+  std::vector<std::string> MergeInjections::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet MergeInjections::getParameterSchema() const

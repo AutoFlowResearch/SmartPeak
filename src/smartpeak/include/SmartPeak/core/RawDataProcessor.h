@@ -77,8 +77,8 @@ namespace SmartPeak
   struct LoadRawData : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_RAW_DATA"; }
-    std::string getDescription() const override { return "Read in raw data mzML file from disk."; }
+    virtual std::string getName() const override { return "LOAD_RAW_DATA"; }
+    virtual std::string getDescription() const override { return "Read in raw data mzML file from disk."; }
     virtual ParameterSet getParameterSchema() const override;
 
     /** Read in raw data mzML file from disk.
@@ -109,8 +109,8 @@ namespace SmartPeak
   {
     
     /* IProcessorDescription */
-    std::string getName() const override { return "STORE_RAW_DATA"; }
-    std::string getDescription() const override { return "Store the processed raw data mzML file to disk."; }
+    virtual std::string getName() const override { return "STORE_RAW_DATA"; }
+    virtual std::string getDescription() const override { return "Store the processed raw data mzML file to disk."; }
 
     /** Store the processed raw data mzML file to disk.
     */
@@ -127,8 +127,9 @@ namespace SmartPeak
   struct ZeroChromatogramBaseline : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "ZERO_CHROMATOGRAM_BASELINE"; }
-    std::string getDescription() const override { return "Normalize the lowest chromatogram intensity to zero."; }
+    virtual std::string getName() const override { return "ZERO_CHROMATOGRAM_BASELINE"; }
+    virtual std::string getDescription() const override { return "Normalize the lowest chromatogram intensity to zero."; }
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Normalize the lowest chromatogram intensity to zero FOR MAPPED CHROMATOGRAMS.
     */
@@ -143,9 +144,10 @@ namespace SmartPeak
   {
     
     /* IProcessorDescription */
-    std::string getName() const override { return "MAP_CHROMATOGRAMS"; }
-    std::string getDescription() const override { return "Map chromatograms to the loaded set of transitions."; }
+    virtual std::string getName() const override { return "MAP_CHROMATOGRAMS"; }
+    virtual std::string getDescription() const override { return "Map chromatograms to the loaded set of transitions."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Map chromatograms to the loaded set of transitions.
     */
@@ -159,8 +161,9 @@ namespace SmartPeak
   struct ExtractChromatogramWindows : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "EXTRACT_CHROMATOGRAM_WINDOWS"; }
-    std::string getDescription() const override { return "Extract out specified chromatogram windows using the componentFeatureFilters."; }
+    virtual std::string getName() const override { return "EXTRACT_CHROMATOGRAM_WINDOWS"; }
+    virtual std::string getDescription() const override { return "Extract out specified chromatogram windows using the componentFeatureFilters."; }
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Extract out specified chromatogram windows FROM A MAPPED CHROMATOGRAM using the componentFeatureFilters
     */
@@ -174,9 +177,10 @@ namespace SmartPeak
   struct ExtractSpectraWindows : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "EXTRACT_SPECTRA_WINDOWS"; }
-    std::string getDescription() const override { return "Extract out specified spectra windows based on the user parameters."; }
+    virtual std::string getName() const override { return "EXTRACT_SPECTRA_WINDOWS"; }
+    virtual std::string getDescription() const override { return "Extract out specified spectra windows based on the user parameters."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Extract out specified spectra windows from an MSExperiment using the range specified in the parameters
     */
@@ -190,9 +194,10 @@ namespace SmartPeak
   struct MergeSpectra : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "MERGE_SPECTRA"; }
-    std::string getDescription() const override { return "Merge all spectra along the time axis."; }
+    virtual std::string getName() const override { return "MERGE_SPECTRA"; }
+    virtual std::string getDescription() const override { return "Merge all spectra along the time axis."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Merge all spectra along the time axis using a binning strategy that is resolution dependent
     */
@@ -206,8 +211,8 @@ namespace SmartPeak
   struct LoadFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_FEATURES"; }
-    std::string getDescription() const override { return "Read in the features from disk."; }
+    virtual std::string getName() const override { return "LOAD_FEATURES"; }
+    virtual std::string getDescription() const override { return "Read in the features from disk."; }
 
     /** Read in the features from disk.
     */
@@ -224,8 +229,9 @@ namespace SmartPeak
   struct StoreFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "STORE_FEATURES"; }
-    std::string getDescription() const override { return "Write the features to disk."; }
+    virtual std::string getName() const override { return "STORE_FEATURES"; }
+    virtual std::string getDescription() const override { return "Write the features to disk."; }
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Write the features to disk.
     */
@@ -242,8 +248,8 @@ namespace SmartPeak
   struct LoadAnnotations : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_ANNOTATIONS"; }
-    std::string getDescription() const override { return "Read in the annotations from disk."; }
+    virtual std::string getName() const override { return "LOAD_ANNOTATIONS"; }
+    virtual std::string getDescription() const override { return "Read in the annotations from disk."; }
 
     /** Read in the annotations from disk.
     */
@@ -260,8 +266,9 @@ namespace SmartPeak
   struct StoreAnnotations : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "STORE_ANNOTATIONS"; }
-    std::string getDescription() const override { return "Write the annotations to disk."; }
+    virtual std::string getName() const override { return "STORE_ANNOTATIONS"; }
+    virtual std::string getDescription() const override { return "Write the annotations to disk."; }
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Write the annotations to disk.
     */
@@ -278,9 +285,10 @@ namespace SmartPeak
   struct PickMRMFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "PICK_MRM_FEATURES"; }
-    std::string getDescription() const override { return "Run the peak picking algorithm for SRMs/MRMs."; }
+    virtual std::string getName() const override { return "PICK_MRM_FEATURES"; }
+    virtual std::string getDescription() const override { return "Run the peak picking algorithm for SRMs/MRMs."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Run the openSWATH pick peaking and scoring workflow for a single raw data file.
     */
@@ -294,9 +302,10 @@ namespace SmartPeak
   struct PickMS1Features : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "PICK_MS1_FEATURES"; }
-    std::string getDescription() const override { return "Run the peak picking algorithm for MS1 spectra."; }
+    virtual std::string getName() const override { return "PICK_MS1_FEATURES"; }
+    virtual std::string getDescription() const override { return "Run the peak picking algorithm for MS1 spectra."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Run the MS1 peak picking and scoring algorithm.
     */
@@ -310,9 +319,10 @@ namespace SmartPeak
   struct PickMS2Features : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "PICK_MS2_FEATURES"; }
-    std::string getDescription() const override { return "Pick MS2 Features"; }
+    virtual std::string getName() const override { return "PICK_MS2_FEATURES"; }
+    virtual std::string getDescription() const override { return "Pick MS2 Features"; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** PickMS2Features
      */
@@ -326,9 +336,10 @@ namespace SmartPeak
   struct SearchAccurateMass : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "SEARCH_ACCURATE_MASS"; }
-    std::string getDescription() const override { return "Run the accurate mass search algorithm."; }
+    virtual std::string getName() const override { return "SEARCH_ACCURATE_MASS"; }
+    virtual std::string getDescription() const override { return "Run the accurate mass search algorithm."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Run the accurate mass search algorithm.
     */
@@ -342,8 +353,9 @@ namespace SmartPeak
   struct MergeFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "MERGE_FEATURES"; }
-    std::string getDescription() const override { return "Create merged features from accurate mass search results."; }
+    virtual std::string getName() const override { return "MERGE_FEATURES"; }
+    virtual std::string getDescription() const override { return "Create merged features from accurate mass search results."; }
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Create merged features from accurate mass search results.
     */
@@ -357,9 +369,10 @@ namespace SmartPeak
   struct SearchSpectrum : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "SEARCH_SPECTRUM"; }
-    std::string getDescription() const override { return "Search accurate masses and add identification (peptide hits) as features/sub-features"; }
+    virtual std::string getName() const override { return "SEARCH_SPECTRUM"; }
+    virtual std::string getDescription() const override { return "Search accurate masses and add identification (peptide hits) as features/sub-features"; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Create merged features from accurate mass search results.
     */
@@ -373,9 +386,10 @@ namespace SmartPeak
   struct DDA : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "DDA"; }
-    std::string getDescription() const override { return "Data-Dependent Acquisition workflow step"; }
+    virtual std::string getName() const override { return "DDA"; }
+    virtual std::string getDescription() const override { return "Data-Dependent Acquisition workflow step"; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Create merged features from accurate mass search results.
     */
@@ -392,9 +406,10 @@ namespace SmartPeak
   struct FilterFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "FILTER_FEATURES"; }
-    std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
+    virtual std::string getName() const override { return "FILTER_FEATURES"; }
+    virtual std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Filter features that do not pass the filter QCs.
     */
@@ -408,9 +423,10 @@ namespace SmartPeak
   struct CheckFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "CHECK_FEATURES"; }
-    std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
+    virtual std::string getName() const override { return "CHECK_FEATURES"; }
+    virtual std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Flag features that do not pass the filter QCs.
     */
@@ -424,8 +440,9 @@ namespace SmartPeak
   struct SelectFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "SELECT_FEATURES"; }
-    std::string getDescription() const override { return "Run the peak selection/alignment algorithm."; }
+    virtual std::string getName() const override { return "SELECT_FEATURES"; }
+    virtual std::string getDescription() const override { return "Run the peak selection/alignment algorithm."; }
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Select features using the MRMFeatureSelection algorithm.
     */
@@ -439,9 +456,10 @@ namespace SmartPeak
   struct ValidateFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "VALIDATE_FEATURES"; }
-    std::string getDescription() const override { return "Compare selected features to a reference data set."; }
+    virtual std::string getName() const override { return "VALIDATE_FEATURES"; }
+    virtual std::string getDescription() const override { return "Compare selected features to a reference data set."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Validate the selected peaks against reference data.
     */
@@ -455,8 +473,8 @@ namespace SmartPeak
   struct QuantifyFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "QUANTIFY_FEATURES"; }
-    std::string getDescription() const override { return "Apply a calibration model defined in quantitationMethods to each transition."; }
+    virtual std::string getName() const override { return "QUANTIFY_FEATURES"; }
+    virtual std::string getDescription() const override { return "Apply a calibration model defined in quantitationMethods to each transition."; }
     virtual ParameterSet getParameterSchema() const override;
     virtual std::vector<std::string> getRequirements() const override;
 
@@ -472,8 +490,9 @@ namespace SmartPeak
   struct PlotFeatures : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "PLOT_FEATURES"; }
-    std::string getDescription() const override { return "Plot the raw chromatogram with selected peaks overlaid."; }
+    virtual std::string getName() const override { return "PLOT_FEATURES"; }
+    virtual std::string getDescription() const override { return "Plot the raw chromatogram with selected peaks overlaid."; }
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Validate the selected peaks against reference data.
     */
@@ -492,8 +511,8 @@ namespace SmartPeak
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_TRANSITIONS"; }
-    std::string getDescription() const override { return "Load the transitions for the SRM experiments from the TraML file."; }
+    virtual std::string getName() const override { return "LOAD_TRANSITIONS"; }
+    virtual std::string getDescription() const override { return "Load the transitions for the SRM experiments from the TraML file."; }
     virtual ParameterSet getParameterSchema() const override;
 
     /** Load the transitions from the TraML file.
@@ -513,8 +532,8 @@ namespace SmartPeak
   struct LoadFeatureFiltersRDP : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
-    std::string getDescription() const override { return "Load the component and component group transition filters from file."; }
+    virtual std::string getName() const override { return "LOAD_FEATURE_FILTERS"; }
+    virtual std::string getDescription() const override { return "Load the component and component group transition filters from file."; }
 
     /** Load the component and component group transition filters from file.
     */
@@ -531,8 +550,8 @@ namespace SmartPeak
   struct LoadFeatureQCsRDP : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_FEATURE_QCS"; }
-    std::string getDescription() const override { return "Load the component and component group transition QC specifications from file."; }
+    virtual std::string getName() const override { return "LOAD_FEATURE_QCS"; }
+    virtual std::string getDescription() const override { return "Load the component and component group transition QC specifications from file."; }
 
     /** Load the component and component group transition QCs from file.
     */
@@ -554,8 +573,9 @@ namespace SmartPeak
     bool static_filenames_;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
-    std::string getDescription() const override { return "Store the component and component group transition filters from file."; }
+    virtual std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
+    virtual std::string getDescription() const override { return "Store the component and component group transition filters from file."; }
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Store the component and component group transition filters from file.
     */
@@ -582,8 +602,9 @@ namespace SmartPeak
     bool static_filenames_;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "STORE_FEATURE_QCS"; }
-    std::string getDescription() const override { return "Store the component and component group transition QC specifications from file."; }
+    virtual std::string getName() const override { return "STORE_FEATURE_QCS"; }
+    virtual std::string getDescription() const override { return "Store the component and component group transition QC specifications from file."; }
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Store the component and component group transition QCs from file.
     */
@@ -610,8 +631,8 @@ namespace SmartPeak
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_VALIDATION_DATA"; }
-    std::string getDescription() const override { return "Load the validation data from file."; }
+    virtual std::string getName() const override { return "LOAD_VALIDATION_DATA"; }
+    virtual std::string getDescription() const override { return "Load the validation data from file."; }
 
     /** Load the validation data from file.
     */
@@ -641,8 +662,9 @@ namespace SmartPeak
     std::string filename_;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "STORE_VALIDATION_DATA"; }
-    std::string getDescription() const override { return "Store the validation data."; }
+    virtual std::string getName() const override { return "STORE_VALIDATION_DATA"; }
+    virtual std::string getDescription() const override { return "Store the validation data."; }
+    virtual std::vector<std::string> getRequirements() const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
@@ -656,8 +678,8 @@ namespace SmartPeak
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "LOAD_PARAMETERS"; }
-    std::string getDescription() const override { return "Load the data processing parameters from file."; }
+    virtual std::string getName() const override { return "LOAD_PARAMETERS"; }
+    virtual std::string getDescription() const override { return "Load the data processing parameters from file."; }
 
     /** Load the data processing parameters from file.
     */
@@ -692,8 +714,9 @@ namespace SmartPeak
     std::string filename_;
 
     /* IProcessorDescription */
-    std::string getName() const override { return "STORE_PARAMETERS"; }
-    std::string getDescription() const override { return "Store a parameters to file"; }
+    virtual std::string getName() const override { return "STORE_PARAMETERS"; }
+    virtual std::string getDescription() const override { return "Store a parameters to file"; }
+    virtual std::vector<std::string> getRequirements() const override;
 
     /* IFilenamesHandler */
     virtual void getFilenames(Filenames& filenames) const override;
@@ -702,9 +725,10 @@ namespace SmartPeak
   struct FitFeaturesEMG : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "FIT_FEATURES_EMG"; }
-    std::string getDescription() const override { return "Reconstruct a peak from available data points."; }
+    virtual std::string getName() const override { return "FIT_FEATURES_EMG"; }
+    virtual std::string getDescription() const override { return "Reconstruct a peak from available data points."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Apply the EMG peak reconstruction technique to the data points.
     */
@@ -727,9 +751,10 @@ namespace SmartPeak
   struct FilterFeaturesRSDs : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "FILTER_FEATURES_RSDS"; }
-    std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
+    virtual std::string getName() const override { return "FILTER_FEATURES_RSDS"; }
+    virtual std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Filter features that do not pass the filter QCs.
     */
@@ -743,9 +768,10 @@ namespace SmartPeak
   struct CheckFeaturesRSDs : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "CHECK_FEATURES_RSDS"; }
-    std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
+    virtual std::string getName() const override { return "CHECK_FEATURES_RSDS"; }
+    virtual std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Flag features that do not pass the filter QCs.
     */
@@ -758,11 +784,11 @@ namespace SmartPeak
 
   struct FilterFeaturesBackgroundInterferences : RawDataProcessor
   {
-    
     /* IProcessorDescription */
-    std::string getName() const override { return "FILTER_FEATURES_BACKGROUND_INTERFERENCES"; }
-    std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
+    virtual std::string getName() const override { return "FILTER_FEATURES_BACKGROUND_INTERFERENCES"; }
+    virtual std::string getDescription() const override { return "Filter transitions and transitions groups based on a user defined criteria."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Filter features that do not pass the filter QCs.
     */
@@ -776,9 +802,10 @@ namespace SmartPeak
   struct CheckFeaturesBackgroundInterferences : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "CHECK_FEATURES_BACKGROUND_INTERFERENCES"; }
-    std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
+    virtual std::string getName() const override { return "CHECK_FEATURES_BACKGROUND_INTERFERENCES"; }
+    virtual std::string getDescription() const override { return "Flag and score transitions and transition groups based on a user defined criteria."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Flag features that do not pass the filter QCs.
     */
@@ -792,8 +819,8 @@ namespace SmartPeak
   struct ClearData : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "CLEAR_DATA"; }
-    std::string getDescription() const override { return "Clear raw and processed data."; }
+    virtual std::string getName() const override { return "CLEAR_DATA"; }
+    virtual std::string getDescription() const override { return "Clear raw and processed data."; }
 
     /** Clear all raw and process data
     */
@@ -807,9 +834,10 @@ namespace SmartPeak
   struct CalculateMDVs : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "CALCULATE_MDVS"; }
-    std::string getDescription() const override { return "Calculate MDVs."; }
+    virtual std::string getName() const override { return "CALCULATE_MDVS"; }
+    virtual std::string getDescription() const override { return "Calculate MDVs."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Calculate MDVs
      */
@@ -823,9 +851,10 @@ namespace SmartPeak
   struct IsotopicCorrections : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "ISOTOPIC_CORRECTIONS"; }
-    std::string getDescription() const override { return "Perform Isotopic Corrections."; }
+    virtual std::string getName() const override { return "ISOTOPIC_CORRECTIONS"; }
+    virtual std::string getDescription() const override { return "Perform Isotopic Corrections."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Correct MDVs
      */
@@ -839,9 +868,10 @@ namespace SmartPeak
   struct CalculateIsotopicPurities : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "CALCULATE_MDV_ISOTOPIC_PURITIES"; }
-    std::string getDescription() const override { return "Calculate MDV Isotopic Purities."; }
+    virtual std::string getName() const override { return "CALCULATE_MDV_ISOTOPIC_PURITIES"; }
+    virtual std::string getDescription() const override { return "Calculate MDV Isotopic Purities."; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Calculate MDV Isotopic Purities
      */
@@ -855,9 +885,10 @@ namespace SmartPeak
   struct CalculateMDVAccuracies : RawDataProcessor
   {
     /* IProcessorDescription */
-    std::string getName() const override { return "CALCULATE_MDV_ACCURACIES"; }
-    std::string getDescription() const override { return "Compare MDVs to Theoretical"; }
+    virtual std::string getName() const override { return "CALCULATE_MDV_ACCURACIES"; }
+    virtual std::string getDescription() const override { return "Compare MDVs to Theoretical"; }
     virtual ParameterSet getParameterSchema() const override;
+    virtual std::vector<std::string> getRequirements() const override;
 
     /** Compare MDVs to Theoretical
      */

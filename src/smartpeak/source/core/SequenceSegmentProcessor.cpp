@@ -78,6 +78,11 @@ namespace SmartPeak
     }
   }
 
+  std::vector<std::string> CalculateCalibration::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet CalculateCalibration::getParameterSchema() const
   {
     OpenMS::AbsoluteQuantitation oms_params;
@@ -174,6 +179,11 @@ namespace SmartPeak
     LOGD << "END optimizeCalibrationCurves";
   }
 
+  std::vector<std::string> LoadStandardsConcentrations::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet LoadStandardsConcentrations::getParameterSchema() const
   {
     return ParameterSet();
@@ -264,6 +274,11 @@ namespace SmartPeak
     LOGD << "END loadStandardsConcentrations";
   }
 
+  std::vector<std::string> StoreStandardsConcentrations::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet StoreStandardsConcentrations::getParameterSchema() const
   {
     return ParameterSet();
@@ -347,6 +362,11 @@ namespace SmartPeak
     }
   }
 
+  std::vector<std::string> LoadQuantitationMethods::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet LoadQuantitationMethods::getParameterSchema() const
   {
     return ParameterSet();
@@ -401,6 +421,11 @@ namespace SmartPeak
     LOGD << "END loadQuantitationMethods";
   }
 
+  std::vector<std::string> StoreQuantitationMethods::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet StoreQuantitationMethods::getParameterSchema() const
   {
     return ParameterSet();
@@ -439,6 +464,11 @@ namespace SmartPeak
     }
 
     LOGD << "END storeQuantitationMethods";
+  }
+
+  std::vector<std::string> LoadFeatureFilters::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet LoadFeatureFilters::getParameterSchema() const
@@ -496,6 +526,11 @@ namespace SmartPeak
     LOGD << "END loadFeatureFilter";
   }
 
+  std::vector<std::string> LoadFeatureQCs::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet LoadFeatureQCs::getParameterSchema() const
   {
     return ParameterSet();
@@ -551,6 +586,11 @@ namespace SmartPeak
     LOGD << "END loadFeatureQC";
   }
 
+  std::vector<std::string> StoreFeatureFilters::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet StoreFeatureFilters::getParameterSchema() const
   {
     return ParameterSet();
@@ -603,6 +643,11 @@ namespace SmartPeak
     LOGD << "END storeFeatureFilter";
   }
 
+  std::vector<std::string> StoreFeatureQCs::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet StoreFeatureQCs::getParameterSchema() const
   {
     return ParameterSet();
@@ -653,6 +698,11 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureQC());
     LOGD << "END storeFeatureQC";
+  }
+
+  std::vector<std::string> LoadFeatureRSDFilters::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet LoadFeatureRSDFilters::getParameterSchema() const
@@ -718,6 +768,11 @@ namespace SmartPeak
     LOGD << "END loadFeatureRSDFilter";
   }
 
+  std::vector<std::string> LoadFeatureRSDQCs::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet LoadFeatureRSDQCs::getParameterSchema() const
   {
     return ParameterSet();
@@ -781,6 +836,11 @@ namespace SmartPeak
     LOGD << "END loadFeatureRSDQC";
   }
 
+  std::vector<std::string> StoreFeatureRSDFilters::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet StoreFeatureRSDFilters::getParameterSchema() const
   {
     return ParameterSet();
@@ -837,6 +897,11 @@ namespace SmartPeak
     LOGD << "END storeFeatureRSDFilter";
   }
 
+  std::vector<std::string> StoreFeatureRSDQCs::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet StoreFeatureRSDQCs::getParameterSchema() const
   {
     return ParameterSet();
@@ -891,6 +956,11 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureRSDQC());
     LOGD << "END storeFeatureRSDQC";
+  }
+
+  std::vector<std::string> LoadFeatureBackgroundFilters::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet LoadFeatureBackgroundFilters::getParameterSchema() const
@@ -956,6 +1026,11 @@ namespace SmartPeak
     LOGD << "END loadFeatureBackgroundFilter";
   }
 
+  std::vector<std::string> LoadFeatureBackgroundQCs::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet LoadFeatureBackgroundQCs::getParameterSchema() const
   {
     return ParameterSet();
@@ -1019,6 +1094,11 @@ namespace SmartPeak
     LOGD << "END loadFeatureBackgroundQC";
   }
 
+  std::vector<std::string> StoreFeatureBackgroundFilters::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet StoreFeatureBackgroundFilters::getParameterSchema() const
   {
     return ParameterSet();
@@ -1075,6 +1155,11 @@ namespace SmartPeak
     LOGD << "END storeFeatureBackgroundFilter";
   }
 
+  std::vector<std::string> StoreFeatureBackgroundQCs::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet StoreFeatureBackgroundQCs::getParameterSchema() const
   {
     return ParameterSet();
@@ -1129,6 +1214,11 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureBackgroundQC());
     LOGD << "END storeFeatureBackgroundQC";
+  }
+
+  std::vector<std::string> EstimateFeatureFilterValues::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet EstimateFeatureFilterValues::getParameterSchema() const
@@ -1191,6 +1281,11 @@ namespace SmartPeak
     LOGD << "END estimateFeatureFilterValues";
   }
 
+  std::vector<std::string> EstimateFeatureQCValues::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet EstimateFeatureQCValues::getParameterSchema() const
   {
     return ParameterSet();
@@ -1251,6 +1346,11 @@ namespace SmartPeak
     LOGD << "END estimateFeatureQCValues";
   }
 
+  std::vector<std::string> TransferLOQToFeatureFilters::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet TransferLOQToFeatureFilters::getParameterSchema() const
   {
     return ParameterSet();
@@ -1282,6 +1382,11 @@ namespace SmartPeak
     LOGD << "END TransferLOQToFeatureFilters";
   }
 
+  std::vector<std::string> TransferLOQToFeatureQCs::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet TransferLOQToFeatureQCs::getParameterSchema() const
   {
     return ParameterSet();
@@ -1311,6 +1416,11 @@ namespace SmartPeak
     );
 
     LOGD << "END TransferLOQToFeatureQCs";
+  }
+
+  std::vector<std::string> EstimateFeatureRSDs::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet EstimateFeatureRSDs::getParameterSchema() const
@@ -1361,6 +1471,11 @@ namespace SmartPeak
     LOGD << "END EstimateFeatureRSDs";
   }
 
+  std::vector<std::string> EstimateFeatureBackgroundInterferences::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet EstimateFeatureBackgroundInterferences::getParameterSchema() const
   {
     return ParameterSet();
@@ -1409,6 +1524,11 @@ namespace SmartPeak
     );
 
     LOGD << "END EstimateFeatureBackgroundInterferences";
+  }
+
+  std::vector<std::string> LoadFeatureRSDEstimations::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet LoadFeatureRSDEstimations::getParameterSchema() const
@@ -1474,6 +1594,11 @@ namespace SmartPeak
     return true;
   }
 
+  std::vector<std::string> StoreFeatureRSDEstimations::getRequirements() const
+  {
+    return { "sequence" };
+  }
+
   ParameterSet StoreFeatureRSDEstimations::getParameterSchema() const
   {
     return ParameterSet();
@@ -1514,6 +1639,11 @@ namespace SmartPeak
       filenames_I,
       sequenceSegmentHandler_IO.getFeatureRSDEstimations());
     LOGD << "END storeFeatureRSDEstimation";
+  }
+
+  std::vector<std::string> LoadFeatureBackgroundEstimations::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet LoadFeatureBackgroundEstimations::getParameterSchema() const
@@ -1579,6 +1709,11 @@ namespace SmartPeak
       &(application_handler->sequenceHandler_),
       filenames);
     return true;
+  }
+
+  std::vector<std::string> StoreFeatureBackgroundEstimations::getRequirements() const
+  {
+    return { "sequence" };
   }
 
   ParameterSet StoreFeatureBackgroundEstimations::getParameterSchema() const
