@@ -340,7 +340,7 @@ public:
   }
 };
 
-TEST(WorkflowWidget, SessionFilesWidget_Create)
+TEST(SessionFilesWidget, SessionFilesWidget_Create)
 {
   ApplicationHandler application_handler;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
@@ -367,7 +367,7 @@ TEST(WorkflowWidget, SessionFilesWidget_Create)
   }
 }
 
-TEST(WorkflowWidget, SessionFilesWidget_isModified)
+TEST(SessionFilesWidget, SessionFilesWidget_isModified)
 {
   ApplicationHandler application_handler;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
@@ -376,7 +376,7 @@ TEST(WorkflowWidget, SessionFilesWidget_isModified)
   EXPECT_EQ(session_widget_test.isModified("parameters"), false);
 }
 
-TEST(WorkflowWidget, SessionFilesWidget_clearEntry)
+TEST(SessionFilesWidget, SessionFilesWidget_clearEntry)
 {
   ApplicationHandler application_handler;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
@@ -395,7 +395,7 @@ TEST(WorkflowWidget, SessionFilesWidget_clearEntry)
   EXPECT_EQ(fef.embedded_, false);
 }
 
-TEST(WorkflowWidget, SessionFilesWidget_doUpdateSession)
+TEST(SessionFilesWidget, SessionFilesWidget_doUpdateSession)
 {
   ApplicationHandler application_handler;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
@@ -412,20 +412,8 @@ TEST(WorkflowWidget, SessionFilesWidget_doUpdateSession)
   EXPECT_EQ(application_handler.isSaved("parameters"), true);
 }
 
-#include <plog/Appenders/ConsoleAppender.h>
-
-TEST(WorkflowWidget, SessionFilesWidget_Modify_ChangeExternalFile)
+TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeToExternalFile)
 {
-  // ==========================================
-  {
-    std::cout << "----- Listing files --- " << std::endl;
-    std::filesystem::path path(SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-    for (const auto& entry : std::filesystem::directory_iterator(path))
-      std::cout << entry.path() << std::endl;
-    std::cout << "----------------------- " << std::endl;
-  }
-  // ==========================================
-
   ApplicationHandler application_handler;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
   SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation);
@@ -446,48 +434,22 @@ TEST(WorkflowWidget, SessionFilesWidget_Modify_ChangeExternalFile)
 
   ASSERT_GT(application_handler.sequenceHandler_.getSequence().size(), 0);
   ParameterSet& parameter_set = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
-  EXPECT_EQ(parameter_set.findParameter("AbsoluteQuantitation", "min_points")->getValueAsString(), "4");
-
-  // Init logger with all the appenders
-  plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
-  plog::init(plog::info).addAppender(&consoleAppender);
+  EXPECT_EQ(parameter_set.findParameter("MRMFeatureFinderScoring", "TransitionGroupPicker:peak_integration")->getValueAsString(), "smoothed");
 
   // Modify the parameter file pointer to another parameter file
-  fef.text_editor_ = "parameters_changed.csv";
+  fef.text_editor_ = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_2.csv");
   EXPECT_EQ(session_widget_test_modify.isModified("parameters"), true);
-  std::cout << "---------------------------- doUpdateSession" << std::endl;
-  // ==========================================
-  {
-    std::cout << "----- Listing files --- " << std::endl;
-    std::filesystem::path path(SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-    for (const auto& entry : std::filesystem::directory_iterator(path))
-      std::cout << entry.path() << std::endl;
-    std::cout << "----------------------- " << std::endl;
-  }
-  // ==========================================
-
   session_widget_test_modify.doUpdateSession();
 
-  // ==========================================
-  {
-    std::cout << "----- Listing files --- " << std::endl;
-    std::filesystem::path path(SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
-    for (const auto& entry : std::filesystem::directory_iterator(path))
-      std::cout << entry.path() << std::endl;
-    std::cout << "----------------------- " << std::endl;
-  }
-  // ==========================================
-
   ASSERT_GT(application_handler.sequenceHandler_.getSequence().size(), 0);
-  std::cout << "---------------------------- open" << std::endl;
   session_widget_test_modify.open(application_handler.filenames_);
   ParameterSet& parameter_set2 = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
-  auto parameter2 = parameter_set2.findParameter("AbsoluteQuantitation", "min_points");
+  auto parameter2 = parameter_set2.findParameter("MRMFeatureFinderScoring", "TransitionGroupPicker:peak_integration");
   ASSERT_NE(parameter2, nullptr);
-  EXPECT_EQ(parameter2->getValueAsString(), "42");
+  EXPECT_EQ(parameter2->getValueAsString(), "original");
 }
-/*
-TEST(WorkflowWidget, SessionFilesWidget_Modify_FileContent)
+
+TEST(SessionFilesWidget, SessionFilesWidget_Modify_FileContent)
 {
   ApplicationHandler application_handler;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
@@ -511,7 +473,7 @@ TEST(WorkflowWidget, SessionFilesWidget_Modify_FileContent)
   }
 }
 
-TEST(WorkflowWidget, SessionFilesWidget_Modify_NoPopupError)
+TEST(SessionFilesWidget, SessionFilesWidget_Modify_NoPopupError)
 {
   ApplicationHandler application_handler;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
@@ -555,7 +517,7 @@ TEST(WorkflowWidget, SessionFilesWidget_Modify_NoPopupError)
   EXPECT_EQ(application_handler.sequenceHandler_.getSequence()[0].getRawData().getParameters().size(), 27);
 }
 
-TEST(WorkflowWidget, LoadSessionWizard_PopupError)
+TEST(SessionFilesWidget, LoadSessionWizard_PopupError)
 {
   ApplicationHandler application_handler;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
@@ -603,4 +565,3 @@ TEST(WorkflowWidget, LoadSessionWizard_PopupError)
     EXPECT_EQ(session_widget_test_modify->isToBeSaved(fef.first), false);
   }
 }
-*/
