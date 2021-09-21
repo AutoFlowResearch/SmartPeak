@@ -293,9 +293,8 @@ namespace SmartPeak
     }
     Filenames filenames;
     filenames.setFullPath("quantitationMethods", filename);
-    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
-      &(application_handler->sequenceHandler_),
-      filenames);
+    sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
 
@@ -482,6 +481,7 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureFilterComponents",
       "featureFilterComponentGroups",
       component_group_))
@@ -542,6 +542,7 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureQCComponents",
       "featureQCComponentGroups",
       component_group_))
@@ -602,15 +603,15 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureFilterComponents",
       "featureFilterComponentGroups",
       component_group_))
     {
       return false;
     }
-    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
-      &(application_handler->sequenceHandler_),
-      filenames);
+    sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
 
@@ -659,15 +660,15 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureQCComponents",
       "featureQCComponentGroups",
       component_group_))
     {
       return false;
     }
-    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
-      &(application_handler->sequenceHandler_),
-      filenames);
+    sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
 
@@ -736,6 +737,7 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureRSDFilterComponents",
       "featureRSDFilterComponentGroups",
       component_group_))
@@ -804,6 +806,7 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureRSDQCComponents",
       "featureRSDQCComponentGroups",
       component_group_))
@@ -852,15 +855,15 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureRSDFilterComponents",
       "featureRSDFilterComponentGroups",
       component_group_))
     {
       return false;
     }
-    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
-      &(application_handler->sequenceHandler_),
-      filenames);
+    sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
 
@@ -913,15 +916,15 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureRSDQCComponents",
       "featureRSDQCComponentGroups",
       component_group_))
     {
       return false;
     }
-    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
-      &(application_handler->sequenceHandler_),
-      filenames);
+    sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
 
@@ -994,6 +997,7 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureBackgroundFilterComponents",
       "featureBackgroundFilterComponentGroups",
       component_group_))
@@ -1062,6 +1066,7 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureBackgroundQCComponents",
       "featureBackgroundQCComponentGroups",
       component_group_))
@@ -1110,15 +1115,15 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureBackgroundFilterComponents",
       "featureBackgroundFilterComponentGroups",
       component_group_))
     {
       return false;
     }
-    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
-      &(application_handler->sequenceHandler_),
-      filenames);
+    sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
 
@@ -1171,15 +1176,15 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureBackgroundQCComponents",
       "featureBackgroundQCComponentGroups",
       component_group_))
     {
       return false;
     }
-    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
-      &(application_handler->sequenceHandler_),
-      filenames);
+    sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
 
@@ -1582,15 +1587,15 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureRSDEstimationComponents",
       "featureRSDEstimationComponentGroups",
       component_group_))
     {
       return false;
     }
-    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
-      &(application_handler->sequenceHandler_),
-      filenames);
+    sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
 
@@ -1699,15 +1704,15 @@ namespace SmartPeak
     if (!FeatureFiltersUtils::onFilePicked(
       filename,
       application_handler,
+      filenames,
       "featureBackgroundEstimationComponents",
       "featureBackgroundEstimationComponentGroups",
       component_group_))
     {
       return false;
     }
-    processForAllSegments(application_handler->sequenceHandler_.getSequenceSegments(),
-      &(application_handler->sequenceHandler_),
-      filenames);
+    sequence_segment_observable_ = &application_handler->sequenceHandler_;
+    process(application_handler->sequenceHandler_.getSequenceSegments()[0], SequenceHandler(), {}, filenames);
     return true;
   }
 

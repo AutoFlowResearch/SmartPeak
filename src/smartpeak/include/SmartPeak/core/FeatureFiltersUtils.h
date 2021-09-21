@@ -47,6 +47,7 @@ public:
 
     static bool onFilePicked(const std::filesystem::path& filename,
       ApplicationHandler* application_handler,
+      Filenames& filenames,
       const std::string& file_id,
       const std::string& file_group_id,
       bool is_component_group);

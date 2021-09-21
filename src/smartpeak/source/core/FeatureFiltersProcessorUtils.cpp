@@ -37,6 +37,7 @@ namespace SmartPeak
 
   bool FeatureFiltersUtils::onFilePicked(const std::filesystem::path& filename,
                                          ApplicationHandler* application_handler,
+                                         Filenames& filenames,
                                          const std::string& file_id,
                                          const std::string& file_group_id,
                                          bool is_component_group)
@@ -46,7 +47,6 @@ namespace SmartPeak
       LOGE << "File cannot be loaded without first loading the sequence.";
       return false;
     }
-    Filenames filenames;
     if (is_component_group)
     {
       filenames.setFullPath(file_id, "");
