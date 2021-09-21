@@ -412,7 +412,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_doUpdateSession)
   EXPECT_EQ(application_handler.isSaved("parameters"), true);
 }
 
-TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeToExternalFile)
+TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeExternalFile)
 {
   ApplicationHandler application_handler;
   Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
@@ -447,6 +447,58 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeToExternalFile)
   auto parameter2 = parameter_set2.findParameter("MRMFeatureFinderScoring", "TransitionGroupPicker:peak_integration");
   ASSERT_NE(parameter2, nullptr);
   EXPECT_EQ(parameter2->getValueAsString(), "original");
+}
+
+TEST(SessionFilesWidget, SessionFilesWidget_Modify_ChangeFromExternalToEmbedded)
+{
+  ApplicationHandler application_handler;
+  Filenames filenames = Utilities::buildFilenamesFromDirectory(application_handler, SMARTPEAK_GET_TEST_DATA_PATH("workflow_csv_files"));
+  SessionFilesWidget_Test session_widget_test_create(application_handler, SessionFilesWidget::Mode::ECreation);
+  session_widget_test_create.open(filenames);
+  session_widget_test_create.doUpdateSession();
+
+  SessionFilesWidget_Test session_widget_test_modify(application_handler, SessionFilesWidget::Mode::EModification);
+  session_widget_test_modify.open(application_handler.filenames_);
+
+  auto& file_editor_fields = session_widget_test_modify.getEditorFileFields();
+  EXPECT_EQ(file_editor_fields.size(), 23);
+
+  auto& fef = file_editor_fields.at("parameters");
+  EXPECT_EQ(fef.text_editor_hint_, std::string("parameters.csv"));
+  EXPECT_EQ(fef.text_editor_, std::string("parameters.csv"));
+  EXPECT_EQ(fef.embedded_, false);
+  EXPECT_EQ(session_widget_test_modify.isModified("parameters"), false);
+
+  ASSERT_GT(application_handler.sequenceHandler_.getSequence().size(), 0);
+  ParameterSet& parameter_set = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+  EXPECT_EQ(parameter_set.findParameter("MRMFeatureFinderScoring", "TransitionGroupPicker:peak_integration")->getValueAsString(), "smoothed");
+
+  // Modify the parameter file pointer to another parameter file, and check it as embedded
+  fef.text_editor_ = SMARTPEAK_GET_TEST_DATA_PATH("RawDataProcessor_params_2.csv");
+  fef.embedded_ = true;
+  EXPECT_EQ(session_widget_test_modify.isModified("parameters"), true);
+  session_widget_test_modify.doUpdateSession();
+
+  // Check the change (without saving)
+  ASSERT_GT(application_handler.sequenceHandler_.getSequence().size(), 0);
+  session_widget_test_modify.open(application_handler.filenames_);
+  ParameterSet& parameter_set2 = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+  auto parameter2 = parameter_set2.findParameter("MRMFeatureFinderScoring", "TransitionGroupPicker:peak_integration");
+  ASSERT_NE(parameter2, nullptr);
+  EXPECT_EQ(parameter2->getValueAsString(), "original");
+
+  // Save and Reload, to check it's well embedded
+  auto tmp_dir_path = Utilities::createEmptyTempDirectory();
+  auto db_path = tmp_dir_path / "session.db";
+  SaveSession save_session(application_handler);
+  save_session.onFilePicked(db_path, &application_handler);
+  auto session_widget_test_modify2 = std::make_shared<SessionFilesWidget>(application_handler, SessionFilesWidget::Mode::EModification);
+  auto load_session_wizard_ = std::make_shared<LoadSessionWizard>(session_widget_test_modify2);
+  load_session_wizard_->onFilePicked(db_path, &application_handler);
+  ParameterSet& parameter_set3 = application_handler.sequenceHandler_.getSequence().at(0).getRawData().getParameters();
+  auto parameter3 = parameter_set3.findParameter("MRMFeatureFinderScoring", "TransitionGroupPicker:peak_integration");
+  ASSERT_NE(parameter3, nullptr);
+  EXPECT_EQ(parameter3->getValueAsString(), "original");
 }
 
 TEST(SessionFilesWidget, SessionFilesWidget_Modify_FileContent)
@@ -496,10 +548,7 @@ TEST(SessionFilesWidget, SessionFilesWidget_Modify_NoPopupError)
   session_widget_test_create.doUpdateSession();
 
   // save session in temporary place, outside working directory.
-
-  auto test1 = std::tmpnam(nullptr);
   auto tmp_dir_path = Utilities::createEmptyTempDirectory();
-
   auto db_path = tmp_dir_path / "session.db";
   SaveSession save_session(application_handler);
   save_session.onFilePicked(db_path, &application_handler);

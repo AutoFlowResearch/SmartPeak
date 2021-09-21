@@ -324,12 +324,12 @@ namespace SmartPeak
     application_handler_.main_dir_ = filenames_.getTag(Filenames::Tag::MAIN_DIR);
     LoadSession load_session(application_handler_);
     load_session.filenames_ = filenames;
-    if (mode_ == Mode::ECreation)
+    // When modifiying one file, we load it using all files are marked as external, to eventually import them.
+    for (const auto& fef : file_editor_fields_)
     {
-      // When creating the session, we load it using all files are marked as external then save it
-      for (const auto& file_id : load_session.filenames_->getFileIds())
+      if (isModified(fef.first))
       {
-        load_session.filenames_->setEmbedded(file_id, false);
+        load_session.filenames_->setEmbedded(fef.first, false);
       }
     }
     load_session.process();
