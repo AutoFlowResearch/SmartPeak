@@ -43,7 +43,7 @@ namespace SmartPeak
     virtual bool process() = 0;
 
     /* IProcessorDescription */
-    virtual virtual std::string getDescription() const override { return ""; }
+    virtual std::string getDescription() const override { return ""; }
     virtual ParameterSet getParameterSchema() const override { return ParameterSet(); };
     virtual std::vector<std::string> getRequirements() const override { return {}; };
 
