@@ -32,6 +32,9 @@
 
 namespace SmartPeak
 {
+  /**
+  * Class used by all the processor loading and storing Features Filters.
+  */
   class FeatureFiltersUtils
   {
 public:

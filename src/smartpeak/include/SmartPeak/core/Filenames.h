@@ -115,6 +115,9 @@ namespace SmartPeak
     */
     bool isEmbedded(const std::string& id) const;
 
+    /**
+      @brief get the session database instance.
+    */
     SessionDB& getSessionDB() { return session_db_; };
 
   protected:
@@ -141,5 +144,4 @@ namespace SmartPeak
 
     SessionDB session_db_;
   };
-
 }

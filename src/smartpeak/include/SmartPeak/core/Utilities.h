@@ -382,8 +382,16 @@ public:
     */
     static void removeTrailing(std::string& str, std::string to_remove);
 
+    /**
+     @brief Construct filename using the default files organisation.
+     
+     Can be used to create an empty session from a directory.
+    */
     static Filenames buildFilenamesFromDirectory(ApplicationHandler& application_handler, const std::filesystem::path& path);
 
+    /**
+     @brief return an empty, temporary directory.
+    */
     static std::filesystem::path createEmptyTempDirectory();
   };
 }

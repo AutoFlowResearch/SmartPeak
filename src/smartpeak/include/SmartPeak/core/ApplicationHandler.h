@@ -87,10 +87,26 @@ namespace SmartPeak
     * @brief clear all data in the aapplication handler.
     */
     void closeSession();
+
+    /**
+    * @brief check if one session is currently opened
+    */
     bool sessionIsOpened() const;
+
+    /**
+    * @brief return the saved status of the session
+    */
     bool sessionIsSaved() const;
-    void setSavedState(const std::string& file_id, bool saved_state);
-    bool isSaved(const std::string& file_id) const;
+
+    /**
+    * @brief Set one file saved status
+    */
+    void setFileSavedState(const std::string& file_id, bool saved_state);
+
+    /**
+    * @brief returns weither a file is saved
+    */
+    bool isFileSaved(const std::string& file_id) const;
 
     std::filesystem::path sequence_pathname_;
     std::filesystem::path main_dir_                = ".";

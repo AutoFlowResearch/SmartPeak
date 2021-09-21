@@ -24,11 +24,7 @@
 #include <SmartPeak/core/Utilities.h>
 #include <SmartPeak/core/CastValue.h>
 #include <SmartPeak/core/Parameters.h>
-#include <SmartPeak/io/InputDataValidation.h>
 #include <SmartPeak/smartpeak_package_version.h>
-#include <SmartPeak/core/ApplicationProcessor.h>
-#include <SmartPeak/core/SharedProcessors.h>
-#include <SmartPeak/core/SequenceProcessor.h>
 #include <OpenMS/DATASTRUCTURES/Param.h>
 #include <algorithm>
 #include <iostream>

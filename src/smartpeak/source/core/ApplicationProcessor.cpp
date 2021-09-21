@@ -386,7 +386,7 @@ namespace SmartPeak
       storing_processor->getFilenames(filenames);
       for (const auto& file_id : filenames.getFileIds())
       {
-        to_be_saved |= (!application_handler_.isSaved(file_id));
+        to_be_saved |= (!application_handler_.isFileSaved(file_id));
       }
       if (to_be_saved)
       {
@@ -425,7 +425,7 @@ namespace SmartPeak
         // update saved state
         for (const auto& file_id : filenames.getFileIds())
         {
-          application_handler_.setSavedState(file_id, true);
+          application_handler_.setFileSavedState(file_id, true);
         }
       }
     }
