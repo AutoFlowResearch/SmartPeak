@@ -598,23 +598,30 @@ namespace SmartPeak
     return oss.str();
   }
 
-  bool InputDataValidation::prepareToLoad(const Filenames& filenames, const std::string& id)
+  bool InputDataValidation::prepareToLoad(const Filenames& filenames, const std::string& file_id)
   {
-    LOGI << "Loading: " << filenames.getFullPath(id).generic_string();
-
-    const auto& full_path = filenames.getFullPath(id);
-    const bool is_embedded = filenames.isEmbedded(id);
-
-    if (!is_embedded)
+    if (filenames.isEmbedded(file_id))
     {
-      if (full_path.empty()) {
-        LOGE << "Filename is empty";
-        return false;
-      }
+      LOGI << "Loading from Session DB: " << file_id;
+    }
+    else
+    {
+      LOGI << "Loading: " << filenames.getFullPath(file_id).generic_string();
 
-      if (!InputDataValidation::fileExists(full_path)) {
-        LOGE << "File not found " << full_path.generic_string();
-        return false;
+      const auto& full_path = filenames.getFullPath(file_id);
+      const bool is_embedded = filenames.isEmbedded(file_id);
+
+      if (!is_embedded)
+      {
+        if (full_path.empty()) {
+          LOGE << "Filename is empty";
+          return false;
+        }
+
+        if (!InputDataValidation::fileExists(full_path)) {
+          LOGE << "File not found " << full_path.generic_string();
+          return false;
+        }
       }
     }
 
@@ -656,21 +663,21 @@ namespace SmartPeak
 
   bool InputDataValidation::prepareToStore(const Filenames& filenames, const std::string& file_id)
   {
-    const auto full_path = filenames.getFullPath(file_id);
-
-    LOGI << "Storing: " << full_path.generic_string();
-
-    if (full_path.empty()) {
-      LOGE << "Filename is empty";
-      return false;
-    }
-
-    if (filenames.isSaved(file_id))
+    if (filenames.isEmbedded(file_id))
     {
-      LOGI << "Filename is up to date";
-      return false;
+      LOGI << "Storing in Session DB: " << file_id;
     }
+    else
+    {
+      const auto full_path = filenames.getFullPath(file_id);
 
+      LOGI << "Storing: " << full_path.generic_string();
+
+      if (full_path.empty()) {
+        LOGE << "Filename is empty";
+        return false;
+      }
+    }
     return true;
   }
 

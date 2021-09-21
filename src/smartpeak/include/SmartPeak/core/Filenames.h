@@ -115,9 +115,6 @@ namespace SmartPeak
     */
     bool isEmbedded(const std::string& id) const;
 
-    void setSavedState(const std::string& file_id, bool saved_state);
-    bool isSaved(const std::string& file_id) const;
-
     SessionDB& getSessionDB() { return session_db_; };
 
   protected:
@@ -130,7 +127,6 @@ namespace SmartPeak
       bool embedded_ = false;
       std::filesystem::path full_path_;
       bool full_path_override_ = false;
-      bool saved_state_ = true;
     };
 
     friend class Filenames;

@@ -255,7 +255,7 @@ namespace SmartPeak
 
   bool SessionFilesWidget::isToBeSaved(const std::string& file_id) const
   {
-    return (mode_ == Mode::EModification) && (!filenames_.isSaved(file_id));
+    return (mode_ == Mode::EModification) && (!application_handler_.isSaved(file_id));
   }
 
   bool SessionFilesWidget::isMissingRequirement(const std::string& file_id) const
@@ -343,20 +343,19 @@ namespace SmartPeak
           // if the file is embedded and we create a new session, 
           // we need to set it as not saved, 
           // so that the file will be embedded in the session db
-          application_handler_.filenames_.setSavedState(fef.first, false);
+          application_handler_.setSavedState(fef.first, false);
         }
         else
         {
-          application_handler_.filenames_.setSavedState(fef.first, !(isModified(fef.first)));
+          application_handler_.setSavedState(fef.first, !(isModified(fef.first)));
         }
       }
       else
       {
-        // The file is not embedded, we don't want to export it.
-        application_handler_.filenames_.setSavedState(fef.first, true);
+        // The file is not embedded, we don't want to export it - set it to saved.
+        application_handler_.setSavedState(fef.first, true);
       }
     }
-
   }
 
   void SessionFilesWidget::updateFieldEditorsStatus()

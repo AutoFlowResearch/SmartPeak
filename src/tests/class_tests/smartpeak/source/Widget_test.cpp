@@ -409,7 +409,7 @@ TEST(WorkflowWidget, SessionFilesWidget_doUpdateSession)
   EXPECT_EQ(application_handler.sequenceHandler_.getSequence().size(), 2);
   const auto& app_filenames = application_handler.filenames_;
   EXPECT_EQ(app_filenames.getFileIds().size(), 23);
-  EXPECT_EQ(app_filenames.isSaved("parameters"), true);
+  EXPECT_EQ(application_handler.isSaved("parameters"), true);
 }
 
 #include <plog/Appenders/ConsoleAppender.h>

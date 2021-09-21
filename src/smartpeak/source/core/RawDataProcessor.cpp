@@ -351,7 +351,6 @@ namespace SmartPeak
       {
         mzmlfile.store(filenames_I.getFullPath("mzML_i").generic_string(), rawDataHandler_IO.getExperiment());
       }
-      filenames_I.setSavedState("mzML_i", true);
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -412,9 +411,6 @@ namespace SmartPeak
     LOGD << "START storeFeatureMap";
     getFilenames(filenames_I);
 
-    // We want to overwrite the file in that case
-    filenames_I.setSavedState("featureXML_o", false);
-
     if (!InputDataValidation::prepareToStore(filenames_I, "featureXML_o"))
     {
       LOGD << "END " << getName();
@@ -425,7 +421,6 @@ namespace SmartPeak
       // Store outfile as featureXML
       OpenMS::FeatureXMLFile featurexml;
       featurexml.store(filenames_I.getFullPath("featureXML_o").generic_string(), rawDataHandler_IO.getFeatureMapHistory());
-      filenames_I.setSavedState("featureXML_o", true);
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -492,7 +487,6 @@ namespace SmartPeak
       // Store outfile as mzTab
       OpenMS::MzTabFile mztabfile;
       mztabfile.store(filenames_I.getFullPath("mzTab_o").generic_string(), rawDataHandler_IO.getMzTab());
-      filenames_I.setSavedState("mzTab_o", true);
     }
     catch (const std::exception& e) {
       LOGE << e.what();
@@ -1341,7 +1335,6 @@ namespace SmartPeak
       {
         LOGE << "Not implemented";
       }
-      filenames_I.setSavedState("referenceData", true);
     }
     catch (const std::exception& e)
     {
@@ -1558,7 +1551,6 @@ namespace SmartPeak
         }
         ParametersParser::write(filenames_I.getFullPath("parameters").generic_string(), rawDataHandler_IO.getParameters());
       }
-      filenames_I.setSavedState("parameters", true);
     }
     catch (const std::exception& e)
     {

@@ -89,6 +89,8 @@ namespace SmartPeak
     void closeSession();
     bool sessionIsOpened() const;
     bool sessionIsSaved() const;
+    void setSavedState(const std::string& file_id, bool saved_state);
+    bool isSaved(const std::string& file_id) const;
 
     std::filesystem::path sequence_pathname_;
     std::filesystem::path main_dir_                = ".";
@@ -99,6 +101,8 @@ namespace SmartPeak
     Filenames             filenames_;
     std::vector<std::shared_ptr<IFilenamesHandler>> loading_processors_;
     std::vector<std::shared_ptr<IFilenamesHandler>> storing_processors_;
+  protected:
+    std::map<std::string, bool> saved_files_;
   };
 
 

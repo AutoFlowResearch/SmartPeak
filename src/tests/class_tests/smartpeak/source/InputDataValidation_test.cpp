@@ -242,9 +242,6 @@ TEST(InputDataValidation, prepareToStore)
 {
   Filenames filenames;
   filenames.setFullPath("quantitationMethods", main_dir + "/quantitationMethods_missing.csv");
-  // by default, saved state is set to true
-  EXPECT_FALSE(InputDataValidation::prepareToStore(filenames, "quantitationMethods"));
-  filenames.setSavedState("quantitationMethods", false);
   EXPECT_TRUE(InputDataValidation::prepareToStore(filenames, "quantitationMethods"));
   filenames.setFullPath("empty_file", "");
   EXPECT_FALSE(InputDataValidation::prepareToStore(filenames, "empty_file"));

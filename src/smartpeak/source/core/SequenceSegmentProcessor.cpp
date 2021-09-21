@@ -338,16 +338,13 @@ namespace SmartPeak
       }
       else
       {
-        // TODO
+        LOGE << "Not implemented";
       }
-      filenames_I.setSavedState("standardsConcentrations", true);
     }
     catch (const std::exception& e)
     {
       LOGE << e.what();
     }
-
-    LOGD << "END StoreStandardsConcentrations";
   }
 
   ParameterSet LoadQuantitationMethods::getParameterSchema() const

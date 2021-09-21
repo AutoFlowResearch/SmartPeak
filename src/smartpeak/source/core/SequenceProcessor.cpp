@@ -667,7 +667,6 @@ namespace SmartPeak
       }
       SequenceParser::writeSequenceFileSmartPeak(*sequenceHandler_IO, filenames_I.getFullPath("sequence").generic_string().c_str());
     }
-    filenames_I.setSavedState("sequence", true);
     LOGD << "END StoreSequence";
   }
 
@@ -815,7 +814,6 @@ namespace SmartPeak
         writer.writeDataInRow(line.cbegin(), line.cend());
       }
     }
-    filenames_I.setSavedState("workflow", true);
     LOGD << "END StoreWorkflow";
   }
 }

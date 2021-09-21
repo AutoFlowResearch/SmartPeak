@@ -88,12 +88,12 @@ namespace SmartPeak
 
   void ApplicationHandler::onParametersUpdated()
   {
-    filenames_.setSavedState("parameters", false);
+    setSavedState("parameters", false);
   }
 
   void ApplicationHandler::onWorkflowUpdated()
   {
-    filenames_.setSavedState("workflow", false);
+    setSavedState("workflow", false);
   }
 
   void ApplicationHandler::closeSession()
@@ -167,15 +167,30 @@ namespace SmartPeak
   bool ApplicationHandler::sessionIsSaved() const
   {
     bool saved = true;
-    for (const auto& file_id : filenames_.getFileIds())
+    for (const auto& saved_file_pair : saved_files_)
     {
-      if (!filenames_.isSaved(file_id))
+      if (!saved_file_pair.second)
       {
         saved = false;
         break;
       }
     }
     return saved;
+  }
+
+
+  void ApplicationHandler::setSavedState(const std::string& file_id, bool saved_state)
+  {
+    saved_files_[file_id] = saved_state;
+  }
+
+  bool ApplicationHandler::isSaved(const std::string& file_id) const
+  {
+    if (!saved_files_.count(file_id))
+    {
+      return true;
+    }
+    return saved_files_.at(file_id);
   }
 
 }

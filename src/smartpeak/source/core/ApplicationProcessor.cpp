@@ -381,38 +381,51 @@ namespace SmartPeak
 
     for (auto& storing_processor : application_handler_.storing_processors_)
     {
-      auto sequence_processor = std::dynamic_pointer_cast<SequenceProcessor>(storing_processor);
-      if (sequence_processor)
+      bool to_be_saved = false;
+      Filenames filenames;
+      storing_processor->getFilenames(filenames);
+      for (const auto& file_id : filenames.getFileIds())
       {
-        sequence_processor->process(application_handler_.filenames_);
+        to_be_saved |= (!application_handler_.isSaved(file_id));
       }
-      auto raw_data_processor = std::dynamic_pointer_cast<RawDataProcessor>(storing_processor);
-      if (raw_data_processor)
+      if (to_be_saved)
       {
-        if (!application_handler_.sequenceHandler_.getSequence().empty())
+        auto sequence_processor = std::dynamic_pointer_cast<SequenceProcessor>(storing_processor);
+        if (sequence_processor)
         {
-          RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence()[0].getRawData();
-          raw_data_processor->process(rawDataHandler, {}, application_handler_.filenames_);
+          sequence_processor->process(application_handler_.filenames_);
         }
-        else
+        auto raw_data_processor = std::dynamic_pointer_cast<RawDataProcessor>(storing_processor);
+        if (raw_data_processor)
         {
-          LOGE << "No Sequence available, Storing process aborted.";
-          return false;
+          if (!application_handler_.sequenceHandler_.getSequence().empty())
+          {
+            RawDataHandler& rawDataHandler = application_handler_.sequenceHandler_.getSequence()[0].getRawData();
+            raw_data_processor->process(rawDataHandler, {}, application_handler_.filenames_);
+          }
+          else
+          {
+            LOGE << "No Sequence available, Storing process aborted.";
+          }
         }
-      }
-      auto sequence_segment_processor = std::dynamic_pointer_cast<SequenceSegmentProcessor>(storing_processor);
-      if (sequence_segment_processor)
-      {
-        if (!application_handler_.sequenceHandler_.getSequenceSegments().empty())
+        auto sequence_segment_processor = std::dynamic_pointer_cast<SequenceSegmentProcessor>(storing_processor);
+        if (sequence_segment_processor)
         {
-          SequenceSegmentHandler& sequenceSegmentHandler = application_handler_.sequenceHandler_.getSequenceSegments().at(0);
-          sequence_segment_processor->sequence_segment_observable_ = &application_handler_.sequenceHandler_;
-          sequence_segment_processor->process(sequenceSegmentHandler, SequenceHandler(), {}, application_handler_.filenames_);
+          if (!application_handler_.sequenceHandler_.getSequenceSegments().empty())
+          {
+            SequenceSegmentHandler& sequenceSegmentHandler = application_handler_.sequenceHandler_.getSequenceSegments().at(0);
+            sequence_segment_processor->sequence_segment_observable_ = &application_handler_.sequenceHandler_;
+            sequence_segment_processor->process(sequenceSegmentHandler, SequenceHandler(), {}, application_handler_.filenames_);
+          }
+          else
+          {
+            LOGE << "No Sequence Segment available, Storing process aborted.";
+          }
         }
-        else
+        // update saved state
+        for (const auto& file_id : filenames.getFileIds())
         {
-          LOGE << "No Sequence Segment available, Storing process aborted.";
-          return false;
+          application_handler_.setSavedState(file_id, true);
         }
       }
     }

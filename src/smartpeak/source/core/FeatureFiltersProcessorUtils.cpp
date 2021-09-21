@@ -74,11 +74,6 @@ namespace SmartPeak
       OpenMS::MRMFeatureQCFile featureQCFile;
       if (!filenames.getFullPath(file_id).empty())  // because we don't know if either of the two names is empty
       {
-        if (filenames.isSaved(file_id))
-        {
-          LOGI << "Filename is up to date";
-          return;
-        }
         if (filenames.isEmbedded(file_id))
         {
           auto db_context = filenames.getSessionDB().beginWrite(
@@ -114,15 +109,9 @@ namespace SmartPeak
         {
           featureQCFile.store(filenames.getFullPath(file_id).generic_string(), features_qc, false);
         }
-        filenames.setSavedState(file_id, true);
       }
       if (!filenames.getFullPath(file_group_id).empty())
       {
-        if (filenames.isSaved(file_group_id))
-        {
-          LOGI << "Filename is up to date";
-          return;
-        }
         if (filenames.isEmbedded(file_group_id))
         {
           auto db_context = filenames.getSessionDB().beginWrite(
@@ -190,7 +179,6 @@ namespace SmartPeak
         {
           featureQCFile.store(filenames.getFullPath(file_group_id).generic_string(), features_qc, true);
         }
-        filenames.setSavedState(file_group_id, true);
       }
     }
     catch (const std::exception& e) {

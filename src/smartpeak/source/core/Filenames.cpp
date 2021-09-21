@@ -204,20 +204,4 @@ namespace SmartPeak
     }
   }
 
-  void Filenames::setSavedState(const std::string& file_id, bool saved_state)
-  {
-    if (file_names_.count(file_id))
-    {
-      file_names_.at(file_id).saved_state_ = saved_state;
-    }
-  }
-
-  bool Filenames::isSaved(const std::string& file_id) const
-  {
-    if (!file_names_.count(file_id))
-    {
-      return true;
-    }
-    return file_names_.at(file_id).saved_state_;
-  }
 }
