@@ -90,6 +90,13 @@ namespace SmartPeak
     void processForAllSegments(std::vector<SmartPeak::SequenceSegmentHandler>& sequence_segment_handlers,
                                SequenceSegmentObservable* sequence_segment_observable,
                                Filenames& filenames);
+
+    /** 
+      Utility method: most of the loading / storing processors can load / store per sequence
+      But also from one unique file to or from multiple sequence (static filename)
+      this method aims at returning the appropriate filename based on "static filename" behavior.
+    */
+    std::string constructFilename(const std::string& filename, bool static_filename) const;
   };
 
   struct CalculateCalibration : SequenceSegmentProcessor
@@ -112,6 +119,10 @@ namespace SmartPeak
 
   struct LoadStandardsConcentrations : SequenceSegmentProcessor, IFilePickerHandler
   {
+    LoadStandardsConcentrations(bool static_filenames = false)
+      : static_filenames_(static_filenames) {}
+    bool static_filenames_;
+
     /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
@@ -136,8 +147,10 @@ namespace SmartPeak
 
   struct StoreStandardsConcentrations : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreStandardsConcentrations(bool component_group = false) : component_group_(component_group) {}
+    StoreStandardsConcentrations(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
@@ -163,6 +176,10 @@ namespace SmartPeak
 
   struct LoadQuantitationMethods : SequenceSegmentProcessor, IFilePickerHandler
   {
+    LoadQuantitationMethods(bool static_filenames = false)
+      : static_filenames_(static_filenames) {}
+    bool static_filenames_;
+
     /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
 
@@ -187,8 +204,10 @@ namespace SmartPeak
 
   struct StoreQuantitationMethods : SequenceSegmentProcessor
   {
-    StoreQuantitationMethods(bool component_group = false) : component_group_(component_group) {}
+    StoreQuantitationMethods(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "STORE_QUANTITATION_METHODS"; }
@@ -211,8 +230,10 @@ namespace SmartPeak
 
   struct LoadFeatureFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureFilters(bool component_group = false) : component_group_(component_group) {}
+    LoadFeatureFilters(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
@@ -237,8 +258,10 @@ namespace SmartPeak
 
   struct LoadFeatureQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureQCs(bool component_group = false) : component_group_(component_group) {}
+    LoadFeatureQCs(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
@@ -263,8 +286,10 @@ namespace SmartPeak
 
   struct StoreFeatureFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureFilters(bool component_group = false) : component_group_(component_group) {}
+    StoreFeatureFilters(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
@@ -289,8 +314,10 @@ namespace SmartPeak
 
   struct StoreFeatureQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureQCs(bool component_group = false) : component_group_(component_group) {}
+    StoreFeatureQCs(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_QCS"; }
@@ -315,8 +342,10 @@ namespace SmartPeak
 
   struct LoadFeatureRSDFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureRSDFilters(bool component_group = false) : component_group_(component_group) {}
+    LoadFeatureRSDFilters(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
@@ -341,8 +370,10 @@ namespace SmartPeak
 
   struct LoadFeatureRSDQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureRSDQCs(bool component_group = false) : component_group_(component_group) {}
+    LoadFeatureRSDQCs(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
@@ -367,8 +398,9 @@ namespace SmartPeak
 
   struct StoreFeatureRSDFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureRSDFilters(bool component_group = false) : component_group_(component_group) {}
+    StoreFeatureRSDFilters(bool component_group = false, bool static_filenames = false) : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_RSD_FILTERS"; }
@@ -393,8 +425,10 @@ namespace SmartPeak
 
   struct StoreFeatureRSDQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureRSDQCs(bool component_group = false) : component_group_(component_group) {}
+    StoreFeatureRSDQCs(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_RSD_QCS"; }
@@ -419,8 +453,10 @@ namespace SmartPeak
 
   struct LoadFeatureBackgroundFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureBackgroundFilters(bool component_group = false) : component_group_(component_group) {}
+    LoadFeatureBackgroundFilters(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
@@ -445,8 +481,10 @@ namespace SmartPeak
 
   struct LoadFeatureBackgroundQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    LoadFeatureBackgroundQCs(bool component_group = false) : component_group_(component_group) {}
+    LoadFeatureBackgroundQCs(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IFilePickerHandler */
     bool onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler) override;
@@ -471,8 +509,10 @@ namespace SmartPeak
 
   struct StoreFeatureBackgroundFilters : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureBackgroundFilters(bool component_group = false) : component_group_(component_group) {}
+    StoreFeatureBackgroundFilters(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_BACKGROUND_FILTERS"; }
@@ -497,8 +537,10 @@ namespace SmartPeak
 
   struct StoreFeatureBackgroundQCs : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureBackgroundQCs(bool component_group = false) : component_group_(component_group) {}
+    StoreFeatureBackgroundQCs(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_BACKGROUND_QCS"; }
@@ -637,8 +679,10 @@ namespace SmartPeak
 
   struct LoadFeatureRSDEstimations : SequenceSegmentProcessor
   {
-    LoadFeatureRSDEstimations(bool component_group = false) : component_group_(component_group) {}
+    LoadFeatureRSDEstimations(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "LOAD_FEATURE_RSD_ESTIMATIONS"; }
@@ -660,8 +704,10 @@ namespace SmartPeak
 
   struct StoreFeatureRSDEstimations : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureRSDEstimations(bool component_group = false) : component_group_(component_group) {}
+    StoreFeatureRSDEstimations(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_RSD_ESTIMATIONS"; }
@@ -686,8 +732,10 @@ namespace SmartPeak
 
   struct LoadFeatureBackgroundEstimations : SequenceSegmentProcessor
   {
-    LoadFeatureBackgroundEstimations(bool component_group = false) : component_group_(component_group) {}
+    LoadFeatureBackgroundEstimations(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "LOAD_FEATURE_BACKGROUND_ESTIMATIONS"; }
@@ -709,8 +757,10 @@ namespace SmartPeak
 
   struct StoreFeatureBackgroundEstimations : SequenceSegmentProcessor, IFilePickerHandler
   {
-    StoreFeatureBackgroundEstimations(bool component_group = false) : component_group_(component_group) {}
+    StoreFeatureBackgroundEstimations(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_BACKGROUND_ESTIMATIONS"; }

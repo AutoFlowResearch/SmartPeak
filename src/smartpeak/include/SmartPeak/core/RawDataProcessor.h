@@ -548,8 +548,10 @@ namespace SmartPeak
 
   struct StoreFeatureFiltersRDP : RawDataProcessor, IFilePickerHandler
   {
-    StoreFeatureFiltersRDP(bool component_group = false) : component_group_(component_group) {}
+    StoreFeatureFiltersRDP(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_FILTERS"; }
@@ -574,8 +576,10 @@ namespace SmartPeak
 
   struct StoreFeatureQCsRDP : RawDataProcessor, IFilePickerHandler
   {
-    StoreFeatureQCsRDP(bool component_group = false) : component_group_(component_group) {}
+    StoreFeatureQCsRDP(bool component_group = false, bool static_filenames = false)
+      : component_group_(component_group), static_filenames_(static_filenames) {}
     bool component_group_;
+    bool static_filenames_;
 
     /* IProcessorDescription */
     std::string getName() const override { return "STORE_FEATURE_QCS"; }

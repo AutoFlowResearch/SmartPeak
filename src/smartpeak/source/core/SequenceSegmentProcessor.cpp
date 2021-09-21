@@ -66,6 +66,18 @@ namespace SmartPeak
     }
   }
 
+  std::string SequenceSegmentProcessor::constructFilename(const std::string& filename, bool static_filename) const
+  {
+    if (static_filename)
+    {
+      return "${MAIN_DIR}/" + filename;
+    }
+    else
+    {
+      return "${FEATURES_OUTPUT_PATH}/${OUTPUT_INJECTION_NAME}_" + filename;
+    }
+  }
+
   ParameterSet CalculateCalibration::getParameterSchema() const
   {
     OpenMS::AbsoluteQuantitation oms_params;
@@ -184,7 +196,7 @@ namespace SmartPeak
 
   void LoadStandardsConcentrations::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("standardsConcentrations", "${MAIN_DIR}/standardsConcentrations.csv", "Standards Concentrations", true, true);
+    filenames.addFileName("standardsConcentrations", constructFilename("standardsConcentrations.csv", static_filenames_), "Standards Concentrations", true, true);
   };
 
   void LoadStandardsConcentrations::process(
@@ -274,7 +286,7 @@ namespace SmartPeak
 
   void StoreStandardsConcentrations::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("standardsConcentrations", "${MAIN_DIR}/standardsConcentrations.csv", "Standards Concentrations", true, true);
+    filenames.addFileName("standardsConcentrations", constructFilename("standardsConcentrations.csv", static_filenames_), "Standards Concentrations", true, true);
   };
 
   void StoreStandardsConcentrations::process(
@@ -345,7 +357,7 @@ namespace SmartPeak
 
   void LoadQuantitationMethods::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("quantitationMethods", "${MAIN_DIR}/quantitationMethods.csv", "Quantitation Methods");
+    filenames.addFileName("quantitationMethods", constructFilename("quantitationMethods.csv", static_filenames_), "Quantitation Methods");
   };
 
   bool LoadQuantitationMethods::onFilePicked(const std::filesystem::path& filename, ApplicationHandler* application_handler)
@@ -399,7 +411,7 @@ namespace SmartPeak
 
   void StoreQuantitationMethods::getFilenames(Filenames& filenames) const
   {
-    filenames.addFileName("quantitationMethods", "${MAIN_DIR}/quantitationMethods.csv", "Quantitation Methods");
+    filenames.addFileName("quantitationMethods", constructFilename("quantitationMethods.csv", static_filenames_), "Quantitation Methods");
   };
 
   void StoreQuantitationMethods::process(
@@ -459,11 +471,11 @@ namespace SmartPeak
   {
     if (component_group_)
     {
-      filenames.addFileName("featureFilterComponentGroups", "${MAIN_DIR}/featureFilterComponentGroups.csv", "Components Group Filters", true, true);
+      filenames.addFileName("featureFilterComponentGroups", constructFilename("featureFilterComponentGroups.csv", static_filenames_), "Components Group Filters", true, true);
     }
     else
     {
-      filenames.addFileName("featureFilterComponents", "${MAIN_DIR}/featureFilterComponents.csv", "Components Filters", true, true);
+      filenames.addFileName("featureFilterComponents", constructFilename("featureFilterComponents.csv", static_filenames_), "Components Filters", true, true);
     }
   };
 
@@ -514,11 +526,11 @@ namespace SmartPeak
   {
     if (component_group_)
     {
-      filenames.addFileName("featureQCComponentGroups", "${MAIN_DIR}/featureQCComponentGroups.csv", "Components Group QCs", true, true);
+      filenames.addFileName("featureQCComponentGroups", constructFilename("featureQCComponentGroups.csv", static_filenames_), "Components Group QCs", true, true);
     }
     else
     {
-      filenames.addFileName("featureQCComponents", "${MAIN_DIR}/featureQCComponents.csv", "Components QCs", true, true);
+      filenames.addFileName("featureQCComponents", constructFilename("featureQCComponents.csv", static_filenames_), "Components QCs", true, true);
     }
   };
 
@@ -569,11 +581,11 @@ namespace SmartPeak
   {
     if (component_group_)
     {
-      filenames.addFileName("featureFilterComponentGroups", "${MAIN_DIR}/featureFilterComponentGroups.csv", "Components Group Filters", true, true);
+      filenames.addFileName("featureFilterComponentGroups", constructFilename("featureFilterComponentGroups.csv", static_filenames_), "Components Group Filters", true, true);
     }
     else
     {
-      filenames.addFileName("featureFilterComponents", "${MAIN_DIR}/featureFilterComponents.csv", "Components Filters", true, true);
+      filenames.addFileName("featureFilterComponents", constructFilename("featureFilterComponents.csv", static_filenames_), "Components Filters", true, true);
     }
   };
 
@@ -621,11 +633,11 @@ namespace SmartPeak
   {
     if (component_group_)
     {
-      filenames.addFileName("featureQCComponentGroups", "${MAIN_DIR}/featureQCComponentGroups.csv", "Components Group QC", true, true);
+      filenames.addFileName("featureQCComponentGroups", constructFilename("featureQCComponentGroups.csv", static_filenames_), "Components Group QC", true, true);
     }
     else
     {
-      filenames.addFileName("featureQCComponents", "${MAIN_DIR}/featureQCComponents.csv", "Components QC", true, true);
+      filenames.addFileName("featureQCComponents", constructFilename("featureQCComponents.csv", static_filenames_), "Components QC", true, true);
     }
   };
 
@@ -656,7 +668,7 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureRSDFilterComponentGroups", 
-                            "${MAIN_DIR}/featureRSDFilterComponentGroups.csv",
+                            constructFilename("featureRSDFilterComponentGroups.csv", static_filenames_),
                             "Components group %RSD Filters",
                             true,
                             true);
@@ -664,7 +676,7 @@ namespace SmartPeak
     else
     {
       filenames.addFileName("featureRSDFilterComponents",
-                            "${MAIN_DIR}/featureRSDFilterComponents.csv",
+                            constructFilename("featureRSDFilterComponents.csv", static_filenames_),
                             "Components %RSD Filters",
                             true,
                             true);
@@ -719,7 +731,7 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureRSDQCComponentGroups",
-                            "${MAIN_DIR}/featureRSDQCComponentGroups.csv",
+                            constructFilename("featureRSDQCComponentGroups.csv", static_filenames_),
                             "Components Group %RSD QCs",
                             true,
                             true);
@@ -727,7 +739,7 @@ namespace SmartPeak
     else
     {
       filenames.addFileName("featureRSDQCComponents",
-                            "${MAIN_DIR}/featureRSDQCComponents.csv",
+                            constructFilename("featureRSDQCComponents.csv", static_filenames_),
                             "Components %RSD QCs",
                             true,
                             true);
@@ -800,13 +812,13 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureRSDFilterComponentGroups",
-                            "${MAIN_DIR}/featureRSDFilterComponentGroups.csv",
+                            constructFilename("featureRSDFilterComponentGroups.csv", static_filenames_),
                             "Components group %RSD Filters");
     }
     else
     {
       filenames.addFileName("featureRSDFilterComponents",
-                            "${MAIN_DIR}/featureRSDFilterComponents.csv",
+                            constructFilename("featureRSDFilterComponents.csv", static_filenames_),
                             "Components %RSD Filters");
     }
   };
@@ -856,13 +868,13 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureRSDQCComponentGroups",
-                            "${MAIN_DIR}/featureRSDQCComponentGroups.csv",
+                            constructFilename("featureRSDQCComponentGroups.csv", static_filenames_),
                             "Components Group %RSD QCs");
     }
     else
     {
       filenames.addFileName("featureRSDQCComponents",
-                            "${MAIN_DIR}/featureRSDQCComponents.csv",
+                            constructFilename("featureRSDQCComponents.csv", static_filenames_),
                             "Components %RSD QCs");
     }
   };
@@ -894,7 +906,7 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureBackgroundFilterComponentGroups", 
-        "${MAIN_DIR}/featureBackgroundFilterComponentGroups.csv", 
+        constructFilename("featureBackgroundFilterComponentGroups.csv", static_filenames_),
         "Components Group % Background Filters",
         true,
         true);
@@ -902,7 +914,7 @@ namespace SmartPeak
     else
     {
       filenames.addFileName("featureBackgroundFilterComponents", 
-        "${MAIN_DIR}/featureBackgroundFilterComponents.csv", 
+        constructFilename("featureBackgroundFilterComponents.csv", static_filenames_),
         "Components % Background Filters",
         true,
         true);
@@ -957,7 +969,7 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureBackgroundQCComponentGroups",
-                            "${MAIN_DIR}/featureBackgroundQCComponentGroups.csv",
+                            constructFilename("featureBackgroundQCComponentGroups.csv", static_filenames_),
                             "Components Group %Background QCs",
                             true,
                             true);
@@ -965,7 +977,7 @@ namespace SmartPeak
     else
     {
       filenames.addFileName("featureBackgroundQCComponents",
-                            "${MAIN_DIR}/featureBackgroundQCComponents.csv",
+                            constructFilename("featureBackgroundQCComponents.csv", static_filenames_),
                             "Components % Background QCs",
                             true,
                             true);
@@ -1038,13 +1050,13 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureBackgroundFilterComponentGroups",
-                            "${MAIN_DIR}/featureBackgroundFilterComponentGroups.csv",
+                            constructFilename("featureBackgroundFilterComponentGroups.csv", static_filenames_),
                             "Components Group % Background Filters");
     }
     else
     {
       filenames.addFileName("featureBackgroundFilterComponents",
-                            "${MAIN_DIR}/featureBackgroundFilterComponents.csv",
+                            constructFilename("featureBackgroundFilterComponents.csv", static_filenames_),
                             "Components % Background Filters");
     }
   };
@@ -1094,13 +1106,13 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureBackgroundQCComponentGroups",
-                            "${MAIN_DIR}/featureBackgroundQCComponentGroups.csv",
+                            constructFilename("featureBackgroundQCComponentGroups.csv", static_filenames_),
                             "Components Group %Background QCs");
     }
     else
     {
       filenames.addFileName("featureBackgroundQCComponents",
-                            "${MAIN_DIR}/featureBackgroundQCComponents.csv",
+                            constructFilename("featureBackgroundQCComponents.csv", static_filenames_),
                             "Components %Background QCs");
     }
   };
@@ -1412,7 +1424,7 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureRSDEstimationComponentGroups",
-        "${MAIN_DIR}/featureRSDEstimationComponentGroups.csv",
+        constructFilename("featureRSDEstimationComponentGroups.csv", static_filenames_),
         "Feature RSD Estimation Component Groups",
         true,
         true);
@@ -1420,7 +1432,7 @@ namespace SmartPeak
     else
     {
       filenames.addFileName("featureRSDEstimationComponents",
-        "${MAIN_DIR}/featureRSDEstimationComponents.csv",
+        constructFilename("featureRSDEstimationComponents.csv", static_filenames_),
         "Feature RSD Estimation Component",
         true,
         true);
@@ -1475,7 +1487,7 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureRSDEstimationComponentGroups",
-        "${MAIN_DIR}/featureRSDEstimationComponentGroups.csv",
+        constructFilename("featureRSDEstimationComponentGroups.csv", static_filenames_),
         "Feature RSD Estimation Component Groups",
         true,
         true);
@@ -1483,7 +1495,7 @@ namespace SmartPeak
     else
     {
       filenames.addFileName("featureRSDEstimationComponents",
-        "${MAIN_DIR}/featureRSDEstimationComponents.csv",
+        constructFilename("featureRSDEstimationComponents.csv", static_filenames_),
         "Feature RSD Estimation Component",
         true,
         true);
@@ -1517,7 +1529,7 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureBackgroundEstimationComponentGroups",
-        "${MAIN_DIR}/featureBackgroundEstimationComponentGroups.csv",
+        constructFilename("featureBackgroundEstimationComponentGroups.csv", static_filenames_),
         "Feature Background Estimation Groups",
         true,
         true
@@ -1526,7 +1538,7 @@ namespace SmartPeak
     else
     {
       filenames.addFileName("featureBackgroundEstimationComponents",
-        "${MAIN_DIR}/featureBackgroundEstimationComponents.csv",
+        constructFilename("featureBackgroundEstimationComponents.csv", static_filenames_),
         "Feature Background Estimation",
         true,
         true
@@ -1582,7 +1594,7 @@ namespace SmartPeak
     if (component_group_)
     {
       filenames.addFileName("featureBackgroundEstimationComponentGroups",
-        "${MAIN_DIR}/featureBackgroundEstimationComponentGroups.csv",
+        constructFilename("featureBackgroundEstimationComponentGroups.csv", static_filenames_),
         "Feature Background Estimation Groups",
         true,
         true
@@ -1591,7 +1603,7 @@ namespace SmartPeak
     else
     {
       filenames.addFileName("featureBackgroundEstimationComponents",
-        "${MAIN_DIR}/featureBackgroundEstimationComponents.csv",
+        constructFilename("featureBackgroundEstimationComponents.csv", static_filenames_),
         "Feature Background Estimation",
         true,
         true
